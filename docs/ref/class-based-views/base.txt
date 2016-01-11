@@ -30,7 +30,7 @@ View
     **Example views.py**::
 
         from django.http import HttpResponse
-        from django.views.generic import View
+        from django.views import View
 
         class MyView(View):
 
@@ -96,6 +96,11 @@ View
 
         Handles responding to requests for the OPTIONS HTTP verb.  Returns a
         list of the allowed HTTP method names for the view.
+
+    .. versionchanged:: 1.10
+
+        The :class:`~django.views.generic.base.View` can also be imported from
+        ``django.views``.
 
 TemplateView
 ------------
