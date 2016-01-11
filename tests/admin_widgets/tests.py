@@ -1154,7 +1154,6 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         # Navigate away and go back to the change form page.
         self.selenium.find_element_by_link_text('Home').click()
         self.selenium.back()
-        self.wait_for('#id_students_from')
         expected_unselected_values = [
             str(self.arthur.id), str(self.bob.id), str(self.cliff.id),
             str(self.jason.id), str(self.jenny.id), str(self.john.id),
@@ -1306,7 +1305,6 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         self.selenium.find_element_by_id('add_id_user').click()
         self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
-        self.wait_for('#id_password')
         password_field = self.selenium.find_element_by_id('id_password')
         password_field.send_keys('password')
 
@@ -1318,14 +1316,13 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
         self.selenium.switch_to.window(main_window)
         # The field now contains the new user
-        self.wait_for('#id_user option[value="newuser"]')
+        self.assertSelectOptions('#id_user', ['', 'super', 'newuser'])
 
         # Click the Change User button to change it
         self.selenium.find_element_by_id('change_id_user').click()
         self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
 
-        self.wait_for('#id_username')
         username_field = self.selenium.find_element_by_id('id_username')
         username_value = 'changednewuser'
         username_field.clear()

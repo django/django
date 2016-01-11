@@ -4430,8 +4430,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(full_url)
         self.selenium.find_element_by_class_name('deletelink').click()
-        # Wait until we're on the delete page.
-        self.wait_for('.cancel-link')
+        # Click 'cancel' on the delete page.
         self.selenium.find_element_by_class_name('cancel-link').click()
         # Wait until we're back on the change page.
         self.wait_for_text('#content h1', 'Change pizza')
@@ -4452,8 +4451,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(full_url)
         self.selenium.find_element_by_class_name('deletelink').click()
-        # Wait until we're on the delete page.
-        self.wait_for('.cancel-link')
+        # Click 'cancel' on the delete page.
         self.selenium.find_element_by_class_name('cancel-link').click()
         # Wait until we're back on the change page.
         self.wait_for_text('#content h1', 'Change pizza')

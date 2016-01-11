@@ -37,6 +37,7 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerTestCase):
         except Exception as e:
             raise SkipTest('Selenium webdriver "%s" not installed or not '
                            'operational: %s' % (cls.webdriver_class, str(e)))
+        cls.selenium.implicitly_wait(10)
         # This has to be last to ensure that resources are cleaned up properly!
         super(AdminSeleniumWebDriverTestCase, cls).setUpClass()
 
@@ -62,13 +63,6 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerTestCase):
         overridden in the case of pop-ups opening other pop-ups).
         """
         self.wait_until(lambda d: len(d.window_handles) == num_windows, timeout)
-
-    def wait_loaded_tag(self, tag_name, timeout=10):
-        """
-        Helper function that blocks until the element with the given tag name
-        is found on the page.
-        """
-        self.wait_for(tag_name, timeout)
 
     def wait_for(self, css_selector, timeout=10):
         """
@@ -112,7 +106,7 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerTestCase):
         from selenium.common.exceptions import TimeoutException
         try:
             # Wait for the next page to be loaded
-            self.wait_loaded_tag('body')
+            self.wait_for('body')
         except TimeoutException:
             # IE7 occasionally returns an error "Internet Explorer cannot
             # display the webpage" and doesn't load the next page. We just
