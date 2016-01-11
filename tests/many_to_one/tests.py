@@ -1,7 +1,9 @@
 import datetime
 from copy import deepcopy
 
-from django.core.exceptions import FieldError, MultipleObjectsReturned
+from django.core.exceptions import (
+    FieldError, MultipleObjectsReturned, ObjectDoesNotExist,
+)
 from django.db import models, transaction
 from django.test import TestCase
 from django.utils import six
@@ -536,16 +538,17 @@ class ManyToOneTests(TestCase):
         p = Parent.objects.get(name="Parent")
         self.assertIsNone(p.bestchild)
 
-        # Assigning None fails: Child.parent is null=False.
-        self.assertRaises(ValueError, setattr, c, "parent", None)
+        # Assigning None is allowed for Child.parent with null=False (#25349)
+        setattr(c, "parent", None)
+        self.assertRaises(ObjectDoesNotExist, getattr, c, "parent")
 
         # You also can't assign an object of the wrong type here
         self.assertRaises(ValueError, setattr, c, "parent", First(id=1, second=1))
 
-        # Nor can you explicitly assign None to Child.parent during object
-        # creation (regression for #9649).
-        self.assertRaises(ValueError, Child, name='xyzzy', parent=None)
-        self.assertRaises(ValueError, Child.objects.create, name='xyzzy', parent=None)
+        # You can explicitly assign None to Child.parent with null=False during model
+        # instantiation (#25349)
+        c = Child(name='xyzzy', parent=None)
+        self.assertRaises(ObjectDoesNotExist, getattr, c, "parent")
 
         # Creation using keyword argument should cache the related object.
         p = Parent.objects.get(name="Parent")

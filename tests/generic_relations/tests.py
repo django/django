@@ -7,7 +7,6 @@ from django.core.exceptions import FieldError
 from django.db import IntegrityError
 from django.db.models import Q
 from django.test import SimpleTestCase, TestCase
-from django.utils import six
 
 from .models import (
     AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
@@ -718,14 +717,10 @@ class ProxyRelatedModelTest(TestCase):
 
 
 class TestInitWithNoneArgument(SimpleTestCase):
-    def test_none_not_allowed(self):
-        # TaggedItem requires a content_type, initializing with None should
-        # raise a ValueError.
-        with six.assertRaisesRegex(self, ValueError,
-          'Cannot assign None: "TaggedItem.content_type" does not allow null values'):
-            TaggedItem(content_object=None)
 
     def test_none_allowed(self):
         # AllowsNullGFK doesn't require a content_type, so None argument should
         # also be allowed.
         AllowsNullGFK(content_object=None)
+        # Model instantiation with generic foreign key set to None should be allowed (#25349)
+        TaggedItem(content_object=None)
