@@ -119,11 +119,6 @@ class Command(BaseCommand):
         # Print some useful info
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
-            if run_syncdb:
-                self.stdout.write(
-                    self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
-                    (", ".join(executor.loader.unmigrated_apps))
-                )
             if target_app_labels_only:
                 self.stdout.write(
                     self.style.MIGRATE_LABEL("  Apply all migrations: ") +
@@ -139,14 +134,13 @@ class Command(BaseCommand):
                         "  Target specific migration: ") + "%s, from %s"
                         % (targets[0][1], targets[0][0])
                     )
+            if run_syncdb:
+                self.stdout.write(
+                    self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
+                    (", ".join(executor.loader.unmigrated_apps))
+                )
 
         emit_pre_migrate_signal(self.verbosity, self.interactive, connection.alias)
-
-        # Run the syncdb phase.
-        if run_syncdb:
-            if self.verbosity >= 1:
-                self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
-            self.sync_apps(connection, executor.loader.unmigrated_apps)
 
         # Migrate!
         if self.verbosity >= 1:
@@ -175,6 +169,12 @@ class Command(BaseCommand):
             fake = options.get("fake")
             fake_initial = options.get("fake_initial")
             executor.migrate(targets, plan, fake=fake, fake_initial=fake_initial)
+
+        # Run the syncdb phase.
+        if run_syncdb:
+            if self.verbosity >= 1:
+                self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
+            self.sync_apps(connection, executor.loader.unmigrated_apps)
 
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
