@@ -149,13 +149,6 @@ def setup(verbosity, test_labels, parallel):
     settings.LANGUAGE_CODE = 'en'
     settings.SITE_ID = 1
     settings.MIDDLEWARE_CLASSES = ALWAYS_MIDDLEWARE_CLASSES
-    settings.MIGRATION_MODULES = {
-        # these 'tests.migrations' modules don't actually exist, but this lets
-        # us skip creating migrations for the test models.
-        'auth': 'django.contrib.auth.tests.migrations',
-        'contenttypes': 'contenttypes_tests.migrations',
-        'sessions': 'sessions_tests.migrations',
-    }
     log_config = copy.deepcopy(DEFAULT_LOGGING)
     # Filter out non-error logging so we don't have to capture it in lots of
     # tests.

@@ -1,8 +1,9 @@
 import uuid
 
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.tests.custom_user import RemoveGroupsAndPermissions
 from django.db import models
+
+from .custom_user import RemoveGroupsAndPermissions
 
 with RemoveGroupsAndPermissions():
     class UUIDUser(AbstractUser):
