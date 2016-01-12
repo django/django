@@ -76,7 +76,7 @@ Synchronizing your databases
 
 The :djadmin:`migrate` management command operates on one database at a
 time. By default, it operates on the ``default`` database, but by
-providing a :djadminopt:`--database` argument, you can tell :djadmin:`migrate`
+providing the :option:`--database <migrate --database>` option, you can tell it
 to synchronize a different database. So, to synchronize all models onto
 all databases in our example, you would need to call::
 
@@ -91,10 +91,9 @@ constraining the availability of particular models.
 Using other management commands
 -------------------------------
 
-The other ``django-admin`` commands that interact with the database
-operate in the same way as :djadmin:`migrate` -- they only ever operate
-on one database at a time, using :djadminopt:`--database` to control
-the database used.
+The other ``django-admin`` commands that interact with the database operate in
+the same way as :djadmin:`migrate` -- they only ever operate on one database at
+a time, using ``--database`` to control the database used.
 
 .. _topics-db-multi-db-routing:
 

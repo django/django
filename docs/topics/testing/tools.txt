@@ -853,9 +853,8 @@ available port in the ``8081-8179`` range. Its full URL can be accessed with
     In earlier versions, the live server's default address was always
     ``'localhost:8081'``.
 
-If you'd like to select another address then you may pass a different one to
-the :djadmin:`test` command via the :djadminopt:`--liveserver` option, for
-example:
+If you'd like to select another address, you may pass a different one using the
+:option:`test --liveserver` option, for example:
 
 .. code-block:: console
 

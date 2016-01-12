@@ -70,8 +70,9 @@ Create superusers using the :djadmin:`createsuperuser` command::
     $ python manage.py createsuperuser --username=joe --email=joe@example.com
 
 You will be prompted for a password. After you enter one, the user will be
-created immediately. If you leave off the :djadminopt:`--username` or the
-:djadminopt:`--email` options, it will prompt you for those values.
+created immediately. If you leave off the :option:`--username <createsuperuser
+--username>` or :option:`--email <createsuperuser --email>` options, it will
+prompt you for those values.
 
 Changing passwords
 ------------------

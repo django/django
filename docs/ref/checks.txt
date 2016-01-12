@@ -69,6 +69,8 @@ class name.
 Builtin checks
 ==============
 
+.. _system-check-builtin-tags:
+
 Builtin tags
 ------------
 
@@ -450,8 +452,7 @@ balancer, it'd be irritating to be constantly warned about not having enabled
 :setting:`SECURE_SSL_REDIRECT`. Use :setting:`SILENCED_SYSTEM_CHECKS` to
 silence unneeded checks.
 
-The following checks will be run if you use the :djadminopt:`--deploy` option
-of the :djadmin:`check` command:
+The following checks are run if you use the :option:`check --deploy` option:
 
 * **security.W001**: You do not have
   :class:`django.middleware.security.SecurityMiddleware` in your

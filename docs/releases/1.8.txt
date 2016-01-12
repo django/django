@@ -68,9 +68,8 @@ Security enhancements
 Several features of the django-secure_ third-party library have been
 integrated into Django. :class:`django.middleware.security.SecurityMiddleware`
 provides several security enhancements to the request/response cycle. The new
-:djadminopt:`--deploy` option of the :djadmin:`check` command allows you to
-check your production settings file for ways to increase the security of your
-site.
+:option:`check --deploy` option allows you to check your production settings
+file for ways to increase the security of your site.
 
 .. _django-secure: https://pypi.python.org/pypi/django-secure
 
@@ -410,18 +409,17 @@ Management Commands
 
 * Commands from alternate package formats like eggs are now also discovered.
 
-* :djadmin:`dumpdata` now has the option :djadminopt:`--output` which allows
-  specifying the file to which the serialized data is written.
+* The new :option:`dumpdata --output` option allows specifying a file to which
+  the serialized data is written.
 
-* :djadmin:`makemessages` and :djadmin:`compilemessages` now have the option
-  :djadminopt:`--exclude` which allows exclusion of specific locales from
-  processing.
+* The new :option:`makemessages --exclude` and :option:`compilemessages
+  --exclude` options allow excluding specific locales from processing.
 
 * :djadmin:`compilemessages` now has a ``--use-fuzzy`` or ``-f`` option which
   includes fuzzy translations into compiled files.
 
-* The :djadminopt:`--ignorenonexistent` option of the :djadmin:`loaddata`
-  management command now ignores data for models that no longer exist.
+* The :option:`loaddata --ignorenonexistent` option now ignores data for models
+  that no longer exist.
 
 * :djadmin:`runserver` now uses daemon threads for faster reloading.
 
@@ -439,15 +437,15 @@ Management Commands
 * The :djadmin:`dbshell` command now supports MySQL's optional SSL certificate
   authority setting (``--ssl-ca``).
 
-* The :djadminopt:`--name` option for :djadmin:`makemigrations` allows you to
-  to give the migration(s) a custom name instead of a generated one.
+* The new :option:`makemigrations --name` allows giving the migration(s) a
+  custom name instead of a generated one.
 
 * The :djadmin:`loaddata` command now prevents repeated fixture loading. If
   :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
   path (``app_name/fixtures``), an exception is raised.
 
-* :djadmin:`makemigrations` now supports an :djadminopt:`--exit` option to
-  exit with an error code if no migrations are created.
+* The new :option:`makemigrations --exit` option allows exiting with an error
+  code if no migrations are created.
 
 * The new :djadmin:`showmigrations` command allows listing all migrations and
   their dependencies in a project.
@@ -637,9 +635,9 @@ Tests
   allows you to test that two JSON fragments are not equal.
 
 * Added options to the :djadmin:`test` command to preserve the test database
-  (:djadminopt:`--keepdb`), to run the test cases in reverse order
-  (:djadminopt:`--reverse`), and to enable SQL logging for failing tests
-  (:djadminopt:`--debug-sql`).
+  (:option:`--keepdb <test --keepdb>`), to run the test cases in reverse order
+  (:option:`--reverse <test --reverse>`), and to enable SQL logging for failing
+  tests (:option:`--debug-sql <test --debug-sql>`).
 
 * Added the :attr:`~django.test.Response.resolver_match` attribute to test
   client responses.
@@ -1192,10 +1190,9 @@ Miscellaneous
   ``name`` column won't be dropped from the database. Use ``migrate.py migrate
   --fake-initial`` to fake only the initial migration instead.
 
-* :djadmin:`migrate` now accepts the :djadminopt:`--fake-initial` option to
-  allow faking initial migrations. In 1.7 initial migrations were always
-  automatically faked if all tables created in an initial migration already
-  existed.
+* The new :option:`migrate --fake-initial` option allows faking initial
+  migrations. In 1.7, initial migrations were always automatically faked if all
+  tables created in an initial migration already existed.
 
 * An app *without* migrations with a ``ForeignKey`` to an app *with* migrations
   may now result in a foreign key constraint error when migrating the database

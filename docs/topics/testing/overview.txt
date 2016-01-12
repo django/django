@@ -115,9 +115,10 @@ wait for the currently running test to complete and then exit gracefully.
 During a graceful exit the test runner will output details of any test
 failures, report on how many tests were run and how many errors and failures
 were encountered, and destroy any test databases as usual. Thus pressing
-``Ctrl-C`` can be very useful if you forget to pass the :djadminopt:`--failfast`
-option, notice that some tests are unexpectedly failing, and want to get details
-on the failures without waiting for the full test run to complete.
+``Ctrl-C`` can be very useful if you forget to pass the :option:`--failfast
+<test --failfast>` option, notice that some tests are unexpectedly failing and
+want to get details on the failures without waiting for the full test run to
+complete.
 
 If you do not want to wait for the currently running test to finish, you
 can press ``Ctrl-C`` a second time and the test run will halt immediately,
@@ -147,11 +148,10 @@ when all the tests have been executed.
 
 .. versionadded:: 1.8
 
-   You can prevent the test databases from being destroyed by adding the
-   :djadminopt:`--keepdb` flag to the test command. This will preserve the test
-   database between runs. If the database does not exist, it will first
-   be created. Any migrations will also be applied in order to keep it
-   up to date.
+   You can prevent the test databases from being destroyed by using the
+   :option:`test --keepdb` flag. This preserves the test database between runs.
+   If the database does not exist, it will first be created. Any migrations
+   will also be applied in order to keep it up to date.
 
 The default test database names are created by prepending ``test_`` to the
 value of each :setting:`NAME` in :setting:`DATABASES`. When using SQLite, the
@@ -230,9 +230,9 @@ the Django test runner reorders tests in the following way:
 
 .. versionadded:: 1.8
 
-    You may reverse the execution order inside groups by passing
-    :djadminopt:`--reverse` to the test command. This can help with ensuring
-    your tests are independent from each other.
+    You may reverse the execution order inside groups by passing the
+    :option:`test --reverse` option. This can help ensure your tests are
+    independent from each other.
 
 .. _test-case-serialized-rollback:
 

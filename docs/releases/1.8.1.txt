@@ -75,7 +75,7 @@ Bugfixes
 * Fixed a migration crash when renaming the target model of a many-to-many
   relation (:ticket:`24725`).
 
-* Removed flushing of the test database with :djadminopt:`--keepdb`, which
+* Removed flushing of the test database with :option:`test --keepdb`, which
   prevented apps with data migrations from using the option (:ticket:`24729`).
 
 * Fixed ``makemessages`` crash in some locales (:ticket:`23271`).

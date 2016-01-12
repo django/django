@@ -325,8 +325,7 @@ model:
    generic relations, you should probably be using a natural key to uniquely
    identify related :class:`~django.contrib.contenttypes.models.ContentType`
    objects. See :ref:`natural keys<topics-serialization-natural-keys>` and
-   :djadminopt:`dumpdata --natural-foreign <--natural-foreign>` for more
-   information.
+   :option:`dumpdata --natural-foreign` for more information.
 
 This will enable an API similar to the one used for a normal
 :class:`~django.db.models.ForeignKey`;

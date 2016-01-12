@@ -704,16 +704,16 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* The :djadminopt:`--no-color` option for ``django-admin`` allows you to
-  disable the colorization of management command output.
+* The new :option:`--no-color` option for ``django-admin`` disables the
+  colorization of management command output.
 
-* The new :djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary`
-  options for :djadmin:`dumpdata`, and the new ``use_natural_foreign_keys`` and
+* The new :option:`dumpdata --natural-foreign` and :option:`dumpdata
+  --natural-primary` options, and the new ``use_natural_foreign_keys`` and
   ``use_natural_primary_keys`` arguments for ``serializers.serialize()``, allow
   the use of natural primary keys when serializing.
 
 * It is no longer necessary to provide the cache table name or the
-  :djadminopt:`--database` option for the :djadmin:`createcachetable` command.
+  ``--database`` option for the :djadmin:`createcachetable` command.
   Django takes this information from your settings file. If you have configured
   multiple caches or multiple databases, all cache tables are created.
 
@@ -1450,8 +1450,8 @@ Miscellaneous
 
 * The ``sql*`` management commands now respect the ``allow_migrate()`` method
   of :setting:`DATABASE_ROUTERS`. If you have models synced to non-default
-  databases, use the :djadminopt:`--database` flag to get SQL for those
-  models (previously they would always be included in the output).
+  databases, use the ``--database`` flag to get SQL for those models
+  (previously they would always be included in the output).
 
 * Decoding the query string from URLs now falls back to the ISO-8859-1 encoding
   when the input is not valid UTF-8.
@@ -1630,7 +1630,7 @@ Natural key serialization options
 ---------------------------------
 
 The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` have been
-deprecated. Use :djadminopt:`--natural-foreign` instead.
+deprecated. Use :option:`dumpdata --natural-foreign` instead.
 
 Similarly, the ``use_natural_keys`` argument for ``serializers.serialize()``
 has been deprecated. Use ``use_natural_foreign_keys`` instead.

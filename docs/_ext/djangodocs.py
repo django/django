@@ -9,6 +9,7 @@ from docutils import nodes
 from docutils.parsers.rst import directives
 from sphinx import __version__ as sphinx_ver, addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
+from sphinx.domains.std import Cmdoption
 from sphinx.util.compat import Directive
 from sphinx.util.console import bold
 from sphinx.util.nodes import set_source_info
@@ -46,12 +47,7 @@ def setup(app):
         indextemplate="pair: %s; django-admin command",
         parse_node=parse_django_admin_node,
     )
-    app.add_description_unit(
-        directivename="django-admin-option",
-        rolename="djadminopt",
-        indextemplate="pair: %s; django-admin command-line option",
-        parse_node=parse_django_adminopt_node,
-    )
+    app.add_directive('django-admin-option', Cmdoption)
     app.add_config_value('django_next_version', '0.0', True)
     app.add_directive('versionadded', VersionDirective)
     app.add_directive('versionchanged', VersionDirective)
@@ -306,39 +302,10 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
 
 def parse_django_admin_node(env, sig, signode):
     command = sig.split(' ')[0]
-    env._django_curr_admin_command = command
+    env.ref_context['std:program'] = command
     title = "django-admin %s" % sig
     signode += addnodes.desc_name(title, title)
-    return sig
-
-
-def parse_django_adminopt_node(env, sig, signode):
-    """A copy of sphinx.directives.CmdoptionDesc.parse_signature()"""
-    from sphinx.domains.std import option_desc_re
-    count = 0
-    firstname = ''
-    for m in option_desc_re.finditer(sig):
-        optname, args = m.groups()
-        if count:
-            signode += addnodes.desc_addname(', ', ', ')
-        signode += addnodes.desc_name(optname, optname)
-        signode += addnodes.desc_addname(args, args)
-        if not count:
-            firstname = optname
-        count += 1
-    if not count:
-        for m in simple_option_desc_re.finditer(sig):
-            optname, args = m.groups()
-            if count:
-                signode += addnodes.desc_addname(', ', ', ')
-            signode += addnodes.desc_name(optname, optname)
-            signode += addnodes.desc_addname(args, args)
-            if not count:
-                firstname = optname
-            count += 1
-    if not firstname:
-        raise ValueError
-    return firstname
+    return command
 
 
 class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):

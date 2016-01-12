@@ -32,10 +32,9 @@ module for production.
 Run ``manage.py check --deploy``
 ================================
 
-Some of the checks described below can be automated using the
-:djadminopt:`--deploy` option of the :djadmin:`check` command. Be sure to run it
-against your production settings file as described in the option's
-documentation.
+Some of the checks described below can be automated using the :option:`check
+--deploy` option. Be sure to run it against your production settings file as
+described in the option's documentation.
 
 Critical settings
 =================
