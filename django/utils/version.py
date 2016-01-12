@@ -8,7 +8,7 @@ from django.utils.lru_cache import lru_cache
 
 
 def get_version(version=None):
-    "Returns a PEP 386-compliant version number from VERSION."
+    "Returns a PEP 440-compliant version number from VERSION."
     version = get_complete_version(version)
 
     # Now build the two parts of the version number:

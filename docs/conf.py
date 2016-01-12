@@ -79,10 +79,10 @@ except ImportError:
     release = version
 else:
     def django_release():
-        pep386ver = get_version()
-        if VERSION[3:5] == ('alpha', 0) and 'dev' not in pep386ver:
-            return pep386ver + '.dev'
-        return pep386ver
+        pep440ver = get_version()
+        if VERSION[3:5] == ('alpha', 0) and 'dev' not in pep440ver:
+            return pep440ver + '.dev'
+        return pep440ver
 
     release = django_release()
 
