@@ -7,8 +7,6 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 
 
 class DatabaseOperations(BaseDatabaseOperations):
-    compiler_module = "django.db.backends.postgresql.compiler"
-
     def unification_cast_sql(self, output_field):
         internal_type = output_field.get_internal_type()
         if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):
@@ -231,16 +229,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def return_insert_id(self):
         return "RETURNING %s", ()
 
-    def bulk_insert_sql(self, fields, num_values, placeholders=None):
-        # This allows non-`%s` placeholders; for example the placeholder DEFAULT
-        if placeholders:
-            items_sql = []
-            for placeholders_for_value in placeholders:
-                items_sql.append("(%s)" % ", ".join(placeholders_for_value))
-            return "VALUES " + ", ".join(items_sql)
-        else:
-            items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
-            return "VALUES " + ", ".join([items_sql] * num_values)
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
+        values_sql = ", ".join("(%s)" % sql for sql in placeholder_rows_sql)
+        return "VALUES " + values_sql
 
     def adapt_datefield_value(self, value):
         return value
