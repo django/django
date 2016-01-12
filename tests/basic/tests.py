@@ -607,6 +607,7 @@ class ManagerTest(SimpleTestCase):
         'create',
         'bulk_create',
         'filter',
+        'add_rel_alias',
         'aggregate',
         'annotate',
         'complex_filter',

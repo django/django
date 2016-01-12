@@ -58,6 +58,8 @@ class Q(tree.Node):
         # Used by Django to push negated filters over multivalued relations to
         # subqueries.
         self.push_to_subquery = False
+        # Should the query reset usable aliases when encountering this Q-object?
+        self.reset_used_aliases = False
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
@@ -89,6 +91,7 @@ class Q(tree.Node):
             else:
                 clone.children.append(child)
         clone.push_to_subquery = self.push_to_subquery
+        clone.reset_used_aliases = self.reset_used_aliases
         return clone
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):

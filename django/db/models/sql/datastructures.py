@@ -148,3 +148,16 @@ class BaseTable(object):
 
     def relabeled_clone(self, change_map):
         return self.__class__(self.table_name, change_map.get(self.table_alias, self.table_alias))
+
+
+class RelAlias(object):
+    """
+    Contains information about a query's related aliases.
+    """
+    def __init__(self, alias, rel_path, table_aliases):
+        # Name of the alias in the query
+        self.alias = alias
+        # Target relation for the alias
+        self.rel_path = rel_path
+        # The found table_aliases for the path
+        self.table_aliases = table_aliases

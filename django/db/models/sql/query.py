@@ -24,7 +24,7 @@ from django.db.models.sql.constants import (
     INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, QUERY_TERMS, SINGLE,
 )
 from django.db.models.sql.datastructures import (
-    BaseTable, Empty, EmptyResultSet, Join, MultiJoin,
+    BaseTable, Empty, EmptyResultSet, Join, MultiJoin, RelAlias
 )
 from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
@@ -196,6 +196,9 @@ class Query(object):
         # load.
         self.deferred_loading = (set(), True)
 
+        self.rel_aliases = {}
+        self.deferred_filters = []
+
         self.context = {}
 
     @property
@@ -237,11 +240,24 @@ class Query(object):
         return self
 
     def get_compiler(self, using=None, connection=None):
+        obj = self.apply_deferred_filters()
         if using is None and connection is None:
             raise ValueError("Need either using or connection")
         if using:
             connection = connections[using]
-        return connection.ops.compiler(self.compiler)(self, connection, using)
+        return connection.ops.compiler(obj.compiler)(obj, connection, using)
+
+    def apply_deferred_filters(self):
+        if not self.deferred_filters:
+            return self
+        total_q = Q()
+        for q in self.deferred_filters:
+            total_q.children.append(q)
+            q.reset_used_aliases = True
+        clone = self.clone()
+        total_q = total_q.clone()
+        clone.add_q(total_q, defer=False)
+        return clone
 
     def get_meta(self):
         """
@@ -316,6 +332,9 @@ class Query(object):
         obj.__dict__.update(kwargs)
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
+
+        obj.rel_aliases = self.rel_aliases.copy()
+        obj.deferred_filters = self.deferred_filters[:]
         obj.context = self.context.copy()
         return obj
 
@@ -966,6 +985,25 @@ class Query(object):
         self.append_annotation_mask([alias])
         self.annotations[alias] = annotation
 
+    def add_rel_alias(self, new_aliases):
+        existing = set(self.rel_aliases.keys()).intersection(new_aliases.keys())
+        if existing:
+            raise FieldError("Conflicting relation aliases: %s" % (', '.join(existing)))
+        # TODO: Check that the added aliases do not conflict with existing field names or
+        # annotations.
+        for key, rel_path in new_aliases.items():
+            # This doesn't actually work. We need to defer the join generation to a point
+            # where we know if we want it to join.
+            if LOOKUP_SEP in key:
+                raise FieldError("The lookup separator %s is not allowed in relation aliases." % LOOKUP_SEP)
+            _, _, _, joins, _ = self.setup_joins(
+                rel_path.split(LOOKUP_SEP), self.get_meta(), self.get_initial_alias(),
+                allow_aliases=True, can_reuse=set())
+            rel_alias = RelAlias(key, rel_path.split(LOOKUP_SEP), joins)
+            self.rel_aliases[key] = rel_alias
+            for alias in joins:
+                self.unref_alias(alias)
+
     def prepare_lookup_value(self, value, lookups, can_reuse, allow_joins=True):
         # Default lookup if none given is exact.
         used_joins = []
@@ -1010,7 +1048,11 @@ class Query(object):
             expression, expression_lookups = refs_expression(lookup_splitted, self.annotations)
             if expression:
                 return expression_lookups, (), expression
-        _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+        if lookup_splitted[0] in self.rel_aliases:
+            rewritten_lookup = self.rel_aliases[lookup_splitted[0]].rel_path + lookup_splitted[1:]
+            _, field, _, lookup_parts = self.names_to_path(rewritten_lookup, self.get_meta())
+        else:
+            _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
         field_parts = lookup_splitted[0:len(lookup_splitted) - len(lookup_parts)]
         if len(lookup_parts) == 0:
             lookup_parts = ['exact']
@@ -1130,12 +1172,13 @@ class Query(object):
 
         opts = self.get_meta()
         alias = self.get_initial_alias()
-        field, sources, opts, join_list, path = self.setup_joins(parts, opts, alias, can_reuse=can_reuse)
+        field, sources, opts, join_list, path = self.setup_joins(parts, opts, alias, can_reuse=can_reuse,
+                                                                 allow_aliases=True)
         if isinstance(value, Iterator):
             value = list(value)
         self.check_related_objects(field, value, opts)
 
-        if can_reuse is not None:
+        if can_reuse is not None and parts[0] not in self.rel_aliases:
             can_reuse.update(join_list)
         used_joins = set(used_joins).union(set(join_list))
         targets, alias, join_list = self.trim_joins(sources, join_list, path)
@@ -1197,10 +1240,13 @@ class Query(object):
             path.append(pos)
             if isinstance(obj, tuple):
                 if in_negated:
+                    splitted_path = obj[0].split(LOOKUP_SEP)
+                    if splitted_path[0] in self.rel_aliases:
+                        found_splits[tuple(path)] = splitted_path[0]
                     # obj if of form (somefield__lte, value)
                     try:
                         self.names_to_path(
-                            obj[0].split(LOOKUP_SEP),
+                            splitted_path,
                             self.get_meta(),
                             fail_on_missing=False,
                             allow_many=False,
@@ -1221,8 +1267,6 @@ class Query(object):
         for_prefixes. The for_prefixes is a set of lookup paths like
         ('friends', 'best_friend__books').
         """
-        if isinstance(q_object, dict):
-            raise FieldError("Cannot parse keyword query as dict")
         found_splits = {}
         if path is None:
             path = [0]
@@ -1354,11 +1398,14 @@ class Query(object):
         found_split_paths = self.find_ancestors(found_splits)
         return self.mark_split_nodes(q_object.clone(), found_split_paths)
 
-    def add_q(self, q_object, reuse_joins=False):
+    def add_q(self, q_object, reuse_joins=False, defer=True):
         """
         A preprocessor for the internal _add_q(). Responsible for doing final
         join promotion.
         """
+        if defer and self.should_defer(q_object):
+            self.deferred_filters.append(q_object)
+            return
         # For join promotion this case is doing an AND for the added q_object
         # and existing conditions. So, any existing inner join forces the join
         # type to remain inner. Existing outer joins can however be demoted.
@@ -1374,6 +1421,17 @@ class Query(object):
         if clause:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
+
+    def should_defer(self, q_object):
+        if isinstance(q_object, dict):
+            raise FieldError("Cannot parse keyword query as dict")
+        for item in q_object.children:
+            if isinstance(item, tuple):
+                if item[0].split(LOOKUP_SEP)[0] in self.rel_aliases:
+                    return True
+            elif self.should_defer(item):
+                return True
+        return False
 
     def add_subquery(self, subq):
         """
@@ -1394,11 +1452,20 @@ class Query(object):
         # where the LOUTER join produces null).
         trim_tables = []
         joins_from = {}  # alias -> list of joins from it
+        multijoins = 0
         for table in subq.tables:
             joins_from[table] = []
+            if subq.alias_refcount[table] == 0:
+                continue
             for join in subq.alias_map.values():
                 if join.parent_alias == table:
                     joins_from[table].append(join)
+            join = subq.alias_map[table]
+            if hasattr(join, 'join_field') and (
+                    join.join_field.one_to_many or join.join_field.many_to_many):
+                multijoins += 1
+        if multijoins > 1:
+            raise NotImplementedError("Django doesn't know how to handle this query")
         for pos, table in enumerate(subq.tables):
             split_join = subq.alias_map[table]
             split_table = table
@@ -1474,6 +1541,8 @@ class Query(object):
 
     def _add_subq(self, q_object):
         new_q = Query(self.model)
+        for value in self.rel_aliases.values():
+            new_q.add_rel_alias({value.alias: LOOKUP_SEP.join(value.rel_path)})
         new_q._annotations = self._annotations
         new_q.annotation_select_mask = set()
         where, _ = new_q._add_q(q_object, set(), split_exclude=False)
@@ -1494,6 +1563,8 @@ class Query(object):
         joinpromoter = JoinPromoter(q_object.connector, len(q_object.children), current_negated)
         for child in q_object.children:
             if isinstance(child, Node):
+                if child.reset_used_aliases:
+                    used_aliases = set()
                 child_clause, needed_inner = self._add_q(
                     child, used_aliases, current_negated, allow_joins,
                 )
@@ -1609,7 +1680,8 @@ class Query(object):
                 break
         return path, final_field, targets, names[pos + 1:]
 
-    def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True):
+    def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True,
+                    allow_aliases=False):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1634,6 +1706,12 @@ class Query(object):
         conversions (convert 'obj' in fk__id=obj to pk val using the foreign
         key field for example).
         """
+        joins = [alias]
+        if allow_aliases:
+            rel_alias = self.rel_aliases.get(names[0])
+            if rel_alias:
+                can_reuse = set(rel_alias.table_aliases)
+                names = rel_alias.rel_path + names[1:]
         joins = [alias]
         # First, generate the path for the names
         path, final_field, targets, rest = self.names_to_path(

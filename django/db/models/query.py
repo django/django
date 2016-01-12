@@ -865,6 +865,14 @@ class QuerySet(object):
             obj.query.select_related = True
         return obj
 
+    def add_rel_alias(self, **kwargs):
+        """
+        Adds relation aliases to be used in .filter() and .exclude() calls.
+        """
+        obj = self._clone()
+        obj.query.add_rel_alias(kwargs)
+        return obj
+
     def prefetch_related(self, *lookups):
         """
         Returns a new QuerySet instance that will prefetch the specified
