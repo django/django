@@ -97,9 +97,9 @@ The new custom command can be called using ``python manage.py closepoll
 
 The ``handle()`` method takes one or more ``poll_ids`` and sets ``poll.opened``
 to ``False`` for each one. If the user referenced any nonexistent polls, a
-:class:`CommandError` is raised. The ``poll.opened`` attribute does not exist
-in the :doc:`tutorial</intro/tutorial01>` and was added to
-``polls.models.Poll`` for this example.
+:exc:`CommandError` is raised. The ``poll.opened`` attribute does not exist in
+the :doc:`tutorial</intro/tutorial01>` and was added to ``polls.models.Poll``
+for this example.
 
 .. _custom-commands-options:
 
@@ -301,7 +301,7 @@ All attributes can be set in your derived class and can be used in
     This option can't be ``False`` when the
     :data:`~BaseCommand.can_import_settings` option is set to ``False`` too
     because attempting to set the locale needs access to settings. This
-    condition will generate a :class:`CommandError`.
+    condition will generate a :exc:`CommandError`.
 
 .. attribute:: BaseCommand.style
 
@@ -353,7 +353,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     Tries to execute this command, performing system checks if needed (as
     controlled by the :attr:`requires_system_checks` attribute). If the command
-    raises a :class:`CommandError`, it's intercepted and printed to stderr.
+    raises a :exc:`CommandError`, it's intercepted and printed to stderr.
 
 .. admonition:: Calling a management command in your code
 
@@ -370,7 +370,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 .. method:: BaseCommand.check(app_configs=None, tags=None, display_num_errors=False)
 
     Uses the system check framework to inspect the entire Django project for
-    potential problems. Serious problems are raised as a :class:`CommandError`;
+    potential problems. Serious problems are raised as a :exc:`CommandError`;
     warnings are output to stderr; minor notifications are output to stdout.
 
     If ``app_configs`` and ``tags`` are both ``None``, all system checks are
@@ -426,12 +426,10 @@ overridden to ensure no arguments are passed to the command.
 
     Perform this command's actions
 
-.. _ref-command-exceptions:
-
 Command exceptions
 ------------------
 
-.. class:: CommandError
+.. exception:: CommandError
 
 Exception class indicating a problem while executing a management command.
 

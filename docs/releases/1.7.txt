@@ -1312,7 +1312,7 @@ Miscellaneous
   to manually delete objects from deleted forms.
 
 * Loading empty fixtures emits a ``RuntimeWarning`` rather than raising
-  :class:`~django.core.management.CommandError`.
+  :exc:`~django.core.management.CommandError`.
 
 * :func:`django.contrib.staticfiles.views.serve` will now raise an
   :exc:`~django.http.Http404` exception instead of
