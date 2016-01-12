@@ -254,8 +254,9 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The generic views support OPTIONS requests.
 
 * Management commands do not raise ``SystemExit`` any more when called by code
-  from :ref:`call_command <call-command>`. Any exception raised by the command
-  (mostly :exc:`~django.core.management.CommandError`) is propagated.
+  from :func:`~django.core.management.call_command`. Any exception raised by
+  the command (mostly :exc:`~django.core.management.CommandError`) is
+  propagated.
 
   Moreover, when you output errors or messages in your custom commands, you
   should now use ``self.stdout.write('message')`` and

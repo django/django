@@ -1746,8 +1746,6 @@ See :doc:`/howto/custom-management-commands` for how to add customized actions.
 Running management commands from your code
 ==========================================
 
-.. _call-command:
-
 .. function:: django.core.management.call_command(name, *args, **options)
 
 To call a management command from code use ``call_command``.
