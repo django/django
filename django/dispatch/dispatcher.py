@@ -171,13 +171,13 @@ class Signal(object):
         Send signal from sender to all connected receivers.
 
         If any receiver raises an error, the error propagates back through send,
-        terminating the dispatch loop, so it is quite possible to not have all
-        receivers called if a raises an error.
+        terminating the dispatch loop. So it's possible that all receivers
+        won't be called if an error is raised.
 
         Arguments:
 
             sender
-                The sender of the signal Either a specific object or None.
+                The sender of the signal. Either a specific object or None.
 
             named
                 Named arguments which will be passed to receivers.
