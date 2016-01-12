@@ -15,7 +15,6 @@ from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
 )
 from django.contrib.auth.models import User
-from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.views import login as login_view, redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
@@ -31,7 +30,7 @@ from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import ParseResult, urlparse
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
-from .models import UUIDUser
+from .models import CustomUser, UUIDUser
 from .settings import AUTH_TEMPLATES
 
 
@@ -367,7 +366,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertContains(response, "Hello, .")
 
 
-@override_settings(AUTH_USER_MODEL='auth.CustomUser')
+@override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
 class CustomUserPasswordResetTest(AuthViewsTestCase):
     user_email = 'staffmember@example.com'
 

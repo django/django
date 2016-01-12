@@ -14,7 +14,6 @@ from django.contrib.auth.management.commands import (
 from django.contrib.auth.models import (
     AbstractBaseUser, Group, Permission, User,
 )
-from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks, exceptions
 from django.core.management import call_command
@@ -28,7 +27,9 @@ from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
 
-from .models import CustomUserNonUniqueUsername, CustomUserWithFK, Email
+from .models import (
+    CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK, Email,
+)
 
 
 def mock_inputs(inputs):
@@ -287,7 +288,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertEqual(u.email, 'joe@somewhere.org')
         self.assertFalse(u.has_usable_password())
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_swappable_user(self):
         "A superuser can be created when a custom User model is in use"
         # We can use the management command to create a superuser
@@ -309,7 +310,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_swappable_user_missing_required_field(self):
         "A Custom superuser won't be created when a required field isn't provided"
         # We can use the management command to create a superuser
