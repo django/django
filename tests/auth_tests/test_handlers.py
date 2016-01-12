@@ -4,8 +4,9 @@ from django.contrib.auth.handlers.modwsgi import (
     check_password, groups_for_user,
 )
 from django.contrib.auth.models import Group, User
-from django.contrib.auth.tests.custom_user import CustomUser
 from django.test import TransactionTestCase, override_settings
+
+from .models import CustomUser
 
 
 # This must be a TransactionTestCase because the WSGI auth handler performs
@@ -18,6 +19,7 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
     available_apps = [
         'django.contrib.auth',
         'django.contrib.contenttypes',
+        'auth_tests',
     ]
 
     def test_check_password(self):
@@ -40,7 +42,7 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         # Valid user with incorrect password
         self.assertFalse(check_password({}, 'test', 'incorrect'))
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_check_password_custom_user(self):
         """
         Verify that check_password returns the correct values as per

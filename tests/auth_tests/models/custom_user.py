@@ -43,9 +43,6 @@ class CustomUser(AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['date_of_birth']
 
-    class Meta:
-        app_label = 'auth'
-
     def get_full_name(self):
         return self.email
 
@@ -108,6 +105,3 @@ with RemoveGroupsAndPermissions():
         custom_objects = UserManager()
 
         REQUIRED_FIELDS = AbstractUser.REQUIRED_FIELDS + ['date_of_birth']
-
-        class Meta:
-            app_label = 'auth'
