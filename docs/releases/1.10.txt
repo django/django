@@ -219,22 +219,20 @@ Internationalization
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
-* The new :djadminopt:`--fail-level` option of the :djadmin:`check` command
-  allows specifying the message level that will cause the command to exit with
-  a non-zero status.
+* The new :option:`check --fail-level` option allows specifying the message
+  level that will cause the command to exit with a non-zero status.
 
-* The new :djadminopt:`makemigrations --check <--check>` option makes the
-  command exit with a non-zero status when model changes without migrations are
-  detected.
+* The new :option:`makemigrations --check` option makes the command exit
+  with a non-zero status when model changes without migrations are detected.
 
 * :djadmin:`makemigrations` now displays the path to the migration files that
   it generates.
 
-* The :djadmin:`shell` ``--interface`` option now accepts ``python`` to force
-  use of the "plain" Python interpreter.
+* The :option:`shell --interface` option now accepts ``python`` to force use of
+  the "plain" Python interpreter.
 
-* The new :djadminopt:`shell --command <--command>` option lets you run a
-  command as Django and exit, instead of opening the interactive shell.
+* The new :option:`shell --command` option lets you run a command as Django and
+  exit, instead of opening the interactive shell.
 
 Migrations
 ^^^^^^^^^^
@@ -510,7 +508,7 @@ Miscellaneous
 ~~~~~~~~~~~~~
 
 * The ``makemigrations --exit`` option is deprecated in favor of the
-  :djadminopt:`--check` option.
+  :option:`makemigrations --check` option.
 
 * ``django.utils.functional.allow_lazy()`` is deprecated in favor of the new
   :func:`~django.utils.functional.keep_lazy` function which can be used with a

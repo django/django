@@ -1830,8 +1830,8 @@ When you supply ``None`` as a value for an app, Django will consider the app as
 an app without migrations regardless of an existing ``migrations`` submodule.
 This can be used, for example, in a test settings file to skip migrations while
 testing (tables will still be created for the apps' models). If this is used in
-your general project settings, remember to use the migrate
-:djadminopt:`--run-syncdb` option if you want to create tables for the app.
+your general project settings, remember to use the :option:`migrate
+--run-syncdb` option if you want to create tables for the app.
 
 .. setting:: MONTH_DAY_FORMAT
 

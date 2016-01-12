@@ -106,8 +106,7 @@ settings file like this::
     def my_check(app_configs, **kwargs):
         ...
 
-These checks will only be run if the :djadminopt:`--deploy` option is passed to
-the :djadmin:`check` command.
+These checks will only be run if the :option:`check --deploy` option is used.
 
 You can also use ``register`` as a function rather than a decorator by
 passing a callable object (usually a function) as the first argument

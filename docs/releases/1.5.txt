@@ -315,9 +315,8 @@ Django 1.5 also includes several smaller improvements worth noting:
   whenever a user fails to login successfully. See
   :data:`~django.contrib.auth.signals.user_login_failed`
 
-* The loaddata management command now supports an
-  :djadminopt:`--ignorenonexistent` option to ignore data for fields that no
-  longer exist.
+* The new :option:`loaddata --ignorenonexistent` option ignore data for fields
+  that no longer exist.
 
 * :meth:`~django.test.SimpleTestCase.assertXMLEqual` and
   :meth:`~django.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
@@ -635,7 +634,7 @@ Behavior of ``syncdb`` with multiple databases
 types (when :mod:`~django.contrib.contenttypes` is enabled) and permissions
 (when :mod:`~django.contrib.auth` is enabled) should be created in the target
 database. Previously, it created them in the default database, even when
-another database was specified with the :djadminopt:`--database` option.
+another database was specified with the ``--database`` option.
 
 If you use ``syncdb`` on multiple databases, you should ensure that
 your routers allow synchronizing content types and permissions to only one of

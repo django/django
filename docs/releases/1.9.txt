@@ -131,8 +131,8 @@ degradation.
 Running tests in parallel
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :djadmin:`test` command now supports a :djadminopt:`--parallel` option to
-run a project's tests in multiple processes in parallel.
+The :djadmin:`test` command now supports a :option:`--parallel <test
+--parallel>` option to run a project's tests in multiple processes in parallel.
 
 Each process gets its own database. You must ensure that different test cases
 don't access the same resources. For instance, test cases that touch the
@@ -451,8 +451,7 @@ Migrations
 
 * Initial migrations are now marked with an :attr:`initial = True
   <django.db.migrations.Migration.initial>` class attribute which allows
-  :djadminopt:`migrate --fake-initial <--fake-initial>` to more easily detect
-  initial migrations.
+  :option:`migrate --fake-initial` to more easily detect initial migrations.
 
 * Added support for serialization of ``functools.partial`` and ``LazyObject``
   instances.
@@ -1407,8 +1406,8 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 * Support for ``allow_syncdb`` on database routers is removed.
 
 * Automatic syncing of apps without migrations is removed. Migrations are
-  compulsory for all apps unless you pass the :djadminopt:`--run-syncdb`
-  option to ``migrate``.
+  compulsory for all apps unless you pass the :option:`migrate --run-syncdb`
+  option.
 
 * The SQL management commands for apps without migrations, ``sql``, ``sqlall``,
   ``sqlclear``, ``sqldropindexes``, and ``sqlindexes``, are removed.

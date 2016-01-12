@@ -123,8 +123,8 @@ parameter of the handle method. See the :py:mod:`argparse` Python documentation
 for more about ``add_argument`` usage.
 
 In addition to being able to add custom command line options, all
-:doc:`management commands</ref/django-admin>` can accept some
-default options such as :djadminopt:`--verbosity` and :djadminopt:`--traceback`.
+:doc:`management commands</ref/django-admin>` can accept some default options
+such as :option:`--verbosity` and :option:`--traceback`.
 
 .. _management-commands-and-locales:
 
@@ -267,9 +267,8 @@ All attributes can be set in your derived class and can be used in
     see the available styles (use uppercased versions of the "roles" described
     in that section).
 
-    If you pass the :djadminopt:`--no-color` option when running your
-    command, all ``self.style()`` calls will return the original string
-    uncolored.
+    If you pass the :option:`--no-color` option when running your command, all
+    ``self.style()`` calls will return the original string uncolored.
 
 Methods
 -------

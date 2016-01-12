@@ -372,10 +372,9 @@ details on these changes.
   ``get_backend_timeout()`` will be removed.
 
 * The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` will be removed.
-  Use :djadminopt:`--natural-foreign` instead.
 
 * The ``use_natural_keys`` argument for ``serializers.serialize()`` will be
-  removed. Use ``use_natural_foreign_keys`` instead.
+  removed.
 
 * Private API ``django.forms.forms.get_declared_fields()`` will be removed.
 

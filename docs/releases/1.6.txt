@@ -287,9 +287,8 @@ Minor features
   and :func:`~django.contrib.auth.views.password_change`, you can now pass
   URL names and they will be resolved.
 
-* The :djadmin:`dumpdata` ``manage.py`` command now has a :djadminopt:`--pks`
-  option which will allow users to specify the primary keys of objects they
-  want to dump. This option can only be used with one model.
+* The new :option:`dumpdata --pks` option specifies the primary keys of objects
+  to dump. This option can only be used with one model.
 
 * Added ``QuerySet`` methods :meth:`~django.db.models.query.QuerySet.first`
   and :meth:`~django.db.models.query.QuerySet.last` which are convenience
@@ -905,7 +904,7 @@ Miscellaneous
 
 * If a ``NoReverseMatch`` exception is raised from a method when rendering a
   template, it is not silenced. For example, ``{{ obj.view_href }}`` will
-  cause template rendering to fail if ``view_href()`` raises 
+  cause template rendering to fail if ``view_href()`` raises
   ``NoReverseMatch``. There is no change to the :ttag:`{% url %}<url>` tag, it
   causes template rendering to fail like always when ``NoReverseMatch`` is
   raised.
@@ -946,9 +945,8 @@ Miscellaneous
 * :meth:`~django.core.validators.validate_email` now accepts email addresses
   with ``localhost`` as the domain.
 
-* The :djadminopt:`--keep-pot` option was added to :djadmin:`makemessages`
-  to prevent django from deleting the temporary .pot file it generates before
-  creating the .po file.
+* The new :option:`makemessages --keep-pot` option prevents deleting the
+  temporary .pot file generated before creating the .po file.
 
 * The undocumented ``django.core.servers.basehttp.WSGIServerException`` has
   been removed. Use ``socket.error`` provided by the standard library instead.

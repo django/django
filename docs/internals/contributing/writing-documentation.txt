@@ -241,7 +241,8 @@ __ http://sphinx-doc.org/markup/
 
         .. django-admin-option:: --traceback
 
-  To link, use ``:djadminopt:`--traceback```.
+  To link, use ``:option:`command_name --traceback``` (or omit ``command_name``
+  for the options shared by all commands like ``--verbosity``).
 
 * Links to Trac tickets (typically reserved for patch release notes)::
 

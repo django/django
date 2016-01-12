@@ -622,8 +622,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   This should make it easier to read when debugging interaction with
   client-side JavaScript.
 
-* Added the :djadminopt:`--no-location` option to the :djadmin:`makemessages`
-  command.
+* Added the :option:`makemessages --no-location` option.
 
 * Changed the ``locmem`` cache backend to use
   ``pickle.HIGHEST_PROTOCOL`` for better compatibility with the other
@@ -1139,7 +1138,7 @@ Development Server Multithreading
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The development server is now is multithreaded by default. Use the
-:djadminopt:`--nothreading` option to disable the use of threading in the
+:option:`runserver --nothreading` option to disable the use of threading in the
 development server::
 
     django-admin.py runserver --nothreading

@@ -143,7 +143,7 @@ get both the changes to your models and the accompanying migration at the
 same time.
 
 If you want to give the migration(s) a meaningful name instead of a generated
-one, you can use the :djadminopt:`--name` option::
+one, you can use the :option:`makemigrations --name` option::
 
     $ python manage.py makemigrations --name changed_my_model your_app_label
 
@@ -291,15 +291,14 @@ migration class. If an ``initial`` class attribute isn't found, a migration
 will be considered "initial" if it is the first migration in the app (i.e. if
 it has no dependencies on any other migration in the same app).
 
-When :djadmin:`migrate` is run with the :djadminopt:`--fake-initial` option,
-these initial migrations are treated specially. For an initial migration that
-creates one or more tables (``CreateModel`` operation), Django checks that all
-of those tables already exist in the database and fake-applies the migration
-if so. Similarly, for an initial migration that adds one or more fields
-(``AddField`` operation), Django checks that all of the respective columns
-already exist in the database and fake-applies the migration if so. Without
-:djadminopt:`--fake-initial`, initial migrations are treated no differently
-from any other migration.
+When the :option:`migrate --fake-initial` option is used, these initial
+migrations are treated specially. For an initial migration that creates one or
+more tables (``CreateModel`` operation), Django checks that all of those tables
+already exist in the database and fake-applies the migration if so. Similarly,
+for an initial migration that adds one or more fields (``AddField`` operation),
+Django checks that all of the respective columns already exist in the database
+and fake-applies the migration if so. Without ``--fake-initial``, initial
+migrations are treated no differently from any other migration.
 
 Adding migrations to apps
 -------------------------
@@ -317,9 +316,9 @@ need to convert it to use migrations; this is a simple process::
 This will make a new initial migration for your app. Now, run ``python
 manage.py migrate --fake-initial``, and Django will detect that you have an
 initial migration *and* that the tables it wants to create already exist, and
-will mark the migration as already applied. (Without the
-:djadminopt:`--fake-initial` flag, the :djadmin:`migrate` command would error
-out because the tables it wants to create already exist.)
+will mark the migration as already applied. (Without the :option:`migrate
+--fake-initial` flag, the command would error out because the tables it wants
+to create already exist.)
 
 Note that this only works given two things:
 
