@@ -1551,7 +1551,7 @@ Example usage::
     django-admin migrate --traceback
 
 By default, ``django-admin`` will show a simple error message whenever a
-:class:`~django.core.management.CommandError` occurs, but a full stack trace
+:exc:`~django.core.management.CommandError` occurs, but a full stack trace
 for any other exception. If you specify ``--traceback``, ``django-admin``
 will also output a full stack trace when a ``CommandError`` is raised.
 
