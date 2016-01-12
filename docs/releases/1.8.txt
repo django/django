@@ -429,12 +429,12 @@ Management Commands
   introspect :class:`~django.db.models.AutoField` for MySQL and PostgreSQL
   databases.
 
-* When calling management commands from code through :ref:`call_command
-  <call-command>` and passing options, the option name can match the command
-  line option name (without the initial dashes) or the final option destination
-  variable name, but in either case, the resulting option received by the
-  command is now always the ``dest`` name specified in the command option
-  definition (as long as the command uses the new :py:mod:`argparse` module).
+* When calling management commands with options using
+  :func:`~django.core.management.call_command`, the option name can match the
+  command line option name (without the initial dashes) or the final option
+  destination variable name, but in either case, the resulting option received
+  by the command is now always the ``dest`` name specified in the command
+  option definition (as long as the command uses the :mod:`argparse` module).
 
 * The :djadmin:`dbshell` command now supports MySQL's optional SSL certificate
   authority setting (``--ssl-ca``).
@@ -1121,8 +1121,8 @@ Miscellaneous
   class name found in the :setting:`BACKEND <CACHES-BACKEND>` key of the
   :setting:`CACHES` setting.
 
-* By default, :ref:`call_command <call-command>` now always skips the check
-  framework (unless you pass it ``skip_checks=False``).
+* By default, :func:`~django.core.management.call_command` now always skips the
+  check framework (unless you pass it ``skip_checks=False``).
 
 * When iterating over lines, :class:`~django.core.files.File` now uses
   `universal newlines`_. The following are recognized as ending a line: the

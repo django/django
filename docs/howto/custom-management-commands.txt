@@ -309,7 +309,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 .. admonition:: Calling a management command in your code
 
     ``execute()`` should not be called directly from your code to execute a
-    command. Use :ref:`call_command <call-command>` instead.
+    command. Use :func:`~django.core.management.call_command` instead.
 
 .. method:: BaseCommand.handle(*args, **options)
 
@@ -374,5 +374,6 @@ message to the appropriate output stream (i.e., stderr); as a result, raising
 this exception (with a sensible description of the error) is the preferred way
 to indicate that something has gone wrong in the execution of a command.
 
-If a management command is called from code through :ref:`call_command
-<call-command>`, it's up to you to catch the exception when needed.
+If a management command is called from code through
+:func:`~django.core.management.call_command`, it's up to you to catch the
+exception when needed.
