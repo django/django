@@ -139,6 +139,11 @@ class Command(BaseCommand):
                         "  Target specific migration: ") + "%s, from %s"
                         % (targets[0][1], targets[0][0])
                     )
+            if run_syncdb:
+                self.stdout.write(
+                    self.style.MIGRATE_LABEL("  Run deferred SQL for apps without migrations: ") +
+                    (", ".join(executor.loader.unmigrated_apps))
+                )
 
         emit_pre_migrate_signal(self.verbosity, self.interactive, connection.alias)
 
@@ -146,7 +151,7 @@ class Command(BaseCommand):
         if run_syncdb:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
-            self.sync_apps(connection, executor.loader.unmigrated_apps)
+            deferred_sql = self.sync_apps(connection, executor.loader.unmigrated_apps)
 
         # Migrate!
         if self.verbosity >= 1:
@@ -175,6 +180,17 @@ class Command(BaseCommand):
             fake = options.get("fake")
             fake_initial = options.get("fake_initial")
             executor.migrate(targets, plan, fake=fake, fake_initial=fake_initial)
+
+        # Run the post-syncdb phase.
+        if run_syncdb:
+            if self.verbosity >= 1:
+                self.stdout.write(self.style.MIGRATE_HEADING("Running deferred SQL for apps without migrations:"))
+            with connection.cursor() as cursor:
+                for model, statements in deferred_sql:
+                    if self.verbosity >= 1:
+                        self.stdout.write("  Running deferred SQL for table %s\n" % model._meta.db_table)
+                    for statement in statements:
+                        cursor.execute(statement)
 
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
@@ -221,7 +237,6 @@ class Command(BaseCommand):
         try:
             # Get a list of already installed *models* so that references work right.
             tables = connection.introspection.table_names(cursor)
-            created_models = set()
 
             # Build the manifest of apps and models that are to be synchronized
             all_models = [
@@ -260,15 +275,11 @@ class Command(BaseCommand):
                             if self.verbosity >= 1:
                                 self.stdout.write("    Creating table %s\n" % model._meta.db_table)
                             editor.create_model(model)
-                            deferred_sql.extend(editor.deferred_sql)
+                            deferred_statements = editor.deferred_sql
+                            if deferred_statements:
+                                deferred_sql.append((model, deferred_statements))
                             editor.deferred_sql = []
-                        created_models.add(model)
 
-                if self.verbosity >= 1:
-                    self.stdout.write("    Running deferred SQL...\n")
-                for statement in deferred_sql:
-                    cursor.execute(statement)
+            return deferred_sql
         finally:
             cursor.close()
-
-        return created_models
