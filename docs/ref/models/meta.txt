@@ -183,8 +183,9 @@ can be made to convert your code to the new API:
   - ``m2m`` can be found through the
     :attr:`~django.db.models.Field.many_to_many` attribute on the field.
 
-* ``MyModel._meta.get_fields_with_model()``::
+* old ``MyModel._meta.get_fields_with_model()``::
 
+      # new
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
@@ -193,8 +194,9 @@ can be made to convert your code to the new API:
               or (f.many_to_one and f.related_model)
       ]
 
-* ``MyModel._meta.get_concrete_fields_with_model()``::
+* old ``MyModel._meta.get_concrete_fields_with_model()``::
 
+      # new
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
@@ -205,46 +207,52 @@ can be made to convert your code to the new API:
           )
       ]
 
-* ``MyModel._meta.get_m2m_with_model()``::
+* old ``MyModel._meta.get_m2m_with_model()``::
 
+      # new
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
           if f.many_to_many and not f.auto_created
       ]
 
-* ``MyModel._meta.get_all_related_objects()``::
+* old ``MyModel._meta.get_all_related_objects()``::
 
+      # new
       [
           f for f in MyModel._meta.get_fields()
           if (f.one_to_many or f.one_to_one) and f.auto_created
       ]
 
-* ``MyModel._meta.get_all_related_objects_with_model()``::
+* old ``MyModel._meta.get_all_related_objects_with_model()``::
 
+      # new
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
           if (f.one_to_many or f.one_to_one) and f.auto_created
       ]
 
-* ``MyModel._meta.get_all_related_many_to_many_objects()``::
+* old ``MyModel._meta.get_all_related_many_to_many_objects()``::
 
+      # new
       [
           f for f in MyModel._meta.get_fields(include_hidden=True)
           if f.many_to_many and f.auto_created
       ]
 
-* ``MyModel._meta.get_all_related_m2m_objects_with_model()``::
+* old ``MyModel._meta.get_all_related_m2m_objects_with_model()``::
 
+      # new
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields(include_hidden=True)
           if f.many_to_many and f.auto_created
       ]
 
-* ``MyModel._meta.get_all_field_names()``::
+* old ``MyModel._meta.get_all_field_names()``::
 
+      # new
       from itertools import chain
       list(set(chain.from_iterable(
           (field.name, field.attname) if hasattr(field, 'attname') else (field.name,)
