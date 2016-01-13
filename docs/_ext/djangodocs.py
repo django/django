@@ -67,6 +67,7 @@ def setup(app):
                  man=(visit_snippet_literal, depart_snippet_literal),
                  text=(visit_snippet_literal, depart_snippet_literal),
                  texinfo=(visit_snippet_literal, depart_snippet_literal))
+    return {'parallel_read_safe': True}
 
 
 class snippet_with_filename(nodes.literal_block):
