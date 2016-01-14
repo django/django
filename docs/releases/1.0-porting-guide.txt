@@ -302,7 +302,7 @@ Work with file fields using the new API
 
 The internal implementation of :class:`django.db.models.FileField` have changed.
 A visible result of this is that the way you access special attributes (URL,
-filename, image size, etc) of these model fields has changed. You will need to
+filename, image size, etc.) of these model fields has changed. You will need to
 make the following changes, assuming your model's
 :class:`~django.db.models.FileField` is called ``myfile``:
 

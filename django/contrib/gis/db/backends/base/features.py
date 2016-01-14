@@ -26,9 +26,10 @@ class BaseSpatialFeatures(object):
     supports_real_shape_operations = True
     # Can geometry fields be null?
     supports_null_geometries = True
-    # Can the `distance`/`length` functions be applied on geodetic coordinate systems?
+    # Can the the function be applied on geodetic coordinate systems?
     supports_distance_geodetic = True
     supports_length_geodetic = True
+    supports_perimeter_geodetic = False
     # Is the database able to count vertices on polygons (with `num_points`)?
     supports_num_points_poly = True
 
@@ -98,9 +99,8 @@ class BaseSpatialFeatures(object):
         m = re.match(r'has_(\w*)_function$', name)
         if m:
             func_name = m.group(1)
-            if func_name not in self.connection.ops.unsupported_functions:
-                return True
-        return False
+            return func_name not in self.connection.ops.unsupported_functions
+        raise AttributeError
 
     def has_ops_method(self, method):
         return getattr(self.connection.ops, method, False)

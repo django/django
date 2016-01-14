@@ -5,11 +5,12 @@ from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.test import TestCase
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
 
 from .models import (
-    Article, Category, Child, First, Parent, Record, Relation, Reporter,
-    School, Student, Third, ToFieldChild,
+    Article, Category, Child, City, District, First, Parent, Record, Relation,
+    Reporter, School, Student, Third, ToFieldChild,
 )
 
 
@@ -123,6 +124,15 @@ class ManyToOneTests(TestCase):
             ])
         self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
 
+    def test_reverse_assignment_deprecation(self):
+        msg = (
+            "Direct assignment to the reverse side of a related set is "
+            "deprecated due to the implicit save() that happens. Use "
+            "article_set.set() instead."
+        )
+        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
+            self.r2.article_set = []
+
     def test_assign(self):
         new_article = self.r.article_set.create(headline="John's second story",
                                                 pub_date=datetime.date(2005, 7, 29))
@@ -141,8 +151,8 @@ class ManyToOneTests(TestCase):
         ])
         self.assertQuerysetEqual(self.r2.article_set.all(), [])
 
-        # Set the article back again using set descriptor.
-        self.r2.article_set = [new_article, new_article2]
+        # Set the article back again using set() method.
+        self.r2.article_set.set([new_article, new_article2])
         self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
         self.assertQuerysetEqual(self.r2.article_set.all(),
             [
@@ -150,9 +160,9 @@ class ManyToOneTests(TestCase):
                 "<Article: Paul's story>",
             ])
 
-        # Funny case - assignment notation can only go so far; because the
-        # ForeignKey cannot be null, existing members of the set must remain.
-        self.r.article_set = [new_article]
+        # Because the ForeignKey cannot be null, existing members of the set
+        # must remain.
+        self.r.article_set.set([new_article])
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
                 "<Article: John's second story>",
@@ -485,10 +495,12 @@ class ManyToOneTests(TestCase):
                                  expected_message % ', '.join(sorted(f.name for f in Reporter._meta.get_fields())),
                                  Article.objects.values_list,
                                  'reporter__notafield')
-        self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(['EXTRA'] + sorted(f.name for f in Article._meta.get_fields())),
-                                 Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
-                                 'notafield')
+        self.assertRaisesMessage(
+            FieldError,
+            expected_message % ', '.join(['EXTRA'] + sorted(f.name for f in Article._meta.get_fields())),
+            Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
+            'notafield'
+        )
 
     def test_fk_assignment_and_related_object_cache(self):
         # Tests of ForeignKey assignment and the related-object cache (see #6886).
@@ -556,6 +568,15 @@ class ManyToOneTests(TestCase):
         c = Child(parent_id=p.id)
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
+
+    def test_fk_to_bigautofield(self):
+        ch = City.objects.create(name='Chicago')
+        District.objects.create(city=ch, name='Far South')
+        District.objects.create(city=ch, name='North')
+
+        ny = City.objects.create(name='New York', id=2 ** 33)
+        District.objects.create(city=ny, name='Brooklyn')
+        District.objects.create(city=ny, name='Manhattan')
 
     def test_multiple_foreignkeys(self):
         # Test of multiple ForeignKeys to the same model (bug #7125).

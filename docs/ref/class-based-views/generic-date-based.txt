@@ -13,7 +13,7 @@ views for displaying drilldown pages for date-based data.
     defined as follows in ``myapp/models.py``::
 
         from django.db import models
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
 
         class Article(models.Model):
             title = models.CharField(max_length=200)
@@ -48,11 +48,9 @@ ArchiveIndexView
     :class:`django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
-      containing all years that have objects available according to
-      ``queryset``, represented as
-      :class:`datetime.datetime<python:datetime.datetime>` objects, in
+    * ``date_list``: A :meth:`QuerySet <django.db.models.query.QuerySet.dates>`
+      object containing all years that have objects available according to
+      ``queryset``, represented as :class:`datetime.datetime` objects, in
       descending order.
 
     **Notes**
@@ -128,11 +126,9 @@ YearArchiveView
     :class:`django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
-      containing all months that have objects available according to
-      ``queryset``, represented as
-      :class:`datetime.datetime<python:datetime.datetime>` objects, in
+    * ``date_list``: A :meth:`QuerySet <django.db.models.query.QuerySet.dates>`
+      object containing all months that have objects available according to
+      ``queryset``, represented as :class:`datetime.datetime` objects, in
       ascending order.
 
     * ``year``: A :class:`~datetime.date` object
@@ -223,12 +219,10 @@ MonthArchiveView
     :class:`~django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
-      containing all days that have objects available in the given month,
-      according to ``queryset``, represented as
-      :class:`datetime.datetime<python:datetime.datetime>` objects, in
-      ascending order.
+    * ``date_list``: A :meth:`QuerySet <django.db.models.query.QuerySet.dates>`
+      object containing all days that have objects available in the given month,
+      according to ``queryset``, represented as :class:`datetime.datetime`
+      objects, in ascending order.
 
     * ``month``: A :class:`~datetime.date` object
       representing the given month.

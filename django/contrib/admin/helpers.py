@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
+import json
 import warnings
 
 from django import forms
 from django.conf import settings
-from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.utils import (
     display_for_field, flatten_fieldsets, help_text_for_field, label_for_field,
     lookup_field,
@@ -14,12 +14,11 @@ from django.db.models.fields.related import ManyToManyRel
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
-from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 ACTION_CHECKBOX_NAME = '_selected_action'
 
@@ -77,7 +76,7 @@ class Fieldset(object):
             js = ['vendor/jquery/jquery%s.js' % extra,
                   'jquery.init.js',
                   'collapse%s.js' % extra]
-            return forms.Media(js=[static('admin/js/%s' % url) for url in js])
+            return forms.Media(js=['admin/js/%s' % url for url in js])
         return forms.Media()
     media = property(_media)
 
@@ -198,16 +197,26 @@ class AdminReadonlyField(object):
                 if boolean:
                     result_repr = _boolean_icon(value)
                 else:
-                    result_repr = smart_text(value)
-                    if getattr(attr, "allow_tags", False):
-                        result_repr = mark_safe(result_repr)
+                    if hasattr(value, "__html__"):
+                        result_repr = value
                     else:
-                        result_repr = linebreaksbr(result_repr)
+                        result_repr = smart_text(value)
+                        if getattr(attr, "allow_tags", False):
+                            warnings.warn(
+                                "Deprecated allow_tags attribute used on %s. "
+                                "Use django.utils.safestring.format_html(), "
+                                "format_html_join(), or mark_safe() instead." % attr,
+                                RemovedInDjango20Warning
+                            )
+                            result_repr = mark_safe(value)
+                        else:
+                            result_repr = linebreaksbr(result_repr)
             else:
                 if isinstance(f.remote_field, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f, self.empty_value_display)
+                result_repr = linebreaksbr(result_repr)
         return conditional_escape(result_repr)
 
 
@@ -227,6 +236,7 @@ class InlineAdminFormSet(object):
         if prepopulated_fields is None:
             prepopulated_fields = {}
         self.prepopulated_fields = prepopulated_fields
+        self.classes = ' '.join(inline.classes) if inline.classes else ''
 
     def __iter__(self):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
@@ -257,7 +267,29 @@ class InlineAdminFormSet(object):
                     'help_text': help_text_for_field(field_name, self.opts.model),
                 }
             else:
-                yield self.formset.form.base_fields[field_name]
+                form_field = self.formset.form.base_fields[field_name]
+                label = form_field.label
+                if label is None:
+                    label = label_for_field(field_name, self.opts.model, self.opts)
+                yield {
+                    'label': label,
+                    'widget': form_field.widget,
+                    'required': form_field.required,
+                    'help_text': form_field.help_text,
+                }
+
+    def inline_formset_data(self):
+        verbose_name = self.opts.verbose_name
+        return json.dumps({
+            'name': '#%s' % self.formset.prefix,
+            'options': {
+                'prefix': self.formset.prefix,
+                'addText': ugettext('Add another %(verbose_name)s') % {
+                    'verbose_name': capfirst(verbose_name),
+                },
+                'deleteText': ugettext('Remove'),
+            }
+        })
 
     def _media(self):
         media = self.opts.media + self.formset.media
@@ -280,21 +312,6 @@ class InlineAdminForm(AdminForm):
         self.absolute_url = view_on_site_url
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields,
             readonly_fields, model_admin)
-
-    @cached_property
-    def original_content_type_id(self):
-        warnings.warn(
-            'InlineAdminForm.original_content_type_id is deprecated and will be '
-            'removed in Django 1.10. If you were using this attribute to construct '
-            'the "view on site" URL, use the `absolute_url` attribute instead.',
-            RemovedInDjango110Warning, stacklevel=2
-        )
-        if self.original is not None:
-            # Since this module gets imported in the application's root package,
-            # it cannot import models from other applications at the module level.
-            from django.contrib.contenttypes.models import ContentType
-            return ContentType.objects.get_for_model(self.original).pk
-        raise AttributeError
 
     def __iter__(self):
         for name, options in self.fieldsets:

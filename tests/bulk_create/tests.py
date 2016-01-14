@@ -3,13 +3,15 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from django.db import connection
+from django.db.models import Value
+from django.db.models.functions import Lower
 from django.test import (
     TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
 )
 
 from .models import (
-    Country, Pizzeria, ProxyCountry, ProxyMultiCountry, ProxyMultiProxyCountry,
-    ProxyProxyCountry, Restaurant, State, TwoFields,
+    Country, NoFields, Pizzeria, ProxyCountry, ProxyMultiCountry,
+    ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant, State, TwoFields,
 )
 
 
@@ -63,10 +65,10 @@ class BulkCreateTests(TestCase):
         }, attrgetter("name"), ordered=False)
 
         ProxyProxyCountry.objects.bulk_create([
-            ProxyProxyCountry(name="Neitherlands", iso_two_letter="NT"),
+            ProxyProxyCountry(name="Netherlands", iso_two_letter="NT"),
         ])
         self.assertQuerysetEqual(ProxyProxyCountry.objects.all(), {
-            "Qwghlm", "Tortall", "Neitherlands",
+            "Qwghlm", "Tortall", "Netherlands",
         }, attrgetter("name"), ordered=False)
 
     def test_non_auto_increment_pk(self):
@@ -175,6 +177,10 @@ class BulkCreateTests(TestCase):
         TwoFields.objects.bulk_create(objs, len(objs))
         self.assertEqual(TwoFields.objects.count(), len(objs))
 
+    def test_empty_model(self):
+        NoFields.objects.bulk_create([NoFields() for i in range(2)])
+        self.assertEqual(NoFields.objects.count(), 2)
+
     @skipUnlessDBFeature('has_bulk_insert')
     def test_explicit_batch_size_efficiency(self):
         objs = [TwoFields(f1=i, f2=i) for i in range(0, 100)]
@@ -183,3 +189,12 @@ class BulkCreateTests(TestCase):
         TwoFields.objects.all().delete()
         with self.assertNumQueries(1):
             TwoFields.objects.bulk_create(objs, len(objs))
+
+    @skipUnlessDBFeature('has_bulk_insert')
+    def test_bulk_insert_expressions(self):
+        Restaurant.objects.bulk_create([
+            Restaurant(name="Sam's Shake Shack"),
+            Restaurant(name=Lower(Value("Betty's Beetroot Bar")))
+        ])
+        bbb = Restaurant.objects.filter(name="betty's beetroot bar")
+        self.assertEqual(bbb.count(), 1)

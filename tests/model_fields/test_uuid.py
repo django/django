@@ -86,7 +86,10 @@ class TestQuerying(TestCase):
 
 
 class TestSerialization(SimpleTestCase):
-    test_data = '[{"fields": {"field": "550e8400-e29b-41d4-a716-446655440000"}, "model": "model_fields.uuidmodel", "pk": null}]'
+    test_data = (
+        '[{"fields": {"field": "550e8400-e29b-41d4-a716-446655440000"}, '
+        '"model": "model_fields.uuidmodel", "pk": null}]'
+    )
 
     def test_dumping(self):
         instance = UUIDModel(field=uuid.UUID('550e8400e29b41d4a716446655440000'))

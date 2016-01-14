@@ -1223,12 +1223,11 @@ be found in the :doc:`related objects reference </ref/models/relations>`.
 ``set(objs)``
     Replace the set of related objects.
 
-To assign the members of a related set in one fell swoop, just assign to it
-from any iterable object. The iterable can contain object instances, or just
-a list of primary key values. For example::
+To assign the members of a related set, use the ``set()`` method with an
+iterable of object instances or a list of primary key values. For example::
 
     b = Blog.objects.get(id=1)
-    b.entry_set = [e1, e2]
+    b.entry_set.set([e1, e2])
 
 In this example, ``e1`` and ``e2`` can be full Entry instances, or integer
 primary key values.

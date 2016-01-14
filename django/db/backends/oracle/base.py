@@ -70,7 +70,7 @@ IntegrityError = Database.IntegrityError
 
 class _UninitializedOperatorsDescriptor(object):
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance, cls=None):
         # If connection.operators is looked up before a connection has been
         # created, transparently initialize connection.operators to avert an
         # AttributeError.
@@ -92,6 +92,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # output (the "qn_" prefix is stripped before the lookup is performed.
     data_types = {
         'AutoField': 'NUMBER(11)',
+        'BigAutoField': 'NUMBER(19)',
         'BinaryField': 'BLOB',
         'BooleanField': 'NUMBER(1)',
         'CharField': 'NVARCHAR2(%(max_length)s)',

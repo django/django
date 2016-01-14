@@ -37,6 +37,10 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+    def clean(self):
+        # Ensure author is always accessible in clean method
+        assert self.author.name is not None
+
 
 @python_2_unicode_compatible
 class BookWithCustomPK(models.Model):

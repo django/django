@@ -234,7 +234,18 @@ class InspectDBTestCase(TestCase):
                      table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'),
                      stdout=out)
         output = out.getvalue()
-        self.assertIn("        unique_together = (('field1', 'field2'),)", output, msg='inspectdb should generate unique_together.')
+        unique_re = re.compile(r'.*unique_together = \((.+),\).*')
+        unique_together_match = re.findall(unique_re, output)
+        # There should be one unique_together tuple.
+        self.assertEqual(len(unique_together_match), 1)
+        fields = unique_together_match[0]
+        # Fields with db_column = field name.
+        self.assertIn("('field1', 'field2')", fields)
+        # Fields from columns whose names are Python keywords.
+        self.assertIn("('field1', 'field2')", fields)
+        # Fields whose names normalize to the same Python field name and hence
+        # are given an integer suffix.
+        self.assertIn("('non_unique_column', 'non_unique_column_0')", fields)
 
     @skipUnless(connection.vendor == 'sqlite',
                 "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")

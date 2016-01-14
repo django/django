@@ -28,7 +28,7 @@ To activate the :mod:`~django.contrib.admindocs`, you will need to do
 the following:
 
 * Add :mod:`django.contrib.admindocs` to your :setting:`INSTALLED_APPS`.
-* Add ``(r'^admin/doc/', include('django.contrib.admindocs.urls'))`` to
+* Add ``url(r'^admin/doc/', include('django.contrib.admindocs.urls'))`` to
   your ``urlpatterns``. Make sure it's included *before* the
   ``r'^admin/'`` entry, so that requests to ``/admin/doc/`` don't get
   handled by the latter entry.
@@ -144,6 +144,7 @@ Django's :ref:`template loaders <template-loaders>`. This can be a handy way to
 check if the specified template exists and to show where on the filesystem that
 template is stored.
 
+.. _admindocs-bookmarklets:
 
 Included Bookmarklets
 =====================

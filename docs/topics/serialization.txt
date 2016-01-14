@@ -256,16 +256,15 @@ Date and datetime related types are treated in a special way by the JSON
 serializer to make the format compatible with `ECMA-262`_.
 
 Be aware that not all Django output can be passed unmodified to :mod:`json`.
-In particular, :ref:`lazy translation objects <lazy-translations>` need a
-`special encoder`_ written for them. Something like this will work::
+For example, if you have some custom type in an object to be serialized, you'll
+have to write a `special encoder`_ for it. Something like this will work::
 
-    from django.utils.functional import Promise
     from django.utils.encoding import force_text
     from django.core.serializers.json import DjangoJSONEncoder
 
     class LazyEncoder(DjangoJSONEncoder):
         def default(self, obj):
-            if isinstance(obj, Promise):
+            if isinstance(obj, YourCustomType):
                 return force_text(obj)
             return super(LazyEncoder, self).default(obj)
 

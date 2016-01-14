@@ -88,6 +88,10 @@ class Vegetable(models.Model):
         return self.name
 
 
+class Carrot(Vegetable):
+    pass
+
+
 @python_2_unicode_compatible
 class Mineral(models.Model):
     name = models.CharField(max_length=150)
@@ -112,6 +116,10 @@ class Gecko(models.Model):
 # To test fix for #11263
 class Rock(Mineral):
     tags = GenericRelation(TaggedItem)
+
+
+class ValuableRock(Mineral):
+    tags = GenericRelation(ValuableTaggedItem)
 
 
 class ManualPK(models.Model):

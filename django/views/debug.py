@@ -5,10 +5,10 @@ import sys
 import types
 
 from django.conf import settings
-from django.core.urlresolvers import Resolver404, resolve
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
+from django.urls import Resolver404, resolve
 from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, smart_text
@@ -22,15 +22,6 @@ DEBUG_ENGINE = Engine(debug=True)
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE')
 
 CLEANSED_SUBSTITUTE = '********************'
-
-
-def linebreak_iter(template_source):
-    yield 0
-    p = template_source.find('\n')
-    while p >= 0:
-        yield p + 1
-        p = template_source.find('\n', p + 1)
-    yield len(template_source) + 1
 
 
 class CallableSettingWrapper(object):
@@ -862,12 +853,12 @@ Installed Middleware:
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}
 Using engine {{ entry.backend.name }}:
-{% if entry.tried %}{% for attempt in entry.tried %}    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
+{% if entry.tried %}{% for attempt in entry.tried %}"""
+"""    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
 {% endfor %}{% else %}    This engine did not provide a list of tried templates.
 {% endif %}{% endfor %}
 {% else %}No templates were found because your 'TEMPLATES' setting is not configured.
-{% endif %}
-{% endif %}{% if template_info %}
+{% endif %}{% endif %}{% if template_info %}
 Template error:
 In template {{ template_info.name }}, error at line {{ template_info.line }}
    {{ template_info.message }}"""
@@ -891,7 +882,7 @@ Exception Type: {{ exception_type|escape }}{% if request %} at {{ request.path_i
 Exception Value: {{ exception_value|force_escape }}
 </textarea>
   <br><br>
-  <input type="submit" value="Share this traceback on a public Web site">
+  <input type="submit" value="Share this traceback on a public website">
   </div>
 </form>
 </div>
@@ -902,6 +893,11 @@ Exception Value: {{ exception_value|force_escape }}
   <h2>Request information</h2>
 
 {% if request %}
+  {% if request.user %}
+    <h3 id="user-info">USER</h3>
+    <p>{{ request.user }}</p>
+  {% endif %}
+
   <h3 id="get-info">GET</h3>
   {% if request.GET %}
     <table class="req">
@@ -1044,7 +1040,8 @@ Exception Value: {{ exception_value|force_escape }}
 </html>
 """)
 
-TECHNICAL_500_TEXT_TEMPLATE = ("""{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
+TECHNICAL_500_TEXT_TEMPLATE = (""""""
+"""{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
 {% firstof exception_value 'No exception message supplied' %}
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
@@ -1062,7 +1059,8 @@ Installed Middleware:
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}
 Using engine {{ entry.backend.name }}:
-{% if entry.tried %}{% for attempt in entry.tried %}    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
+{% if entry.tried %}{% for attempt in entry.tried %}"""
+"""    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
 {% endfor %}{% else %}    This engine did not provide a list of tried templates.
 {% endif %}{% endfor %}
 {% else %}No templates were found because your 'TEMPLATES' setting is not configured.
@@ -1095,6 +1093,8 @@ File "{{ frame.filename }}" in {{ frame.function }}
 {% if exception_type %}Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 {% if exception_value %}Exception Value: {{ exception_value }}{% endif %}{% endif %}{% endif %}
 {% if request %}Request information:
+{% if request.user %}USER: {{ request.user }}{% endif %}
+
 GET:{% for k, v in request.GET.items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No GET data{% endfor %}
 

@@ -15,7 +15,6 @@ from .point import Point  # NOQA
 from .polygon import Polygon  # NOQA
 
 try:
-    geos_version_info()
-    HAS_GEOS = True
+    HAS_GEOS = geos_version_info()['version'] >= '3.3.0'
 except ImportError:
     HAS_GEOS = False

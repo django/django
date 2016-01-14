@@ -3,11 +3,13 @@ import re
 
 from django import http
 from django.conf import settings
-from django.core import urlresolvers
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
+from django.urls import is_valid_path
 from django.utils.cache import get_conditional_response, set_response_etag
 from django.utils.encoding import force_text
+from django.utils.http import unquote_etag
+from django.utils.six.moves.urllib.parse import urlparse
 
 logger = logging.getLogger('django.request')
 
@@ -73,8 +75,8 @@ class CommonMiddleware(object):
         if settings.APPEND_SLASH and not request.get_full_path().endswith('/'):
             urlconf = getattr(request, 'urlconf', None)
             return (
-                not urlresolvers.is_valid_path(request.path_info, urlconf)
-                and urlresolvers.is_valid_path('%s/' % request.path_info, urlconf)
+                not is_valid_path(request.path_info, urlconf)
+                and is_valid_path('%s/' % request.path_info, urlconf)
             )
         return False
 
@@ -119,7 +121,7 @@ class CommonMiddleware(object):
             if response.has_header('ETag'):
                 return get_conditional_response(
                     request,
-                    etag=response['ETag'],
+                    etag=unquote_etag(response['ETag']),
                     response=response,
                 )
 
@@ -163,13 +165,17 @@ class BrokenLinkEmailsMiddleware(object):
         according to project settings or in three specific situations:
          - If the referer is empty.
          - If a '?' in referer is identified as a search engine source.
-         - If the referer is equal to the current URL (assumed to be a
-           malicious bot).
+         - If the referer is equal to the current URL, ignoring the scheme
+           (assumed to be a poorly implemented bot).
         """
-        full_url = "%s://%s/%s" % (request.scheme, domain, uri.lstrip('/'))
-        if (not referer or
-                (not self.is_internal_request(domain, referer) and '?' in referer) or
-                (referer == uri or referer == full_url)):
+        if not referer:
+            return True
+
+        if not self.is_internal_request(domain, referer) and '?' in referer:
+            return True
+
+        parsed_referer = urlparse(referer)
+        if parsed_referer.netloc in ['', domain] and parsed_referer.path == uri:
             return True
 
         return any(pattern.search(uri) for pattern in settings.IGNORABLE_404_URLS)

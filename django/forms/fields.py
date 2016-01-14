@@ -10,7 +10,6 @@ import os
 import re
 import sys
 import uuid
-import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
 
@@ -18,6 +17,7 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 # Provide this import for backwards compatibility.
 from django.core.validators import EMPTY_VALUES  # NOQA
+from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
     FILE_INPUT_CONTRADICTION, CheckboxInput, ClearableFileInput, DateInput,
@@ -28,9 +28,6 @@ from django.forms.widgets import (
 )
 from django.utils import formats, six
 from django.utils.dateparse import parse_duration
-from django.utils.deprecation import (
-    RemovedInDjango110Warning, RenameMethodsBase,
-)
 from django.utils.duration import duration_string
 from django.utils.encoding import force_str, force_text, smart_text
 from django.utils.ipv6 import clean_ipv6_address
@@ -48,13 +45,7 @@ __all__ = (
 )
 
 
-class RenameFieldMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('_has_changed', 'has_changed', RemovedInDjango110Warning),
-    )
-
-
-class Field(six.with_metaclass(RenameFieldMethods, object)):
+class Field(object):
     widget = TextInput  # Default widget to use when rendering this type of Field.
     hidden_widget = HiddenInput  # Default widget to use when rendering this as "hidden".
     default_validators = []  # Default set of validators
@@ -190,19 +181,25 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
         """
         Return True if data differs from initial.
         """
-        # For purposes of seeing whether something has changed, None is
-        # the same as an empty string, if the data or initial value we get
-        # is None, replace it w/ ''.
-        initial_value = initial if initial is not None else ''
         try:
             data = self.to_python(data)
             if hasattr(self, '_coerce'):
-                data = self._coerce(data)
-                initial_value = self._coerce(initial_value)
+                return self._coerce(data) != self._coerce(initial)
         except ValidationError:
             return True
+        # For purposes of seeing whether something has changed, None is
+        # the same as an empty string, if the data or initial value we get
+        # is None, replace it with ''.
+        initial_value = initial if initial is not None else ''
         data_value = data if data is not None else ''
         return initial_value != data_value
+
+    def get_bound_field(self, form, field_name):
+        """
+        Return a BoundField instance that will be used when accessing the form
+        field in a template.
+        """
+        return BoundField(form, self, field_name)
 
     def __deepcopy__(self, memo):
         result = copy.copy(self)
@@ -326,23 +323,12 @@ class FloatField(IntegerField):
 class DecimalField(IntegerField):
     default_error_messages = {
         'invalid': _('Enter a number.'),
-        'max_digits': ungettext_lazy(
-            'Ensure that there are no more than %(max)s digit in total.',
-            'Ensure that there are no more than %(max)s digits in total.',
-            'max'),
-        'max_decimal_places': ungettext_lazy(
-            'Ensure that there are no more than %(max)s decimal place.',
-            'Ensure that there are no more than %(max)s decimal places.',
-            'max'),
-        'max_whole_digits': ungettext_lazy(
-            'Ensure that there are no more than %(max)s digit before the decimal point.',
-            'Ensure that there are no more than %(max)s digits before the decimal point.',
-            'max'),
     }
 
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         super(DecimalField, self).__init__(max_value, min_value, *args, **kwargs)
+        self.validators.append(validators.DecimalValidator(max_digits, decimal_places))
 
     def to_python(self, value):
         """
@@ -371,38 +357,6 @@ class DecimalField(IntegerField):
         # isn't equal to itself, so we can use this to identify NaN
         if value != value or value == Decimal("Inf") or value == Decimal("-Inf"):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
-        sign, digittuple, exponent = value.as_tuple()
-        decimals = abs(exponent)
-        # digittuple doesn't include any leading zeros.
-        digits = len(digittuple)
-        if decimals > digits:
-            # We have leading zeros up to or past the decimal point.  Count
-            # everything past the decimal point as a digit.  We do not count
-            # 0 before the decimal point as a digit since that would mean
-            # we would not allow max_digits = decimal_places.
-            digits = decimals
-        whole_digits = digits - decimals
-
-        if self.max_digits is not None and digits > self.max_digits:
-            raise ValidationError(
-                self.error_messages['max_digits'],
-                code='max_digits',
-                params={'max': self.max_digits},
-            )
-        if self.decimal_places is not None and decimals > self.decimal_places:
-            raise ValidationError(
-                self.error_messages['max_decimal_places'],
-                code='max_decimal_places',
-                params={'max': self.decimal_places},
-            )
-        if (self.max_digits is not None and self.decimal_places is not None
-                and whole_digits > (self.max_digits - self.decimal_places)):
-            raise ValidationError(
-                self.error_messages['max_whole_digits'],
-                code='max_whole_digits',
-                params={'max': (self.max_digits - self.decimal_places)},
-            )
-        return value
 
     def widget_attrs(self, widget):
         attrs = super(DecimalField, self).widget_attrs(widget)
@@ -548,16 +502,6 @@ class RegexField(CharField):
         'Enter a valid value' is too generic for you.
         """
         kwargs.setdefault('strip', False)
-        # error_message is just kept for backwards compatibility:
-        if error_message is not None:
-            warnings.warn(
-                "The 'error_message' argument is deprecated. Use "
-                "Field.error_messages['invalid'] instead.",
-                RemovedInDjango110Warning, stacklevel=2
-            )
-            error_messages = kwargs.get('error_messages') or {}
-            error_messages['invalid'] = error_message
-            kwargs['error_messages'] = error_messages
         super(RegexField, self).__init__(max_length, min_length, *args, **kwargs)
         self._set_regex(regex)
 

@@ -126,11 +126,17 @@ class YearLte(models.lookups.LessThanOrEqual):
         return "%s <= (%s || '-12-31')::date" % (lhs_sql, rhs_sql), params
 
 
-class SQLFunc(models.Lookup):
-    def __init__(self, name, *args, **kwargs):
-        super(SQLFunc, self).__init__(*args, **kwargs)
-        self.name = name
+class Exactly(models.lookups.Exact):
+    """
+    This lookup is used to test lookup registration.
+    """
+    lookup_name = 'exactly'
 
+    def get_rhs_op(self, connection, rhs):
+        return connection.operators['exact'] % rhs
+
+
+class SQLFuncMixin(object):
     def as_sql(self, compiler, connection):
         return '%s()', [self.name]
 
@@ -139,13 +145,28 @@ class SQLFunc(models.Lookup):
         return CustomField()
 
 
+class SQLFuncLookup(SQLFuncMixin, models.Lookup):
+    def __init__(self, name, *args, **kwargs):
+        super(SQLFuncLookup, self).__init__(*args, **kwargs)
+        self.name = name
+
+
+class SQLFuncTransform(SQLFuncMixin, models.Transform):
+    def __init__(self, name, *args, **kwargs):
+        super(SQLFuncTransform, self).__init__(*args, **kwargs)
+        self.name = name
+
+
 class SQLFuncFactory(object):
 
-    def __init__(self, name):
+    def __init__(self, key, name):
+        self.key = key
         self.name = name
 
     def __call__(self, *args, **kwargs):
-        return SQLFunc(self.name, *args, **kwargs)
+        if self.key == 'lookupfunc':
+            return SQLFuncLookup(self.name, *args, **kwargs)
+        return SQLFuncTransform(self.name, *args, **kwargs)
 
 
 class CustomField(models.TextField):
@@ -153,13 +174,13 @@ class CustomField(models.TextField):
     def get_lookup(self, lookup_name):
         if lookup_name.startswith('lookupfunc_'):
             key, name = lookup_name.split('_', 1)
-            return SQLFuncFactory(name)
+            return SQLFuncFactory(key, name)
         return super(CustomField, self).get_lookup(lookup_name)
 
     def get_transform(self, lookup_name):
         if lookup_name.startswith('transformfunc_'):
             key, name = lookup_name.split('_', 1)
-            return SQLFuncFactory(name)
+            return SQLFuncFactory(key, name)
         return super(CustomField, self).get_transform(lookup_name)
 
 
@@ -200,6 +221,27 @@ class DateTimeTransform(models.Transform):
 
 
 class LookupTests(TestCase):
+
+    def test_custom_name_lookup(self):
+        a1 = Author.objects.create(name='a1', birthdate=date(1981, 2, 16))
+        Author.objects.create(name='a2', birthdate=date(2012, 2, 29))
+        custom_lookup_name = 'isactually'
+        custom_transform_name = 'justtheyear'
+        try:
+            models.DateField.register_lookup(YearTransform)
+            models.DateField.register_lookup(YearTransform, custom_transform_name)
+            YearTransform.register_lookup(Exactly)
+            YearTransform.register_lookup(Exactly, custom_lookup_name)
+            qs1 = Author.objects.filter(birthdate__testyear__exactly=1981)
+            qs2 = Author.objects.filter(birthdate__justtheyear__isactually=1981)
+            self.assertQuerysetEqual(qs1, [a1], lambda x: x)
+            self.assertQuerysetEqual(qs2, [a1], lambda x: x)
+        finally:
+            YearTransform._unregister_lookup(Exactly)
+            YearTransform._unregister_lookup(Exactly, custom_lookup_name)
+            models.DateField._unregister_lookup(YearTransform)
+            models.DateField._unregister_lookup(YearTransform, custom_transform_name)
+
     def test_basic_lookup(self):
         a1 = Author.objects.create(name='a1', age=1)
         a2 = Author.objects.create(name='a2', age=2)
@@ -298,6 +340,19 @@ class BilateralTransformTests(TestCase):
         with register_lookup(models.CharField, UpperBilateralTransform):
             with self.assertRaises(NotImplementedError):
                 Author.objects.filter(name__upper__in=Author.objects.values_list('name'))
+
+    def test_bilateral_multi_value(self):
+        with register_lookup(models.CharField, UpperBilateralTransform):
+            Author.objects.bulk_create([
+                Author(name='Foo'),
+                Author(name='Bar'),
+                Author(name='Ray'),
+            ])
+            self.assertQuerysetEqual(
+                Author.objects.filter(name__upper__in=['foo', 'bar', 'doe']).order_by('name'),
+                ['Bar', 'Foo'],
+                lambda a: a.name
+            )
 
     def test_div3_bilateral_extract(self):
         with register_lookup(models.IntegerField, Div3BilateralTransform):

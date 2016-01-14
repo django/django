@@ -5,17 +5,17 @@ import warnings
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
+from django.db.models.fields.related import ForeignObject
 from django.test import ignore_warnings
-from django.test.testcases import skipIfDBFeature
-from django.test.utils import override_settings
+from django.test.testcases import SimpleTestCase, skipIfDBFeature
+from django.test.utils import isolate_apps, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.version import get_docs_version
 
-from .base import IsolatedModelsTestCase
 
-
-class RelativeFieldTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class RelativeFieldTests(SimpleTestCase):
 
     def test_valid_foreign_key_without_accessor(self):
         class Target(models.Model):
@@ -51,9 +51,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertEqual(
                 str(warns[0].message),
                 'on_delete will be a required arg for ForeignKey in Django '
-                '2.0. Set it to models.CASCADE if you want to maintain the '
-                'current default behavior. See '
-                'https://docs.djangoproject.com/en/%s/ref/models/fields/'
+                '2.0. Set it to models.CASCADE on models and in existing '
+                'migrations if you want to maintain the current default '
+                'behavior. See https://docs.djangoproject.com/en/%s/ref/models/fields/'
                 '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
             )
 
@@ -88,9 +88,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertEqual(
                 str(warns[0].message),
                 'on_delete will be a required arg for OneToOneField in Django '
-                '2.0. Set it to models.CASCADE if you want to maintain the '
-                'current default behavior. See '
-                'https://docs.djangoproject.com/en/%s/ref/models/fields/'
+                '2.0. Set it to models.CASCADE on models and in existing '
+                'migrations if you want to maintain the current default '
+                'behavior. See https://docs.djangoproject.com/en/%s/ref/models/fields/'
                 '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
             )
 
@@ -131,6 +131,21 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    @isolate_apps('invalid_models_tests')
+    def test_foreign_key_to_isolate_apps_model(self):
+        """
+        #25723 - Referenced model registration lookup should be run against the
+        field's model registry.
+        """
+        class OtherModel(models.Model):
+            pass
+
+        class Model(models.Model):
+            foreign_key = models.ForeignKey('OtherModel', models.CASCADE)
+
+        field = Model._meta.get_field('foreign_key')
+        self.assertEqual(field.check(from_model=Model), [])
+
     def test_many_to_many_to_missing_model(self):
         class Model(models.Model):
             m2m = models.ManyToManyField("Rel2")
@@ -147,6 +162,21 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             ),
         ]
         self.assertEqual(errors, expected)
+
+    @isolate_apps('invalid_models_tests')
+    def test_many_to_many_to_isolate_apps_model(self):
+        """
+        #25723 - Referenced model registration lookup should be run against the
+        field's model registry.
+        """
+        class OtherModel(models.Model):
+            pass
+
+        class Model(models.Model):
+            m2m = models.ManyToManyField('OtherModel')
+
+        field = Model._meta.get_field('m2m')
+        self.assertEqual(field.check(from_model=Model), [])
 
     def test_many_to_many_with_useless_options(self):
         class Model(models.Model):
@@ -287,6 +317,25 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    @isolate_apps('invalid_models_tests')
+    def test_many_to_many_through_isolate_apps_model(self):
+        """
+        #25723 - Through model registration lookup should be run against the
+        field's model registry.
+        """
+        class GroupMember(models.Model):
+            person = models.ForeignKey('Person', models.CASCADE)
+            group = models.ForeignKey('Group', models.CASCADE)
+
+        class Person(models.Model):
+            pass
+
+        class Group(models.Model):
+            members = models.ManyToManyField('Person', through='GroupMember')
+
+        field = Group._meta.get_field('members')
+        self.assertEqual(field.check(from_model=Group), [])
+
     def test_symmetrical_self_referential_field(self):
         class Person(models.Model):
             # Implicit symmetrical=False.
@@ -357,7 +406,10 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
     def test_symmetric_self_reference_with_intermediate_table_and_through_fields(self):
-        """Using through_fields in a m2m with an intermediate model shouldn't mask its incompatibility with symmetry."""
+        """
+        Using through_fields in a m2m with an intermediate model shouldn't
+        mask its incompatibility with symmetry.
+        """
         class Person(models.Model):
             # Explicit symmetrical=True.
             friends = models.ManyToManyField('self',
@@ -383,25 +435,27 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
     def test_foreign_key_to_abstract_model(self):
-        class Model(models.Model):
-            foreign_key = models.ForeignKey('AbstractModel', models.CASCADE)
-
         class AbstractModel(models.Model):
             class Meta:
                 abstract = True
 
-        field = Model._meta.get_field('foreign_key')
-        errors = field.check()
-        expected = [
-            Error(
-                ("Field defines a relation with model 'AbstractModel', "
-                 "which is either not installed, or is abstract."),
-                hint=None,
-                obj=field,
-                id='fields.E300',
-            ),
+        class Model(models.Model):
+            rel_string_foreign_key = models.ForeignKey('AbstractModel', models.CASCADE)
+            rel_class_foreign_key = models.ForeignKey(AbstractModel, models.CASCADE)
+
+        fields = [
+            Model._meta.get_field('rel_string_foreign_key'),
+            Model._meta.get_field('rel_class_foreign_key'),
         ]
-        self.assertEqual(errors, expected)
+        expected_error = Error(
+            "Field defines a relation with model 'AbstractModel', "
+            "which is either not installed, or is abstract.",
+            id='fields.E300',
+        )
+        for field in fields:
+            expected_error.obj = field
+            errors = field.check()
+            self.assertEqual(errors, [expected_error])
 
     def test_m2m_to_abstract_model(self):
         class AbstractModel(models.Model):
@@ -409,20 +463,22 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 abstract = True
 
         class Model(models.Model):
-            m2m = models.ManyToManyField('AbstractModel')
+            rel_string_m2m = models.ManyToManyField('AbstractModel')
+            rel_class_m2m = models.ManyToManyField(AbstractModel)
 
-        field = Model._meta.get_field('m2m')
-        errors = field.check(from_model=Model)
-        expected = [
-            Error(
-                ("Field defines a relation with model 'AbstractModel', "
-                 "which is either not installed, or is abstract."),
-                hint=None,
-                obj=field,
-                id='fields.E300',
-            ),
+        fields = [
+            Model._meta.get_field('rel_string_m2m'),
+            Model._meta.get_field('rel_class_m2m'),
         ]
-        self.assertEqual(errors, expected)
+        expected_error = Error(
+            "Field defines a relation with model 'AbstractModel', "
+            "which is either not installed, or is abstract.",
+            id='fields.E300',
+        )
+        for field in fields:
+            expected_error.obj = field
+            errors = field.check(from_model=Model)
+            self.assertEqual(errors, [expected_error])
 
     def test_unique_m2m(self):
         class Person(models.Model):
@@ -500,9 +556,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                ("None of the fields 'country_id', 'city_id' on model 'Person' "
-                 "have a unique=True constraint."),
-                hint=None,
+                "No subset of the fields 'country_id', 'city_id' on model 'Person' is unique.",
+                hint=(
+                    "Add unique=True on any of those fields or add at least "
+                    "a subset of them to a unique_together constraint."
+                ),
                 obj=field,
                 id='fields.E310',
             )
@@ -652,6 +710,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             'ends_with_whitespace_%s' % whitespace,
             'with',  # a Python keyword
             'related_name\n',
+            '',
         ]
         # Python 2 crashes on non-ASCII strings.
         if six.PY3:
@@ -711,7 +770,8 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertFalse(errors)
 
 
-class AccessorClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class AccessorClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_accessor_clash(
@@ -823,7 +883,8 @@ class AccessorClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ReverseQueryNameClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ReverseQueryNameClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_reverse_query_name_clash(
@@ -879,7 +940,8 @@ class ReverseQueryNameClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ExplicitRelatedNameClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_explicit_related_name_clash(
@@ -943,7 +1005,8 @@ class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_explicit_related_query_name_clash(
@@ -1007,7 +1070,8 @@ class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class SelfReferentialM2MClashTests(SimpleTestCase):
 
     def test_clash_between_accessors(self):
         class Model(models.Model):
@@ -1102,7 +1166,8 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, [])
 
 
-class SelfReferentialFKClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class SelfReferentialFKClashTests(SimpleTestCase):
 
     def test_accessor_clash(self):
         class Model(models.Model):
@@ -1165,7 +1230,8 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ComplexClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ComplexClashTests(SimpleTestCase):
 
     # New tests should not be included here, because this is a single,
     # self-contained sanity check, not a test of everything.
@@ -1279,7 +1345,8 @@ class ComplexClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class M2mThroughFieldsTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class M2mThroughFieldsTests(SimpleTestCase):
     def test_m2m_field_argument_validation(self):
         """
         Tests that ManyToManyField accepts the ``through_fields`` kwarg
@@ -1333,7 +1400,11 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
             pass
 
         class Event(models.Model):
-            invitees = models.ManyToManyField(Fan, through='Invitation', through_fields=('invalid_field_1', 'invalid_field_2'))
+            invitees = models.ManyToManyField(
+                Fan,
+                through='Invitation',
+                through_fields=('invalid_field_1', 'invalid_field_2'),
+            )
 
         class Invitation(models.Model):
             event = models.ForeignKey(Event, models.CASCADE)
@@ -1344,12 +1415,12 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Event)
         expected = [
             Error(
-                ("The intermediary model 'invalid_models_tests.Invitation' has no field 'invalid_field_1'."),
+                "The intermediary model 'invalid_models_tests.Invitation' has no field 'invalid_field_1'.",
                 hint="Did you mean one of the following foreign keys to 'Event': event?",
                 obj=field,
                 id='fields.E338'),
             Error(
-                ("The intermediary model 'invalid_models_tests.Invitation' has no field 'invalid_field_2'."),
+                "The intermediary model 'invalid_models_tests.Invitation' has no field 'invalid_field_2'.",
                 hint="Did you mean one of the following foreign keys to 'Fan': invitee, inviter?",
                 obj=field,
                 id='fields.E338'),
@@ -1376,11 +1447,85 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Event)
         expected = [
             Error(
-                ("Field specifies 'through_fields' but does not provide the names "
-                 "of the two link fields that should be used for the relation "
-                 "through model 'invalid_models_tests.Invitation'."),
+                "Field specifies 'through_fields' but does not provide the names "
+                "of the two link fields that should be used for the relation "
+                "through model 'invalid_models_tests.Invitation'.",
                 hint=("Make sure you specify 'through_fields' as "
                       "through_fields=('field1', 'field2')"),
                 obj=field,
                 id='fields.E337')]
+        self.assertEqual(expected, errors)
+
+    def test_superset_foreign_object(self):
+        class Parent(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            c = models.PositiveIntegerField()
+
+            class Meta:
+                unique_together = (('a', 'b', 'c'),)
+
+        class Child(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            value = models.CharField(max_length=255)
+            parent = ForeignObject(
+                Parent,
+                on_delete=models.SET_NULL,
+                from_fields=('a', 'b'),
+                to_fields=('a', 'b'),
+                related_name='children',
+            )
+
+        field = Child._meta.get_field('parent')
+        errors = field.check(from_model=Child)
+        expected = [
+            Error(
+                "No subset of the fields 'a', 'b' on model 'Parent' is unique.",
+                hint=(
+                    "Add unique=True on any of those fields or add at least "
+                    "a subset of them to a unique_together constraint."
+                ),
+                obj=field,
+                id='fields.E310',
+            ),
+        ]
+        self.assertEqual(expected, errors)
+
+    def test_intersection_foreign_object(self):
+        class Parent(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            c = models.PositiveIntegerField()
+            d = models.PositiveIntegerField()
+
+            class Meta:
+                unique_together = (('a', 'b', 'c'),)
+
+        class Child(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            d = models.PositiveIntegerField()
+            value = models.CharField(max_length=255)
+            parent = ForeignObject(
+                Parent,
+                on_delete=models.SET_NULL,
+                from_fields=('a', 'b', 'd'),
+                to_fields=('a', 'b', 'd'),
+                related_name='children',
+            )
+
+        field = Child._meta.get_field('parent')
+        errors = field.check(from_model=Child)
+        expected = [
+            Error(
+                "No subset of the fields 'a', 'b', 'd' on model 'Parent' is unique.",
+                hint=(
+                    "Add unique=True on any of those fields or add at least "
+                    "a subset of them to a unique_together constraint."
+                ),
+                obj=field,
+                id='fields.E310',
+            ),
+        ]
         self.assertEqual(expected, errors)

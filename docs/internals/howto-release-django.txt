@@ -191,11 +191,6 @@ OK, this is the fun part, where we actually push out a release!
    Please see `notes on setting the VERSION tuple`_ below for details
    on ``VERSION``.
 
-   In 1.4, the version number in ``docs/conf.py`` and ``setup.py`` should also
-   be updated. Here's `an example commit updating version numbers`__ for that.
-
-   __ https://github.com/django/django/commit/592187e11b934f83153133cd5b3a246a881359e7
-
 #. If this is a pre-release package, update the "Development Status" trove
    classifier in ``setup.py`` to reflect this. Otherwise, make sure the
    classifier is set to ``Development Status :: 5 - Production/Stable``.
@@ -211,8 +206,7 @@ OK, this is the fun part, where we actually push out a release!
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
 #. Run ``make -f extras/Makefile`` to generate the release packages. This will
-   create the release packages in a ``dist/`` directory. Note that we don't
-   publish wheel files for 1.4.
+   create the release packages in a ``dist/`` directory.
 
 #. Generate the hashes of the release packages::
 
@@ -229,7 +223,7 @@ OK, this is the fun part, where we actually push out a release!
    .. code-block:: text
 
     This file contains MD5, SHA1, and SHA256 checksums for the source-code
-    tarball of Django <<VERSION>>, released <<DATE>>.
+    tarball and wheel files of Django <<VERSION>>, released <<DATE>>.
 
     To use this file, you will need a working install of PGP or other
     compatible public-key encryption software. You will also need to have
@@ -251,8 +245,8 @@ OK, this is the fun part, where we actually push out a release!
     Release packages:
     =================
 
-    Django <<VERSION>> (tar.tgz): https://www.djangoproject.com/m/releases/<<RELEASE TAR.GZ FILENAME>>
-    Django <<VERSION>> (.whl): https://www.djangoproject.com/m/releases/<<RELEASE WHL FILENAME>>
+    https://www.djangoproject.com/m/releases/<<RELEASE TAR.GZ FILENAME>>
+    https://www.djangoproject.com/m/releases/<<RELEASE WHL FILENAME>>
 
     MD5 checksums:
     ==============

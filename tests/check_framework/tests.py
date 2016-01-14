@@ -11,7 +11,9 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import models
 from django.test import SimpleTestCase
-from django.test.utils import override_settings, override_system_checks
+from django.test.utils import (
+    isolate_apps, override_settings, override_system_checks,
+)
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
@@ -116,7 +118,7 @@ def simple_system_check(**kwargs):
 
 def tagged_system_check(**kwargs):
     tagged_system_check.kwargs = kwargs
-    return []
+    return [checks.Warning('System Check')]
 tagged_system_check.tags = ['simpletag']
 
 
@@ -192,6 +194,11 @@ class CheckCommandTests(SimpleTestCase):
         call_command('check', deploy=True, tags=['deploymenttag'])
         self.assertIn('Deployment Check', sys.stderr.getvalue())
 
+    @override_system_checks([tagged_system_check])
+    def test_fail_level(self):
+        with self.assertRaises(CommandError):
+            call_command('check', fail_level='WARNING')
+
 
 def custom_error_system_check(app_configs, **kwargs):
     return [
@@ -249,23 +256,10 @@ class SilencingCheckTests(SimpleTestCase):
         self.assertEqual(err.getvalue(), '')
 
 
-class IsolateModelsMixin(object):
-    def setUp(self):
-        self.current_models = apps.all_models[__package__]
-        self.saved_models = set(self.current_models)
-
-    def tearDown(self):
-        for model in (set(self.current_models) - self.saved_models):
-            del self.current_models[model]
-        apps.clear_cache()
-
-
-class CheckFrameworkReservedNamesTests(IsolateModelsMixin, SimpleTestCase):
-    @override_settings(
-        SILENCED_SYSTEM_CHECKS=['models.E20', 'fields.W342'],  # ForeignKey(unique=True)
-        INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'check_framework']
-    )
-    def test_model_check_method_not_shadowed(self):
+class CheckFrameworkReservedNamesTests(SimpleTestCase):
+    @isolate_apps('check_framework', kwarg_name='apps')
+    @override_system_checks([checks.model_checks.check_all_models])
+    def test_model_check_method_not_shadowed(self, apps):
         class ModelWithAttributeCalledCheck(models.Model):
             check = 42
 
@@ -283,7 +277,7 @@ class CheckFrameworkReservedNamesTests(IsolateModelsMixin, SimpleTestCase):
                 related_name='check',
             )
 
-        errors = checks.run_checks()
+        errors = checks.run_checks(app_configs=apps.get_app_configs())
         expected = [
             Error(
                 "The 'ModelWithAttributeCalledCheck.check()' class method is "

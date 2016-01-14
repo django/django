@@ -5,9 +5,6 @@ from django.db import models
 class Email(models.Model):
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
 
-    class Meta:
-        app_label = 'auth'
-
 
 class CustomUserWithFKManager(BaseUserManager):
     def create_superuser(self, username, email, group, password):
@@ -26,6 +23,3 @@ class CustomUserWithFK(AbstractBaseUser):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'group']
-
-    class Meta:
-        app_label = 'auth'

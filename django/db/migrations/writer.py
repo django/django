@@ -19,11 +19,17 @@ from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.encoding import force_text
-from django.utils.functional import Promise
+from django.utils.functional import LazyObject, Promise
 from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
 from django.utils.timezone import now, utc
 from django.utils.version import get_docs_version
+
+try:
+    import enum
+except ImportError:
+    # No support on Python 2 if enum34 isn't installed.
+    enum = None
 
 
 class SettingsReference(str):
@@ -241,6 +247,13 @@ class MigrationWriter(object):
     def basedir(self):
         migrations_package_name = MigrationLoader.migrations_module(self.migration.app_label)
 
+        if migrations_package_name is None:
+            raise ValueError(
+                "Django can't create migrations for app '%s' because "
+                "migrations have been disabled via the MIGRATION_MODULES "
+                "setting." % self.migration.app_label
+            )
+
         # See if we can import the migrations module directly
         try:
             migrations_module = import_module(migrations_package_name)
@@ -337,6 +350,10 @@ class MigrationWriter(object):
         # process.
         if isinstance(value, Promise):
             value = force_text(value)
+        elif isinstance(value, LazyObject):
+            # The unwrapped value is returned as the first item of the
+            # arguments tuple.
+            value = value.__reduce__()[1][0]
 
         # Sequences
         if isinstance(value, (frozenset, list, set, tuple)):
@@ -369,6 +386,14 @@ class MigrationWriter(object):
                 imports.update(v_imports)
                 strings.append((k_string, v_string))
             return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
+        # Enums
+        elif enum and isinstance(value, enum.Enum):
+            enum_class = value.__class__
+            module = enum_class.__module__
+            imports = {"import %s" % module}
+            v_string, v_imports = cls.serialize(value.value)
+            imports.update(v_imports)
+            return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
         # Datetimes
         elif isinstance(value, datetime.datetime):
             value_repr = cls.serialize_datetime(value)

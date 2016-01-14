@@ -65,7 +65,7 @@ control.
 
 :ref:`CSRF protection works <how-csrf-works>` by checking for a nonce in each
 POST request. This ensures that a malicious user cannot simply "replay" a form
-POST to your Web site and have another logged in user unwittingly submit that
+POST to your website and have another logged in user unwittingly submit that
 form. The malicious user would have to know the nonce, which is user specific
 (using a cookie).
 
@@ -120,11 +120,11 @@ for a small section of the site.
 SSL/HTTPS
 =========
 
-It is always better for security, though not always practical in all cases, to
-deploy your site behind HTTPS. Without this, it is possible for malicious
-network users to sniff authentication credentials or any other information
-transferred between client and server, and in some cases -- **active** network
-attackers -- to alter data that is sent in either direction.
+It is always better for security to deploy your site behind HTTPS. Without
+this, it is possible for malicious network users to sniff authentication
+credentials or any other information transferred between client and server, and
+in some cases -- **active** network attackers -- to alter data that is sent in
+either direction.
 
 If you want the protection that HTTPS provides, and have enabled it on your
 server, there are some additional steps you may need:
@@ -272,4 +272,4 @@ security protection of the Web server, operating system and other components.
 * It is a good idea to limit the accessibility of your caching system and
   database using a firewall.
 
-.. _LimitRequestBody: http://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
+.. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody

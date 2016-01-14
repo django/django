@@ -3,12 +3,12 @@ from __future__ import unicode_literals
 import os
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import clear_url_caches, reverse, translate_url
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import override_script_prefix
+from django.urls import clear_url_caches, reverse, translate_url
 from django.utils import translation
 from django.utils._os import upath
 
@@ -94,7 +94,7 @@ class URLDisabledTests(URLTestCaseBase):
 @override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
 class PathUnusedTests(URLTestCaseBase):
     """
-    Check that if no i18n_patterns is used in root urlconfs, then no
+    Check that if no i18n_patterns is used in root URLconfs, then no
     language activation happens based on url prefix.
     """
 

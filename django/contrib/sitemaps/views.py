@@ -3,10 +3,10 @@ from calendar import timegm
 from functools import wraps
 
 from django.contrib.sites.shortcuts import get_current_site
-from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.http import http_date
 
 
@@ -32,8 +32,7 @@ def index(request, sitemaps,
         if callable(site):
             site = site()
         protocol = req_protocol if site.protocol is None else site.protocol
-        sitemap_url = urlresolvers.reverse(
-            sitemap_url_name, kwargs={'section': section})
+        sitemap_url = reverse(sitemap_url_name, kwargs={'section': section})
         absolute_url = '%s://%s%s' % (protocol, req_site.domain, sitemap_url)
         sites.append(absolute_url)
         for page in range(2, site.paginator.num_pages + 1):

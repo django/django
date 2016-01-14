@@ -1,5 +1,4 @@
 import os
-import warnings
 from collections import Counter, OrderedDict
 
 from django.apps import apps
@@ -7,7 +6,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -29,25 +27,6 @@ class EngineHandler(object):
     def templates(self):
         if self._templates is None:
             self._templates = settings.TEMPLATES
-
-        if not self._templates:
-            warnings.warn(
-                "You haven't defined a TEMPLATES setting. You must do so "
-                "before upgrading to Django 1.10. Otherwise Django will be "
-                "unable to load templates.", RemovedInDjango110Warning)
-            self._templates = [
-                {
-                    'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                    'DIRS': settings.TEMPLATE_DIRS,
-                    'OPTIONS': {
-                        'allowed_include_roots': settings.ALLOWED_INCLUDE_ROOTS,
-                        'context_processors': settings.TEMPLATE_CONTEXT_PROCESSORS,
-                        'debug': settings.TEMPLATE_DEBUG,
-                        'loaders': settings.TEMPLATE_LOADERS,
-                        'string_if_invalid': settings.TEMPLATE_STRING_IF_INVALID,
-                    },
-                },
-            ]
 
         templates = OrderedDict()
         backend_names = []

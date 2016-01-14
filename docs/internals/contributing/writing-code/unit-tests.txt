@@ -138,6 +138,7 @@ dependencies:
 
 *  bcrypt_
 *  docutils_
+*  enum34_ (Python 2 only)
 *  geoip2_
 *  jinja2_ 2.7+
 *  numpy_
@@ -171,6 +172,7 @@ associated tests will be skipped.
 
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
+.. _enum34: https://pypi.python.org/pypi/enum34
 .. _geoip2: https://pypi.python.org/pypi/geoip2
 .. _jinja2: https://pypi.python.org/pypi/jinja2
 .. _numpy: https://pypi.python.org/pypi/numpy
@@ -180,7 +182,7 @@ associated tests will be skipped.
 .. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
 .. _mock: https://pypi.python.org/pypi/mock
-.. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
+.. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: https://pypi.python.org/pypi/selenium
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 .. _pip requirements files: https://pip.pypa.io/en/latest/user_guide.html#requirements-files
@@ -192,9 +194,10 @@ Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
 in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
-To run coverage on the Django test suite using the standard test settings::
+Coverage should be run in a single process to obtain accurate statistics. To
+run coverage on the Django test suite using the standard test settings::
 
-   $ coverage run ./runtests.py --settings=test_sqlite
+   $ coverage run ./runtests.py --settings=test_sqlite --parallel=1
 
 After running coverage, generate the html report by running::
 
@@ -275,12 +278,142 @@ cause any trouble::
 
     $ ./runtests.py basic --reverse
 
+Seeing the SQL queries run during a test
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 If you wish to examine the SQL being run in failing tests, you can turn on
 :ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
 combine this with ``--verbosity=2``, all SQL queries will be output::
 
     $ ./runtests.py basic --debug-sql
 
-.. versionadded:: 1.8
+Seeing the full traceback of a test failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    The ``--reverse`` and ``--debug-sql`` options were added.
+By default tests are run in parallel with one process per core. When the tests
+are run in parallel, however, you'll only see a truncated traceback for any
+test failures. You can adjust this behavior with the ``--parallel`` option::
+
+    $ ./runtests.py basic --parallel=1
+
+You can also use the ``DJANGO_TEST_PROCESSES`` environment variable for this
+purpose.
+
+.. versionadded:: 1.9
+
+    Support for running tests in parallel and the ``--parallel`` option were
+    added.
+
+Tips for writing tests
+----------------------
+
+.. highlight:: python
+
+Isolating model registration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To avoid polluting the global :attr:`~django.apps.apps` registry and prevent
+unnecessary table creation, models defined in a test method should be bound to
+a temporary ``Apps`` instance::
+
+    from django.apps.registry import Apps
+    from django.db import models
+    from django.test import SimpleTestCase
+
+    class TestModelDefinition(SimpleTestCase):
+        def test_model_definition(self):
+            test_apps = Apps(['app_label'])
+
+            class TestModel(models.Model):
+                class Meta:
+                    apps = test_apps
+            ...
+
+.. function:: django.test.utils.isolate_apps(*app_labels, attr_name=None, kwarg_name=None)
+
+.. versionadded:: 1.10
+
+Since this pattern involves a lot of boilerplate, Django provides the
+:func:`~django.test.utils.isolate_apps` decorator. It's used like this::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    class TestModelDefinition(SimpleTestCase):
+        @isolate_apps('app_label')
+        def test_model_definition(self):
+            class TestModel(models.Model):
+                pass
+            ...
+
+.. admonition:: Setting ``app_label``
+
+    Models defined in a test method with no explicit
+    :attr:`~django.db.models.Options.app_label` are automatically assigned the
+    label of the app in which their test class is located.
+
+    In order to make sure the models defined within the context of
+    :func:`~django.test.utils.isolate_apps` instances are correctly
+    installed, you should pass the set of targeted ``app_label`` as arguments:
+
+    .. snippet::
+        :filename: tests/app_label/tests.py
+
+        from django.db import models
+        from django.test import SimpleTestCase
+        from django.test.utils import isolate_apps
+
+        class TestModelDefinition(SimpleTestCase):
+            @isolate_apps('app_label', 'other_app_label')
+            def test_model_definition(self):
+                # This model automatically receives app_label='app_label'
+                class TestModel(models.Model):
+                    pass
+
+                class OtherAppModel(models.Model):
+                    class Meta:
+                        app_label = 'other_app_label'
+                ...
+
+The decorator can also be applied to classes::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    @isolate_apps('app_label')
+    class TestModelDefinition(SimpleTestCase):
+        def test_model_definition(self):
+            class TestModel(models.Model):
+                pass
+            ...
+
+The temporary ``Apps`` instance used to isolate model registration can be
+retrieved as an attribute when used as a class decorator by using the
+``attr_name`` parameter::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    @isolate_apps('app_label', attr_name='apps')
+    class TestModelDefinition(SimpleTestCase):
+        def test_model_definition(self):
+            class TestModel(models.Model):
+                pass
+            self.assertIs(self.apps.get_model('app_label', 'TestModel'), TestModel)
+
+Or as an argument on the test method when used as a method decorator by using
+the ``kwarg_name`` parameter::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    class TestModelDefinition(SimpleTestCase):
+        @isolate_apps('app_label', kwarg_name='apps')
+        def test_model_definition(self, apps):
+            class TestModel(models.Model):
+                pass
+            self.assertIs(apps.get_model('app_label', 'TestModel'), TestModel)

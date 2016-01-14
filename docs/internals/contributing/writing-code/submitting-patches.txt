@@ -11,7 +11,7 @@ Typo fixes and trivial documentation changes
 
 If you are fixing a really trivial issue, for example changing a word in the
 documentation, the preferred way to provide the patch is using GitHub pull
-requests without a Trac ticket. Trac tickets are still acceptable.
+requests without a Trac ticket.
 
 See the :doc:`working-with-git` for more details on how to use pull requests.
 
@@ -29,9 +29,9 @@ If you have identified a contribution you want to make and you're capable of
 fixing it (as measured by your coding ability, knowledge of Django internals
 and time availability), claim it by following these steps:
 
-* `Create an account`_ to use in our ticket system. If you have an account
-  but have forgotten your password, you can reset it using the
-  `password reset page`_.
+* `Login using your GitHub account`_ or `create an account`_ in our ticket
+  system. If you have an account but have forgotten your password, you can
+  reset it using the `password reset page`_.
 
 * If a ticket for this issue doesn't exist yet, create one in our
   `ticket tracker`_.
@@ -39,18 +39,16 @@ and time availability), claim it by following these steps:
 * If a ticket for this issue already exists, make sure nobody else has
   claimed it. To do this, look at the "Owned by" section of the ticket.
   If it's assigned to "nobody," then it's available to be claimed.
-  Otherwise, somebody else is working on this ticket, and you either find
-  another bug/feature to work on, or contact the developer working on the
-  ticket to offer your help.
+  Otherwise, somebody else may be working on this ticket. Either find another
+  bug/feature to work on, or contact the developer working on the ticket to
+  offer your help. If a ticket has been assigned for weeks or months without
+  any activity, it's probably safe to reassign it to yourself.
 
-* Log into your account, if you haven't already, by clicking "Login" in
-  the upper right of the ticket page.
+* Log into your account, if you haven't already, by clicking "GitHub Login"
+  or "DjangoProject Login" in the upper left of the ticket page.
 
-* Claim the ticket:
-
-  1. click the "assign to myself" radio button under "Action" near the bottom of the
-     page,
-  2. then click "Submit changes."
+* Claim the ticket by clicking the "assign to myself" radio button under
+  "Action" near the bottom of the page, then click "Submit changes."
 
 .. note::
     The Django software foundation requests that anyone contributing more than
@@ -58,6 +56,7 @@ and time availability), claim it by following these steps:
     Agreement`_, this ensures that the Django Software Foundation has clear
     license to all contributions allowing for a clear license for all users.
 
+.. _Login using your GitHub account: https://code.djangoproject.com/github/login
 .. _Create an account: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
 .. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/
@@ -114,21 +113,14 @@ requirements:
   behavior of an existing feature, the patch should also contain
   documentation.
 
-You can use either GitHub branches and pull requests or direct patches
-to publish your work. If you use the Git workflow, then you should
-announce your branch in the ticket by including a link to your branch.
-When you think your work is ready to be merged in create a pull request.
+When you think your work is ready to be reviewed, send :doc:`a GitHub pull
+request <working-with-git>`. Please review the patch yourself using our
+:ref:`patch review checklist <patch-review-checklist>` first.
 
-See the :doc:`working-with-git` documentation for more details.
-
-You can also use patches in Trac. When using this style, follow these
-guidelines.
+If you can't send a pull request for some reason, you can also use patches in
+Trac. When using this style, follow these guidelines.
 
 * Submit patches in the format returned by the ``git diff`` command.
-  An exception is for code changes that are described more clearly in
-  plain English than in code. Indentation is the most common example; it's
-  hard to read patches when the only difference in code is that it's
-  indented.
 
 * Attach patches to a ticket in the `ticket tracker`_, using the "attach
   file" button. Please *don't* put the patch in the ticket description
@@ -139,14 +131,16 @@ guidelines.
 
 Regardless of the way you submit your work, follow these steps.
 
-* Make sure your code matches our :doc:`coding-style`.
+* Make sure your code fulfills the requirements in our :ref:`patch review
+  checklist <patch-review-checklist>`.
 
-* Check the "Has patch" box on the ticket details. This will make it
-  obvious that the ticket includes a patch, and it will add the ticket to
-  the `list of tickets with patches`_.
+* Check the "Has patch" box on the ticket and make sure the "Needs
+  documentation", "Needs tests", and "Patch needs improvement" boxes aren't
+  checked. This makes the ticket appear in the "Patches needing review" queue
+  on the `Development dashboard`_.
 
-.. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _ticket tracker: https://code.djangoproject.com/newticket
+.. _Development dashboard: https://dashboard.djangoproject.com/
 
 Non-trivial patches
 -------------------
@@ -206,12 +200,6 @@ level:
     @ignore_warnings(category=RemovedInDjangoXXWarning)
     class MyDeprecatedTests(unittest.TestCase):
         ...
-
-.. versionchanged:: 1.8
-
-    Previous versions of Django had some ``Ignore*DeprecationWarningsMixin``
-    classes to prevent warnings from appearing. These have been replaced by the
-    ``ignore_warnings`` decorator.
 
 You can also add a test for the deprecation warning. You'll have to disable the
 "warning as error" behavior in your test by doing::

@@ -254,8 +254,9 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The generic views support OPTIONS requests.
 
 * Management commands do not raise ``SystemExit`` any more when called by code
-  from :ref:`call_command <call-command>`. Any exception raised by the command
-  (mostly :ref:`CommandError <ref-command-exceptions>`) is propagated.
+  from :func:`~django.core.management.call_command`. Any exception raised by
+  the command (mostly :exc:`~django.core.management.CommandError`) is
+  propagated.
 
   Moreover, when you output errors or messages in your custom commands, you
   should now use ``self.stdout.write('message')`` and
@@ -293,8 +294,8 @@ Django 1.5 also includes several smaller improvements worth noting:
   objects fetched into memory. See :meth:`QuerySet.delete()
   <django.db.models.query.QuerySet.delete>` for details.
 
-* An instance of :class:`~django.core.urlresolvers.ResolverMatch` is stored on
-  the request as ``resolver_match``.
+* An instance of ``ResolverMatch`` is stored on the request as
+  ``resolver_match``.
 
 * By default, all logging messages reaching the ``django`` logger when
   :setting:`DEBUG` is ``True`` are sent to the console (unless you redefine the
@@ -671,7 +672,7 @@ Miscellaneous
 
 * The ``slugify`` template filter is now available as a standard python
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
-  available at :func:`django.utils.html.remove_tags`.
+  available at ``django.utils.html.remove_tags()``.
 
 * Uploaded files are no longer created as executable by default. If you need
   them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
@@ -726,7 +727,7 @@ The localflavor contrib app has been split into separate packages.
 ``django.contrib.localflavor`` itself will be removed in Django 1.6,
 after an accelerated deprecation.
 
-The new packages are available on Github. The core team cannot
+The new packages are available on GitHub. The core team cannot
 efficiently maintain these packages in the long term — it spans just a
 dozen countries at this time; similar to translations, maintenance
 will be handed over to interested members of the community.

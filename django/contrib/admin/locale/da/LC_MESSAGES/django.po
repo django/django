@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013
+# Erik Wognsen <r4mses@gmail.com>, 2013,2015
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # valberg <valberg@orn.li>, 2014-2015
@@ -11,11 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-03-08 15:05+0000\n"
-"Last-Translator: valberg <valberg@orn.li>\n"
-"Language-Team: Danish (http://www.transifex.com/projects/p/django/language/"
-"da/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-12-01 20:01+0000\n"
+"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
+"Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -81,6 +80,12 @@ msgstr "Handling"
 msgid "action time"
 msgstr "handlingstid"
 
+msgid "user"
+msgstr "bruger"
+
+msgid "content type"
+msgstr "indholdstype"
+
 msgid "object id"
 msgstr "objekt-ID"
 
@@ -121,6 +126,9 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Hold \"Ctrl\" (eller \"Æbletasten\" på Mac) nede for at vælge mere end en."
+
+msgid "Added."
+msgstr "Tilføjet."
 
 #, python-format
 msgid "Changed %s."
@@ -314,7 +322,7 @@ msgid "Change password"
 msgstr "Skift adgangskode"
 
 msgid "Please correct the error below."
-msgstr "Ret venligst fejlene herunder."
+msgstr "Ret venligst fejlen herunder."
 
 msgid "Please correct the errors below."
 msgstr "Ret venligst fejlene herunder."
@@ -476,6 +484,14 @@ msgstr ""
 "databasetabellerne er blevet oprettet og at databasen er læsbar for den "
 "pågældende bruger."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Du er logget ind som %(username)s, men du har ikke tilladelse til at tilgå "
+"denne site. Vil du logge ind med en anden brugerkonto?"
+
 msgid "Forgotten your password or username?"
 msgstr "Har du glemt dit password eller brugernavn?"
 
@@ -500,6 +516,9 @@ msgstr "Vis alle"
 
 msgid "Save"
 msgstr "Gem"
+
+msgid "Popup closing..."
+msgstr "Popup lukker..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -637,9 +656,6 @@ msgstr "Nulstil min adgangskode"
 
 msgid "All dates"
 msgstr "Alle datoer"
-
-msgid "(None)"
-msgstr "(Ingen)"
 
 #, python-format
 msgid "Select %s"

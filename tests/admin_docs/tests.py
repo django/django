@@ -7,9 +7,9 @@ from django.contrib.admindocs import utils
 from django.contrib.admindocs.views import get_return_data_type
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
 from django.test import TestCase, modify_settings, override_settings
 from django.test.utils import captured_stderr
+from django.urls import reverse
 
 from .models import Company, Person
 
@@ -485,3 +485,8 @@ class TestUtils(AdminDocsTestCase):
             '</p>\n'
         )
         self.assertHTMLEqual(description_output, description_rendered)
+
+    def test_initial_header_level(self):
+        header = 'should be h3...\n\nHeader\n------\n'
+        output = utils.parse_rst(header, 'header')
+        self.assertIn('<h3>Header</h3>', output)

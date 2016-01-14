@@ -44,10 +44,12 @@ END;
     def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
         # create a sequence and a trigger.
-        sq_name = self._get_sequence_name(table)
-        tr_name = self._get_trigger_name(table)
-        tbl_name = self.quote_name(table)
-        col_name = self.quote_name(column)
+        args = {
+            'sq_name': self._get_sequence_name(table),
+            'tr_name': self._get_trigger_name(table),
+            'tbl_name': self.quote_name(table),
+            'col_name': self.quote_name(column),
+        }
         sequence_sql = """
 DECLARE
     i INTEGER;
@@ -58,7 +60,7 @@ BEGIN
         EXECUTE IMMEDIATE 'CREATE SEQUENCE "%(sq_name)s"';
     END IF;
 END;
-/""" % locals()
+/""" % args
         trigger_sql = """
 CREATE OR REPLACE TRIGGER "%(tr_name)s"
 BEFORE INSERT ON %(tbl_name)s
@@ -68,7 +70,7 @@ WHEN (new.%(col_name)s IS NULL)
         SELECT "%(sq_name)s".nextval
         INTO :new.%(col_name)s FROM dual;
     END;
-/""" % locals()
+/""" % args
         return sequence_sql, trigger_sql
 
     def cache_key_culling_sql(self):
@@ -267,6 +269,9 @@ WHEN (new.%(col_name)s IS NULL)
     def max_name_length(self):
         return 30
 
+    def pk_default_value(self):
+        return "NULL"
+
     def prep_for_iexact_query(self, x):
         return x
 
@@ -439,6 +444,8 @@ WHEN (new.%(col_name)s IS NULL)
         name_length = self.max_name_length() - 3
         return '%s_TR' % truncate_name(table, name_length).upper()
 
-    def bulk_insert_sql(self, fields, num_values):
-        items_sql = "SELECT %s FROM DUAL" % ", ".join(["%s"] * len(fields))
-        return " UNION ALL ".join([items_sql] * num_values)
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        return " UNION ALL ".join(
+            "SELECT %s FROM DUAL" % ", ".join(row)
+            for row in placeholder_rows
+        )

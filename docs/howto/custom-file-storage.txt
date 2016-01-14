@@ -114,7 +114,3 @@ free unique filename cannot be found, a :exc:`SuspiciousFileOperation
 
 If a file with ``name`` already exists, an underscore plus a random 7 character
 alphanumeric string is appended to the filename before the extension.
-
-.. versionchanged:: 1.8
-
-    The ``max_length`` argument was added.

@@ -4,8 +4,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.test import Client
 from django.test.client import CONTENT_TYPE_RE
@@ -38,7 +37,7 @@ get_view = login_required(get_view)
 
 def request_data(request, template='base.html', data='sausage'):
     "A simple view that returns the request data in the context"
-    return render_to_response(template, {
+    return render(request, template, {
         'get-foo': request.GET.get('foo'),
         'get-bar': request.GET.get('bar'),
         'post-foo': request.POST.get('foo'),
@@ -67,7 +66,7 @@ def nested_view(request):
     setup_test_environment()
     c = Client()
     c.get("/no_template_view/")
-    return render_to_response('base.html', {'nested': 'yes'})
+    return render(request, 'base.html', {'nested': 'yes'})
 
 
 def login_protected_redirect_view(request):
@@ -99,7 +98,7 @@ def request_methods_view(request):
 
 
 def return_unicode(request):
-    return render_to_response('unicode.html')
+    return render(request, 'unicode.html')
 
 
 def return_undecodable_binary(request):
@@ -152,7 +151,7 @@ def read_buffer(request):
 def request_context_view(request):
     # Special attribute that won't be present on a plain HttpRequest
     request.special_path = request.path
-    return render_to_response('request_context.html', context_instance=RequestContext(request, {}))
+    return render(request, 'request_context.html')
 
 
 def render_template_multiple_times(request):

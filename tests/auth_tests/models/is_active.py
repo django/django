@@ -12,7 +12,4 @@ class IsActiveTestUser1(AbstractBaseUser):
 
     USERNAME_FIELD = 'username'
 
-    class Meta:
-        app_label = 'auth'
-
     # the is_active attr is provided by AbstractBaseUser

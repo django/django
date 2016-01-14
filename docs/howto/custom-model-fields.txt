@@ -40,7 +40,7 @@ something like this::
         """A hand of cards (bridge style)"""
 
         def __init__(self, north, east, south, west):
-            # Input parameters are lists of cards ('Ah', '9s', etc)
+            # Input parameters are lists of cards ('Ah', '9s', etc.)
             self.north = north
             self.east = east
             self.south = south
@@ -374,14 +374,14 @@ For example::
             else:
                 return 'timestamp'
 
-The :meth:`~Field.db_type` method is called by Django when the framework
-constructs the ``CREATE TABLE`` statements for your application -- that is,
-when you first create your tables. It is also called when constructing a
-``WHERE`` clause that includes the model field -- that is, when you retrieve data
-using QuerySet methods like ``get()``, ``filter()``, and ``exclude()`` and have
-the model field as an argument. It's not called at any other time, so it can afford to
-execute slightly complex code, such as the ``connection.settings_dict`` check in
-the above example.
+The :meth:`~Field.db_type` and :meth:`~Field.rel_db_type` methods are called by
+Django when the framework constructs the ``CREATE TABLE`` statements for your
+application -- that is, when you first create your tables. The methods are also
+called when constructing a ``WHERE`` clause that includes the model field --
+that is, when you retrieve data using QuerySet methods like ``get()``,
+``filter()``, and ``exclude()`` and have the model field as an argument. They
+are not called at any other time, so it can afford to execute slightly complex
+code, such as the ``connection.settings_dict`` check in the above example.
 
 Some database column types accept parameters, such as ``CHAR(25)``, where the
 parameter ``25`` represents the maximum column length. In cases like these,
@@ -423,17 +423,27 @@ over this field. You are then responsible for creating the column in the right
 table in some other way, of course, but this gives you a way to tell Django to
 get out of the way.
 
+The :meth:`~Field.rel_db_type` method is called by fields such as ``ForeignKey``
+and ``OneToOneField`` that point to another field to determine their database
+column data types. For example, if you have an ``UnsignedAutoField``, you also
+need the foreign keys that point to that field to use the same data type::
+
+    # MySQL unsigned integer (range 0 to 4294967295).
+    class UnsignedAutoField(models.AutoField):
+        def db_type(self, connection):
+            return 'integer UNSIGNED AUTO_INCREMENT'
+
+        def rel_db_type(self, connection):
+            return 'integer UNSIGNED'
+
+.. versionadded:: 1.10
+
+    The :meth:`~Field.rel_db_type` method was added.
+
 .. _converting-values-to-python-objects:
 
 Converting values to Python objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionchanged:: 1.8
-
-    Historically, Django provided a metaclass called ``SubfieldBase`` which
-    always called :meth:`~Field.to_python` on assignment. This did not play
-    nicely with custom database transformations, aggregation, or values
-    queries, so it has been replaced with :meth:`~Field.from_db_value`.
 
 If your custom :class:`~Field` class deals with data structures that are more
 complex than strings, dates, integers, or floats, then you may need to override

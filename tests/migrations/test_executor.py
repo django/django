@@ -1,5 +1,6 @@
 from django.apps.registry import apps as global_apps
 from django.db import connection
+from django.db.migrations.exceptions import InvalidMigrationPlan
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
@@ -145,6 +146,64 @@ class ExecutorTests(MigrationTestBase):
         executor.recorder.record_unapplied("migrations", "0002_second")
         executor.recorder.record_unapplied("migrations", "0001_initial")
 
+    @override_settings(MIGRATION_MODULES={
+        "migrations": "migrations.test_migrations",
+        "migrations2": "migrations2.test_migrations_2_no_deps",
+    })
+    def test_mixed_plan_not_supported(self):
+        """
+        Although the MigrationExecutor interfaces allows for mixed migration
+        plans (combined forwards and backwards migrations) this is not
+        supported.
+        """
+        # Prepare for mixed plan
+        executor = MigrationExecutor(connection)
+        plan = executor.migration_plan([("migrations", "0002_second")])
+        self.assertEqual(
+            plan,
+            [
+                (executor.loader.graph.nodes["migrations", "0001_initial"], False),
+                (executor.loader.graph.nodes["migrations", "0002_second"], False),
+            ],
+        )
+        executor.migrate(None, plan)
+        # Rebuild the graph to reflect the new DB state
+        executor.loader.build_graph()
+        self.assertIn(('migrations', '0001_initial'), executor.loader.applied_migrations)
+        self.assertIn(('migrations', '0002_second'), executor.loader.applied_migrations)
+        self.assertNotIn(('migrations2', '0001_initial'), executor.loader.applied_migrations)
+
+        # Generate mixed plan
+        plan = executor.migration_plan([
+            ("migrations", None),
+            ("migrations2", "0001_initial"),
+        ])
+        msg = (
+            'Migration plans with both forwards and backwards migrations are '
+            'not supported. Please split your migration process into separate '
+            'plans of only forwards OR backwards migrations.'
+        )
+        with self.assertRaisesMessage(InvalidMigrationPlan, msg) as cm:
+            executor.migrate(None, plan)
+        self.assertEqual(
+            cm.exception.args[1],
+            [
+                (executor.loader.graph.nodes["migrations", "0002_second"], True),
+                (executor.loader.graph.nodes["migrations", "0001_initial"], True),
+                (executor.loader.graph.nodes["migrations2", "0001_initial"], False),
+            ],
+        )
+        # Rebuild the graph to reflect the new DB state
+        executor.loader.build_graph()
+        executor.migrate([
+            ("migrations", None),
+            ("migrations2", None),
+        ])
+        # Are the tables gone?
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_book")
+        self.assertTableNotExists("migrations2_otherauthor")
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_soft_apply(self):
         """
@@ -241,6 +300,65 @@ class ExecutorTests(MigrationTestBase):
         executor.migrate([("migrations", None)])
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
+
+    @override_settings(
+        MIGRATION_MODULES={
+            "migrations": "migrations.test_add_many_to_many_field_initial",
+        },
+    )
+    def test_detect_soft_applied_add_field_manytomanyfield(self):
+        """
+        executor.detect_soft_applied() detects ManyToManyField tables from an
+        AddField operation. This checks the case of AddField in a migration
+        with other operations (0001) and the case of AddField in its own
+        migration (0002).
+        """
+        tables = [
+            # from 0001
+            "migrations_project",
+            "migrations_task",
+            "migrations_project_tasks",
+            # from 0002
+            "migrations_task_projects",
+        ]
+        executor = MigrationExecutor(connection)
+        # Create the tables for 0001 but make it look like the migration hasn't
+        # been applied.
+        executor.migrate([("migrations", "0001_initial")])
+        executor.migrate([("migrations", None)], fake=True)
+        for table in tables[:3]:
+            self.assertTableExists(table)
+        # Table detection sees 0001 is applied but not 0002.
+        migration = executor.loader.get_migration("migrations", "0001_initial")
+        self.assertEqual(executor.detect_soft_applied(None, migration)[0], True)
+        migration = executor.loader.get_migration("migrations", "0002_initial")
+        self.assertEqual(executor.detect_soft_applied(None, migration)[0], False)
+
+        # Create the tables for both migrations but make it look like neither
+        # has been applied.
+        executor.loader.build_graph()
+        executor.migrate([("migrations", "0001_initial")], fake=True)
+        executor.migrate([("migrations", "0002_initial")])
+        executor.loader.build_graph()
+        executor.migrate([("migrations", None)], fake=True)
+        # Table detection sees 0002 is applied.
+        migration = executor.loader.get_migration("migrations", "0002_initial")
+        self.assertEqual(executor.detect_soft_applied(None, migration)[0], True)
+
+        # Leave the tables for 0001 except the many-to-many table. That missing
+        # table should cause detect_soft_applied() to return False.
+        with connection.schema_editor() as editor:
+            for table in tables[2:]:
+                editor.execute(editor.sql_delete_table % {"table": table})
+        migration = executor.loader.get_migration("migrations", "0001_initial")
+        self.assertEqual(executor.detect_soft_applied(None, migration)[0], False)
+
+        # Cleanup by removing the remaining tables.
+        with connection.schema_editor() as editor:
+            for table in tables[:2]:
+                editor.execute(editor.sql_delete_table % {"table": table})
+        for table in tables:
+            self.assertTableNotExists(table)
 
     @override_settings(
         INSTALLED_APPS=[

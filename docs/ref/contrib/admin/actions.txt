@@ -18,7 +18,7 @@ action; Django ships with a "delete selected objects" action available to all
 models. For example, here's the user module from Django's built-in
 :mod:`django.contrib.auth` app:
 
-.. image:: _images/user_actions.png
+.. image:: _images/admin-actions.png
 
 .. warning::
 
@@ -134,7 +134,7 @@ the action and its registration would look like::
 
 That code will give us an admin change list that looks something like this:
 
-.. image:: _images/article_actions.png
+.. image:: _images/adding-actions-to-the-modeladmin.png
 
 That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document just covers more
@@ -202,7 +202,7 @@ that the action was successful::
 This make the action match what the admin itself does after successfully
 performing an action:
 
-.. image:: _images/article_actions_message.png
+.. image:: _images/actions-as-modeladmin-methods.png
 
 Actions that provide intermediate pages
 ---------------------------------------

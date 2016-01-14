@@ -16,6 +16,10 @@ class GISLookup(Lookup):
     transform_func = None
     distance = False
 
+    def __init__(self, *args, **kwargs):
+        super(GISLookup, self).__init__(*args, **kwargs)
+        self.template_params = {}
+
     @classmethod
     def _check_geo_field(cls, opts, lookup):
         """
@@ -87,14 +91,21 @@ class GISLookup(Lookup):
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler)
         return rhs, rhs_params
 
+    def get_rhs_op(self, connection, rhs):
+        # Unlike BuiltinLookup, the GIS get_rhs_op() implementation should return
+        # an object (SpatialOperator) with an as_sql() method to allow for more
+        # complex computations (where the lhs part can be mixed in).
+        return connection.ops.gis_operators[self.lookup_name]
+
     def as_sql(self, compiler, connection):
         lhs_sql, sql_params = self.process_lhs(compiler, connection)
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         sql_params.extend(rhs_params)
 
-        template_params = {'lhs': lhs_sql, 'rhs': rhs_sql}
-        backend_op = connection.ops.gis_operators[self.lookup_name]
-        return backend_op.as_sql(connection, self, template_params, sql_params)
+        template_params = {'lhs': lhs_sql, 'rhs': rhs_sql, 'value': '%s'}
+        template_params.update(self.template_params)
+        rhs_op = self.get_rhs_op(connection, rhs_sql)
+        return rhs_op.as_sql(connection, self, template_params, sql_params)
 
 
 # ------------------
@@ -296,18 +307,26 @@ gis_lookups['within'] = WithinLookup
 
 class DistanceLookupBase(GISLookup):
     distance = True
-    sql_template = '%(func)s(%(lhs)s, %(rhs)s) %(op)s %%s'
+    sql_template = '%(func)s(%(lhs)s, %(rhs)s) %(op)s %(value)s'
 
-    def get_db_prep_lookup(self, value, connection):
-        if isinstance(value, (tuple, list)):
-            if not 2 <= len(value) <= 3:
-                raise ValueError("2 or 3-element tuple required for '%s' lookup." % self.lookup_name)
-            params = [connection.ops.Adapter(value[0])]
-            # Getting the distance parameter in the units of the field.
-            params += connection.ops.get_distance(self.lhs.output_field, value[1:], self.lookup_name)
-            return ('%s', params)
+    def process_rhs(self, compiler, connection):
+        if not isinstance(self.rhs, (tuple, list)) or not 2 <= len(self.rhs) <= 3:
+            raise ValueError("2 or 3-element tuple required for '%s' lookup." % self.lookup_name)
+        params = [connection.ops.Adapter(self.rhs[0])]
+        # Getting the distance parameter in the units of the field.
+        dist_param = self.rhs[1]
+        if hasattr(dist_param, 'resolve_expression'):
+            dist_param = dist_param.resolve_expression(compiler.query)
+            sql, expr_params = compiler.compile(dist_param)
+            self.template_params['value'] = sql
+            params.extend(expr_params)
         else:
-            return super(DistanceLookupBase, self).get_db_prep_lookup(value, connection)
+            params += connection.ops.get_distance(
+                self.lhs.output_field, (dist_param,) + self.rhs[2:],
+                self.lookup_name, handle_spheroid=False
+            )
+        rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, params[0], compiler)
+        return (rhs, params)
 
 
 class DWithinLookup(DistanceLookupBase):

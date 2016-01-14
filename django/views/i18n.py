@@ -6,8 +6,8 @@ import os
 from django import http
 from django.apps import apps
 from django.conf import settings
-from django.core.urlresolvers import translate_url
 from django.template import Context, Engine
+from django.urls import translate_url
 from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import smart_text

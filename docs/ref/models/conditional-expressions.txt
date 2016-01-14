@@ -4,8 +4,6 @@ Conditional Expressions
 
 .. currentmodule:: django.db.models.expressions
 
-.. versionadded:: 1.8
-
 Conditional expressions let you use :keyword:`if` ... :keyword:`elif` ...
 :keyword:`else` logic within filters, annotations, aggregations, and updates. A
 conditional expression evaluates a series of conditions for each row of a

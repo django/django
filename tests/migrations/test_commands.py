@@ -11,7 +11,7 @@ from django.db import DatabaseError, connection, models
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel
@@ -159,37 +159,6 @@ class MigrateTests(MigrationTestBase):
         """
         with self.assertRaisesMessage(CommandError, "Conflicting migrations detected"):
             call_command("migrate", "migrations")
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
-    def test_migrate_list(self):
-        """
-        Tests --list output of migrate command
-        """
-        out = six.StringIO()
-        with mock.patch('django.core.management.color.supports_color', lambda *args: True):
-            call_command("migrate", list=True, stdout=out, verbosity=0, no_color=False)
-        self.assertEqual(
-            '\x1b[1mmigrations\n\x1b[0m'
-            ' [ ] 0001_initial\n'
-            ' [ ] 0002_second\n',
-            out.getvalue().lower()
-        )
-
-        call_command("migrate", "migrations", "0001", verbosity=0)
-
-        out = six.StringIO()
-        # Giving the explicit app_label tests for selective `show_migration_list` in the command
-        call_command("migrate", "migrations", list=True, stdout=out, verbosity=0, no_color=True)
-        self.assertEqual(
-            'migrations\n'
-            ' [x] 0001_initial\n'
-            ' [ ] 0002_second\n',
-            out.getvalue().lower()
-        )
-
-        # Cleanup by unmigrating everything
-        call_command("migrate", "migrations", "zero", verbosity=0)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_showmigrations_list(self):
@@ -505,8 +474,10 @@ class MakeMigrationsTests(MigrationTestBase):
                     self.assertIn('ÚÑÍ¢ÓÐÉ', content)  # title.verbose_name
                     self.assertIn('“Ðjáñgó”', content)  # title.default
                 else:
-                    self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8', content)  # Meta.verbose_name
-                    self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8\\xdf', content)  # Meta.verbose_name_plural
+                    # Meta.verbose_name
+                    self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8', content)
+                    # Meta.verbose_name_plural
+                    self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8\\xdf', content)
                     self.assertIn('\\xda\\xd1\\xcd\\xa2\\xd3\\xd0\\xc9', content)  # title.verbose_name
                     self.assertIn('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d', content)  # title.default
 
@@ -592,6 +563,19 @@ class MakeMigrationsTests(MigrationTestBase):
                 content = content.replace(' ', '')
                 self.assertIn('dependencies=[\n]', content)
                 self.assertIn('operations=[\n]', content)
+
+    @override_settings(MIGRATION_MODULES={"migrations": None})
+    def test_makemigrations_disabled_migrations_for_app(self):
+        """
+        makemigrations raises a nice error when migrations are disabled for an
+        app.
+        """
+        msg = (
+            "Django can't create migrations for app 'migrations' because migrations "
+            "have been disabled via the MIGRATION_MODULES setting."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            call_command("makemigrations", "migrations", empty=True, verbosity=0)
 
     def test_makemigrations_no_changes_no_apps(self):
         """
@@ -865,7 +849,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = "migrations"
 
         out = six.StringIO()
-        with self.temporary_migration_module(module="migrations.test_migrations_path_doesnt_exist.foo.bar") as migration_dir:
+        migration_module = "migrations.test_migrations_path_doesnt_exist.foo.bar"
+        with self.temporary_migration_module(module=migration_module) as migration_dir:
             call_command("makemigrations", "migrations", stdout=out)
 
             # Migrations file is actually created in the expected path.
@@ -999,6 +984,7 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertIn("dependencies=[\n('migrations','0001_%s'),\n]" % migration_name_0001, content)
             self.assertIn("operations=[\n]", content)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_makemigrations_exit(self):
         """
         makemigrations --exit should exit with sys.exit(1) when there are no
@@ -1010,6 +996,30 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
             with self.assertRaises(SystemExit):
                 call_command("makemigrations", "--exit", "migrations", verbosity=0)
+
+    def test_makemigrations_check(self):
+        """
+        makemigrations --check should exit with a non-zero status when
+        there are changes to an app requiring migrations.
+        """
+        with self.temporary_migration_module():
+            with self.assertRaises(SystemExit):
+                call_command("makemigrations", "--check", "migrations", verbosity=0)
+
+        with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
+            call_command("makemigrations", "--check", "migrations", verbosity=0)
+
+    def test_makemigrations_migration_path_output(self):
+        """
+        makemigrations should print the relative paths to the migrations unless
+        they are outside of the current tree, in which case the absolute path
+        should be shown.
+        """
+        out = six.StringIO()
+        apps.register_model('migrations', UnicodeModel)
+        with self.temporary_migration_module() as migration_dir:
+            call_command("makemigrations", "migrations", stdout=out)
+            self.assertIn(os.path.join(migration_dir, '0001_initial.py'), out.getvalue())
 
 
 class SquashMigrationsTests(MigrationTestBase):
@@ -1054,3 +1064,34 @@ class SquashMigrationsTests(MigrationTestBase):
             call_command("squashmigrations", "migrations", "0002",
                          interactive=False, verbosity=1, no_optimize=True, stdout=out)
         self.assertIn("Skipping optimization", force_text(out.getvalue()))
+
+    def test_squashmigrations_valid_start(self):
+        """
+        squashmigrations accepts a starting migration.
+        """
+        out = six.StringIO()
+        with self.temporary_migration_module(module="migrations.test_migrations_no_changes") as migration_dir:
+            call_command("squashmigrations", "migrations", "0002", "0003",
+                         interactive=False, verbosity=1, stdout=out)
+
+            squashed_migration_file = os.path.join(migration_dir, "0002_second_squashed_0003_third.py")
+            with codecs.open(squashed_migration_file, "r", encoding="utf-8") as fp:
+                content = fp.read()
+                self.assertIn("        ('migrations', '0001_initial')", content)
+                self.assertNotIn("initial = True", content)
+        out = force_text(out.getvalue())
+        self.assertNotIn(" - 0001_initial", out)
+        self.assertIn(" - 0002_second", out)
+        self.assertIn(" - 0003_third", out)
+
+    def test_squashmigrations_invalid_start(self):
+        """
+        squashmigrations doesn't accept a starting migration after the ending migration.
+        """
+        with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
+            msg = (
+                "The migration 'migrations.0003_third' cannot be found. Maybe "
+                "it comes after the migration 'migrations.0002_second'"
+            )
+            with self.assertRaisesMessage(CommandError, msg):
+                call_command("squashmigrations", "migrations", "0003", "0002", interactive=False, verbosity=0)

@@ -16,6 +16,7 @@ from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.encoding import (
     escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
 )
+from django.utils.http import is_same_domain
 from django.utils.six.moves.urllib.parse import (
     parse_qsl, quote, urlencode, urljoin, urlsplit,
 )
@@ -546,15 +547,7 @@ def validate_host(host, allowed_hosts):
     host = host[:-1] if host.endswith('.') else host
 
     for pattern in allowed_hosts:
-        pattern = pattern.lower()
-        match = (
-            pattern == '*' or
-            pattern.startswith('.') and (
-                host.endswith(pattern) or host == pattern[1:]
-            ) or
-            pattern == host
-        )
-        if match:
+        if pattern == '*' or is_same_domain(host, pattern):
             return True
 
     return False

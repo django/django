@@ -68,8 +68,6 @@ Adds a few conveniences for perfectionists:
 
 .. attribute:: CommonMiddleware.response_redirect_class
 
-.. versionadded:: 1.8
-
 Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
 ``CommonMiddleware`` and override the attribute to customize the redirects
 issued by the middleware.
@@ -179,8 +177,6 @@ Security middleware
     the same protections as requests to your Django application.
 
 .. class:: SecurityMiddleware
-
-.. versionadded:: 1.8
 
 The ``django.middleware.security.SecurityMiddleware`` provides several security
 enhancements to the request/response cycle. Each one can be independently
@@ -381,13 +377,6 @@ Middleware for utilizing Web server provided authentication. See
 Middleware for utilizing Web server provided authentication when enabled only
 on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
 details.
-
-.. class:: SessionAuthenticationMiddleware
-
-Allows a user's sessions to be invalidated when their password changes. See
-:ref:`session-invalidation-on-password-change` for details. This middleware must
-appear after :class:`django.contrib.auth.middleware.AuthenticationMiddleware`
-in :setting:`MIDDLEWARE_CLASSES`.
 
 CSRF protection middleware
 --------------------------

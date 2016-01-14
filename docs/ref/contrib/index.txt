@@ -35,7 +35,6 @@ those packages have.
    sites
    staticfiles
    syndication
-   webdesign
 
 admin
 =====
@@ -117,7 +116,7 @@ See the :doc:`sessions documentation </topics/http/sessions>`.
 sites
 =====
 
-A light framework that lets you operate multiple Web sites off of the same
+A light framework that lets you operate multiple websites off of the same
 database and Django installation. It gives you hooks for associating objects to
 one or more sites.
 
@@ -136,14 +135,6 @@ syndication
 A framework for generating syndication feeds, in RSS and Atom, quite easily.
 
 See the :doc:`syndication documentation </ref/contrib/syndication>`.
-
-webdesign
-=========
-
-Helpers and utilities targeted primarily at Web *designers* rather than
-Web *developers*.
-
-See the :doc:`Web design helpers documentation </ref/contrib/webdesign>`.
 
 Other add-ons
 =============

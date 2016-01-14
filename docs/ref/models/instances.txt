@@ -67,8 +67,6 @@ Customizing model loading
 
 .. classmethod:: Model.from_db(db, field_names, values)
 
-.. versionadded:: 1.8
-
 The ``from_db()`` method can be used to customize model instance creation
 when loading from the database.
 
@@ -120,8 +118,6 @@ Refreshing objects from database
 ================================
 
 .. method:: Model.refresh_from_db(using=None, fields=None, **kwargs)
-
-.. versionadded:: 1.8
 
 If you need to reload a model's values from the database, you can use the
 ``refresh_from_db()`` method. When this method is called without arguments the
@@ -177,8 +173,6 @@ all of the instance's fields when a deferred field is reloaded::
             super(ExampleModel, self).refresh_from_db(using, fields, **kwargs)
 
 .. method:: Model.get_deferred_fields()
-
-.. versionadded:: 1.8
 
 A helper method that returns a set containing the attribute names of all those
 fields that are currently deferred for this model.
@@ -582,8 +576,6 @@ the data that's currently in the database.
     Django version N+1. Pickles should not be used as part of a long-term
     archival strategy.
 
-    .. versionadded:: 1.8
-
     Since pickle compatibility errors can be difficult to diagnose, such as
     silently corrupted objects, a ``RuntimeWarning`` is raised when you try to
     unpickle a model in a Django version that is different than the one in
@@ -596,58 +588,23 @@ Other model instance methods
 
 A few object methods have special purposes.
 
-.. note::
-    On Python 3, as all strings are natively considered Unicode, only use the
-    ``__str__()`` method (the ``__unicode__()`` method is obsolete).
-    If you'd like compatibility with Python 2, you can decorate your model class
-    with :func:`~django.utils.encoding.python_2_unicode_compatible`.
-
-``__unicode__``
----------------
-
-.. method:: Model.__unicode__()
-
-The ``__unicode__()`` method is called whenever you call ``unicode()`` on an
-object. Django uses ``unicode(obj)`` (or the related function, :meth:`str(obj)
-<Model.__str__>`) in a number of places. Most notably, to display an object in
-the Django admin site and as the value inserted into a template when it
-displays an object. Thus, you should always return a nice, human-readable
-representation of the model from the ``__unicode__()`` method.
-
-For example::
-
-    from django.db import models
-
-    class Person(models.Model):
-        first_name = models.CharField(max_length=50)
-        last_name = models.CharField(max_length=50)
-
-        def __unicode__(self):
-            return u'%s %s' % (self.first_name, self.last_name)
-
-If you define a ``__unicode__()`` method on your model and not a
-:meth:`~Model.__str__()` method, Django will automatically provide you with a
-:meth:`~Model.__str__()` that calls ``__unicode__()`` and then converts the
-result correctly to a UTF-8 encoded string object. This is recommended
-development practice: define only ``__unicode__()`` and let Django take care of
-the conversion to string objects when required.
-
 ``__str__``
 -----------
 
 .. method:: Model.__str__()
 
-The ``__str__()`` method is called whenever you call ``str()`` on an
-object. In Python 3, Django uses ``str(obj)`` in a number of
-places. Most notably, to display an object in the Django admin site
-and as the value inserted into a template when it displays an
-object. Thus, you should always return a nice, human-readable
+The ``__str__()`` method is called whenever you call ``str()`` on an object.
+Django uses ``str(obj)`` in a number of places. Most notably, to display an
+object in the Django admin site and as the value inserted into a template when
+it displays an object. Thus, you should always return a nice, human-readable
 representation of the model from the ``__str__()`` method.
 
 For example::
 
     from django.db import models
+    from django.utils.encoding import python_2_unicode_compatible
 
+    @python_2_unicode_compatible  # only if you need to support Python 2
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
@@ -655,26 +612,8 @@ For example::
         def __str__(self):
             return '%s %s' % (self.first_name, self.last_name)
 
-In Python 2, the main use of ``__str__`` directly inside Django is
-when the ``repr()`` output of a model is displayed anywhere (for
-example, in debugging output). It isn't required to put ``__str__()``
-methods everywhere if you have sensible :meth:`~Model.__unicode__()`
-methods.
-
-The previous :meth:`~Model.__unicode__()` example could be similarly written
-using ``__str__()`` like this::
-
-    from django.db import models
-    from django.utils.encoding import force_bytes
-
-    class Person(models.Model):
-        first_name = models.CharField(max_length=50)
-        last_name = models.CharField(max_length=50)
-
-        def __str__(self):
-            # Note use of django.utils.encoding.force_bytes() here because
-            # first_name and last_name will be unicode strings.
-            return force_bytes('%s %s' % (self.first_name, self.last_name))
+If you'd like compatibility with Python 2, you can decorate your model class
+with :func:`~django.utils.encoding.python_2_unicode_compatible` as shown above.
 
 ``__eq__``
 ----------
@@ -733,14 +672,14 @@ For example::
     def get_absolute_url(self):
         return "/people/%i/" % self.id
 
-(Whilst this code is correct and simple, it may not be the most portable way to
-write this kind of method. The :func:`~django.core.urlresolvers.reverse`
-function is usually the best approach.)
+While this code is correct and simple, it may not be the most portable way to
+to write this kind of method. The :func:`~django.urls.reverse` function is
+usually the best approach.
 
 For example::
 
     def get_absolute_url(self):
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
         return reverse('people.views.details', args=[str(self.id)])
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object

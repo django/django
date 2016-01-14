@@ -2,40 +2,39 @@ from __future__ import unicode_literals
 
 import warnings
 from functools import partial
-from operator import attrgetter
 
 from django import forms
 from django.apps import apps
 from django.core import checks, exceptions
-from django.core.exceptions import FieldDoesNotExist
-from django.db import connection, connections, router, transaction
+from django.db import connection, router
 from django.db.backends import utils
-from django.db.models import Q, signals
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
-from django.db.models.fields import (
-    BLANK_CHOICE_DASH, AutoField, Field, IntegerField, PositiveIntegerField,
-    PositiveSmallIntegerField,
-)
-from django.db.models.fields.related_lookups import (
-    RelatedExact, RelatedGreaterThan, RelatedGreaterThanOrEqual, RelatedIn,
-    RelatedLessThan, RelatedLessThanOrEqual,
-)
-from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils import six
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property, curry
 from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_docs_version
 
+from . import Field
+from .related_descriptors import (
+    ForwardManyToOneDescriptor, ManyToManyDescriptor,
+    ReverseManyToOneDescriptor, ReverseOneToOneDescriptor,
+)
+from .related_lookups import (
+    RelatedExact, RelatedGreaterThan, RelatedGreaterThanOrEqual, RelatedIn,
+    RelatedIsNull, RelatedLessThan, RelatedLessThanOrEqual,
+)
+from .reverse_related import (
+    ForeignObjectRel, ManyToManyRel, ManyToOneRel, OneToOneRel,
+)
+
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
 
-def resolve_relation(scope_model, relation):
+def resolve_relation(scope_model, relation, resolve_recursive_relationship=True):
     """
     Transform relation into a model or fully-qualified model string of the form
     "app_label.ModelName", relative to scope_model.
@@ -50,12 +49,11 @@ def resolve_relation(scope_model, relation):
     """
     # Check for recursive relations
     if relation == RECURSIVE_RELATIONSHIP_CONSTANT:
-        relation = scope_model
-
+        if resolve_recursive_relationship:
+            relation = scope_model
     # Look for an "app.Model" relation
-    if isinstance(relation, six.string_types):
-        if "." not in relation:
-            relation = "%s.%s" % (scope_model._meta.app_label, relation)
+    elif isinstance(relation, six.string_types) and '.' not in relation:
+        relation = "%s.%s" % (scope_model._meta.app_label, relation)
 
     return relation
 
@@ -120,7 +118,7 @@ class RelatedField(Field):
         import re
         import keyword
         related_name = self.remote_field.related_name
-        if not related_name:
+        if related_name is None:
             return []
         is_valid_id = True
         if keyword.iskeyword(related_name):
@@ -145,7 +143,7 @@ class RelatedField(Field):
         return []
 
     def _check_relation_model_exists(self):
-        rel_is_missing = self.remote_field.model not in apps.get_models()
+        rel_is_missing = self.remote_field.model not in self.opts.apps.get_models()
         rel_is_string = isinstance(self.remote_field.model, six.string_types)
         model_name = self.remote_field.model if rel_is_string else self.remote_field.model._meta.object_name
         if rel_is_missing and (rel_is_string or not self.remote_field.model._meta.swapped):
@@ -161,7 +159,7 @@ class RelatedField(Field):
         return []
 
     def _check_referencing_to_swapped_model(self):
-        if (self.remote_field.model not in apps.get_models() and
+        if (self.remote_field.model not in self.opts.apps.get_models() and
                 not isinstance(self.remote_field.model, six.string_types) and
                 self.remote_field.model._meta.swapped):
             model = "%s.%s" % (
@@ -302,6 +300,11 @@ class RelatedField(Field):
                 field.remote_field.model = related
                 field.do_related_class(related, model)
             lazy_related_operation(resolve_related_class, cls, self.remote_field.model, field=self)
+        else:
+            # Bind a lazy reference to the app in which the model is defined.
+            self.remote_field.model = resolve_relation(
+                cls, self.remote_field.model, resolve_recursive_relationship=False
+            )
 
     def get_forward_related_filter(self, obj):
         """
@@ -346,17 +349,13 @@ class RelatedField(Field):
         return None
 
     def set_attributes_from_rel(self):
-        self.name = self.name or (self.remote_field.model._meta.model_name + '_' + self.remote_field.model._meta.pk.name)
+        self.name = (
+            self.name or
+            (self.remote_field.model._meta.model_name + '_' + self.remote_field.model._meta.pk.name)
+        )
         if self.verbose_name is None:
             self.verbose_name = self.remote_field.model._meta.verbose_name
         self.remote_field.set_field_name()
-
-    @property
-    def related(self):
-        warnings.warn(
-            "Usage of field.related has been deprecated. Use field.remote_field instead.",
-            RemovedInDjango110Warning, 2)
-        return self.remote_field
 
     def do_related_class(self, other, cls):
         self.set_attributes_from_rel()
@@ -413,1185 +412,6 @@ class RelatedField(Field):
         return target_fields[0]
 
 
-class SingleRelatedObjectDescriptor(object):
-    """
-    Accessor to the related object on the reverse side of a one-to-one
-    relation.
-
-    In the example::
-
-        class Restaurant(Model):
-            place = OneToOneField(Place, related_name='restaurant')
-
-    ``place.restaurant`` is a ``SingleRelatedObjectDescriptor`` instance.
-    """
-
-    def __init__(self, related):
-        self.related = related
-        self.cache_name = related.get_cache_name()
-
-    @cached_property
-    def RelatedObjectDoesNotExist(self):
-        # The exception isn't created at initialization time for the sake of
-        # consistency with `ReverseSingleRelatedObjectDescriptor`.
-        return type(
-            str('RelatedObjectDoesNotExist'),
-            (self.related.related_model.DoesNotExist, AttributeError),
-            {}
-        )
-
-    def is_cached(self, instance):
-        return hasattr(instance, self.cache_name)
-
-    def get_queryset(self, **hints):
-        manager = self.related.related_model._default_manager
-        # If the related manager indicates that it should be used for
-        # related fields, respect that.
-        if not getattr(manager, 'use_for_related_fields', False):
-            manager = self.related.related_model._base_manager
-        return manager.db_manager(hints=hints).all()
-
-    def get_prefetch_queryset(self, instances, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
-        queryset._add_hints(instance=instances[0])
-
-        rel_obj_attr = attrgetter(self.related.field.attname)
-        instance_attr = lambda obj: obj._get_pk_val()
-        instances_dict = {instance_attr(inst): inst for inst in instances}
-        query = {'%s__in' % self.related.field.name: instances}
-        queryset = queryset.filter(**query)
-
-        # Since we're going to assign directly in the cache,
-        # we must manage the reverse relation cache manually.
-        rel_obj_cache_name = self.related.field.get_cache_name()
-        for rel_obj in queryset:
-            instance = instances_dict[rel_obj_attr(rel_obj)]
-            setattr(rel_obj, rel_obj_cache_name, instance)
-        return queryset, rel_obj_attr, instance_attr, True, self.cache_name
-
-    def __get__(self, instance, instance_type=None):
-        if instance is None:
-            return self
-        try:
-            rel_obj = getattr(instance, self.cache_name)
-        except AttributeError:
-            related_pk = instance._get_pk_val()
-            if related_pk is None:
-                rel_obj = None
-            else:
-                filter_args = self.related.field.get_forward_related_filter(instance)
-                try:
-                    rel_obj = self.get_queryset(instance=instance).get(**filter_args)
-                except self.related.related_model.DoesNotExist:
-                    rel_obj = None
-                else:
-                    setattr(rel_obj, self.related.field.get_cache_name(), instance)
-            setattr(instance, self.cache_name, rel_obj)
-        if rel_obj is None:
-            raise self.RelatedObjectDoesNotExist(
-                "%s has no %s." % (
-                    instance.__class__.__name__,
-                    self.related.get_accessor_name()
-                )
-            )
-        else:
-            return rel_obj
-
-    def __set__(self, instance, value):
-        # The similarity of the code below to the code in
-        # ReverseSingleRelatedObjectDescriptor is annoying, but there's a bunch
-        # of small differences that would make a common base class convoluted.
-
-        # If null=True, we can assign null here, but otherwise the value needs
-        # to be an instance of the related class.
-        if value is None and self.related.field.null is False:
-            raise ValueError(
-                'Cannot assign None: "%s.%s" does not allow null values.' % (
-                    instance._meta.object_name,
-                    self.related.get_accessor_name(),
-                )
-            )
-        elif value is not None and not isinstance(value, self.related.related_model):
-            raise ValueError(
-                'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
-                    value,
-                    instance._meta.object_name,
-                    self.related.get_accessor_name(),
-                    self.related.related_model._meta.object_name,
-                )
-            )
-        elif value is not None:
-            if instance._state.db is None:
-                instance._state.db = router.db_for_write(instance.__class__, instance=value)
-            elif value._state.db is None:
-                value._state.db = router.db_for_write(value.__class__, instance=instance)
-            elif value._state.db is not None and instance._state.db is not None:
-                if not router.allow_relation(value, instance):
-                    raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
-
-        related_pk = tuple(getattr(instance, field.attname) for field in self.related.field.foreign_related_fields)
-        if None in related_pk:
-            raise ValueError(
-                'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
-                (value, instance._meta.object_name)
-            )
-
-        # Set the value of the related field to the value of the related object's related field
-        for index, field in enumerate(self.related.field.local_related_fields):
-            setattr(value, field.attname, related_pk[index])
-
-        # Since we already know what the related object is, seed the related
-        # object caches now, too. This avoids another db hit if you get the
-        # object you just set.
-        setattr(instance, self.cache_name, value)
-        setattr(value, self.related.field.get_cache_name(), instance)
-
-
-class ReverseSingleRelatedObjectDescriptor(object):
-    """
-    Accessor to the related object on the forward side of a many-to-one or
-    one-to-one relation.
-
-    In the example::
-
-        class Choice(Model):
-            poll = ForeignKey(Place, related_name='choices')
-
-    `choice.poll` is a ReverseSingleRelatedObjectDescriptor instance.
-    """
-
-    def __init__(self, field_with_rel):
-        self.field = field_with_rel
-        self.cache_name = self.field.get_cache_name()
-
-    @cached_property
-    def RelatedObjectDoesNotExist(self):
-        # The exception can't be created at initialization time since the
-        # related model might not be resolved yet; `rel.model` might still be
-        # a string model reference.
-        return type(
-            str('RelatedObjectDoesNotExist'),
-            (self.field.remote_field.model.DoesNotExist, AttributeError),
-            {}
-        )
-
-    def is_cached(self, instance):
-        return hasattr(instance, self.cache_name)
-
-    def get_queryset(self, **hints):
-        manager = self.field.remote_field.model._default_manager
-        # If the related manager indicates that it should be used for
-        # related fields, respect that.
-        if not getattr(manager, 'use_for_related_fields', False):
-            manager = self.field.remote_field.model._base_manager
-        return manager.db_manager(hints=hints).all()
-
-    def get_prefetch_queryset(self, instances, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
-        queryset._add_hints(instance=instances[0])
-
-        rel_obj_attr = self.field.get_foreign_related_value
-        instance_attr = self.field.get_local_related_value
-        instances_dict = {instance_attr(inst): inst for inst in instances}
-        related_field = self.field.foreign_related_fields[0]
-
-        # FIXME: This will need to be revisited when we introduce support for
-        # composite fields. In the meantime we take this practical approach to
-        # solve a regression on 1.6 when the reverse manager in hidden
-        # (related_name ends with a '+'). Refs #21410.
-        # The check for len(...) == 1 is a special case that allows the query
-        # to be join-less and smaller. Refs #21760.
-        if self.field.remote_field.is_hidden() or len(self.field.foreign_related_fields) == 1:
-            query = {'%s__in' % related_field.name: set(instance_attr(inst)[0] for inst in instances)}
-        else:
-            query = {'%s__in' % self.field.related_query_name(): instances}
-        queryset = queryset.filter(**query)
-
-        # Since we're going to assign directly in the cache,
-        # we must manage the reverse relation cache manually.
-        if not self.field.remote_field.multiple:
-            rel_obj_cache_name = self.field.remote_field.get_cache_name()
-            for rel_obj in queryset:
-                instance = instances_dict[rel_obj_attr(rel_obj)]
-                setattr(rel_obj, rel_obj_cache_name, instance)
-        return queryset, rel_obj_attr, instance_attr, True, self.cache_name
-
-    def __get__(self, instance, instance_type=None):
-        if instance is None:
-            return self
-        try:
-            rel_obj = getattr(instance, self.cache_name)
-        except AttributeError:
-            val = self.field.get_local_related_value(instance)
-            if None in val:
-                rel_obj = None
-            else:
-                qs = self.get_queryset(instance=instance)
-                qs = qs.filter(**self.field.get_reverse_related_filter(instance))
-                # Assuming the database enforces foreign keys, this won't fail.
-                rel_obj = qs.get()
-                if not self.field.remote_field.multiple:
-                    setattr(rel_obj, self.field.remote_field.get_cache_name(), instance)
-            setattr(instance, self.cache_name, rel_obj)
-        if rel_obj is None and not self.field.null:
-            raise self.RelatedObjectDoesNotExist(
-                "%s has no %s." % (self.field.model.__name__, self.field.name)
-            )
-        else:
-            return rel_obj
-
-    def __set__(self, instance, value):
-        # If null=True, we can assign null here, but otherwise the value needs
-        # to be an instance of the related class.
-        if value is None and self.field.null is False:
-            raise ValueError(
-                'Cannot assign None: "%s.%s" does not allow null values.' %
-                (instance._meta.object_name, self.field.name)
-            )
-        elif value is not None and not isinstance(value, self.field.remote_field.model):
-            raise ValueError(
-                'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
-                    value,
-                    instance._meta.object_name,
-                    self.field.name,
-                    self.field.remote_field.model._meta.object_name,
-                )
-            )
-        elif value is not None:
-            if instance._state.db is None:
-                instance._state.db = router.db_for_write(instance.__class__, instance=value)
-            elif value._state.db is None:
-                value._state.db = router.db_for_write(value.__class__, instance=instance)
-            elif value._state.db is not None and instance._state.db is not None:
-                if not router.allow_relation(value, instance):
-                    raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
-
-        # If we're setting the value of a OneToOneField to None, we need to clear
-        # out the cache on any old related object. Otherwise, deleting the
-        # previously-related object will also cause this object to be deleted,
-        # which is wrong.
-        if value is None:
-            # Look up the previously-related object, which may still be available
-            # since we've not yet cleared out the related field.
-            # Use the cache directly, instead of the accessor; if we haven't
-            # populated the cache, then we don't care - we're only accessing
-            # the object to invalidate the accessor cache, so there's no
-            # need to populate the cache just to expire it again.
-            related = getattr(instance, self.cache_name, None)
-
-            # If we've got an old related object, we need to clear out its
-            # cache. This cache also might not exist if the related object
-            # hasn't been accessed yet.
-            if related is not None:
-                setattr(related, self.field.remote_field.get_cache_name(), None)
-
-            for lh_field, rh_field in self.field.related_fields:
-                setattr(instance, lh_field.attname, None)
-
-        # Set the values of the related field.
-        else:
-            for lh_field, rh_field in self.field.related_fields:
-                setattr(instance, lh_field.attname, getattr(value, rh_field.attname))
-
-        # Since we already know what the related object is, seed the related
-        # object caches now, too. This avoids another db hit if you get the
-        # object you just set.
-        setattr(instance, self.cache_name, value)
-        if value is not None and not self.field.remote_field.multiple:
-            setattr(value, self.field.remote_field.get_cache_name(), instance)
-
-
-def create_foreign_related_manager(superclass, rel):
-    """
-    Factory function to create a manager that subclasses another manager
-    (generally the default manager of a given model) and adds behaviors
-    specific to many-to-one relations.
-    """
-
-    class RelatedManager(superclass):
-        def __init__(self, instance):
-            super(RelatedManager, self).__init__()
-
-            self.instance = instance
-            self.model = rel.related_model
-            self.field = rel.field
-
-            self.core_filters = {self.field.name: instance}
-
-        def __call__(self, **kwargs):
-            # We use **kwargs rather than a kwarg argument to enforce the
-            # `manager='manager_name'` syntax.
-            manager = getattr(self.model, kwargs.pop('manager'))
-            manager_class = create_foreign_related_manager(manager.__class__, rel)
-            return manager_class(self.instance)
-        do_not_call_in_templates = True
-
-        def get_queryset(self):
-            try:
-                return self.instance._prefetched_objects_cache[self.field.related_query_name()]
-            except (AttributeError, KeyError):
-                db = self._db or router.db_for_read(self.model, instance=self.instance)
-                empty_strings_as_null = connections[db].features.interprets_empty_strings_as_nulls
-                qs = super(RelatedManager, self).get_queryset()
-                qs._add_hints(instance=self.instance)
-                if self._db:
-                    qs = qs.using(self._db)
-                qs = qs.filter(**self.core_filters)
-                for field in self.field.foreign_related_fields:
-                    val = getattr(self.instance, field.attname)
-                    if val is None or (val == '' and empty_strings_as_null):
-                        return qs.none()
-                qs._known_related_objects = {self.field: {self.instance.pk: self.instance}}
-                return qs
-
-        def get_prefetch_queryset(self, instances, queryset=None):
-            if queryset is None:
-                queryset = super(RelatedManager, self).get_queryset()
-
-            queryset._add_hints(instance=instances[0])
-            queryset = queryset.using(queryset._db or self._db)
-
-            rel_obj_attr = self.field.get_local_related_value
-            instance_attr = self.field.get_foreign_related_value
-            instances_dict = {instance_attr(inst): inst for inst in instances}
-            query = {'%s__in' % self.field.name: instances}
-            queryset = queryset.filter(**query)
-
-            # Since we just bypassed this class' get_queryset(), we must manage
-            # the reverse relation manually.
-            for rel_obj in queryset:
-                instance = instances_dict[rel_obj_attr(rel_obj)]
-                setattr(rel_obj, self.field.name, instance)
-            cache_name = self.field.related_query_name()
-            return queryset, rel_obj_attr, instance_attr, False, cache_name
-
-        def add(self, *objs, **kwargs):
-            bulk = kwargs.pop('bulk', True)
-            objs = list(objs)
-            db = router.db_for_write(self.model, instance=self.instance)
-
-            def check_and_update_obj(obj):
-                if not isinstance(obj, self.model):
-                    raise TypeError("'%s' instance expected, got %r" % (
-                        self.model._meta.object_name, obj,
-                    ))
-                setattr(obj, self.field.name, self.instance)
-
-            if bulk:
-                pks = []
-                for obj in objs:
-                    check_and_update_obj(obj)
-                    if obj._state.adding or obj._state.db != db:
-                        raise ValueError(
-                            "%r instance isn't saved. Use bulk=False or save "
-                            "the object first." % obj
-                        )
-                    pks.append(obj.pk)
-                self.model._base_manager.using(db).filter(pk__in=pks).update(**{
-                    self.field.name: self.instance,
-                })
-            else:
-                with transaction.atomic(using=db, savepoint=False):
-                    for obj in objs:
-                        check_and_update_obj(obj)
-                        obj.save()
-        add.alters_data = True
-
-        def create(self, **kwargs):
-            kwargs[self.field.name] = self.instance
-            db = router.db_for_write(self.model, instance=self.instance)
-            return super(RelatedManager, self.db_manager(db)).create(**kwargs)
-        create.alters_data = True
-
-        def get_or_create(self, **kwargs):
-            kwargs[self.field.name] = self.instance
-            db = router.db_for_write(self.model, instance=self.instance)
-            return super(RelatedManager, self.db_manager(db)).get_or_create(**kwargs)
-        get_or_create.alters_data = True
-
-        def update_or_create(self, **kwargs):
-            kwargs[self.field.name] = self.instance
-            db = router.db_for_write(self.model, instance=self.instance)
-            return super(RelatedManager, self.db_manager(db)).update_or_create(**kwargs)
-        update_or_create.alters_data = True
-
-        # remove() and clear() are only provided if the ForeignKey can have a value of null.
-        if rel.field.null:
-            def remove(self, *objs, **kwargs):
-                if not objs:
-                    return
-                bulk = kwargs.pop('bulk', True)
-                val = self.field.get_foreign_related_value(self.instance)
-                old_ids = set()
-                for obj in objs:
-                    # Is obj actually part of this descriptor set?
-                    if self.field.get_local_related_value(obj) == val:
-                        old_ids.add(obj.pk)
-                    else:
-                        raise self.field.remote_field.model.DoesNotExist("%r is not related to %r." % (obj, self.instance))
-                self._clear(self.filter(pk__in=old_ids), bulk)
-            remove.alters_data = True
-
-            def clear(self, **kwargs):
-                bulk = kwargs.pop('bulk', True)
-                self._clear(self, bulk)
-            clear.alters_data = True
-
-            def _clear(self, queryset, bulk):
-                db = router.db_for_write(self.model, instance=self.instance)
-                queryset = queryset.using(db)
-                if bulk:
-                    # `QuerySet.update()` is intrinsically atomic.
-                    queryset.update(**{self.field.name: None})
-                else:
-                    with transaction.atomic(using=db, savepoint=False):
-                        for obj in queryset:
-                            setattr(obj, self.field.name, None)
-                            obj.save(update_fields=[self.field.name])
-            _clear.alters_data = True
-
-        def set(self, objs, **kwargs):
-            # Force evaluation of `objs` in case it's a queryset whose value
-            # could be affected by `manager.clear()`. Refs #19816.
-            objs = tuple(objs)
-
-            bulk = kwargs.pop('bulk', True)
-            clear = kwargs.pop('clear', False)
-
-            if self.field.null:
-                db = router.db_for_write(self.model, instance=self.instance)
-                with transaction.atomic(using=db, savepoint=False):
-                    if clear:
-                        self.clear()
-                        self.add(*objs, bulk=bulk)
-                    else:
-                        old_objs = set(self.using(db).all())
-                        new_objs = []
-                        for obj in objs:
-                            if obj in old_objs:
-                                old_objs.remove(obj)
-                            else:
-                                new_objs.append(obj)
-
-                        self.remove(*old_objs, bulk=bulk)
-                        self.add(*new_objs, bulk=bulk)
-            else:
-                self.add(*objs, bulk=bulk)
-        set.alters_data = True
-
-    return RelatedManager
-
-
-class ForeignRelatedObjectsDescriptor(object):
-    """
-    Accessor to the related objects manager on the reverse side of a
-    many-to-one relation.
-
-    In the example::
-
-        class Choice(Model):
-            poll = ForeignKey(Place, related_name='choices')
-
-    ``poll.choices`` is a ``ForeignRelatedObjectsDescriptor`` instance.
-    """
-
-    def __init__(self, rel):
-        self.rel = rel
-        self.field = rel.field
-
-    @cached_property
-    def related_manager_cls(self):
-        return create_foreign_related_manager(
-            self.rel.related_model._default_manager.__class__,
-            self.rel,
-        )
-
-    def __get__(self, instance, instance_type=None):
-        if instance is None:
-            return self
-
-        return self.related_manager_cls(instance)
-
-    def __set__(self, instance, value):
-        manager = self.__get__(instance)
-        manager.set(value)
-
-
-def create_many_related_manager(superclass, rel, reverse):
-    """
-    Factory function to create a manager that subclasses another manager
-    (generally the default manager of a given model) and adds behaviors
-    specific to many-to-many relations.
-    """
-
-    class ManyRelatedManager(superclass):
-        def __init__(self, instance=None):
-            super(ManyRelatedManager, self).__init__()
-
-            self.instance = instance
-
-            if not reverse:
-                self.model = rel.model
-                self.query_field_name = rel.field.related_query_name()
-                self.prefetch_cache_name = rel.field.name
-                self.source_field_name = rel.field.m2m_field_name()
-                self.target_field_name = rel.field.m2m_reverse_field_name()
-                self.symmetrical = rel.symmetrical
-            else:
-                self.model = rel.related_model
-                self.query_field_name = rel.field.name
-                self.prefetch_cache_name = rel.field.related_query_name()
-                self.source_field_name = rel.field.m2m_reverse_field_name()
-                self.target_field_name = rel.field.m2m_field_name()
-                self.symmetrical = False
-
-            self.through = rel.through
-            self.reverse = reverse
-
-            self.source_field = self.through._meta.get_field(self.source_field_name)
-            self.target_field = self.through._meta.get_field(self.target_field_name)
-
-            self.core_filters = {}
-            for lh_field, rh_field in self.source_field.related_fields:
-                self.core_filters['%s__%s' % (self.query_field_name, rh_field.name)] = getattr(instance, rh_field.attname)
-
-            self.related_val = self.source_field.get_foreign_related_value(instance)
-            if None in self.related_val:
-                raise ValueError('"%r" needs to have a value for field "%s" before '
-                                 'this many-to-many relationship can be used.' %
-                                 (instance, self.source_field_name))
-            # Even if this relation is not to pk, we require still pk value.
-            # The wish is that the instance has been already saved to DB,
-            # although having a pk value isn't a guarantee of that.
-            if instance.pk is None:
-                raise ValueError("%r instance needs to have a primary key value before "
-                                 "a many-to-many relationship can be used." %
-                                 instance.__class__.__name__)
-
-        def __call__(self, **kwargs):
-            # We use **kwargs rather than a kwarg argument to enforce the
-            # `manager='manager_name'` syntax.
-            manager = getattr(self.model, kwargs.pop('manager'))
-            manager_class = create_many_related_manager(manager.__class__, rel, reverse)
-            return manager_class(instance=self.instance)
-        do_not_call_in_templates = True
-
-        def _build_remove_filters(self, removed_vals):
-            filters = Q(**{self.source_field_name: self.related_val})
-            # No need to add a subquery condition if removed_vals is a QuerySet without
-            # filters.
-            removed_vals_filters = (not isinstance(removed_vals, QuerySet) or
-                                    removed_vals._has_filters())
-            if removed_vals_filters:
-                filters &= Q(**{'%s__in' % self.target_field_name: removed_vals})
-            if self.symmetrical:
-                symmetrical_filters = Q(**{self.target_field_name: self.related_val})
-                if removed_vals_filters:
-                    symmetrical_filters &= Q(
-                        **{'%s__in' % self.source_field_name: removed_vals})
-                filters |= symmetrical_filters
-            return filters
-
-        def get_queryset(self):
-            try:
-                return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
-            except (AttributeError, KeyError):
-                qs = super(ManyRelatedManager, self).get_queryset()
-                qs._add_hints(instance=self.instance)
-                if self._db:
-                    qs = qs.using(self._db)
-                return qs._next_is_sticky().filter(**self.core_filters)
-
-        def get_prefetch_queryset(self, instances, queryset=None):
-            if queryset is None:
-                queryset = super(ManyRelatedManager, self).get_queryset()
-
-            queryset._add_hints(instance=instances[0])
-            queryset = queryset.using(queryset._db or self._db)
-
-            query = {'%s__in' % self.query_field_name: instances}
-            queryset = queryset._next_is_sticky().filter(**query)
-
-            # M2M: need to annotate the query in order to get the primary model
-            # that the secondary model was actually related to. We know that
-            # there will already be a join on the join table, so we can just add
-            # the select.
-
-            # For non-autocreated 'through' models, can't assume we are
-            # dealing with PK values.
-            fk = self.through._meta.get_field(self.source_field_name)
-            join_table = self.through._meta.db_table
-            connection = connections[queryset.db]
-            qn = connection.ops.quote_name
-            queryset = queryset.extra(select={
-                '_prefetch_related_val_%s' % f.attname:
-                '%s.%s' % (qn(join_table), qn(f.column)) for f in fk.local_related_fields})
-            return (
-                queryset,
-                lambda result: tuple(
-                    getattr(result, '_prefetch_related_val_%s' % f.attname)
-                    for f in fk.local_related_fields
-                ),
-                lambda inst: tuple(
-                    f.get_db_prep_value(getattr(inst, f.attname), connection)
-                    for f in fk.foreign_related_fields
-                ),
-                False,
-                self.prefetch_cache_name,
-            )
-
-        def add(self, *objs):
-            if not rel.through._meta.auto_created:
-                opts = self.through._meta
-                raise AttributeError(
-                    "Cannot use add() on a ManyToManyField which specifies an "
-                    "intermediary model. Use %s.%s's Manager instead." %
-                    (opts.app_label, opts.object_name)
-                )
-
-            db = router.db_for_write(self.through, instance=self.instance)
-            with transaction.atomic(using=db, savepoint=False):
-                self._add_items(self.source_field_name, self.target_field_name, *objs)
-
-                # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
-                if self.symmetrical:
-                    self._add_items(self.target_field_name, self.source_field_name, *objs)
-        add.alters_data = True
-
-        def remove(self, *objs):
-            if not rel.through._meta.auto_created:
-                opts = self.through._meta
-                raise AttributeError(
-                    "Cannot use remove() on a ManyToManyField which specifies "
-                    "an intermediary model. Use %s.%s's Manager instead." %
-                    (opts.app_label, opts.object_name)
-                )
-            self._remove_items(self.source_field_name, self.target_field_name, *objs)
-        remove.alters_data = True
-
-        def clear(self):
-            db = router.db_for_write(self.through, instance=self.instance)
-            with transaction.atomic(using=db, savepoint=False):
-                signals.m2m_changed.send(sender=self.through, action="pre_clear",
-                    instance=self.instance, reverse=self.reverse,
-                    model=self.model, pk_set=None, using=db)
-
-                filters = self._build_remove_filters(super(ManyRelatedManager, self).get_queryset().using(db))
-                self.through._default_manager.using(db).filter(filters).delete()
-
-                signals.m2m_changed.send(sender=self.through, action="post_clear",
-                    instance=self.instance, reverse=self.reverse,
-                    model=self.model, pk_set=None, using=db)
-        clear.alters_data = True
-
-        def set(self, objs, **kwargs):
-            if not rel.through._meta.auto_created:
-                opts = self.through._meta
-                raise AttributeError(
-                    "Cannot set values on a ManyToManyField which specifies an "
-                    "intermediary model. Use %s.%s's Manager instead." %
-                    (opts.app_label, opts.object_name)
-                )
-
-            # Force evaluation of `objs` in case it's a queryset whose value
-            # could be affected by `manager.clear()`. Refs #19816.
-            objs = tuple(objs)
-
-            clear = kwargs.pop('clear', False)
-
-            db = router.db_for_write(self.through, instance=self.instance)
-            with transaction.atomic(using=db, savepoint=False):
-                if clear:
-                    self.clear()
-                    self.add(*objs)
-                else:
-                    old_ids = set(self.using(db).values_list(self.target_field.target_field.attname, flat=True))
-
-                    new_objs = []
-                    for obj in objs:
-                        fk_val = (self.target_field.get_foreign_related_value(obj)[0]
-                            if isinstance(obj, self.model) else obj)
-
-                        if fk_val in old_ids:
-                            old_ids.remove(fk_val)
-                        else:
-                            new_objs.append(obj)
-
-                    self.remove(*old_ids)
-                    self.add(*new_objs)
-        set.alters_data = True
-
-        def create(self, **kwargs):
-            # This check needs to be done here, since we can't later remove this
-            # from the method lookup table, as we do with add and remove.
-            if not self.through._meta.auto_created:
-                opts = self.through._meta
-                raise AttributeError(
-                    "Cannot use create() on a ManyToManyField which specifies "
-                    "an intermediary model. Use %s.%s's Manager instead." %
-                    (opts.app_label, opts.object_name)
-                )
-            db = router.db_for_write(self.instance.__class__, instance=self.instance)
-            new_obj = super(ManyRelatedManager, self.db_manager(db)).create(**kwargs)
-            self.add(new_obj)
-            return new_obj
-        create.alters_data = True
-
-        def get_or_create(self, **kwargs):
-            db = router.db_for_write(self.instance.__class__, instance=self.instance)
-            obj, created = super(ManyRelatedManager, self.db_manager(db)).get_or_create(**kwargs)
-            # We only need to add() if created because if we got an object back
-            # from get() then the relationship already exists.
-            if created:
-                self.add(obj)
-            return obj, created
-        get_or_create.alters_data = True
-
-        def update_or_create(self, **kwargs):
-            db = router.db_for_write(self.instance.__class__, instance=self.instance)
-            obj, created = super(ManyRelatedManager, self.db_manager(db)).update_or_create(**kwargs)
-            # We only need to add() if created because if we got an object back
-            # from get() then the relationship already exists.
-            if created:
-                self.add(obj)
-            return obj, created
-        update_or_create.alters_data = True
-
-        def _add_items(self, source_field_name, target_field_name, *objs):
-            # source_field_name: the PK fieldname in join table for the source object
-            # target_field_name: the PK fieldname in join table for the target object
-            # *objs - objects to add. Either object instances, or primary keys of object instances.
-
-            # If there aren't any objects, there is nothing to do.
-            from django.db.models import Model
-            if objs:
-                new_ids = set()
-                for obj in objs:
-                    if isinstance(obj, self.model):
-                        if not router.allow_relation(obj, self.instance):
-                            raise ValueError(
-                                'Cannot add "%r": instance is on database "%s", value is on database "%s"' %
-                                (obj, self.instance._state.db, obj._state.db)
-                            )
-                        fk_val = self.through._meta.get_field(
-                            target_field_name).get_foreign_related_value(obj)[0]
-                        if fk_val is None:
-                            raise ValueError(
-                                'Cannot add "%r": the value for field "%s" is None' %
-                                (obj, target_field_name)
-                            )
-                        new_ids.add(fk_val)
-                    elif isinstance(obj, Model):
-                        raise TypeError(
-                            "'%s' instance expected, got %r" %
-                            (self.model._meta.object_name, obj)
-                        )
-                    else:
-                        new_ids.add(obj)
-
-                db = router.db_for_write(self.through, instance=self.instance)
-                vals = (self.through._default_manager.using(db)
-                        .values_list(target_field_name, flat=True)
-                        .filter(**{
-                            source_field_name: self.related_val[0],
-                            '%s__in' % target_field_name: new_ids,
-                        }))
-                new_ids = new_ids - set(vals)
-
-                with transaction.atomic(using=db, savepoint=False):
-                    if self.reverse or source_field_name == self.source_field_name:
-                        # Don't send the signal when we are inserting the
-                        # duplicate data row for symmetrical reverse entries.
-                        signals.m2m_changed.send(sender=self.through, action='pre_add',
-                            instance=self.instance, reverse=self.reverse,
-                            model=self.model, pk_set=new_ids, using=db)
-
-                    # Add the ones that aren't there already
-                    self.through._default_manager.using(db).bulk_create([
-                        self.through(**{
-                            '%s_id' % source_field_name: self.related_val[0],
-                            '%s_id' % target_field_name: obj_id,
-                        })
-                        for obj_id in new_ids
-                    ])
-
-                    if self.reverse or source_field_name == self.source_field_name:
-                        # Don't send the signal when we are inserting the
-                        # duplicate data row for symmetrical reverse entries.
-                        signals.m2m_changed.send(sender=self.through, action='post_add',
-                            instance=self.instance, reverse=self.reverse,
-                            model=self.model, pk_set=new_ids, using=db)
-
-        def _remove_items(self, source_field_name, target_field_name, *objs):
-            # source_field_name: the PK colname in join table for the source object
-            # target_field_name: the PK colname in join table for the target object
-            # *objs - objects to remove
-            if not objs:
-                return
-
-            # Check that all the objects are of the right type
-            old_ids = set()
-            for obj in objs:
-                if isinstance(obj, self.model):
-                    fk_val = self.target_field.get_foreign_related_value(obj)[0]
-                    old_ids.add(fk_val)
-                else:
-                    old_ids.add(obj)
-
-            db = router.db_for_write(self.through, instance=self.instance)
-            with transaction.atomic(using=db, savepoint=False):
-                # Send a signal to the other end if need be.
-                signals.m2m_changed.send(sender=self.through, action="pre_remove",
-                    instance=self.instance, reverse=self.reverse,
-                    model=self.model, pk_set=old_ids, using=db)
-                target_model_qs = super(ManyRelatedManager, self).get_queryset()
-                if target_model_qs._has_filters():
-                    old_vals = target_model_qs.using(db).filter(**{
-                        '%s__in' % self.target_field.target_field.attname: old_ids})
-                else:
-                    old_vals = old_ids
-                filters = self._build_remove_filters(old_vals)
-                self.through._default_manager.using(db).filter(filters).delete()
-
-                signals.m2m_changed.send(sender=self.through, action="post_remove",
-                    instance=self.instance, reverse=self.reverse,
-                    model=self.model, pk_set=old_ids, using=db)
-
-    return ManyRelatedManager
-
-
-class ManyRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
-    """
-    Accessor to the related objects manager on the forward and reverse sides of
-    a many-to-many relation.
-
-    In the example::
-
-        class Pizza(Model):
-            toppings = ManyToManyField(Topping, related_name='pizzas')
-
-    ``pizza.toppings`` and ``topping.pizzas`` are ManyRelatedObjectsDescriptor
-    instances.
-    """
-
-    def __init__(self, rel, reverse=False):
-        super(ManyRelatedObjectsDescriptor, self).__init__(rel)
-
-        self.reverse = reverse
-
-    @property
-    def through(self):
-        # through is provided so that you have easy access to the through
-        # model (Book.authors.through) for inlines, etc. This is done as
-        # a property to ensure that the fully resolved value is returned.
-        return self.rel.through
-
-    @cached_property
-    def related_manager_cls(self):
-        model = self.rel.related_model if self.reverse else self.rel.model
-        return create_many_related_manager(
-            model._default_manager.__class__,
-            self.rel,
-            reverse=self.reverse,
-        )
-
-
-class ForeignObjectRel(object):
-    """
-    Used by ForeignObject to store information about the relation.
-
-    ``_meta.get_fields()`` returns this class to provide access to the field
-    flags for the reverse relation.
-    """
-
-    # Field flags
-    auto_created = True
-    concrete = False
-    editable = False
-    is_relation = True
-
-    # Reverse relations are always nullable (Django can't enforce that a
-    # foreign key on the related model points to this model).
-    null = True
-
-    def __init__(self, field, to, related_name=None, related_query_name=None,
-            limit_choices_to=None, parent_link=False, on_delete=None):
-        self.field = field
-        self.model = to
-        self.related_name = related_name
-        self.related_query_name = related_query_name
-        self.limit_choices_to = {} if limit_choices_to is None else limit_choices_to
-        self.parent_link = parent_link
-        self.on_delete = on_delete
-
-        self.symmetrical = False
-        self.multiple = True
-
-    # Some of the following cached_properties can't be initialized in
-    # __init__ as the field doesn't have its model yet. Calling these methods
-    # before field.contribute_to_class() has been called will result in
-    # AttributeError
-    @property
-    def to(self):
-        warnings.warn(
-            "Usage of ForeignObjectRel.to attribute has been deprecated. "
-            "Use the model attribute instead.",
-            RemovedInDjango20Warning, 2)
-        return self.model
-
-    @cached_property
-    def hidden(self):
-        return self.is_hidden()
-
-    @cached_property
-    def name(self):
-        return self.field.related_query_name()
-
-    @property
-    def remote_field(self):
-        return self.field
-
-    @property
-    def target_field(self):
-        """
-        When filtering against this relation, returns the field on the remote
-        model against which the filtering should happen.
-        """
-        target_fields = self.get_path_info()[-1].target_fields
-        if len(target_fields) > 1:
-            raise exceptions.FieldError("Can't use target_field for multicolumn relations.")
-        return target_fields[0]
-
-    @cached_property
-    def related_model(self):
-        if not self.field.model:
-            raise AttributeError(
-                "This property can't be accessed before self.field.contribute_to_class has been called.")
-        return self.field.model
-
-    @cached_property
-    def many_to_many(self):
-        return self.field.many_to_many
-
-    @cached_property
-    def many_to_one(self):
-        return self.field.one_to_many
-
-    @cached_property
-    def one_to_many(self):
-        return self.field.many_to_one
-
-    @cached_property
-    def one_to_one(self):
-        return self.field.one_to_one
-
-    def get_prep_lookup(self, lookup_name, value):
-        return self.field.get_prep_lookup(lookup_name, value)
-
-    def get_lookup(self, lookup_name):
-        return self.field.get_lookup(lookup_name)
-
-    def get_internal_type(self):
-        return self.field.get_internal_type()
-
-    @property
-    def db_type(self):
-        return self.field.db_type
-
-    def __repr__(self):
-        return '<%s: %s.%s>' % (
-            type(self).__name__,
-            self.related_model._meta.app_label,
-            self.related_model._meta.model_name,
-        )
-
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
-                    limit_to_currently_related=False):
-        """
-        Return choices with a default blank choices included, for use as
-        SelectField choices for this field.
-
-        Analog of django.db.models.fields.Field.get_choices(), provided
-        initially for utilization by RelatedFieldListFilter.
-        """
-        first_choice = blank_choice if include_blank else []
-        queryset = self.related_model._default_manager.all()
-        if limit_to_currently_related:
-            queryset = queryset.complex_filter(
-                {'%s__isnull' % self.related_model._meta.model_name: False}
-            )
-        lst = [(x._get_pk_val(), smart_text(x)) for x in queryset]
-        return first_choice + lst
-
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        # Defer to the actual field definition for db prep
-        return self.field.get_db_prep_lookup(lookup_type, value, connection=connection, prepared=prepared)
-
-    def is_hidden(self):
-        "Should the related object be hidden?"
-        return self.related_name is not None and self.related_name[-1] == '+'
-
-    def get_joining_columns(self):
-        return self.field.get_reverse_joining_columns()
-
-    def get_extra_restriction(self, where_class, alias, related_alias):
-        return self.field.get_extra_restriction(where_class, related_alias, alias)
-
-    def set_field_name(self):
-        """
-        Sets the related field's name, this is not available until later stages
-        of app loading, so set_field_name is called from
-        set_attributes_from_rel()
-        """
-        # By default foreign object doesn't relate to any remote field (for
-        # example custom multicolumn joins currently have no remote field).
-        self.field_name = None
-
-    def get_accessor_name(self, model=None):
-        # This method encapsulates the logic that decides what name to give an
-        # accessor descriptor that retrieves related many-to-one or
-        # many-to-many objects. It uses the lower-cased object_name + "_set",
-        # but this can be overridden with the "related_name" option.
-        # Due to backwards compatibility ModelForms need to be able to provide
-        # an alternate model. See BaseInlineFormSet.get_default_prefix().
-        opts = model._meta if model else self.related_model._meta
-        model = model or self.related_model
-        if self.multiple:
-            # If this is a symmetrical m2m relation on self, there is no reverse accessor.
-            if self.symmetrical and model == self.model:
-                return None
-        if self.related_name:
-            return self.related_name
-        if opts.default_related_name:
-            return opts.default_related_name % {
-                'model_name': opts.model_name.lower(),
-                'app_label': opts.app_label.lower(),
-            }
-        return opts.model_name + ('_set' if self.multiple else '')
-
-    def get_cache_name(self):
-        return "_%s_cache" % self.get_accessor_name()
-
-    def get_path_info(self):
-        return self.field.get_reverse_path_info()
-
-
-class ManyToOneRel(ForeignObjectRel):
-    """
-    Used by the ForeignKey field to store information about the relation.
-
-    ``_meta.get_fields()`` returns this class to provide access to the field
-    flags for the reverse relation.
-
-    Note: Because we somewhat abuse the Rel objects by using them as reverse
-    fields we get the funny situation where
-    ``ManyToOneRel.many_to_one == False`` and
-    ``ManyToOneRel.one_to_many == True``. This is unfortunate but the actual
-    ManyToOneRel class is a private API and there is work underway to turn
-    reverse relations into actual fields.
-    """
-
-    def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
-            limit_choices_to=None, parent_link=False, on_delete=None):
-        super(ManyToOneRel, self).__init__(
-            field, to,
-            related_name=related_name,
-            related_query_name=related_query_name,
-            limit_choices_to=limit_choices_to,
-            parent_link=parent_link,
-            on_delete=on_delete,
-        )
-
-        self.field_name = field_name
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state.pop('related_model', None)
-        return state
-
-    def get_related_field(self):
-        """
-        Return the Field in the 'to' object to which this relationship is tied.
-        """
-        field = self.model._meta.get_field(self.field_name)
-        if not field.concrete:
-            raise FieldDoesNotExist("No related field named '%s'" %
-                    self.field_name)
-        return field
-
-    def set_field_name(self):
-        self.field_name = self.field_name or self.model._meta.pk.name
-
-
-class OneToOneRel(ManyToOneRel):
-    """
-    Used by OneToOneField to store information about the relation.
-
-    ``_meta.get_fields()`` returns this class to provide access to the field
-    flags for the reverse relation.
-    """
-
-    def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
-            limit_choices_to=None, parent_link=False, on_delete=None):
-        super(OneToOneRel, self).__init__(
-            field, to, field_name,
-            related_name=related_name,
-            related_query_name=related_query_name,
-            limit_choices_to=limit_choices_to,
-            parent_link=parent_link,
-            on_delete=on_delete,
-        )
-
-        self.multiple = False
-
-
-class ManyToManyRel(ForeignObjectRel):
-    """
-    Used by ManyToManyField to store information about the relation.
-
-    ``_meta.get_fields()`` returns this class to provide access to the field
-    flags for the reverse relation.
-    """
-
-    def __init__(self, field, to, related_name=None, related_query_name=None,
-            limit_choices_to=None, symmetrical=True, through=None, through_fields=None,
-            db_constraint=True):
-        super(ManyToManyRel, self).__init__(
-            field, to,
-            related_name=related_name,
-            related_query_name=related_query_name,
-            limit_choices_to=limit_choices_to,
-        )
-
-        if through and not db_constraint:
-            raise ValueError("Can't supply a through model and db_constraint=False")
-        self.through = through
-
-        if through_fields and not through:
-            raise ValueError("Cannot specify through_fields without a through model")
-        self.through_fields = through_fields
-
-        self.symmetrical = symmetrical
-        self.db_constraint = db_constraint
-
-    def get_related_field(self):
-        """
-        Return the field in the 'to' object to which this relationship is tied.
-        Provided for symmetry with ManyToOneRel.
-        """
-        opts = self.through._meta
-        if self.through_fields:
-            field = opts.get_field(self.through_fields[0])
-        else:
-            for field in opts.fields:
-                rel = getattr(field, 'remote_field', None)
-                if rel and rel.model == self.model:
-                    break
-        return field.foreign_related_fields[0]
-
-
 class ForeignObject(RelatedField):
     """
     Abstraction of the ForeignKey relation, supports multi-column relations.
@@ -1604,7 +424,7 @@ class ForeignObject(RelatedField):
     one_to_one = False
 
     requires_unique_target = True
-    related_accessor_class = ForeignRelatedObjectsDescriptor
+    related_accessor_class = ReverseManyToOneDescriptor
     rel_class = ForeignObjectRel
 
     def __init__(self, to, on_delete, from_fields, to_fields, rel=None, related_name=None,
@@ -1639,25 +459,41 @@ class ForeignObject(RelatedField):
 
         try:
             self.foreign_related_fields
-        except FieldDoesNotExist:
+        except exceptions.FieldDoesNotExist:
             return []
 
-        has_unique_field = any(rel_field.unique
-            for rel_field in self.foreign_related_fields)
-        if not has_unique_field and len(self.foreign_related_fields) > 1:
+        if not self.foreign_related_fields:
+            return []
+
+        unique_foreign_fields = {
+            frozenset([f.name])
+            for f in self.remote_field.model._meta.get_fields()
+            if getattr(f, 'unique', False)
+        }
+        unique_foreign_fields.update({
+            frozenset(ut)
+            for ut in self.remote_field.model._meta.unique_together
+        })
+        foreign_fields = {f.name for f in self.foreign_related_fields}
+        has_unique_constraint = any(u <= foreign_fields for u in unique_foreign_fields)
+
+        if not has_unique_constraint and len(self.foreign_related_fields) > 1:
             field_combination = ', '.join("'%s'" % rel_field.name
                 for rel_field in self.foreign_related_fields)
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
-                    "None of the fields %s on model '%s' have a unique=True constraint."
+                    "No subset of the fields %s on model '%s' is unique."
                     % (field_combination, model_name),
-                    hint=None,
+                    hint=(
+                        "Add unique=True on any of those fields or add at "
+                        "least a subset of them to a unique_together constraint."
+                    ),
                     obj=self,
                     id='fields.E310',
                 )
             ]
-        elif not has_unique_field:
+        elif not has_unique_constraint:
             field_name = self.foreign_related_fields[0].name
             model_name = self.remote_field.model.__name__
             return [
@@ -1688,7 +524,10 @@ class ForeignObject(RelatedField):
         if isinstance(self.remote_field.model, six.string_types):
             kwargs['to'] = self.remote_field.model
         else:
-            kwargs['to'] = "%s.%s" % (self.remote_field.model._meta.app_label, self.remote_field.model._meta.object_name)
+            kwargs['to'] = "%s.%s" % (
+                self.remote_field.model._meta.app_label,
+                self.remote_field.model._meta.object_name,
+            )
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting
@@ -1741,7 +580,7 @@ class ForeignObject(RelatedField):
 
     @property
     def foreign_related_fields(self):
-        return tuple(rhs_field for lhs_field, rhs_field in self.related_fields)
+        return tuple(rhs_field for lhs_field, rhs_field in self.related_fields if rhs_field)
 
     def get_local_related_value(self, instance):
         return self.get_instance_value_for_fields(instance, self.local_related_fields)
@@ -1837,9 +676,10 @@ class ForeignObject(RelatedField):
             return RelatedLessThan
         elif lookup_name == 'lte':
             return RelatedLessThanOrEqual
-        elif lookup_name != 'isnull':
+        elif lookup_name == 'isnull':
+            return RelatedIsNull
+        else:
             raise TypeError('Related Field got invalid lookup: %s' % lookup_name)
-        return super(ForeignObject, self).get_lookup(lookup_name)
 
     def get_transform(self, *args, **kwargs):
         raise NotImplementedError('Relational fields do not support transforms.')
@@ -1853,13 +693,13 @@ class ForeignObject(RelatedField):
 
     def contribute_to_class(self, cls, name, virtual_only=False):
         super(ForeignObject, self).contribute_to_class(cls, name, virtual_only=virtual_only)
-        setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
+        setattr(cls, self.name, ForwardManyToOneDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):
         # Internal FK's - i.e., those with a related name ending with '+' -
         # and swapped models don't get a related descriptor.
         if not self.remote_field.is_hidden() and not related.related_model._meta.swapped:
-            setattr(cls, related.get_accessor_name(), self.related_accessor_class(related))
+            setattr(cls._meta.concrete_model, related.get_accessor_name(), self.related_accessor_class(related))
             # While 'limit_choices_to' might be a callable, simply pass
             # it along for later - this is too early because it's still
             # model load time.
@@ -1911,8 +751,9 @@ class ForeignKey(ForeignObject):
 
         if on_delete is None:
             warnings.warn(
-                "on_delete will be a required arg for %s in Django 2.0. "
-                "Set it to models.CASCADE if you want to maintain the current default behavior. "
+                "on_delete will be a required arg for %s in Django 2.0. Set "
+                "it to models.CASCADE on models and in existing migrations "
+                "if you want to maintain the current default behavior. "
                 "See https://docs.djangoproject.com/en/%s/ref/models/fields/"
                 "#django.db.models.ForeignKey.on_delete" % (
                     self.__class__.__name__,
@@ -1999,7 +840,8 @@ class ForeignKey(ForeignObject):
             kwargs['db_constraint'] = self.db_constraint
         # Rel needs more work.
         to_meta = getattr(self.remote_field.model, "_meta", None)
-        if self.remote_field.field_name and (not to_meta or (to_meta.pk and self.remote_field.field_name != to_meta.pk.name)):
+        if self.remote_field.field_name and (
+                not to_meta or (to_meta.pk and self.remote_field.field_name != to_meta.pk.name)):
             kwargs['to_field'] = self.remote_field.field_name
         return name, path, args, kwargs
 
@@ -2096,19 +938,7 @@ class ForeignKey(ForeignObject):
         return super(ForeignKey, self).formfield(**defaults)
 
     def db_type(self, connection):
-        # The database column type of a ForeignKey is the column type
-        # of the field to which it points. An exception is if the ForeignKey
-        # points to an AutoField/PositiveIntegerField/PositiveSmallIntegerField,
-        # in which case the column type is simply that of an IntegerField.
-        # If the database needs similar types for key fields however, the only
-        # thing we can do is making AutoField an IntegerField.
-        rel_field = self.target_field
-        if (isinstance(rel_field, AutoField) or
-                (not connection.features.related_fields_match_type and
-                isinstance(rel_field, (PositiveIntegerField,
-                                       PositiveSmallIntegerField)))):
-            return IntegerField().db_type(connection=connection)
-        return rel_field.db_type(connection=connection)
+        return self.target_field.rel_db_type(connection=connection)
 
     def db_parameters(self, connection):
         return {"type": self.db_type(connection), "check": []}
@@ -2142,7 +972,7 @@ class OneToOneField(ForeignKey):
     one_to_many = False
     one_to_one = True
 
-    related_accessor_class = SingleRelatedObjectDescriptor
+    related_accessor_class = ReverseOneToOneDescriptor
     rel_class = OneToOneRel
 
     description = _("One-to-one relationship")
@@ -2152,8 +982,9 @@ class OneToOneField(ForeignKey):
 
         if on_delete is None:
             warnings.warn(
-                "on_delete will be a required arg for %s in Django 2.0. "
-                "Set it to models.CASCADE if you want to maintain the current default behavior. "
+                "on_delete will be a required arg for %s in Django 2.0. Set "
+                "it to models.CASCADE on models and in existing migrations "
+                "if you want to maintain the current default behavior. "
                 "See https://docs.djangoproject.com/en/%s/ref/models/fields/"
                 "#django.db.models.ForeignKey.on_delete" % (
                     self.__class__.__name__,
@@ -2219,8 +1050,8 @@ def create_many_to_many_intermediary_model(field, klass):
         'app_label': klass._meta.app_label,
         'db_tablespace': klass._meta.db_tablespace,
         'unique_together': (from_, to),
-        'verbose_name': '%(from)s-%(to)s relationship' % {'from': from_, 'to': to},
-        'verbose_name_plural': '%(from)s-%(to)s relationships' % {'from': from_, 'to': to},
+        'verbose_name': _('%(from)s-%(to)s relationship') % {'from': from_, 'to': to},
+        'verbose_name_plural': _('%(from)s-%(to)s relationships') % {'from': from_, 'to': to},
         'apps': field.model._meta.apps,
     })
     # Construct and return the new class.
@@ -2358,7 +1189,7 @@ class ManyToManyField(RelatedField):
 
         errors = []
 
-        if self.remote_field.through not in apps.get_models(include_auto_created=True):
+        if self.remote_field.through not in self.opts.apps.get_models(include_auto_created=True):
             # The relationship model is not installed.
             errors.append(
                 checks.Error(
@@ -2521,7 +1352,7 @@ class ManyToManyField(RelatedField):
 
                     try:
                         field = through._meta.get_field(field_name)
-                    except FieldDoesNotExist:
+                    except exceptions.FieldDoesNotExist:
                         errors.append(
                             checks.Error(
                                 ("The intermediary model '%s' has no field '%s'.") % (
@@ -2726,9 +1557,14 @@ class ManyToManyField(RelatedField):
                 lazy_related_operation(resolve_through_model, cls, self.remote_field.through, field=self)
             elif not cls._meta.swapped:
                 self.remote_field.through = create_many_to_many_intermediary_model(self, cls)
+        else:
+            # Bind a lazy reference to the app in which the model is defined.
+            self.remote_field.through = resolve_relation(
+                cls, self.remote_field.through, resolve_recursive_relationship=False
+            )
 
         # Add the descriptor for the m2m relation.
-        setattr(cls, self.name, ManyRelatedObjectsDescriptor(self.remote_field, reverse=False))
+        setattr(cls, self.name, ManyToManyDescriptor(self.remote_field, reverse=False))
 
         # Set up the accessor for the m2m table name for the relation.
         self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
@@ -2737,7 +1573,7 @@ class ManyToManyField(RelatedField):
         # Internal M2Ms (i.e., those with a related name ending with '+')
         # and swapped models don't get a related descriptor.
         if not self.remote_field.is_hidden() and not related.related_model._meta.swapped:
-            setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(self.remote_field, reverse=True))
+            setattr(cls, related.get_accessor_name(), ManyToManyDescriptor(self.remote_field, reverse=True))
 
         # Set up the accessors for the column names on the m2m table.
         self.m2m_column_name = curry(self._get_m2m_attr, related, 'column')
@@ -2761,7 +1597,7 @@ class ManyToManyField(RelatedField):
         return getattr(obj, self.attname).all()
 
     def save_form_data(self, instance, data):
-        setattr(instance, self.attname, data)
+        getattr(instance, self.attname).set(data)
 
     def formfield(self, **kwargs):
         db = kwargs.pop('using', None)

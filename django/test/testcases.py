@@ -20,12 +20,12 @@ from django.apps import apps
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.files import locks
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
-from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -38,9 +38,7 @@ from django.test.utils import (
 )
 from django.utils import six
 from django.utils.decorators import classproperty
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import (
     unquote, urlparse, urlsplit, urlunsplit,
@@ -226,33 +224,11 @@ class SimpleTestCase(unittest.TestCase):
         * Clearing the mail test outbox.
         """
         self.client = self.client_class()
-        self._urlconf_setup()
         mail.outbox = []
 
-    def _urlconf_setup(self):
-        if hasattr(self, 'urls'):
-            warnings.warn(
-                "SimpleTestCase.urls is deprecated and will be removed in "
-                "Django 1.10. Use @override_settings(ROOT_URLCONF=...) "
-                "in %s instead." % self.__class__.__name__,
-                RemovedInDjango110Warning, stacklevel=2)
-            set_urlconf(None)
-            self._old_root_urlconf = settings.ROOT_URLCONF
-            settings.ROOT_URLCONF = self.urls
-            clear_url_caches()
-
     def _post_teardown(self):
-        """Performs any post-test things. This includes:
-
-        * Putting back the original ROOT_URLCONF if it was changed.
-        """
-        self._urlconf_teardown()
-
-    def _urlconf_teardown(self):
-        if hasattr(self, '_old_root_urlconf'):
-            set_urlconf(None)
-            settings.ROOT_URLCONF = self._old_root_urlconf
-            clear_url_caches()
+        """Perform any post-test things."""
+        pass
 
     def settings(self, **kwargs):
         """
@@ -990,7 +966,7 @@ class TestCase(TransactionTestCase):
     Similar to TransactionTestCase, but uses `transaction.atomic()` to achieve
     test isolation.
 
-    In most situation, TestCase should be prefered to TransactionTestCase as
+    In most situations, TestCase should be preferred to TransactionTestCase as
     it allows faster execution. However, there are some situations where using
     TransactionTestCase might be necessary (e.g. testing some transactional
     behavior).
@@ -1077,7 +1053,7 @@ class CheckCondition(object):
     def __init__(self, cond_func):
         self.cond_func = cond_func
 
-    def __get__(self, obj, objtype):
+    def __get__(self, instance, cls=None):
         return self.cond_func()
 
 
@@ -1276,7 +1252,7 @@ class LiveServerThread(threading.Thread):
             self.is_ready.set()
 
     def _create_server(self, port):
-        return WSGIServer((self.host, port), QuietWSGIRequestHandler)
+        return WSGIServer((self.host, port), QuietWSGIRequestHandler, allow_reuse_address=False)
 
     def terminate(self):
         if hasattr(self, 'httpd'):
@@ -1318,7 +1294,7 @@ class LiveServerTestCase(TransactionTestCase):
 
         # Launch the live server's thread
         specified_address = os.environ.get(
-            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081')
+            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081-8179')
 
         # The specified ports may be of the form '8000-8010,8080,9200-9300'
         # i.e. a comma-separated list of ports or ranges of ports, so we break
@@ -1379,3 +1355,31 @@ class LiveServerTestCase(TransactionTestCase):
     def tearDownClass(cls):
         cls._tearDownClassInternal()
         super(LiveServerTestCase, cls).tearDownClass()
+
+
+class SerializeMixin(object):
+    """
+    Mixin to enforce serialization of TestCases that share a common resource.
+
+    Define a common 'lockfile' for each set of TestCases to serialize. This
+    file must exist on the filesystem.
+
+    Place it early in the MRO in order to isolate setUpClass / tearDownClass.
+    """
+
+    lockfile = None
+
+    @classmethod
+    def setUpClass(cls):
+        if cls.lockfile is None:
+            raise ValueError(
+                "{}.lockfile isn't set. Set it to a unique value "
+                "in the base class.".format(cls.__name__))
+        cls._lockfile = open(cls.lockfile)
+        locks.lock(cls._lockfile, locks.LOCK_EX)
+        super(SerializeMixin, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(SerializeMixin, cls).tearDownClass()
+        cls._lockfile.close()

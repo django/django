@@ -1090,8 +1090,6 @@ the same coordinate transformation repeatedly on different geometries::
 Raster Data Objects
 ===================
 
-.. versionadded:: 1.8
-
 ``GDALRaster``
 ----------------
 
@@ -1204,6 +1202,23 @@ blue.
             4326
             >>> rst.srs = 3086
             >>> rst.srs.srid
+            3086
+
+    .. attribute:: srid
+
+        .. versionadded:: 1.10
+
+        The Spatial Reference System Identifier (SRID) of the raster. This
+        property is a shortcut to getting or setting the SRID through the
+        :attr:`srs` attribute.
+
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
+            >>> rst.srid
+            4326
+            >>> rst.srid = 3086
+            >>> rst.srid
+            3086
+            >>> rst.srs.srid  # This is equivalent
             3086
 
     .. attribute:: geotransform
@@ -1398,6 +1413,35 @@ blue.
 
         The total number of pixels in this band. Is equal to ``width * height``.
 
+    .. method:: statistics(refresh=False, approximate=False)
+
+        .. versionadded:: 1.10
+
+        Compute statistics on the pixel values of this band. The return value
+        is a tuple with the following structure:
+        ``(minimum, maximum, mean, standard deviation)``.
+
+        If the ``approximate`` argument is set to ``True``, the statistics may
+        be computed based on overviews or a subset of image tiles.
+
+        If the ``refresh`` argument is set to ``True``, the statistics will be
+        computed from the data directly, and the cache will be updated with the
+        result.
+
+        If a persistent cache value is found, that value is returned. For
+        raster formats using Persistent Auxiliary Metadata (PAM) services, the
+        statistics might be cached in an auxiliary file. In some cases this
+        metadata might be out of sync with the pixel values or cause values
+        from a previous call to be returned which don't reflect the value of
+        the ``approximate`` argument. In such cases, use the ``refresh``
+        argument to get updated values and store them in the cache.
+
+        For empty bands (where all pixel values are "no data"), all statistics
+        are returned as ``None``.
+
+        The statistics can also be retrieved directly by accessing the
+        :attr:`min`, :attr:`max`, :attr:`mean`, and :attr:`std` properties.
+
     .. attribute:: min
 
         The minimum pixel value of the band (excluding the "no data" value).
@@ -1405,6 +1449,20 @@ blue.
     .. attribute:: max
 
         The maximum pixel value of the band (excluding the "no data" value).
+
+    .. attribute:: mean
+
+        .. versionadded:: 1.10
+
+        The mean of all pixel values of the band (excluding the "no data"
+        value).
+
+    .. attribute:: std
+
+        .. versionadded:: 1.10
+
+        The standard deviation of all pixel values of the band (excluding the
+        "no data" value).
 
     .. attribute:: nodata_value
 

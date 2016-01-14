@@ -6,12 +6,12 @@ from collections import defaultdict
 
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import FieldDoesNotExist
-from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import QUERY_TERMS
-from django.forms.forms import pretty_name
+from django.forms.utils import pretty_name
+from django.urls import NoReverseMatch, reverse
 from django.utils import formats, six, timezone
 from django.utils.encoding import force_str, force_text, smart_text
 from django.utils.html import format_html
@@ -163,8 +163,9 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
     to_delete = collector.nested(format_callback)
 
     protected = [format_callback(obj) for obj in collector.protected]
+    model_count = {model._meta.verbose_name_plural: len(objs) for model, objs in collector.model_objs.items()}
 
-    return to_delete, collector.model_count, perms_needed, protected
+    return to_delete, model_count, perms_needed, protected
 
 
 class NestedObjects(Collector):
@@ -172,7 +173,7 @@ class NestedObjects(Collector):
         super(NestedObjects, self).__init__(*args, **kwargs)
         self.edges = {}  # {from_instance: [to_instances]}
         self.protected = set()
-        self.model_count = defaultdict(int)
+        self.model_objs = defaultdict(set)
 
     def add_edge(self, source, target):
         self.edges.setdefault(source, []).append(target)
@@ -187,7 +188,7 @@ class NestedObjects(Collector):
                 self.add_edge(getattr(obj, related_name), obj)
             else:
                 self.add_edge(None, obj)
-            self.model_count[obj._meta.verbose_name_plural] += 1
+            self.model_objs[obj._meta.model].add(obj)
         try:
             return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
         except models.ProtectedError as e:

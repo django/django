@@ -24,7 +24,7 @@
   WGS 84
   >>> print(mpnt.srs.proj)
   +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
-  >>> mpnt.transform_to(SpatialReference('NAD27'))
+  >>> mpnt.transform(SpatialReference('NAD27'))
   >>> print(mpnt.proj)
   +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
   >>> print(mpnt)
@@ -121,8 +121,10 @@ class OGRGeometry(GDALBase):
 
     def __del__(self):
         "Deletes this Geometry."
-        if self._ptr and capi:
+        try:
             capi.destroy_geom(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     # Pickle routines
     def __getstate__(self):
@@ -270,6 +272,8 @@ class OGRGeometry(GDALBase):
         elif isinstance(srs, six.integer_types + six.string_types):
             sr = SpatialReference(srs)
             srs_ptr = sr.ptr
+        elif srs is None:
+            srs_ptr = None
         else:
             raise TypeError('Cannot assign spatial reference with object of type: %s' % type(srs))
         capi.assign_srs(self.ptr, srs_ptr)
@@ -284,7 +288,7 @@ class OGRGeometry(GDALBase):
         return None
 
     def _set_srid(self, srid):
-        if isinstance(srid, six.integer_types):
+        if isinstance(srid, six.integer_types) or srid is None:
             self.srs = srid
         else:
             raise TypeError('SRID must be set with an integer.')
@@ -394,10 +398,6 @@ class OGRGeometry(GDALBase):
         else:
             raise TypeError('Transform only accepts CoordTransform, '
                             'SpatialReference, string, and integer objects.')
-
-    def transform_to(self, srs):
-        "For backwards-compatibility."
-        self.transform(srs)
 
     # #### Topology Methods ####
     def _topology(self, func, other):

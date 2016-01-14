@@ -60,7 +60,7 @@ class Command(BaseCommand):
             try:
                 validate_password(p2, u)
             except ValidationError as err:
-                self.stdout.write(', '.join(err.messages))
+                self.stderr.write('\n'.join(err.messages))
                 count += 1
             else:
                 password_validated = True

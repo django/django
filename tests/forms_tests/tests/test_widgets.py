@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
-from django.core.urlresolvers import reverse
 from django.forms import (
     CheckboxSelectMultiple, ClearableFileInput, RadioSelect, TextInput,
 )
@@ -10,6 +9,7 @@ from django.forms.widgets import (
     ChoiceFieldRenderer, ChoiceInput, RadioFieldRenderer,
 )
 from django.test import SimpleTestCase, override_settings
+from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import SafeData
@@ -34,7 +34,15 @@ class FormsWidgetTests(SimpleTestCase):
             inp_set1.append(str(inp))
             inp_set2.append('%s<br />' % inp)
             inp_set3.append('<p>%s %s</p>' % (inp.tag(), inp.choice_label))
-            inp_set4.append('%s %s %s %s %s' % (inp.name, inp.value, inp.choice_value, inp.choice_label, inp.is_checked()))
+            inp_set4.append(
+                '%s %s %s %s %s' % (
+                    inp.name,
+                    inp.value,
+                    inp.choice_value,
+                    inp.choice_label,
+                    inp.is_checked(),
+                )
+            )
 
         self.assertHTMLEqual('\n'.join(inp_set1), """<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>
 <label><input type="radio" name="beatle" value="P" /> Paul</label>
@@ -57,7 +65,10 @@ beatle J R Ringo False""")
         w = RadioSelect()
         r = w.get_renderer('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
         self.assertHTMLEqual(str(r[1]), '<label><input type="radio" name="beatle" value="P" /> Paul</label>')
-        self.assertHTMLEqual(str(r[0]), '<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>')
+        self.assertHTMLEqual(
+            str(r[0]),
+            '<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>'
+        )
         self.assertTrue(r[0].is_checked())
         self.assertFalse(r[1].is_checked())
         self.assertEqual((r[1].name, r[1].value, r[1].choice_value, r[1].choice_label), ('beatle', 'J', 'P', 'Paul'))
@@ -76,30 +87,39 @@ beatle J R Ringo False""")
             def render(self):
                 return '<br />\n'.join(six.text_type(choice) for choice in self)
         w = RadioSelect(renderer=MyRenderer)
-        self.assertHTMLEqual(w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))), """<label><input type="radio" name="beatle" value="J" /> John</label><br />
+        self.assertHTMLEqual(
+            w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
+            """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
 <label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
-<label><input type="radio" name="beatle" value="R" /> Ringo</label>""")
+<label><input type="radio" name="beatle" value="R" /> Ringo</label>"""
+        )
 
         # Or you can use custom RadioSelect fields that use your custom renderer.
         class CustomRadioSelect(RadioSelect):
             renderer = MyRenderer
         w = CustomRadioSelect()
-        self.assertHTMLEqual(w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))), """<label><input type="radio" name="beatle" value="J" /> John</label><br />
+        self.assertHTMLEqual(
+            w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
+            """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
 <label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
-<label><input type="radio" name="beatle" value="R" /> Ringo</label>""")
+<label><input type="radio" name="beatle" value="R" /> Ringo</label>"""
+        )
 
         # You can customize rendering with outer_html/inner_html renderer variables (#22950)
         class MyRenderer(RadioFieldRenderer):
-            outer_html = str('<div{id_attr}>{content}</div>')  # str is just to test some Python 2 issue with bytestrings
+            # str is just to test some Python 2 issue with bytestrings
+            outer_html = str('<div{id_attr}>{content}</div>')
             inner_html = '<p>{choice_value}{sub_widgets}</p>'
         w = RadioSelect(renderer=MyRenderer)
         output = w.render('beatle', 'J',
                           choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')),
                           attrs={'id': 'bar'})
         self.assertIsInstance(output, SafeData)
-        self.assertHTMLEqual(output, """<div id="bar">
+        self.assertHTMLEqual(
+            output,
+            """<div id="bar">
 <p><label for="bar_0"><input checked="checked" type="radio" id="bar_0" value="J" name="beatle" /> John</label></p>
 <p><label for="bar_1"><input type="radio" id="bar_1" value="P" name="beatle" /> Paul</label></p>
 <p><label for="bar_2"><input type="radio" id="bar_2" value="G" name="beatle" /> George</label></p>

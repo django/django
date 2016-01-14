@@ -236,12 +236,13 @@ class Deserializer(base.Deserializer):
         if node.getElementsByTagName('None'):
             return None
         else:
-            if hasattr(field.remote_field.model._default_manager, 'get_by_natural_key'):
+            model = field.remote_field.model
+            if hasattr(model._default_manager, 'get_by_natural_key'):
                 keys = node.getElementsByTagName('natural')
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj = field.remote_field.model._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
+                    obj = model._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
                     obj_pk = getattr(obj, field.remote_field.field_name)
                     # If this is a natural foreign key to an object that
                     # has a FK/O2O as the foreign key, use the FK value
@@ -250,29 +251,31 @@ class Deserializer(base.Deserializer):
                 else:
                     # Otherwise, treat like a normal PK
                     field_value = getInnerText(node).strip()
-                    obj_pk = field.remote_field.model._meta.get_field(field.remote_field.field_name).to_python(field_value)
+                    obj_pk = model._meta.get_field(field.remote_field.field_name).to_python(field_value)
                 return obj_pk
             else:
                 field_value = getInnerText(node).strip()
-                return field.remote_field.model._meta.get_field(field.remote_field.field_name).to_python(field_value)
+                return model._meta.get_field(field.remote_field.field_name).to_python(field_value)
 
     def _handle_m2m_field_node(self, node, field):
         """
         Handle a <field> node for a ManyToManyField.
         """
-        if hasattr(field.remote_field.model._default_manager, 'get_by_natural_key'):
+        model = field.remote_field.model
+        default_manager = model._default_manager
+        if hasattr(default_manager, 'get_by_natural_key'):
             def m2m_convert(n):
                 keys = n.getElementsByTagName('natural')
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj_pk = field.remote_field.model._default_manager.db_manager(self.db).get_by_natural_key(*field_value).pk
+                    obj_pk = default_manager.db_manager(self.db).get_by_natural_key(*field_value).pk
                 else:
                     # Otherwise, treat like a normal PK value.
-                    obj_pk = field.remote_field.model._meta.pk.to_python(n.getAttribute('pk'))
+                    obj_pk = model._meta.pk.to_python(n.getAttribute('pk'))
                 return obj_pk
         else:
-            m2m_convert = lambda n: field.remote_field.model._meta.pk.to_python(n.getAttribute('pk'))
+            m2m_convert = lambda n: model._meta.pk.to_python(n.getAttribute('pk'))
         return [m2m_convert(c) for c in node.getElementsByTagName("object")]
 
     def _get_model_from_node(self, node, attr):

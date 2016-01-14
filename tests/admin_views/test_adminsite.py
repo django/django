@@ -5,9 +5,9 @@ import datetime
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
+from django.urls import reverse
 
 from .models import Article
 
@@ -32,7 +32,7 @@ class SiteEachContextTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.u1 = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10),
@@ -50,6 +50,11 @@ class SiteEachContextTest(TestCase):
         self.assertEqual(ctx['site_title'], 'Django site admin')
         self.assertEqual(ctx['site_url'], '/')
         self.assertEqual(ctx['has_permission'], True)
+
+    def test_each_context_site_url_with_script_name(self):
+        request = RequestFactory().get(reverse('test_adminsite:index'), SCRIPT_NAME='/my-script-name/')
+        request.user = self.u1
+        self.assertEqual(site.each_context(request)['site_url'], '/my-script-name/')
 
     def test_available_apps(self):
         ctx = self.ctx

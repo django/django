@@ -9,9 +9,8 @@ from django.conf import settings
 from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.test import ignore_warnings, modify_settings, override_settings
+from django.test import modify_settings, override_settings
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.formats import localize
 from django.utils.translation import activate, deactivate
 
@@ -21,15 +20,8 @@ from .models import TestModel
 
 class HTTPSitemapTests(SitemapTestsBase):
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_simple_sitemap_index(self):
         "A simple sitemap index can be rendered"
-        # The URL for views.sitemap in tests/urls/http.py has been updated
-        # with a name but since reversing by Python path is tried first
-        # before reversing by name and works since we're giving
-        # name='django.contrib.sitemaps.views.sitemap', we need to silence
-        # the erroneous warning until reversing by dotted path is removed.
-        # The test will work without modification when it's removed.
         response = self.client.get('/simple/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -38,19 +30,12 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % self.base_url
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
     }])
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
-        # The URL for views.sitemap in tests/urls/http.py has been updated
-        # with a name but since reversing by Python path is tried first
-        # before reversing by name and works since we're giving
-        # name='django.contrib.sitemaps.views.sitemap', we need to silence
-        # the erroneous warning until reversing by dotted path is removed.
-        # The test will work without modification when it's removed.
         response = self.client.get('/simple/custom-index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
@@ -194,14 +179,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % self.base_url
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_x_robots_sitemap(self):
-        # The URL for views.sitemap in tests/urls/http.py has been updated
-        # with a name but since reversing by Python path is tried first
-        # before reversing by name and works since we're giving
-        # name='django.contrib.sitemaps.views.sitemap', we need to silence
-        # the erroneous warning until reversing by dotted path is removed.
-        # The test will work without modification when it's removed.
         response = self.client.get('/simple/index.xml')
         self.assertEqual(response['X-Robots-Tag'], 'noindex, noodp, noarchive')
 

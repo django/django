@@ -1,16 +1,12 @@
 """
 Parser and utilities for the smart 'if' tag
 """
-import warnings
-
-from django.utils.deprecation import RemovedInDjango110Warning
-
-
 # Using a simple top down parser, as described here:
 #    http://effbot.org/zone/simple-top-down-parsing.htm.
 # 'led' = left denotation
 # 'nud' = null denotation
 # 'bp' = binding power (left = lbp, right = rbp)
+
 
 class TokenBase(object):
     """
@@ -102,8 +98,6 @@ OPERATORS = {
     'not': prefix(8, lambda context, x: not x.eval(context)),
     'in': infix(9, lambda context, x, y: x.eval(context) in y.eval(context)),
     'not in': infix(9, lambda context, x, y: x.eval(context) not in y.eval(context)),
-    # This should be removed in Django 1.10:
-    '=': infix(10, lambda context, x, y: x.eval(context) == y.eval(context)),
     '==': infix(10, lambda context, x, y: x.eval(context) == y.eval(context)),
     '!=': infix(10, lambda context, x, y: x.eval(context) != y.eval(context)),
     '>': infix(10, lambda context, x, y: x.eval(context) > y.eval(context)),
@@ -123,7 +117,7 @@ class Literal(TokenBase):
     """
     # IfParser uses Literal in create_var, but TemplateIfParser overrides
     # create_var so that a proper implementation that actually resolves
-    # variables, filters etc is used.
+    # variables, filters etc. is used.
     id = "literal"
     lbp = 0
 
@@ -178,11 +172,6 @@ class IfParser(object):
         except (KeyError, TypeError):
             return self.create_var(token)
         else:
-            if token == '=':
-                warnings.warn(
-                    "Operator '=' is deprecated and will be removed in Django 1.10. Use '==' instead.",
-                    RemovedInDjango110Warning, stacklevel=2
-                )
             return op()
 
     def next_token(self):

@@ -41,11 +41,6 @@ namespace.
 Support for template engines
 ============================
 
-.. versionadded:: 1.8
-
-    Support for multiple template engines and the :setting:`TEMPLATES` setting
-    were added in Django 1.8.
-
 Configuration
 -------------
 
@@ -95,7 +90,7 @@ Usage
 
 The ``django.template.loader`` module defines two functions to load templates.
 
-.. function:: get_template(template_name, dirs=_dirs_undefined, using=None)
+.. function:: get_template(template_name, using=None)
 
     This function loads the template with the given name and returns a
     ``Template`` object.
@@ -115,37 +110,11 @@ The ``django.template.loader`` module defines two functions to load templates.
     If you want to restrict the search to a particular template engine, pass
     the engine's :setting:`NAME <TEMPLATES-NAME>` in the ``using`` argument.
 
-    .. deprecated:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
-    .. versionchanged:: 1.8
-
-       The ``using`` parameter was added.
-
-    .. versionchanged:: 1.8
-
-        ``get_template()`` returns a backend-dependent ``Template`` instead
-        of a :class:`django.template.Template`.
-
-.. function:: select_template(template_name_list, dirs=_dirs_undefined, using=None)
+.. function:: select_template(template_name_list, using=None)
 
     ``select_template()`` is just like ``get_template()``, except it takes a
     list of template names. It tries each name in order and returns the first
     template that exists.
-
-    .. deprecated:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
-    .. versionchanged:: 1.8
-
-       The ``using`` parameter was added.
-
-    .. versionchanged:: 1.8
-
-        ``select_template()`` returns a backend-dependent ``Template`` instead
-        of a :class:`django.template.Template`.
 
 .. currentmodule:: django.template
 
@@ -269,7 +238,7 @@ the following templates:
 In addition, to cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which automates the process.
 
-.. function:: render_to_string(template_name, context=None, context_instance=_context_instance_undefined, request=None, using=None)
+.. function:: render_to_string(template_name, context=None, request=None, using=None)
 
     ``render_to_string()`` loads a template like :func:`get_template` and
     calls its ``render()`` method immediately. It takes the following
@@ -283,35 +252,12 @@ templates, Django provides a shortcut function which automates the process.
     ``context``
         A :class:`dict` to be used as the template's context for rendering.
 
-        .. versionchanged:: 1.8
-
-            The ``context`` argument used to be called ``dictionary``. That name
-            is deprecated in Django 1.8 and will be removed in Django 1.10.
-
-            ``context`` is now optional. An empty context will be used if it
-            isn't provided.
-
-    ``context_instance``
-        An instance of :class:`~django.template.Context` or a subclass (e.g., an
-        instance of :class:`~django.template.RequestContext`) to use as the
-        template's context.
-
-        .. deprecated:: 1.8
-
-            The ``context_instance`` argument is deprecated. Use ``context`` and
-            if needed ``request``.
-
     ``request``
         An optional :class:`~django.http.HttpRequest` that will be available
         during the template's rendering process.
 
-        .. versionadded:: 1.8
-
-            The ``request`` argument was added.
-
-See also the :func:`~django.shortcuts.render()` and
-:func:`~django.shortcuts.render_to_response()` shortcuts, which call
-:func:`render_to_string()` and feed the result into an
+See also the :func:`~django.shortcuts.render()` shortcut which calls
+:func:`render_to_string()` and feeds the result into an
 :class:`~django.http.HttpResponse` suitable for returning from a view.
 
 Finally, you can use configured engines directly:
@@ -348,20 +294,18 @@ applications. This generic name was kept for backwards-compatibility.
 ``DjangoTemplates`` engines accept the following :setting:`OPTIONS
 <TEMPLATES-OPTIONS>`:
 
-* ``'allowed_include_roots'``: a list of strings representing allowed prefixes
-  for the ``{% ssi %}`` template tag. This is a security measure, so that
-  template authors can't access files that they shouldn't be accessing.
+* ``'autoescape'``: a boolean that controls whether HTML autoescaping is
+  enabled.
 
-  For example, if ``'allowed_include_roots'`` is ``['/home/html',
-  '/var/www']``, then ``{% ssi /home/html/foo.txt %}`` would work, but ``{%
-  ssi /etc/passwd %}`` wouldn't.
+  It defaults to ``True``.
 
-  It defaults to an empty list.
+  .. warning::
 
-  .. deprecated:: 1.8
+      Only set it to ``False`` if you're rendering non-HTML templates!
 
-      ``allowed_include_roots`` is deprecated because the {% ssi %} tag is
-      deprecated.
+  .. versionadded:: 1.10
+
+      The ``autoescape`` option was added.
 
 * ``'context_processors'``: a list of dotted Python paths to callables that
   are used to populate the context when a template is rendered with a request.
@@ -467,7 +411,7 @@ For example, you can create ``myproject/jinja2.py`` with this content::
     from __future__ import absolute_import  # Python 2 only
 
     from django.contrib.staticfiles.storage import staticfiles_storage
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 
     from jinja2 import Environment
 

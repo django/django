@@ -8,3 +8,4 @@ PyYAML
 pytz > dev
 selenium
 sqlparse
+tblib

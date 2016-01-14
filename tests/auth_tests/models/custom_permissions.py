@@ -30,9 +30,6 @@ with RemoveGroupsAndPermissions():
         USERNAME_FIELD = 'email'
         REQUIRED_FIELDS = ['date_of_birth']
 
-        class Meta:
-            app_label = 'auth'
-
         def get_full_name(self):
             return self.email
 

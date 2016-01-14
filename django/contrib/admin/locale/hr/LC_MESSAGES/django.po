@@ -4,17 +4,17 @@
 # aljosa <aljosa.mohorovic@gmail.com>, 2011,2013
 # Bojan Mihelač <bmihelac@mihelac.org>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2013
+# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2013,2015
 # Ylodi <stjepan@gmail.com>, 2015
 # Ylodi <stjepan@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-03-20 10:22+0000\n"
-"Last-Translator: Ylodi <stjepan@gmail.com>\n"
-"Language-Team: Croatian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-12-11 09:11+0000\n"
+"Last-Translator: Mislav Cimperšak <mislav.cimpersak@gmail.com>\n"
+"Language-Team: Croatian (http://www.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -82,6 +82,12 @@ msgstr "Akcija:"
 msgid "action time"
 msgstr "vrijeme akcije"
 
+msgid "user"
+msgstr "korisnik"
+
+msgid "content type"
+msgstr "tip sadržaja"
+
 msgid "object id"
 msgstr "id objekta"
 
@@ -123,6 +129,9 @@ msgid ""
 msgstr ""
 "Držite  \"Control\" ili \"Command\" na Mac-u kako bi odabrali više od jednog "
 "objekta. "
+
+msgid "Added."
+msgstr "Dodano."
 
 #, python-format
 msgid "Changed %s."
@@ -479,6 +488,14 @@ msgstr ""
 "Nešto nije uredu sa instalacijom/postavkama baze. Provjerite jesu li "
 "potrebne tablice u bazi kreirane i provjerite je li baza dostupna korisniku."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Prijavljeni ste kao %(username)s, ali nemate dopuštenje za pristup traženoj "
+"stranici. Želite li se prijaviti drugim korisničkim računom?"
+
 msgid "Forgotten your password or username?"
 msgstr "Zaboravili ste lozinku ili korisničko ime?"
 
@@ -503,6 +520,9 @@ msgstr "Prikaži sve"
 
 msgid "Save"
 msgstr "Spremi"
+
+msgid "Popup closing..."
+msgstr "Zatvaranje popup-a..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -641,9 +661,6 @@ msgstr "Resetiraj moju lozinku"
 
 msgid "All dates"
 msgstr "Svi datumi"
-
-msgid "(None)"
-msgstr "(Nijedan)"
 
 #, python-format
 msgid "Select %s"

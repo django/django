@@ -182,7 +182,7 @@ translation string and the number of objects.
 
 This function is useful when you need your Django application to be localizable
 to languages where the number and complexity of `plural forms
-<http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
+<https://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
 greater than the two forms used in English ('object' for the singular and
 'objects' for all the cases where ``count`` is different from one, irrespective
 of its value.)
@@ -872,10 +872,6 @@ If you enable the ``django.template.context_processors.i18n`` context processor
 then each ``RequestContext`` will have access to ``LANGUAGES``,
 ``LANGUAGE_CODE``, and ``LANGUAGE_BIDI`` as defined above.
 
-.. versionchanged:: 1.8
-
-    The ``i18n`` context processor is not enabled by default for new projects.
-
 .. templatetag:: get_language_info
 
 ``get_language_info``
@@ -1332,13 +1328,7 @@ Django provides two mechanisms to internationalize URL patterns:
 Language prefix in URL patterns
 -------------------------------
 
-.. function:: i18n_patterns(prefix, pattern_description, ...)
-
-.. deprecated:: 1.8
-
-    The ``prefix`` argument to ``i18n_patterns()`` has been deprecated and will
-    not be supported in Django 1.10. Simply pass a list of
-    :func:`django.conf.urls.url` instances instead.
+.. function:: i18n_patterns(*pattern_list)
 
 This function can be used in your root URLconf and Django will automatically
 prepend the current active language code to all url patterns defined within
@@ -1352,7 +1342,7 @@ prepend the current active language code to all url patterns defined within
     from sitemap.views import sitemap
 
     urlpatterns = [
-        url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
+        url(r'^sitemap\.xml$', sitemap, name='sitemap-xml'),
     ]
 
     news_patterns = ([
@@ -1370,11 +1360,11 @@ After defining these URL patterns, Django will automatically add the
 language prefix to the URL patterns that were added by the ``i18n_patterns``
 function. Example::
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.utils.translation import activate
 
     >>> activate('en')
-    >>> reverse('sitemap_xml')
+    >>> reverse('sitemap-xml')
     '/sitemap.xml'
     >>> reverse('news:index')
     '/en/news/'
@@ -1410,7 +1400,7 @@ URL patterns can also be marked translatable using the
     from sitemaps.views import sitemap
 
     urlpatterns = [
-        url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
+        url(r'^sitemap\.xml$', sitemap, name='sitemap-xml'),
     ]
 
     news_patterns = ([
@@ -1424,11 +1414,10 @@ URL patterns can also be marked translatable using the
         url(_(r'^news/'), include(news_patterns, namespace='news')),
     )
 
-After you've created the translations, the
-:func:`~django.core.urlresolvers.reverse` function will return the URL in the
-active language. Example::
+After you've created the translations, the :func:`~django.urls.reverse`
+function will return the URL in the active language. Example::
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.utils.translation import activate
 
     >>> activate('en')
@@ -1549,8 +1538,8 @@ multiple times::
 .. admonition:: Using Jinja2 templates?
 
     :djadmin:`makemessages` doesn't understand the syntax of Jinja2 templates.
-    To extract strings from a project containing Jinja2 templates, use Babel_
-    instead.
+    To extract strings from a project containing Jinja2 templates, use `Message
+    Extracting`_ from Babel_ instead.
 
     Here's an example ``babel.cfg`` configuration file::
 
@@ -1569,6 +1558,7 @@ multiple times::
     in general, and doesn't depend on ``gettext``. For more information, read
     its documentation about `working with message catalogs`_.
 
+    .. _Message extracting: http://babel.pocoo.org/docs/messages/#message-extraction
     .. _Babel: http://babel.pocoo.org/
     .. _working with message catalogs: http://babel.pocoo.org/docs/messages/
 
@@ -1887,14 +1877,15 @@ For example::
 Calling this function with the value 'de' will give you ``"Willkommen"``,
 regardless of :setting:`LANGUAGE_CODE` and language set by middleware.
 
-Functions of particular interest are ``django.utils.translation.get_language()``
-which returns the language used in the current thread,
-``django.utils.translation.activate()`` which activates a translation catalog
-for the current thread, and ``django.utils.translation.check_for_language()``
+Functions of particular interest are
+:func:`django.utils.translation.get_language()` which returns the language used
+in the current thread, :func:`django.utils.translation.activate()` which
+activates a translation catalog for the current thread, and
+:func:`django.utils.translation.check_for_language()`
 which checks if the given language is supported by Django.
 
 To help write more concise code, there is also a context manager
-``django.utils.translation.override()`` that stores the current language on
+:func:`django.utils.translation.override()` that stores the current language on
 enter and restores it on exit. With it, the above example becomes::
 
     from django.utils import translation

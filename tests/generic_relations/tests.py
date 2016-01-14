@@ -10,9 +10,10 @@ from django.test import SimpleTestCase, TestCase
 from django.utils import six
 
 from .models import (
-    AllowsNullGFK, Animal, Comparison, ConcreteRelatedModel,
+    AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
     ForConcreteModelModel, ForProxyModelModel, Gecko, ManualPK, Mineral,
-    ProxyRelatedModel, Rock, TaggedItem, ValuableTaggedItem, Vegetable,
+    ProxyRelatedModel, Rock, TaggedItem, ValuableRock, ValuableTaggedItem,
+    Vegetable,
 )
 
 
@@ -312,31 +313,31 @@ class GenericRelationsTests(TestCase):
         fatty = bacon.tags.create(tag="fatty")
         salty = bacon.tags.create(tag="salty")
 
-        bacon.tags = [fatty, salty]
+        bacon.tags.set([fatty, salty])
         self.assertQuerysetEqual(bacon.tags.all(), [
             "<TaggedItem: fatty>",
             "<TaggedItem: salty>",
         ])
 
-        bacon.tags = [fatty]
+        bacon.tags.set([fatty])
         self.assertQuerysetEqual(bacon.tags.all(), [
             "<TaggedItem: fatty>",
         ])
 
-        bacon.tags = []
+        bacon.tags.set([])
         self.assertQuerysetEqual(bacon.tags.all(), [])
 
     def test_assign_with_queryset(self):
         # Ensure that querysets used in reverse GFK assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
-        # ManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        # ManyRelatedManager.set() (#19816).
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         bacon.tags.create(tag="fatty")
         bacon.tags.create(tag="salty")
         self.assertEqual(2, bacon.tags.count())
 
         qs = bacon.tags.filter(tag="fatty")
-        bacon.tags = qs
+        bacon.tags.set(qs)
 
         self.assertEqual(1, bacon.tags.count())
         self.assertEqual(1, qs.count())
@@ -400,15 +401,47 @@ class GenericRelationsTests(TestCase):
         )
         self.assertEqual(valuedtag.content_object, quartz)
 
+    def test_generic_relation_to_inherited_child(self):
+        # GenericRelations to models that use multi-table inheritance work.
+        granite = ValuableRock.objects.create(name='granite', hardness=5)
+        ValuableTaggedItem.objects.create(content_object=granite, tag="countertop", value=1)
+        self.assertEqual(ValuableRock.objects.filter(tags__value=1).count(), 1)
+        # We're generating a slightly inefficient query for tags__tag - we
+        # first join ValuableRock -> TaggedItem -> ValuableTaggedItem, and then
+        # we fetch tag by joining TaggedItem from ValuableTaggedItem. The last
+        # join isn't necessary, as TaggedItem <-> ValuableTaggedItem is a
+        # one-to-one join.
+        self.assertEqual(ValuableRock.objects.filter(tags__tag="countertop").count(), 1)
+        granite.delete()  # deleting the rock should delete the related tag.
+        self.assertEqual(ValuableTaggedItem.objects.count(), 0)
+
     def test_generic_inline_formsets(self):
         GenericFormSet = generic_inlineformset_factory(TaggedItem, extra=1)
         formset = GenericFormSet()
-        self.assertHTMLEqual(''.join(form.as_p() for form in formset.forms), """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text" name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50" /></p>
-<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label> <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE" id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" /><input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id" id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>""")
+        self.assertHTMLEqual(
+            ''.join(form.as_p() for form in formset.forms),
+            """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">
+Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text"
+name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50" /></p>
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label>
+<input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE"
+id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" />
+<input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id"
+id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>"""
+        )
 
         formset = GenericFormSet(instance=Animal())
-        self.assertHTMLEqual(''.join(form.as_p() for form in formset.forms), """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text" name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50" /></p>
-<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label> <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE" id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" /><input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id" id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>""")
+        self.assertHTMLEqual(
+            ''.join(form.as_p() for form in formset.forms),
+            """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">
+Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag"
+type="text" name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50" /></p>
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label>
+<input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE"
+id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" /><input type="hidden"
+name="generic_relations-taggeditem-content_type-object_id-0-id"
+id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>"""
+        )
 
         platypus = Animal.objects.create(
             common_name="Platypus", latin_name="Ornithorhynchus anatinus"
@@ -419,14 +452,35 @@ class GenericRelationsTests(TestCase):
         tagged_item_id = TaggedItem.objects.get(
             tag='shiny', object_id=platypus.id
         ).id
-        self.assertHTMLEqual(''.join(form.as_p() for form in formset.forms), """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text" name="generic_relations-taggeditem-content_type-object_id-0-tag" value="shiny" maxlength="50" /></p>
-<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label> <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE" id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" /><input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id" value="%s" id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p><p><label for="id_generic_relations-taggeditem-content_type-object_id-1-tag">Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-1-tag" type="text" name="generic_relations-taggeditem-content_type-object_id-1-tag" maxlength="50" /></p>
-<p><label for="id_generic_relations-taggeditem-content_type-object_id-1-DELETE">Delete:</label> <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-1-DELETE" id="id_generic_relations-taggeditem-content_type-object_id-1-DELETE" /><input type="hidden" name="generic_relations-taggeditem-content_type-object_id-1-id" id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tagged_item_id)
+        self.assertHTMLEqual(
+            ''.join(form.as_p() for form in formset.forms),
+            """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">Tag:</label>
+<input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text"
+name="generic_relations-taggeditem-content_type-object_id-0-tag" value="shiny" maxlength="50" /></p>
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label>
+<input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE"
+id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" />
+<input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id"
+value="%s" id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-1-tag">Tag:</label>
+<input id="id_generic_relations-taggeditem-content_type-object_id-1-tag" type="text"
+name="generic_relations-taggeditem-content_type-object_id-1-tag" maxlength="50" /></p>
+<p><label for="id_generic_relations-taggeditem-content_type-object_id-1-DELETE">Delete:</label>
+<input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-1-DELETE"
+id="id_generic_relations-taggeditem-content_type-object_id-1-DELETE" />
+<input type="hidden" name="generic_relations-taggeditem-content_type-object_id-1-id"
+id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tagged_item_id
+        )
 
         lion = Animal.objects.create(common_name="Lion", latin_name="Panthera leo")
         formset = GenericFormSet(instance=lion, prefix='x')
-        self.assertHTMLEqual(''.join(form.as_p() for form in formset.forms), """<p><label for="id_x-0-tag">Tag:</label> <input id="id_x-0-tag" type="text" name="x-0-tag" maxlength="50" /></p>
-<p><label for="id_x-0-DELETE">Delete:</label> <input type="checkbox" name="x-0-DELETE" id="id_x-0-DELETE" /><input type="hidden" name="x-0-id" id="id_x-0-id" /></p>""")
+        self.assertHTMLEqual(
+            ''.join(form.as_p() for form in formset.forms),
+            """<p><label for="id_x-0-tag">Tag:</label>
+<input id="id_x-0-tag" type="text" name="x-0-tag" maxlength="50" /></p>
+<p><label for="id_x-0-DELETE">Delete:</label> <input type="checkbox" name="x-0-DELETE" id="id_x-0-DELETE" />
+<input type="hidden" name="x-0-id" id="id_x-0-id" /></p>"""
+        )
 
     def test_gfk_manager(self):
         # GenericForeignKey should not use the default manager (which may filter objects) #16048
@@ -441,7 +495,16 @@ class GenericRelationsTests(TestCase):
         """
         granite = Rock.objects.create(name='granite', hardness=5)
         TaggedItem.objects.create(content_object=granite, tag="countertop")
-        self.assertEqual(Rock.objects.filter(tags__tag="countertop").count(), 1)
+        self.assertEqual(Rock.objects.get(tags__tag="countertop"), granite)
+
+    def test_subclasses_with_parent_gen_rel(self):
+        """
+        Generic relations on a base class (Vegetable) work correctly in
+        subclasses (Carrot).
+        """
+        bear = Carrot.objects.create(name='carrot')
+        TaggedItem.objects.create(content_object=bear, tag='orange')
+        self.assertEqual(Carrot.objects.get(tags__tag='orange'), bear)
 
     def test_generic_inline_formsets_initial(self):
         """
@@ -649,7 +712,7 @@ class ProxyRelatedModelTest(TestCase):
         base.save()
         newrel = ConcreteRelatedModel.objects.create()
 
-        newrel.bases = [base]
+        newrel.bases.set([base])
         newrel = ConcreteRelatedModel.objects.get(pk=newrel.pk)
         self.assertEqual(base, newrel.bases.get())
 

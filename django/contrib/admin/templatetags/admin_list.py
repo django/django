@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
 import datetime
+import warnings
 
-from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field, display_for_value, label_for_field, lookup_field,
@@ -11,13 +11,15 @@ from django.contrib.admin.views.main import (
     ALL_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
 )
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import NoReverseMatch
 from django.db import models
 from django.template import Library
 from django.template.loader import get_template
+from django.templatetags.static import static
+from django.urls import NoReverseMatch
 from django.utils import formats
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
-from django.utils.html import escapejs, format_html
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -207,12 +209,14 @@ def items_for_result(cl, result, form):
                     row_classes = ['action-checkbox']
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
-                if boolean or not value:
-                    allow_tags = True
                 result_repr = display_for_value(value, empty_value_display, boolean)
-                # Strip HTML tags in the resulting text, except if the
-                # function has an "allow_tags" attribute set to True.
                 if allow_tags:
+                    warnings.warn(
+                        "Deprecated allow_tags attribute used on field {}. "
+                        "Use django.utils.safestring.format_html(), "
+                        "format_html_join(), or mark_safe() instead.".format(field_name),
+                        RemovedInDjango20Warning
+                    )
                     result_repr = mark_safe(result_repr)
                 if isinstance(value, (datetime.date, datetime.time)):
                     row_classes.append('nowrap')
@@ -250,13 +254,11 @@ def items_for_result(cl, result, form):
                 else:
                     attr = pk
                 value = result.serializable_value(attr)
-                result_id = escapejs(value)
                 link_or_text = format_html(
                     '<a href="{}"{}>{}</a>',
                     url,
                     format_html(
-                        ' onclick="opener.dismissRelatedLookupPopup(window, '
-                        '&#39;{}&#39;); return false;"', result_id
+                        ' data-popup-opener="{}"', value
                     ) if cl.is_popup else '',
                     result_repr)
 

@@ -12,7 +12,7 @@ documentation for any custom tags or filters installed.
 Built-in tag reference
 ----------------------
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 .. templatetag:: autoescape
 
@@ -185,18 +185,6 @@ call to ``{% cycle %}`` doesn't specify ``silent``::
     {% cycle 'row1' 'row2' as rowcolors silent %}
     {% cycle rowcolors %}
 
-.. deprecated:: 1.9
-
-    The ``{% cycle %}`` tag supports the much inferior old syntax from previous
-    Django versions. You shouldn't use this in any new projects, but for the
-    sake of the people who are still using it, here's what it looks like::
-
-        {% cycle row1,row2,row3 %}
-
-    In this syntax, each value gets interpreted as a literal string, and there's
-    no way to specify variable values, literal commas, or spaces. Support for
-    this syntax will be removed in Django 1.10.
-
 .. templatetag:: debug
 
 debug
@@ -326,6 +314,14 @@ would display the keys and values of the dictionary::
     {% for key, value in data.items %}
         {{ key }}: {{ value }}
     {% endfor %}
+
+Keep in mind that for the dot operator, dictionary key lookup takes precedence
+over method lookup. Therefore if the ``data`` dictionary contains a key named
+``'items'``, ``data.items`` will return ``data['items']`` instead of
+``data.items()``. Avoid adding keys that are named like dictionary methods if
+you want to use those methods in a template (``items``, ``values``, ``keys``,
+etc.). Read more about the lookup order of the dot operator in the
+:ref:`documentation of template variables <template-variables>`.
 
 The for loop sets a number of variables available within the loop:
 
@@ -552,9 +548,7 @@ operators, from lowest to highest, is as follows:
 * ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=``
 
 (This follows Python exactly). So, for example, the following complex
-:ttag:`if` tag:
-
-.. code-block:: django
+:ttag:`if` tag::
 
     {% if a == b or c == d and e %}
 
@@ -673,9 +667,14 @@ if it's missing or has syntax errors), the behavior varies depending on the
 :class:`template engine's <django.template.Engine>` ``debug`` option (if not
 set, this option defaults to the value of :setting:`DEBUG`). When debug mode is
 turned on, an exception like :exc:`~django.template.TemplateDoesNotExist` or
-:exc:`~django.template.TemplateSyntaxError` will be raised; otherwise
-``{% include %}`` silences any exception that happens while rendering the
-included template and returns an empty string.
+:exc:`~django.template.TemplateSyntaxError` will be raised. When debug mode
+is turned off, ``{% include %}`` logs a warning to the ``django.template``
+logger with the exception that happens while rendering the included template
+and returns an empty string.
+
+.. versionchanged:: 1.9
+
+    Template logging now includes the warning logging mentioned above.
 
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
@@ -715,10 +714,6 @@ more information.
 
 lorem
 ^^^^^
-
-.. versionadded:: 1.8
-
-    The tag was previously located in :mod:`django.contrib.webdesign`.
 
 Displays random "lorem ipsum" Latin text. This is useful for providing sample
 data in templates.
@@ -787,10 +782,6 @@ output (as a string) inside a variable. This is useful if you want to use
 
     {% now "Y" as current_year %}
     {% blocktrans %}Copyright {{ current_year }}{% endblocktrans %}
-
-.. versionadded:: 1.8
-
-The ability to use the "as" syntax was added.
 
 .. templatetag:: regroup
 
@@ -957,45 +948,6 @@ this example, the space around ``Hello`` won't be stripped::
         </strong>
     {% endspaceless %}
 
-.. templatetag:: ssi
-
-ssi
-^^^
-
-.. deprecated:: 1.8
-
-    This tag has been deprecated and will be removed in Django 1.10. Use the
-    :ttag:`include` tag instead.
-
-Outputs the contents of a given file into the page.
-
-Like a simple :ttag:`include` tag, ``{% ssi %}`` includes the contents of
-another file -- which must be specified using an absolute path -- in the
-current page::
-
-    {% ssi '/home/html/ljworld.com/includes/right_generic.html' %}
-
-The first parameter of ``ssi`` can be a quoted literal or any other context
-variable.
-
-If the optional ``parsed`` parameter is given, the contents of the included
-file are evaluated as template code, within the current context::
-
-    {% ssi '/home/html/ljworld.com/includes/right_generic.html' parsed %}
-
-Note that if you use ``{% ssi %}``, you'll need to define
-``'allowed_include_roots'`` in the :setting:`OPTIONS <TEMPLATES-OPTIONS>` of
-your template engine, as a security measure.
-
-.. note::
-    With the :ttag:`ssi` tag and the ``parsed`` parameter
-    there is no shared state between files -- each include is a completely
-    independent rendering process. This means it's not possible for example to
-    define blocks or alter the context in the current page using the included
-    file.
-
-See also: :ttag:`{% include %}<include>`.
-
 .. templatetag:: templatetag
 
 templatetag
@@ -1072,8 +1024,8 @@ such as this:
 The template tag will output the string ``/clients/client/123/``.
 
 Note that if the URL you're reversing doesn't exist, you'll get an
-:exc:`~django.core.urlresolvers.NoReverseMatch` exception raised, which will
-cause your site to display an error page.
+:exc:`~django.urls.NoReverseMatch` exception raised, which will cause your
+site to display an error page.
 
 If you'd like to retrieve a URL without displaying it, you can use a slightly
 different call::
@@ -1100,13 +1052,6 @@ If you'd like to retrieve a namespaced URL, specify the fully qualified name::
 This will follow the normal :ref:`namespaced URL resolution strategy
 <topics-http-reversing-url-namespaces>`, including using any hints provided
 by the context as to the current application.
-
-.. deprecated:: 1.8
-
-    You can also pass a dotted Python path to a view function, but this syntax
-    is deprecated and will be removed in Django 1.10::
-
-        {% url 'path.to.some_view' v1 v2 %}
 
 .. warning::
 
@@ -1280,7 +1225,7 @@ date
 
 Formats a date according to the given format.
 
-Uses a similar format as PHP's ``date()`` function (http://php.net/date)
+Uses a similar format as PHP's ``date()`` function (https://php.net/date)
 with some differences.
 
 .. note::
@@ -1560,7 +1505,7 @@ filesizeformat
 ^^^^^^^^^^^^^^
 
 Formats the value like a 'human-readable' file size (i.e. ``'13 KB'``,
-``'4.1 MB'``, ``'102 bytes'``, etc).
+``'4.1 MB'``, ``'102 bytes'``, etc.).
 
 For example::
 
@@ -1736,10 +1681,7 @@ For example::
 If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 ``4``.
 
-.. versionchanged:: 1.8
-
-    The filter returns ``0`` for an undefined variable. Previously, it returned
-    an empty string.
+The filter returns ``0`` for an undefined variable.
 
 .. templatefilter:: length_is
 
@@ -1835,8 +1777,8 @@ For example::
 
     {{ value|lower }}
 
-If ``value`` is ``Still MAD At Yoko``, the output will be
-``still mad at yoko``.
+If ``value`` is ``Totally LOVING this Album!``, the output will be
+``totally loving this album!``.
 
 .. templatefilter:: make_list
 
@@ -1923,44 +1865,6 @@ For example::
 
 If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output could be ``"b"``.
 
-.. templatefilter:: removetags
-
-removetags
-^^^^^^^^^^
-
-.. deprecated:: 1.8
-
-    ``removetags`` cannot guarantee HTML safe output and has been deprecated due
-    to security concerns. Consider using `bleach`_ instead.
-
-.. _bleach: http://bleach.readthedocs.org/en/latest/
-
-Removes a space-separated list of [X]HTML tags from the output.
-
-For example::
-
-    {{ value|removetags:"b span" }}
-
-If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-unescaped output will be ``"Joel <button>is</button> a slug"``.
-
-Note that this filter is case-sensitive.
-
-If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"`` the
-unescaped output will be ``"<B>Joel</B> <button>is</button> a slug"``.
-
-.. admonition:: No safety guarantee
-
-    Note that ``removetags`` doesn't give any guarantee about its output being
-    HTML safe. In particular, it doesn't work recursively, so an input like
-    ``"<sc<script>ript>alert('XSS')</sc</script>ript>"`` won't be safe even if
-    you apply ``|removetags:"script"``. So if the input is user provided,
-    **NEVER** apply the ``safe`` filter to a ``removetags`` output. If you are
-    looking for something more robust, you can use the ``bleach`` Python
-    library, notably its `clean`_ method.
-
-.. _clean: http://bleach.readthedocs.org/en/latest/clean.html
-
 .. templatefilter:: rjust
 
 rjust
@@ -1988,9 +1892,7 @@ autoescaping is off, this filter has no effect.
 
     If you are chaining filters, a filter applied after ``safe`` can
     make the contents unsafe again. For example, the following code
-    prints the variable as is, unescaped:
-
-    .. code-block:: html+django
+    prints the variable as is, unescaped::
 
         {{ var|safe|escape }}
 
@@ -2081,7 +1983,7 @@ output will be ``"Joel is a slug"``.
     more robust, you can use the ``bleach`` Python library, notably its
     `clean`_ method.
 
-.. _clean: http://bleach.readthedocs.org/en/latest/clean.html
+.. _clean: https://bleach.readthedocs.org/en/latest/clean.html
 
 .. templatefilter:: time
 
@@ -2281,12 +2183,6 @@ contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
     </ul>
     </li>
 
-.. deprecated:: 1.8
-
-    An older, more restrictive and verbose input format is also supported:
-    ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``.
-    Support for this syntax will be removed in Django 1.10.
-
 .. templatefilter:: upper
 
 upper
@@ -2311,8 +2207,8 @@ For example::
 
     {{ value|urlencode }}
 
-If ``value`` is ``"http://www.example.org/foo?a=b&c=d"``, the output will be
-``"http%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
+If ``value`` is ``"https://www.example.org/foo?a=b&c=d"``, the output will be
+``"https%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
 
 An optional argument containing the characters which should not be escaped can
 be provided.
@@ -2322,8 +2218,8 @@ provided when *all* characters should be escaped. For example::
 
     {{ value|urlencode:"" }}
 
-If ``value`` is ``"http://www.example.org/"``, the output will be
-``"http%3A%2F%2Fwww.example.org%2F"``.
+If ``value`` is ``"https://www.example.org/"``, the output will be
+``"https%3A%2F%2Fwww.example.org%2F"``.
 
 .. templatefilter:: urlize
 
@@ -2333,18 +2229,12 @@ urlize
 Converts URLs and email addresses in text into clickable links.
 
 This template tag works on links prefixed with ``http://``, ``https://``, or
-``www.``. For example, ``http://goo.gl/aia1t`` will get converted but
+``www.``. For example, ``https://goo.gl/aia1t`` will get converted but
 ``goo.gl/aia1t`` won't.
 
 It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
 ``.org``). For example, ``djangoproject.com`` gets converted.
-
-.. versionchanged:: 1.8
-
-    Support for domain-only links that include characters after the top-level
-    domain (e.g. ``djangoproject.com/`` and ``djangoproject.com/download/``)
-    was added.
 
 Links can have trailing punctuation (periods, commas, close-parens) and leading
 punctuation (opening parens), and ``urlize`` will still do the right thing.
@@ -2508,53 +2398,42 @@ static
 static
 """"""
 
-.. highlight:: html+django
-
 To link to static files that are saved in :setting:`STATIC_ROOT` Django ships
-with a :ttag:`static` template tag. You can use this regardless if you're
-using :class:`~django.template.RequestContext` or not.
-
-.. code-block:: html+django
+with a :ttag:`static` template tag. If the :mod:`django.contrib.staticfiles`
+app is installed, the tag will serve files using ``url()`` method of the
+storage specified by :setting:`STATICFILES_STORAGE`. For example::
 
     {% load static %}
     <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
 
 It is also able to consume standard context variables, e.g. assuming a
-``user_stylesheet`` variable is passed to the template:
-
-.. code-block:: html+django
+``user_stylesheet`` variable is passed to the template::
 
     {% load static %}
     <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
 
 If you'd like to retrieve a static URL without displaying it, you can use a
-slightly different call:
-
-.. code-block:: html+django
+slightly different call::
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
     <img src="{{ myphoto }}"></img>
 
-.. note::
+.. admonition:: Using Jinja2 templates?
 
-    The :mod:`staticfiles<django.contrib.staticfiles>` contrib app also ships
-    with a :ttag:`static template tag<staticfiles-static>` which uses
-    ``staticfiles'`` :setting:`STATICFILES_STORAGE` to build the URL of the
-    given path (rather than simply using :func:`urllib.parse.urljoin` with the
-    :setting:`STATIC_URL` setting and the given path). Use that instead if you
-    have an advanced use case such as :ref:`using a cloud service to serve
-    static files<staticfiles-from-cdn>`::
+    See :class:`~django.template.backends.jinja2.Jinja2` for information on
+    using the ``static`` tag with Jinja2.
 
-        {% load static from staticfiles %}
-        <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
+.. versionchanged:: 1.10
+
+    In older versions, you had to use ``{% load static from staticfiles %}`` in
+    your template to serve files from the storage defined in
+    :setting:`STATICFILES_STORAGE`. This is no longer required.
 
 .. templatetag:: get_static_prefix
 
 get_static_prefix
 """""""""""""""""
-
-.. highlight:: html+django
 
 You should prefer the :ttag:`static` template tag, but if you need more control
 over exactly where and how :setting:`STATIC_URL` is injected into the template,
@@ -2576,8 +2455,6 @@ the value multiple times::
 
 get_media_prefix
 """"""""""""""""
-
-.. highlight:: html+django
 
 Similar to the :ttag:`get_static_prefix`, ``get_media_prefix`` populates a
 template variable with the media prefix :setting:`MEDIA_URL`, e.g.::

@@ -17,19 +17,19 @@ class SpatialProxy(object):
         self._field = field
         self._klass = klass
 
-    def __get__(self, obj, type=None):
+    def __get__(self, instance, cls=None):
         """
         This accessor retrieves the geometry or raster, initializing it using
         the corresponding class specified during initialization and the value
         of the field. Currently, GEOS or OGR geometries as well as GDALRasters
         are supported.
         """
-        if obj is None:
+        if instance is None:
             # Accessed on a class, not an instance
             return self
 
         # Getting the value of the field.
-        geo_value = obj.__dict__[self._field.attname]
+        geo_value = instance.__dict__[self._field.attname]
 
         if isinstance(geo_value, self._klass):
             geo_obj = geo_value
@@ -39,10 +39,10 @@ class SpatialProxy(object):
             # Otherwise, a geometry or raster object is built using the field's
             # contents, and the model's corresponding attribute is set.
             geo_obj = self._klass(geo_value)
-            setattr(obj, self._field.attname, geo_obj)
+            setattr(instance, self._field.attname, geo_obj)
         return geo_obj
 
-    def __set__(self, obj, value):
+    def __set__(self, instance, value):
         """
         This accessor sets the proxied geometry or raster with the
         corresponding class specified during initialization.
@@ -68,8 +68,8 @@ class SpatialProxy(object):
             pass
         else:
             raise TypeError('Cannot set %s SpatialProxy (%s) with value of type: %s' % (
-                obj.__class__.__name__, gtype, type(value)))
+                instance.__class__.__name__, gtype, type(value)))
 
         # Setting the objects dictionary with the value, and returning.
-        obj.__dict__[self._field.attname] = value
+        instance.__dict__[self._field.attname] = value
         return value

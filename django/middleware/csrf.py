@@ -10,11 +10,12 @@ import logging
 import re
 
 from django.conf import settings
-from django.core.urlresolvers import get_callable
+from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.encoding import force_text
-from django.utils.http import same_origin
+from django.utils.http import is_same_domain
+from django.utils.six.moves.urllib.parse import urlparse
 
 logger = logging.getLogger('django.request')
 
@@ -22,6 +23,8 @@ REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match any trusted origins."
 REASON_NO_CSRF_COOKIE = "CSRF cookie not set."
 REASON_BAD_TOKEN = "CSRF token missing or incorrect."
+REASON_MALFORMED_REFERER = "Referer checking failed - Referer is malformed."
+REASON_INSECURE_REFERER = "Referer checking failed - Referer is insecure while host is secure."
 
 CSRF_KEY_LENGTH = 32
 
@@ -154,15 +157,35 @@ class CsrfViewMiddleware(object):
                 if referer is None:
                     return self._reject(request, REASON_NO_REFERER)
 
+                referer = urlparse(referer)
+
+                # Make sure we have a valid URL for Referer.
+                if '' in (referer.scheme, referer.netloc):
+                    return self._reject(request, REASON_MALFORMED_REFERER)
+
+                # Ensure that our Referer is also secure.
+                if referer.scheme != 'https':
+                    return self._reject(request, REASON_INSECURE_REFERER)
+
+                # If there isn't a CSRF_COOKIE_DOMAIN, assume we need an exact
+                # match on host:port. If not, obey the cookie rules.
+                if settings.CSRF_COOKIE_DOMAIN is None:
+                    # request.get_host() includes the port.
+                    good_referer = request.get_host()
+                else:
+                    good_referer = settings.CSRF_COOKIE_DOMAIN
+                    server_port = request.META['SERVER_PORT']
+                    if server_port not in ('443', '80'):
+                        good_referer = '%s:%s' % (good_referer, server_port)
+
                 # Here we generate a list of all acceptable HTTP referers,
                 # including the current host since that has been validated
                 # upstream.
                 good_hosts = list(settings.CSRF_TRUSTED_ORIGINS)
-                # Note that request.get_host() includes the port.
-                good_hosts.append(request.get_host())
-                good_referers = ['https://{0}/'.format(host) for host in good_hosts]
-                if not any(same_origin(referer, host) for host in good_referers):
-                    reason = REASON_BAD_REFERER % referer
+                good_hosts.append(good_referer)
+
+                if not any(is_same_domain(referer.netloc, host) for host in good_hosts):
+                    reason = REASON_BAD_REFERER % referer.geturl()
                     return self._reject(request, reason)
 
             if csrf_token is None:

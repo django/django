@@ -158,7 +158,7 @@ class ProxyTrackerUser(TrackerUser):
 @python_2_unicode_compatible
 class Issue(models.Model):
     summary = models.CharField(max_length=255)
-    assignee = models.ForeignKey(ProxyTrackerUser, models.CASCADE)
+    assignee = models.ForeignKey(ProxyTrackerUser, models.CASCADE, related_name='issues')
 
     def __str__(self):
         return ':'.join((self.__class__.__name__, self.summary,))

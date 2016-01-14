@@ -1,5 +1,6 @@
 import os
 import sys
+import warnings
 from itertools import takewhile
 
 from django.apps import apps
@@ -13,6 +14,7 @@ from django.db.migrations.questioner import (
 )
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six import iteritems
 from django.utils.six.moves import zip
 
@@ -35,10 +37,12 @@ class Command(BaseCommand):
         parser.add_argument('-n', '--name', action='store', dest='name', default=None,
             help="Use this name for migration file(s).")
         parser.add_argument('-e', '--exit', action='store_true', dest='exit_code', default=False,
-            help='Exit with error code 1 if no changes needing migrations are found.')
+            help='Exit with error code 1 if no changes needing migrations are found. '
+            'Deprecated, use the --check option instead.')
+        parser.add_argument('--check', action='store_true', dest='check_changes',
+            help='Exit with a non-zero status if model changes are missing migrations.')
 
     def handle(self, *app_labels, **options):
-
         self.verbosity = options.get('verbosity')
         self.interactive = options.get('interactive')
         self.dry_run = options.get('dry_run', False)
@@ -46,6 +50,13 @@ class Command(BaseCommand):
         self.empty = options.get('empty', False)
         self.migration_name = options.get('name')
         self.exit_code = options.get('exit_code', False)
+        check_changes = options['check_changes']
+
+        if self.exit_code:
+            warnings.warn(
+                "The --exit option is deprecated in favor of the --check option.",
+                RemovedInDjango20Warning
+            )
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
@@ -144,10 +155,10 @@ class Command(BaseCommand):
 
             if self.exit_code:
                 sys.exit(1)
-            else:
-                return
-
-        self.write_migration_files(changes)
+        else:
+            self.write_migration_files(changes)
+            if check_changes:
+                sys.exit(1)
 
     def write_migration_files(self, changes):
         """
@@ -161,7 +172,12 @@ class Command(BaseCommand):
                 # Describe the migration
                 writer = MigrationWriter(migration)
                 if self.verbosity >= 1:
-                    self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(writer.filename),))
+                    # Display a relative path if it's below the current working
+                    # directory, or an absolute path otherwise.
+                    migration_string = os.path.relpath(writer.path)
+                    if migration_string.startswith('..'):
+                        migration_string = writer.path
+                    self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(migration_string),))
                     for operation in migration.operations:
                         self.stdout.write("    - %s\n" % operation.describe())
                 if not self.dry_run:

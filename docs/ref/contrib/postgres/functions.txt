@@ -28,4 +28,4 @@ Usage example::
 
     >>> from django.contrib.postgres.functions import TransactionNow
     >>> Article.objects.filter(published__lte=TransactionNow())
-    [<Article: How to Django>]
+    <QuerySet [<Article: How to Django>]>

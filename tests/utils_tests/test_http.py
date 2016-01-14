@@ -10,31 +10,6 @@ from django.utils.datastructures import MultiValueDict
 
 class TestUtilsHttp(unittest.TestCase):
 
-    def test_same_origin_true(self):
-        # Identical
-        self.assertTrue(http.same_origin('http://foo.com/', 'http://foo.com/'))
-        # One with trailing slash - see #15617
-        self.assertTrue(http.same_origin('http://foo.com', 'http://foo.com/'))
-        self.assertTrue(http.same_origin('http://foo.com/', 'http://foo.com'))
-        # With port
-        self.assertTrue(http.same_origin('https://foo.com:8000', 'https://foo.com:8000/'))
-        # No port given but according to RFC6454 still the same origin
-        self.assertTrue(http.same_origin('http://foo.com', 'http://foo.com:80/'))
-        self.assertTrue(http.same_origin('https://foo.com', 'https://foo.com:443/'))
-
-    def test_same_origin_false(self):
-        # Different scheme
-        self.assertFalse(http.same_origin('http://foo.com', 'https://foo.com'))
-        # Different host
-        self.assertFalse(http.same_origin('http://foo.com', 'http://goo.com'))
-        # Different host again
-        self.assertFalse(http.same_origin('http://foo.com', 'http://foo.com.evil.com'))
-        # Different port
-        self.assertFalse(http.same_origin('http://foo.com:8000', 'http://foo.com:8001'))
-        # No port given
-        self.assertFalse(http.same_origin('http://foo.com', 'http://foo.com:8000/'))
-        self.assertFalse(http.same_origin('https://foo.com', 'https://foo.com:8000/'))
-
     def test_urlencode(self):
         # 2-tuples (the norm)
         result = http.urlencode((('a', 1), ('b', 2), ('c', 3)))
@@ -100,7 +75,7 @@ class TestUtilsHttp(unittest.TestCase):
         for bad_url in ('http://example.com',
                         'http:///example.com',
                         'https://example.com',
-                        'ftp://exampel.com',
+                        'ftp://example.com',
                         r'\\example.com',
                         r'\\\example.com',
                         r'/\\/example.com',
@@ -121,7 +96,7 @@ class TestUtilsHttp(unittest.TestCase):
             self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
         for good_url in ('/view/?param=http://example.com',
                      '/view/?param=https://example.com',
-                     '/view?param=ftp://exampel.com',
+                     '/view?param=ftp://example.com',
                      'view/?param=//example.com',
                      'https://testserver/',
                      'HTTPS://testserver/',
@@ -157,6 +132,25 @@ class TestUtilsHttp(unittest.TestCase):
             http.urlunquote_plus('Paris+&+Orl%C3%A9ans'),
             'Paris & Orl\xe9ans')
 
+    def test_is_same_domain_good(self):
+        for pair in (
+            ('example.com', 'example.com'),
+            ('example.com', '.example.com'),
+            ('foo.example.com', '.example.com'),
+            ('example.com:8888', 'example.com:8888'),
+            ('example.com:8888', '.example.com:8888'),
+            ('foo.example.com:8888', '.example.com:8888'),
+        ):
+            self.assertTrue(http.is_same_domain(*pair))
+
+    def test_is_same_domain_bad(self):
+        for pair in (
+            ('example2.com', 'example.com'),
+            ('foo.example.com', 'example.com'),
+            ('example.com:9999', 'example.com:8888'),
+        ):
+            self.assertFalse(http.is_same_domain(*pair))
+
 
 class ETagProcessingTests(unittest.TestCase):
     def test_parsing(self):
@@ -164,8 +158,10 @@ class ETagProcessingTests(unittest.TestCase):
         self.assertEqual(etags, ['', 'etag', 'e"t"ag', r'e\tag', 'weak'])
 
     def test_quoting(self):
-        quoted_etag = http.quote_etag(r'e\t"ag')
+        original_etag = r'e\t"ag'
+        quoted_etag = http.quote_etag(original_etag)
         self.assertEqual(quoted_etag, r'"e\\t\"ag"')
+        self.assertEqual(http.unquote_etag(quoted_etag), original_etag)
 
 
 class HttpDateProcessingTests(unittest.TestCase):

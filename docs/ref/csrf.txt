@@ -7,8 +7,8 @@ Cross Site Request Forgery protection
 
 The CSRF middleware and template tag provides easy-to-use protection against
 `Cross Site Request Forgeries`_.  This type of attack occurs when a malicious
-Web site contains a link, a form button or some JavaScript that is intended to
-perform some action on your Web site, using the credentials of a logged-in user
+website contains a link, a form button or some JavaScript that is intended to
+perform some action on your website, using the credentials of a logged-in user
 who visits the malicious site in their browser.  A related type of attack,
 'login CSRF', where an attacking site tricks a user's browser into logging into
 a site with someone else's credentials, is also covered.
@@ -19,7 +19,7 @@ The first defense against CSRF attacks is to ensure that GET requests (and other
 such as POST, PUT and DELETE, can then be protected by following the steps
 below.
 
-.. _Cross Site Request Forgeries: http://www.squarefree.com/securitytips/web-developers.html#CSRF
+.. _Cross Site Request Forgeries: https://www.squarefree.com/securitytips/web-developers.html#CSRF
 
 .. _using-csrf:
 
@@ -45,31 +45,11 @@ To take advantage of CSRF protection in your views, follow these steps:
    This should not be done for POST forms that target external URLs, since
    that would cause the CSRF token to be leaked, leading to a vulnerability.
 
-3. In the corresponding view functions, ensure that the
-   ``'django.template.context_processors.csrf'`` context processor is
-   being used. Usually, this can be done in one of two ways:
-
-   1. Use RequestContext, which always uses
-      ``'django.template.context_processors.csrf'`` (no matter what template
-      context processors are configured in the :setting:`TEMPLATES` setting).
-      If you are using generic views or contrib apps, you are covered already,
-      since these apps use RequestContext throughout.
-
-   2. Manually import and use the processor to generate the CSRF token and
-      add it to the template context. e.g.::
-
-          from django.shortcuts import render_to_response
-          from django.template.context_processors import csrf
-
-          def my_view(request):
-              c = {}
-              c.update(csrf(request))
-              # ... view code here
-              return render_to_response("a_template.html", c)
-
-      You may want to write your own
-      :func:`~django.shortcuts.render_to_response()` wrapper that takes care
-      of this step for you.
+3. In the corresponding view functions, ensure that
+   :class:`~django.template.RequestContext` is used to render the response so
+   that ``{% csrf_token %}`` will work properly. If you're using the
+   :func:`~django.shortcuts.render` function, generic views, or contrib apps,
+   you are covered already since these all use ``RequestContext``.
 
 .. _csrf-ajax:
 
@@ -142,7 +122,7 @@ The above code could be simplified by using the `JavaScript Cookie library
 
 Finally, you'll have to actually set the header on your AJAX request, while
 protecting the CSRF token from being sent to other domains using
-`settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5.1 and
+`settings.crossDomain <https://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5.1 and
 newer:
 
 .. code-block:: javascript
@@ -257,17 +237,29 @@ The CSRF protection is based on the following things:
    due to the fact that HTTP 'Set-Cookie' headers are (unfortunately) accepted
    by clients that are talking to a site under HTTPS.  (Referer checking is not
    done for HTTP requests because the presence of the Referer header is not
-   reliable enough under HTTP.) Expanding the accepted referers beyond the
-   current host can be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.
+   reliable enough under HTTP.)
 
-This ensures that only forms that have originated from your Web site can be used
-to POST data back.
+   If the :setting:`CSRF_COOKIE_DOMAIN` setting is set, the referer is compared
+   against it. This setting supports subdomains. For example,
+   ``CSRF_COOKIE_DOMAIN = '.example.com'`` will allow POST requests from
+   ``www.example.com`` and ``api.example.com``. If the setting is not set, then
+   the referer must match the HTTP ``Host`` header.
+
+   Expanding the accepted referers beyond the current host or cookie domain can
+   be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.
+
+This ensures that only forms that have originated from trusted domains can be
+used to POST data back.
 
 It deliberately ignores GET requests (and other requests that are defined as
 'safe' by :rfc:`2616`). These requests ought never to have any potentially
 dangerous side effects , and so a CSRF attack with a GET request ought to be
 harmless. :rfc:`2616` defines POST, PUT and DELETE as 'unsafe', and all other
 methods are assumed to be unsafe, for maximum protection.
+
+.. versionchanged:: 1.9
+
+    Checking against the :setting:`CSRF_COOKIE_DOMAIN` setting was added.
 
 Caching
 =======

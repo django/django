@@ -116,6 +116,18 @@ class LookupTests(TestCase):
         arts = Article.objects.in_bulk([self.a1.id, self.a2.id])
         self.assertEqual(arts[self.a1.id], self.a1)
         self.assertEqual(arts[self.a2.id], self.a2)
+        self.assertEqual(
+            Article.objects.in_bulk(),
+            {
+                self.a1.id: self.a1,
+                self.a2.id: self.a2,
+                self.a3.id: self.a3,
+                self.a4.id: self.a4,
+                self.a5.id: self.a5,
+                self.a6.id: self.a6,
+                self.a7.id: self.a7,
+            }
+        )
         self.assertEqual(Article.objects.in_bulk([self.a3.id]), {self.a3.id: self.a3})
         self.assertEqual(Article.objects.in_bulk({self.a3.id}), {self.a3.id: self.a3})
         self.assertEqual(Article.objects.in_bulk(frozenset([self.a3.id])), {self.a3.id: self.a3})
@@ -124,7 +136,6 @@ class LookupTests(TestCase):
         self.assertEqual(Article.objects.in_bulk([]), {})
         self.assertEqual(Article.objects.in_bulk(iter([self.a1.id])), {self.a1.id: self.a1})
         self.assertEqual(Article.objects.in_bulk(iter([])), {})
-        self.assertRaises(TypeError, Article.objects.in_bulk)
         self.assertRaises(TypeError, Article.objects.in_bulk, headline__startswith='Blah')
 
     def test_values(self):
@@ -229,7 +240,11 @@ class LookupTests(TestCase):
                 {'name': self.au2.name, 'article__headline': self.a7.headline},
             ], transform=identity)
         self.assertQuerysetEqual(
-            Author.objects.values('name', 'article__headline', 'article__tag__name').order_by('name', 'article__headline', 'article__tag__name'),
+            (
+                Author.objects
+                .values('name', 'article__headline', 'article__tag__name')
+                .order_by('name', 'article__headline', 'article__tag__name')
+            ),
             [
                 {'name': self.au1.name, 'article__headline': self.a1.headline, 'article__tag__name': self.t1.name},
                 {'name': self.au1.name, 'article__headline': self.a2.headline, 'article__tag__name': self.t1.name},
@@ -311,7 +326,11 @@ class LookupTests(TestCase):
             ],
             transform=identity)
         self.assertQuerysetEqual(
-            Author.objects.values_list('name', 'article__headline', 'article__tag__name').order_by('name', 'article__headline', 'article__tag__name'),
+            (
+                Author.objects
+                .values_list('name', 'article__headline', 'article__tag__name')
+                .order_by('name', 'article__headline', 'article__tag__name')
+            ),
             [
                 (self.au1.name, self.a1.headline, self.t1.name),
                 (self.au1.name, self.a2.headline, self.t1.name),
@@ -484,6 +503,12 @@ class LookupTests(TestCase):
             self.assertEqual(
                 str(ex), "Unsupported lookup 'starts' for CharField "
                 "or join on the field not permitted.")
+
+    def test_relation_nested_lookup_error(self):
+        # An invalid nested lookup on a related field raises a useful error.
+        msg = 'Related Field got invalid lookup: editor'
+        with self.assertRaisesMessage(FieldError, msg):
+            Article.objects.filter(author__editor__name='James')
 
     def test_regex(self):
         # Create some articles with a bit more interesting headlines for testing field lookups:
@@ -669,13 +694,13 @@ class LookupTests(TestCase):
         season_2011.games.create(home="Houston Astros", away="St. Louis Cardinals")
         season_2011.games.create(home="Houston Astros", away="Milwaukee Brewers")
         hunter_pence = Player.objects.create(name="Hunter Pence")
-        hunter_pence.games = Game.objects.filter(season__year__in=[2009, 2010])
+        hunter_pence.games.set(Game.objects.filter(season__year__in=[2009, 2010]))
         pudge = Player.objects.create(name="Ivan Rodriquez")
-        pudge.games = Game.objects.filter(season__year=2009)
+        pudge.games.set(Game.objects.filter(season__year=2009))
         pedro_feliz = Player.objects.create(name="Pedro Feliz")
-        pedro_feliz.games = Game.objects.filter(season__year__in=[2011])
+        pedro_feliz.games.set(Game.objects.filter(season__year__in=[2011]))
         johnson = Player.objects.create(name="Johnson")
-        johnson.games = Game.objects.filter(season__year__in=[2011])
+        johnson.games.set(Game.objects.filter(season__year__in=[2011]))
 
         # Games in 2010
         self.assertEqual(Game.objects.filter(season__year=2010).count(), 3)

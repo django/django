@@ -15,7 +15,8 @@ from django.contrib.gis.gdal import (
     SpatialReference,
 )
 from django.contrib.gis.gdal.field import (
-    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime,
+    OFTDate, OFTDateTime, OFTInteger, OFTInteger64, OFTReal, OFTString,
+    OFTTime,
 )
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import connections, models, router, transaction
@@ -60,6 +61,7 @@ class LayerMapping(object):
     # counterparts.
     FIELD_TYPES = {
         models.AutoField: OFTInteger,
+        models.BigAutoField: OFTInteger64,
         models.IntegerField: (OFTInteger, OFTReal, OFTString),
         models.FloatField: (OFTInteger, OFTReal),
         models.DateField: OFTDate,
@@ -619,7 +621,7 @@ class LayerMapping(object):
                 try:
                     num_feat, num_saved = _save(step_slice, num_feat, num_saved)
                     beg = end
-                except:  # Deliberately catch everything
+                except Exception:  # Deliberately catch everything
                     stream.write('%s\nFailed to save slice: %s\n' % ('=-' * 20, step_slice))
                     raise
         else:

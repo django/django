@@ -4,10 +4,10 @@ from __future__ import unicode_literals
 import sys
 
 from django.contrib.auth.models import Group
-from django.core import urlresolvers
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
+from django.urls import NoReverseMatch
 
 
 class TemplateTests(SimpleTestCase):
@@ -26,7 +26,7 @@ class TemplateTests(SimpleTestCase):
         """
         t = Engine(debug=True).from_string('{% url will_not_match %}')
         c = Context()
-        with self.assertRaises(urlresolvers.NoReverseMatch):
+        with self.assertRaises(NoReverseMatch):
             t.render(c)
 
     def test_url_reverse_view_name(self):
@@ -38,7 +38,7 @@ class TemplateTests(SimpleTestCase):
         c = Context()
         try:
             t.render(c)
-        except urlresolvers.NoReverseMatch:
+        except NoReverseMatch:
             tb = sys.exc_info()[2]
             depth = 0
             while tb.tb_next is not None:
@@ -68,14 +68,21 @@ class TemplateTests(SimpleTestCase):
         #7876 -- Error messages should include the unexpected block name.
         """
         engine = Engine()
-
-        with self.assertRaises(TemplateSyntaxError) as e:
+        msg = (
+            "Invalid block tag on line 1: 'endblock', expected 'elif', 'else' "
+            "or 'endif'. Did you forget to register or load this tag?"
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.from_string("{% if 1 %}lala{% endblock %}{% endif %}")
 
-        self.assertEqual(
-            e.exception.args[0],
-            "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'",
+    def test_unknown_block_tag(self):
+        engine = Engine()
+        msg = (
+            "Invalid block tag on line 1: 'foobar'. Did you forget to "
+            "register or load this tag?"
         )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            engine.from_string("lala{% foobar %}")
 
     def test_compile_filter_expression_error(self):
         """
@@ -111,7 +118,7 @@ class TemplateTests(SimpleTestCase):
         """
         engine = Engine(app_dirs=True)
         t = engine.get_template('included_content.html')
-        with self.assertRaises(urlresolvers.NoReverseMatch):
+        with self.assertRaises(NoReverseMatch):
             t.render(Context())
 
     def test_debug_tag_non_ascii(self):

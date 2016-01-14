@@ -98,9 +98,9 @@ class ModelBase(type):
                 if not abstract:
                     raise RuntimeError(
                         "Model class %s.%s doesn't declare an explicit "
-                        "app_label and either isn't in an application in "
-                        "INSTALLED_APPS or else was imported before its "
-                        "application was loaded. " % (module, name))
+                        "app_label and isn't in an application in "
+                        "INSTALLED_APPS." % (module, name)
+                    )
 
             else:
                 app_label = app_config.label
@@ -185,7 +185,6 @@ class ModelBase(type):
                 raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
             new_class._meta.setup_proxy(base)
             new_class._meta.concrete_model = base._meta.concrete_model
-            base._meta.concrete_model._meta.proxied_children.append(new_class._meta)
         else:
             new_class._meta.concrete_model = new_class
 
@@ -464,7 +463,7 @@ class Model(six.with_metaclass(ModelBase)):
     def __str__(self):
         if six.PY2 and hasattr(self, '__unicode__'):
             return force_text(self).encode('utf-8')
-        return '%s object' % self.__class__.__name__
+        return str('%s object' % self.__class__.__name__)
 
     def __eq__(self, other):
         if not isinstance(other, Model):
@@ -593,7 +592,7 @@ class Model(six.with_metaclass(ModelBase)):
                 rel_instance = getattr(self, field.get_cache_name())
                 local_val = getattr(db_instance, field.attname)
                 related_val = None if rel_instance is None else getattr(rel_instance, field.target_field.attname)
-                if local_val != related_val:
+                if local_val != related_val or (local_val is None and related_val is None):
                     del self.__dict__[field.get_cache_name()]
         self._state.db = db_instance._state.db
 
@@ -643,6 +642,9 @@ class Model(six.with_metaclass(ModelBase)):
                 # constraints aren't supported by the database, there's the
                 # unavoidable risk of data corruption.
                 if obj and obj.pk is None:
+                    # Remove the object from a related instance cache.
+                    if not field.remote_field.multiple:
+                        delattr(obj, field.remote_field.get_cache_name())
                     raise ValueError(
                         "save() prohibited to prevent data loss due to "
                         "unsaved related object '%s'." % field.name

@@ -227,7 +227,7 @@ class BaseDatabaseOperations(object):
     def lookup_cast(self, lookup_type, internal_type=None):
         """
         Returns the string to use in a query when performing lookups
-        ("contains", "like", etc). The resulting string should contain a '%s'
+        ("contains", "like", etc.). The resulting string should contain a '%s'
         placeholder for the column being searched against.
         """
         return "%s"
@@ -576,7 +576,7 @@ class BaseDatabaseOperations(object):
     def combine_duration_expression(self, connector, sub_expressions):
         return self.combine_expression(connector, sub_expressions)
 
-    def modify_insert_params(self, placeholders, params):
+    def modify_insert_params(self, placeholder, params):
         """Allow modification of insert parameters. Needed for Oracle Spatial
         backend due to #10888.
         """

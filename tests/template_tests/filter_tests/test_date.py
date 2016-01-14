@@ -42,7 +42,9 @@ class DateTests(TimezoneTestCase):
     # Timezone name
     @setup({'date06': '{{ d|date:"e" }}'})
     def test_date06(self):
-        output = self.engine.render_to_string('date06', {'d': datetime(2009, 3, 12, tzinfo=timezone.get_fixed_timezone(30))})
+        output = self.engine.render_to_string(
+            'date06', {'d': datetime(2009, 3, 12, tzinfo=timezone.get_fixed_timezone(30))}
+        )
         self.assertEqual(output, '+0030')
 
     @setup({'date07': '{{ d|date:"e" }}'})

@@ -90,26 +90,32 @@
     display: block;
     text-indent: -3000px;
     overflow: hidden;
+    cursor: default;
+    opacity: 0.3;
+}
+
+.active.selector-add, .active.selector-remove {
+    opacity: 1;
+}
+
+.active.selector-add:hover, .active.selector-remove:hover {
+    cursor: pointer;
 }
 
 .selector-add {
     background: url(../img/selector-icons.svg) 0 -96px no-repeat;
-    cursor: default;
 }
 
-.active.selector-add {
+.active.selector-add:focus, .active.selector-add:hover {
     background-position: 0 -112px;
-    cursor: pointer;
 }
 
 .selector-remove {
     background: url(../img/selector-icons.svg) 0 -64px no-repeat;
-    cursor: default;
 }
 
-.active.selector-remove {
+.active.selector-remove:focus, .active.selector-remove:hover {
     background-position: 0 -80px;
-    cursor: pointer;
 }
 
 a.selector-chooseall, a.selector-clearall {
@@ -121,38 +127,41 @@ a.selector-chooseall, a.selector-clearall {
     font-weight: bold;
     line-height: 16px;
     color: #666;
+    text-decoration: none;
+    opacity: 0.3;
 }
 
-a.selector-chooseall {
-    padding: 0 18px 0 0;
-}
-
-a.selector-clearall {
-    padding: 0 0 0 18px;
-}
-
+a.active.selector-chooseall:focus, a.active.selector-clearall:focus,
 a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
     color: #447e9b;
 }
 
+a.active.selector-chooseall, a.active.selector-clearall {
+    opacity: 1;
+}
+
+a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
+    cursor: pointer;
+}
+
 a.selector-chooseall {
+    padding: 0 18px 0 0;
     background: url(../img/selector-icons.svg) right -160px no-repeat;
     cursor: default;
 }
 
-a.active.selector-chooseall {
+a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
     background-position: 100% -176px;
-    cursor: pointer;
 }
 
 a.selector-clearall {
+    padding: 0 0 0 18px;
     background: url(../img/selector-icons.svg) 0 -128px no-repeat;
     cursor: default;
 }
 
-a.active.selector-clearall {
+a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     background-position: 0 -144px;
-    cursor: pointer;
 }
 
 /* STACKED SELECTORS */
@@ -246,11 +255,6 @@ p.datetime {
     font-weight: bold;
 }
 
-form .form-row p.datetime {
-    margin-left: 160px;
-    padding-left: 10px;
-}
-
 .datetime span {
     white-space: nowrap;
     font-weight: normal;
@@ -265,7 +269,7 @@ form .form-row p.datetime {
 }
 
 table p.datetime {
-    font-size: 10px;
+    font-size: 11px;
     margin-left: 0;
     padding-left: 0;
 }
@@ -283,6 +287,7 @@ table p.datetime {
     background: url(../img/icon-clock.svg) 0 0 no-repeat;
 }
 
+.datetimeshortcuts a:focus .clock-icon,
 .datetimeshortcuts a:hover .clock-icon {
     background-position: 0 -16px;
 }
@@ -292,6 +297,7 @@ table p.datetime {
     top: -1px;
 }
 
+.datetimeshortcuts a:focus .date-icon,
 .datetimeshortcuts a:hover .date-icon {
     background-position: 0 -16px;
 }
@@ -428,6 +434,7 @@ span.clearable-file-input label {
     color: #444;
 }
 
+.calendar td a:focus, .timelist a:focus,
 .calendar td a:hover, .timelist a:hover {
     background: #79aec8;
     color: white;
@@ -446,7 +453,8 @@ span.clearable-file-input label {
     padding: 1px 3px;
 }
 
-.calendarnav a:link, #calendarnav a:visited, #calendarnav a:hover {
+.calendarnav a:link, #calendarnav a:visited,
+#calendarnav a:focus, #calendarnav a:hover {
     color: #999;
 }
 
@@ -474,6 +482,7 @@ span.clearable-file-input label {
     background: url(../img/calendar-icons.svg) 0 0 no-repeat;
 }
 
+.calendarbox .calendarnav-previous:focus,
 .calendarbox .calendarnav-previous:hover {
     background-position: 0 -15px;
 }
@@ -483,6 +492,7 @@ span.clearable-file-input label {
     background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
 }
 
+.calendarbox .calendarnav-next:focus,
 .calendarbox .calendarnav-next:hover {
     background-position: 0 -45px;
 }
@@ -496,7 +506,7 @@ span.clearable-file-input label {
     color: #333;
 }
 
-.calendar-cancel:hover {
+.calendar-cancel:focus, .calendar-cancel:hover {
     background: #ddd;
 }
 
@@ -524,10 +534,9 @@ ul.timelist, .timelist li {
     width: 16px;
     height: 16px;
     border: 0px none;
-    outline: 0; /* Remove dotted border around link */
 }
 
-.inline-deletelink:hover {
+.inline-deletelink:focus, .inline-deletelink:hover {
     cursor: pointer;
 }
 
@@ -542,6 +551,11 @@ ul.timelist, .timelist li {
 }
 
 .related-widget-wrapper-link:link {
+    opacity: .8;
+}
+
+.related-widget-wrapper-link:link:focus,
+.related-widget-wrapper-link:link:hover {
     opacity: 1;
 }
 

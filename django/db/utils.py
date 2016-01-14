@@ -1,7 +1,5 @@
-import inspect
 import os
 import pkgutil
-import warnings
 from importlib import import_module
 from threading import local
 
@@ -9,7 +7,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
 from django.utils._os import npath, upath
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -88,6 +85,8 @@ class DatabaseErrorWrapper(object):
             if issubclass(exc_type, db_exc_type):
                 dj_exc_value = dj_exc_type(*exc_value.args)
                 dj_exc_value.__cause__ = exc_value
+                if not hasattr(exc_value, '__traceback__'):
+                    exc_value.__traceback__ = traceback
                 # Only set the 'errors_occurred' flag for errors that may make
                 # the connection unusable.
                 if dj_exc_type not in (DataError, IntegrityError):
@@ -298,26 +297,7 @@ class ConnectionRouter(object):
                 # If the router doesn't have a method, skip to the next one.
                 continue
 
-            if six.PY3:
-                sig = inspect.signature(router.allow_migrate)
-                has_deprecated_signature = not any(
-                    p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()
-                )
-            else:
-                argspec = inspect.getargspec(router.allow_migrate)
-                has_deprecated_signature = len(argspec.args) == 3 and not argspec.keywords
-
-            if has_deprecated_signature:
-                warnings.warn(
-                    "The signature of allow_migrate has changed from "
-                    "allow_migrate(self, db, model) to "
-                    "allow_migrate(self, db, app_label, model_name=None, **hints). "
-                    "Support for the old signature will be removed in Django 1.10.",
-                    RemovedInDjango110Warning)
-                model = hints.get('model')
-                allow = None if model is None else method(db, model)
-            else:
-                allow = method(db, app_label, **hints)
+            allow = method(db, app_label, **hints)
 
             if allow is not None:
                 return allow

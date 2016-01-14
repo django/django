@@ -1,4 +1,7 @@
+from __future__ import unicode_literals
+
 import copy
+import json
 import operator
 from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
@@ -11,7 +14,6 @@ from django.contrib.admin.checks import (
     BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
 )
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
-from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects, flatten_fieldsets, get_deleted_objects,
@@ -22,7 +24,6 @@ from django.core.exceptions import (
     FieldDoesNotExist, FieldError, PermissionDenied, ValidationError,
 )
 from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -35,14 +36,17 @@ from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
 from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
+from django.urls import reverse
 from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.html import escape, escapejs
-from django.utils.http import urlencode
+from django.utils.html import escape, format_html
+from django.utils.http import urlencode, urlquote
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, get_text_list
-from django.utils.translation import string_concat, ugettext as _, ungettext
+from django.utils.translation import (
+    override as translation_override, string_concat, ugettext as _, ungettext,
+)
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
@@ -109,24 +113,21 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     show_full_result_count = True
     checks_class = BaseModelAdminChecks
 
-    @classmethod
-    def check(cls, model, **kwargs):
-        return cls.checks_class().check(cls, model, **kwargs)
+    def check(self, **kwargs):
+        return self.checks_class().check(self, **kwargs)
 
     def __init__(self):
         overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
         overrides.update(self.formfield_overrides)
         self.formfield_overrides = overrides
 
-    def formfield_for_dbfield(self, db_field, **kwargs):
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
         """
         Hook for specifying the form Field instance for a given database Field
         instance.
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
-        request = kwargs.pop("request", None)
-
         # If the field specifies choices, we don't need to look for special
         # admin widgets - we just need to use a select widget of some kind.
         if db_field.choices:
@@ -176,7 +177,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)
 
-    def formfield_for_choice_field(self, db_field, request=None, **kwargs):
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
         """
         Get a form Field for a database Field that has declared choices.
         """
@@ -207,7 +208,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                 return db_field.remote_field.model._default_manager.using(db).order_by(*ordering)
         return None
 
-    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """
         Get a form Field for a ForeignKey.
         """
@@ -228,7 +229,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
 
         return db_field.formfield(**kwargs)
 
-    def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
         """
         Get a form Field for a ManyToManyField.
         """
@@ -414,8 +415,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         )
         for related_object in related_objects:
             related_model = related_object.related_model
+            remote_field = related_object.field.remote_field
             if (any(issubclass(model, related_model) for model in registered_models) and
-                    related_object.field.remote_field.get_related_field() == field):
+                    hasattr(remote_field, 'get_related_field') and
+                    remote_field.get_related_field() == field):
                 return True
 
         return False
@@ -565,15 +568,15 @@ class ModelAdmin(BaseModelAdmin):
         extra = '' if settings.DEBUG else '.min'
         js = [
             'core.js',
-            'admin/RelatedObjectLookups.js',
             'vendor/jquery/jquery%s.js' % extra,
             'jquery.init.js',
+            'admin/RelatedObjectLookups.js',
             'actions%s.js' % extra,
             'urlify.js',
             'prepopulate%s.js' % extra,
             'vendor/xregexp/xregexp.min.js',
         ]
-        return forms.Media(js=[static('admin/js/%s' % url) for url in js])
+        return forms.Media(js=['admin/js/%s' % url for url in js])
 
     def get_model_perms(self, request):
         """
@@ -753,7 +756,6 @@ class ModelAdmin(BaseModelAdmin):
         """
         return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, force_text(obj.pk))
     action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle" />')
-    action_checkbox.allow_tags = True
 
     def get_actions(self, request):
         """
@@ -924,33 +926,44 @@ class ModelAdmin(BaseModelAdmin):
                 return urlencode({'_changelist_filters': preserved_filters})
         return ''
 
+    @translation_override(None)
     def construct_change_message(self, request, form, formsets, add=False):
         """
-        Construct a change message from a changed object.
+        Construct a JSON structure describing changes from a changed object.
+        Translations are deactivated so that strings are stored untranslated.
+        Translation happens later on LogEntry access.
         """
         change_message = []
         if add:
-            change_message.append(_('Added.'))
+            change_message.append({'added': {}})
         elif form.changed_data:
-            change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
+            change_message.append({'changed': {'fields': form.changed_data}})
 
         if formsets:
             for formset in formsets:
                 for added_object in formset.new_objects:
-                    change_message.append(_('Added %(name)s "%(object)s".')
-                                          % {'name': force_text(added_object._meta.verbose_name),
-                                             'object': force_text(added_object)})
+                    change_message.append({
+                        'added': {
+                            'name': force_text(added_object._meta.verbose_name),
+                            'object': force_text(added_object),
+                        }
+                    })
                 for changed_object, changed_fields in formset.changed_objects:
-                    change_message.append(_('Changed %(list)s for %(name)s "%(object)s".')
-                                          % {'list': get_text_list(changed_fields, _('and')),
-                                             'name': force_text(changed_object._meta.verbose_name),
-                                             'object': force_text(changed_object)})
+                    change_message.append({
+                        'changed': {
+                            'name': force_text(changed_object._meta.verbose_name),
+                            'object': force_text(changed_object),
+                            'fields': changed_fields,
+                        }
+                    })
                 for deleted_object in formset.deleted_objects:
-                    change_message.append(_('Deleted %(name)s "%(object)s".')
-                                          % {'name': force_text(deleted_object._meta.verbose_name),
-                                             'object': force_text(deleted_object)})
-        change_message = ' '.join(change_message)
-        return change_message or _('No fields changed.')
+                    change_message.append({
+                        'deleted': {
+                            'name': force_text(deleted_object._meta.verbose_name),
+                            'object': force_text(deleted_object),
+                        }
+                    })
+        return change_message
 
     def message_user(self, request, message, level=messages.INFO, extra_tags='',
                      fail_silently=False):
@@ -1058,7 +1071,20 @@ class ModelAdmin(BaseModelAdmin):
         opts = obj._meta
         pk_value = obj._get_pk_val()
         preserved_filters = self.get_preserved_filters(request)
-        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        obj_url = reverse(
+            'admin:%s_%s_change' % (opts.app_label, opts.model_name),
+            args=(quote(pk_value),),
+            current_app=self.admin_site.name,
+        )
+        # Add a link to the object's change form if the user can edit the obj.
+        if self.has_change_permission(request, obj):
+            obj_repr = format_html('<a href="{}">{}</a>', urlquote(obj_url), obj)
+        else:
+            obj_repr = force_text(obj)
+        msg_dict = {
+            'name': force_text(opts.verbose_name),
+            'obj': obj_repr,
+        }
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
 
@@ -1069,19 +1095,22 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 attr = obj._meta.pk.attname
             value = obj.serializable_value(attr)
+            popup_response_data = json.dumps({
+                'value': six.text_type(value),
+                'obj': six.text_type(obj),
+            })
             return SimpleTemplateResponse('admin/popup_response.html', {
-                'value': value,
-                'obj': obj,
+                'popup_response_data': popup_response_data,
             })
 
         elif "_continue" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
+            msg = format_html(
+                _('The {name} "{obj}" was added successfully. You may edit it again below.'),
+                **msg_dict
+            )
             self.message_user(request, msg, messages.SUCCESS)
             if post_url_continue is None:
-                post_url_continue = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.model_name),
-                                            args=(quote(pk_value),),
-                                            current_app=self.admin_site.name)
+                post_url_continue = obj_url
             post_url_continue = add_preserved_filters(
                 {'preserved_filters': preserved_filters, 'opts': opts},
                 post_url_continue
@@ -1089,14 +1118,20 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect(post_url_continue)
 
         elif "_addanother" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was added successfully. You may add another %(name)s below.') % msg_dict
+            msg = format_html(
+                _('The {name} "{obj}" was added successfully. You may add another {name} below.'),
+                **msg_dict
+            )
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = request.path
             redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
             return HttpResponseRedirect(redirect_url)
 
         else:
-            msg = _('The %(name)s "%(obj)s" was added successfully.') % msg_dict
+            msg = format_html(
+                _('The {name} "{obj}" was added successfully.'),
+                **msg_dict
+            )
             self.message_user(request, msg, messages.SUCCESS)
             return self.response_post_save_add(request, obj)
 
@@ -1111,27 +1146,39 @@ class ModelAdmin(BaseModelAdmin):
             # Retrieve the `object_id` from the resolved pattern arguments.
             value = request.resolver_match.args[0]
             new_value = obj.serializable_value(attr)
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            popup_response_data = json.dumps({
                 'action': 'change',
-                'value': escape(value),
-                'obj': escapejs(obj),
-                'new_value': escape(new_value),
+                'value': six.text_type(value),
+                'obj': six.text_type(obj),
+                'new_value': six.text_type(new_value),
+            })
+            return SimpleTemplateResponse('admin/popup_response.html', {
+                'popup_response_data': popup_response_data,
             })
 
         opts = self.model._meta
         pk_value = obj._get_pk_val()
         preserved_filters = self.get_preserved_filters(request)
 
-        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        msg_dict = {
+            'name': force_text(opts.verbose_name),
+            'obj': format_html('<a href="{}">{}</a>', urlquote(request.path), obj),
+        }
         if "_continue" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was changed successfully. You may edit it again below.') % msg_dict
+            msg = format_html(
+                _('The {name} "{obj}" was changed successfully. You may edit it again below.'),
+                **msg_dict
+            )
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = request.path
             redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
             return HttpResponseRedirect(redirect_url)
 
         elif "_saveasnew" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
+            msg = format_html(
+                _('The {name} "{obj}" was added successfully. You may edit it again below.'),
+                **msg_dict
+            )
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = reverse('admin:%s_%s_change' %
                                    (opts.app_label, opts.model_name),
@@ -1141,7 +1188,10 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect(redirect_url)
 
         elif "_addanother" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was changed successfully. You may add another %(name)s below.') % msg_dict
+            msg = format_html(
+                _('The {name} "{obj}" was changed successfully. You may add another {name} below.'),
+                **msg_dict
+            )
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = reverse('admin:%s_%s_add' %
                                    (opts.app_label, opts.model_name),
@@ -1150,7 +1200,10 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect(redirect_url)
 
         else:
-            msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
+            msg = format_html(
+                _('The {name} "{obj}" was changed successfully.'),
+                **msg_dict
+            )
             self.message_user(request, msg, messages.SUCCESS)
             return self.response_post_save_change(request, obj)
 
@@ -1264,9 +1317,12 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
 
         if IS_POPUP_VAR in request.POST:
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            popup_response_data = json.dumps({
                 'action': 'delete',
-                'value': escape(obj_id),
+                'value': str(obj_id),
+            })
+            return SimpleTemplateResponse('admin/popup_response.html', {
+                'popup_response_data': popup_response_data,
             })
 
         self.message_user(request,
@@ -1296,6 +1352,7 @@ class ModelAdmin(BaseModelAdmin):
         context.update(
             to_field_var=TO_FIELD_VAR,
             is_popup_var=IS_POPUP_VAR,
+            media=self.media,
         )
 
         return TemplateResponse(request,
@@ -1754,6 +1811,7 @@ class InlineModelAdmin(BaseModelAdmin):
     can_delete = True
     show_change_link = False
     checks_class = InlineModelAdminChecks
+    classes = None
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
@@ -1773,7 +1831,9 @@ class InlineModelAdmin(BaseModelAdmin):
               'inlines%s.js' % extra]
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['SelectBox.js', 'SelectFilter2.js'])
-        return forms.Media(js=[static('admin/js/%s' % url) for url in js])
+        if self.classes and 'collapse' in self.classes:
+            js.append('collapse%s.js' % extra)
+        return forms.Media(js=['admin/js/%s' % url for url in js])
 
     def get_extra(self, request, obj=None, **kwargs):
         """Hook for customizing the number of extra inline forms."""

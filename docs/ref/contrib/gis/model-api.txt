@@ -147,7 +147,7 @@ Additional Resources:
 
 * `spatialreference.org`__: A Django-powered database of spatial reference
   systems.
-* `The State Plane Coordinate System`__: A Web site covering the various
+* `The State Plane Coordinate System`__: A website covering the various
   projection systems used in the United States.  Much of the U.S. spatial
   data encountered will be in one of these coordinate systems rather than
   in a geographic coordinate system such as WGS84.
@@ -156,7 +156,7 @@ __ https://en.wikipedia.org/wiki/Geodesy
 __ https://en.wikipedia.org/wiki/Great_circle
 __ http://www.spatialreference.org/ref/epsg/2796/
 __ http://spatialreference.org/
-__ http://web.archive.org/web/20080302095452/http://welcome.warnercnr.colostate.edu/class_info/nr502/lg3/datums_coordinates/spcs.html
+__ https://web.archive.org/web/20080302095452/http://welcome.warnercnr.colostate.edu/class_info/nr502/lg3/datums_coordinates/spcs.html
 
 ``spatial_index``
 -----------------

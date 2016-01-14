@@ -30,6 +30,7 @@ from django.http import HttpResponse
 from django.test import (
     Client, RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
+from django.urls import reverse_lazy
 
 from .views import get_view, post_view, trace_view
 
@@ -156,7 +157,9 @@ class ClientTest(TestCase):
 
     def test_raw_post(self):
         "POST raw data (with a content type) to a view"
-        test_doc = """<?xml version="1.0" encoding="utf-8"?><library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>"""
+        test_doc = """<?xml version="1.0" encoding="utf-8"?>
+        <library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>
+        """
         response = self.client.post("/raw_post_view/", test_doc,
                                     content_type="text/xml")
         self.assertEqual(response.status_code, 200)
@@ -519,7 +522,6 @@ class ClientTest(TestCase):
 
         # Log in
         self.client.force_login(self.u1, backend='test_client.auth_backends.TestClientBackend')
-        self.assertEqual(self.u1.backend, 'test_client.auth_backends.TestClientBackend')
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')
@@ -621,6 +623,14 @@ class ClientTest(TestCase):
         self.assertEqual(mail.outbox[0].to[0], 'first@example.com')
         self.assertEqual(mail.outbox[0].to[1], 'second@example.com')
 
+    def test_reverse_lazy_decodes(self):
+        "Ensure reverse_lazy works in the test client"
+        data = {'var': 'data'}
+        response = self.client.get(reverse_lazy('get_view'), data)
+
+        # Check some response details
+        self.assertContains(response, 'This is a test')
+
     def test_mass_mail_sending(self):
         "Test that mass mail is redirected to a dummy outbox during test setup"
 
@@ -718,7 +728,6 @@ class RequestFactoryTest(SimpleTestCase):
         request = self.request_factory.get('/somewhere/')
         response = get_view(request)
 
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'This is a test')
 
     def test_trace_request_from_factory(self):
@@ -729,5 +738,4 @@ class RequestFactoryTest(SimpleTestCase):
         protocol = request.META["SERVER_PROTOCOL"]
         echoed_request_line = "TRACE {} {}".format(url_path, protocol)
 
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, echoed_request_line)

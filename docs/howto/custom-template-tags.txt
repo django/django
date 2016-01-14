@@ -22,8 +22,12 @@ described below are automatically made available to load within templates.
 The app should contain a ``templatetags`` directory, at the same level as
 ``models.py``, ``views.py``, etc. If this doesn't already exist, create it -
 don't forget the ``__init__.py`` file to ensure the directory is treated as a
-Python package. After adding this module, you will need to restart your server
-before you can use the tags or filters in templates.
+Python package.
+
+.. admonition:: Development server won't automatically restart
+
+    After adding the ``templatetags``  module, you will need to restart your
+    server before you can use the tags or filters in templates.
 
 Your custom tags and filters will live in a module inside the ``templatetags``
 directory. The name of the module file is the name you'll use to load the tags
@@ -336,8 +340,6 @@ Template filter code falls into one of two situations:
 
 .. warning:: Avoiding XSS vulnerabilities when reusing built-in filters
 
-    .. versionchanged:: 1.8
-
     Django's built-in filters have ``autoescape=True`` by default in order to
     get the proper autoescaping behavior and avoid a cross-site script
     vulnerability.
@@ -645,8 +647,6 @@ positional arguments. For example:
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
 
-.. _howto-custom-template-tags-assignment-tags:
-
 Assignment tags
 ~~~~~~~~~~~~~~~
 
@@ -844,15 +844,6 @@ template yourself. For example::
     def render(self, context):
         t = context.template.engine.get_template('small_fragment.html')
         return t.render(Context({'var': obj}, autoescape=context.autoescape))
-
-.. versionchanged:: 1.8
-
-    The ``template`` attribute of ``Context`` objects was added in Django 1.8.
-    :meth:`context.template.engine.get_template
-    <django.template.Engine.get_template>` must be used instead of
-    :func:`django.template.loader.get_template` because the latter now returns
-    a wrapper whose ``render`` method doesn't accept a
-    :class:`~django.template.Context`.
 
 If we had neglected to pass in the current ``context.autoescape`` value to our
 new ``Context`` in this example, the results would have *always* been
@@ -1127,10 +1118,9 @@ The difference here is that ``do_current_time()`` grabs the format string and
 the variable name, passing both to ``CurrentTimeNode3``.
 
 Finally, if you only need to have a simple syntax for your custom
-context-updating template tag, you might want to consider using the
-:ref:`assignment tag <howto-custom-template-tags-assignment-tags>` shortcut
-we introduced above.
-
+context-updating template tag, consider using the
+:meth:`~django.template.Library.simple_tag` shortcut, which supports assigning
+the tag results to a template variable.
 
 Parsing until another block tag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

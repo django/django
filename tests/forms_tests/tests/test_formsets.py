@@ -101,9 +101,15 @@ class FormsFormsetTestCase(SimpleTestCase):
         # for adding data. By default, it displays 1 blank form. It can display more,
         # but we'll look at how to do so later.
         formset = self.make_choiceformset()
-        self.assertHTMLEqual(str(formset), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="1000" />
+        self.assertHTMLEqual(
+            str(formset),
+            """<input type="hidden" name="choices-TOTAL_FORMS" value="1" />
+<input type="hidden" name="choices-INITIAL_FORMS" value="0" />
+<input type="hidden" name="choices-MIN_NUM_FORMS" value="0" />
+<input type="hidden" name="choices-MAX_NUM_FORMS" value="1000" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" /></td></tr>
-<tr><th>Votes:</th><td><input type="number" name="choices-0-votes" /></td></tr>""")
+<tr><th>Votes:</th><td><input type="number" name="choices-0-votes" /></td></tr>"""
+        )
 
         # We treat FormSet pretty much like we would treat a normal Form. FormSet has an
         # is_valid method, and a cleaned_data or errors attribute depending on whether all
@@ -186,10 +192,13 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(form.as_ul())
 
-        self.assertHTMLEqual('\n'.join(form_output), """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>
 <li>Choice: <input type="text" name="choices-1-choice" /></li>
-<li>Votes: <input type="number" name="choices-1-votes" /></li>""")
+<li>Votes: <input type="number" name="choices-1-votes" /></li>"""
+        )
 
         # Let's simulate what would happen if we submitted this form.
         formset = self.make_choiceformset([('Calexico', '100'), ('', '')], initial_forms=1)
@@ -212,7 +221,10 @@ class FormsFormsetTestCase(SimpleTestCase):
         # handle that case later.
         formset = self.make_choiceformset([('', ''), ('', '')], initial_forms=1)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.errors, [{'votes': ['This field is required.'], 'choice': ['This field is required.']}, {}])
+        self.assertEqual(
+            formset.errors,
+            [{'votes': ['This field is required.'], 'choice': ['This field is required.']}, {}]
+        )
 
     def test_displaying_more_than_one_blank_form(self):
         # Displaying more than 1 blank form ###########################################
@@ -226,12 +238,15 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(form.as_ul())
 
-        self.assertHTMLEqual('\n'.join(form_output), """<li>Choice: <input type="text" name="choices-0-choice" /></li>
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<li>Choice: <input type="text" name="choices-0-choice" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" /></li>
 <li>Choice: <input type="text" name="choices-1-choice" /></li>
 <li>Votes: <input type="number" name="choices-1-votes" /></li>
 <li>Choice: <input type="text" name="choices-2-choice" /></li>
-<li>Votes: <input type="number" name="choices-2-votes" /></li>""")
+<li>Votes: <input type="number" name="choices-2-votes" /></li>"""
+        )
 
         # Since we displayed every form as blank, we will also accept them back as blank.
         # This may seem a little strange, but later we will show how to require a minimum
@@ -269,10 +284,13 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertFalse(formset.forms[0].empty_permitted)
         self.assertTrue(formset.forms[1].empty_permitted)
 
-        self.assertHTMLEqual('\n'.join(form_output), """<li>Choice: <input type="text" name="choices-0-choice" /></li>
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<li>Choice: <input type="text" name="choices-0-choice" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" /></li>
 <li>Choice: <input type="text" name="choices-1-choice" /></li>
-<li>Votes: <input type="number" name="choices-1-votes" /></li>""")
+<li>Votes: <input type="number" name="choices-1-votes" /></li>"""
+        )
 
     def test_min_num_displaying_more_than_one_blank_form_with_zero_extra(self):
         # We can also display more than 1 empty form passing min_num argument
@@ -284,12 +302,15 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(form.as_ul())
 
-        self.assertHTMLEqual('\n'.join(form_output), """<li>Choice: <input type="text" name="choices-0-choice" /></li>
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<li>Choice: <input type="text" name="choices-0-choice" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" /></li>
 <li>Choice: <input type="text" name="choices-1-choice" /></li>
 <li>Votes: <input type="number" name="choices-1-votes" /></li>
 <li>Choice: <input type="text" name="choices-2-choice" /></li>
-<li>Votes: <input type="number" name="choices-2-votes" /></li>""")
+<li>Votes: <input type="number" name="choices-2-votes" /></li>"""
+        )
 
     def test_single_form_completed(self):
         # We can just fill out one of the forms.
@@ -388,20 +409,26 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(form.as_ul())
 
-        self.assertHTMLEqual('\n'.join(form_output), """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>
 <li>Choice: <input type="text" name="choices-1-choice" /></li>
 <li>Votes: <input type="number" name="choices-1-votes" /></li>
 <li>Choice: <input type="text" name="choices-2-choice" /></li>
 <li>Votes: <input type="number" name="choices-2-votes" /></li>
 <li>Choice: <input type="text" name="choices-3-choice" /></li>
-<li>Votes: <input type="number" name="choices-3-votes" /></li>""")
+<li>Votes: <input type="number" name="choices-3-votes" /></li>"""
+        )
 
         # Make sure retrieving an empty form works, and it shows up in the form list
 
         self.assertTrue(formset.empty_form.empty_permitted)
-        self.assertHTMLEqual(formset.empty_form.as_ul(), """<li>Choice: <input type="text" name="choices-__prefix__-choice" /></li>
-<li>Votes: <input type="number" name="choices-__prefix__-votes" /></li>""")
+        self.assertHTMLEqual(
+            formset.empty_form.as_ul(),
+            """<li>Choice: <input type="text" name="choices-__prefix__-choice" /></li>
+<li>Votes: <input type="number" name="choices-__prefix__-votes" /></li>"""
+        )
 
     def test_formset_with_deletion(self):
         # FormSets with deletion ######################################################
@@ -418,7 +445,9 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(form.as_ul())
 
-        self.assertHTMLEqual('\n'.join(form_output), """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>
 <li>Delete: <input type="checkbox" name="choices-0-DELETE" /></li>
 <li>Choice: <input type="text" name="choices-1-choice" value="Fergie" /></li>
@@ -426,7 +455,8 @@ class FormsFormsetTestCase(SimpleTestCase):
 <li>Delete: <input type="checkbox" name="choices-1-DELETE" /></li>
 <li>Choice: <input type="text" name="choices-2-choice" /></li>
 <li>Votes: <input type="number" name="choices-2-votes" /></li>
-<li>Delete: <input type="checkbox" name="choices-2-DELETE" /></li>""")
+<li>Delete: <input type="checkbox" name="choices-2-DELETE" /></li>"""
+        )
 
         # To delete something, we just need to set that form's special delete field to
         # 'on'. Let's go ahead and delete Fergie.
@@ -449,8 +479,18 @@ class FormsFormsetTestCase(SimpleTestCase):
 
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertTrue(formset.is_valid())
-        self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'DELETE': False, 'choice': 'Calexico'}, {'votes': 900, 'DELETE': True, 'choice': 'Fergie'}, {}])
-        self.assertEqual([form.cleaned_data for form in formset.deleted_forms], [{'votes': 900, 'DELETE': True, 'choice': 'Fergie'}])
+        self.assertEqual(
+            [form.cleaned_data for form in formset.forms],
+            [
+                {'votes': 100, 'DELETE': False, 'choice': 'Calexico'},
+                {'votes': 900, 'DELETE': True, 'choice': 'Fergie'},
+                {},
+            ]
+        )
+        self.assertEqual(
+            [form.cleaned_data for form in formset.deleted_forms],
+            [{'votes': 900, 'DELETE': True, 'choice': 'Fergie'}]
+        )
 
         # If we fill a form with something and then we check the can_delete checkbox for
         # that form, that form's errors should not make the entire formset invalid since
@@ -517,7 +557,9 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(form.as_ul())
 
-        self.assertHTMLEqual('\n'.join(form_output), """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>
 <li>Order: <input type="number" name="choices-0-ORDER" value="1" /></li>
 <li>Choice: <input type="text" name="choices-1-choice" value="Fergie" /></li>
@@ -525,7 +567,8 @@ class FormsFormsetTestCase(SimpleTestCase):
 <li>Order: <input type="number" name="choices-1-ORDER" value="2" /></li>
 <li>Choice: <input type="text" name="choices-2-choice" /></li>
 <li>Votes: <input type="number" name="choices-2-votes" /></li>
-<li>Order: <input type="number" name="choices-2-ORDER" /></li>""")
+<li>Order: <input type="number" name="choices-2-ORDER" /></li>"""
+        )
 
         data = {
             'choices-TOTAL_FORMS': '3',  # the number of forms rendered
@@ -631,7 +674,9 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(form.as_ul())
 
-        self.assertHTMLEqual('\n'.join(form_output), """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>
 <li>Order: <input type="number" name="choices-0-ORDER" value="1" /></li>
 <li>Delete: <input type="checkbox" name="choices-0-DELETE" /></li>
@@ -646,7 +691,8 @@ class FormsFormsetTestCase(SimpleTestCase):
 <li>Choice: <input type="text" name="choices-3-choice" /></li>
 <li>Votes: <input type="number" name="choices-3-votes" /></li>
 <li>Order: <input type="number" name="choices-3-ORDER" /></li>
-<li>Delete: <input type="checkbox" name="choices-3-DELETE" /></li>""")
+<li>Delete: <input type="checkbox" name="choices-3-DELETE" /></li>"""
+        )
 
         # Let's delete Fergie, and put The Decemberists ahead of Calexico.
 
@@ -684,7 +730,10 @@ class FormsFormsetTestCase(SimpleTestCase):
             {'votes': 500, 'DELETE': False, 'ORDER': 0, 'choice': 'The Decemberists'},
             {'votes': 100, 'DELETE': False, 'ORDER': 1, 'choice': 'Calexico'},
         ])
-        self.assertEqual([form.cleaned_data for form in formset.deleted_forms], [{'votes': 900, 'DELETE': True, 'ORDER': 2, 'choice': 'Fergie'}])
+        self.assertEqual(
+            [form.cleaned_data for form in formset.deleted_forms],
+            [{'votes': 900, 'DELETE': True, 'ORDER': 2, 'choice': 'Fergie'}]
+        )
 
     def test_invalid_deleted_form_with_ordering(self):
         # Should be able to get ordered forms from a valid formset even if a
@@ -761,9 +810,15 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>
-<tr><th><label for="id_form-2-name">Name:</label></th><td><input type="text" name="form-2-name" id="id_form-2-name" /></td></tr>""")
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<tr><th><label for="id_form-0-name">Name:</label></th>
+<td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>
+<tr><th><label for="id_form-1-name">Name:</label></th>
+<td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>
+<tr><th><label for="id_form-2-name">Name:</label></th>
+<td><input type="text" name="form-2-name" id="id_form-2-name" /></td></tr>"""
+        )
 
         # If max_num is 0 then no form is rendered at all.
         LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=3, max_num=0)
@@ -782,8 +837,13 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<tr><th><label for="id_form-0-name">Name:</label></th><td>
+<input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>
+<tr><th><label for="id_form-1-name">Name:</label></th>
+<td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>"""
+        )
 
         # Ensure that max_num has no effect when extra is less than max_num.
 
@@ -794,7 +854,11 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>""")
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<tr><th><label for="id_form-0-name">Name:</label></th>
+<td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>"""
+        )
 
     def test_max_num_with_initial_data(self):
         # max_num with initial data
@@ -813,8 +877,13 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" value="Fernet and Coke" id="id_form-0-name" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<tr><th><label for="id_form-0-name">Name:</label></th>
+<td><input type="text" name="form-0-name" value="Fernet and Coke" id="id_form-0-name" /></td></tr>
+<tr><th><label for="id_form-1-name">Name:</label></th>
+<td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>"""
+        )
 
     def test_max_num_zero(self):
         # If max_num is 0 then no form is rendered at all, regardless of extra,
@@ -842,8 +911,13 @@ class FormsFormsetTestCase(SimpleTestCase):
 
         for form in formset.forms:
             form_output.append(str(form))
-        self.assertEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" name="form-0-name" type="text" value="Fernet and Coke" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" name="form-1-name" type="text" value="Bloody Mary" /></td></tr>""")
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<tr><th><label for="id_form-0-name">Name:</label></th>
+<td><input id="id_form-0-name" name="form-0-name" type="text" value="Fernet and Coke" /></td></tr>
+<tr><th><label for="id_form-1-name">Name:</label></th>
+<td><input id="id_form-1-name" name="form-1-name" type="text" value="Bloody Mary" /></td></tr>"""
+        )
 
     def test_more_initial_than_max_num(self):
         # More initial forms than max_num now results in all initial forms
@@ -861,9 +935,15 @@ class FormsFormsetTestCase(SimpleTestCase):
 
         for form in formset.forms:
             form_output.append(str(form))
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" name="form-0-name" type="text" value="Gin Tonic" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" name="form-1-name" type="text" value="Bloody Mary" /></td></tr>
-<tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" name="form-2-name" type="text" value="Jack and Coke" /></td></tr>""")
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<tr><th><label for="id_form-0-name">Name:</label></th>
+<td><input id="id_form-0-name" name="form-0-name" type="text" value="Gin Tonic" /></td></tr>
+<tr><th><label for="id_form-1-name">Name:</label></th>
+<td><input id="id_form-1-name" name="form-1-name" type="text" value="Bloody Mary" /></td></tr>
+<tr><th><label for="id_form-2-name">Name:</label></th>
+<td><input id="id_form-2-name" name="form-2-name" type="text" value="Jack and Coke" /></td></tr>"""
+        )
 
         # One form from initial and extra=3 with max_num=2 should result in the one
         # initial form and one extra.
@@ -877,8 +957,13 @@ class FormsFormsetTestCase(SimpleTestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
+        self.assertHTMLEqual(
+            '\n'.join(form_output),
+            """<tr><th><label for="id_form-0-name">Name:</label></th>
+<td><input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name" /></td></tr>
+<tr><th><label for="id_form-1-name">Name:</label></th>
+<td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>"""
+        )
 
     def test_regression_6926(self):
         # Regression test for #6926 ##################################################
@@ -1157,21 +1242,39 @@ ChoiceFormSet = formset_factory(Choice)
 class FormsetAsFooTests(SimpleTestCase):
     def test_as_table(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_table(), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(
+            formset.as_table(),
+            """<input type="hidden" name="choices-TOTAL_FORMS" value="1" />
+<input type="hidden" name="choices-INITIAL_FORMS" value="0" />
+<input type="hidden" name="choices-MIN_NUM_FORMS" value="0" />
+<input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" value="Calexico" /></td></tr>
-<tr><th>Votes:</th><td><input type="number" name="choices-0-votes" value="100" /></td></tr>""")
+<tr><th>Votes:</th><td><input type="number" name="choices-0-votes" value="100" /></td></tr>"""
+        )
 
     def test_as_p(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_p(), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(
+            formset.as_p(),
+            """<input type="hidden" name="choices-TOTAL_FORMS" value="1" />
+<input type="hidden" name="choices-INITIAL_FORMS" value="0" />
+<input type="hidden" name="choices-MIN_NUM_FORMS" value="0" />
+<input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <p>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></p>
-<p>Votes: <input type="number" name="choices-0-votes" value="100" /></p>""")
+<p>Votes: <input type="number" name="choices-0-votes" value="100" /></p>"""
+        )
 
     def test_as_ul(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_ul(), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(
+            formset.as_ul(),
+            """<input type="hidden" name="choices-TOTAL_FORMS" value="1" />
+<input type="hidden" name="choices-INITIAL_FORMS" value="0" />
+<input type="hidden" name="choices-MIN_NUM_FORMS" value="0" />
+<input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>""")
+<li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>"""
+        )
 
 
 # Regression test for #11418 #################################################
@@ -1241,8 +1344,14 @@ class TestEmptyFormSet(SimpleTestCase):
     def test_empty_formset_is_valid(self):
         """Test that an empty formset still calls clean()"""
         EmptyFsetWontValidateFormset = formset_factory(FavoriteDrinkForm, extra=0, formset=EmptyFsetWontValidate)
-        formset = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS': '0', 'form-TOTAL_FORMS': '0'}, prefix="form")
-        formset2 = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS': '0', 'form-TOTAL_FORMS': '1', 'form-0-name': 'bah'}, prefix="form")
+        formset = EmptyFsetWontValidateFormset(
+            data={'form-INITIAL_FORMS': '0', 'form-TOTAL_FORMS': '0'},
+            prefix="form",
+        )
+        formset2 = EmptyFsetWontValidateFormset(
+            data={'form-INITIAL_FORMS': '0', 'form-TOTAL_FORMS': '1', 'form-0-name': 'bah'},
+            prefix="form",
+        )
         self.assertFalse(formset.is_valid())
         self.assertFalse(formset2.is_valid())
 

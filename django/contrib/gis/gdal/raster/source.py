@@ -131,8 +131,10 @@ class GDALRaster(GDALBase):
             raise GDALException('Invalid data source input type: "{}".'.format(type(ds_input)))
 
     def __del__(self):
-        if self._ptr and capi:
+        try:
             capi.close_ds(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     def __str__(self):
         return self.name
@@ -213,6 +215,20 @@ class GDALRaster(GDALBase):
             raise ValueError('Could not create a SpatialReference from input.')
         capi.set_ds_projection_ref(self._ptr, srs.wkt.encode())
         self._flush()
+
+    @property
+    def srid(self):
+        """
+        Shortcut to access the srid of this GDALRaster.
+        """
+        return self.srs.srid
+
+    @srid.setter
+    def srid(self, value):
+        """
+        Shortcut to set this GDALRaster's srs from an srid.
+        """
+        self.srs = value
 
     @property
     def geotransform(self):

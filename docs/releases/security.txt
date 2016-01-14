@@ -679,3 +679,16 @@ Versions affected
 * Django 1.8 `(patch) <https://github.com/django/django/commit/2eb86b01d7b59be06076f6179a454d0fd0afaff6>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/2f5485346ee6f84b4e52068c04e043092daf55f7>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/575f59f9bc7c59a5e41a081d1f5f55fc859c5012>`__
+
+November 24, 2015 - CVE-2015-8213
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-8213 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-8213&cid=2>`_:
+Settings leak possibility in ``date`` template filter.
+`Full description <https://www.djangoproject.com/weblog/2015/nov/24/security-releases-issued/>`__
+
+Versions affected
+-----------------
+
+* Django 1.8 `(patch) <https://github.com/django/django/commit/9f83fc2f66f5a0bac7c291aec55df66050bb6991>`__
+* Django 1.7 `(patch) <https://github.com/django/django/commit/8a01c6b53169ee079cb21ac5919fdafcc8c5e172>`__

@@ -88,11 +88,37 @@ class RequestsTests(SimpleTestCase):
         Refs #20169.
         """
         # With trailing slash
-        request = WSGIRequest({'PATH_INFO': '/somepath/', 'SCRIPT_NAME': '/PREFIX/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+        request = WSGIRequest({
+            'PATH_INFO': '/somepath/',
+            'SCRIPT_NAME': '/PREFIX/',
+            'REQUEST_METHOD': 'get',
+            'wsgi.input': BytesIO(b''),
+        })
         self.assertEqual(request.path, '/PREFIX/somepath/')
         # Without trailing slash
-        request = WSGIRequest({'PATH_INFO': '/somepath/', 'SCRIPT_NAME': '/PREFIX', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+        request = WSGIRequest({
+            'PATH_INFO': '/somepath/',
+            'SCRIPT_NAME': '/PREFIX',
+            'REQUEST_METHOD': 'get',
+            'wsgi.input': BytesIO(b''),
+        })
         self.assertEqual(request.path, '/PREFIX/somepath/')
+
+    def test_wsgirequest_script_url_double_slashes(self):
+        """
+        WSGI squashes multiple successive slashes in PATH_INFO, WSGIRequest
+        should take that into account when populating request.path and
+        request.META['SCRIPT_NAME'].
+        Refs #17133.
+        """
+        request = WSGIRequest({
+            'SCRIPT_URL': '/mst/milestones//accounts/login//help',
+            'PATH_INFO': '/milestones/accounts/login/help',
+            'REQUEST_METHOD': 'get',
+            'wsgi.input': BytesIO(b''),
+        })
+        self.assertEqual(request.path, '/mst/milestones/accounts/login/help')
+        self.assertEqual(request.META['SCRIPT_NAME'], '/mst')
 
     def test_wsgirequest_with_force_script_name(self):
         """
@@ -101,7 +127,12 @@ class RequestsTests(SimpleTestCase):
         Refs #20169.
         """
         with override_settings(FORCE_SCRIPT_NAME='/FORCED_PREFIX/'):
-            request = WSGIRequest({'PATH_INFO': '/somepath/', 'SCRIPT_NAME': '/PREFIX/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+            request = WSGIRequest({
+                'PATH_INFO': '/somepath/',
+                'SCRIPT_NAME': '/PREFIX/',
+                'REQUEST_METHOD': 'get',
+                'wsgi.input': BytesIO(b''),
+            })
             self.assertEqual(request.path, '/FORCED_PREFIX/somepath/')
 
     def test_wsgirequest_path_with_force_script_name_trailing_slash(self):
@@ -176,6 +207,18 @@ class RequestsTests(SimpleTestCase):
         response.set_cookie('datetime', expires=expires)
         datetime_cookie = response.cookies['datetime']
         self.assertEqual(datetime_cookie['max-age'], 10)
+
+    def test_create_cookie_after_deleting_cookie(self):
+        """
+        Setting a cookie after deletion should clear the expiry date.
+        """
+        response = HttpResponse()
+        response.set_cookie('c', 'old-value')
+        self.assertEqual(response.cookies['c']['expires'], '')
+        response.delete_cookie('c')
+        self.assertEqual(response.cookies['c']['expires'], 'Thu, 01-Jan-1970 00:00:00 GMT')
+        response.set_cookie('c', 'new-value')
+        self.assertEqual(response.cookies['c']['expires'], '')
 
     def test_far_expiration(self):
         "Cookie will expire when an distant expiration time is provided"
@@ -575,7 +618,7 @@ class HostValidationTests(SimpleTestCase):
             '12.34.56.78:443',
             '[2001:19f0:feee::dead:beef:cafe]',
             '[2001:19f0:feee::dead:beef:cafe]:8080',
-            'xn--4ca9at.com',  # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punycode for öäü.com
             'anything.multitenant.com',
             'multitenant.com',
             'insensitive.com',
@@ -645,7 +688,7 @@ class HostValidationTests(SimpleTestCase):
             '12.34.56.78:443',
             '[2001:19f0:feee::dead:beef:cafe]',
             '[2001:19f0:feee::dead:beef:cafe]:8080',
-            'xn--4ca9at.com',  # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punycode for öäü.com
         ]
 
         for host in legit_hosts:
@@ -723,7 +766,7 @@ class HostValidationTests(SimpleTestCase):
             'example.com',
             '12.34.56.78',
             '[2001:19f0:feee::dead:beef:cafe]',
-            'xn--4ca9at.com',  # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punycode for öäü.com
         ]:
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}

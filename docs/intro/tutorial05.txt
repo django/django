@@ -362,12 +362,12 @@ With that ready, we can ask the client to do some work for us::
     404
     >>> # on the other hand we should expect to find something at '/polls/'
     >>> # we'll use 'reverse()' rather than a hardcoded URL
-    >>> from django.core.urlresolvers import reverse
+    >>> from django.urls import reverse
     >>> response = client.get(reverse('polls:index'))
     >>> response.status_code
     200
     >>> response.content
-    '\n\n\n    <p>No polls are available.</p>\n\n'
+    b'\n\n\n    <p>No polls are available.</p>\n\n'
     >>> # note - you might get unexpected results if your ``TIME_ZONE``
     >>> # in ``settings.py`` is not correct. If you need to change it,
     >>> # you will also need to restart your shell session
@@ -379,11 +379,11 @@ With that ready, we can ask the client to do some work for us::
     >>> # check the response once again
     >>> response = client.get('/polls/')
     >>> response.content
-    '\n\n\n    <ul>\n    \n        <li><a href="/polls/1/">Who is your favorite Beatle?</a></li>\n    \n    </ul>\n\n'
+    b'\n\n\n    <ul>\n    \n        <li><a href="/polls/1/">Who is your favorite Beatle?</a></li>\n    \n    </ul>\n\n'
     >>> # If the following doesn't work, you probably omitted the call to
     >>> # setup_test_environment() described above
     >>> response.context['latest_question_list']
-    [<Question: Who is your favorite Beatle?>]
+    <QuerySet [<Question: Who is your favorite Beatle?>]>
 
 Improving our view
 ------------------
@@ -447,7 +447,7 @@ Add the following to ``polls/tests.py``:
 .. snippet::
     :filename: polls/tests.py
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 
 and we'll create a shortcut function to create questions as well as a new test
 class:
@@ -457,8 +457,8 @@ class:
 
     def create_question(question_text, days):
         """
-        Creates a question with the given `question_text` published the given
-        number of `days` offset to now (negative for questions published
+        Creates a question with the given `question_text` and published the
+        given number of `days` offset to now (negative for questions published
         in the past, positive for questions that have yet to be published).
         """
         time = timezone.now() + datetime.timedelta(days=days)

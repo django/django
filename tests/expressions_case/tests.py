@@ -8,7 +8,7 @@ from uuid import UUID
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.db.models import F, Q, Max, Min, Value
+from django.db.models import F, Q, Max, Min, Sum, Value
 from django.db.models.expressions import Case, When
 from django.test import TestCase
 from django.utils import six
@@ -117,6 +117,17 @@ class CaseExpressionTests(TestCase):
             )).order_by('pk'),
             [(1, 2), (2, 5), (3, 3), (2, 5), (3, 3), (3, 3), (4, 1)],
             transform=attrgetter('integer', 'join_test')
+        )
+
+    def test_annotate_with_in_clause(self):
+        fk_rels = FKCaseTestModel.objects.filter(integer__in=[5])
+        self.assertQuerysetEqual(
+            CaseTestModel.objects.only('pk', 'integer').annotate(in_test=Sum(Case(
+                When(fk_rel__in=fk_rels, then=F('fk_rel__integer')),
+                default=Value(0),
+            ))).order_by('pk'),
+            [(1, 0), (2, 0), (3, 0), (2, 0), (3, 0), (3, 0), (4, 5)],
+            transform=attrgetter('integer', 'in_test')
         )
 
     def test_annotate_with_join_in_condition(self):
@@ -250,6 +261,18 @@ class CaseExpressionTests(TestCase):
             )).exclude(test='other').order_by('pk'),
             [(1, 'one'), (2, 'two'), (2, 'two')],
             transform=attrgetter('integer', 'test')
+        )
+
+    def test_annotate_values_not_in_order_by(self):
+        self.assertEqual(
+            list(CaseTestModel.objects.annotate(test=Case(
+                When(integer=1, then=Value('one')),
+                When(integer=2, then=Value('two')),
+                When(integer=3, then=Value('three')),
+                default=Value('other'),
+                output_field=models.CharField(),
+            )).order_by('test').values_list('integer', flat=True)),
+            [1, 4, 3, 3, 3, 2, 2]
         )
 
     def test_combined_expression(self):
@@ -689,7 +712,15 @@ class CaseExpressionTests(TestCase):
         )
         self.assertQuerysetEqual(
             CaseTestModel.objects.all().order_by('pk'),
-            [(1, Decimal('1.1')), (2, Decimal('2.2')), (3, None), (2, Decimal('2.2')), (3, None), (3, None), (4, None)],
+            [
+                (1, Decimal('1.1')),
+                (2, Decimal('2.2')),
+                (3, None),
+                (2, Decimal('2.2')),
+                (3, None),
+                (3, None),
+                (4, None)
+            ],
             transform=attrgetter('integer', 'decimal')
         )
 
@@ -934,8 +965,13 @@ class CaseExpressionTests(TestCase):
         self.assertQuerysetEqual(
             CaseTestModel.objects.all().order_by('pk'),
             [
-                (1, UUID('11111111111111111111111111111111')), (2, UUID('22222222222222222222222222222222')), (3, None),
-                (2, UUID('22222222222222222222222222222222')), (3, None), (3, None), (4, None)
+                (1, UUID('11111111111111111111111111111111')),
+                (2, UUID('22222222222222222222222222222222')),
+                (3, None),
+                (2, UUID('22222222222222222222222222222222')),
+                (3, None),
+                (3, None),
+                (4, None),
             ],
             transform=attrgetter('integer', 'uuid')
         )
@@ -1060,7 +1096,7 @@ class CaseExpressionTests(TestCase):
             lambda x: (x, x.foo)
         )
 
-    def test_join_promotion_multiple_annonations(self):
+    def test_join_promotion_multiple_annotations(self):
         o = CaseTestModel.objects.create(integer=1, integer2=1, string='1')
         # Testing that:
         # 1. There isn't any object on the remote side of the fk_rel

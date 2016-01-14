@@ -180,6 +180,13 @@ class BaseExpression(object):
                 return True
         return False
 
+    @cached_property
+    def contains_column_references(self):
+        for expr in self.get_source_expressions():
+            if expr and expr.contains_column_references:
+                return True
+        return False
+
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         """
         Provides the chance to do any preprocessing or validation before being
@@ -302,7 +309,7 @@ class BaseExpression(object):
         Does this expression contain a reference to some of the
         existing aggregates? If so, returns the aggregate and also
         the lookup parts that *weren't* found. So, if
-            exsiting_aggregates = {'max_id': Max('id')}
+            existing_aggregates = {'max_id': Max('id')}
             self.name = 'max_id'
             queryset.filter(max_id__range=[10,100])
         then this method will return Max('id') and those parts of the
@@ -338,6 +345,17 @@ class BaseExpression(object):
 
     def reverse_ordering(self):
         return self
+
+    def flatten(self):
+        """
+        Recursively yield this expression and all subexpressions, in
+        depth-first order.
+        """
+        yield self
+        for expr in self.get_source_expressions():
+            if expr:
+                for inner_expr in expr.flatten():
+                    yield inner_expr
 
 
 class Expression(BaseExpression, Combinable):
@@ -464,8 +482,18 @@ class Func(Expression):
     function = None
     template = '%(function)s(%(expressions)s)'
     arg_joiner = ', '
+    arity = None  # The number of arguments the function accepts.
 
     def __init__(self, *expressions, **extra):
+        if self.arity is not None and len(expressions) != self.arity:
+            raise TypeError(
+                "'%s' takes exactly %s %s (%s given)" % (
+                    self.__class__.__name__,
+                    self.arity,
+                    "argument" if self.arity == 1 else "arguments",
+                    len(expressions),
+                )
+            )
         output_field = extra.pop('output_field', None)
         super(Func, self).__init__(output_field=output_field)
         self.source_expressions = self._parse_expressions(*expressions)
@@ -593,6 +621,14 @@ class RawSQL(Expression):
         return [self]
 
 
+class Star(Expression):
+    def __repr__(self):
+        return "'*'"
+
+    def as_sql(self, compiler, connection):
+        return '*', []
+
+
 class Random(Expression):
     def __init__(self):
         super(Random, self).__init__(output_field=fields.FloatField())
@@ -605,6 +641,9 @@ class Random(Expression):
 
 
 class Col(Expression):
+
+    contains_column_references = True
+
     def __init__(self, alias, target, output_field=None):
         if output_field is None:
             output_field = target
@@ -719,7 +758,8 @@ class When(Expression):
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         c = self.copy()
         c.is_summary = summarize
-        c.condition = c.condition.resolve_expression(query, allow_joins, reuse, summarize, False)
+        if hasattr(c.condition, 'resolve_expression'):
+            c.condition = c.condition.resolve_expression(query, allow_joins, reuse, summarize, False)
         c.result = c.result.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         return c
 
@@ -943,8 +983,10 @@ class OrderBy(BaseExpression):
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)
-        placeholders = {'expression': expression_sql}
-        placeholders['ordering'] = 'DESC' if self.descending else 'ASC'
+        placeholders = {
+            'expression': expression_sql,
+            'ordering': 'DESC' if self.descending else 'ASC',
+        }
         return (self.template % placeholders).rstrip(), params
 
     def get_group_by_cols(self):

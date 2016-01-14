@@ -7,7 +7,7 @@ import re
 
 from docutils import nodes
 from docutils.parsers.rst import directives
-from sphinx import __version__ as sphinx_ver, addnodes
+from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.util.compat import Directive
 from sphinx.util.console import bold
@@ -67,6 +67,7 @@ def setup(app):
                  man=(visit_snippet_literal, depart_snippet_literal),
                  text=(visit_snippet_literal, depart_snippet_literal),
                  texinfo=(visit_snippet_literal, depart_snippet_literal))
+    return {'parallel_read_safe': True}
 
 
 class snippet_with_filename(nodes.literal_block):
@@ -125,14 +126,8 @@ def visit_snippet_latex(self, node):
     """
     Latex document generator visit handler
     """
-    self.verbatim = ''
+    code = node.rawsource.rstrip('\n')
 
-
-def depart_snippet_latex(self, node):
-    """
-    Latex document generator depart handler.
-    """
-    code = self.verbatim.rstrip('\n')
     lang = self.hlsettingstack[-1][0]
     linenos = code.count('\n') >= self.hlsettingstack[-1][1] - 1
     fname = node['filename']
@@ -151,9 +146,14 @@ def depart_snippet_latex(self, node):
                                               linenos=linenos,
                                               **highlight_args)
 
-    self.body.append('\n{\\colorbox[rgb]{0.9,0.9,0.9}'
-                     '{\\makebox[\\textwidth][l]'
-                     '{\\small\\texttt{%s}}}}\n' % (fname,))
+    self.body.append(
+        '\n{\\colorbox[rgb]{0.9,0.9,0.9}'
+        '{\\makebox[\\textwidth][l]'
+        '{\\small\\texttt{%s}}}}\n' % (
+            # Some filenames have '_', which is special in latex.
+            fname.replace('_', r'\_'),
+        )
+    )
 
     if self.table:
         hlcode = hlcode.replace('\\begin{Verbatim}',
@@ -165,7 +165,16 @@ def depart_snippet_latex(self, node):
     hlcode = hlcode.rstrip() + '\n'
     self.body.append('\n' + hlcode + '\\end{%sVerbatim}\n' %
                      (self.table and 'Original' or ''))
-    self.verbatim = None
+
+    # Prevent rawsource from appearing in output a second time.
+    raise nodes.SkipNode
+
+
+def depart_snippet_latex(self, node):
+    """
+    Latex document generator depart handler.
+    """
+    pass
 
 
 class SnippetWithFilename(Directive):
@@ -245,18 +254,6 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
 
     def depart_desc_parameterlist(self, node):
         self.body.append(')')
-
-    if sphinx_ver < '1.0.8':
-        #
-        # Don't apply smartypants to literal blocks
-        #
-        def visit_literal_block(self, node):
-            self.no_smarty += 1
-            SmartyPantsHTMLTranslator.visit_literal_block(self, node)
-
-        def depart_literal_block(self, node):
-            SmartyPantsHTMLTranslator.depart_literal_block(self, node)
-            self.no_smarty -= 1
 
     #
     # Turn the "new in version" stuff (versionadded/versionchanged) into a

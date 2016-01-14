@@ -75,7 +75,7 @@ overridden:
 
 * The form subclass's ``clean()`` method can perform validation that requires
   access to multiple form fields. This is where you might put in checks such as
-  "if field ``A``is supplied, field ``B`` must contain a valid email address".
+  "if field ``A`` is supplied, field ``B`` must contain a valid email address".
   This method can return a completely different dictionary if it wishes, which
   will be used as the ``cleaned_data``.
 
@@ -371,16 +371,24 @@ example::
 In this code, if the validation error is raised, the form will display an
 error message at the top of the form (normally) describing the problem.
 
-Note that the call to ``super(ContactForm, self).clean()`` in the example code
-ensures that any validation logic in parent classes is maintained.
+The call to ``super(ContactForm, self).clean()`` in the example code ensures
+that any validation logic in parent classes is maintained. If your form
+inherits another that doesn't return a ``cleaned_data`` dictionary in its
+``clean()`` method (doing so is optional), then don't assign ``cleaned_data``
+to the result of the ``super()`` call and use ``self.cleaned_data`` instead::
 
-The second approach might involve assigning the error message to one of the
-fields. In this case, let's assign an error message to both the "subject" and
-"cc_myself" rows in the form display. Be careful when doing this in practice,
-since it can lead to confusing form output. We're showing what is possible
-here and leaving it up to you and your designers to work out what works
-effectively in your particular situation. Our new code (replacing the previous
-sample) looks like this::
+    def clean(self):
+        super(ContactForm, self).clean()
+        cc_myself = self.cleaned_data.get("cc_myself")
+        ...
+
+The second approach for reporting validation errors might involve assigning the
+error message to one of the fields. In this case, let's assign an error message
+to both the "subject" and "cc_myself" rows in the form display. Be careful when
+doing this in practice, since it can lead to confusing form output. We're
+showing what is possible here and leaving it up to you and your designers to
+work out what works effectively in your particular situation. Our new code
+(replacing the previous sample) looks like this::
 
     from django import forms
 

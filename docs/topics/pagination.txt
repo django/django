@@ -86,6 +86,7 @@ show how you can display the results. This example assumes you have a
 The view function looks like this::
 
     from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    from django.shortcuts import render
 
     def listing(request):
         contact_list = Contacts.objects.all()
@@ -101,7 +102,7 @@ The view function looks like this::
             # If page is out of range (e.g. 9999), deliver last page of results.
             contacts = paginator.page(paginator.num_pages)
 
-        return render_to_response('list.html', {"contacts": contacts})
+        return render(request, 'list.html', {'contacts': contacts})
 
 In the template :file:`list.html`, you'll want to include navigation between
 pages along with any interesting information from the objects themselves::

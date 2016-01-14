@@ -305,7 +305,7 @@ Gettext
 GiB
 gid
 gis
-github
+GitHub
 globalization
 Godwin
 google
@@ -421,6 +421,7 @@ linebreaks
 linebreaksbr
 linenumbers
 linestring
+linework
 Livni
 ljust
 loaddata
@@ -520,6 +521,7 @@ nestable
 neuroscientist
 newforms
 nginx
+noding
 nonspatial
 nullable
 OAuth
@@ -556,7 +558,7 @@ Peucker
 pgAdmin
 phishing
 php
-pickleable
+picklable
 picosecond
 PIL
 pingback
@@ -580,6 +582,7 @@ postgresql
 pq
 pre
 precisions
+precomputation
 preconfigured
 prefetch
 prefetched
@@ -626,6 +629,7 @@ quo
 quoteless
 Radziej
 rc
+readded
 reallowed
 rebase
 rebased
@@ -770,6 +774,7 @@ submodule
 submodules
 subpackage
 subpackages
+subpath
 subqueries
 subquery
 subselect
@@ -869,10 +874,12 @@ unglamorous
 ungrouped
 unhandled
 unharmful
+unhashable
 unicode
 uninstall
 uninstalling
 uninstalls
+unioning
 uniterated
 unittest
 unittests
@@ -934,7 +941,6 @@ virtualenvs
 virtualized
 Votizen
 webapps
-webdesign
 webkit
 WebKit
 Weblog

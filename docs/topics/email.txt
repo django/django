@@ -277,10 +277,6 @@ All parameters are optional and can be set at any time prior to calling the
 * ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
   header when sending the email.
 
-.. versionchanged:: 1.8
-
-    The ``reply_to`` parameter was added.
-
 For example::
 
     email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
@@ -412,10 +408,6 @@ It can also be used as a context manager, which will automatically call
         mail.EmailMessage(subject2, body2, from2, [to2],
                           connection=connection).send()
 
-.. versionadded:: 1.8
-
-    The context manager protocol was added.
-
 Obtaining an instance of an email backend
 -----------------------------------------
 
@@ -471,12 +463,6 @@ SMTP backend
 
     If unspecified, the default ``timeout`` will be the one provided by
     :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
-
-    .. versionchanged:: 1.8
-
-        The ``ssl_keyfile``, and ``ssl_certfile`` parameters and corresponding
-        settings were added. The ability to customize ``timeout`` using
-        a setting (:setting:`EMAIL_TIMEOUT`) was added.
 
 .. _topic-email-console-backend:
 
@@ -625,7 +611,7 @@ Configuring email for development
 =================================
 
 There are times when you do not want Django to send emails at
-all. For example, while developing a Web site, you probably don't want
+all. For example, while developing a website, you probably don't want
 to send out thousands of emails -- but you may want to validate that
 emails will be sent to the right people under the right conditions,
 and that those emails will contain the correct content.

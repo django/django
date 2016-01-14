@@ -59,6 +59,7 @@ Other topics
 
    actions
    admindocs
+   javascript
 
 .. seealso::
 
@@ -123,6 +124,13 @@ The register decorator
         @admin.register(Author, Reader, Editor, site=custom_admin_site)
         class PersonAdmin(admin.ModelAdmin):
             pass
+
+    You can't use this decorator if you have to reference your model admin
+    class in its ``__init__()`` method, e.g.
+    ``super(PersonAdmin, self).__init__(*args, **kwargs)``. If you are using
+    Python 3 and don't have to worry about supporting Python 2, you can
+    use ``super().__init__(*args, **kwargs)`` . Otherwise, you'll have to use
+    ``admin.site.register()`` instead of this decorator.
 
 Discovery of admin files
 ------------------------
@@ -336,7 +344,7 @@ subclass::
 
     This results in an admin page that looks like:
 
-    .. image:: _images/flatfiles_admin.png
+    .. image:: _images/fieldsets.png
 
     If neither ``fieldsets`` nor :attr:`~ModelAdmin.fields` options are present,
     Django will default to displaying each field that isn't an ``AutoField`` and
@@ -583,11 +591,9 @@ subclass::
       ``False``.
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
-      callable, Django will HTML-escape the output by default. If you'd
-      rather not escape the output of the method, give the method an
-      ``allow_tags`` attribute whose value is ``True``. However, to avoid an
-      XSS vulnerability, you should use :func:`~django.utils.html.format_html`
-      to escape user-provided inputs.
+      callable, Django will HTML-escape the output by default. To escape
+      user input and allow your own unescaped tags, use
+      :func:`~django.utils.html.format_html`.
 
       Here's a full example model::
 
@@ -606,10 +612,16 @@ subclass::
                                      self.first_name,
                                      self.last_name)
 
-              colored_name.allow_tags = True
-
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
+
+      .. deprecated:: 1.9
+
+          In older versions, you could add an ``allow_tags`` attribute to the
+          method to prevent auto-escaping. This attribute is deprecated as it's
+          safer to use :func:`~django.utils.html.format_html`,
+          :func:`~django.utils.html.format_html_join`, or
+          :func:`~django.utils.safestring.mark_safe` instead.
 
     * If the value of a field is ``None``, an empty string, or an iterable
       without elements, Django will display ``-`` (a dash). You can override
@@ -688,7 +700,6 @@ subclass::
                                    self.color_code,
                                    self.first_name)
 
-            colored_first_name.allow_tags = True
             colored_first_name.admin_order_field = 'first_name'
 
         class PersonAdmin(admin.ModelAdmin):
@@ -702,6 +713,22 @@ subclass::
       look like::
 
           colored_first_name.admin_order_field = '-first_name'
+
+      ``admin_order_field`` supports query lookups to sort by values on related
+      models. This example includes an "author first name" column in the list
+      display and allows sorting it by first name::
+
+          class Blog(models.Model):
+              title = models.CharField(max_length=255)
+              author = models.ForeignKey(Person, on_delete=models.CASCADE)
+
+          class BlogAdmin(admin.ModelAdmin):
+              list_display = ('title', 'author', 'author_first_name')
+
+              def author_first_name(self, obj):
+                  return obj.author.first_name
+
+              author_first_name.admin_order_field = 'author__first_name'
 
     * Elements of ``list_display`` can also be properties. Please note however,
       that due to the way properties work in Python, setting
@@ -799,7 +826,7 @@ subclass::
     Set ``list_filter`` to activate filters in the right sidebar of the change
     list page of the admin, as illustrated in the following screenshot:
 
-    .. image:: _images/users_changelist.png
+    .. image:: _images/list_filter.png
 
     ``list_filter`` should be a list or tuple of elements, where each element
     should be of one of the following types:
@@ -911,10 +938,8 @@ subclass::
                   ('is_staff', admin.BooleanFieldListFilter),
               )
 
-      .. versionadded:: 1.8
-
-      You can now limit the choices of a related model to the objects
-      involved in that relation using ``RelatedOnlyFieldListFilter``::
+      You can limit the choices of a related model to the objects involved in
+      that relation using ``RelatedOnlyFieldListFilter``::
 
           class BookAdmin(admin.ModelAdmin):
               list_filter = (
@@ -1095,12 +1120,10 @@ subclass::
                     mark_safe('<br/>'),
                     '{}',
                     ((line,) for line in instance.get_full_address()),
-                ) or "<span class='errors'>I can't determine this address.</span>"
+                ) or mark_safe("<span class='errors'>I can't determine this address.</span>")
 
             # short_description functions like a model field's verbose_name
             address_report.short_description = "Address"
-            # in this example, we have used HTML tags in the output
-            address_report.allow_tags = True
 
 .. attribute:: ModelAdmin.save_as
 
@@ -1198,8 +1221,6 @@ subclass::
 
 .. attribute:: ModelAdmin.show_full_result_count
 
-    .. versionadded:: 1.8
-
     Set ``show_full_result_count`` to control whether the full count of objects
     should be displayed on a filtered admin page (e.g. ``99 results (103 total)``).
     If this option is set to ``False``, a text like ``99 results (Show all)``
@@ -1231,12 +1252,12 @@ subclass::
     For example::
 
         from django.contrib import admin
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
 
         class PersonAdmin(admin.ModelAdmin):
             def view_on_site(self, obj):
-                return 'http://example.com' + reverse('person-detail',
-                                                      kwargs={'slug': obj.slug})
+                return 'https://example.com' + reverse('person-detail',
+                                                       kwargs={'slug': obj.slug})
 
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1676,7 +1697,7 @@ templates used by the :class:`ModelAdmin` views:
     changelist page if :attr:`~ModelAdmin.list_editable` is used. To use a
     custom formset, for example::
 
-        from django.forms.models import BaseModelFormSet
+        from django.forms import BaseModelFormSet
 
         class MyAdminFormSet(BaseModelFormSet):
             pass
@@ -1708,8 +1729,6 @@ templates used by the :class:`ModelAdmin` views:
     any object of this type).
 
 .. method:: ModelAdmin.has_module_permission(request)
-
-    .. versionadded:: 1.8
 
     Should return ``True`` if displaying the module on the admin index page and
     accessing the module's index page is permitted, ``False`` otherwise.
@@ -1785,10 +1804,6 @@ templates used by the :class:`ModelAdmin` views:
 
     ``obj_id`` is the serialized identifier used to retrieve the object to be
     deleted.
-
-    .. versionadded:: 1.8
-
-        The ``obj_id`` parameter was added.
 
 .. method:: ModelAdmin.get_changeform_initial_data(request)
 
@@ -1881,6 +1896,8 @@ The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
 ``None``) to any asset paths. The same rules apply as :ref:`regular asset
 definitions on forms <form-asset-paths>`.
 
+.. _contrib-admin-jquery:
+
 jQuery
 ~~~~~~
 
@@ -1890,10 +1907,6 @@ To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
 (version 2.1.4) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
-
-.. versionchanged:: 1.8
-
-    The embedded jQuery has been upgraded from 1.9.1 to 1.11.2.
 
 .. versionchanged:: 1.9
 
@@ -1916,7 +1929,7 @@ files for the forms and/or formsets. If :setting:`DEBUG` is ``True`` it will
 return the uncompressed versions of the various JavaScript files, including
 ``jquery.js``; if not, it will return the 'minified' versions.
 
-.. _jQuery: http://jquery.com
+.. _jQuery: https://jquery.com
 
 .. _admin-custom-validation:
 
@@ -2045,6 +2058,16 @@ The ``InlineModelAdmin`` class adds:
     parent model fails to validate, it may be left in an inconsistent state as
     described in the warning in :ref:`validation-on-modelform`.
 
+.. attribute:: InlineModelAdmin.classes
+
+    .. versionadded:: 1.10
+
+    A list or tuple containing extra CSS classes to apply to the fieldset that
+    is rendered for the inlines. Defaults to ``None``. As with classes
+    configured in :attr:`~ModelAdmin.fieldsets`, inlines with a ``collapse``
+    class will be initially collapsed and their header will have a small "show"
+    link.
+
 .. attribute:: InlineModelAdmin.extra
 
     This controls the number of extra forms the formset will display in
@@ -2114,8 +2137,6 @@ The ``InlineModelAdmin`` class adds:
     Defaults to ``True``.
 
 .. attribute:: InlineModelAdmin.show_change_link
-
-    .. versionadded:: 1.8
 
     Specifies whether or not inline objects that can be changed in the
     admin have a link to the change form. Defaults to ``False``.
@@ -2515,10 +2536,17 @@ Templates can override or extend base admin templates as described in
 
 .. attribute:: AdminSite.site_url
 
-    .. versionadded:: 1.8
-
     The URL for the "View site" link at the top of each admin page. By default,
     ``site_url`` is ``/``. Set it to ``None`` to remove the link.
+
+    For sites running on a subpath, the :meth:`each_context` method checks if
+    the current request has ``request.META['SCRIPT_NAME']`` set and uses that
+    value if ``site_url`` isn't set to something other than ``/``.
+
+    .. versionchanged:: 1.10
+
+        The ``SCRIPT_NAME`` support described in the previous paragraph was
+        added.
 
 .. attribute:: AdminSite.index_title
 
@@ -2598,10 +2626,6 @@ Templates can override or extend base admin templates as described in
       * ``perms``: a ``dict`` tracking ``add``, ``change``, and ``delete`` permissions
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
-
-    .. versionchanged:: 1.8
-
-        The ``request`` argument and the ``has_permission`` variable were added.
 
     .. versionchanged:: 1.9
 
@@ -2688,7 +2712,7 @@ Multiple admin sites in the same URLconf
 ----------------------------------------
 
 It's easy to create multiple instances of the admin site on the same
-Django-powered Web site. Just create multiple instances of ``AdminSite`` and
+Django-powered website. Just create multiple instances of ``AdminSite`` and
 root each one at a different URL.
 
 In this example, the URLs ``/basic-admin/`` and ``/advanced-admin/`` feature
@@ -2728,12 +2752,6 @@ a pattern for your new view.
     ``AdminSite`` or ``self.admin_site.name`` if your view is on a
     ``ModelAdmin``.
 
-    .. versionchanged:: 1.8
-
-       In previous versions of Django, you had to provide the ``current_app``
-       argument to :class:`~django.template.RequestContext` or
-       :class:`~django.template.Context` when rendering the template.
-
 .. _auth_password_reset:
 
 Adding a password-reset feature
@@ -2756,6 +2774,84 @@ itself).
 The presence of the ``admin_password_reset`` named URL will cause a "forgotten
 your password?" link to appear on the default admin log-in page under the
 password box.
+
+``LogEntry`` objects
+====================
+
+.. class:: models.LogEntry
+
+    The ``LogEntry`` class tracks additions, changes, and deletions of objects
+    done through the admin interface.
+
+.. currentmodule:: django.contrib.admin.models
+
+``LogEntry`` attributes
+-----------------------
+
+.. attribute:: LogEntry.action_time
+
+    The date and time of the action.
+
+.. attribute:: LogEntry.user
+
+    The user (an :setting:`AUTH_USER_MODEL` instance) who performed the
+    action.
+
+.. attribute:: LogEntry.content_type
+
+    The :class:`~django.contrib.contenttypes.models.ContentType` of the
+    modified object.
+
+.. attribute:: LogEntry.object_id
+
+    The textual representation of the modified object's primary key.
+
+.. attribute:: LogEntry.object_repr
+
+    The object`s ``repr()`` after the modification.
+
+.. attribute:: LogEntry.action_flag
+
+    The type of action logged: ``ADDITION``, ``CHANGE``, ``DELETION``.
+
+    For example, to get a list of all additions done through the admin::
+
+        from django.contrib.admin.models import LogEntry, ADDITION
+
+        LogEntry.objects.filter(action_flag=ADDITION)
+
+.. attribute:: LogEntry.change_message
+
+    The detailed description of the modification. In the case of an edit, for
+    example, the message contains a list of the edited fields. The Django admin
+    site formats this content as a JSON structure, so that
+    :meth:`get_change_message` can recompose a message translated in the current
+    user language. Custom code might set this as a plain string though. You are
+    advised to use the :meth:`get_change_message` method to retrieve this value
+    instead of accessing it directly.
+
+    .. versionchanged:: 1.10
+
+        Previously, this attribute was always a plain string. It is
+        now JSON-structured so that the message can be translated in the current
+        user language. Old messages are untouched.
+
+``LogEntry`` methods
+--------------------
+
+.. method:: LogEntry.get_edited_object()
+
+    A shortcut that returns the referenced object.
+
+.. method:: LogEntry.get_change_message()
+
+    .. versionadded:: 1.10
+
+    Formats and translates :attr:`change_message` into the current user
+    language. Messages created before Django 1.10 will always be displayed in
+    the language in which they were logged.
+
+.. currentmodule:: django.contrib.admin
 
 .. _admin-reverse-urls:
 
@@ -2791,6 +2887,14 @@ Delete                  ``{{ app_label }}_{{ model_name }}_delete``       ``obje
 Change                  ``{{ app_label }}_{{ model_name }}_change``       ``object_id``
 ======================  ===============================================   =============
 
+The ``UserAdmin`` provides a named URL:
+
+======================  ===============================================   =============
+Page                    URL name                                          Parameters
+======================  ===============================================   =============
+Password change         ``auth_user_password_change``                     ``user_id``
+======================  ===============================================   =============
+
 These named URLs are registered with the application namespace ``admin``, and
 with an instance namespace corresponding to the name of the Site instance.
 
@@ -2798,9 +2902,9 @@ So - if you wanted to get a reference to the Change view for a particular
 ``Choice`` object (from the polls application) in the default admin, you would
 call::
 
-    >>> from django.core import urlresolvers
+    >>> from django.urls import reverse
     >>> c = Choice.objects.get(...)
-    >>> change_url = urlresolvers.reverse('admin:polls_choice_change', args=(c.id,))
+    >>> change_url = reverse('admin:polls_choice_change', args=(c.id,))
 
 This will find the first registered instance of the admin application
 (whatever the instance name), and resolve to the view for changing
@@ -2811,8 +2915,7 @@ that instance as a ``current_app`` hint to the reverse call. For example,
 if you specifically wanted the admin view from the admin instance named
 ``custom``, you would need to call::
 
-    >>> change_url = urlresolvers.reverse('admin:polls_choice_change',
-    ...                                   args=(c.id,), current_app='custom')
+    >>> change_url = reverse('admin:polls_choice_change', args=(c.id,), current_app='custom')
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.

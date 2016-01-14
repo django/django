@@ -45,6 +45,12 @@ Python style
           """
           ...
 
+* In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` instead
+  of :meth:`~unittest.TestCase.assertRaises` so you can check the exception
+  message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
+  (``six.assertRaisesRegex()`` as long as we support Python 2) only if you need
+  to use regular expression matching.
+
 Imports
 -------
 
@@ -119,7 +125,7 @@ Imports
 
 * Use convenience imports whenever available. For example, do this::
 
-      from django.views.generic import View
+      from django.views import View
 
   instead of::
 
@@ -256,7 +262,7 @@ already been configured).
 So, if there is a module containing some code as follows::
 
     from django.conf import settings
-    from django.core.urlresolvers import get_callable
+    from django.urls import get_callable
 
     default_foo_view = get_callable(settings.FOO_VIEW)
 

@@ -80,6 +80,8 @@ Django's system checks are organized using the following tags:
 * ``compatibility``: Flagging potential problems with version upgrades.
 * ``security``: Checks security related configuration.
 * ``templates``: Checks template related configuration.
+* ``caches``: Checks cache related configuration.
+* ``urls``: Checks URL configuration.
 
 Some checks may be registered with multiple tags.
 
@@ -186,8 +188,9 @@ Related Fields
   for ``<field name>``.
 * **fields.E306**: Related name must be a valid Python identifier or end with
   a ``'+'``.
-* **fields.E310**: None of the fields ``<field1>``, ``<field2>``, ... on model
-  ``<model>`` have a ``unique=True`` constraint.
+* **fields.E310**: No subset of the fields ``<field1>``, ``<field2>``, ... on
+  model ``<model>`` is unique. Add ``unique=True`` on any of those fields or
+  add at least a subset of them to a unique_together constraint.
 * **fields.E311**: ``<model>`` must set ``unique=True`` because it is
   referenced by a ``ForeignKey``.
 * **fields.E320**: Field specifies ``on_delete=SET_NULL``, but cannot be null.
@@ -249,9 +252,8 @@ that might occur as a result of a version upgrade.
 * **1_8.W001**: The standalone ``TEMPLATE_*`` settings were deprecated in
   Django 1.8 and the :setting:`TEMPLATES` dictionary takes precedence. You must
   put the values of the following settings into your defaults ``TEMPLATES``
-  dict: :setting:`TEMPLATE_DIRS`, :setting:`ALLOWED_INCLUDE_ROOTS`,
-  :setting:`TEMPLATE_CONTEXT_PROCESSORS`, :setting:`TEMPLATE_DEBUG`,
-  :setting:`TEMPLATE_LOADERS`, :setting:`TEMPLATE_STRING_IF_INVALID`.
+  dict: ``TEMPLATE_DIRS``, ``TEMPLATE_CONTEXT_PROCESSORS``, ``TEMPLATE_DEBUG``,
+  ``TEMPLATE_LOADERS``, ``TEMPLATE_STRING_IF_INVALID``.
 
 Admin
 -----
@@ -569,3 +571,27 @@ configured:
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
   remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+
+Caches
+------
+
+The following checks verify that your :setting:`CACHES` setting is correctly
+configured:
+
+* **caches.E001**: You must define a ``'default'`` cache in your
+  :setting:`CACHES` setting.
+
+URLs
+----
+
+The following checks are performed on your URL configuration:
+
+* **urls.W001**: Your URL pattern ``<pattern>`` uses
+  :func:`~django.conf.urls.include` with a ``regex`` ending with a
+  ``$``. Remove the dollar from the ``regex`` to avoid problems
+  including URLs.
+* **urls.W002**: Your URL pattern ``<pattern>`` has a ``regex``
+  beginning with a ``/``. Remove this slash as it is unnecessary.
+* **urls.W003**: Your URL pattern ``<pattern>`` has a ``name``
+  including a ``:``. Remove the colon, to avoid ambiguous namespace
+  references.

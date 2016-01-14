@@ -24,6 +24,8 @@ and Django's handling of database schema:
 
 * :djadmin:`sqlmigrate`, which displays the SQL statements for a migration.
 
+* :djadmin:`showmigrations`, which lists a project's migrations.
+
 You should think of migrations as a version control system for your database
 schema. ``makemigrations`` is responsible for packaging up your model changes
 into individual migration files - analogous to commits - and ``migrate`` is
@@ -115,7 +117,7 @@ a field and remove a model - and then run :djadmin:`makemigrations`::
 
     $ python manage.py makemigrations
     Migrations for 'books':
-      0003_auto.py:
+      books/migrations/0003_auto.py:
         - Alter field author on book
 
 Your models will be scanned and compared to the versions currently
@@ -139,8 +141,6 @@ to your version control system as a single commit - that way, when other
 developers (or your production servers) check out the code, they'll
 get both the changes to your models and the accompanying migration at the
 same time.
-
-.. versionadded:: 1.8
 
 If you want to give the migration(s) a meaningful name instead of a generated
 one, you can use the :djadminopt:`--name` option::
@@ -251,8 +251,6 @@ argument, please create a keyword argument and add something like
 Model managers
 ~~~~~~~~~~~~~~
 
-.. versionadded:: 1.8
-
 You can optionally serialize managers into migrations and have them available
 in :class:`~django.db.migrations.operations.RunPython` operations. This is done
 by defining a ``use_in_migrations`` attribute on the manager class::
@@ -333,12 +331,6 @@ Note that this only works given two things:
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
-.. versionchanged:: 1.8
-
-    The ``--fake-initial`` flag to :djadmin:`migrate` was added. Previously,
-    Django would always automatically fake-apply initial migrations if it
-    detected that the tables exist.
-
 .. _historical-models:
 
 Historical models
@@ -379,8 +371,6 @@ can opt to move them into a superclass.
 
 Considerations when removing model fields
 -----------------------------------------
-
-.. versionadded:: 1.8
 
 Similar to the "references to historical functions" considerations described in
 the previous section, removing custom model fields from your project or
@@ -572,7 +562,7 @@ possible depends on how closely intertwined your models are and if you have
 any :class:`~django.db.migrations.operations.RunSQL`
 or :class:`~django.db.migrations.operations.RunPython` operations (which can't
 be optimized through) - Django will then write it back out into a new set of
-initial migration files.
+migration files.
 
 These files are marked to say they replace the previously-squashed migrations,
 so they can coexist with the old migration files, and Django will intelligently
@@ -624,12 +614,13 @@ migrations it replaces and distribute this change to all running instances
 of your application, making sure that they run ``migrate`` to store the change
 in their database.
 
-After this has been done, you must then transition the squashed migration to
-a normal initial migration, by:
+You must then transition the squashed migration to a normal migration by:
 
-- Deleting all the migration files it replaces
-- Removing the ``replaces`` argument in the ``Migration`` class of the
-  squashed migration (this is how Django tells that it is a squashed migration)
+- Deleting all the migration files it replaces.
+- Updating all migrations that depend on the deleted migrations to depend on
+  the squashed migration instead.
+- Removing the ``replaces`` attribute in the ``Migration`` class of the
+  squashed migration (this is how Django tells that it is a squashed migration).
 
 .. note::
     Once you've squashed a migration, you should not then re-squash that squashed
@@ -657,8 +648,10 @@ Django can serialize the following:
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
 - ``decimal.Decimal`` instances
+- ``enum.Enum`` instances
 - ``functools.partial`` instances which have serializable ``func``, ``args``,
   and ``keywords`` values.
+- ``LazyObject`` instances which wrap a serializable value.
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
 - Any class reference (must be in module's top-level scope)
@@ -666,7 +659,12 @@ Django can serialize the following:
 
 .. versionchanged:: 1.9
 
-    Serialization support for `functools.partial` was added.
+    Serialization support for ``functools.partial`` and ``LazyObject``
+    instances was added.
+
+.. versionchanged:: 1.10
+
+    Serialization support for ``enum.Enum`` was added.
 
 Django can serialize the following on Python 3 only:
 
@@ -780,48 +778,6 @@ same policy as the rest of Django, so migration files generated on Django X.Y
 should run unchanged on Django X.Y+1. The migrations system does not promise
 forwards-compatibility, however. New features may be added, and migration files
 generated with newer versions of Django may not work on older versions.
-
-.. _upgrading-from-south:
-
-Upgrading from South
---------------------
-
-If you already have pre-existing migrations created with
-`South <http://south.aeracode.org>`_, then the upgrade process to use
-``django.db.migrations`` is quite simple:
-
-* Ensure all installs are fully up-to-date with their migrations.
-* Remove ``'south'`` from :setting:`INSTALLED_APPS`.
-* Delete all your (numbered) migration files, but not the directory or
-  ``__init__.py`` - make sure you remove the ``.pyc`` files too.
-* Run ``python manage.py makemigrations``. Django should see the empty
-  migration directories and make new initial migrations in the new format.
-* Run ``python manage.py migrate --fake-initial``. Django will see that the
-  tables for the initial migrations already exist and mark them as applied
-  without running them. (Django won't check that the table schema match your
-  models, just that the right table names exist).
-
-.. versionchanged:: 1.8
-
-    The :djadminopt:`--fake-initial` flag was added to :djadmin:`migrate`;
-    previously, initial migrations were always automatically fake-applied if
-    existing tables were detected.
-
-Libraries/Third-party Apps
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you are a library or app maintainer, and wish to support both South migrations
-(for Django 1.6 and below) and Django migrations (for 1.7 and above) you should
-keep two parallel migration sets in your app, one in each format.
-
-To aid in this, South 1.0 will automatically look for South-format migrations
-in a ``south_migrations`` directory first, before looking in ``migrations``,
-meaning that users' projects will transparently use the correct set as long
-as you put your South migrations in the ``south_migrations`` directory and
-your Django migrations in the ``migrations`` directory.
-
-More information is available in the
-`South 1.0 release notes <http://south.readthedocs.org/en/latest/releasenotes/1.0.html#library-migration-path>`_.
 
 .. seealso::
 

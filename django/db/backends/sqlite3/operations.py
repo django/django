@@ -103,6 +103,39 @@ class DatabaseOperations(BaseDatabaseOperations):
     def pk_default_value(self):
         return "NULL"
 
+    def _quote_params_for_last_executed_query(self, params):
+        """
+        Only for last_executed_query! Don't use this to execute SQL queries!
+        """
+        sql = 'SELECT ' + ', '.join(['QUOTE(?)'] * len(params))
+        # Bypass Django's wrappers and use the underlying sqlite3 connection
+        # to avoid logging this query - it would trigger infinite recursion.
+        cursor = self.connection.connection.cursor()
+        # Native sqlite3 cursors cannot be used as context managers.
+        try:
+            return cursor.execute(sql, params).fetchone()
+        finally:
+            cursor.close()
+
+    def last_executed_query(self, cursor, sql, params):
+        # Python substitutes parameters in Modules/_sqlite/cursor.c with:
+        # pysqlite_statement_bind_parameters(self->statement, parameters, allow_8bit_chars);
+        # Unfortunately there is no way to reach self->statement from Python,
+        # so we quote and substitute parameters manually.
+        if params:
+            if isinstance(params, (list, tuple)):
+                params = self._quote_params_for_last_executed_query(params)
+            else:
+                keys = params.keys()
+                values = tuple(params.values())
+                values = self._quote_params_for_last_executed_query(values)
+                params = dict(zip(keys, values))
+            return sql % params
+        # For consistency with SQLiteCursorWrapper.execute(), just return sql
+        # when there are no parameters. See #13648 and #17158.
+        else:
+            return sql
+
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
@@ -193,13 +226,11 @@ class DatabaseOperations(BaseDatabaseOperations):
             value = uuid.UUID(value)
         return value
 
-    def bulk_insert_sql(self, fields, num_values):
-        res = []
-        res.append("SELECT %s" % ", ".join(
-            "%%s AS %s" % self.quote_name(f.column) for f in fields
-        ))
-        res.extend(["UNION ALL SELECT %s" % ", ".join(["%s"] * len(fields))] * (num_values - 1))
-        return " ".join(res)
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        return " UNION ALL ".join(
+            "SELECT %s" % ", ".join(row)
+            for row in placeholder_rows
+        )
 
     def combine_expression(self, connector, sub_expressions):
         # SQLite doesn't have a power function, so we fake it with a

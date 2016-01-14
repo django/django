@@ -6,6 +6,7 @@ from django.db import connection
 from django.db.models import Prefetch
 from django.db.models.query import get_prefetcher
 from django.test import TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import six
 from django.utils.encoding import force_text
 
@@ -223,6 +224,49 @@ class PrefetchRelatedTests(TestCase):
         self.assertIn('prefetch_related', str(cm.exception))
         self.assertIn("name", str(cm.exception))
 
+    def test_forward_m2m_to_attr_conflict(self):
+        msg = 'to_attr=authors conflicts with a field on the Book model.'
+        authors = Author.objects.all()
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Book.objects.prefetch_related(
+                Prefetch('authors', queryset=authors, to_attr='authors'),
+            ))
+        # Without the ValueError, an author was deleted due to the implicit
+        # save of the relation assignment.
+        self.assertEqual(self.book1.authors.count(), 3)
+
+    def test_reverse_m2m_to_attr_conflict(self):
+        msg = 'to_attr=books conflicts with a field on the Author model.'
+        poems = Book.objects.filter(title='Poems')
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Author.objects.prefetch_related(
+                Prefetch('books', queryset=poems, to_attr='books'),
+            ))
+        # Without the ValueError, a book was deleted due to the implicit
+        # save of reverse relation assignment.
+        self.assertEqual(self.author1.books.count(), 2)
+
+    def test_m2m_then_reverse_fk_object_ids(self):
+        with CaptureQueriesContext(connection) as queries:
+            list(Book.objects.prefetch_related('authors__addresses'))
+
+        sql = queries[-1]['sql']
+        self.assertEqual(sql.count(self.author1.name), 1)
+
+    def test_m2m_then_m2m_object_ids(self):
+        with CaptureQueriesContext(connection) as queries:
+            list(Book.objects.prefetch_related('authors__favorite_authors'))
+
+        sql = queries[-1]['sql']
+        self.assertEqual(sql.count(self.author1.name), 1)
+
+    def test_m2m_then_reverse_one_to_one_object_ids(self):
+        with CaptureQueriesContext(connection) as queries:
+            list(Book.objects.prefetch_related('authors__authorwithage'))
+
+        sql = queries[-1]['sql']
+        self.assertEqual(sql.count(str(self.author1.id)), 1, sql)
+
 
 class CustomPrefetchTests(TestCase):
     @classmethod
@@ -313,7 +357,10 @@ class CustomPrefetchTests(TestCase):
         # Ambiguous: Lookup houses_lst doesn't yet exist when performing houses_lst__rooms.
         with self.assertRaises(AttributeError):
             self.traverse_qs(
-                Person.objects.prefetch_related('houses_lst__rooms', Prefetch('houses', queryset=House.objects.all(), to_attr='houses_lst')),
+                Person.objects.prefetch_related(
+                    'houses_lst__rooms',
+                    Prefetch('houses', queryset=House.objects.all(), to_attr='houses_lst')
+                ),
                 [['houses', 'rooms']]
             )
 
@@ -324,7 +371,10 @@ class CustomPrefetchTests(TestCase):
         )
 
         self.traverse_qs(
-            Person.objects.prefetch_related('houses__rooms', Prefetch('houses', queryset=House.objects.all(), to_attr='houses_lst')),
+            Person.objects.prefetch_related(
+                'houses__rooms',
+                Prefetch('houses', queryset=House.objects.all(), to_attr='houses_lst')
+            ),
             [['houses', 'rooms']]
         )
 
@@ -537,8 +587,15 @@ class CustomPrefetchTests(TestCase):
 
         # Test queryset filtering.
         with self.assertNumQueries(2):
-            lst2 = list(Person.objects.prefetch_related(
-                Prefetch('houses', queryset=House.objects.filter(pk__in=[self.house1.pk, self.house3.pk]), to_attr='houses_lst')))
+            lst2 = list(
+                Person.objects.prefetch_related(
+                    Prefetch(
+                        'houses',
+                        queryset=House.objects.filter(pk__in=[self.house1.pk, self.house3.pk]),
+                        to_attr='houses_lst',
+                    )
+                )
+            )
         self.assertEqual(len(lst2[0].houses_lst), 1)
         self.assertEqual(lst2[0].houses_lst[0], self.house1)
         self.assertEqual(len(lst2[1].houses_lst), 1)
@@ -582,7 +639,7 @@ class CustomPrefetchTests(TestCase):
         self.assertEqual(lst2[0].houses_lst[0].rooms_lst[0].main_room_of, self.house1)
         self.assertEqual(len(lst2[1].houses_lst), 0)
 
-        # Test ReverseSingleRelatedObjectDescriptor.
+        # Test ForwardManyToOneDescriptor.
         houses = House.objects.select_related('owner')
         with self.assertNumQueries(6):
             rooms = Room.objects.all().prefetch_related('house')
@@ -596,10 +653,14 @@ class CustomPrefetchTests(TestCase):
             rooms = Room.objects.all().prefetch_related(Prefetch('house', queryset=houses.all(), to_attr='house_attr'))
             lst2 = self.traverse_qs(rooms, [['house_attr', 'owner']])
         self.assertEqual(lst1, lst2)
-        room = Room.objects.all().prefetch_related(Prefetch('house', queryset=houses.filter(address='DoesNotExist'))).first()
+        room = Room.objects.all().prefetch_related(
+            Prefetch('house', queryset=houses.filter(address='DoesNotExist'))
+        ).first()
         with self.assertRaises(ObjectDoesNotExist):
             getattr(room, 'house')
-        room = Room.objects.all().prefetch_related(Prefetch('house', queryset=houses.filter(address='DoesNotExist'), to_attr='house_attr')).first()
+        room = Room.objects.all().prefetch_related(
+            Prefetch('house', queryset=houses.filter(address='DoesNotExist'), to_attr='house_attr')
+        ).first()
         self.assertIsNone(room.house_attr)
         rooms = Room.objects.all().prefetch_related(Prefetch('house', queryset=House.objects.only('name')))
         with self.assertNumQueries(2):
@@ -607,7 +668,7 @@ class CustomPrefetchTests(TestCase):
         with self.assertNumQueries(3):
             getattr(rooms.first().house, 'address')
 
-        # Test SingleRelatedObjectDescriptor.
+        # Test ReverseOneToOneDescriptor.
         houses = House.objects.select_related('owner')
         with self.assertNumQueries(6):
             rooms = Room.objects.all().prefetch_related('main_room_of')
@@ -617,13 +678,21 @@ class CustomPrefetchTests(TestCase):
             lst2 = self.traverse_qs(rooms, [['main_room_of', 'owner']])
         self.assertEqual(lst1, lst2)
         with self.assertNumQueries(2):
-            rooms = list(Room.objects.all().prefetch_related(Prefetch('main_room_of', queryset=houses.all(), to_attr='main_room_of_attr')))
+            rooms = list(
+                Room.objects.all().prefetch_related(
+                    Prefetch('main_room_of', queryset=houses.all(), to_attr='main_room_of_attr')
+                )
+            )
             lst2 = self.traverse_qs(rooms, [['main_room_of_attr', 'owner']])
         self.assertEqual(lst1, lst2)
-        room = Room.objects.filter(main_room_of__isnull=False).prefetch_related(Prefetch('main_room_of', queryset=houses.filter(address='DoesNotExist'))).first()
+        room = Room.objects.filter(main_room_of__isnull=False).prefetch_related(
+            Prefetch('main_room_of', queryset=houses.filter(address='DoesNotExist'))
+        ).first()
         with self.assertRaises(ObjectDoesNotExist):
             getattr(room, 'main_room_of')
-        room = Room.objects.filter(main_room_of__isnull=False).prefetch_related(Prefetch('main_room_of', queryset=houses.filter(address='DoesNotExist'), to_attr='main_room_of_attr')).first()
+        room = Room.objects.filter(main_room_of__isnull=False).prefetch_related(
+            Prefetch('main_room_of', queryset=houses.filter(address='DoesNotExist'), to_attr='main_room_of_attr')
+        ).first()
         self.assertIsNone(room.main_room_of_attr)
 
     def test_nested_prefetch_related_are_not_overwritten(self):

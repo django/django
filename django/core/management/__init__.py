@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-import collections
 import os
 import pkgutil
 import sys
+from collections import OrderedDict, defaultdict
 from importlib import import_module
 
 import django
@@ -16,6 +16,7 @@ from django.core.management.base import (
 from django.core.management.color import color_style
 from django.utils import autoreload, lru_cache, six
 from django.utils._os import npath, upath
+from django.utils.encoding import force_text
 
 
 def find_commands(management_dir):
@@ -100,19 +101,16 @@ def call_command(name, *args, **options):
 
     # Simulate argument parsing to get the option defaults (see #10080 for details).
     parser = command.create_parser('', name)
-    if command.use_argparse:
-        # Use the `dest` option name from the parser option
-        opt_mapping = {sorted(s_opt.option_strings)[0].lstrip('-').replace('-', '_'): s_opt.dest
-                       for s_opt in parser._actions if s_opt.option_strings}
-        arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
-        defaults = parser.parse_args(args=args)
-        defaults = dict(defaults._get_kwargs(), **arg_options)
-        # Move positional args out of options to mimic legacy optparse
-        args = defaults.pop('args', ())
-    else:
-        # Legacy optparse method
-        defaults, _ = parser.parse_args(args=[])
-        defaults = dict(defaults.__dict__, **options)
+    # Use the `dest` option name from the parser option
+    opt_mapping = {
+        sorted(s_opt.option_strings)[0].lstrip('-').replace('-', '_'): s_opt.dest
+        for s_opt in parser._actions if s_opt.option_strings
+    }
+    arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
+    defaults = parser.parse_args(args=[force_text(a) for a in args])
+    defaults = dict(defaults._get_kwargs(), **arg_options)
+    # Move positional args out of options to mimic legacy optparse
+    args = defaults.pop('args', ())
     if 'skip_checks' not in options:
         defaults['skip_checks'] = True
 
@@ -144,7 +142,7 @@ class ManagementUtility(object):
                 "",
                 "Available subcommands:",
             ]
-            commands_dict = collections.defaultdict(lambda: [])
+            commands_dict = defaultdict(lambda: [])
             for name, app in six.iteritems(get_commands()):
                 if app == 'django.core':
                     app = 'django'
@@ -249,12 +247,10 @@ class ManagementUtility(object):
                     # user will find out once they execute the command.
                     pass
             parser = subcommand_cls.create_parser('', cwords[0])
-            if subcommand_cls.use_argparse:
-                options.extend((sorted(s_opt.option_strings)[0], s_opt.nargs != 0) for s_opt in
-                               parser._actions if s_opt.option_strings)
-            else:
-                options.extend((s_opt.get_opt_string(), s_opt.nargs) for s_opt in
-                               parser.option_list)
+            options.extend(
+                (sorted(s_opt.option_strings)[0], s_opt.nargs != 0)
+                for s_opt in parser._actions if s_opt.option_strings
+            )
             # filter out previously specified options from available options
             prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
             options = [opt for opt in options if opt[0] not in prev_opts]
@@ -316,8 +312,11 @@ class ManagementUtility(object):
                     autoreload.check_errors(django.setup)()
                 except Exception:
                     # The exception will be raised later in the child process
-                    # started by the autoreloader.
-                    pass
+                    # started by the autoreloader. Pretend it didn't happen by
+                    # loading an empty list of applications.
+                    apps.all_models = defaultdict(OrderedDict)
+                    apps.app_configs = OrderedDict()
+                    apps.apps_ready = apps.models_ready = apps.ready = True
 
             # In all other cases, django.setup() is required to succeed.
             else:

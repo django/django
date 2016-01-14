@@ -111,20 +111,18 @@ We've specified ``auto_id=False`` to simplify the output::
     >>> from django import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(label='Your name')
-    ...     url = forms.URLField(label='Your Web site', required=False)
+    ...     url = forms.URLField(label='Your website', required=False)
     ...     comment = forms.CharField()
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <tr><th>Your name:</th><td><input type="text" name="name" /></td></tr>
-    <tr><th>Your Web site:</th><td><input type="url" name="url" /></td></tr>
+    <tr><th>Your website:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 ``label_suffix``
 ~~~~~~~~~~~~~~~~
 
 .. attribute:: Field.label_suffix
-
-.. versionadded:: 1.8
 
 The ``label_suffix`` argument lets you override the form's
 :attr:`~django.forms.Form.label_suffix` on a per-field basis::
@@ -225,6 +223,9 @@ The ``help_text`` argument lets you specify descriptive text for this
 ``Field`` when the ``Field`` is rendered by one of the convenience ``Form``
 methods (e.g., ``as_ul()``).
 
+Like the model field's :attr:`~django.db.models.Field.help_text`, this value
+isn't HTML-escaped in automatically-generated forms.
+
 Here's a full example ``Form`` that implements ``help_text`` for two of its
 fields. We've specified ``auto_id=False`` to simplify the output::
 
@@ -319,10 +320,6 @@ Checking if the field data has changed
 
 .. method:: Field.has_changed()
 
-.. versionchanged:: 1.8
-
-    This method was renamed from ``_has_changed()``.
-
 The ``has_changed()`` method is used to determine if the field value has changed
 from the initial value. Returns ``True`` or ``False``.
 
@@ -411,10 +408,6 @@ For each field, we describe the default widget used if you don't specify
         model field. See the :ref:`model field reference documentation on
         choices <field-choices>` for more details. If the argument is a
         callable, it is evaluated each time the field's form is initialized.
-
-        .. versionchanged:: 1.8
-
-            The ability to pass a callable to ``choices`` was added.
 
 ``TypedChoiceField``
 ~~~~~~~~~~~~~~~~~~~~
@@ -561,8 +554,6 @@ For each field, we describe the default widget used if you don't specify
 ``DurationField``
 ~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.8
-
 .. class:: DurationField(**kwargs)
 
     * Default widget: :class:`TextInput`
@@ -708,12 +699,7 @@ For each field, we describe the default widget used if you don't specify
     ``UploadedFile.content_type`` will be updated with the image's content type
     if Pillow can determine it, otherwise it will be set to ``None``.
 
-    .. versionchanged:: 1.8
-
-        The ``image`` and ``content_type`` attributes described in the last
-        paragraph were added.
-
-.. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Pillow: https://pillow.readthedocs.org/en/latest/
 .. _Image: https://pillow.readthedocs.org/en/latest/reference/Image.html
 
 ``IntegerField``
@@ -790,7 +776,7 @@ For each field, we describe the default widget used if you don't specify
     The ``invalid_choice`` error message may contain ``%(value)s``, which will be
     replaced with the selected choice.
 
-    Takes one extra required argument, ``choices``, as for ``ChoiceField``.
+    Takes one extra required argument, ``choices``, as for :class:`ChoiceField`.
 
 ``TypedMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -811,7 +797,8 @@ For each field, we describe the default widget used if you don't specify
     The ``invalid_choice`` error message may contain ``%(value)s``, which will be
     replaced with the selected choice.
 
-    Takes two extra arguments, ``coerce`` and ``empty_value``, as for ``TypedChoiceField``.
+    Takes two extra arguments, ``coerce`` and ``empty_value``, as for
+    :class:`TypedChoiceField`.
 
 ``NullBooleanField``
 ~~~~~~~~~~~~~~~~~~~~
@@ -843,7 +830,7 @@ For each field, we describe the default widget used if you don't specify
         expression object.
 
     Also takes ``max_length``, ``min_length``, and ``strip``, which work just
-    as they do for ``CharField``.
+    as they do for :class:`CharField`.
 
     .. attribute:: strip
 
@@ -851,14 +838,6 @@ For each field, we describe the default widget used if you don't specify
 
         Defaults to ``False``. If enabled, stripping will be applied before the
         regex validation.
-
-    .. deprecated:: 1.8
-
-        The optional argument ``error_message`` is also accepted for backwards
-        compatibility but will be removed in Django 1.10. The preferred way to
-        provide an error message is to use the :attr:`~Field.error_messages`
-        argument, passing a dictionary with ``'invalid'`` as a key and the error
-        message as the value.
 
 ``SlugField``
 ~~~~~~~~~~~~~
@@ -928,8 +907,6 @@ For each field, we describe the default widget used if you don't specify
 
 ``UUIDField``
 ~~~~~~~~~~~~~
-
-.. versionadded:: 1.8
 
 .. class:: UUIDField(**kwargs)
 
@@ -1076,7 +1053,7 @@ Slightly complex built-in ``Field`` classes
         ``datetime.date`` object.
 
     If no ``input_date_formats`` argument is provided, the default input formats
-    for ``DateField`` are used.
+    for :class:`DateField` are used.
 
     .. attribute:: input_time_formats
 
@@ -1084,7 +1061,7 @@ Slightly complex built-in ``Field`` classes
         ``datetime.time`` object.
 
     If no ``input_time_formats`` argument is provided, the default input formats
-    for ``TimeField`` are used.
+    for :class:`TimeField` are used.
 
 Fields which handle relationships
 ---------------------------------
@@ -1239,3 +1216,6 @@ custom ``Field`` classes. To do this, just create a subclass of
 ``clean()`` method and that its ``__init__()`` method accept the core arguments
 mentioned above (``required``, ``label``, ``initial``, ``widget``,
 ``help_text``).
+
+You can also customize how a field will be accessed by overriding
+:meth:`~django.forms.Field.get_bound_field()`.

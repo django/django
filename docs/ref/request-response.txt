@@ -29,8 +29,7 @@ HttpRequest objects
 Attributes
 ----------
 
-All attributes should be considered read-only, unless stated otherwise below.
-``session`` is a notable exception.
+All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.scheme
 
@@ -159,36 +158,30 @@ All attributes should be considered read-only, unless stated otherwise below.
     underscores in WSGI environment variables. It matches the behavior of
     Web servers like Nginx and Apache 2.4+.
 
-.. attribute:: HttpRequest.user
+.. attribute:: HttpRequest.resolver_match
 
-    An object of type :setting:`AUTH_USER_MODEL` representing the currently
-    logged-in user. If the user isn't currently logged in, ``user`` will be set
-    to an instance of :class:`django.contrib.auth.models.AnonymousUser`. You
-    can tell them apart with
-    :meth:`~django.contrib.auth.models.User.is_authenticated`, like so::
+    An instance of :class:`~django.urls.ResolverMatch` representing the
+    resolved URL. This attribute is only set after URL resolving took place,
+    which means it's available in all views but not in middleware methods
+    which are executed before URL resolving takes place (like
+    ``process_request()``, you can use ``process_view()`` instead).
 
-        if request.user.is_authenticated():
-            # Do something for logged-in users.
-        else:
-            # Do something for anonymous users.
+Attributes set by application code
+----------------------------------
 
-    ``user`` is only available if your Django installation has the
-    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
-    activated. For more, see :doc:`/topics/auth/index`.
+Django doesn't set these attributes itself but makes use of them if set by your
+application.
 
-.. attribute:: HttpRequest.session
+.. attribute:: HttpRequest.current_app
 
-    A readable-and-writable, dictionary-like object that represents the current
-    session. This is only available if your Django installation has session
-    support activated. See the :doc:`session documentation
-    </topics/http/sessions>` for full details.
+    The :ttag:`url` template tag will use its value as the ``current_app``
+    argument to :func:`~django.urls.reverse()`.
 
 .. attribute:: HttpRequest.urlconf
 
-    Not defined by Django itself, but will be read if other code (e.g., a custom
-    middleware class) sets it. When present, this will be used as the root
-    URLconf for the current request, overriding the :setting:`ROOT_URLCONF`
-    setting. See :ref:`how-django-processes-a-request` for details.
+    This will be used as the root URLconf for the current request, overriding
+    the :setting:`ROOT_URLCONF` setting. See
+    :ref:`how-django-processes-a-request` for details.
 
     ``urlconf`` can be set to ``None`` to revert any changes made by previous
     middleware and return to using the :setting:`ROOT_URLCONF`.
@@ -198,21 +191,40 @@ All attributes should be considered read-only, unless stated otherwise below.
         Setting ``urlconf=None`` raised
         :exc:`~django.core.exceptions.ImproperlyConfigured` in older versions.
 
-.. attribute:: HttpRequest.resolver_match
+Attributes set by middleware
+----------------------------
 
-    An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing
-    the resolved url. This attribute is only set after url resolving took place,
-    which means it's available in all views but not in middleware methods which
-    are executed before url resolving takes place (like ``process_request``, you
-    can use ``process_view`` instead).
+Some of the middleware included in Django's contrib apps set attributes on the
+request. If you don't see the attribute on a request, be sure the appropriate
+middleware class is listed in :setting:`MIDDLEWARE_CLASSES`.
 
-.. attribute:: HttpRequest.current_app
+.. attribute:: HttpRequest.session
 
-    .. versionadded:: 1.8
+    From the :class:`~django.contrib.sessions.middleware.SessionMiddleware`: A
+    readable and writable, dictionary-like object that represents the current
+    session.
 
-    Not defined by Django itself, but if set, the :ttag:`url` template tag
-    will use its value as the ``current_app`` argument to
-    :func:`~django.core.urlresolvers.reverse()`.
+.. attribute:: HttpRequest.site
+
+    From the :class:`~django.contrib.sites.middleware.CurrentSiteMiddleware`:
+    An instance of :class:`~django.contrib.sites.models.Site` or
+    :class:`~django.contrib.sites.requests.RequestSite` as returned by
+    :func:`~django.contrib.sites.shortcuts.get_current_site()`
+    representing the current site.
+
+.. attribute:: HttpRequest.user
+
+    From the :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`:
+    An instance of :setting:`AUTH_USER_MODEL` representing the currently
+    logged-in user. If the user isn't currently logged in, ``user`` will be set
+    to an instance of :class:`~django.contrib.auth.models.AnonymousUser`. You
+    can tell them apart with
+    :meth:`~django.contrib.auth.models.User.is_authenticated`, like so::
+
+        if request.user.is_authenticated():
+            ... # Do something for logged-in users.
+        else:
+            ... # Do something for anonymous users.
 
 Methods
 -------
@@ -277,7 +289,7 @@ Methods
     Otherwise the absolute URI is built using the server variables available in
     this request.
 
-    Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
+    Example: ``"https://example.com/music/bands/the_beatles/?print=true"``
 
     .. note::
 
@@ -400,10 +412,6 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Strings for setting both keys and values will be converted from ``encoding``
     to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
-
-    .. versionchanged:: 1.8
-
-        In previous versions, ``query_string`` was a required positional argument.
 
 .. method:: QueryDict.__getitem__(key)
 
@@ -600,10 +608,16 @@ Passing iterators
 
 Finally, you can pass ``HttpResponse`` an iterator rather than strings.
 ``HttpResponse`` will consume the iterator immediately, store its content as a
-string, and discard it.
+string, and discard it. Objects with a ``close()`` method such as files and
+generators are immediately closed.
 
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
+
+.. versionchanged:: 1.10
+
+    Objects with a ``close()`` method used to be closed when the WSGI server
+    called ``close()`` on the response.
 
 Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
@@ -650,8 +664,6 @@ Attributes
 
 .. attribute:: HttpResponse.charset
 
-    .. versionadded:: 1.8
-
     A string denoting the charset in which the response will be encoded. If not
     given at ``HttpResponse`` instantiation time, it will be extracted from
     ``content_type`` and if that is unsuccessful, the
@@ -690,8 +702,6 @@ Attributes
 
 .. attribute:: HttpResponse.closed
 
-    .. versionadded:: 1.8
-
     ``True`` if the response has been closed.
 
 Methods
@@ -722,10 +732,6 @@ Methods
     given it will be extracted from ``content_type``, and if that
     is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
 
-    .. versionadded:: 1.8
-
-        The ``charset`` parameter was added.
-
 .. method:: HttpResponse.__setitem__(header, value)
 
     Sets the given header name to the given value. Both ``header`` and
@@ -746,8 +752,6 @@ Methods
     header with the given name.
 
 .. method:: HttpResponse.setdefault(header, value)
-
-    .. versionadded:: 1.8
 
     Sets a header unless it has already been set.
 
@@ -820,21 +824,29 @@ Methods
 
 .. method:: HttpResponse.getvalue()
 
-    .. versionadded:: 1.8
-
     Returns the value of :attr:`HttpResponse.content`. This method makes
     an :class:`HttpResponse` instance a stream-like object.
 
-.. method:: HttpResponse.writable()
+.. method:: HttpResponse.readable()
 
-    .. versionadded:: 1.8
+   .. versionadded:: 1.10
+
+    Always ``False``. This method makes an :class:`HttpResponse` instance a
+    stream-like object.
+
+.. method:: HttpResponse.seekable()
+
+   .. versionadded:: 1.10
+
+    Always ``False``. This method makes an :class:`HttpResponse` instance a
+    stream-like object.
+
+.. method:: HttpResponse.writable()
 
     Always ``True``. This method makes an :class:`HttpResponse` instance a
     stream-like object.
 
 .. method:: HttpResponse.writelines(lines)
-
-    .. versionadded:: 1.8
 
     Writes a list of lines to the response. Line separators are not added. This
     method makes an :class:`HttpResponse` instance a stream-like object.
@@ -854,7 +866,7 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
     The first argument to the constructor is required -- the path to redirect
     to. This can be a fully qualified URL
-    (e.g. ``'http://www.yahoo.com/search/'``), an absolute path with no domain
+    (e.g. ``'https://www.yahoo.com/search/'``), an absolute path with no domain
     (e.g. ``'/search/'``), or even a relative path (e.g. ``'search/'``). In that
     last case, the client browser will reconstruct the full URL itself
     according to the current path. See :class:`HttpResponse` for other optional
@@ -949,7 +961,7 @@ Typical usage could look like::
     >>> from django.http import JsonResponse
     >>> response = JsonResponse({'foo': 'bar'})
     >>> response.content
-    '{"foo": "bar"}'
+    b'{"foo": "bar"}'
 
 
 Serializing non-dictionary objects
@@ -1059,8 +1071,6 @@ Attributes
 
 FileResponse objects
 ====================
-
-.. versionadded:: 1.7.4
 
 .. class:: FileResponse
 

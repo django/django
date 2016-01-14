@@ -61,8 +61,11 @@ class Command(BaseCommand):
         index_output = []
         qn = connection.ops.quote_name
         for f in fields:
-            field_output = [qn(f.name), f.db_type(connection=connection)]
-            field_output.append("%sNULL" % ("NOT " if not f.null else ""))
+            field_output = [
+                qn(f.name),
+                f.db_type(connection=connection),
+                '%sNULL' % ('NOT ' if not f.null else ''),
+            ]
             if f.primary_key:
                 field_output.append("PRIMARY KEY")
             elif f.unique:

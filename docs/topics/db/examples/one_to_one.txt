@@ -92,7 +92,7 @@ Set the place back again, using assignment in the reverse direction::
     <Restaurant: Demon Dogs the restaurant>
 
 Note that you must save an object before it can be assigned to a one-to-one
-relationship. For example, creating an ``Restaurant`` with unsaved ``Place``
+relationship. For example, creating a ``Restaurant`` with unsaved ``Place``
 raises ``ValueError``::
 
     >>> p3 = Place(name='Demon Dogs', address='944 W. Fullerton')
@@ -101,25 +101,18 @@ raises ``ValueError``::
     ...
     ValueError: save() prohibited to prevent data loss due to unsaved related object 'place'.
 
-.. versionchanged:: 1.8.4
-
-    Previously, saving an object with unsaved related objects did not raise an
-    error and could result in silent data loss. In 1.8-1.8.3, unsaved model
-    instances couldn't be assigned to related fields, but this restriction was
-    removed to allow easier usage of in-memory models.
-
 Restaurant.objects.all() just returns the Restaurants, not the Places.  Note
 that there are two restaurants - Ace Hardware the Restaurant was created in the
 call to r.place = p2::
 
     >>> Restaurant.objects.all()
-    [<Restaurant: Demon Dogs the restaurant>, <Restaurant: Ace Hardware the restaurant>]
+    <QuerySet [<Restaurant: Demon Dogs the restaurant>, <Restaurant: Ace Hardware the restaurant>]>
 
 Place.objects.all() returns all Places, regardless of whether they have
 Restaurants::
 
     >>> Place.objects.order_by('name')
-    [<Place: Ace Hardware the place>, <Place: Demon Dogs the place>]
+    <QuerySet [<Place: Ace Hardware the place>, <Place: Demon Dogs the place>]>
 
 You can query the models using :ref:`lookups across relationships <lookups-that-span-relationships>`::
 
@@ -128,9 +121,9 @@ You can query the models using :ref:`lookups across relationships <lookups-that-
     >>> Restaurant.objects.get(place__pk=1)
     <Restaurant: Demon Dogs the restaurant>
     >>> Restaurant.objects.filter(place__name__startswith="Demon")
-    [<Restaurant: Demon Dogs the restaurant>]
+    <QuerySet [<Restaurant: Demon Dogs the restaurant>]>
     >>> Restaurant.objects.exclude(place__address__contains="Ashland")
-    [<Restaurant: Demon Dogs the restaurant>]
+    <QuerySet [<Restaurant: Demon Dogs the restaurant>]>
 
 This of course works in reverse::
 
@@ -153,6 +146,6 @@ Add a Waiter to the Restaurant::
 Query the waiters::
 
     >>> Waiter.objects.filter(restaurant__place=p1)
-    [<Waiter: Joe the waiter at Demon Dogs the restaurant>]
+    <QuerySet [<Waiter: Joe the waiter at Demon Dogs the restaurant>]>
     >>> Waiter.objects.filter(restaurant__place__name__startswith="Demon")
-    [<Waiter: Joe the waiter at Demon Dogs the restaurant>]
+    <QuerySet [<Waiter: Joe the waiter at Demon Dogs the restaurant>]>

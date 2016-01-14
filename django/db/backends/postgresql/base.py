@@ -72,6 +72,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # If a column type is set to None, it won't be included in the output.
     data_types = {
         'AutoField': 'serial',
+        'BigAutoField': 'bigserial',
         'BinaryField': 'bytea',
         'BooleanField': 'boolean',
         'CharField': 'varchar(%(max_length)s)',
@@ -232,7 +233,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             return True
 
-    @cached_property
+    @property
     def _nodb_connection(self):
         nodb_connection = super(DatabaseWrapper, self)._nodb_connection
         try:

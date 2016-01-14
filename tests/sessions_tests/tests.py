@@ -521,7 +521,10 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertRaises(InvalidSessionKey,
                           self.backend()._key_to_file, "a/b/c")
 
-    @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.file")
+    @override_settings(
+        SESSION_ENGINE="django.contrib.sessions.backends.file",
+        SESSION_COOKIE_AGE=0,
+    )
     def test_clearsessions_command(self):
         """
         Test clearsessions command for clearing expired sessions.
@@ -546,10 +549,17 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         other_session.set_expiry(-3600)
         other_session.save()
 
-        # Two sessions are in the filesystem before clearsessions...
-        self.assertEqual(2, count_sessions())
+        # One object in the present without an expiry (should be deleted since
+        # its modification time + SESSION_COOKIE_AGE will be in the past when
+        # clearsessions runs).
+        other_session2 = self.backend()
+        other_session2['foo'] = 'bar'
+        other_session2.save()
+
+        # Three sessions are in the filesystem before clearsessions...
+        self.assertEqual(3, count_sessions())
         management.call_command('clearsessions')
-        # ... and one is deleted.
+        # ... and two are deleted.
         self.assertEqual(1, count_sessions())
 
 
@@ -726,7 +736,7 @@ class SessionMiddlewareTests(TestCase):
         self.assertEqual(response['Vary'], 'Cookie')
 
     def test_empty_session_saved(self):
-        """"
+        """
         If a session is emptied of data but still has a key, it should still
         be updated.
         """

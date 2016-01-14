@@ -94,6 +94,42 @@ details on these changes.
 * The ``callable_obj`` keyword argument to
   ``SimpleTestCase.assertRaisesMessage()`` will be removed.
 
+* Support for the ``allow_tags`` attribute on ``ModelAdmin`` methods will be
+  removed.
+
+* The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` will be
+  removed.
+
+* The ``django.template.loader.LoaderOrigin`` and
+  ``django.template.base.StringOrigin`` aliases for
+  ``django.template.base.Origin`` will be removed.
+
+See the :ref:`Django 1.10 release notes <deprecated-features-1.10>` for more
+details on these changes.
+
+* The ``makemigrations --exit`` option will be removed.
+
+* Support for direct assignment to a reverse foreign key or many-to-many
+  relation will be removed.
+
+* The ``get_srid()`` and ``set_srid()`` methods of
+  ``django.contrib.gis.geos.GEOSGeometry`` will be removed.
+
+* The ``get_x()``, ``set_x()``, ``get_y()``, ``set_y()``, ``get_z()``, and
+  ``set_z()`` methods of ``django.contrib.gis.geos.Point`` will be removed.
+
+* The ``get_coords()`` and ``set_coords()`` methods of
+  ``django.contrib.gis.geos.Point`` will be removed.
+
+* The ``cascaded_union`` property of ``django.contrib.gis.geos.MultiPolygon``
+  will be removed.
+
+* ``django.utils.functional.allow_lazy()`` will be removed.
+
+* The ``shell --plain`` option will be removed.
+
+* The ``django.core.urlresolvers`` module will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
@@ -118,13 +154,12 @@ details on these changes.
 * Using an incorrect count of unpacked values in the ``for`` template tag
   will raise an exception rather than fail silently.
 
-* The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
-  Python path will be removed.
+* The ability to reverse URLs using a dotted Python path will be removed.
 
 * Support for :py:mod:`optparse` will be dropped for custom management commands
   (replaced by :py:mod:`argparse`).
 
-* The class :class:`~django.core.management.NoArgsCommand` will be removed. Use
+* The class ``django.core.management.NoArgsCommand`` will be removed. Use
   :class:`~django.core.management.BaseCommand` instead, which takes no arguments
   by default.
 
@@ -292,6 +327,9 @@ details on these changes.
 * Automatic syncing of apps without migrations will be removed. Migrations will
   become compulsory for all apps unless you pass the ``--run-syncdb`` option to
   ``migrate``.
+
+* The SQL management commands for apps without migrations, ``sql``, ``sqlall``,
+  ``sqlclear``, ``sqldropindexes``, and ``sqlindexes``, will be removed.
 
 * Support for automatic loading of ``initial_data`` fixtures and initial SQL
   data will be removed.
@@ -516,8 +554,8 @@ details on these changes.
   :class:`~django.template.response.SimpleTemplateResponse`, and
   :class:`~django.template.response.TemplateResponse`, will be removed.
   ``content_type`` should be used instead. This also applies to the
-  :func:`~django.shortcuts.render_to_response` shortcut and
-  the sitemap views, :func:`~django.contrib.sitemaps.views.index` and
+  ``render_to_response()`` shortcut and the sitemap views,
+  :func:`~django.contrib.sitemaps.views.index` and
   :func:`~django.contrib.sitemaps.views.sitemap`.
 
 * When :class:`~django.http.HttpResponse` is instantiated with an iterator,
@@ -620,7 +658,7 @@ details on these changes.
   :mod:`django.contrib.gis.utils` will be removed.
 
 * ``django.conf.urls.defaults`` will be removed. The functions
-  :func:`~django.conf.urls.include`, :func:`~django.conf.urls.patterns` and
+  :func:`~django.conf.urls.include`, ``patterns()`` and
   :func:`~django.conf.urls.url` plus :data:`~django.conf.urls.handler404`,
   :data:`~django.conf.urls.handler500`, are now available through
   :mod:`django.conf.urls` .
@@ -685,10 +723,10 @@ details on these changes.
   handling. (This is faster than the usual deprecation path; see the
   :doc:`Django 1.4 release notes</releases/1.4>`.)
 
-* The :ttag:`url` and :ttag:`ssi` template tags will be
-  modified so that the first argument to each tag is a template variable, not
-  an implied string. In 1.4, this behavior is provided by a version of the tag
-  in the ``future`` template tag library.
+* The ``url`` and ``ssi`` template tags will be modified so that the first
+  argument to each tag is a template variable, not an implied string. In 1.4,
+  this behavior is provided by a version of the tag in the ``future`` template
+  tag library.
 
 * The ``reset`` and ``sqlreset`` management commands will be removed.
 

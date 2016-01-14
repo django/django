@@ -13,7 +13,7 @@ At the same time, the World Online Web developers have consistently been
 perfectionists when it comes to following best practices of Web development.
 
 In fall 2003, the World Online developers (Adrian Holovaty and Simon Willison)
-ditched PHP and began using Python to develop its Web sites. As they built
+ditched PHP and began using Python to develop its websites. As they built
 intensive, richly interactive sites such as Lawrence.com, they began to extract
 a generic Web development framework that let them build Web applications more
 and more quickly. They tweaked this framework constantly, adding improvements
@@ -24,7 +24,7 @@ Django. Django would not be possible without a whole host of open-source
 projects -- `Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're
 thrilled to be able to give something back to the open-source community.
 
-.. _Apache: http://httpd.apache.org/
+.. _Apache: https://httpd.apache.org/
 .. _Python: https://www.python.org/
 .. _PostgreSQL: http://www.postgresql.org/
 
@@ -75,7 +75,7 @@ Which sites use Django?
 
 `DjangoSites.org`_ features a constantly growing list of Django-powered sites.
 
-.. _DjangoSites.org: http://djangosites.org
+.. _DjangoSites.org: https://djangosites.org
 
 .. _faq-mtv:
 
@@ -148,7 +148,7 @@ Is Django a content-management-system (CMS)?
 --------------------------------------------
 
 No, Django is not a CMS, or any sort of "turnkey product" in and of itself.
-It's a Web framework; it's a programming tool that lets you build Web sites.
+It's a Web framework; it's a programming tool that lets you build websites.
 
 For example, it doesn't make much sense to compare Django to something like
 Drupal_, because Django is something you use to *create* things like Drupal.

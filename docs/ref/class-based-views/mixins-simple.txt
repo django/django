@@ -51,8 +51,6 @@ TemplateResponseMixin
 
     .. attribute:: template_engine
 
-        .. versionadded:: 1.8
-
         The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
         loading the template. ``template_engine`` is passed as the ``using``
         keyword argument to ``response_class``. Default is ``None``, which
@@ -61,24 +59,10 @@ TemplateResponseMixin
     .. attribute:: response_class
 
         The response class to be returned by ``render_to_response`` method.
-        Default is
-        :class:`TemplateResponse <django.template.response.TemplateResponse>`.
-        The template and context of ``TemplateResponse`` instances can be
-        altered later (e.g. in
+        Default is :class:`TemplateResponse
+        <django.template.response.TemplateResponse>`. The template and context
+        of ``TemplateResponse`` instances can be altered later (e.g. in
         :ref:`template response middleware <template-response-middleware>`).
-
-        .. versionchanged:: 1.8
-
-            In older versions of Django, ``TemplateResponse`` used
-            :class:`~django.template.RequestContext` in such a way that values
-            from template context processors would override template variables
-            defined in your views. For example, if you subclassed
-            :class:`DetailView <django.views.generic.detail.DetailView>` and
-            set ``context_object_name`` to ``user``, the
-            ``django.contrib.auth.context_processors.auth`` context processor
-            would overwrite your variable with the current user. Now, for
-            consistency with the ``render()`` shortcut, values in the context
-            provided by the class override values from context processors.
 
         If you need custom template loading or custom context object
         instantiation, create a ``TemplateResponse`` subclass and assign it to

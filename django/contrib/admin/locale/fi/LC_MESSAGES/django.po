@@ -2,17 +2,17 @@
 #
 # Translators:
 # Aarni Koskela, 2015
-# Antti Kaihola <antti-2013@ambitone.com>, 2011
+# Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Finnish (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-12-07 08:13+0000\n"
+"Last-Translator: Aarni Koskela\n"
+"Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -79,6 +79,12 @@ msgstr "Toiminto:"
 msgid "action time"
 msgstr "tapahtumahetki"
 
+msgid "user"
+msgstr "käyttäjä"
+
+msgid "content type"
+msgstr "sisältötyyppi"
+
 msgid "object id"
 msgstr "kohteen tunniste"
 
@@ -118,6 +124,11 @@ msgstr "Ei arvoa"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+" Pidä \"Ctrl\" (tai Macin \"Command\") pohjassa valitaksesi useita "
+"vaihtoehtoja."
+
+msgid "Added."
+msgstr "Lisätty."
 
 #, python-format
 msgid "Changed %s."
@@ -319,7 +330,7 @@ msgid "Welcome,"
 msgstr "Tervetuloa,"
 
 msgid "View site"
-msgstr ""
+msgstr "Näytä sivusto"
 
 msgid "Documentation"
 msgstr "Ohjeita"
@@ -383,13 +394,13 @@ msgstr ""
 "Myös seuraavat kohteet poistettaisiin samalla:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Kohteet"
 
 msgid "Yes, I'm sure"
 msgstr "Kyllä, olen varma"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Ei, mennään takaisin"
 
 msgid "Delete multiple objects"
 msgstr "Poista useita kohteita"
@@ -438,7 +449,7 @@ msgid " By %(filter_title)s "
 msgstr " %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
+msgstr "Yhteenveto"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -467,6 +478,14 @@ msgstr ""
 "Tietokanta-asennuksessa on jotain vialla. Varmista, että sopivat taulut on "
 "luotu ja että oikea käyttäjä voi lukea tietokantaa."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Olet kirjautunut käyttäjänä %(username)s, mutta sinulla ei ole pääsyä tälle "
+"sivulle. Haluaisitko kirjautua eri tilille?"
+
 msgid "Forgotten your password or username?"
 msgstr "Unohditko salasanasi tai käyttäjätunnuksesi?"
 
@@ -492,17 +511,20 @@ msgstr "Näytä kaikki"
 msgid "Save"
 msgstr "Tallenna ja poistu"
 
+msgid "Popup closing..."
+msgstr "Ponnahdusikkuna sulkeutuu..."
+
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "Muuta valittuja %(model)s"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "Lisää toinen %(model)s"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "Poista valitut %(model)s"
 
 msgid "Search"
 msgstr "Haku"
@@ -581,6 +603,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Sinulle on lähetetty sähköpostitse ohjeet salasanasi asettamiseen, mikäli "
+"antamallasi sähköpostiosoitteella on olemassa tili."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -625,9 +649,6 @@ msgstr "Nollaa salasanani"
 
 msgid "All dates"
 msgstr "Kaikki päivät"
-
-msgid "(None)"
-msgstr "(Ei mitään)"
 
 #, python-format
 msgid "Select %s"

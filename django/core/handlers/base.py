@@ -7,12 +7,13 @@ import warnings
 
 from django import http
 from django.conf import settings
-from django.core import signals, urlresolvers
+from django.core import signals
 from django.core.exceptions import (
     MiddlewareNotUsed, PermissionDenied, SuspiciousOperation,
 )
 from django.db import connections, transaction
 from django.http.multipartparser import MultiPartParserError
+from django.urls import get_resolver, set_urlconf
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -97,7 +98,7 @@ class BaseHandler(object):
                     RemovedInDjango20Warning, stacklevel=2
                 )
                 response = callback(request, **param_dict)
-        except:
+        except Exception:
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 
@@ -111,8 +112,8 @@ class BaseHandler(object):
         # variable" exception in the event an exception is raised before
         # resolver is set
         urlconf = settings.ROOT_URLCONF
-        urlresolvers.set_urlconf(urlconf)
-        resolver = urlresolvers.get_resolver(urlconf)
+        set_urlconf(urlconf)
+        resolver = get_resolver(urlconf)
         # Use a flag to check if the response was rendered to prevent
         # multiple renderings or to force rendering if necessary.
         response_is_rendered = False
@@ -126,10 +127,10 @@ class BaseHandler(object):
 
             if response is None:
                 if hasattr(request, 'urlconf'):
-                    # Reset url resolver with a custom urlconf.
+                    # Reset url resolver with a custom URLconf.
                     urlconf = request.urlconf
-                    urlresolvers.set_urlconf(urlconf)
-                    resolver = urlresolvers.get_resolver(urlconf)
+                    set_urlconf(urlconf)
+                    resolver = get_resolver(urlconf)
 
                 resolver_match = resolver.resolve(request.path_info)
                 callback, callback_args, callback_kwargs = resolver_match
@@ -224,7 +225,7 @@ class BaseHandler(object):
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
 
-        except:  # Handle everything else.
+        except Exception:  # Handle everything else.
             # Get the exception info now, in case another exception is thrown later.
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
@@ -240,7 +241,7 @@ class BaseHandler(object):
                         "HttpResponse object. It returned None instead."
                         % (middleware_method.__self__.__class__.__name__))
             response = self.apply_response_fixes(request, response)
-        except:  # Any exception should be gathered and handled
+        except Exception:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 

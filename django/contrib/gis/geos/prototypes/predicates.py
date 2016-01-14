@@ -23,6 +23,7 @@ class BinaryPredicate(UnaryPredicate):
 
 # ## Unary Predicates ##
 geos_hasz = UnaryPredicate('GEOSHasZ')
+geos_isclosed = UnaryPredicate('GEOSisClosed')
 geos_isempty = UnaryPredicate('GEOSisEmpty')
 geos_isring = UnaryPredicate('GEOSisRing')
 geos_issimple = UnaryPredicate('GEOSisSimple')
@@ -30,6 +31,7 @@ geos_isvalid = UnaryPredicate('GEOSisValid')
 
 # ## Binary Predicates ##
 geos_contains = BinaryPredicate('GEOSContains')
+geos_covers = BinaryPredicate('GEOSCovers')
 geos_crosses = BinaryPredicate('GEOSCrosses')
 geos_disjoint = BinaryPredicate('GEOSDisjoint')
 geos_equals = BinaryPredicate('GEOSEquals')

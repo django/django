@@ -179,10 +179,10 @@ What the URLconf searches against
 The URLconf searches against the requested URL, as a normal Python string. This
 does not include GET or POST parameters, or the domain name.
 
-For example, in a request to ``http://www.example.com/myapp/``, the URLconf
+For example, in a request to ``https://www.example.com/myapp/``, the URLconf
 will look for ``myapp/``.
 
-In a request to ``http://www.example.com/myapp/?page=3``, the URLconf will look
+In a request to ``https://www.example.com/myapp/?page=3``, the URLconf will look
 for ``myapp/``.
 
 The URLconf doesn't look at the request method. In other words, all request
@@ -274,7 +274,7 @@ Including other URLconfs
 At any point, your ``urlpatterns`` can "include" other URLconf modules. This
 essentially "roots" a set of URLs below other ones.
 
-For example, here's an excerpt of the URLconf for the `Django Web site`_
+For example, here's an excerpt of the URLconf for the `Django website`_
 itself. It includes a number of other URLconfs::
 
     from django.conf.urls import include, url
@@ -343,7 +343,7 @@ the suffixes that differ::
         ])),
     ]
 
-.. _`Django Web site`: https://www.djangoproject.com/
+.. _`Django website`: https://www.djangoproject.com/
 
 Captured parameters
 -------------------
@@ -533,8 +533,7 @@ layers where URLs are needed:
 
 * In templates: Using the :ttag:`url` template tag.
 
-* In Python code: Using the :func:`django.core.urlresolvers.reverse`
-  function.
+* In Python code: Using the :func:`~django.urls.reverse` function.
 
 * In higher level code related to handling of URLs of Django model instances:
   The :meth:`~django.db.models.Model.get_absolute_url` method.
@@ -571,7 +570,7 @@ You can obtain these in template code by using:
 
 Or in Python code::
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.http import HttpResponseRedirect
 
     def redirect_to_year(request):
@@ -671,21 +670,14 @@ the fully qualified name into parts and then tries the following lookup:
 
 2. If there is a current application defined, Django finds and returns the URL
    resolver for that instance. The current application can be specified with
-   the ``current_app`` argument to the
-   :func:`~django.core.urlresolvers.reverse()` function.
+   the ``current_app`` argument to the :func:`~django.urls.reverse()`
+   function.
 
    The :ttag:`url` template tag uses the namespace of the currently resolved
    view as the current application in a
    :class:`~django.template.RequestContext`. You can override this default by
    setting the current application on the :attr:`request.current_app
    <django.http.HttpRequest.current_app>` attribute.
-
-   .. versionchanged:: 1.8
-
-      In previous versions of Django, you had to set the ``current_app``
-      attribute on any :class:`~django.template.Context` or
-      :class:`~django.template.RequestContext` that is used to render a
-      template.
 
    .. versionchanged:: 1.9
 

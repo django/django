@@ -8,11 +8,8 @@ class RemovedInDjango20Warning(PendingDeprecationWarning):
     pass
 
 
-class RemovedInDjango110Warning(DeprecationWarning):
+class RemovedInNextVersionWarning(DeprecationWarning):
     pass
-
-
-RemovedInNextVersionWarning = RemovedInDjango110Warning
 
 
 class warn_about_renamed_method(object):
@@ -73,3 +70,12 @@ class RenameMethodsBase(type):
                     setattr(base, old_method_name, wrapper(new_method))
 
         return new_class
+
+
+class DeprecationInstanceCheck(type):
+    def __instancecheck__(self, instance):
+        warnings.warn(
+            "`%s` is deprecated, use `%s` instead." % (self.__name__, self.alternative),
+            self.deprecation_warning, 2
+        )
+        return super(DeprecationInstanceCheck, self).__instancecheck__(instance)

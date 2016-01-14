@@ -60,9 +60,14 @@ class C:
         return 24
 
 
-class Unpickable(object):
+class Unpicklable(object):
     def __getstate__(self):
         raise pickle.PickleError()
+
+
+class UnpicklableType(object):
+    # Unpicklable using the default pickling protocol on Python 2.
+    __slots__ = 'a',
 
 
 @override_settings(CACHES={
@@ -196,6 +201,15 @@ class DummyCacheTests(SimpleTestCase):
         cache.set('answer', 42)
         self.assertRaises(ValueError, cache.decr_version, 'answer')
         self.assertRaises(ValueError, cache.decr_version, 'does_not_exist')
+
+    def test_get_or_set(self):
+        self.assertEqual(cache.get_or_set('mykey', 'default'), 'default')
+
+    def test_get_or_set_callable(self):
+        def my_callable():
+            return 'default'
+
+        self.assertEqual(cache.get_or_set('mykey', my_callable), 'default')
 
 
 def custom_key_func(key, key_prefix, version):
@@ -844,7 +858,7 @@ class BaseCacheTests(object):
         self.assertEqual(caches['custom_key'].get('answer2'), 42)
         self.assertEqual(caches['custom_key2'].get('answer2'), 42)
 
-    def test_cache_write_unpickable_object(self):
+    def test_cache_write_unpicklable_object(self):
         update_middleware = UpdateCacheMiddleware()
         update_middleware.cache = cache
 
@@ -875,14 +889,13 @@ class BaseCacheTests(object):
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
     def test_add_fail_on_pickleerror(self):
-        "See https://code.djangoproject.com/ticket/21200"
+        # Shouldn't fail silently if trying to cache an unpicklable type.
         with self.assertRaises(pickle.PickleError):
-            cache.add('unpickable', Unpickable())
+            cache.add('unpicklable', Unpicklable())
 
     def test_set_fail_on_pickleerror(self):
-        "See https://code.djangoproject.com/ticket/21200"
         with self.assertRaises(pickle.PickleError):
-            cache.set('unpickable', Unpickable())
+            cache.set('unpicklable', Unpicklable())
 
     def test_get_or_set(self):
         self.assertIsNone(cache.get('projector'))
@@ -1221,6 +1234,10 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         cache.set('foo', 'bar')
         os.path.exists(self.dirname)
 
+    def test_cache_write_unpicklable_type(self):
+        # This fails if not using the highest pickling protocol on Python 2.
+        cache.set('unpicklable', UnpicklableType())
+
 
 @override_settings(CACHES={
     'default': {
@@ -1448,6 +1465,7 @@ class CacheUtils(SimpleTestCase):
         tests = (
             # Initial Cache-Control, kwargs to patch_cache_control, expected Cache-Control parts
             (None, {'private': True}, {'private'}),
+            ('', {'private': True}, {'private'}),
 
             # Test whether private/public attributes are mutually exclusive
             ('private', {'private': True}, {'private'}),
@@ -1844,7 +1862,8 @@ class CacheMiddlewareTest(SimpleTestCase):
 
         self.assertEqual(as_view_decorator.cache_timeout, 30)  # Timeout value for 'default' cache, i.e. 30
         self.assertEqual(as_view_decorator.key_prefix, '')
-        self.assertEqual(as_view_decorator.cache_alias, 'default')  # Value of DEFAULT_CACHE_ALIAS from django.core.cache
+        # Value of DEFAULT_CACHE_ALIAS from django.core.cache
+        self.assertEqual(as_view_decorator.cache_alias, 'default')
 
         # Next, test with custom values:
         as_view_decorator_with_custom = CacheMiddleware(cache_timeout=60, cache_alias='other', key_prefix='foo')

@@ -6,14 +6,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
 # ntrrgc <ntrrgc@gmail.com>, 2014
+# Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Spanish (http://www.transifex.com/projects/p/django/language/"
+"PO-Revision-Date: 2015-05-13 09:17+0000\n"
+"Last-Translator: Veronicabh <vero.blazher@gmail.com>\n"
+"Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -218,7 +219,7 @@ msgstr "ahora"
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
 msgstr[0] "hace un segundo"
-msgstr[1] "hacen %(count)s segundos"
+msgstr[1] "hace %(count)s segundos"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -226,7 +227,7 @@ msgstr[1] "hacen %(count)s segundos"
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
 msgstr[0] "hace un minuto"
-msgstr[1] "hacen %(count)s minutos"
+msgstr[1] "hace %(count)s minutos"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -234,7 +235,7 @@ msgstr[1] "hacen %(count)s minutos"
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
 msgstr[0] "hace una hora"
-msgstr[1] "hacen %(count)s horas"
+msgstr[1] "hace %(count)s horas"
 
 #, python-format
 msgctxt "naturaltime"

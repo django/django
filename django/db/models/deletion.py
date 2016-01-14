@@ -1,5 +1,4 @@
 from collections import Counter, OrderedDict
-from itertools import chain
 from operator import attrgetter
 
 from django.db import IntegrityError, connections, transaction
@@ -53,18 +52,10 @@ def DO_NOTHING(collector, field, sub_objs, using):
 
 
 def get_candidate_relations_to_delete(opts):
-    # Collect models that contain candidate relations to delete. This may include
-    # relations coming from proxy models.
-    candidate_models = {opts}
-    candidate_models = candidate_models.union(opts.concrete_model._meta.proxied_children)
-    # For each model, get all candidate fields.
-    candidate_model_fields = chain.from_iterable(
-        opts.get_fields(include_hidden=True) for opts in candidate_models
-    )
     # The candidate relations are the ones that come from N-1 and 1-1 relations.
     # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
     return (
-        f for f in candidate_model_fields
+        f for f in opts.get_fields(include_hidden=True)
         if f.auto_created and not f.concrete and (f.one_to_one or f.one_to_many)
     )
 
@@ -73,7 +64,7 @@ class Collector(object):
     def __init__(self, using):
         self.using = using
         # Initially, {model: {instances}}, later values become lists.
-        self.data = {}
+        self.data = OrderedDict()
         self.field_updates = {}  # {model: {(field, value): {instances}}}
         # fast_deletes is a list of queryset-likes that can be deleted without
         # fetching the objects into memory.

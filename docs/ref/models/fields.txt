@@ -228,11 +228,6 @@ The default value is used when new model instances are created and a value
 isn't provided for the field. When the field is a primary key, the default is
 also used when the field is set to ``None``.
 
-.. versionchanged:: 1.8
-
-    The default wasn't used for ``None`` primary key values in previous
-    versions.
-
 ``editable``
 ------------
 
@@ -393,12 +388,22 @@ according to available IDs. You usually won't need to use this directly; a
 primary key field will automatically be added to your model if you don't specify
 otherwise. See :ref:`automatic-primary-key-fields`.
 
+``BigAutoField``
+----------------
+
+.. class:: BigAutoField(**options)
+
+.. versionadded:: 1.10
+
+A 64-bit integer, much like an :class:`AutoField` except that it is
+guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
+
 ``BigIntegerField``
 -------------------
 
 .. class:: BigIntegerField(**options)
 
-A 64 bit integer, much like an :class:`IntegerField` except that it is
+A 64-bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from ``-9223372036854775808`` to
 ``9223372036854775807``. The default form widget for this field is a
 :class:`~django.forms.TextInput`.
@@ -496,9 +501,13 @@ optional arguments:
     for creation of timestamps. Note that the current date is *always* used;
     it's not just a default value that you can override. So even if you
     set a value for this field when creating the object, it will be ignored.
-    If you want to be able to modify this field, set ``default=timezone.now``
-    (from :func:`django.utils.timezone.now`) instead of ``auto_now_add=True``.
+    If you want to be able to modify this field, set the following instead of
+    ``auto_now_add=True``:
 
+    * For :class:`DateField`: ``default=date.today`` - from
+      :meth:`datetime.date.today`
+    * For :class:`DateTimeField`: ``default=timezone.now`` - from
+      :func:`django.utils.timezone.now`
 
 The default form widget for this field is a
 :class:`~django.forms.TextInput`. The admin adds a JavaScript calendar,
@@ -574,8 +583,6 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 ``DurationField``
 -----------------
 
-.. versionadded:: 1.8
-
 .. class:: DurationField(**options)
 
 A field for storing periods of time - modeled in Python by
@@ -596,11 +603,6 @@ SECOND(6)``. Otherwise a ``bigint`` of microseconds is used.
 
 A :class:`CharField` that checks that the value is a valid email address. It
 uses :class:`~django.core.validators.EmailValidator` to validate the input.
-
-.. versionchanged:: 1.8
-
-    The default ``max_length`` was increased from 75 to 254 in order to be
-    compliant with RFC3696/5321.
 
 ``FileField``
 -------------
@@ -791,7 +793,7 @@ Python file object like this::
 
     from django.core.files import File
     # Open an existing file using Python's built-in open()
-    f = open('/tmp/hello.world')
+    f = open('/path/to/hello.world')
     myfile = File(f)
 
 Or you can construct one from a Python string like this::
@@ -919,7 +921,7 @@ optional arguments:
 
 Requires the `Pillow`_ library.
 
-.. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Pillow: https://pillow.readthedocs.org/en/latest/
 
 :class:`ImageField` instances are created in your database as ``varchar``
 columns with a default max length of 100 characters. As with other fields, you
@@ -941,7 +943,7 @@ is ``False`` or :class:`~django.forms.TextInput` otherwise.
 ``GenericIPAddressField``
 -------------------------
 
-.. class:: GenericIPAddressField(protocol=both, unpack_ipv4=False, **options)
+.. class:: GenericIPAddressField(protocol='both', unpack_ipv4=False, **options)
 
 An IPv4 or IPv6 address, in string format (e.g. ``192.0.2.30`` or
 ``2a02:42fe::4``). The default form widget for this field is a
@@ -1078,8 +1080,6 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 
 ``UUIDField``
 -------------
-
-.. versionadded:: 1.8
 
 .. class:: UUIDField(**options)
 
@@ -1711,7 +1711,8 @@ Field API reference
 
         where the arguments are interpolated from the field's ``__dict__``.
 
-    To map a ``Field`` to a database-specific type, Django exposes two methods:
+    To map a ``Field`` to a database-specific type, Django exposes several
+    methods:
 
     .. method:: get_internal_type()
 
@@ -1723,6 +1724,16 @@ Field API reference
     .. method:: db_type(connection)
 
         Returns the database column data type for the :class:`Field`, taking
+        into account the ``connection``.
+
+        See :ref:`custom-database-types` for usage in custom fields.
+
+    .. method:: rel_db_type(connection)
+
+        .. versionadded:: 1.10
+
+        Returns the database column data type for fields such as ``ForeignKey``
+        and ``OneToOneField`` that point to the :class:`Field`, taking
         into account the ``connection``.
 
         See :ref:`custom-database-types` for usage in custom fields.
@@ -1756,8 +1767,6 @@ Field API reference
     When loading data, :meth:`from_db_value` is used:
 
     .. method:: from_db_value(value, expression, connection, context)
-
-        .. versionadded:: 1.8
 
         Converts a value as returned by the database to a Python object. It is
         the reverse of :meth:`get_prep_value`.
@@ -1877,8 +1886,6 @@ Field API reference
 =========================
 Field attribute reference
 =========================
-
-.. versionadded:: 1.8
 
 Every ``Field`` instance contains several attributes that allow
 introspecting its behavior. Use these attributes instead of ``isinstance``

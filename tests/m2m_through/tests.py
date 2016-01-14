@@ -13,12 +13,13 @@ from .models import (
 
 
 class M2mThroughTests(TestCase):
-    def setUp(self):
-        self.bob = Person.objects.create(name='Bob')
-        self.jim = Person.objects.create(name='Jim')
-        self.jane = Person.objects.create(name='Jane')
-        self.rock = Group.objects.create(name='Rock')
-        self.roll = Group.objects.create(name='Roll')
+    @classmethod
+    def setUpTestData(cls):
+        cls.bob = Person.objects.create(name='Bob')
+        cls.jim = Person.objects.create(name='Jim')
+        cls.jane = Person.objects.create(name='Jane')
+        cls.rock = Group.objects.create(name='Rock')
+        cls.roll = Group.objects.create(name='Roll')
 
     def test_retrieve_intermediate_items(self):
         Membership.objects.create(person=self.jim, group=self.rock)
@@ -97,7 +98,7 @@ class M2mThroughTests(TestCase):
         members = list(Person.objects.filter(name__in=['Bob', 'Jim']))
 
         with self.assertRaisesMessage(AttributeError, msg):
-            setattr(self.rock, 'members', members)
+            self.rock.members.set(members)
 
         self.assertQuerysetEqual(
             self.rock.members.all(),
@@ -166,7 +167,7 @@ class M2mThroughTests(TestCase):
         members = list(Group.objects.filter(name__in=['Rock', 'Roll']))
 
         with self.assertRaisesMessage(AttributeError, msg):
-            setattr(self.bob, 'group_set', members)
+            self.bob.group_set.set(members)
 
         self.assertQuerysetEqual(
             self.bob.group_set.all(),
@@ -346,7 +347,7 @@ class M2mThroughReferentialTests(TestCase):
             []
         )
 
-    def test_self_referential_non_symmentrical_first_side(self):
+    def test_self_referential_non_symmetrical_first_side(self):
         tony = PersonSelfRefM2M.objects.create(name="Tony")
         chris = PersonSelfRefM2M.objects.create(name="Chris")
         Friendship.objects.create(
@@ -359,7 +360,7 @@ class M2mThroughReferentialTests(TestCase):
             attrgetter("name")
         )
 
-    def test_self_referential_non_symmentrical_second_side(self):
+    def test_self_referential_non_symmetrical_second_side(self):
         tony = PersonSelfRefM2M.objects.create(name="Tony")
         chris = PersonSelfRefM2M.objects.create(name="Chris")
         Friendship.objects.create(
@@ -371,7 +372,7 @@ class M2mThroughReferentialTests(TestCase):
             []
         )
 
-    def test_self_referential_non_symmentrical_clear_first_side(self):
+    def test_self_referential_non_symmetrical_clear_first_side(self):
         tony = PersonSelfRefM2M.objects.create(name="Tony")
         chris = PersonSelfRefM2M.objects.create(name="Chris")
         Friendship.objects.create(
@@ -392,7 +393,7 @@ class M2mThroughReferentialTests(TestCase):
             attrgetter("name")
         )
 
-    def test_self_referential_symmentrical(self):
+    def test_self_referential_symmetrical(self):
         tony = PersonSelfRefM2M.objects.create(name="Tony")
         chris = PersonSelfRefM2M.objects.create(name="Chris")
         Friendship.objects.create(
@@ -432,14 +433,15 @@ class M2mThroughReferentialTests(TestCase):
 
 
 class M2mThroughToFieldsTests(TestCase):
-    def setUp(self):
-        self.pea = Ingredient.objects.create(iname='pea')
-        self.potato = Ingredient.objects.create(iname='potato')
-        self.tomato = Ingredient.objects.create(iname='tomato')
-        self.curry = Recipe.objects.create(rname='curry')
-        RecipeIngredient.objects.create(recipe=self.curry, ingredient=self.potato)
-        RecipeIngredient.objects.create(recipe=self.curry, ingredient=self.pea)
-        RecipeIngredient.objects.create(recipe=self.curry, ingredient=self.tomato)
+    @classmethod
+    def setUpTestData(cls):
+        cls.pea = Ingredient.objects.create(iname='pea')
+        cls.potato = Ingredient.objects.create(iname='potato')
+        cls.tomato = Ingredient.objects.create(iname='tomato')
+        cls.curry = Recipe.objects.create(rname='curry')
+        RecipeIngredient.objects.create(recipe=cls.curry, ingredient=cls.potato)
+        RecipeIngredient.objects.create(recipe=cls.curry, ingredient=cls.pea)
+        RecipeIngredient.objects.create(recipe=cls.curry, ingredient=cls.tomato)
 
     def test_retrieval(self):
         # Forward retrieval

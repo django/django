@@ -140,7 +140,10 @@ class DeeplyNestedForeignKeysTests(TestCase):
         self.assertEqual(len(Event.objects.values()), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__director__pk')), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__director__name')), 2)
-        self.assertEqual(len(Event.objects.values('screening__movie__director__pk', 'screening__movie__director__name')), 2)
+        self.assertEqual(
+            len(Event.objects.values('screening__movie__director__pk', 'screening__movie__director__name')),
+            2
+        )
         self.assertEqual(len(Event.objects.values('screening__movie__pk', 'screening__movie__director__pk')), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__pk', 'screening__movie__director__name')), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__title', 'screening__movie__director__pk')), 2)
@@ -160,7 +163,10 @@ class DeeplyNestedForeignKeysTests(TestCase):
         self.assertEqual(len(Package.objects.values()), 2)
         self.assertEqual(len(Package.objects.values('screening__movie__director__pk')), 2)
         self.assertEqual(len(Package.objects.values('screening__movie__director__name')), 2)
-        self.assertEqual(len(Package.objects.values('screening__movie__director__pk', 'screening__movie__director__name')), 2)
+        self.assertEqual(
+            len(Package.objects.values('screening__movie__director__pk', 'screening__movie__director__name')),
+            2
+        )
         self.assertEqual(len(Package.objects.values('screening__movie__pk', 'screening__movie__director__pk')), 2)
         self.assertEqual(len(Package.objects.values('screening__movie__pk', 'screening__movie__director__name')), 2)
         self.assertEqual(len(Package.objects.values('screening__movie__title', 'screening__movie__director__pk')), 2)

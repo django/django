@@ -73,7 +73,7 @@ necessary:
 
     # No reporters are in the system yet.
     >>> Reporter.objects.all()
-    []
+    <QuerySet []>
 
     # Create a new Reporter.
     >>> r = Reporter(full_name='John Smith')
@@ -87,7 +87,7 @@ necessary:
 
     # Now the new reporter is in the database.
     >>> Reporter.objects.all()
-    [<Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>]>
 
     # Fields are represented as attributes on the Python object.
     >>> r.full_name
@@ -113,7 +113,7 @@ necessary:
 
     # Now the article is in the database.
     >>> Article.objects.all()
-    [<Article: Django is cool>]
+    <QuerySet [<Article: Django is cool>]>
 
     # Article objects get API access to related Reporter objects.
     >>> r = a.reporter
@@ -122,13 +122,13 @@ necessary:
 
     # And vice versa: Reporter objects get API access to Article objects.
     >>> r.article_set.all()
-    [<Article: Django is cool>]
+    <QuerySet [<Article: Django is cool>]>
 
     # The API follows relationships as far as you need, performing efficient
     # JOINs for you behind the scenes.
     # This finds all articles by a reporter whose name starts with "John".
     >>> Article.objects.filter(reporter__full_name__startswith='John')
-    [<Article: Django is cool>]
+    <QuerySet [<Article: Django is cool>]>
 
     # Change an object by altering its attributes and calling save().
     >>> r.full_name = 'Billy Goat'
@@ -142,7 +142,7 @@ A dynamic admin interface: it's not just scaffolding -- it's the whole house
 
 Once your models are defined, Django can automatically create a professional,
 production ready :doc:`administrative interface </ref/contrib/admin/index>` --
-a Web site that lets authenticated users add, change and delete objects. It's
+a website that lets authenticated users add, change and delete objects. It's
 as easy as registering your model in the admin site:
 
 .. snippet::
@@ -304,7 +304,7 @@ Here's what the "base.html" template, including the use of :doc:`static files
 .. snippet:: html+django
     :filename: mysite/templates/base.html
 
-    {% load staticfiles %}
+    {% load static %}
     <html>
     <head>
         <title>{% block title %}{% endblock %}</title>

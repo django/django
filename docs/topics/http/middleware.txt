@@ -33,7 +33,6 @@ here's the default value created by :djadmin:`django-admin startproject
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
     ]
@@ -273,11 +272,6 @@ raise :exc:`django.core.exceptions.MiddlewareNotUsed`. Django will then remove
 that piece of middleware from the middleware process and a debug message will
 be logged to the ``django.request`` logger when :setting:`DEBUG` is set to
 ``True``.
-
-.. versionchanged:: 1.8
-
-    Previously, :exc:`~django.core.exceptions.MiddlewareNotUsed` exceptions
-    weren't logged.
 
 Guidelines
 ----------

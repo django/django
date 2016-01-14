@@ -13,11 +13,11 @@ from unittest import skipIf
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
 from django.db import DatabaseError, connection
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin
+from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import SimpleLazyObject
@@ -34,6 +34,11 @@ from ..views import (
 
 if six.PY3:
     from .py3_test_debug import Py3ExceptionReporterTests  # NOQA
+
+
+class User(object):
+    def __str__(self):
+        return 'jacob'
 
 
 class CallableSettingWrapperTests(SimpleTestCase):
@@ -169,9 +174,9 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
     @override_settings(ROOT_URLCONF='view_tests.default_urls')
     def test_default_urlconf_template(self):
         """
-        Make sure that the default urlconf template is shown shown instead
+        Make sure that the default URLconf template is shown shown instead
         of the technical 404 page, if the user has not altered their
-        url conf yet.
+        URLconf yet.
         """
         response = self.client.get('/')
         self.assertContains(
@@ -254,6 +259,7 @@ class ExceptionReporterTests(SimpleTestCase):
         "A simple exception report can be generated"
         try:
             request = self.rf.get('/test_view/')
+            request.user = User()
             raise ValueError("Can't find my keys")
         except ValueError:
             exc_type, exc_value, tb = sys.exc_info()
@@ -263,6 +269,8 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('<pre class="exception_value">Can&#39;t find my keys</pre>', html)
         self.assertIn('<th>Request Method:</th>', html)
         self.assertIn('<th>Request URL:</th>', html)
+        self.assertIn('<h3 id="user-info">USER</h3>', html)
+        self.assertIn('<p>jacob</p>', html)
         self.assertIn('<th>Exception Type:</th>', html)
         self.assertIn('<th>Exception Value:</th>', html)
         self.assertIn('<h2>Traceback ', html)
@@ -281,6 +289,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('<pre class="exception_value">Can&#39;t find my keys</pre>', html)
         self.assertNotIn('<th>Request Method:</th>', html)
         self.assertNotIn('<th>Request URL:</th>', html)
+        self.assertNotIn('<h3 id="user-info">USER</h3>', html)
         self.assertIn('<th>Exception Type:</th>', html)
         self.assertIn('<th>Exception Value:</th>', html)
         self.assertIn('<h2>Traceback ', html)
@@ -455,6 +464,7 @@ class PlainTextReportTests(SimpleTestCase):
         "A simple exception report can be generated"
         try:
             request = self.rf.get('/test_view/')
+            request.user = User()
             raise ValueError("Can't find my keys")
         except ValueError:
             exc_type, exc_value, tb = sys.exc_info()
@@ -464,6 +474,7 @@ class PlainTextReportTests(SimpleTestCase):
         self.assertIn("Can't find my keys", text)
         self.assertIn('Request Method:', text)
         self.assertIn('Request URL:', text)
+        self.assertIn('USER: jacob', text)
         self.assertIn('Exception Type:', text)
         self.assertIn('Exception Value:', text)
         self.assertIn('Traceback:', text)
@@ -482,6 +493,7 @@ class PlainTextReportTests(SimpleTestCase):
         self.assertIn("Can't find my keys", text)
         self.assertNotIn('Request Method:', text)
         self.assertNotIn('Request URL:', text)
+        self.assertNotIn('USER:', text)
         self.assertIn('Exception Type:', text)
         self.assertIn('Exception Value:', text)
         self.assertIn('Traceback:', text)

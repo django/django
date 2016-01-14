@@ -40,7 +40,11 @@ class UserForm(forms.Form):
 
 class TestFieldWithValidators(TestCase):
     def test_all_errors_get_reported(self):
-        form = UserForm({'full_name': 'not int nor mail', 'string': '2 is not correct', 'ignore_case_string': "IgnORE Case strIng"})
+        form = UserForm({
+            'full_name': 'not int nor mail',
+            'string': '2 is not correct',
+            'ignore_case_string': "IgnORE Case strIng",
+        })
         self.assertRaises(ValidationError, form.fields['full_name'].clean, 'not int nor mail')
 
         try:

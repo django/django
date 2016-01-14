@@ -52,10 +52,6 @@ Lookup registration can also be done using a decorator pattern::
     class NotEqualLookup(Lookup):
         # ...
 
-.. versionchanged:: 1.8
-
-    The ability to use the decorator pattern was added.
-
 We can now use ``foo__ne`` for any field ``foo``. You will need to ensure that
 this registration happens before you try to create any querysets using it. You
 could place the implementation in a ``models.py`` file, or register the lookup
@@ -120,10 +116,7 @@ function ``ABS()`` to transform the value before comparison::
 
   class AbsoluteValue(Transform):
       lookup_name = 'abs'
-
-      def as_sql(self, compiler, connection):
-          lhs, params = compiler.compile(self.lhs)
-          return "ABS(%s)" % lhs, params
+      function = 'ABS'
 
 Next, let's register it for ``IntegerField``::
 
@@ -157,10 +150,7 @@ be done by adding an ``output_field`` attribute to the transform::
 
     class AbsoluteValue(Transform):
         lookup_name = 'abs'
-
-        def as_sql(self, compiler, connection):
-            lhs, params = compiler.compile(self.lhs)
-            return "ABS(%s)" % lhs, params
+        function = 'ABS'
 
         @property
         def output_field(self):
@@ -200,10 +190,10 @@ The implementation is::
 There are a couple of notable things going on. First, ``AbsoluteValueLessThan``
 isn't calling ``process_lhs()``. Instead it skips the transformation of the
 ``lhs`` done by ``AbsoluteValue`` and uses the original ``lhs``. That is, we
-want to get ``27`` not ``ABS(27)``. Referring directly to ``self.lhs.lhs`` is
-safe as ``AbsoluteValueLessThan`` can be accessed only from the
-``AbsoluteValue`` lookup, that is the ``lhs`` is always an instance of
-``AbsoluteValue``.
+want to get ``"experiments"."change"`` not ``ABS("experiments"."change")``.
+Referring directly to ``self.lhs.lhs`` is safe as ``AbsoluteValueLessThan``
+can be accessed only from the ``AbsoluteValue`` lookup, that is the ``lhs``
+is always an instance of ``AbsoluteValue``.
 
 Notice also that  as both sides are used multiple times in the query the params
 need to contain ``lhs_params`` and ``rhs_params`` multiple times.
@@ -243,11 +233,8 @@ this transformation should apply to both ``lhs`` and ``rhs``::
 
   class UpperCase(Transform):
       lookup_name = 'upper'
+      function = 'UPPER'
       bilateral = True
-
-      def as_sql(self, compiler, connection):
-          lhs, params = compiler.compile(self.lhs)
-          return "UPPER(%s)" % lhs, params
 
 Next, let's register it::
 

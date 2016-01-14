@@ -5,10 +5,14 @@ Query Expressions
 .. currentmodule:: django.db.models
 
 Query expressions describe a value or a computation that can be used as part of
-a filter, order by, annotation, or aggregate. There are a number of built-in
-expressions (documented below) that can be used to help you write queries.
-Expressions can be combined, or in some cases nested, to form more complex
-computations.
+an update, create, filter, order by, annotation, or aggregate. There are a
+number of built-in expressions (documented below) that can be used to help you
+write queries. Expressions can be combined, or in some cases nested, to form
+more complex computations.
+
+.. versionchanged:: 1.9
+
+    Support for using expressions when creating new model instances was added.
 
 Supported arithmetic
 ====================
@@ -20,14 +24,10 @@ variables, and even other expressions.
 Some examples
 =============
 
-.. versionchanged:: 1.8
-
-    Some of the examples rely on functionality that is new in Django 1.8.
-
 .. code-block:: python
 
     from django.db.models import F, Count
-    from django.db.models.functions import Length
+    from django.db.models.functions import Length, Upper, Value
 
     # Find companies that have more employees than chairs.
     Company.objects.filter(num_employees__gt=F('num_chairs'))
@@ -48,6 +48,13 @@ Some examples
     50
     >>> company.chairs_needed
     70
+
+    # Create a new company using expressions.
+    >>> company = Company.objects.create(name='Google', ticker=Upper(Value('goog')))
+    # Be sure to refresh it if you need to access the field.
+    >>> company.refresh_from_db()
+    >>> company.ticker
+    'GOOG'
 
     # Annotate models with an aggregated value. Both forms
     # below are equivalent.
@@ -122,6 +129,8 @@ and describe the operation.
    will need to be reloaded::
 
        reporter = Reporters.objects.get(pk=reporter.pk)
+       # Or, more succinctly:
+       reporter.refresh_from_db()
 
 As well as being used in operations on single instances as above, ``F()`` can
 be used on ``QuerySets`` of object instances, with ``update()``. This reduces
@@ -198,8 +207,6 @@ directly support ``output_field`` you will need to wrap the expression with
 ``Func()`` expressions
 ----------------------
 
-.. versionadded:: 1.8
-
 ``Func()`` expressions are the base type of all expressions that involve
 database functions like ``COALESCE`` and ``LOWER``, or aggregates like ``SUM``.
 They can be used directly::
@@ -244,6 +251,15 @@ The ``Func`` API is as follows:
 
         A class attribute that denotes the character used to join the list of
         ``expressions`` together. Defaults to ``', '``.
+
+    .. attribute:: arity
+
+        .. versionadded:: 1.10
+
+        A class attribute that denotes the number of arguments the function
+        accepts. If this attribute is set and the function is called with a
+        different number of expressions, ``TypeError`` will be raised. Defaults
+        to ``None``.
 
 The ``*expressions`` argument is a list of positional expressions that the
 function will be applied to. The expressions will be converted to strings,
@@ -309,17 +325,8 @@ should define the desired ``output_field``. For example, adding an
 ``IntegerField()`` and a ``FloatField()`` together should probably have
 ``output_field=FloatField()`` defined.
 
-.. versionchanged:: 1.8
-
-    ``output_field`` is a new parameter.
-
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
-
-.. versionadded:: 1.8
-
-    Aggregate functions can now use arithmetic and reference multiple
-    model fields in a single function.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -356,7 +363,10 @@ boolean, or string within an expression, you can wrap that value within a
 
 You will rarely need to use ``Value()`` directly. When you write the expression
 ``F('field') + 1``, Django implicitly wraps the ``1`` in a ``Value()``,
-allowing simple values to be used in more complex expressions.
+allowing simple values to be used in more complex expressions. You will need to
+use ``Value()`` when you want to pass a string to an expression. Most
+expressions interpret a string argument as the name of a field, like
+``Lower('name')``.
 
 The ``value`` argument describes the value to be included in the expression,
 such as ``1``, ``True``, or ``None``. Django knows how to convert these Python
@@ -374,8 +384,6 @@ output value.
 
 .. class:: ExpressionWrapper(expression, output_field)
 
-.. versionadded:: 1.8
-
 ``ExpressionWrapper`` simply surrounds another expression and provides access
 to properties, such as ``output_field``, that may not be available on other
 expressions. ``ExpressionWrapper`` is necessary when using arithmetic on
@@ -385,16 +393,12 @@ expressions. ``ExpressionWrapper`` is necessary when using arithmetic on
 Conditional expressions
 -----------------------
 
-.. versionadded:: 1.8
-
 Conditional expressions allow you to use :keyword:`if` ... :keyword:`elif` ...
 :keyword:`else` logic in queries. Django natively supports SQL ``CASE``
 expressions. For more details see :doc:`conditional-expressions`.
 
 Raw SQL expressions
 -------------------
-
-.. versionadded:: 1.8
 
 .. currentmodule:: django.db.models.expressions
 

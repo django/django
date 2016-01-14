@@ -115,12 +115,12 @@ Either way, ``authenticate`` should check the credentials it gets, and it
 should return a ``User`` object that matches those credentials, if the
 credentials are valid. If they're not valid, it should return ``None``.
 
-The Django admin system is tightly coupled to the Django ``User`` object
-described at the beginning of this document. For now, the best way to deal with
-this is to create a Django ``User`` object for each user that exists for your
-backend (e.g., in your LDAP directory, your external SQL database, etc.) You
-can either write a script to do this in advance, or your ``authenticate``
-method can do it the first time a user logs in.
+The Django admin is tightly coupled to the Django :ref:`User object
+<user-objects>`. The best way to deal with this is to create a Django ``User``
+object for each user that exists for your backend (e.g., in your LDAP
+directory, your external SQL database, etc.) You can either write a script to
+do this in advance, or your ``authenticate`` method can do it the first time a
+user logs in.
 
 Here's an example backend that authenticates against a username and password
 variable defined in your ``settings.py`` file and creates a Django ``User``
@@ -180,13 +180,10 @@ The permissions given to the user will be the superset of all permissions
 returned by all backends. That is, Django grants a permission to a user that
 any one backend grants.
 
-.. versionadded:: 1.8
-
-    If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
-    exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
-    :meth:`~django.contrib.auth.models.User.has_module_perms()`,
-    the authorization will immediately fail and Django
-    won't check the backends that follow.
+If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
+exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
+:meth:`~django.contrib.auth.models.User.has_module_perms()`, the authorization
+will immediately fail and Django won't check the backends that follow.
 
 The simple backend above could implement permissions for the magic admin
 fairly simply::
@@ -220,7 +217,7 @@ Authorization for anonymous users
 
 An anonymous user is one that is not authenticated i.e. they have provided no
 valid authentication details. However, that does not necessarily mean they are
-not authorized to do anything. At the most basic level, most Web sites
+not authorized to do anything. At the most basic level, most websites
 authorize anonymous users to browse most of the site, and many allow anonymous
 posting of comments etc.
 
@@ -329,7 +326,7 @@ add it to a ``UserAdmin`` class which is registered with the
 :class:`~django.contrib.auth.models.User` class::
 
     from django.contrib import admin
-    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.models import User
 
     from my_user_profile_app.models import Employee
@@ -342,7 +339,7 @@ add it to a ``UserAdmin`` class which is registered with the
         verbose_name_plural = 'employee'
 
     # Define a new User admin
-    class UserAdmin(UserAdmin):
+    class UserAdmin(BaseUserAdmin):
         inlines = (EmployeeInline, )
 
     # Re-register UserAdmin
@@ -494,11 +491,6 @@ Django expects your custom User model to meet some minimum requirements.
    what these two methods return - if you want, they can return exactly
    the same value.
 
-.. versionchanged:: 1.8
-
-    Older versions of Django required your model to have an integer primary
-    key as well.
-
 The easiest way to construct a compliant custom User model is to inherit from
 :class:`~django.contrib.auth.models.AbstractBaseUser`.
 :class:`~django.contrib.auth.models.AbstractBaseUser` provides the core
@@ -525,8 +517,6 @@ password resets. You must then provide some key implementation details:
                 identifier = models.CharField(max_length=40, unique=True)
                 ...
                 USERNAME_FIELD = 'identifier'
-
-        .. versionadded:: 1.8
 
         :attr:`USERNAME_FIELD` now supports
         :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
@@ -561,8 +551,6 @@ password resets. You must then provide some key implementation details:
             ``REQUIRED_FIELDS`` must contain all required fields on your
             ``User`` model, but should *not* contain the ``USERNAME_FIELD`` or
             ``password`` as these fields will always be prompted for.
-
-        .. versionadded:: 1.8
 
         :attr:`REQUIRED_FIELDS` now supports
         :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
@@ -1071,7 +1059,7 @@ code would be required in the app's ``admin.py`` file::
     from django import forms
     from django.contrib import admin
     from django.contrib.auth.models import Group
-    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
     from customauth.models import MyUser
@@ -1122,7 +1110,7 @@ code would be required in the app's ``admin.py`` file::
             return self.initial["password"]
 
 
-    class MyUserAdmin(UserAdmin):
+    class UserAdmin(BaseUserAdmin):
         # The forms to add and change user instances
         form = UserChangeForm
         add_form = UserCreationForm
@@ -1150,7 +1138,7 @@ code would be required in the app's ``admin.py`` file::
         filter_horizontal = ()
 
     # Now register the new UserAdmin...
-    admin.site.register(MyUser, MyUserAdmin)
+    admin.site.register(MyUser, UserAdmin)
     # ... and, since we're not using Django's built-in permissions,
     # unregister the Group model from admin.
     admin.site.unregister(Group)

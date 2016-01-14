@@ -1,10 +1,10 @@
 "This is the locale selecting middleware that will look at accept headers"
 
 from django.conf import settings
-from django.core.urlresolvers import (
+from django.http import HttpResponseRedirect
+from django.urls import (
     LocaleRegexURLResolver, get_resolver, get_script_prefix, is_valid_path,
 )
-from django.http import HttpResponseRedirect
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
 from django.utils.functional import cached_property

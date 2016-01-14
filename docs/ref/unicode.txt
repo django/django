@@ -23,11 +23,17 @@ able to store certain characters in the database, and information will be lost.
 * PostgreSQL users, refer to the `PostgreSQL manual`_ (section 22.3.2 in
   PostgreSQL 9) for details on creating databases with the correct encoding.
 
+* Oracle users, refer to the `Oracle manual`_ for details on how to set
+  (`section 2`_) or alter (`section 11`_) the database character set encoding.
+
 * SQLite users, there is nothing you need to do. SQLite always uses UTF-8
   for internal encoding.
 
-.. _MySQL manual: http://dev.mysql.com/doc/refman/5.6/en/charset-database.html
+.. _MySQL manual: https://dev.mysql.com/doc/refman/5.6/en/charset-database.html
 .. _PostgreSQL manual: http://www.postgresql.org/docs/current/static/multibyte.html
+.. _Oracle manual: https://docs.oracle.com/cd/E11882_01/server.112/e10729/toc.htm
+.. _section 2: https://docs.oracle.com/cd/E11882_01/server.112/e10729/ch2charset.htm#NLSPG002
+.. _section 11: https://docs.oracle.com/cd/E11882_01/server.112/e10729/ch11charsetmig.htm#NLSPG011
 
 All of Django's database backends automatically convert Unicode strings into
 the appropriate encoding for talking to the database. They also automatically
@@ -238,14 +244,14 @@ following is always true::
 So you can safely call it multiple times on the same URI/IRI without risking
 double-quoting problems.
 
-.. _URI: http://www.ietf.org/rfc/rfc2396.txt
-.. _IRI: http://www.ietf.org/rfc/rfc3987.txt
+.. _URI: https://www.ietf.org/rfc/rfc2396.txt
+.. _IRI: https://www.ietf.org/rfc/rfc3987.txt
 
 Models
 ======
 
 Because all strings are returned from the database as Unicode strings, model
-fields that are character based (CharField, TextField, URLField, etc) will
+fields that are character based (CharField, TextField, URLField, etc.) will
 contain Unicode values when Django retrieves data from the database. This
 is *always* the case, even if the data could fit into an ASCII bytestring.
 
@@ -284,8 +290,8 @@ Taking care in ``get_absolute_url()``
 
 URLs can only contain ASCII characters. If you're constructing a URL from
 pieces of data that might be non-ASCII, be careful to encode the results in a
-way that is suitable for a URL. The :func:`~django.core.urlresolvers.reverse`
-function handles this for you automatically.
+way that is suitable for a URL. The :func:`~django.urls.reverse` function
+handles this for you automatically.
 
 If you're constructing a URL manually (i.e., *not* using the ``reverse()``
 function), you'll need to take care of the encoding yourself. In this case,
@@ -351,6 +357,36 @@ A couple of tips to remember when writing your own template tags and filters:
   rendered, so there is no advantage to postponing the conversion of lazy
   translation objects into strings. It's easier to work solely with Unicode
   strings at that point.
+
+.. _unicode-files:
+
+Files
+=====
+
+If you intend to allow users to upload files, you must ensure that the
+environment used to run Django is configured to work with non-ASCII file names.
+If your environment isn't configured correctly, you'll encounter
+``UnicodeEncodeError`` exceptions when saving files with file names that
+contain non-ASCII characters.
+
+Filesystem support for UTF-8 file names varies and might depend on the
+environment. Check your current configuration in an interactive Python shell by
+running::
+
+    import sys
+    sys.getfilesystemencoding()
+
+This should output "UTF-8".
+
+The ``LANG`` environment variable is responsible for setting the expected
+encoding on Unix platforms. Consult the documentation for your operating system
+and application server for the appropriate syntax and location to set this
+variable.
+
+In your development environment, you might need to add a setting to your
+``~.bashrc`` analogous to:::
+
+    export LANG="en_US.UTF-8"
 
 Email
 =====

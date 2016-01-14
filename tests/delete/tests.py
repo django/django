@@ -224,12 +224,13 @@ class DeletionTests(TestCase):
         s2 = S.objects.create(pk=2, r=r)
         T.objects.create(pk=1, s=s1)
         T.objects.create(pk=2, s=s2)
+        RChild.objects.create(r_ptr=r)
         r.delete()
         self.assertEqual(
-            pre_delete_order, [(T, 2), (T, 1), (S, 2), (S, 1), (R, 1)]
+            pre_delete_order, [(T, 2), (T, 1), (RChild, 1), (S, 2), (S, 1), (R, 1)]
         )
         self.assertEqual(
-            post_delete_order, [(T, 1), (T, 2), (S, 1), (S, 2), (R, 1)]
+            post_delete_order, [(T, 1), (T, 2), (RChild, 1), (S, 1), (S, 2), (R, 1)]
         )
 
         models.signals.post_delete.disconnect(log_post_delete)
@@ -413,6 +414,17 @@ class DeletionTests(TestCase):
         for k, v in existed_objs.items():
             self.assertEqual(deleted_objs[k], v)
 
+    def test_proxied_model_duplicate_queries(self):
+        """
+        #25685 - Deleting instances of a model with existing proxy
+        classes should not issue multiple queries during cascade
+        deletion of referring models.
+        """
+        avatar = Avatar.objects.create()
+        # One query for the Avatar table and a second for the User one.
+        with self.assertNumQueries(2):
+            avatar.delete()
+
 
 class FastDeleteTests(TestCase):
 
@@ -491,3 +503,15 @@ class FastDeleteTests(TestCase):
         # that + fast delete of the related objs.
         self.assertNumQueries(2, a.delete)
         self.assertEqual(User.objects.count(), 0)
+
+    def test_fast_delete_empty_no_update_can_self_select(self):
+        """
+        #25932 - Fast deleting on backends that don't have the
+        `no_update_can_self_select` feature should work even if the specified
+        filter doesn't match any row.
+        """
+        with self.assertNumQueries(1):
+            self.assertEqual(
+                User.objects.filter(avatar__desc='missing').delete(),
+                (0, {'delete.User': 0})
+            )

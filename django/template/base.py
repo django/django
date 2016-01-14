@@ -54,13 +54,14 @@ from __future__ import unicode_literals
 import inspect
 import logging
 import re
-import warnings
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils.deprecation import (
+    DeprecationInstanceCheck, RemovedInDjango20Warning,
+)
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
@@ -150,12 +151,20 @@ class Origin(object):
             self.loader == other.loader
         )
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @property
     def loader_name(self):
         if self.loader:
             return '%s.%s' % (
                 self.loader.__module__, self.loader.__class__.__name__,
             )
+
+
+class StringOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
+    alternative = 'django.template.Origin'
+    deprecation_warning = RemovedInDjango20Warning
 
 
 class Template(object):
@@ -348,9 +357,9 @@ class Token(object):
         for bit in bits:
             # Handle translation-marked template pieces
             if bit.startswith(('_("', "_('")):
-                sentinal = bit[2] + ')'
+                sentinel = bit[2] + ')'
                 trans_bit = [bit]
-                while not bit.endswith(sentinal):
+                while not bit.endswith(sentinel):
                     bit = next(bits)
                     trans_bit.append(bit)
                 bit = ' '.join(trans_bit)
@@ -453,7 +462,7 @@ class Parser(object):
 
     def parse(self, parse_until=None):
         """
-        Iterate through the parser tokens and compils each one into a node.
+        Iterate through the parser tokens and compiles each one into a node.
 
         If parse_until is provided, parsing will stop once one of the
         specified tokens has been reached. This is formatted as a list of
@@ -470,7 +479,7 @@ class Parser(object):
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
             elif token.token_type == 1:  # TOKEN_VAR
                 if not token.contents:
-                    raise self.error(token, 'Empty variable tag')
+                    raise self.error(token, 'Empty variable tag on line %d' % token.lineno)
                 try:
                     filter_expression = self.compile_filter(token.contents)
                 except TemplateSyntaxError as e:
@@ -481,7 +490,7 @@ class Parser(object):
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
-                    raise self.error(token, 'Empty block tag')
+                    raise self.error(token, 'Empty block tag on line %d' % token.lineno)
                 if command in parse_until:
                     # A matching token has been reached. Return control to
                     # the caller. Put the token back on the token list so the
@@ -545,13 +554,28 @@ class Parser(object):
 
     def invalid_block_tag(self, token, command, parse_until=None):
         if parse_until:
-            raise self.error(token, "Invalid block tag: '%s', expected %s" %
-                (command, get_text_list(["'%s'" % p for p in parse_until])))
-        raise self.error(token, "Invalid block tag: '%s'" % command)
+            raise self.error(
+                token,
+                "Invalid block tag on line %d: '%s', expected %s. Did you "
+                "forget to register or load this tag?" % (
+                    token.lineno,
+                    command,
+                    get_text_list(["'%s'" % p for p in parse_until]),
+                ),
+            )
+        raise self.error(
+            token,
+            "Invalid block tag on line %d: '%s'. Did you forget to register "
+            "or load this tag?" % (token.lineno, command)
+        )
 
     def unclosed_block_tag(self, parse_until):
         command, token = self.command_stack.pop()
-        msg = "Unclosed tag '%s'. Looking for one of: %s." % (command, ', '.join(parse_until))
+        msg = "Unclosed tag on line %d: '%s'. Looking for one of: %s." % (
+            token.lineno,
+            command,
+            ', '.join(parse_until),
+        )
         raise self.error(token, msg)
 
     def next_token(self):
@@ -737,19 +761,6 @@ class FilterExpression(object):
         return self.token
 
 
-def resolve_variable(path, context):
-    """
-    Returns the resolved variable, which may contain attribute syntax, within
-    the given context.
-
-    Deprecated; use the Variable class instead.
-    """
-    warnings.warn("resolve_variable() is deprecated. Use django.template."
-                  "Variable(path).resolve(context) instead",
-                  RemovedInDjango110Warning, stacklevel=2)
-    return Variable(path).resolve(context)
-
-
 class Variable(object):
     """
     A template variable, resolvable against a given context. The variable may
@@ -892,8 +903,13 @@ class Variable(object):
                             else:
                                 raise
         except Exception as e:
-            template_name = getattr(context, 'template_name', 'unknown')
-            logger.debug('{} - {}'.format(template_name, e))
+            template_name = getattr(context, 'template_name', None) or 'unknown'
+            logger.debug(
+                "Exception while resolving variable '%s' in template '%s'.",
+                bit,
+                template_name,
+                exc_info=True,
+            )
 
             if getattr(e, 'silent_variable_failure', False):
                 current = context.template.engine.string_if_invalid

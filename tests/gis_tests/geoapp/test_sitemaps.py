@@ -7,10 +7,8 @@ from xml.dom import minidom
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.test import (
-    TestCase, ignore_warnings, modify_settings, override_settings,
-    skipUnlessDBFeature,
+    TestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
-from django.utils.deprecation import RemovedInDjango110Warning
 
 from .models import City, Country
 
@@ -30,17 +28,9 @@ class GeoSitemapTest(TestCase):
         expected = set(expected)
         self.assertEqual(actual, expected)
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_geositemap_kml(self):
         "Tests KML/KMZ geographic sitemaps."
         for kml_type in ('kml', 'kmz'):
-            # The URL for the sitemaps in urls.py have been updated
-            # with a name but since reversing by Python path is tried first
-            # before reversing by name and works since we're giving
-            # name='django.contrib.gis.sitemaps.views.(kml|kmz)', we need
-            # to silence the erroneous warning until reversing by dotted
-            # path is removed. The test will work without modification when
-            # it's removed.
             doc = minidom.parseString(self.client.get('/sitemaps/%s.xml' % kml_type).content)
 
             # Ensuring the right sitemaps namespace is present.

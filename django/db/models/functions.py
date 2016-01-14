@@ -1,8 +1,9 @@
 """
 Classes that represent database functions.
 """
-from django.db.models import DateTimeField, IntegerField
-from django.db.models.expressions import Func, Value
+from django.db.models import (
+    DateTimeField, Func, IntegerField, Transform, Value,
+)
 
 
 class Coalesce(Func):
@@ -41,10 +42,10 @@ class ConcatPair(Func):
         super(ConcatPair, self).__init__(left, right, **extra)
 
     def as_sqlite(self, compiler, connection):
-        self.arg_joiner = ' || '
-        self.template = '%(expressions)s'
-        self.coalesce()
-        return super(ConcatPair, self).as_sql(compiler, connection)
+        coalesced = self.coalesce()
+        coalesced.arg_joiner = ' || '
+        coalesced.template = '%(expressions)s'
+        return super(ConcatPair, coalesced).as_sql(compiler, connection)
 
     def as_mysql(self, compiler, connection):
         # Use CONCAT_WS with an empty separator so that NULLs are ignored.
@@ -54,9 +55,12 @@ class ConcatPair(Func):
 
     def coalesce(self):
         # null on either side results in null for expression, wrap with coalesce
+        c = self.copy()
         expressions = [
-            Coalesce(expression, Value('')) for expression in self.get_source_expressions()]
-        self.set_source_expressions(expressions)
+            Coalesce(expression, Value('')) for expression in c.get_source_expressions()
+        ]
+        c.set_source_expressions(expressions)
+        return c
 
 
 class Concat(Func):
@@ -123,9 +127,10 @@ class Least(Func):
         return super(Least, self).as_sql(compiler, connection, function='MIN')
 
 
-class Length(Func):
+class Length(Transform):
     """Returns the number of characters in the expression"""
     function = 'LENGTH'
+    lookup_name = 'length'
 
     def __init__(self, expression, **extra):
         output_field = extra.pop('output_field', IntegerField())
@@ -136,11 +141,9 @@ class Length(Func):
         return super(Length, self).as_sql(compiler, connection)
 
 
-class Lower(Func):
+class Lower(Transform):
     function = 'LOWER'
-
-    def __init__(self, expression, **extra):
-        super(Lower, self).__init__(expression, **extra)
+    lookup_name = 'lower'
 
 
 class Now(Func):
@@ -188,8 +191,6 @@ class Substr(Func):
         return super(Substr, self).as_sql(compiler, connection)
 
 
-class Upper(Func):
+class Upper(Transform):
     function = 'UPPER'
-
-    def __init__(self, expression, **extra):
-        super(Upper, self).__init__(expression, **extra)
+    lookup_name = 'upper'

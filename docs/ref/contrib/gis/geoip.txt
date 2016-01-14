@@ -22,10 +22,10 @@ datasets in binary format (the CSV files will not work!).  These datasets may be
 you set :setting:`GEOIP_PATH` with in your settings.  See the example and
 reference below for more details.
 
-__ http://www.maxmind.com/app/c
-__ http://www.maxmind.com/app/country
-__ http://www.maxmind.com/app/city
-__ http://www.maxmind.com/download/geoip/database/
+__ https://www.maxmind.com/app/c
+__ https://www.maxmind.com/app/country
+__ https://www.maxmind.com/app/city
+__ https://www.maxmind.com/download/geoip/database/
 
 Example
 =======

@@ -1,9 +1,10 @@
 import copy
 import operator
+import warnings
 from functools import total_ordering, wraps
 
 from django.utils import six
-from django.utils.six.moves import copyreg
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -28,7 +29,7 @@ class cached_property(object):
         self.__doc__ = getattr(func, '__doc__')
         self.name = name or func.__name__
 
-    def __get__(self, instance, type=None):
+    def __get__(self, instance, cls=None):
         if instance is None:
             return self
         res = instance.__dict__[self.name] = self.func(instance)
@@ -177,24 +178,52 @@ def _lazy_proxy_unpickle(func, args, kwargs, *resultclasses):
     return lazy(func, *resultclasses)(*args, **kwargs)
 
 
+def lazystr(text):
+    """
+    Shortcut for the common case of a lazy callable that returns str.
+    """
+    from django.utils.encoding import force_text  # Avoid circular import
+    return lazy(force_text, six.text_type)(text)
+
+
 def allow_lazy(func, *resultclasses):
+    warnings.warn(
+        "django.utils.functional.allow_lazy() is deprecated in favor of "
+        "django.utils.functional.keep_lazy()",
+        RemovedInDjango20Warning, 2)
+    return keep_lazy(*resultclasses)(func)
+
+
+def keep_lazy(*resultclasses):
     """
     A decorator that allows a function to be called with one or more lazy
     arguments. If none of the args are lazy, the function is evaluated
     immediately, otherwise a __proxy__ is returned that will evaluate the
     function when needed.
     """
-    lazy_func = lazy(func, *resultclasses)
+    if not resultclasses:
+        raise TypeError("You must pass at least one argument to keep_lazy().")
 
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        for arg in list(args) + list(kwargs.values()):
-            if isinstance(arg, Promise):
-                break
-        else:
-            return func(*args, **kwargs)
-        return lazy_func(*args, **kwargs)
-    return wrapper
+    def decorator(func):
+        lazy_func = lazy(func, *resultclasses)
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for arg in list(args) + list(six.itervalues(kwargs)):
+                if isinstance(arg, Promise):
+                    break
+            else:
+                return func(*args, **kwargs)
+            return lazy_func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+def keep_lazy_text(func):
+    """
+    A decorator for functions that accept lazy arguments and return text.
+    """
+    return keep_lazy(six.text_type)(func)
 
 empty = object()
 
@@ -247,32 +276,30 @@ class LazyObject(object):
         raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
 
     # Because we have messed with __class__ below, we confuse pickle as to what
-    # class we are pickling. It also appears to stop __reduce__ from being
-    # called. So, we define __getstate__ in a way that cooperates with the way
-    # that pickle interprets this class.  This fails when the wrapped class is
-    # a builtin, but it is better than nothing.
-    def __getstate__(self):
+    # class we are pickling. We're going to have to initialize the wrapped
+    # object to successfully pickle it, so we might as well just pickle the
+    # wrapped object since they're supposed to act the same way.
+    #
+    # Unfortunately, if we try to simply act like the wrapped object, the ruse
+    # will break down when pickle gets our id(). Thus we end up with pickle
+    # thinking, in effect, that we are a distinct object from the wrapped
+    # object, but with the same __dict__. This can cause problems (see #25389).
+    #
+    # So instead, we define our own __reduce__ method and custom unpickler. We
+    # pickle the wrapped object as the unpickler's argument, so that pickle
+    # will pickle it normally, and then the unpickler simply returns its
+    # argument.
+    def __reduce__(self):
         if self._wrapped is empty:
             self._setup()
-        return self._wrapped.__dict__
+        return (unpickle_lazyobject, (self._wrapped,))
 
-    # Python 3 will call __reduce__ when pickling; this method is needed
-    # to serialize and deserialize correctly.
-    @classmethod
-    def __newobj__(cls, *args):
-        return cls.__new__(cls, *args)
-
-    def __reduce_ex__(self, proto):
-        if proto >= 2:
-            # On Py3, since the default protocol is 3, pickle uses the
-            # ``__newobj__`` method (& more efficient opcodes) for writing.
-            return (self.__newobj__, (self.__class__,), self.__getstate__())
-        else:
-            # On Py2, the default protocol is 0 (for back-compat) & the above
-            # code fails miserably (see regression test). Instead, we return
-            # exactly what's returned if there's no ``__reduce__`` method at
-            # all.
-            return (copyreg._reconstructor, (self.__class__, object, None), self.__getstate__())
+    # We have to explicitly override __getstate__ so that older versions of
+    # pickle don't try to pickle the __dict__ (which in the case of a
+    # SimpleLazyObject may contain a lambda). The value will end up being
+    # ignored by our __reduce__ and custom unpickler.
+    def __getstate__(self):
+        return {}
 
     def __deepcopy__(self, memo):
         if self._wrapped is empty:
@@ -311,8 +338,12 @@ class LazyObject(object):
     __contains__ = new_method_proxy(operator.contains)
 
 
-# Workaround for http://bugs.python.org/issue12370
-_super = super
+def unpickle_lazyobject(wrapped):
+    """
+    Used to unpickle lazy objects. Just return its argument, which will be the
+    wrapped object.
+    """
+    return wrapped
 
 
 class SimpleLazyObject(LazyObject):
@@ -332,7 +363,7 @@ class SimpleLazyObject(LazyObject):
         value.
         """
         self.__dict__['_setupfunc'] = func
-        _super(SimpleLazyObject, self).__init__()
+        super(SimpleLazyObject, self).__init__()
 
     def _setup(self):
         self._wrapped = self._setupfunc()

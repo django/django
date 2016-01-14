@@ -1,6 +1,5 @@
 import datetime
 import os
-import warnings
 
 from django import forms
 from django.core import checks
@@ -10,9 +9,7 @@ from django.core.files.storage import default_storage
 from django.db.models import signals
 from django.db.models.fields import Field
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_str, force_text
-from django.utils.inspect import func_supports_parameter
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -88,18 +85,7 @@ class FieldFile(File):
 
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
-
-        if func_supports_parameter(self.storage.save, 'max_length'):
-            self.name = self.storage.save(name, content, max_length=self.field.max_length)
-        else:
-            warnings.warn(
-                'Backwards compatibility for storage backends without '
-                'support for the `max_length` argument in '
-                'Storage.save() will be removed in Django 1.10.',
-                RemovedInDjango110Warning, stacklevel=2
-            )
-            self.name = self.storage.save(name, content)
-
+        self.name = self.storage.save(name, content, max_length=self.field.max_length)
         setattr(self.instance, self.field.name, self.name)
 
         # Update the filesize cache
@@ -163,17 +149,15 @@ class FileDescriptor(object):
 
     Assigns a file object on assignment so you can do::
 
-        >>> with open('/tmp/hello.world', 'r') as f:
+        >>> with open('/path/to/hello.world', 'r') as f:
         ...     instance.file = File(f)
     """
     def __init__(self, field):
         self.field = field
 
-    def __get__(self, instance=None, owner=None):
+    def __get__(self, instance, cls=None):
         if instance is None:
-            raise AttributeError(
-                "The '%s' attribute can only be accessed from %s instances."
-                % (self.field.name, owner.__name__))
+            return self
 
         # This is slightly complicated, so worth an explanation.
         # instance.file`needs to ultimately return some instance of `File`,
@@ -217,6 +201,10 @@ class FileDescriptor(object):
             file.instance = instance
             file.field = self.field
             file.storage = self.field.storage
+
+        # Make sure that the instance is correct.
+        elif isinstance(file, FieldFile) and instance is not file.instance:
+            file.instance = instance
 
         # That was fun, wasn't it?
         return instance.__dict__[self.field.name]

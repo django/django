@@ -40,7 +40,7 @@ The following is a simple unit test using the request factory::
     from django.contrib.auth.models import AnonymousUser, User
     from django.test import TestCase, RequestFactory
 
-    from .views import my_view
+    from .views import MyView, my_view
 
     class SimpleTest(TestCase):
         def setUp(self):
@@ -63,6 +63,8 @@ The following is a simple unit test using the request factory::
 
             # Test my_view() as if it were deployed at /customer/details
             response = my_view(request)
+            # Use this syntax for class-based views.
+            response = MyView.as_view()(request)
             self.assertEqual(response.status_code, 200)
 
 .. _topics-testing-advanced-multidb:
@@ -248,6 +250,7 @@ Advanced features of ``TransactionTestCase``
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is an relatively expensive database operation.
 
+.. _testing-reusable-applications:
 
 Using the Django test runner to test reusable applications
 ==========================================================
@@ -415,14 +418,6 @@ execute and tear down the test suite.
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
 
-    .. versionchanged:: 1.8
-
-        Previously, you had to provide an ``option_list`` attribute to a
-        subclassed test runner to add options to the list of command-line
-        options that the :djadmin:`test` command could use.
-
-        The ``keepdb``, ``reverse``, and ``debug_sql`` arguments were added.
-
 Attributes
 ~~~~~~~~~~
 
@@ -448,18 +443,6 @@ Attributes
     By default it is set to ``unittest.defaultTestLoader``. You can override
     this attribute if your tests are going to be loaded in unusual ways.
 
-.. attribute:: DiscoverRunner.option_list
-
-    This is the tuple of ``optparse`` options which will be fed into the
-    management command's ``OptionParser`` for parsing arguments. See the
-    documentation for Python's ``optparse`` module for more details.
-
-    .. deprecated:: 1.8
-
-        You should now override the :meth:`~DiscoverRunner.add_arguments` class
-        method to add custom arguments accepted by the :djadmin:`test`
-        management command.
-
 Methods
 ~~~~~~~
 
@@ -478,8 +461,6 @@ Methods
     This method should return the number of tests that failed.
 
 .. classmethod:: DiscoverRunner.add_arguments(parser)
-
-    .. versionadded:: 1.8
 
     Override this class method to add custom arguments accepted by the
     :djadmin:`test` management command. See
@@ -620,10 +601,6 @@ can be useful during testing.
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
 
-    .. versionchanged:: 1.8
-
-        The ``keepdb`` argument was added.
-
 .. function:: destroy_test_db(old_database_name, verbosity=1, keepdb=False)
 
     Destroys the database whose name is the value of :setting:`NAME` in
@@ -635,10 +612,6 @@ can be useful during testing.
 
     If the ``keepdb`` argument is ``True``, then the connection to the
     database will be closed, but the database will not be destroyed.
-
-    .. versionchanged:: 1.8
-
-        The ``keepdb`` argument was added.
 
 .. _topics-testing-code-coverage:
 

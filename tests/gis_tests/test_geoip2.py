@@ -8,6 +8,7 @@ from unittest import skipUnless
 from django.conf import settings
 from django.contrib.gis.geoip2 import HAS_GEOIP2
 from django.contrib.gis.geos import HAS_GEOS, GEOSGeometry
+from django.test import mock
 from django.utils import six
 
 if HAS_GEOIP2:
@@ -64,8 +65,10 @@ class GeoIPTest(unittest.TestCase):
         self.assertRaises(TypeError, cntry_g.country_code, 17)
         self.assertRaises(TypeError, cntry_g.country_name, GeoIP2)
 
-    def test03_country(self):
+    @mock.patch('socket.gethostbyname')
+    def test03_country(self, gethostbyname):
         "GeoIP country querying methods."
+        gethostbyname.return_value = '128.249.1.1'
         g = GeoIP2(city='<foo>')
 
         for query in (self.fqdn, self.addr):
@@ -85,8 +88,10 @@ class GeoIPTest(unittest.TestCase):
             )
 
     @skipUnless(HAS_GEOS, "Geos is required")
-    def test04_city(self):
+    @mock.patch('socket.gethostbyname')
+    def test04_city(self, gethostbyname):
         "GeoIP city querying methods."
+        gethostbyname.return_value = '128.249.1.1'
         g = GeoIP2(country='<foo>')
 
         for query in (self.fqdn, self.addr):
@@ -121,11 +126,13 @@ class GeoIPTest(unittest.TestCase):
                 self.assertAlmostEqual(lon, tup[0], 4)
                 self.assertAlmostEqual(lat, tup[1], 4)
 
-    def test05_unicode_response(self):
+    @mock.patch('socket.gethostbyname')
+    def test05_unicode_response(self, gethostbyname):
         "GeoIP strings should be properly encoded (#16553)."
+        gethostbyname.return_value = '194.27.42.76'
         g = GeoIP2()
-        d = g.city("duesseldorf.de")
-        self.assertEqual('Düsseldorf', d['city'])
+        d = g.city("nigde.edu.tr")
+        self.assertEqual('Niğde', d['city'])
         d = g.country('200.26.205.1')
         # Some databases have only unaccented countries
         self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))

@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import os
-import warnings
 from unittest import skipUnless
 
 from django.apps import AppConfig, apps
@@ -10,7 +9,7 @@ from django.contrib.admin.models import LogEntry
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import models
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import extend_sys_path
+from django.test.utils import extend_sys_path, isolate_apps
 from django.utils import six
 from django.utils._os import upath
 
@@ -118,7 +117,7 @@ class AppsTests(SimpleTestCase):
         self.assertEqual(app_config.name, 'django.contrib.staticfiles')
 
         with self.assertRaises(LookupError):
-            apps.get_app_config('webdesign')
+            apps.get_app_config('admindocs')
 
         msg = "No installed app with label 'django.contrib.auth'. Did you mean 'myauth'"
         with self.assertRaisesMessage(LookupError, msg):
@@ -132,7 +131,7 @@ class AppsTests(SimpleTestCase):
         self.assertTrue(apps.is_installed('django.contrib.admin'))
         self.assertTrue(apps.is_installed('django.contrib.auth'))
         self.assertTrue(apps.is_installed('django.contrib.staticfiles'))
-        self.assertFalse(apps.is_installed('django.contrib.webdesign'))
+        self.assertFalse(apps.is_installed('django.contrib.admindocs'))
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_model(self):
@@ -232,14 +231,13 @@ class AppsTests(SimpleTestCase):
         body = {}
         body['Meta'] = type(str("Meta"), tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__
-        with warnings.catch_warnings(record=True) as w:
+        msg = (
+            "Model 'apps.southponies' was already registered. "
+            "Reloading models is not advised as it can lead to inconsistencies, "
+            "most notably with related models."
+        )
+        with self.assertRaisesMessage(RuntimeWarning, msg):
             type(str("SouthPonies"), (models.Model,), body)
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[-1].category, RuntimeWarning))
-            self.assertEqual(str(w[-1].message),
-                 "Model 'apps.southponies' was already registered. "
-                 "Reloading models is not advised as it can lead to inconsistencies, "
-                 "most notably with related models.")
 
         # If it doesn't appear to be a reloaded module then we expect
         # a RuntimeError.
@@ -262,7 +260,8 @@ class AppsTests(SimpleTestCase):
         finally:
             apps.apps_ready = True
 
-    def test_lazy_model_operation(self):
+    @isolate_apps('apps', kwarg_name='apps')
+    def test_lazy_model_operation(self, apps):
         """
         Tests apps.lazy_model_operation().
         """
@@ -398,7 +397,7 @@ class NamespacePackageAppTests(SimpleTestCase):
         A Py3.3+ namespace package with multiple locations cannot be an app.
 
         (Because then we wouldn't know where to load its templates, static
-        assets, etc from.)
+        assets, etc. from.)
         """
         # Temporarily add two directories to sys.path that both contain
         # components of the "nsapp" package.

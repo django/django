@@ -319,7 +319,7 @@ class SetupDatabasesTests(unittest.TestCase):
             with mock.patch('django.test.runner.connections', new=tested_connections):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
-            0, autoclobber=False, serialize=True, keepdb=False
+            verbosity=0, autoclobber=False, serialize=True, keepdb=False
         )
 
     def test_serialized_off(self):
@@ -333,7 +333,7 @@ class SetupDatabasesTests(unittest.TestCase):
             with mock.patch('django.test.runner.connections', new=tested_connections):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
-            0, autoclobber=False, serialize=False, keepdb=False
+            verbosity=0, autoclobber=False, serialize=False, keepdb=False
         )
 
 
@@ -352,8 +352,9 @@ class DeprecationDisplayTest(AdminScriptTestCase):
         args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
         self.assertIn("Ran 1 test", force_text(err))
-        six.assertRegex(self, err, r"RemovedInDjango\d+Warning: warning from test")
-        six.assertRegex(self, err, r"RemovedInDjango\d+Warning: module-level warning from deprecation_app")
+        # change "NextVersion" to "RemovedInDjango\d+" in Django 1.11.
+        six.assertRegex(self, err, r"RemovedInNextVersionWarning: warning from test")
+        six.assertRegex(self, err, r"RemovedInNextVersionWarning: module-level warning from deprecation_app")
 
     def test_runner_deprecation_verbosity_zero(self):
         args = ['test', '--settings=test_project.settings', '--verbosity=0', 'test_runner_deprecation_app']

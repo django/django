@@ -165,7 +165,7 @@ and the :setting:`SECRET_KEY` setting.
 
     Finally, the size of a cookie can have an impact on the `speed of your site`_.
 
-.. _`common limit of 4096 bytes`: http://tools.ietf.org/html/rfc2965#section-5.3
+.. _`common limit of 4096 bytes`: https://tools.ietf.org/html/rfc2965#section-5.3
 .. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
 .. _`speed of your site`: http://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 
@@ -225,12 +225,6 @@ You can edit it multiple times.
       cookie. This is used if you want to ensure that the previous session data
       can't be accessed again from the user's browser (for example, the
       :func:`django.contrib.auth.logout()` function calls it).
-
-      .. versionchanged:: 1.8
-
-          Deletion of the session cookie is a behavior new in Django 1.8.
-          Previously, the behavior was to regenerate the session key value that
-          was sent back to the user in the cookie.
 
     .. method:: set_test_cookie()
 
@@ -457,6 +451,9 @@ yourself. Do this after you've verified that the test cookie worked.
 
 Here's a typical usage example::
 
+    from django.http import HttpResponse
+    from django.shortcuts import render
+
     def login(request):
         if request.method == 'POST':
             if request.session.test_cookie_worked():
@@ -465,7 +462,7 @@ Here's a typical usage example::
             else:
                 return HttpResponse("Please enable cookies and try again.")
         request.session.set_test_cookie()
-        return render_to_response('foo/login_form.html')
+        return render(request, 'foo/login_form.html')
 
 Using sessions out of views
 ===========================
@@ -663,7 +660,7 @@ Technical details
 
 * The session dictionary accepts any :mod:`json` serializable value when using
   :class:`~django.contrib.sessions.serializers.JSONSerializer` or any
-  pickleable Python object when using
+  picklable Python object when using
   :class:`~django.contrib.sessions.serializers.PickleSerializer`. See the
   :mod:`pickle` module for more information.
 

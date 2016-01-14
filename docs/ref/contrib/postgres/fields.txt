@@ -120,13 +120,13 @@ data. It uses the SQL operator ``@>``. For example::
     >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
 
     >>> Post.objects.filter(tags__contains=['thoughts'])
-    [<Post: First post>, <Post: Second post>]
+    <QuerySet [<Post: First post>, <Post: Second post>]>
 
     >>> Post.objects.filter(tags__contains=['django'])
-    [<Post: First post>, <Post: Third post>]
+    <QuerySet [<Post: First post>, <Post: Third post>]>
 
     >>> Post.objects.filter(tags__contains=['django', 'thoughts'])
-    [<Post: First post>]
+    <QuerySet [<Post: First post>]>
 
 .. fieldlookup:: arrayfield.contained_by
 
@@ -142,10 +142,10 @@ passed. It uses the SQL operator ``<@``. For example::
     >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
 
     >>> Post.objects.filter(tags__contained_by=['thoughts', 'django'])
-    [<Post: First post>, <Post: Second post>]
+    <QuerySet [<Post: First post>, <Post: Second post>]>
 
     >>> Post.objects.filter(tags__contained_by=['thoughts', 'django', 'tutorial'])
-    [<Post: First post>, <Post: Second post>, <Post: Third post>]
+    <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
 .. fieldlookup:: arrayfield.overlap
 
@@ -160,10 +160,10 @@ the SQL operator ``&&``. For example::
     >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
 
     >>> Post.objects.filter(tags__overlap=['thoughts'])
-    [<Post: First post>, <Post: Second post>]
+    <QuerySet [<Post: First post>, <Post: Second post>]>
 
     >>> Post.objects.filter(tags__overlap=['thoughts', 'tutorial'])
-    [<Post: First post>, <Post: Second post>, <Post: Third post>]
+    <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
 .. fieldlookup:: arrayfield.len
 
@@ -177,7 +177,7 @@ available for :class:`~django.db.models.IntegerField`. For example::
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
 
     >>> Post.objects.filter(tags__len=1)
-    [<Post: Second post>]
+    <QuerySet [<Post: Second post>]>
 
 .. fieldlookup:: arrayfield.index
 
@@ -194,13 +194,13 @@ example::
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
 
     >>> Post.objects.filter(tags__0='thoughts')
-    [<Post: First post>, <Post: Second post>]
+    <QuerySet [<Post: First post>, <Post: Second post>]>
 
     >>> Post.objects.filter(tags__1__iexact='Django')
-    [<Post: First post>]
+    <QuerySet [<Post: First post>]>
 
     >>> Post.objects.filter(tags__276='javascript')
-    []
+    <QuerySet []>
 
 .. note::
 
@@ -222,10 +222,10 @@ lookups available after the transform do not change. For example::
     >>> Post.objects.create(name='Third post', tags=['django', 'python', 'thoughts'])
 
     >>> Post.objects.filter(tags__0_1=['thoughts'])
-    [<Post: First post>]
+    <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__0_2__contains='thoughts')
-    [<Post: First post>, <Post: Second post>]
+    >>> Post.objects.filter(tags__0_2__contains=['thoughts'])
+    <QuerySet [<Post: First post>, <Post: Second post>]>
 
 .. note::
 
@@ -320,12 +320,12 @@ To query based on a given key, you simply use that key as the lookup name::
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie'})
 
     >>> Dog.objects.filter(data__breed='collie')
-    [<Dog: Meg>]
+    <QuerySet [<Dog: Meg>]>
 
 You can chain other lookups after key lookups::
 
     >>> Dog.objects.filter(data__breed__contains='l')
-    [<Dog: Rufus>, <Dog: Meg>]
+    <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
 If the key you wish to query by clashes with the name of another lookup, you
 need to use the :lookup:`hstorefield.contains` lookup instead.
@@ -352,10 +352,10 @@ field. It uses the SQL operator ``@>``. For example::
     >>> Dog.objects.create(name='Fred', data={})
 
     >>> Dog.objects.filter(data__contains={'owner': 'Bob'})
-    [<Dog: Rufus>, <Dog: Meg>]
+    <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
     >>> Dog.objects.filter(data__contains={'breed': 'collie'})
-    [<Dog: Meg>]
+    <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.contained_by
 
@@ -372,10 +372,10 @@ example::
     >>> Dog.objects.create(name='Fred', data={})
 
     >>> Dog.objects.filter(data__contained_by={'breed': 'collie', 'owner': 'Bob'})
-    [<Dog: Meg>, <Dog: Fred>]
+    <QuerySet [<Dog: Meg>, <Dog: Fred>]>
 
     >>> Dog.objects.filter(data__contained_by={'breed': 'collie'})
-    [<Dog: Fred>]
+    <QuerySet [<Dog: Fred>]>
 
 .. fieldlookup:: hstorefield.has_key
 
@@ -389,7 +389,7 @@ Returns objects where the given key is in the data. Uses the SQL operator
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
 
     >>> Dog.objects.filter(data__has_key='owner')
-    [<Dog: Meg>]
+    <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.has_any_keys
 
@@ -406,7 +406,7 @@ operator ``?|``. For example::
     >>> Dog.objects.create(name='Fred', data={})
 
     >>> Dog.objects.filter(data__has_any_keys=['owner', 'breed'])
-    [<Dog: Rufus>, <Dog: Meg>]
+    <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.has_keys
 
@@ -420,7 +420,7 @@ Returns objects where all of the given keys are in the data. Uses the SQL operat
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
 
     >>> Dog.objects.filter(data__has_keys=['breed', 'owner'])
-    [<Dog: Meg>]
+    <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.keys
 
@@ -437,7 +437,7 @@ in conjunction with lookups on
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
 
     >>> Dog.objects.filter(data__keys__overlap=['breed', 'toy'])
-    [<Dog: Rufus>, <Dog: Meg>]
+    <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.values
 
@@ -454,7 +454,7 @@ using in conjunction with lookups on
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
 
     >>> Dog.objects.filter(data__values__contains=['collie'])
-    [<Dog: Meg>]
+    <QuerySet [<Dog: Meg>]>
 
 JSONField
 ---------
@@ -466,6 +466,12 @@ JSONField
     A field for storing JSON encoded data. In Python the data is represented in
     its Python native format: dictionaries, lists, strings, numbers, booleans
     and ``None``.
+
+    If you want to store other data types, you'll need to serialize them first.
+    For example, you might cast a ``datetime`` to a string. You might also want
+    to convert the string back to a ``datetime`` when you retrieve the data
+    from the database. There are some third-party ``JSONField`` implementations
+    which do this sort of thing automatically.
 
     If you give the field a :attr:`~django.db.models.Field.default`, ensure
     it's a callable such as ``dict`` (for an empty default) or a callable that
@@ -483,8 +489,7 @@ JSONField
     of the JSON which allows indexing. The trade-off is a small additional cost
     on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
 
-    **As a result, the usage of this field is only supported on PostgreSQL
-    versions at least 9.4**.
+    **As a result, this field requires PostgreSQL ≥ 9.4 and Psycopg2 ≥ 2.5.4**.
 
 Querying JSONField
 ^^^^^^^^^^^^^^^^^^
@@ -521,18 +526,18 @@ name::
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie'})
 
     >>> Dog.objects.filter(data__breed='collie')
-    [<Dog: Meg>]
+    <QuerySet [<Dog: Meg>]>
 
 Multiple keys can be chained together to form a path lookup::
 
     >>> Dog.objects.filter(data__owner__name='Bob')
-    [<Dog: Rufus>]
+    <QuerySet [<QuerySet <Dog: Rufus>]>
 
 If the key is an integer, it will be interpreted as an index lookup in an
 array::
 
     >>> Dog.objects.filter(data__owner__other_pets__0__name='Fishy')
-    [<Dog: Rufus>]
+    <QuerySet [<Dog: Rufus>]>
 
 If the key you wish to query by clashes with the name of another lookup, use
 the :lookup:`jsonfield.contains` lookup instead.
@@ -673,7 +678,7 @@ contains
 ''''''''
 
     >>> Event.objects.filter(ages__contains=NumericRange(4, 5))
-    [<Event: Soft play>]
+    <QuerySet [<Event: Soft play>]>
 
 .. fieldlookup:: rangefield.contained_by
 
@@ -681,7 +686,7 @@ contained_by
 ''''''''''''
 
     >>> Event.objects.filter(ages__contained_by=NumericRange(0, 15))
-    [<Event: Soft play>]
+    <QuerySet [<Event: Soft play>]>
 
 .. versionadded 1.9
 
@@ -697,7 +702,7 @@ contained_by
     ...     timezone.now() - datetime.timedelta(hours=1),
     ...     timezone.now() + datetime.timedelta(hours=1),
     ... )
-    [<Event: Soft play>]
+    <QuerySet [<Event: Soft play>]>
 
 .. fieldlookup:: rangefield.overlap
 
@@ -705,7 +710,7 @@ overlap
 '''''''
 
     >>> Event.objects.filter(ages__overlap=NumericRange(8, 12))
-    [<Event: Soft play>]
+    <QuerySet [<Event: Soft play>]>
 
 Comparison functions
 ~~~~~~~~~~~~~~~~~~~~
@@ -726,7 +731,7 @@ all the points in the returned range are less than all those in the passed
 range.
 
     >>> Event.objects.filter(ages__fully_lt=NumericRange(11, 15))
-    [<Event: Soft play>]
+    <QuerySet [<Event: Soft play>]>
 
 .. fieldlookup:: rangefield.fully_gt
 
@@ -738,7 +743,7 @@ the all the points in the returned range are greater than all those in the
 passed range.
 
     >>> Event.objects.filter(ages__fully_gt=NumericRange(11, 15))
-    [<Event: Pub trip>]
+    <QuerySet [<Event: Pub trip>]>
 
 .. fieldlookup:: rangefield.not_lt
 
@@ -750,7 +755,7 @@ is the lower bound of the returned range is at least the lower bound of the
 passed range.
 
     >>> Event.objects.filter(ages__not_lt=NumericRange(0, 15))
-    [<Event: Soft play>, <Event: Pub trip>]
+    <QuerySet [<Event: Soft play>, <Event: Pub trip>]>
 
 .. fieldlookup:: rangefield.not_gt
 
@@ -762,7 +767,7 @@ is the upper bound of the returned range is at most the upper bound of the
 passed range.
 
     >>> Event.objects.filter(ages__not_gt=NumericRange(3, 10))
-    [<Event: Soft play>]
+    <QuerySet [<Event: Soft play>]>
 
 .. fieldlookup:: rangefield.adjacent_to
 
@@ -772,7 +777,7 @@ adjacent_to
 The returned ranges share a bound with the passed range.
 
     >>> Event.objects.filter(ages__adjacent_to=NumericRange(10, 21))
-    [<Event: Soft play>, <Event: Pub trip>]
+    <QuerySet [<Event: Soft play>, <Event: Pub trip>]>
 
 Querying using the bounds
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -789,7 +794,7 @@ Returned objects have the given lower bound. Can be chained to valid lookups
 for the base field.
 
     >>> Event.objects.filter(ages__startswith=21)
-    [<Event: Pub trip>]
+    <QuerySet [<Event: Pub trip>]>
 
 .. fieldlookup:: rangefield.endswith
 
@@ -800,7 +805,7 @@ Returned objects have the given upper bound. Can be chained to valid lookups
 for the base field.
 
     >>> Event.objects.filter(ages__endswith=10)
-    [<Event: Soft play>]
+    <QuerySet [<Event: Soft play>]>
 
 .. fieldlookup:: rangefield.isempty
 
@@ -811,7 +816,7 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.
 
     >>> Event.objects.filter(ages__isempty=True)
-    []
+    <QuerySet []>
 
 Defining your own range types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

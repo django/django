@@ -37,6 +37,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_rollback_ddl = True
     supports_paramstyle_pyformat = False
     supports_sequence_reset = False
+    can_clone_databases = True
 
     @cached_property
     def uses_savepoints(self):

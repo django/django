@@ -1,19 +1,17 @@
 import errno
 import os
-import warnings
 from datetime import datetime
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import File, locks
 from django.core.files.move import file_move_safe
+from django.core.signals import setting_changed
 from django.utils._os import abspathu, safe_join
 from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import filepath_to_uri, force_text
-from django.utils.functional import LazyObject
-from django.utils.inspect import func_supports_parameter
+from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
@@ -49,17 +47,7 @@ class Storage(object):
         if not hasattr(content, 'chunks'):
             content = File(content)
 
-        if func_supports_parameter(self.get_available_name, 'max_length'):
-            name = self.get_available_name(name, max_length=max_length)
-        else:
-            warnings.warn(
-                'Backwards compatibility for storage backends without '
-                'support for the `max_length` argument in '
-                'Storage.get_available_name() will be removed in Django 1.10.',
-                RemovedInDjango110Warning, stacklevel=2
-            )
-            name = self.get_available_name(name)
-
+        name = self.get_available_name(name, max_length=max_length)
         name = self._save(name, content)
 
         # Store filenames with forward slashes, even on Windows
@@ -178,24 +166,49 @@ class FileSystemStorage(Storage):
     """
 
     def __init__(self, location=None, base_url=None, file_permissions_mode=None,
-            directory_permissions_mode=None):
-        if location is None:
-            location = settings.MEDIA_ROOT
-        self.base_location = location
-        self.location = abspathu(self.base_location)
-        if base_url is None:
-            base_url = settings.MEDIA_URL
-        elif not base_url.endswith('/'):
+                 directory_permissions_mode=None):
+        self._location = location
+        if base_url is not None and not base_url.endswith('/'):
             base_url += '/'
-        self.base_url = base_url
-        self.file_permissions_mode = (
-            file_permissions_mode if file_permissions_mode is not None
-            else settings.FILE_UPLOAD_PERMISSIONS
-        )
-        self.directory_permissions_mode = (
-            directory_permissions_mode if directory_permissions_mode is not None
-            else settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS
-        )
+        self._base_url = base_url
+        self._file_permissions_mode = file_permissions_mode
+        self._directory_permissions_mode = directory_permissions_mode
+        setting_changed.connect(self._clear_cached_properties)
+
+    def _clear_cached_properties(self, setting, **kwargs):
+        """Reset setting based property values."""
+        if setting == 'MEDIA_ROOT':
+            self.__dict__.pop('base_location', None)
+            self.__dict__.pop('location', None)
+        elif setting == 'MEDIA_URL':
+            self.__dict__.pop('base_url', None)
+        elif setting == 'FILE_UPLOAD_PERMISSIONS':
+            self.__dict__.pop('file_permissions_mode', None)
+        elif setting == 'FILE_UPLOAD_DIRECTORY_PERMISSIONS':
+            self.__dict__.pop('directory_permissions_mode', None)
+
+    def _value_or_setting(self, value, setting):
+        return setting if value is None else value
+
+    @cached_property
+    def base_location(self):
+        return self._value_or_setting(self._location, settings.MEDIA_ROOT)
+
+    @cached_property
+    def location(self):
+        return abspathu(self.base_location)
+
+    @cached_property
+    def base_url(self):
+        return self._value_or_setting(self._base_url, settings.MEDIA_URL)
+
+    @cached_property
+    def file_permissions_mode(self):
+        return self._value_or_setting(self._file_permissions_mode, settings.FILE_UPLOAD_PERMISSIONS)
+
+    @cached_property
+    def directory_permissions_mode(self):
+        return self._value_or_setting(self._directory_permissions_mode, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS)
 
     def _open(self, name, mode='rb'):
         return File(open(self.path(name), mode))

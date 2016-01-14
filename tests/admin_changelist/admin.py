@@ -22,6 +22,9 @@ class EventAdmin(admin.ModelAdmin):
     def event_date_func(self, event):
         return event.date
 
+    def has_add_permission(self, request):
+        return False
+
 site.register(Event, EventAdmin)
 
 
@@ -36,7 +39,7 @@ class ChildAdmin(admin.ModelAdmin):
     list_filter = ['parent', 'age']
 
     def get_queryset(self, request):
-        return super(ChildAdmin, self).get_queryset(request).select_related("parent__name")
+        return super(ChildAdmin, self).get_queryset(request).select_related("parent")
 
 
 class CustomPaginationAdmin(ChildAdmin):

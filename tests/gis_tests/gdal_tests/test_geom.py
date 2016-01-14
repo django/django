@@ -320,6 +320,11 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
                     self.assertEqual('WGS 72', ring.srs.name)
                     self.assertEqual(4322, ring.srid)
 
+            # srs/srid may be assigned their own values, even when srs is None.
+            mpoly = OGRGeometry(mp.wkt, srs=None)
+            mpoly.srs = mpoly.srs
+            mpoly.srid = mpoly.srid
+
     def test_srs_transform(self):
         "Testing transform()."
         orig = OGRGeometry('POINT (-104.609 38.255)', 4326)
@@ -484,7 +489,49 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(3, geom[0].coord_dim)
         self.assertEqual(wkt_3d, geom.wkt)
 
+    # Testing binary predicates, `assertIs` is used to check that bool is returned.
+
     def test_equivalence_regression(self):
         "Testing equivalence methods with non-OGRGeometry instances."
         self.assertIsNotNone(OGRGeometry('POINT(0 0)'))
         self.assertNotEqual(OGRGeometry('LINESTRING(0 0, 1 1)'), 3)
+
+    def test_contains(self):
+        self.assertIs(OGRGeometry('POINT(0 0)').contains(OGRGeometry('POINT(0 0)')), True)
+        self.assertIs(OGRGeometry('POINT(0 0)').contains(OGRGeometry('POINT(0 1)')), False)
+
+    def test_crosses(self):
+        self.assertIs(OGRGeometry('LINESTRING(0 0, 1 1)').crosses(OGRGeometry('LINESTRING(0 1, 1 0)')), True)
+        self.assertIs(OGRGeometry('LINESTRING(0 0, 0 1)').crosses(OGRGeometry('LINESTRING(1 0, 1 1)')), False)
+
+    def test_disjoint(self):
+        self.assertIs(OGRGeometry('LINESTRING(0 0, 1 1)').disjoint(OGRGeometry('LINESTRING(0 1, 1 0)')), False)
+        self.assertIs(OGRGeometry('LINESTRING(0 0, 0 1)').disjoint(OGRGeometry('LINESTRING(1 0, 1 1)')), True)
+
+    def test_equals(self):
+        self.assertIs(OGRGeometry('POINT(0 0)').contains(OGRGeometry('POINT(0 0)')), True)
+        self.assertIs(OGRGeometry('POINT(0 0)').contains(OGRGeometry('POINT(0 1)')), False)
+
+    def test_intersects(self):
+        self.assertIs(OGRGeometry('LINESTRING(0 0, 1 1)').intersects(OGRGeometry('LINESTRING(0 1, 1 0)')), True)
+        self.assertIs(OGRGeometry('LINESTRING(0 0, 0 1)').intersects(OGRGeometry('LINESTRING(1 0, 1 1)')), False)
+
+    def test_overlaps(self):
+        self.assertIs(
+            OGRGeometry('POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))').overlaps(
+                OGRGeometry('POLYGON ((1 1, 1 5, 5 5, 5 1, 1 1))')
+            ), True
+        )
+        self.assertIs(OGRGeometry('POINT(0 0)').overlaps(OGRGeometry('POINT(0 1)')), False)
+
+    def test_touches(self):
+        self.assertIs(
+            OGRGeometry('POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))').touches(OGRGeometry('LINESTRING(0 2, 2 0)')), True
+        )
+        self.assertIs(OGRGeometry('POINT(0 0)').touches(OGRGeometry('POINT(0 1)')), False)
+
+    def test_within(self):
+        self.assertIs(
+            OGRGeometry('POINT(0.5 0.5)').within(OGRGeometry('POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))')), True
+        )
+        self.assertIs(OGRGeometry('POINT(0 0)').within(OGRGeometry('POINT(0 1)')), False)

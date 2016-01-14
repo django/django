@@ -114,8 +114,6 @@ described here.
     Django version N+1. Pickles should not be used as part of a long-term
     archival strategy.
 
-    .. versionadded:: 1.8
-
     Since pickle compatibility errors can be difficult to diagnose, such as
     silently corrupted objects, a ``RuntimeWarning`` is raised when you try to
     unpickle a queryset in a Django version that is different than the one in
@@ -227,14 +225,8 @@ annotate
 Annotates each object in the ``QuerySet`` with the provided list of :doc:`query
 expressions </ref/models/expressions>`. An expression may be a simple value, a
 reference to a field on the model (or any related models), or an aggregate
-expression (averages, sums, etc) that has been computed over the objects that
+expression (averages, sums, etc.) that has been computed over the objects that
 are related to the objects in the ``QuerySet``.
-
-.. versionadded:: 1.8
-
-    Previous versions of Django only allowed aggregate functions to be used as
-    annotations. It is now possible to annotate a model with all kinds of
-    expressions.
 
 Each argument to ``annotate()`` is an annotation that will be added
 to each object in the ``QuerySet`` that is returned.
@@ -334,10 +326,6 @@ calling ``asc()`` or ``desc()`` on the expression::
 
     Entry.objects.order_by(Coalesce('summary', 'headline').desc())
 
-.. versionadded:: 1.8
-
-    Ordering by query expressions was added.
-
 Be cautious when ordering by fields in related models if you are also using
 :meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
 related model ordering can change the expected results.
@@ -380,10 +368,6 @@ You can order by a field converted to lowercase with
 ordering::
 
     Entry.objects.order_by(Lower('headline').desc())
-
-.. versionadded:: 1.8
-
-    The ability to order by expressions like ``Lower`` was added.
 
 If you don't want any ordering to be applied to a query, not even the default
 ordering, call :meth:`order_by()` with no parameters.
@@ -529,11 +513,11 @@ objects::
 
     # This list contains a Blog object.
     >>> Blog.objects.filter(name__startswith='Beatles')
-    [<Blog: Beatles Blog>]
+    <QuerySet [<Blog: Beatles Blog>]>
 
     # This list contains a dictionary.
     >>> Blog.objects.filter(name__startswith='Beatles').values()
-    [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]
+    <QuerySet [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]>
 
 The ``values()`` method takes optional positional arguments, ``*fields``, which
 specify field names to which the ``SELECT`` should be limited. If you specify
@@ -544,9 +528,9 @@ contain a key and value for every field in the database table.
 Example::
 
     >>> Blog.objects.values()
-    [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}],
+    <QuerySet [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]>
     >>> Blog.objects.values('id', 'name')
-    [{'id': 1, 'name': 'Beatles Blog'}]
+    <QuerySet [{'id': 1, 'name': 'Beatles Blog'}]>
 
 A few subtleties that are worth mentioning:
 
@@ -562,13 +546,13 @@ A few subtleties that are worth mentioning:
   For example::
 
     >>> Entry.objects.values()
-    [{'blog_id': 1, 'headline': 'First Entry', ...}, ...]
+    <QuerySet [{'blog_id': 1, 'headline': 'First Entry', ...}, ...]>
 
     >>> Entry.objects.values('blog')
-    [{'blog': 1}, ...]
+    <QuerySet [{'blog': 1}, ...]>
 
     >>> Entry.objects.values('blog_id')
-    [{'blog_id': 1}, ...]
+    <QuerySet [{'blog_id': 1}, ...]>
 
 * When using ``values()`` together with :meth:`distinct()`, be aware that
   ordering can affect the results. See the note in :meth:`distinct` for
@@ -601,9 +585,9 @@ individualism.
 You can also refer to fields on related models with reverse relations through
 ``OneToOneField``, ``ForeignKey`` and ``ManyToManyField`` attributes::
 
-    Blog.objects.values('name', 'entry__headline')
-    [{'name': 'My blog', 'entry__headline': 'An entry'},
-         {'name': 'My blog', 'entry__headline': 'Another entry'}, ...]
+    >>> Blog.objects.values('name', 'entry__headline')
+    <QuerySet [{'name': 'My blog', 'entry__headline': 'An entry'},
+         {'name': 'My blog', 'entry__headline': 'Another entry'}, ...]>
 
 .. warning::
 
@@ -641,14 +625,20 @@ It is an error to pass in ``flat`` when there is more than one field.
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
 
+A common need is to get a specific field value of a certain model instance. To
+achieve that, use ``values_list()`` followed by a ``get()`` call::
+
+    >>> Entry.objects.values_list('headline', flat=True).get(pk=1)
+    'First entry'
+
 dates
 ~~~~~
 
 .. method:: dates(field, kind, order='ASC')
 
-Returns a ``DateQuerySet`` — a ``QuerySet`` that evaluates to a list of
-:class:`datetime.date` objects representing all available dates of a
-particular kind within the contents of the ``QuerySet``.
+Returns a ``QuerySet`` that evaluates to a list of :class:`datetime.date`
+objects representing all available dates of a particular kind within the
+contents of the ``QuerySet``.
 
 ``field`` should be the name of a ``DateField`` of your model.
 ``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
@@ -718,8 +708,8 @@ object. If it's ``None``, Django uses the :ref:`current time zone
 
     .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: http://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
-    .. _Choosing a Time Zone File: http://docs.oracle.com/cd/B19306_01/server.102/b14225/ch4datetime.htm#i1006667
-    .. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
+    .. _Choosing a Time Zone File: https://docs.oracle.com/cd/E11882_01/server.112/e10729/ch4datetime.htm#NLSPG258
+    .. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 none
 ~~~~
@@ -733,7 +723,7 @@ is an instance of ``EmptyQuerySet``.
 Examples::
 
     >>> Entry.objects.none()
-    []
+    <QuerySet []>
     >>> from django.db.models.query import EmptyQuerySet
     >>> isinstance(Entry.objects.none(), EmptyQuerySet)
     True
@@ -884,7 +874,10 @@ many-to-many and many-to-one objects, which cannot be done using
 ``select_related``, in addition to the foreign key and one-to-one relationships
 that are supported by ``select_related``. It also supports prefetching of
 :class:`~django.contrib.contenttypes.fields.GenericRelation` and
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey`.
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey`, however, it
+must be restricted to a homogeneous set of results. For example, prefetching
+objects referenced by a ``GenericForeignKey`` is only supported if the query
+is restricted to one ``ContentType``.
 
 For example, suppose you have these models::
 
@@ -1223,10 +1216,6 @@ of the arguments is required, but you should use at least one of them.
 
   If you need to use a literal ``%s`` inside your select string, use
   the sequence ``%%s``.
-
-  .. versionchanged:: 1.8
-
-      Prior to 1.8, you were unable to escape a literal ``%s``.
 
 * ``where`` / ``tables``
 
@@ -1847,10 +1836,11 @@ database query like ``count()`` would.
 in_bulk
 ~~~~~~~
 
-.. method:: in_bulk(id_list)
+.. method:: in_bulk(id_list=None)
 
 Takes a list of primary-key values and returns a dictionary mapping each
-primary-key value to an instance of the object with the given ID.
+primary-key value to an instance of the object with the given ID. If a list
+isn't provided, all objects in the queryset are returned.
 
 Example::
 
@@ -1860,8 +1850,14 @@ Example::
     {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>}
     >>> Blog.objects.in_bulk([])
     {}
+    >>> Blog.objects.in_bulk()
+    {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Django Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
+
+.. versionchanged:: 1.10
+
+    In older versions, ``id_list`` was a required argument.
 
 iterator
 ~~~~~~~~
@@ -1958,7 +1954,7 @@ aggregate
 
 .. method:: aggregate(*args, **kwargs)
 
-Returns a dictionary of aggregate values (averages, sums, etc) calculated over
+Returns a dictionary of aggregate values (averages, sums, etc.) calculated over
 the ``QuerySet``. Each argument to ``aggregate()`` specifies a value that will
 be included in the dictionary that is returned.
 
@@ -2188,7 +2184,7 @@ specified as keyword arguments to the ``QuerySet`` methods :meth:`filter()`,
 For an introduction, see :ref:`models and database queries documentation
 <field-lookups-intro>`.
 
-Django's inbuilt lookups are listed below. It is also possible to write
+Django's built-in lookups are listed below. It is also possible to write
 :doc:`custom lookups </howto/custom-lookups>` for model fields.
 
 As a convenience when no lookup type is provided (like in
@@ -2780,7 +2776,7 @@ Note this is only available in MySQL and requires direct manipulation of the
 database to add the full-text index. By default Django uses BOOLEAN MODE for
 full text searches. See the `MySQL documentation`_ for additional details.
 
-.. _MySQL documentation: http://dev.mysql.com/doc/refman/5.6/en/fulltext-boolean.html
+.. _MySQL documentation: https://dev.mysql.com/doc/refman/5.6/en/fulltext-boolean.html
 
 .. fieldlookup:: regex
 
@@ -2802,7 +2798,7 @@ SQL equivalents::
 
     SELECT ... WHERE title REGEXP BINARY '^(An?|The) +'; -- MySQL
 
-    SELECT ... WHERE REGEXP_LIKE(title, '^(an?|the) +', 'c'); -- Oracle
+    SELECT ... WHERE REGEXP_LIKE(title, '^(An?|The) +', 'c'); -- Oracle
 
     SELECT ... WHERE title ~ '^(An?|The) +'; -- PostgreSQL
 
@@ -2868,20 +2864,11 @@ All aggregates have the following parameters in common:
 A string that references a field on the model, or a :doc:`query expression
 </ref/models/expressions>`.
 
-.. versionadded:: 1.8
-
-    Aggregate functions are now able to reference multiple fields in complex
-    computations.
-
 ``output_field``
 ~~~~~~~~~~~~~~~~
 
 An optional argument that represents the :doc:`model field </ref/models/fields>`
 of the return value
-
-.. versionadded:: 1.8
-
-    The ``output_field`` argument was added.
 
 .. note::
 
@@ -3009,7 +2996,7 @@ Variance
         documentation`_ for instructions on obtaining and installing this
         extension.
 
-.. _SQLite documentation: http://www.sqlite.org/contrib
+.. _SQLite documentation: https://www.sqlite.org/contrib
 
 Query-related classes
 =====================
@@ -3044,11 +3031,11 @@ as the string based lookups passed to
 :meth:`~django.db.models.query.QuerySet.prefetch_related()`. For example:
 
     >>> Question.objects.prefetch_related(Prefetch('choice_set')).get().choice_set.all()
-    [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
+    <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
     # This will only execute two queries regardless of the number of Question
     # and Choice objects.
     >>> Question.objects.prefetch_related(Prefetch('choice_set')).all()
-    [<Question: Question object>]
+    <QuerySet [<Question: Question object>]>
 
 The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.
 This is useful to further filter down the prefetch operation, or to call
@@ -3057,19 +3044,19 @@ relation, hence reducing the number of queries even further:
 
     >>> voted_choices = Choice.objects.filter(votes__gt=0)
     >>> voted_choices
-    [<Choice: The sky>]
+    <QuerySet [<Choice: The sky>]>
     >>> prefetch = Prefetch('choice_set', queryset=voted_choices)
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
-    [<Choice: The sky>]
+    <QuerySet [<Choice: The sky>]>
 
 The ``to_attr`` argument sets the result of the prefetch operation to a custom
 attribute:
 
     >>> prefetch = Prefetch('choice_set', queryset=voted_choices, to_attr='voted_choices')
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
-    [<Choice: The sky>]
+    <QuerySet [<Choice: The sky>]>
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
-    [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
+    <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 
 .. note::
 

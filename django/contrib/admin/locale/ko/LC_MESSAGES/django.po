@@ -1,18 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ian Y. Choi <ianyrchoi@gmail.com>, 2015
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeong Seongtae <magno79@gmail.com>, 2014
+# Taesik Yoon <xotlr43@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
-"ko/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-12-02 17:26+0000\n"
+"Last-Translator: Ian Y. Choi <ianyrchoi@gmail.com>\n"
+"Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -78,6 +79,12 @@ msgstr "액션:"
 msgid "action time"
 msgstr "액션 타임"
 
+msgid "user"
+msgstr "사용자"
+
+msgid "content type"
+msgstr "콘텐츠 타입"
+
 msgid "object id"
 msgstr "오브젝트 아이디"
 
@@ -116,7 +123,10 @@ msgstr "없음"
 
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
+msgstr "하나 이상을 선택하려면 \"Control\" 키, Mac은 \"Command\"키를 누르세요."
+
+msgid "Added."
+msgstr "추가하였습니다."
 
 #, python-format
 msgid "Changed %s."
@@ -319,7 +329,7 @@ msgid "Welcome,"
 msgstr "환영합니다,"
 
 msgid "View site"
-msgstr ""
+msgstr "사이트 보기"
 
 msgid "Documentation"
 msgstr "문서"
@@ -383,13 +393,13 @@ msgstr ""
 "관련 항목들이 모두 삭제됩니다. :"
 
 msgid "Objects"
-msgstr ""
+msgstr "오브젝트"
 
 msgid "Yes, I'm sure"
 msgstr "네, 확실합니다."
 
 msgid "No, take me back"
-msgstr ""
+msgstr "아뇨, 돌려주세요."
 
 msgid "Delete multiple objects"
 msgstr "여러 개의 오브젝트 삭제"
@@ -437,7 +447,7 @@ msgid " By %(filter_title)s "
 msgstr "%(filter_title)s (으)로"
 
 msgid "Summary"
-msgstr ""
+msgstr "개요"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -466,6 +476,14 @@ msgstr ""
 "데이터베이스 설정에 문제가 발생했습니다. 해당 데이터베이스 테이블이 생성되었"
 "는지, 해당 유저가 데이터베이스를 읽어 들일 수 있는지 확인하세요."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"%(username)s 로 인증되어 있지만, 이 페이지를 액세스하기 위한 권한이 없습니"
+"다. 다른 계정으로 로그인하시겠습니까?"
+
 msgid "Forgotten your password or username?"
 msgstr "이름이나 비밀번호를 분실하였습니까?"
 
@@ -491,17 +509,20 @@ msgstr "모두 표시"
 msgid "Save"
 msgstr "저장"
 
+msgid "Popup closing..."
+msgstr "팝업 닫는 중..."
+
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "선택된 %(model)s 변경"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "%(model)s 추가"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "선택된 %(model)s 제거"
 
 msgid "Search"
 msgstr "검색"
@@ -579,6 +600,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"계정에 등록된 이메일로 비밀번호를 지정하기 위한 지침을 보냈습니다. 곧 메일을 "
+"받으실 것입니다."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -621,9 +644,6 @@ msgstr "비밀번호 초기화"
 
 msgid "All dates"
 msgstr "언제나"
-
-msgid "(None)"
-msgstr "(없음)"
 
 #, python-format
 msgid "Select %s"

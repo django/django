@@ -208,7 +208,7 @@ rather than creating directories.
     What's the difference between a project and an app? An app is a Web
     application that does something -- e.g., a Weblog system, a database of
     public records or a simple poll app. A project is a collection of
-    configuration and apps for a particular Web site. A project can contain
+    configuration and apps for a particular website. A project can contain
     multiple apps. An app can be in multiple projects.
 
 Your apps can live anywhere on your `Python path`_. In this tutorial, we'll
@@ -227,6 +227,7 @@ That'll create a directory :file:`polls`, which is laid out like this::
     polls/
         __init__.py
         admin.py
+        apps.py
         migrations/
             __init__.py
         models.py
@@ -261,6 +262,7 @@ Your app directory should now look like::
     polls/
         __init__.py
         admin.py
+        apps.py
         migrations/
             __init__.py
         models.py
@@ -282,8 +284,8 @@ In the ``polls/urls.py`` file include the following code:
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py`` insert an :func:`~django.conf.urls.include`, leaving you
-with:
+``mysite/urls.py``, add an import for ``django.conf.urls.include`` and insert
+an :func:`~django.conf.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. snippet::
     :filename: mysite/urls.py
@@ -295,6 +297,11 @@ with:
         url(r'^polls/', include('polls.urls')),
         url(r'^admin/', admin.site.urls),
     ]
+
+.. admonition:: When to use :func:`~django.conf.urls.include()`
+
+    You should always use ``include()`` when you include other URL patterns.
+    ``admin.site.urls`` is the only exception to this.
 
 .. admonition:: Doesn't match what you see?
 
@@ -329,8 +336,8 @@ finds one that matches.
 
 Note that these regular expressions do not search GET and POST parameters, or
 the domain name. For example, in a request to
-``http://www.example.com/myapp/``, the URLconf will look for ``myapp/``. In a
-request to ``http://www.example.com/myapp/?page=3``, the URLconf will also
+``https://www.example.com/myapp/``, the URLconf will look for ``myapp/``. In a
+request to ``https://www.example.com/myapp/?page=3``, the URLconf will also
 look for ``myapp/``.
 
 If you need help with regular expressions, see `Wikipedia's entry`_ and the

@@ -47,16 +47,9 @@ class Command(BaseCommand):
             action='store', dest='liveserver', default=None,
             help='Overrides the default address where the live server (used '
                  'with LiveServerTestCase) is expected to run from. The '
-                 'default value is localhost:8081.'),
+                 'default value is localhost:8081-8179.'),
 
         test_runner_class = get_runner(settings, self.test_runner)
-        if hasattr(test_runner_class, 'option_list'):
-            # Keeping compatibility with both optparse and argparse at this level
-            # would be too heavy for a non-critical item
-            raise RuntimeError(
-                "The method to extend accepted command-line arguments by the "
-                "test management command has changed in Django 1.8. Please "
-                "create an add_arguments class method to achieve this.")
 
         if hasattr(test_runner_class, 'add_arguments'):
             test_runner_class.add_arguments(parser)

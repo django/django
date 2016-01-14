@@ -16,6 +16,7 @@ from django.core.serializers.python import (
     Deserializer as PythonDeserializer, Serializer as PythonSerializer,
 )
 from django.utils import six
+from django.utils.functional import Promise
 from django.utils.timezone import is_aware
 
 
@@ -111,6 +112,8 @@ class DjangoJSONEncoder(json.JSONEncoder):
             return str(o)
         elif isinstance(o, uuid.UUID):
             return str(o)
+        elif isinstance(o, Promise):
+            return six.text_type(o)
         else:
             return super(DjangoJSONEncoder, self).default(o)
 

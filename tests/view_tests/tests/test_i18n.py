@@ -8,11 +8,11 @@ import unittest
 from os import path
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, modify_settings,
     override_settings,
 )
+from django.urls import reverse
 from django.utils import six
 from django.utils._os import upath
 from django.utils.module_loading import import_string
@@ -208,7 +208,6 @@ class JsI18NTests(SimpleTestCase):
         """
         with self.settings(LANGUAGE_CODE='en-us'), override('fr'):
             response = self.client.get('/jsi18n/app5/')
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'emoji')
             self.assertContains(response, '\\ud83d\\udca9')
 
@@ -278,6 +277,7 @@ class JavascriptI18nTests(LiveServerTestCase):
         except Exception as e:
             raise unittest.SkipTest('Selenium webdriver "%s" not installed or '
                                     'not operational: %s' % (cls.webdriver_class, str(e)))
+        cls.selenium.implicitly_wait(10)
         super(JavascriptI18nTests, cls).setUpClass()
 
     @classmethod

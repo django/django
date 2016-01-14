@@ -200,8 +200,7 @@ Django provides a single API to control database transactions.
     the error handling described above.
 
     You may use ``atomic`` when autocommit is turned off. It will only use
-    savepoints, even for the outermost block, and it will raise an exception
-    if the outermost block is declared with ``savepoint=False``.
+    savepoints, even for the outermost block.
 
 .. admonition:: Performance considerations
 
@@ -588,7 +587,7 @@ function in autocommit mode: statements will be executed and committed as soon
 as they're called. If your MySQL setup *does* support transactions, Django
 will handle transactions as explained in this document.
 
-.. _information on MySQL transactions: http://dev.mysql.com/doc/refman/5.6/en/sql-syntax-transactions.html
+.. _information on MySQL transactions: https://dev.mysql.com/doc/refman/5.6/en/sql-syntax-transactions.html
 
 Handling exceptions within PostgreSQL transactions
 --------------------------------------------------
@@ -602,7 +601,7 @@ Handling exceptions within PostgreSQL transactions
 Inside a transaction, when a call to a PostgreSQL cursor raises an exception
 (typically ``IntegrityError``), all subsequent SQL in the same transaction
 will fail with the error "current transaction is aborted, queries ignored
-until end of transaction block". Whilst simple use of ``save()`` is unlikely
+until end of transaction block". While simple use of ``save()`` is unlikely
 to raise an exception in PostgreSQL, there are more advanced usage patterns
 which might, such as saving objects with unique fields, saving using the
 force_insert/force_update flag, or invoking custom SQL.

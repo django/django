@@ -19,7 +19,7 @@ from .models import (
 class ModelInheritanceTests(TestCase):
     def test_abstract(self):
         # The Student and Worker models both have 'name' and 'age' fields on
-        # them and inherit the __unicode__() method, just as with normal Python
+        # them and inherit the __str__() method, just as with normal Python
         # subclassing. This is useful if you want to factor out common
         # information for programming purposes, but still completely
         # independent separate models at the database level.
@@ -234,9 +234,9 @@ class ModelInheritanceDataTests(TestCase):
     def test_related_objects_for_inherited_models(self):
         # Related objects work just as they normally do.
         s1 = Supplier.objects.create(name="Joe's Chickens", address="123 Sesame St")
-        s1.customers = [self.restaurant, self.italian_restaurant]
+        s1.customers .set([self.restaurant, self.italian_restaurant])
         s2 = Supplier.objects.create(name="Luigi's Pasta", address="456 Sesame St")
-        s2.customers = [self.italian_restaurant]
+        s2.customers.set([self.italian_restaurant])
 
         # This won't work because the Place we select is not a Restaurant (it's
         # a Supplier).

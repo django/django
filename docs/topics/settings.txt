@@ -277,13 +277,15 @@ After you've either set :envvar:`DJANGO_SETTINGS_MODULE` or called
 ``configure()``, you'll need to call :func:`django.setup()` to load your
 settings and populate Django's application registry. For example::
 
+    import django
     from django.conf import settings
     from myapp import myapp_defaults
 
     settings.configure(default_settings=myapp_defaults, DEBUG=True)
     django.setup()
 
-    # Now this script can use any part of Django it needs.
+    # Now this script or any imported module can use any part of Django it needs.
+    from myapp import models
 
 Note that calling ``django.setup()`` is only necessary if your code is truly
 standalone. When invoked by your Web server, or through :doc:`django-admin

@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 import os
+import shutil
 import sys
+import tempfile
 import unittest
 
 from django.conf import settings
@@ -18,7 +20,7 @@ from django.utils.encoding import force_text
 from .cases import (
     BaseCollectionTestCase, BaseStaticFilesTestCase, StaticFilesTestCase,
 )
-from .settings import TEST_ROOT, TEST_SETTINGS, TESTFILES_PATH
+from .settings import TEST_ROOT, TEST_SETTINGS
 
 
 def hashed_file_path(test, path):
@@ -83,11 +85,12 @@ class TestHashedFiles(object):
 
     def test_path_with_querystring_and_fragment(self):
         relpath = self.hashed_file_path("cached/css/fragments.css")
-        self.assertEqual(relpath, "cached/css/fragments.75433540b096.css")
+        self.assertEqual(relpath, "cached/css/fragments.ef92012a8c16.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b'fonts/font.a4b0478549d0.eot?#iefix', content)
             self.assertIn(b'fonts/font.b8d603e42714.svg#webfontIyfZbseF', content)
+            self.assertIn(b'fonts/font.b8d603e42714.svg#../path/to/fonts/font.svg', content)
             self.assertIn(b'data:font/woff;charset=utf-8;base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA', content)
             self.assertIn(b'#default#VML', content)
 
@@ -252,14 +255,24 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
     def setUp(self):
         super(TestCollectionManifestStorage, self).setUp()
 
-        self._clear_filename = os.path.join(TESTFILES_PATH, 'cleared.txt')
+        temp_dir = tempfile.mkdtemp()
+        os.makedirs(os.path.join(temp_dir, 'test'))
+        self._clear_filename = os.path.join(temp_dir, 'test', 'cleared.txt')
         with open(self._clear_filename, 'w') as f:
             f.write('to be deleted in one test')
 
+        self.patched_settings = self.settings(
+            STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir])
+        self.patched_settings.enable()
+        self.addCleanup(shutil.rmtree, six.text_type(temp_dir))
+
     def tearDown(self):
-        super(TestCollectionManifestStorage, self).tearDown()
+        self.patched_settings.disable()
+
         if os.path.exists(self._clear_filename):
             os.unlink(self._clear_filename)
+
+        super(TestCollectionManifestStorage, self).tearDown()
 
     def test_manifest_exists(self):
         filename = storage.staticfiles_storage.manifest_name

@@ -239,7 +239,10 @@ class TestFixtures(TestCase):
             )
             warning = warning_list.pop()
             self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(str(warning.message), "No fixture data found for 'bad_fixture2'. (File format may be invalid.)")
+            self.assertEqual(
+                str(warning.message),
+                "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
+            )
 
     def test_invalid_data_no_ext(self):
         """
@@ -256,7 +259,10 @@ class TestFixtures(TestCase):
             )
             warning = warning_list.pop()
             self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(str(warning.message), "No fixture data found for 'bad_fixture2'. (File format may be invalid.)")
+            self.assertEqual(
+                str(warning.message),
+                "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
+            )
 
     def test_empty(self):
         """
@@ -272,7 +278,8 @@ class TestFixtures(TestCase):
             )
             warning = warning_list.pop()
             self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(str(warning.message), "No fixture data found for 'empty'. (File format may be invalid.)")
+            self.assertEqual(str(warning.message),
+            "No fixture data found for 'empty'. (File format may be invalid.)")
 
     def test_error_message(self):
         """
@@ -289,7 +296,10 @@ class TestFixtures(TestCase):
             )
             warning = warning_list.pop()
             self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(str(warning.message), "No fixture data found for 'bad_fixture2'. (File format may be invalid.)")
+            self.assertEqual(
+                str(warning.message),
+                "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
+            )
 
     def test_pg_sequence_resetting_checks(self):
         """
@@ -394,9 +404,18 @@ class TestFixtures(TestCase):
         data = re.sub('0{6,}[0-9]', '', data)
 
         animals_data = sorted([
-            {"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}},
-            {"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}},
-            {"pk": animal.pk, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.2, "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}},
+            {
+                "pk": 1, "model": "fixtures_regress.animal",
+                "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}
+            },
+            {
+                "pk": 10, "model": "fixtures_regress.animal",
+                "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}
+            },
+            {
+                "pk": animal.pk, "model": "fixtures_regress.animal",
+                "fields": {"count": 2, "weight": 2.2, "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}
+            },
         ], key=lambda x: x["pk"])
 
         data = sorted(json.loads(data), key=lambda x: x["pk"])
@@ -636,7 +655,13 @@ class NaturalKeyFixtureTests(TestCase):
         )
         self.assertJSONEqual(
             out.getvalue(),
-            """[{"fields": {"main": null, "name": "Amazon"}, "model": "fixtures_regress.store"}, {"fields": {"main": null, "name": "Borders"}, "model": "fixtures_regress.store"}, {"fields": {"name": "Neal Stephenson"}, "model": "fixtures_regress.person"}, {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]], "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]"""
+            """
+            [{"fields": {"main": null, "name": "Amazon"}, "model": "fixtures_regress.store"},
+            {"fields": {"main": null, "name": "Borders"}, "model": "fixtures_regress.store"},
+            {"fields": {"name": "Neal Stephenson"}, "model": "fixtures_regress.person"},
+            {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]],
+            "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]
+            """
         )
 
     def test_dependency_sorting(self):
@@ -711,7 +736,8 @@ class NaturalKeyFixtureTests(TestCase):
     def test_dependency_sorting_tight_circular(self):
         self.assertRaisesMessage(
             RuntimeError,
-            """Can't resolve dependencies for fixtures_regress.Circle1, fixtures_regress.Circle2 in serialized app list.""",
+            "Can't resolve dependencies for fixtures_regress.Circle1, "
+            "fixtures_regress.Circle2 in serialized app list.",
             serializers.sort_dependencies,
             [('fixtures_regress', [Person, Circle2, Circle1, Store, Book])],
         )
@@ -719,7 +745,8 @@ class NaturalKeyFixtureTests(TestCase):
     def test_dependency_sorting_tight_circular_2(self):
         self.assertRaisesMessage(
             RuntimeError,
-            """Can't resolve dependencies for fixtures_regress.Circle1, fixtures_regress.Circle2 in serialized app list.""",
+            "Can't resolve dependencies for fixtures_regress.Circle1, "
+            "fixtures_regress.Circle2 in serialized app list.",
             serializers.sort_dependencies,
             [('fixtures_regress', [Circle1, Book, Circle2])],
         )
@@ -727,7 +754,8 @@ class NaturalKeyFixtureTests(TestCase):
     def test_dependency_self_referential(self):
         self.assertRaisesMessage(
             RuntimeError,
-            """Can't resolve dependencies for fixtures_regress.Circle3 in serialized app list.""",
+            "Can't resolve dependencies for fixtures_regress.Circle3 in "
+            "serialized app list.",
             serializers.sort_dependencies,
             [('fixtures_regress', [Book, Circle3])],
         )
@@ -735,7 +763,9 @@ class NaturalKeyFixtureTests(TestCase):
     def test_dependency_sorting_long(self):
         self.assertRaisesMessage(
             RuntimeError,
-            """Can't resolve dependencies for fixtures_regress.Circle1, fixtures_regress.Circle2, fixtures_regress.Circle3 in serialized app list.""",
+            "Can't resolve dependencies for fixtures_regress.Circle1, "
+            "fixtures_regress.Circle2, fixtures_regress.Circle3 in serialized "
+            "app list.",
             serializers.sort_dependencies,
             [('fixtures_regress', [Person, Circle2, Circle1, Circle3, Store, Book])],
         )
@@ -770,9 +800,12 @@ class NaturalKeyFixtureTests(TestCase):
             verbosity=0,
         )
         books = Book.objects.all()
-        self.assertEqual(
-            books.__repr__(),
-            """[<Book: Cryptonomicon by Neal Stephenson (available at Amazon, Borders)>, <Book: Ender's Game by Orson Scott Card (available at Collins Bookstore)>, <Book: Permutation City by Greg Egan (available at Angus and Robertson)>]"""
+        self.assertQuerysetEqual(
+            books, [
+                "<Book: Cryptonomicon by Neal Stephenson (available at Amazon, Borders)>",
+                "<Book: Ender's Game by Orson Scott Card (available at Collins Bookstore)>",
+                "<Book: Permutation City by Greg Egan (available at Angus and Robertson)>",
+            ]
         )
 
 

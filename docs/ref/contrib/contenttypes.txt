@@ -82,11 +82,6 @@ The ``ContentType`` model
         :attr:`verbose_name <django.db.models.Field.verbose_name>`
         attribute of the model.
 
-.. versionchanged:: 1.8
-
-    Before Django 1.8, the ``name`` property was a real field on the
-    ``ContentType`` model.
-
 Let's look at an example to see how this works. If you already have
 the :mod:`~django.contrib.contenttypes` application installed, and then add
 :mod:`the sites application <django.contrib.sites>` to your
@@ -102,8 +97,6 @@ created with the following values:
 
 * :attr:`~django.contrib.contenttypes.models.ContentType.model`
   will be set to ``'site'``.
-
-.. _the verbose_name attribute: ../model-api/#verbose_name
 
 Methods on ``ContentType`` instances
 ====================================
@@ -131,8 +124,7 @@ For example, we could look up the
 :class:`~django.contrib.auth.models.User` model::
 
     >>> from django.contrib.contenttypes.models import ContentType
-    >>> user_type = ContentType.objects.get(app_label="auth", model="user")
-    >>> user_type
+    >>> ContentType.objects.get(app_label="auth", model="user")
     <ContentType: user>
 
 And then use it to query for a particular
@@ -229,8 +221,7 @@ want to go to the trouble of obtaining the model's metadata to perform a manual
 lookup::
 
     >>> from django.contrib.auth.models import User
-    >>> user_type = ContentType.objects.get_for_model(User)
-    >>> user_type
+    >>> ContentType.objects.get_for_model(User)
     <ContentType: user>
 
 .. module:: django.contrib.contenttypes.fields
@@ -374,6 +365,9 @@ Reverse generic relations
 If you know which models you'll be using most often, you can also add
 a "reverse" generic relationship to enable an additional API. For example::
 
+    from django.db import models
+    from django.contrib.contenttypes.fields import GenericRelation
+
     class Bookmark(models.Model):
         url = models.URLField()
         tags = GenericRelation(TaggedItem)
@@ -388,7 +382,7 @@ be used to retrieve their associated ``TaggedItems``::
     >>> t2 = TaggedItem(content_object=b, tag='python')
     >>> t2.save()
     >>> b.tags.all()
-    [<TaggedItem: django>, <TaggedItem: python>]
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
@@ -400,7 +394,7 @@ from ``TaggedItem``::
 
     >>> # Get all tags belonging to books containing `django` in the url
     >>> TaggedItem.objects.filter(bookmarks__url__contains='django')
-    [<TaggedItem: django>, <TaggedItem: python>]
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
 Just as :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
 accepts the names of the content-type and object-ID fields as
@@ -424,7 +418,7 @@ same types of lookups manually::
     >>> bookmark_type = ContentType.objects.get_for_model(b)
     >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id,
     ...                           object_id=b.id)
-    [<TaggedItem: django>, <TaggedItem: python>]
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
 Note that if the model in a
 :class:`~django.contrib.contenttypes.fields.GenericRelation` uses a
@@ -456,19 +450,12 @@ signal.
 Generic relations and aggregation
 ---------------------------------
 
-:doc:`Django's database aggregation API </topics/db/aggregation>`
-doesn't work with a
+:doc:`Django's database aggregation API </topics/db/aggregation>` works with a
 :class:`~django.contrib.contenttypes.fields.GenericRelation`. For example, you
-might be tempted to try something like::
+can find out how many tags all the bookmarks have::
 
-    Bookmark.objects.aggregate(Count('tags'))
-
-This will not work correctly, however. The generic relation adds extra filters
-to the queryset to ensure the correct content type, but the
-:meth:`~django.db.models.query.QuerySet.aggregate` method doesn't take them
-into account. For now, if you need aggregates on generic relations, you'll
-need to calculate them without using the aggregation API.
-
+    >>> Bookmark.objects.aggregate(Count('tags'))
+    {'tags__count': 3}
 
 .. module:: django.contrib.contenttypes.forms
 

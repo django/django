@@ -26,7 +26,10 @@ class FeedgeneratorTest(unittest.TestCase):
         numbers.
         """
         self.assertEqual(
-            feedgenerator.get_tag_uri('http://www.example.org:8000/2008/11/14/django#headline', datetime.datetime(2008, 11, 14, 13, 37, 0)),
+            feedgenerator.get_tag_uri(
+                'http://www.example.org:8000/2008/11/14/django#headline',
+                datetime.datetime(2008, 11, 14, 13, 37, 0),
+            ),
             'tag:www.example.org,2008-11-14:/2008/11/14/django/headline')
 
     def test_rfc2822_date(self):

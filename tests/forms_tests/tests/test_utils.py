@@ -22,9 +22,18 @@ class FormsUtilsTestCase(SimpleTestCase):
 
         self.assertEqual(flatatt({'id': "header"}), ' id="header"')
         self.assertEqual(flatatt({'class': "news", 'title': "Read this"}), ' class="news" title="Read this"')
-        self.assertEqual(flatatt({'class': "news", 'title': "Read this", 'required': "required"}), ' class="news" required="required" title="Read this"')
-        self.assertEqual(flatatt({'class': "news", 'title': "Read this", 'required': True}), ' class="news" title="Read this" required')
-        self.assertEqual(flatatt({'class': "news", 'title': "Read this", 'required': False}), ' class="news" title="Read this"')
+        self.assertEqual(
+            flatatt({'class': "news", 'title': "Read this", 'required': "required"}),
+            ' class="news" required="required" title="Read this"'
+        )
+        self.assertEqual(
+            flatatt({'class': "news", 'title': "Read this", 'required': True}),
+            ' class="news" title="Read this" required'
+        )
+        self.assertEqual(
+            flatatt({'class': "news", 'title': "Read this", 'required': False}),
+            ' class="news" title="Read this"'
+        )
         self.assertEqual(flatatt({}), '')
 
     def test_flatatt_no_side_effects(self):
@@ -97,19 +106,33 @@ class FormsUtilsTestCase(SimpleTestCase):
                 return "A very bad error."
 
         # Can take a non-string.
-        self.assertHTMLEqual(str(ErrorList(ValidationError(VeryBadError()).messages)),
-                         '<ul class="errorlist"><li>A very bad error.</li></ul>')
+        self.assertHTMLEqual(
+            str(ErrorList(ValidationError(VeryBadError()).messages)),
+            '<ul class="errorlist"><li>A very bad error.</li></ul>'
+        )
 
         # Escapes non-safe input but not input marked safe.
         example = 'Example of link: <a href="http://www.example.com/">example</a>'
-        self.assertHTMLEqual(str(ErrorList([example])),
-                         '<ul class="errorlist"><li>Example of link: &lt;a href=&quot;http://www.example.com/&quot;&gt;example&lt;/a&gt;</li></ul>')
-        self.assertHTMLEqual(str(ErrorList([mark_safe(example)])),
-                         '<ul class="errorlist"><li>Example of link: <a href="http://www.example.com/">example</a></li></ul>')
-        self.assertHTMLEqual(str(ErrorDict({'name': example})),
-                         '<ul class="errorlist"><li>nameExample of link: &lt;a href=&quot;http://www.example.com/&quot;&gt;example&lt;/a&gt;</li></ul>')
-        self.assertHTMLEqual(str(ErrorDict({'name': mark_safe(example)})),
-                         '<ul class="errorlist"><li>nameExample of link: <a href="http://www.example.com/">example</a></li></ul>')
+        self.assertHTMLEqual(
+            str(ErrorList([example])),
+            '<ul class="errorlist"><li>Example of link: '
+            '&lt;a href=&quot;http://www.example.com/&quot;&gt;example&lt;/a&gt;</li></ul>'
+        )
+        self.assertHTMLEqual(
+            str(ErrorList([mark_safe(example)])),
+            '<ul class="errorlist"><li>Example of link: '
+            '<a href="http://www.example.com/">example</a></li></ul>'
+        )
+        self.assertHTMLEqual(
+            str(ErrorDict({'name': example})),
+            '<ul class="errorlist"><li>nameExample of link: '
+            '&lt;a href=&quot;http://www.example.com/&quot;&gt;example&lt;/a&gt;</li></ul>'
+        )
+        self.assertHTMLEqual(
+            str(ErrorDict({'name': mark_safe(example)})),
+            '<ul class="errorlist"><li>nameExample of link: '
+            '<a href="http://www.example.com/">example</a></li></ul>'
+        )
 
     def test_error_dict_copy(self):
         e = ErrorDict()

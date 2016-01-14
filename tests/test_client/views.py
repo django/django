@@ -9,7 +9,7 @@ from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed,
     HttpResponseNotFound, HttpResponseRedirect,
 )
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import Context, Template
 from django.test import Client
 from django.utils.decorators import method_decorator
@@ -168,12 +168,10 @@ def form_view_with_template(request):
     else:
         form = TestForm()
         message = 'GET form page'
-    return render_to_response('form_view.html',
-        {
-            'form': form,
-            'message': message
-        }
-    )
+    return render(request, 'form_view.html', {
+        'form': form,
+        'message': message,
+    })
 
 
 class BaseTestFormSet(BaseFormSet):
@@ -230,7 +228,9 @@ def login_protected_view_changed_redirect(request):
     c = Context({'user': request.user})
 
     return HttpResponse(t.render(c))
-login_protected_view_changed_redirect = login_required(redirect_field_name="redirect_to")(login_protected_view_changed_redirect)
+login_protected_view_changed_redirect = (
+    login_required(redirect_field_name="redirect_to")(login_protected_view_changed_redirect)
+)
 
 
 def _permission_protected_view(request):
@@ -242,7 +242,9 @@ def _permission_protected_view(request):
     c = Context({'user': request.user})
     return HttpResponse(t.render(c))
 permission_protected_view = permission_required('permission_not_granted')(_permission_protected_view)
-permission_protected_view_exception = permission_required('permission_not_granted', raise_exception=True)(_permission_protected_view)
+permission_protected_view_exception = (
+    permission_required('permission_not_granted', raise_exception=True)(_permission_protected_view)
+)
 
 
 class _ViewManager(object):

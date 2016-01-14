@@ -2,7 +2,10 @@
 
 from __future__ import unicode_literals
 
+import io
+
 from django.conf import settings
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.http.response import HttpResponseBase
 from django.test import SimpleTestCase
@@ -112,3 +115,20 @@ class HttpResponseTests(SimpleTestCase):
         response = HttpResponse(content="Café :)".encode(UTF8), status=201)
         expected = '<HttpResponse status_code=201, "text/html; charset=utf-8">'
         self.assertEqual(repr(response), expected)
+
+    def test_wrap_textiowrapper(self):
+        content = "Café :)"
+        r = HttpResponse()
+        with io.TextIOWrapper(r, UTF8) as buf:
+            buf.write(content)
+        self.assertEqual(r.content, content.encode(UTF8))
+
+    def test_generator_cache(self):
+        generator = ("{}".format(i) for i in range(10))
+        response = HttpResponse(content=generator)
+        self.assertEqual(response.content, b'0123456789')
+        self.assertRaises(StopIteration, next, generator)
+
+        cache.set('my-response-key', response)
+        response = cache.get('my-response-key')
+        self.assertEqual(response.content, b'0123456789')

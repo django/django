@@ -4,13 +4,13 @@ import datetime
 import re
 import sys
 import warnings
+from contextlib import contextmanager
 from unittest import SkipTest, skipIf
 from xml.dom.minidom import parseString
 
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
 from django.db import connection, connections
 from django.db.models import Max, Min
 from django.http import HttpRequest
@@ -22,6 +22,7 @@ from django.test import (
     skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.utils import requires_tz_support
+from django.urls import reverse
 from django.utils import six, timezone
 
 from .forms import (
@@ -126,7 +127,7 @@ class LegacyDatabaseTests(TestCase):
         self.assertEqual(event.dt.replace(tzinfo=EAT), dt)
 
     @skipIfDBFeature('supports_timezones')
-    def test_aware_datetime_unspported(self):
+    def test_aware_datetime_unsupported(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
         with self.assertRaises(ValueError):
             Event.objects.create(dt=dt)
@@ -611,27 +612,41 @@ class ForcedTimeZoneDatabaseTests(TransactionTestCase):
             raise SkipTest("Database doesn't support feature(s): test_db_allows_multiple_connections")
 
         super(ForcedTimeZoneDatabaseTests, cls).setUpClass()
-        connections.databases['tz'] = connections.databases['default'].copy()
-        connections.databases['tz']['TIME_ZONE'] = 'Asia/Bangkok'
 
-    @classmethod
-    def tearDownClass(cls):
-        connections['tz'].close()
-        del connections['tz']
-        del connections.databases['tz']
-        super(ForcedTimeZoneDatabaseTests, cls).tearDownClass()
+    @contextmanager
+    def override_database_connection_timezone(self, timezone):
+        try:
+            orig_timezone = connection.settings_dict['TIME_ZONE']
+            connection.settings_dict['TIME_ZONE'] = timezone
+            # Clear cached properties, after first accessing them to ensure they exist.
+            connection.timezone
+            del connection.timezone
+            connection.timezone_name
+            del connection.timezone_name
+
+            yield
+
+        finally:
+            connection.settings_dict['TIME_ZONE'] = orig_timezone
+            # Clear cached properties, after first accessing them to ensure they exist.
+            connection.timezone
+            del connection.timezone
+            connection.timezone_name
+            del connection.timezone_name
 
     def test_read_datetime(self):
         fake_dt = datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=UTC)
         Event.objects.create(dt=fake_dt)
 
-        event = Event.objects.using('tz').get()
-        dt = datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
+        with self.override_database_connection_timezone('Asia/Bangkok'):
+            event = Event.objects.get()
+            dt = datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
         self.assertEqual(event.dt, dt)
 
     def test_write_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
-        Event.objects.using('tz').create(dt=dt)
+        with self.override_database_connection_timezone('Asia/Bangkok'):
+            Event.objects.create(dt=dt)
 
         event = Event.objects.get()
         fake_dt = datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=UTC)
@@ -661,7 +676,7 @@ class SerializationTests(SimpleTestCase):
     # Backend-specific notes:
     # - JSON supports only milliseconds, microseconds will be truncated.
     # - PyYAML dumps the UTC offset correctly for timezone-aware datetimes,
-    #   but when it loads this representation, it substracts the offset and
+    #   but when it loads this representation, it subtracts the offset and
     #   returns a naive datetime object in UTC (http://pyyaml.org/ticket/202).
     # Tests are adapted to take these quirks into account.
 
@@ -841,9 +856,18 @@ class TemplateTests(TestCase):
         }
         templates = {
             'notag': Template("{% load tz %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}"),
-            'noarg': Template("{% load tz %}{% localtime %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
-            'on': Template("{% load tz %}{% localtime on %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
-            'off': Template("{% load tz %}{% localtime off %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
+            'noarg': Template(
+                "{% load tz %}{% localtime %}{{ dt }}|{{ dt|localtime }}|"
+                "{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"
+            ),
+            'on': Template(
+                "{% load tz %}{% localtime on %}{{ dt }}|{{ dt|localtime }}|"
+                "{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"
+            ),
+            'off': Template(
+                "{% load tz %}{% localtime off %}{{ dt }}|{{ dt|localtime }}|"
+                "{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"
+            ),
         }
 
         # Transform a list of keys in 'datetimes' to the expected template
@@ -963,7 +987,10 @@ class TemplateTests(TestCase):
         )
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC),
                        'tz1': ICT, 'tz2': None})
-        self.assertEqual(tpl.render(ctx), "2011-09-01T13:20:30+03:00|2011-09-01T17:20:30+07:00|2011-09-01T13:20:30+03:00")
+        self.assertEqual(
+            tpl.render(ctx),
+            "2011-09-01T13:20:30+03:00|2011-09-01T17:20:30+07:00|2011-09-01T13:20:30+03:00"
+        )
 
     @requires_pytz
     def test_timezone_templatetag_with_pytz(self):
@@ -999,7 +1026,10 @@ class TemplateTests(TestCase):
         with timezone.override(UTC):
             self.assertEqual(tpl.render(Context()), "UTC")
 
-        tpl = Template("{% load tz %}{% timezone tz %}{% get_current_timezone as time_zone %}{% endtimezone %}{{ time_zone }}")
+        tpl = Template(
+            "{% load tz %}{% timezone tz %}{% get_current_timezone as time_zone %}"
+            "{% endtimezone %}{{ time_zone }}"
+        )
 
         self.assertEqual(tpl.render(Context({'tz': ICT})), "+0700")
         with timezone.override(UTC):
@@ -1014,7 +1044,11 @@ class TemplateTests(TestCase):
         with timezone.override(pytz.timezone('Europe/Paris')):
             self.assertEqual(tpl.render(Context()), "Europe/Paris")
 
-        tpl = Template("{% load tz %}{% timezone 'Europe/Paris' %}{% get_current_timezone as time_zone %}{% endtimezone %}{{ time_zone }}")
+        tpl = Template(
+            "{% load tz %}{% timezone 'Europe/Paris' %}"
+            "{% get_current_timezone as time_zone %}{% endtimezone %}"
+            "{{ time_zone }}"
+        )
         self.assertEqual(tpl.render(Context()), "Europe/Paris")
 
     def test_get_current_timezone_templatetag_invalid_argument(self):
@@ -1041,7 +1075,10 @@ class TemplateTests(TestCase):
             self.assertEqual(tpl.render(ctx), "2011-09-02 at 03:20:20")
 
     def test_date_and_time_template_filters_honor_localtime(self):
-        tpl = Template("{% load tz %}{% localtime off %}{{ dt|date:'Y-m-d' }} at {{ dt|time:'H:i:s' }}{% endlocaltime %}")
+        tpl = Template(
+            "{% load tz %}{% localtime off %}{{ dt|date:'Y-m-d' }} at "
+            "{{ dt|time:'H:i:s' }}{% endlocaltime %}"
+        )
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 20, 20, 20, tzinfo=UTC)})
         self.assertEqual(tpl.render(ctx), "2011-09-01 at 20:20:20")
         with timezone.override(ICT):
@@ -1172,7 +1209,7 @@ class AdminTests(TestCase):
     def setUpTestData(cls):
         # password = "secret"
         cls.u1 = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10, tzinfo=UTC),
             is_superuser=True, username='super', first_name='Super', last_name='User',
             email='super@example.com', is_staff=True, is_active=True,

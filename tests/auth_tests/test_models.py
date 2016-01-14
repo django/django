@@ -269,7 +269,7 @@ class IsActiveTestCase(TestCase):
         # the is_active flag is saved
         self.assertFalse(user_fetched.is_active)
 
-    @override_settings(AUTH_USER_MODEL='auth.IsActiveTestUser1')
+    @override_settings(AUTH_USER_MODEL='auth_tests.IsActiveTestUser1')
     def test_is_active_field_default(self):
         """
         tests that the default value for is_active is provided

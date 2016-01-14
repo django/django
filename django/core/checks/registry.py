@@ -11,11 +11,13 @@ class Tags(object):
     Built-in tags for internal checks.
     """
     admin = 'admin'
+    caches = 'caches'
     compatibility = 'compatibility'
     models = 'models'
     security = 'security'
     signals = 'signals'
     templates = 'templates'
+    urls = 'urls'
 
 
 class CheckRegistry(object):

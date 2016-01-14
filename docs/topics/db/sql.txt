@@ -282,9 +282,9 @@ using something like this::
 
     def dictfetchall(cursor):
         "Return all rows from a cursor as a dict"
-        desc = cursor.description
+        columns = [col[0] for col in cursor.description]
         return [
-            dict(zip([col[0] for col in desc], row))
+            dict(zip(columns, row))
             for row in cursor.fetchall()
         ]
 

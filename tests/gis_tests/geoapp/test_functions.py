@@ -4,9 +4,7 @@ import re
 from decimal import Decimal
 
 from django.contrib.gis.db.models import functions
-from django.contrib.gis.geos import (
-    LineString, Point, Polygon, fromstr, geos_version_info,
-)
+from django.contrib.gis.geos import LineString, Point, Polygon, fromstr
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
@@ -27,7 +25,7 @@ class GISFunctionsTests(TestCase):
     fixtures = ['initial']
 
     def test_asgeojson(self):
-        # Only PostGIS and SpatiaLite 3.0+ support GeoJSON.
+        # Only PostGIS and SpatiaLite support GeoJSON.
         if not connection.ops.geojson:
             with self.assertRaises(NotImplementedError):
                 list(Country.objects.annotate(json=functions.AsGeoJSON('mpoly')))
@@ -108,12 +106,6 @@ class GISFunctionsTests(TestCase):
                 r'<gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ '
                 r'</gml:coordinates></gml:Point>'
             )
-        elif spatialite and connection.ops.spatial_version < (3, 0, 0):
-            # Spatialite before 3.0 has extra colon in SrsName
-            gml_regex = re.compile(
-                r'^<gml:Point SrsName="EPSG::4326"><gml:coordinates decimal="\." '
-                r'cs="," ts=" ">-104.609251\d+,38.255001</gml:coordinates></gml:Point>'
-            )
         else:
             gml_regex = re.compile(
                 r'^<gml:Point srsName="EPSG:4326"><gml:coordinates>'
@@ -168,27 +160,30 @@ class GISFunctionsTests(TestCase):
         for state in qs:
             self.assertTrue(state.poly.centroid.equals_exact(state.centroid, tol))
 
+        with self.assertRaisesMessage(TypeError, "'Centroid' takes exactly 1 argument (2 given)"):
+            State.objects.annotate(centroid=functions.Centroid('poly', 'poly'))
+
     @skipUnlessDBFeature("has_Difference_function")
     def test_difference(self):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(diff=functions.Difference('mpoly', geom))
-        # For some reason SpatiaLite does something screwy with the Texas geometry here.
-        if spatialite:
+        # SpatiaLite and Oracle do something screwy with the Texas geometry.
+        if spatialite or oracle:
             qs = qs.exclude(name='Texas')
 
         for c in qs:
-            self.assertEqual(c.mpoly.difference(geom), c.diff)
+            self.assertTrue(c.mpoly.difference(geom).equals(c.diff))
 
-    @skipUnlessDBFeature("has_Difference_function")
+    @skipUnlessDBFeature("has_Difference_function", "has_Transform_function")
     def test_difference_mixed_srid(self):
         """Testing with mixed SRID (Country has default 4326)."""
         geom = Point(556597.4, 2632018.6, srid=3857)  # Spherical mercator
         qs = Country.objects.annotate(difference=functions.Difference('mpoly', geom))
-        # For some reason SpatiaLite does something screwy with the Texas geometry here.
-        if spatialite:
+        # SpatiaLite and Oracle do something screwy with the Texas geometry.
+        if spatialite or oracle:
             qs = qs.exclude(name='Texas')
         for c in qs:
-            self.assertEqual(c.mpoly.difference(geom), c.difference)
+            self.assertTrue(c.mpoly.difference(geom).equals(c.difference))
 
     @skipUnlessDBFeature("has_Envelope_function")
     def test_envelope(self):
@@ -226,9 +221,12 @@ class GISFunctionsTests(TestCase):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(inter=functions.Intersection('mpoly', geom))
         for c in qs:
-            if spatialite:
-                # When the intersection is empty, Spatialite returns None
+            if spatialite or mysql:
+                # When the intersection is empty, Spatialite and MySQL return None
                 expected = None
+            elif oracle:
+                # When the intersection is empty, Oracle returns an empty string
+                expected = ''
             else:
                 expected = c.mpoly.intersection(geom)
             self.assertEqual(c.inter, expected)
@@ -246,10 +244,9 @@ class GISFunctionsTests(TestCase):
 
         qs = City.objects.filter(point__isnull=False).annotate(num_geom=functions.NumGeometries('point'))
         for city in qs:
-            # Oracle and PostGIS 2.0+ will return 1 for the number of
-            # geometries on non-collections, whereas PostGIS < 2.0.0 and MySQL
-            # will return None.
-            if (postgis and connection.ops.spatial_version < (2, 0, 0)) or mysql:
+            # Oracle and PostGIS return 1 for the number of geometries on
+            # non-collections, whereas MySQL returns None.
+            if mysql:
                 self.assertIsNone(city.num_geom)
             else:
                 self.assertEqual(1, city.num_geom)
@@ -382,14 +379,13 @@ class GISFunctionsTests(TestCase):
 
     @skipUnlessDBFeature("has_SymDifference_function")
     def test_sym_difference(self):
-        if geos_version_info()['version'] < '3.3.0':
-            self.skipTest("GEOS >= 3.3 required")
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(sym_difference=functions.SymDifference('mpoly', geom))
+        # Oracle does something screwy with the Texas geometry.
+        if oracle:
+            qs = qs.exclude(name='Texas')
         for country in qs:
-            # Ordering might differ in collections
-            self.assertSetEqual(set(g.wkt for g in country.mpoly.sym_difference(geom)),
-                                set(g.wkt for g in country.sym_difference))
+            self.assertTrue(country.mpoly.sym_difference(geom).equals(country.sym_difference))
 
     @skipUnlessDBFeature("has_Transform_function")
     def test_transform(self):
@@ -429,7 +425,7 @@ class GISFunctionsTests(TestCase):
             union=functions.Union('mpoly', geom),
         )
 
-        # For some reason SpatiaLite does something screwey with the Texas geometry here.
+        # For some reason SpatiaLite does something screwy with the Texas geometry here.
         # Also, it doesn't like the null intersection.
         if spatialite:
             qs = qs.exclude(name='Texas')
@@ -442,14 +438,11 @@ class GISFunctionsTests(TestCase):
             # SpatiaLite).
             return
         for c in qs:
-            self.assertEqual(c.mpoly.difference(geom), c.difference)
-            if not spatialite:
+            self.assertTrue(c.mpoly.difference(geom).equals(c.difference))
+            if not (spatialite or mysql):
                 self.assertEqual(c.mpoly.intersection(geom), c.intersection)
-            # Ordering might differ in collections
-            self.assertSetEqual(set(g.wkt for g in c.mpoly.sym_difference(geom)),
-                                set(g.wkt for g in c.sym_difference))
-            self.assertSetEqual(set(g.wkt for g in c.mpoly.union(geom)),
-                                set(g.wkt for g in c.union))
+            self.assertTrue(c.mpoly.sym_difference(geom).equals(c.sym_difference))
+            self.assertTrue(c.mpoly.union(geom).equals(c.union))
 
     @skipUnlessDBFeature("has_Union_function")
     def test_union(self):

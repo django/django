@@ -12,8 +12,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db import connections, models
-from django.test import TestCase, override_settings
-from django.test.utils import captured_stdout
+from django.test import SimpleTestCase, TestCase, override_settings
+from django.test.utils import captured_stdout, isolate_apps
 from django.utils.encoding import force_str, force_text
 
 from .models import Article, Author, SchemeIncludedURL
@@ -114,20 +114,9 @@ class ContentTypesViewsTests(TestCase):
         self.assertEqual(force_text(ct), 'modelcreatedonthefly')
 
 
-class IsolatedModelsTestCase(TestCase):
-    def setUp(self):
-        # The unmanaged models need to be removed after the test in order to
-        # prevent bad interactions with the flush operation in other tests.
-        self._old_models = apps.app_configs['contenttypes_tests'].models.copy()
-
-    def tearDown(self):
-        apps.app_configs['contenttypes_tests'].models = self._old_models
-        apps.all_models['contenttypes_tests'] = self._old_models
-        apps.clear_cache()
-
-
 @override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
-class GenericForeignKeyTests(IsolatedModelsTestCase):
+@isolate_apps('contenttypes_tests', attr_name='apps')
+class GenericForeignKeyTests(SimpleTestCase):
 
     def test_str(self):
         class Model(models.Model):
@@ -164,7 +153,10 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 "'Model.content_type' is not a ForeignKey.",
-                hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                hint=(
+                    "GenericForeignKeys must use a ForeignKey to "
+                    "'contenttypes.ContentType' as the 'content_type' field."
+                ),
                 obj=Model.content_object,
                 id='contenttypes.E003',
             )
@@ -182,7 +174,10 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 "'Model.content_type' is not a ForeignKey to 'contenttypes.ContentType'.",
-                hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                hint=(
+                    "GenericForeignKeys must use a ForeignKey to "
+                    "'contenttypes.ContentType' as the 'content_type' field."
+                ),
                 obj=Model.content_object,
                 id='contenttypes.E004',
             )
@@ -233,11 +228,12 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         class Model(models.Model):
             content_object = MyGenericForeignKey()
 
-        errors = checks.run_checks()
+        errors = checks.run_checks(app_configs=self.apps.get_app_configs())
         self.assertEqual(errors, ['performed!'])
 
 
-class GenericRelationshipTests(IsolatedModelsTestCase):
+@isolate_apps('contenttypes_tests')
+class GenericRelationshipTests(SimpleTestCase):
 
     def test_valid_generic_relationship(self):
         class TaggedItem(models.Model):

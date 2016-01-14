@@ -3,7 +3,10 @@ from __future__ import unicode_literals
 import codecs
 import os
 import shutil
+import tempfile
 import unittest
+
+from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
 from django.contrib.staticfiles import storage
@@ -11,6 +14,7 @@ from django.contrib.staticfiles.management.commands import collectstatic
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import override_settings
+from django.test.utils import extend_sys_path
 from django.utils import six
 from django.utils._os import symlinks_supported
 from django.utils.encoding import force_text
@@ -128,6 +132,18 @@ class TestConfiguration(StaticFilesTestCase):
             storage.staticfiles_storage = staticfiles_storage
 
 
+class TestCollectionHelpSubcommand(AdminScriptTestCase):
+    @override_settings(STATIC_ROOT=None)
+    def test_missing_settings_dont_prevent_help(self):
+        """
+        Even if the STATIC_ROOT setting is not set, one can still call the
+        `manage.py help collectstatic` command.
+        """
+        self.write_settings('settings.py', apps=['django.contrib.staticfiles'])
+        out, err = self.run_manage(['help', 'collectstatic'])
+        self.assertNoOutput(err)
+
+
 class TestCollection(CollectionTestCase, TestDefaults):
     """
     Test ``collectstatic`` management command.
@@ -197,31 +213,45 @@ class TestCollectionFilesOverride(CollectionTestCase):
     Test overriding duplicated files by ``collectstatic`` management command.
     Check for proper handling of apps order in installed apps even if file modification
     dates are in different order:
-        'staticfiles_tests.apps.test',
+        'staticfiles_test_app',
         'staticfiles_tests.apps.no_label',
     """
     def setUp(self):
-        self.orig_path = os.path.join(TEST_ROOT, 'apps', 'no_label', 'static', 'file2.txt')
+        self.temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
+
         # get modification and access times for no_label/static/file2.txt
+        self.orig_path = os.path.join(TEST_ROOT, 'apps', 'no_label', 'static', 'file2.txt')
         self.orig_mtime = os.path.getmtime(self.orig_path)
         self.orig_atime = os.path.getatime(self.orig_path)
 
-        # prepare duplicate of file2.txt from no_label app
+        # prepare duplicate of file2.txt from a temporary app
         # this file will have modification time older than no_label/static/file2.txt
-        # anyway it should be taken to STATIC_ROOT because 'test' app is before
+        # anyway it should be taken to STATIC_ROOT because the temporary app is before
         # 'no_label' app in installed apps
-        self.testfile_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'file2.txt')
+        self.temp_app_path = os.path.join(self.temp_dir, 'staticfiles_test_app')
+        self.testfile_path = os.path.join(self.temp_app_path, 'static', 'file2.txt')
+
+        os.makedirs(self.temp_app_path)
+        with open(os.path.join(self.temp_app_path, '__init__.py'), 'w+'):
+            pass
+
+        os.makedirs(os.path.dirname(self.testfile_path))
         with open(self.testfile_path, 'w+') as f:
             f.write('duplicate of file2.txt')
+
         os.utime(self.testfile_path, (self.orig_atime - 1, self.orig_mtime - 1))
+
+        self.settings_with_test_app = self.modify_settings(
+            INSTALLED_APPS={'prepend': 'staticfiles_test_app'})
+        with extend_sys_path(self.temp_dir):
+            self.settings_with_test_app.enable()
+
         super(TestCollectionFilesOverride, self).setUp()
 
     def tearDown(self):
-        if os.path.exists(self.testfile_path):
-            os.unlink(self.testfile_path)
-        # set back original modification time
-        os.utime(self.orig_path, (self.orig_atime, self.orig_mtime))
         super(TestCollectionFilesOverride, self).tearDown()
+        self.settings_with_test_app.disable()
 
     def test_ordering_override(self):
         """
@@ -234,22 +264,11 @@ class TestCollectionFilesOverride(CollectionTestCase):
 
         self.assertFileContains('file2.txt', 'duplicate of file2.txt')
 
-        # and now change modification time of no_label/static/file2.txt
-        # test app is first in installed apps so file2.txt should remain unmodified
-        mtime = os.path.getmtime(self.testfile_path)
-        atime = os.path.getatime(self.testfile_path)
-        os.utime(self.orig_path, (mtime + 1, atime + 1))
-
-        # run collectstatic again
-        self.run_collectstatic()
-
-        self.assertFileContains('file2.txt', 'duplicate of file2.txt')
-
 
 # The collectstatic test suite already has conflicting files since both
 # project/test/file.txt and apps/test/static/test/file.txt are collected. To
 # properly test for the warning not happening unless we tell it to explicitly,
-# we only include static files from the default finders.
+# we remove the project directory and will add back a conflicting file later.
 @override_settings(STATICFILES_DIRS=[])
 class TestCollectionOverwriteWarning(CollectionTestCase):
     """
@@ -268,41 +287,37 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
         """
         out = six.StringIO()
         call_command('collectstatic', interactive=False, verbosity=3, stdout=out, **kwargs)
-        out.seek(0)
-        return out.read()
+        return force_text(out.getvalue())
 
     def test_no_warning(self):
         """
         There isn't a warning if there isn't a duplicate destination.
         """
         output = self._collectstatic_output(clear=True)
-        self.assertNotIn(self.warning_string, force_text(output))
+        self.assertNotIn(self.warning_string, output)
 
     def test_warning(self):
         """
         There is a warning when there are duplicate destinations.
         """
-        # Create new file in the no_label app that also exists in the test app.
-        test_dir = os.path.join(TEST_ROOT, 'apps', 'no_label', 'static', 'test')
-        if not os.path.exists(test_dir):
-            os.mkdir(test_dir)
+        static_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, static_dir)
 
-        try:
-            duplicate_path = os.path.join(test_dir, 'file.txt')
-            with open(duplicate_path, 'w+') as f:
-                f.write('duplicate of file.txt')
+        duplicate = os.path.join(static_dir, 'test', 'file.txt')
+        os.mkdir(os.path.dirname(duplicate))
+        with open(duplicate, 'w+') as f:
+            f.write('duplicate of file.txt')
+
+        with self.settings(STATICFILES_DIRS=[static_dir]):
             output = self._collectstatic_output(clear=True)
-            self.assertIn(self.warning_string, force_text(output))
-        finally:
-            if os.path.exists(duplicate_path):
-                os.unlink(duplicate_path)
+        self.assertIn(self.warning_string, output)
 
-        if os.path.exists(test_dir):
-            os.rmdir(test_dir)
+        os.remove(duplicate)
 
         # Make sure the warning went away again.
-        output = self._collectstatic_output(clear=True)
-        self.assertNotIn(self.warning_string, force_text(output))
+        with self.settings(STATICFILES_DIRS=[static_dir]):
+            output = self._collectstatic_output(clear=True)
+        self.assertNotIn(self.warning_string, output)
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage')
@@ -322,8 +337,8 @@ class TestCollectionLinks(CollectionTestCase, TestDefaults):
     the standard file resolving tests here, to make sure using
     ``--link`` does not change the file-selection semantics.
     """
-    def run_collectstatic(self):
-        super(TestCollectionLinks, self).run_collectstatic(link=True)
+    def run_collectstatic(self, clear=False):
+        super(TestCollectionLinks, self).run_collectstatic(link=True, clear=clear)
 
     def test_links_created(self):
         """
@@ -339,3 +354,13 @@ class TestCollectionLinks(CollectionTestCase, TestDefaults):
         os.unlink(path)
         self.run_collectstatic()
         self.assertTrue(os.path.islink(path))
+
+    def test_clear_broken_symlink(self):
+        """
+        With ``--clear``, broken symbolic links are deleted.
+        """
+        nonexistent_file_path = os.path.join(settings.STATIC_ROOT, 'nonexistent.txt')
+        broken_symlink_path = os.path.join(settings.STATIC_ROOT, 'symlink.txt')
+        os.symlink(nonexistent_file_path, broken_symlink_path)
+        self.run_collectstatic(clear=True)
+        self.assertFalse(os.path.lexists(broken_symlink_path))

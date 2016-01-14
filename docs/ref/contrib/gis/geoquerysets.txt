@@ -515,13 +515,20 @@ Distance lookups take the following form::
 
 The value passed into a distance lookup is a tuple; the first two
 values are mandatory, and are the geometry to calculate distances to,
-and a distance value (either a number in units of the field or a
-:class:`~django.contrib.gis.measure.Distance` object).  On every
-distance lookup but :lookup:`dwithin`, an optional
+and a distance value (either a number in units of the field, a
+:class:`~django.contrib.gis.measure.Distance` object, or a `query expression
+<ref/models/expressions>`).
+
+With PostGIS, on every distance lookup but :lookup:`dwithin`, an optional
 third element, ``'spheroid'``, may be included to tell GeoDjango
 to use the more accurate spheroid distance calculation functions on
 fields with a geodetic coordinate system (e.g., ``ST_Distance_Spheroid``
-would be used instead of ``ST_Distance_Sphere``).
+would be used instead of ``ST_Distance_Sphere``). The simpler ``ST_Distance``
+function is used with projected coordinate systems.
+
+.. versionadded:: 1.10
+
+    The ability to pass an expression as the distance value was added.
 
 .. fieldlookup:: distance_gt
 
@@ -535,13 +542,13 @@ Example::
 
     Zipcode.objects.filter(poly__distance_gt=(geom, D(m=5)))
 
-==========  ===============================================
+==========  ==================================================
 Backend     SQL Equivalent
-==========  ===============================================
-PostGIS     ``ST_Distance(poly, geom) > 5``
+==========  ==================================================
+PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) > 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) > 5``
 SpatiaLite  ``Distance(poly, geom) > 5``
-==========  ===============================================
+==========  ==================================================
 
 .. fieldlookup:: distance_gte
 
@@ -555,13 +562,13 @@ Example::
 
     Zipcode.objects.filter(poly__distance_gte=(geom, D(m=5)))
 
-==========  ================================================
+==========  ===================================================
 Backend     SQL Equivalent
-==========  ================================================
-PostGIS     ``ST_Distance(poly, geom) >= 5``
+==========  ===================================================
+PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) >= 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) >= 5``
 SpatiaLite  ``Distance(poly, geom) >= 5``
-==========  ================================================
+==========  ===================================================
 
 .. fieldlookup:: distance_lt
 
@@ -575,13 +582,13 @@ Example::
 
     Zipcode.objects.filter(poly__distance_lt=(geom, D(m=5)))
 
-==========  ===============================================
+==========  ==================================================
 Backend     SQL Equivalent
-==========  ===============================================
-PostGIS     ``ST_Distance(poly, geom) < 5``
+==========  ==================================================
+PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) < 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) < 5``
 SpatiaLite  ``Distance(poly, geom) < 5``
-==========  ===============================================
+==========  ==================================================
 
 .. fieldlookup:: distance_lte
 
@@ -595,13 +602,13 @@ Example::
 
     Zipcode.objects.filter(poly__distance_lte=(geom, D(m=5)))
 
-==========  ================================================
+==========  ===================================================
 Backend     SQL Equivalent
-==========  ================================================
-PostGIS     ``ST_Distance(poly, geom) <= 5``
+==========  ===================================================
+PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) <= 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) <= 5``
 SpatiaLite  ``Distance(poly, geom) <= 5``
-==========  ================================================
+==========  ===================================================
 
 .. fieldlookup:: dwithin
 
@@ -1216,72 +1223,6 @@ Returns the number of points in the first linestring in the
 geometry field in a ``num_points`` attribute on each element of
 the ``GeoQuerySet``; otherwise sets with ``None``.
 
-Spatial Aggregates
-==================
-
-Aggregate Methods
------------------
-
-.. deprecated:: 1.8
-
-    Aggregate methods are now deprecated. Prefer using their function-based
-    equivalents.
-
-``collect``
-~~~~~~~~~~~
-
-.. method:: GeoQuerySet.collect(**kwargs)
-
-.. deprecated:: 1.8
-
-    Use the :class:`Collect` aggregate instead.
-
-Shortcut for ``aggregate(Collect(<field>))``.
-
-``extent``
-~~~~~~~~~~
-
-.. method:: GeoQuerySet.extent(**kwargs)
-
-.. deprecated:: 1.8
-
-    Use the :class:`Extent` aggregate instead.
-
-Shortcut for ``aggregate(Extent(<field>))``.
-
-``extent3d``
-~~~~~~~~~~~~
-
-.. method:: GeoQuerySet.extent3d(**kwargs)
-
-.. deprecated:: 1.8
-
-    Use the :class:`Extent` aggregate instead.
-
-Shortcut for ``aggregate(Extent3D(<field>))``.
-
-``make_line``
-~~~~~~~~~~~~~
-
-.. method:: GeoQuerySet.make_line(**kwargs)
-
-.. deprecated:: 1.8
-
-    Use the :class:`MakeLine` aggregate instead.
-
-Shortcut for ``aggregate(MakeLine(<field>))``.
-
-``unionagg``
-~~~~~~~~~~~~
-
-.. method:: GeoQuerySet.unionagg(**kwargs)
-
-.. deprecated:: 1.8
-
-    Use the :class:`Union` aggregate instead.
-
-Shortcut for ``aggregate(Union(<field>))``.
-
 Aggregate Functions
 -------------------
 
@@ -1298,7 +1239,7 @@ Keyword Argument       Description
                        details.
 =====================  =====================================================
 
-__ http://docs.oracle.com/html/B14255_01/sdo_intro.htm#sthref150
+__ https://docs.oracle.com/html/B14255_01/sdo_intro.htm#sthref150
 
 Example::
 
@@ -1310,7 +1251,7 @@ Example::
 
 .. class:: Collect(geo_field)
 
-*Availability*: PostGIS, Spatialite (≥3.0)
+*Availability*: PostGIS, Spatialite
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
 column. This is analogous to a simplified version of the :class:`Union`
@@ -1323,7 +1264,7 @@ not caring about dissolving boundaries.
 
 .. class:: Extent(geo_field)
 
-*Availability*: PostGIS, Oracle, Spatialite (≥3.0)
+*Availability*: PostGIS, Oracle, Spatialite
 
 Returns the extent of all ``geo_field`` in the ``QuerySet`` as a four-tuple,
 comprising the lower left coordinate and the upper right coordinate.
@@ -1331,7 +1272,7 @@ comprising the lower left coordinate and the upper right coordinate.
 Example::
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent('poly'))
-    >>> print(qs[poly__extent])
+    >>> print(qs['poly__extent'])
     (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
 ``Extent3D``
@@ -1348,7 +1289,7 @@ and z coordinates).
 Example::
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent3D('poly'))
-    >>> print(qs[poly__extent3d])
+    >>> print(qs['poly__extent3d'])
     (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
 
 ``MakeLine``
@@ -1356,15 +1297,19 @@ Example::
 
 .. class:: MakeLine(geo_field)
 
-*Availability*: PostGIS
+*Availability*: PostGIS, SpatiaLite
 
 Returns a ``LineString`` constructed from the point field geometries in the
 ``QuerySet``. Currently, ordering the queryset has no effect.
 
+.. versionchanged:: 1.10
+
+    SpatiaLite support was added.
+
 Example::
 
      >>> print(City.objects.filter(name__in=('Houston', 'Dallas')
-     ...      ).aggregate(MakeLine('poly'))[poly__makeline]
+     ...      ).aggregate(MakeLine('poly'))['poly__makeline']
      LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
 
 ``Union``
@@ -1391,6 +1336,6 @@ Example::
 
 .. rubric:: Footnotes
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
-.. [#fnsdorelate] *See* `SDO_RELATE documentation <http://docs.oracle.com/cd/B19306_01/appdev.102/b14255/sdo_operat.htm#sthref845>`_, from Ch. 11 of the Oracle Spatial User's Guide and Manual.
+.. [#fnsdorelate] *See* `SDO_RELATE documentation <https://docs.oracle.com/cd/B19306_01/appdev.102/b14255/sdo_operat.htm#sthref845>`_, from Ch. 11 of the Oracle Spatial User's Guide and Manual.
 .. [#fncovers] For an explanation of this routine, read `Quirks of the "Contains" Spatial Predicate <http://lin-ear-th-inking.blogspot.com/2007/06/subtleties-of-ogc-covers-spatial.html>`_ by Martin Davis (a PostGIS developer).
 .. [#fncontainsproperly] Refer to the PostGIS ``ST_ContainsProperly`` `documentation <http://postgis.net/docs/manual-1.5/ST_ContainsProperly.html>`_ for more details.

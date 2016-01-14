@@ -206,18 +206,16 @@ foundation for custom widgets.
             >>> name.render('name', 'A name')
             '<input title="Your name" type="text" name="name" value="A name" size="10" />'
 
-        .. versionchanged:: 1.8
+        If you assign a value of ``True`` or ``False`` to an attribute,
+        it will be rendered as an HTML5 boolean attribute::
 
-            If you assign a value of ``True`` or ``False`` to an attribute,
-            it will be rendered as an HTML5 boolean attribute::
-
-                >>> name = forms.TextInput(attrs={'required': True})
-                >>> name.render('name', 'A name')
-                '<input name="name" type="text" value="A name" required />'
-                >>>
-                >>> name = forms.TextInput(attrs={'required': False})
-                >>> name.render('name', 'A name')
-                '<input name="name" type="text" value="A name" />'
+            >>> name = forms.TextInput(attrs={'required': True})
+            >>> name.render('name', 'A name')
+            '<input name="name" type="text" value="A name" required />'
+            >>>
+            >>> name = forms.TextInput(attrs={'required': False})
+            >>> name.render('name', 'A name')
+            '<input name="name" type="text" value="A name" />'
 
     .. attribute:: Widget.supports_microseconds
 
@@ -229,6 +227,16 @@ foundation for custom widgets.
 
            In older versions, this attribute was only defined on the date
            and time widgets (as ``False``).
+
+    .. method:: id_for_label(self, id_)
+
+        Returns the HTML ID attribute of this widget for use by a ``<label>``,
+        given the ID of the field. Returns ``None`` if an ID isn't available.
+
+        This hook is necessary because some widgets have multiple HTML
+        elements and, thus, multiple IDs. In that case, this method should
+        return an ID value that corresponds to the first ID in the widget's
+        tags.
 
     .. method:: render(name, value, attrs=None)
 
@@ -798,8 +806,6 @@ Composite widgets
             }
 
     .. attribute:: SelectDateWidget.empty_label
-
-        .. versionadded:: 1.8
 
         If the :class:`~django.forms.DateField` is not required,
         :class:`SelectDateWidget` will have an empty choice at the top of the

@@ -199,7 +199,7 @@ class TestQuerying(TestCase):
 
 
 @skipUnlessPG92
-class TestQueringWithRanges(TestCase):
+class TestQueryingWithRanges(TestCase):
     def test_date_range(self):
         objs = [
             RangeLookupsModel.objects.create(date='2015-01-01'),
@@ -322,6 +322,8 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.ints, NumericRange(0, 10))
         self.assertEqual(instance.floats, NumericRange(empty=True))
         self.assertEqual(instance.bigints, None)
+        self.assertEqual(instance.dates, DateRange(self.lower_date, self.upper_date))
+        self.assertEqual(instance.timestamps, DateTimeTZRange(self.lower_dt, self.upper_dt))
 
 
 class TestValidators(PostgreSQLTestCase):
@@ -627,5 +629,6 @@ class TestWidget(PostgreSQLTestCase):
         )
         self.assertHTMLEqual(
             f.widget.render('datetimerange', dt_range),
-            '<input type="text" name="datetimerange_0" value="2006-01-10 07:30:00" /><input type="text" name="datetimerange_1" value="2006-02-12 09:50:00" />'
+            '<input type="text" name="datetimerange_0" value="2006-01-10 07:30:00" />'
+            '<input type="text" name="datetimerange_1" value="2006-02-12 09:50:00" />'
         )

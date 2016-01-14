@@ -21,8 +21,19 @@ Fields
 
     .. attribute:: username
 
-        Required. 30 characters or fewer. Usernames may contain alphanumeric,
+        Required. 150 characters or fewer. Usernames may contain alphanumeric,
         ``_``, ``@``, ``+``, ``.`` and ``-`` characters.
+
+        The ``max_length`` should be sufficient for many use cases. If you need
+        a longer length, please use a :ref:`custom user model
+        <specifying-custom-user-model>`. If you use MySQL with the ``utf8mb4``
+        encoding (recommended for proper Unicode support), specify at most
+        ``max_length=191`` because MySQL can only create unique indexes with
+        191 characters in that case by default.
+
+        .. versionchanged:: 1.10
+
+            The ``max_length`` increased from 30 to 150 characters.
 
     .. attribute:: first_name
 
@@ -82,11 +93,6 @@ Fields
     .. attribute:: last_login
 
         A datetime of the user's last login.
-
-        .. versionchanged:: 1.8
-
-            This field will be ``null`` if the user has never logged in.
-            Previously it was set to the current date/time by default.
 
     .. attribute:: date_joined
 
@@ -285,11 +291,6 @@ Anonymous users
       :meth:`~django.db.models.Model.save` and
       :meth:`~django.db.models.Model.delete()` raise :exc:`NotImplementedError`.
 
-    .. versionadded:: 1.8
-
-      ``AnonymousUser.get_username()`` has been added to
-      better mirror :class:`django.contrib.auth.models.User`.
-
 In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
 they're used by Web requests, as explained in the next section.
@@ -310,10 +311,6 @@ fields:
     .. attribute:: name
 
         Required. 255 characters or fewer. Example: ``'Can vote'``.
-
-        .. versionchanged:: 1.8
-
-            The ``max_length`` increased from 50 to 255 characters.
 
     .. attribute:: content_type
 
@@ -351,7 +348,7 @@ Fields
 
         Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
 
-            group.permissions = [permission_list]
+            group.permissions.set([permission_list])
             group.permissions.add(permission, permission, ...)
             group.permissions.remove(permission, permission, ...)
             group.permissions.clear()
@@ -459,8 +456,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         authenticated user or ``None``.
 
     .. method:: get_user_permissions(user_obj, obj=None)
-
-        .. versionadded:: 1.8
 
         Returns the set of permission strings the ``user_obj`` has from their
         own user permissions. Returns an empty set if

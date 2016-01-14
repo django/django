@@ -5,8 +5,6 @@ Database Functions
 .. module:: django.db.models.functions
     :synopsis: Database Functions
 
-.. versionadded:: 1.8
-
 The classes documented below provide a way for users to use functions provided
 by the underlying database as annotations, aggregations, or filters in Django.
 Functions are also :doc:`expressions <expressions>`, so they can be used and
@@ -180,6 +178,18 @@ Usage example::
     >>> print(author.name_length, author.goes_by_length)
     (14, None)
 
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import CharField
+    >>> from django.db.models.functions import Length
+    >>> CharField.register_lookup(Length, 'length')
+    >>> # Get authors whose name is longer than 7 characters
+    >>> authors = Author.objects.filter(name__length__gt=7)
+
+.. versionchanged:: 1.9
+
+    The ability to register the function as a transform was added.
+
 Lower
 ------
 
@@ -188,6 +198,8 @@ Lower
 Accepts a single text field or expression and returns the lowercase
 representation.
 
+It can also be registered as a transform as described in :class:`Length`.
+
 Usage example::
 
     >>> from django.db.models.functions import Lower
@@ -195,6 +207,10 @@ Usage example::
     >>> author = Author.objects.annotate(name_lower=Lower('name')).get()
     >>> print(author.name_lower)
     margaret smith
+
+.. versionchanged:: 1.9
+
+    The ability to register the function as a transform was added.
 
 Now
 ---
@@ -210,7 +226,7 @@ Usage example::
 
     >>> from django.db.models.functions import Now
     >>> Article.objects.filter(published__lte=Now())
-    [<Article: How to Django>]
+    <QuerySet [<Article: How to Django>]>
 
 .. admonition:: PostgreSQL considerations
 
@@ -246,6 +262,8 @@ Upper
 Accepts a single text field or expression and returns the uppercase
 representation.
 
+It can also be registered as a transform as described in :class:`Length`.
+
 Usage example::
 
     >>> from django.db.models.functions import Upper
@@ -253,3 +271,7 @@ Usage example::
     >>> author = Author.objects.annotate(name_upper=Upper('name')).get()
     >>> print(author.name_upper)
     MARGARET SMITH
+
+.. versionchanged:: 1.9
+
+    The ability to register the function as a transform was added.

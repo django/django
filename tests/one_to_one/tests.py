@@ -135,9 +135,14 @@ class OneToOneTests(TestCase):
         should raise an exception.
         """
         place = Place(name='User', address='London')
+        with self.assertRaises(Restaurant.DoesNotExist):
+            place.restaurant
         msg = "save() prohibited to prevent data loss due to unsaved related object 'place'."
         with self.assertRaisesMessage(ValueError, msg):
             Restaurant.objects.create(place=place, serves_hot_dogs=True, serves_pizza=False)
+        # place should not cache restaurant
+        with self.assertRaises(Restaurant.DoesNotExist):
+            place.restaurant
 
     def test_reverse_relationship_cache_cascade(self):
         """
@@ -166,7 +171,7 @@ class OneToOneTests(TestCase):
         """
         f = Favorites(name='Fred')
         f.save()
-        f.restaurants = [self.r1]
+        f.restaurants.set([self.r1])
         self.assertQuerysetEqual(
             f.restaurants.all(),
             ['<Restaurant: Demon Dogs the restaurant>']
@@ -180,6 +185,22 @@ class OneToOneTests(TestCase):
         """
         self.assertEqual(self.p1.restaurant, self.r1)
         self.assertEqual(self.p1.bar, self.b1)
+
+    def test_assign_none_reverse_relation(self):
+        p = Place.objects.get(name="Demon Dogs")
+        # Assigning None succeeds if field is null=True.
+        ug_bar = UndergroundBar.objects.create(place=p, serves_cocktails=False)
+        p.undergroundbar = None
+        self.assertIsNone(ug_bar.place)
+        ug_bar.save()
+        ug_bar.refresh_from_db()
+        self.assertIsNone(ug_bar.place)
+
+    def test_assign_none_null_reverse_relation(self):
+        p = Place.objects.get(name="Demon Dogs")
+        # Assigning None doesn't throw AttributeError if there isn't a related
+        # UndergroundBar.
+        p.undergroundbar = None
 
     def test_related_object_cache(self):
         """ Regression test for #6886 (the related-object cache) """
@@ -373,13 +394,15 @@ class OneToOneTests(TestCase):
         """
         p = Place()
         b = UndergroundBar.objects.create()
-        msg = (
-            'Cannot assign "<UndergroundBar: UndergroundBar object>": "Place" '
-            'instance isn\'t saved in the database.'
-        )
+
+        # Assigning a reverse relation on an unsaved object is allowed.
+        p.undergroundbar = b
+
+        # However saving the object is not allowed.
+        msg = "save() prohibited to prevent data loss due to unsaved related object 'place'."
         with self.assertNumQueries(0):
             with self.assertRaisesMessage(ValueError, msg):
-                p.undergroundbar = b
+                b.save()
 
     def test_nullable_o2o_delete(self):
         u = UndergroundBar.objects.create(place=self.p1)

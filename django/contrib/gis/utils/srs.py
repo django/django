@@ -75,6 +75,3 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
         SpatialRefSys.objects.using(database).get(srid=srs.srid)
     except SpatialRefSys.DoesNotExist:
         SpatialRefSys.objects.using(database).create(**kwargs)
-
-# Alias is for backwards-compatibility purposes.
-add_postgis_srs = add_srs_entry

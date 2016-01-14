@@ -74,7 +74,7 @@ class M2MRegressionTests(TestCase):
         t2 = Tag.objects.create(name='t2')
 
         c1 = TagCollection.objects.create(name='c1')
-        c1.tags = [t1, t2]
+        c1.tags.set([t1, t2])
         c1 = TagCollection.objects.get(name='c1')
 
         self.assertQuerysetEqual(c1.tags.all(), ["<Tag: t1>", "<Tag: t2>"], ordered=False)
@@ -104,10 +104,10 @@ class M2MRegressionTests(TestCase):
         t1 = Tag.objects.create(name='t1')
         t2 = Tag.objects.create(name='t2')
         c1 = TagCollection.objects.create(name='c1')
-        c1.tags = [t1, t2]
+        c1.tags.set([t1, t2])
 
         with self.assertRaises(TypeError):
-            c1.tags = 7
+            c1.tags.set(7)
 
         c1.refresh_from_db()
         self.assertQuerysetEqual(c1.tags.order_by('name'), ["<Tag: t1>", "<Tag: t2>"])

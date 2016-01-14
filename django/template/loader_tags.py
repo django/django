@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 
 from django.utils import six
@@ -11,6 +12,8 @@ from .library import Library
 register = Library()
 
 BLOCK_CONTEXT_KEY = 'block_context'
+
+logger = logging.getLogger('django.template')
 
 
 class ExtendsError(Exception):
@@ -207,6 +210,13 @@ class IncludeNode(Node):
         except Exception:
             if context.template.engine.debug:
                 raise
+            template_name = getattr(context, 'template_name', None) or 'unknown'
+            logger.warning(
+                "Exception raised while rendering {%% include %%} for "
+                "template '%s'. Empty string rendered instead.",
+                template_name,
+                exc_info=True,
+            )
             return ''
 
 

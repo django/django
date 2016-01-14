@@ -49,10 +49,22 @@ class M2MThroughTestCase(TestCase):
         )
 
     def test_cannot_use_setattr_on_reverse_m2m_with_intermediary_model(self):
-        self.assertRaises(AttributeError, setattr, self.bob, "group_set", [])
+        msg = (
+            "Cannot set values on a ManyToManyField which specifies an "
+            "intermediary model. Use m2m_through_regress.Membership's Manager "
+            "instead."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.bob.group_set.set([])
 
     def test_cannot_use_setattr_on_forward_m2m_with_intermediary_model(self):
-        self.assertRaises(AttributeError, setattr, self.roll, "members", [])
+        msg = (
+            "Cannot set values on a ManyToManyField which specifies an "
+            "intermediary model. Use m2m_through_regress.Membership's Manager "
+            "instead."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.roll.members.set([])
 
     def test_cannot_use_create_on_m2m_with_intermediary_model(self):
         self.assertRaises(AttributeError, self.rock.members.create, name="Anne")
@@ -105,7 +117,13 @@ class M2MThroughSerializationTestCase(TestCase):
 
         out = StringIO()
         management.call_command("dumpdata", "m2m_through_regress", format="json", stdout=out)
-        self.assertJSONEqual(out.getvalue().strip(), """[{"pk": %(m_pk)s, "model": "m2m_through_regress.membership", "fields": {"person": %(p_pk)s, "price": 100, "group": %(g_pk)s}}, {"pk": %(p_pk)s, "model": "m2m_through_regress.person", "fields": {"name": "Bob"}}, {"pk": %(g_pk)s, "model": "m2m_through_regress.group", "fields": {"name": "Roll"}}]""" % pks)
+        self.assertJSONEqual(
+            out.getvalue().strip(),
+            '[{"pk": %(m_pk)s, "model": "m2m_through_regress.membership", "fields": {"person": %(p_pk)s, "price": '
+            '100, "group": %(g_pk)s}}, {"pk": %(p_pk)s, "model": "m2m_through_regress.person", "fields": {"name": '
+            '"Bob"}}, {"pk": %(g_pk)s, "model": "m2m_through_regress.group", "fields": {"name": "Roll"}}]'
+            % pks
+        )
 
         out = StringIO()
         management.call_command("dumpdata", "m2m_through_regress", format="xml",
@@ -237,7 +255,15 @@ class ThroughLoadDataTestCase(TestCase):
     fixtures = ["m2m_through"]
 
     def test_sequence_creation(self):
-        "Check that sequences on an m2m_through are created for the through model, not a phantom auto-generated m2m table. Refs #11107"
+        """
+        Sequences on an m2m_through are created for the through model, not a
+        phantom auto-generated m2m table (#11107).
+        """
         out = StringIO()
         management.call_command("dumpdata", "m2m_through_regress", format="json", stdout=out)
-        self.assertJSONEqual(out.getvalue().strip(), """[{"pk": 1, "model": "m2m_through_regress.usermembership", "fields": {"price": 100, "group": 1, "user": 1}}, {"pk": 1, "model": "m2m_through_regress.person", "fields": {"name": "Guido"}}, {"pk": 1, "model": "m2m_through_regress.group", "fields": {"name": "Python Core Group"}}]""")
+        self.assertJSONEqual(
+            out.getvalue().strip(),
+            '[{"pk": 1, "model": "m2m_through_regress.usermembership", "fields": {"price": 100, "group": 1, "user"'
+            ': 1}}, {"pk": 1, "model": "m2m_through_regress.person", "fields": {"name": "Guido"}}, {"pk": 1, '
+            '"model": "m2m_through_regress.group", "fields": {"name": "Python Core Group"}}]'
+        )

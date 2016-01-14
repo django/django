@@ -36,8 +36,6 @@ attribute::
             migrations.RunPython(forwards),
         ]
 
-.. versionadded:: 1.8
-
 You can also provide hints that will be passed to the :meth:`allow_migrate()`
 method of database routers as ``**hints``:
 

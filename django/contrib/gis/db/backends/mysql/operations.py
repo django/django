@@ -16,7 +16,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     from_text = 'GeomFromText'
 
     Adapter = WKTAdapter
-    Adaptor = Adapter  # Backwards-compatibility alias.
 
     gis_operators = {
         'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
@@ -34,8 +33,11 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     }
 
     function_names = {
+        'Difference': 'ST_Difference',
         'Distance': 'ST_Distance',
+        'Intersection': 'ST_Intersection',
         'Length': 'GLength',
+        'SymDifference': 'ST_SymDifference',
         'Union': 'ST_Union',
     }
 
@@ -48,12 +50,12 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     def unsupported_functions(self):
         unsupported = {
             'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG', 'BoundingCircle',
-            'Difference', 'ForceRHR', 'GeoHash', 'Intersection', 'MemSize',
+            'ForceRHR', 'GeoHash', 'MemSize',
             'Perimeter', 'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid',
-            'SymDifference', 'Transform', 'Translate',
+            'Transform', 'Translate',
         }
         if self.connection.mysql_version < (5, 6, 1):
-            unsupported.update({'Distance', 'Union'})
+            unsupported.update({'Difference', 'Distance', 'Intersection', 'SymDifference', 'Union'})
         return unsupported
 
     def geo_db_type(self, f):

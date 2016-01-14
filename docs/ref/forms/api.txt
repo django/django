@@ -185,8 +185,6 @@ Note that ``Form.add_error()`` automatically removes the relevant field from
 
 .. method:: Form.has_error(field, code=None)
 
-.. versionadded:: 1.8
-
 This method returns a boolean designating whether a field has an error with
 a specific error ``code``. If ``code`` is ``None``, it will return ``True``
 if the field contains any errors at all.
@@ -570,11 +568,6 @@ classes, as needed. The HTML will look something like::
     >>> f['subject'].label_tag(attrs={'class': 'foo'})
     <label for="id_subject" class="foo required">Subject:</label>
 
-.. versionchanged:: 1.8
-
-    The ``required_css_class`` will also be added to the ``<label>`` tag as
-    seen above.
-
 .. _ref-forms-api-configuring-label:
 
 Configuring form elements' HTML ``id`` attributes and ``<label>`` tags
@@ -693,8 +686,6 @@ Note that the label suffix is added only if the last character of the
 label isn't a punctuation character (in English, those are ``.``, ``!``, ``?``
 or ``:``).
 
-.. versionadded:: 1.8
-
 Fields can also define their own :attr:`~django.forms.Field.label_suffix`.
 This will take precedence over :attr:`Form.label_suffix
 <django.forms.Form.label_suffix>`. The suffix can also be overridden at runtime
@@ -767,6 +758,8 @@ method you're using::
     <p>Sender: <input type="email" name="sender" value="invalid email address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
+.. _ref-forms-error-list-format:
+
 Customizing the error list format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -792,10 +785,10 @@ Python 2)::
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
 More granular output
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
-The ``as_p()``, ``as_ul()`` and ``as_table()`` methods are simply shortcuts for
-lazy developers -- they're not the only way a form object can be displayed.
+The ``as_p()``, ``as_ul()``, and ``as_table()`` methods are simply shortcuts --
+they're not the only way a form object can be displayed.
 
 .. class:: BoundField
 
@@ -830,107 +823,218 @@ The field-specific output honors the form object's ``auto_id`` setting::
     >>> print(f['message'])
     <input type="text" name="message" id="id_message" />
 
-For a field's list of errors, access the field's ``errors`` attribute.
+Attributes of ``BoundField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. attribute:: BoundField.data
+
+    This property returns the data for this :class:`~django.forms.BoundField`
+    extracted by the widget's :meth:`~django.forms.Widget.value_from_datadict`
+    method, or ``None`` if it wasn't given::
+
+        >>> unbound_form = ContactForm()
+        >>> print(unbound_form['subject'].data)
+        None
+        >>> bound_form = ContactForm(data={'subject': 'My Subject'})
+        >>> print(bound_form['subject'].data)
+        My Subject
 
 .. attribute:: BoundField.errors
 
-A list-like object that is displayed as an HTML ``<ul class="errorlist">``
-when printed::
+    A :ref:`list-like object <ref-forms-error-list-format>` that is displayed
+    as an HTML ``<ul class="errorlist">`` when printed::
 
-    >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
-    >>> f = ContactForm(data, auto_id=False)
-    >>> print(f['message'])
-    <input type="text" name="message" />
-    >>> f['message'].errors
-    ['This field is required.']
-    >>> print(f['message'].errors)
-    <ul class="errorlist"><li>This field is required.</li></ul>
-    >>> f['subject'].errors
-    []
-    >>> print(f['subject'].errors)
+        >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
+        >>> f = ContactForm(data, auto_id=False)
+        >>> print(f['message'])
+        <input type="text" name="message" />
+        >>> f['message'].errors
+        ['This field is required.']
+        >>> print(f['message'].errors)
+        <ul class="errorlist"><li>This field is required.</li></ul>
+        >>> f['subject'].errors
+        []
+        >>> print(f['subject'].errors)
 
-    >>> str(f['subject'].errors)
-    ''
+        >>> str(f['subject'].errors)
+        ''
 
-.. method:: BoundField.label_tag(contents=None, attrs=None, label_suffix=None)
+.. attribute:: BoundField.field
 
-To separately render the label tag of a form field, you can call its
-``label_tag`` method::
+    The form :class:`~django.forms.Field` instance from the form class that
+    this :class:`~django.forms.BoundField` wraps.
 
-    >>> f = ContactForm(data)
-    >>> print(f['message'].label_tag())
-    <label for="id_message">Message:</label>
+.. attribute:: BoundField.form
 
-Optionally, you can provide the ``contents`` parameter which will replace the
-auto-generated label tag. An optional ``attrs`` dictionary may contain
-additional attributes for the ``<label>`` tag.
+    The :class:`~django.forms.Form` instance this :class:`~django.forms.BoundField`
+    is bound to.
 
-The HTML that's generated includes the form's
-:attr:`~django.forms.Form.label_suffix` (a colon, by default) or, if set, the
-current field's :attr:`~django.forms.Field.label_suffix`. The optional
-``label_suffix`` parameter allows you to override any previously set
-suffix. For example, you can use an empty string to hide the label on selected
-fields. If you need to do this in a template, you could write a custom
-filter to allow passing parameters to ``label_tag``.
+.. attribute:: BoundField.help_text
 
-.. versionchanged:: 1.8
+    The :attr:`~django.forms.Field.help_text` of the field.
 
-    The label includes :attr:`~Form.required_css_class` if applicable.
+.. attribute:: BoundField.html_name
 
-.. method:: BoundField.css_classes()
-
-When you use Django's rendering shortcuts, CSS classes are used to
-indicate required form fields or fields that contain errors. If you're
-manually rendering a form, you can access these CSS classes using the
-``css_classes`` method::
-
-    >>> f = ContactForm(data)
-    >>> f['message'].css_classes()
-    'required'
-
-If you want to provide some additional classes in addition to the
-error and required classes that may be required, you can provide
-those classes as an argument::
-
-    >>> f = ContactForm(data)
-    >>> f['message'].css_classes('foo bar')
-    'foo bar required'
-
-.. method:: BoundField.value()
-
-Use this method to render the raw value of this field as it would be rendered
-by a ``Widget``::
-
-    >>> initial = {'subject': 'welcome'}
-    >>> unbound_form = ContactForm(initial=initial)
-    >>> bound_form = ContactForm(data, initial=initial)
-    >>> print(unbound_form['subject'].value())
-    welcome
-    >>> print(bound_form['subject'].value())
-    hi
+    The name that will be used in the widget's HTML ``name`` attribute. It takes
+    the form :attr:`~django.forms.Form.prefix` into account.
 
 .. attribute:: BoundField.id_for_label
 
-Use this property to render the ID of this field. For example, if you are
-manually constructing a ``<label>`` in your template (despite the fact that
-:meth:`~BoundField.label_tag` will do this for you):
+    Use this property to render the ID of this field. For example, if you are
+    manually constructing a ``<label>`` in your template (despite the fact that
+    :meth:`~BoundField.label_tag` will do this for you):
 
-.. code-block:: html+django
+    .. code-block:: html+django
 
-    <label for="{{ form.my_field.id_for_label }}">...</label>{{ my_field }}
+        <label for="{{ form.my_field.id_for_label }}">...</label>{{ my_field }}
 
-By default, this will be the field's name prefixed by ``id_``
-("``id_my_field``" for the example above). You may modify the ID by setting
-:attr:`~django.forms.Widget.attrs` on the field's widget. For example,
-declaring a field like this::
+    By default, this will be the field's name prefixed by ``id_``
+    ("``id_my_field``" for the example above). You may modify the ID by setting
+    :attr:`~django.forms.Widget.attrs` on the field's widget. For example,
+    declaring a field like this::
 
-    my_field = forms.CharField(widget=forms.TextInput(attrs={'id': 'myFIELD'}))
+        my_field = forms.CharField(widget=forms.TextInput(attrs={'id': 'myFIELD'}))
 
-and using the template above, would render something like:
+    and using the template above, would render something like:
 
-.. code-block:: html
+    .. code-block:: html
 
-    <label for="myFIELD">...</label><input id="myFIELD" type="text" name="my_field" />
+        <label for="myFIELD">...</label><input id="myFIELD" type="text" name="my_field" />
+
+.. attribute:: BoundField.is_hidden
+
+    Returns ``True`` if this :class:`~django.forms.BoundField`'s widget is
+    hidden.
+
+.. attribute:: BoundField.label
+
+    The :attr:`~django.forms.Field.label` of the field. This is used in
+    :meth:`~BoundField.label_tag`.
+
+.. attribute:: BoundField.name
+
+    The name of this field in the form::
+
+        >>> f = ContactForm()
+        >>> print(f['subject'].name)
+        subject
+        >>> print(f['message'].name)
+        message
+
+Methods of ``BoundField``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: BoundField.as_hidden(attrs=None, **kwargs)
+
+    Returns a string of HTML for representing this as an ``<input type="hidden">``.
+
+    ``**kwargs`` are passed to :meth:`~django.forms.BoundField.as_widget`.
+
+    This method is primarily used internally. You should use a widget instead.
+
+.. method:: BoundField.as_widget(widget=None, attrs=None, only_initial=False)
+
+    Renders the field by rendering the passed widget, adding any HTML
+    attributes passed as ``attrs``.  If no widget is specified, then the
+    field's default widget will be used.
+
+    ``only_initial`` is used by Django internals and should not be set
+    explicitly.
+
+.. method:: BoundField.css_classes()
+
+    When you use Django's rendering shortcuts, CSS classes are used to
+    indicate required form fields or fields that contain errors. If you're
+    manually rendering a form, you can access these CSS classes using the
+    ``css_classes`` method::
+
+        >>> f = ContactForm(data={'message': ''})
+        >>> f['message'].css_classes()
+        'required'
+
+    If you want to provide some additional classes in addition to the
+    error and required classes that may be required, you can provide
+    those classes as an argument::
+
+        >>> f = ContactForm(data={'message': ''})
+        >>> f['message'].css_classes('foo bar')
+        'foo bar required'
+
+.. method:: BoundField.label_tag(contents=None, attrs=None, label_suffix=None)
+
+    To separately render the label tag of a form field, you can call its
+    ``label_tag()`` method::
+
+        >>> f = ContactForm(data={'message': ''})
+        >>> print(f['message'].label_tag())
+        <label for="id_message">Message:</label>
+
+    You can provide the ``contents`` parameter which will replace the
+    auto-generated label tag. An ``attrs`` dictionary may contain additional
+    attributes for the ``<label>`` tag.
+
+    The HTML that's generated includes the form's
+    :attr:`~django.forms.Form.label_suffix` (a colon, by default) or, if set, the
+    current field's :attr:`~django.forms.Field.label_suffix`. The optional
+    ``label_suffix`` parameter allows you to override any previously set
+    suffix. For example, you can use an empty string to hide the label on selected
+    fields. If you need to do this in a template, you could write a custom
+    filter to allow passing parameters to ``label_tag``.
+
+.. method:: BoundField.value()
+
+    Use this method to render the raw value of this field as it would be rendered
+    by a ``Widget``::
+
+        >>> initial = {'subject': 'welcome'}
+        >>> unbound_form = ContactForm(initial=initial)
+        >>> bound_form = ContactForm(data={'subject': 'hi'}, initial=initial)
+        >>> print(unbound_form['subject'].value())
+        welcome
+        >>> print(bound_form['subject'].value())
+        hi
+
+Customizing ``BoundField``
+--------------------------
+
+.. versionadded:: 1.9
+
+If you need to access some additional information about a form field in a
+template and using a subclass of :class:`~django.forms.Field` isn't
+sufficient, consider also customizing :class:`~django.forms.BoundField`.
+
+A custom form field can override ``get_bound_field()``:
+
+.. method:: Field.get_bound_field(form, field_name)
+
+    Takes an instance of :class:`~django.forms.Form` and the name of the field.
+    The return value will be used when accessing the field in a template. Most
+    likely it will be an instance of a subclass of
+    :class:`~django.forms.BoundField`.
+
+If you have a ``GPSCoordinatesField``, for example, and want to be able to
+access additional information about the coordinates in a template, this could
+be implemented as follows::
+
+    class GPSCoordinatesBoundField(BoundField):
+        @property
+        def country(self):
+            """
+            Return the country the coordinates lie in or None if it can't be
+            determined.
+            """
+            value = self.value()
+            if value:
+                return get_country_from_coordinates(value)
+            else:
+                return None
+
+    class GPSCoordinatesField(Field):
+        def get_bound_field(self, form, field_name):
+            return GPSCoordinatesBoundField(form, self, field_name)
+
+Now you can access the country in a template with
+``{{ form.coordinates.country }}``.
 
 .. _binding-uploaded-files:
 

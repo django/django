@@ -2,12 +2,10 @@
 from __future__ import unicode_literals
 
 import time
-import warnings
 from collections import OrderedDict
 from importlib import import_module
 
 from django.apps import apps
-from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.sql import (
     emit_post_migrate_signal, emit_pre_migrate_signal,
@@ -17,7 +15,6 @@ from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.state import ProjectState
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.module_loading import module_has_submodule
 
 
@@ -45,8 +42,6 @@ class Command(BaseCommand):
             help='Detect if tables already exist and fake-apply initial migrations if so. Make sure '
                  'that the current database schema matches your initial migration before using this '
                  'flag. Django will only check for an existing table name.')
-        parser.add_argument('--list', '-l', action='store_true', dest='list', default=False,
-            help='Show a list of all known migrations and which are applied.')
         parser.add_argument('--run-syncdb', action='store_true', dest='run_syncdb',
             help='Creates tables for apps without migrations.')
 
@@ -64,24 +59,6 @@ class Command(BaseCommand):
         # Get the database we're operating from
         db = options.get('database')
         connection = connections[db]
-
-        # If they asked for a migration listing, quit main execution flow and show it
-        if options.get("list", False):
-            warnings.warn(
-                "The 'migrate --list' command is deprecated. Use 'showmigrations' instead.",
-                RemovedInDjango110Warning, stacklevel=2)
-            self.stdout.ending = None  # Remove when #21429 is fixed
-            return call_command(
-                'showmigrations',
-                '--list',
-                app_labels=[options['app_label']] if options['app_label'] else None,
-                database=db,
-                no_color=options.get('no_color'),
-                settings=options.get('settings'),
-                stdout=self.stdout,
-                traceback=options.get('traceback'),
-                verbosity=self.verbosity,
-            )
 
         # Hook for backends needing any database preparation
         connection.prepare_database()
@@ -214,9 +191,9 @@ class Command(BaseCommand):
             elif action == "apply_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
                 if fake:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
                 else:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
             elif action == "unapply_start":
                 if compute_time:
                     self.start = time.time()
@@ -225,9 +202,9 @@ class Command(BaseCommand):
             elif action == "unapply_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
                 if fake:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
                 else:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
             elif action == "render_start":
                 if compute_time:
                     self.start = time.time()
@@ -235,7 +212,7 @@ class Command(BaseCommand):
                 self.stdout.flush()
             elif action == "render_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
-                self.stdout.write(self.style.MIGRATE_SUCCESS(" DONE" + elapsed))
+                self.stdout.write(self.style.SUCCESS(" DONE" + elapsed))
 
     def sync_apps(self, connection, app_labels):
         "Runs the old syncdb-style operation on a list of app_labels."

@@ -1,6 +1,5 @@
 import warnings
 
-from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.db.models.fields import (
     GeometryField, LineStringField, PointField, get_srid_info,
 )
@@ -11,13 +10,12 @@ from django.contrib.gis.db.models.sql import (
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 from django.db import connections
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import RawSQL
 from django.db.models.fields import Field
 from django.db.models.query import QuerySet
 from django.utils import six
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 class GeoQuerySet(QuerySet):
@@ -62,19 +60,6 @@ class GeoQuerySet(QuerySet):
         """
         return self._geom_attribute('centroid', **kwargs)
 
-    def collect(self, **kwargs):
-        """
-        Performs an aggregate collect operation on the given geometry field.
-        This is analogous to a union operation, but much faster because
-        boundaries are not dissolved.
-        """
-        warnings.warn(
-            "The collect GeoQuerySet method is deprecated. Use the Collect() "
-            "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango110Warning, stacklevel=2
-        )
-        return self._spatial_aggregate(aggregates.Collect, **kwargs)
-
     def difference(self, geom, **kwargs):
         """
         Returns the spatial difference of the geographic field in a `difference`
@@ -108,31 +93,6 @@ class GeoQuerySet(QuerySet):
         """
         return self._geom_attribute('envelope', **kwargs)
 
-    def extent(self, **kwargs):
-        """
-        Returns the extent (aggregate) of the features in the GeoQuerySet.  The
-        extent will be returned as a 4-tuple, consisting of (xmin, ymin, xmax, ymax).
-        """
-        warnings.warn(
-            "The extent GeoQuerySet method is deprecated. Use the Extent() "
-            "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango110Warning, stacklevel=2
-        )
-        return self._spatial_aggregate(aggregates.Extent, **kwargs)
-
-    def extent3d(self, **kwargs):
-        """
-        Returns the aggregate extent, in 3D, of the features in the
-        GeoQuerySet. It is returned as a 6-tuple, comprising:
-          (xmin, ymin, zmin, xmax, ymax, zmax).
-        """
-        warnings.warn(
-            "The extent3d GeoQuerySet method is deprecated. Use the Extent3D() "
-            "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango110Warning, stacklevel=2
-        )
-        return self._spatial_aggregate(aggregates.Extent3D, **kwargs)
-
     def force_rhr(self, **kwargs):
         """
         Returns a modified version of the Polygon/MultiPolygon in which
@@ -153,8 +113,7 @@ class GeoQuerySet(QuerySet):
         """
         backend = connections[self.db].ops
         if not backend.geojson:
-            raise NotImplementedError('Only PostGIS 1.3.4+ and SpatiaLite 3.0+ '
-                                      'support GeoJSON serialization.')
+            raise NotImplementedError('Only PostGIS and SpatiaLite support GeoJSON serialization.')
 
         if not isinstance(precision, six.integer_types):
             raise TypeError('Precision keyword must be set with an integer.')
@@ -226,19 +185,6 @@ class GeoQuerySet(QuerySet):
         stored in a `length` attribute on each element of this GeoQuerySet.
         """
         return self._distance_attribute('length', None, **kwargs)
-
-    def make_line(self, **kwargs):
-        """
-        Creates a linestring from all of the PointField geometries in the
-        this GeoQuerySet and returns it.  This is a spatial aggregate
-        method, and thus returns a geometry rather than a GeoQuerySet.
-        """
-        warnings.warn(
-            "The make_line GeoQuerySet method is deprecated. Use the MakeLine() "
-            "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango110Warning, stacklevel=2
-        )
-        return self._spatial_aggregate(aggregates.MakeLine, geo_field_type=PointField, **kwargs)
 
     def mem_size(self, **kwargs):
         """
@@ -415,19 +361,6 @@ class GeoQuerySet(QuerySet):
         """
         return self._geomset_attribute('union', geom, **kwargs)
 
-    def unionagg(self, **kwargs):
-        """
-        Performs an aggregate union on the given geometry field.  Returns
-        None if the GeoQuerySet is empty.  The `tolerance` keyword is for
-        Oracle backends only.
-        """
-        warnings.warn(
-            "The unionagg GeoQuerySet method is deprecated. Use the Union() "
-            "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango110Warning, stacklevel=2
-        )
-        return self._spatial_aggregate(aggregates.Union, **kwargs)
-
     # ### Private API -- Abstracted DRY routines. ###
     def _spatial_setup(self, att, desc=None, field_name=None, geo_field_type=None):
         """
@@ -462,35 +395,6 @@ class GeoQuerySet(QuerySet):
 
         return procedure_args, geo_field
 
-    def _spatial_aggregate(self, aggregate, field_name=None,
-                           geo_field_type=None, tolerance=0.05):
-        """
-        DRY routine for calling aggregate spatial stored procedures and
-        returning their result to the caller of the function.
-        """
-        # Getting the field the geographic aggregate will be called on.
-        geo_field = self._geo_field(field_name)
-        if not geo_field:
-            raise TypeError('%s aggregate only available on GeometryFields.' % aggregate.name)
-
-        # Checking if there are any geo field type limitations on this
-        # aggregate (e.g. ST_Makeline only operates on PointFields).
-        if geo_field_type is not None and not isinstance(geo_field, geo_field_type):
-            raise TypeError('%s aggregate may only be called on %ss.' % (aggregate.name, geo_field_type.__name__))
-
-        # Getting the string expression of the field name, as this is the
-        # argument taken by `Aggregate` objects.
-        agg_col = field_name or geo_field.name
-
-        # Adding any keyword parameters for the Aggregate object. Oracle backends
-        # in particular need an additional `tolerance` parameter.
-        agg_kwargs = {}
-        if connections[self.db].ops.oracle:
-            agg_kwargs['tolerance'] = tolerance
-
-        # Calling the QuerySet.aggregate, and returning only the value of the aggregate.
-        return self.aggregate(geoagg=aggregate(agg_col, **agg_kwargs))['geoagg']
-
     def _spatial_attribute(self, att, settings, field_name=None, model_att=None):
         """
         DRY routine for calling a spatial stored procedure on a geometry column
@@ -502,7 +406,7 @@ class GeoQuerySet(QuerySet):
           SQL function to call.
 
          settings:
-          Dictonary of internal settings to customize for the spatial procedure.
+          Dictionary of internal settings to customize for the spatial procedure.
 
         Public Keyword Arguments:
 
@@ -771,9 +675,10 @@ class GeoQuerySet(QuerySet):
         if geo_field not in opts.fields:
             # Is this operation going to be on a related geographic field?
             # If so, it'll have to be added to the select related information
-            # (e.g., if 'location__point' was given as the field name).
+            # (e.g., if 'location__point' was given as the field name, then
+            # chop the non-relational field and add select_related('location')).
             # Note: the operation really is defined as "must add select related!"
-            self.query.add_select_related([field_name])
+            self.query.add_select_related([field_name.rsplit(LOOKUP_SEP, 1)[0]])
             # Call pre_sql_setup() so that compiler.select gets populated.
             compiler.pre_sql_setup()
             for col, _, _ in compiler.select:

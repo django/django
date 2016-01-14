@@ -10,5 +10,5 @@ def get_wsgi_application():
     Allows us to avoid making django.core.handlers.WSGIHandler public API, in
     case the internal WSGI implementation changes or moves in the future.
     """
-    django.setup()
+    django.setup(set_prefix=False)
     return WSGIHandler()

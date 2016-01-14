@@ -345,11 +345,6 @@ Integrating with :mod:`django.contrib.sitemaps`
     :attr:`~django.contrib.sitemaps.Sitemap.changefreq` or
     :attr:`~django.contrib.sitemaps.Sitemap.priority`.
 
-    .. versionchanged:: 1.8
-
-        This class is available from ``django.contrib.sitemaps.FlatPageSitemap``
-        in older version of Django.
-
 Example
 -------
 

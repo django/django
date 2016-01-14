@@ -225,8 +225,8 @@ We'll demonstrate this with the ``Author`` model we used in the
     :filename: views.py
 
     from django.http import HttpResponseForbidden, HttpResponseRedirect
-    from django.core.urlresolvers import reverse
-    from django.views.generic import View
+    from django.urls import reverse
+    from django.views import View
     from django.views.generic.detail import SingleObjectMixin
     from books.models import Author
 
@@ -445,7 +445,7 @@ Our new ``AuthorDetail`` looks like this::
 
     from django import forms
     from django.http import HttpResponseForbidden
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.views.generic import DetailView
     from django.views.generic.edit import FormMixin
     from books.models import Author
@@ -541,7 +541,7 @@ can find the author we're talking about, and we have to remember to set
 ``template_name`` to ensure that form errors will render the same
 template as ``AuthorDisplay`` is using on ``GET``::
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.http import HttpResponseForbidden
     from django.views.generic import FormView
     from django.views.generic.detail import SingleObjectMixin
@@ -570,7 +570,7 @@ You can of course pass through keyword arguments to
 would in your URLconf, such as if you wanted the ``AuthorInterest`` behavior
 to also appear at another URL but using a different template::
 
-    from django.views.generic import View
+    from django.views import View
 
     class AuthorDetail(View):
 

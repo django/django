@@ -76,7 +76,7 @@ generate signatures. You can use a different secret by passing it to the
 
     Returns a signer which uses ``key`` to generate signatures and ``sep`` to
     separate values. ``sep`` cannot be in the `URL safe base64 alphabet
-    <http://tools.ietf.org/html/rfc4648#section-5>`_.  This alphabet contains
+    <https://tools.ietf.org/html/rfc4648#section-5>`_.  This alphabet contains
     alphanumeric characters, hyphens, and underscores.
 
 Using the salt argument
@@ -141,10 +141,6 @@ created within a specified period of time::
         Checks if ``value`` was signed less than ``max_age`` seconds ago,
         otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
         accept an integer or a :py:class:`datetime.timedelta` object.
-
-        .. versionchanged:: 1.8
-
-            Previously, the ``max_age`` parameter only accepted an integer.
 
 Protecting complex data structures
 ----------------------------------

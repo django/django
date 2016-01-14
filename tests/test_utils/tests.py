@@ -8,8 +8,7 @@ from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import default_storage
-from django.core.urlresolvers import NoReverseMatch, reverse
-from django.db import connection, router
+from django.db import connection, models, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -18,7 +17,10 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import CaptureQueriesContext, override_settings
+from django.test.utils import (
+    CaptureQueriesContext, isolate_apps, override_settings,
+)
+from django.urls import NoReverseMatch, reverse
 from django.utils import six
 from django.utils._os import abspathu
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -363,7 +365,8 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             with self.assertTemplateUsed(template_name='template_used/base.html'):
                 pass
 
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
+        with six.assertRaisesRegex(
+                self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
@@ -519,13 +522,16 @@ class HTMLEqualTests(SimpleTestCase):
 <td><input type="text" value="1940-10-9" name="birthday" id="id_birthday" /></td></tr>""",
             """
         <tr><th>
-            <label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" />
+            <label for="id_first_name">First name:</label></th><td>
+            <input type="text" name="first_name" value="John" id="id_first_name" />
         </td></tr>
         <tr><th>
-            <label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" value="Lennon" id="id_last_name" />
+            <label for="id_last_name">Last name:</label></th><td>
+            <input type="text" name="last_name" value="Lennon" id="id_last_name" />
         </td></tr>
         <tr><th>
-            <label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" />
+            <label for="id_birthday">Birthday:</label></th><td>
+            <input type="text" name="birthday" value="1940-10-9" id="id_birthday" />
         </td></tr>
         """)
 
@@ -645,7 +651,11 @@ class HTMLEqualTests(SimpleTestCase):
 
     def test_unicode_handling(self):
         response = HttpResponse('<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
-        self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
+        self.assertContains(
+            response,
+            '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>',
+            html=True
+        )
 
 
 class JSONEqualTests(SimpleTestCase):
@@ -745,6 +755,16 @@ class XMLEqualTests(SimpleTestCase):
         xml2 = "<?xml version='1.0'?><!-- comment2 --><elem attr2='b' attr1='a' />"
         self.assertXMLEqual(xml1, xml2)
 
+    def test_simple_equal_with_leading_or_trailing_whitespace(self):
+        xml1 = "<elem>foo</elem> \t\n"
+        xml2 = " \t\n<elem>foo</elem>"
+        self.assertXMLEqual(xml1, xml2)
+
+    def test_simple_not_equal_with_whitespace_in_the_middle(self):
+        xml1 = "<elem>foo</elem><elem>bar</elem>"
+        xml2 = "<elem>foo</elem> <elem>bar</elem>"
+        self.assertXMLNotEqual(xml1, xml2)
+
 
 class SkippingExtraTests(TestCase):
     fixtures = ['should_not_be_loaded.json']
@@ -805,9 +825,14 @@ class AssertFieldOutputTests(SimpleTestCase):
     def test_assert_field_output(self):
         error_invalid = ['Enter a valid email address.']
         self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid + ['Another error']})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'Wrong output'}, {'aaa': error_invalid})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': ['Come on, gimme some well formatted data, dude.']})
+        with self.assertRaises(AssertionError):
+            self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid + ['Another error']})
+        with self.assertRaises(AssertionError):
+            self.assertFieldOutput(EmailField, {'a@a.com': 'Wrong output'}, {'aaa': error_invalid})
+        with self.assertRaises(AssertionError):
+            self.assertFieldOutput(
+                EmailField, {'a@a.com': 'a@a.com'}, {'aaa': ['Come on, gimme some well formatted data, dude.']}
+            )
 
     def test_custom_required_message(self):
         class MyCustomField(IntegerField):
@@ -1006,3 +1031,40 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
 
     def test_allowed_database_queries(self):
         Car.objects.first()
+
+
+@isolate_apps('test_utils', attr_name='class_apps')
+class IsolatedAppsTests(SimpleTestCase):
+    def test_installed_apps(self):
+        self.assertEqual([app_config.label for app_config in self.class_apps.get_app_configs()], ['test_utils'])
+
+    def test_class_decoration(self):
+        class ClassDecoration(models.Model):
+            pass
+        self.assertEqual(ClassDecoration._meta.apps, self.class_apps)
+
+    @isolate_apps('test_utils', kwarg_name='method_apps')
+    def test_method_decoration(self, method_apps):
+        class MethodDecoration(models.Model):
+            pass
+        self.assertEqual(MethodDecoration._meta.apps, method_apps)
+
+    def test_context_manager(self):
+        with isolate_apps('test_utils') as context_apps:
+            class ContextManager(models.Model):
+                pass
+        self.assertEqual(ContextManager._meta.apps, context_apps)
+
+    @isolate_apps('test_utils', kwarg_name='method_apps')
+    def test_nested(self, method_apps):
+        class MethodDecoration(models.Model):
+            pass
+        with isolate_apps('test_utils') as context_apps:
+            class ContextManager(models.Model):
+                pass
+            with isolate_apps('test_utils') as nested_context_apps:
+                class NestedContextManager(models.Model):
+                    pass
+        self.assertEqual(MethodDecoration._meta.apps, method_apps)
+        self.assertEqual(ContextManager._meta.apps, context_apps)
+        self.assertEqual(NestedContextManager._meta.apps, nested_context_apps)

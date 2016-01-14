@@ -71,6 +71,8 @@ urlpatterns = auth_urlpatterns + [
     url(r'^logout/next_page/named/$', views.logout, dict(next_page='password_reset')),
     url(r'^remote_user/$', remote_user_auth_view),
     url(r'^password_reset_from_email/$', views.password_reset, dict(from_email='staffmember@example.com')),
+    url(r'^password_reset_extra_email_context/$', views.password_reset,
+        dict(extra_email_context=dict(greeting='Hello!'))),
     url(r'^password_reset/custom_redirect/$', views.password_reset, dict(post_reset_redirect='/custom/')),
     url(r'^password_reset/custom_redirect/named/$', views.password_reset, dict(post_reset_redirect='password_reset')),
     url(r'^password_reset/html_email_template/$', views.password_reset,
@@ -83,7 +85,6 @@ urlpatterns = auth_urlpatterns + [
         dict(post_reset_redirect='password_reset')),
     url(r'^password_change/custom/$', views.password_change, dict(post_change_redirect='/custom/')),
     url(r'^password_change/custom/named/$', views.password_change, dict(post_change_redirect='password_reset')),
-    url(r'^admin_password_reset/$', views.password_reset, dict(is_admin_site=True)),
     url(r'^login_required/$', login_required(views.password_reset)),
     url(r'^login_required_login_url/$', login_required(views.password_reset, login_url='/somewhere/')),
 

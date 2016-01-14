@@ -122,7 +122,10 @@ class StateTests(SimpleTestCase):
         self.assertEqual(author_state.fields[1][1].max_length, 255)
         self.assertEqual(author_state.fields[2][1].null, False)
         self.assertEqual(author_state.fields[3][1].null, True)
-        self.assertEqual(author_state.options, {"unique_together": {("name", "bio")}, "index_together": {("bio", "age")}})
+        self.assertEqual(
+            author_state.options,
+            {"unique_together": {("name", "bio")}, "index_together": {("bio", "age")}}
+        )
         self.assertEqual(author_state.bases, (models.Model, ))
 
         self.assertEqual(book_state.app_label, "migrations")
@@ -956,6 +959,16 @@ class RelatedModelsTests(SimpleTestCase):
         B = self.create_model("B")
         self.assertRelated(A, [B])
         self.assertRelated(B, [A])
+
+    def test_fk_through_proxy(self):
+        A = self.create_model("A")
+        B = self.create_model("B", bases=(A,), proxy=True)
+        C = self.create_model("C", bases=(B,), proxy=True)
+        D = self.create_model("D", foreign_keys=[models.ForeignKey('C', models.CASCADE)])
+        self.assertRelated(A, [B, C, D])
+        self.assertRelated(B, [A, C, D])
+        self.assertRelated(C, [A, B, D])
+        self.assertRelated(D, [A, B, C])
 
     def test_nested_fk(self):
         A = self.create_model("A", foreign_keys=[models.ForeignKey('B', models.CASCADE)])

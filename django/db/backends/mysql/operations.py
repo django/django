@@ -13,8 +13,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     # MySQL stores positive fields as UNSIGNED ints.
     integer_field_ranges = dict(BaseDatabaseOperations.integer_field_ranges,
-        PositiveSmallIntegerField=(0, 4294967295),
-        PositiveIntegerField=(0, 18446744073709551615),
+        PositiveSmallIntegerField=(0, 65535),
+        PositiveIntegerField=(0, 4294967295),
     )
 
     def date_extract_sql(self, lookup_type, field_name):
@@ -27,17 +27,15 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
     def date_trunc_sql(self, lookup_type, field_name):
-        fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
-        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')  # Use double percents to escape.
-        format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
-        try:
-            i = fields.index(lookup_type) + 1
-        except ValueError:
-            sql = field_name
+        fields = {
+            'year': '%%Y-01-01',
+            'month': '%%Y-%%m-01',
+        }  # Use double percents to escape.
+        if lookup_type in fields:
+            format_str = fields[lookup_type]
+            return "CAST(DATE_FORMAT(%s, '%s') AS DATE)" % (field_name, format_str)
         else:
-            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
-            sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
-        return sql
+            return "DATE(%s)" % (field_name)
 
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
@@ -166,9 +164,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def max_name_length(self):
         return 64
 
-    def bulk_insert_sql(self, fields, num_values):
-        items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
-        return "VALUES " + ", ".join([items_sql] * num_values)
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
+        values_sql = ", ".join("(%s)" % sql for sql in placeholder_rows_sql)
+        return "VALUES " + values_sql
 
     def combine_expression(self, connector, sub_expressions):
         """

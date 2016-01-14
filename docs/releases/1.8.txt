@@ -25,8 +25,13 @@ release date of Django 1.8.
 Python compatibility
 ====================
 
-Like Django 1.7, Django 1.8 requires Python 2.7 or above, though we
-**highly recommend** the latest minor release.
+Django 1.8 requires Python 2.7, 3.2, 3.3, 3.4, or 3.5. We **highly recommend**
+and only officially support the latest release of each series.
+
+Django 1.8 is the first release to support Python 3.5.
+
+Due to the end of upstream support for Python 3.2 in February 2016, we won't
+test Django 1.8.x on Python 3.2 after the end of 2016.
 
 What's new in Django 1.8
 ========================
@@ -424,12 +429,12 @@ Management Commands
   introspect :class:`~django.db.models.AutoField` for MySQL and PostgreSQL
   databases.
 
-* When calling management commands from code through :ref:`call_command
-  <call-command>` and passing options, the option name can match the command
-  line option name (without the initial dashes) or the final option destination
-  variable name, but in either case, the resulting option received by the
-  command is now always the ``dest`` name specified in the command option
-  definition (as long as the command uses the new :py:mod:`argparse` module).
+* When calling management commands with options using
+  :func:`~django.core.management.call_command`, the option name can match the
+  command line option name (without the initial dashes) or the final option
+  destination variable name, but in either case, the resulting option received
+  by the command is now always the ``dest`` name specified in the command
+  option definition (as long as the command uses the :mod:`argparse` module).
 
 * The :djadmin:`dbshell` command now supports MySQL's optional SSL certificate
   authority setting (``--ssl-ca``).
@@ -673,13 +678,12 @@ Related object operations are run in a transaction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some operations on related objects such as
-:meth:`~django.db.models.fields.related.RelatedManager.add()` or
-:ref:`direct assignment<direct-assignment>` ran multiple data modifying
-queries without wrapping them in transactions. To reduce the risk of data
-corruption, all data modifying methods that affect multiple related objects
-(i.e. ``add()``, ``remove()``, ``clear()``, and :ref:`direct assignment
-<direct-assignment>`) now perform their data modifying queries from within a
-transaction, provided your database supports transactions.
+:meth:`~django.db.models.fields.related.RelatedManager.add()` or direct
+assignment ran multiple data modifying queries without wrapping them in
+transactions. To reduce the risk of data corruption, all data modifying methods
+that affect multiple related objects (i.e. ``add()``, ``remove()``,
+``clear()``, and direct assignment) now perform their data modifying queries
+from within a transaction, provided your database supports transactions.
 
 This has one backwards incompatible side effect, signal handlers triggered from
 these methods are now executed within the method's transaction and any
@@ -701,6 +705,9 @@ Assigning unsaved objects to relations raises an error
         Traceback (most recent call last):
         ...
         ValueError: save() prohibited to prevent data loss due to unsaved related object 'author'.
+
+    A similar check on assignment to reverse one-to-one relations was removed
+    in Django 1.8.5.
 
 Assigning unsaved objects to a :class:`~django.db.models.ForeignKey`,
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, and
@@ -735,15 +742,14 @@ Management commands that only accept positional arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you have written a custom management command that only accepts positional
-arguments and you didn't specify the
-:attr:`~django.core.management.BaseCommand.args` command variable, you might
-get an error like ``Error: unrecognized arguments: ...``, as variable parsing
-is now based on :py:mod:`argparse` which doesn't implicitly accept positional
+arguments and you didn't specify the ``args`` command variable, you might get
+an error like ``Error: unrecognized arguments: ...``, as variable parsing is
+now based on :py:mod:`argparse` which doesn't implicitly accept positional
 arguments. You can make your command backwards compatible by simply setting the
-:attr:`~django.core.management.BaseCommand.args` class variable. However, if
-you don't have to keep compatibility with older Django versions, it's better to
-implement the new :meth:`~django.core.management.BaseCommand.add_arguments`
-method as described in :doc:`/howto/custom-management-commands`.
+``args`` class variable. However, if you don't have to keep compatibility with
+older Django versions, it's better to implement the new
+:meth:`~django.core.management.BaseCommand.add_arguments` method as described
+in :doc:`/howto/custom-management-commands`.
 
 Custom test management command arguments through test runner
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -927,7 +933,7 @@ Removal of ``django.contrib.formtools``
 The formtools contrib app has been moved to a separate package and the
 relevant documentation pages have been updated or removed.
 
-The new package is available `on Github`_ and on PyPI.
+The new package is available `on GitHub`_ and on PyPI.
 
 .. _on GitHub: https://github.com/django/django-formtools/
 
@@ -1106,9 +1112,8 @@ Miscellaneous
 * The default max size of the Oracle test tablespace has increased from 300M
   (or 200M, before 1.7.2) to 500M.
 
-* :func:`~django.core.urlresolvers.reverse` and
-  :func:`~django.core.urlresolvers.reverse_lazy` now return Unicode strings
-  instead of byte strings.
+* ``reverse()`` and ``reverse_lazy()`` now return Unicode strings instead of
+  byte strings.
 
 * The ``CacheClass`` shim has been removed from all cache backends.
   These aliases were provided for backwards compatibility with Django 1.3.
@@ -1116,8 +1121,8 @@ Miscellaneous
   class name found in the :setting:`BACKEND <CACHES-BACKEND>` key of the
   :setting:`CACHES` setting.
 
-* By default, :ref:`call_command <call-command>` now always skips the check
-  framework (unless you pass it ``skip_checks=False``).
+* By default, :func:`~django.core.management.call_command` now always skips the
+  check framework (unless you pass it ``skip_checks=False``).
 
 * When iterating over lines, :class:`~django.core.files.File` now uses
   `universal newlines`_. The following are recognized as ending a line: the
@@ -1177,6 +1182,12 @@ Miscellaneous
 * The ``name`` field of :class:`django.contrib.contenttypes.models.ContentType`
   has been removed by a migration and replaced by a property. That means it's
   not possible to query or filter a ``ContentType`` by this field any longer.
+
+  Be careful if you upgrade to Django 1.8 and skip Django 1.7. If you run
+  ``manage.py migrate --fake``, this migration will be skipped and you'll see
+  a ``RuntimeError: Error creating new content types.`` exception because the
+  ``name`` column won't be dropped from the database. Use ``migrate.py migrate
+  --fake-initial`` to fake only the initial migration instead.
 
 * :djadmin:`migrate` now accepts the :djadminopt:`--fake-initial` option to
   allow faking initial migrations. In 1.7 initial migrations were always
@@ -1304,10 +1315,10 @@ Built-in template context processors have been moved to
 ``django.test.SimpleTestCase.urls``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The attribute :attr:`SimpleTestCase.urls <django.test.SimpleTestCase.urls>`
-for specifying URLconf configuration in tests has been deprecated and will be
-removed in Django 1.10. Use :func:`@override_settings(ROOT_URLCONF=...)
-<django.test.override_settings>` instead.
+The attribute ``SimpleTestCase.urls`` for specifying URLconf configuration in
+tests has been deprecated and will be removed in Django 1.10. Use
+:func:`@override_settings(ROOT_URLCONF=...) <django.test.override_settings>`
+instead.
 
 ``prefix`` argument to :func:`~django.conf.urls.i18n.i18n_patterns`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1322,8 +1333,8 @@ Using an incorrect count of unpacked values in the :ttag:`for` template tag
 Using an incorrect count of unpacked values in :ttag:`for` tag will raise an
 exception rather than fail silently in Django 1.10.
 
-Passing a dotted path to :func:`~django.core.urlresolvers.reverse()` and :ttag:`url`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Passing a dotted path to ``reverse()`` and :ttag:`url`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Reversing URLs by Python path is an expensive operation as it causes the
 path being reversed to be imported. This behavior has also resulted in a
@@ -1382,9 +1393,9 @@ arguments through ``argparse.add_argument()``. See
 ``django.core.management.NoArgsCommand``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The class :class:`~django.core.management.NoArgsCommand` is now deprecated and
-will be removed in Django 1.10. Use :class:`~django.core.management.BaseCommand`
-instead, which takes no arguments by default.
+The class ``NoArgsCommand`` is now deprecated and will be removed in Django
+1.10. Use :class:`~django.core.management.BaseCommand` instead, which takes no
+arguments by default.
 
 Listing all migrations in a project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1566,7 +1577,7 @@ The following functions will no longer accept a ``dirs`` parameter to override
 * :func:`django.template.loader.get_template()`
 * :func:`django.template.loader.select_template()`
 * :func:`django.shortcuts.render()`
-* :func:`django.shortcuts.render_to_response()`
+* ``django.shortcuts.render_to_response()``
 
 The parameter didn't work consistently across different template loaders and
 didn't work for included templates.
@@ -1619,7 +1630,7 @@ attribute will change from ``True`` to ``False`` in Django 1.9.
 Using ``AuthenticationMiddleware`` without ``SessionAuthenticationMiddleware``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:class:`django.contrib.auth.middleware.SessionAuthenticationMiddleware` was
+``django.contrib.auth.middleware.SessionAuthenticationMiddleware`` was
 added in Django 1.7. In Django 1.7.2, its functionality was moved to
 ``auth.get_user()`` and, for backwards compatibility, enabled only if
 ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears in
@@ -1651,7 +1662,7 @@ Django 1.10.
 ``ssi`` template tag
 ~~~~~~~~~~~~~~~~~~~~
 
-The :ttag:`ssi` template tag allows files to be included in a template by
+The ``ssi`` template tag allows files to be included in a template by
 absolute path. This is of limited use in most deployment situations, and
 the :ttag:`include` tag often makes more sense. This tag is now deprecated and
 will be removed in Django 1.10.

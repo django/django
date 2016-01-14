@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 import random as random_module
 import re
-import warnings
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from pprint import pformat
@@ -11,11 +10,10 @@ from pprint import pformat
 from django.conf import settings
 from django.utils import formats, six
 from django.utils.dateformat import format, time_format
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (
     avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
-    remove_tags, strip_tags, urlize as _urlize,
+    strip_tags, urlize as _urlize,
 )
 from django.utils.http import urlquote
 from django.utils.safestring import SafeData, mark_for_escaping, mark_safe
@@ -504,13 +502,6 @@ def safeseq(value):
 
 @register.filter(is_safe=True)
 @stringfilter
-def removetags(value, tags):
-    """Removes a space separated list of [X]HTML tags from the output."""
-    return remove_tags(value, tags)
-
-
-@register.filter(is_safe=True)
-@stringfilter
 def striptags(value):
     """Strips all [X]HTML tags."""
     return strip_tags(value)
@@ -650,37 +641,6 @@ def unordered_list(value, autoescape=True):
     else:
         escaper = lambda x: x
 
-    def convert_old_style_list(list_):
-        """
-        Converts old style lists to the new easier to understand format.
-
-        The old list format looked like:
-            ['Item 1', [['Item 1.1', []], ['Item 1.2', []]]
-
-        And it is converted to:
-            ['Item 1', ['Item 1.1', 'Item 1.2]]
-        """
-        if not isinstance(list_, (tuple, list)) or len(list_) != 2:
-            return list_, False
-        first_item, second_item = list_
-        if second_item == []:
-            return [first_item], True
-        try:
-            # see if second item is iterable
-            iter(second_item)
-        except TypeError:
-            return list_, False
-        old_style_list = True
-        new_second_item = []
-        for sublist in second_item:
-            item, old_style_list = convert_old_style_list(sublist)
-            if not old_style_list:
-                break
-            new_second_item.extend(item)
-        if old_style_list:
-            second_item = new_second_item
-        return [first_item, second_item], old_style_list
-
     def walk_items(item_list):
         item_iterator = iter(item_list)
         try:
@@ -717,12 +677,6 @@ def unordered_list(value, autoescape=True):
                 indent, escaper(force_text(item)), sublist))
         return '\n'.join(output)
 
-    value, converted = convert_old_style_list(value)
-    if converted:
-        warnings.warn(
-            "The old style syntax in `unordered_list` is deprecated and will "
-            "be removed in Django 1.10. Use the the new format instead.",
-            RemovedInDjango110Warning)
     return mark_safe(list_formatter(value))
 
 
@@ -843,7 +797,7 @@ def default_if_none(value, arg):
 
 @register.filter(is_safe=False)
 def divisibleby(value, arg):
-    """Returns True if the value is devisible by the argument."""
+    """Returns True if the value is divisible by the argument."""
     return int(value) % int(arg) == 0
 
 
@@ -885,13 +839,13 @@ def yesno(value, arg=None):
 ###################
 
 @register.filter(is_safe=True)
-def filesizeformat(bytes):
+def filesizeformat(bytes_):
     """
     Formats the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB,
-    102 bytes, etc).
+    102 bytes, etc.).
     """
     try:
-        bytes = float(bytes)
+        bytes_ = float(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
         value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
@@ -904,19 +858,25 @@ def filesizeformat(bytes):
     TB = 1 << 40
     PB = 1 << 50
 
-    if bytes < KB:
-        value = ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
-    elif bytes < MB:
-        value = ugettext("%s KB") % filesize_number_format(bytes / KB)
-    elif bytes < GB:
-        value = ugettext("%s MB") % filesize_number_format(bytes / MB)
-    elif bytes < TB:
-        value = ugettext("%s GB") % filesize_number_format(bytes / GB)
-    elif bytes < PB:
-        value = ugettext("%s TB") % filesize_number_format(bytes / TB)
-    else:
-        value = ugettext("%s PB") % filesize_number_format(bytes / PB)
+    negative = bytes_ < 0
+    if negative:
+        bytes_ = -bytes_  # Allow formatting of negative numbers.
 
+    if bytes_ < KB:
+        value = ungettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
+    elif bytes_ < MB:
+        value = ugettext("%s KB") % filesize_number_format(bytes_ / KB)
+    elif bytes_ < GB:
+        value = ugettext("%s MB") % filesize_number_format(bytes_ / MB)
+    elif bytes_ < TB:
+        value = ugettext("%s GB") % filesize_number_format(bytes_ / GB)
+    elif bytes_ < PB:
+        value = ugettext("%s TB") % filesize_number_format(bytes_ / TB)
+    else:
+        value = ugettext("%s PB") % filesize_number_format(bytes_ / PB)
+
+    if negative:
+        value = "-%s" % value
     return avoid_wrapping(value)
 
 

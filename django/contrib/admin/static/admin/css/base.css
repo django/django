@@ -20,8 +20,12 @@ a:link, a:visited {
     text-decoration: none;
 }
 
-a:hover {
+a:focus, a:hover {
     color: #036;
+}
+
+a:focus {
+    text-decoration: underline;
 }
 
 a img {
@@ -31,6 +35,10 @@ a img {
 a.section:link, a.section:visited {
     color: #fff;
     text-decoration: none;
+}
+
+a.section:focus, a.section:hover {
+    text-decoration: underline;
 }
 
 /* GLOBAL DEFAULTS */
@@ -264,6 +272,10 @@ tfoot td {
     border-top: 1px solid #eee;
 }
 
+thead th.required {
+    color: #000;
+}
+
 tr.alt {
     background: #f6f6f6;
 }
@@ -308,7 +320,7 @@ table thead th .text a {
     padding: 8px 10px;
 }
 
-table thead th.sortable:hover {
+table thead th .text a:focus, table thead th .text a:hover {
     background: #eee;
 }
 
@@ -359,10 +371,12 @@ table thead th.sorted .sortoptions a.sortremove:after {
     color: #999;
 }
 
+table thead th.sorted .sortoptions a.sortremove:focus:after,
 table thead th.sorted .sortoptions a.sortremove:hover:after {
     color: #447e9b;
 }
 
+table thead th.sorted .sortoptions a.sortremove:focus,
 table thead th.sorted .sortoptions a.sortremove:hover {
     background-position: 0 -14px;
 }
@@ -371,6 +385,7 @@ table thead th.sorted .sortoptions a.ascending {
     background-position: 0 -28px;
 }
 
+table thead th.sorted .sortoptions a.ascending:focus,
 table thead th.sorted .sortoptions a.ascending:hover {
     background-position: 0 -42px;
 }
@@ -380,6 +395,7 @@ table thead th.sorted .sortoptions a.descending {
     background-position: 0 -56px;
 }
 
+table thead th.sorted .sortoptions a.descending:focus,
 table thead th.sorted .sortoptions a.descending:hover {
     background-position: 0 -70px;
 }
@@ -405,7 +421,6 @@ input[type=number], textarea, select, .vTextField {
     border-radius: 4px;
     padding: 5px 6px;
     margin-top: 0;
-    outline: none;
 }
 
 input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
@@ -428,7 +443,6 @@ select[multiple] {
     background: #79aec8;
     padding: 10px 15px;
     border: none;
-    outline: none;
     border-radius: 4px;
     color: #fff;
     cursor: pointer;
@@ -439,6 +453,7 @@ a.button {
 }
 
 .button:active, input[type=submit]:active, input[type=button]:active,
+.button:focus, input[type=submit]:focus, input[type=button]:focus,
 .button:hover, input[type=submit]:hover, input[type=button]:hover {
     background: #609ab6;
 }
@@ -455,6 +470,7 @@ a.button {
 }
 
 .button.default:active, input[type=submit].default:active,
+.button.default:focus, input[type=submit].default:focus,
 .button.default:hover, input[type=submit].default:hover {
     background: #205067;
 }
@@ -633,7 +649,7 @@ div.breadcrumbs a {
     color: #fff;
 }
 
-div.breadcrumbs a:hover {
+div.breadcrumbs a:focus, div.breadcrumbs a:hover {
     color: #c4dce8;
 }
 
@@ -658,8 +674,9 @@ a.deletelink:link, a.deletelink:visited {
     color: #CC3434;
 }
 
-a.deletelink:hover {
+a.deletelink:focus, a.deletelink:hover {
     color: #993333;
+    text-decoration: none;
 }
 
 /* OBJECT TOOLS */
@@ -704,18 +721,26 @@ a.deletelink:hover {
     color: #fff;
 }
 
-.object-tools a:hover, .object-tools li:hover a {
+.object-tools a:focus, .object-tools a:hover {
     background-color: #417690;
 }
 
-.object-tools a.viewsitelink, .object-tools a.golink {
-    background: #999 url(../img/tooltag-arrowright.svg) 93% center no-repeat;
+.object-tools a:focus{
+    text-decoration: none;
+}
+
+.object-tools a.viewsitelink, .object-tools a.golink,.object-tools a.addlink {
+    background-repeat: no-repeat;
+    background-position: 93% center;
     padding-right: 26px;
 }
 
+.object-tools a.viewsitelink, .object-tools a.golink {
+    background-image: url(../img/tooltag-arrowright.svg);
+}
+
 .object-tools a.addlink {
-    background: #999 url(../img/tooltag-add.svg) 93% center no-repeat;
-    padding-right: 26px;
+    background-image: url(../img/tooltag-add.svg);
 }
 
 /* OBJECT HISTORY */
@@ -802,7 +827,7 @@ table#change-history tbody th {
     color: #fff;
 }
 
-#header a:hover {
+#header a:focus , #header a:hover {
     text-decoration: underline;
 }
 
@@ -849,7 +874,7 @@ table#change-history tbody th {
     border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-#user-tools a:hover {
+#user-tools a:focus, #user-tools a:hover {
     text-decoration: none;
     border-bottom-color: #79aec8;
     color: #79aec8;
@@ -909,6 +934,7 @@ table#change-history tbody th {
 }
 
 .delete-confirmation form input[type="submit"]:active,
+.delete-confirmation form input[type="submit"]:focus,
 .delete-confirmation form input[type="submit"]:hover {
     background: #a41515;
 }
@@ -926,10 +952,10 @@ table#change-history tbody th {
 }
 
 .delete-confirmation form .cancel-link:active,
+.delete-confirmation form .cancel-link:focus,
 .delete-confirmation form .cancel-link:hover {
     background: #ccc;
 }
-
 
 /* POPUP */
 .popup #content {

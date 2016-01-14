@@ -226,7 +226,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     safely but you must rename the algorithm if you change SHA256.
     """
     algorithm = "pbkdf2_sha256"
-    iterations = 24000
+    iterations = 30000
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
@@ -286,7 +286,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
 
     def salt(self):
         bcrypt = self._load_library()
-        return bcrypt.gensalt(rounds=self.rounds)
+        return bcrypt.gensalt(self.rounds)
 
     def encode(self, password, salt):
         bcrypt = self._load_library()
@@ -353,7 +353,7 @@ class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
 
     This hasher does not first hash the password which means it is subject to
     the 72 character bcrypt password truncation, most use cases should prefer
-    the BCryptSha512PasswordHasher.
+    the BCryptSHA256PasswordHasher.
 
     See: https://code.djangoproject.com/ticket/20138
     """

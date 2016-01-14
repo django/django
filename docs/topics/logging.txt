@@ -240,8 +240,8 @@ The full documentation for `dictConfig format`_ is the best source of
 information about logging configuration dictionaries. However, to give
 you a taste of what is possible, here are several examples.
 
-First, here's a simple configuration which writes all request logging from the
-:ref:`django-request-logger` logger to a local file::
+First, here's a simple configuration which writes all logging from the
+:ref:`django-logger` logger to a local file::
 
     LOGGING = {
         'version': 1,
@@ -254,7 +254,7 @@ First, here's a simple configuration which writes all request logging from the
             },
         },
         'loggers': {
-            'django.request': {
+            'django': {
                 'handlers': ['file'],
                 'level': 'DEBUG',
                 'propagate': True,
@@ -315,15 +315,15 @@ Finally, here's an example of a fairly complex logging setup::
             'special': {
                 '()': 'project.logging.SpecialFilter',
                 'foo': 'bar',
-            }
+            },
+            'require_debug_true': {
+                '()': 'django.utils.log.RequireDebugTrue',
+            },
         },
         'handlers': {
-            'null': {
-                'level': 'DEBUG',
-                'class': 'logging.NullHandler',
-            },
             'console': {
-                'level': 'DEBUG',
+                'level': 'INFO',
+                'filters': ['require_debug_true'],
                 'class': 'logging.StreamHandler',
                 'formatter': 'simple'
             },
@@ -335,9 +335,8 @@ Finally, here's an example of a fairly complex logging setup::
         },
         'loggers': {
             'django': {
-                'handlers': ['null'],
+                'handlers': ['console'],
                 'propagate': True,
-                'level': 'INFO',
             },
             'django.request': {
                 'handlers': ['mail_admins'],
@@ -371,17 +370,18 @@ This logging configuration does the following things:
     message, plus the time, process, thread and module that
     generate the log message.
 
-* Defines one filter -- ``project.logging.SpecialFilter``,
-  using the alias ``special``. If this filter required additional
-  arguments at time of construction, they can be provided as
-  additional keys in the filter configuration dictionary. In this
-  case, the argument ``foo`` will be given a value of ``bar`` when
-  instantiating the ``SpecialFilter``.
+* Defines two filters:
 
-* Defines three handlers:
+  * ``project.logging.SpecialFilter``, using the alias ``special``. If this
+    filter required additional arguments, they can be provided as additional
+    keys in the filter configuration dictionary. In this case, the argument
+    ``foo`` will be given a value of ``bar`` when instantiating
+    ``SpecialFilter``.
 
-  * ``null``, a NullHandler, which will pass any ``DEBUG`` (or
-    higher) message to ``/dev/null``.
+  * ``django.utils.log.RequireDebugTrue``, which passes on records when
+    :setting:`DEBUG` is ``True``.
+
+* Defines two handlers:
 
   * ``console``, a StreamHandler, which will print any ``DEBUG``
     (or higher) message to stderr. This handler uses the ``simple`` output
@@ -393,8 +393,7 @@ This logging configuration does the following things:
 
 * Configures three loggers:
 
-  * ``django``, which passes all messages at ``INFO`` or higher
-    to the ``null`` handler.
+  * ``django``, which passes all messages to the ``console`` handler.
 
   * ``django.request``, which passes all ``ERROR`` messages to
     the ``mail_admins`` handler. In addition, this logger is
@@ -460,6 +459,8 @@ Loggers
 
 Django provides several built-in loggers.
 
+.. _django-logger:
+
 ``django``
 ~~~~~~~~~~
 
@@ -483,6 +484,24 @@ Messages to this logger have the following extra context:
 * ``request``: The request object that generated the logging
   message.
 
+.. _django-server-logger:
+
+``django.server``
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.10
+
+Log messages related to the handling of requests received by the server invoked
+by the :djadmin:`runserver` command. HTTP 5XX responses are logged as ``ERROR``
+messages, 4XX responses are logged as ``WARNING`` messages, and everything else
+is logged as ``INFO``.
+
+Messages to this logger have the following extra context:
+
+* ``status_code``: The HTTP response code associated with the request.
+
+* ``request``: The request object that generated the logging message.
+
 .. _django-template-logger:
 
 ``django.template``
@@ -490,8 +509,14 @@ Messages to this logger have the following extra context:
 
 .. versionadded:: 1.9
 
-Log messages related to the rendering of templates. Missing context variables
-are logged as ``DEBUG`` messages if :setting:`DEBUG` is `True`.
+Log messages related to the rendering of templates.
+
+* Missing context variables are logged as ``DEBUG`` messages.
+
+* Uncaught exceptions raised during the rendering of an
+  :ttag:`{% include %} <include>` are logged as ``WARNING`` messages when
+  debug mode is off (helpful since ``{% include %}`` silences the exception and
+  returns an empty string in that case).
 
 .. _django-db-logger:
 
@@ -540,6 +565,11 @@ specific logger following this example:
 
 .. code-block:: python
 
+    'handlers': {
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+    },
     'loggers': {
         'django.security.DisallowedHost': {
             'handlers': ['null'],
@@ -566,7 +596,9 @@ Python logging module.
     message it receives.
 
     If the log record contains a ``request`` attribute, the full details
-    of the request will be included in the email.
+    of the request will be included in the email. The email subject will be
+    include the phrase "internal IP" if the client's IP address is in the
+    :setting:`INTERNAL_IPS` setting; if not, it will include "EXTERNAL IP".
 
     If the log record contains stack trace information, that stack
     trace will be included in the email.
@@ -616,8 +648,6 @@ Python logging module.
     :setting:`EMAIL_BACKEND` will be used.
 
     .. method:: send_mail(subject, message, *args, **kwargs)
-
-        .. versionadded:: 1.8
 
         Sends emails to admin users. To customize this behavior, you can
         subclass the :class:`~django.utils.log.AdminEmailHandler` class and
@@ -716,6 +746,11 @@ When :setting:`DEBUG` is ``False``:
 
 * The ``django`` logger send messages with ``ERROR`` or ``CRITICAL`` level to
   :class:`AdminEmailHandler`.
+
+Independent of the value of :setting:`DEBUG`:
+
+* The :ref:`django-server-logger` logger sends all messages at the ``INFO``
+  level or higher to the console.
 
 .. versionchanged:: 1.9
 

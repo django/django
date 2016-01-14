@@ -33,11 +33,6 @@ Django core exception classes are defined in ``django.core.exceptions``.
     ``_meta.get_field()`` method when the requested field does not exist on the
     model or on the model's parents.
 
-    .. versionchanged:: 1.8
-
-        This exception was previously defined only in
-        ``django.db.models.fields`` and wasn't part of the public API.
-
 ``MultipleObjectsReturned``
 ---------------------------
 
@@ -89,7 +84,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: ViewDoesNotExist
 
     The :exc:`ViewDoesNotExist` exception is raised by
-    :mod:`django.core.urlresolvers` when a requested view does not exist.
+    :mod:`django.urls` when a requested view does not exist.
 
 ``MiddlewareNotUsed``
 ---------------------
@@ -147,12 +142,18 @@ or model are classified as ``NON_FIELD_ERRORS``. This constant is used
 as a key in dictionaries that otherwise map fields to their respective
 list of errors.
 
-.. currentmodule:: django.core.urlresolvers
+.. currentmodule:: django.urls
 
 URL Resolver exceptions
 =======================
 
-URL Resolver exceptions are defined in ``django.core.urlresolvers``.
+URL Resolver exceptions are defined in ``django.urls``.
+
+.. deprecated:: 1.10
+
+    In older versions, these exceptions are located in
+    ``django.core.urlresolvers``. Importing from the old location will continue
+    to work until Django 2.0.
 
 ``Resolver404``
 ---------------
@@ -160,18 +161,17 @@ URL Resolver exceptions are defined in ``django.core.urlresolvers``.
 .. exception:: Resolver404
 
     The :exc:`Resolver404` exception is raised by
-    :func:`django.core.urlresolvers.resolve()` if the path passed to
-    ``resolve()`` doesn't map to a view. It's a subclass of
-    :class:`django.http.Http404`.
+    :func:`~django.urls.resolve()` if the path passed to ``resolve()`` doesn't
+    map to a view. It's a subclass of :class:`django.http.Http404`.
 
 ``NoReverseMatch``
 ------------------
 
 .. exception:: NoReverseMatch
 
-    The :exc:`NoReverseMatch` exception is raised by
-    :mod:`django.core.urlresolvers` when a matching URL in your URLconf
-    cannot be identified based on the parameters supplied.
+    The :exc:`NoReverseMatch` exception is raised by :mod:`django.urls` when a
+    matching URL in your URLconf cannot be identified based on the parameters
+    supplied.
 
 .. currentmodule:: django.db
 
@@ -201,7 +201,13 @@ As per :pep:`3134`, a ``__cause__`` attribute is set with the original
 (underlying) database exception, allowing access to any additional
 information provided. (Note that this attribute is available under
 both Python 2 and Python 3, although :pep:`3134` normally only applies
-to Python 3.)
+to Python 3. To avoid unexpected differences with Python 3, Django will also
+ensure that the exception made available via ``__cause__`` has a usable
+``__traceback__`` attribute.)
+
+.. versionchanged:: 1.10
+
+    The ``__traceback__`` attribute described above was added.
 
 .. exception:: models.ProtectedError
 
@@ -249,8 +255,6 @@ Exceptions provided by the ``django.test`` package.
 ----------------------
 
 .. exception:: client.RedirectCycleError
-
-    .. versionadded:: 1.8
 
     :exc:`~client.RedirectCycleError` is raised when the test client detects a
     loop or an overly long chain of redirects.

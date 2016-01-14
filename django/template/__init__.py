@@ -58,11 +58,9 @@ from .exceptions import TemplateDoesNotExist, TemplateSyntaxError       # NOQA i
 
 # Template parts
 from .base import (                                                     # NOQA isort:skip
-    Context, Node, NodeList, Origin, RequestContext, Template, Variable,
+    Context, Node, NodeList, Origin, RequestContext, StringOrigin, Template,
+    Variable,
 )
-
-# Deprecated in Django 1.8, will be removed in Django 1.10.
-from .base import resolve_variable                                      # NOQA isort:skip
 
 # Library management
 from .library import Library                                            # NOQA isort:skip

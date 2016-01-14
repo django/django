@@ -18,15 +18,6 @@ Methods that it provides can be used to:
 * Retrieve all field instances of a model
 * Retrieve a single field instance of a model by name
 
-.. versionchanged:: 1.8
-
-    The Model ``_meta`` API has always existed as a Django internal, but
-    wasn't formally documented and supported. As part of the effort to
-    make this API public, some of the already existing API entry points
-    have changed slightly. A :ref:`migration guide <migrating-old-meta-api>`
-    has been provided to assist in converting your code to use the new,
-    official API.
-
 .. _model-meta-field-api:
 
 Field access API
@@ -70,24 +61,10 @@ Retrieving a single field instance of a model by name
             ...
         FieldDoesNotExist: User has no field named 'does_not_exist'
 
-    .. deprecated:: 1.8
-
-        :meth:`Options.get_field()` previously accepted a ``many_to_many``
-        parameter which could be set to ``False`` to avoid searching
-        ``ManyToManyField``\s. The old behavior has been preserved for
-        backwards compatibility; however, the parameter and this behavior
-        has been deprecated.
-
-        If you wish to filter out ``ManyToManyField``\s, you can inspect the
-        :attr:`Field.many_to_many <django.db.models.Field.many_to_many>`
-        attribute after calling ``get_field()``.
-
 Retrieving all field instances of a model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: Options.get_fields(include_parents=True, include_hidden=False)
-
-    .. versionadded:: 1.8
 
     Returns a tuple of fields associated with a model. ``get_fields()`` accepts
     two parameters that can be used to control which fields are returned:

@@ -122,8 +122,6 @@ Related objects reference
         the ``blog`` :class:`~django.db.models.ForeignKey` doesn't have
         ``null=True``, this is invalid.
 
-        .. versionchanged 1.7::
-
         For :class:`~django.db.models.ForeignKey` objects, this method accepts
         a ``bulk`` argument to control how to perform the operation.
         If ``True`` (the default), ``QuerySet.update()`` is used.
@@ -179,8 +177,6 @@ Related objects reference
        <intermediary-manytomany>` for a many-to-many relationship, some of the
        related manager's methods are disabled.
 
-.. _direct-assignment:
-
 Direct Assignment
 -----------------
 
@@ -195,8 +191,17 @@ will first disassociate any existing objects in the related set before adding
 the contents of ``new_list``. Otherwise the objects in ``new_list`` will be
 added to the existing related object set.
 
-.. versionchanged:1.9
+.. versionchanged:: 1.9
 
     In earlier versions, direct assignment used to perform ``clear()`` followed
     by ``add()``. It now performs a ``set()`` with the keyword argument
     ``clear=False``.
+
+.. deprecated:: 1.10
+
+    Direct assignment is deprecated in favor of the
+    :meth:`~django.db.models.fields.related.RelatedManager.set` method::
+
+        >>> e.related_set.set([obj1, obj2, obj3])
+
+    This prevents confusion about an assignment resulting in an implicit save.

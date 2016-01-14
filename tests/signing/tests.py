@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import datetime
-import warnings
 
 from django.core import signing
 from django.test import SimpleTestCase
@@ -121,14 +120,11 @@ class TestSigner(SimpleTestCase):
 
     def test_invalid_sep(self):
         """should warn on invalid separator"""
+        msg = 'Unsafe Signer separator: %r (cannot be empty or consist of only A-z0-9-_=)'
         separators = ['', '-', 'abc']
         for sep in separators:
-            with warnings.catch_warnings(record=True) as recorded:
-                warnings.simplefilter('always')
+            with self.assertRaisesMessage(ValueError, msg % sep):
                 signing.Signer(sep=sep)
-                self.assertEqual(len(recorded), 1)
-                msg = str(recorded[0].message)
-                self.assertTrue(msg.startswith('Unsafe Signer separator'))
 
 
 class TestTimestampSigner(SimpleTestCase):

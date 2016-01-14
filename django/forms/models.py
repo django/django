@@ -376,6 +376,11 @@ class BaseModelForm(BaseForm):
 
         exclude = self._get_validation_exclusions()
 
+        try:
+            self.instance = construct_instance(self, self.instance, opts.fields, exclude)
+        except ValidationError as e:
+            self._update_errors(e)
+
         # Foreign Keys being used to represent inline relationships
         # are excluded from basic field value validation. This is for two
         # reasons: firstly, the value may not be supplied (#12507; the
@@ -386,11 +391,6 @@ class BaseModelForm(BaseForm):
         for name, field in self.fields.items():
             if isinstance(field, InlineForeignKeyField):
                 exclude.append(name)
-
-        try:
-            self.instance = construct_instance(self, self.instance, opts.fields, exclude)
-        except ValidationError as e:
-            self._update_errors(e)
 
         try:
             self.instance.full_clean(exclude=exclude, validate_unique=False)
@@ -788,8 +788,12 @@ class BaseModelFormSet(BaseFormSet):
         # True, so check for that as well.
 
         def pk_is_not_editable(pk):
-            return ((not pk.editable) or (pk.auto_created or isinstance(pk, AutoField))
-                or (pk.remote_field and pk.remote_field.parent_link and pk_is_not_editable(pk.remote_field.model._meta.pk)))
+            return (
+                (not pk.editable) or (pk.auto_created or isinstance(pk, AutoField)) or (
+                    pk.remote_field and pk.remote_field.parent_link
+                    and pk_is_not_editable(pk.remote_field.model._meta.pk)
+                )
+            )
         if pk_is_not_editable(pk) or pk.name not in form.fields:
             if form.is_bound:
                 # If we're adding the related instance, ignore its primary key
@@ -1098,7 +1102,11 @@ class ModelChoiceIterator(object):
     def __iter__(self):
         if self.field.empty_label is not None:
             yield ("", self.field.empty_label)
-        for obj in self.queryset.iterator():
+        queryset = self.queryset.all()
+        # Can't use iterator() when queryset uses prefetch_related()
+        if not queryset._prefetch_related_lookups:
+            queryset = queryset.iterator()
+        for obj in queryset:
             yield self.choice(obj)
 
     def __len__(self):

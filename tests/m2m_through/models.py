@@ -21,7 +21,11 @@ class Group(models.Model):
     name = models.CharField(max_length=128)
     members = models.ManyToManyField(Person, through='Membership')
     custom_members = models.ManyToManyField(Person, through='CustomMembership', related_name="custom")
-    nodefaultsnonulls = models.ManyToManyField(Person, through='TestNoDefaultsOrNulls', related_name="testnodefaultsnonulls")
+    nodefaultsnonulls = models.ManyToManyField(
+        Person,
+        through='TestNoDefaultsOrNulls',
+        related_name="testnodefaultsnonulls",
+    )
 
     class Meta:
         ordering = ('name',)
@@ -88,7 +92,11 @@ class Friendship(models.Model):
 @python_2_unicode_compatible
 class Event(models.Model):
     title = models.CharField(max_length=50)
-    invitees = models.ManyToManyField(Person, through='Invitation', through_fields=('event', 'invitee'), related_name='events_invited')
+    invitees = models.ManyToManyField(
+        Person, through='Invitation',
+        through_fields=('event', 'invitee'),
+        related_name='events_invited',
+    )
 
     def __str__(self):
         return self.title
@@ -104,7 +112,12 @@ class Invitation(models.Model):
 @python_2_unicode_compatible
 class Employee(models.Model):
     name = models.CharField(max_length=5)
-    subordinates = models.ManyToManyField('self', through="Relationship", through_fields=('source', 'target'), symmetrical=False)
+    subordinates = models.ManyToManyField(
+        'self',
+        through="Relationship",
+        through_fields=('source', 'target'),
+        symmetrical=False,
+    )
 
     class Meta:
         ordering = ('pk',)

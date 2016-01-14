@@ -6,8 +6,8 @@ Django 1.5.9 release notes
 
 Django 1.5.9 fixes several security issues in 1.5.8.
 
-:func:`~django.core.urlresolvers.reverse()` could generate URLs pointing to other hosts
-=======================================================================================
+``reverse()`` could generate URLs pointing to other hosts
+=========================================================
 
 In certain situations, URL reversing could generate scheme-relative URLs  (URLs
 starting with two slashes), which could unexpectedly redirect a user  to a

@@ -12,7 +12,6 @@ from django.test import (
     override_settings, signals,
 )
 from django.utils import six
-from django.utils.encoding import force_text
 
 
 @modify_settings(ITEMS={
@@ -472,7 +471,6 @@ class TestListSettings(unittest.TestCase):
     ImproperlyConfigured if they are set to a string instead of a list or tuple.
     """
     list_or_tuple_settings = (
-        "ALLOWED_INCLUDE_ROOTS",
         "INSTALLED_APPS",
         "TEMPLATE_DIRS",
         "LOCALE_PATHS",
@@ -490,47 +488,3 @@ class TestListSettings(unittest.TestCase):
             finally:
                 del sys.modules['fake_settings_module']
                 delattr(settings_module, setting)
-
-
-class TestSessionVerification(unittest.TestCase):
-
-    def setUp(self):
-        self.settings_module = ModuleType('fake_settings_module')
-        self.settings_module.SECRET_KEY = 'foo'
-
-    def tearDown(self):
-        if 'fake_settings_module' in sys.modules:
-            del sys.modules['fake_settings_module']
-
-    def test_session_verification_deprecation_no_verification(self):
-        self.settings_module.MIDDLEWARE_CLASSES = ['django.contrib.auth.middleware.AuthenticationMiddleware']
-        sys.modules['fake_settings_module'] = self.settings_module
-        with warnings.catch_warnings(record=True) as warn:
-            warnings.filterwarnings('always')
-            Settings('fake_settings_module')
-        self.assertEqual(
-            force_text(warn[0].message),
-            "Session verification will become mandatory in Django 1.10. "
-            "Please add 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' "
-            "to your MIDDLEWARE_CLASSES setting when you are ready to opt-in after "
-            "reading the upgrade considerations in the 1.8 release notes.",
-        )
-
-    def test_session_verification_deprecation_both(self):
-        self.settings_module.MIDDLEWARE_CLASSES = [
-            'django.contrib.auth.middleware.AuthenticationMiddleware',
-            'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-        ]
-        sys.modules['fake_settings_module'] = self.settings_module
-        with warnings.catch_warnings(record=True) as warn:
-            warnings.filterwarnings('always')
-            Settings('fake_settings_module')
-        self.assertEqual(len(warn), 0)
-
-    def test_session_verification_deprecation_neither(self):
-        self.settings_module.MIDDLEWARE_CLASSES = []
-        sys.modules['fake_settings_module'] = self.settings_module
-        with warnings.catch_warnings(record=True) as warn:
-            warnings.filterwarnings('always')
-            Settings('fake_settings_module')
-        self.assertEqual(len(warn), 0)

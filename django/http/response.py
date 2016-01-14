@@ -190,6 +190,8 @@ class HttpResponseBase(six.Iterator):
                 max_age = max(0, delta.days * 86400 + delta.seconds)
             else:
                 self.cookies[key]['expires'] = expires
+        else:
+            self.cookies[key]['expires'] = ''
         if max_age is not None:
             self.cookies[key]['max-age'] = max_age
             # IE requires expires, so set it if hasn't been already.
@@ -263,6 +265,12 @@ class HttpResponseBase(six.Iterator):
     # These methods partially implement a stream-like object interface.
     # See https://docs.python.org/library/io.html#io.IOBase
 
+    def readable(self):
+        return False
+
+    def seekable(self):
+        return False
+
     def writable(self):
         return False
 
@@ -308,13 +316,16 @@ class HttpResponse(HttpResponseBase):
     def content(self, value):
         # Consume iterators upon assignment to allow repeated iteration.
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
+            content = b''.join(self.make_bytes(chunk) for chunk in value)
             if hasattr(value, 'close'):
-                self._closable_objects.append(value)
-            value = b''.join(self.make_bytes(chunk) for chunk in value)
+                try:
+                    value.close()
+                except Exception:
+                    pass
         else:
-            value = self.make_bytes(value)
+            content = self.make_bytes(value)
         # Create a list of properly encoded bytestrings to support write().
-        self._container = [value]
+        self._container = [content]
 
     def __iter__(self):
         return iter(self._container)

@@ -5,8 +5,8 @@ from functools import update_wrapper
 
 from django import http
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import NoReverseMatch, reverse
 from django.template.response import TemplateResponse
+from django.urls import NoReverseMatch, reverse
 from django.utils import six
 from django.utils.decorators import classonlymethod
 
@@ -151,7 +151,7 @@ class TemplateResponseMixin(object):
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
     """
     A view that renders a template.  This view will also pass into the context
-    any keyword arguments passed by the url conf.
+    any keyword arguments passed by the URLconf.
     """
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
