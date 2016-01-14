@@ -149,7 +149,7 @@ that were previously excluded - will almost certainly result in better code.
 Assuming you have a model named ``MyModel``, the following substitutions
 can be made to convert your code to the new API:
 
-* ``MyModel._meta.get_field(name)``::
+* ``MyModel._meta.get_field(name)`` becomes::
 
       f = MyModel._meta.get_field(name)
 
@@ -162,10 +162,8 @@ can be made to convert your code to the new API:
     ``get_field()`` API will find
     :class:`~django.contrib.contenttypes.fields.GenericForeignKey` relations;
 
-* ``MyModel._meta.get_field_by_name(name)``:
-
-  ``get_field_by_name()`` returned four values:
-  ``(field, model, direct,  m2m)``:
+* ``MyModel._meta.get_field_by_name(name)`` returns a tuple of these four
+  values with the following replacements:
 
   - ``field`` can be found by ``MyModel._meta.get_field(name)``
 
@@ -183,7 +181,7 @@ can be made to convert your code to the new API:
   - ``m2m`` can be found through the
     :attr:`~django.db.models.Field.many_to_many` attribute on the field.
 
-* ``MyModel._meta.get_fields_with_model()``::
+* ``MyModel._meta.get_fields_with_model()`` becomes::
 
       [
           (f, f.model if f.model != MyModel else None)
@@ -193,7 +191,7 @@ can be made to convert your code to the new API:
               or (f.many_to_one and f.related_model)
       ]
 
-* ``MyModel._meta.get_concrete_fields_with_model()``::
+* ``MyModel._meta.get_concrete_fields_with_model()`` becomes::
 
       [
           (f, f.model if f.model != MyModel else None)
@@ -205,7 +203,7 @@ can be made to convert your code to the new API:
           )
       ]
 
-* ``MyModel._meta.get_m2m_with_model()``::
+* ``MyModel._meta.get_m2m_with_model()`` becomes::
 
       [
           (f, f.model if f.model != MyModel else None)
@@ -213,14 +211,14 @@ can be made to convert your code to the new API:
           if f.many_to_many and not f.auto_created
       ]
 
-* ``MyModel._meta.get_all_related_objects()``::
+* ``MyModel._meta.get_all_related_objects()`` becomes::
 
       [
           f for f in MyModel._meta.get_fields()
           if (f.one_to_many or f.one_to_one) and f.auto_created
       ]
 
-* ``MyModel._meta.get_all_related_objects_with_model()``::
+* ``MyModel._meta.get_all_related_objects_with_model()`` becomes::
 
       [
           (f, f.model if f.model != MyModel else None)
@@ -228,14 +226,14 @@ can be made to convert your code to the new API:
           if (f.one_to_many or f.one_to_one) and f.auto_created
       ]
 
-* ``MyModel._meta.get_all_related_many_to_many_objects()``::
+* ``MyModel._meta.get_all_related_many_to_many_objects()`` becomes::
 
       [
           f for f in MyModel._meta.get_fields(include_hidden=True)
           if f.many_to_many and f.auto_created
       ]
 
-* ``MyModel._meta.get_all_related_m2m_objects_with_model()``::
+* ``MyModel._meta.get_all_related_m2m_objects_with_model()`` becomes::
 
       [
           (f, f.model if f.model != MyModel else None)
@@ -243,7 +241,7 @@ can be made to convert your code to the new API:
           if f.many_to_many and f.auto_created
       ]
 
-* ``MyModel._meta.get_all_field_names()``::
+* ``MyModel._meta.get_all_field_names()`` becomes::
 
       from itertools import chain
       list(set(chain.from_iterable(
