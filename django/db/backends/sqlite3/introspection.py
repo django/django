@@ -100,10 +100,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Returns a dictionary of {field_index: (field_index_other_table, other_table)}
-        representing all relationships to the given table. Indexes are 0-based.
+        Return a dictionary of {field_name: (field_name_other_table, other_table)}
+        representing all relationships to the given table.
         """
-
         # Dictionary of relations to return
         relations = {}
 
@@ -239,7 +238,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         constraints = {}
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
-        for number, index, unique in cursor.fetchall():
+        for row in cursor.fetchall():
+            # Sqlite3 3.8.9+ has 5 columns, however older versions only give 3
+            # columns. Discard last 2 columns if there.
+            number, index, unique = row[:3]
             # Get the index info for that index
             cursor.execute('PRAGMA index_info(%s)' % self.connection.ops.quote_name(index))
             for index_rank, column_rank, column in cursor.fetchall():

@@ -5,6 +5,24 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
+class City(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class District(models.Model):
+    city = models.ForeignKey(City, models.CASCADE)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
 class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -25,8 +43,8 @@ class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
     body = models.TextField(default='')
-    reporter = models.ForeignKey(Reporter)
-    response_to = models.ForeignKey('self', null=True)
+    reporter = models.ForeignKey(Reporter, models.CASCADE)
+    response_to = models.ForeignKey('self', models.SET_NULL, null=True)
 
     def __str__(self):
         return self.headline

@@ -68,8 +68,6 @@ Adds a few conveniences for perfectionists:
 
 .. attribute:: CommonMiddleware.response_redirect_class
 
-.. versionadded:: 1.8
-
 Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
 ``CommonMiddleware`` and override the attribute to customize the redirects
 issued by the middleware.
@@ -180,8 +178,6 @@ Security middleware
 
 .. class:: SecurityMiddleware
 
-.. versionadded:: 1.8
-
 The ``django.middleware.security.SecurityMiddleware`` provides several security
 enhancements to the request/response cycle. Each one can be independently
 enabled or disabled with a setting.
@@ -239,7 +235,7 @@ be vulnerable via an insecure connection to a subdomain.
     it may be because Django doesn't realize that it's on a secure connection;
     you may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
-.. _"Strict-Transport-Security" header: http://en.wikipedia.org/wiki/Strict_Transport_Security
+.. _"Strict-Transport-Security" header: https://en.wikipedia.org/wiki/Strict_Transport_Security
 
 .. _x-content-type-options:
 
@@ -252,7 +248,7 @@ sites with improperly configured servers, it can also pose a security
 risk.
 
 If your site serves user-uploaded files, a malicious user could upload a
-specially-crafted file that would be interpreted as HTML or Javascript by
+specially-crafted file that would be interpreted as HTML or JavaScript by
 the browser when you expected it to be something harmless.
 
 To learn more about this header and how the browser treats it, you can
@@ -280,8 +276,8 @@ setting will be useful.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some browsers have the ability to block content that appears to be an `XSS
-attack`_. They work by looking for Javascript content in the GET or POST
-parameters of a page. If the Javascript is replayed in the server's response,
+attack`_. They work by looking for JavaScript content in the GET or POST
+parameters of a page. If the JavaScript is replayed in the server's response,
 the page is blocked from rendering and an error page is shown instead.
 
 The `X-XSS-Protection header`_ is used to control the operation of the
@@ -298,7 +294,7 @@ header. ``SecurityMiddleware`` will do this for all responses if the
     browsers support the header. Ensure you are still :ref:`validating and
     sanitizing <cross-site-scripting>` all input to prevent XSS attacks.
 
-.. _XSS attack: http://en.wikipedia.org/wiki/Cross-site_scripting
+.. _XSS attack: https://en.wikipedia.org/wiki/Cross-site_scripting
 .. _X-XSS-Protection header: http://blogs.msdn.com/b/ie/archive/2008/07/02/ie8-security-part-iv-the-xss-filter.aspx
 
 .. _ssl-redirect:
@@ -374,12 +370,13 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
 Middleware for utilizing Web server provided authentication. See
 :doc:`/howto/auth-remote-user` for usage details.
 
-.. class:: SessionAuthenticationMiddleware
+.. class:: PersistentRemoteUserMiddleware
 
-Allows a user's sessions to be invalidated when their password changes. See
-:ref:`session-invalidation-on-password-change` for details. This middleware must
-appear after :class:`django.contrib.auth.middleware.AuthenticationMiddleware`
-in :setting:`MIDDLEWARE_CLASSES`.
+.. versionadded:: 1.9
+
+Middleware for utilizing Web server provided authentication when enabled only
+on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
+details.
 
 CSRF protection middleware
 --------------------------
@@ -411,6 +408,12 @@ Middleware ordering
 
 Here are some hints about the ordering of various Django middleware classes:
 
+#. :class:`~django.middleware.security.SecurityMiddleware`
+
+   It should go near the top of the list if you're going to turn on the SSL
+   redirect as that avoids running through a bunch of other unnecessary
+   middleware.
+
 #. :class:`~django.middleware.cache.UpdateCacheMiddleware`
 
    Before those that modify the ``Vary`` header (``SessionMiddleware``,
@@ -434,7 +437,7 @@ Here are some hints about the ordering of various Django middleware classes:
 #. :class:`~django.middleware.locale.LocaleMiddleware`
 
    One of the topmost, after ``SessionMiddleware`` (uses session data) and
-   ``CacheMiddleware`` (modifies ``Vary`` header).
+   ``UpdateCacheMiddleware`` (modifies ``Vary`` header).
 
 #. :class:`~django.middleware.common.CommonMiddleware`
 

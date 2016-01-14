@@ -29,7 +29,7 @@ databases -- a default PostgreSQL database and a MySQL database called
     DATABASES = {
         'default': {
             'NAME': 'app_data',
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'USER': 'postgres_user',
             'PASSWORD': 's3krit'
         },
@@ -128,7 +128,7 @@ A database Router is a class that provides up to four methods:
     provided in the ``hints`` dictionary. Details on valid hints are
     provided :ref:`below <topics-db-multi-db-hints>`.
 
-    Returns None if there is no suggestion.
+    Returns ``None`` if there is no suggestion.
 
 .. method:: db_for_write(model, **hints)
 
@@ -140,32 +140,47 @@ A database Router is a class that provides up to four methods:
     provided in the ``hints`` dictionary. Details on valid hints are
     provided :ref:`below <topics-db-multi-db-hints>`.
 
-    Returns None if there is no suggestion.
+    Returns ``None`` if there is no suggestion.
 
 .. method:: allow_relation(obj1, obj2, **hints)
 
-    Return True if a relation between obj1 and obj2 should be
-    allowed, False if the relation should be prevented, or None if
+    Return ``True`` if a relation between ``obj1`` and ``obj2`` should be
+    allowed, ``False`` if the relation should be prevented, or ``None`` if
     the router has no opinion. This is purely a validation operation,
     used by foreign key and many to many operations to determine if a
     relation should be allowed between two objects.
 
-.. method:: allow_migrate(db, model, **hints)
+.. method:: allow_migrate(db, app_label, model_name=None, **hints)
 
-    Determine if the ``model`` should have tables/indexes created in the
-    database with alias ``db``. Return True if the model should be
-    migrated, False if it should not be migrated, or None if
-    the router has no opinion. This method can be used to determine
-    the availability of a model on a given database.
+    Determine if the migration operation is allowed to run on the database with
+    alias ``db``. Return ``True`` if the operation should run, ``False`` if it
+    shouldn't run, or ``None`` if the router has no opinion.
 
-    Note that migrations will just silently not perform any operations
-    on a model for which this returns ``False``. This may result in broken
-    ForeignKeys, extra tables or missing tables if you change it once you
-    have applied some migrations.
+    The ``app_label`` positional argument is the label of the application
+    being migrated.
 
-    The value passed for ``model`` may be a
-    :ref:`historical model <historical-models>`, and thus not have any
-    custom attributes, methods or managers. You should only rely on ``_meta``.
+    ``model_name`` is set by most migration operations to the value of
+    ``model._meta.model_name`` (the lowercased version of the model
+    ``__name__``) of the model being migrated. Its value is ``None`` for the
+    :class:`~django.db.migrations.operations.RunPython` and
+    :class:`~django.db.migrations.operations.RunSQL` operations unless they
+    provide it using hints.
+
+    ``hints`` are used by certain operations to communicate additional
+    information to the router.
+
+    When ``model_name`` is set, ``hints`` normally contains the model class
+    under the key ``'model'``. Note that it may be a :ref:`historical model
+    <historical-models>`, and thus not have any custom attributes, methods, or
+    managers. You should only rely on ``_meta``.
+
+    This method can also be used to determine the availability of a model on a
+    given database.
+
+    Note that migrations will just silently not perform any operations on a
+    model for which this returns ``False``. This may result in broken foreign
+    keys, extra tables, or missing tables if you change it once you have
+    applied some migrations.
 
 A router doesn't have to provide *all* these methods -- it may omit one
 or more of them. If one of the methods is omitted, Django will skip
@@ -234,6 +249,7 @@ with two read replicas. Here are the settings specifying these
 databases::
 
     DATABASES = {
+        'default': {},
         'auth_db': {
             'NAME': 'auth_db',
             'ENGINE': 'django.db.backends.mysql',
@@ -293,15 +309,13 @@ send queries for the ``auth`` app to ``auth_db``::
                return True
             return None
 
-        def allow_migrate(self, db, model, **hints):
+        def allow_migrate(self, db, app_label, model=None, **hints):
             """
             Make sure the auth app only appears in the 'auth_db'
             database.
             """
-            if db == 'auth_db':
-                return model._meta.app_label == 'auth'
-            elif model._meta.app_label == 'auth':
-                return False
+            if app_label == 'auth':
+                return db == 'auth_db'
             return None
 
 And we also want a router that sends all other apps to the
@@ -333,14 +347,14 @@ from::
                 return True
             return None
 
-        def allow_migrate(self, db, model, **hints):
+        def allow_migrate(self, db, app_label, model=None, **hints):
             """
             All non-auth models end up in this pool.
             """
             return True
 
 Finally, in the settings file, we add the following (substituting
-``path.to.`` with the actual python path to the module(s) where the
+``path.to.`` with the actual Python path to the module(s) where the
 routers are defined)::
 
     DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.PrimaryReplicaRouter']
@@ -557,15 +571,15 @@ multiple-database support::
             # Tell Django to look for objects on the 'other' database.
             return super(MultiDBModelAdmin, self).get_queryset(request).using(self.using)
 
-        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        def formfield_for_foreignkey(self, db_field, request, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
             # on the 'other' database.
-            return super(MultiDBModelAdmin, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+            return super(MultiDBModelAdmin, self).formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
 
-        def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        def formfield_for_manytomany(self, db_field, request, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
             # on the 'other' database.
-            return super(MultiDBModelAdmin, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+            return super(MultiDBModelAdmin, self).formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
 
 The implementation provided here implements a multi-database strategy
 where all objects of a given type are stored on a specific database
@@ -582,15 +596,15 @@ Inlines can be handled in a similar fashion. They require three customized metho
             # Tell Django to look for inline objects on the 'other' database.
             return super(MultiDBTabularInline, self).get_queryset(request).using(self.using)
 
-        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        def formfield_for_foreignkey(self, db_field, request, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
             # on the 'other' database.
-            return super(MultiDBTabularInline, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+            return super(MultiDBTabularInline, self).formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
 
-        def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        def formfield_for_manytomany(self, db_field, request, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
             # on the 'other' database.
-            return super(MultiDBTabularInline, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+            return super(MultiDBTabularInline, self).formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
 
 Once you've written your model admin definitions, they can be
 registered with any ``Admin`` instance::

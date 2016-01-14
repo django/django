@@ -4,10 +4,10 @@ import time
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import resolve
 from django.http import HttpResponse
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
+from django.urls import resolve
 from django.views.generic import RedirectView, TemplateView, View
 
 from . import views
@@ -241,13 +241,12 @@ class ViewTest(unittest.TestCase):
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
-class TemplateViewTest(TestCase):
+class TemplateViewTest(SimpleTestCase):
 
     rf = RequestFactory()
 
     def _assert_about(self, response):
         response.render()
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<h1>About</h1>')
 
     def test_get(self):
@@ -352,7 +351,7 @@ class TemplateViewTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
-class RedirectViewTest(TestCase):
+class RedirectViewTest(SimpleTestCase):
 
     rf = RequestFactory()
 

@@ -10,7 +10,7 @@ things:
 
 * Set the :setting:`SESSION_COOKIE_DOMAIN` setting in your admin config
   file to match your domain. For example, if you're going to
-  "http://www.example.com/admin/" in your browser, in "myproject.settings" you
+  "https://www.example.com/admin/" in your browser, in "myproject.settings" you
   should set :setting:`SESSION_COOKIE_DOMAIN` = 'www.example.com'.
 
 I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.
@@ -106,4 +106,4 @@ There *may* be minor stylistic differences between supported browsers—for
 example, some browsers may not support rounded corners. These are considered
 acceptable variations in rendering.
 
-.. _YUI's A-grade: http://yuilibrary.com/yui/docs/tutorials/gbs/
+.. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support

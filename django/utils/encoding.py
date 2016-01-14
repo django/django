@@ -25,22 +25,8 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
                 type(self.obj))
 
 
-def python_2_unicode_compatible(klass):
-    """
-    A decorator that defines __unicode__ and __str__ methods under Python 2.
-    Under Python 3 it does nothing.
-
-    To support Python 2 and 3 with a single code base, define a __str__ method
-    returning text and apply this decorator to the class.
-    """
-    if six.PY2:
-        if '__str__' not in klass.__dict__:
-            raise ValueError("@python_2_unicode_compatible cannot be applied "
-                             "to %s because it doesn't define __str__()." %
-                             klass.__name__)
-        klass.__unicode__ = klass.__str__
-        klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
-    return klass
+# For backwards compatibility. (originally in Django, then added to six 1.9)
+python_2_unicode_compatible = six.python_2_unicode_compatible
 
 
 def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
@@ -77,12 +63,12 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     If strings_only is True, don't convert (some) non-string-like objects.
     """
     # Handle the common case first for performance reasons.
-    if isinstance(s, six.text_type):
+    if issubclass(type(s), six.text_type):
         return s
     if strings_only and is_protected_type(s):
         return s
     try:
-        if not isinstance(s, six.string_types):
+        if not issubclass(type(s), six.string_types):
             if six.PY3:
                 if isinstance(s, bytes):
                     s = six.text_type(s, encoding, errors)
@@ -237,7 +223,7 @@ def escape_uri_path(path):
     #   reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","
     #   unreserved  = alphanum | mark
     #   mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
-    # The list of safe characters here is constructed substracting ";", "=",
+    # The list of safe characters here is constructed subtracting ";", "=",
     # and "?" according to section 3.3 of RFC 2396.
     # The reason for not subtracting and escaping "/" is that we are escaping
     # the entire path, not a path segment.

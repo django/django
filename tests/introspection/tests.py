@@ -6,7 +6,7 @@ from django.db import connection
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, mock, skipUnlessDBFeature
 
-from .models import Article, Reporter
+from .models import Article, City, Reporter
 
 
 class IntrospectionTests(TransactionTestCase):
@@ -103,6 +103,12 @@ class IntrospectionTests(TransactionTestCase):
             [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False]
         )
 
+    @skipUnlessDBFeature('can_introspect_autofield')
+    def test_bigautofield(self):
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
+        self.assertIn('BigAutoField', [datatype(r[1], r) for r in desc])
+
     # Regression test for #9991 - 'real' types in postgres
     @skipUnlessDBFeature('has_real_datatype')
     def test_postgresql_real_type(self):
@@ -138,9 +144,13 @@ class IntrospectionTests(TransactionTestCase):
     def test_get_relations_alt_format(self):
         """With SQLite, foreign keys can be added with different syntaxes."""
         with connection.cursor() as cursor:
-            cursor.fetchone = mock.Mock(return_value=[
-                "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES %s(id));" % Article._meta.db_table
-            ])
+            cursor.fetchone = mock.Mock(
+                return_value=[
+                    "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES {}(id));".format(
+                        Article._meta.db_table
+                    )
+                ]
+            )
             relations = connection.introspection.get_relations(cursor, 'mocked_table')
         self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 

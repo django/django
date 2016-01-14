@@ -1,21 +1,18 @@
 from __future__ import unicode_literals
 
-import os
 import pickle
 import time
 from datetime import datetime
 
 from django.conf import settings
-from django.template import Context, engines
+from django.template import engines
 from django.template.response import (
     ContentNotRenderedError, SimpleTemplateResponse, TemplateResponse,
 )
-from django.test import (
-    RequestFactory, SimpleTestCase, ignore_warnings, override_settings,
-)
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
-from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+
+from .utils import TEMPLATE_DIR
 
 
 def test_processor(request):
@@ -118,14 +115,6 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         response.render()
         self.assertEqual(response.content, b'bar')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_context_instance(self):
-        response = self._response('{{ foo }}{{ processors }}',
-                                  Context({'foo': 'bar'}))
-        self.assertEqual(response.context_data.__class__, Context)
-        response.render()
-        self.assertEqual(response.content, b'bar')
-
     def test_kwargs(self):
         response = self._response(content_type='application/json', status=504)
         self.assertEqual(response['content-type'], 'application/json')
@@ -166,7 +155,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
 
     def test_pickling(self):
         # Create a template response. The context is
-        # known to be unpickleable (e.g., a function).
+        # known to be unpicklable (e.g., a function).
         response = SimpleTemplateResponse('first/test.html', {
             'value': 123,
             'fn': datetime.now,
@@ -224,7 +213,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
 
 @override_settings(TEMPLATES=[{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+    'DIRS': [TEMPLATE_DIR],
     'OPTIONS': {
         'context_processors': [test_processor_name],
     },
@@ -247,12 +236,6 @@ class TemplateResponseTest(SimpleTestCase):
         response = self._response('{{ foo }}{{ processors }}',
                                   {'foo': 'bar'}).render()
         self.assertEqual(response.content, b'baryes')
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_render_with_context(self):
-        response = self._response('{{ foo }}{{ processors }}',
-                                  Context({'foo': 'bar'})).render()
-        self.assertEqual(response.content, b'bar')
 
     def test_context_processor_priority(self):
         # context processors should be overridden by passed-in context
@@ -282,14 +265,9 @@ class TemplateResponseTest(SimpleTestCase):
         response = TemplateResponse(request, 'template_tests/using.html', using='jinja2').render()
         self.assertEqual(response.content, b'Jinja2\n')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_custom_app(self):
-        self._response('{{ foo }}', current_app="foobar")
-        self.assertEqual(self._request.current_app, 'foobar')
-
     def test_pickling(self):
         # Create a template response. The context is
-        # known to be unpickleable (e.g., a function).
+        # known to be unpicklable (e.g., a function).
         response = TemplateResponse(self.factory.get('/'),
             'first/test.html', {
                 'value': 123,
@@ -310,8 +288,12 @@ class TemplateResponseTest(SimpleTestCase):
 
         # ...and the unpickled response doesn't have the
         # template-related attributes, so it can't be re-rendered
-        template_attrs = ('template_name', 'context_data',
-            '_post_render_callbacks', '_request', '_current_app')
+        template_attrs = (
+            'template_name',
+            'context_data',
+            '_post_render_callbacks',
+            '_request',
+        )
         for attr in template_attrs:
             self.assertFalse(hasattr(unpickled_response, attr))
 
@@ -344,7 +326,6 @@ class CustomURLConfTest(SimpleTestCase):
 
     def test_custom_urlconf(self):
         response = self.client.get('/template_response_view/')
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'This is where you can find the snark: /snark/')
 
 

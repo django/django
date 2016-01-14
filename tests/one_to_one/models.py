@@ -22,7 +22,7 @@ class Place(models.Model):
 
 @python_2_unicode_compatible
 class Restaurant(models.Model):
-    place = models.OneToOneField(Place, primary_key=True)
+    place = models.OneToOneField(Place, models.CASCADE, primary_key=True)
     serves_hot_dogs = models.BooleanField(default=False)
     serves_pizza = models.BooleanField(default=False)
 
@@ -32,7 +32,7 @@ class Restaurant(models.Model):
 
 @python_2_unicode_compatible
 class Bar(models.Model):
-    place = models.OneToOneField(Place)
+    place = models.OneToOneField(Place, models.CASCADE)
     serves_cocktails = models.BooleanField(default=True)
 
     def __str__(self):
@@ -40,13 +40,13 @@ class Bar(models.Model):
 
 
 class UndergroundBar(models.Model):
-    place = models.OneToOneField(Place, null=True)
+    place = models.OneToOneField(Place, models.SET_NULL, null=True)
     serves_cocktails = models.BooleanField(default=True)
 
 
 @python_2_unicode_compatible
 class Waiter(models.Model):
-    restaurant = models.ForeignKey(Restaurant)
+    restaurant = models.ForeignKey(Restaurant, models.CASCADE)
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -68,14 +68,14 @@ class ManualPrimaryKey(models.Model):
 
 
 class RelatedModel(models.Model):
-    link = models.OneToOneField(ManualPrimaryKey)
+    link = models.OneToOneField(ManualPrimaryKey, models.CASCADE)
     name = models.CharField(max_length=50)
 
 
 @python_2_unicode_compatible
 class MultiModel(models.Model):
-    link1 = models.OneToOneField(Place)
-    link2 = models.OneToOneField(ManualPrimaryKey)
+    link1 = models.OneToOneField(Place, models.CASCADE)
+    link2 = models.OneToOneField(ManualPrimaryKey, models.CASCADE)
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -83,19 +83,19 @@ class MultiModel(models.Model):
 
 
 class Target(models.Model):
-    pass
+    name = models.CharField(max_length=50)
 
 
 class Pointer(models.Model):
-    other = models.OneToOneField(Target, primary_key=True)
+    other = models.OneToOneField(Target, models.CASCADE, primary_key=True)
 
 
 class Pointer2(models.Model):
-    other = models.OneToOneField(Target, related_name='second_pointer')
+    other = models.OneToOneField(Target, models.CASCADE, related_name='second_pointer')
 
 
 class HiddenPointer(models.Model):
-    target = models.OneToOneField(Target, related_name='hidden+')
+    target = models.OneToOneField(Target, models.CASCADE, related_name='hidden+')
 
 
 # Test related objects visibility.
@@ -116,5 +116,5 @@ class DirectorManager(models.Manager):
 
 class Director(models.Model):
     is_temp = models.BooleanField(default=False)
-    school = models.OneToOneField(School)
+    school = models.OneToOneField(School, models.CASCADE)
     objects = DirectorManager()

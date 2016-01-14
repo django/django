@@ -12,6 +12,8 @@ class CreateExtension(Operation):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        if schema_editor.connection.vendor != 'postgresql':
+            return
         schema_editor.execute("CREATE EXTENSION IF NOT EXISTS %s" % self.name)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):

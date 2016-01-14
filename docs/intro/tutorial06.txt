@@ -68,13 +68,11 @@ Next, add the following at the top of ``polls/templates/polls/index.html``:
 .. snippet:: html+django
     :filename: polls/templates/polls/index.html
 
-    {% load staticfiles %}
+    {% load static %}
 
     <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
 
-``{% load staticfiles %}`` loads the :ttag:`{% static %} <staticfiles-static>`
-template tag from the ``staticfiles`` template library. The ``{% static %}``
-template tag generates the absolute URL of the static file.
+The ``{% static %}`` template tag generates the absolute URL of static files.
 
 That's all you need to do for development. Reload
 ``http://localhost:8000/polls/`` and you should see that the question links are
@@ -116,13 +114,6 @@ with the framework see
 static files </howto/static-files/deployment>` discusses how to use static
 files on a real server.
 
-What's next?
-============
-
-The beginner tutorial ends here for the time being. In the meantime, you might
-want to check out some pointers on :doc:`where to go from here
-</intro/whatsnext>`.
-
-If you are familiar with Python packaging and interested in learning how to
-turn polls into a "reusable app", check out :doc:`Advanced tutorial: How to
-write reusable apps</intro/reusable-apps>`.
+When you're comfortable with the static files, read :doc:`part 7 of this
+tutorial </intro/tutorial07>` to learn how to customize Django's
+automatically-generated admin site.

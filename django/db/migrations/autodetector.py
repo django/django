@@ -11,6 +11,7 @@ from django.db.migrations.migration import Migration
 from django.db.migrations.operations.models import AlterModelOptions
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import MigrationQuestioner
+from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils import six
 
 from .topological_sort import stable_topological_sort
@@ -33,6 +34,7 @@ class MigrationAutodetector(object):
         self.from_state = from_state
         self.to_state = to_state
         self.questioner = questioner or MigrationQuestioner()
+        self.existing_apps = {app for app, model in from_state.models}
 
     def changes(self, graph, trim_to_apps=None, convert_apps=None, migration_name=None):
         """
@@ -52,21 +54,37 @@ class MigrationAutodetector(object):
         Used for full comparison for rename/alter; sometimes a single-level
         deconstruction will not compare correctly.
         """
-        if not hasattr(obj, 'deconstruct') or isinstance(obj, type):
-            return obj
-        deconstructed = obj.deconstruct()
-        if isinstance(obj, models.Field):
-            # we have a field which also returns a name
-            deconstructed = deconstructed[1:]
-        path, args, kwargs = deconstructed
-        return (
-            path,
-            [self.deep_deconstruct(value) for value in args],
-            {
+        if isinstance(obj, list):
+            return [self.deep_deconstruct(value) for value in obj]
+        elif isinstance(obj, tuple):
+            return tuple(self.deep_deconstruct(value) for value in obj)
+        elif isinstance(obj, dict):
+            return {
                 key: self.deep_deconstruct(value)
-                for key, value in kwargs.items()
-            },
-        )
+                for key, value in obj.items()
+            }
+        elif isinstance(obj, COMPILED_REGEX_TYPE):
+            return RegexObject(obj)
+        elif isinstance(obj, type):
+            # If this is a type that implements 'deconstruct' as an instance method,
+            # avoid treating this as being deconstructible itself - see #22951
+            return obj
+        elif hasattr(obj, 'deconstruct'):
+            deconstructed = obj.deconstruct()
+            if isinstance(obj, models.Field):
+                # we have a field which also returns a name
+                deconstructed = deconstructed[1:]
+            path, args, kwargs = deconstructed
+            return (
+                path,
+                [self.deep_deconstruct(value) for value in args],
+                {
+                    key: self.deep_deconstruct(value)
+                    for key, value in kwargs.items()
+                },
+            )
+        else:
+            return obj
 
     def only_relation_agnostic_fields(self, fields):
         """
@@ -76,9 +94,9 @@ class MigrationAutodetector(object):
         change during renames)
         """
         fields_def = []
-        for name, field in fields:
+        for name, field in sorted(fields):
             deconstruction = self.deep_deconstruct(field)
-            if field.rel and field.rel.to:
+            if field.remote_field and field.remote_field.model:
                 del deconstruction[2]['to']
             fields_def.append(deconstruction)
         return fields_def
@@ -141,35 +159,9 @@ class MigrationAutodetector(object):
         # Renames have to come first
         self.generate_renamed_models()
 
-        # Prepare field lists, and prepare a list of the fields that used
-        # through models in the old state so we can make dependencies
-        # from the through model deletion to the field that uses it.
-        self.kept_model_keys = set(self.old_model_keys).intersection(self.new_model_keys)
-        self.kept_proxy_keys = set(self.old_proxy_keys).intersection(self.new_proxy_keys)
-        self.kept_unmanaged_keys = set(self.old_unmanaged_keys).intersection(self.new_unmanaged_keys)
-        self.through_users = {}
-        self.old_field_keys = set()
-        self.new_field_keys = set()
-        for app_label, model_name in sorted(self.kept_model_keys):
-            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
-            old_model_state = self.from_state.models[app_label, old_model_name]
-            new_model_state = self.to_state.models[app_label, model_name]
-            self.old_field_keys.update((app_label, model_name, x) for x, y in old_model_state.fields)
-            self.new_field_keys.update((app_label, model_name, x) for x, y in new_model_state.fields)
-
-        # Through model map generation
-        for app_label, model_name in sorted(self.old_model_keys):
-            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
-            old_model_state = self.from_state.models[app_label, old_model_name]
-            for field_name, field in old_model_state.fields:
-                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(field_name)
-                if (hasattr(old_field, "rel") and getattr(old_field.rel, "through", None)
-                        and not old_field.rel.through._meta.auto_created):
-                    through_key = (
-                        old_field.rel.through._meta.app_label,
-                        old_field.rel.through._meta.model_name,
-                    )
-                    self.through_users[through_key] = (app_label, old_model_name, field_name)
+        # Prepare lists of fields and generate through model map
+        self._prepare_field_lists()
+        self._generate_through_model_map()
 
         # Generate non-rename model operations
         self.generate_deleted_models()
@@ -189,33 +181,59 @@ class MigrationAutodetector(object):
         self.generate_altered_db_table()
         self.generate_altered_order_with_respect_to()
 
-        # Now, reordering to make things possible. The order we have already
-        # isn't bad, but we need to pull a few things around so FKs work nicely
-        # inside the same app
-        for app_label, ops in sorted(self.generated_operations.items()):
+        self._sort_migrations()
+        self._build_migration_list(graph)
+        self._optimize_migrations()
 
-            # construct a dependency graph for intra-app dependencies
-            dependency_graph = {op: set() for op in ops}
-            for op in ops:
-                for dep in op._auto_deps:
-                    if dep[0] == app_label:
-                        for op2 in ops:
-                            if self.check_dependency(op2, dep):
-                                dependency_graph[op].add(op2)
+        return self.migrations
 
-            # we use a stable sort for deterministic tests & general behavior
-            self.generated_operations[app_label] = stable_topological_sort(ops, dependency_graph)
+    def _prepare_field_lists(self):
+        """
+        Prepare field lists, and prepare a list of the fields that used
+        through models in the old state so we can make dependencies
+        from the through model deletion to the field that uses it.
+        """
+        self.kept_model_keys = set(self.old_model_keys).intersection(self.new_model_keys)
+        self.kept_proxy_keys = set(self.old_proxy_keys).intersection(self.new_proxy_keys)
+        self.kept_unmanaged_keys = set(self.old_unmanaged_keys).intersection(self.new_unmanaged_keys)
+        self.through_users = {}
+        self.old_field_keys = set()
+        self.new_field_keys = set()
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            self.old_field_keys.update((app_label, model_name, x) for x, y in old_model_state.fields)
+            self.new_field_keys.update((app_label, model_name, x) for x, y in new_model_state.fields)
 
-        # Now, we need to chop the lists of operations up into migrations with
-        # dependencies on each other.
-        # We do this by stepping up an app's list of operations until we
-        # find one that has an outgoing dependency that isn't in another app's
-        # migration yet (hasn't been chopped off its list). We then chop off the
-        # operations before it into a migration and move onto the next app.
-        # If we loop back around without doing anything, there's a circular
-        # dependency (which _should_ be impossible as the operations are all
-        # split at this point so they can't depend and be depended on)
+    def _generate_through_model_map(self):
+        """
+        Through model map generation
+        """
+        for app_label, model_name in sorted(self.old_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            for field_name, field in old_model_state.fields:
+                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(field_name)
+                if (hasattr(old_field, "remote_field") and getattr(old_field.remote_field, "through", None)
+                        and not old_field.remote_field.through._meta.auto_created):
+                    through_key = (
+                        old_field.remote_field.through._meta.app_label,
+                        old_field.remote_field.through._meta.model_name,
+                    )
+                    self.through_users[through_key] = (app_label, old_model_name, field_name)
 
+    def _build_migration_list(self, graph=None):
+        """
+        We need to chop the lists of operations up into migrations with
+        dependencies on each other. We do this by stepping up an app's list of
+        operations until we find one that has an outgoing dependency that isn't
+        in another app's migration yet (hasn't been chopped off its list). We
+        then chop off the operations before it into a migration and move onto
+        the next app. If we loop back around without doing anything, there's a
+        circular dependency (which _should_ be impossible as the operations are
+        all split at this point so they can't depend and be depended on).
+        """
         self.migrations = {}
         num_ops = sum(len(x) for x in self.generated_operations.values())
         chop_mode = False
@@ -283,6 +301,7 @@ class MigrationAutodetector(object):
                         instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
                         instance.dependencies = list(dependencies)
                         instance.operations = chopped
+                        instance.initial = app_label not in self.existing_apps
                         self.migrations.setdefault(app_label, []).append(instance)
                         chop_mode = False
                     else:
@@ -295,7 +314,27 @@ class MigrationAutodetector(object):
                     raise ValueError("Cannot resolve operation dependencies: %r" % self.generated_operations)
             num_ops = new_num_ops
 
-        # OK, add in internal dependencies among the migrations
+    def _sort_migrations(self):
+        """
+        Reorder to make things possible. The order we have already isn't bad,
+        but we need to pull a few things around so FKs work nicely inside the
+        same app
+        """
+        for app_label, ops in sorted(self.generated_operations.items()):
+            # construct a dependency graph for intra-app dependencies
+            dependency_graph = {op: set() for op in ops}
+            for op in ops:
+                for dep in op._auto_deps:
+                    if dep[0] == app_label:
+                        for op2 in ops:
+                            if self.check_dependency(op2, dep):
+                                dependency_graph[op].add(op2)
+
+            # we use a stable sort for deterministic tests & general behavior
+            self.generated_operations[app_label] = stable_topological_sort(ops, dependency_graph)
+
+    def _optimize_migrations(self):
+        # Add in internal dependencies among the migrations
         for app_label, migrations in self.migrations.items():
             for m1, m2 in zip(migrations, migrations[1:]):
                 m2.dependencies.append((app_label, m1.name))
@@ -309,8 +348,6 @@ class MigrationAutodetector(object):
         for app_label, migrations in self.migrations.items():
             for migration in migrations:
                 migration.operations = MigrationOptimizer().optimize(migration.operations, app_label=app_label)
-
-        return self.migrations
 
     def check_dependency(self, operation, dependency):
         """
@@ -431,7 +468,11 @@ class MigrationAutodetector(object):
                                 )
                             )
                             self.renamed_models[app_label, model_name] = rem_model_name
-                            self.renamed_models_rel['%s.%s' % (rem_model_state.app_label, rem_model_state.name)] = '%s.%s' % (model_state.app_label, model_state.name)
+                            renamed_models_rel_key = '%s.%s' % (rem_model_state.app_label, rem_model_state.name)
+                            self.renamed_models_rel[renamed_models_rel_key] = '%s.%s' % (
+                                model_state.app_label,
+                                model_state.name,
+                            )
                             self.old_model_keys.remove((rem_app_label, rem_model_name))
                             self.old_model_keys.append((app_label, model_name))
                             break
@@ -460,20 +501,21 @@ class MigrationAutodetector(object):
             related_fields = {}
             primary_key_rel = None
             for field in model_opts.local_fields:
-                if field.rel:
-                    if field.rel.to:
+                if field.remote_field:
+                    if field.remote_field.model:
                         if field.primary_key:
-                            primary_key_rel = field.rel.to
-                        elif not field.rel.parent_link:
+                            primary_key_rel = field.remote_field.model
+                        elif not field.remote_field.parent_link:
                             related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
-                    if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                    if (getattr(field.remote_field, "through", None)
+                            and not field.remote_field.through._meta.auto_created):
                         related_fields[field.name] = field
             for field in model_opts.local_many_to_many:
-                if field.rel.to:
+                if field.remote_field.model:
                     related_fields[field.name] = field
-                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                     related_fields[field.name] = field
             # Are there unique/index_together to defer?
             unique_together = model_state.options.pop('unique_together', None)
@@ -516,22 +558,7 @@ class MigrationAutodetector(object):
 
             # Generate operations for each related field
             for name, field in sorted(related_fields.items()):
-                # Account for FKs to swappable models
-                swappable_setting = getattr(field, 'swappable_setting', None)
-                if swappable_setting is not None:
-                    dep_app_label = "__setting__"
-                    dep_object_name = swappable_setting
-                else:
-                    dep_app_label = field.rel.to._meta.app_label
-                    dep_object_name = field.rel.to._meta.object_name
-                dependencies = [(dep_app_label, dep_object_name, None, True)]
-                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
-                    dependencies.append((
-                        field.rel.through._meta.app_label,
-                        field.rel.through._meta.object_name,
-                        None,
-                        True
-                    ))
+                dependencies = self._get_dependecies_for_foreign_key(field)
                 # Depend on our own model being created
                 dependencies.append((app_label, model_name, None, True))
                 # Make operation
@@ -591,7 +618,7 @@ class MigrationAutodetector(object):
         added = set(self.new_proxy_keys) - set(self.old_proxy_keys)
         for app_label, model_name in sorted(added):
             model_state = self.to_state.models[app_label, model_name]
-            assert model_state.options.get("proxy", False)
+            assert model_state.options.get("proxy")
             # Depend on the deletion of any possible non-proxy version of us
             dependencies = [
                 (app_label, model_name, None, False),
@@ -639,17 +666,18 @@ class MigrationAutodetector(object):
             # Gather related fields
             related_fields = {}
             for field in model._meta.local_fields:
-                if field.rel:
-                    if field.rel.to:
+                if field.remote_field:
+                    if field.remote_field.model:
                         related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
-                    if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                    if (getattr(field.remote_field, "through", None)
+                            and not field.remote_field.through._meta.auto_created):
                         related_fields[field.name] = field
             for field in model._meta.local_many_to_many:
-                if field.rel.to:
+                if field.remote_field.model:
                     related_fields[field.name] = field
-                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                     related_fields[field.name] = field
             # Generate option removal first
             unique_together = model_state.options.pop('unique_together', None)
@@ -695,7 +723,7 @@ class MigrationAutodetector(object):
             for name, field in sorted(related_fields.items()):
                 dependencies.append((app_label, model_name, name, False))
             # We're referenced in another field's through=
-            through_user = self.through_users.get((app_label, model_state.name_lower), None)
+            through_user = self.through_users.get((app_label, model_state.name_lower))
             if through_user:
                 dependencies.append((through_user[0], through_user[1], through_user[2], False))
             # Finally, make the operation, deduping any dependencies
@@ -714,7 +742,7 @@ class MigrationAutodetector(object):
         deleted = set(self.old_proxy_keys) - set(self.new_proxy_keys)
         for app_label, model_name in sorted(deleted):
             model_state = self.from_state.models[app_label, model_name]
-            assert model_state.options.get("proxy", False)
+            assert model_state.options.get("proxy")
             self.add_operation(
                 app_label,
                 operations.DeleteModel(
@@ -736,7 +764,7 @@ class MigrationAutodetector(object):
             for rem_app_label, rem_model_name, rem_field_name in sorted(self.old_field_keys - self.new_field_keys):
                 if rem_app_label == app_label and rem_model_name == model_name:
                     old_field_dec = self.deep_deconstruct(old_model_state.get_field_by_name(rem_field_name))
-                    if field.rel and field.rel.to and 'to' in old_field_dec[2]:
+                    if field.remote_field and field.remote_field.model and 'to' in old_field_dec[2]:
                         old_rel_to = old_field_dec[2]['to']
                         if old_rel_to in self.renamed_models_rel:
                             old_field_dec[2]['to'] = self.renamed_models_rel[old_rel_to]
@@ -766,23 +794,8 @@ class MigrationAutodetector(object):
         field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
         # Fields that are foreignkeys/m2ms depend on stuff
         dependencies = []
-        if field.rel and field.rel.to:
-            # Account for FKs to swappable models
-            swappable_setting = getattr(field, 'swappable_setting', None)
-            if swappable_setting is not None:
-                dep_app_label = "__setting__"
-                dep_object_name = swappable_setting
-            else:
-                dep_app_label = field.rel.to._meta.app_label
-                dep_object_name = field.rel.to._meta.object_name
-            dependencies = [(dep_app_label, dep_object_name, None, True)]
-            if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
-                dependencies.append((
-                    field.rel.through._meta.app_label,
-                    field.rel.through._meta.object_name,
-                    None,
-                    True,
-                ))
+        if field.remote_field and field.remote_field.model:
+            dependencies.extend(self._get_dependecies_for_foreign_key(field))
         # You can't just add NOT NULL fields with no default or fields
         # which don't allow empty strings as default.
         preserve_default = True
@@ -838,18 +851,26 @@ class MigrationAutodetector(object):
             new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
             # Implement any model renames on relations; these are handled by RenameModel
             # so we need to exclude them from the comparison
-            if hasattr(new_field, "rel") and getattr(new_field.rel, "to", None):
+            if hasattr(new_field, "remote_field") and getattr(new_field.remote_field, "model", None):
                 rename_key = (
-                    new_field.rel.to._meta.app_label,
-                    new_field.rel.to._meta.model_name,
+                    new_field.remote_field.model._meta.app_label,
+                    new_field.remote_field.model._meta.model_name,
                 )
                 if rename_key in self.renamed_models:
-                    new_field.rel.to = old_field.rel.to
+                    new_field.remote_field.model = old_field.remote_field.model
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:
-                if (not isinstance(old_field, models.ManyToManyField) and
-                        not isinstance(new_field, models.ManyToManyField)):
+                both_m2m = (
+                    isinstance(old_field, models.ManyToManyField) and
+                    isinstance(new_field, models.ManyToManyField)
+                )
+                neither_m2m = (
+                    not isinstance(old_field, models.ManyToManyField) and
+                    not isinstance(new_field, models.ManyToManyField)
+                )
+                if both_m2m or neither_m2m:
+                    # Either both fields are m2m or neither is
                     preserve_default = True
                     if (old_field.null and not new_field.null and not new_field.has_default() and
                             not isinstance(new_field, models.ManyToManyField)):
@@ -870,8 +891,28 @@ class MigrationAutodetector(object):
                         )
                     )
                 else:
+                    # We cannot alter between m2m and concrete fields
                     self._generate_removed_field(app_label, model_name, field_name)
                     self._generate_added_field(app_label, model_name, field_name)
+
+    def _get_dependecies_for_foreign_key(self, field):
+        # Account for FKs to swappable models
+        swappable_setting = getattr(field, 'swappable_setting', None)
+        if swappable_setting is not None:
+            dep_app_label = "__setting__"
+            dep_object_name = swappable_setting
+        else:
+            dep_app_label = field.remote_field.model._meta.app_label
+            dep_object_name = field.remote_field.model._meta.object_name
+        dependencies = [(dep_app_label, dep_object_name, None, True)]
+        if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
+            dependencies.append((
+                field.remote_field.through._meta.app_label,
+                field.remote_field.through._meta.object_name,
+                None,
+                True,
+            ))
+        return dependencies
 
     def _generate_altered_foo_together(self, operation):
         option_name = operation.option_name
@@ -896,12 +937,20 @@ class MigrationAutodetector(object):
                 new_value = set(new_value)
 
             if old_value != new_value:
+                dependencies = []
+                for foo_togethers in new_value:
+                    for field_name in foo_togethers:
+                        field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
+                        if field.remote_field and field.remote_field.model:
+                            dependencies.extend(self._get_dependecies_for_foreign_key(field))
+
                 self.add_operation(
                     app_label,
                     operation(
                         name=model_name,
                         **{option_name: new_value}
-                    )
+                    ),
+                    dependencies=dependencies,
                 )
 
     def generate_altered_unique_together(self):
@@ -971,12 +1020,12 @@ class MigrationAutodetector(object):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
-            if (old_model_state.options.get("order_with_respect_to", None) !=
-                    new_model_state.options.get("order_with_respect_to", None)):
+            if (old_model_state.options.get("order_with_respect_to") !=
+                    new_model_state.options.get("order_with_respect_to")):
                 # Make sure it comes second if we're adding
                 # (removal dependency is part of RemoveField)
                 dependencies = []
-                if new_model_state.options.get("order_with_respect_to", None):
+                if new_model_state.options.get("order_with_respect_to"):
                     dependencies.append((
                         app_label,
                         model_name,
@@ -988,7 +1037,7 @@ class MigrationAutodetector(object):
                     app_label,
                     operations.AlterOrderWithRespectTo(
                         name=model_name,
-                        order_with_respect_to=new_model_state.options.get('order_with_respect_to', None),
+                        order_with_respect_to=new_model_state.options.get('order_with_respect_to'),
                     ),
                     dependencies=dependencies,
                 )
@@ -1111,6 +1160,7 @@ class MigrationAutodetector(object):
         Given a migration name, tries to extract a number from the
         beginning of it. If no number found, returns None.
         """
-        if re.match(r"^\d+_", name):
-            return int(name.split("_")[0])
+        match = re.match(r'^\d+', name)
+        if match:
+            return int(match.group())
         return None

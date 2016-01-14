@@ -4,6 +4,7 @@ import warnings
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils import six
+from django.utils.html import escape, format_html
 
 register = template.Library()
 
@@ -79,7 +80,9 @@ simple_one_default.anything = "Expected simple_one_default __dict__"
 @register.simple_tag
 def simple_unlimited_args(one, two='hi', *args):
     """Expected simple_unlimited_args __doc__"""
-    return "simple_unlimited_args - Expected result: %s" % (', '.join(six.text_type(arg) for arg in [one, two] + list(args)))
+    return "simple_unlimited_args - Expected result: %s" % (
+        ', '.join(six.text_type(arg) for arg in [one, two] + list(args))
+    )
 simple_unlimited_args.anything = "Expected simple_unlimited_args __dict__"
 
 
@@ -107,6 +110,24 @@ def simple_tag_without_context_parameter(arg):
     """Expected simple_tag_without_context_parameter __doc__"""
     return "Expected result"
 simple_tag_without_context_parameter.anything = "Expected simple_tag_without_context_parameter __dict__"
+
+
+@register.simple_tag(takes_context=True)
+def escape_naive(context):
+    """A tag that doesn't even think about escaping issues"""
+    return "Hello {0}!".format(context['name'])
+
+
+@register.simple_tag(takes_context=True)
+def escape_explicit(context):
+    """A tag that uses escape explicitly"""
+    return escape("Hello {0}!".format(context['name']))
+
+
+@register.simple_tag(takes_context=True)
+def escape_format_html(context):
+    """A tag that uses format_html"""
+    return format_html("Hello {0}!", context['name'])
 
 
 @register.simple_tag(takes_context=True)

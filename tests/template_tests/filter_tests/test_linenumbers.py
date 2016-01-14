@@ -44,3 +44,15 @@ class FunctionTests(SimpleTestCase):
 
     def test_non_string_input(self):
         self.assertEqual(linenumbers(123), '1. 123')
+
+    def test_autoescape(self):
+        self.assertEqual(
+            linenumbers('foo\n<a>bar</a>\nbuz'),
+            '1. foo\n2. &lt;a&gt;bar&lt;/a&gt;\n3. buz',
+        )
+
+    def test_autoescape_off(self):
+        self.assertEqual(
+            linenumbers('foo\n<a>bar</a>\nbuz', autoescape=False),
+            '1. foo\n2. <a>bar</a>\n3. buz'
+        )

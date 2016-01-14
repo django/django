@@ -42,8 +42,7 @@ class HStoreField(Field):
         return value
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
-        return json.dumps(value)
+        return json.dumps(self.value_from_object(obj))
 
     def formfield(self, **kwargs):
         defaults = {
@@ -55,18 +54,9 @@ class HStoreField(Field):
 
 HStoreField.register_lookup(lookups.DataContains)
 HStoreField.register_lookup(lookups.ContainedBy)
-
-
-@HStoreField.register_lookup
-class HasKeyLookup(lookups.PostgresSimpleLookup):
-    lookup_name = 'has_key'
-    operator = '?'
-
-
-@HStoreField.register_lookup
-class HasKeysLookup(lookups.PostgresSimpleLookup):
-    lookup_name = 'has_keys'
-    operator = '?&'
+HStoreField.register_lookup(lookups.HasKey)
+HStoreField.register_lookup(lookups.HasKeys)
+HStoreField.register_lookup(lookups.HasAnyKeys)
 
 
 class KeyTransform(Transform):
@@ -78,7 +68,7 @@ class KeyTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return "%s -> '%s'" % (lhs, self.key_name), params
+        return "(%s -> '%s')" % (lhs, self.key_name), params
 
 
 class KeyTransformFactory(object):
@@ -91,14 +81,14 @@ class KeyTransformFactory(object):
 
 
 @HStoreField.register_lookup
-class KeysTransform(lookups.FunctionTransform):
+class KeysTransform(Transform):
     lookup_name = 'keys'
     function = 'akeys'
     output_field = ArrayField(TextField())
 
 
 @HStoreField.register_lookup
-class ValuesTransform(lookups.FunctionTransform):
+class ValuesTransform(Transform):
     lookup_name = 'values'
     function = 'avals'
     output_field = ArrayField(TextField())

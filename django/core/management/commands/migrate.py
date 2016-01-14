@@ -2,12 +2,10 @@
 from __future__ import unicode_literals
 
 import time
-import warnings
 from collections import OrderedDict
 from importlib import import_module
 
 from django.apps import apps
-from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.sql import (
     emit_post_migrate_signal, emit_pre_migrate_signal,
@@ -17,7 +15,6 @@ from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.state import ProjectState
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.module_loading import module_has_submodule
 
 
@@ -33,15 +30,20 @@ class Command(BaseCommand):
                 'migration. Use the name "zero" to unapply all migrations.'
             ),
         )
-        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
+        parser.add_argument('--noinput', '--no-input',
+            action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.')
         parser.add_argument('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
                 'Defaults to the "default" database.')
         parser.add_argument('--fake', action='store_true', dest='fake', default=False,
-            help='Mark migrations as run without actually running them')
-        parser.add_argument('--list', '-l', action='store_true', dest='list', default=False,
-            help='Show a list of all known migrations and which are applied')
+            help='Mark migrations as run without actually running them.')
+        parser.add_argument('--fake-initial', action='store_true', dest='fake_initial', default=False,
+            help='Detect if tables already exist and fake-apply initial migrations if so. Make sure '
+                 'that the current database schema matches your initial migration before using this '
+                 'flag. Django will only check for an existing table name.')
+        parser.add_argument('--run-syncdb', action='store_true', dest='run_syncdb',
+            help='Creates tables for apps without migrations.')
 
     def handle(self, *args, **options):
 
@@ -58,24 +60,6 @@ class Command(BaseCommand):
         db = options.get('database')
         connection = connections[db]
 
-        # If they asked for a migration listing, quit main execution flow and show it
-        if options.get("list", False):
-            warnings.warn(
-                "The 'migrate --list' command is deprecated. Use 'showmigrations' instead.",
-                RemovedInDjango20Warning, stacklevel=2)
-            self.stdout.ending = None  # Remove when #21429 is fixed
-            return call_command(
-                'showmigrations',
-                '--list',
-                app_labels=[options['app_label']] if options['app_label'] else None,
-                database=db,
-                no_color=options.get('no_color'),
-                settings=options.get('settings'),
-                stdout=self.stdout,
-                traceback=options.get('traceback'),
-                verbosity=self.verbosity,
-            )
-
         # Hook for backends needing any database preparation
         connection.prepare_database()
         # Work out which apps have migrations and which do not
@@ -90,7 +74,8 @@ class Command(BaseCommand):
                 for app, names in conflicts.items()
             )
             raise CommandError(
-                "Conflicting migrations detected (%s).\nTo fix them run "
+                "Conflicting migrations detected; multiple leaf nodes in the "
+                "migration graph: (%s).\nTo fix them run "
                 "'python manage.py makemigrations --merge'" % name_str
             )
 
@@ -167,6 +152,7 @@ class Command(BaseCommand):
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Running migrations:"))
         if not plan:
+            executor.check_replacements()
             if self.verbosity >= 1:
                 self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
@@ -186,7 +172,9 @@ class Command(BaseCommand):
                         "apply them."
                     ))
         else:
-            executor.migrate(targets, plan, fake=options.get("fake", False))
+            fake = options.get("fake")
+            fake_initial = options.get("fake_initial")
+            executor.migrate(targets, plan, fake=fake, fake_initial=fake_initial)
 
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
@@ -203,9 +191,9 @@ class Command(BaseCommand):
             elif action == "apply_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
                 if fake:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
                 else:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
             elif action == "unapply_start":
                 if compute_time:
                     self.start = time.time()
@@ -214,9 +202,9 @@ class Command(BaseCommand):
             elif action == "unapply_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
                 if fake:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
                 else:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
             elif action == "render_start":
                 if compute_time:
                     self.start = time.time()
@@ -224,7 +212,7 @@ class Command(BaseCommand):
                 self.stdout.flush()
             elif action == "render_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
-                self.stdout.write(self.style.MIGRATE_SUCCESS(" DONE" + elapsed))
+                self.stdout.write(self.style.SUCCESS(" DONE" + elapsed))
 
     def sync_apps(self, connection, app_labels):
         "Runs the old syncdb-style operation on a list of app_labels."
@@ -262,7 +250,7 @@ class Command(BaseCommand):
                 deferred_sql = []
                 for app_name, model_list in manifest.items():
                     for model in model_list:
-                        if model._meta.proxy or not model._meta.managed:
+                        if not model._meta.can_migrate(connection):
                             continue
                         if self.verbosity >= 3:
                             self.stdout.write(

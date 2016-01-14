@@ -48,7 +48,7 @@ def shortcut(request, content_type_id, object_id):
 
         # First, look for an many-to-many relationship to Site.
         for field in opts.many_to_many:
-            if field.rel.to is Site:
+            if field.remote_field.model is Site:
                 try:
                     # Caveat: In the case of multiple related Sites, this just
                     # selects the *first* one, which is arbitrary.
@@ -61,7 +61,7 @@ def shortcut(request, content_type_id, object_id):
         # Next, look for a many-to-one relationship to Site.
         if object_domain is None:
             for field in obj._meta.fields:
-                if field.rel and field.rel.to is Site:
+                if field.remote_field and field.remote_field.model is Site:
                     try:
                         object_domain = getattr(obj, field.name).domain
                     except Site.DoesNotExist:

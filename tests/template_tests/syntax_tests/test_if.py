@@ -1,9 +1,5 @@
-import warnings
-
 from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase, ignore_warnings
-from django.test.utils import reset_warning_registry
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import SimpleTestCase
 
 from ..utils import TestObj, setup
 
@@ -526,42 +522,8 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string('if-tag-badarg04')
         self.assertEqual(output, 'no')
 
-    @setup({'if-tag-eq-deprecated': '{% if foo = bar %}yes{% else %}no{% endif %}'},
-        test_once=True)
-    def test_if_tag_eq_deprecated(self):
-        reset_warning_registry()
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            output = self.engine.render_to_string('if-tag-eq-deprecated')
-            self.assertEqual(output, 'yes')
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            str(warns[0].message),
-            "Operator '=' is deprecated and will be removed in Django 2.0. "
-            "Use '==' instead."
-        )
-
-
-@ignore_warnings(category=RemovedInDjango20Warning)
-class TestEqualitySingleEqualsSign(SimpleTestCase):
-    # The following tests should be changed to template.TemplateSyntaxError
-    # (or simply removed) when the deprecation path ends in Django 2.0.
-    @setup({'if-tag-eq01': '{% if foo = bar %}yes{% else %}no{% endif %}'})
-    def test_if_tag_eq01(self):
-        output = self.engine.render_to_string('if-tag-eq01', {'foo': 1})
-        self.assertEqual(output, 'no')
-
-    @setup({'if-tag-eq02': '{% if foo = bar %}yes{% else %}no{% endif %}'})
-    def test_if_tag_eq02(self):
-        output = self.engine.render_to_string('if-tag-eq02', {'foo': 1, 'bar': 1})
-        self.assertEqual(output, 'yes')
-
-    @setup({'if-tag-eq03': '{% if foo = bar %}yes{% else %}no{% endif %}'})
-    def test_if_tag_eq03(self):
-        output = self.engine.render_to_string('if-tag-eq03', {'foo': 1, 'bar': 2})
-        self.assertEqual(output, 'no')
-
-    @setup({'if-tag-eq04': '{% if foo == \'\' %}yes{% else %}no{% endif %}'})
-    def test_if_tag_eq04(self):
-        output = self.engine.render_to_string('if-tag-eq04')
-        self.assertEqual(output, 'no')
+    @setup({'if-tag-single-eq': '{% if foo = bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_single_eq(self):
+        # A single equals sign is a syntax error.
+        with self.assertRaises(TemplateSyntaxError):
+            self.engine.render_to_string('if-tag-single-eq', {'foo': 1})

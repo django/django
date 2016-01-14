@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls admin_static admin_modify %}
+{% load i18n admin_urls static admin_modify %}
 
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
@@ -68,22 +68,12 @@
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
 
 {% block admin_change_form_document_ready %}
-    <script type="text/javascript">
-        (function($) {
-            $(document).ready(function() {
-                $('.add-another').click(function(e) {
-                    e.preventDefault();
-                    showAddAnotherPopup(this);
-                });
-                $('.related-lookup').click(function(e) {
-                    e.preventDefault();
-                    showRelatedObjectLookupPopup(this);
-                });
+    <script type="text/javascript"
+            id="django-admin-form-add-constants"
+            src="{% static 'admin/js/change_form.js' %}"
             {% if adminform and add %}
-                $('form#{{ opts.model_name }}_form :input:visible:enabled:first').focus()
-            {% endif %}
-            });
-        })(django.jQuery);
+                data-model-name="{{ opts.model_name }}"
+            {% endif %}>
     </script>
 {% endblock %}
 

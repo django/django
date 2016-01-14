@@ -4,6 +4,7 @@ XML serializer.
 
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
@@ -13,7 +14,9 @@ from django.conf import settings
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.encoding import smart_text
-from django.utils.xmlutils import SimplerXMLGenerator
+from django.utils.xmlutils import (
+    SimplerXMLGenerator, UnserializableContentError,
+)
 
 
 class Serializer(base.Serializer):
@@ -22,8 +25,8 @@ class Serializer(base.Serializer):
     """
 
     def indent(self, level):
-        if self.options.get('indent', None) is not None:
-            self.xml.ignorableWhitespace('\n' + ' ' * self.options.get('indent', None) * level)
+        if self.options.get('indent') is not None:
+            self.xml.ignorableWhitespace('\n' + ' ' * self.options.get('indent') * level)
 
     def start_serialization(self):
         """
@@ -49,7 +52,8 @@ class Serializer(base.Serializer):
             raise base.SerializationError("Non-model object (%s) encountered during serialization" % type(obj))
 
         self.indent(1)
-        attrs = {"model": smart_text(obj._meta)}
+        model = obj._meta.proxy_for_model if obj._deferred else obj.__class__
+        attrs = OrderedDict([("model", smart_text(model._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
             obj_pk = obj._get_pk_val()
             if obj_pk is not None:
@@ -70,14 +74,18 @@ class Serializer(base.Serializer):
         ManyToManyFields)
         """
         self.indent(2)
-        self.xml.startElement("field", {
-            "name": field.name,
-            "type": field.get_internal_type()
-        })
+        self.xml.startElement("field", OrderedDict([
+            ("name", field.name),
+            ("type", field.get_internal_type()),
+        ]))
 
         # Get a "string version" of the object's data.
         if getattr(obj, field.name) is not None:
-            self.xml.characters(field.value_to_string(obj))
+            try:
+                self.xml.characters(field.value_to_string(obj))
+            except UnserializableContentError:
+                raise ValueError("%s.%s (pk:%s) contains unserializable characters" % (
+                    obj.__class__.__name__, field.name, obj._get_pk_val()))
         else:
             self.xml.addQuickElement("None")
 
@@ -91,7 +99,7 @@ class Serializer(base.Serializer):
         self._start_relational_field(field)
         related_att = getattr(obj, field.get_attname())
         if related_att is not None:
-            if self.use_natural_foreign_keys and hasattr(field.rel.to, 'natural_key'):
+            if self.use_natural_foreign_keys and hasattr(field.remote_field.model, 'natural_key'):
                 related = getattr(obj, field.name)
                 # If related object has a natural key, use it
                 related = related.natural_key()
@@ -112,9 +120,9 @@ class Serializer(base.Serializer):
         serialized as references to the object's PK (i.e. the related *data*
         is not dumped, just the relation).
         """
-        if field.rel.through._meta.auto_created:
+        if field.remote_field.through._meta.auto_created:
             self._start_relational_field(field)
-            if self.use_natural_foreign_keys and hasattr(field.rel.to, 'natural_key'):
+            if self.use_natural_foreign_keys and hasattr(field.remote_field.model, 'natural_key'):
                 # If the objects in the m2m have a natural key, use it
                 def handle_m2m(value):
                     natural = value.natural_key()
@@ -140,11 +148,11 @@ class Serializer(base.Serializer):
         Helper to output the <field> element for relational fields
         """
         self.indent(2)
-        self.xml.startElement("field", {
-            "name": field.name,
-            "rel": field.rel.__class__.__name__,
-            "to": smart_text(field.rel.to._meta),
-        })
+        self.xml.startElement("field", OrderedDict([
+            ("name", field.name),
+            ("rel", field.remote_field.__class__.__name__),
+            ("to", smart_text(field.remote_field.model._meta)),
+        ]))
 
 
 class Deserializer(base.Deserializer):
@@ -204,9 +212,9 @@ class Deserializer(base.Deserializer):
             field = Model._meta.get_field(field_name)
 
             # As is usually the case, relation fields get the special treatment.
-            if field.rel and isinstance(field.rel, models.ManyToManyRel):
+            if field.remote_field and isinstance(field.remote_field, models.ManyToManyRel):
                 m2m_data[field.name] = self._handle_m2m_field_node(field_node, field)
-            elif field.rel and isinstance(field.rel, models.ManyToOneRel):
+            elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
                 data[field.attname] = self._handle_fk_field_node(field_node, field)
             else:
                 if field_node.getElementsByTagName('None'):
@@ -228,43 +236,46 @@ class Deserializer(base.Deserializer):
         if node.getElementsByTagName('None'):
             return None
         else:
-            if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
+            model = field.remote_field.model
+            if hasattr(model._default_manager, 'get_by_natural_key'):
                 keys = node.getElementsByTagName('natural')
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj = field.rel.to._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
-                    obj_pk = getattr(obj, field.rel.field_name)
+                    obj = model._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
+                    obj_pk = getattr(obj, field.remote_field.field_name)
                     # If this is a natural foreign key to an object that
                     # has a FK/O2O as the foreign key, use the FK value
-                    if field.rel.to._meta.pk.rel:
+                    if field.remote_field.model._meta.pk.remote_field:
                         obj_pk = obj_pk.pk
                 else:
                     # Otherwise, treat like a normal PK
                     field_value = getInnerText(node).strip()
-                    obj_pk = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                    obj_pk = model._meta.get_field(field.remote_field.field_name).to_python(field_value)
                 return obj_pk
             else:
                 field_value = getInnerText(node).strip()
-                return field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                return model._meta.get_field(field.remote_field.field_name).to_python(field_value)
 
     def _handle_m2m_field_node(self, node, field):
         """
         Handle a <field> node for a ManyToManyField.
         """
-        if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
+        model = field.remote_field.model
+        default_manager = model._default_manager
+        if hasattr(default_manager, 'get_by_natural_key'):
             def m2m_convert(n):
                 keys = n.getElementsByTagName('natural')
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj_pk = field.rel.to._default_manager.db_manager(self.db).get_by_natural_key(*field_value).pk
+                    obj_pk = default_manager.db_manager(self.db).get_by_natural_key(*field_value).pk
                 else:
                     # Otherwise, treat like a normal PK value.
-                    obj_pk = field.rel.to._meta.pk.to_python(n.getAttribute('pk'))
+                    obj_pk = model._meta.pk.to_python(n.getAttribute('pk'))
                 return obj_pk
         else:
-            m2m_convert = lambda n: field.rel.to._meta.pk.to_python(n.getAttribute('pk'))
+            m2m_convert = lambda n: model._meta.pk.to_python(n.getAttribute('pk'))
         return [m2m_convert(c) for c in node.getElementsByTagName("object")]
 
     def _get_model_from_node(self, node, attr):
@@ -309,7 +320,6 @@ class DefusedExpatParser(_ExpatParser):
     An expat parser hardened against XML bomb attacks.
 
     Forbids DTDs, external entity references
-
     """
     def __init__(self, *args, **kwargs):
         _ExpatParser.__init__(self, *args, **kwargs)

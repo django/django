@@ -142,8 +142,8 @@ Improved CSRF protection
 
 Django now has much improved protection against :doc:`Cross-Site Request Forgery
 (CSRF) attacks</ref/csrf>`. This type of attack occurs when a malicious
-Web site contains a link, a form button or some JavaScript that is intended to
-perform some action on your Web site, using the credentials of a logged-in user
+website contains a link, a form button or some JavaScript that is intended to
+perform some action on your website, using the credentials of a logged-in user
 who visits the malicious site in their browser. A related type of attack, "login
 CSRF," where an attacking site tricks a user's browser into logging into a site
 with someone else's credentials, is also covered.
@@ -358,8 +358,7 @@ Support for 3D geometry fields was added, and may be enabled
 by setting the :attr:`~django.contrib.gis.db.models.GeometryField.dim`
 keyword to 3 in your :class:`~django.contrib.gis.db.models.GeometryField`.
 The :class:`~django.contrib.gis.db.models.Extent3D` aggregate
-and :meth:`~django.contrib.gis.db.models.GeoQuerySet.extent3d` ``GeoQuerySet``
-method were added as a part of this feature.
+and ``extent3d()`` ``GeoQuerySet`` method were added as a part of this feature.
 
 The following :class:`~django.contrib.gis.db.models.GeoQuerySet`
 methods are new in 1.2:
@@ -686,7 +685,7 @@ other browsers, our encoding of cookie values was changed so that the
 comma and semicolon are treated as non-safe characters, and are
 therefore encoded as ``\054`` and ``\073`` respectively.  This could
 produce backwards incompatibilities, especially if you are storing
-comma or semi-colon in cookies and have javascript code that parses
+comma or semi-colon in cookies and have JavaScript code that parses
 and manipulates cookie values client-side.
 
 ``ModelForm.is_valid()`` and ``ModelForm.errors``

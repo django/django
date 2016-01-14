@@ -166,7 +166,7 @@ The technical board is an elected group of five committers. They're expected
 to be experienced but there's no formal seniority requirement. Its current
 composition is published :ref:`here <technical-board-list>`.
 
-A new board is elected after each major release of Django. The election
+A new board is elected after each feature release of Django. The election
 process is managed by a returns officer nominated by the outgoing technical
 board. The election process works as follows:
 

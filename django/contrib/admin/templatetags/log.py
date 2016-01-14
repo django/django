@@ -13,14 +13,13 @@ class AdminLogNode(template.Node):
 
     def render(self, context):
         if self.user is None:
-            context[self.varname] = LogEntry.objects.all().select_related('content_type', 'user')[:self.limit]
+            entries = LogEntry.objects.all()
         else:
             user_id = self.user
             if not user_id.isdigit():
                 user_id = context[self.user].pk
-            context[self.varname] = LogEntry.objects.filter(
-                user__pk=user_id,
-            ).select_related('content_type', 'user')[:int(self.limit)]
+            entries = LogEntry.objects.filter(user__pk=user_id)
+        context[self.varname] = entries.select_related('content_type', 'user')[:int(self.limit)]
         return ''
 
 

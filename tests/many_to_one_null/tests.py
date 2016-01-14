@@ -94,7 +94,7 @@ class ManyToOneNullTests(TestCase):
         # Use descriptor assignment to allocate ForeignKey. Null is legal, so
         # existing members of the set that are not in the assignment set are
         # set to null.
-        self.r2.article_set = [self.a2, self.a3]
+        self.r2.article_set.set([self.a2, self.a3])
         self.assertQuerysetEqual(self.r2.article_set.all(),
                                  ['<Article: Second>', '<Article: Third>'])
         # Clear the rest of the set
@@ -106,14 +106,23 @@ class ManyToOneNullTests(TestCase):
     def test_assign_with_queryset(self):
         # Ensure that querysets used in reverse FK assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
-        # ForeignRelatedObjectsDescriptor.__set__. Refs #19816.
-        self.r2.article_set = [self.a2, self.a3]
+        # RelatedManager.set() (#19816).
+        self.r2.article_set.set([self.a2, self.a3])
 
         qs = self.r2.article_set.filter(headline="Second")
-        self.r2.article_set = qs
+        self.r2.article_set.set(qs)
 
         self.assertEqual(1, self.r2.article_set.count())
         self.assertEqual(1, qs.count())
+
+    def test_add_efficiency(self):
+        r = Reporter.objects.create()
+        articles = []
+        for _ in range(3):
+            articles.append(Article.objects.create())
+        with self.assertNumQueries(1):
+            r.article_set.add(*articles)
+        self.assertEqual(r.article_set.count(), 3)
 
     def test_clear_efficiency(self):
         r = Reporter.objects.create()

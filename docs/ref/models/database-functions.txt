@@ -5,8 +5,6 @@ Database Functions
 .. module:: django.db.models.functions
     :synopsis: Database Functions
 
-.. versionadded:: 1.8
-
 The classes documented below provide a way for users to use functions provided
 by the underlying database as annotations, aggregations, or filters in Django.
 Functions are also :doc:`expressions <expressions>`, so they can be used and
@@ -55,6 +53,17 @@ Usage examples::
     >>> print(aggregated['combined_age_default'])
     None
 
+.. warning::
+
+    A Python value passed to ``Coalesce`` on MySQL may be converted to an
+    incorrect type unless explicitly cast to the correct database type:
+
+    >>> from django.db.models.expressions import RawSQL
+    >>> from django.utils import timezone
+    >>> now = timezone.now()
+    >>> now_sql = RawSQL("cast(%s as datetime)", (now,))
+    >>> Coalesce('updated', now_sql)
+
 Concat
 ------
 
@@ -82,6 +91,74 @@ Usage example::
     >>> print(author.screen_name)
     Margaret Smith (Maggie)
 
+Greatest
+--------
+
+.. class:: Greatest(*expressions, **extra)
+
+.. versionadded:: 1.9
+
+Accepts a list of at least two field names or expressions and returns the
+greatest value. Each argument must be of a similar type, so mixing text and
+numbers will result in a database error.
+
+Usage example::
+
+    class Blog(models.Model):
+        body = models.TextField()
+        modified = models.DateTimeField(auto_now=True)
+
+    class Comment(models.Model):
+        body = models.TextField()
+        modified = models.DateTimeField(auto_now=True)
+        blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+
+    >>> from django.db.models.functions import Greatest
+    >>> blog = Blog.objects.create(body='Greatest is the best.')
+    >>> comment = Comment.objects.create(body='No, Least is better.', blog=blog)
+    >>> comments = Comment.objects.annotate(last_updated=Greatest('modified', 'blog__modified'))
+    >>> annotated_comment = comments.get()
+
+``annotated_comment.last_updated`` will be the most recent of ``blog.modified``
+and ``comment.modified``.
+
+.. warning::
+
+    The behavior of ``Greatest`` when one or more expression may be ``null``
+    varies between databases:
+
+    - PostgreSQL: ``Greatest`` will return the largest non-null expression,
+      or ``null`` if all expressions are ``null``.
+    - SQLite, Oracle, and MySQL: If any expression is ``null``, ``Greatest``
+      will return ``null``.
+
+    The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
+    a sensible minimum value to provide as a default.
+
+Least
+-----
+
+.. class:: Least(*expressions, **extra)
+
+.. versionadded:: 1.9
+
+Accepts a list of at least two field names or expressions and returns the
+least value. Each argument must be of a similar type, so mixing text and numbers
+will result in a database error.
+
+.. warning::
+
+    The behavior of ``Least`` when one or more expression may be ``null``
+    varies between databases:
+
+    - PostgreSQL: ``Least`` will return the smallest non-null expression,
+      or ``null`` if all expressions are ``null``.
+    - SQLite, Oracle, and MySQL: If any expression is ``null``, ``Least``
+      will return ``null``.
+
+    The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
+    a sensible maximum value to provide as a default.
+
 Length
 ------
 
@@ -101,6 +178,18 @@ Usage example::
     >>> print(author.name_length, author.goes_by_length)
     (14, None)
 
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import CharField
+    >>> from django.db.models.functions import Length
+    >>> CharField.register_lookup(Length, 'length')
+    >>> # Get authors whose name is longer than 7 characters
+    >>> authors = Author.objects.filter(name__length__gt=7)
+
+.. versionchanged:: 1.9
+
+    The ability to register the function as a transform was added.
+
 Lower
 ------
 
@@ -109,6 +198,8 @@ Lower
 Accepts a single text field or expression and returns the lowercase
 representation.
 
+It can also be registered as a transform as described in :class:`Length`.
+
 Usage example::
 
     >>> from django.db.models.functions import Lower
@@ -116,6 +207,33 @@ Usage example::
     >>> author = Author.objects.annotate(name_lower=Lower('name')).get()
     >>> print(author.name_lower)
     margaret smith
+
+.. versionchanged:: 1.9
+
+    The ability to register the function as a transform was added.
+
+Now
+---
+
+.. class:: Now()
+
+.. versionadded:: 1.9
+
+Returns the database server's current date and time when the query is executed,
+typically using the SQL ``CURRENT_TIMESTAMP``.
+
+Usage example::
+
+    >>> from django.db.models.functions import Now
+    >>> Article.objects.filter(published__lte=Now())
+    <QuerySet [<Article: How to Django>]>
+
+.. admonition:: PostgreSQL considerations
+
+    On PostgreSQL, the SQL ``CURRENT_TIMESTAMP`` returns the time that the
+    current transaction started. Therefore for cross-database compatibility,
+    ``Now()`` uses ``STATEMENT_TIMESTAMP`` instead. If you need the transaction
+    timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
 
 Substr
 ------
@@ -144,6 +262,8 @@ Upper
 Accepts a single text field or expression and returns the uppercase
 representation.
 
+It can also be registered as a transform as described in :class:`Length`.
+
 Usage example::
 
     >>> from django.db.models.functions import Upper
@@ -151,3 +271,7 @@ Usage example::
     >>> author = Author.objects.annotate(name_upper=Upper('name')).get()
     >>> print(author.name_upper)
     MARGARET SMITH
+
+.. versionchanged:: 1.9
+
+    The ability to register the function as a transform was added.

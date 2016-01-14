@@ -32,7 +32,6 @@ urlpatterns = [
     url(r'^accounts/logout/$', auth_views.logout),
 
     # Special URLs for particular regression cases.
-    url('^中文/$', views.redirect),
     url('^中文/target/$', views.index_page),
 ]
 

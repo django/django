@@ -13,8 +13,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     # MySQL stores positive fields as UNSIGNED ints.
     integer_field_ranges = dict(BaseDatabaseOperations.integer_field_ranges,
-        PositiveSmallIntegerField=(0, 4294967295),
-        PositiveIntegerField=(0, 18446744073709551615),
+        PositiveSmallIntegerField=(0, 65535),
+        PositiveIntegerField=(0, 4294967295),
     )
 
     def date_extract_sql(self, lookup_type, field_name):
@@ -27,39 +27,36 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
     def date_trunc_sql(self, lookup_type, field_name):
-        fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
-        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')  # Use double percents to escape.
-        format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
-        try:
-            i = fields.index(lookup_type) + 1
-        except ValueError:
-            sql = field_name
+        fields = {
+            'year': '%%Y-01-01',
+            'month': '%%Y-%%m-01',
+        }  # Use double percents to escape.
+        if lookup_type in fields:
+            format_str = fields[lookup_type]
+            return "CAST(DATE_FORMAT(%s, '%s') AS DATE)" % (field_name, format_str)
         else:
-            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
-            sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
-        return sql
+            return "DATE(%s)" % (field_name)
 
-    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+    def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
             field_name = "CONVERT_TZ(%s, 'UTC', %%s)" % field_name
             params = [tzname]
         else:
             params = []
-        # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
-        if lookup_type == 'week_day':
-            # DAYOFWEEK() returns an integer, 1-7, Sunday=1.
-            # Note: WEEKDAY() returns 0-6, Monday=0.
-            sql = "DAYOFWEEK(%s)" % field_name
-        else:
-            sql = "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+        return field_name, params
+
+    def datetime_cast_date_sql(self, field_name, tzname):
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
+        sql = "DATE(%s)" % field_name
+        return sql, params
+
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
+        sql = self.date_extract_sql(lookup_type, field_name)
         return sql, params
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = "CONVERT_TZ(%s, 'UTC', %%s)" % field_name
-            params = [tzname]
-        else:
-            params = []
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
         fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
         format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')  # Use double percents to escape.
         format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
@@ -77,7 +74,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             timedelta.days, timedelta.seconds, timedelta.microseconds), []
 
     def format_for_duration_arithmetic(self, sql):
-        return 'INTERVAL %s MICROSECOND' % sql
+        if self.connection.features.supports_microsecond_precision:
+            return 'INTERVAL %s MICROSECOND' % sql
+        else:
+            return 'INTERVAL FLOOR(%s / 1000000) SECOND' % sql
 
     def drop_foreignkey_sql(self):
         return "DROP FOREIGN KEY"
@@ -135,20 +135,23 @@ class DatabaseOperations(BaseDatabaseOperations):
                              'value for AutoField.')
         return value
 
-    def value_to_db_datetime(self, value):
+    def adapt_datetimefield_value(self, value):
         if value is None:
             return None
 
         # MySQL doesn't support tz-aware datetimes
         if timezone.is_aware(value):
             if settings.USE_TZ:
-                value = value.astimezone(timezone.utc).replace(tzinfo=None)
+                value = timezone.make_naive(value, self.connection.timezone)
             else:
                 raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
 
+        if not self.connection.features.supports_microsecond_precision:
+            value = value.replace(microsecond=0)
+
         return six.text_type(value)
 
-    def value_to_db_time(self, value):
+    def adapt_timefield_value(self, value):
         if value is None:
             return None
 
@@ -161,9 +164,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def max_name_length(self):
         return 64
 
-    def bulk_insert_sql(self, fields, num_values):
-        items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
-        return "VALUES " + ", ".join([items_sql] * num_values)
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
+        values_sql = ", ".join("(%s)" % sql for sql in placeholder_rows_sql)
+        return "VALUES " + values_sql
 
     def combine_expression(self, connector, sub_expressions):
         """
@@ -176,25 +180,33 @@ class DatabaseOperations(BaseDatabaseOperations):
     def get_db_converters(self, expression):
         converters = super(DatabaseOperations, self).get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
-        if internal_type in ['BooleanField', 'NullBooleanField']:
-            converters.append(self.convert_booleanfield_value)
-        if internal_type == 'UUIDField':
-            converters.append(self.convert_uuidfield_value)
         if internal_type == 'TextField':
             converters.append(self.convert_textfield_value)
+        elif internal_type in ['BooleanField', 'NullBooleanField']:
+            converters.append(self.convert_booleanfield_value)
+        elif internal_type == 'DateTimeField':
+            converters.append(self.convert_datetimefield_value)
+        elif internal_type == 'UUIDField':
+            converters.append(self.convert_uuidfield_value)
         return converters
 
-    def convert_booleanfield_value(self, value, expression, context):
+    def convert_textfield_value(self, value, expression, connection, context):
+        if value is not None:
+            value = force_text(value)
+        return value
+
+    def convert_booleanfield_value(self, value, expression, connection, context):
         if value in (0, 1):
             value = bool(value)
         return value
 
-    def convert_uuidfield_value(self, value, expression, context):
+    def convert_datetimefield_value(self, value, expression, connection, context):
         if value is not None:
-            value = uuid.UUID(value)
+            if settings.USE_TZ:
+                value = timezone.make_aware(value, self.connection.timezone)
         return value
 
-    def convert_textfield_value(self, value, expression, context):
+    def convert_uuidfield_value(self, value, expression, connection, context):
         if value is not None:
-            value = force_text(value)
+            value = uuid.UUID(value)
         return value

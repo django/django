@@ -40,7 +40,13 @@ class Article(models.Model):
     Article_ID = models.AutoField(primary_key=True, db_column='Article ID')
     headline = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author, db_table='my_m2m_table')
-    primary_author = models.ForeignKey(Author, db_column='Author ID', related_name='primary_set', null=True)
+    primary_author = models.ForeignKey(
+        Author,
+        models.SET_NULL,
+        db_column='Author ID',
+        related_name='primary_set',
+        null=True,
+    )
 
     def __str__(self):
         return self.headline

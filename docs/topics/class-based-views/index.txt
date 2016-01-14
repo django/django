@@ -84,7 +84,7 @@ views::
 
 
 For more information on how to use the built in generic views, consult the next
-topic on :doc:`generic class based views</topics/class-based-views/generic-display>`.
+topic on :doc:`generic class-based views</topics/class-based-views/generic-display>`.
 
 .. _supporting-other-http-methods:
 

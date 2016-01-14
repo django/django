@@ -135,7 +135,7 @@ class DispatcherTests(unittest.TestCase):
         self.assertIsInstance(err, ValueError)
         self.assertEqual(err.args, ('this',))
         self.assertTrue(hasattr(err, '__traceback__'))
-        self.assertTrue(isinstance(err.__traceback__, TracebackType))
+        self.assertIsInstance(err.__traceback__, TracebackType)
         a_signal.disconnect(fails)
         self.assertTestIsClean(a_signal)
 

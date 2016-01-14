@@ -49,9 +49,12 @@ class Field(GDALBase):
         "Retrieves the Field's value as a double (float)."
         return capi.get_field_as_double(self._feat.ptr, self._index)
 
-    def as_int(self):
+    def as_int(self, is_64=False):
         "Retrieves the Field's value as an integer."
-        return capi.get_field_as_integer(self._feat.ptr, self._index)
+        if is_64:
+            return capi.get_field_as_integer64(self._feat.ptr, self._index)
+        else:
+            return capi.get_field_as_integer(self._feat.ptr, self._index)
 
     def as_string(self):
         "Retrieves the Field's value as a string."
@@ -106,6 +109,7 @@ class Field(GDALBase):
 # ### The Field sub-classes for each OGR Field type. ###
 class OFTInteger(Field):
     _double = False
+    _bit64 = False
 
     @property
     def value(self):
@@ -115,7 +119,7 @@ class OFTInteger(Field):
             # read as a double and cast as Python int (to prevent overflow).
             return int(self.as_double())
         else:
-            return self.as_int()
+            return self.as_int(self._bit64)
 
     @property
     def type(self):
@@ -185,6 +189,10 @@ class OFTTime(Field):
             return None
 
 
+class OFTInteger64(OFTInteger):
+    _bit64 = True
+
+
 # List fields are also just subclasses
 class OFTIntegerList(Field):
     pass
@@ -201,6 +209,11 @@ class OFTStringList(Field):
 class OFTWideStringList(Field):
     pass
 
+
+class OFTInteger64List(Field):
+    pass
+
+
 # Class mapping dictionary for OFT Types and reverse mapping.
 OGRFieldTypes = {
     0: OFTInteger,
@@ -215,5 +228,8 @@ OGRFieldTypes = {
     9: OFTDate,
     10: OFTTime,
     11: OFTDateTime,
+    # New 64-bit integer types in GDAL 2
+    12: OFTInteger64,
+    13: OFTInteger64List,
 }
 ROGRFieldTypes = {cls: num for num, cls in OGRFieldTypes.items()}

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import cgi
 import codecs
 import logging
+import re
 import sys
 from io import BytesIO
 from threading import Lock
@@ -11,7 +12,7 @@ from django import http
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
-from django.core.urlresolvers import set_script_prefix
+from django.urls import set_script_prefix
 from django.utils import six
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import cached_property
@@ -20,6 +21,8 @@ logger = logging.getLogger('django.request')
 
 # encode() and decode() expect the charset to be a native string.
 ISO_8859_1, UTF_8 = str('iso-8859-1'), str('utf-8')
+
+_slashes_re = re.compile(br'/+')
 
 
 class LimitedStream(object):
@@ -152,14 +155,9 @@ class WSGIHandler(base.BaseHandler):
         # settings weren't available.
         if self._request_middleware is None:
             with self.initLock:
-                try:
-                    # Check that middleware is still uninitialized.
-                    if self._request_middleware is None:
-                        self.load_middleware()
-                except:
-                    # Unload whatever middleware we got
-                    self._request_middleware = None
-                    raise
+                # Check that middleware is still uninitialized.
+                if self._request_middleware is None:
+                    self.load_middleware()
 
         set_script_prefix(get_script_name(environ))
         signals.request_started.send(sender=self.__class__, environ=environ)
@@ -218,8 +216,12 @@ def get_script_name(environ):
         script_url = get_bytes_from_wsgi(environ, 'REDIRECT_URL', '')
 
     if script_url:
+        if b'//' in script_url:
+            # mod_wsgi squashes multiple successive slashes in PATH_INFO,
+            # do the same with script_url before manipulating paths (#17133).
+            script_url = _slashes_re.sub(b'/', script_url)
         path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '')
-        script_name = script_url[:-len(path_info)]
+        script_name = script_url[:-len(path_info)] if path_info else script_url
     else:
         script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
 

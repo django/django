@@ -2,7 +2,6 @@
 # Unit and doctests for specific database backends.
 from __future__ import unicode_literals
 
-import copy
 import datetime
 import re
 import threading
@@ -10,7 +9,6 @@ import unittest
 import warnings
 from decimal import Decimal, Rounded
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
 from django.db import (
@@ -18,24 +16,23 @@ from django.db import (
     reset_queries, transaction,
 )
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.postgresql_psycopg2 import version as pg_version
+from django.db.backends.postgresql import version as pg_version
 from django.db.backends.signals import connection_created
 from django.db.backends.utils import CursorWrapper, format_number
 from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (
-    TestCase, TransactionTestCase, mock, override_settings, skipIfDBFeature,
-    skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
+    skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.six.moves import range
 
 from . import models
 
 
-class DummyBackendTest(TestCase):
+class DummyBackendTest(SimpleTestCase):
 
     def test_no_databases(self):
         """
@@ -145,6 +142,30 @@ class SQLiteTests(TestCase):
                 models.Item.objects.all().aggregate,
                 **{'complex': aggregate('last_modified') + aggregate('last_modified')})
 
+    def test_memory_db_test_name(self):
+        """
+        A named in-memory db should be allowed where supported.
+        """
+        from django.db.backends.sqlite3.base import DatabaseWrapper
+        settings_dict = {
+            'TEST': {
+                'NAME': 'file:memorydb_test?mode=memory&cache=shared',
+            }
+        }
+        wrapper = DatabaseWrapper(settings_dict)
+        creation = wrapper.creation
+        if creation.connection.features.can_share_in_memory_db:
+            expected = creation.connection.settings_dict['TEST']['NAME']
+            self.assertEqual(creation._get_test_db_name(), expected)
+        else:
+            msg = (
+                "Using a shared memory database with `mode=memory` in the "
+                "database name is not supported in your environment, "
+                "use `:memory:` instead."
+            )
+            with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                creation._get_test_db_name()
+
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "Test only for PostgreSQL")
 class PostgreSQLTests(TestCase):
@@ -159,7 +180,36 @@ class PostgreSQLTests(TestCase):
         self.assert_parses("EnterpriseDB 9.3", 90300)
         self.assert_parses("PostgreSQL 9.3.6", 90306)
         self.assert_parses("PostgreSQL 9.4beta1", 90400)
-        self.assert_parses("PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", 90301)
+        self.assert_parses(
+            "PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC "
+            "i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)",
+            90301
+        )
+
+    def test_nodb_connection(self):
+        """
+        Test that the _nodb_connection property fallbacks to the default connection
+        database when access to the 'postgres' database is not granted.
+        """
+        def mocked_connect(self):
+            if self.settings_dict['NAME'] is None:
+                raise DatabaseError()
+            return ''
+
+        nodb_conn = connection._nodb_connection
+        self.assertIsNone(nodb_conn.settings_dict['NAME'])
+
+        # Now assume the 'postgres' db isn't available
+        with warnings.catch_warnings(record=True) as w:
+            with mock.patch('django.db.backends.base.base.BaseDatabaseWrapper.connect',
+                            side_effect=mocked_connect, autospec=True):
+                warnings.simplefilter('always', RuntimeWarning)
+                nodb_conn = connection._nodb_connection
+        self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
+        self.assertEqual(nodb_conn.settings_dict['NAME'], connection.settings_dict['NAME'])
+        # Check a RuntimeWarning has been emitted
+        self.assertEqual(len(w), 1)
+        self.assertEqual(w[0].message.__class__, RuntimeWarning)
 
     def test_version_detection(self):
         """Test PostgreSQL version detection"""
@@ -193,9 +243,8 @@ class PostgreSQLTests(TestCase):
         PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
         transaction is rolled back (#17062).
         """
-        databases = copy.deepcopy(settings.DATABASES)
-        new_connections = ConnectionHandler(databases)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
+
         try:
             # Ensure the database default time zone is different than
             # the time zone in new_connection.settings_dict. We can
@@ -207,17 +256,22 @@ class PostgreSQLTests(TestCase):
             new_tz = 'Europe/Paris' if db_default_tz == 'UTC' else 'UTC'
             new_connection.close()
 
+            # Invalidate timezone name cache, because the setting_changed
+            # handler cannot know about new_connection.
+            del new_connection.timezone_name
+
             # Fetch a new connection with the new_tz as default
             # time zone, run a query and rollback.
-            new_connection.settings_dict['TIME_ZONE'] = new_tz
-            new_connection.set_autocommit(False)
-            cursor = new_connection.cursor()
-            new_connection.rollback()
+            with self.settings(TIME_ZONE=new_tz):
+                new_connection.set_autocommit(False)
+                cursor = new_connection.cursor()
+                new_connection.rollback()
 
-            # Now let's see if the rollback rolled back the SET TIME ZONE.
-            cursor.execute("SHOW TIMEZONE")
-            tz = cursor.fetchone()[0]
-            self.assertEqual(new_tz, tz)
+                # Now let's see if the rollback rolled back the SET TIME ZONE.
+                cursor.execute("SHOW TIMEZONE")
+                tz = cursor.fetchone()[0]
+                self.assertEqual(new_tz, tz)
+
         finally:
             new_connection.close()
 
@@ -226,14 +280,39 @@ class PostgreSQLTests(TestCase):
         The connection wrapper shouldn't believe that autocommit is enabled
         after setting the time zone when AUTOCOMMIT is False (#21452).
         """
-        databases = copy.deepcopy(settings.DATABASES)
-        databases[DEFAULT_DB_ALIAS]['AUTOCOMMIT'] = False
-        new_connections = ConnectionHandler(databases)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
+        new_connection.settings_dict['AUTOCOMMIT'] = False
+
         try:
             # Open a database connection.
             new_connection.cursor()
             self.assertFalse(new_connection.get_autocommit())
+        finally:
+            new_connection.close()
+
+    def test_connect_isolation_level(self):
+        """
+        Regression test for #18130 and #24318.
+        """
+        from psycopg2.extensions import (
+            ISOLATION_LEVEL_READ_COMMITTED as read_committed,
+            ISOLATION_LEVEL_SERIALIZABLE as serializable,
+        )
+
+        # Since this is a django.test.TestCase, a transaction is in progress
+        # and the isolation level isn't reported as 0. This test assumes that
+        # PostgreSQL is configured with the default isolation level.
+
+        # Check the level on the psycopg2 connection, not the Django wrapper.
+        self.assertEqual(connection.connection.isolation_level, read_committed)
+
+        new_connection = connection.copy()
+        new_connection.settings_dict['OPTIONS']['isolation_level'] = serializable
+        try:
+            # Start a transaction so the isolation level isn't reported as 0.
+            new_connection.set_autocommit(False)
+            # Check the level on the psycopg2 connection, not the Django wrapper.
+            self.assertEqual(new_connection.connection.isolation_level, serializable)
         finally:
             new_connection.close()
 
@@ -253,7 +332,7 @@ class PostgreSQLTests(TestCase):
         self.assertEqual(a[0], b[0])
 
     def test_lookup_cast(self):
-        from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
+        from django.db.backends.postgresql.operations import DatabaseOperations
 
         do = DatabaseOperations(connection=None)
         for lookup in ('iexact', 'contains', 'icontains', 'startswith',
@@ -261,14 +340,14 @@ class PostgreSQLTests(TestCase):
             self.assertIn('::text', do.lookup_cast(lookup))
 
     def test_correct_extraction_psycopg2_version(self):
-        from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper
-        version_path = 'django.db.backends.postgresql_psycopg2.base.Database.__version__'
+        from django.db.backends.postgresql.base import psycopg2_version
+        version_path = 'django.db.backends.postgresql.base.Database.__version__'
 
         with mock.patch(version_path, '2.6.9'):
-            self.assertEqual(DatabaseWrapper.psycopg2_version.__get__(self), (2, 6, 9))
+            self.assertEqual(psycopg2_version(), (2, 6, 9))
 
         with mock.patch(version_path, '2.5.dev0'):
-            self.assertEqual(DatabaseWrapper.psycopg2_version.__get__(self), (2, 5))
+            self.assertEqual(psycopg2_version(), (2, 5))
 
 
 class DateQuotingTest(TestCase):
@@ -280,7 +359,6 @@ class DateQuotingTest(TestCase):
         #12818__.
 
         __: http://code.djangoproject.com/ticket/12818
-
         """
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -293,7 +371,6 @@ class DateQuotingTest(TestCase):
         which clash with strings passed to it (e.g. 'day') - see #12818__.
 
         __: http://code.djangoproject.com/ticket/12818
-
         """
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -310,10 +387,7 @@ class LastExecutedQueryTest(TestCase):
         query has been run.
         """
         cursor = connection.cursor()
-        try:
-            connection.ops.last_executed_query(cursor, '', ())
-        except Exception:
-            self.fail("'last_executed_query' should not raise an exception.")
+        connection.ops.last_executed_query(cursor, '', ())
 
     def test_debug_sql(self):
         list(models.Reporter.objects.filter(first_name="test"))
@@ -338,8 +412,19 @@ class LastExecutedQueryTest(TestCase):
         # This shouldn't raise an exception
         query = "SELECT strftime('%Y', 'now');"
         connection.cursor().execute(query)
-        self.assertEqual(connection.queries[-1]['sql'],
-            str_prefix("QUERY = %(_)s\"SELECT strftime('%%Y', 'now');\" - PARAMS = ()"))
+        self.assertEqual(connection.queries[-1]['sql'], query)
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "This test is specific to SQLite.")
+    def test_parameter_quoting_on_sqlite(self):
+        # The implementation of last_executed_queries isn't optimal. It's
+        # worth testing that parameters are quoted. See #14091.
+        query = "SELECT %s"
+        params = ["\"'\\"]
+        connection.cursor().execute(query, params)
+        # Note that the single quote is repeated
+        substituted = "SELECT '\"''\\'"
+        self.assertEqual(connection.queries[-1]['sql'], substituted)
 
 
 class ParameterHandlingTest(TestCase):
@@ -373,13 +458,19 @@ class LongNameTest(TransactionTestCase):
         models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
 
     def test_sequence_name_length_limits_m2m(self):
-        """Test an m2m save of a model with a long name and a long m2m field name doesn't error as on Django >=1.2 this now uses object saves. Ref #8901"""
+        """
+        An m2m save of a model with a long name and a long m2m field name
+        doesn't error (#8901).
+        """
         obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
         rel_obj = models.Person.objects.create(first_name='Django', last_name='Reinhardt')
         obj.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.add(rel_obj)
 
     def test_sequence_name_length_limits_flush(self):
-        """Test that sequence resetting as part of a flush with model with long name and long pk name doesn't error. Ref #8901"""
+        """
+        Sequence resetting as part of a flush with model with long name and
+        long pk name doesn't error (#8901).
+        """
         # A full flush is expensive to the full test, so we dig into the
         # internals to generate the likely offending SQL and run it manually
 
@@ -693,8 +784,7 @@ class BackendTestCase(TransactionTestCase):
         """
         old_queries_limit = BaseDatabaseWrapper.queries_limit
         BaseDatabaseWrapper.queries_limit = 3
-        new_connections = ConnectionHandler(settings.DATABASES)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
 
         # Initialize the connection and clear initialization statements.
         with new_connection.cursor():
@@ -789,11 +879,16 @@ class FkConstraintsTests(TransactionTestCase):
 
     def test_disable_constraint_checks_manually(self):
         """
-        When constraint checks are disabled, should be able to write bad data without IntegrityErrors.
+        When constraint checks are disabled, should be able to write bad data
+        without IntegrityErrors.
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            models.Article.objects.create(
+                headline="Test article",
+                pub_date=datetime.datetime(2010, 9, 4),
+                reporter=self.r,
+            )
             # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
@@ -807,11 +902,16 @@ class FkConstraintsTests(TransactionTestCase):
 
     def test_disable_constraint_checks_context_manager(self):
         """
-        When constraint checks are disabled (using context manager), should be able to write bad data without IntegrityErrors.
+        When constraint checks are disabled (using context manager), should be
+        able to write bad data without IntegrityErrors.
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            models.Article.objects.create(
+                headline="Test article",
+                pub_date=datetime.datetime(2010, 9, 4),
+                reporter=self.r,
+            )
             # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
@@ -828,7 +928,11 @@ class FkConstraintsTests(TransactionTestCase):
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            models.Article.objects.create(
+                headline="Test article",
+                pub_date=datetime.datetime(2010, 9, 4),
+                reporter=self.r,
+            )
             # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
@@ -1030,13 +1134,13 @@ class DBConstraintTestCase(TestCase):
         self.assertEqual(models.Object.objects.count(), 2)
         self.assertEqual(obj.related_objects.count(), 1)
 
-        intermediary_model = models.Object._meta.get_field("related_objects").rel.through
+        intermediary_model = models.Object._meta.get_field("related_objects").remote_field.through
         intermediary_model.objects.create(from_object_id=obj.id, to_object_id=12345)
         self.assertEqual(obj.related_objects.count(), 1)
         self.assertEqual(intermediary_model.objects.count(), 2)
 
 
-class BackendUtilTests(TestCase):
+class BackendUtilTests(SimpleTestCase):
 
     def test_format_number(self):
         """

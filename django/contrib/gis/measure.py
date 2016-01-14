@@ -37,9 +37,9 @@ and Geoff Biggs' PhD work on dimensioned units for robotics.
 """
 __all__ = ['A', 'Area', 'D', 'Distance']
 from decimal import Decimal
+from functools import total_ordering
 
 from django.utils import six
-from django.utils.functional import total_ordering
 
 NUMERIC_TYPES = six.integer_types + (float, Decimal)
 AREA_PREFIX = "sq_"

@@ -1,5 +1,4 @@
 import re
-import warnings
 from itertools import chain
 
 from django.core.exceptions import FieldError
@@ -13,7 +12,6 @@ from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six.moves import zip
 
 
@@ -136,21 +134,32 @@ class SQLCompiler(object):
         # If the DB can group by primary key, then group by the primary key of
         # query's main model. Note that for PostgreSQL the GROUP BY clause must
         # include the primary key of every table, but for MySQL it is enough to
-        # have the main table's primary key. Currently only the MySQL form is
-        # implemented.
-        # MySQLism: however, columns in HAVING clause must be added to the
-        # GROUP BY.
+        # have the main table's primary key.
         if self.connection.features.allows_group_by_pk:
             # The logic here is: if the main model's primary key is in the
             # query, then set new_expressions to that field. If that happens,
             # then also add having expressions to group by.
             pk = None
             for expr in expressions:
-                if (expr.output_field.primary_key and
-                        getattr(expr.output_field, 'model') == self.query.model):
+                # Is this a reference to query's base table primary key? If the
+                # expression isn't a Col-like, then skip the expression.
+                if (getattr(expr, 'target', None) == self.query.model._meta.pk and
+                        getattr(expr, 'alias', None) == self.query.tables[0]):
                     pk = expr
+                    break
             if pk:
+                # MySQLism: Columns in HAVING clause must be added to the GROUP BY.
                 expressions = [pk] + [expr for expr in expressions if expr in having]
+        elif self.connection.features.allows_group_by_selected_pks:
+            # Filter out all expressions associated with a table's primary key
+            # present in the grouped columns. This is done by identifying all
+            # tables that have their primary key included in the grouped
+            # columns and removing non-primary key columns referring to them.
+            pks = {expr for expr in expressions if hasattr(expr, 'target') and expr.target.primary_key}
+            aliases = {expr.alias for expr in pks}
+            expressions = [
+                expr for expr in expressions if expr in pks or getattr(expr, 'alias', None) not in aliases
+            ]
         return expressions
 
     def get_select(self):
@@ -219,7 +228,7 @@ class SQLCompiler(object):
 
     def get_order_by(self):
         """
-        Returns a list of 2-tuples of form (expr, (sql, params)) for the
+        Returns a list of 2-tuples of form (expr, (sql, params, is_ref)) for the
         ORDER BY clause.
 
         The order_by clause can alter the select clause (for example it
@@ -254,9 +263,16 @@ class SQLCompiler(object):
             descending = True if order == 'DESC' else False
 
             if col in self.query.annotation_select:
+                # Reference to expression in SELECT clause
                 order_by.append((
                     OrderBy(Ref(col, self.query.annotation_select[col]), descending=descending),
                     True))
+                continue
+            if col in self.query.annotations:
+                # References to an expression which is masked out of the SELECT clause
+                order_by.append((
+                    OrderBy(self.query.annotations[col], descending=descending),
+                    False))
                 continue
 
             if '.' in field:
@@ -312,17 +328,6 @@ class SQLCompiler(object):
                     extra_select.append((expr, (without_ordering, params), None))
         return extra_select
 
-    def __call__(self, name):
-        """
-        Backwards-compatibility shim so that calling a SQLCompiler is equivalent to
-        calling its quote_name_unless_alias method.
-        """
-        warnings.warn(
-            "Calling a SQLCompiler directly is deprecated. "
-            "Call compiler.quote_name_unless_alias instead.",
-            RemovedInDjango20Warning, stacklevel=2)
-        return self.quote_name_unless_alias(name)
-
     def quote_name_unless_alias(self, name):
         """
         A wrapper around connection.ops.quote_name that doesn't quote aliases
@@ -332,7 +337,8 @@ class SQLCompiler(object):
         if name in self.quote_cache:
             return self.quote_cache[name]
         if ((name in self.query.alias_map and name not in self.query.table_map) or
-                name in self.query.extra_select or name in self.query.external_aliases):
+                name in self.query.extra_select or (
+                    name in self.query.external_aliases and name not in self.query.table_map)):
             self.quote_cache[name] = name
             return name
         r = self.connection.ops.quote_name(name)
@@ -357,14 +363,10 @@ class SQLCompiler(object):
         If 'with_limits' is False, any limit/offset information is not included
         in the query.
         """
-        if with_limits and self.query.low_mark == self.query.high_mark:
-            return '', ()
         self.subquery = subquery
         refcounts_before = self.query.alias_refcount.copy()
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()
-            if with_limits and self.query.low_mark == self.query.high_mark:
-                return '', ()
             distinct_fields = self.get_distinct()
 
             # This must come after 'select', 'ordering', and 'distinct' -- see
@@ -465,7 +467,10 @@ class SQLCompiler(object):
         if obj.low_mark == 0 and obj.high_mark is None and not self.query.distinct_fields:
             # If there is no slicing in use, then we can safely drop all ordering
             obj.clear_ordering(True)
-        return obj.get_compiler(connection=self.connection).as_sql(subquery=True)
+        nested_sql = obj.get_compiler(connection=self.connection).as_sql(subquery=True)
+        if nested_sql == ('', ()):
+            raise EmptyResultSet
+        return nested_sql
 
     def get_default_columns(self, start_alias=None, opts=None, from_parent=None):
         """
@@ -529,7 +534,10 @@ class SQLCompiler(object):
             _, targets, alias, joins, path, _ = self._setup_joins(parts, opts, None)
             targets, alias, _ = self.query.trim_joins(targets, joins, path)
             for target in targets:
-                result.append("%s.%s" % (qn(alias), qn2(target.column)))
+                if name in self.query.annotation_select:
+                    result.append(name)
+                else:
+                    result.append("%s.%s" % (qn(alias), qn2(target.column)))
         return result
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
@@ -547,11 +555,11 @@ class SQLCompiler(object):
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model unless the attribute name
         # of the field is specified.
-        if field.rel and path and opts.ordering and name != field.attname:
+        if field.is_relation and path and opts.ordering and name != field.attname:
             # Firstly, avoid infinite loops.
             if not already_seen:
                 already_seen = set()
-            join_tuple = tuple(self.query.alias_map[j].table_name for j in joins)
+            join_tuple = tuple(getattr(self.query.alias_map[j], 'join_cols', None) for j in joins)
             if join_tuple in already_seen:
                 raise FieldError('Infinite loop caused by ordering.')
             already_seen.add(join_tuple)
@@ -661,7 +669,7 @@ class SQLCompiler(object):
                 if not f.is_relation:
                     # If a non-related field is used like a relation,
                     # or if a single non-relational field is given.
-                    if next or (cur_depth == 1 and f.name in requested):
+                    if next or f.name in requested:
                         raise FieldError(
                             "Non-relational field given in select_related: '%s'. "
                             "Choices are: %s" % (
@@ -676,7 +684,7 @@ class SQLCompiler(object):
                                           only_load.get(field_model)):
                 continue
             klass_info = {
-                'model': f.rel.to,
+                'model': f.remote_field.model,
                 'field': f,
                 'reverse': False,
                 'from_parent': False,
@@ -686,13 +694,13 @@ class SQLCompiler(object):
             _, _, _, joins, _ = self.query.setup_joins(
                 [f.name], opts, root_alias)
             alias = joins[-1]
-            columns = self.get_default_columns(start_alias=alias, opts=f.rel.to._meta)
+            columns = self.get_default_columns(start_alias=alias, opts=f.remote_field.model._meta)
             for col in columns:
                 select_fields.append(len(select))
                 select.append((col, None))
             klass_info['select_fields'] = select_fields
             next_klass_infos = self.get_related_selections(
-                select, f.rel.to._meta, alias, cur_depth + 1, next, restricted)
+                select, f.remote_field.model._meta, alias, cur_depth + 1, next, restricted)
             get_related_klass_infos(klass_info, next_klass_infos)
 
         if restricted:
@@ -760,17 +768,15 @@ class SQLCompiler(object):
                 backend_converters = self.connection.ops.get_db_converters(expression)
                 field_converters = expression.get_db_converters(self.connection)
                 if backend_converters or field_converters:
-                    converters[i] = (backend_converters, field_converters, expression)
+                    converters[i] = (backend_converters + field_converters, expression)
         return converters
 
     def apply_converters(self, row, converters):
         row = list(row)
-        for pos, (backend_converters, field_converters, field) in converters.items():
+        for pos, (convs, expression) in converters.items():
             value = row[pos]
-            for converter in backend_converters:
-                value = converter(value, field, self.query.context)
-            for converter in field_converters:
-                value = converter(value, self.connection, self.query.context)
+            for converter in convs:
+                value = converter(value, expression, self.connection, self.query.context)
             row[pos] = value
         return tuple(row)
 
@@ -886,17 +892,102 @@ class SQLInsertCompiler(SQLCompiler):
         self.return_id = False
         super(SQLInsertCompiler, self).__init__(*args, **kwargs)
 
-    def placeholder(self, field, val):
+    def field_as_sql(self, field, val):
+        """
+        Take a field and a value intended to be saved on that field, and
+        return placeholder SQL and accompanying params. Checks for raw values,
+        expressions and fields with get_placeholder() defined in that order.
+
+        When field is None, the value is considered raw and is used as the
+        placeholder, with no corresponding parameters returned.
+        """
         if field is None:
             # A field value of None means the value is raw.
-            return val
+            sql, params = val, []
+        elif hasattr(val, 'as_sql'):
+            # This is an expression, let's compile it.
+            sql, params = self.compile(val)
         elif hasattr(field, 'get_placeholder'):
             # Some fields (e.g. geo fields) need special munging before
             # they can be inserted.
-            return field.get_placeholder(val, self, self.connection)
+            sql, params = field.get_placeholder(val, self, self.connection), [val]
         else:
             # Return the common case for the placeholder
-            return '%s'
+            sql, params = '%s', [val]
+
+        # The following hook is only used by Oracle Spatial, which sometimes
+        # needs to yield 'NULL' and [] as its placeholder and params instead
+        # of '%s' and [None]. The 'NULL' placeholder is produced earlier by
+        # OracleOperations.get_geom_placeholder(). The following line removes
+        # the corresponding None parameter. See ticket #10888.
+        params = self.connection.ops.modify_insert_params(sql, params)
+
+        return sql, params
+
+    def prepare_value(self, field, value):
+        """
+        Prepare a value to be used in a query by resolving it if it is an
+        expression and otherwise calling the field's get_db_prep_save().
+        """
+        if hasattr(value, 'resolve_expression'):
+            value = value.resolve_expression(self.query, allow_joins=False, for_save=True)
+            # Don't allow values containing Col expressions. They refer to
+            # existing columns on a row, but in the case of insert the row
+            # doesn't exist yet.
+            if value.contains_column_references:
+                raise ValueError(
+                    'Failed to insert expression "%s" on %s. F() expressions '
+                    'can only be used to update, not to insert.' % (value, field)
+                )
+            if value.contains_aggregate:
+                raise FieldError("Aggregate functions are not allowed in this query")
+        else:
+            value = field.get_db_prep_save(value, connection=self.connection)
+        return value
+
+    def pre_save_val(self, field, obj):
+        """
+        Get the given field's value off the given obj. pre_save() is used for
+        things like auto_now on DateTimeField. Skip it if this is a raw query.
+        """
+        if self.query.raw:
+            return getattr(obj, field.attname)
+        return field.pre_save(obj, add=True)
+
+    def assemble_as_sql(self, fields, value_rows):
+        """
+        Take a sequence of N fields and a sequence of M rows of values,
+        generate placeholder SQL and parameters for each field and value, and
+        return a pair containing:
+         * a sequence of M rows of N SQL placeholder strings, and
+         * a sequence of M rows of corresponding parameter values.
+
+        Each placeholder string may contain any number of '%s' interpolation
+        strings, and each parameter row will contain exactly as many params
+        as the total number of '%s's in the corresponding placeholder row.
+        """
+        if not value_rows:
+            return [], []
+
+        # list of (sql, [params]) tuples for each object to be saved
+        # Shape: [n_objs][n_fields][2]
+        rows_of_fields_as_sql = (
+            (self.field_as_sql(field, v) for field, v in zip(fields, row))
+            for row in value_rows
+        )
+
+        # tuple like ([sqls], [[params]s]) for each object to be saved
+        # Shape: [n_objs][2][n_fields]
+        sql_and_param_pair_rows = (zip(*row) for row in rows_of_fields_as_sql)
+
+        # Extract separate lists for placeholders and params.
+        # Each of these has shape [n_objs][n_fields]
+        placeholder_rows, param_rows = zip(*sql_and_param_pair_rows)
+
+        # Params for each field are still lists, and need to be flattened.
+        param_rows = [[p for ps in row for p in ps] for row in param_rows]
+
+        return placeholder_rows, param_rows
 
     def as_sql(self):
         # We don't need quote_name_unless_alias() here, since these are all
@@ -910,35 +1001,27 @@ class SQLInsertCompiler(SQLCompiler):
         result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
         if has_fields:
-            params = values = [
-                [
-                    f.get_db_prep_save(
-                        getattr(obj, f.attname) if self.query.raw else f.pre_save(obj, True),
-                        connection=self.connection
-                    ) for f in fields
-                ]
+            value_rows = [
+                [self.prepare_value(field, self.pre_save_val(field, obj)) for field in fields]
                 for obj in self.query.objs
             ]
         else:
-            values = [[self.connection.ops.pk_default_value()] for obj in self.query.objs]
-            params = [[]]
+            # An empty object.
+            value_rows = [[self.connection.ops.pk_default_value()] for _ in self.query.objs]
             fields = [None]
-        can_bulk = (not any(hasattr(field, "get_placeholder") for field in fields) and
-            not self.return_id and self.connection.features.has_bulk_insert)
 
-        if can_bulk:
-            placeholders = [["%s"] * len(fields)]
-        else:
-            placeholders = [
-                [self.placeholder(field, v) for field, v in zip(fields, val)]
-                for val in values
-            ]
-            # Oracle Spatial needs to remove some values due to #10888
-            params = self.connection.ops.modify_insert_params(placeholders, params)
+        # Currently the backends just accept values when generating bulk
+        # queries and generate their own placeholders. Doing that isn't
+        # necessary and it should be possible to use placeholders and
+        # expressions in bulk inserts too.
+        can_bulk = (not self.return_id and self.connection.features.has_bulk_insert)
+
+        placeholder_rows, param_rows = self.assemble_as_sql(fields, value_rows)
+
         if self.return_id and self.connection.features.can_return_id_from_insert:
-            params = params[0]
+            params = param_rows[0]
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
-            result.append("VALUES (%s)" % ", ".join(placeholders[0]))
+            result.append("VALUES (%s)" % ", ".join(placeholder_rows[0]))
             r_fmt, r_params = self.connection.ops.return_insert_id()
             # Skip empty r_fmt to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
@@ -946,13 +1029,14 @@ class SQLInsertCompiler(SQLCompiler):
                 result.append(r_fmt % col)
                 params += r_params
             return [(" ".join(result), tuple(params))]
+
         if can_bulk:
-            result.append(self.connection.ops.bulk_insert_sql(fields, len(values)))
-            return [(" ".join(result), tuple(v for val in values for v in val))]
+            result.append(self.connection.ops.bulk_insert_sql(fields, placeholder_rows))
+            return [(" ".join(result), tuple(p for ps in param_rows for p in ps))]
         else:
             return [
                 (" ".join(result + ["VALUES (%s)" % ", ".join(p)]), vals)
-                for p, vals in zip(placeholders, params)
+                for p, vals in zip(placeholder_rows, param_rows)
             ]
 
     def execute_sql(self, return_id=False):
@@ -975,7 +1059,7 @@ class SQLDeleteCompiler(SQLCompiler):
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
-        assert len(self.query.tables) == 1, \
+        assert len([t for t in self.query.tables if self.query.alias_refcount[t] > 0]) == 1, \
             "Can only delete from one table at a time."
         qn = self.quote_name_unless_alias
         result = ['DELETE FROM %s' % qn(self.query.tables[0])]
@@ -994,10 +1078,7 @@ class SQLUpdateCompiler(SQLCompiler):
         self.pre_sql_setup()
         if not self.query.values:
             return '', ()
-        table = self.query.tables[0]
         qn = self.quote_name_unless_alias
-        result = ['UPDATE %s' % qn(table)]
-        result.append('SET')
         values, update_params = [], []
         for field, model, val in self.query.values:
             if hasattr(val, 'resolve_expression'):
@@ -1005,13 +1086,17 @@ class SQLUpdateCompiler(SQLCompiler):
                 if val.contains_aggregate:
                     raise FieldError("Aggregate functions are not allowed in this query")
             elif hasattr(val, 'prepare_database_save'):
-                if field.rel:
-                    val = val.prepare_database_save(field)
+                if field.remote_field:
+                    val = field.get_db_prep_save(
+                        val.prepare_database_save(field),
+                        connection=self.connection,
+                    )
                 else:
-                    raise TypeError("Database is trying to update a relational field "
-                                    "of type %s with a value of type %s. Make sure "
-                                    "you are setting the correct relations" %
-                                    (field.__class__.__name__, val.__class__.__name__))
+                    raise TypeError(
+                        "Tried to update field %s with a model instance, %r. "
+                        "Use a value compatible with %s."
+                        % (field, val, field.__class__.__name__)
+                    )
             else:
                 val = field.get_db_prep_save(val, connection=self.connection)
 
@@ -1032,7 +1117,11 @@ class SQLUpdateCompiler(SQLCompiler):
                 values.append('%s = NULL' % qn(name))
         if not values:
             return '', ()
-        result.append(', '.join(values))
+        table = self.query.tables[0]
+        result = [
+            'UPDATE %s SET' % qn(table),
+            ', '.join(values),
+        ]
         where, params = self.compile(self.query.where)
         if where:
             result.append('WHERE %s' % where)

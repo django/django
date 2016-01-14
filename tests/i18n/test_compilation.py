@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 import gettext as gettext_module
 import os
 import shutil
 import stat
 import unittest
+from subprocess import Popen
 
 from django.core.management import (
     CommandError, call_command, execute_from_command_line,
 )
+from django.core.management.commands.makemessages import \
+    Command as MakeMessagesCommand
 from django.core.management.utils import find_command
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, captured_stdout
-from django.utils import translation
+from django.utils import six, translation
 from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
@@ -61,7 +65,7 @@ class PoFileTests(MessageCompilationTests):
         try:
             call_command('compilemessages', locale=['en'], stderr=err_buffer, verbosity=0)
             err = err_buffer.getvalue()
-            self.assertIn("not writable location", err)
+            self.assertIn("not writable location", force_text(err))
         finally:
             os.chmod(mo_file_en, old_mode)
 
@@ -79,31 +83,6 @@ class PoFileContentsTests(MessageCompilationTests):
     def test_percent_symbol_in_po_file(self):
         call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
         self.assertTrue(os.path.exists(self.MO_FILE))
-
-
-class PercentRenderingTests(MessageCompilationTests):
-    # Ticket #11240 -- Testing rendering doesn't belong here but we are trying
-    # to keep tests for all the stack together
-
-    LOCALE = 'it'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
-
-    def setUp(self):
-        super(PercentRenderingTests, self).setUp()
-        self.addCleanup(os.unlink, os.path.join(self.test_dir, self.MO_FILE))
-
-    def test_percent_symbol_escaping(self):
-        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
-            from django.template import Template, Context
-            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
-            with translation.override(self.LOCALE):
-                t = Template('{% load i18n %}{% trans "Looks like a str fmt spec %% o but shouldn\'t be interpreted as such" %}')
-                rendered = t.render(Context({}))
-                self.assertEqual(rendered, 'IT translation contains %% for the above string')
-
-                t = Template('{% load i18n %}{% trans "Completed 50%% of all the tasks" %}')
-                rendered = t.render(Context({}))
-                self.assertEqual(rendered, 'IT translation of Completed 50%% of all the tasks')
 
 
 class MultipleLocaleCompilationTests(MessageCompilationTests):
@@ -179,27 +158,50 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
 
 
 class CompilationErrorHandling(MessageCompilationTests):
+    def test_error_reported_by_msgfmt(self):
+        # po file contains wrong po formatting.
+        mo_file = 'locale/ja/LC_MESSAGES/django.mo'
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, mo_file))
+        with self.assertRaises(CommandError):
+            call_command('compilemessages', locale=['ja'], verbosity=0)
 
-    LOCALE = 'ja'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    # We will check the output of msgfmt, so we need to make sure its output
+    # is unaffected by the current locale.
+    @mock.patch('django.core.management.utils.Popen',
+        lambda *args, **kwargs: Popen(*args, env={'LANG': 'C'}, **kwargs))
+    def test_msgfmt_error_including_non_ascii(self):
+        # po file contains invalid msgstr content (triggers non-ascii error content).
+        mo_file = 'locale/ko/LC_MESSAGES/django.mo'
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, mo_file))
+        if six.PY2:
+            # Various assertRaises on PY2 don't support unicode error messages.
+            try:
+                call_command('compilemessages', locale=['ko'], verbosity=0)
+            except CommandError as err:
+                self.assertIn("'�' cannot start a field name", six.text_type(err))
+        else:
+            cmd = MakeMessagesCommand()
+            if cmd.gettext_version < (0, 18, 3):
+                raise unittest.SkipTest("python-brace-format is a recent gettext addition.")
+            with self.assertRaisesMessage(CommandError, "'�' cannot start a field name"):
+                call_command('compilemessages', locale=['ko'], verbosity=0)
+
+
+class ProjectAndAppTests(MessageCompilationTests):
+    LOCALE = 'ru'
+    PROJECT_MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    APP_MO_FILE = 'app_with_locale/locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
     def setUp(self):
-        super(CompilationErrorHandling, self).setUp()
-        self.addCleanup(self.rmfile, os.path.join(self.test_dir, self.MO_FILE))
-
-    def test_error_reported_by_msgfmt(self):
-        with self.assertRaises(CommandError):
-            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+        super(ProjectAndAppTests, self).setUp()
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, self.PROJECT_MO_FILE))
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, self.APP_MO_FILE))
 
 
-class FuzzyTranslationTest(MessageCompilationTests):
-
-    LOCALE = 'ru'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
+class FuzzyTranslationTest(ProjectAndAppTests):
 
     def setUp(self):
         super(FuzzyTranslationTest, self).setUp()
-        self.addCleanup(self.rmfile, os.path.join(self.test_dir, self.MO_FILE))
         gettext_module._translations = {}  # flush cache or test will be useless
 
     def test_nofuzzy_compiling(self):
@@ -215,3 +217,11 @@ class FuzzyTranslationTest(MessageCompilationTests):
             with translation.override(self.LOCALE):
                 self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
                 self.assertEqual(ugettext('Vodka'), force_text('Водка'))
+
+
+class AppCompilationTest(ProjectAndAppTests):
+
+    def test_app_locale_compiled(self):
+        call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+        self.assertTrue(os.path.exists(self.PROJECT_MO_FILE))
+        self.assertTrue(os.path.exists(self.APP_MO_FILE))

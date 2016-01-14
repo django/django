@@ -39,15 +39,14 @@ class BaseDatabaseCreation(object):
         test_database_name = self._get_test_db_name()
 
         if verbosity >= 1:
-            test_db_repr = ''
             action = 'Creating'
-            if verbosity >= 2:
-                test_db_repr = " ('%s')" % test_database_name
             if keepdb:
                 action = "Using existing"
 
-            print("%s test database for alias '%s'%s..." % (
-                action, self.connection.alias, test_db_repr))
+            print("%s test database for alias %s..." % (
+                action,
+                self._get_database_display_str(verbosity, test_database_name),
+            ))
 
         # We could skip this call if keepdb is True, but we instead
         # give it the keepdb param. This is to handle the case
@@ -85,6 +84,13 @@ class BaseDatabaseCreation(object):
 
         return test_database_name
 
+    def set_as_test_mirror(self, primary_settings_dict):
+        """
+        Set this database up to be used in testing as a mirror of a primary database
+        whose settings are given
+        """
+        self.connection.settings_dict['NAME'] = primary_settings_dict['NAME']
+
     def serialize_db_to_string(self):
         """
         Serializes all data in the database into a JSON string.
@@ -106,8 +112,8 @@ class BaseDatabaseCreation(object):
         # Make a function to iteratively return every object
         def get_objects():
             for model in serializers.sort_dependencies(app_list):
-                if (not model._meta.proxy and model._meta.managed and
-                        router.allow_migrate(self.connection.alias, model)):
+                if (model._meta.can_migrate(self.connection) and
+                        router.allow_migrate_model(self.connection.alias, model)):
                     queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
                     for obj in queryset.iterator():
                         yield obj
@@ -125,12 +131,21 @@ class BaseDatabaseCreation(object):
         for obj in serializers.deserialize("json", data, using=self.connection.alias):
             obj.save()
 
+    def _get_database_display_str(self, verbosity, database_name):
+        """
+        Return display string for a database for use in various actions.
+        """
+        return "'%s'%s" % (
+            self.connection.alias,
+            (" ('%s')" % database_name) if verbosity >= 2 else '',
+        )
+
     def _get_test_db_name(self):
         """
         Internal implementation - returns the name of the test DB that will be
         created. Only useful when called from create_test_db() and
         _create_test_db() and when no external munging is done with the 'NAME'
-        or 'TEST_NAME' settings.
+        settings.
         """
         if self.connection.settings_dict['TEST']['NAME']:
             return self.connection.settings_dict['TEST']['NAME']
@@ -166,8 +181,9 @@ class BaseDatabaseCreation(object):
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
-                            print("Destroying old test database '%s'..."
-                                  % self.connection.alias)
+                            print("Destroying old test database for alias %s..." % (
+                                self._get_database_display_str(verbosity, test_database_name),
+                            ))
                         cursor.execute(
                             "DROP DATABASE %s" % qn(test_database_name))
                         cursor.execute(
@@ -183,22 +199,64 @@ class BaseDatabaseCreation(object):
 
         return test_database_name
 
-    def destroy_test_db(self, old_database_name, verbosity=1, keepdb=False):
+    def clone_test_db(self, number, verbosity=1, autoclobber=False, keepdb=False):
+        """
+        Clone a test database.
+        """
+        source_database_name = self.connection.settings_dict['NAME']
+
+        if verbosity >= 1:
+            action = 'Cloning test database'
+            if keepdb:
+                action = 'Using existing clone'
+            print("%s for alias %s..." % (
+                action,
+                self._get_database_display_str(verbosity, source_database_name),
+            ))
+
+        # We could skip this call if keepdb is True, but we instead
+        # give it the keepdb param. See create_test_db for details.
+        self._clone_test_db(number, verbosity, keepdb)
+
+    def get_test_db_clone_settings(self, number):
+        """
+        Return a modified connection settings dict for the n-th clone of a DB.
+        """
+        # When this function is called, the test database has been created
+        # already and its name has been copied to settings_dict['NAME'] so
+        # we don't need to call _get_test_db_name.
+        orig_settings_dict = self.connection.settings_dict
+        new_settings_dict = orig_settings_dict.copy()
+        new_settings_dict['NAME'] = '{}_{}'.format(orig_settings_dict['NAME'], number)
+        return new_settings_dict
+
+    def _clone_test_db(self, number, verbosity, keepdb=False):
+        """
+        Internal implementation - duplicate the test db tables.
+        """
+        raise NotImplementedError(
+            "The database backend doesn't support cloning databases. "
+            "Disable the option to run tests in parallel processes.")
+
+    def destroy_test_db(self, old_database_name=None, verbosity=1, keepdb=False, number=None):
         """
         Destroy a test database, prompting the user for confirmation if the
         database already exists.
         """
         self.connection.close()
-        test_database_name = self.connection.settings_dict['NAME']
+        if number is None:
+            test_database_name = self.connection.settings_dict['NAME']
+        else:
+            test_database_name = self.get_test_db_clone_settings(number)['NAME']
+
         if verbosity >= 1:
-            test_db_repr = ''
             action = 'Destroying'
-            if verbosity >= 2:
-                test_db_repr = " ('%s')" % test_database_name
             if keepdb:
                 action = 'Preserving'
-            print("%s test database for alias '%s'%s..." % (
-                action, self.connection.alias, test_db_repr))
+            print("%s test database for alias %s..." % (
+                action,
+                self._get_database_display_str(verbosity, test_database_name),
+            ))
 
         # if we want to preserve the database
         # skip the actual destroying piece.
@@ -206,8 +264,9 @@ class BaseDatabaseCreation(object):
             self._destroy_test_db(test_database_name, verbosity)
 
         # Restore the original database name
-        settings.DATABASES[self.connection.alias]["NAME"] = old_database_name
-        self.connection.settings_dict["NAME"] = old_database_name
+        if old_database_name is not None:
+            settings.DATABASES[self.connection.alias]["NAME"] = old_database_name
+            self.connection.settings_dict["NAME"] = old_database_name
 
     def _destroy_test_db(self, test_database_name, verbosity):
         """
@@ -217,7 +276,7 @@ class BaseDatabaseCreation(object):
         # ourselves. Connect to the previous database (not the test database)
         # to do so, because it's not allowed to delete a database while being
         # connected to it.
-        with self._nodb_connection.cursor() as cursor:
+        with self.connection._nodb_connection.cursor() as cursor:
             # Wait to avoid "database is being accessed by other users" errors.
             time.sleep(1)
             cursor.execute("DROP DATABASE %s"

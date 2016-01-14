@@ -41,7 +41,6 @@ class Join(object):
           to join_type)
         - as_sql()
         - relabeled_clone()
-
     """
     def __init__(self, table_name, parent_alias, table_alias, join_type,
                  join_field, nullable):
@@ -66,30 +65,40 @@ class Join(object):
            LEFT OUTER JOIN sometable ON sometable.somecol = othertable.othercol, params
         clause for this join.
         """
+        join_conditions = []
         params = []
-        sql = []
-        alias_str = '' if self.table_alias == self.table_name else (' %s' % self.table_alias)
         qn = compiler.quote_name_unless_alias
         qn2 = connection.ops.quote_name
-        sql.append('%s %s%s ON (' % (self.join_type, qn(self.table_name), alias_str))
+
+        # Add a join condition for each pair of joining columns.
         for index, (lhs_col, rhs_col) in enumerate(self.join_cols):
-            if index != 0:
-                sql.append(' AND ')
-            sql.append('%s.%s = %s.%s' % (
+            join_conditions.append('%s.%s = %s.%s' % (
                 qn(self.parent_alias),
                 qn2(lhs_col),
                 qn(self.table_alias),
                 qn2(rhs_col),
             ))
+
+        # Add a single condition inside parentheses for whatever
+        # get_extra_restriction() returns.
         extra_cond = self.join_field.get_extra_restriction(
             compiler.query.where_class, self.table_alias, self.parent_alias)
         if extra_cond:
             extra_sql, extra_params = compiler.compile(extra_cond)
-            extra_sql = 'AND (%s)' % extra_sql
+            join_conditions.append('(%s)' % extra_sql)
             params.extend(extra_params)
-            sql.append('%s' % extra_sql)
-        sql.append(')')
-        return ' '.join(sql), params
+
+        if not join_conditions:
+            # This might be a rel on the other end of an actual declared field.
+            declared_field = getattr(self.join_field, 'field', self.join_field)
+            raise ValueError(
+                "Join generated an empty ON clause. %s did not yield either "
+                "joining columns or extra restrictions." % declared_field.__class__
+            )
+        on_clause_sql = ' AND '.join(join_conditions)
+        alias_str = '' if self.table_alias == self.table_name else (' %s' % self.table_alias)
+        sql = '%s %s%s ON (%s)' % (self.join_type, qn(self.table_name), alias_str, on_clause_sql)
+        return sql, params
 
     def relabeled_clone(self, change_map):
         new_parent_alias = change_map.get(self.parent_alias, self.parent_alias)

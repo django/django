@@ -15,10 +15,7 @@ def ensure_default_manager(cls):
     points to a plain Manager instance (which could be the same as
     _default_manager if it's not a subclass of Manager).
     """
-    if cls._meta.abstract:
-        setattr(cls, 'objects', AbstractManagerDescriptor(cls))
-        return
-    elif cls._meta.swapped:
+    if cls._meta.swapped:
         setattr(cls, 'objects', SwappedManagerDescriptor(cls))
         return
     if not getattr(cls, '_default_manager', None):
@@ -76,9 +73,7 @@ class BaseManager(object):
 
     def __str__(self):
         """ Return "app_label.model_label.manager_name". """
-        model = self.model
-        app = model._meta.app_label
-        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+        return '%s.%s' % (self.model._meta.label, self.name)
 
     def deconstruct(self):
         """
@@ -216,7 +211,7 @@ class BaseManager(object):
         Returns a new QuerySet object.  Subclasses can override this method to
         easily customize the behavior of the Manager.
         """
-        return self._queryset_class(self.model, using=self._db, hints=self._hints)
+        return self._queryset_class(model=self.model, using=self._db, hints=self._hints)
 
     def all(self):
         # We can't proxy this method through the `QuerySet` like we do for the
@@ -236,6 +231,9 @@ class BaseManager(object):
     def __ne__(self, other):
         return not (self == other)
 
+    def __hash__(self):
+        return id(self)
+
 
 class Manager(BaseManager.from_queryset(QuerySet)):
     pass
@@ -247,9 +245,9 @@ class ManagerDescriptor(object):
     def __init__(self, manager):
         self.manager = manager
 
-    def __get__(self, instance, type=None):
+    def __get__(self, instance, cls=None):
         if instance is not None:
-            raise AttributeError("Manager isn't accessible via %s instances" % type.__name__)
+            raise AttributeError("Manager isn't accessible via %s instances" % cls.__name__)
         return self.manager
 
 
@@ -259,7 +257,7 @@ class AbstractManagerDescriptor(object):
     def __init__(self, model):
         self.model = model
 
-    def __get__(self, instance, type=None):
+    def __get__(self, instance, cls=None):
         raise AttributeError("Manager isn't available; %s is abstract" % (
             self.model._meta.object_name,
         ))
@@ -271,10 +269,14 @@ class SwappedManagerDescriptor(object):
     def __init__(self, model):
         self.model = model
 
-    def __get__(self, instance, type=None):
-        raise AttributeError("Manager isn't available; %s has been swapped for '%s'" % (
-            self.model._meta.object_name, self.model._meta.swapped
-        ))
+    def __get__(self, instance, cls=None):
+        raise AttributeError(
+            "Manager isn't available; '%s.%s' has been swapped for '%s'" % (
+                self.model._meta.app_label,
+                self.model._meta.object_name,
+                self.model._meta.swapped,
+            )
+        )
 
 
 class EmptyManager(Manager):

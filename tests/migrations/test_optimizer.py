@@ -2,12 +2,12 @@
 
 from django.db import migrations, models
 from django.db.migrations.optimizer import MigrationOptimizer
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .models import CustomModelBase, EmptyManager
 
 
-class OptimizerTests(TestCase):
+class OptimizerTests(SimpleTestCase):
     """
     Tests the migration autodetector.
     """
@@ -25,9 +25,16 @@ class OptimizerTests(TestCase):
         expected = [repr(f.deconstruct()) for f in expected]
         self.assertEqual(expected, result)
         if exact is not None and iterations != exact:
-            raise self.failureException("Optimization did not take exactly %s iterations (it took %s)" % (exact, iterations))
+            raise self.failureException(
+                "Optimization did not take exactly %s iterations (it took %s)" % (exact, iterations)
+            )
         if less_than is not None and iterations >= less_than:
-            raise self.failureException("Optimization did not take less than %s iterations (it took %s)" % (less_than, iterations))
+            raise self.failureException(
+                "Optimization did not take less than %s iterations (it took %s)" % (less_than, iterations)
+            )
+
+    def assertDoesNotOptimize(self, operations):
+        self.assertOptimizesTo(operations, operations)
 
     def test_single(self):
         """
@@ -93,18 +100,67 @@ class OptimizerTests(TestCase):
             ],
         )
 
-    def test_create_alter_delete_model(self):
+    def _test_create_alter_foo_delete_model(self, alter_foo):
         """
-        CreateModel, AlterModelTable, AlterUniqueTogether, and DeleteModel should collapse into nothing.
+        CreateModel, AlterModelTable, AlterUniqueTogether/AlterIndexTogether/
+        AlterOrderWithRespectTo, and DeleteModel should collapse into nothing.
         """
         self.assertOptimizesTo(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.AlterModelTable("Foo", "woohoo"),
-                migrations.AlterUniqueTogether("Foo", [["a", "b"]]),
+                alter_foo,
                 migrations.DeleteModel("Foo"),
             ],
             [],
+        )
+
+    def test_create_alter_unique_delete_model(self):
+        self._test_create_alter_foo_delete_model(migrations.AlterUniqueTogether("Foo", [["a", "b"]]))
+
+    def test_create_alter_index_delete_model(self):
+        self._test_create_alter_foo_delete_model(migrations.AlterIndexTogether("Foo", [["a", "b"]]))
+
+    def test_create_alter_owrt_delete_model(self):
+        self._test_create_alter_foo_delete_model(migrations.AlterOrderWithRespectTo("Foo", "a"))
+
+    def _test_alter_alter_model(self, alter_foo, alter_bar):
+        """
+        Two AlterUniqueTogether/AlterIndexTogether/AlterOrderWithRespectTo
+        should collapse into the second.
+        """
+        self.assertOptimizesTo(
+            [
+                alter_foo,
+                alter_bar,
+            ],
+            [
+                alter_bar,
+            ],
+        )
+
+    def test_alter_alter_table_model(self):
+        self._test_alter_alter_model(
+            migrations.AlterModelTable("Foo", "a"),
+            migrations.AlterModelTable("Foo", "b"),
+        )
+
+    def test_alter_alter_unique_model(self):
+        self._test_alter_alter_model(
+            migrations.AlterUniqueTogether("Foo", [["a", "b"]]),
+            migrations.AlterUniqueTogether("Foo", [["a", "c"]]),
+        )
+
+    def test_alter_alter_index_model(self):
+        self._test_alter_alter_model(
+            migrations.AlterIndexTogether("Foo", [["a", "b"]]),
+            migrations.AlterIndexTogether("Foo", [["a", "c"]]),
+        )
+
+    def test_alter_alter_owrt_model(self):
+        self._test_alter_alter_model(
+            migrations.AlterOrderWithRespectTo("Foo", "a"),
+            migrations.AlterOrderWithRespectTo("Foo", "b"),
         )
 
     def test_optimize_through_create(self):
@@ -146,12 +202,12 @@ class OptimizerTests(TestCase):
         self.assertOptimizesTo(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo"))]),
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
                 migrations.DeleteModel("Foo"),
             ],
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo"))]),
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
                 migrations.DeleteModel("Foo"),
             ],
         )
@@ -208,12 +264,12 @@ class OptimizerTests(TestCase):
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("Link", [("url", models.TextField())]),
-                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link")),
+                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link", models.CASCADE)),
             ],
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("Link", [("url", models.TextField())]),
-                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link")),
+                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link", models.CASCADE)),
             ],
         )
 
@@ -228,12 +284,16 @@ class OptimizerTests(TestCase):
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("LinkThrough", []),
-                migrations.AddField("Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")),
+                migrations.AddField(
+                    "Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")
+                ),
             ],
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("LinkThrough", []),
-                migrations.AddField("Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")),
+                migrations.AddField(
+                    "Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")
+                ),
             ],
         )
 
@@ -397,6 +457,155 @@ class OptimizerTests(TestCase):
                 migrations.RemoveField("Foo", "age"),
             ],
         )
+
+    def _test_create_alter_foo_field(self, alter):
+        """
+        CreateModel, AlterFooTogether/AlterOrderWithRespectTo followed by an
+        add/alter/rename field should optimize to CreateModel and the Alter*
+        """
+        # AddField
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                ]),
+                alter,
+                migrations.AddField("Foo", "c", models.IntegerField()),
+            ],
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                    ("c", models.IntegerField()),
+                ]),
+                alter,
+            ],
+        )
+
+        # AlterField
+        self.assertDoesNotOptimize(
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                ]),
+                alter,
+                migrations.AlterField("Foo", "b", models.CharField(max_length=255)),
+            ],
+        )
+
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                    ("c", models.IntegerField()),
+                ]),
+                alter,
+                migrations.AlterField("Foo", "c", models.CharField(max_length=255)),
+            ],
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                    ("c", models.CharField(max_length=255)),
+                ]),
+                alter,
+            ],
+        )
+
+        # RenameField
+        self.assertDoesNotOptimize(
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                ]),
+                alter,
+                migrations.RenameField("Foo", "b", "c"),
+            ],
+        )
+
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                ]),
+                alter,
+                migrations.RenameField("Foo", "b", "x"),
+                migrations.RenameField("Foo", "x", "c"),
+            ],
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                ]),
+                alter,
+                migrations.RenameField("Foo", "b", "c"),
+            ],
+        )
+
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                    ("c", models.IntegerField()),
+                ]),
+                alter,
+                migrations.RenameField("Foo", "c", "d"),
+            ],
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                    ("d", models.IntegerField()),
+                ]),
+                alter,
+            ],
+        )
+
+        # RemoveField
+        self.assertDoesNotOptimize(
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                ]),
+                alter,
+                migrations.RemoveField("Foo", "b"),
+            ],
+        )
+
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                    ("c", models.IntegerField()),
+                ]),
+                alter,
+                migrations.RemoveField("Foo", "c"),
+            ],
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                ]),
+                alter,
+            ],
+        )
+
+    def test_create_alter_unique_field(self):
+        self._test_create_alter_foo_field(migrations.AlterUniqueTogether("Foo", [["a", "b"]]))
+
+    def test_create_alter_index_field(self):
+        self._test_create_alter_foo_field(migrations.AlterIndexTogether("Foo", [["a", "b"]]))
+
+    def test_create_alter_owrt_field(self):
+        self._test_create_alter_foo_field(migrations.AlterOrderWithRespectTo("Foo", "b"))
 
     def test_optimize_through_fields(self):
         """

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import atexit
+import copy
 import logging
 import os
 import shutil
@@ -9,30 +11,39 @@ import warnings
 from argparse import ArgumentParser
 
 import django
-from django import contrib
 from django.apps import apps
 from django.conf import settings
-from django.db import connection
+from django.db import connection, connections
 from django.test import TestCase, TransactionTestCase
+from django.test.runner import default_test_processes
 from django.test.utils import get_runner
 from django.utils import six
 from django.utils._os import upath
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.log import DEFAULT_LOGGING
 
+# Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango20Warning)
-warnings.simplefilter("error", RemovedInDjango21Warning)
+# Make runtime warning errors to ensure no usage of error prone patterns.
+warnings.simplefilter("error", RuntimeWarning)
+# Ignore known warnings in test dependencies.
+warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
 
-CONTRIB_MODULE_PATH = 'django.contrib'
-
-CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, 'templates')
 
-TEMP_DIR = tempfile.mkdtemp(prefix='django_')
-os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
+# Create a specific subdirectory for the duration of the test suite.
+TMPDIR = tempfile.mkdtemp(prefix='django_')
+# Set the TMPDIR environment variable in addition to tempfile.tempdir
+# so that children processes inherit it.
+tempfile.tempdir = os.environ['TMPDIR'] = TMPDIR
+
+# Removing the temporary TMPDIR. Ensure we pass in unicode so that it will
+# successfully remove temp trees containing non-ASCII filenames on Windows.
+# (We're assuming the temp dir name itself only contains ASCII characters.)
+atexit.register(shutil.rmtree, six.text_type(TMPDIR))
+
 
 SUBDIRS_TO_SKIP = [
     'data',
@@ -60,17 +71,22 @@ ALWAYS_MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
+# Need to add the associated contrib app to INSTALLED_APPS in some cases to
+# avoid "RuntimeError: Model class X doesn't declare an explicit app_label
+# and isn't in an application in INSTALLED_APPS."
+CONTRIB_TESTS_TO_APPS = {
+    'flatpages_tests': 'django.contrib.flatpages',
+    'redirects_tests': 'django.contrib.redirects',
+}
+
 
 def get_test_modules():
     modules = []
     discovery_paths = [
         (None, RUNTESTS_DIR),
-        (CONTRIB_MODULE_PATH, CONTRIB_DIR)
+        # GIS tests are in nested apps
+        ('gis_tests', os.path.join(RUNTESTS_DIR, 'gis_tests')),
     ]
-    if connection.features.gis_enabled:
-        discovery_paths.append(
-            ('django.contrib.gis.tests', os.path.join(CONTRIB_DIR, 'gis', 'tests'))
-        )
 
     for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
@@ -78,8 +94,6 @@ def get_test_modules():
                     os.path.basename(f) in SUBDIRS_TO_SKIP or
                     os.path.isfile(f) or
                     not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
-                continue
-            if not connection.vendor == 'postgresql' and f == 'postgres_tests' or f == 'postgres':
                 continue
             modules.append((modpath, f))
     return modules
@@ -89,9 +103,13 @@ def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
-def setup(verbosity, test_labels):
+def setup(verbosity, test_labels, parallel):
     if verbosity >= 1:
-        print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
+        msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
+        max_parallel = default_test_processes() if parallel == 0 else parallel
+        if max_parallel > 1:
+            msg += " with up to %d processes" % max_parallel
+        print(msg)
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
     def no_available_apps(self):
@@ -103,8 +121,6 @@ def setup(verbosity, test_labels):
     state = {
         'INSTALLED_APPS': settings.INSTALLED_APPS,
         'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),
-        # Remove the following line in Django 2.0.
-        'TEMPLATE_DIRS': settings.TEMPLATE_DIRS,
         'TEMPLATES': settings.TEMPLATES,
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
         'STATIC_URL': settings.STATIC_URL,
@@ -116,9 +132,7 @@ def setup(verbosity, test_labels):
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
     settings.ROOT_URLCONF = 'urls'
     settings.STATIC_URL = '/static/'
-    settings.STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
-    # Remove the following line in Django 2.0.
-    settings.TEMPLATE_DIRS = [TEMPLATE_DIR]
+    settings.STATIC_ROOT = os.path.join(TMPDIR, 'static')
     settings.TEMPLATES = [{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [TEMPLATE_DIR],
@@ -135,14 +149,18 @@ def setup(verbosity, test_labels):
     settings.LANGUAGE_CODE = 'en'
     settings.SITE_ID = 1
     settings.MIDDLEWARE_CLASSES = ALWAYS_MIDDLEWARE_CLASSES
-    # Ensure the middleware classes are seen as overridden otherwise we get a compatibility warning.
-    settings._explicit_settings.add('MIDDLEWARE_CLASSES')
     settings.MIGRATION_MODULES = {
         # these 'tests.migrations' modules don't actually exist, but this lets
         # us skip creating migrations for the test models.
         'auth': 'django.contrib.auth.tests.migrations',
-        'contenttypes': 'django.contrib.contenttypes.tests.migrations',
+        'contenttypes': 'contenttypes_tests.migrations',
+        'sessions': 'sessions_tests.migrations',
     }
+    log_config = copy.deepcopy(DEFAULT_LOGGING)
+    # Filter out non-error logging so we don't have to capture it in lots of
+    # tests.
+    log_config['loggers']['django']['level'] = 'ERROR'
+    settings.LOGGING = log_config
 
     if verbosity > 0:
         # Ensure any warnings captured to logging are piped through a verbose
@@ -154,7 +172,7 @@ def setup(verbosity, test_labels):
 
     warnings.filterwarnings(
         'ignore',
-        'django.contrib.webdesign will be removed in Django 2.0.',
+        'The GeoManager class is deprecated.',
         RemovedInDjango20Warning
     )
 
@@ -167,11 +185,7 @@ def setup(verbosity, test_labels):
     # Reduce given test labels to just the app module path
     test_labels_set = set()
     for label in test_labels:
-        bits = label.split('.')
-        if bits[:2] == ['django', 'contrib']:
-            bits = bits[:3]
-        else:
-            bits = bits[:1]
+        bits = label.split('.')[:1]
         test_labels_set.add('.'.join(bits))
 
     installed_app_names = set(get_installed())
@@ -191,10 +205,21 @@ def setup(verbosity, test_labels):
                 module_label == label or module_label.startswith(label + '.')
                 for label in test_labels_set)
 
+        if module_name in CONTRIB_TESTS_TO_APPS and module_found_in_labels:
+            settings.INSTALLED_APPS.append(CONTRIB_TESTS_TO_APPS[module_name])
+
         if module_found_in_labels and module_label not in installed_app_names:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
             settings.INSTALLED_APPS.append(module_label)
+
+    # Add contrib.gis to INSTALLED_APPS if needed (rather than requiring
+    # @override_settings(INSTALLED_APPS=...) on all test cases.
+    gis = 'django.contrib.gis'
+    if connection.features.gis_enabled and gis not in settings.INSTALLED_APPS:
+        if verbosity >= 2:
+            print("Importing application %s" % gis)
+        settings.INSTALLED_APPS.append(gis)
 
     apps.set_installed_apps(settings.INSTALLED_APPS)
 
@@ -202,22 +227,25 @@ def setup(verbosity, test_labels):
 
 
 def teardown(state):
-    try:
-        # Removing the temporary TEMP_DIR. Ensure we pass in unicode
-        # so that it will successfully remove temp trees containing
-        # non-ASCII filenames on Windows. (We're assuming the temp dir
-        # name itself does not contain non-ASCII characters.)
-        shutil.rmtree(six.text_type(TEMP_DIR))
-    except OSError:
-        print('Failed to remove temp directory: %s' % TEMP_DIR)
-
     # Restore the old settings.
     for key, value in state.items():
         setattr(settings, key, value)
 
 
-def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels, debug_sql):
-    state = setup(verbosity, test_labels)
+def actual_test_processes(parallel):
+    if parallel == 0:
+        # This doesn't work before django.setup() on some databases.
+        if all(conn.features.can_clone_databases for conn in connections.all()):
+            return default_test_processes()
+        else:
+            return 1
+    else:
+        return parallel
+
+
+def django_tests(verbosity, interactive, failfast, keepdb, reverse,
+                 test_labels, debug_sql, parallel):
+    state = setup(verbosity, test_labels, parallel)
     extra_tests = []
 
     # Run the test suite, including the extra validation tests.
@@ -232,6 +260,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels,
         keepdb=keepdb,
         reverse=reverse,
         debug_sql=debug_sql,
+        parallel=actual_test_processes(parallel),
     )
     failures = test_runner.run_tests(
         test_labels or get_installed(),
@@ -241,8 +270,8 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels,
     return failures
 
 
-def bisect_tests(bisection_label, options, test_labels):
-    state = setup(options.verbosity, test_labels)
+def bisect_tests(bisection_label, options, test_labels, parallel):
+    state = setup(options.verbosity, test_labels, parallel)
 
     test_labels = test_labels or get_installed()
 
@@ -299,8 +328,8 @@ def bisect_tests(bisection_label, options, test_labels):
     teardown(state)
 
 
-def paired_tests(paired_test, options, test_labels):
-    state = setup(options.verbosity, test_labels)
+def paired_tests(paired_test, options, test_labels, parallel):
+    state = setup(options.verbosity, test_labels, parallel)
 
     test_labels = test_labels or get_installed()
 
@@ -370,13 +399,18 @@ if __name__ == "__main__":
     parser.add_argument('--liveserver',
         help='Overrides the default address where the live server (used with '
              'LiveServerTestCase) is expected to run from. The default value '
-             'is localhost:8081.')
+             'is localhost:8081-8179.')
     parser.add_argument(
         '--selenium', action='store_true', dest='selenium', default=False,
-        help='Run the Selenium tests as well (if Selenium is installed)')
+        help='Run the Selenium tests as well (if Selenium is installed).')
     parser.add_argument(
         '--debug-sql', action='store_true', dest='debug_sql', default=False,
-        help='Turn on the SQL query logger within tests')
+        help='Turn on the SQL query logger within tests.')
+    parser.add_argument(
+        '--parallel', dest='parallel', nargs='?', default=0, type=int,
+        const=default_test_processes(), metavar='N',
+        help='Run tests using up to N parallel processes.')
+
     options = parser.parse_args()
 
     # mock is a required dependency
@@ -406,13 +440,13 @@ if __name__ == "__main__":
         os.environ['DJANGO_SELENIUM_TESTS'] = '1'
 
     if options.bisect:
-        bisect_tests(options.bisect, options, options.modules)
+        bisect_tests(options.bisect, options, options.modules, options.parallel)
     elif options.pair:
-        paired_tests(options.pair, options, options.modules)
+        paired_tests(options.pair, options, options.modules, options.parallel)
     else:
         failures = django_tests(options.verbosity, options.interactive,
                                 options.failfast, options.keepdb,
                                 options.reverse, options.modules,
-                                options.debug_sql)
+                                options.debug_sql, options.parallel)
         if failures:
             sys.exit(bool(failures))

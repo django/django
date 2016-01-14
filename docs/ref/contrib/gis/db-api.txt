@@ -28,7 +28,7 @@ MySQL Spatial Limitations
 MySQL's spatial extensions only support bounding box operations
 (what MySQL calls minimum bounding rectangles, or MBR).  Specifically,
 `MySQL does not conform to the OGC standard
-<http://dev.mysql.com/doc/refman/5.6/en/spatial-relation-functions.html>`_:
+<https://dev.mysql.com/doc/refman/5.6/en/spatial-relation-functions.html>`_:
 
     Currently, MySQL does not implement these functions
     [``Contains``, ``Crosses``, ``Disjoint``, ``Intersects``, ``Overlaps``,
@@ -49,8 +49,14 @@ on a different spatial backend.
     lookups and the integrity of your data -- MyISAM tables do
     not support transactions or foreign key constraints.
 
-Creating and Saving Geographic Models
-=====================================
+Raster Support
+--------------
+
+``RasterField`` is currently only implemented for the PostGIS backend. Spatial
+queries (such as lookups and distance) are not yet available for raster fields.
+
+Creating and Saving Models with Geometry Fields
+===============================================
 
 Here is an example of how to create a geometry object (assuming the ``Zipcode``
 model)::
@@ -87,6 +93,42 @@ create a ``GEOSGeometry`` instance from the input.
 For more information creating :class:`~django.contrib.gis.geos.GEOSGeometry`
 objects, refer to the :ref:`GEOS tutorial <geos-tutorial>`.
 
+.. _creating-and-saving-raster-models:
+
+Creating and Saving Models with Raster Fields
+=============================================
+
+.. versionadded:: 1.9
+
+When creating raster models, the raster field will implicitly convert the input
+into a :class:`~django.contrib.gis.gdal.GDALRaster` using lazy-evaluation.
+The raster field will therefore accept any input that is accepted by the
+:class:`~django.contrib.gis.gdal.GDALRaster` constructor.
+
+Here is an example of how to create a raster object from a raster file
+``volcano.tif`` (assuming the ``Elevation`` model)::
+
+    >>> from elevation.models import Elevation
+    >>> dem = Elevation(name='Volcano', rast='/path/to/raster/volcano.tif')
+    >>> dem.save()
+
+:class:`~django.contrib.gis.gdal.GDALRaster` objects may also be used to save
+raster models::
+
+    >>> from django.contrib.gis.gdal import GDALRaster
+    >>> rast = GDALRaster({'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
+    ...                    'scale': [0.1, -0.1]'bands': [{"data": range(100)}]}
+    >>> dem = Elevation(name='Canyon', rast=rast)
+    >>> dem.save()
+
+Note that this equivalent to::
+
+    >>> dem = Elevation.objects.create(
+    ...     name='Canyon',
+    ...     rast={'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
+    ...           'scale': [0.1, -0.1]'bands': [{"data": range(100)}]}
+    ... )
+
 .. _spatial-lookups-intro:
 
 Spatial Lookups
@@ -115,13 +157,6 @@ GeoJSON , WKT, or HEXEWKB).
 A complete reference can be found in the :ref:`spatial lookup reference
 <spatial-lookups>`.
 
-.. note::
-
-    GeoDjango constructs spatial SQL with the :class:`GeoQuerySet`, a
-    subclass of :class:`~django.db.models.query.QuerySet`.  The
-    :class:`GeoManager` instance attached to your model is what
-    enables use of :class:`GeoQuerySet`.
-
 .. _distance-queries:
 
 Distance Queries
@@ -129,6 +164,7 @@ Distance Queries
 
 Introduction
 ------------
+
 Distance calculations with spatial data is tricky because, unfortunately,
 the Earth is not flat.  Some distance queries with fields in a geographic
 coordinate system may have to be expressed differently because of
@@ -139,6 +175,7 @@ in the :doc:`model-api` documentation for more details.
 
 Distance Lookups
 ----------------
+
 *Availability*: PostGIS, Oracle, SpatiaLite
 
 The following distance lookups are available:
@@ -152,7 +189,7 @@ The following distance lookups are available:
 .. note::
 
     For *measuring*, rather than querying on distances, use the
-    :meth:`GeoQuerySet.distance` method.
+    :class:`~django.contrib.gis.db.models.functions.Distance` function.
 
 Distance lookups take a tuple parameter comprising:
 
@@ -166,7 +203,7 @@ to be in the units of the field.
 
 .. note::
 
-    In PostGIS 1.5, ``ST_Distance_Sphere`` does *not* limit the geometry types
+    In PostGIS, ``ST_Distance_Sphere`` does *not* limit the geometry types
     geographic distance queries are performed with. [#fndistsphere15]_  However,
     these queries may take a long time, as great-circle distances must be
     calculated on the fly for *every* row in the query.  This is because the
@@ -189,23 +226,22 @@ in southern Texas::
         # A projected coordinate system (only valid for South Texas!)
         # is used, units are in meters.
         point = models.PointField(srid=32140)
-        objects = models.GeoManager()
 
 Then distance queries may be performed as follows::
 
-    >>> from django.contrib.gis.geos import *
+    >>> from django.contrib.gis.geos import GEOSGeometry
     >>> from django.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
-    >>> from geoapp import SouthTexasCity
+    >>> from geoapp.models import SouthTexasCity
     # Distances will be calculated from this point, which does not have to be projected.
-    >>> pnt = fromstr('POINT(-96.876369 29.905320)', srid=4326)
+    >>> pnt = GEOSGeometry('POINT(-96.876369 29.905320)', srid=4326)
     # If numeric parameter, units of field (meters in this case) are assumed.
     >>> qs = SouthTexasCity.objects.filter(point__distance_lte=(pnt, 7000))
-    # Find all Cities within 7 km, > 20 miles away, and > 100 chains  away (an obscure unit)
+    # Find all Cities within 7 km, > 20 miles away, and > 100 chains away (an obscure unit)
     >>> qs = SouthTexasCity.objects.filter(point__distance_lte=(pnt, D(km=7)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(mi=20)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(chain=100)))
 
-__ https://github.com/django/django/blob/master/django/contrib/gis/tests/distapp/models.py
+__ https://github.com/django/django/blob/master/tests/gis_tests/distapp/models.py
 
 .. _compatibility-table:
 
@@ -255,43 +291,47 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite
 :lookup:`strictly_below`           X
 =================================  =========  ========  ============ ==========
 
-.. _geoqueryset-method-compatibility:
+.. _database-functions-compatibility:
 
-``GeoQuerySet`` Methods
------------------------
-The following table provides a summary of what :class:`GeoQuerySet` methods
-are available on each spatial backend.  Please note that MySQL does not
-support any of these methods, and is thus excluded from the table.
+Database functions
+------------------
 
-====================================  =======  ======  ==========
-Method                                PostGIS  Oracle  SpatiaLite
-====================================  =======  ======  ==========
-:meth:`GeoQuerySet.area`              X        X       X
-:meth:`GeoQuerySet.centroid`          X        X       X
-:meth:`GeoQuerySet.difference`        X        X       X
-:meth:`GeoQuerySet.distance`          X        X       X
-:meth:`GeoQuerySet.envelope`          X                X
-:meth:`GeoQuerySet.force_rhr`         X
-:meth:`GeoQuerySet.geohash`           X
-:meth:`GeoQuerySet.geojson`           X                X
-:meth:`GeoQuerySet.gml`               X        X       X
-:meth:`GeoQuerySet.intersection`      X        X       X
-:meth:`GeoQuerySet.kml`               X                X
-:meth:`GeoQuerySet.length`            X        X       X
-:meth:`GeoQuerySet.mem_size`          X
-:meth:`GeoQuerySet.num_geom`          X        X       X
-:meth:`GeoQuerySet.num_points`        X        X       X
-:meth:`GeoQuerySet.perimeter`         X        X
-:meth:`GeoQuerySet.point_on_surface`  X        X       X
-:meth:`GeoQuerySet.reverse_geom`      X        X
-:meth:`GeoQuerySet.scale`             X                X
-:meth:`GeoQuerySet.snap_to_grid`      X
-:meth:`GeoQuerySet.svg`               X                X
-:meth:`GeoQuerySet.sym_difference`    X        X       X
-:meth:`GeoQuerySet.transform`         X        X       X
-:meth:`GeoQuerySet.translate`         X                X
-:meth:`GeoQuerySet.union`             X        X       X
-====================================  =======  ======  ==========
+.. module:: django.contrib.gis.db.models.functions
+   :synopsis: GeoDjango's database functions.
+
+The following table provides a summary of what geography-specific database
+functions are available on each spatial backend.
+
+====================================  =======  ======  ===========  ==========
+Function                              PostGIS  Oracle  MySQL        SpatiaLite
+====================================  =======  ======  ===========  ==========
+:class:`Area`                         X        X       X            X
+:class:`AsGeoJSON`                    X                             X
+:class:`AsGML`                        X        X                    X
+:class:`AsKML`                        X                             X
+:class:`AsSVG`                        X                             X
+:class:`BoundingCircle`               X
+:class:`Centroid`                     X        X       X            X
+:class:`Difference`                   X        X       X (≥ 5.6.1)  X
+:class:`Distance`                     X        X       X (≥ 5.6.1)  X
+:class:`Envelope`                     X                X            X
+:class:`ForceRHR`                     X
+:class:`GeoHash`                      X                             X (≥ 4.0, LWGEOM)
+:class:`Intersection`                 X        X       X (≥ 5.6.1)  X
+:class:`Length`                       X        X       X            X
+:class:`MemSize`                      X
+:class:`NumGeometries`                X        X       X            X
+:class:`NumPoints`                    X        X       X            X
+:class:`Perimeter`                    X        X                    X (≥ 4.0)
+:class:`PointOnSurface`               X        X                    X
+:class:`Reverse`                      X        X                    X (≥ 4.0)
+:class:`Scale`                        X                             X
+:class:`SnapToGrid`                   X                             X (≥ 3.1)
+:class:`SymDifference`                X        X       X (≥ 5.6.1)  X
+:class:`Transform`                    X        X                    X
+:class:`Translate`                    X                             X
+:class:`Union`                        X        X       X (≥ 5.6.1)  X
+====================================  =======  ======  ===========  ==========
 
 Aggregate Functions
 -------------------
@@ -300,22 +340,24 @@ The following table provides a summary of what GIS-specific aggregate functions
 are available on each spatial backend. Please note that MySQL does not
 support any of these aggregates, and is thus excluded from the table.
 
-====================================  =======  ======  ==========
-Aggregate                             PostGIS  Oracle  SpatiaLite
-====================================  =======  ======  ==========
-:class:`Collect`                      X                (from v3.0)
-:class:`Extent`                       X        X       (from v3.0)
-:class:`Extent3D`                     X
-:class:`MakeLine`                     X
-:class:`Union`                        X        X       X
-====================================  =======  ======  ==========
+.. currentmodule:: django.contrib.gis.db.models
+
+=======================  =======  ======  ==========
+Aggregate                PostGIS  Oracle  SpatiaLite
+=======================  =======  ======  ==========
+:class:`Collect`         X                X
+:class:`Extent`          X        X       X
+:class:`Extent3D`        X
+:class:`MakeLine`        X                X
+:class:`Union`           X        X       X
+=======================  =======  ======  ==========
 
 .. rubric:: Footnotes
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
-.. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/manual-1.5/ch04.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
+.. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/manual-2.1/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
 .. [#fngeojson] *See* Howard Butler, Martin Daly, Allan Doyle, Tim Schaub, & Christopher Schmidt, `The GeoJSON Format Specification <http://geojson.org/geojson-spec.html>`_, Revision 1.0 (June 16, 2008).
-.. [#fndistsphere15] *See* `PostGIS 1.5 documentation <http://postgis.net/docs/manual-1.5/ST_Distance_Sphere.html>`_ on ``ST_distance_sphere``.
-.. [#fnmysqlidx] *See* `Creating Spatial Indexes <http://dev.mysql.com/doc/refman/5.6/en/creating-spatial-indexes.html>`_
+.. [#fndistsphere15] *See* `PostGIS documentation <http://postgis.net/docs/manual-2.1/ST_Distance_Sphere.html>`_ on ``ST_distance_sphere``.
+.. [#fnmysqlidx] *See* `Creating Spatial Indexes <https://dev.mysql.com/doc/refman/5.6/en/creating-spatial-indexes.html>`_
    in the MySQL Reference Manual:
 
        For MyISAM tables, ``SPATIAL INDEX`` creates an R-tree index. For storage

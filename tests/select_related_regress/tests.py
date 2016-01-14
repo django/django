@@ -39,7 +39,12 @@ class SelectRelatedRegressTests(TestCase):
         self.assertEqual([(c.id, six.text_type(c.start), six.text_type(c.end)) for c in connections],
             [(c1.id, 'router/4', 'switch/7'), (c2.id, 'switch/7', 'server/1')])
 
-        connections = Connection.objects.filter(start__device__building=b, end__device__building=b).select_related().order_by('id')
+        connections = (
+            Connection.objects
+            .filter(start__device__building=b, end__device__building=b)
+            .select_related()
+            .order_by('id')
+        )
         self.assertEqual([(c.id, six.text_type(c.start), six.text_type(c.end)) for c in connections],
             [(c1.id, 'router/4', 'switch/7'), (c2.id, 'switch/7', 'server/1')])
 

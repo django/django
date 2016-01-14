@@ -14,7 +14,7 @@ class DatabaseValidation(BaseDatabaseValidation):
         errors = super(DatabaseValidation, self).check_field(field, **kwargs)
 
         # Ignore any related fields.
-        if getattr(field, 'rel', None) is None:
+        if getattr(field, 'remote_field', None) is None:
             field_type = field.db_type(connection)
 
             # Ignore any non-concrete fields

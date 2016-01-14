@@ -1,5 +1,5 @@
 ==============================
-Built-in Class-based views API
+Built-in class-based views API
 ==============================
 
 Class-based views API reference. For introductory material, see the

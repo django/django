@@ -54,8 +54,8 @@ class FileBasedCache(BaseCache):
         try:
             with io.open(fd, 'wb') as f:
                 expiry = self.get_backend_timeout(timeout)
-                f.write(pickle.dumps(expiry, -1))
-                f.write(zlib.compress(pickle.dumps(value), -1))
+                f.write(pickle.dumps(expiry, pickle.HIGHEST_PROTOCOL))
+                f.write(zlib.compress(pickle.dumps(value, pickle.HIGHEST_PROTOCOL)))
             file_move_safe(tmp_path, fname, allow_overwrite=True)
             renamed = True
         finally:

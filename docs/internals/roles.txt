@@ -7,13 +7,13 @@ Roles
 Technical board
 ===============
 
-The technical board for the 1.8 release cycle is:
+The technical board for the 1.10 release cycle is:
 
-* Aymeric Augustin
+* James Bennett
 * Andrew Godwin
 * Russell Keith-Magee
-* Jannis Leidel
 * Carl Meyer
+* Marc Tamlyn
 
 .. _committers:
 
@@ -57,6 +57,7 @@ The current releasers are:
 
 - James Bennett
 - Jacob Kaplan-Moss
+- Tim Graham
 
 Ops team
 ========

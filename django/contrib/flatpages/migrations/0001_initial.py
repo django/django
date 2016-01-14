@@ -19,9 +19,17 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=200, verbose_name='title')),
                 ('content', models.TextField(verbose_name='content', blank=True)),
                 ('enable_comments', models.BooleanField(default=False, verbose_name='enable comments')),
-                ('template_name', models.CharField(help_text="Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'.", max_length=70, verbose_name='template name', blank=True)),
-                ('registration_required', models.BooleanField(default=False, help_text='If this is checked, only logged-in users will be able to view the page.', verbose_name='registration required')),
-                ('sites', models.ManyToManyField(to='sites.Site')),
+                ('template_name', models.CharField(
+                    help_text=(
+                        "Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use "
+                        "'flatpages/default.html'."
+                    ), max_length=70, verbose_name='template name', blank=True
+                )),
+                ('registration_required', models.BooleanField(
+                    default=False, help_text='If this is checked, only logged-in users will be able to view the page.',
+                    verbose_name='registration required'
+                )),
+                ('sites', models.ManyToManyField(to='sites.Site', verbose_name='sites')),
             ],
             options={
                 'ordering': ('url',),

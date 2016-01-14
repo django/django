@@ -63,7 +63,7 @@ Here are some useful attributes of ``UploadedFile``:
     handler may not receive the uploaded file content, but instead a URL or
     other pointer to the file. (see `RFC 2388`_ section 5.3).
 
-    .. _RFC 2388: http://www.ietf.org/rfc/rfc2388.txt
+    .. _RFC 2388: https://www.ietf.org/rfc/rfc2388.txt
 
 .. attribute:: UploadedFile.charset
 
@@ -86,10 +86,6 @@ Here are some useful attributes of ``UploadedFile``:
 
     .. _universal newlines: https://www.python.org/dev/peps/pep-0278
 
-    .. versionchanged:: 1.8
-
-        Previously lines were only split on the Unix end-of-line ``'\n'``.
-
 Subclasses of ``UploadedFile`` include:
 
 .. class:: TemporaryUploadedFile
@@ -109,8 +105,8 @@ Subclasses of ``UploadedFile`` include:
     A file uploaded into memory (i.e. stream-to-memory). This class is used
     by the :class:`~django.core.files.uploadhandler.MemoryFileUploadHandler`.
 
-Built-in upload handers
-=======================
+Built-in upload handlers
+========================
 
 .. module:: django.core.files.uploadhandler
    :synopsis: Django's handlers for file uploads.

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import uuid
 
 from django.db import models
 from django.utils import six
@@ -24,7 +25,7 @@ class BetterAuthor(Author):
 
 @python_2_unicode_compatible
 class Book(models.Model):
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=100)
 
     class Meta:
@@ -36,11 +37,15 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+    def clean(self):
+        # Ensure author is always accessible in clean method
+        assert self.author.name is not None
+
 
 @python_2_unicode_compatible
 class BookWithCustomPK(models.Model):
     my_pk = models.DecimalField(max_digits=5, decimal_places=0, primary_key=True)
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=100)
 
     def __str__(self):
@@ -53,9 +58,9 @@ class Editor(models.Model):
 
 @python_2_unicode_compatible
 class BookWithOptionalAltEditor(models.Model):
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(Author, models.CASCADE)
     # Optional secondary author
-    alt_editor = models.ForeignKey(Editor, blank=True, null=True)
+    alt_editor = models.ForeignKey(Editor, models.SET_NULL, blank=True, null=True)
     title = models.CharField(max_length=100)
 
     class Meta:
@@ -106,14 +111,14 @@ class Place(models.Model):
 class Owner(models.Model):
     auto_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    place = models.ForeignKey(Place)
+    place = models.ForeignKey(Place, models.CASCADE)
 
     def __str__(self):
         return "%s at %s" % (self.name, self.place)
 
 
 class Location(models.Model):
-    place = models.ForeignKey(Place, unique=True)
+    place = models.ForeignKey(Place, models.CASCADE, unique=True)
     # this is purely for testing the data doesn't matter here :)
     lat = models.CharField(max_length=100)
     lon = models.CharField(max_length=100)
@@ -121,7 +126,7 @@ class Location(models.Model):
 
 @python_2_unicode_compatible
 class OwnerProfile(models.Model):
-    owner = models.OneToOneField(Owner, primary_key=True)
+    owner = models.OneToOneField(Owner, models.CASCADE, primary_key=True)
     age = models.PositiveIntegerField()
 
     def __str__(self):
@@ -161,7 +166,7 @@ class MexicanRestaurant(Restaurant):
 
 
 class ClassyMexicanRestaurant(MexicanRestaurant):
-    restaurant = models.OneToOneField(MexicanRestaurant, parent_link=True, primary_key=True)
+    restaurant = models.OneToOneField(MexicanRestaurant, models.CASCADE, parent_link=True, primary_key=True)
     tacos_are_yummy = models.BooleanField(default=False)
 
 
@@ -177,7 +182,7 @@ class Repository(models.Model):
 
 @python_2_unicode_compatible
 class Revision(models.Model):
-    repository = models.ForeignKey(Repository)
+    repository = models.ForeignKey(Repository, models.CASCADE)
     revision = models.CharField(max_length=40)
 
     class Meta:
@@ -195,7 +200,7 @@ class Person(models.Model):
 
 
 class Membership(models.Model):
-    person = models.ForeignKey(Person)
+    person = models.ForeignKey(Person, models.CASCADE)
     date_joined = models.DateTimeField(default=datetime.datetime.now)
     karma = models.IntegerField()
 
@@ -207,7 +212,7 @@ class Team(models.Model):
 
 @python_2_unicode_compatible
 class Player(models.Model):
-    team = models.ForeignKey(Team, null=True)
+    team = models.ForeignKey(Team, models.SET_NULL, null=True)
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -225,7 +230,7 @@ class Poet(models.Model):
 
 @python_2_unicode_compatible
 class Poem(models.Model):
-    poet = models.ForeignKey(Poet)
+    poet = models.ForeignKey(Poet, models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -241,3 +246,45 @@ class Post(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# Models for testing UUID primary keys
+class UUIDPKParent(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+
+
+class UUIDPKChild(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(UUIDPKParent, models.CASCADE)
+
+
+class ChildWithEditablePK(models.Model):
+    name = models.CharField(max_length=255, primary_key=True)
+    parent = models.ForeignKey(UUIDPKParent, models.CASCADE)
+
+
+class AutoPKChildOfUUIDPKParent(models.Model):
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(UUIDPKParent, models.CASCADE)
+
+
+class AutoPKParent(models.Model):
+    name = models.CharField(max_length=255)
+
+
+class UUIDPKChildOfAutoPKParent(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(AutoPKParent, models.CASCADE)
+
+
+class ParentWithUUIDAlternateKey(models.Model):
+    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=50)
+
+
+class ChildRelatedViaAK(models.Model):
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(ParentWithUUIDAlternateKey, models.CASCADE, to_field='uuid')

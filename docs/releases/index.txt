@@ -15,16 +15,25 @@ version.
 Final releases
 ==============
 
-Below are release notes through Django |version| and its minor releases. Newer
+Below are release notes through Django |version| and its patch releases. Newer
 versions of the documentation contain the release notes for any later releases.
 
 .. _development_release_notes:
+
+1.10 release
+------------
+.. toctree::
+   :maxdepth: 1
+
+   1.10
 
 1.9 release
 -----------
 .. toctree::
    :maxdepth: 1
 
+   1.9.2
+   1.9.1
    1.9
 
 1.8 release
@@ -32,6 +41,15 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   1.8.9
+   1.8.8
+   1.8.7
+   1.8.6
+   1.8.5
+   1.8.4
+   1.8.3
+   1.8.2
+   1.8.1
    1.8
 
 1.7 release
@@ -39,6 +57,12 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   1.7.11
+   1.7.10
+   1.7.9
+   1.7.8
+   1.7.7
+   1.7.6
    1.7.5
    1.7.4
    1.7.3
@@ -51,6 +75,7 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   1.6.11
    1.6.10
    1.6.9
    1.6.8
@@ -87,6 +112,9 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   1.4.22
+   1.4.21
+   1.4.20
    1.4.19
    1.4.18
    1.4.17

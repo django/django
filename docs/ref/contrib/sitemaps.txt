@@ -13,7 +13,7 @@ creating sitemap_ XML files easy.
 Overview
 ========
 
-A sitemap is an XML file on your Web site that tells search-engine indexers how
+A sitemap is an XML file on your website that tells search-engine indexers how
 frequently your pages change and how "important" certain pages are in relation
 to other pages on your site. This information helps search engines index your
 site.
@@ -160,7 +160,7 @@ Sitemap class reference
 
         * Good: :file:`'/foo/bar/'`
         * Bad: :file:`'example.com/foo/bar/'`
-        * Bad: :file:`'http://example.com/foo/bar/'`
+        * Bad: :file:`'https://example.com/foo/bar/'`
 
         If :attr:`~Sitemap.location` isn't provided, the framework will call
         the ``get_absolute_url()`` method on each object as returned by
@@ -232,9 +232,16 @@ Sitemap class reference
         sitemap was requested is used. If the sitemap is built outside the
         context of a request, the default is ``'http'``.
 
-    .. attribute:: Sitemap.i18n
+    .. attribute:: Sitemap.limit
 
-        .. versionadded:: 1.8
+        **Optional.**
+
+        This attribute defines the maximum number of URLs included on each page
+        of the sitemap. Its value should not exceed the default value of
+        ``50000``, which is the upper limit allowed in the `Sitemaps protocol
+        <http://www.sitemaps.org/protocol.html#index>`_.
+
+    .. attribute:: Sitemap.i18n
 
         **Optional.**
 
@@ -293,13 +300,12 @@ Sitemap for static views
 
 Often you want the search engine crawlers to index views which are neither
 object detail pages nor flatpages. The solution is to explicitly list URL
-names for these views in ``items`` and call
-:func:`~django.core.urlresolvers.reverse` in the ``location`` method of
-the sitemap. For example::
+names for these views in ``items`` and call :func:`~django.urls.reverse` in
+the ``location`` method of the sitemap. For example::
 
     # sitemaps.py
     from django.contrib import sitemaps
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 
     class StaticViewSitemap(sitemaps.Sitemap):
         priority = 0.5
@@ -444,7 +450,7 @@ generate a Google News compatible sitemap:
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset
       xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+      xmlns:news="https://www.google.com/schemas/sitemap-news/0.9">
     {% spaceless %}
     {% for url in urlset %}
       <url>
@@ -487,7 +493,7 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
     The :func:`ping_google` command only works if you have registered your
     site with `Google Webmaster Tools`_.
 
-.. _`Google Webmaster Tools`: http://www.google.com/webmasters/tools/
+.. _`Google Webmaster Tools`: https://www.google.com/webmasters/tools/
 
 One useful way to call :func:`ping_google` is from a model's ``save()``
 method::

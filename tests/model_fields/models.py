@@ -26,12 +26,12 @@ class Foo(models.Model):
 
 
 def get_foo():
-    return Foo.objects.get(id=1)
+    return Foo.objects.get(id=1).pk
 
 
 class Bar(models.Model):
     b = models.CharField(max_length=10)
-    a = models.ForeignKey(Foo, default=get_foo, related_name=b'bars')
+    a = models.ForeignKey(Foo, models.CASCADE, default=get_foo, related_name=b'bars')
 
 
 class Whiz(models.Model):
@@ -84,6 +84,10 @@ class FloatModel(models.Model):
 
 class BigS(models.Model):
     s = models.SlugField(max_length=255)
+
+
+class UnicodeSlugField(models.Model):
+    s = models.SlugField(max_length=255, allow_unicode=True)
 
 
 class SmallIntegerModel(models.Model):
@@ -141,13 +145,13 @@ class PrimaryKeyCharModel(models.Model):
 
 class FksToBooleans(models.Model):
     """Model with FKs to models with {Null,}BooleanField's, #15040"""
-    bf = models.ForeignKey(BooleanModel)
-    nbf = models.ForeignKey(NullBooleanModel)
+    bf = models.ForeignKey(BooleanModel, models.CASCADE)
+    nbf = models.ForeignKey(NullBooleanModel, models.CASCADE)
 
 
 class FkToChar(models.Model):
     """Model with FK to a model with a CharField primary key, #19299"""
-    out = models.ForeignKey(PrimaryKeyCharModel)
+    out = models.ForeignKey(PrimaryKeyCharModel, models.CASCADE)
 
 
 class RenamedField(models.Model):
@@ -179,6 +183,8 @@ class VerboseNameField(models.Model):
     field19 = models.TextField("verbose field19")
     field20 = models.TimeField("verbose field20")
     field21 = models.URLField("verbose field21")
+    field22 = models.UUIDField("verbose field22")
+    field23 = models.DurationField("verbose field23")
 
 
 class GenericIPAddress(models.Model):
@@ -234,7 +240,7 @@ if Image:
         attr_class = TestImageFieldFile
 
     # Set up a temp directory for file storage.
-    temp_storage_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+    temp_storage_dir = tempfile.mkdtemp()
     temp_storage = FileSystemStorage(temp_storage_dir)
     temp_upload_to_dir = os.path.join(temp_storage.location, 'tests')
 
@@ -245,7 +251,7 @@ if Image:
         name = models.CharField(max_length=50)
         mugshot = TestImageField(storage=temp_storage, upload_to='tests')
 
-    class AbsctractPersonWithHeight(models.Model):
+    class AbstractPersonWithHeight(models.Model):
         """
         Abstract model that defines an ImageField with only one dimension field
         to make sure the dimension update is correctly run on concrete subclass
@@ -258,9 +264,9 @@ if Image:
         class Meta:
             abstract = True
 
-    class PersonWithHeight(AbsctractPersonWithHeight):
+    class PersonWithHeight(AbstractPersonWithHeight):
         """
-        Concrete model that subclass an abctract one with only on dimension
+        Concrete model that subclass an abstract one with only on dimension
         field.
         """
         name = models.CharField(max_length=50)
@@ -292,7 +298,7 @@ if Image:
         Model that:
         * Defines two ImageFields
         * Defines the height/width fields before the ImageFields
-        * Has a nullalble ImageField
+        * Has a nullable ImageField
         """
         name = models.CharField(max_length=50)
         mugshot_height = models.PositiveSmallIntegerField()
@@ -337,19 +343,21 @@ class AllFieldsModel(models.Model):
 
     fo = ForeignObject(
         'self',
+        on_delete=models.CASCADE,
         from_fields=['abstract_non_concrete_id'],
         to_fields=['id'],
         related_name='reverse'
     )
     fk = ForeignKey(
         'self',
+        models.CASCADE,
         related_name='reverse2'
     )
     m2m = ManyToManyField('self')
-    oto = OneToOneField('self')
+    oto = OneToOneField('self', models.CASCADE)
 
     object_id = models.PositiveIntegerField()
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     gfk = GenericForeignKey()
     gr = GenericRelation(DataModel)
 
@@ -367,3 +375,15 @@ class NullableUUIDModel(models.Model):
 
 class PrimaryKeyUUIDModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+
+class RelatedToUUIDModel(models.Model):
+    uuid_fk = models.ForeignKey('PrimaryKeyUUIDModel', models.CASCADE)
+
+
+class UUIDChild(PrimaryKeyUUIDModel):
+    pass
+
+
+class UUIDGrandchild(UUIDChild):
+    pass

@@ -5,34 +5,31 @@ Installing Geospatial libraries
 GeoDjango uses and/or provides interfaces for the following open source
 geospatial libraries:
 
-========================  ====================================  ================================  ==========================
+========================  ====================================  ================================  ============================
 Program                   Description                           Required                          Supported Versions
-========================  ====================================  ================================  ==========================
-:doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.4, 3.3, 3.2
-`PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.8, 4.7, 4.6, 4.5, 4.4
-:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes (SQLite only)                 1.10, 1.9, 1.8, 1.7
+========================  ====================================  ================================  ============================
+:doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.4, 3.3
+`PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.9, 4.8, 4.7, 4.6, 4.5, 4.4
+:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes (SQLite only)                 2.0, 1.11, 1.10, 1.9, 1.8, 1.7
 :doc:`GeoIP <../geoip>`   IP-based geolocation library          No                                1.4
-`PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.1, 2.0, 1.5
-`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.1, 4.0, 3.0, 2.4
-========================  ====================================  ================================  ==========================
+`PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.1, 2.0
+`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.1, 4.0, 3.0
+========================  ====================================  ================================  ============================
 
 Note that older or more recent versions of these libraries *may* also work
 totally fine with GeoDjango. Your mileage may vary.
 
 ..
     Libs release dates:
-    GEOS 3.2.0 2009-12-14
     GEOS 3.3.0 2011-05-30
     GEOS 3.4.0 2013-08-11
     GDAL 1.7.1 2010-02-08
     GDAL 1.8.0 2011-01-13
     GDAL 1.9.0 2012-01-03
     GDAL 1.10.0 2013-04-29
-    GDAL 1.11.0 2014-04-25 # To be tested!
-    PostGIS 1.5.0 2010-02-04
+    GDAL 1.11.0 2014-04-25
     PostGIS 2.0.0 2012-04-03
     PostGIS 2.1.0 2013-08-17
-    Spatialite 2.4.0 2010-11-14
     Spatialite 3.0.0 2011-12-30
     Spatialite 4.0.0 2012-11-25
     Spatialite 4.1.0 2013-06-04
@@ -50,7 +47,7 @@ totally fine with GeoDjango. Your mileage may vary.
     independently of Django.  In other words, no database or settings file
     required -- just import them as normal from :mod:`django.contrib.gis`.
 
-.. _PROJ.4: http://trac.osgeo.org/proj/
+.. _PROJ.4: https://github.com/OSGeo/proj.4/wiki/
 __ http://postgis.net/
 __ http://www.gaia-gis.it/gaia-sins/
 
@@ -58,7 +55,7 @@ __ http://www.gaia-gis.it/gaia-sins/
 On Debian/Ubuntu, you are advised to install the following packages which will
 install, directly or by dependency, the required geospatial libraries:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ sudo apt-get install binutils libproj-dev gdal-bin
 
@@ -107,16 +104,16 @@ internal geometry representation used by GeoDjango (it's behind the "lazy"
 geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
-First, download GEOS 3.3.8 from the GEOS Web site and untar the source
+First, download GEOS 3.4.2 from the GEOS website and untar the source
 archive::
 
-    $ wget http://download.osgeo.org/geos/geos-3.3.8.tar.bz2
-    $ tar xjf geos-3.3.8.tar.bz2
+    $ wget http://download.osgeo.org/geos/geos-3.4.2.tar.bz2
+    $ tar xjf geos-3.4.2.tar.bz2
 
 Next, change into the directory where GEOS was unpacked, run the configure
 script, compile, and install::
 
-    $ cd geos-3.3.8
+    $ cd geos-3.4.2
     $ ./configure
     $ make
     $ sudo make install
@@ -168,14 +165,14 @@ reference systems.
 
 First, download the PROJ.4 source code and datum shifting files [#]_::
 
-    $ wget http://download.osgeo.org/proj/proj-4.8.0.tar.gz
+    $ wget http://download.osgeo.org/proj/proj-4.9.1.tar.gz
     $ wget http://download.osgeo.org/proj/proj-datumgrid-1.5.tar.gz
 
 Next, untar the source code archive, and extract the datum shifting files in the
 ``nad`` subdirectory.  This must be done *prior* to configuration::
 
-    $ tar xzf proj-4.8.0.tar.gz
-    $ cd proj-4.8.0/nad
+    $ tar xzf proj-4.9.1.tar.gz
+    $ cd proj-4.9.1/nad
     $ tar xzf ../../proj-datumgrid-1.5.tar.gz
     $ cd ..
 
@@ -198,9 +195,9 @@ supports :doc:`GDAL's vector data <../gdal>` capabilities [#]_.
 
 First download the latest GDAL release version and untar the archive::
 
-    $ wget http://download.osgeo.org/gdal/gdal-1.9.2.tar.gz
-    $ tar xzf gdal-1.9.2.tar.gz
-    $ cd gdal-1.9.2
+    $ wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz
+    $ tar xzf gdal-1.11.2.tar.gz
+    $ cd gdal-1.11.2
 
 Configure, make and install::
 
@@ -219,8 +216,8 @@ Configure, make and install::
 If you have any problems, please see the troubleshooting section below for
 suggestions and solutions.
 
-__ http://trac.osgeo.org/gdal/
-__ http://trac.osgeo.org/gdal/wiki/GdalOgrInPython
+__ https://trac.osgeo.org/gdal/
+__ https://trac.osgeo.org/gdal/wiki/GdalOgrInPython
 
 .. _gdaltrouble:
 
@@ -264,4 +261,4 @@ the GDAL library.  For example::
        It is easier to install the shifting files now, then to have debug a
        problem caused by their absence later.
 .. [#] Specifically, GeoDjango provides support for the `OGR
-       <http://gdal.org/ogr>`_ library, a component of GDAL.
+       <http://gdal.org/ogr_arch.html>`_ library, a component of GDAL.

@@ -1,7 +1,10 @@
 from django.apps.registry import apps as global_apps
 from django.db import connection
+from django.db.migrations.exceptions import InvalidMigrationPlan
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
+from django.db.migrations.recorder import MigrationRecorder
+from django.db.utils import DatabaseError
 from django.test import TestCase, modify_settings, override_settings
 
 from .test_base import MigrationTestBase
@@ -143,6 +146,64 @@ class ExecutorTests(MigrationTestBase):
         executor.recorder.record_unapplied("migrations", "0002_second")
         executor.recorder.record_unapplied("migrations", "0001_initial")
 
+    @override_settings(MIGRATION_MODULES={
+        "migrations": "migrations.test_migrations",
+        "migrations2": "migrations2.test_migrations_2_no_deps",
+    })
+    def test_mixed_plan_not_supported(self):
+        """
+        Although the MigrationExecutor interfaces allows for mixed migration
+        plans (combined forwards and backwards migrations) this is not
+        supported.
+        """
+        # Prepare for mixed plan
+        executor = MigrationExecutor(connection)
+        plan = executor.migration_plan([("migrations", "0002_second")])
+        self.assertEqual(
+            plan,
+            [
+                (executor.loader.graph.nodes["migrations", "0001_initial"], False),
+                (executor.loader.graph.nodes["migrations", "0002_second"], False),
+            ],
+        )
+        executor.migrate(None, plan)
+        # Rebuild the graph to reflect the new DB state
+        executor.loader.build_graph()
+        self.assertIn(('migrations', '0001_initial'), executor.loader.applied_migrations)
+        self.assertIn(('migrations', '0002_second'), executor.loader.applied_migrations)
+        self.assertNotIn(('migrations2', '0001_initial'), executor.loader.applied_migrations)
+
+        # Generate mixed plan
+        plan = executor.migration_plan([
+            ("migrations", None),
+            ("migrations2", "0001_initial"),
+        ])
+        msg = (
+            'Migration plans with both forwards and backwards migrations are '
+            'not supported. Please split your migration process into separate '
+            'plans of only forwards OR backwards migrations.'
+        )
+        with self.assertRaisesMessage(InvalidMigrationPlan, msg) as cm:
+            executor.migrate(None, plan)
+        self.assertEqual(
+            cm.exception.args[1],
+            [
+                (executor.loader.graph.nodes["migrations", "0002_second"], True),
+                (executor.loader.graph.nodes["migrations", "0001_initial"], True),
+                (executor.loader.graph.nodes["migrations2", "0001_initial"], False),
+            ],
+        )
+        # Rebuild the graph to reflect the new DB state
+        executor.loader.build_graph()
+        executor.migrate([
+            ("migrations", None),
+            ("migrations2", None),
+        ])
+        # Are the tables gone?
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_book")
+        self.assertTableNotExists("migrations2_otherauthor")
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_soft_apply(self):
         """
@@ -186,7 +247,14 @@ class ExecutorTests(MigrationTestBase):
                 (executor.loader.graph.nodes["migrations", "0001_initial"], False),
             ],
         )
-        executor.migrate([("migrations", "0001_initial")])
+        # Applying the migration should raise a database level error
+        # because we haven't given the --fake-initial option
+        with self.assertRaises(DatabaseError):
+            executor.migrate([("migrations", "0001_initial")])
+        # Reset the faked state
+        state = {"faked": None}
+        # Allow faking of initial CreateModel operations
+        executor.migrate([("migrations", "0001_initial")], fake_initial=True)
         self.assertEqual(state["faked"], True)
         # And migrate back to clean up the database
         executor.loader.build_graph()
@@ -232,6 +300,65 @@ class ExecutorTests(MigrationTestBase):
         executor.migrate([("migrations", None)])
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
+
+    @override_settings(
+        MIGRATION_MODULES={
+            "migrations": "migrations.test_add_many_to_many_field_initial",
+        },
+    )
+    def test_detect_soft_applied_add_field_manytomanyfield(self):
+        """
+        executor.detect_soft_applied() detects ManyToManyField tables from an
+        AddField operation. This checks the case of AddField in a migration
+        with other operations (0001) and the case of AddField in its own
+        migration (0002).
+        """
+        tables = [
+            # from 0001
+            "migrations_project",
+            "migrations_task",
+            "migrations_project_tasks",
+            # from 0002
+            "migrations_task_projects",
+        ]
+        executor = MigrationExecutor(connection)
+        # Create the tables for 0001 but make it look like the migration hasn't
+        # been applied.
+        executor.migrate([("migrations", "0001_initial")])
+        executor.migrate([("migrations", None)], fake=True)
+        for table in tables[:3]:
+            self.assertTableExists(table)
+        # Table detection sees 0001 is applied but not 0002.
+        migration = executor.loader.get_migration("migrations", "0001_initial")
+        self.assertEqual(executor.detect_soft_applied(None, migration)[0], True)
+        migration = executor.loader.get_migration("migrations", "0002_initial")
+        self.assertEqual(executor.detect_soft_applied(None, migration)[0], False)
+
+        # Create the tables for both migrations but make it look like neither
+        # has been applied.
+        executor.loader.build_graph()
+        executor.migrate([("migrations", "0001_initial")], fake=True)
+        executor.migrate([("migrations", "0002_initial")])
+        executor.loader.build_graph()
+        executor.migrate([("migrations", None)], fake=True)
+        # Table detection sees 0002 is applied.
+        migration = executor.loader.get_migration("migrations", "0002_initial")
+        self.assertEqual(executor.detect_soft_applied(None, migration)[0], True)
+
+        # Leave the tables for 0001 except the many-to-many table. That missing
+        # table should cause detect_soft_applied() to return False.
+        with connection.schema_editor() as editor:
+            for table in tables[2:]:
+                editor.execute(editor.sql_delete_table % {"table": table})
+        migration = executor.loader.get_migration("migrations", "0001_initial")
+        self.assertEqual(executor.detect_soft_applied(None, migration)[0], False)
+
+        # Cleanup by removing the remaining tables.
+        with connection.schema_editor() as editor:
+            for table in tables[:2]:
+                editor.execute(editor.sql_delete_table % {"table": table})
+        for table in tables:
+            self.assertTableNotExists(table)
 
     @override_settings(
         INSTALLED_APPS=[
@@ -367,6 +494,85 @@ class ExecutorTests(MigrationTestBase):
             ("unapply_success", migrations['migrations', '0001_initial'], False),
         ]
         self.assertEqual(call_args_list, expected)
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.alter_fk.author_app",
+            "migrations.migrations_test_apps.alter_fk.book_app",
+        ]
+    )
+    def test_alter_id_type_with_fk(self):
+        try:
+            executor = MigrationExecutor(connection)
+            self.assertTableNotExists("author_app_author")
+            self.assertTableNotExists("book_app_book")
+            # Apply initial migrations
+            executor.migrate([
+                ("author_app", "0001_initial"),
+                ("book_app", "0001_initial"),
+            ])
+            self.assertTableExists("author_app_author")
+            self.assertTableExists("book_app_book")
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+
+            # Apply PK type alteration
+            executor.migrate([("author_app", "0002_alter_id")])
+
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+        finally:
+            # We can't simply unapply the migrations here because there is no
+            # implicit cast from VARCHAR to INT on the database level.
+            with connection.schema_editor() as editor:
+                editor.execute(editor.sql_delete_table % {"table": "book_app_book"})
+                editor.execute(editor.sql_delete_table % {"table": "author_app_author"})
+            self.assertTableNotExists("author_app_author")
+            self.assertTableNotExists("book_app_book")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_apply_all_replaced_marks_replacement_as_applied(self):
+        """
+        Applying all replaced migrations marks replacement as applied (#24628).
+        """
+        recorder = MigrationRecorder(connection)
+        # Place the database in a state where the replaced migrations are
+        # partially applied: 0001 is applied, 0002 is not.
+        recorder.record_applied("migrations", "0001_initial")
+        executor = MigrationExecutor(connection)
+        # Use fake because we don't actually have the first migration
+        # applied, so the second will fail. And there's no need to actually
+        # create/modify tables here, we're just testing the
+        # MigrationRecord, which works the same with or without fake.
+        executor.migrate([("migrations", "0002_second")], fake=True)
+
+        # Because we've now applied 0001 and 0002 both, their squashed
+        # replacement should be marked as applied.
+        self.assertIn(
+            ("migrations", "0001_squashed_0002"),
+            recorder.applied_migrations(),
+        )
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_migrate_marks_replacement_applied_even_if_it_did_nothing(self):
+        """
+        A new squash migration will be marked as applied even if all its
+        replaced migrations were previously already applied (#24628).
+        """
+        recorder = MigrationRecorder(connection)
+        # Record all replaced migrations as applied
+        recorder.record_applied("migrations", "0001_initial")
+        recorder.record_applied("migrations", "0002_second")
+        executor = MigrationExecutor(connection)
+        executor.migrate([("migrations", "0001_squashed_0002")])
+
+        # Because 0001 and 0002 are both applied, even though this migrate run
+        # didn't apply anything new, their squashed replacement should be
+        # marked as applied.
+        self.assertIn(
+            ("migrations", "0001_squashed_0002"),
+            recorder.applied_migrations(),
+        )
 
 
 class FakeLoader(object):

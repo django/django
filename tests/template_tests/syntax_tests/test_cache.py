@@ -1,11 +1,15 @@
 from django.core.cache import cache
-from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase
+from django.template import Context, Engine, TemplateSyntaxError
+from django.test import SimpleTestCase, override_settings
 
 from ..utils import setup
 
 
 class CacheTagTests(SimpleTestCase):
+    libraries = {
+        'cache': 'django.templatetags.cache',
+        'custom': 'template_tests.templatetags.custom',
+    }
 
     def tearDown(self):
         cache.clear()
@@ -115,3 +119,52 @@ class CacheTagTests(SimpleTestCase):
         """
         output = self.engine.render_to_string('cache18')
         self.assertEqual(output, 'cache18')
+
+
+class CacheTests(SimpleTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = Engine(libraries={'cache': 'django.templatetags.cache'})
+        super(CacheTests, cls).setUpClass()
+
+    def test_cache_regression_20130(self):
+        t = self.engine.from_string('{% load cache %}{% cache 1 regression_20130 %}foo{% endcache %}')
+        cachenode = t.nodelist[1]
+        self.assertEqual(cachenode.fragment_name, 'regression_20130')
+
+    @override_settings(CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'default',
+        },
+        'template_fragments': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'fragments',
+        },
+    })
+    def test_cache_fragment_cache(self):
+        """
+        When a cache called "template_fragments" is present, the cache tag
+        will use it in preference to 'default'
+        """
+        t1 = self.engine.from_string('{% load cache %}{% cache 1 fragment %}foo{% endcache %}')
+        t2 = self.engine.from_string('{% load cache %}{% cache 1 fragment using="default" %}bar{% endcache %}')
+
+        ctx = Context()
+        o1 = t1.render(ctx)
+        o2 = t2.render(ctx)
+
+        self.assertEqual(o1, 'foo')
+        self.assertEqual(o2, 'bar')
+
+    def test_cache_missing_backend(self):
+        """
+        When a cache that doesn't exist is specified, the cache tag will
+        raise a TemplateSyntaxError
+        '"""
+        t = self.engine.from_string('{% load cache %}{% cache 1 backend using="unknown" %}bar{% endcache %}')
+
+        ctx = Context()
+        with self.assertRaises(TemplateSyntaxError):
+            t.render(ctx)

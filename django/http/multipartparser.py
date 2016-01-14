@@ -327,12 +327,15 @@ class LazyStream(six.Iterator):
             while remaining != 0:
                 assert remaining > 0, 'remaining bytes to read should never go negative'
 
-                chunk = next(self)
-
-                emitting = chunk[:remaining]
-                self.unget(chunk[remaining:])
-                remaining -= len(emitting)
-                yield emitting
+                try:
+                    chunk = next(self)
+                except StopIteration:
+                    return
+                else:
+                    emitting = chunk[:remaining]
+                    self.unget(chunk[remaining:])
+                    remaining -= len(emitting)
+                    yield emitting
 
         out = b''.join(parts())
         return out

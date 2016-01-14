@@ -41,11 +41,6 @@ namespace.
 Support for template engines
 ============================
 
-.. versionadded:: 1.8
-
-    Support for multiple template engines and the :setting:`TEMPLATES` setting
-    were added in Django 1.8.
-
 Configuration
 -------------
 
@@ -95,7 +90,7 @@ Usage
 
 The ``django.template.loader`` module defines two functions to load templates.
 
-.. function:: get_template(template_name[, dirs][, using])
+.. function:: get_template(template_name, using=None)
 
     This function loads the template with the given name and returns a
     ``Template`` object.
@@ -115,48 +110,43 @@ The ``django.template.loader`` module defines two functions to load templates.
     If you want to restrict the search to a particular template engine, pass
     the engine's :setting:`NAME <TEMPLATES-NAME>` in the ``using`` argument.
 
-    .. deprecated:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
-    .. versionchanged:: 1.8
-
-       The ``using`` parameter was added.
-
-    .. versionchanged:: 1.8
-
-        ``get_template()`` returns a backend-dependent ``Template`` instead
-        of a :class:`django.template.Template`.
-
-.. function:: select_template(template_name_list[, dirs][, using])
+.. function:: select_template(template_name_list, using=None)
 
     ``select_template()`` is just like ``get_template()``, except it takes a
     list of template names. It tries each name in order and returns the first
     template that exists.
-
-    .. deprecated:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
-    .. versionchanged:: 1.8
-
-       The ``using`` parameter was added.
-
-    .. versionchanged:: 1.8
-
-        ``select_template()`` returns a backend-dependent ``Template`` instead
-        of a :class:`django.template.Template`.
 
 .. currentmodule:: django.template
 
 If loading a template fails, the following two exceptions, defined in
 ``django.template``, may be raised:
 
-.. exception:: TemplateDoesNotExist
+.. exception:: TemplateDoesNotExist(msg, tried=None, backend=None, chain=None)
 
-    This exception is raised when a template cannot be found.
+    This exception is raised when a template cannot be found. It accepts the
+    following optional arguments for populating the :ref:`template postmortem
+    <template-postmortem>` on the debug page:
 
-.. exception:: TemplateSyntaxError
+    ``backend``
+        The template backend instance from which the exception originated.
+
+    ``tried``
+        A list of sources that were tried when finding the template. This is
+        formatted as a list of tuples containing ``(origin, status)``, where
+        ``origin`` is an :ref:`origin-like <template-origin-api>` object and
+        ``status`` is a string with the reason the template wasn't found.
+
+    ``chain``
+        A list of intermediate :exc:`~django.template.TemplateDoesNotExist`
+        exceptions raised when trying to load a template. This is used by
+        functions, such as :func:`~django.template.loader.get_template`, that
+        try to load a given template from multiple engines.
+
+    .. versionadded:: 1.9
+
+        The ``backend``, ``tried``, and ``chain`` arguments were added.
+
+.. exception:: TemplateSyntaxError(msg)
 
     This exception is raised when a template was found but contains errors.
 
@@ -248,7 +238,7 @@ the following templates:
 In addition, to cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which automates the process.
 
-.. function:: render_to_string(template_name[, context][, context_instance][, request][, using])
+.. function:: render_to_string(template_name, context=None, request=None, using=None)
 
     ``render_to_string()`` loads a template like :func:`get_template` and
     calls its ``render()`` method immediately. It takes the following
@@ -262,35 +252,12 @@ templates, Django provides a shortcut function which automates the process.
     ``context``
         A :class:`dict` to be used as the template's context for rendering.
 
-        .. versionchanged:: 1.8
-
-            The ``context`` argument used to be called ``dictionary``. That name
-            is deprecated in Django 1.8 and will be removed in Django 2.0.
-
-            ``context`` is now optional. An empty context will be used if it
-            isn't provided.
-
-    ``context_instance``
-        An instance of :class:`~django.template.Context` or a subclass (e.g., an
-        instance of :class:`~django.template.RequestContext`) to use as the
-        template's context.
-
-        .. deprecated:: 1.8
-
-            The ``context_instance`` argument is deprecated. Use ``context`` and
-            if needed ``request``.
-
     ``request``
         An optional :class:`~django.http.HttpRequest` that will be available
         during the template's rendering process.
 
-        .. versionadded:: 1.8
-
-            The ``request`` argument was added.
-
-See also the :func:`~django.shortcuts.render()` and
-:func:`~django.shortcuts.render_to_response()` shortcuts, which call
-:func:`render_to_string()` and feed the result into an
+See also the :func:`~django.shortcuts.render()` shortcut which calls
+:func:`render_to_string()` and feeds the result into an
 :class:`~django.http.HttpResponse` suitable for returning from a view.
 
 Finally, you can use configured engines directly:
@@ -327,20 +294,18 @@ applications. This generic name was kept for backwards-compatibility.
 ``DjangoTemplates`` engines accept the following :setting:`OPTIONS
 <TEMPLATES-OPTIONS>`:
 
-* ``'allowed_include_roots'``: a list of strings representing allowed prefixes
-  for the ``{% ssi %}`` template tag. This is a security measure, so that
-  template authors can't access files that they shouldn't be accessing.
+* ``'autoescape'``: a boolean that controls whether HTML autoescaping is
+  enabled.
 
-  For example, if ``'allowed_include_roots'`` is ``['/home/html',
-  '/var/www']``, then ``{% ssi /home/html/foo.txt %}`` would work, but ``{%
-  ssi /etc/passwd %}`` wouldn't.
+  It defaults to ``True``.
 
-  It defaults to an empty list.
+  .. warning::
 
-  .. deprecated:: 1.8
+      Only set it to ``False`` if you're rendering non-HTML templates!
 
-      ``allowed_include_roots`` is deprecated because the {% ssi %} tag is
-      deprecated.
+  .. versionadded:: 1.10
+
+      The ``autoescape`` option was added.
 
 * ``'context_processors'``: a list of dotted Python paths to callables that
   are used to populate the context when a template is rendered with a request.
@@ -356,9 +321,7 @@ applications. This generic name was kept for backwards-compatibility.
   exception raised during template rendering. This report contains the
   relevant snippet of the template with the appropriate line highlighted.
 
-  It defaults to the value of the :setting:`TEMPLATE_DEBUG` setting. The
-  setting is convenient for toggling template debug mode globally rather than
-  on a per-engine basis.
+  It defaults to the value of the :setting:`DEBUG` setting.
 
 * ``'loaders'``: a list of dotted Python paths to template loader classes.
   Each ``Loader`` class knows how to import templates from a particular
@@ -382,9 +345,43 @@ applications. This generic name was kept for backwards-compatibility.
 
   It defaults to the value of :setting:`FILE_CHARSET`.
 
+* ``'libraries'``: A dictionary of labels and dotted Python paths of template
+  tag modules to register with the template engine. This can be used to add
+  new libraries or provide alternate labels for existing ones. For example::
+
+      OPTIONS={
+          'libraries': {
+              'myapp_tags': 'path.to.myapp.tags',
+              'admin.urls': 'django.contrib.admin.templatetags.admin_urls',
+          },
+      }
+
+  Libraries can be loaded by passing the corresponding dictionary key to
+  the :ttag:`{% load %}<load>` tag.
+
+* ``'builtins'``: A list of dotted Python paths of template tag modules to
+  add to :doc:`built-ins </ref/templates/builtins>`. For example::
+
+      OPTIONS={
+          'builtins': ['myapp.builtins'],
+      }
+
+  Tags and filters from built-in libraries can be used without first calling
+  the :ttag:`{% load %} <load>` tag.
+
+.. versionadded:: 1.9
+
+    The ``libraries`` and ``builtins`` arguments were added.
+
 .. module:: django.template.backends.jinja2
 
 .. class:: Jinja2
+
+Requires Jinja2_ to be installed:
+
+.. code-block:: console
+
+    $ pip install Jinja2
 
 Set :setting:`BACKEND <TEMPLATES-BACKEND>` to
 ``'django.template.backends.jinja2.Jinja2'`` to configure a Jinja2_ engine.
@@ -403,6 +400,47 @@ adds defaults that differ from Jinja2's for a few options:
   :setting:`APP_DIRS <TEMPLATES-APP_DIRS>`
 * ``'auto_reload'``: ``settings.DEBUG``
 * ``'undefined'``: ``DebugUndefined if settings.DEBUG else Undefined``
+
+The default configuration is purposefully kept to a minimum. The ``Jinja2``
+backend doesn't create a Django-flavored environment. It doesn't know about
+Django context processors, filters, and tags. In order to use Django-specific
+APIs, you must configure them into the environment.
+
+For example, you can create ``myproject/jinja2.py`` with this content::
+
+    from __future__ import absolute_import  # Python 2 only
+
+    from django.contrib.staticfiles.storage import staticfiles_storage
+    from django.urls import reverse
+
+    from jinja2 import Environment
+
+
+    def environment(**options):
+        env = Environment(**options)
+        env.globals.update({
+            'static': staticfiles_storage.url,
+            'url': reverse,
+        })
+        return env
+
+and set the ``'environment'`` option to ``'myproject.jinja2.environment'``.
+
+Then you could use the following constructs in Jinja2 templates:
+
+.. code-block:: html+jinja
+
+    <img src="{{ static('path/to/company-logo.png') }}" alt="Company Logo">
+
+    <a href="{{ url('admin:index') }}">Administration</a>
+
+The concepts of tags and filters exist both in the Django template language
+and in Jinja2 but they're used differently. Since Jinja2 supports passing
+arguments to callables in templates, many features that require a template tag
+or filter in Django templates can be achieved simply by calling a function in
+Jinja2 templates, as shown in the example above. Jinja2's global namespace
+removes the need for template context processors. The Django template language
+doesn't have an equivalent of Jinja2 tests.
 
 Custom backends
 ---------------
@@ -433,7 +471,6 @@ fictional ``foobar`` template library::
 
             self.engine = foobar.Engine(**options)
 
-
         def from_string(self, template_code):
             try:
               return Template(self.engine.from_string(template_code))
@@ -444,7 +481,7 @@ fictional ``foobar`` template library::
             try:
                 return Template(self.engine.get_template(template_name))
             except foobar.TemplateNotFound as exc:
-                raise TemplateDoesNotExist(exc.args)
+                raise TemplateDoesNotExist(exc.args, backend=self)
             except foobar.TemplateCompilationFailed as exc:
                 raise TemplateSyntaxError(exc.args)
 
@@ -464,6 +501,117 @@ fictional ``foobar`` template library::
             return self.template.render(context)
 
 See `DEP 182`_ for more information.
+
+.. _template-debug-integration:
+
+Debug integration for custom engines
+------------------------------------
+
+.. versionadded:: 1.9
+
+    Debug page integration for non-Django template engines was added.
+
+The Django debug page has hooks to provide detailed information when a template
+error arises. Custom template engines can use these hooks to enhance the
+traceback information that appears to users. The following hooks are available:
+
+.. _template-postmortem:
+
+Template postmortem
+~~~~~~~~~~~~~~~~~~~
+
+The postmortem appears when :exc:`~django.template.TemplateDoesNotExist` is
+raised. It lists the template engines and loaders that were used when trying
+to find a given template. For example, if two Django engines are configured,
+the postmortem will appear like:
+
+.. image:: _images/postmortem.png
+
+Custom engines can populate the postmortem by passing the ``backend`` and
+``tried`` arguments when raising :exc:`~django.template.TemplateDoesNotExist`.
+Backends that use the postmortem :ref:`should specify an origin
+<template-origin-api>` on the template object.
+
+Contextual line information
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If an error happens during template parsing or rendering, Django can display
+the line the error happened on. For example:
+
+.. image:: _images/template-lines.png
+
+Custom engines can populate this information by setting a ``template_debug``
+attribute on exceptions raised during parsing and rendering. This attribute
+is a :class:`dict` with the following values:
+
+* ``'name'``: The name of the template in which the exception occurred.
+
+* ``'message'``: The exception message.
+
+* ``'source_lines'``: The lines before, after, and including the line the
+  exception occurred on. This is for context, so it shouldn't contain more than
+  20 lines or so.
+
+* ``'line'``: The line number on which the exception occurred.
+
+* ``'before'``: The content on the error line before the token that raised the
+  error.
+
+* ``'during'``: The token that raised the error.
+
+* ``'after'``: The content on the error line after the token that raised the
+  error.
+
+* ``'total'``: The number of lines in ``source_lines``.
+
+* ``'top'``: The line number where ``source_lines`` starts.
+
+* ``'bottom'``: The line number where ``source_lines`` ends.
+
+Given the above template error, ``template_debug`` would look like::
+
+    {
+        'name': '/path/to/template.html',
+        'message': "Invalid block tag: 'syntax'",
+        'source_lines': [
+            (1, 'some\n'),
+            (2, 'lines\n'),
+            (3, 'before\n'),
+            (4, 'Hello {% syntax error %} {{ world }}\n'),
+            (5, 'some\n'),
+            (6, 'lines\n'),
+            (7, 'after\n'),
+            (8, ''),
+        ],
+        'line': 4,
+        'before': 'Hello ',
+        'during': '{% syntax error %}',
+        'after': ' {{ world }}\n',
+        'total': 9,
+        'bottom': 9,
+        'top': 1,
+    }
+
+.. _template-origin-api:
+
+Origin API and 3rd-party integration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django templates have an :class:`~django.template.base.Origin` object available
+through the ``template.origin`` attribute. This enables debug information to be
+displayed in the :ref:`template postmortem <template-postmortem>`, as well as
+in 3rd-party libraries, like the `Django Debug Toolbar`_.
+
+Custom engines can provide their own ``template.origin`` information by
+creating an object that specifies the following attributes:
+
+* ``'name'``: The full path to the template.
+
+* ``'template_name'``: The relative path to the template as passed into the
+  the template loading methods.
+
+* ``'loader_name'``: An optional string identifying the function or class used
+  to load the template, e.g. ``django.template.loaders.filesystem.Loader``.
 
 .. currentmodule:: django.template
 
@@ -642,3 +790,4 @@ Implementing a custom context processor is as simple as defining a function.
 
 .. _Jinja2: http://jinja.pocoo.org/
 .. _DEP 182: https://github.com/django/deps/blob/master/accepted/0182-multiple-template-engines.rst
+.. _Django Debug Toolbar: https://github.com/django-debug-toolbar/django-debug-toolbar

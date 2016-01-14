@@ -2,11 +2,13 @@
     DJANGO Admin styles
 */
 
+@import url(fonts.css);
+
 body {
     margin: 0;
     padding: 0;
-    font-size: 12px;
-    font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+    font-size: 14px;
+    font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
     color: #333;
     background: #fff;
 }
@@ -14,12 +16,16 @@ body {
 /* LINKS */
 
 a:link, a:visited {
-    color: #5b80b2;
+    color: #447e9b;
     text-decoration: none;
 }
 
-a:hover {
+a:focus, a:hover {
     color: #036;
+}
+
+a:focus {
+    text-decoration: underline;
 }
 
 a img {
@@ -29,6 +35,10 @@ a img {
 a.section:link, a.section:visited {
     color: #fff;
     text-decoration: none;
+}
+
+a.section:focus, a.section:hover {
+    text-decoration: underline;
 }
 
 /* GLOBAL DEFAULTS */
@@ -47,10 +57,10 @@ h1,h2,h3,h4,h5 {
 }
 
 h1 {
-    font-size: 18px;
+    margin: 0 0 20px;
+    font-weight: 300;
+    font-size: 20px;
     color: #666;
-    padding: 0 6px 0 0;
-    margin: 0 0 .2em 0;
 }
 
 h2 {
@@ -89,21 +99,13 @@ ul li {
     padding: 1px 0;
 }
 
-ul.plainlist {
-    margin-left: 0 !important;
-}
-
-ul.plainlist li {
-    list-style-type: none;
-}
-
 li ul {
     margin-bottom: 0;
 }
 
 li, dt, dd {
-    font-size: 11px;
-    line-height: 14px;
+    font-size: 13px;
+    line-height: 20px;
 }
 
 dt {
@@ -123,6 +125,8 @@ form {
 fieldset {
     margin: 0;
     padding: 0;
+    border: none;
+    border-top: 1px solid #eee;
 }
 
 blockquote {
@@ -136,7 +140,7 @@ blockquote {
 code, pre {
     font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
     color: #666;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 pre.literal-block {
@@ -176,19 +180,19 @@ p.tiny {
 }
 
 .mini {
-    font-size: 9px;
+    font-size: 10px;
 }
 
 p.mini {
     margin-top: -3px;
 }
 
-.help, p.help {
-    font-size: 10px !important;
+.help, p.help, form p.help {
+    font-size: 11px;
     color: #999;
 }
 
-img.help-tooltip {
+.help-tooltip {
     cursor: help;
 }
 
@@ -197,12 +201,8 @@ p img, h1 img, h2 img, h3 img, h4 img, td img {
 }
 
 .quiet, a.quiet:link, a.quiet:visited {
-    color: #999 !important;
-    font-weight: normal !important;
-}
-
-.quiet strong {
-    font-weight: bold !important;
+    color: #999;
+    font-weight: normal;
 }
 
 .float-right {
@@ -243,55 +243,37 @@ table {
 }
 
 td, th {
-    font-size: 11px;
-    line-height: 13px;
+    font-size: 13px;
+    line-height: 16px;
     border-bottom: 1px solid #eee;
     vertical-align: top;
-    padding: 5px;
-    font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+    padding: 8px;
+    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
 }
 
 th {
+    font-weight: 600;
     text-align: left;
-    font-size: 12px;
-    font-weight: bold;
 }
 
 thead th,
 tfoot td {
     color: #666;
-    padding: 2px 5px;
+    padding: 5px 10px;
     font-size: 11px;
-    background: #e1e1e1 url(../img/nav-bg.gif) top left repeat-x;
-    border-left: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
+    background: #fff;
+    border: none;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
 }
 
 tfoot td {
     border-bottom: none;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #eee;
 }
 
-thead th:first-child,
-tfoot td:first-child {
-    border-left: none !important;
-}
-
-thead th.optional {
-    font-weight: normal !important;
-}
-
-fieldset table {
-    border-right: 1px solid #eee;
-}
-
-tr.row-label td {
-    font-size: 9px;
-    padding-top: 2px;
-    padding-bottom: 0;
-    border-bottom: none;
-    color: #666;
-    margin-top: -1px;
+thead th.required {
+    color: #000;
 }
 
 tr.alt {
@@ -299,18 +281,20 @@ tr.alt {
 }
 
 .row1 {
-    background: #EDF3FE;
+    background: #fff;
 }
 
 .row2 {
-    background: #fff;
+    background: #f9f9f9;
 }
 
 /* SORTABLE TABLES */
 
 thead th {
-    padding: 2px 5px;
+    padding: 5px 10px;
     line-height: normal;
+    text-transform: uppercase;
+    background: #f6f6f6;
 }
 
 thead th a:link, thead th a:visited {
@@ -318,7 +302,7 @@ thead th a:link, thead th a:visited {
 }
 
 thead th.sorted {
-    background: #c5c5c5 url(../img/nav-bg-selected.gif) top left repeat-x;
+    background: #eee;
 }
 
 thead th.sorted .text {
@@ -326,18 +310,18 @@ thead th.sorted .text {
 }
 
 table thead th .text span {
-    padding: 2px 5px;
-    display:block;
+    padding: 8px 10px;
+    display: block;
 }
 
 table thead th .text a {
     display: block;
     cursor: pointer;
-    padding: 2px 5px;
+    padding: 8px 10px;
 }
 
-table thead th.sortable:hover {
-    background: #fff url(../img/nav-bg-reverse.gif) 0 -5px repeat-x;
+table thead th .text a:focus, table thead th .text a:hover {
+    background: #eee;
 }
 
 thead th.sorted a.sortremove {
@@ -350,7 +334,7 @@ table thead th.sorted:hover a.sortremove {
 
 table thead th.sorted .sortoptions {
     display: block;
-    padding: 4px 5px 0 5px;
+    padding: 9px 5px 0 5px;
     float: right;
     text-align: right;
 }
@@ -359,53 +343,61 @@ table thead th.sorted .sortpriority {
     font-size: .8em;
     min-width: 12px;
     text-align: center;
-    vertical-align: top;
+    vertical-align: 3px;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 table thead th.sorted .sortoptions a {
+    position: relative;
     width: 14px;
-    height: 12px;
+    height: 14px;
     display: inline-block;
+    background: url(../img/sorting-icons.svg) 0 0 no-repeat;
+    background-size: 14px auto;
 }
 
 table thead th.sorted .sortoptions a.sortremove {
-    background: url(../img/sorting-icons.gif) -4px -5px no-repeat;
+    background-position: 0 0;
 }
 
+table thead th.sorted .sortoptions a.sortremove:after {
+    content: '\\';
+    position: absolute;
+    top: -6px;
+    left: 3px;
+    font-weight: 200;
+    font-size: 18px;
+    color: #999;
+}
+
+table thead th.sorted .sortoptions a.sortremove:focus:after,
+table thead th.sorted .sortoptions a.sortremove:hover:after {
+    color: #447e9b;
+}
+
+table thead th.sorted .sortoptions a.sortremove:focus,
 table thead th.sorted .sortoptions a.sortremove:hover {
-    background: url(../img/sorting-icons.gif) -4px -27px no-repeat;
+    background-position: 0 -14px;
 }
 
 table thead th.sorted .sortoptions a.ascending {
-    background: url(../img/sorting-icons.gif) -5px -50px no-repeat;
+    background-position: 0 -28px;
 }
 
+table thead th.sorted .sortoptions a.ascending:focus,
 table thead th.sorted .sortoptions a.ascending:hover {
-    background: url(../img/sorting-icons.gif) -5px -72px no-repeat;
+    background-position: 0 -42px;
 }
 
 table thead th.sorted .sortoptions a.descending {
-    background: url(../img/sorting-icons.gif) -5px -94px no-repeat;
+    top: 1px;
+    background-position: 0 -56px;
 }
 
+table thead th.sorted .sortoptions a.descending:focus,
 table thead th.sorted .sortoptions a.descending:hover {
-    background: url(../img/sorting-icons.gif) -5px -115px no-repeat;
-}
-
-/* ORDERABLE TABLES */
-
-table.orderable tbody tr td:hover {
-    cursor: move;
-}
-
-table.orderable tbody tr td:first-child {
-    padding-left: 14px;
-    background-image: url(../img/nav-bg-grabber.gif);
-    background-repeat: repeat-y;
-}
-
-table.orderable-initalized .order-cell, body>tr>td.order-cell {
-    display: none;
+    background-position: 0 -70px;
 }
 
 /* FORM DEFAULTS */
@@ -414,61 +406,78 @@ input, textarea, select, .form-row p, form .button {
     margin: 2px 0;
     padding: 2px 3px;
     vertical-align: middle;
-    font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
     font-weight: normal;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 textarea {
-    vertical-align: top !important;
+    vertical-align: top;
 }
 
-input[type=text], input[type=password], input[type=email], input[type=url], input[type=number],
-textarea, select, .vTextField {
+input[type=text], input[type=password], input[type=email], input[type=url],
+input[type=number], textarea, select, .vTextField {
     border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 6px;
+    margin-top: 0;
+}
+
+input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
+input[type=url]:focus, input[type=number]:focus, textarea:focus, select:focus,
+.vTextField:focus {
+    border-color: #999;
+}
+
+select {
+    height: 30px;
+}
+
+select[multiple] {
+    min-height: 150px;
 }
 
 /* FORM BUTTONS */
 
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
-    background: #fff url(../img/nav-bg.gif) bottom repeat-x;
-    padding: 3px 5px;
-    color: black;
-    border: 1px solid #bbb;
-    border-color: #ddd #aaa #aaa #ddd;
+    background: #79aec8;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
 }
 
 a.button {
     padding: 4px 5px;
 }
 
-.button:active, input[type=submit]:active, input[type=button]:active {
-    background-image: url(../img/nav-bg-reverse.gif);
-    background-position: top;
+.button:active, input[type=submit]:active, input[type=button]:active,
+.button:focus, input[type=submit]:focus, input[type=button]:focus,
+.button:hover, input[type=submit]:hover, input[type=button]:hover {
+    background: #609ab6;
 }
 
 .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
-    background-image: url(../img/nav-bg.gif);
-    background-position: bottom;
     opacity: 0.4;
 }
 
 .button.default, input[type=submit].default, .submit-row input.default {
-    border: 2px solid #5b80b2;
-    background: #7CA0C7 url(../img/default-bg.gif) bottom repeat-x;
-    font-weight: bold;
-    color: #fff;
     float: right;
+    border: none;
+    font-weight: 400;
+    background: #417690;
 }
 
-.button.default:active, input[type=submit].default:active {
-    background-image: url(../img/default-bg-reverse.gif);
-    background-position: top;
+.button.default:active, input[type=submit].default:active,
+.button.default:focus, input[type=submit].default:focus,
+.button.default:hover, input[type=submit].default:hover {
+    background: #205067;
 }
 
-.button[disabled].default, input[type=submit][disabled].default, input[type=button][disabled].default {
-    background-image: url(../img/default-bg.gif);
-    background-position: bottom;
+.button[disabled].default,
+input[type=submit][disabled].default,
+input[type=button][disabled].default {
     opacity: 0.4;
 }
 
@@ -476,8 +485,8 @@ a.button {
 /* MODULES */
 
 .module {
-    border: 1px solid #ccc;
-    margin-bottom: 5px;
+    border: none;
+    margin-bottom: 30px;
     background: #fff;
 }
 
@@ -500,12 +509,19 @@ a.button {
 
 .module h2, .module caption, .inline-group h2 {
     margin: 0;
-    padding: 2px 5px 3px 5px;
-    font-size: 11px;
+    padding: 8px;
+    font-weight: 400;
+    font-size: 13px;
     text-align: left;
-    font-weight: bold;
-    background: #7CA0C7 url(../img/default-bg.gif) top left repeat-x;
+    background: #79aec8;
     color: #fff;
+}
+
+.module caption,
+.inline-group h2 {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .module table {
@@ -520,51 +536,50 @@ ul.messagelist {
 }
 
 ul.messagelist li {
-    font-size: 12px;
-    font-weight: bold;
     display: block;
-    padding: 5px 5px 4px 25px;
-    margin: 0 0 3px 0;
-    border-bottom: 1px solid #ddd;
-    color: #666;
-    background: #dfd url(../img/icon_success.gif) 5px .3em no-repeat;
+    font-weight: 400;
+    font-size: 13px;
+    padding: 10px 10px 10px 65px;
+    margin: 0 0 10px 0;
+    background: #dfd url(../img/icon-yes.svg) 40px 12px no-repeat;
+    background-size: 16px auto;
+    color: #333;
 }
 
 ul.messagelist li.warning {
-    background: #ffc url(../img/icon_alert.gif) 5px .3em no-repeat;
+    background: #ffc url(../img/icon-alert.svg) 40px 14px no-repeat;
+    background-size: 14px auto;
 }
 
 ul.messagelist li.error {
-    background: #ffefef url(../img/icon_error.gif) 5px .3em no-repeat;
+    background: #ffefef url(../img/icon-no.svg) 40px 12px no-repeat;
+    background-size: 16px auto;
 }
 
 .errornote {
-    font-size: 12px !important;
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 700;
     display: block;
-    padding: 5px 5px 4px 25px;
-    margin: 0 0 3px 0;
-    border: 1px solid #c22;
-    color: #c11;
-    background: #ffefef url(../img/icon_error.gif) 5px .38em no-repeat;
-}
-
-.errornote, ul.errorlist {
-    border-radius: 1px;
+    padding: 10px 12px;
+    margin: 0 0 10px 0;
+    color: #ba2121;
+    border: 1px solid #ba2121;
+    border-radius: 4px;
+    background-color: #fff;
+    background-position: 5px 12px;
 }
 
 ul.errorlist {
-    margin: 0 0 4px !important;
-    padding: 0 !important;
-    color: #fff;
-    background: #c11;
+    margin: 0 0 4px;
+    padding: 0;
+    color: #ba2121;
+    background: #fff;
 }
 
 ul.errorlist li {
-    font-size: 12px !important;
+    font-size: 13px;
     display: block;
-    padding: 5px 5px 4px 7px;
-    margin: 3px 0 0 0;
+    margin-bottom: 4px;
 }
 
 ul.errorlist li:first-child {
@@ -572,30 +587,32 @@ ul.errorlist li:first-child {
 }
 
 ul.errorlist li a {
-    color: #fff;
+    color: inherit;
     text-decoration: underline;
 }
 
 td ul.errorlist {
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0;
+    padding: 0;
 }
 
 td ul.errorlist li {
-    margin: 0 !important;
-}
-
-.errors, .form-row.errors {
-    background: #ffefef;
+    margin: 0;
 }
 
 .form-row.errors {
-    border: 1px solid #c22;
-    margin: -1px;
+    margin: 0;
+    border: none;
+    border-bottom: 1px solid #eee;
+    background: none;
+}
+
+.form-row.errors ul.errorlist li {
+    padding-left: 0;
 }
 
 .errors input, .errors select, .errors textarea {
-    border: 1px solid #c11;
+    border: 1px solid #ba2121;
 }
 
 div.system-message {
@@ -609,7 +626,7 @@ div.system-message p.system-message-title {
     padding: 4px 5px 4px 25px;
     margin: 0;
     color: #c11;
-    background: #ffefef url(../img/icon_error.gif) 5px .3em no-repeat;
+    background: #ffefef url(../img/icon-no.svg) 5px 5px no-repeat;
 }
 
 .description {
@@ -620,38 +637,46 @@ div.system-message p.system-message-title {
 /* BREADCRUMBS */
 
 div.breadcrumbs {
-    background: #fff url(../img/nav-bg-reverse.gif) 0 -10px repeat-x;
-    padding: 2px 8px 3px 8px;
-    font-size: 11px;
-    color: #999;
-    border-top: 1px solid #fff;
-    border-bottom: 1px solid #ddd;
+    background: #79aec8;
+    padding: 10px 40px;
+    border: none;
+    font-size: 14px;
+    color: #c4dce8;
     text-align: left;
+}
+
+div.breadcrumbs a {
+    color: #fff;
+}
+
+div.breadcrumbs a:focus, div.breadcrumbs a:hover {
+    color: #c4dce8;
 }
 
 /* ACTION ICONS */
 
 .addlink {
-    padding-left: 12px;
-    background: url(../img/icon_addlink.gif) 0 .2em no-repeat;
+    padding-left: 16px;
+    background: url(../img/icon-addlink.svg) 0 1px no-repeat;
 }
 
 .changelink, .inlinechangelink {
-    padding-left: 12px;
-    background: url(../img/icon_changelink.gif) 0 .2em no-repeat;
+    padding-left: 16px;
+    background: url(../img/icon-changelink.svg) 0 1px no-repeat;
 }
 
 .deletelink {
-    padding-left: 12px;
-    background: url(../img/icon_deletelink.gif) 0 .25em no-repeat;
+    padding-left: 16px;
+    background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
 }
 
 a.deletelink:link, a.deletelink:visited {
     color: #CC3434;
 }
 
-a.deletelink:hover {
+a.deletelink:focus, a.deletelink:hover {
     color: #993333;
+    text-decoration: none;
 }
 
 /* OBJECT TOOLS */
@@ -659,12 +684,10 @@ a.deletelink:hover {
 .object-tools {
     font-size: 10px;
     font-weight: bold;
-    font-family: Arial,Helvetica,sans-serif;
     padding-left: 0;
     float: right;
     position: relative;
-    margin-top: -2.4em;
-    margin-bottom: -2em;
+    margin-top: -48px;
 }
 
 .form-row .object-tools {
@@ -689,23 +712,35 @@ a.deletelink:hover {
 .object-tools a:link, .object-tools a:visited {
     display: block;
     float: left;
-    color: #fff;
-    padding: .2em 10px;
+    padding: 3px 12px;
     background: #999;
+    font-weight: 400;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #fff;
 }
 
-.object-tools a:hover, .object-tools li:hover a {
-    background-color: #5b80b2;
+.object-tools a:focus, .object-tools a:hover {
+    background-color: #417690;
+}
+
+.object-tools a:focus{
+    text-decoration: none;
+}
+
+.object-tools a.viewsitelink, .object-tools a.golink,.object-tools a.addlink {
+    background-repeat: no-repeat;
+    background-position: 93% center;
+    padding-right: 26px;
 }
 
 .object-tools a.viewsitelink, .object-tools a.golink {
-    background: #999 url(../img/tooltag-arrowright.png) 95% center no-repeat;
-    padding-right: 26px;
+    background-image: url(../img/tooltag-arrowright.svg);
 }
 
 .object-tools a.addlink {
-    background: #999 url(../img/tooltag-add.png) 95% center no-repeat;
-    padding-right: 26px;
+    background-image: url(../img/tooltag-add.svg);
 }
 
 /* OBJECT HISTORY */
@@ -723,12 +758,16 @@ table#change-history tbody th {
 #container {
     position: relative;
     width: 100%;
-    min-width: 760px;
+    min-width: 980px;
     padding: 0;
 }
 
 #content {
-    margin: 10px 15px;
+    padding: 20px 40px;
+}
+
+.dashboard #content {
+    width: 600px;
 }
 
 #content-main {
@@ -738,9 +777,9 @@ table#change-history tbody th {
 
 #content-related {
     float: right;
-    width: 18em;
+    width: 260px;
     position: relative;
-    margin-right: -19em;
+    margin-right: -300px;
 }
 
 #footer {
@@ -751,17 +790,17 @@ table#change-history tbody th {
 /* COLUMN TYPES */
 
 .colMS {
-    margin-right: 20em !important;
+    margin-right: 300px;
 }
 
 .colSM {
-    margin-left: 20em !important;
+    margin-left: 300px;
 }
 
 .colSM #content-related {
     float: left;
     margin-right: 0;
-    margin-left: -19em;
+    margin-left: -300px;
 }
 
 .colSM #content-main {
@@ -769,24 +808,17 @@ table#change-history tbody th {
 }
 
 .popup .colM {
-    width: 95%;
-}
-
-.subcol {
-    float: left;
-    width: 46%;
-    margin-right: 15px;
-}
-
-.dashboard #content {
-    width: 500px;
+    width: auto;
 }
 
 /* HEADER */
 
 #header {
-    width: 100%;
+    width: auto;
+    height: 40px;
+    padding: 10px 40px;
     background: #417690;
+    line-height: 40px;
     color: #ffc;
     overflow: hidden;
 }
@@ -795,22 +827,24 @@ table#change-history tbody th {
     color: #fff;
 }
 
-#header a:hover {
+#header a:focus , #header a:hover {
     text-decoration: underline;
 }
 
 #branding {
     float: left;
 }
+
 #branding h1 {
-    padding: 0 10px;
-    font-size: 18px;
-    margin: 8px 0;
-    font-weight: normal;
+    padding: 0;
+    margin: 0 20px 0 0;
+    font-weight: 300;
+    font-size: 24px;
+    color: #f5dd5d;
 }
 
 #branding h1, #branding h1 a:link, #branding h1 a:visited {
-    color: #f4f379;
+    color: #f5dd5d;
 }
 
 #branding h2 {
@@ -827,24 +861,111 @@ table#change-history tbody th {
 
 #user-tools {
     float: right;
-    padding: 1.2em 10px;
+    padding: 0;
+    margin: 0 0 0 20px;
+    font-weight: 300;
     font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
     text-align: right;
+}
+
+#user-tools a {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+#user-tools a:focus, #user-tools a:hover {
+    text-decoration: none;
+    border-bottom-color: #79aec8;
+    color: #79aec8;
 }
 
 /* SIDEBAR */
 
+#content-related {
+    background: #f8f8f8;
+}
+
+#content-related .module {
+    background: none;
+}
+
 #content-related h3 {
-    font-size: 12px;
+    font-size: 14px;
     color: #666;
-    margin-bottom: 3px;
+    padding: 0 16px;
+    margin: 0 0 16px;
 }
 
 #content-related h4 {
-    font-size: 11px;
+    font-size: 13px;
+}
+
+#content-related p {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+#content-related .actionlist {
+    padding: 0;
+    margin: 16px;
+}
+
+#content-related .actionlist li {
+    line-height: 1.2;
+    margin-bottom: 10px;
+    padding-left: 18px;
 }
 
 #content-related .module h2 {
-    background: #eee url(../img/nav-bg.gif) bottom left repeat-x;
-    color: #666;
+    background: none;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #eaeaea;
+    font-size: 18px;
+    color: #333;
+}
+
+.delete-confirmation form input[type="submit"] {
+    background: #ba2121;
+    border-radius: 4px;
+    padding: 10px 15px;
+    color: #fff;
+}
+
+.delete-confirmation form input[type="submit"]:active,
+.delete-confirmation form input[type="submit"]:focus,
+.delete-confirmation form input[type="submit"]:hover {
+    background: #a41515;
+}
+
+.delete-confirmation form .cancel-link {
+    display: inline-block;
+    vertical-align: middle;
+    height: 15px;
+    line-height: 15px;
+    background: #ddd;
+    border-radius: 4px;
+    padding: 10px 15px;
+    color: #333;
+    margin: 0 0 0 10px;
+}
+
+.delete-confirmation form .cancel-link:active,
+.delete-confirmation form .cancel-link:focus,
+.delete-confirmation form .cancel-link:hover {
+    background: #ccc;
+}
+
+/* POPUP */
+.popup #content {
+    padding: 20px;
+}
+
+.popup #container {
+    min-width: 0;
+}
+
+.popup #header {
+    padding: 10px 20px;
 }

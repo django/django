@@ -1,15 +1,16 @@
 from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.base import numpy
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.geometry import GEOSGeometry
+from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
 from django.contrib.gis.geos.point import Point
+from django.contrib.gis.shortcuts import numpy
 from django.utils.six.moves import range
 
 
-class LineString(GEOSGeometry):
+class LineString(LinearGeometryMixin, GEOSGeometry):
     _init_func = capi.create_linestring
     _minlength = 2
+    has_cs = True
 
     def __init__(self, *args, **kwargs):
         """
@@ -29,32 +30,48 @@ class LineString(GEOSGeometry):
         else:
             coords = args
 
+        if not (isinstance(coords, (tuple, list)) or numpy and isinstance(coords, numpy.ndarray)):
+            raise TypeError('Invalid initialization input for LineStrings.')
+
+        # If SRID was passed in with the keyword arguments
+        srid = kwargs.get('srid')
+
+        ncoords = len(coords)
+        if not ncoords:
+            super(LineString, self).__init__(self._init_func(None), srid=srid)
+            return
+
+        if ncoords < self._minlength:
+            raise ValueError(
+                '%s requires at least %d points, got %s.' % (
+                    self.__class__.__name__,
+                    self._minlength,
+                    ncoords,
+                )
+            )
+
         if isinstance(coords, (tuple, list)):
             # Getting the number of coords and the number of dimensions -- which
             #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
-            ncoords = len(coords)
-            if coords:
-                ndim = len(coords[0])
-            else:
-                raise TypeError('Cannot initialize on empty sequence.')
-            self._checkdim(ndim)
+            ndim = None
             # Incrementing through each of the coordinates and verifying
-            for i in range(1, ncoords):
-                if not isinstance(coords[i], (tuple, list, Point)):
-                    raise TypeError('each coordinate should be a sequence (list or tuple)')
-                if len(coords[i]) != ndim:
+            for coord in coords:
+                if not isinstance(coord, (tuple, list, Point)):
+                    raise TypeError('Each coordinate should be a sequence (list or tuple)')
+
+                if ndim is None:
+                    ndim = len(coord)
+                    self._checkdim(ndim)
+                elif len(coord) != ndim:
                     raise TypeError('Dimension mismatch.')
             numpy_coords = False
-        elif numpy and isinstance(coords, numpy.ndarray):
+        else:
             shape = coords.shape  # Using numpy's shape.
             if len(shape) != 2:
                 raise TypeError('Too many dimensions.')
             self._checkdim(shape[1])
-            ncoords = shape[0]
             ndim = shape[1]
             numpy_coords = True
-        else:
-            raise TypeError('Invalid initialization input for LineStrings.')
 
         # Creating a coordinate sequence object because it is easier to
         # set the points using GEOSCoordSeq.__setitem__().
@@ -67,9 +84,6 @@ class LineString(GEOSGeometry):
                 cs[i] = coords[i].tuple
             else:
                 cs[i] = coords[i]
-
-        # If SRID was passed in with the keyword arguments
-        srid = kwargs.get('srid', None)
 
         # Calling the base geometry initialization with the returned pointer
         #  from the function.
@@ -139,11 +153,6 @@ class LineString(GEOSGeometry):
         return self._listarr(self._cs.__getitem__)
 
     @property
-    def merged(self):
-        "Returns the line merge of this LineString."
-        return self._topology(capi.geos_linemerge(self.ptr))
-
-    @property
     def x(self):
         "Returns a list or numpy array of the X variable."
         return self._listarr(self._cs.getX)
@@ -164,5 +173,5 @@ class LineString(GEOSGeometry):
 
 # LinearRings are LineStrings used within Polygons.
 class LinearRing(LineString):
-    _minLength = 4
+    _minlength = 4
     _init_func = capi.create_linearring

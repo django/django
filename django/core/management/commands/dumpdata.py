@@ -68,8 +68,8 @@ class Command(BaseCommand):
             else:
                 try:
                     app_config = apps.get_app_config(exclude)
-                except LookupError:
-                    raise CommandError('Unknown app in excludes: %s' % exclude)
+                except LookupError as e:
+                    raise CommandError(str(e))
                 excluded_apps.add(app_config)
 
         if len(app_labels) == 0:
@@ -87,8 +87,8 @@ class Command(BaseCommand):
                     app_label, model_label = label.split('.')
                     try:
                         app_config = apps.get_app_config(app_label)
-                    except LookupError:
-                        raise CommandError("Unknown application: %s" % app_label)
+                    except LookupError as e:
+                        raise CommandError(str(e))
                     if app_config.models_module is None or app_config in excluded_apps:
                         continue
                     try:
@@ -111,8 +111,8 @@ class Command(BaseCommand):
                     app_label = label
                     try:
                         app_config = apps.get_app_config(app_label)
-                    except LookupError:
-                        raise CommandError("Unknown application: %s" % app_label)
+                    except LookupError as e:
+                        raise CommandError(str(e))
                     if app_config.models_module is None or app_config in excluded_apps:
                         continue
                     app_list[app_config] = None
@@ -127,12 +127,15 @@ class Command(BaseCommand):
 
             raise CommandError("Unknown serialization format: %s" % format)
 
-        def get_objects():
-            # Collate the objects to be serialized.
+        def get_objects(count_only=False):
+            """
+            Collate the objects to be serialized. If count_only is True, just
+            count the number of objects to be serialized.
+            """
             for model in serializers.sort_dependencies(app_list.items()):
                 if model in excluded_models:
                     continue
-                if not model._meta.proxy and router.allow_migrate(using, model):
+                if not model._meta.proxy and router.allow_migrate_model(using, model):
                     if use_base_manager:
                         objects = model._base_manager
                     else:
@@ -141,17 +144,27 @@ class Command(BaseCommand):
                     queryset = objects.using(using).order_by(model._meta.pk.name)
                     if primary_keys:
                         queryset = queryset.filter(pk__in=primary_keys)
-                    for obj in queryset.iterator():
-                        yield obj
+                    if count_only:
+                        yield queryset.order_by().count()
+                    else:
+                        for obj in queryset.iterator():
+                            yield obj
 
         try:
             self.stdout.ending = None
+            progress_output = None
+            object_count = 0
+            # If dumpdata is outputting to stdout, there is no way to display progress
+            if (output and self.stdout.isatty() and options['verbosity'] > 0):
+                progress_output = self.stdout
+                object_count = sum(get_objects(count_only=True))
             stream = open(output, 'w') if output else None
             try:
                 serializers.serialize(format, get_objects(), indent=indent,
                         use_natural_foreign_keys=use_natural_foreign_keys,
                         use_natural_primary_keys=use_natural_primary_keys,
-                        stream=stream or self.stdout)
+                        stream=stream or self.stdout, progress_output=progress_output,
+                        object_count=object_count)
             finally:
                 if stream:
                     stream.close()

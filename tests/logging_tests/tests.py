@@ -6,14 +6,16 @@ import warnings
 
 from admin_scripts.tests import AdminScriptTestCase
 
+from django.conf import settings
 from django.core import mail
 from django.core.files.temp import NamedTemporaryFile
-from django.test import RequestFactory, TestCase, override_settings
-from django.test.utils import patch_logger
+from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.encoding import force_text
 from django.utils.log import (
-    AdminEmailHandler, CallbackFilter, RequireDebugFalse, RequireDebugTrue,
+    DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
+    RequireDebugTrue,
 )
 from django.utils.six import StringIO
 
@@ -39,7 +41,7 @@ OLD_LOGGING = {
 }
 
 
-class LoggingFiltersTest(TestCase):
+class LoggingFiltersTest(SimpleTestCase):
     def test_require_debug_false_filter(self):
         """
         Test the RequireDebugFalse filter class.
@@ -65,29 +67,47 @@ class LoggingFiltersTest(TestCase):
             self.assertEqual(filter_.filter("record is not used"), False)
 
 
-class DefaultLoggingTest(TestCase):
-    def setUp(self):
-        self.logger = logging.getLogger('django')
-        self.old_stream = self.logger.handlers[0].stream
+class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
 
-    def tearDown(self):
-        self.logger.handlers[0].stream = self.old_stream
+    @classmethod
+    def setUpClass(cls):
+        super(DefaultLoggingTest, cls).setUpClass()
+        cls._logging = settings.LOGGING
+        logging.config.dictConfig(DEFAULT_LOGGING)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(DefaultLoggingTest, cls).tearDownClass()
+        logging.config.dictConfig(cls._logging)
 
     def test_django_logger(self):
         """
         The 'django' base logger only output anything when DEBUG=True.
         """
-        output = StringIO()
-        self.logger.handlers[0].stream = output
         self.logger.error("Hey, this is an error.")
-        self.assertEqual(output.getvalue(), '')
+        self.assertEqual(self.logger_output.getvalue(), '')
 
         with self.settings(DEBUG=True):
             self.logger.error("Hey, this is an error.")
-            self.assertEqual(output.getvalue(), 'Hey, this is an error.\n')
+            self.assertEqual(self.logger_output.getvalue(), 'Hey, this is an error.\n')
+
+    def test_django_logger_warning(self):
+        with self.settings(DEBUG=True):
+            self.logger.warning('warning')
+            self.assertEqual(self.logger_output.getvalue(), 'warning\n')
+
+    def test_django_logger_info(self):
+        with self.settings(DEBUG=True):
+            self.logger.info('info')
+            self.assertEqual(self.logger_output.getvalue(), 'info\n')
+
+    def test_django_logger_debug(self):
+        with self.settings(DEBUG=True):
+            self.logger.debug('debug')
+            self.assertEqual(self.logger_output.getvalue(), '')
 
 
-class WarningLoggerTests(TestCase):
+class WarningLoggerTests(SimpleTestCase):
     """
     Tests that warnings output for RemovedInDjangoXXWarning (XX being the next
     Django version) is enabled and captured to the logging system
@@ -145,7 +165,7 @@ class WarningLoggerTests(TestCase):
                 warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
 
 
-class CallbackFilterTest(TestCase):
+class CallbackFilterTest(SimpleTestCase):
     def test_sense(self):
         f_false = CallbackFilter(lambda r: False)
         f_true = CallbackFilter(lambda r: True)
@@ -166,12 +186,11 @@ class CallbackFilterTest(TestCase):
         self.assertEqual(collector, ["a record"])
 
 
-class AdminEmailHandlerTest(TestCase):
-    logger = logging.getLogger('django.request')
+class AdminEmailHandlerTest(SimpleTestCase):
+    logger = logging.getLogger('django')
 
     def get_admin_email_handler(self, logger):
-        # Inspired from views/views.py: send_log()
-        # ensuring the AdminEmailHandler does not get filtered out
+        # Ensure that AdminEmailHandler does not get filtered out
         # even with DEBUG=True.
         admin_email_handler = [
             h for h in logger.handlers
@@ -343,7 +362,7 @@ class AdminEmailHandlerTest(TestCase):
         msg = mail.outbox[0]
         self.assertEqual(msg.to, ['admin@example.com'])
         self.assertEqual(msg.subject, "[Django] ERROR (EXTERNAL IP): message")
-        self.assertIn("path:%s" % url_path, msg.body)
+        self.assertIn("Report at %s" % url_path, msg.body)
 
     @override_settings(
         MANAGERS=[('manager', 'manager@example.com')],
@@ -360,6 +379,25 @@ class AdminEmailHandlerTest(TestCase):
         handler.emit(record)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ['manager@example.com'])
+
+    @override_settings(ALLOWED_HOSTS='example.com')
+    def test_disallowed_host_doesnt_crash(self):
+        admin_email_handler = self.get_admin_email_handler(self.logger)
+        old_include_html = admin_email_handler.include_html
+
+        # Text email
+        admin_email_handler.include_html = False
+        try:
+            self.client.get('/', HTTP_HOST='evil.com')
+        finally:
+            admin_email_handler.include_html = old_include_html
+
+        # HTML email
+        admin_email_handler.include_html = True
+        try:
+            self.client.get('/', HTTP_HOST='evil.com')
+        finally:
+            admin_email_handler.include_html = old_include_html
 
 
 class SettingsConfigTest(AdminScriptTestCase):
@@ -394,7 +432,7 @@ def dictConfig(config):
 dictConfig.called = False
 
 
-class SetupConfigureLogging(TestCase):
+class SetupConfigureLogging(SimpleTestCase):
     """
     Test that calling django.setup() initializes the logging configuration.
     """
@@ -407,7 +445,7 @@ class SetupConfigureLogging(TestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF='logging_tests.urls')
-class SecurityLoggerTest(TestCase):
+class SecurityLoggerTest(SimpleTestCase):
 
     def test_suspicious_operation_creates_log_message(self):
         with patch_logger('django.security.SuspiciousOperation', 'error') as calls:
@@ -428,7 +466,7 @@ class SecurityLoggerTest(TestCase):
     def test_suspicious_email_admins(self):
         self.client.get('/suspicious/')
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('path:/suspicious/,', mail.outbox[0].body)
+        self.assertIn('Report at /suspicious/', mail.outbox[0].body)
 
 
 class SettingsCustomLoggingTest(AdminScriptTestCase):

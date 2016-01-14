@@ -2,12 +2,72 @@
 System check framework
 ======================
 
+.. currentmodule:: django.core.checks
+
 The system check framework is a set of static checks for validating Django
 projects. It detects common problems and provides hints for how to fix them.
 The framework is extensible so you can easily add your own checks.
 
 For details on how to add your own checks and integrate them with Django's
 system checks, see the :doc:`System check topic guide </topics/checks>`.
+
+API Reference
+=============
+
+``CheckMessage``
+-----------------
+
+.. class:: CheckMessage(level, msg, hint, obj=None, id=None)
+
+The warnings and errors raised by system checks must be instances of
+``CheckMessage``. An instance encapsulates a single reportable error or
+warning. It also provides context and hints applicable to the message, and a
+unique identifier that is used for filtering purposes.
+
+Constructor arguments are:
+
+``level``
+    The severity of the message. Use one of the predefined values: ``DEBUG``,
+    ``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. If the level is greater or
+    equal to ``ERROR``, then Django will prevent management commands from
+    executing. Messages with level lower than ``ERROR`` (i.e. warnings) are
+    reported to the console, but can be silenced.
+
+``msg``
+    A short (less than 80 characters) string describing the problem. The string
+    should *not* contain newlines.
+
+``hint``
+    A single-line string providing a hint for fixing the problem. If no hint
+    can be provided, or the hint is self-evident from the error message, the
+    hint can be omitted, or a value of ``None`` can be used.
+
+``obj``
+    Optional. An object providing context for the message (for example, the
+    model where the problem was discovered). The object should be a model,
+    field, or manager or any other object that defines ``__str__`` method (on
+    Python 2 you need to define ``__unicode__`` method). The method is used
+    while reporting all messages and its result precedes the message.
+
+``id``
+    Optional string. A unique identifier for the issue. Identifiers should
+    follow the pattern ``applabel.X001``, where ``X`` is one of the letters
+    ``CEWID``, indicating the message severity (``C`` for criticals, ``E`` for
+    errors and so). The number can be allocated by the application, but should
+    be unique within that application.
+
+There are subclasses to make creating messages with common levels easier. When
+using them you can omit the ``level`` argument because it is implied by the
+class name.
+
+.. class:: Debug(msg, hint, obj=None, id=None)
+.. class:: Info(msg, hint, obj=None, id=None)
+.. class:: Warning(msg, hint, obj=None, id=None)
+.. class:: Error(msg, hint, obj=None, id=None)
+.. class:: Critical(msg, hint, obj=None, id=None)
+
+Builtin checks
+==============
 
 Builtin tags
 ------------
@@ -19,6 +79,9 @@ Django's system checks are organized using the following tags:
 * ``admin``: Checks of any admin site declarations.
 * ``compatibility``: Flagging potential problems with version upgrades.
 * ``security``: Checks security related configuration.
+* ``templates``: Checks template related configuration.
+* ``caches``: Checks cache related configuration.
+* ``urls``: Checks URL configuration.
 
 Some checks may be registered with multiple tags.
 
@@ -63,6 +126,8 @@ Models
   ``<M2M field>``. Maximum length is ``<maximum length>`` for database
   ``<alias>``.
 * **models.E020**: The ``<model>.check()`` class method is currently overridden.
+* **models.E021**: ``ordering`` and ``order_with_respect_to`` cannot be used
+  together.
 
 Fields
 ~~~~~~
@@ -123,8 +188,9 @@ Related Fields
   for ``<field name>``.
 * **fields.E306**: Related name must be a valid Python identifier or end with
   a ``'+'``.
-* **fields.E310**: None of the fields ``<field1>``, ``<field2>``, ... on model
-  ``<model>`` have a ``unique=True`` constraint.
+* **fields.E310**: No subset of the fields ``<field1>``, ``<field2>``, ... on
+  model ``<model>`` is unique. Add ``unique=True`` on any of those fields or
+  add at least a subset of them to a unique_together constraint.
 * **fields.E311**: ``<model>`` must set ``unique=True`` because it is
   referenced by a ``ForeignKey``.
 * **fields.E320**: Field specifies ``on_delete=SET_NULL``, but cannot be null.
@@ -182,7 +248,12 @@ that might occur as a result of a version upgrade.
   ``django.contrib.auth.middleware.AuthenticationMiddleware``, and
   ``django.contrib.messages.middleware.MessageMiddleware`` were removed from
   the defaults. If your project needs these middleware then you should
-  configure this setting.
+  configure this setting. *This check was removed in Django 1.9*.
+* **1_8.W001**: The standalone ``TEMPLATE_*`` settings were deprecated in
+  Django 1.8 and the :setting:`TEMPLATES` dictionary takes precedence. You must
+  put the values of the following settings into your defaults ``TEMPLATES``
+  dict: ``TEMPLATE_DIRS``, ``TEMPLATE_CONTEXT_PROCESSORS``, ``TEMPLATE_DEBUG``,
+  ``TEMPLATE_LOADERS``, ``TEMPLATE_STRING_IF_INVALID``.
 
 Admin
 -----
@@ -467,6 +538,7 @@ of the :djadmin:`check` command:
   ``'DENY'``. The default is ``'SAMEORIGIN'``, but unless there is a good reason
   for your site to serve other parts of itself in a frame, you should change
   it to ``'DENY'``.
+* **security.W020**: :setting:`ALLOWED_HOSTS` must not be empty in deployment.
 
 Sites
 -----
@@ -489,3 +561,37 @@ If you're using MySQL, the following checks will be performed:
 
 * **mysql.E001**: MySQL does not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+
+Templates
+---------
+
+The following checks verify that your :setting:`TEMPLATES` setting is correctly
+configured:
+
+* **templates.E001**: You have ``'APP_DIRS': True`` in your
+  :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
+  remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+
+Caches
+------
+
+The following checks verify that your :setting:`CACHES` setting is correctly
+configured:
+
+* **caches.E001**: You must define a ``'default'`` cache in your
+  :setting:`CACHES` setting.
+
+URLs
+----
+
+The following checks are performed on your URL configuration:
+
+* **urls.W001**: Your URL pattern ``<pattern>`` uses
+  :func:`~django.conf.urls.include` with a ``regex`` ending with a
+  ``$``. Remove the dollar from the ``regex`` to avoid problems
+  including URLs.
+* **urls.W002**: Your URL pattern ``<pattern>`` has a ``regex``
+  beginning with a ``/``. Remove this slash as it is unnecessary.
+* **urls.W003**: Your URL pattern ``<pattern>`` has a ``name``
+  including a ``:``. Remove the colon, to avoid ambiguous namespace
+  references.

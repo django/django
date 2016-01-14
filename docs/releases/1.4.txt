@@ -150,7 +150,7 @@ actual project.
 
 If settings, URLconfs and apps within the project are imported or referenced
 using the project name prefix (e.g. ``myproject.settings``, ``ROOT_URLCONF =
-"myproject.urls"``, etc), the new ``manage.py`` will need to be moved one
+"myproject.urls"``, etc.), the new ``manage.py`` will need to be moved one
 directory up, so it is outside the project package rather than adjacent to
 ``settings.py`` and ``urls.py``.
 
@@ -273,10 +273,10 @@ uses the PBKDF2_ algorithm (as recommended by NIST_). You can also easily choose
 a different algorithm (including the popular bcrypt_ algorithm). For more
 details, see :ref:`auth_password_storage`.
 
-.. _sha1: http://en.wikipedia.org/wiki/SHA1
-.. _pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
+.. _sha1: https://en.wikipedia.org/wiki/SHA1
+.. _pbkdf2: https://en.wikipedia.org/wiki/PBKDF2
 .. _nist: http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf
-.. _bcrypt: http://en.wikipedia.org/wiki/Bcrypt
+.. _bcrypt: https://en.wikipedia.org/wiki/Bcrypt
 
 HTML5 doctype
 ~~~~~~~~~~~~~
@@ -371,8 +371,8 @@ Django 1.4 to store the wizard's state in the user's cookies.
 ``reverse_lazy``
 ~~~~~~~~~~~~~~~~
 
-A lazily evaluated version of :func:`django.core.urlresolvers.reverse` was
-added to allow using URL reversals before the project's URLconf gets loaded.
+A lazily evaluated version of ``reverse()`` was added to allow using URL
+reversals before the project's URLconf gets loaded.
 
 Translating URL patterns
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -406,19 +406,17 @@ object generic views.
 Assignment template tags
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-A new :ref:`assignment_tag<howto-custom-template-tags-assignment-tags>` helper
-function was added to ``template.Library`` to ease the creation of template
-tags that store data in a specified context variable.
+A new ``assignment_tag`` helper function was added to ``template.Library`` to
+ease the creation of template tags that store data in a specified context
+variable.
 
 ``*args`` and ``**kwargs`` support for template tag helper functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :ref:`simple_tag<howto-custom-template-tags-simple-tags>`,
-:ref:`inclusion_tag <howto-custom-template-tags-inclusion-tags>` and
-newly introduced
-:ref:`assignment_tag<howto-custom-template-tags-assignment-tags>` template
-helper functions may now accept any number of positional or keyword arguments.
-For example::
+:ref:`inclusion_tag <howto-custom-template-tags-inclusion-tags>` and newly
+introduced ``assignment_tag`` template helper functions may now accept any
+number of positional or keyword arguments. For example::
 
     @register.simple_tag
     def my_tag(a, b, *args, **kwargs):
@@ -437,7 +435,7 @@ For example:
 No wrapping of exceptions in ``TEMPLATE_DEBUG`` mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In previous versions of Django, whenever the :setting:`TEMPLATE_DEBUG` setting
+In previous versions of Django, whenever the ``TEMPLATE_DEBUG`` setting
 was ``True``, any exception raised during template rendering (even exceptions
 unrelated to template syntax) were wrapped in ``TemplateSyntaxError`` and
 re-raised. This was done in order to provide detailed template source location
@@ -446,7 +444,7 @@ information in the debug 500 page.
 In Django 1.4, exceptions are no longer wrapped. Instead, the original
 exception is annotated with the source information. This means that catching
 exceptions from template rendering is now consistent regardless of the value of
-:setting:`TEMPLATE_DEBUG`, and there's no need to catch and unwrap
+``TEMPLATE_DEBUG``, and there's no need to catch and unwrap
 ``TemplateSyntaxError`` in order to catch other errors.
 
 ``truncatechars`` template filter
@@ -461,10 +459,10 @@ more details.
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The :mod:`staticfiles<django.contrib.staticfiles>` contrib app has a new
-:ttag:`static<staticfiles-static>` template tag to refer to files saved with
-the :setting:`STATICFILES_STORAGE` storage backend. It uses the storage
-backend's ``url`` method and therefore supports advanced features such as
-:ref:`serving files from a cloud service<staticfiles-from-cdn>`.
+``static`` template tag to refer to files saved with the
+:setting:`STATICFILES_STORAGE` storage backend. It uses the storage backend's
+``url`` method and therefore supports advanced features such as :ref:`serving
+files from a cloud service<staticfiles-from-cdn>`.
 
 ``CachedStaticFilesStorage`` storage backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -483,7 +481,7 @@ Simple clickjacking protection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We've added a middleware to provide easy protection against `clickjacking
-<http://en.wikipedia.org/wiki/Clickjacking>`_ using the ``X-Frame-Options``
+<https://en.wikipedia.org/wiki/Clickjacking>`_ using the ``X-Frame-Options``
 header. It's not enabled by default for backwards compatibility reasons, but
 you'll almost certainly want to :doc:`enable it </ref/clickjacking/>` to help
 plug that security hole for browsers that support the header.
@@ -1233,7 +1231,7 @@ disable this backward-compatibility shim and deprecation warning.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Until Django 1.3, the functions :func:`~django.conf.urls.include`,
-:func:`~django.conf.urls.patterns` and :func:`~django.conf.urls.url` plus
+``patterns()`` and :func:`~django.conf.urls.url` plus
 :data:`~django.conf.urls.handler404`, :data:`~django.conf.urls.handler500`
 were located in a ``django.conf.urls.defaults`` module.
 

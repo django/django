@@ -1,9 +1,10 @@
 """
-A subset of the tests in tests/servers/tests exercicing
+A subset of the tests in tests/servers/tests exercising
 django.contrib.staticfiles.testing.StaticLiveServerTestCase instead of
 django.test.LiveServerTestCase.
 """
 
+import contextlib
 import os
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -94,5 +95,5 @@ class StaticLiveServerView(LiveServerBase):
         Test that StaticLiveServerTestCase use of staticfiles' serve() allows it
         to discover app's static assets without having to collectstatic first.
         """
-        f = self.urlopen('/static/test/file.txt')
-        self.assertEqual(f.read().rstrip(b'\r\n'), b'In app media directory.')
+        with contextlib.closing(self.urlopen('/static/test/file.txt')) as f:
+            self.assertEqual(f.read().rstrip(b'\r\n'), b'In static directory.')

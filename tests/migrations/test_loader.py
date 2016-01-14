@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 from unittest import skipIf
 
 from django.db import connection, connections
-from django.db.migrations.graph import NodeNotFoundError
-from django.db.migrations.loader import AmbiguityError, MigrationLoader
+from django.db.migrations.exceptions import AmbiguityError, NodeNotFoundError
+from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, modify_settings, override_settings
 from django.utils import six
@@ -164,12 +164,43 @@ class LoaderTests(TestCase):
 
     def test_load_module_file(self):
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.file"}):
-            MigrationLoader(connection)
+            loader = MigrationLoader(connection)
+            self.assertIn(
+                "migrations", loader.unmigrated_apps,
+                "App with migrations module file not in unmigrated apps."
+            )
 
     @skipIf(six.PY2, "PY2 doesn't load empty dirs.")
     def test_load_empty_dir(self):
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.namespace"}):
-            MigrationLoader(connection)
+            loader = MigrationLoader(connection)
+            self.assertIn(
+                "migrations", loader.unmigrated_apps,
+                "App missing __init__.py in migrations module not in unmigrated apps."
+            )
+
+    @override_settings(
+        INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+    )
+    def test_marked_as_migrated(self):
+        """
+        Undefined MIGRATION_MODULES implies default migration module.
+        """
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(migration_loader.migrated_apps, {'migrated_app'})
+        self.assertEqual(migration_loader.unmigrated_apps, set())
+
+    @override_settings(
+        INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+        MIGRATION_MODULES={"migrated_app": None},
+    )
+    def test_marked_as_unmigrated(self):
+        """
+        MIGRATION_MODULES allows disabling of migrations for a particular app.
+        """
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(migration_loader.migrated_apps, set())
+        self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_loading_squashed(self):
@@ -251,12 +282,37 @@ class LoaderTests(TestCase):
         loader.build_graph()
 
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
-        expected_plan = set([
+        expected_plan = {
             ('app1', '4_auto'),
             ('app1', '2_squashed_3'),
             ('app2', '1_squashed_2'),
             ('app1', '1_auto')
-        ])
+        }
+        self.assertEqual(plan, expected_plan)
+
+    @override_settings(MIGRATION_MODULES={
+        "app1": "migrations.test_migrations_squashed_complex_multi_apps.app1",
+        "app2": "migrations.test_migrations_squashed_complex_multi_apps.app2",
+    })
+    @modify_settings(INSTALLED_APPS={'append': [
+        "migrations.test_migrations_squashed_complex_multi_apps.app1",
+        "migrations.test_migrations_squashed_complex_multi_apps.app2",
+    ]})
+    def test_loading_squashed_complex_multi_apps_partially_applied(self):
+        loader = MigrationLoader(connection)
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('app1', '1_auto')
+        recorder.record_applied('app1', '2_auto')
+        loader.build_graph()
+
+        plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
+        plan = plan - loader.applied_migrations
+        expected_plan = {
+            ('app1', '4_auto'),
+            ('app1', '3_auto'),
+            ('app2', '1_squashed_2'),
+        }
+
         self.assertEqual(plan, expected_plan)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_erroneous"})

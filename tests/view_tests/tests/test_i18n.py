@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+from __future__ import unicode_literals
+
 import gettext
 import json
 import os
@@ -6,10 +8,11 @@ import unittest
 from os import path
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.test import (
-    LiveServerTestCase, TestCase, modify_settings, override_settings,
+    LiveServerTestCase, SimpleTestCase, TestCase, modify_settings,
+    override_settings,
 )
+from django.urls import reverse
 from django.utils import six
 from django.utils._os import upath
 from django.utils.module_loading import import_string
@@ -31,7 +34,7 @@ class I18NTests(TestCase):
         for lang_code, lang_name in settings.LANGUAGES:
             post_data = dict(language=lang_code, next='/')
             response = self.client.post('/i18n/setlang/', data=post_data)
-            self.assertRedirects(response, 'http://testserver/')
+            self.assertRedirects(response, '/')
             self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_unsafe_next(self):
@@ -42,7 +45,7 @@ class I18NTests(TestCase):
         lang_code, lang_name = settings.LANGUAGES[0]
         post_data = dict(language=lang_code, next='//unsafe/redirection/')
         response = self.client.post('/i18n/setlang/', data=post_data)
-        self.assertEqual(response.url, 'http://testserver/')
+        self.assertEqual(response.url, '/')
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_reversal(self):
@@ -67,6 +70,23 @@ class I18NTests(TestCase):
             self.assertEqual(language_cookie['path'], '/test/')
             self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
 
+    @modify_settings(MIDDLEWARE_CLASSES={
+        'append': 'django.middleware.locale.LocaleMiddleware',
+    })
+    def test_lang_from_translated_i18n_pattern(self):
+        response = self.client.post(
+            '/i18n/setlang/', data={'language': 'nl'},
+            follow=True, HTTP_REFERER='/en/translated/'
+        )
+        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'nl')
+        self.assertRedirects(response, '/nl/vertaald/')
+        # And reverse
+        response = self.client.post(
+            '/i18n/setlang/', data={'language': 'en'},
+            follow=True, HTTP_REFERER='/nl/vertaald/'
+        )
+        self.assertRedirects(response, '/en/translated/')
+
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""
         for lang_code in ['es', 'fr', 'ru']:
@@ -83,11 +103,25 @@ class I18NTests(TestCase):
                 self.assertContains(response, json.dumps(trans_txt), 1)
                 if lang_code == 'fr':
                     # Message with context (msgctxt)
-                    self.assertContains(response, r'"month name\u0004May": "mai"', 1)
+                    self.assertContains(response, '"month name\\u0004May": "mai"', 1)
+
+    def test_jsoni18n(self):
+        """
+        The json_catalog returns the language catalog and settings as JSON.
+        """
+        with override('de'):
+            response = self.client.get('/jsoni18n/')
+            data = json.loads(response.content.decode('utf-8'))
+            self.assertIn('catalog', data)
+            self.assertIn('formats', data)
+            self.assertIn('plural', data)
+            self.assertEqual(data['catalog']['month name\x04May'], 'Mai')
+            self.assertIn('DATETIME_FORMAT', data['formats'])
+            self.assertEqual(data['plural'], '(n != 1)')
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class JsI18NTests(TestCase):
+class JsI18NTests(SimpleTestCase):
     """
     Tests django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE.
@@ -106,6 +140,21 @@ class JsI18NTests(TestCase):
         with self.settings(LANGUAGE_CODE='es'), override('en-us'):
             response = self.client.get('/jsi18n/')
             self.assertNotContains(response, 'esto tiene que ser traducido')
+
+    def test_jsoni18n_with_missing_en_files(self):
+        """
+        Same as above for the json_catalog view. Here we also check for the
+        expected JSON format.
+        """
+        with self.settings(LANGUAGE_CODE='es'), override('en-us'):
+            response = self.client.get('/jsoni18n/')
+            data = json.loads(response.content.decode('utf-8'))
+            self.assertIn('catalog', data)
+            self.assertIn('formats', data)
+            self.assertIn('plural', data)
+            self.assertEqual(data['catalog'], {})
+            self.assertIn('DATETIME_FORMAT', data['formats'])
+            self.assertIsNone(data['plural'])
 
     def test_jsi18n_fallback_language(self):
         """
@@ -159,13 +208,12 @@ class JsI18NTests(TestCase):
         """
         with self.settings(LANGUAGE_CODE='en-us'), override('fr'):
             response = self.client.get('/jsi18n/app5/')
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'emoji')
             self.assertContains(response, '\\ud83d\\udca9')
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class JsI18NTestsMultiPackage(TestCase):
+class JsI18NTestsMultiPackage(SimpleTestCase):
     """
     Tests for django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE and merge JS translation from several packages.
@@ -229,6 +277,7 @@ class JavascriptI18nTests(LiveServerTestCase):
         except Exception as e:
             raise unittest.SkipTest('Selenium webdriver "%s" not installed or '
                                     'not operational: %s' % (cls.webdriver_class, str(e)))
+        cls.selenium.implicitly_wait(10)
         super(JavascriptI18nTests, cls).setUpClass()
 
     @classmethod
@@ -252,6 +301,16 @@ class JavascriptI18nTests(LiveServerTestCase):
         self.assertEqual(elem.text, "1 Resultat")
         elem = self.selenium.find_element_by_id("npgettext_plur")
         self.assertEqual(elem.text, "455 Resultate")
+
+    @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})
+    @override_settings(LANGUAGE_CODE='fr')
+    def test_multiple_catalogs(self):
+        self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_multi_catalogs/'))
+
+        elem = self.selenium.find_element_by_id('app1string')
+        self.assertEqual(elem.text, 'il faut traduire cette chaîne de caractères de app1')
+        elem = self.selenium.find_element_by_id('app2string')
+        self.assertEqual(elem.text, 'il faut traduire cette chaîne de caractères de app2')
 
 
 class JavascriptI18nChromeTests(JavascriptI18nTests):

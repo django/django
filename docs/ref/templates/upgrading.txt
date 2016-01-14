@@ -10,7 +10,7 @@ The :setting:`TEMPLATES` settings
 =================================
 
 A new setting was introduced in Django 1.8: :setting:`TEMPLATES`. All existing
-template-related settings except :setting:`TEMPLATE_DEBUG` were deprecated.
+template-related settings were deprecated.
 
 During the deprecation period, Django will create a backwards-compatible
 :setting:`TEMPLATES` based on the ``TEMPLATE_*`` settings if you don't define
@@ -85,9 +85,13 @@ If your settings module defines ``ALLOWED_INCLUDE_ROOTS`` or
 ``'allowed_include_roots'`` and ``'string_if_invalid'`` keys in the
 ``'OPTIONS'`` dictionary.
 
+If it sets ``TEMPLATE_DEBUG`` to a value that differs from :setting:`DEBUG`,
+include that value under the ``'debug'`` key in ``'OPTIONS'``.
+
 Once you have defined :setting:`TEMPLATES`, you can safely remove
-``ALLOWED_INCLUDE_ROOTS``, ``TEMPLATE_CONTEXT_PROCESSORS``, ``TEMPLATE_DIRS``,
-``TEMPLATE_LOADERS``, and ``TEMPLATE_STRING_IF_INVALID``.
+``ALLOWED_INCLUDE_ROOTS``, ``TEMPLATE_CONTEXT_PROCESSORS``,
+``TEMPLATE_DEBUG``, ``TEMPLATE_DIRS``, ``TEMPLATE_LOADERS``, and
+``TEMPLATE_STRING_IF_INVALID``.
 
 If you are overriding some of these settings in tests, you should override the
 entire :setting:`TEMPLATES` setting instead.
@@ -146,7 +150,7 @@ You should write::
 Passing a :class:`~django.template.Context` or a
 :class:`~django.template.RequestContext` is still possible when the template
 is loaded by a :class:`~django.template.backends.django.DjangoTemplates`
-backend but it's deprecated and won't be supported in Django 2.0.
+backend but it's deprecated and won't be supported in Django 1.10.
 
 If you're loading a template while you're rendering another template with the
 Django template language and you have access to the current context, for
@@ -158,7 +162,7 @@ instance in the ``render()`` method of a template tag, you can use the current
 
 You can write::
 
-    template = context.engine.get_template('included.html')
+    template = context.template.engine.get_template('included.html')
 
 This will load the template with the current engine without triggering the
 multiple template engines machinery, which is usually the desired behavior.
@@ -197,7 +201,7 @@ APIs. The multiple template engines machinery isn't involved here.
 Finally, if you have access to the current context, you can use the same trick
 as above::
 
-    template = context.engine.from_string(template_code)
+    template = context.template.engine.from_string(template_code)
 
 ``Template()``
 ==============

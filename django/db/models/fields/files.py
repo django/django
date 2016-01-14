@@ -1,7 +1,5 @@
 import datetime
 import os
-import warnings
-from inspect import getargspec
 
 from django import forms
 from django.core import checks
@@ -11,7 +9,6 @@ from django.core.files.storage import default_storage
 from django.db.models import signals
 from django.db.models.fields import Field
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str, force_text
 from django.utils.translation import ugettext_lazy as _
 
@@ -88,19 +85,7 @@ class FieldFile(File):
 
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
-
-        args, varargs, varkw, defaults = getargspec(self.storage.save)
-        if 'max_length' in args:
-            self.name = self.storage.save(name, content, max_length=self.field.max_length)
-        else:
-            warnings.warn(
-                'Backwards compatibility for storage backends without '
-                'support for the `max_length` argument in '
-                'Storage.save() will be removed in Django 2.0.',
-                RemovedInDjango20Warning, stacklevel=2
-            )
-            self.name = self.storage.save(name, content)
-
+        self.name = self.storage.save(name, content, max_length=self.field.max_length)
         setattr(self.instance, self.field.name, self.name)
 
         # Update the filesize cache
@@ -164,18 +149,15 @@ class FileDescriptor(object):
 
     Assigns a file object on assignment so you can do::
 
-        >>> with open('/tmp/hello.world', 'r') as f:
+        >>> with open('/path/to/hello.world', 'r') as f:
         ...     instance.file = File(f)
-
     """
     def __init__(self, field):
         self.field = field
 
-    def __get__(self, instance=None, owner=None):
+    def __get__(self, instance, cls=None):
         if instance is None:
-            raise AttributeError(
-                "The '%s' attribute can only be accessed from %s instances."
-                % (self.field.name, owner.__name__))
+            return self
 
         # This is slightly complicated, so worth an explanation.
         # instance.file`needs to ultimately return some instance of `File`,
@@ -203,7 +185,7 @@ class FileDescriptor(object):
             instance.__dict__[self.field.name] = attr
 
         # Other types of files may be assigned as well, but they need to have
-        # the FieldFile interface added to the. Thus, we wrap any other type of
+        # the FieldFile interface added to them. Thus, we wrap any other type of
         # File inside a FieldFile (well, the field's attr_class, which is
         # usually FieldFile).
         elif isinstance(file, File) and not isinstance(file, FieldFile):
@@ -219,6 +201,10 @@ class FileDescriptor(object):
             file.instance = instance
             file.field = self.field
             file.storage = self.field.storage
+
+        # Make sure that the instance is correct.
+        elif isinstance(file, FieldFile) and instance is not file.instance:
+            file.instance = instance
 
         # That was fun, wasn't it?
         return instance.__dict__[self.field.name]
@@ -244,8 +230,6 @@ class FileField(Field):
 
         self.storage = storage or default_storage
         self.upload_to = upload_to
-        if callable(upload_to):
-            self.generate_filename = upload_to
 
         kwargs['max_length'] = kwargs.get('max_length', 100)
         super(FileField, self).__init__(verbose_name, name, **kwargs)
@@ -284,7 +268,7 @@ class FileField(Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super(FileField, self).deconstruct()
-        if kwargs.get("max_length", None) == 100:
+        if kwargs.get("max_length") == 100:
             del kwargs["max_length"]
         kwargs['upload_to'] = self.upload_to
         if self.storage is not default_storage:
@@ -326,6 +310,13 @@ class FileField(Field):
         return os.path.normpath(self.storage.get_valid_name(os.path.basename(filename)))
 
     def generate_filename(self, instance, filename):
+        # If upload_to is a callable, make sure that the path it returns is
+        # passed through get_valid_name() of the underlying storage.
+        if callable(self.upload_to):
+            directory_name, filename = os.path.split(self.upload_to(instance, filename))
+            filename = self.storage.get_valid_name(filename)
+            return os.path.normpath(os.path.join(directory_name, filename))
+
         return os.path.join(self.get_directory_name(), self.get_filename(filename))
 
     def save_form_data(self, instance, data):

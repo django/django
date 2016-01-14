@@ -44,10 +44,12 @@ END;
     def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
         # create a sequence and a trigger.
-        sq_name = self._get_sequence_name(table)
-        tr_name = self._get_trigger_name(table)
-        tbl_name = self.quote_name(table)
-        col_name = self.quote_name(column)
+        args = {
+            'sq_name': self._get_sequence_name(table),
+            'tr_name': self._get_trigger_name(table),
+            'tbl_name': self.quote_name(table),
+            'col_name': self.quote_name(column),
+        }
         sequence_sql = """
 DECLARE
     i INTEGER;
@@ -58,7 +60,7 @@ BEGIN
         EXECUTE IMMEDIATE 'CREATE SEQUENCE "%(sq_name)s"';
     END IF;
 END;
-/""" % locals()
+/""" % args
         trigger_sql = """
 CREATE OR REPLACE TRIGGER "%(tr_name)s"
 BEFORE INSERT ON %(tbl_name)s
@@ -68,7 +70,7 @@ WHEN (new.%(col_name)s IS NULL)
         SELECT "%(sq_name)s".nextval
         INTO :new.%(col_name)s FROM dual;
     END;
-/""" % locals()
+/""" % args
         return sequence_sql, trigger_sql
 
     def cache_key_culling_sql(self):
@@ -114,6 +116,8 @@ WHEN (new.%(col_name)s IS NULL)
     _tzname_re = re.compile(r'^[\w/:+-]+$')
 
     def _convert_field_to_tz(self, field_name, tzname):
+        if not settings.USE_TZ:
+            return field_name
         if not self._tzname_re.match(tzname):
             raise ValueError("Invalid time zone name: %s" % tzname)
         # Convert from UTC to local time, returning TIMESTAMP WITH TIME ZONE.
@@ -127,20 +131,18 @@ WHEN (new.%(col_name)s IS NULL)
         # on DATE values, even though they actually store the time part.
         return "CAST(%s AS TIMESTAMP)" % result
 
+    def datetime_cast_date_sql(self, field_name, tzname):
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        sql = 'TRUNC(%s)' % field_name
+        return sql, []
+
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = self._convert_field_to_tz(field_name, tzname)
-        if lookup_type == 'week_day':
-            # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
-            sql = "TO_CHAR(%s, 'D')" % field_name
-        else:
-            # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions050.htm
-            sql = "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        sql = self.date_extract_sql(lookup_type, field_name)
         return sql, []
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = self._convert_field_to_tz(field_name, tzname)
+        field_name = self._convert_field_to_tz(field_name, tzname)
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
         if lookup_type in ('year', 'month'):
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
@@ -163,6 +165,8 @@ WHEN (new.%(col_name)s IS NULL)
             converters.append(self.convert_binaryfield_value)
         elif internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
+        elif internal_type == 'DateTimeField':
+            converters.append(self.convert_datetimefield_value)
         elif internal_type == 'DateField':
             converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
@@ -172,7 +176,47 @@ WHEN (new.%(col_name)s IS NULL)
         converters.append(self.convert_empty_values)
         return converters
 
-    def convert_empty_values(self, value, expression, context):
+    def convert_textfield_value(self, value, expression, connection, context):
+        if isinstance(value, Database.LOB):
+            value = force_text(value.read())
+        return value
+
+    def convert_binaryfield_value(self, value, expression, connection, context):
+        if isinstance(value, Database.LOB):
+            value = force_bytes(value.read())
+        return value
+
+    def convert_booleanfield_value(self, value, expression, connection, context):
+        if value in (0, 1):
+            value = bool(value)
+        return value
+
+    # cx_Oracle always returns datetime.datetime objects for
+    # DATE and TIMESTAMP columns, but Django wants to see a
+    # python datetime.date, .time, or .datetime.
+
+    def convert_datetimefield_value(self, value, expression, connection, context):
+        if value is not None:
+            if settings.USE_TZ:
+                value = timezone.make_aware(value, self.connection.timezone)
+        return value
+
+    def convert_datefield_value(self, value, expression, connection, context):
+        if isinstance(value, Database.Timestamp):
+            value = value.date()
+        return value
+
+    def convert_timefield_value(self, value, expression, connection, context):
+        if isinstance(value, Database.Timestamp):
+            value = value.time()
+        return value
+
+    def convert_uuidfield_value(self, value, expression, connection, context):
+        if value is not None:
+            value = uuid.UUID(value)
+        return value
+
+    def convert_empty_values(self, value, expression, connection, context):
         # Oracle stores empty strings as null. We need to undo this in
         # order to adhere to the Django convention of using the empty
         # string instead of null, but only if the field accepts the
@@ -182,38 +226,6 @@ WHEN (new.%(col_name)s IS NULL)
             value = ''
             if field.get_internal_type() == 'BinaryField':
                 value = b''
-        return value
-
-    def convert_textfield_value(self, value, expression, context):
-        if isinstance(value, Database.LOB):
-            value = force_text(value.read())
-        return value
-
-    def convert_binaryfield_value(self, value, expression, context):
-        if isinstance(value, Database.LOB):
-            value = force_bytes(value.read())
-        return value
-
-    def convert_booleanfield_value(self, value, expression, context):
-        if value in (1, 0):
-            value = bool(value)
-        return value
-
-    # cx_Oracle always returns datetime.datetime objects for
-    # DATE and TIMESTAMP columns, but Django wants to see a
-    # python datetime.date, .time, or .datetime.
-    def convert_datefield_value(self, value, expression, context):
-        if isinstance(value, Database.Timestamp):
-            return value.date()
-
-    def convert_timefield_value(self, value, expression, context):
-        if isinstance(value, Database.Timestamp):
-            value = value.time()
-        return value
-
-    def convert_uuidfield_value(self, value, expression, context):
-        if value is not None:
-            value = uuid.UUID(value)
         return value
 
     def deferrable_sql(self):
@@ -235,7 +247,7 @@ WHEN (new.%(col_name)s IS NULL)
         # http://cx-oracle.sourceforge.net/html/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
-        if statement and six.PY2 and not isinstance(statement, unicode):
+        if statement and six.PY2 and not isinstance(statement, unicode):  # NOQA: unicode undefined on PY3
             statement = statement.decode('utf-8')
         # Unlike Psycopg's `query` and MySQLdb`'s `_last_executed`, CxOracle's
         # `statement` doesn't contain the query parameters. refs #20010.
@@ -256,6 +268,9 @@ WHEN (new.%(col_name)s IS NULL)
 
     def max_name_length(self):
         return 30
+
+    def pk_default_value(self):
+        return "NULL"
 
     def prep_for_iexact_query(self, x):
         return x
@@ -346,7 +361,7 @@ WHEN (new.%(col_name)s IS NULL)
                     # continue to loop
                     break
             for f in model._meta.many_to_many:
-                if not f.rel.through:
+                if not f.remote_field.through:
                     table_name = self.quote_name(f.m2m_db_table())
                     sequence_name = self._get_sequence_name(f.m2m_db_table())
                     column_name = self.quote_name('id')
@@ -364,7 +379,7 @@ WHEN (new.%(col_name)s IS NULL)
         else:
             return "TABLESPACE %s" % self.quote_name(tablespace)
 
-    def value_to_db_date(self, value):
+    def adapt_datefield_value(self, value):
         """
         Transform a date value to an object compatible with what is expected
         by the backend driver for date columns.
@@ -373,7 +388,7 @@ WHEN (new.%(col_name)s IS NULL)
         """
         return value
 
-    def value_to_db_datetime(self, value):
+    def adapt_datetimefield_value(self, value):
         """
         Transform a datetime value to an object compatible with what is expected
         by the backend driver for datetime columns.
@@ -389,13 +404,13 @@ WHEN (new.%(col_name)s IS NULL)
         # cx_Oracle doesn't support tz-aware datetimes
         if timezone.is_aware(value):
             if settings.USE_TZ:
-                value = value.astimezone(timezone.utc).replace(tzinfo=None)
+                value = timezone.make_naive(value, self.connection.timezone)
             else:
                 raise ValueError("Oracle backend does not support timezone-aware datetimes when USE_TZ is False.")
 
         return Oracle_datetime.from_datetime(value)
 
-    def value_to_db_time(self, value):
+    def adapt_timefield_value(self, value):
         if value is None:
             return None
 
@@ -408,19 +423,6 @@ WHEN (new.%(col_name)s IS NULL)
 
         return Oracle_datetime(1900, 1, 1, value.hour, value.minute,
                                value.second, value.microsecond)
-
-    def year_lookup_bounds_for_date_field(self, value):
-        # Create bounds as real date values
-        first = datetime.date(value, 1, 1)
-        last = datetime.date(value, 12, 31)
-        return [first, last]
-
-    def year_lookup_bounds_for_datetime_field(self, value):
-        # cx_Oracle doesn't support tz-aware datetimes
-        bounds = super(DatabaseOperations, self).year_lookup_bounds_for_datetime_field(value)
-        if settings.USE_TZ:
-            bounds = [b.astimezone(timezone.utc) for b in bounds]
-        return [Oracle_datetime.from_datetime(b) for b in bounds]
 
     def combine_expression(self, connector, sub_expressions):
         "Oracle requires special cases for %% and & operators in query expressions"
@@ -442,6 +444,8 @@ WHEN (new.%(col_name)s IS NULL)
         name_length = self.max_name_length() - 3
         return '%s_TR' % truncate_name(table, name_length).upper()
 
-    def bulk_insert_sql(self, fields, num_values):
-        items_sql = "SELECT %s FROM DUAL" % ", ".join(["%s"] * len(fields))
-        return " UNION ALL ".join([items_sql] * num_values)
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        return " UNION ALL ".join(
+            "SELECT %s FROM DUAL" % ", ".join(row)
+            for row in placeholder_rows
+        )

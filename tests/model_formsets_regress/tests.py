@@ -202,7 +202,10 @@ class InlineFormsetTests(TestCase):
         FormSet(instance=None)
 
     def test_empty_fields_on_modelformset(self):
-        "No fields passed to modelformset_factory should result in no fields on returned forms except for the id. See #14119."
+        """
+        No fields passed to modelformset_factory() should result in no fields
+        on returned forms except for the id (#14119).
+        """
         UserFormSet = modelformset_factory(User, fields=())
         formset = UserFormSet()
         for form in formset.forms:
@@ -214,7 +217,6 @@ class InlineFormsetTests(TestCase):
         Existing and new inlines are saved with save_as_new.
 
         Regression for #14938.
-
         """
         efnet = Network.objects.create(name="EFNet")
         host1 = Host.objects.create(hostname="irc.he.net", network=efnet)

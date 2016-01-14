@@ -59,11 +59,10 @@ def normalize(pattern):
     (3) Select the first (essentially an arbitrary) element from any character
         class. Select an arbitrary character for any unordered class (e.g. '.'
         or '\w') in the pattern.
-    (5) Ignore comments and any of the reg-exp flags that won't change
-        what we construct ("iLmsu"). "(?x)" is an error, however.
-    (6) Raise an error on all other non-capturing (?...) forms (e.g.
-        look-ahead and look-behind matches) and any disjunctive ('|')
-        constructs.
+    (4) Ignore comments, look-ahead and look-behind assertions, and any of the
+        reg-exp flags that won't change what we construct ("iLmsu"). "(?x)" is
+        an error, however.
+    (5) Raise an error on any disjunctive ('|') constructs.
 
     Django's URLs for forward resolving are either all positional arguments or
     all keyword arguments. That is assumed here, as well. Although reverse
@@ -129,7 +128,7 @@ def normalize(pattern):
                     walk_to_end(ch, pattern_iter)
                 else:
                     ch, escaped = next(pattern_iter)
-                    if ch in "iLmsu#":
+                    if ch in "iLmsu#!=<":
                         # All of these are ignorable. Walk to the end of the
                         # group.
                         walk_to_end(ch, pattern_iter)

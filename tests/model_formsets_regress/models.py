@@ -8,17 +8,17 @@ class User(models.Model):
 
 
 class UserSite(models.Model):
-    user = models.ForeignKey(User, to_field="username")
+    user = models.ForeignKey(User, models.CASCADE, to_field="username")
     data = models.IntegerField()
 
 
 class UserProfile(models.Model):
-    user = models.ForeignKey(User, unique=True, to_field="username")
+    user = models.ForeignKey(User, models.CASCADE, unique=True, to_field="username")
     about = models.TextField()
 
 
 class ProfileNetwork(models.Model):
-    profile = models.ForeignKey(UserProfile, to_field="user")
+    profile = models.ForeignKey(UserProfile, models.CASCADE, to_field="user")
     network = models.IntegerField()
     identifier = models.IntegerField()
 
@@ -32,7 +32,7 @@ class Restaurant(Place):
 
 
 class Manager(models.Model):
-    restaurant = models.ForeignKey(Restaurant)
+    restaurant = models.ForeignKey(Restaurant, models.CASCADE)
     name = models.CharField(max_length=50)
 
 
@@ -42,7 +42,7 @@ class Network(models.Model):
 
 @python_2_unicode_compatible
 class Host(models.Model):
-    network = models.ForeignKey(Network)
+    network = models.ForeignKey(Network, models.CASCADE)
     hostname = models.CharField(max_length=25)
 
     def __str__(self):

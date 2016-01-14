@@ -17,7 +17,7 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     except LookupError:
         return
 
-    if not router.allow_migrate(using, ContentType):
+    if not router.allow_migrate_model(using, ContentType):
         return
 
     ContentType.objects.clear_cache()

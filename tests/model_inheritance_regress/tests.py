@@ -350,10 +350,10 @@ class ModelInheritanceTest(TestCase):
 
         birthday = BirthdayParty.objects.create(
             name='Birthday party for Alice')
-        birthday.attendees = [p1, p3]
+        birthday.attendees.set([p1, p3])
 
         bachelor = BachelorParty.objects.create(name='Bachelor party for Bob')
-        bachelor.attendees = [p2, p4]
+        bachelor.attendees.set([p2, p4])
 
         parties = list(p1.birthdayparty_set.all())
         self.assertEqual(parties, [birthday])
@@ -371,7 +371,7 @@ class ModelInheritanceTest(TestCase):
         # ... but it does inherit the m2m from its parent
         messy = MessyBachelorParty.objects.create(
             name='Bachelor party for Dave')
-        messy.attendees = [p4]
+        messy.attendees.set([p4])
         messy_parent = messy.bachelorparty_ptr
 
         parties = list(p4.bachelorparty_set.all())
@@ -461,7 +461,10 @@ class ModelInheritanceTest(TestCase):
             name='John Doe', title='X', state='Y'
         )
 
-        Senator.objects.get(pk=senator.pk)
+        senator = Senator.objects.get(pk=senator.pk)
+        self.assertEqual(senator.name, 'John Doe')
+        self.assertEqual(senator.title, 'X')
+        self.assertEqual(senator.state, 'Y')
 
     def test_inheritance_resolve_columns(self):
         Restaurant.objects.create(name='Bobs Cafe', address="Somewhere",
@@ -490,3 +493,22 @@ class ModelInheritanceTest(TestCase):
 
         jane = Supplier.objects.order_by("name").select_related("restaurant")[0]
         self.assertEqual(jane.restaurant.name, "Craft")
+
+    def test_related_filtering_query_efficiency_ticket_15844(self):
+        r = Restaurant.objects.create(
+            name="Guido's House of Pasta",
+            address='944 W. Fullerton',
+            serves_hot_dogs=True,
+            serves_pizza=False,
+        )
+        s = Supplier.objects.create(restaurant=r)
+        with self.assertNumQueries(1):
+            self.assertQuerysetEqual(
+                Supplier.objects.filter(restaurant=r),
+                [s], lambda x: x,
+            )
+        with self.assertNumQueries(1):
+            self.assertQuerysetEqual(
+                r.supplier_set.all(),
+                [s], lambda x: x,
+            )

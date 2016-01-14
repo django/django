@@ -5,11 +5,42 @@ from datetime import date
 from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Author, Book, Coffee, FriendlyAuthor, Reviewer
+from .models import Author, Book, BookFkAsPk, Coffee, FriendlyAuthor, Reviewer
 
 
 class RawQueryTests(TestCase):
-    fixtures = ['raw_query_books.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Author.objects.create(first_name='Joe', last_name='Smith', dob=date(1950, 9, 20))
+        cls.a2 = Author.objects.create(first_name='Jill', last_name='Doe', dob=date(1920, 4, 2))
+        cls.a3 = Author.objects.create(first_name='Bob', last_name='Smith', dob=date(1986, 1, 25))
+        cls.a4 = Author.objects.create(first_name='Bill', last_name='Jones', dob=date(1932, 5, 10))
+        cls.b1 = Book.objects.create(
+            title='The awesome book', author=cls.a1, paperback=False,
+            opening_line='It was a bright cold day in April and the clocks were striking thirteen.',
+        )
+        cls.b2 = Book.objects.create(
+            title='The horrible book', author=cls.a1, paperback=True,
+            opening_line=(
+                'On an evening in the latter part of May a middle-aged man '
+                'was walking homeward from Shaston to the village of Marlott, '
+                'in the adjoining Vale of Blakemore, or Blackmoor.'
+            ),
+        )
+        cls.b3 = Book.objects.create(
+            title='Another awesome book', author=cls.a1, paperback=False,
+            opening_line='A squat grey building of only thirty-four stories.',
+        )
+        cls.b4 = Book.objects.create(
+            title='Some other book', author=cls.a3, paperback=True,
+            opening_line='It was the day my grandmother exploded.',
+        )
+        cls.c1 = Coffee.objects.create(brand='dunkin doughnuts')
+        cls.c2 = Coffee.objects.create(brand='starbucks')
+        cls.r1 = Reviewer.objects.create()
+        cls.r2 = Reviewer.objects.create()
+        cls.r1.reviewed.add(cls.b2, cls.b3, cls.b4)
 
     def assertSuccessfulRawQuery(self, model, query, expected_results,
             expected_annotations=(), params=[], translations=None):
@@ -196,7 +227,12 @@ class RawQueryTests(TestCase):
             pass
 
     def test_annotations(self):
-        query = "SELECT a.*, count(b.id) as book_count FROM raw_query_author a LEFT JOIN raw_query_book b ON a.id = b.author_id GROUP BY a.id, a.first_name, a.last_name, a.dob ORDER BY a.id"
+        query = (
+            "SELECT a.*, count(b.id) as book_count "
+            "FROM raw_query_author a "
+            "LEFT JOIN raw_query_book b ON a.id = b.author_id "
+            "GROUP BY a.id, a.first_name, a.last_name, a.dob ORDER BY a.id"
+        )
         expected_annotations = (
             ('book_count', 3),
             ('book_count', 0),
@@ -259,3 +295,14 @@ class RawQueryTests(TestCase):
             list(Book.objects.raw('SELECT id FROM (SELECT * FROM raw_query_book WHERE paperback IS NOT NULL) sq'))
         except InvalidQuery:
             self.fail("Using a subquery in a RawQuerySet raised InvalidQuery")
+
+    def test_db_column_name_is_used_in_raw_query(self):
+        """
+        Regression test that ensures the `column` attribute on the field is
+        used to generate the list of fields included in the query, as opposed
+        to the `attname`. This is important when the primary key is a
+        ForeignKey field because `attname` and `column` are not necessarily the
+        same.
+        """
+        b = BookFkAsPk.objects.create(book=self.b1)
+        self.assertEqual(list(BookFkAsPk.objects.raw('SELECT not_the_default FROM raw_query_bookfkaspk')), [b])

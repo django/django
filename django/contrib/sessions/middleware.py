@@ -12,7 +12,7 @@ class SessionMiddleware(object):
         self.SessionStore = engine.SessionStore
 
     def process_request(self, request):
-        session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME, None)
+        session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
         request.session = self.SessionStore(session_key)
 
     def process_response(self, request, response):
@@ -31,11 +31,12 @@ class SessionMiddleware(object):
             # First check if we need to delete this cookie.
             # The session should be deleted only if the session is entirely empty
             if settings.SESSION_COOKIE_NAME in request.COOKIES and empty:
-                response.delete_cookie(settings.SESSION_COOKIE_NAME)
+                response.delete_cookie(settings.SESSION_COOKIE_NAME,
+                    domain=settings.SESSION_COOKIE_DOMAIN)
             else:
                 if accessed:
                     patch_vary_headers(response, ('Cookie',))
-                if modified or settings.SESSION_SAVE_EVERY_REQUEST:
+                if (modified or settings.SESSION_SAVE_EVERY_REQUEST) and not empty:
                     if request.session.get_expire_at_browser_close():
                         max_age = None
                         expires = None

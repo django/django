@@ -18,7 +18,7 @@ action; Django ships with a "delete selected objects" action available to all
 models. For example, here's the user module from Django's built-in
 :mod:`django.contrib.auth` app:
 
-.. image:: _images/user_actions.png
+.. image:: _images/admin-actions.png
 
 .. warning::
 
@@ -70,7 +70,7 @@ Writing action functions
 ------------------------
 
 First, we'll need to write a function that gets called when the action is
-trigged from the admin. Action functions are just regular functions that take
+triggered from the admin. Action functions are just regular functions that take
 three arguments:
 
 * The current :class:`ModelAdmin`
@@ -134,7 +134,7 @@ the action and its registration would look like::
 
 That code will give us an admin change list that looks something like this:
 
-.. image:: _images/article_actions.png
+.. image:: _images/adding-actions-to-the-modeladmin.png
 
 That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document just covers more
@@ -202,7 +202,7 @@ that the action was successful::
 This make the action match what the admin itself does after successfully
 performing an action:
 
-.. image:: _images/article_actions_message.png
+.. image:: _images/actions-as-modeladmin-methods.png
 
 Actions that provide intermediate pages
 ---------------------------------------
@@ -257,7 +257,7 @@ Writing this view is left as an exercise to the reader.
 Making actions available site-wide
 ----------------------------------
 
-.. method:: AdminSite.add_action(action[, name])
+.. method:: AdminSite.add_action(action, name=None)
 
     Some actions are best if they're made available to *any* object in the admin
     site -- the export action defined above would be a good candidate. You can

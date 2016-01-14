@@ -1,9 +1,9 @@
 from functools import update_wrapper
 
 from django.contrib import admin
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -77,6 +77,7 @@ class CarAdmin(admin.ModelAdmin):
             request, obj, post_url_continue=reverse('admin:admin_custom_urls_car_history', args=[obj.pk]))
 
 
-admin.site.register(Action, ActionAdmin)
-admin.site.register(Person, PersonAdmin)
-admin.site.register(Car, CarAdmin)
+site = admin.AdminSite(name='admin_custom_urls')
+site.register(Action, ActionAdmin)
+site.register(Person, PersonAdmin)
+site.register(Car, CarAdmin)

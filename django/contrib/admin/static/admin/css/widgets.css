@@ -1,18 +1,18 @@
 /* SELECTOR (FILTER INTERFACE) */
 
 .selector {
-    width: 840px;
+    width: 800px;
     float: left;
 }
 
 .selector select {
-    width: 400px;
+    width: 380px;
     height: 17.2em;
 }
 
 .selector-available, .selector-chosen {
     float: left;
-    width: 400px;
+    width: 380px;
     text-align: center;
     margin-bottom: 5px;
 }
@@ -23,10 +23,16 @@
 
 .selector-available h2, .selector-chosen h2 {
     border: 1px solid #ccc;
+    border-radius: 4px 4px 0 0;
+}
+
+.selector-chosen h2 {
+    background: #79aec8;
+    color: #fff;
 }
 
 .selector .selector-available h2 {
-    background: white url(../img/nav-bg.gif) bottom left repeat-x;
+    background: #f8f8f8;
     color: #666;
 }
 
@@ -34,7 +40,7 @@
     background: white;
     border: 1px solid #ccc;
     border-width: 0 1px;
-    padding: 3px;
+    padding: 8px;
     color: #999;
     font-size: 10px;
     margin: 0;
@@ -43,12 +49,18 @@
 
 .selector .selector-filter label,
 .inline-group .aligned .selector .selector-filter label {
-    width: 16px;
-    padding: 2px;
+    float: left;
+    margin: 7px 0 0;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    overflow: hidden;
+    line-height: 1;
 }
 
 .selector .selector-available input {
-    width: 360px;
+    width: 320px;
+    margin-left: 8px;
 }
 
 .selector ul.selector-chooser {
@@ -67,8 +79,9 @@
 }
 
 .selector select {
-    margin-bottom: 10px;
-    margin-top: 0;
+    padding: 0 10px;
+    margin: 0 0 10px;
+    border-radius: 0 0 4px 4px;
 }
 
 .selector-add, .selector-remove {
@@ -77,75 +90,85 @@
     display: block;
     text-indent: -3000px;
     overflow: hidden;
+    cursor: default;
+    opacity: 0.3;
+}
+
+.active.selector-add, .active.selector-remove {
+    opacity: 1;
+}
+
+.active.selector-add:hover, .active.selector-remove:hover {
+    cursor: pointer;
 }
 
 .selector-add {
-    background: url(../img/selector-icons.gif) 0 -161px no-repeat;
-    cursor: default;
-    margin-bottom: 2px;
+    background: url(../img/selector-icons.svg) 0 -96px no-repeat;
 }
 
-.active.selector-add {
-    background: url(../img/selector-icons.gif) 0 -187px no-repeat;
-    cursor: pointer;
+.active.selector-add:focus, .active.selector-add:hover {
+    background-position: 0 -112px;
 }
 
 .selector-remove {
-    background: url(../img/selector-icons.gif) 0 -109px no-repeat;
-    cursor: default;
+    background: url(../img/selector-icons.svg) 0 -64px no-repeat;
 }
 
-.active.selector-remove {
-    background: url(../img/selector-icons.gif) 0 -135px no-repeat;
-    cursor: pointer;
+.active.selector-remove:focus, .active.selector-remove:hover {
+    background-position: 0 -80px;
 }
 
 a.selector-chooseall, a.selector-clearall {
     display: inline-block;
+    height: 16px;
     text-align: left;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 1px auto 3px;
+    overflow: hidden;
     font-weight: bold;
+    line-height: 16px;
     color: #666;
+    text-decoration: none;
+    opacity: 0.3;
 }
 
-a.selector-chooseall {
-    padding: 3px 18px 3px 0;
+a.active.selector-chooseall:focus, a.active.selector-clearall:focus,
+a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
+    color: #447e9b;
 }
 
-a.selector-clearall {
-    padding: 3px 0 3px 18px;
+a.active.selector-chooseall, a.active.selector-clearall {
+    opacity: 1;
 }
 
 a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
-    color: #036;
+    cursor: pointer;
 }
 
 a.selector-chooseall {
-    background: url(../img/selector-icons.gif) right -263px no-repeat;
+    padding: 0 18px 0 0;
+    background: url(../img/selector-icons.svg) right -160px no-repeat;
     cursor: default;
 }
 
-a.active.selector-chooseall {
-    background: url(../img/selector-icons.gif) right -289px no-repeat;
-    cursor: pointer;
+a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
+    background-position: 100% -176px;
 }
 
 a.selector-clearall {
-    background: url(../img/selector-icons.gif) left -211px no-repeat;
+    padding: 0 0 0 18px;
+    background: url(../img/selector-icons.svg) 0 -128px no-repeat;
     cursor: default;
 }
 
-a.active.selector-clearall {
-    background: url(../img/selector-icons.gif) left -237px no-repeat;
-    cursor: pointer;
+a.active.selector-clearall:focus, a.active.selector-clearall:hover {
+    background-position: 0 -144px;
 }
 
 /* STACKED SELECTORS */
 
 .stacked {
     float: left;
-    width: 500px;
+    width: 490px;
 }
 
 .stacked select {
@@ -162,13 +185,13 @@ a.active.selector-clearall {
 }
 
 .stacked .selector-available input {
-    width: 442px;
+    width: 422px;
 }
 
 .stacked ul.selector-chooser {
     height: 22px;
     width: 50px;
-    margin: 0 0 3px 40%;
+    margin: 0 0 10px 40%;
     background-color: #eee;
     border-radius: 10px;
 }
@@ -183,23 +206,43 @@ a.active.selector-clearall {
 }
 
 .stacked .selector-add {
-    background: url(../img/selector-icons.gif) 0 -57px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -32px no-repeat;
     cursor: default;
 }
 
 .stacked .active.selector-add {
-    background: url(../img/selector-icons.gif) 0 -83px no-repeat;
+    background-position: 0 -48px;
     cursor: pointer;
 }
 
 .stacked .selector-remove {
-    background: url(../img/selector-icons.gif) 0 -5px no-repeat;
+    background: url(../img/selector-icons.svg) 0 0 no-repeat;
     cursor: default;
 }
 
 .stacked .active.selector-remove {
-    background: url(../img/selector-icons.gif) 0 -31px no-repeat;
+    background-position: 0 -16px;
     cursor: pointer;
+}
+
+.selector .help-icon {
+    background: url(../img/icon-unknown.svg) 0 0 no-repeat;
+    display: inline-block;
+    vertical-align: middle;
+    margin: -2px 0 0 2px;
+    width: 13px;
+    height: 13px;
+}
+
+.selector .selector-chosen .help-icon {
+    background: url(../img/icon-unknown-alt.svg) 0 0 no-repeat;
+}
+
+.selector .search-label-icon {
+    background: url(../img/search.svg) 0 0 no-repeat;
+    display: inline-block;
+    height: 18px;
+    width: 18px;
 }
 
 /* DATE AND TIME */
@@ -209,21 +252,59 @@ p.datetime {
     margin: 0;
     padding: 0;
     color: #666;
-    font-size: 11px;
     font-weight: bold;
 }
 
 .datetime span {
+    white-space: nowrap;
+    font-weight: normal;
     font-size: 11px;
     color: #ccc;
-    font-weight: normal;
-    white-space: nowrap;
+}
+
+.datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
+    min-width: 0;
+    margin-left: 5px;
+    margin-bottom: 4px;
 }
 
 table p.datetime {
-    font-size: 10px;
+    font-size: 11px;
     margin-left: 0;
     padding-left: 0;
+}
+
+.datetimeshortcuts .clock-icon, .datetimeshortcuts .date-icon {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    height: 16px;
+    width: 16px;
+    overflow: hidden;
+}
+
+.datetimeshortcuts .clock-icon {
+    background: url(../img/icon-clock.svg) 0 0 no-repeat;
+}
+
+.datetimeshortcuts a:focus .clock-icon,
+.datetimeshortcuts a:hover .clock-icon {
+    background-position: 0 -16px;
+}
+
+.datetimeshortcuts .date-icon {
+    background: url(../img/icon-calendar.svg) 0 0 no-repeat;
+    top: -1px;
+}
+
+.datetimeshortcuts a:focus .date-icon,
+.datetimeshortcuts a:hover .date-icon {
+    background-position: 0 -16px;
+}
+
+.timezonewarning {
+    font-size: 11px;
+    color: #999;
 }
 
 /* URL */
@@ -252,6 +333,10 @@ p.file-upload {
     font-weight: bold;
 }
 
+.aligned p.file-upload {
+    margin-left: 170px;
+}
+
 .file-upload a {
     font-weight: normal;
 }
@@ -271,10 +356,14 @@ span.clearable-file-input label {
 
 .calendarbox, .clockbox {
     margin: 5px auto;
-    font-size: 11px;
-    width: 16em;
+    font-size: 12px;
+    width: 19em;
     text-align: center;
     background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
     position: relative;
 }
 
@@ -297,22 +386,27 @@ span.clearable-file-input label {
 
 .calendar caption, .calendarbox h2 {
     margin: 0;
-    font-size: 11px;
     text-align: center;
     border-top: none;
+    background: #f5dd5d;
+    font-weight: 700;
+    font-size: 12px;
+    color: #333;
 }
 
 .calendar th {
-    font-size: 10px;
-    color: #666;
-    padding: 2px 3px;
-    text-align: center;
-    background: #e1e1e1 url(../img/nav-bg.gif) 0 50% repeat-x;
+    padding: 8px 5px;
+    background: #f8f8f8;
     border-bottom: 1px solid #ddd;
+    font-weight: 400;
+    font-size: 12px;
+    text-align: center;
+    color: #666;
 }
 
 .calendar td {
-    font-size: 11px;
+    font-weight: 400;
+    font-size: 12px;
     text-align: center;
     padding: 0;
     border-top: 1px solid #eee;
@@ -320,32 +414,34 @@ span.clearable-file-input label {
 }
 
 .calendar td.selected a {
-    background: #C9DBED;
+    background: #79aec8;
+    color: #fff;
 }
 
 .calendar td.nonday {
-    background: #efefef;
+    background: #f8f8f8;
 }
 
 .calendar td.today a {
-    background: #ffc;
+    font-weight: 700;
 }
 
 .calendar td a, .timelist a {
     display: block;
-    font-weight: bold;
-    padding: 4px;
+    font-weight: 400;
+    padding: 6px;
     text-decoration: none;
     color: #444;
 }
 
+.calendar td a:focus, .timelist a:focus,
 .calendar td a:hover, .timelist a:hover {
-    background: #5b80b2;
+    background: #79aec8;
     color: white;
 }
 
 .calendar td a:active, .timelist a:active {
-    background: #036;
+    background: #417690;
     color: white;
 }
 
@@ -357,53 +453,61 @@ span.clearable-file-input label {
     padding: 1px 3px;
 }
 
-.calendarnav a:link, #calendarnav a:visited, #calendarnav a:hover {
+.calendarnav a:link, #calendarnav a:visited,
+#calendarnav a:focus, #calendarnav a:hover {
     color: #999;
 }
 
 .calendar-shortcuts {
     background: white;
-    font-size: 10px;
+    font-size: 11px;
     line-height: 11px;
     border-top: 1px solid #eee;
-    padding: 3px 0 4px;
+    padding: 8px 0;
     color: #ccc;
 }
 
 .calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
     display: block;
     position: absolute;
-    font-weight: bold;
-    font-size: 12px;
-    background: #C9DBED url(../img/default-bg.gif) bottom left repeat-x;
-    padding: 1px 4px 2px 4px;
-    color: white;
-}
-
-.calendarnav-previous:hover, .calendarnav-next:hover {
-    background: #036;
+    top: 8px;
+    width: 15px;
+    height: 15px;
+    text-indent: -9999px;
+    padding: 0;
 }
 
 .calendarnav-previous {
-    top: 0;
-    left: 0;
+    left: 10px;
+    background: url(../img/calendar-icons.svg) 0 0 no-repeat;
+}
+
+.calendarbox .calendarnav-previous:focus,
+.calendarbox .calendarnav-previous:hover {
+    background-position: 0 -15px;
 }
 
 .calendarnav-next {
-    top: 0;
-    right: 0;
+    right: 10px;
+    background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
+}
+
+.calendarbox .calendarnav-next:focus,
+.calendarbox .calendarnav-next:hover {
+    background-position: 0 -45px;
 }
 
 .calendar-cancel {
-    margin: 0 !important;
-    padding: 0 !important;
-    font-size: 10px;
-    background: #e1e1e1 url(../img/nav-bg.gif) 0 50% repeat-x;
+    margin: 0;
+    padding: 4px 0;
+    font-size: 12px;
+    background: #eee;
     border-top: 1px solid #ddd;
+    color: #333;
 }
 
-.calendar-cancel:hover {
-    background: #e1e1e1 url(../img/nav-bg-reverse.gif) 0 50% repeat-x;
+.calendar-cancel:focus, .calendar-cancel:hover {
+    background: #ddd;
 }
 
 .calendar-cancel a {
@@ -421,168 +525,41 @@ ul.timelist, .timelist li {
     padding: 2px;
 }
 
-/* INLINE ORDERER */
-
-ul.orderer {
-    position: relative;
-    padding: 0 !important;
-    margin: 0 !important;
-    list-style-type: none;
-}
-
-ul.orderer li {
-    list-style-type: none;
-    display: block;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #bbb;
-    border-width: 0 1px 1px 0;
-    white-space: nowrap;
-    overflow: hidden;
-    background: #e2e2e2 url(../img/nav-bg-grabber.gif) repeat-y;
-}
-
-ul.orderer li:hover {
-    cursor: move;
-    background-color: #ddd;
-}
-
-ul.orderer li a.selector {
-    margin-left: 12px;
-    overflow: hidden;
-    width: 83%;
-    font-size: 10px !important;
-    padding: 0.6em 0;
-}
-
-ul.orderer li a:link, ul.orderer li a:visited {
-    color: #333;
-}
-
-ul.orderer li .inline-deletelink {
-    position: absolute;
-    right: 4px;
-    margin-top: 0.6em;
-}
-
-ul.orderer li.selected {
-    background-color: #f8f8f8;
-    border-right-color: #f8f8f8;
-}
-
-ul.orderer li.deleted {
-    background: #bbb url(../img/deleted-overlay.gif);
-}
-
-ul.orderer li.deleted a:link, ul.orderer li.deleted a:visited {
-    color: #888;
-}
-
-ul.orderer li.deleted .inline-deletelink {
-    background-image: url(../img/inline-restore.png);
-}
-
-ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
-    cursor: default;
-}
-
 /* EDIT INLINE */
 
 .inline-deletelink {
     float: right;
     text-indent: -9999px;
-    background: transparent url(../img/inline-delete.png) no-repeat;
-    width: 15px;
-    height: 15px;
+    background: url(../img/inline-delete.svg) 0 0 no-repeat;
+    width: 16px;
+    height: 16px;
     border: 0px none;
-    outline: 0; /* Remove dotted border around link */
 }
 
-.inline-deletelink:hover {
-    background-position: -15px 0;
+.inline-deletelink:focus, .inline-deletelink:hover {
     cursor: pointer;
-}
-
-.editinline button.addlink {
-    border: 0px none;
-    color: #5b80b2;
-    font-size: 100%;
-    cursor: pointer;
-}
-
-.editinline button.addlink:hover {
-    color: #036;
-    cursor: pointer;
-}
-
-.editinline table .help {
-    text-align: right;
-    float: right;
-    padding-left: 2em;
-}
-
-.editinline tfoot .addlink {
-    white-space: nowrap;
-}
-
-.editinline table thead th:last-child {
-    border-left: none;
-}
-
-.editinline tr.deleted {
-    background: #ddd url(../img/deleted-overlay.gif);
-}
-
-.editinline tr.deleted .inline-deletelink {
-    background-image: url(../img/inline-restore.png);
-}
-
-.editinline tr.deleted td:hover {
-    cursor: default;
-}
-
-.editinline tr.deleted td:first-child {
-    background-image: none !important;
-}
-
-/* EDIT INLINE - STACKED */
-
-.editinline-stacked {
-    min-width: 758px;
-}
-
-.editinline-stacked .inline-object {
-    margin-left: 210px;
-    background: white;
-}
-
-.editinline-stacked .inline-source {
-    float: left;
-    width: 200px;
-    background: #f8f8f8;
-}
-
-.editinline-stacked .inline-splitter {
-    float: left;
-    width: 9px;
-    background: #f8f8f8 url(../img/inline-splitter-bg.gif) 50% 50% no-repeat;
-    border-right: 1px solid #ccc;
-}
-
-.editinline-stacked .controls {
-    clear: both;
-    background: #e1e1e1 url(../img/nav-bg.gif) top left repeat-x;
-    padding: 3px 4px;
-    font-size: 11px;
-    border-top: 1px solid #ddd;
 }
 
 /* RELATED WIDGET WRAPPER */
+.related-widget-wrapper {
+    float: left;       /* display properly in form rows with multiple fields */
+    overflow: hidden;  /* clear floated contents */
+}
 
 .related-widget-wrapper-link {
     opacity: 0.3;
 }
 
 .related-widget-wrapper-link:link {
+    opacity: .8;
+}
+
+.related-widget-wrapper-link:link:focus,
+.related-widget-wrapper-link:link:hover {
     opacity: 1;
+}
+
+select + .related-widget-wrapper-link,
+.related-widget-wrapper-link + .related-widget-wrapper-link {
+    margin-left: 7px;
 }

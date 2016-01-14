@@ -8,15 +8,15 @@ from django.utils.lru_cache import lru_cache
 
 
 def get_version(version=None):
-    "Returns a PEP 386-compliant version number from VERSION."
+    "Returns a PEP 440-compliant version number from VERSION."
     version = get_complete_version(version)
 
     # Now build the two parts of the version number:
-    # major = X.Y[.Z]
+    # main = X.Y[.Z]
     # sub = .devN - for pre-alpha releases
-    #     | {a|b|c}N - for alpha, beta and rc releases
+    #     | {a|b|rc}N - for alpha, beta, and rc releases
 
-    major = get_major_version(version)
+    main = get_main_version(version)
 
     sub = ''
     if version[3] == 'alpha' and version[4] == 0:
@@ -25,18 +25,17 @@ def get_version(version=None):
             sub = '.dev%s' % git_changeset
 
     elif version[3] != 'final':
-        mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'c'}
+        mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'rc'}
         sub = mapping[version[3]] + str(version[4])
 
-    return str(major + sub)
+    return str(main + sub)
 
 
-def get_major_version(version=None):
-    "Returns major version from VERSION."
+def get_main_version(version=None):
+    "Returns main version (X.Y[.Z]) from VERSION."
     version = get_complete_version(version)
     parts = 2 if version[2] == 0 else 3
-    major = '.'.join(str(x) for x in version[:parts])
-    return major
+    return '.'.join(str(x) for x in version[:parts])
 
 
 def get_complete_version(version=None):

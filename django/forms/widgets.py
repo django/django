@@ -11,6 +11,7 @@ from itertools import chain
 
 from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
+from django.templatetags.static import static
 from django.utils import datetime_safe, formats, six
 from django.utils.datastructures import MultiValueDict
 from django.utils.dates import MONTHS
@@ -18,10 +19,9 @@ from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
 from django.utils.formats import get_format
-from django.utils.html import conditional_escape, format_html
+from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.six.moves import range
-from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.translation import ugettext_lazy
 
 __all__ = (
@@ -37,6 +37,7 @@ __all__ = (
 MEDIA_TYPES = ('css', 'js')
 
 
+@html_safe
 @python_2_unicode_compatible
 class Media(object):
     def __init__(self, media=None, **kwargs):
@@ -49,7 +50,7 @@ class Media(object):
         self._js = []
 
         for name in MEDIA_TYPES:
-            getattr(self, 'add_' + name)(media_attrs.get(name, None))
+            getattr(self, 'add_' + name)(media_attrs.get(name))
 
     def __str__(self):
         return self.render()
@@ -76,16 +77,15 @@ class Media(object):
             ) for path in self._css[medium]
         ] for medium in media])
 
-    def absolute_path(self, path, prefix=None):
+    def absolute_path(self, path):
+        """
+        Given a relative or absolute path to a static asset, return an absolute
+        path. An absolute path will be returned unchanged while a relative path
+        will be passed to django.templatetags.static.static().
+        """
         if path.startswith(('http://', 'https://', '/')):
             return path
-        if prefix is None:
-            if settings.STATIC_URL is None:
-                # backwards compatibility
-                prefix = settings.MEDIA_URL
-            else:
-                prefix = settings.STATIC_URL
-        return urljoin(prefix, path)
+        return static(path)
 
     def __getitem__(self, name):
         "Returns a Media object that only contains media of the given type"
@@ -156,6 +156,7 @@ class MediaDefiningClass(type):
         return new_class
 
 
+@html_safe
 @python_2_unicode_compatible
 class SubWidget(object):
     """
@@ -178,6 +179,7 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
     needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
+    supports_microseconds = True
 
     def __init__(self, attrs=None):
         if attrs is not None:
@@ -225,7 +227,7 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         Given a dictionary of data and this widget's name, returns the value
         of this widget. Returns None if it's not provided.
         """
-        return data.get(name, None)
+        return data.get(name)
 
     def id_for_label(self, id_):
         """
@@ -314,7 +316,7 @@ class MultipleHiddenInput(HiddenInput):
         if value is None:
             value = []
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        id_ = final_attrs.get('id', None)
+        id_ = final_attrs.get('id')
         inputs = []
         for i, v in enumerate(value):
             input_attrs = dict(value=force_text(v), **final_attrs)
@@ -328,7 +330,7 @@ class MultipleHiddenInput(HiddenInput):
     def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
             return data.getlist(name)
-        return data.get(name, None)
+        return data.get(name)
 
 
 class FileInput(Input):
@@ -340,7 +342,7 @@ class FileInput(Input):
 
     def value_from_datadict(self, data, files, name):
         "File widgets take data from FILES, not POST"
-        return files.get(name, None)
+        return files.get(name)
 
 
 FILE_INPUT_CONTRADICTION = object()
@@ -510,6 +512,13 @@ class Select(Widget):
         # more than once.
         self.choices = list(choices)
 
+    def __deepcopy__(self, memo):
+        obj = copy.copy(self)
+        obj.attrs = self.attrs.copy()
+        obj.choices = copy.copy(self.choices)
+        memo[id(self)] = obj
+        return obj
+
     def render(self, name, value, attrs=None, choices=()):
         if value is None:
             value = ''
@@ -570,13 +579,13 @@ class NullBooleanSelect(Select):
         return super(NullBooleanSelect, self).render(name, value, attrs, choices)
 
     def value_from_datadict(self, data, files, name):
-        value = data.get(name, None)
+        value = data.get(name)
         return {'2': True,
                 True: True,
                 'True': True,
                 '3': False,
                 'False': False,
-                False: False}.get(value, None)
+                False: False}.get(value)
 
 
 class SelectMultiple(Select):
@@ -596,9 +605,10 @@ class SelectMultiple(Select):
     def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
             return data.getlist(name)
-        return data.get(name, None)
+        return data.get(name)
 
 
+@html_safe
 @python_2_unicode_compatible
 class ChoiceInput(SubWidget):
     """
@@ -664,6 +674,7 @@ class CheckboxChoiceInput(ChoiceInput):
         return self.choice_value in self.value
 
 
+@html_safe
 @python_2_unicode_compatible
 class ChoiceFieldRenderer(object):
     """
@@ -693,7 +704,7 @@ class ChoiceFieldRenderer(object):
         If an id was given to the field, it is applied to the <ul> (each
         item in the list will get an id of `$id_$i`).
         """
-        id_ = self.attrs.get('id', None)
+        id_ = self.attrs.get('id')
         output = []
         for i, choice in enumerate(self.choices):
             choice_value, choice_label = choice
@@ -701,10 +712,12 @@ class ChoiceFieldRenderer(object):
                 attrs_plus = self.attrs.copy()
                 if id_:
                     attrs_plus['id'] += '_{}'.format(i)
-                sub_ul_renderer = ChoiceFieldRenderer(name=self.name,
-                                                      value=self.value,
-                                                      attrs=attrs_plus,
-                                                      choices=choice_label)
+                sub_ul_renderer = self.__class__(
+                    name=self.name,
+                    value=self.value,
+                    attrs=attrs_plus,
+                    choices=choice_label,
+                )
                 sub_ul_renderer.choice_input_class = self.choice_input_class
                 output.append(format_html(self.inner_html, choice_value=choice_value,
                                           sub_widgets=sub_ul_renderer.render()))
@@ -818,7 +831,7 @@ class MultiWidget(Widget):
             value = self.decompress(value)
         output = []
         final_attrs = self.build_attrs(attrs)
-        id_ = final_attrs.get('id', None)
+        id_ = final_attrs.get('id')
         for i, widget in enumerate(self.widgets):
             try:
                 widget_value = value[i]
@@ -913,6 +926,7 @@ class SelectDateWidget(Widget):
     month_field = '%s_month'
     day_field = '%s_day'
     year_field = '%s_year'
+    select_widget = Select
 
     date_re = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
 
@@ -977,14 +991,14 @@ class SelectDateWidget(Widget):
                         year_val, month_val, day_val = v.year, v.month, v.day
                     except ValueError:
                         pass
-                else:
+                if year_val is None:
                     match = self.date_re.match(value)
                     if match:
-                        year_val, month_val, day_val = [int(v) for v in match.groups()]
+                        year_val, month_val, day_val = [int(val) for val in match.groups()]
         html = {}
         choices = [(i, i) for i in self.years]
         html['year'] = self.create_select(name, self.year_field, value, year_val, choices, self.year_none_value)
-        choices = list(six.iteritems(self.months))
+        choices = list(self.months.items())
         html['month'] = self.create_select(name, self.month_field, value, month_val, choices, self.month_none_value)
         choices = [(i, i) for i in range(1, 32)]
         html['day'] = self.create_select(name, self.day_field, value, day_val, choices, self.day_none_value)
@@ -1018,7 +1032,7 @@ class SelectDateWidget(Widget):
                     return date_value.strftime(input_format)
             else:
                 return '%s-%s-%s' % (y, m, d)
-        return data.get(name, None)
+        return data.get(name)
 
     def create_select(self, name, field, value, val, choices, none_value):
         if 'id' in self.attrs:
@@ -1028,6 +1042,6 @@ class SelectDateWidget(Widget):
         if not self.is_required:
             choices.insert(0, none_value)
         local_attrs = self.build_attrs(id=field % id_)
-        s = Select(choices=choices)
+        s = self.select_widget(choices=choices)
         select_html = s.render(field % name, val, local_attrs)
         return select_html

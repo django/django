@@ -34,12 +34,12 @@ class RedirectFallbackMiddleware(object):
             r = Redirect.objects.get(site=current_site, old_path=full_path)
         except Redirect.DoesNotExist:
             pass
-        if settings.APPEND_SLASH and not request.path.endswith('/'):
-            # Try appending a trailing slash.
-            path_len = len(request.path)
-            full_path = full_path[:path_len] + '/' + full_path[path_len:]
+        if r is None and settings.APPEND_SLASH and not request.path.endswith('/'):
             try:
-                r = Redirect.objects.get(site=current_site, old_path=full_path)
+                r = Redirect.objects.get(
+                    site=current_site,
+                    old_path=request.get_full_path(force_append_slash=True),
+                )
             except Redirect.DoesNotExist:
                 pass
         if r is not None:

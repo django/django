@@ -1,9 +1,10 @@
 from django.core import signals
-from django.db.utils import (DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY,
-    DataError, OperationalError, IntegrityError, InternalError, ProgrammingError,
-    NotSupportedError, DatabaseError, InterfaceError, Error, ConnectionHandler,
-    ConnectionRouter)
-
+from django.db.utils import (
+    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, ConnectionHandler,
+    ConnectionRouter, DatabaseError, DataError, Error, IntegrityError,
+    InterfaceError, InternalError, NotSupportedError, OperationalError,
+    ProgrammingError,
+)
 
 __all__ = [
     'backend', 'connection', 'connections', 'router', 'DatabaseError',
@@ -20,10 +21,9 @@ router = ConnectionRouter()
 # `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
 # for backend bits.
 
-# DatabaseWrapper.__init__() takes a dictionary, not a settings module, so
-# we manually create the dictionary from the settings, passing only the
-# settings that the database backends care about. Note that TIME_ZONE is used
-# by the PostgreSQL backends.
+# DatabaseWrapper.__init__() takes a dictionary, not a settings module, so we
+# manually create the dictionary from the settings, passing only the settings
+# that the database backends care about.
 # We load all these up for backwards compatibility, you should use
 # connections['default'] instead.
 class DefaultConnectionProxy(object):

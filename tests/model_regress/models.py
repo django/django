@@ -52,7 +52,7 @@ class Department(models.Model):
 
 @python_2_unicode_compatible
 class Worker(models.Model):
-    department = models.ForeignKey(Department)
+    department = models.ForeignKey(Department, models.CASCADE)
     name = models.CharField(max_length=200)
 
     def __str__(self):
@@ -78,8 +78,8 @@ class Model1(models.Model):
 
 
 class Model2(models.Model):
-    model1 = models.ForeignKey(Model1, unique=True, to_field='pkey')
+    model1 = models.ForeignKey(Model1, models.CASCADE, unique=True, to_field='pkey')
 
 
 class Model3(models.Model):
-    model2 = models.ForeignKey(Model2, unique=True, to_field='model1')
+    model2 = models.ForeignKey(Model2, models.CASCADE, unique=True, to_field='model1')

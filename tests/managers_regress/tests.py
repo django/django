@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from django.apps import apps
 from django.db import models
 from django.template import Context, Template
 from django.test import TestCase, override_settings
+from django.test.utils import isolate_apps
 from django.utils.encoding import force_text
 
 from .models import (
@@ -66,115 +66,83 @@ class ManagersRegressionTests(TestCase):
     def test_abstract_manager(self):
         # Accessing the manager on an abstract model should
         # raise an attribute error with an appropriate message.
-        try:
+        # This error message isn't ideal, but if the model is abstract and
+        # a lot of the class instantiation logic isn't invoked; if the
+        # manager is implied, then we don't get a hook to install the
+        # error-raising manager.
+        msg = "type object 'AbstractBase3' has no attribute 'objects'"
+        with self.assertRaisesMessage(AttributeError, msg):
             AbstractBase3.objects.all()
-            self.fail('Should raise an AttributeError')
-        except AttributeError as e:
-            # This error message isn't ideal, but if the model is abstract and
-            # a lot of the class instantiation logic isn't invoked; if the
-            # manager is implied, then we don't get a hook to install the
-            # error-raising manager.
-            self.assertEqual(str(e), "type object 'AbstractBase3' has no attribute 'objects'")
 
     def test_custom_abstract_manager(self):
         # Accessing the manager on an abstract model with an custom
         # manager should raise an attribute error with an appropriate
         # message.
-        try:
+        msg = "Manager isn't available; AbstractBase2 is abstract"
+        with self.assertRaisesMessage(AttributeError, msg):
             AbstractBase2.restricted.all()
-            self.fail('Should raise an AttributeError')
-        except AttributeError as e:
-            self.assertEqual(str(e), "Manager isn't available; AbstractBase2 is abstract")
 
     def test_explicit_abstract_manager(self):
         # Accessing the manager on an abstract model with an explicit
         # manager should raise an attribute error with an appropriate
         # message.
-        try:
+        msg = "Manager isn't available; AbstractBase1 is abstract"
+        with self.assertRaisesMessage(AttributeError, msg):
             AbstractBase1.objects.all()
-            self.fail('Should raise an AttributeError')
-        except AttributeError as e:
-            self.assertEqual(str(e), "Manager isn't available; AbstractBase1 is abstract")
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
+    @isolate_apps('managers_regress')
     def test_swappable_manager(self):
-        # The models need to be removed after the test in order to prevent bad
-        # interactions with the flush operation in other tests.
-        _old_models = apps.app_configs['managers_regress'].models.copy()
+        class SwappableModel(models.Model):
+            class Meta:
+                swappable = 'TEST_SWAPPABLE_MODEL'
 
-        try:
-            class SwappableModel(models.Model):
-                class Meta:
-                    swappable = 'TEST_SWAPPABLE_MODEL'
-
-            # Accessing the manager on a swappable model should
-            # raise an attribute error with a helpful message
-            try:
-                SwappableModel.objects.all()
-                self.fail('Should raise an AttributeError')
-            except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
-
-        finally:
-            apps.app_configs['managers_regress'].models = _old_models
-            apps.all_models['managers_regress'] = _old_models
-            apps.clear_cache()
+        # Accessing the manager on a swappable model should
+        # raise an attribute error with a helpful message
+        msg = (
+            "Manager isn't available; 'managers_regress.SwappableModel' "
+            "has been swapped for 'managers_regress.Parent'"
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            SwappableModel.objects.all()
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
+    @isolate_apps('managers_regress')
     def test_custom_swappable_manager(self):
-        # The models need to be removed after the test in order to prevent bad
-        # interactions with the flush operation in other tests.
-        _old_models = apps.app_configs['managers_regress'].models.copy()
+        class SwappableModel(models.Model):
+            stuff = models.Manager()
 
-        try:
-            class SwappableModel(models.Model):
+            class Meta:
+                swappable = 'TEST_SWAPPABLE_MODEL'
 
-                stuff = models.Manager()
-
-                class Meta:
-                    swappable = 'TEST_SWAPPABLE_MODEL'
-
-            # Accessing the manager on a swappable model with an
-            # explicit manager should raise an attribute error with a
-            # helpful message
-            try:
-                SwappableModel.stuff.all()
-                self.fail('Should raise an AttributeError')
-            except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
-
-        finally:
-            apps.app_configs['managers_regress'].models = _old_models
-            apps.all_models['managers_regress'] = _old_models
-            apps.clear_cache()
+        # Accessing the manager on a swappable model with an
+        # explicit manager should raise an attribute error with a
+        # helpful message
+        msg = (
+            "Manager isn't available; 'managers_regress.SwappableModel' "
+            "has been swapped for 'managers_regress.Parent'"
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            SwappableModel.stuff.all()
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
+    @isolate_apps('managers_regress')
     def test_explicit_swappable_manager(self):
-        # The models need to be removed after the test in order to prevent bad
-        # interactions with the flush operation in other tests.
-        _old_models = apps.app_configs['managers_regress'].models.copy()
+        class SwappableModel(models.Model):
+            objects = models.Manager()
 
-        try:
-            class SwappableModel(models.Model):
+            class Meta:
+                swappable = 'TEST_SWAPPABLE_MODEL'
 
-                objects = models.Manager()
-
-                class Meta:
-                    swappable = 'TEST_SWAPPABLE_MODEL'
-
-            # Accessing the manager on a swappable model with an
-            # explicit manager should raise an attribute error with a
-            # helpful message
-            try:
-                SwappableModel.objects.all()
-                self.fail('Should raise an AttributeError')
-            except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
-
-        finally:
-            apps.app_configs['managers_regress'].models = _old_models
-            apps.all_models['managers_regress'] = _old_models
-            apps.clear_cache()
+        # Accessing the manager on a swappable model with an
+        # explicit manager should raise an attribute error with a
+        # helpful message
+        msg = (
+            "Manager isn't available; 'managers_regress.SwappableModel' "
+            "has been swapped for 'managers_regress.Parent'"
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            SwappableModel.objects.all()
 
     def test_regress_3871(self):
         related = RelatedModel.objects.create()

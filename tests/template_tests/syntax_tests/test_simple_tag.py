@@ -5,6 +5,7 @@ from ..utils import setup
 
 
 class SimpleTagTests(SimpleTestCase):
+    libraries = {'custom': 'template_tests.templatetags.custom'}
 
     @setup({'simpletag-renamed01': '{% load custom %}{% minusone 7 %}'})
     def test_simpletag_renamed01(self):

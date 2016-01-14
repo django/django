@@ -24,11 +24,16 @@ Available ``Meta`` options
 
 .. attribute:: Options.app_label
 
-    If a model exists outside of an application in :setting:`INSTALLED_APPS` or
-    if it's imported before its application was loaded, it must define which
-    app it is part of::
+    If a model is defined outside of an application in
+    :setting:`INSTALLED_APPS`, it must declare which app it belongs to::
 
         app_label = 'myapp'
+
+    .. versionadded:: 1.9
+
+    If you want to represent a model with the format ``app_label.object_name``
+    or ``app_label.model_name`` you can use ``model._meta.label``
+    or ``model._meta.label_lower`` respectively.
 
 ``db_table``
 ------------
@@ -94,8 +99,6 @@ Django quotes column and table names behind the scenes.
 ------------------------
 
 .. attribute:: Options.default_related_name
-
-    .. versionadded:: 1.8
 
     The name that will be used by default for the relation from a related object
     back to this one. The default is ``<model_name>_set``.
@@ -168,11 +171,11 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.order_with_respect_to
 
-    Marks this object as "orderable" with respect to the given field. This is almost
-    always used with related objects to allow them to be ordered with respect to a
-    parent object. For example, if an ``Answer`` relates to a ``Question`` object,
-    and a question has more than one answer, and the order of answers matters, you'd
-    do this::
+    Makes this object orderable with respect to the given field, usually a
+    ``ForeignKey``. This can be used to make related objects orderable with
+    respect to a parent object. For example, if an ``Answer`` relates to a
+    ``Question`` object, and a question has more than one answer, and the order
+    of answers matters, you'd do this::
 
         from django.db import models
 
@@ -181,7 +184,7 @@ Django quotes column and table names behind the scenes.
             # ...
 
         class Answer(models.Model):
-            question = models.ForeignKey(Question)
+            question = models.ForeignKey(Question, on_delete=models.CASCADE)
             # ...
 
             class Meta:
@@ -213,12 +216,20 @@ Django quotes column and table names behind the scenes.
         >>> answer.get_previous_in_order()
         <Answer: 1>
 
-.. admonition:: Changing order_with_respect_to
+.. admonition:: ``order_with_respect_to`` implicitly sets the ``ordering`` option
 
-        ``order_with_respect_to`` adds an additional field/database column
-        named ``_order``, so be sure to make and apply the appropriate
-        migrations if you add or change ``order_with_respect_to``
-        after your initial :djadmin:`migrate`.
+    Internally, ``order_with_respect_to`` adds an additional field/database
+    column named ``_order`` and sets the model's :attr:`~Options.ordering`
+    option to this field. Consequently, ``order_with_respect_to`` and
+    ``ordering`` cannot be used together, and the ordering added by
+    ``order_with_respect_to`` will apply whenever you obtain a list of objects
+    of this model.
+
+.. admonition:: Changing ``order_with_respect_to``
+
+    Because ``order_with_respect_to`` adds a new database column, be sure to
+    make and apply the appropriate migrations if you add or change
+    ``order_with_respect_to`` after your initial :djadmin:`migrate`.
 
 ``ordering``
 ------------
@@ -283,6 +294,32 @@ Django quotes column and table names behind the scenes.
 
     If ``proxy = True``, a model which subclasses another model will be treated as
     a :ref:`proxy model <proxy-models>`.
+
+``required_db_features``
+------------------------
+
+.. attribute:: Options.required_db_features
+
+    .. versionadded:: 1.9
+
+    List of database features that the current connection should have so that
+    the model is considered during the migration phase. For example, if you set
+    this list to ``['gis_enabled']``, the model will only be synchronized on
+    GIS-enabled databases. It's also useful to skip some models when testing
+    with several database backends. Avoid relations between models that may or
+    may not be created as the ORM doesn't handle this.
+
+``required_db_vendor``
+----------------------
+
+.. attribute:: Options.required_db_vendor
+
+    .. versionadded:: 1.9
+
+    Name of a supported database vendor that this model is specific to. Current
+    built-in vendor names are: ``sqlite``, ``postgresql``, ``mysql``,
+    ``oracle``. If this attribute is not empty and the current connection vendor
+    doesn't match it, the model will not be synchronized.
 
 ``select_on_save``
 ------------------
@@ -373,3 +410,26 @@ Django quotes column and table names behind the scenes.
         verbose_name_plural = "stories"
 
     If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+
+Read-only ``Meta`` attributes
+=============================
+
+``label``
+---------
+
+.. attribute:: Options.label
+
+    .. versionadded:: 1.9
+
+    Representation of the object, returns ``app_label.object_name``, e.g.
+    ``'polls.Question'``.
+
+``label_lower``
+---------------
+
+.. attribute:: Options.label_lower
+
+    .. versionadded:: 1.9
+
+    Representation of the model, returns ``app_label.model_name``, e.g.
+    ``'polls.question'``.

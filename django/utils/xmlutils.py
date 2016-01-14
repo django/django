@@ -2,7 +2,12 @@
 Utilities for XML generation/parsing.
 """
 
+import re
 from xml.sax.saxutils import XMLGenerator
+
+
+class UnserializableContentError(ValueError):
+    pass
 
 
 class SimplerXMLGenerator(XMLGenerator):
@@ -14,3 +19,10 @@ class SimplerXMLGenerator(XMLGenerator):
         if contents is not None:
             self.characters(contents)
         self.endElement(name)
+
+    def characters(self, content):
+        if content and re.search(r'[\x00-\x08\x0B-\x0C\x0E-\x1F]', content):
+            # Fail loudly when content has control chars (unsupported in XML 1.0)
+            # See http://www.w3.org/International/questions/qa-controls
+            raise UnserializableContentError("Control characters are not supported in XML 1.0")
+        XMLGenerator.characters(self, content)

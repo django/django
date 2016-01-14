@@ -15,55 +15,55 @@ from django.forms.models import modelform_defines_fields
 
 
 class GenericInlineModelAdminChecks(InlineModelAdminChecks):
-    def _check_exclude_of_parent_model(self, cls, parent_model):
+    def _check_exclude_of_parent_model(self, obj, parent_model):
         # There's no FK to exclude, so no exclusion checks are required.
         return []
 
-    def _check_relation(self, cls, parent_model):
+    def _check_relation(self, obj, parent_model):
         # There's no FK, but we do need to confirm that the ct_field and ct_fk_field are valid,
         # and that they are part of a GenericForeignKey.
 
         gfks = [
-            f for f in cls.model._meta.virtual_fields
+            f for f in obj.model._meta.virtual_fields
             if isinstance(f, GenericForeignKey)
         ]
         if len(gfks) == 0:
             return [
                 checks.Error(
                     "'%s.%s' has no GenericForeignKey." % (
-                        cls.model._meta.app_label, cls.model._meta.object_name
+                        obj.model._meta.app_label, obj.model._meta.object_name
                     ),
                     hint=None,
-                    obj=cls,
+                    obj=obj.__class__,
                     id='admin.E301'
                 )
             ]
         else:
             # Check that the ct_field and ct_fk_fields exist
             try:
-                cls.model._meta.get_field(cls.ct_field)
+                obj.model._meta.get_field(obj.ct_field)
             except FieldDoesNotExist:
                 return [
                     checks.Error(
                         "'ct_field' references '%s', which is not a field on '%s.%s'." % (
-                            cls.ct_field, cls.model._meta.app_label, cls.model._meta.object_name
+                            obj.ct_field, obj.model._meta.app_label, obj.model._meta.object_name
                         ),
                         hint=None,
-                        obj=cls,
+                        obj=obj.__class__,
                         id='admin.E302'
                     )
                 ]
 
             try:
-                cls.model._meta.get_field(cls.ct_fk_field)
+                obj.model._meta.get_field(obj.ct_fk_field)
             except FieldDoesNotExist:
                 return [
                     checks.Error(
                         "'ct_fk_field' references '%s', which is not a field on '%s.%s'." % (
-                            cls.ct_fk_field, cls.model._meta.app_label, cls.model._meta.object_name
+                            obj.ct_fk_field, obj.model._meta.app_label, obj.model._meta.object_name
                         ),
                         hint=None,
-                        obj=cls,
+                        obj=obj.__class__,
                         id='admin.E303'
                     )
                 ]
@@ -71,16 +71,16 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             # There's one or more GenericForeignKeys; make sure that one of them
             # uses the right ct_field and ct_fk_field.
             for gfk in gfks:
-                if gfk.ct_field == cls.ct_field and gfk.fk_field == cls.ct_fk_field:
+                if gfk.ct_field == obj.ct_field and gfk.fk_field == obj.ct_fk_field:
                     return []
 
             return [
                 checks.Error(
                     "'%s.%s' has no GenericForeignKey using content type field '%s' and object ID field '%s'." % (
-                        cls.model._meta.app_label, cls.model._meta.object_name, cls.ct_field, cls.ct_fk_field
+                        obj.model._meta.app_label, obj.model._meta.object_name, obj.ct_field, obj.ct_fk_field
                     ),
                     hint=None,
-                    obj=cls,
+                    obj=obj.__class__,
                     id='admin.E304'
                 )
             ]

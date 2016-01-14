@@ -2,17 +2,17 @@
 
 from __future__ import unicode_literals
 
-from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
+from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections, connection
 from django.test import (
-    RequestFactory, TestCase, TransactionTestCase, override_settings,
+    RequestFactory, SimpleTestCase, TransactionTestCase, override_settings,
 )
 from django.utils import six
 from django.utils.encoding import force_str
 
 
-class HandlerTests(TestCase):
+class HandlerTests(SimpleTestCase):
 
     def setUp(self):
         request_started.disconnect(close_old_connections)
@@ -137,7 +137,7 @@ class TransactionsPerRequestTests(TransactionTestCase):
 
 
 @override_settings(ROOT_URLCONF='handlers.urls')
-class SignalsTests(TestCase):
+class SignalsTests(SimpleTestCase):
 
     def setUp(self):
         self.signals = []
@@ -170,7 +170,7 @@ class SignalsTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='handlers.urls')
-class HandlerSuspiciousOpsTest(TestCase):
+class HandlerSuspiciousOpsTest(SimpleTestCase):
 
     def test_suspiciousop_in_view_returns_400(self):
         response = self.client.get('/suspicious/')
@@ -178,25 +178,43 @@ class HandlerSuspiciousOpsTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF='handlers.urls')
-class HandlerNotFoundTest(TestCase):
+class HandlerNotFoundTest(SimpleTestCase):
 
     def test_invalid_urls(self):
         response = self.client.get('~%A9helloworld')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, '~%A9helloworld', status_code=404)
 
         response = self.client.get('d%aao%aaw%aan%aal%aao%aaa%aad%aa/')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, 'd%AAo%AAw%AAn%AAl%AAo%AAa%AAd%AA', status_code=404)
 
         response = self.client.get('/%E2%99%E2%99%A5/')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, '%E2%99\u2665', status_code=404)
 
         response = self.client.get('/%E2%98%8E%E2%A9%E2%99%A5/')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, '\u260e%E2%A9\u2665', status_code=404)
 
     def test_environ_path_info_type(self):
         environ = RequestFactory().get('/%E2%A8%87%87%A5%E2%A8%A0').environ
         self.assertIsInstance(environ['PATH_INFO'], six.text_type)
+
+
+class ScriptNameTests(SimpleTestCase):
+    def test_get_script_name(self):
+        # Regression test for #23173
+        # Test first without PATH_INFO
+        script_name = get_script_name({'SCRIPT_URL': '/foobar/'})
+        self.assertEqual(script_name, '/foobar/')
+
+        script_name = get_script_name({'SCRIPT_URL': '/foobar/', 'PATH_INFO': '/'})
+        self.assertEqual(script_name, '/foobar')
+
+    def test_get_script_name_double_slashes(self):
+        """
+        WSGI squashes multiple successive slashes in PATH_INFO, get_script_name
+        should take that into account when forming SCRIPT_NAME (#17133).
+        """
+        script_name = get_script_name({
+            'SCRIPT_URL': '/mst/milestones//accounts/login//help',
+            'PATH_INFO': '/milestones/accounts/login/help',
+        })
+        self.assertEqual(script_name, '/mst')

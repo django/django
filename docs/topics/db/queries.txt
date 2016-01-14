@@ -426,13 +426,13 @@ probably use:
 :lookup:`exact`
     An "exact" match. For example::
 
-        >>> Entry.objects.get(headline__exact="Man bites dog")
+        >>> Entry.objects.get(headline__exact="Cat bites dog")
 
     Would generate SQL along these lines:
 
     .. code-block:: sql
 
-        SELECT ... WHERE headline = 'Man bites dog';
+        SELECT ... WHERE headline = 'Cat bites dog';
 
     If you don't provide a lookup type -- that is, if your keyword argument
     doesn't contain a double underscore -- the lookup type is assumed to be
@@ -546,8 +546,7 @@ find entries linked to tags called *"music"* and *"bands"* or we might want an
 entry that contains a tag with a name of *"music"* and a status of *"public"*.
 
 To handle both of these situations, Django has a consistent way of processing
-:meth:`~django.db.models.query.QuerySet.filter` and
-:meth:`~django.db.models.query.QuerySet.exclude` calls. Everything inside a
+:meth:`~django.db.models.query.QuerySet.filter` calls. Everything inside a
 single :meth:`~django.db.models.query.QuerySet.filter` call is applied
 simultaneously to filter out items matching all those requirements. Successive
 :meth:`~django.db.models.query.QuerySet.filter` calls further restrict the set
@@ -581,14 +580,34 @@ that were published in 2008. The entries selected by the second filter may or
 may not be the same as the entries in the first filter. We are filtering the
 ``Blog`` items with each filter statement, not the ``Entry`` items.
 
-All of this behavior also applies to
-:meth:`~django.db.models.query.QuerySet.exclude`: all the conditions in a
-single :meth:`~django.db.models.query.QuerySet.exclude` statement apply to a
-single instance (if those conditions are talking about the same multi-valued
-relation). Conditions in subsequent
-:meth:`~django.db.models.query.QuerySet.filter` or
-:meth:`~django.db.models.query.QuerySet.exclude` calls that refer to the same
-relation may end up filtering on different linked objects.
+.. note::
+
+    The behavior of :meth:`~django.db.models.query.QuerySet.filter` for queries
+    that span multi-value relationships, as described above, is not implemented
+    equivalently for :meth:`~django.db.models.query.QuerySet.exclude`. Instead,
+    the conditions in a single :meth:`~django.db.models.query.QuerySet.exclude`
+    call will not necessarily refer to the same item.
+
+    For example, the following query would exclude blogs that contain *both*
+    entries with *"Lennon"* in the headline *and* entries published in 2008::
+
+        Blog.objects.exclude(
+            entry__headline__contains='Lennon',
+            entry__pub_date__year=2008,
+        )
+
+    However, unlike the behavior when using
+    :meth:`~django.db.models.query.QuerySet.filter`, this will not limit blogs
+    based on entries that satisfy both conditions. In order to do that, i.e.
+    to select all blogs that do not contain entries published with *"Lennon"*
+    that were published in 2008, you need to make two queries::
+
+        Blog.objects.exclude(
+            entry=Entry.objects.filter(
+                headline__contains='Lennon',
+                pub_date__year=2008,
+            ),
+        )
 
 .. _using-f-expressions-in-filters:
 
@@ -880,9 +899,15 @@ Deleting objects
 
 The delete method, conveniently, is named
 :meth:`~django.db.models.Model.delete`. This method immediately deletes the
-object and has no return value. Example::
+object and returns the number of objects deleted and a dictionary with
+the number of deletions per object type. Example::
 
-    e.delete()
+    >>> e.delete()
+    (1, {'weblog.Entry': 1})
+
+.. versionchanged:: 1.9
+
+    The return value describing the number of objects deleted was added.
 
 You can also delete objects in bulk. Every
 :class:`~django.db.models.query.QuerySet` has a
@@ -892,7 +917,8 @@ members of that :class:`~django.db.models.query.QuerySet`.
 For example, this deletes all ``Entry`` objects with a ``pub_date`` year of
 2005::
 
-    Entry.objects.filter(pub_date__year=2005).delete()
+    >>> Entry.objects.filter(pub_date__year=2005).delete()
+    (5, {'webapp.Entry': 5})
 
 Keep in mind that this will, whenever possible, be executed purely in SQL, and
 so the ``delete()`` methods of individual object instances will not necessarily
@@ -903,6 +929,10 @@ on a model class and want to ensure that it is called, you will need to
 object individually) rather than using the bulk
 :meth:`~django.db.models.query.QuerySet.delete` method of a
 :class:`~django.db.models.query.QuerySet`.
+
+.. versionchanged:: 1.9
+
+    The return value describing the number of objects deleted was added.
 
 When Django deletes an object, by default it emulates the behavior of the SQL
 constraint ``ON DELETE CASCADE`` -- in other words, any objects which had
@@ -991,8 +1021,8 @@ new value to be the new model instance you want to point to. For example::
 The ``update()`` method is applied instantly and returns the number of rows
 matched by the query (which may not be equal to the number of rows updated if
 some rows already have the new value). The only restriction on the
-:class:`~django.db.models.query.QuerySet` that is updated is that it can only
-access one database table, the model's main table. You can filter based on
+:class:`~django.db.models.query.QuerySet` being updated is that it can only
+access one database table: the model's main table. You can filter based on
 related fields, but you can only update columns in the model's main
 table. Example::
 
@@ -1130,8 +1160,8 @@ Example::
 You can override the ``FOO_set`` name by setting the
 :attr:`~django.db.models.ForeignKey.related_name` parameter in the
 :class:`~django.db.models.ForeignKey` definition. For example, if the ``Entry``
-model was altered to ``blog = ForeignKey(Blog, related_name='entries')``, the
-above example code would look like this::
+model was altered to ``blog = ForeignKey(Blog, on_delete=models.CASCADE,
+related_name='entries')``, the above example code would look like this::
 
     >>> b = Blog.objects.get(id=1)
     >>> b.entries.all() # Returns all Entry objects related to Blog.
@@ -1193,12 +1223,11 @@ be found in the :doc:`related objects reference </ref/models/relations>`.
 ``set(objs)``
     Replace the set of related objects.
 
-To assign the members of a related set in one fell swoop, just assign to it
-from any iterable object. The iterable can contain object instances, or just
-a list of primary key values. For example::
+To assign the members of a related set, use the ``set()`` method with an
+iterable of object instances or a list of primary key values. For example::
 
     b = Blog.objects.get(id=1)
-    b.entry_set = [e1, e2]
+    b.entry_set.set([e1, e2])
 
 In this example, ``e1`` and ``e2`` can be full Entry instances, or integer
 primary key values.
@@ -1254,7 +1283,7 @@ model.
 For example::
 
     class EntryDetail(models.Model):
-        entry = models.OneToOneField(Entry)
+        entry = models.OneToOneField(Entry, on_delete=models.CASCADE)
         details = models.TextField()
 
     ed = EntryDetail.objects.get(id=2)

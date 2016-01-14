@@ -1,9 +1,8 @@
 from django.conf import settings
 from django.http import HttpResponseForbidden
-from django.template import Context, Template
+from django.template import Context, Engine, TemplateDoesNotExist, loader
 from django.utils.translation import ugettext as _
 from django.utils.version import get_docs_version
-
 
 # We include the template inline since we need to be able to reliably display
 # this error message, especially for the sake of developers, and there isn't any
@@ -67,9 +66,9 @@ CSRF_FAILURE_TEMPLATE = """
   <ul>
     <li>Your browser is accepting cookies.</li>
 
-    <li>The view function uses <a
-    href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/templates/api/#subclassing-context-requestcontext"><code>RequestContext</code></a>
-    for the template, instead of <code>Context</code>.</li>
+    <li>The view function passes a <code>request</code> to the template's <a
+    href="https://docs.djangoproject.com/en/dev/topics/templates/#django.template.backends.base.Template.render"><code>render</code></a>
+    method.</li>
 
     <li>In the template, there is a <code>{% templatetag openblock %} csrf_token
     {% templatetag closeblock %}</code> template tag inside each POST form that
@@ -95,14 +94,14 @@ CSRF_FAILURE_TEMPLATE = """
 </body>
 </html>
 """
+CSRF_FAILURE_TEMPLATE_NAME = "403_csrf.html"
 
 
-def csrf_failure(request, reason=""):
+def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
     """
     Default view used when request fails CSRF protection
     """
     from django.middleware.csrf import REASON_NO_REFERER, REASON_NO_CSRF_COOKIE
-    t = Template(CSRF_FAILURE_TEMPLATE)
     c = Context({
         'title': _("Forbidden"),
         'main': _("CSRF verification failed. Request aborted."),
@@ -131,4 +130,13 @@ def csrf_failure(request, reason=""):
         'docs_version': get_docs_version(),
         'more': _("More information is available with DEBUG=True."),
     })
+    try:
+        t = loader.get_template(template_name)
+    except TemplateDoesNotExist:
+        if template_name == CSRF_FAILURE_TEMPLATE_NAME:
+            # If the default template doesn't exist, use the string template.
+            t = Engine().from_string(CSRF_FAILURE_TEMPLATE)
+        else:
+            # Raise if a developer-specified template doesn't exist.
+            raise
     return HttpResponseForbidden(t.render(c), content_type='text/html')

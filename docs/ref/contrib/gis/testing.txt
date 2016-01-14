@@ -17,16 +17,6 @@ Settings
 
     The settings below have sensible defaults, and shouldn't require manual setting.
 
-.. setting:: POSTGIS_TEMPLATE
-
-``POSTGIS_TEMPLATE``
-^^^^^^^^^^^^^^^^^^^^
-
-This setting may be used to customize the name of the PostGIS template
-database to use. It automatically defaults to ``'template_postgis'``
-(the same name used in the
-:ref:`installation documentation <spatialdb_template>`).
-
 .. setting:: POSTGIS_VERSION
 
 ``POSTGIS_VERSION``
@@ -36,10 +26,10 @@ When GeoDjango's spatial backend initializes on PostGIS, it has to perform
 an SQL query to determine the version in order to figure out what
 features are available. Advanced users wishing to prevent this additional
 query may set the version manually using a 3-tuple of integers specifying
-the major, minor, and subminor version numbers for PostGIS. For example,
-to configure for PostGIS 1.5.2 you would use::
+the major, minor, and micro version numbers for PostGIS. For example,
+to configure for PostGIS X.Y.Z you would use::
 
-    POSTGIS_VERSION = (1, 5, 2)
+    POSTGIS_VERSION = (X, Y, Z)
 
 Obtaining sufficient privileges
 -------------------------------
@@ -79,15 +69,6 @@ Or you may alter the user's role from the SQL shell (assuming this
 is done from an existing superuser account)::
 
     postgres# ALTER ROLE <user_name> SUPERUSER;
-
-Create a database using PostGIS version 2
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-When testing projects using :ref:`PostGIS 2 <spatialdb_template91>`,
-the test database is created using the ``CREATE EXTENSION postgis``
-instruction, provided that no template ``template_postgis`` (or named
-accordingly to :setting:`POSTGIS_TEMPLATE`) exists in the current
-database.
 
 Windows
 -------
@@ -147,6 +128,6 @@ be performed when executing the command::
 
     $ ./runtests.py --settings=postgis
 
-To run only the GeoDjango test suite, specify ``django.contrib.gis``::
+To run only the GeoDjango test suite, specify ``gis_tests``::
 
-    $ ./runtests.py --settings=postgis django.contrib.gis
+    $ ./runtests.py --settings=postgis gis_tests

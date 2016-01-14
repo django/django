@@ -9,16 +9,15 @@ Time zones
 Overview
 ========
 
-When support for time zones is enabled, Django stores date and time
-information in UTC in the database, uses time-zone-aware datetime objects
-internally, and translates them to the end user's time zone in templates and
-forms.
+When support for time zones is enabled, Django stores datetime information in
+UTC in the database, uses time-zone-aware datetime objects internally, and
+translates them to the end user's time zone in templates and forms.
 
 This is handy if your users live in more than one time zone and you want to
-display date and time information according to each user's wall clock.
+display datetime information according to each user's wall clock.
 
-Even if your Web site is available in only one time zone, it's still good
-practice to store data in UTC in your database. One main reason is Daylight
+Even if your website is available in only one time zone, it's still good
+practice to store data in UTC in your database. The main reason is Daylight
 Saving Time (DST). Many countries have a system of DST, where clocks are moved
 forward in spring and backward in autumn. If you're working in local time,
 you're likely to encounter errors twice a year, when the transitions happen.
@@ -34,7 +33,7 @@ but may not be mandatory depending on your particular database backend,
 operating system and time zone. If you encounter an exception querying dates
 or times, please try installing it before filing a bug. It's as simple as:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ pip install pytz
 
@@ -169,7 +168,7 @@ time zone automatically. Instead, Django provides :ref:`time zone selection
 functions <time-zone-selection-functions>`. Use them to build the time zone
 selection logic that makes sense for you.
 
-Most Web sites that care about time zones just ask users in which time zone they
+Most websites that care about time zones just ask users in which time zone they
 live and store this information in the user's profile. For anonymous users,
 they use the time zone of their primary audience or UTC. pytz_ provides
 helpers_, like a list of time zones per country, that you can use to pre-select
@@ -537,6 +536,14 @@ Setup
    Furthermore, if you want to support users in more than one time zone, pytz
    is the reference for time zone definitions.
 
+4. **How do I interact with a database that stores datetimes in local time?**
+
+   Set the :setting:`TIME_ZONE <DATABASE-TIME_ZONE>` option to the appropriate
+   time zone for this database in the :setting:`DATABASES` setting.
+
+   This is useful for connecting to a database that doesn't support time zones
+   and that isn't managed by Django when :setting:`USE_TZ` is ``True``.
+
 Troubleshooting
 ---------------
 
@@ -704,4 +711,4 @@ Usage
 .. _more examples: http://pytz.sourceforge.net/#example-usage
 .. _these issues: http://pytz.sourceforge.net/#problems-with-localtime
 .. _helpers: http://pytz.sourceforge.net/#helpers
-.. _tz database: http://en.wikipedia.org/wiki/Tz_database
+.. _tz database: https://en.wikipedia.org/wiki/Tz_database

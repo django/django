@@ -1,4 +1,3 @@
-import re
 from collections import namedtuple
 
 from MySQLdb.constants import FIELD_TYPE
@@ -11,7 +10,6 @@ from django.utils.encoding import force_text
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra', 'default'))
 InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default')
-foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -40,8 +38,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_field_type(self, data_type, description):
         field_type = super(DatabaseIntrospection, self).get_field_type(data_type, description)
-        if field_type == 'IntegerField' and 'auto_increment' in description.extra:
-            return 'AutoField'
+        if 'auto_increment' in description.extra:
+            if field_type == 'IntegerField':
+                return 'AutoField'
+            elif field_type == 'BigIntegerField':
+                return 'BigAutoField'
+
         return field_type
 
     def get_table_list(self, cursor):

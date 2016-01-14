@@ -3,24 +3,33 @@ from __future__ import unicode_literals
 import collections
 import datetime
 import decimal
-import inspect
+import functools
 import math
 import os
 import re
-import sys
 import types
 from importlib import import_module
 
+from django import get_version
 from django.apps import apps
 from django.db import migrations, models
 from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.operations.base import Operation
+from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils import datetime_safe, six
+from django.utils._os import upath
 from django.utils.encoding import force_text
-from django.utils.functional import Promise
-from django.utils.timezone import utc
+from django.utils.functional import LazyObject, Promise
+from django.utils.inspect import get_func_args
+from django.utils.module_loading import module_dir
+from django.utils.timezone import now, utc
 from django.utils.version import get_docs_version
 
-COMPILED_REGEX_TYPE = type(re.compile(''))
+try:
+    import enum
+except ImportError:
+    # No support on Python 2 if enum34 isn't installed.
+    enum = None
 
 
 class SettingsReference(str):
@@ -38,11 +47,10 @@ class SettingsReference(str):
 
 
 class OperationWriter(object):
-    indentation = 2
-
-    def __init__(self, operation):
+    def __init__(self, operation, indentation=2):
         self.operation = operation
         self.buff = []
+        self.indentation = indentation
 
     def serialize(self):
 
@@ -55,7 +63,14 @@ class OperationWriter(object):
                     for key, value in _arg_value.items():
                         key_string, key_imports = MigrationWriter.serialize(key)
                         arg_string, arg_imports = MigrationWriter.serialize(value)
-                        self.feed('%s: %s,' % (key_string, arg_string))
+                        args = arg_string.splitlines()
+                        if len(args) > 1:
+                            self.feed('%s: %s' % (key_string, args[0]))
+                            for arg in args[1:-1]:
+                                self.feed(arg)
+                            self.feed('%s,' % args[-1])
+                        else:
+                            self.feed('%s: %s,' % (key_string, arg_string))
                         imports.update(key_imports)
                         imports.update(arg_imports)
                     self.unindent()
@@ -65,18 +80,31 @@ class OperationWriter(object):
                     self.indent()
                     for item in _arg_value:
                         arg_string, arg_imports = MigrationWriter.serialize(item)
-                        self.feed('%s,' % arg_string)
+                        args = arg_string.splitlines()
+                        if len(args) > 1:
+                            for arg in args[:-1]:
+                                self.feed(arg)
+                            self.feed('%s,' % args[-1])
+                        else:
+                            self.feed('%s,' % arg_string)
                         imports.update(arg_imports)
                     self.unindent()
                     self.feed('],')
             else:
                 arg_string, arg_imports = MigrationWriter.serialize(_arg_value)
-                self.feed('%s=%s,' % (_arg_name, arg_string))
+                args = arg_string.splitlines()
+                if len(args) > 1:
+                    self.feed('%s=%s' % (_arg_name, args[0]))
+                    for arg in args[1:-1]:
+                        self.feed(arg)
+                    self.feed('%s,' % args[-1])
+                else:
+                    self.feed('%s=%s,' % (_arg_name, arg_string))
                 imports.update(arg_imports)
 
         imports = set()
         name, args, kwargs = self.operation.deconstruct()
-        argspec = inspect.getargspec(self.operation.__init__)
+        operation_args = get_func_args(self.operation.__init__)
 
         # See if this operation is in django.db.migrations. If it is,
         # We can just use the fact we already have that imported,
@@ -89,15 +117,14 @@ class OperationWriter(object):
 
         self.indent()
 
-        # Start at one because argspec includes "self"
-        for i, arg in enumerate(args, 1):
+        for i, arg in enumerate(args):
             arg_value = arg
-            arg_name = argspec.args[i]
+            arg_name = operation_args[i]
             _write(arg_name, arg_value)
 
         i = len(args)
         # Only iterate over remaining arguments
-        for arg_name in argspec.args[i + 1:]:
+        for arg_name in operation_args[i:]:
             if arg_name in kwargs:  # Don't sort to maintain signature order
                 arg_value = kwargs[arg_name]
                 _write(arg_name, arg_value)
@@ -135,9 +162,10 @@ class MigrationWriter(object):
         """
         items = {
             "replaces_str": "",
+            "initial_str": "",
         }
 
-        imports = {"from django.db import migrations, models"}
+        imports = set()
 
         # Deconstruct operations
         operations = []
@@ -167,7 +195,15 @@ class MigrationWriter(object):
                 migration_imports.add(line.split("import")[1].strip())
                 imports.remove(line)
                 self.needs_manual_porting = True
-        imports.discard("from django.db import models")
+
+        # django.db.migrations is always used, but models import may not be.
+        # If models import exists, merge it with migrations import.
+        if "from django.db import models" in imports:
+            imports.discard("from django.db import models")
+            imports.add("from django.db import migrations, models")
+        else:
+            imports.add("from django.db import migrations")
+
         # Sort imports by the package / module to be imported (the part after
         # "from" in "from ... import ..." or after "import" in "import ...").
         sorted_imports = sorted(imports, key=lambda i: i.split()[1])
@@ -182,6 +218,14 @@ class MigrationWriter(object):
         # If there's a replaces, make a string for it
         if self.migration.replaces:
             items['replaces_str'] = "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
+        # Hinting that goes into comment
+        items.update(
+            version=get_version(),
+            timestamp=now().strftime("%Y-%m-%d %H:%M"),
+        )
+
+        if self.migration.initial:
+            items['initial_str'] = "\n    initial = True\n"
 
         return (MIGRATION_TEMPLATE % items).encode("utf8")
 
@@ -200,43 +244,73 @@ class MigrationWriter(object):
         return value_repr
 
     @property
+    def basedir(self):
+        migrations_package_name = MigrationLoader.migrations_module(self.migration.app_label)
+
+        if migrations_package_name is None:
+            raise ValueError(
+                "Django can't create migrations for app '%s' because "
+                "migrations have been disabled via the MIGRATION_MODULES "
+                "setting." % self.migration.app_label
+            )
+
+        # See if we can import the migrations module directly
+        try:
+            migrations_module = import_module(migrations_package_name)
+        except ImportError:
+            pass
+        else:
+            try:
+                return upath(module_dir(migrations_module))
+            except ValueError:
+                pass
+
+        # Alright, see if it's a direct submodule of the app
+        app_config = apps.get_app_config(self.migration.app_label)
+        maybe_app_name, _, migrations_package_basename = migrations_package_name.rpartition(".")
+        if app_config.name == maybe_app_name:
+            return os.path.join(app_config.path, migrations_package_basename)
+
+        # In case of using MIGRATION_MODULES setting and the custom package
+        # doesn't exist, create one, starting from an existing package
+        existing_dirs, missing_dirs = migrations_package_name.split("."), []
+        while existing_dirs:
+            missing_dirs.insert(0, existing_dirs.pop(-1))
+            try:
+                base_module = import_module(".".join(existing_dirs))
+            except ImportError:
+                continue
+            else:
+                try:
+                    base_dir = upath(module_dir(base_module))
+                except ValueError:
+                    continue
+                else:
+                    break
+        else:
+            raise ValueError(
+                "Could not locate an appropriate location to create "
+                "migrations package %s. Make sure the toplevel "
+                "package exists and can be imported." %
+                migrations_package_name)
+
+        final_dir = os.path.join(base_dir, *missing_dirs)
+        if not os.path.isdir(final_dir):
+            os.makedirs(final_dir)
+        for missing_dir in missing_dirs:
+            base_dir = os.path.join(base_dir, missing_dir)
+            with open(os.path.join(base_dir, "__init__.py"), "w"):
+                pass
+
+        return final_dir
+
+    @property
     def filename(self):
         return "%s.py" % self.migration.name
 
     @property
     def path(self):
-        migrations_package_name = MigrationLoader.migrations_module(self.migration.app_label)
-        # See if we can import the migrations module directly
-        try:
-            migrations_module = import_module(migrations_package_name)
-
-            # Python 3 fails when the migrations directory does not have a
-            # __init__.py file
-            if not hasattr(migrations_module, '__file__'):
-                raise ImportError
-
-            basedir = os.path.dirname(migrations_module.__file__)
-        except ImportError:
-            app_config = apps.get_app_config(self.migration.app_label)
-            migrations_package_basename = migrations_package_name.split(".")[-1]
-
-            # Alright, see if it's a direct submodule of the app
-            if '%s.%s' % (app_config.name, migrations_package_basename) == migrations_package_name:
-                basedir = os.path.join(app_config.path, migrations_package_basename)
-            else:
-                # In case of using MIGRATION_MODULES setting and the custom
-                # package doesn't exist, create one.
-                package_dirs = migrations_package_name.split(".")
-                create_path = os.path.join(sys.path[0], *package_dirs)
-                if not os.path.isdir(create_path):
-                    os.makedirs(create_path)
-                for i in range(1, len(package_dirs) + 1):
-                    init_dir = os.path.join(sys.path[0], *package_dirs[:i])
-                    init_path = os.path.join(init_dir, "__init__.py")
-                    if not os.path.isfile(init_path):
-                        open(init_path, "w").close()
-                return os.path.join(create_path, self.filename)
-        return os.path.join(basedir, self.filename)
+        return os.path.join(self.basedir, self.filename)
 
     @classmethod
     def serialize_deconstructed(cls, path, args, kwargs):
@@ -276,9 +350,13 @@ class MigrationWriter(object):
         # process.
         if isinstance(value, Promise):
             value = force_text(value)
+        elif isinstance(value, LazyObject):
+            # The unwrapped value is returned as the first item of the
+            # arguments tuple.
+            value = value.__reduce__()[1][0]
 
         # Sequences
-        if isinstance(value, (list, set, tuple)):
+        if isinstance(value, (frozenset, list, set, tuple)):
             imports = set()
             strings = []
             for item in value:
@@ -288,6 +366,8 @@ class MigrationWriter(object):
             if isinstance(value, set):
                 # Don't use the literal "{%s}" as it doesn't support empty set
                 format = "set([%s])"
+            elif isinstance(value, frozenset):
+                format = "frozenset([%s])"
             elif isinstance(value, tuple):
                 # When len(value)==0, the empty tuple should be serialized as
                 # "()", not "(,)" because (,) is invalid Python syntax.
@@ -306,6 +386,14 @@ class MigrationWriter(object):
                 imports.update(v_imports)
                 strings.append((k_string, v_string))
             return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
+        # Enums
+        elif enum and isinstance(value, enum.Enum):
+            enum_class = value.__class__
+            module = enum_class.__module__
+            imports = {"import %s" % module}
+            v_string, v_imports = cls.serialize(value.value)
+            imports.update(v_imports)
+            return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
         # Datetimes
         elif isinstance(value, datetime.datetime):
             value_repr = cls.serialize_datetime(value)
@@ -325,6 +413,9 @@ class MigrationWriter(object):
             if isinstance(value, datetime_safe.time):
                 value_repr = "datetime.%s" % value_repr
             return value_repr, {"import datetime"}
+        # Timedeltas
+        elif isinstance(value, datetime.timedelta):
+            return repr(value), {"import datetime"}
         # Settings references
         elif isinstance(value, SettingsReference):
             return "settings.%s" % value.setting_name, {"from django.conf import settings"}
@@ -375,6 +466,26 @@ class MigrationWriter(object):
                 return "%s.as_manager()" % name, imports
             else:
                 return cls.serialize_deconstructed(manager_path, args, kwargs)
+        elif isinstance(value, Operation):
+            string, imports = OperationWriter(value, indentation=0).serialize()
+            # Nested operation, trailing comma is handled in upper OperationWriter._write()
+            return string.rstrip(','), imports
+        elif isinstance(value, functools.partial):
+            imports = {'import functools'}
+            # Serialize functools.partial() arguments
+            func_string, func_imports = cls.serialize(value.func)
+            args_string, args_imports = cls.serialize(value.args)
+            keywords_string, keywords_imports = cls.serialize(value.keywords)
+            # Add any imports needed by arguments
+            imports.update(func_imports)
+            imports.update(args_imports)
+            imports.update(keywords_imports)
+            return (
+                "functools.partial(%s, *%s, **%s)" % (
+                    func_string, args_string, keywords_string,
+                ),
+                imports,
+            )
         # Anything that knows how to deconstruct itself.
         elif hasattr(value, 'deconstruct'):
             return cls.serialize_deconstructed(*value.deconstruct())
@@ -408,6 +519,9 @@ class MigrationWriter(object):
                     "For more information, see "
                     "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
                     % (value.__name__, module_name, get_docs_version()))
+            # Needed on Python 2 only
+            if module_name == '__builtin__':
+                return value.__name__, set()
             return "%s.%s" % (module_name, value.__name__), {"import %s" % module_name}
         # Other iterables
         elif isinstance(value, collections.Iterable):
@@ -422,7 +536,7 @@ class MigrationWriter(object):
             format = "(%s)" if len(strings) != 1 else "(%s,)"
             return format % (", ".join(strings)), imports
         # Compiled regex
-        elif isinstance(value, COMPILED_REGEX_TYPE):
+        elif isinstance(value, (COMPILED_REGEX_TYPE, RegexObject)):
             imports = {"import re"}
             regex_pattern, pattern_imports = cls.serialize(value.pattern)
             regex_flags, flag_imports = cls.serialize(value.flags)
@@ -443,12 +557,13 @@ class MigrationWriter(object):
 
 MIGRATION_TEMPLATE = """\
 # -*- coding: utf-8 -*-
+# Generated by Django %(version)s on %(timestamp)s
 from __future__ import unicode_literals
 
 %(imports)s
 
 class Migration(migrations.Migration):
-%(replaces_str)s
+%(replaces_str)s%(initial_str)s
     dependencies = [
 %(dependencies)s\
     ]

@@ -1,8 +1,10 @@
 from django.db import models
-from django.test import TestCase
+from django.test import SimpleTestCase
+from django.test.utils import isolate_apps
 
 
-class AbsoluteUrlOverrideTests(TestCase):
+@isolate_apps('absolute_url_overrides')
+class AbsoluteUrlOverrideTests(SimpleTestCase):
 
     def test_get_absolute_url(self):
         """

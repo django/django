@@ -3,10 +3,13 @@ from __future__ import unicode_literals
 import copy
 import pickle
 import sys
+import warnings
 from unittest import TestCase
 
 from django.utils import six
 from django.utils.functional import LazyObject, SimpleLazyObject, empty
+
+from .models import Category, CategoryInfo
 
 
 class Foo(object):
@@ -165,11 +168,22 @@ class LazyObjectTestCase(TestCase):
             del obj_dict['f']
 
     def test_iter(self):
-        # LazyObjects don't actually implements __iter__ but you can still
-        # iterate over them because they implement __getitem__
-        obj = self.lazy_wrap([1, 2, 3])
-        for expected, actual in zip([1, 2, 3], obj):
-            self.assertEqual(expected, actual)
+        # Tests whether an object's custom `__iter__` method is being
+        # used when iterating over it.
+
+        class IterObject(object):
+
+            def __init__(self, values):
+                self.values = values
+
+            def __iter__(self):
+                return iter(self.values)
+
+        original_list = ['test', '123']
+        self.assertEqual(
+            list(self.lazy_wrap(IterObject(original_list))),
+            original_list
+        )
 
     def test_pickle(self):
         # See ticket #16563
@@ -273,3 +287,92 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
         self.assertNotIn(6, lazy_set)
         self.assertEqual(len(lazy_list), 5)
         self.assertEqual(len(lazy_set), 4)
+
+
+class BaseBaz(object):
+    """
+    A base class with a funky __reduce__ method, meant to simulate the
+    __reduce__ method of Model, which sets self._django_version.
+    """
+    def __init__(self):
+        self.baz = 'wrong'
+
+    def __reduce__(self):
+        self.baz = 'right'
+        return super(BaseBaz, self).__reduce__()
+
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        for attr in ['bar', 'baz', 'quux']:
+            if hasattr(self, attr) != hasattr(other, attr):
+                return False
+            elif getattr(self, attr, None) != getattr(other, attr, None):
+                return False
+        return True
+
+
+class Baz(BaseBaz):
+    """
+    A class that inherits from BaseBaz and has its own __reduce_ex__ method.
+    """
+    def __init__(self, bar):
+        self.bar = bar
+        super(Baz, self).__init__()
+
+    def __reduce_ex__(self, proto):
+        self.quux = 'quux'
+        return super(Baz, self).__reduce_ex__(proto)
+
+
+class BazProxy(Baz):
+    """
+    A class that acts as a proxy for Baz. It does some scary mucking about with
+    dicts, which simulates some crazy things that people might do with
+    e.g. proxy models.
+    """
+    def __init__(self, baz):
+        self.__dict__ = baz.__dict__
+        self._baz = baz
+        super(BaseBaz, self).__init__()
+
+
+class SimpleLazyObjectPickleTestCase(TestCase):
+    """
+    Regression test for pickling a SimpleLazyObject wrapping a model (#25389).
+    Also covers other classes with a custom __reduce__ method.
+    """
+    def test_pickle_with_reduce(self):
+        """
+        Test in a fairly synthetic setting.
+        """
+        # Test every pickle protocol available
+        for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
+            lazy_objs = [
+                SimpleLazyObject(lambda: BaseBaz()),
+                SimpleLazyObject(lambda: Baz(1)),
+                SimpleLazyObject(lambda: BazProxy(Baz(2))),
+            ]
+            for obj in lazy_objs:
+                pickled = pickle.dumps(obj, protocol)
+                unpickled = pickle.loads(pickled)
+                self.assertEqual(unpickled, obj)
+                self.assertEqual(unpickled.baz, 'right')
+
+    def test_pickle_model(self):
+        """
+        Test on an actual model, based on the report in #25426.
+        """
+        category = Category.objects.create(name="thing1")
+        CategoryInfo.objects.create(category=category)
+        # Test every pickle protocol available
+        for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
+            lazy_category = SimpleLazyObject(lambda: category)
+            # Test both if we accessed a field on the model and if we didn't.
+            lazy_category.categoryinfo
+            lazy_category_2 = SimpleLazyObject(lambda: category)
+            with warnings.catch_warnings(record=True) as recorded:
+                self.assertEqual(pickle.loads(pickle.dumps(lazy_category, protocol)), category)
+                self.assertEqual(pickle.loads(pickle.dumps(lazy_category_2, protocol)), category)
+                # Assert that there were no warnings.
+                self.assertEqual(len(recorded), 0)

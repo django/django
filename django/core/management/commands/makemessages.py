@@ -3,26 +3,28 @@ from __future__ import unicode_literals
 import fnmatch
 import glob
 import io
-import locale
 import os
 import re
 import sys
+from functools import total_ordering
 from itertools import dropwhile
 
 import django
 from django.conf import settings
+from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import (
     find_command, handle_extensions, popen_wrapper,
 )
-from django.utils import six
-from django.utils.encoding import force_str
-from django.utils.functional import cached_property, total_ordering
+from django.utils._os import upath
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_str
+from django.utils.functional import cached_property
 from django.utils.jslex import prepare_js_for_gettext
 from django.utils.text import get_text_list
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0
+NO_LOCALE_DIR = object()
 
 
 def check_programs(*programs):
@@ -30,21 +32,6 @@ def check_programs(*programs):
         if find_command(program) is None:
             raise CommandError("Can't find %s. Make sure you have GNU "
                     "gettext tools 0.15 or newer installed." % program)
-
-
-def gettext_popen_wrapper(args, os_err_exc_type=CommandError):
-    """
-    Makes sure text obtained from stdout of gettext utilities is Unicode.
-    """
-    stdout, stderr, status_code = popen_wrapper(args, os_err_exc_type=os_err_exc_type)
-    if os.name == 'nt' and six.PY3:
-        # This looks weird because it's undoing what subprocess.Popen(universal_newlines=True).communicate()
-        # does when capturing PO files contents from stdout of gettext command line programs. See ticket #23271
-        # for details. No need to do anything on Python 2 because it's already a UTF-8-encoded byte-string there
-        stdout = stdout.encode(locale.getpreferredencoding(False)).decode('utf-8')
-    if six.PY2:
-        stdout = stdout.decode('utf-8')
-    return stdout, stderr, status_code
 
 
 @total_ordering
@@ -67,99 +54,96 @@ class TranslatableFile(object):
     def path(self):
         return os.path.join(self.dirpath, self.file)
 
-    def process(self, command, domain):
-        """
-        Extract translatable literals from self.file for :param domain:,
-        creating or updating the POT file.
 
-        Uses the xgettext GNU gettext utility.
+class BuildFile(object):
+    """
+    Represents the state of a translatable file during the build process.
+    """
+    def __init__(self, command, domain, translatable):
+        self.command = command
+        self.domain = domain
+        self.translatable = translatable
+
+    @cached_property
+    def is_templatized(self):
+        if self.domain == 'djangojs':
+            return self.command.gettext_version < (0, 18, 3)
+        elif self.domain == 'django':
+            file_ext = os.path.splitext(self.translatable.file)[1]
+            return file_ext != '.py'
+        return False
+
+    @cached_property
+    def path(self):
+        return self.translatable.path
+
+    @cached_property
+    def work_path(self):
+        """
+        Path to a file which is being fed into GNU gettext pipeline. This may
+        be either a translatable or its preprocessed version.
+        """
+        if not self.is_templatized:
+            return self.path
+        extension = {
+            'djangojs': 'c',
+            'django': 'py',
+        }.get(self.domain)
+        filename = '%s.%s' % (self.translatable.file, extension)
+        return os.path.join(self.translatable.dirpath, filename)
+
+    def preprocess(self):
+        """
+        Preprocess (if necessary) a translatable file before passing it to
+        xgettext GNU gettext utility.
         """
         from django.utils.translation import templatize
 
-        if command.verbosity > 1:
-            command.stdout.write('processing file %s in %s\n' % (self.file, self.dirpath))
-        file_ext = os.path.splitext(self.file)[1]
-        if domain == 'djangojs':
-            orig_file = os.path.join(self.dirpath, self.file)
-            work_file = orig_file
-            is_templatized = command.gettext_version < (0, 18, 3)
-            if is_templatized:
-                with io.open(orig_file, 'r', encoding=settings.FILE_CHARSET) as fp:
-                    src_data = fp.read()
-                src_data = prepare_js_for_gettext(src_data)
-                work_file = os.path.join(self.dirpath, '%s.c' % self.file)
-                with io.open(work_file, "w", encoding='utf-8') as fp:
-                    fp.write(src_data)
-            args = [
-                'xgettext',
-                '-d', domain,
-                '--language=%s' % ('C' if is_templatized else 'JavaScript',),
-                '--keyword=gettext_noop',
-                '--keyword=gettext_lazy',
-                '--keyword=ngettext_lazy:1,2',
-                '--keyword=pgettext:1c,2',
-                '--keyword=npgettext:1c,2,3',
-                '--output=-'
-            ] + command.xgettext_options
-            args.append(work_file)
-        elif domain == 'django':
-            orig_file = os.path.join(self.dirpath, self.file)
-            work_file = orig_file
-            is_templatized = file_ext != '.py'
-            if is_templatized:
-                with io.open(orig_file, encoding=settings.FILE_CHARSET) as fp:
-                    src_data = fp.read()
-                content = templatize(src_data, orig_file[2:])
-                work_file = os.path.join(self.dirpath, '%s.py' % self.file)
-                with io.open(work_file, "w", encoding='utf-8') as fp:
-                    fp.write(content)
-            args = [
-                'xgettext',
-                '-d', domain,
-                '--language=Python',
-                '--keyword=gettext_noop',
-                '--keyword=gettext_lazy',
-                '--keyword=ngettext_lazy:1,2',
-                '--keyword=ugettext_noop',
-                '--keyword=ugettext_lazy',
-                '--keyword=ungettext_lazy:1,2',
-                '--keyword=pgettext:1c,2',
-                '--keyword=npgettext:1c,2,3',
-                '--keyword=pgettext_lazy:1c,2',
-                '--keyword=npgettext_lazy:1c,2,3',
-                '--output=-'
-            ] + command.xgettext_options
-            args.append(work_file)
-        else:
+        if not self.is_templatized:
             return
-        msgs, errors, status = gettext_popen_wrapper(args)
-        if errors:
-            if status != STATUS_OK:
-                if is_templatized:
-                    os.unlink(work_file)
-                raise CommandError(
-                    "errors happened while running xgettext on %s\n%s" %
-                    (self.file, errors))
-            elif command.verbosity > 0:
-                # Print warnings
-                command.stdout.write(errors)
-        if msgs:
-            # Write/append messages to pot file
-            potfile = os.path.join(self.locale_dir, '%s.pot' % str(domain))
-            if is_templatized:
-                # Remove '.py' suffix
-                if os.name == 'nt':
-                    # Preserve '.\' prefix on Windows to respect gettext behavior
-                    old = '#: ' + work_file
-                    new = '#: ' + orig_file
-                else:
-                    old = '#: ' + work_file[2:]
-                    new = '#: ' + orig_file[2:]
-                msgs = msgs.replace(old, new)
-            write_pot_file(potfile, msgs)
 
-        if is_templatized:
-            os.unlink(work_file)
+        with io.open(self.path, 'r', encoding=settings.FILE_CHARSET) as fp:
+            src_data = fp.read()
+
+        if self.domain == 'djangojs':
+            content = prepare_js_for_gettext(src_data)
+        elif self.domain == 'django':
+            content = templatize(src_data, self.path[2:])
+
+        with io.open(self.work_path, 'w', encoding='utf-8') as fp:
+            fp.write(content)
+
+    def postprocess_messages(self, msgs):
+        """
+        Postprocess messages generated by xgettext GNU gettext utility.
+
+        Transform paths as if these messages were generated from original
+        translatable files rather than from preprocessed versions.
+        """
+        if not self.is_templatized:
+            return msgs
+
+        # Remove '.py' suffix
+        if os.name == 'nt':
+            # Preserve '.\' prefix on Windows to respect gettext behavior
+            old = '#: ' + self.work_path
+            new = '#: ' + self.path
+        else:
+            old = '#: ' + self.work_path[2:]
+            new = '#: ' + self.path[2:]
+
+        return msgs.replace(old, new)
+
+    def cleanup(self):
+        """
+        Remove a preprocessed copy of a translatable file (if any).
+        """
+        if self.is_templatized:
+            # This check is needed for the case of a symlinked file and its
+            # source being processed inside a single group (locale dir);
+            # removing either of those two removes both.
+            if os.path.exists(self.work_path):
+                os.unlink(self.work_path)
 
 
 def write_pot_file(potfile, msgs):
@@ -183,6 +167,9 @@ class Command(BaseCommand):
 "applications) directory.\n\nYou must run this command with one of either the "
 "--locale, --exclude or --all options.")
 
+    translatable_file_class = TranslatableFile
+    build_file_class = BuildFile
+
     requires_system_checks = False
     leave_locale_alone = True
 
@@ -202,7 +189,7 @@ class Command(BaseCommand):
         parser.add_argument('--all', '-a', action='store_true', dest='all',
             default=False, help='Updates the message files for all existing locales.')
         parser.add_argument('--extension', '-e', dest='extensions',
-            help='The file extension(s) to examine (default: "html,txt", or "js" '
+            help='The file extension(s) to examine (default: "html,txt,py", or "js" '
                  'if the domain is "djangojs"). Separate multiple extensions with '
                  'commas, or use -e multiple times.',
             action='append')
@@ -324,7 +311,12 @@ class Command(BaseCommand):
 
     @cached_property
     def gettext_version(self):
-        out, err, status = gettext_popen_wrapper(['xgettext', '--version'])
+        # Gettext tools will output system-encoded bytestrings instead of UTF-8,
+        # when looking up the version. It's especially a problem on Windows.
+        out, err, status = popen_wrapper(
+            ['xgettext', '--version'],
+            stdout_encoding=DEFAULT_LOCALE_ENCODING,
+        )
         m = re.search(r'(\d+)\.(\d+)\.?(\d+)?', out)
         if m:
             return tuple(int(d) for d in m.groups() if d is not None)
@@ -337,19 +329,14 @@ class Command(BaseCommand):
         """
         file_list = self.find_files(".")
         self.remove_potfiles()
-        for f in file_list:
-            try:
-                f.process(self, self.domain)
-            except UnicodeDecodeError:
-                self.stdout.write("UnicodeDecodeError: skipped file %s in %s" % (f.file, f.dirpath))
-
+        self.process_files(file_list)
         potfiles = []
         for path in self.locale_paths:
             potfile = os.path.join(path, '%s.pot' % str(self.domain))
             if not os.path.exists(potfile):
                 continue
             args = ['msguniq'] + self.msguniq_options + [potfile]
-            msgs, errors, status = gettext_popen_wrapper(args)
+            msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -420,10 +407,116 @@ class Command(BaseCommand):
                     if not locale_dir:
                         locale_dir = self.default_locale_path
                     if not locale_dir:
-                        raise CommandError(
-                            "Unable to find a locale path to store translations for file %s" % file_path)
-                    all_files.append(TranslatableFile(dirpath, filename, locale_dir))
+                        locale_dir = NO_LOCALE_DIR
+                    all_files.append(self.translatable_file_class(dirpath, filename, locale_dir))
         return sorted(all_files)
+
+    def process_files(self, file_list):
+        """
+        Group translatable files by locale directory and run pot file build
+        process for each group.
+        """
+        file_groups = {}
+        for translatable in file_list:
+            file_group = file_groups.setdefault(translatable.locale_dir, [])
+            file_group.append(translatable)
+        for locale_dir, files in file_groups.items():
+            self.process_locale_dir(locale_dir, files)
+
+    def process_locale_dir(self, locale_dir, files):
+        """
+        Extract translatable literals from the specified files, creating or
+        updating the POT file for a given locale directory.
+
+        Uses the xgettext GNU gettext utility.
+        """
+        build_files = []
+        for translatable in files:
+            if self.verbosity > 1:
+                self.stdout.write('processing file %s in %s\n' % (
+                    translatable.file, translatable.dirpath
+                ))
+            if self.domain not in ('djangojs', 'django'):
+                continue
+            build_file = self.build_file_class(self, self.domain, translatable)
+            try:
+                build_file.preprocess()
+            except UnicodeDecodeError as e:
+                self.stdout.write(
+                    'UnicodeDecodeError: skipped file %s in %s (reason: %s)' % (
+                        translatable.file, translatable.dirpath, e,
+                    )
+                )
+                continue
+            build_files.append(build_file)
+
+        if self.domain == 'djangojs':
+            is_templatized = build_file.is_templatized
+            args = [
+                'xgettext',
+                '-d', self.domain,
+                '--language=%s' % ('C' if is_templatized else 'JavaScript',),
+                '--keyword=gettext_noop',
+                '--keyword=gettext_lazy',
+                '--keyword=ngettext_lazy:1,2',
+                '--keyword=pgettext:1c,2',
+                '--keyword=npgettext:1c,2,3',
+                '--output=-',
+            ]
+        elif self.domain == 'django':
+            args = [
+                'xgettext',
+                '-d', self.domain,
+                '--language=Python',
+                '--keyword=gettext_noop',
+                '--keyword=gettext_lazy',
+                '--keyword=ngettext_lazy:1,2',
+                '--keyword=ugettext_noop',
+                '--keyword=ugettext_lazy',
+                '--keyword=ungettext_lazy:1,2',
+                '--keyword=pgettext:1c,2',
+                '--keyword=npgettext:1c,2,3',
+                '--keyword=pgettext_lazy:1c,2',
+                '--keyword=npgettext_lazy:1c,2,3',
+                '--output=-',
+            ]
+        else:
+            return
+
+        input_files = [bf.work_path for bf in build_files]
+        with NamedTemporaryFile(mode='w+') as input_files_list:
+            input_files_list.write('\n'.join(input_files))
+            input_files_list.flush()
+            args.extend(['--files-from', input_files_list.name])
+            args.extend(self.xgettext_options)
+            msgs, errors, status = popen_wrapper(args)
+
+        if errors:
+            if status != STATUS_OK:
+                for build_file in build_files:
+                    build_file.cleanup()
+                raise CommandError(
+                    'errors happened while running xgettext on %s\n%s' %
+                    ('\n'.join(input_files), errors)
+                )
+            elif self.verbosity > 0:
+                # Print warnings
+                self.stdout.write(errors)
+
+        if msgs:
+            if locale_dir is NO_LOCALE_DIR:
+                file_path = os.path.normpath(build_files[0].path)
+                raise CommandError(
+                    'Unable to find a locale path to store translations for '
+                    'file %s' % file_path
+                )
+            for build_file in build_files:
+                msgs = build_file.postprocess_messages(msgs)
+            potfile = os.path.join(locale_dir, '%s.pot' % str(self.domain))
+            write_pot_file(potfile, msgs)
+
+        for build_file in build_files:
+            build_file.cleanup()
 
     def write_po_file(self, potfile, locale):
         """
@@ -439,7 +532,7 @@ class Command(BaseCommand):
 
         if os.path.exists(pofile):
             args = ['msgmerge'] + self.msgmerge_options + [pofile, potfile]
-            msgs, errors, status = gettext_popen_wrapper(args)
+            msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -458,7 +551,7 @@ class Command(BaseCommand):
 
         if self.no_obsolete:
             args = ['msgattrib'] + self.msgattrib_options + ['-o', pofile, pofile]
-            msgs, errors, status = gettext_popen_wrapper(args)
+            msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -472,7 +565,7 @@ class Command(BaseCommand):
         the msgs string, inserting it at the right place. msgs should be the
         contents of a newly created .po file.
         """
-        django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
+        django_dir = os.path.normpath(os.path.join(os.path.dirname(upath(django.__file__))))
         if self.domain == 'djangojs':
             domains = ('djangojs', 'django')
         else:

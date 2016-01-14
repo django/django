@@ -98,7 +98,7 @@ First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
 .. snippet::
     :filename: models.py
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.db import models
 
     class Author(models.Model):
@@ -115,7 +115,7 @@ here; we don't have to write any logic ourselves:
     :filename: views.py
 
     from django.views.generic.edit import CreateView, UpdateView, DeleteView
-    from django.core.urlresolvers import reverse_lazy
+    from django.urls import reverse_lazy
     from myapp.models import Author
 
     class AuthorCreate(CreateView):
@@ -131,8 +131,8 @@ here; we don't have to write any logic ourselves:
         success_url = reverse_lazy('author-list')
 
 .. note::
-    We have to use :func:`~django.core.urlresolvers.reverse_lazy` here, not
-    just ``reverse`` as the urls are not loaded when the file is imported.
+    We have to use :func:`~django.urls.reverse_lazy` here, not just
+    ``reverse()`` as the urls are not loaded when the file is imported.
 
 The ``fields`` attribute works the same way as the ``fields`` attribute on the
 inner ``Meta`` class on :class:`~django.forms.ModelForm`. Unless you define the
@@ -142,16 +142,6 @@ an :exc:`~django.core.exceptions.ImproperlyConfigured` exception if it's not.
 If you specify both the :attr:`~django.views.generic.edit.ModelFormMixin.fields`
 and :attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
 :exc:`~django.core.exceptions.ImproperlyConfigured` exception will be raised.
-
-.. versionchanged:: 1.8
-
-    Omitting the ``fields`` attribute was previously allowed and resulted in a
-    form with all of the model's fields.
-
-.. versionchanged:: 1.8
-
-    Previously if both ``fields`` and ``form_class`` were specified,
-    ``fields`` was silently ignored.
 
 Finally, we hook these new views into the URLconf:
 
@@ -163,9 +153,9 @@ Finally, we hook these new views into the URLconf:
 
     urlpatterns = [
         # ...
-        url(r'author/add/$', AuthorCreate.as_view(), name='author_add'),
-        url(r'author/(?P<pk>[0-9]+)/$', AuthorUpdate.as_view(), name='author_update'),
-        url(r'author/(?P<pk>[0-9]+)/delete/$', AuthorDelete.as_view(), name='author_delete'),
+        url(r'author/add/$', AuthorCreate.as_view(), name='author-add'),
+        url(r'author/(?P<pk>[0-9]+)/$', AuthorUpdate.as_view(), name='author-update'),
+        url(r'author/(?P<pk>[0-9]+)/delete/$', AuthorDelete.as_view(), name='author-delete'),
     ]
 
 .. note::
@@ -204,7 +194,7 @@ the foreign key relation to the model:
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
-        created_by = models.ForeignKey(User)
+        created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
         # ...
 

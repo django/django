@@ -49,25 +49,21 @@ def debug(request):
 
 def i18n(request):
     from django.utils import translation
-
-    context_extras = {}
-    context_extras['LANGUAGES'] = settings.LANGUAGES
-    context_extras['LANGUAGE_CODE'] = translation.get_language()
-    context_extras['LANGUAGE_BIDI'] = translation.get_language_bidi()
-
-    return context_extras
+    return {
+        'LANGUAGES': settings.LANGUAGES,
+        'LANGUAGE_CODE': translation.get_language(),
+        'LANGUAGE_BIDI': translation.get_language_bidi(),
+    }
 
 
 def tz(request):
     from django.utils import timezone
-
     return {'TIME_ZONE': timezone.get_current_timezone_name()}
 
 
 def static(request):
     """
     Adds static-related context variables to the context.
-
     """
     return {'STATIC_URL': settings.STATIC_URL}
 
@@ -75,7 +71,6 @@ def static(request):
 def media(request):
     """
     Adds media-related context variables to the context.
-
     """
     return {'MEDIA_URL': settings.MEDIA_URL}
 

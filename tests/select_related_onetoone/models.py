@@ -13,7 +13,7 @@ class User(models.Model):
 
 @python_2_unicode_compatible
 class UserProfile(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, models.CASCADE)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=2)
 
@@ -31,9 +31,9 @@ class UserStatResult(models.Model):
 
 @python_2_unicode_compatible
 class UserStat(models.Model):
-    user = models.OneToOneField(User, primary_key=True)
+    user = models.OneToOneField(User, models.CASCADE, primary_key=True)
     posts = models.IntegerField()
-    results = models.ForeignKey(UserStatResult)
+    results = models.ForeignKey(UserStatResult, models.CASCADE)
 
     def __str__(self):
         return 'UserStat, posts = %s' % (self.posts,)
@@ -41,7 +41,7 @@ class UserStat(models.Model):
 
 @python_2_unicode_compatible
 class StatDetails(models.Model):
-    base_stats = models.OneToOneField(UserStat)
+    base_stats = models.OneToOneField(UserStat, models.CASCADE)
     comments = models.IntegerField()
 
     def __str__(self):
@@ -58,7 +58,7 @@ class Image(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
-    image = models.OneToOneField(Image, null=True)
+    image = models.OneToOneField(Image, models.SET_NULL, null=True)
 
 
 @python_2_unicode_compatible
@@ -89,7 +89,7 @@ class Child1(Parent1, Parent2):
 
 @python_2_unicode_compatible
 class Child2(Parent1):
-    parent2 = models.OneToOneField(Parent2)
+    parent2 = models.OneToOneField(Parent2, models.CASCADE)
     value = models.IntegerField()
 
     def __str__(self):

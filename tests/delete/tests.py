@@ -31,25 +31,25 @@ class OnDeleteTests(TestCase):
         a = create_a('setvalue')
         a.setvalue.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(self.DEFAULT, a.setvalue)
+        self.assertEqual(self.DEFAULT, a.setvalue.pk)
 
     def test_setnull(self):
         a = create_a('setnull')
         a.setnull.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.setnull)
+        self.assertIsNone(a.setnull)
 
     def test_setdefault(self):
         a = create_a('setdefault')
         a.setdefault.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(self.DEFAULT, a.setdefault)
+        self.assertEqual(self.DEFAULT, a.setdefault.pk)
 
     def test_setdefault_none(self):
         a = create_a('setdefault_none')
         a.setdefault_none.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.setdefault_none)
+        self.assertIsNone(a.setdefault_none)
 
     def test_cascade(self):
         a = create_a('cascade')
@@ -119,7 +119,7 @@ class OnDeleteTests(TestCase):
         self.assertFalse(R.objects.filter(pk=a.child_setnull_id).exists())
 
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.child_setnull)
+        self.assertIsNone(a.child_setnull)
 
     def test_setnull_from_parent(self):
         a = create_a('child_setnull')
@@ -127,16 +127,17 @@ class OnDeleteTests(TestCase):
         self.assertFalse(RChild.objects.filter(pk=a.child_setnull_id).exists())
 
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.child_setnull)
+        self.assertIsNone(a.child_setnull)
 
     def test_o2o_setnull(self):
         a = create_a('o2o_setnull')
         a.o2o_setnull.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.o2o_setnull)
+        self.assertIsNone(a.o2o_setnull)
 
 
 class DeletionTests(TestCase):
+
     def test_m2m(self):
         m = M.objects.create()
         r = R.objects.create()
@@ -153,7 +154,7 @@ class DeletionTests(TestCase):
         r = R.objects.create()
         m.m2m.add(r)
         r.delete()
-        through = M._meta.get_field('m2m').rel.through
+        through = M._meta.get_field('m2m').remote_field.through
         self.assertFalse(through.objects.exists())
 
         r = R.objects.create()
@@ -197,11 +198,11 @@ class DeletionTests(TestCase):
         a.cascade.delete()
 
         for obj in deleted:
-            self.assertEqual(None, obj.pk)
+            self.assertIsNone(obj.pk)
 
         for pk_list in related_setnull_sets:
             for a in A.objects.filter(id__in=pk_list):
-                self.assertEqual(None, a.setnull)
+                self.assertIsNone(a.setnull)
 
         models.signals.pre_delete.disconnect(pre_delete)
 
@@ -223,12 +224,13 @@ class DeletionTests(TestCase):
         s2 = S.objects.create(pk=2, r=r)
         T.objects.create(pk=1, s=s1)
         T.objects.create(pk=2, s=s2)
+        RChild.objects.create(r_ptr=r)
         r.delete()
         self.assertEqual(
-            pre_delete_order, [(T, 2), (T, 1), (S, 2), (S, 1), (R, 1)]
+            pre_delete_order, [(T, 2), (T, 1), (RChild, 1), (S, 2), (S, 1), (R, 1)]
         )
         self.assertEqual(
-            post_delete_order, [(T, 1), (T, 2), (S, 1), (S, 2), (R, 1)]
+            post_delete_order, [(T, 1), (T, 2), (RChild, 1), (S, 1), (S, 2), (R, 1)]
         )
 
         models.signals.post_delete.disconnect(log_post_delete)
@@ -349,6 +351,80 @@ class DeletionTests(TestCase):
         self.assertFalse(S.objects.exists())
         self.assertFalse(T.objects.exists())
 
+    def test_delete_with_keeping_parents(self):
+        child = RChild.objects.create()
+        parent_id = child.r_ptr_id
+        child.delete(keep_parents=True)
+        self.assertFalse(RChild.objects.filter(id=child.id).exists())
+        self.assertTrue(R.objects.filter(id=parent_id).exists())
+
+    def test_queryset_delete_returns_num_rows(self):
+        """
+        QuerySet.delete() should return the number of deleted rows and a
+        dictionary with the number of deletions for each object type.
+        """
+        Avatar.objects.bulk_create([Avatar(desc='a'), Avatar(desc='b'), Avatar(desc='c')])
+        avatars_count = Avatar.objects.count()
+        deleted, rows_count = Avatar.objects.all().delete()
+        self.assertEqual(deleted, avatars_count)
+
+        # more complex example with multiple object types
+        r = R.objects.create()
+        h1 = HiddenUser.objects.create(r=r)
+        HiddenUser.objects.create(r=r)
+        HiddenUserProfile.objects.create(user=h1)
+        existed_objs = {
+            R._meta.label: R.objects.count(),
+            HiddenUser._meta.label: HiddenUser.objects.count(),
+            A._meta.label: A.objects.count(),
+            MR._meta.label: MR.objects.count(),
+            HiddenUserProfile._meta.label: HiddenUserProfile.objects.count(),
+        }
+        deleted, deleted_objs = R.objects.all().delete()
+        for k, v in existed_objs.items():
+            self.assertEqual(deleted_objs[k], v)
+
+    def test_model_delete_returns_num_rows(self):
+        """
+        Model.delete() should return the number of deleted rows and a
+        dictionary with the number of deletions for each object type.
+        """
+        r = R.objects.create()
+        h1 = HiddenUser.objects.create(r=r)
+        h2 = HiddenUser.objects.create(r=r)
+        HiddenUser.objects.create(r=r)
+        HiddenUserProfile.objects.create(user=h1)
+        HiddenUserProfile.objects.create(user=h2)
+        m1 = M.objects.create()
+        m2 = M.objects.create()
+        MR.objects.create(r=r, m=m1)
+        r.m_set.add(m1)
+        r.m_set.add(m2)
+        r.save()
+        existed_objs = {
+            R._meta.label: R.objects.count(),
+            HiddenUser._meta.label: HiddenUser.objects.count(),
+            A._meta.label: A.objects.count(),
+            MR._meta.label: MR.objects.count(),
+            HiddenUserProfile._meta.label: HiddenUserProfile.objects.count(),
+            M.m2m.through._meta.label: M.m2m.through.objects.count(),
+        }
+        deleted, deleted_objs = r.delete()
+        self.assertEqual(deleted, sum(existed_objs.values()))
+        for k, v in existed_objs.items():
+            self.assertEqual(deleted_objs[k], v)
+
+    def test_proxied_model_duplicate_queries(self):
+        """
+        #25685 - Deleting instances of a model with existing proxy
+        classes should not issue multiple queries during cascade
+        deletion of referring models.
+        """
+        avatar = Avatar.objects.create()
+        # One query for the Avatar table and a second for the User one.
+        with self.assertNumQueries(2):
+            avatar.delete()
+
 
 class FastDeleteTests(TestCase):
 
@@ -427,3 +503,15 @@ class FastDeleteTests(TestCase):
         # that + fast delete of the related objs.
         self.assertNumQueries(2, a.delete)
         self.assertEqual(User.objects.count(), 0)
+
+    def test_fast_delete_empty_no_update_can_self_select(self):
+        """
+        #25932 - Fast deleting on backends that don't have the
+        `no_update_can_self_select` feature should work even if the specified
+        filter doesn't match any row.
+        """
+        with self.assertNumQueries(1):
+            self.assertEqual(
+                User.objects.filter(avatar__desc='missing').delete(),
+                (0, {'delete.User': 0})
+            )

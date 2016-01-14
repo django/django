@@ -92,8 +92,10 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 9.0 and higher. It requires the use of Psycopg2
-2.0.9 or higher.
+Django supports PostgreSQL 9.2 and higher. It requires the use of `psycopg2`_
+2.4.5 or higher (or 2.5+ if you want to use :mod:`django.contrib.postgres`).
+
+.. _psycopg2: http://initd.org/psycopg/
 
 PostgreSQL connection settings
 -------------------------------
@@ -162,6 +164,19 @@ lookups that use the ``LIKE`` operator in their SQL, as is done with the
 
 .. _PostgreSQL operator class: http://www.postgresql.org/docs/current/static/indexes-opclass.html
 
+Speeding up test execution with non-durable settings
+----------------------------------------------------
+
+You can speed up test execution times by `configuring PostgreSQL to be
+non-durable <http://www.postgresql.org/docs/current/static/non-durability.html>`_.
+
+.. warning::
+
+    This is dangerous: it will make your database more susceptible to data loss
+    or corruption in the case of a server crash or power loss. Only use this on
+    a development machine where you can easily restore the entire contents of
+    all databases in the cluster.
+
 .. _mysql-notes:
 
 MySQL notes
@@ -210,9 +225,9 @@ running ``migrate``::
         1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
     )
 
-.. _storage engines: http://dev.mysql.com/doc/refman/5.6/en/storage-engines.html
-.. _MyISAM: http://dev.mysql.com/doc/refman/5.6/en/myisam-storage-engine.html
-.. _InnoDB: http://dev.mysql.com/doc/refman/5.6/en/innodb-storage-engine.html
+.. _storage engines: https://dev.mysql.com/doc/refman/5.6/en/storage-engines.html
+.. _MyISAM: https://dev.mysql.com/doc/refman/5.6/en/myisam-storage-engine.html
+.. _InnoDB: https://dev.mysql.com/doc/refman/5.6/en/innodb-storage-engine.html
 
 .. [#] Unless this was changed by the packager of your MySQL package. We've
    had reports that the Windows Community Server installer sets up InnoDB as
@@ -237,7 +252,7 @@ drivers that implement this API:
 
 .. _MySQLdb: https://pypi.python.org/pypi/MySQL-python/1.2.4
 .. _mysqlclient: https://pypi.python.org/pypi/mysqlclient
-.. _MySQL Connector/Python: http://dev.mysql.com/downloads/connector/python
+.. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python
 
 All these drivers are thread-safe and provide connection pooling. ``MySQLdb``
 is the only one not supporting Python 3 currently.
@@ -246,33 +261,25 @@ In addition to a DB API driver, Django needs an adapter to access the database
 drivers from its ORM. Django provides an adapter for MySQLdb/mysqlclient while
 MySQL Connector/Python includes `its own`_.
 
-.. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-info.html
+.. _its own: https://dev.mysql.com/doc/connector-python/en/connector-python-django-backend.html
 
 MySQLdb
 ~~~~~~~
 
 Django requires MySQLdb version 1.2.1p2 or later.
 
-.. note::
-    If you see ``ImportError: cannot import name ImmutableSet`` when trying to
-    use Django, your MySQLdb installation may contain an outdated ``sets.py``
-    file that conflicts with the built-in module of the same name from Python
-    2.4 and later. To fix this, verify that you have installed MySQLdb version
-    1.2.1p2 or newer, then delete the ``sets.py`` file in the MySQLdb
-    directory that was left by an earlier version.
+At the time of writing, the latest release of MySQLdb (1.2.5) doesn't support
+Python 3. In order to use MySQLdb under Python 3, you'll have to install
+``mysqlclient`` instead.
 
 .. note::
     There are known issues with the way MySQLdb converts date strings into
-    datetime objects. Specifically, date strings with value 0000-00-00 are
-    valid for MySQL but will be converted into None by MySQLdb.
+    datetime objects. Specifically, date strings with value ``0000-00-00`` are
+    valid for MySQL but will be converted into ``None`` by MySQLdb.
 
-    This means you should be careful while using loaddata/dumpdata with rows
-    that may have 0000-00-00 values, as they will be converted to None.
-
-.. note::
-    At the time of writing, the latest release of MySQLdb (1.2.4) doesn't
-    support Python 3. In order to use MySQLdb under Python 3, you'll have to
-    install ``mysqlclient``.
+    This means you should be careful while using :djadmin:`loaddata` and
+    :djadmin:`dumpdata` with rows that may have ``0000-00-00`` values, as they
+    will be converted to ``None``.
 
 mysqlclient
 ~~~~~~~~~~~
@@ -288,7 +295,7 @@ MySQL Connector/Python is available from the `download page`_.
 The Django adapter is available in versions 1.1.X and later. It may not
 support the most recent releases of Django.
 
-.. _download page: http://dev.mysql.com/downloads/connector/python/
+.. _download page: https://dev.mysql.com/downloads/connector/python/
 
 .. _mysql-time-zone-definitions:
 
@@ -299,7 +306,7 @@ If you plan on using Django's :doc:`timezone support </topics/i18n/timezones>`,
 use `mysql_tzinfo_to_sql`_ to load time zone tables into the MySQL database.
 This needs to be done just once for your MySQL server, not per database.
 
-.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
+.. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 Creating your database
 ----------------------
@@ -310,7 +317,7 @@ You can `create your database`_ using the command-line tools and this SQL::
 
 This ensures all tables and columns will use UTF-8 by default.
 
-.. _create your database: http://dev.mysql.com/doc/refman/5.6/en/create-database.html
+.. _create your database: https://dev.mysql.com/doc/refman/5.6/en/create-database.html
 
 .. _mysql-collation:
 
@@ -324,7 +331,7 @@ the MySQL documentation. In all cases, you set the collation by directly
 manipulating the database tables; Django doesn't provide a way to set this on
 the model definition.
 
-.. _documented thoroughly: http://dev.mysql.com/doc/refman/5.6/en/charset.html
+.. _documented thoroughly: https://dev.mysql.com/doc/refman/5.6/en/charset.html
 
 By default, with a UTF-8 database, MySQL will use the
 ``utf8_general_ci`` collation. This results in all string equality
@@ -367,7 +374,7 @@ Should you decide to use ``utf8_bin`` collation for some of your tables with
 MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_general_ci``
 (the default) collation for the ``django.contrib.sessions.models.Session``
 table (usually called ``django_session``) and the
-``django.contrib.admin.models.LogEntry`` table (usually called
+:class:`django.contrib.admin.models.LogEntry` table (usually called
 ``django_admin_log``). Those are the two standard tables that use
 :class:`~django.db.models.TextField` internally.
 
@@ -380,7 +387,7 @@ you should use ``utf8_general_ci`` because it is faster. If this is not acceptab
 (for example, if you require German dictionary order), use ``utf8_unicode_ci``
 because it is more accurate.
 
-.. _MySQL Unicode Character Sets: http://dev.mysql.com/doc/refman/5.7/en/charset-unicode-sets.html
+.. _MySQL Unicode Character Sets: https://dev.mysql.com/doc/refman/5.7/en/charset-unicode-sets.html
 
 .. warning::
 
@@ -429,7 +436,7 @@ Several other MySQLdb connection options may be useful, such as ``ssl``,
 ``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
 more details.
 
-.. _MySQL option file: http://dev.mysql.com/doc/refman/5.6/en/option-files.html
+.. _MySQL option file: https://dev.mysql.com/doc/refman/5.6/en/option-files.html
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/
 
 Creating your tables
@@ -473,7 +480,7 @@ Django uses lowercase table names when it auto-generates table names from
 models, so this is mainly a consideration if you are overriding the table name
 via the :class:`~django.db.models.Options.db_table` parameter.
 
-.. _known issues: http://bugs.mysql.com/bug.php?id=48875
+.. _known issues: https://bugs.mysql.com/bug.php?id=48875
 
 Savepoints
 ----------
@@ -501,6 +508,14 @@ for the field. This affects :class:`~django.db.models.CharField`,
 :class:`~django.db.models.SlugField` and
 :class:`~django.db.models.CommaSeparatedIntegerField`.
 
+``TextField`` limitations
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MySQL can index only the first N chars of a ``BLOB`` or ``TEXT`` column. Since
+``TextField`` doesn't have a defined length, you can't mark it as
+``unique=True``. MySQL will report: "BLOB/TEXT column '<db_column>' used in key
+specification without a key length".
+
 .. _mysql-fractional-seconds:
 
 Fractional seconds support for Time and DateTime fields
@@ -523,15 +538,6 @@ executing a command like::
 
 or using a :class:`~django.db.migrations.operations.RunSQL` operation in a
 :ref:`data migration <data-migrations>`.
-
-.. versionchanged:: 1.8
-
-    Previously, Django truncated fractional seconds from ``datetime`` and
-    ``time`` values when using the MySQL backend. Now it lets the database
-    decide whether it should drop that part of the value or not. By default, new
-    ``DateTimeField`` or ``TimeField`` columns are now created with fractional
-    seconds support on MySQL 5.6.4 or later with either mysqlclient or
-    MySQLdb 1.2.5 or later.
 
 ``TIMESTAMP`` columns
 ~~~~~~~~~~~~~~~~~~~~~
@@ -559,11 +565,13 @@ query for ``WHERE mycolumn=0``, both rows will match. Similarly, ``WHERE mycolum
 will match the value ``'abc1'``. Therefore, string type fields included in Django
 will always cast the value to a string before using it in a query.
 
-If you implement custom model fields that inherit from :class:`~django.db.models.Field`
-directly, are overriding :meth:`~django.db.models.Field.get_prep_value`, or use
-:meth:`extra() <django.db.models.query.QuerySet.extra>` or
-:meth:`raw() <django.db.models.Manager.raw>`, you should ensure that you
-perform the appropriate typecasting.
+If you implement custom model fields that inherit from
+:class:`~django.db.models.Field` directly, are overriding
+:meth:`~django.db.models.Field.get_prep_value`, or use
+:class:`~django.db.models.expressions.RawSQL`,
+:meth:`~django.db.models.query.QuerySet.extra`, or
+:meth:`~django.db.models.Manager.raw`, you should ensure that you perform
+appropriate typecasting.
 
 .. _sqlite-notes:
 
@@ -575,7 +583,7 @@ are predominantly read-only or require a smaller installation footprint. As
 with all database servers, though, there are some differences that are
 specific to SQLite that you should be aware of.
 
-.. _SQLite: http://www.sqlite.org/
+.. _SQLite: https://www.sqlite.org/
 
 .. _sqlite-string-matching:
 
@@ -601,7 +609,7 @@ would be fairly difficult to do robustly. Thus, Django exposes the default
 SQLite behavior and you should be aware of this when doing case-insensitive or
 substring filtering.
 
-.. _documented at sqlite.org: http://www.sqlite.org/faq.html#q18
+.. _documented at sqlite.org: https://www.sqlite.org/faq.html#q18
 
 Old SQLite and ``CASE`` expressions
 -----------------------------------
@@ -613,10 +621,10 @@ SQLite 3.6.23.1 was released in March 2010, and most current binary
 distributions for different platforms include a newer version of SQLite, with
 the notable exception of the Python 2.7 installers for Windows.
 
-As of this writing, the latest release for Windows - Python 2.7.9 - includes
+As of this writing, the latest release for Windows - Python 2.7.10 - includes
 SQLite 3.6.21. You can install ``pysqlite2`` or replace ``sqlite3.dll`` (by
 default installed in ``C:\Python27\DLLs``) with a newer version from
-http://www.sqlite.org/ to remedy this issue.
+https://www.sqlite.org/ to remedy this issue.
 
 .. _handling query parameters: https://code.djangoproject.com/ticket/24148
 
@@ -657,7 +665,7 @@ If you're getting this error, you can solve it by:
   transactions are short-lived.
 
 * Increase the default timeout value by setting the ``timeout`` database
-  option option::
+  option::
 
       'OPTIONS': {
           # ...
@@ -682,22 +690,12 @@ can use the "pyformat" parameter style, where placeholders in the query
 are given as ``'%(name)s'`` and the parameters are passed as a dictionary
 rather than a list. SQLite does not support this.
 
-.. _sqlite-connection-queries:
-
-Parameters not quoted in ``connection.queries``
------------------------------------------------
-
-``sqlite3`` does not provide a way to retrieve the SQL after quoting and
-substituting the parameters. Instead, the SQL in ``connection.queries`` is
-rebuilt with a simple string interpolation. It may be incorrect. Make sure
-you add quotes where necessary before copying a query into an SQLite shell.
-
 .. _oracle-notes:
 
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 11.1 and higher. Version
+Django supports `Oracle Database Server`_ versions 11.2 and higher. Version
 4.3.1 or higher of the `cx_Oracle`_ Python driver is required, although we
 recommend version 5.1.3 or later as these versions support Python 3.
 
@@ -744,22 +742,18 @@ Some test suites also create views; to run these, the user also needs
 the CREATE VIEW WITH ADMIN OPTION privilege. In particular, this is needed
 for Django's own test suite.
 
-.. versionchanged:: 1.8
-
-    Prior to Django 1.8, the test user was granted the CONNECT and RESOURCE
-    roles, so the extra privileges required for running the test suite were
-    different.
-
 All of these privileges are included in the DBA role, which is appropriate
 for use on a private developer's database.
 
-The Oracle database backend uses the ``SYS.DBMS_LOB`` package, so your user
-will require execute permissions on it. It's normally accessible to all users
-by default, but in case it is not, you'll need to grant permissions like so:
+The Oracle database backend uses the ``SYS.DBMS_LOB`` and ``SYS.DBMS_RANDOM``
+packages, so your user will require execute permissions on it. It's normally
+accessible to all users by default, but in case it is not, you'll need to grant
+permissions like so:
 
 .. code-block:: sql
 
     GRANT EXECUTE ON SYS.DBMS_LOB TO user;
+    GRANT EXECUTE ON SYS.DBMS_RANDOM TO user;
 
 Connecting to the database
 --------------------------
@@ -883,10 +877,10 @@ some limitations on the usage of such LOB columns in general:
 
 * LOB columns may not be used in a ``SELECT DISTINCT`` list. This means that
   attempting to use the ``QuerySet.distinct`` method on a model that
-  includes ``TextField`` columns will result in an error when run against
-  Oracle. As a workaround, use the ``QuerySet.defer`` method in conjunction
-  with ``distinct()`` to prevent ``TextField`` columns from being included in
-  the ``SELECT DISTINCT`` list.
+  includes ``TextField`` columns will result in an ``ORA-00932`` error when
+  run against Oracle. As a workaround, use the ``QuerySet.defer`` method in
+  conjunction with ``distinct()`` to prevent ``TextField`` columns from being
+  included in the ``SELECT DISTINCT`` list.
 
 .. _third-party-notes:
 
@@ -901,7 +895,6 @@ by 3rd parties that allow you to use other databases with Django:
 * `Microsoft SQL Server`_
 * Firebird_
 * ODBC_
-* ADSDB_
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
@@ -909,8 +902,7 @@ unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
 
 .. _SAP SQL Anywhere: https://github.com/sqlanywhere/sqlany-django
-.. _IBM DB2: http://code.google.com/p/ibm-db/
+.. _IBM DB2: https://pypi.python.org/pypi/ibm_db/
 .. _Microsoft SQL Server: http://django-mssql.readthedocs.org/en/latest/
 .. _Firebird: https://github.com/maxirobaina/django-firebird
 .. _ODBC: https://github.com/lionheart/django-pyodbc/
-.. _ADSDB: http://code.google.com/p/adsdb-django/

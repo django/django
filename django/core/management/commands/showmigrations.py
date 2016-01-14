@@ -74,7 +74,7 @@ class Command(BaseCommand):
                         shown.add(plan_node)
             # If we didn't print anything, then a small message
             if not shown:
-                self.stdout.write(" (no migrations)", self.style.MIGRATE_FAILURE)
+                self.stdout.write(" (no migrations)", self.style.ERROR)
 
     def show_plan(self, connection):
         """

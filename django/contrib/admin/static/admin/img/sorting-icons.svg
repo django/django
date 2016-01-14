@@ -1,0 +1,19 @@
+<svg width="14" height="84" viewBox="0 0 1792 10752" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <g id="sort">
+      <path d="M1408 1088q0 26-19 45l-448 448q-19 19-45 19t-45-19l-448-448q-19-19-19-45t19-45 45-19h896q26 0 45 19t19 45zm0-384q0 26-19 45t-45 19h-896q-26 0-45-19t-19-45 19-45l448-448q19-19 45-19t45 19l448 448q19 19 19 45z"/>
+    </g>
+    <g id="ascending">
+      <path d="M1408 1216q0 26-19 45t-45 19h-896q-26 0-45-19t-19-45 19-45l448-448q19-19 45-19t45 19l448 448q19 19 19 45z"/>
+    </g>
+    <g id="descending">
+      <path d="M1408 704q0 26-19 45l-448 448q-19 19-45 19t-45-19l-448-448q-19-19-19-45t19-45 45-19h896q26 0 45 19t19 45z"/>
+    </g>
+  </defs>
+  <use xlink:href="#sort" x="0" y="0" fill="#999999" />
+  <use xlink:href="#sort" x="0" y="1792" fill="#447e9b" />
+  <use xlink:href="#ascending" x="0" y="3584" fill="#999999" />
+  <use xlink:href="#ascending" x="0" y="5376" fill="#447e9b" />
+  <use xlink:href="#descending" x="0" y="7168" fill="#999999" />
+  <use xlink:href="#descending" x="0" y="8960" fill="#447e9b" />
+</svg>

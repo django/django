@@ -3,20 +3,17 @@ from __future__ import unicode_literals
 
 import random as random_module
 import re
-import warnings
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from pprint import pformat
 
 from django.conf import settings
-from django.template.base import Library, Variable, VariableDoesNotExist
 from django.utils import formats, six
 from django.utils.dateformat import format, time_format
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (
     avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
-    remove_tags, strip_tags, urlize as _urlize,
+    strip_tags, urlize as _urlize,
 )
 from django.utils.http import urlquote
 from django.utils.safestring import SafeData, mark_for_escaping, mark_safe
@@ -25,6 +22,9 @@ from django.utils.text import (
 )
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import ugettext, ungettext
+
+from .base import Variable, VariableDoesNotExist
+from .library import Library
 
 register = Library()
 
@@ -191,7 +191,7 @@ def iriencode(value):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def linenumbers(value, autoescape=None):
+def linenumbers(value, autoescape=True):
     """Displays text with line numbers."""
     lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
@@ -353,14 +353,14 @@ def urlencode(value, safe=None):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def urlize(value, autoescape=None):
+def urlize(value, autoescape=True):
     """Converts URLs in plain text into clickable links."""
     return mark_safe(_urlize(value, nofollow=True, autoescape=autoescape))
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def urlizetrunc(value, limit, autoescape=None):
+def urlizetrunc(value, limit, autoescape=True):
     """
     Converts URLs into clickable links, truncating URLs to the given character
     limit, and adding 'rel=nofollow' attribute to discourage spamming.
@@ -439,7 +439,7 @@ def cut(value, arg):
 @stringfilter
 def escape_filter(value):
     """
-    Marks the value as a string that should not be auto-escaped.
+    Marks the value as a string that should be auto-escaped.
     """
     return mark_for_escaping(value)
 
@@ -457,7 +457,7 @@ def force_escape(value):
 
 @register.filter("linebreaks", is_safe=True, needs_autoescape=True)
 @stringfilter
-def linebreaks_filter(value, autoescape=None):
+def linebreaks_filter(value, autoescape=True):
     """
     Replaces line breaks in plain text with appropriate HTML; a single
     newline becomes an HTML line break (``<br />``) and a new line
@@ -469,7 +469,7 @@ def linebreaks_filter(value, autoescape=None):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def linebreaksbr(value, autoescape=None):
+def linebreaksbr(value, autoescape=True):
     """
     Converts all newlines in a piece of plain text to HTML line breaks
     (``<br />``).
@@ -498,13 +498,6 @@ def safeseq(value):
     with the results.
     """
     return [mark_safe(force_text(obj)) for obj in value]
-
-
-@register.filter(is_safe=True)
-@stringfilter
-def removetags(value, tags):
-    """Removes a space separated list of [X]HTML tags from the output."""
-    return remove_tags(value, tags)
 
 
 @register.filter(is_safe=True)
@@ -552,7 +545,7 @@ def first(value):
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
-def join(value, arg, autoescape=None):
+def join(value, arg, autoescape=True):
     """
     Joins a list with a string, like Python's ``str.join(list)``.
     """
@@ -622,7 +615,7 @@ def slice_filter(value, arg):
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
-def unordered_list(value, autoescape=None):
+def unordered_list(value, autoescape=True):
     """
     Recursively takes a self-nested list and returns an HTML unordered list --
     WITHOUT opening and closing <ul> tags.
@@ -648,55 +641,29 @@ def unordered_list(value, autoescape=None):
     else:
         escaper = lambda x: x
 
-    def convert_old_style_list(list_):
-        """
-        Converts old style lists to the new easier to understand format.
-
-        The old list format looked like:
-            ['Item 1', [['Item 1.1', []], ['Item 1.2', []]]
-
-        And it is converted to:
-            ['Item 1', ['Item 1.1', 'Item 1.2]]
-        """
-        if not isinstance(list_, (tuple, list)) or len(list_) != 2:
-            return list_, False
-        first_item, second_item = list_
-        if second_item == []:
-            return [first_item], True
-        try:
-            # see if second item is iterable
-            iter(second_item)
-        except TypeError:
-            return list_, False
-        old_style_list = True
-        new_second_item = []
-        for sublist in second_item:
-            item, old_style_list = convert_old_style_list(sublist)
-            if not old_style_list:
-                break
-            new_second_item.extend(item)
-        if old_style_list:
-            second_item = new_second_item
-        return [first_item, second_item], old_style_list
-
     def walk_items(item_list):
         item_iterator = iter(item_list)
-        for item in item_iterator:
-            try:
-                next_item = next(item_iterator)
-            except StopIteration:
-                next_item = None
-            if not isinstance(next_item, six.string_types):
+        try:
+            item = next(item_iterator)
+            while True:
                 try:
-                    iter(next_item)
-                except TypeError:
-                    pass
-                else:
-                    yield item, next_item
-                    continue
-            yield item, None
-            if next_item:
-                yield next_item, None
+                    next_item = next(item_iterator)
+                except StopIteration:
+                    yield item, None
+                    break
+                if not isinstance(next_item, six.string_types):
+                    try:
+                        iter(next_item)
+                    except TypeError:
+                        pass
+                    else:
+                        yield item, next_item
+                        item = next(item_iterator)
+                        continue
+                yield item, None
+                item = next_item
+        except StopIteration:
+            pass
 
     def list_formatter(item_list, tabs=1):
         indent = '\t' * tabs
@@ -710,12 +677,6 @@ def unordered_list(value, autoescape=None):
                 indent, escaper(force_text(item)), sublist))
         return '\n'.join(output)
 
-    value, converted = convert_old_style_list(value)
-    if converted:
-        warnings.warn(
-            "The old style syntax in `unordered_list` is deprecated and will "
-            "be removed in Django 2.0. Use the the new format instead.",
-            RemovedInDjango20Warning)
     return mark_safe(list_formatter(value))
 
 
@@ -836,7 +797,7 @@ def default_if_none(value, arg):
 
 @register.filter(is_safe=False)
 def divisibleby(value, arg):
-    """Returns True if the value is devisible by the argument."""
+    """Returns True if the value is divisible by the argument."""
     return int(value) % int(arg) == 0
 
 
@@ -878,13 +839,13 @@ def yesno(value, arg=None):
 ###################
 
 @register.filter(is_safe=True)
-def filesizeformat(bytes):
+def filesizeformat(bytes_):
     """
     Formats the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB,
-    102 bytes, etc).
+    102 bytes, etc.).
     """
     try:
-        bytes = float(bytes)
+        bytes_ = float(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
         value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
@@ -897,19 +858,25 @@ def filesizeformat(bytes):
     TB = 1 << 40
     PB = 1 << 50
 
-    if bytes < KB:
-        value = ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
-    elif bytes < MB:
-        value = ugettext("%s KB") % filesize_number_format(bytes / KB)
-    elif bytes < GB:
-        value = ugettext("%s MB") % filesize_number_format(bytes / MB)
-    elif bytes < TB:
-        value = ugettext("%s GB") % filesize_number_format(bytes / GB)
-    elif bytes < PB:
-        value = ugettext("%s TB") % filesize_number_format(bytes / TB)
-    else:
-        value = ugettext("%s PB") % filesize_number_format(bytes / PB)
+    negative = bytes_ < 0
+    if negative:
+        bytes_ = -bytes_  # Allow formatting of negative numbers.
 
+    if bytes_ < KB:
+        value = ungettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
+    elif bytes_ < MB:
+        value = ugettext("%s KB") % filesize_number_format(bytes_ / KB)
+    elif bytes_ < GB:
+        value = ugettext("%s MB") % filesize_number_format(bytes_ / MB)
+    elif bytes_ < TB:
+        value = ugettext("%s GB") % filesize_number_format(bytes_ / GB)
+    elif bytes_ < PB:
+        value = ugettext("%s TB") % filesize_number_format(bytes_ / TB)
+    else:
+        value = ugettext("%s PB") % filesize_number_format(bytes_ / PB)
+
+    if negative:
+        value = "-%s" % value
     return avoid_wrapping(value)
 
 

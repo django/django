@@ -10,7 +10,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 @python_2_unicode_compatible
 class RevisionableModel(models.Model):
-    base = models.ForeignKey('self', null=True)
+    base = models.ForeignKey('self', models.SET_NULL, null=True)
     title = models.CharField(blank=True, max_length=255)
     when = models.DateTimeField(default=datetime.datetime.now)
 
@@ -32,7 +32,7 @@ class RevisionableModel(models.Model):
 
 
 class Order(models.Model):
-    created_by = models.ForeignKey(User)
+    created_by = models.ForeignKey(User, models.CASCADE)
     text = models.TextField()
 
 

@@ -35,8 +35,8 @@ class FlatpageForm(forms.ModelForm):
         return url
 
     def clean(self):
-        url = self.cleaned_data.get('url', None)
-        sites = self.cleaned_data.get('sites', None)
+        url = self.cleaned_data.get('url')
+        sites = self.cleaned_data.get('sites')
 
         same_url = FlatPage.objects.filter(url=url)
         if self.instance.pk:

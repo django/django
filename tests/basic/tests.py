@@ -1,17 +1,16 @@
 from __future__ import unicode_literals
 
 import threading
-import warnings
 from datetime import datetime, timedelta
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
 from django.db.models.fields import Field
-from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.manager import BaseManager
 from django.db.models.query import EmptyQuerySet, QuerySet
 from django.test import (
-    TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, skipIfDBFeature,
+    skipUnlessDBFeature,
 )
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -24,7 +23,7 @@ class ModelInstanceCreationTests(TestCase):
     def test_object_is_not_written_to_database_until_save_was_called(self):
         a = Article(
             id=None,
-            headline='Area man programs in Python',
+            headline='Parrot programs in Python',
             pub_date=datetime(2005, 7, 28),
         )
         self.assertIsNone(a.id)
@@ -129,7 +128,7 @@ class ModelInstanceCreationTests(TestCase):
 
     def test_querysets_checking_for_membership(self):
         headlines = [
-            'Area man programs in Python', 'Second article', 'Third article']
+            'Parrot programs in Python', 'Second article', 'Third article']
         some_pub_date = datetime(2014, 5, 16, 12, 1)
         for headline in headlines:
             Article(headline=headline, pub_date=some_pub_date).save()
@@ -192,15 +191,30 @@ class ModelTest(TestCase):
 
     @skipIfDBFeature('supports_microsecond_precision')
     def test_microsecond_precision_not_supported(self):
-        # In MySQL, microsecond-level precision isn't available. You'll lose
-        # microsecond-level precision once the data is saved.
+        # In MySQL, microsecond-level precision isn't always available. You'll
+        # lose microsecond-level precision once the data is saved.
         a9 = Article(
             headline='Article 9',
             pub_date=datetime(2005, 7, 31, 12, 30, 45, 180),
         )
         a9.save()
-        self.assertEqual(Article.objects.get(id__exact=a9.id).pub_date,
-            datetime(2005, 7, 31, 12, 30, 45))
+        self.assertEqual(
+            Article.objects.get(id__exact=a9.id).pub_date,
+            datetime(2005, 7, 31, 12, 30, 45),
+        )
+
+    @skipIfDBFeature('supports_microsecond_precision')
+    def test_microsecond_precision_not_supported_edge_case(self):
+        # In MySQL, microsecond-level precision isn't always available. You'll
+        # lose microsecond-level precision once the data is saved.
+        a = Article.objects.create(
+            headline='Article',
+            pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
+        )
+        self.assertEqual(
+            Article.objects.get(pk=a.pk).pub_date,
+            datetime(2008, 12, 31, 23, 59, 59),
+        )
 
     def test_manually_specify_primary_key(self):
         # You can manually specify the primary key when creating a new object.
@@ -353,6 +367,7 @@ class ModelTest(TestCase):
         with self.assertRaises(TypeError):
             EmptyQuerySet()
         self.assertIsInstance(Article.objects.none(), EmptyQuerySet)
+        self.assertFalse(isinstance('', EmptyQuerySet))
 
     def test_emptyqs_values(self):
         # test for #15959
@@ -421,7 +436,7 @@ class ModelLookupTest(TestCase):
         # Create an Article.
         self.a = Article(
             id=None,
-            headline='Area woman programs in Python',
+            headline='Swallow programs in Python',
             pub_date=datetime(2005, 7, 28),
         )
         # Save it into the database. You have to call save() explicitly.
@@ -429,17 +444,17 @@ class ModelLookupTest(TestCase):
 
     def test_all_lookup(self):
         # Change values by changing the attributes, then calling save().
-        self.a.headline = 'Area man programs in Python'
+        self.a.headline = 'Parrot programs in Python'
         self.a.save()
 
         # Article.objects.all() returns all the articles in the database.
         self.assertQuerysetEqual(Article.objects.all(),
-            ['<Article: Area man programs in Python>'])
+            ['<Article: Parrot programs in Python>'])
 
     def test_rich_lookup(self):
         # Django provides a rich database lookup API.
         self.assertEqual(Article.objects.get(id__exact=self.a.id), self.a)
-        self.assertEqual(Article.objects.get(headline__startswith='Area woman'), self.a)
+        self.assertEqual(Article.objects.get(headline__startswith='Swallow'), self.a)
         self.assertEqual(Article.objects.get(pub_date__year=2005), self.a)
         self.assertEqual(Article.objects.get(pub_date__year=2005, pub_date__month=7), self.a)
         self.assertEqual(Article.objects.get(pub_date__year=2005, pub_date__month=7, pub_date__day=28), self.a)
@@ -448,11 +463,11 @@ class ModelLookupTest(TestCase):
     def test_equal_lookup(self):
         # The "__exact" lookup type can be omitted, as a shortcut.
         self.assertEqual(Article.objects.get(id=self.a.id), self.a)
-        self.assertEqual(Article.objects.get(headline='Area woman programs in Python'), self.a)
+        self.assertEqual(Article.objects.get(headline='Swallow programs in Python'), self.a)
 
         self.assertQuerysetEqual(
             Article.objects.filter(pub_date__year=2005),
-            ['<Article: Area woman programs in Python>'],
+            ['<Article: Swallow programs in Python>'],
         )
         self.assertQuerysetEqual(
             Article.objects.filter(pub_date__year=2004),
@@ -460,12 +475,12 @@ class ModelLookupTest(TestCase):
         )
         self.assertQuerysetEqual(
             Article.objects.filter(pub_date__year=2005, pub_date__month=7),
-            ['<Article: Area woman programs in Python>'],
+            ['<Article: Swallow programs in Python>'],
         )
 
         self.assertQuerysetEqual(
             Article.objects.filter(pub_date__week_day=5),
-            ['<Article: Area woman programs in Python>'],
+            ['<Article: Swallow programs in Python>'],
         )
         self.assertQuerysetEqual(
             Article.objects.filter(pub_date__week_day=6),
@@ -506,7 +521,7 @@ class ModelLookupTest(TestCase):
 
         # pk can be used as a shortcut for the primary key name in any query.
         self.assertQuerysetEqual(Article.objects.filter(pk__in=[self.a.id]),
-            ["<Article: Area woman programs in Python>"])
+            ["<Article: Swallow programs in Python>"])
 
         # Model instances of the same type and same ID are considered equal.
         a = Article.objects.get(pk=self.a.id)
@@ -517,7 +532,7 @@ class ModelLookupTest(TestCase):
         # Create a very similar object
         a = Article(
             id=None,
-            headline='Area man programs in Python',
+            headline='Swallow bites Python',
             pub_date=datetime(2005, 7, 28),
         )
         a.save()
@@ -531,7 +546,7 @@ class ModelLookupTest(TestCase):
             MultipleObjectsReturned,
             "get\(\) returned more than one Article -- it returned 2!",
             Article.objects.get,
-            headline__startswith='Area',
+            headline__startswith='Swallow',
         )
         six.assertRaisesRegex(
             self,
@@ -579,7 +594,7 @@ class ConcurrentSaveTests(TransactionTestCase):
         self.assertEqual(Article.objects.get(pk=a.pk).headline, 'foo')
 
 
-class ManagerTest(TestCase):
+class ManagerTest(SimpleTestCase):
     QUERYSET_PROXY_METHODS = [
         'none',
         'count',
@@ -735,6 +750,13 @@ class ModelRefreshTests(TestCase):
             self.assertFalse(hasattr(s3_copy.selfref, 'touched'))
             self.assertEqual(s3_copy.selfref, s2)
 
+    def test_refresh_null_fk(self):
+        s1 = SelfRef.objects.create()
+        s2 = SelfRef.objects.create(selfref=s1)
+        s2.selfref = None
+        s2.refresh_from_db()
+        self.assertEqual(s2.selfref, s1)
+
     def test_refresh_unsaved(self):
         pub_date = self._truncate_ms(datetime.now())
         a = Article.objects.create(pub_date=pub_date)
@@ -744,20 +766,18 @@ class ModelRefreshTests(TestCase):
         self.assertEqual(a2.pub_date, pub_date)
         self.assertEqual(a2._state.db, "default")
 
+    def test_refresh_fk_on_delete_set_null(self):
+        a = Article.objects.create(
+            headline='Parrot programs in Python',
+            pub_date=datetime(2005, 7, 28),
+        )
+        s1 = SelfRef.objects.create(article=a)
+        a.delete()
+        s1.refresh_from_db()
+        self.assertIsNone(s1.article_id)
+        self.assertIsNone(s1.article)
+
     def test_refresh_no_fields(self):
         a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
         with self.assertNumQueries(0):
             a.refresh_from_db(fields=[])
-
-
-class TestRelatedObjectDeprecation(TestCase):
-    def test_field_related_deprecation(self):
-        field = SelfRef._meta.get_field('selfref')
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            self.assertIsInstance(field.related, ForeignObjectRel)
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns.pop().message),
-                'Usage of field.related has been deprecated. Use field.rel instead.'
-            )

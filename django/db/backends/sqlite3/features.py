@@ -1,9 +1,8 @@
 from __future__ import unicode_literals
 
-import sys
-
 from django.db import utils
 from django.db.backends.base.features import BaseDatabaseFeatures
+from django.utils import six
 from django.utils.functional import cached_property
 
 from .base import Database
@@ -38,6 +37,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_rollback_ddl = True
     supports_paramstyle_pyformat = False
     supports_sequence_reset = False
+    can_clone_databases = True
 
     @cached_property
     def uses_savepoints(self):
@@ -50,7 +50,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def can_share_in_memory_db(self):
         return (
-            sys.version_info[:2] >= (3, 4) and
+            six.PY3 and
             Database.__name__ == 'sqlite3.dbapi2' and
             Database.sqlite_version_info >= (3, 7, 13)
         )

@@ -277,10 +277,6 @@ All parameters are optional and can be set at any time prior to calling the
 * ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
   header when sending the email.
 
-.. versionchanged:: 1.8
-
-    The ``reply_to`` parameter was added.
-
 For example::
 
     email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
@@ -412,10 +408,6 @@ It can also be used as a context manager, which will automatically call
         mail.EmailMessage(subject2, body2, from2, [to2],
                           connection=connection).send()
 
-.. versionadded:: 1.8
-
-    The context manager protocol was added.
-
 Obtaining an instance of an email backend
 -----------------------------------------
 
@@ -447,15 +439,22 @@ can :ref:`write your own email backend <topic-custom-email-backend>`.
 SMTP backend
 ~~~~~~~~~~~~
 
-.. class:: backends.smtp.EmailBackend([host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs])
+.. class:: backends.smtp.EmailBackend(host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs)
 
     This is the default backend. Email will be sent through a SMTP server.
-    The server address and authentication credentials are set in the
-    :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
-    :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS`,
-    :setting:`EMAIL_USE_SSL`, :setting:`EMAIL_TIMEOUT`,
-    :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE` settings
-    in your settings file.
+
+    The value for each argument is retrieved from the matching setting if the
+    argument is ``None``:
+
+    * ``host``: :setting:`EMAIL_HOST`
+    * ``port``: :setting:`EMAIL_PORT`
+    * ``username``: :setting:`EMAIL_HOST_USER`
+    * ``password``: :setting:`EMAIL_HOST_PASSWORD`
+    * ``use_tls``: :setting:`EMAIL_USE_TLS`
+    * ``use_ssl``: :setting:`EMAIL_USE_SSL`
+    * ``timeout``: :setting:`EMAIL_TIMEOUT`
+    * ``ssl_keyfile``: :setting:`EMAIL_SSL_KEYFILE`
+    * ``ssl_certfile``: :setting:`EMAIL_SSL_CERTFILE`
 
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
@@ -464,12 +463,6 @@ SMTP backend
 
     If unspecified, the default ``timeout`` will be the one provided by
     :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
-
-    .. versionchanged:: 1.8
-
-        The ``ssl_keyfile``, and ``ssl_certfile`` parameters and corresponding
-        settings were added. The ability to customize ``timeout`` using
-        a setting (:setting:`EMAIL_TIMEOUT`) was added.
 
 .. _topic-email-console-backend:
 
@@ -618,7 +611,7 @@ Configuring email for development
 =================================
 
 There are times when you do not want Django to send emails at
-all. For example, while developing a Web site, you probably don't want
+all. For example, while developing a website, you probably don't want
 to send out thousands of emails -- but you may want to validate that
 emails will be sent to the right people under the right conditions,
 and that those emails will contain the correct content.

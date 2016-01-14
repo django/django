@@ -1,4 +1,5 @@
-from django.utils.http import http_date, parse_http_date_safe
+from django.utils.cache import get_conditional_response
+from django.utils.http import http_date, parse_http_date_safe, unquote_etag
 
 
 class ConditionalGetMiddleware(object):
@@ -14,28 +15,17 @@ class ConditionalGetMiddleware(object):
         if not response.streaming and not response.has_header('Content-Length'):
             response['Content-Length'] = str(len(response.content))
 
-        # If-None-Match must be ignored if original result would be anything
-        # other than a 2XX or 304 status. 304 status would result in no change.
-        # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26
-        if 200 <= response.status_code < 300 and response.has_header('ETag'):
-            if_none_match = request.META.get('HTTP_IF_NONE_MATCH')
-            if if_none_match == response['ETag']:
-                # Setting the status is enough here. The response handling path
-                # automatically removes content for this status code (in
-                # http.conditional_content_removal()).
-                response.status_code = 304
+        etag = response.get('ETag')
+        last_modified = response.get('Last-Modified')
+        if last_modified:
+            last_modified = parse_http_date_safe(last_modified)
 
-        # If-Modified-Since must be ignored if the original result was not a 200.
-        # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25
-        if response.status_code == 200 and response.has_header('Last-Modified'):
-            if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
-            if if_modified_since is not None:
-                if_modified_since = parse_http_date_safe(if_modified_since)
-            if if_modified_since is not None:
-                last_modified = parse_http_date_safe(response['Last-Modified'])
-                if last_modified is not None and last_modified <= if_modified_since:
-                    # Setting the status code is enough here (same reasons as
-                    # above).
-                    response.status_code = 304
+        if etag or last_modified:
+            return get_conditional_response(
+                request,
+                etag=unquote_etag(etag),
+                last_modified=last_modified,
+                response=response,
+            )
 
         return response

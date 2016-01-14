@@ -16,7 +16,6 @@ def static(prefix, view=serve, **kwargs):
     urlpatterns = [
         # ... the rest of your URLconf goes here ...
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
     """
     # No-op if not in debug mode or an non-local prefix
     if not settings.DEBUG or (prefix and '://' in prefix):

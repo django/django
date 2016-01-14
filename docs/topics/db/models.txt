@@ -99,7 +99,7 @@ Example::
         instrument = models.CharField(max_length=100)
 
     class Album(models.Model):
-        artist = models.ForeignKey(Musician)
+        artist = models.ForeignKey(Musician, on_delete=models.CASCADE)
         name = models.CharField(max_length=100)
         release_date = models.DateField()
         num_stars = models.IntegerField()
@@ -281,9 +281,17 @@ In this example, the verbose name is ``"first name"``::
 :class:`~django.db.models.OneToOneField` require the first argument to be a
 model class, so use the :attr:`~Field.verbose_name` keyword argument::
 
-    poll = models.ForeignKey(Poll, verbose_name="the related poll")
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        verbose_name="the related poll",
+    )
     sites = models.ManyToManyField(Site, verbose_name="list of sites")
-    place = models.OneToOneField(Place, verbose_name="related place")
+    place = models.OneToOneField(
+        Place,
+        on_delete=models.CASCADE,
+        verbose_name="related place",
+    )
 
 The convention is not to capitalize the first letter of the
 :attr:`~Field.verbose_name`. Django will automatically capitalize the first
@@ -317,7 +325,7 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
         pass
 
     class Car(models.Model):
-        manufacturer = models.ForeignKey(Manufacturer)
+        manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
         # ...
 
 You can also create :ref:`recursive relationships <recursive-relationships>` (an
@@ -331,7 +339,10 @@ above) be the name of the model, lowercase. You can, of course, call the field
 whatever you want. For example::
 
     class Car(models.Model):
-        company_that_makes_it = models.ForeignKey(Manufacturer)
+        company_that_makes_it = models.ForeignKey(
+            Manufacturer,
+            on_delete=models.CASCADE,
+        )
         # ...
 
 .. seealso::
@@ -445,8 +456,8 @@ something like this::
             return self.name
 
     class Membership(models.Model):
-        person = models.ForeignKey(Person)
-        group = models.ForeignKey(Group)
+        person = models.ForeignKey(Person, on_delete=models.CASCADE)
+        group = models.ForeignKey(Group, on_delete=models.CASCADE)
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
@@ -490,24 +501,24 @@ the intermediate model::
     ...     invite_reason="Needed a new drummer.")
     >>> m1.save()
     >>> beatles.members.all()
-    [<Person: Ringo Starr>]
+    <QuerySet [<Person: Ringo Starr>]>
     >>> ringo.group_set.all()
-    [<Group: The Beatles>]
+    <QuerySet [<Group: The Beatles>]>
     >>> m2 = Membership.objects.create(person=paul, group=beatles,
     ...     date_joined=date(1960, 8, 1),
     ...     invite_reason="Wanted to form a band.")
     >>> beatles.members.all()
-    [<Person: Ringo Starr>, <Person: Paul McCartney>]
+    <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>]>
 
-Unlike normal many-to-many fields, you *can't* use ``add``, ``create``,
-or assignment (i.e., ``beatles.members = [...]``) to create relationships::
+Unlike normal many-to-many fields, you *can't* use ``add()``, ``create()``,
+or ``set()`` to create relationships::
 
-    # THIS WILL NOT WORK
+    >>> # THIS WILL NOT WORK
     >>> beatles.members.add(john)
-    # NEITHER WILL THIS
+    >>> # NEITHER WILL THIS
     >>> beatles.members.create(name="George Harrison")
-    # AND NEITHER WILL THIS
-    >>> beatles.members = [john, paul, ringo, george]
+    >>> # AND NEITHER WILL THIS
+    >>> beatles.members.set([john, paul, ringo, george])
 
 Why? You can't just create a relationship between a ``Person`` and a ``Group``
 - you need to specify all the detail for the relationship required by the
@@ -518,15 +529,27 @@ The only way to create this type of relationship is to create instances of the
 intermediate model.
 
 The :meth:`~django.db.models.fields.related.RelatedManager.remove` method is
-disabled for similar reasons. However, the
-:meth:`~django.db.models.fields.related.RelatedManager.clear` method can be
-used to remove all many-to-many relationships for an instance::
+disabled for similar reasons. For example, if the custom through table defined
+by the intermediate model does not enforce uniqueness on the
+``(model1, model2)`` pair, a ``remove()`` call would not provide enough
+information as to which intermediate model instance should be deleted::
+
+    >>> Membership.objects.create(person=ringo, group=beatles,
+    ...     date_joined=date(1968, 9, 4),
+    ...     invite_reason="You've been gone for a month and we miss you.")
+    >>> beatles.members.all()
+    <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>, <Person: Ringo Starr>]>
+    >>> # THIS WILL NOT WORK BECAUSE IT CANNOT TELL WHICH MEMBERSHIP TO REMOVE
+    >>> beatles.members.remove(ringo)
+
+However, the :meth:`~django.db.models.fields.related.RelatedManager.clear`
+method can be used to remove all many-to-many relationships for an instance::
 
     >>> # Beatles have broken up
     >>> beatles.members.clear()
     >>> # Note that this deletes the intermediate model instances
     >>> Membership.objects.all()
-    []
+    <QuerySet []>
 
 Once you have established the many-to-many relationships by creating instances
 of your intermediate model, you can issue queries. Just as with normal
@@ -535,7 +558,7 @@ many-to-many-related model::
 
     # Find all the groups with a member whose name starts with 'Paul'
     >>> Group.objects.filter(members__name__startswith='Paul')
-    [<Group: The Beatles>]
+    <QuerySet [<Group: The Beatles>]>
 
 As you are using an intermediate model, you can also query on its attributes::
 
@@ -543,7 +566,7 @@ As you are using an intermediate model, you can also query on its attributes::
     >>> Person.objects.filter(
     ...     group__name='The Beatles',
     ...     membership__date_joined__gt=date(1961,1,1))
-    [<Person: Ringo Starr]
+    <QuerySet [<Person: Ringo Starr]>
 
 If you need to access a membership's information you may do so by directly
 querying the ``Membership`` model::
@@ -563,7 +586,6 @@ Another way to access the same information is by querying the
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
     'Needed a new drummer.'
-
 
 One-to-one relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -621,7 +643,12 @@ just refer to the other model class wherever needed. For example::
 
     class Restaurant(models.Model):
         # ...
-        zip_code = models.ForeignKey(ZipCode)
+        zip_code = models.ForeignKey(
+            ZipCode,
+            on_delete=models.SET_NULL,
+            blank=True,
+            null=True,
+        )
 
 Field name restrictions
 -----------------------
@@ -740,9 +767,6 @@ You can override most of these -- see `overriding predefined model methods`_,
 below -- but there are a couple that you'll almost always want to define:
 
 :meth:`~Model.__str__` (Python 3)
-    Python 3 equivalent of ``__unicode__()``.
-
-:meth:`~Model.__unicode__` (Python 2)
     A Python "magic method" that returns a unicode "representation" of any
     object. This is what Python and Django will use whenever a model
     instance needs to be coerced and displayed as a plain string. Most
@@ -751,6 +775,9 @@ below -- but there are a couple that you'll almost always want to define:
 
     You'll always want to define this method; the default isn't very helpful
     at all.
+
+``__unicode__()`` (Python 2)
+    Python 2 equivalent of ``__str__()``.
 
 :meth:`~Model.get_absolute_url`
     This tells Django how to calculate the URL for an object. Django uses
@@ -819,9 +846,11 @@ code will automatically support those arguments when they are added.
 
     Note that the :meth:`~Model.delete()` method for an object is not
     necessarily called when :ref:`deleting objects in bulk using a
-    QuerySet<topics-db-queries-delete>`. To ensure customized delete logic
-    gets executed, you can use :data:`~django.db.models.signals.pre_delete`
-    and/or :data:`~django.db.models.signals.post_delete` signals.
+    QuerySet <topics-db-queries-delete>` or as a result of a :attr:`cascading
+    delete <django.db.models.ForeignKey.on_delete>`. To ensure customized
+    delete logic gets executed, you can use
+    :data:`~django.db.models.signals.pre_delete` and/or
+    :data:`~django.db.models.signals.post_delete` signals.
 
     Unfortunately, there isn't a workaround when
     :meth:`creating<django.db.models.query.QuerySet.bulk_create>` or
@@ -899,7 +928,7 @@ model, since it is an abstract base class. It does not generate a database
 table or have a manager, and cannot be instantiated or saved directly.
 
 For many uses, this type of model inheritance will be exactly what you want.
-It provides a way to factor out common information at the Python level, whilst
+It provides a way to factor out common information at the Python level, while
 still only creating one database table per child model at the database level.
 
 ``Meta`` inheritance
@@ -982,7 +1011,7 @@ Along with another app ``rare/models.py``::
         pass
 
 The reverse name of the ``common.ChildA.m2m`` field will be
-``common_childa_related``, whilst the reverse name of the
+``common_childa_related``, while the reverse name of the
 ``common.ChildB.m2m`` field will be ``common_childb_related``, and finally the
 reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
 It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion
@@ -1104,7 +1133,7 @@ Specifying the parent link field
 
 As mentioned, Django will automatically create a
 :class:`~django.db.models.OneToOneField` linking your child
-class back any non-abstract parent models. If you want to control the
+class back to any non-abstract parent models. If you want to control the
 name of the attribute linking back to the parent, you can create your
 own :class:`~django.db.models.OneToOneField` and set
 :attr:`parent_link=True <django.db.models.OneToOneField.parent_link>`
@@ -1188,9 +1217,6 @@ can't inherit from multiple non-abstract models as the proxy model doesn't
 provide any connection between the rows in the different database tables. A
 proxy model can inherit from any number of abstract model classes, providing
 they do *not* define any model fields.
-
-Proxy models inherit any ``Meta`` options that they don't define from their
-non-abstract model parent (the model they are proxying for).
 
 Proxy model managers
 ~~~~~~~~~~~~~~~~~~~~

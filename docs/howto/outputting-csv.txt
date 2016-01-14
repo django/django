@@ -39,8 +39,7 @@ mention:
 
 * The response gets an additional ``Content-Disposition`` header, which
   contains the name of the CSV file. This filename is arbitrary; call it
-  whatever you want. It'll be used by browsers in the "Save as..."
-  dialogue, etc.
+  whatever you want. It'll be used by browsers in the "Save as..." dialog, etc.
 
 * Hooking into the CSV-generation API is easy: Just pass ``response`` as the
   first argument to ``csv.writer``. The ``csv.writer`` function expects a

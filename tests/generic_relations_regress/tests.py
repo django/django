@@ -144,22 +144,26 @@ class GenericRelationTests(TestCase):
         tag.save()
 
     def test_ticket_20378(self):
+        # Create a couple of extra HasLinkThing so that the autopk value
+        # isn't the same for Link and HasLinkThing.
         hs1 = HasLinkThing.objects.create()
         hs2 = HasLinkThing.objects.create()
-        l1 = Link.objects.create(content_object=hs1)
-        l2 = Link.objects.create(content_object=hs2)
+        hs3 = HasLinkThing.objects.create()
+        hs4 = HasLinkThing.objects.create()
+        l1 = Link.objects.create(content_object=hs3)
+        l2 = Link.objects.create(content_object=hs4)
         self.assertQuerysetEqual(
             HasLinkThing.objects.filter(links=l1),
-            [hs1], lambda x: x)
+            [hs3], lambda x: x)
         self.assertQuerysetEqual(
             HasLinkThing.objects.filter(links=l2),
-            [hs2], lambda x: x)
+            [hs4], lambda x: x)
         self.assertQuerysetEqual(
             HasLinkThing.objects.exclude(links=l2),
-            [hs1], lambda x: x)
+            [hs1, hs2, hs3], lambda x: x, ordered=False)
         self.assertQuerysetEqual(
             HasLinkThing.objects.exclude(links=l1),
-            [hs2], lambda x: x)
+            [hs1, hs2, hs4], lambda x: x, ordered=False)
 
     def test_ticket_20564(self):
         b1 = B.objects.create()

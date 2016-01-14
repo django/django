@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 
 import datetime
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError
-from django.test import TestCase
+from django.db import connection
+from django.test import TestCase, override_settings
 from django.utils import six
 
 from .models import Article, Category, Comment
@@ -95,7 +97,7 @@ class DatesTests(TestCase):
             self,
             FieldError,
             "Cannot resolve keyword u?'invalid_field' into field. Choices are: "
-            "categories, comments, id, pub_date, title",
+            "categories, comments, id, pub_date, pub_datetime, title",
             Article.objects.dates,
             "invalid_field",
             "year",
@@ -121,3 +123,31 @@ class DatesTests(TestCase):
             "year",
             order="bad order",
         )
+
+    @override_settings(USE_TZ=False)
+    def test_dates_trunc_datetime_fields(self):
+        Article.objects.bulk_create(
+            Article(pub_date=pub_datetime.date(), pub_datetime=pub_datetime)
+            for pub_datetime in [
+                datetime.datetime(2015, 10, 21, 18, 1),
+                datetime.datetime(2015, 10, 21, 18, 2),
+                datetime.datetime(2015, 10, 22, 18, 1),
+                datetime.datetime(2015, 10, 22, 18, 2),
+            ]
+        )
+        self.assertQuerysetEqual(
+            Article.objects.dates('pub_datetime', 'day', order='ASC'), [
+                "datetime.date(2015, 10, 21)",
+                "datetime.date(2015, 10, 22)",
+            ]
+        )
+
+    @skipUnless(connection.vendor == 'mysql', "Test checks MySQL query syntax")
+    def test_dates_avoid_datetime_cast(self):
+        Article.objects.create(pub_date=datetime.date(2015, 10, 21))
+        for kind in ['day', 'month', 'year']:
+            qs = Article.objects.dates('pub_date', kind)
+            if kind == 'day':
+                self.assertIn('DATE(', str(qs.query))
+            else:
+                self.assertIn(' AS DATE)', str(qs.query))

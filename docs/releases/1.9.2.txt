@@ -1,0 +1,37 @@
+==========================
+Django 1.9.2 release notes
+==========================
+
+*Under development*
+
+Django 1.9.2 fixes several bugs in 1.9.1.
+
+Bugfixes
+========
+
+* Fixed a regression in ``ConditionalGetMiddleware`` causing ``If-None-Match``
+  checks to always return HTTP 200 (:ticket:`26024`).
+
+* Fixed a regression that caused the "user-tools" items to display on the
+  admin's logout page (:ticket:`26035`).
+
+* Fixed a crash in the translations system when the current language has no
+  translations (:ticket:`26046`).
+
+* Fixed a regression that caused the incorrect day to be selected when opening
+  the admin calendar widget for timezones from GMT+0100 to GMT+1200
+  (:ticket:`24980`).
+
+* Fixed a regression in the admin's edit related model popup that caused an
+  escaped value to be displayed in the select dropdown of the parent window
+  (:ticket:`25997`).
+
+* Fixed incorrect index handling in migrations on PostgreSQL when adding
+  ``db_index=True`` or ``unique=True`` to a ``CharField`` or ``TextField`` that
+  already had the other specified, or when removing one of them from a field
+  that had both (:ticket:`26034`).
+
+* Fixed a regression where defining a relation on an abstract model's field
+  using a string model name without an app_label no longer resolved that
+  reference to the abstract model's app if using that model in another
+  application (:ticket`25858`).

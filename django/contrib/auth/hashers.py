@@ -221,12 +221,12 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     """
     Secure password hashing using the PBKDF2 algorithm (recommended)
 
-    Configured to use PBKDF2 + HMAC + SHA256 with 20000 iterations.
+    Configured to use PBKDF2 + HMAC + SHA256.
     The result is a 64 byte binary string.  Iterations may be changed
     safely but you must rename the algorithm if you change SHA256.
     """
     algorithm = "pbkdf2_sha256"
-    iterations = 24000
+    iterations = 30000
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
@@ -337,6 +337,10 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
             (_('checksum'), mask_hash(checksum)),
         ])
 
+    def must_update(self, encoded):
+        algorithm, empty, algostr, rounds, data = encoded.split('$', 4)
+        return int(rounds) != self.rounds
+
 
 class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
     """
@@ -349,7 +353,7 @@ class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
 
     This hasher does not first hash the password which means it is subject to
     the 72 character bcrypt password truncation, most use cases should prefer
-    the BCryptSha512PasswordHasher.
+    the BCryptSHA256PasswordHasher.
 
     See: https://code.djangoproject.com/ticket/20138
     """

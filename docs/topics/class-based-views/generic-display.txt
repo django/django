@@ -1,7 +1,7 @@
 .. _Generic views:
 
 ==================================
-Built-in Class-based generic views
+Built-in class-based generic views
 ==================================
 
 Writing Web applications can be monotonous, because we repeat certain patterns
@@ -104,7 +104,7 @@ We'll be using these models::
     class Book(models.Model):
         title = models.CharField(max_length=100)
         authors = models.ManyToManyField('Author')
-        publisher = models.ForeignKey(Publisher)
+        publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
         publication_date = models.DateField()
 
 Now we need to define a view::
@@ -236,6 +236,11 @@ template, but you can override it to send more::
     to super), any children of that class will also need to explicitly set it
     after super if they want to be sure to override all parents. If you're
     having trouble, review the method resolution order of your view.
+
+    Another consideration is that the context data from class-based generic
+    views will override data provided by context processors; see
+    :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data` for
+    an example.
 
 .. _generic-views-list-subsets:
 

@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import unittest
+from django.test import modify_settings
 
-from django.db import connection
-from django.test import TestCase, modify_settings
-
+from . import PostgreSQLTestCase
 from .models import CharFieldModel, TextFieldModel
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
-class UnaccentTest(TestCase):
+class UnaccentTest(PostgreSQLTestCase):
 
     Model = CharFieldModel
 

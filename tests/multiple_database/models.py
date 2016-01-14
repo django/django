@@ -10,7 +10,7 @@ from django.utils.encoding import python_2_unicode_compatible
 @python_2_unicode_compatible
 class Review(models.Model):
     source = models.CharField(max_length=100)
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
 
@@ -58,7 +58,7 @@ class Book(models.Model):
     title = models.CharField(max_length=100)
     published = models.DateField()
     authors = models.ManyToManyField(Person)
-    editor = models.ForeignKey(Person, null=True, related_name='edited')
+    editor = models.ForeignKey(Person, models.SET_NULL, null=True, related_name='edited')
     reviews = GenericRelation(Review)
     pages = models.IntegerField(default=100)
 
@@ -72,7 +72,7 @@ class Book(models.Model):
 @python_2_unicode_compatible
 class Pet(models.Model):
     name = models.CharField(max_length=100)
-    owner = models.ForeignKey(Person)
+    owner = models.ForeignKey(Person, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -82,7 +82,7 @@ class Pet(models.Model):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, null=True)
+    user = models.OneToOneField(User, models.SET_NULL, null=True)
     flavor = models.CharField(max_length=100)
 
     class Meta:

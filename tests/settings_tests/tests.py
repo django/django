@@ -4,7 +4,7 @@ import unittest
 import warnings
 from types import ModuleType
 
-from django.conf import LazySettings, Settings, settings
+from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import (
@@ -12,7 +12,6 @@ from django.test import (
     override_settings, signals,
 )
 from django.utils import six
-from django.utils.encoding import force_text
 
 
 @modify_settings(ITEMS={
@@ -101,7 +100,6 @@ class ClassDecoratedTestCaseSuper(TestCase):
     """
     Dummy class for testing max recursion error in child class call to
     super().  Refs #17011.
-
     """
     def test_max_recursion_error(self):
         pass
@@ -112,7 +110,7 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
 
     @classmethod
     def setUpClass(cls):
-        super(cls, ClassDecoratedTestCase).setUpClass()
+        super(ClassDecoratedTestCase, cls).setUpClass()
         cls.foo = getattr(settings, 'TEST', 'BUG')
 
     def test_override(self):
@@ -130,7 +128,6 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
         """
         Overriding a method on a super class and then calling that method on
         the super class should not trigger infinite recursion. See #17011.
-
         """
         try:
             super(ClassDecoratedTestCase, self).test_max_recursion_error()
@@ -152,7 +149,7 @@ class ChildDecoratedTestCase(ParentDecoratedTestCase):
         self.assertEqual(settings.TEST, 'override-child')
 
 
-class SettingsTests(TestCase):
+class SettingsTests(SimpleTestCase):
     def setUp(self):
         self.testvalue = None
         signals.setting_changed.connect(self.signal_callback)
@@ -279,7 +276,7 @@ class SettingsTests(TestCase):
         self.assertRaises(AttributeError, getattr, settings, 'TEST2')
 
 
-class TestComplexSettingOverride(TestCase):
+class TestComplexSettingOverride(SimpleTestCase):
     def setUp(self):
         self.old_warn_override_settings = signals.COMPLEX_OVERRIDE_SETTINGS.copy()
         signals.COMPLEX_OVERRIDE_SETTINGS.add('TEST_WARN')
@@ -304,7 +301,7 @@ class TestComplexSettingOverride(TestCase):
                 'Overriding setting TEST_WARN can lead to unexpected behavior.')
 
 
-class TrailingSlashURLTests(TestCase):
+class TrailingSlashURLTests(SimpleTestCase):
     """
     Tests for the MEDIA_URL and STATIC_URL settings.
 
@@ -386,7 +383,7 @@ class TrailingSlashURLTests(TestCase):
                          self.settings_module.STATIC_URL)
 
 
-class SecureProxySslHeaderTest(TestCase):
+class SecureProxySslHeaderTest(SimpleTestCase):
     settings_module = settings
 
     def setUp(self):
@@ -418,7 +415,7 @@ class SecureProxySslHeaderTest(TestCase):
         self.assertEqual(req.is_secure(), True)
 
 
-class IsOverriddenTest(TestCase):
+class IsOverriddenTest(SimpleTestCase):
     def test_configure(self):
         s = LazySettings()
         s.configure(SECRET_KEY='foo')
@@ -442,6 +439,31 @@ class IsOverriddenTest(TestCase):
         with override_settings(ALLOWED_HOSTS=[]):
             self.assertTrue(settings.is_overridden('ALLOWED_HOSTS'))
 
+    def test_unevaluated_lazysettings_repr(self):
+        lazy_settings = LazySettings()
+        expected = '<LazySettings [Unevaluated]>'
+        self.assertEqual(repr(lazy_settings), expected)
+
+    def test_evaluated_lazysettings_repr(self):
+        lazy_settings = LazySettings()
+        module = os.environ.get(ENVIRONMENT_VARIABLE)
+        expected = '<LazySettings "%s">' % module
+        # Force evaluation of the lazy object.
+        lazy_settings.APPEND_SLASH
+        self.assertEqual(repr(lazy_settings), expected)
+
+    def test_usersettingsholder_repr(self):
+        lazy_settings = LazySettings()
+        lazy_settings.configure(APPEND_SLASH=False)
+        expected = '<UserSettingsHolder>'
+        self.assertEqual(repr(lazy_settings._wrapped), expected)
+
+    def test_settings_repr(self):
+        module = os.environ.get(ENVIRONMENT_VARIABLE)
+        lazy_settings = Settings(module)
+        expected = '<Settings "%s">' % module
+        self.assertEqual(repr(lazy_settings), expected)
+
 
 class TestListSettings(unittest.TestCase):
     """
@@ -449,7 +471,6 @@ class TestListSettings(unittest.TestCase):
     ImproperlyConfigured if they are set to a string instead of a list or tuple.
     """
     list_or_tuple_settings = (
-        "ALLOWED_INCLUDE_ROOTS",
         "INSTALLED_APPS",
         "TEMPLATE_DIRS",
         "LOCALE_PATHS",
@@ -467,47 +488,3 @@ class TestListSettings(unittest.TestCase):
             finally:
                 del sys.modules['fake_settings_module']
                 delattr(settings_module, setting)
-
-
-class TestSessionVerification(unittest.TestCase):
-
-    def setUp(self):
-        self.settings_module = ModuleType('fake_settings_module')
-        self.settings_module.SECRET_KEY = 'foo'
-
-    def tearDown(self):
-        if 'fake_settings_module' in sys.modules:
-            del sys.modules['fake_settings_module']
-
-    def test_session_verification_deprecation_no_verification(self):
-        self.settings_module.MIDDLEWARE_CLASSES = ['django.contrib.auth.middleware.AuthenticationMiddleware']
-        sys.modules['fake_settings_module'] = self.settings_module
-        with warnings.catch_warnings(record=True) as warn:
-            warnings.filterwarnings('always')
-            Settings('fake_settings_module')
-        self.assertEqual(
-            force_text(warn[0].message),
-            "Session verification will become mandatory in Django 2.0. "
-            "Please add 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' "
-            "to your MIDDLEWARE_CLASSES setting when you are ready to opt-in after "
-            "reading the upgrade considerations in the 1.8 release notes.",
-        )
-
-    def test_session_verification_deprecation_both(self):
-        self.settings_module.MIDDLEWARE_CLASSES = [
-            'django.contrib.auth.middleware.AuthenticationMiddleware',
-            'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-        ]
-        sys.modules['fake_settings_module'] = self.settings_module
-        with warnings.catch_warnings(record=True) as warn:
-            warnings.filterwarnings('always')
-            Settings('fake_settings_module')
-        self.assertEqual(len(warn), 0)
-
-    def test_session_verification_deprecation_neither(self):
-        self.settings_module.MIDDLEWARE_CLASSES = []
-        sys.modules['fake_settings_module'] = self.settings_module
-        with warnings.catch_warnings(record=True) as warn:
-            warnings.filterwarnings('always')
-            Settings('fake_settings_module')
-        self.assertEqual(len(warn), 0)

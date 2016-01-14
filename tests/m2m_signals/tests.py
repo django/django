@@ -28,6 +28,7 @@ class ManyToManySignalsTest(TestCase):
         self.vw = Car.objects.create(name='VW')
         self.bmw = Car.objects.create(name='BMW')
         self.toyota = Car.objects.create(name='Toyota')
+
         self.wheelset = Part.objects.create(name='Wheelset')
         self.doors = Part.objects.create(name='Doors')
         self.engine = Part.objects.create(name='Engine')
@@ -54,24 +55,22 @@ class ManyToManySignalsTest(TestCase):
             self.m2m_changed_signal_receiver, Person.friends.through
         )
 
-    def test_m2m_relations_add_remove_clear(self):
-        expected_messages = []
-
-        # Install a listener on one of the two m2m relations.
+    def _initialize_signal_car(self, add_default_parts_before_set_signal=False):
+        """ Install a listener on the two m2m relations. """
         models.signals.m2m_changed.connect(
             self.m2m_changed_signal_receiver, Car.optional_parts.through
         )
-
-        # Test the add, remove and clear methods on both sides of the
-        # many-to-many relation
-
-        # adding a default part to our car - no signal listener installed
-        self.vw.default_parts.add(self.sunroof)
-
-        # Now install a listener
+        if add_default_parts_before_set_signal:
+            # adding a default part to our car - no signal listener installed
+            self.vw.default_parts.add(self.sunroof)
         models.signals.m2m_changed.connect(
             self.m2m_changed_signal_receiver, Car.default_parts.through
         )
+
+    def test_m2m_relations_add_remove_clear(self):
+        expected_messages = []
+
+        self._initialize_signal_car(add_default_parts_before_set_signal=True)
 
         self.vw.default_parts.add(self.wheelset, self.doors, self.engine)
         expected_messages.append({
@@ -108,24 +107,31 @@ class ManyToManySignalsTest(TestCase):
         })
         self.assertEqual(self.m2m_changed_messages, expected_messages)
 
+    def test_m2m_relations_signals_remove_relation(self):
+        self._initialize_signal_car()
         # remove the engine from the self.vw and the airbag (which is not set
         # but is returned)
         self.vw.default_parts.remove(self.engine, self.airbag)
-        expected_messages.append({
-            'instance': self.vw,
-            'action': 'pre_remove',
-            'reverse': False,
-            'model': Part,
-            'objects': [self.airbag, self.engine],
-        })
-        expected_messages.append({
-            'instance': self.vw,
-            'action': 'post_remove',
-            'reverse': False,
-            'model': Part,
-            'objects': [self.airbag, self.engine],
-        })
-        self.assertEqual(self.m2m_changed_messages, expected_messages)
+        self.assertEqual(self.m2m_changed_messages, [
+            {
+                'instance': self.vw,
+                'action': 'pre_remove',
+                'reverse': False,
+                'model': Part,
+                'objects': [self.airbag, self.engine],
+            }, {
+                'instance': self.vw,
+                'action': 'post_remove',
+                'reverse': False,
+                'model': Part,
+                'objects': [self.airbag, self.engine],
+            }
+        ])
+
+    def test_m2m_relations_signals_give_the_self_vw_some_optional_parts(self):
+        expected_messages = []
+
+        self._initialize_signal_car()
 
         # give the self.vw some optional parts (second relation to same model)
         self.vw.optional_parts.add(self.airbag, self.sunroof)
@@ -163,73 +169,86 @@ class ManyToManySignalsTest(TestCase):
         })
         self.assertEqual(self.m2m_changed_messages, expected_messages)
 
+    def test_m2m_relations_signals_reverse_relation_with_custom_related_name(self):
+        self._initialize_signal_car()
         # remove airbag from the self.vw (reverse relation with custom
         # related_name)
         self.airbag.cars_optional.remove(self.vw)
-        expected_messages.append({
-            'instance': self.airbag,
-            'action': 'pre_remove',
-            'reverse': True,
-            'model': Car,
-            'objects': [self.vw],
-        })
-        expected_messages.append({
-            'instance': self.airbag,
-            'action': 'post_remove',
-            'reverse': True,
-            'model': Car,
-            'objects': [self.vw],
-        })
-        self.assertEqual(self.m2m_changed_messages, expected_messages)
+        self.assertEqual(self.m2m_changed_messages, [
+            {
+                'instance': self.airbag,
+                'action': 'pre_remove',
+                'reverse': True,
+                'model': Car,
+                'objects': [self.vw],
+            }, {
+                'instance': self.airbag,
+                'action': 'post_remove',
+                'reverse': True,
+                'model': Car,
+                'objects': [self.vw],
+            }
+        ])
 
+    def test_m2m_relations_signals_clear_all_parts_of_the_self_vw(self):
+        self._initialize_signal_car()
         # clear all parts of the self.vw
         self.vw.default_parts.clear()
-        expected_messages.append({
-            'instance': self.vw,
-            'action': 'pre_clear',
-            'reverse': False,
-            'model': Part,
-        })
-        expected_messages.append({
-            'instance': self.vw,
-            'action': 'post_clear',
-            'reverse': False,
-            'model': Part,
-        })
-        self.assertEqual(self.m2m_changed_messages, expected_messages)
+        self.assertEqual(self.m2m_changed_messages, [
+            {
+                'instance': self.vw,
+                'action': 'pre_clear',
+                'reverse': False,
+                'model': Part,
+            }, {
+                'instance': self.vw,
+                'action': 'post_clear',
+                'reverse': False,
+                'model': Part,
+            }
+        ])
 
+    def test_m2m_relations_signals_all_the_doors_off_of_cars(self):
+        self._initialize_signal_car()
         # take all the doors off of cars
         self.doors.car_set.clear()
-        expected_messages.append({
-            'instance': self.doors,
-            'action': 'pre_clear',
-            'reverse': True,
-            'model': Car,
-        })
-        expected_messages.append({
-            'instance': self.doors,
-            'action': 'post_clear',
-            'reverse': True,
-            'model': Car,
-        })
-        self.assertEqual(self.m2m_changed_messages, expected_messages)
+        self.assertEqual(self.m2m_changed_messages, [
+            {
+                'instance': self.doors,
+                'action': 'pre_clear',
+                'reverse': True,
+                'model': Car,
+            }, {
+                'instance': self.doors,
+                'action': 'post_clear',
+                'reverse': True,
+                'model': Car,
+            }
+        ])
 
+    def test_m2m_relations_signals_reverse_relation(self):
+        self._initialize_signal_car()
         # take all the airbags off of cars (clear reverse relation with custom
         # related_name)
         self.airbag.cars_optional.clear()
-        expected_messages.append({
-            'instance': self.airbag,
-            'action': 'pre_clear',
-            'reverse': True,
-            'model': Car,
-        })
-        expected_messages.append({
-            'instance': self.airbag,
-            'action': 'post_clear',
-            'reverse': True,
-            'model': Car,
-        })
-        self.assertEqual(self.m2m_changed_messages, expected_messages)
+        self.assertEqual(self.m2m_changed_messages, [
+            {
+                'instance': self.airbag,
+                'action': 'pre_clear',
+                'reverse': True,
+                'model': Car,
+            }, {
+                'instance': self.airbag,
+                'action': 'post_clear',
+                'reverse': True,
+                'model': Car,
+            }
+        ])
+
+    def test_m2m_relations_signals_alternative_ways(self):
+        expected_messages = []
+
+        self._initialize_signal_car()
 
         # alternative ways of setting relation:
         self.vw.default_parts.create(name='Windows')
@@ -251,7 +270,7 @@ class ManyToManySignalsTest(TestCase):
         self.assertEqual(self.m2m_changed_messages, expected_messages)
 
         # direct assignment clears the set first, then adds
-        self.vw.default_parts = [self.wheelset, self.doors, self.engine]
+        self.vw.default_parts.set([self.wheelset, self.doors, self.engine])
         expected_messages.append({
             'instance': self.vw,
             'action': 'pre_remove',
@@ -281,6 +300,11 @@ class ManyToManySignalsTest(TestCase):
             'objects': [self.doors, self.engine, self.wheelset],
         })
         self.assertEqual(self.m2m_changed_messages, expected_messages)
+
+    def test_m2m_relations_signals_clearing_removing(self):
+        expected_messages = []
+
+        self._initialize_signal_car(add_default_parts_before_set_signal=True)
 
         # set by clearing.
         self.vw.default_parts.set([self.wheelset, self.doors, self.engine], clear=True)
@@ -330,10 +354,15 @@ class ManyToManySignalsTest(TestCase):
         })
         self.assertEqual(self.m2m_changed_messages, expected_messages)
 
+    def test_m2m_relations_signals_when_inheritance(self):
+        expected_messages = []
+
+        self._initialize_signal_car(add_default_parts_before_set_signal=True)
+
         # Check that signals still work when model inheritance is involved
         c4 = SportsCar.objects.create(name='Bugatti', price='1000000')
         c4b = Car.objects.get(name='Bugatti')
-        c4.default_parts = [self.doors]
+        c4.default_parts.set([self.doors])
         expected_messages.append({
             'instance': c4,
             'action': 'pre_add',
@@ -367,9 +396,8 @@ class ManyToManySignalsTest(TestCase):
         })
         self.assertEqual(self.m2m_changed_messages, expected_messages)
 
-    def test_m2m_relations_with_self(self):
-        expected_messages = []
-
+    def _initialize_signal_person(self):
+        # Install a listener on the two m2m relations.
         models.signals.m2m_changed.connect(
             self.m2m_changed_signal_receiver, Person.fans.through
         )
@@ -377,53 +405,59 @@ class ManyToManySignalsTest(TestCase):
             self.m2m_changed_signal_receiver, Person.friends.through
         )
 
-        self.alice.friends = [self.bob, self.chuck]
-        expected_messages.append({
-            'instance': self.alice,
-            'action': 'pre_add',
-            'reverse': False,
-            'model': Person,
-            'objects': [self.bob, self.chuck],
-        })
-        expected_messages.append({
-            'instance': self.alice,
-            'action': 'post_add',
-            'reverse': False,
-            'model': Person,
-            'objects': [self.bob, self.chuck],
-        })
-        self.assertEqual(self.m2m_changed_messages, expected_messages)
+    def test_m2m_relations_with_self_add_friends(self):
+        self._initialize_signal_person()
+        self.alice.friends.set([self.bob, self.chuck])
+        self.assertEqual(self.m2m_changed_messages, [
+            {
+                'instance': self.alice,
+                'action': 'pre_add',
+                'reverse': False,
+                'model': Person,
+                'objects': [self.bob, self.chuck],
+            }, {
+                'instance': self.alice,
+                'action': 'post_add',
+                'reverse': False,
+                'model': Person,
+                'objects': [self.bob, self.chuck],
+            }
+        ])
 
-        self.alice.fans = [self.daisy]
-        expected_messages.append({
-            'instance': self.alice,
-            'action': 'pre_add',
-            'reverse': False,
-            'model': Person,
-            'objects': [self.daisy],
-        })
-        expected_messages.append({
-            'instance': self.alice,
-            'action': 'post_add',
-            'reverse': False,
-            'model': Person,
-            'objects': [self.daisy],
-        })
-        self.assertEqual(self.m2m_changed_messages, expected_messages)
+    def test_m2m_relations_with_self_add_fan(self):
+        self._initialize_signal_person()
+        self.alice.fans.set([self.daisy])
+        self.assertEqual(self.m2m_changed_messages, [
+            {
+                'instance': self.alice,
+                'action': 'pre_add',
+                'reverse': False,
+                'model': Person,
+                'objects': [self.daisy],
+            }, {
+                'instance': self.alice,
+                'action': 'post_add',
+                'reverse': False,
+                'model': Person,
+                'objects': [self.daisy],
+            }
+        ])
 
-        self.chuck.idols = [self.alice, self.bob]
-        expected_messages.append({
-            'instance': self.chuck,
-            'action': 'pre_add',
-            'reverse': True,
-            'model': Person,
-            'objects': [self.alice, self.bob],
-        })
-        expected_messages.append({
-            'instance': self.chuck,
-            'action': 'post_add',
-            'reverse': True,
-            'model': Person,
-            'objects': [self.alice, self.bob],
-        })
-        self.assertEqual(self.m2m_changed_messages, expected_messages)
+    def test_m2m_relations_with_self_add_idols(self):
+        self._initialize_signal_person()
+        self.chuck.idols.set([self.alice, self.bob])
+        self.assertEqual(self.m2m_changed_messages, [
+            {
+                'instance': self.chuck,
+                'action': 'pre_add',
+                'reverse': True,
+                'model': Person,
+                'objects': [self.alice, self.bob],
+            }, {
+                'instance': self.chuck,
+                'action': 'post_add',
+                'reverse': True,
+                'model': Person,
+                'objects': [self.alice, self.bob],
+            }
+        ])

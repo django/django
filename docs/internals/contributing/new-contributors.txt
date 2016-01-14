@@ -36,9 +36,10 @@ Start with these easy tasks to discover Django's development process.
 
   Mark the appropriate flags if a patch needs docs or tests. Look through the
   changes a patch makes, and keep an eye out for syntax that is incompatible
-  with older but still supported versions of Python. Run the tests and make
-  sure they pass on your system.  Where possible and relevant, try them out on
-  a database other than SQLite. Leave comments and feedback!
+  with older but still supported versions of Python. :doc:`Run the tests
+  </internals/contributing/writing-code/unit-tests>` and make sure they pass.
+  Where possible and relevant, try them out on a database other than SQLite.
+  Leave comments and feedback!
 
 * **Keep old patches up to date**
 

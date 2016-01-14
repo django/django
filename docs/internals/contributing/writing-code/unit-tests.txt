@@ -2,13 +2,10 @@
 Unit tests
 ==========
 
+.. highlight:: console
+
 Django comes with a test suite of its own, in the ``tests`` directory of the
 code base. It's our policy to make sure all tests pass at all times.
-
-The tests cover:
-
-* Models, the database API and everything else in core Django core (``tests/``),
-* :ref:`contrib-apps` (``django/contrib/<app>/tests`` or ``tests/<app>_...``).
 
 We appreciate any and all contributions to the test suite!
 
@@ -24,20 +21,23 @@ Running the unit tests
 Quickstart
 ~~~~~~~~~~
 
-If you are on Python < 3.3, you'll first need to install a backport of the
-``unittest.mock`` module that's available in Python 3.3+. See
+If you are on Python 2, you'll first need to install a backport of the
+``unittest.mock`` module that's available in Python 3. See
 :ref:`running-unit-tests-dependencies` for details on installing `mock`_ and
 the other optional test dependencies.
 
 Running the tests requires a Django settings module that defines the
 databases to use. To make it easy to get started, Django provides and uses a
-sample settings module that uses the SQLite database. To run the tests:
-
-.. code-block:: bash
+sample settings module that uses the SQLite database. To run the tests::
 
    $ git clone https://github.com/django/django.git django-repo
    $ cd django-repo/tests
    $ PYTHONPATH=..:$PYTHONPATH ./runtests.py
+
+.. admonition:: Windows users
+
+    We recommend something like `Git Bash <https://msysgit.github.io/>`_ to run
+    the tests using the above approach.
 
 You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
 checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
@@ -62,7 +62,7 @@ The :setting:`DATABASES` setting in any test settings module needs to define
 two databases:
 
 * A ``default`` database. This database should use the backend that
-  you want to use for primary testing
+  you want to use for primary testing.
 
 * A database with the alias ``other``. The ``other`` database is used to
   establish that queries can be directed to different databases. As a result,
@@ -86,8 +86,8 @@ These test databases are deleted when the tests are finished.
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
-you will need to include a value for :setting:`TEST_CHARSET` in the settings
-dictionary for the applicable database.
+you will need to include a value for :setting:`CHARSET <TEST_CHARSET>` in the
+test settings dictionary for the applicable database.
 
 .. _runtests-specifying-labels:
 
@@ -101,42 +101,32 @@ tests by appending the names of the test modules to ``runtests.py`` on the
 command line.
 
 For example, if you'd like to run tests only for generic relations and
-internationalization, type:
-
-.. code-block:: bash
+internationalization, type::
 
    $ ./runtests.py --settings=path.to.settings generic_relations i18n
 
 How do you find out the names of individual tests? Look in ``tests/`` — each
-directory name there is the name of a test. Contrib app names are also valid
-test names.
+directory name there is the name of a test.
 
 If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
-of the ``i18n`` module, type:
-
-.. code-block:: bash
+of the ``i18n`` module, type::
 
    $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests
 
-Going beyond that, you can specify an individual test method like this:
-
-.. code-block:: bash
+Going beyond that, you can specify an individual test method like this::
 
    $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
 
 Running the Selenium tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some admin tests require Selenium 2, Firefox and Python >= 2.6 to work via a
-real Web browser. To allow those tests to run and not be skipped, you must
-install the selenium_ package (version > 2.13) into your Python path and run
-the tests with the ``--selenium`` option:
-
-.. code-block:: bash
+Some tests require Selenium and a Web browser (Firefox, Google Chrome, or
+Internet Explorer). To allow those tests to be run rather than skipped, you must
+install the selenium_ package into your Python path and run the tests with the
+``--selenium`` option::
 
    $ ./runtests.py --settings=test_sqlite --selenium admin_inlines
-
 
 .. _running-unit-tests-dependencies:
 
@@ -148,22 +138,23 @@ dependencies:
 
 *  bcrypt_
 *  docutils_
+*  enum34_ (Python 2 only)
+*  geoip2_
+*  jinja2_ 2.7+
 *  numpy_
 *  Pillow_
 *  PyYAML_
 *  pytz_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
-*  mock_ (for Python < 3.3)
+*  mock_ (for Python 2)
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
 *  sqlparse_
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
-like so:
-
-.. code-block:: bash
+like so::
 
    $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
 
@@ -181,6 +172,9 @@ associated tests will be skipped.
 
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
+.. _enum34: https://pypi.python.org/pypi/enum34
+.. _geoip2: https://pypi.python.org/pypi/geoip2
+.. _jinja2: https://pypi.python.org/pypi/jinja2
 .. _numpy: https://pypi.python.org/pypi/numpy
 .. _Pillow: https://pypi.python.org/pypi/Pillow/
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
@@ -188,10 +182,10 @@ associated tests will be skipped.
 .. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
 .. _mock: https://pypi.python.org/pypi/mock
-.. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
+.. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: https://pypi.python.org/pypi/selenium
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
-.. _pip requirements files: http://www.pip-installer.org/en/latest/user_guide.html#requirements-files
+.. _pip requirements files: https://pip.pypa.io/en/latest/user_guide.html#requirements-files
 
 Code coverage
 ~~~~~~~~~~~~~
@@ -200,15 +194,12 @@ Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
 in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
-To run coverage on the Django test suite using the standard test settings:
+Coverage should be run in a single process to obtain accurate statistics. To
+run coverage on the Django test suite using the standard test settings::
 
-.. code-block:: bash
+   $ coverage run ./runtests.py --settings=test_sqlite --parallel=1
 
-   $ coverage run ./runtests.py --settings=test_sqlite
-
-After running coverage, generate the html report by running:
-
-.. code-block:: bash
+After running coverage, generate the html report by running::
 
    $ coverage html
 
@@ -222,18 +213,9 @@ and also excludes several directories not relevant to the results
 Contrib apps
 ------------
 
-Tests for contrib apps go in their respective directories under
-``django/contrib``, in a ``tests.py`` file. You can split the tests over
-multiple modules by using a ``tests`` directory in the normal Python way.
-
-If you have URLs that need to be mapped, put them in ``tests/urls.py``.
-
-To run tests for just one contrib app (e.g. ``auth``), use the same
-method as above:
-
-.. code-block:: bash
-
-   $ ./runtests.py --settings=settings django.contrib.auth
+Tests for contrib apps can be found in the ``tests/`` directory, typically
+under ``<app_name>_tests``. For example, tests for ``contrib.auth`` are located
+in ``tests/auth_tests``.
 
 .. _troubleshooting-unit-tests:
 
@@ -246,9 +228,7 @@ Many test failures with ``UnicodeEncodeError``
 If the ``locales`` package is not installed, some tests will fail with a
 ``UnicodeEncodeError``.
 
-You can resolve this on Debian-based systems, for example, by running:
-
-.. code-block:: bash
+You can resolve this on Debian-based systems, for example, by running::
 
     $ apt-get install locales
     $ dpkg-reconfigure locales
@@ -265,9 +245,7 @@ it possible to identify a small number of tests that may be related to the
 failure.
 
 For example, suppose that the failing test that works on its own is
-``ModelTest.test_eq``, then using:
-
-.. code-block:: bash
+``ModelTest.test_eq``, then using::
 
     $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
 
@@ -281,9 +259,7 @@ failing tests is minimized.
 
 The ``--pair`` option runs the given test alongside every other test from the
 suite, letting you check if another test has side-effects that cause the
-failure. So:
-
-.. code-block:: bash
+failure. So::
 
     $ ./runtests.py --pair basic.tests.ModelTest.test_eq
 
@@ -292,28 +268,152 @@ will pair ``test_eq`` with every test label.
 With both ``--bisect`` and ``--pair``, if you already suspect which cases
 might be responsible for the failure, you may limit tests to be cross-analyzed
 by :ref:`specifying further test labels <runtests-specifying-labels>` after
-the first one:
-
-.. code-block:: bash
+the first one::
 
     $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
 
 You can also try running any set of tests in reverse using the ``--reverse``
 option in order to verify that executing tests in a different order does not
-cause any trouble:
-
-.. code-block:: bash
+cause any trouble::
 
     $ ./runtests.py basic --reverse
 
+Seeing the SQL queries run during a test
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 If you wish to examine the SQL being run in failing tests, you can turn on
 :ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
-combine this with ``--verbosity=2``, all SQL queries will be output.
-
-.. code-block:: bash
+combine this with ``--verbosity=2``, all SQL queries will be output::
 
     $ ./runtests.py basic --debug-sql
 
-.. versionadded:: 1.8
+Seeing the full traceback of a test failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    The ``--reverse`` and ``--debug-sql`` options were added.
+By default tests are run in parallel with one process per core. When the tests
+are run in parallel, however, you'll only see a truncated traceback for any
+test failures. You can adjust this behavior with the ``--parallel`` option::
+
+    $ ./runtests.py basic --parallel=1
+
+You can also use the ``DJANGO_TEST_PROCESSES`` environment variable for this
+purpose.
+
+.. versionadded:: 1.9
+
+    Support for running tests in parallel and the ``--parallel`` option were
+    added.
+
+Tips for writing tests
+----------------------
+
+.. highlight:: python
+
+Isolating model registration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To avoid polluting the global :attr:`~django.apps.apps` registry and prevent
+unnecessary table creation, models defined in a test method should be bound to
+a temporary ``Apps`` instance::
+
+    from django.apps.registry import Apps
+    from django.db import models
+    from django.test import SimpleTestCase
+
+    class TestModelDefinition(SimpleTestCase):
+        def test_model_definition(self):
+            test_apps = Apps(['app_label'])
+
+            class TestModel(models.Model):
+                class Meta:
+                    apps = test_apps
+            ...
+
+.. function:: django.test.utils.isolate_apps(*app_labels, attr_name=None, kwarg_name=None)
+
+.. versionadded:: 1.10
+
+Since this pattern involves a lot of boilerplate, Django provides the
+:func:`~django.test.utils.isolate_apps` decorator. It's used like this::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    class TestModelDefinition(SimpleTestCase):
+        @isolate_apps('app_label')
+        def test_model_definition(self):
+            class TestModel(models.Model):
+                pass
+            ...
+
+.. admonition:: Setting ``app_label``
+
+    Models defined in a test method with no explicit
+    :attr:`~django.db.models.Options.app_label` are automatically assigned the
+    label of the app in which their test class is located.
+
+    In order to make sure the models defined within the context of
+    :func:`~django.test.utils.isolate_apps` instances are correctly
+    installed, you should pass the set of targeted ``app_label`` as arguments:
+
+    .. snippet::
+        :filename: tests/app_label/tests.py
+
+        from django.db import models
+        from django.test import SimpleTestCase
+        from django.test.utils import isolate_apps
+
+        class TestModelDefinition(SimpleTestCase):
+            @isolate_apps('app_label', 'other_app_label')
+            def test_model_definition(self):
+                # This model automatically receives app_label='app_label'
+                class TestModel(models.Model):
+                    pass
+
+                class OtherAppModel(models.Model):
+                    class Meta:
+                        app_label = 'other_app_label'
+                ...
+
+The decorator can also be applied to classes::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    @isolate_apps('app_label')
+    class TestModelDefinition(SimpleTestCase):
+        def test_model_definition(self):
+            class TestModel(models.Model):
+                pass
+            ...
+
+The temporary ``Apps`` instance used to isolate model registration can be
+retrieved as an attribute when used as a class decorator by using the
+``attr_name`` parameter::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    @isolate_apps('app_label', attr_name='apps')
+    class TestModelDefinition(SimpleTestCase):
+        def test_model_definition(self):
+            class TestModel(models.Model):
+                pass
+            self.assertIs(self.apps.get_model('app_label', 'TestModel'), TestModel)
+
+Or as an argument on the test method when used as a method decorator by using
+the ``kwarg_name`` parameter::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    class TestModelDefinition(SimpleTestCase):
+        @isolate_apps('app_label', kwarg_name='apps')
+        def test_model_definition(self, apps):
+            class TestModel(models.Model):
+                pass
+            self.assertIs(apps.get_model('app_label', 'TestModel'), TestModel)

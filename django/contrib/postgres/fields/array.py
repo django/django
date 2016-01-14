@@ -5,15 +5,14 @@ from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, IntegerField, Transform
+from django.db.models.lookups import Exact, In
 from django.utils import six
-from django.utils.translation import string_concat, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
+
+from ..utils import prefix_validation_error
+from .utils import AttributeSetter
 
 __all__ = ['ArrayField']
-
-
-class AttributeSetter(object):
-    def __init__(self, name, value):
-        setattr(self, name, value)
 
 
 class ArrayField(Field):
@@ -31,9 +30,21 @@ class ArrayField(Field):
             self.default_validators.append(ArrayMaxLengthValidator(self.size))
         super(ArrayField, self).__init__(**kwargs)
 
+    @property
+    def model(self):
+        try:
+            return self.__dict__['model']
+        except KeyError:
+            raise AttributeError("'%s' object has no attribute 'model'" % self.__class__.__name__)
+
+    @model.setter
+    def model(self, model):
+        self.__dict__['model'] = model
+        self.base_field.model = model
+
     def check(self, **kwargs):
         errors = super(ArrayField, self).check(**kwargs)
-        if self.base_field.rel:
+        if self.base_field.remote_field:
             errors.append(
                 checks.Error(
                     'Base field for array cannot be a related field.',
@@ -93,7 +104,7 @@ class ArrayField(Field):
 
     def value_to_string(self, obj):
         values = []
-        vals = self._get_val_from_obj(obj)
+        vals = self.value_from_object(obj)
         base_field = self.base_field
 
         for val in vals:
@@ -123,20 +134,34 @@ class ArrayField(Field):
 
     def validate(self, value, model_instance):
         super(ArrayField, self).validate(value, model_instance)
-        for i, part in enumerate(value):
+        for index, part in enumerate(value):
             try:
                 self.base_field.validate(part, model_instance)
-            except exceptions.ValidationError as e:
-                raise exceptions.ValidationError(
-                    string_concat(self.error_messages['item_invalid'], e.message),
+            except exceptions.ValidationError as error:
+                raise prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': i},
+                    params={'nth': index},
                 )
         if isinstance(self.base_field, ArrayField):
             if len({len(i) for i in value}) > 1:
                 raise exceptions.ValidationError(
                     self.error_messages['nested_array_mismatch'],
                     code='nested_array_mismatch',
+                )
+
+    def run_validators(self, value):
+        super(ArrayField, self).run_validators(value)
+        for index, part in enumerate(value):
+            try:
+                self.base_field.run_validators(part)
+            except exceptions.ValidationError as error:
+                raise prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
+                    code='item_invalid',
+                    params={'nth': index},
                 )
 
     def formfield(self, **kwargs):
@@ -153,7 +178,7 @@ class ArrayField(Field):
 class ArrayContains(lookups.DataContains):
     def as_sql(self, qn, connection):
         sql, params = super(ArrayContains, self).as_sql(qn, connection)
-        sql += '::%s' % self.lhs.output_field.db_type(connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
 
@@ -161,7 +186,15 @@ class ArrayContains(lookups.DataContains):
 class ArrayContainedBy(lookups.ContainedBy):
     def as_sql(self, qn, connection):
         sql, params = super(ArrayContainedBy, self).as_sql(qn, connection)
-        sql += '::%s' % self.lhs.output_field.db_type(connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
+        return sql, params
+
+
+@ArrayField.register_lookup
+class ArrayExact(Exact):
+    def as_sql(self, qn, connection):
+        sql, params = super(ArrayExact, self).as_sql(qn, connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
 
@@ -169,7 +202,7 @@ class ArrayContainedBy(lookups.ContainedBy):
 class ArrayOverlap(lookups.Overlap):
     def as_sql(self, qn, connection):
         sql, params = super(ArrayOverlap, self).as_sql(qn, connection)
-        sql += '::%s' % self.lhs.output_field.db_type(connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
 
@@ -180,7 +213,20 @@ class ArrayLenTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return 'array_length(%s, 1)' % lhs, params
+        # Distinguish NULL and empty arrays
+        return (
+            'CASE WHEN %(lhs)s IS NULL THEN NULL ELSE '
+            'coalesce(array_length(%(lhs)s, 1), 0) END'
+        ) % {'lhs': lhs}, params
+
+
+@ArrayField.register_lookup
+class ArrayInLookup(In):
+    def get_prep_lookup(self):
+        values = super(ArrayInLookup, self).get_prep_lookup()
+        # In.process_rhs() expects values to be hashable, so convert lists
+        # to tuples.
+        return [tuple(value) for value in values]
 
 
 class IndexTransform(Transform):

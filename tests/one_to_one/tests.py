@@ -5,7 +5,8 @@ from django.test import TestCase
 
 from .models import (
     Bar, Director, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
-    Place, RelatedModel, Restaurant, School, Target, UndergroundBar, Waiter,
+    Place, Pointer, RelatedModel, Restaurant, School, Target, UndergroundBar,
+    Waiter,
 )
 
 
@@ -134,16 +135,14 @@ class OneToOneTests(TestCase):
         should raise an exception.
         """
         place = Place(name='User', address='London')
-        with self.assertRaisesMessage(ValueError,
-                            'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                            % (place, Restaurant.place.field.rel.to._meta.object_name)):
+        with self.assertRaises(Restaurant.DoesNotExist):
+            place.restaurant
+        msg = "save() prohibited to prevent data loss due to unsaved related object 'place'."
+        with self.assertRaisesMessage(ValueError, msg):
             Restaurant.objects.create(place=place, serves_hot_dogs=True, serves_pizza=False)
-        bar = UndergroundBar()
-        p = Place(name='User', address='London')
-        with self.assertRaisesMessage(ValueError,
-                            'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                            % (bar, p._meta.object_name)):
-            p.undergroundbar = bar
+        # place should not cache restaurant
+        with self.assertRaises(Restaurant.DoesNotExist):
+            place.restaurant
 
     def test_reverse_relationship_cache_cascade(self):
         """
@@ -172,7 +171,7 @@ class OneToOneTests(TestCase):
         """
         f = Favorites(name='Fred')
         f.save()
-        f.restaurants = [self.r1]
+        f.restaurants.set([self.r1])
         self.assertQuerysetEqual(
             f.restaurants.all(),
             ['<Restaurant: Demon Dogs the restaurant>']
@@ -186,6 +185,22 @@ class OneToOneTests(TestCase):
         """
         self.assertEqual(self.p1.restaurant, self.r1)
         self.assertEqual(self.p1.bar, self.b1)
+
+    def test_assign_none_reverse_relation(self):
+        p = Place.objects.get(name="Demon Dogs")
+        # Assigning None succeeds if field is null=True.
+        ug_bar = UndergroundBar.objects.create(place=p, serves_cocktails=False)
+        p.undergroundbar = None
+        self.assertIsNone(ug_bar.place)
+        ug_bar.save()
+        ug_bar.refresh_from_db()
+        self.assertIsNone(ug_bar.place)
+
+    def test_assign_none_null_reverse_relation(self):
+        p = Place.objects.get(name="Demon Dogs")
+        # Assigning None doesn't throw AttributeError if there isn't a related
+        # UndergroundBar.
+        p.undergroundbar = None
 
     def test_related_object_cache(self):
         """ Regression test for #6886 (the related-object cache) """
@@ -224,6 +239,11 @@ class OneToOneTests(TestCase):
         r = Restaurant(place=p)
         self.assertIs(r.place, p)
 
+        # Creation using keyword argument and unsaved related instance (#8070).
+        p = Place()
+        r = Restaurant(place=p)
+        self.assertTrue(r.place is p)
+
         # Creation using attname keyword argument and an id will cause the related
         # object to be fetched.
         p = Place.objects.get(name="Demon Dogs")
@@ -257,6 +277,13 @@ class OneToOneTests(TestCase):
             Target.objects.exclude(second_pointer=None),
             []
         )
+
+    def test_o2o_primary_key_delete(self):
+        t = Target.objects.create(name='name')
+        Pointer.objects.create(other=t)
+        num_deleted, objs = Pointer.objects.filter(other__name='name').delete()
+        self.assertEqual(num_deleted, 1)
+        self.assertEqual(objs, {'one_to_one.Pointer': 1})
 
     def test_reverse_object_does_not_exist_cache(self):
         """
@@ -367,9 +394,15 @@ class OneToOneTests(TestCase):
         """
         p = Place()
         b = UndergroundBar.objects.create()
+
+        # Assigning a reverse relation on an unsaved object is allowed.
+        p.undergroundbar = b
+
+        # However saving the object is not allowed.
+        msg = "save() prohibited to prevent data loss due to unsaved related object 'place'."
         with self.assertNumQueries(0):
-            with self.assertRaises(ValueError):
-                p.undergroundbar = b
+            with self.assertRaisesMessage(ValueError, msg):
+                b.save()
 
     def test_nullable_o2o_delete(self):
         u = UndergroundBar.objects.create(place=self.p1)
@@ -385,7 +418,7 @@ class OneToOneTests(TestCase):
         be added to the related model.
         """
         self.assertFalse(
-            hasattr(Target, HiddenPointer._meta.get_field('target').rel.get_accessor_name())
+            hasattr(Target, HiddenPointer._meta.get_field('target').remote_field.get_accessor_name())
         )
 
     def test_related_object(self):
@@ -443,3 +476,32 @@ class OneToOneTests(TestCase):
         # refs #21563
         self.assertFalse(hasattr(Director(), 'director'))
         self.assertFalse(hasattr(School(), 'school'))
+
+    def test_update_one_to_one_pk(self):
+        p1 = Place.objects.create()
+        p2 = Place.objects.create()
+        r1 = Restaurant.objects.create(place=p1)
+        r2 = Restaurant.objects.create(place=p2)
+        w = Waiter.objects.create(restaurant=r1)
+
+        Waiter.objects.update(restaurant=r2)
+        w.refresh_from_db()
+        self.assertEqual(w.restaurant, r2)
+
+    def test_rel_pk_subquery(self):
+        r = Restaurant.objects.first()
+        q1 = Restaurant.objects.filter(place_id=r.pk)
+        # Test that subquery using primary key and a query against the
+        # same model works correctly.
+        q2 = Restaurant.objects.filter(place_id__in=q1)
+        self.assertQuerysetEqual(q2, [r], lambda x: x)
+        # Test that subquery using 'pk__in' instead of 'place_id__in' work, too.
+        q2 = Restaurant.objects.filter(
+            pk__in=Restaurant.objects.filter(place__id=r.place.pk)
+        )
+        self.assertQuerysetEqual(q2, [r], lambda x: x)
+
+    def test_rel_pk_exact(self):
+        r = Restaurant.objects.first()
+        r2 = Restaurant.objects.filter(pk__exact=r).first()
+        self.assertEqual(r, r2)

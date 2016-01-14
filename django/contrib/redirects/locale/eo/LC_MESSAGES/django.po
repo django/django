@@ -2,32 +2,32 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2011
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2015
 # kristjan <kristjan.schmidt@googlemail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-21 14:05+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-20 13:57+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
-"Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
-"language/eo/)\n"
+"Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
+"eo/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: eo\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
 msgstr "Alidirektoj"
 
-#: contrib/redirects/models.py:10
+msgid "site"
+msgstr "retejo"
+
 msgid "redirect from"
 msgstr "alidirekto de"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -35,11 +35,9 @@ msgstr ""
 "Tio ĉi devus esti absoluta vojo, escepte de la retregionan nomon. Ekzemplo: "
 "'/eventoj/serĉo/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "alidirekto al"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -47,10 +45,8 @@ msgstr ""
 "Tio ĉi povas esti aŭ absoluta vojo (kiel supre), aŭ URL komencante kun "
 "'http://'."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "alidirekto"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "alidirektoj"

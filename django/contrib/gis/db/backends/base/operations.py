@@ -22,6 +22,7 @@ class BaseSpatialOperations(object):
     geometry = False
 
     area = False
+    bounding_circle = False
     centroid = False
     difference = False
     distance = False
@@ -30,7 +31,6 @@ class BaseSpatialOperations(object):
     envelope = False
     force_rhr = False
     mem_size = False
-    bounding_circle = False
     num_geom = False
     num_points = False
     perimeter = False
@@ -47,6 +47,22 @@ class BaseSpatialOperations(object):
 
     # Aggregates
     disallowed_aggregates = ()
+
+    geom_func_prefix = ''
+
+    # Mapping between Django function names and backend names, when names do not
+    # match; used in spatial_function_name().
+    function_names = {}
+
+    # Blacklist/set of known unsupported functions of the backend
+    unsupported_functions = {
+        'Area', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
+        'BoundingCircle', 'Centroid', 'Difference', 'Distance', 'Envelope',
+        'ForceRHR', 'GeoHash', 'Intersection', 'Length', 'MemSize', 'NumGeometries',
+        'NumPoints', 'Perimeter', 'PointOnSurface', 'Reverse', 'Scale',
+        'SnapToGrid', 'SymDifference', 'Transform', 'Translate',
+        'Union',
+    }
 
     # Serialization
     geohash = False
@@ -108,9 +124,14 @@ class BaseSpatialOperations(object):
     def spatial_aggregate_name(self, agg_name):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')
 
+    def spatial_function_name(self, func_name):
+        if func_name in self.unsupported_functions:
+            raise NotImplementedError("This backend doesn't support the %s function." % func_name)
+        return self.function_names.get(func_name, self.geom_func_prefix + func_name)
+
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
-        raise NotImplementedError('subclasses of BaseSpatialOperations must a provide geometry_columns() method')
+        raise NotImplementedError('Subclasses of BaseSpatialOperations must provide a geometry_columns() method.')
 
     def spatial_ref_sys(self):
         raise NotImplementedError('subclasses of BaseSpatialOperations must a provide spatial_ref_sys() method')

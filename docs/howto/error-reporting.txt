@@ -61,8 +61,15 @@ not found" errors). Django sends emails about 404 errors when:
 
 If those conditions are met, Django will email the users listed in the
 :setting:`MANAGERS` setting whenever your code raises a 404 and the request has
-a referer. (It doesn't bother to email for 404s that don't have a referer --
-those are usually just people typing in broken URLs or broken Web 'bots).
+a referer. It doesn't bother to email for 404s that don't have a referer --
+those are usually just people typing in broken URLs or broken Web bots. It also
+ignores 404s when the referer is equal to the requested URL, since this
+behavior is from broken Web bots too.
+
+.. versionchanged:: 1.9
+
+    In older versions, 404s were not ignored when the referer was equal to the
+    requested URL.
 
 .. note::
 
@@ -114,6 +121,14 @@ and override its methods.
 Filtering error reports
 -----------------------
 
+.. warning::
+
+    Filtering sensitive data is a hard problem, and it's nearly impossible to
+    guarantee that sensitive won't leak into an error report. Therefore, error
+    reports should only be available to trusted team members and you should
+    avoid transmitting error reports unencrypted over the Internet (such as
+    through email).
+
 Filtering sensitive information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -132,8 +147,8 @@ control which information should be filtered out of error reports in a
 production environment (that is, where :setting:`DEBUG` is set to ``False``):
 :func:`sensitive_variables` and :func:`sensitive_post_parameters`.
 
-.. _`full traceback`: http://en.wikipedia.org/wiki/Stack_trace
-.. _`traceback frame`: http://en.wikipedia.org/wiki/Stack_frame
+.. _`full traceback`: https://en.wikipedia.org/wiki/Stack_trace
+.. _`traceback frame`: https://en.wikipedia.org/wiki/Stack_frame
 
 .. function:: sensitive_variables(*variables)
 
@@ -254,13 +269,6 @@ following methods:
 
     Returns ``True`` to activate the filtering operated in the other methods.
     By default the filter is active if :setting:`DEBUG` is ``False``.
-
-.. method:: SafeExceptionReporterFilter.get_request_repr(request)
-
-    Returns the representation string of the request object, that is, the
-    value that would be returned by ``repr(request)``, except it uses the
-    filtered dictionary of POST parameters as determined by
-    :meth:`SafeExceptionReporterFilter.get_post_parameters`.
 
 .. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 

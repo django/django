@@ -40,6 +40,8 @@ The following is a simple unit test using the request factory::
     from django.contrib.auth.models import AnonymousUser, User
     from django.test import TestCase, RequestFactory
 
+    from .views import MyView, my_view
+
     class SimpleTest(TestCase):
         def setUp(self):
             # Every test needs access to the request factory.
@@ -61,6 +63,8 @@ The following is a simple unit test using the request factory::
 
             # Test my_view() as if it were deployed at /customer/details
             response = my_view(request)
+            # Use this syntax for class-based views.
+            response = MyView.as_view()(request)
             self.assertEqual(response.status_code, 200)
 
 .. _topics-testing-advanced-multidb:
@@ -95,7 +99,9 @@ configuration::
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'myproject',
             'HOST': 'dbreplica',
-            'TEST_MIRROR': 'default'
+            'TEST': {
+                'MIRROR': 'default',
+            },
             # ... plus some other settings
         }
     }
@@ -109,8 +115,8 @@ normal activity, any write to ``default`` will appear on ``replica``.
 If Django created two independent test databases, this would break any
 tests that expected replication to occur. However, the ``replica``
 database has been configured as a test mirror (using the
-:setting:`TEST_MIRROR` setting), indicating that under testing,
-``replica`` should be treated as a mirror of ``default``.
+:setting:`MIRROR <TEST_MIRROR>` test setting), indicating that under
+testing, ``replica`` should be treated as a mirror of ``default``.
 
 When the test environment is configured, a test version of ``replica``
 will *not* be created. Instead the connection to ``replica``
@@ -130,41 +136,51 @@ However, no guarantees are made on the creation order of any other
 databases in your test setup.
 
 If your database configuration requires a specific creation order, you
-can specify the dependencies that exist using the
-:setting:`TEST_DEPENDENCIES` setting. Consider the following
-(simplified) example database configuration::
+can specify the dependencies that exist using the :setting:`DEPENDENCIES
+<TEST_DEPENDENCIES>` test setting. Consider the following (simplified)
+example database configuration::
 
     DATABASES = {
         'default': {
-             # ... db settings
-             'TEST_DEPENDENCIES': ['diamonds']
+            # ... db settings
+            'TEST': {
+                'DEPENDENCIES': ['diamonds'],
+            },
         },
         'diamonds': {
-            # ... db settings
-             'TEST_DEPENDENCIES': []
+             ... db settings
+            'TEST': {
+                'DEPENDENCIES': [],
+            },
         },
         'clubs': {
             # ... db settings
-            'TEST_DEPENDENCIES': ['diamonds']
+            'TEST': {
+                'DEPENDENCIES': ['diamonds'],
+            },
         },
         'spades': {
             # ... db settings
-            'TEST_DEPENDENCIES': ['diamonds','hearts']
+            'TEST': {
+                'DEPENDENCIES': ['diamonds', 'hearts'],
+            },
         },
         'hearts': {
             # ... db settings
-            'TEST_DEPENDENCIES': ['diamonds','clubs']
+            'TEST': {
+                'DEPENDENCIES': ['diamonds', 'clubs'],
+            },
         }
     }
 
 Under this configuration, the ``diamonds`` database will be created first,
 as it is the only database alias without dependencies. The ``default`` and
 ``clubs`` alias will be created next (although the order of creation of this
-pair is not guaranteed); then ``hearts``; and finally ``spades``.
+pair is not guaranteed), then ``hearts``, and finally ``spades``.
 
-If there are any circular dependencies in the
-:setting:`TEST_DEPENDENCIES` definition, an ``ImproperlyConfigured``
-exception will be raised.
+If there are any circular dependencies in the :setting:`DEPENDENCIES
+<TEST_DEPENDENCIES>` definition, an
+:exc:`~django.core.exceptions.ImproperlyConfigured` exception will be raised.
 
 Advanced features of ``TransactionTestCase``
 ============================================
@@ -234,6 +250,7 @@ Advanced features of ``TransactionTestCase``
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is an relatively expensive database operation.
 
+.. _testing-reusable-applications:
 
 Using the Django test runner to test reusable applications
 ==========================================================
@@ -401,14 +418,6 @@ execute and tear down the test suite.
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
 
-    .. versionchanged:: 1.8
-
-        Previously, you had to provide an ``option_list`` attribute to a
-        subclassed test runner to add options to the list of command-line
-        options that the :djadmin:`test` command could use.
-
-        The ``keepdb``, ``reverse``, and ``debug_sql`` arguments were added.
-
 Attributes
 ~~~~~~~~~~
 
@@ -434,18 +443,6 @@ Attributes
     By default it is set to ``unittest.defaultTestLoader``. You can override
     this attribute if your tests are going to be loaded in unusual ways.
 
-.. attribute:: DiscoverRunner.option_list
-
-    This is the tuple of ``optparse`` options which will be fed into the
-    management command's ``OptionParser`` for parsing arguments. See the
-    documentation for Python's ``optparse`` module for more details.
-
-    .. deprecated:: 1.8
-
-        You should now override the :meth:`~DiscoverRunner.add_arguments` class
-        method to add custom arguments accepted by the :djadmin:`test`
-        management command.
-
 Methods
 ~~~~~~~
 
@@ -464,8 +461,6 @@ Methods
     This method should return the number of tests that failed.
 
 .. classmethod:: DiscoverRunner.add_arguments(parser)
-
-    .. versionadded:: 1.8
 
     Override this class method to add custom arguments accepted by the
     :djadmin:`test` management command. See
@@ -568,7 +563,7 @@ django.db.connection.creation
 The creation module of the database backend also provides some utilities that
 can be useful during testing.
 
-.. function:: create_test_db([verbosity=1, autoclobber=False, serialize=True, keepdb=False])
+.. function:: create_test_db(verbosity=1, autoclobber=False, serialize=True, keepdb=False)
 
     Creates a new test database and runs ``migrate`` against it.
 
@@ -606,11 +601,7 @@ can be useful during testing.
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
 
-    .. versionchanged:: 1.8
-
-        The ``keepdb`` argument was added.
-
-.. function:: destroy_test_db(old_database_name, [verbosity=1, keepdb=False])
+.. function:: destroy_test_db(old_database_name, verbosity=1, keepdb=False)
 
     Destroys the database whose name is the value of :setting:`NAME` in
     :setting:`DATABASES`, and sets :setting:`NAME` to the value of
@@ -621,10 +612,6 @@ can be useful during testing.
 
     If the ``keepdb`` argument is ``True``, then the connection to the
     database will be closed, but the database will not be destroyed.
-
-    .. versionchanged:: 1.8
-
-        The ``keepdb`` argument was added.
 
 .. _topics-testing-code-coverage:
 

@@ -6,9 +6,11 @@ from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
-from django.db.migrations.graph import MigrationGraph, NodeNotFoundError
+from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
+
+from .exceptions import AmbiguityError, BadMigrationError, NodeNotFoundError
 
 MIGRATIONS_MODULE_NAME = 'migrations'
 
@@ -64,6 +66,9 @@ class MigrationLoader(object):
         for app_config in apps.get_app_configs():
             # Get the migrations module directory
             module_name = self.migrations_module(app_config.label)
+            if module_name is None:
+                self.unmigrated_apps.add(app_config.label)
+                continue
             was_loaded = module_name in sys.modules
             try:
                 module = import_module(module_name)
@@ -77,9 +82,11 @@ class MigrationLoader(object):
             else:
                 # PY3 will happily import empty dirs as namespaces.
                 if not hasattr(module, '__file__'):
+                    self.unmigrated_apps.add(app_config.label)
                     continue
                 # Module is not a package (e.g. migrations.py).
                 if not hasattr(module, '__path__'):
+                    self.unmigrated_apps.add(app_config.label)
                     continue
                 # Force a reload if it's already loaded (tests need this)
                 if was_loaded:
@@ -94,27 +101,16 @@ class MigrationLoader(object):
                     if import_name[0] not in "_.~":
                         migration_names.add(import_name)
             # Load them
-            south_style_migrations = False
             for migration_name in migration_names:
-                try:
-                    migration_module = import_module("%s.%s" % (module_name, migration_name))
-                except ImportError as e:
-                    # Ignore South import errors, as we're triggering them
-                    if "south" in str(e).lower():
-                        south_style_migrations = True
-                        break
-                    raise
+                migration_module = import_module("%s.%s" % (module_name, migration_name))
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError(
                         "Migration %s in app %s has no Migration class" % (migration_name, app_config.label)
                     )
-                # Ignore South-style migrations
-                if hasattr(migration_module.Migration, "forwards"):
-                    south_style_migrations = True
-                    break
-                self.disk_migrations[app_config.label, migration_name] = migration_module.Migration(migration_name, app_config.label)
-            if south_style_migrations:
-                self.unmigrated_apps.add(app_config.label)
+                self.disk_migrations[app_config.label, migration_name] = migration_module.Migration(
+                    migration_name,
+                    app_config.label,
+                )
 
     def get_migration(self, app_label, name_prefix):
         "Gets the migration exactly named, or raises `graph.NodeNotFoundError`"
@@ -220,19 +216,35 @@ class MigrationLoader(object):
                 for child_key in reverse_dependencies.get(replaced, set()):
                     if child_key in migration.replaces:
                         continue
-                    # child_key may appear in a replacement
+                    # List of migrations whose dependency on `replaced` needs
+                    # to be updated to a dependency on `key`.
+                    to_update = []
+                    # Child key may itself be replaced, in which case it might
+                    # not be in `normal` anymore (depending on whether we've
+                    # processed its replacement yet). If it's present, we go
+                    # ahead and update it; it may be deleted later on if it is
+                    # replaced, but there's no harm in updating it regardless.
+                    if child_key in normal:
+                        to_update.append(normal[child_key])
+                    # If the child key is replaced, we update its replacement's
+                    # dependencies too, if necessary. (We don't know if this
+                    # replacement will actually take effect or not, but either
+                    # way it's OK to update the replacing migration).
                     if child_key in reverse_replacements:
-                        for replaced_child_key in reverse_replacements[child_key]:
-                            if replaced in replacing[replaced_child_key].dependencies:
-                                replacing[replaced_child_key].dependencies.remove(replaced)
-                                replacing[replaced_child_key].dependencies.append(key)
-                    else:
-                        normal[child_key].dependencies.remove(replaced)
-                        normal[child_key].dependencies.append(key)
+                        for replaces_child_key in reverse_replacements[child_key]:
+                            if replaced in replacing[replaces_child_key].dependencies:
+                                to_update.append(replacing[replaces_child_key])
+                    # Actually perform the dependency update on all migrations
+                    # that require it.
+                    for migration_needing_update in to_update:
+                        migration_needing_update.dependencies.remove(replaced)
+                        migration_needing_update.dependencies.append(key)
             normal[key] = migration
             # Mark the replacement as applied if all its replaced ones are
             if all(applied_statuses):
                 self.applied_migrations.add(key)
+        # Store the replacement migrations for later checks
+        self.replacements = replacing
         # Finally, make a graph and load everything into it
         self.graph = MigrationGraph()
         for key, migration in normal.items():
@@ -260,6 +272,8 @@ class MigrationLoader(object):
                         ),
                         missing)
                     exc_value.__cause__ = exc
+                    if not hasattr(exc, '__traceback__'):
+                        exc.__traceback__ = sys.exc_info()[2]
                     six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
             raise exc
 
@@ -324,17 +338,3 @@ class MigrationLoader(object):
         See graph.make_state for the meaning of "nodes" and "at_end"
         """
         return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=list(self.unmigrated_apps))
-
-
-class BadMigrationError(Exception):
-    """
-    Raised when there's a bad migration (unreadable/bad format/etc.)
-    """
-    pass
-
-
-class AmbiguityError(Exception):
-    """
-    Raised when more than one migration matches a name prefix
-    """
-    pass

@@ -7,8 +7,13 @@ from django.contrib.auth.decorators import (
 )
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
+from django.test import SimpleTestCase
+from django.utils import six
 from django.utils.decorators import method_decorator
-from django.utils.functional import allow_lazy, lazy
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_text
+from django.utils.functional import allow_lazy, keep_lazy, keep_lazy_text, lazy
+from django.utils.translation import ugettext_lazy
 from django.views.decorators.cache import (
     cache_control, cache_page, never_cache,
 )
@@ -66,7 +71,8 @@ full_decorator = compose(
     staff_member_required,
 
     # django.utils.functional
-    allow_lazy,
+    keep_lazy(HttpResponse),
+    keep_lazy_text,
     lazy,
 )
 
@@ -148,6 +154,15 @@ class DecoratorsTest(TestCase):
         request.method = 'DELETE'
         self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
 
+    def test_deprecated_allow_lazy(self):
+        with self.assertRaises(RemovedInDjango20Warning):
+            def noop_text(text):
+                return force_text(text)
+            noop_text = allow_lazy(noop_text, six.text_type)
+            rendered = noop_text(ugettext_lazy("I am a text"))
+            self.assertEqual(type(rendered), six.text_type)
+            self.assertEqual(rendered, "I am a text")
+
 
 # For testing method_decorator, a decorator that assumes a single argument.
 # We will get type arguments if there is a mismatch in the number of arguments.
@@ -189,7 +204,7 @@ class ClsDec(object):
         return update_wrapper(wrapped, f)
 
 
-class MethodDecoratorTests(TestCase):
+class MethodDecoratorTests(SimpleTestCase):
     """
     Tests for method_decorator
     """
@@ -211,22 +226,52 @@ class MethodDecoratorTests(TestCase):
         self.assertEqual(getattr(func, 'myattr', False), True)
         self.assertEqual(getattr(func, 'myattr2', False), True)
 
-        # Now check method_decorator
-        class Test(object):
+        # Decorate using method_decorator() on the method.
+        class TestPlain(object):
             @myattr_dec_m
             @myattr2_dec_m
             def method(self):
                 "A method"
                 pass
 
-        self.assertEqual(getattr(Test().method, 'myattr', False), True)
-        self.assertEqual(getattr(Test().method, 'myattr2', False), True)
+        # Decorate using method_decorator() on both the class and the method.
+        # The decorators applied to the methods are applied before the ones
+        # applied to the class.
+        @method_decorator(myattr_dec_m, "method")
+        class TestMethodAndClass(object):
+            @method_decorator(myattr2_dec_m)
+            def method(self):
+                "A method"
+                pass
 
-        self.assertEqual(getattr(Test.method, 'myattr', False), True)
-        self.assertEqual(getattr(Test.method, 'myattr2', False), True)
+        # Decorate using an iterable of decorators.
+        decorators = (myattr_dec_m, myattr2_dec_m)
 
-        self.assertEqual(Test.method.__doc__, 'A method')
-        self.assertEqual(Test.method.__name__, 'method')
+        @method_decorator(decorators, "method")
+        class TestIterable(object):
+            def method(self):
+                "A method"
+                pass
+
+        for Test in (TestPlain, TestMethodAndClass, TestIterable):
+            self.assertEqual(getattr(Test().method, 'myattr', False), True)
+            self.assertEqual(getattr(Test().method, 'myattr2', False), True)
+
+            self.assertEqual(getattr(Test.method, 'myattr', False), True)
+            self.assertEqual(getattr(Test.method, 'myattr2', False), True)
+
+            self.assertEqual(Test.method.__doc__, 'A method')
+            self.assertEqual(Test.method.__name__, 'method')
+
+    def test_bad_iterable(self):
+        decorators = {myattr_dec_m, myattr2_dec_m}
+        # The rest of the exception message differs between Python 2 and 3.
+        with self.assertRaisesMessage(TypeError, "'set' object"):
+            @method_decorator(decorators, "method")
+            class TestIterable(object):
+                def method(self):
+                    "A method"
+                    pass
 
     # Test for argumented decorator
     def test_argumented(self):
@@ -255,7 +300,7 @@ class MethodDecoratorTests(TestCase):
             def __call__(self, arg):
                 return self.wrapped(arg)
 
-            def __get__(self, instance, owner):
+            def __get__(self, instance, cls=None):
                 return self
 
         class descriptor_wrapper(object):
@@ -263,8 +308,8 @@ class MethodDecoratorTests(TestCase):
                 self.wrapped = wrapped
                 self.__name__ = wrapped.__name__
 
-            def __get__(self, instance, owner):
-                return bound_wrapper(self.wrapped.__get__(instance, owner))
+            def __get__(self, instance, cls=None):
+                return bound_wrapper(self.wrapped.__get__(instance, cls))
 
         class Test(object):
             @method_dec
@@ -273,6 +318,89 @@ class MethodDecoratorTests(TestCase):
                 return arg
 
         self.assertEqual(Test().method(1), 1)
+
+    def test_class_decoration(self):
+        """
+        @method_decorator can be used to decorate a class and its methods.
+        """
+        def deco(func):
+            def _wrapper(*args, **kwargs):
+                return True
+            return _wrapper
+
+        @method_decorator(deco, name="method")
+        class Test(object):
+            def method(self):
+                return False
+
+        self.assertTrue(Test().method())
+
+    def test_tuple_of_decorators(self):
+        """
+        @method_decorator can accept a tuple of decorators.
+        """
+        def add_question_mark(func):
+            def _wrapper(*args, **kwargs):
+                return func(*args, **kwargs) + "?"
+            return _wrapper
+
+        def add_exclamation_mark(func):
+            def _wrapper(*args, **kwargs):
+                return func(*args, **kwargs) + "!"
+            return _wrapper
+
+        # The order should be consistent with the usual order in which
+        # decorators are applied, e.g.
+        #    @add_exclamation_mark
+        #    @add_question_mark
+        #    def func():
+        #        ...
+        decorators = (add_exclamation_mark, add_question_mark)
+
+        @method_decorator(decorators, name="method")
+        class TestFirst(object):
+            def method(self):
+                return "hello world"
+
+        class TestSecond(object):
+            @method_decorator(decorators)
+            def method(self):
+                return "hello world"
+
+        self.assertEqual(TestFirst().method(), "hello world?!")
+        self.assertEqual(TestSecond().method(), "hello world?!")
+
+    def test_invalid_non_callable_attribute_decoration(self):
+        """
+        @method_decorator on a non-callable attribute raises an error.
+        """
+        msg = (
+            "Cannot decorate 'prop' as it isn't a callable attribute of "
+            "<class 'Test'> (1)"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            @method_decorator(lambda: None, name="prop")
+            class Test(object):
+                prop = 1
+
+                @classmethod
+                def __module__(cls):
+                    return "tests"
+
+    def test_invalid_method_name_to_decorate(self):
+        """
+        @method_decorator on a nonexistent method raises an error.
+        """
+        msg = (
+            "The keyword argument `name` must be the name of a method of the "
+            "decorated class: <class 'Test'>. Got 'non_existing_method' instead"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            @method_decorator(lambda: None, name="non_existing_method")
+            class Test(object):
+                @classmethod
+                def __module__(cls):
+                    return "tests"
 
 
 class XFrameOptionsDecoratorsTests(TestCase):
@@ -317,3 +445,15 @@ class XFrameOptionsDecoratorsTests(TestCase):
         # the middleware's functionality, let's make sure it actually works...
         r = XFrameOptionsMiddleware().process_response(req, resp)
         self.assertEqual(r.get('X-Frame-Options', None), None)
+
+
+class NeverCacheDecoratorTest(TestCase):
+    def test_never_cache_decorator(self):
+        @never_cache
+        def a_view(request):
+            return HttpResponse()
+        r = a_view(HttpRequest())
+        self.assertEqual(
+            set(r['Cache-Control'].split(', ')),
+            {'max-age=0', 'no-cache', 'no-store', 'must-revalidate'},
+        )

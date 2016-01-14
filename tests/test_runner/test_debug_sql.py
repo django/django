@@ -5,6 +5,7 @@ from django.db import connection
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
 from django.utils import six
+from django.utils.encoding import force_text
 
 from .models import Person
 
@@ -42,8 +43,9 @@ class TestDebugSQL(unittest.TestCase):
         ).run(suite)
         runner.teardown_databases(old_config)
 
-        stream.seek(0)
-        return stream.read()
+        if six.PY2:
+            stream.buflist = [force_text(x) for x in stream.buflist]
+        return stream.getvalue()
 
     def test_output_normal(self):
         full_output = self._test_output(1)
@@ -59,28 +61,14 @@ class TestDebugSQL(unittest.TestCase):
         for output in self.verbose_expected_outputs:
             self.assertIn(output, full_output)
 
-    if six.PY3:
-        expected_outputs = [
-            ('''QUERY = 'SELECT COUNT(%s) AS "__count" '''
-                '''FROM "test_runner_person" WHERE '''
-                '''"test_runner_person"."first_name" = %s' '''
-                '''- PARAMS = ('*', 'error');'''),
-            ('''QUERY = 'SELECT COUNT(%s) AS "__count" '''
-                '''FROM "test_runner_person" WHERE '''
-                '''"test_runner_person"."first_name" = %s' '''
-                '''- PARAMS = ('*', 'fail');'''),
-        ]
-    else:
-        expected_outputs = [
-            ('''QUERY = u'SELECT COUNT(%s) AS "__count" '''
-                '''FROM "test_runner_person" WHERE '''
-                '''"test_runner_person"."first_name" = %s' '''
-                '''- PARAMS = (u'*', u'error');'''),
-            ('''QUERY = u'SELECT COUNT(%s) AS "__count" '''
-                '''FROM "test_runner_person" WHERE '''
-                '''"test_runner_person"."first_name" = %s' '''
-                '''- PARAMS = (u'*', u'fail');'''),
-        ]
+    expected_outputs = [
+        ('''SELECT COUNT(*) AS "__count" '''
+            '''FROM "test_runner_person" WHERE '''
+            '''"test_runner_person"."first_name" = 'error';'''),
+        ('''SELECT COUNT(*) AS "__count" '''
+            '''FROM "test_runner_person" WHERE '''
+            '''"test_runner_person"."first_name" = 'fail';'''),
+    ]
 
     verbose_expected_outputs = [
         # Output format changed in Python 3.5+
@@ -89,18 +77,8 @@ class TestDebugSQL(unittest.TestCase):
             'runTest (test_runner.test_debug_sql.{}ErrorTest) ... ERROR',
             'runTest (test_runner.test_debug_sql.{}PassingTest) ... ok',
         ]
+    ] + [
+        ('''SELECT COUNT(*) AS "__count" '''
+            '''FROM "test_runner_person" WHERE '''
+            '''"test_runner_person"."first_name" = 'pass';'''),
     ]
-    if six.PY3:
-        verbose_expected_outputs += [
-            ('''QUERY = 'SELECT COUNT(%s) AS "__count" '''
-                '''FROM "test_runner_person" WHERE '''
-                '''"test_runner_person"."first_name" = %s' '''
-                '''- PARAMS = ('*', 'pass');'''),
-        ]
-    else:
-        verbose_expected_outputs += [
-            ('''QUERY = u'SELECT COUNT(%s) AS "__count" '''
-                '''FROM "test_runner_person" WHERE '''
-                '''"test_runner_person"."first_name" = %s' '''
-                '''- PARAMS = (u'*', u'pass');'''),
-        ]

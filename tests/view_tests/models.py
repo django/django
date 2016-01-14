@@ -25,7 +25,7 @@ class BaseArticle(models.Model):
     """
     title = models.CharField(max_length=100)
     slug = models.SlugField()
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(Author, models.CASCADE)
 
     class Meta:
         abstract = True

@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 
 from django.db import transaction
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
-from .models import Article, Publication
+from .models import Article, InheritedArticleA, InheritedArticleB, Publication
 
 
 class ManyToManyTests(TestCase):
@@ -371,8 +372,17 @@ class ManyToManyTests(TestCase):
         self.a4.publications.set([], clear=True)
         self.assertQuerysetEqual(self.a4.publications.all(), [])
 
-    def test_assign(self):
-        # Relation sets can be assigned. Assignment clears any existing set members
+    def test_assign_deprecation(self):
+        msg = (
+            "Direct assignment to the reverse side of a related set is "
+            "deprecated due to the implicit save() that happens. Use "
+            "article_set.set() instead."
+        )
+        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
+            self.p2.article_set = [self.a4, self.a3]
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_assign_deprecated(self):
         self.p2.article_set = [self.a4, self.a3]
         self.assertQuerysetEqual(self.p2.article_set.all(),
             [
@@ -393,9 +403,29 @@ class ManyToManyTests(TestCase):
         self.a4.publications = []
         self.assertQuerysetEqual(self.a4.publications.all(), [])
 
+    def test_assign(self):
+        # Relation sets can be assigned using set().
+        self.p2.article_set.set([self.a4, self.a3])
+        self.assertQuerysetEqual(
+            self.p2.article_set.all(), [
+                '<Article: NASA finds intelligent life on Earth>',
+                '<Article: Oxygen-free diet works wonders>',
+            ]
+        )
+        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science News>'])
+        self.a4.publications.set([self.p3.id])
+        self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA finds intelligent life on Earth>'])
+        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science Weekly>'])
+
+        # An alternate to calling clear() is to set an empty set.
+        self.p2.article_set.set([])
+        self.assertQuerysetEqual(self.p2.article_set.all(), [])
+        self.a4.publications.set([])
+        self.assertQuerysetEqual(self.a4.publications.all(), [])
+
     def test_assign_ids(self):
         # Relation sets can also be set using primary key values
-        self.p2.article_set = [self.a4.id, self.a3.id]
+        self.p2.article_set.set([self.a4.id, self.a3.id])
         self.assertQuerysetEqual(self.p2.article_set.all(),
             [
                 '<Article: NASA finds intelligent life on Earth>',
@@ -403,7 +433,7 @@ class ManyToManyTests(TestCase):
             ])
         self.assertQuerysetEqual(self.a4.publications.all(),
                                  ['<Publication: Science News>'])
-        self.a4.publications = [self.p3.id]
+        self.a4.publications.set([self.p3.id])
         self.assertQuerysetEqual(self.p2.article_set.all(),
                                  ['<Article: NASA finds intelligent life on Earth>'])
         self.assertQuerysetEqual(self.a4.publications.all(),
@@ -412,11 +442,11 @@ class ManyToManyTests(TestCase):
     def test_forward_assign_with_queryset(self):
         # Ensure that querysets used in m2m assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
-        # ManyRelatedObjectsDescriptor.__set__. Refs #19816.
-        self.a1.publications = [self.p1, self.p2]
+        # ManyRelatedManager.set() (#19816).
+        self.a1.publications.set([self.p1, self.p2])
 
         qs = self.a1.publications.filter(title='The Python Journal')
-        self.a1.publications = qs
+        self.a1.publications.set(qs)
 
         self.assertEqual(1, self.a1.publications.count())
         self.assertEqual(1, qs.count())
@@ -424,11 +454,11 @@ class ManyToManyTests(TestCase):
     def test_reverse_assign_with_queryset(self):
         # Ensure that querysets used in M2M assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
-        # ReverseManyRelatedObjectsDescriptor.__set__. Refs #19816.
-        self.p1.article_set = [self.a1, self.a2]
+        # ManyRelatedManager.set() (#19816).
+        self.p1.article_set.set([self.a1, self.a2])
 
         qs = self.p1.article_set.filter(headline='Django lets you build Web apps easily')
-        self.p1.article_set = qs
+        self.p1.article_set.set(qs)
 
         self.assertEqual(1, self.p1.article_set.count())
         self.assertEqual(1, qs.count())
@@ -454,3 +484,28 @@ class ManyToManyTests(TestCase):
         self.assertQuerysetEqual(self.a4.publications.all(), [])
         self.assertQuerysetEqual(self.p2.article_set.all(),
                                  ['<Article: NASA finds intelligent life on Earth>'])
+
+    def test_inherited_models_selects(self):
+        """
+        #24156 - Objects from child models where the parent's m2m field uses
+        related_name='+' should be retrieved correctly.
+        """
+        a = InheritedArticleA.objects.create()
+        b = InheritedArticleB.objects.create()
+        a.publications.add(self.p1, self.p2)
+        self.assertQuerysetEqual(a.publications.all(),
+            [
+                '<Publication: Science News>',
+                '<Publication: The Python Journal>',
+            ])
+        self.assertQuerysetEqual(b.publications.all(), [])
+        b.publications.add(self.p3)
+        self.assertQuerysetEqual(a.publications.all(),
+            [
+                '<Publication: Science News>',
+                '<Publication: The Python Journal>',
+            ])
+        self.assertQuerysetEqual(b.publications.all(),
+            [
+                '<Publication: Science Weekly>',
+            ])

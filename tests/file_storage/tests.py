@@ -9,7 +9,6 @@ import tempfile
 import threading
 import time
 import unittest
-import warnings
 from datetime import datetime, timedelta
 
 from django.core.cache import cache
@@ -19,7 +18,10 @@ from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
 )
-from django.test import LiveServerTestCase, SimpleTestCase, override_settings
+from django.db.models.fields.files import FileDescriptor
+from django.test import (
+    LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
+)
 from django.utils import six
 from django.utils._os import upath
 from django.utils.six.moves.urllib.request import urlopen
@@ -81,7 +83,7 @@ class FileStorageDeconstructionTests(unittest.TestCase):
         self.assertEqual(kwargs, kwargs_orig)
 
 
-class FileStorageTests(unittest.TestCase):
+class FileStorageTests(SimpleTestCase):
     storage_class = FileSystemStorage
 
     def setUp(self):
@@ -249,7 +251,7 @@ class FileStorageTests(unittest.TestCase):
         self.assertEqual(self.storage.url(r"""~!*()'@#$%^&*abc`+ =.file"""),
             """/test_media_url/~!*()'%40%23%24%25%5E%26*abc%60%2B%20%3D.file""")
 
-        # should stanslate os path separator(s) to the url path separator
+        # should translate os path separator(s) to the url path separator
         self.assertEqual(self.storage.url("""a/b\\c.file"""),
             """/test_media_url/a/b/c.file""")
 
@@ -401,6 +403,44 @@ class FileStorageTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.storage.delete('')
 
+    @override_settings(
+        MEDIA_ROOT='media_root',
+        MEDIA_URL='media_url/',
+        FILE_UPLOAD_PERMISSIONS=0o777,
+        FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o777,
+    )
+    def test_setting_changed(self):
+        """
+        Properties using settings values as defaults should be updated on
+        referenced settings change while specified values should be unchanged.
+        """
+        storage = self.storage_class(
+            location='explicit_location',
+            base_url='explicit_base_url/',
+            file_permissions_mode=0o666,
+            directory_permissions_mode=0o666,
+        )
+        defaults_storage = self.storage_class()
+        settings = {
+            'MEDIA_ROOT': 'overriden_media_root',
+            'MEDIA_URL': 'overriden_media_url/',
+            'FILE_UPLOAD_PERMISSIONS': 0o333,
+            'FILE_UPLOAD_DIRECTORY_PERMISSIONS': 0o333,
+        }
+        with self.settings(**settings):
+            self.assertEqual(storage.base_location, 'explicit_location')
+            self.assertIn('explicit_location', storage.location)
+            self.assertEqual(storage.base_url, 'explicit_base_url/')
+            self.assertEqual(storage.file_permissions_mode, 0o666)
+            self.assertEqual(storage.directory_permissions_mode, 0o666)
+            self.assertEqual(defaults_storage.base_location, settings['MEDIA_ROOT'])
+            self.assertIn(settings['MEDIA_ROOT'], defaults_storage.location)
+            self.assertEqual(defaults_storage.base_url, settings['MEDIA_URL'])
+            self.assertEqual(defaults_storage.file_permissions_mode, settings['FILE_UPLOAD_PERMISSIONS'])
+            self.assertEqual(
+                defaults_storage.directory_permissions_mode, settings['FILE_UPLOAD_DIRECTORY_PERMISSIONS']
+            )
+
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name, max_length=None):
@@ -429,14 +469,24 @@ class CustomStorageTests(FileStorageTests):
         self.storage.delete(second)
 
 
-class FileFieldStorageTests(SimpleTestCase):
+class FileFieldStorageTests(TestCase):
     def tearDown(self):
         shutil.rmtree(temp_storage_location)
 
+    def _storage_max_filename_length(self, storage):
+        """
+        Query filesystem for maximum filename length (e.g. AUFS has 242).
+        """
+        dir_to_test = storage.location
+        while not os.path.exists(dir_to_test):
+            dir_to_test = os.path.dirname(dir_to_test)
+        try:
+            return os.pathconf(dir_to_test, 'PC_NAME_MAX')
+        except Exception:
+            return 255  # Should be safe on most backends
+
     def test_files(self):
-        # Attempting to access a FileField from the class raises a descriptive
-        # error
-        self.assertRaises(AttributeError, lambda: Storage.normal)
+        self.assertIsInstance(Storage.normal, FileDescriptor)
 
         # An object without a file has limited functionality.
         obj1 = Storage()
@@ -534,37 +584,12 @@ class FileFieldStorageTests(SimpleTestCase):
     def test_extended_length_storage(self):
         # Testing FileField with max_length > 255. Most systems have filename
         # length limitation of 255. Path takes extra chars.
-        filename = 251 * 'a'  # 4 chars for extension.
+        filename = (self._storage_max_filename_length(temp_storage) - 4) * 'a'  # 4 chars for extension.
         obj = Storage()
         obj.extended_length.save('%s.txt' % filename, ContentFile('Same Content'))
         self.assertEqual(obj.extended_length.name, 'tests/%s.txt' % filename)
         self.assertEqual(obj.extended_length.read(), b'Same Content')
         obj.extended_length.close()
-
-    def test_old_style_storage(self):
-        # Testing backward-compatibility with old-style storage backends that
-        # don't take ``max_length`` parameter in ``get_available_name()``
-        # and save(). A deprecation warning should be raised.
-        obj = Storage()
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            obj.old_style.save('deprecated_storage_test.txt', ContentFile('Same Content'))
-        self.assertEqual(len(warns), 2)
-        self.assertEqual(
-            str(warns[0].message),
-            'Backwards compatibility for storage backends without support for '
-            'the `max_length` argument in Storage.save() will be removed in '
-            'Django 2.0.'
-        )
-        self.assertEqual(
-            str(warns[1].message),
-            'Backwards compatibility for storage backends without support for '
-            'the `max_length` argument in Storage.get_available_name() will '
-            'be removed in Django 2.0.'
-        )
-        self.assertEqual(obj.old_style.name, 'tests/deprecated_storage_test.txt')
-        self.assertEqual(obj.old_style.read(), b'Same Content')
-        obj.old_style.close()
 
     def test_filefield_default(self):
         # Default values allow an object to access a single file.
@@ -596,6 +621,16 @@ class FileFieldStorageTests(SimpleTestCase):
         obj.random.save("random_file", ContentFile("random content"))
         self.assertTrue(obj.random.name.endswith("/random_file"))
         obj.random.close()
+
+    def test_custom_valid_name_callable_upload_to(self):
+        """
+        Storage.get_valid_name() should be called when upload_to is a callable.
+        """
+        obj = Storage()
+        obj.custom_valid_name.save("random_file", ContentFile("random content"))
+        # CustomValidNameStorage.get_valid_name() appends '_valid' to the name
+        self.assertTrue(obj.custom_valid_name.name.endswith("/random_file_valid"))
+        obj.custom_valid_name.close()
 
     def test_filefield_pickling(self):
         # Push an object into the cache to make sure it pickles properly

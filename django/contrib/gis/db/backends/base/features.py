@@ -1,3 +1,4 @@
+import re
 from functools import partial
 
 from django.contrib.gis.db.models import aggregates
@@ -14,6 +15,8 @@ class BaseSpatialFeatures(object):
     # Does the backend introspect GeometryField to its subtypes?
     supports_geometry_field_introspection = True
 
+    # Does the backend support storing 3D geometries?
+    supports_3d_storage = False
     # Reference implementation of 3D functions is:
     # http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
     supports_3d_functions = False
@@ -23,8 +26,10 @@ class BaseSpatialFeatures(object):
     supports_real_shape_operations = True
     # Can geometry fields be null?
     supports_null_geometries = True
-    # Can the `distance` GeoQuerySet method be applied on geodetic coordinate systems?
+    # Can the the function be applied on geodetic coordinate systems?
     supports_distance_geodetic = True
+    supports_length_geodetic = True
+    supports_perimeter_geodetic = False
     # Is the database able to count vertices on polygons (with `num_points`)?
     supports_num_points_poly = True
 
@@ -32,6 +37,12 @@ class BaseSpatialFeatures(object):
     # certain lookups (dwithin, left and right, relate, ...)
     supports_distances_lookups = True
     supports_left_right_lookups = False
+
+    # Does the database have raster support?
+    supports_raster = False
+
+    # Does the database support a unique index on geometry fields?
+    supports_geometry_field_unique_index = True
 
     @property
     def supports_bbcontains_lookup(self):
@@ -57,11 +68,11 @@ class BaseSpatialFeatures(object):
     # `has_<name>_method` (defined in __init__) which accesses connection.ops
     # to determine GIS method availability.
     geoqueryset_methods = (
-        'area', 'centroid', 'difference', 'distance', 'distance_spheroid',
-        'envelope', 'force_rhr', 'geohash', 'gml', 'intersection', 'kml',
-        'length', 'num_geom', 'perimeter', 'point_on_surface', 'reverse',
-        'scale', 'snap_to_grid', 'svg', 'sym_difference', 'transform',
-        'translate', 'union', 'unionagg',
+        'area', 'bounding_circle', 'centroid', 'difference', 'distance',
+        'distance_spheroid', 'envelope', 'force_rhr', 'geohash', 'gml',
+        'intersection', 'kml', 'length', 'mem_size', 'num_geom', 'num_points',
+        'perimeter', 'point_on_surface', 'reverse', 'scale', 'snap_to_grid',
+        'svg', 'sym_difference', 'transform', 'translate', 'union', 'unionagg',
     )
 
     # Specifies whether the Collect and Extent aggregates are supported by the database
@@ -83,6 +94,13 @@ class BaseSpatialFeatures(object):
             # Add dynamically properties for each GQS method, e.g. has_force_rhr_method, etc.
             setattr(self.__class__, 'has_%s_method' % method,
                     property(partial(BaseSpatialFeatures.has_ops_method, method=method)))
+
+    def __getattr__(self, name):
+        m = re.match(r'has_(\w*)_function$', name)
+        if m:
+            func_name = m.group(1)
+            return func_name not in self.connection.ops.unsupported_functions
+        raise AttributeError
 
     def has_ops_method(self, method):
         return getattr(self.connection.ops, method, False)

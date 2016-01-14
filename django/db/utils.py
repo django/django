@@ -6,7 +6,7 @@ from threading import local
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
-from django.utils._os import upath
+from django.utils._os import npath, upath
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -14,7 +14,7 @@ DEFAULT_DB_ALIAS = 'default'
 DJANGO_VERSION_PICKLE_KEY = '_django_version'
 
 
-class Error(Exception if six.PY3 else StandardError):
+class Error(Exception if six.PY3 else StandardError):  # NOQA: StandardError undefined on PY3
     pass
 
 
@@ -85,6 +85,8 @@ class DatabaseErrorWrapper(object):
             if issubclass(exc_type, db_exc_type):
                 dj_exc_value = dj_exc_type(*exc_value.args)
                 dj_exc_value.__cause__ = exc_value
+                if not hasattr(exc_value, '__traceback__'):
+                    exc_value.__traceback__ = traceback
                 # Only set the 'errors_occurred' flag for errors that may make
                 # the connection unusable.
                 if dj_exc_type not in (DataError, IntegrityError):
@@ -101,7 +103,14 @@ class DatabaseErrorWrapper(object):
 
 
 def load_backend(backend_name):
-    # Look for a fully qualified database backend name
+    """
+    Return a database backend's "base" module given a fully qualified database
+    backend name, or raise an error if it doesn't exist.
+    """
+    # This backend was renamed in Django 1.9.
+    if backend_name == 'django.db.backends.postgresql_psycopg2':
+        backend_name = 'django.db.backends.postgresql'
+
     try:
         return import_module('%s.base' % backend_name)
     except ImportError as e_user:
@@ -110,8 +119,9 @@ def load_backend(backend_name):
         backend_dir = os.path.join(os.path.dirname(upath(__file__)), 'backends')
         try:
             builtin_backends = [
-                name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
-                if ispkg and name != 'dummy']
+                name for _, name, ispkg in pkgutil.iter_modules([npath(backend_dir)])
+                if ispkg and name not in {'base', 'dummy', 'postgresql_psycopg2'}
+            ]
         except EnvironmentError:
             builtin_backends = []
         if backend_name not in ['django.db.backends.%s' % b for b in
@@ -150,6 +160,9 @@ class ConnectionHandler(object):
                     'ENGINE': 'django.db.backends.dummy',
                 },
             }
+        if self._databases[DEFAULT_DB_ALIAS] == {}:
+            self._databases[DEFAULT_DB_ALIAS]['ENGINE'] = 'django.db.backends.dummy'
+
         if DEFAULT_DB_ALIAS not in self._databases:
             raise ImproperlyConfigured("You must define a '%s' database" % DEFAULT_DB_ALIAS)
         return self._databases
@@ -171,7 +184,7 @@ class ConnectionHandler(object):
             conn['ENGINE'] = 'django.db.backends.dummy'
         conn.setdefault('CONN_MAX_AGE', 0)
         conn.setdefault('OPTIONS', {})
-        conn.setdefault('TIME_ZONE', 'UTC' if settings.USE_TZ else settings.TIME_ZONE)
+        conn.setdefault('TIME_ZONE', None)
         for setting in ['NAME', 'USER', 'PASSWORD', 'HOST', 'PORT']:
             conn.setdefault(setting, '')
 
@@ -276,22 +289,31 @@ class ConnectionRouter(object):
                     return allow
         return obj1._state.db == obj2._state.db
 
-    def allow_migrate(self, db, model, **hints):
+    def allow_migrate(self, db, app_label, **hints):
         for router in self.routers:
             try:
                 method = router.allow_migrate
             except AttributeError:
                 # If the router doesn't have a method, skip to the next one.
-                pass
-            else:
-                allow = method(db, model, **hints)
-                if allow is not None:
-                    return allow
+                continue
+
+            allow = method(db, app_label, **hints)
+
+            if allow is not None:
+                return allow
         return True
+
+    def allow_migrate_model(self, db, model):
+        return self.allow_migrate(
+            db,
+            model._meta.app_label,
+            model_name=model._meta.model_name,
+            model=model,
+        )
 
     def get_migratable_models(self, app_config, db, include_auto_created=False):
         """
         Return app models allowed to be synchronized on provided db.
         """
         models = app_config.get_models(include_auto_created=include_auto_created)
-        return [model for model in models if self.allow_migrate(db, model)]
+        return [model for model in models if self.allow_migrate_model(db, model)]

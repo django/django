@@ -1,13 +1,13 @@
 from django.apps import apps as django_apps
 from django.conf import settings
-from django.core import urlresolvers, paginator
+from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import NoReverseMatch, reverse
 from django.utils import translation
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import urlopen
 
-
-PING_URL = "http://www.google.com/webmasters/tools/ping"
+PING_URL = "https://www.google.com/webmasters/tools/ping"
 
 
 class SitemapNotFound(Exception):
@@ -19,17 +19,17 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     Alerts Google that the sitemap for the current site has been updated.
     If sitemap_url is provided, it should be an absolute path to the sitemap
     for this site -- e.g., '/sitemap.xml'. If sitemap_url is not provided, this
-    function will attempt to deduce it by using urlresolvers.reverse().
+    function will attempt to deduce it by using urls.reverse().
     """
     if sitemap_url is None:
         try:
             # First, try to get the "index" sitemap URL.
-            sitemap_url = urlresolvers.reverse('django.contrib.sitemaps.views.index')
-        except urlresolvers.NoReverseMatch:
+            sitemap_url = reverse('django.contrib.sitemaps.views.index')
+        except NoReverseMatch:
             try:
                 # Next, try for the "global" sitemap URL.
-                sitemap_url = urlresolvers.reverse('django.contrib.sitemaps.views.sitemap')
-            except urlresolvers.NoReverseMatch:
+                sitemap_url = reverse('django.contrib.sitemaps.views.sitemap')
+            except NoReverseMatch:
                 pass
 
     if sitemap_url is None:
@@ -112,8 +112,8 @@ class Sitemap(object):
         all_items_lastmod = True  # track if all items have a lastmod
         for item in self.paginator.page(page).object_list:
             loc = "%s://%s%s" % (protocol, domain, self.__get('location', item))
-            priority = self.__get('priority', item, None)
-            lastmod = self.__get('lastmod', item, None)
+            priority = self.__get('priority', item)
+            lastmod = self.__get('lastmod', item)
             if all_items_lastmod:
                 all_items_lastmod = lastmod is not None
                 if (all_items_lastmod and
@@ -123,7 +123,7 @@ class Sitemap(object):
                 'item': item,
                 'location': loc,
                 'lastmod': lastmod,
-                'changefreq': self.__get('changefreq', item, None),
+                'changefreq': self.__get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
             }
             urls.append(url_info)
@@ -138,7 +138,7 @@ class GenericSitemap(Sitemap):
 
     def __init__(self, info_dict, priority=None, changefreq=None):
         self.queryset = info_dict['queryset']
-        self.date_field = info_dict.get('date_field', None)
+        self.date_field = info_dict.get('date_field')
         self.priority = priority
         self.changefreq = changefreq
 

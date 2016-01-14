@@ -6,6 +6,7 @@ from ..utils import setup
 
 
 class WidthRatioTagTests(SimpleTestCase):
+    libraries = {'custom': 'template_tests.templatetags.custom'}
 
     @setup({'widthratio01': '{% widthratio a b 0 %}'})
     def test_widthratio01(self):

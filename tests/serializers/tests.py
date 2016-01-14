@@ -1,32 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import importlib
-import json
-import re
-import unittest
 from datetime import datetime
-from xml.dom import minidom
 
-from django.core import management, serializers
+from django.core import serializers
+from django.core.serializers import SerializerDoesNotExist
+from django.core.serializers.base import ProgressBar
 from django.db import connection, transaction
+from django.http import HttpResponse
 from django.test import (
-    TestCase, TransactionTestCase, override_settings, skipUnlessDBFeature,
+    SimpleTestCase, mock, override_settings, skipUnlessDBFeature,
 )
 from django.test.utils import Approximate
-from django.utils import six
+from django.utils.functional import curry
 from django.utils.six import StringIO
 
 from .models import (
-    Actor, Article, Author, AuthorProfile, Category, Movie, Player, Score,
-    Team,
+    Actor, Article, Author, AuthorProfile, BaseModel, Category, ComplexModel,
+    Movie, Player, ProxyBaseModel, ProxyProxyBaseModel, Score, Team,
 )
-
-try:
-    import yaml
-    HAS_YAML = True
-except ImportError:
-    HAS_YAML = False
 
 
 @override_settings(
@@ -34,7 +26,7 @@ except ImportError:
         "json2": "django.core.serializers.json",
     }
 )
-class SerializerRegistrationTests(TestCase):
+class SerializerRegistrationTests(SimpleTestCase):
     def setUp(self):
         self.old_serializers = serializers._serializers
         serializers._serializers = {}
@@ -61,6 +53,10 @@ class SerializerRegistrationTests(TestCase):
         self.assertNotIn('xml', public_formats)
         self.assertIn('json3', public_formats)
 
+    def test_unregister_unknown_serializer(self):
+        with self.assertRaises(SerializerDoesNotExist):
+            serializers.unregister_serializer("nonsense")
+
     def test_builtin_serializers(self):
         "Requesting a list of serializer formats popuates the registry"
         all_formats = set(serializers.get_serializer_formats())
@@ -75,8 +71,29 @@ class SerializerRegistrationTests(TestCase):
         self.assertIn('python', all_formats)
         self.assertNotIn('python', public_formats)
 
+    def test_get_unknown_serializer(self):
+        """
+        #15889: get_serializer('nonsense') raises a SerializerDoesNotExist
+        """
+        with self.assertRaises(SerializerDoesNotExist):
+            serializers.get_serializer("nonsense")
+
+        with self.assertRaises(KeyError):
+            serializers.get_serializer("nonsense")
+
+        # SerializerDoesNotExist is instantiated with the nonexistent format
+        with self.assertRaises(SerializerDoesNotExist) as cm:
+            serializers.get_serializer("nonsense")
+        self.assertEqual(cm.exception.args, ("nonsense",))
+
+    def test_get_unknown_deserializer(self):
+        with self.assertRaises(SerializerDoesNotExist):
+            serializers.get_deserializer("nonsense")
+
 
 class SerializersTestBase(object):
+    serializer_name = None  # Set by subclasses to the serialization format name
+
     @staticmethod
     def _comparison_value(value):
         return value
@@ -95,7 +112,7 @@ class SerializersTestBase(object):
             pub_date=datetime(2006, 6, 16, 11, 00)
         )
         self.a1.save()
-        self.a1.categories = [sports, op_ed]
+        self.a1.categories.set([sports, op_ed])
 
         self.a2 = Article(
             author=self.joe,
@@ -103,7 +120,7 @@ class SerializersTestBase(object):
             pub_date=datetime(2006, 6, 16, 13, 00, 11, 345)
         )
         self.a2.save()
-        self.a2.categories = [music, op_ed]
+        self.a2.categories.set([music, op_ed])
 
     def test_serialize(self):
         """Tests that basic serialization works."""
@@ -117,6 +134,38 @@ class SerializersTestBase(object):
                                            Article.objects.all())
         models = list(serializers.deserialize(self.serializer_name, serial_str))
         self.assertEqual(len(models), 2)
+
+    def test_serialize_to_stream(self):
+        obj = ComplexModel(field1='first', field2='second', field3='third')
+        obj.save_base(raw=True)
+
+        # Serialize the test database to a stream
+        for stream in (StringIO(), HttpResponse()):
+            serializers.serialize(self.serializer_name, [obj], indent=2, stream=stream)
+
+            # Serialize normally for a comparison
+            string_data = serializers.serialize(self.serializer_name, [obj], indent=2)
+
+            # Check that the two are the same
+            if isinstance(stream, StringIO):
+                self.assertEqual(string_data, stream.getvalue())
+            else:
+                self.assertEqual(string_data, stream.content.decode('utf-8'))
+
+    def test_serialize_specific_fields(self):
+        obj = ComplexModel(field1='first', field2='second', field3='third')
+        obj.save_base(raw=True)
+
+        # Serialize then deserialize the test database
+        serialized_data = serializers.serialize(
+            self.serializer_name, [obj], indent=2, fields=('field1', 'field3')
+        )
+        result = next(serializers.deserialize(self.serializer_name, serialized_data))
+
+        # Check that the deserialized object contains data in only the serialized fields.
+        self.assertEqual(result.object.field1, 'first')
+        self.assertEqual(result.object.field2, '')
+        self.assertEqual(result.object.field3, 'third')
 
     def test_altering_serialized_output(self):
         """
@@ -187,6 +236,16 @@ class SerializersTestBase(object):
         mv_obj = obj_list[0].object
         self.assertEqual(mv_obj.title, movie_title)
 
+    def test_serialize_progressbar(self):
+        fake_stdout = StringIO()
+        serializers.serialize(
+            self.serializer_name, Article.objects.all(),
+            progress_output=fake_stdout, object_count=Article.objects.count()
+        )
+        self.assertTrue(
+            fake_stdout.getvalue().endswith('[' + '.' * ProgressBar.progress_width + ']\n')
+        )
+
     def test_serialize_superfluous_queries(self):
         """Ensure no superfluous queries are made when serializing ForeignKeys
 
@@ -222,6 +281,15 @@ class SerializersTestBase(object):
         deserial_objs = list(serializers.deserialize(self.serializer_name,
                                                 serial_str))
         self.assertEqual(deserial_objs[0].object.score, Approximate(3.4, places=1))
+
+    def test_deferred_field_serialization(self):
+        author = Author.objects.create(name='Victor Hugo')
+        author = Author.objects.defer('name').get(pk=author.pk)
+        serial_str = serializers.serialize(self.serializer_name, [author])
+        deserial_objs = list(serializers.deserialize(self.serializer_name, serial_str))
+        # Check the class instead of using isinstance() because model instances
+        # with deferred fields (e.g. Author_Deferred_name) will pass isinstance.
+        self.assertEqual(deserial_objs[0].object.__class__, Author)
 
     def test_custom_field_serialization(self):
         """Tests that custom fields serialize and deserialize intact"""
@@ -266,6 +334,37 @@ class SerializersTestBase(object):
             obj.save()
         self.assertEqual(Category.objects.all().count(), 5)
 
+    def test_deterministic_mapping_ordering(self):
+        """Mapping such as fields should be deterministically ordered. (#24558)"""
+        output = serializers.serialize(self.serializer_name, [self.a1], indent=2)
+        categories = self.a1.categories.values_list('pk', flat=True)
+        self.assertEqual(output, self.mapping_ordering_str % {
+            'article_pk': self.a1.pk,
+            'author_pk': self.a1.author_id,
+            'first_category_pk': categories[0],
+            'second_category_pk': categories[1],
+        })
+
+    def test_deserialize_force_insert(self):
+        """Tests that deserialized content can be saved with force_insert as a parameter."""
+        serial_str = serializers.serialize(self.serializer_name, [self.a1])
+        deserial_obj = list(serializers.deserialize(self.serializer_name, serial_str))[0]
+        with mock.patch('django.db.models.Model') as mock_model:
+            deserial_obj.save(force_insert=False)
+            mock_model.save_base.assert_called_with(deserial_obj.object, raw=True, using=None, force_insert=False)
+
+    @skipUnlessDBFeature('can_defer_constraint_checks')
+    def test_serialize_proxy_model(self):
+        BaseModel.objects.create(parent_data=1)
+        base_objects = BaseModel.objects.all()
+        proxy_objects = ProxyBaseModel.objects.all()
+        proxy_proxy_objects = ProxyProxyBaseModel.objects.all()
+        base_data = serializers.serialize("json", base_objects)
+        proxy_data = serializers.serialize("json", proxy_objects)
+        proxy_proxy_data = serializers.serialize("json", proxy_proxy_objects)
+        self.assertEqual(base_data, proxy_data.replace('proxy', ''))
+        self.assertEqual(base_data, proxy_proxy_data.replace('proxy', ''))
+
 
 class SerializersTransactionTestBase(object):
 
@@ -292,296 +391,16 @@ class SerializersTransactionTestBase(object):
         self.assertEqual(art_obj.author.name, "Agnes")
 
 
-class XmlSerializerTestCase(SerializersTestBase, TestCase):
-    serializer_name = "xml"
-    pkless_str = """<?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
-    <object model="serializers.category">
-        <field type="CharField" name="name">Reference</field>
-    </object>
-    <object model="serializers.category">
-        <field type="CharField" name="name">Non-fiction</field>
-    </object>
-</django-objects>"""
-
-    @staticmethod
-    def _comparison_value(value):
-        # The XML serializer handles everything as strings, so comparisons
-        # need to be performed on the stringified value
-        return six.text_type(value)
-
-    @staticmethod
-    def _validate_output(serial_str):
-        try:
-            minidom.parseString(serial_str)
-        except Exception:
-            return False
-        else:
-            return True
-
-    @staticmethod
-    def _get_pk_values(serial_str):
-        ret_list = []
-        dom = minidom.parseString(serial_str)
-        fields = dom.getElementsByTagName("object")
-        for field in fields:
-            ret_list.append(field.getAttribute("pk"))
-        return ret_list
-
-    @staticmethod
-    def _get_field_values(serial_str, field_name):
-        ret_list = []
-        dom = minidom.parseString(serial_str)
-        fields = dom.getElementsByTagName("field")
-        for field in fields:
-            if field.getAttribute("name") == field_name:
-                temp = []
-                for child in field.childNodes:
-                    temp.append(child.nodeValue)
-                ret_list.append("".join(temp))
-        return ret_list
-
-
-class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
-    serializer_name = "xml"
-    fwd_ref_str = """<?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
-    <object pk="1" model="serializers.article">
-        <field to="serializers.author" name="author" rel="ManyToOneRel">1</field>
-        <field type="CharField" name="headline">Forward references pose no problem</field>
-        <field type="DateTimeField" name="pub_date">2006-06-16T15:00:00</field>
-        <field to="serializers.category" name="categories" rel="ManyToManyRel">
-            <object pk="1"></object>
-        </field>
-    </object>
-    <object pk="1" model="serializers.author">
-        <field type="CharField" name="name">Agnes</field>
-    </object>
-    <object pk="1" model="serializers.category">
-        <field type="CharField" name="name">Reference</field></object>
-</django-objects>"""
-
-
-class JsonSerializerTestCase(SerializersTestBase, TestCase):
-    serializer_name = "json"
-    pkless_str = """[
-    {
-        "pk": null,
-        "model": "serializers.category",
-        "fields": {"name": "Reference"}
-    }, {
-        "model": "serializers.category",
-        "fields": {"name": "Non-fiction"}
-    }]"""
-
-    @staticmethod
-    def _validate_output(serial_str):
-        try:
-            json.loads(serial_str)
-        except Exception:
-            return False
-        else:
-            return True
-
-    @staticmethod
-    def _get_pk_values(serial_str):
-        ret_list = []
-        serial_list = json.loads(serial_str)
-        for obj_dict in serial_list:
-            ret_list.append(obj_dict["pk"])
-        return ret_list
-
-    @staticmethod
-    def _get_field_values(serial_str, field_name):
-        ret_list = []
-        serial_list = json.loads(serial_str)
-        for obj_dict in serial_list:
-            if field_name in obj_dict["fields"]:
-                ret_list.append(obj_dict["fields"][field_name])
-        return ret_list
-
-    def test_indentation_whitespace(self):
-        Score.objects.create(score=5.0)
-        Score.objects.create(score=6.0)
-        qset = Score.objects.all()
-
-        s = serializers.json.Serializer()
-        json_data = s.serialize(qset, indent=2)
-        for line in json_data.splitlines():
-            if re.search(r'.+,\s*$', line):
-                self.assertEqual(line, line.rstrip())
-
-
-class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
-    serializer_name = "json"
-    fwd_ref_str = """[
-    {
-        "pk": 1,
-        "model": "serializers.article",
-        "fields": {
-            "headline": "Forward references pose no problem",
-            "pub_date": "2006-06-16T15:00:00",
-            "categories": [1],
-            "author": 1
-        }
-    },
-    {
-        "pk": 1,
-        "model": "serializers.category",
-        "fields": {
-            "name": "Reference"
-        }
-    },
-    {
-        "pk": 1,
-        "model": "serializers.author",
-        "fields": {
-            "name": "Agnes"
-        }
-    }]"""
-
-
-YAML_IMPORT_ERROR_MESSAGE = r'No module named yaml'
-
-
-class YamlImportModuleMock(object):
-    """Provides a wrapped import_module function to simulate yaml ImportError
-
-    In order to run tests that verify the behavior of the YAML serializer
-    when run on a system that has yaml installed (like the django CI server),
-    mock import_module, so that it raises an ImportError when the yaml
-    serializer is being imported.  The importlib.import_module() call is
-    being made in the serializers.register_serializer().
-
-    Refs: #12756
+def register_tests(test_class, method_name, test_func, exclude=None):
     """
-    def __init__(self):
-        self._import_module = importlib.import_module
-
-    def import_module(self, module_path):
-        if module_path == serializers.BUILTIN_SERIALIZERS['yaml']:
-            raise ImportError(YAML_IMPORT_ERROR_MESSAGE)
-
-        return self._import_module(module_path)
-
-
-class NoYamlSerializerTestCase(TestCase):
-    """Not having pyyaml installed provides a misleading error
-
-    Refs: #12756
+    Dynamically create serializer tests to ensure that all registered
+    serializers are automatically tested.
     """
-    @classmethod
-    def setUpClass(cls):
-        """Removes imported yaml and stubs importlib.import_module"""
-        super(NoYamlSerializerTestCase, cls).setUpClass()
-
-        cls._import_module_mock = YamlImportModuleMock()
-        importlib.import_module = cls._import_module_mock.import_module
-
-        # clear out cached serializers to emulate yaml missing
-        serializers._serializers = {}
-
-    @classmethod
-    def tearDownClass(cls):
-        """Puts yaml back if necessary"""
-        super(NoYamlSerializerTestCase, cls).tearDownClass()
-
-        importlib.import_module = cls._import_module_mock._import_module
-
-        # clear out cached serializers to clean out BadSerializer instances
-        serializers._serializers = {}
-
-    def test_serializer_pyyaml_error_message(self):
-        """Using yaml serializer without pyyaml raises ImportError"""
-        jane = Author(name="Jane")
-        self.assertRaises(ImportError, serializers.serialize, "yaml", [jane])
-
-    def test_deserializer_pyyaml_error_message(self):
-        """Using yaml deserializer without pyyaml raises ImportError"""
-        self.assertRaises(ImportError, serializers.deserialize, "yaml", "")
-
-    def test_dumpdata_pyyaml_error_message(self):
-        """Calling dumpdata produces an error when yaml package missing"""
-        with six.assertRaisesRegex(self, management.CommandError, YAML_IMPORT_ERROR_MESSAGE):
-            management.call_command('dumpdata', format='yaml')
-
-
-@unittest.skipUnless(HAS_YAML, "No yaml library detected")
-class YamlSerializerTestCase(SerializersTestBase, TestCase):
-    serializer_name = "yaml"
-    fwd_ref_str = """- fields:
-    headline: Forward references pose no problem
-    pub_date: 2006-06-16 15:00:00
-    categories: [1]
-    author: 1
-  pk: 1
-  model: serializers.article
-- fields:
-    name: Reference
-  pk: 1
-  model: serializers.category
-- fields:
-    name: Agnes
-  pk: 1
-  model: serializers.author"""
-
-    pkless_str = """- fields:
-    name: Reference
-  pk: null
-  model: serializers.category
-- fields:
-    name: Non-fiction
-  model: serializers.category"""
-
-    @staticmethod
-    def _validate_output(serial_str):
-        try:
-            yaml.safe_load(StringIO(serial_str))
-        except Exception:
-            return False
-        else:
-            return True
-
-    @staticmethod
-    def _get_pk_values(serial_str):
-        ret_list = []
-        stream = StringIO(serial_str)
-        for obj_dict in yaml.safe_load(stream):
-            ret_list.append(obj_dict["pk"])
-        return ret_list
-
-    @staticmethod
-    def _get_field_values(serial_str, field_name):
-        ret_list = []
-        stream = StringIO(serial_str)
-        for obj_dict in yaml.safe_load(stream):
-            if "fields" in obj_dict and field_name in obj_dict["fields"]:
-                field_value = obj_dict["fields"][field_name]
-                # yaml.safe_load will return non-string objects for some
-                # of the fields we are interested in, this ensures that
-                # everything comes back as a string
-                if isinstance(field_value, six.string_types):
-                    ret_list.append(field_value)
-                else:
-                    ret_list.append(str(field_value))
-        return ret_list
-
-
-@unittest.skipUnless(HAS_YAML, "No yaml library detected")
-class YamlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
-    serializer_name = "yaml"
-    fwd_ref_str = """- fields:
-    headline: Forward references pose no problem
-    pub_date: 2006-06-16 15:00:00
-    categories: [1]
-    author: 1
-  pk: 1
-  model: serializers.article
-- fields:
-    name: Reference
-  pk: 1
-  model: serializers.category
-- fields:
-    name: Agnes
-  pk: 1
-  model: serializers.author"""
+    formats = [
+        f for f in serializers.get_serializer_formats()
+        if (not isinstance(serializers.get_serializer(f), serializers.BadSerializer)
+            and not f == 'geojson'
+            and (exclude is None or f not in exclude))
+    ]
+    for format_ in formats:
+        setattr(test_class, method_name % format_, curry(test_func, format_))

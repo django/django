@@ -1,15 +1,11 @@
-<!DOCTYPE html>
+{% load i18n static %}<!DOCTYPE html>
 <html>
-  <head><title></title></head>
+  <head><title>{% trans 'Popup closing...' %}</title></head>
   <body>
-    <script type="text/javascript">
-      {% if action == 'change' %}
-        opener.dismissChangeRelatedObjectPopup(window, "{{ value }}", "{{ obj }}", "{{ new_value }}");
-      {% elif action == 'delete' %}
-        opener.dismissDeleteRelatedObjectPopup(window, "{{ value }}");
-      {% else %}
-        opener.dismissAddRelatedObjectPopup(window, "{{ value }}", "{{ obj }}");
-      {% endif %}
+    <script type="text/javascript"
+            id="django-admin-popup-response-constants"
+            src="{% static "admin/js/popup_response.js" %}"
+            data-popup-response="{{ popup_response_data }}">
     </script>
   </body>
 </html>

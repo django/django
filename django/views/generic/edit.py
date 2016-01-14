@@ -1,43 +1,14 @@
-import inspect
-import re
-import warnings
-
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import models as model_forms
 from django.http import HttpResponseRedirect
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import (
     BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,
 )
 
-PERCENT_PLACEHOLDER_REGEX = re.compile(r'%\([^\)]+\)')  # RemovedInDjango20Warning
 
-
-class FormMixinBase(type):
-    def __new__(cls, name, bases, attrs):
-        get_form = attrs.get('get_form')
-        if get_form and inspect.isfunction(get_form):
-            try:
-                inspect.getcallargs(get_form, None)
-            except TypeError:
-                warnings.warn(
-                    "`%s.%s.get_form` method must define a default value for "
-                    "its `form_class` argument." % (attrs['__module__'], name),
-                    RemovedInDjango20Warning, stacklevel=2
-                )
-
-                def get_form_with_form_class(self, form_class=None):
-                    if form_class is None:
-                        form_class = self.get_form_class()
-                    return get_form(self, form_class=form_class)
-                attrs['get_form'] = get_form_with_form_class
-        return super(FormMixinBase, cls).__new__(cls, name, bases, attrs)
-
-
-class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
+class FormMixin(ContextMixin):
     """
     A mixin that provides a way to show and handle a form in a request.
     """
@@ -114,6 +85,14 @@ class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
         """
         return self.render_to_response(self.get_context_data(form=form))
 
+    def get_context_data(self, **kwargs):
+        """
+        Insert the form into the context dict.
+        """
+        if 'form' not in kwargs:
+            kwargs['form'] = self.get_form()
+        return super(FormMixin, self).get_context_data(**kwargs)
+
 
 class ModelFormMixin(FormMixin, SingleObjectMixin):
     """
@@ -166,17 +145,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         Returns the supplied URL.
         """
         if self.success_url:
-            # force_text can be removed with deprecation warning
-            self.success_url = force_text(self.success_url)
-            if PERCENT_PLACEHOLDER_REGEX.search(self.success_url):
-                warnings.warn(
-                    "%()s placeholder style in success_url is deprecated. "
-                    "Please replace them by the {} Python format syntax.",
-                    RemovedInDjango20Warning, stacklevel=2
-                )
-                url = self.success_url % self.object.__dict__
-            else:
-                url = self.success_url.format(**self.object.__dict__)
+            url = self.success_url.format(**self.object.__dict__)
         else:
             try:
                 url = self.object.get_absolute_url()
@@ -202,8 +171,7 @@ class ProcessFormView(View):
         """
         Handles GET requests and instantiates a blank version of the form.
         """
-        form = self.get_form()
-        return self.render_to_response(self.get_context_data(form=form))
+        return self.render_to_response(self.get_context_data())
 
     def post(self, request, *args, **kwargs):
         """
@@ -302,17 +270,7 @@ class DeletionMixin(object):
 
     def get_success_url(self):
         if self.success_url:
-            # force_text can be removed with deprecation warning
-            self.success_url = force_text(self.success_url)
-            if PERCENT_PLACEHOLDER_REGEX.search(self.success_url):
-                warnings.warn(
-                    "%()s placeholder style in success_url is deprecated. "
-                    "Please replace them by the {} Python format syntax.",
-                    RemovedInDjango20Warning, stacklevel=2
-                )
-                return self.success_url % self.object.__dict__
-            else:
-                return self.success_url.format(**self.object.__dict__)
+            return self.success_url.format(**self.object.__dict__)
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")

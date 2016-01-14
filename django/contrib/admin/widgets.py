@@ -6,12 +6,11 @@ from __future__ import unicode_literals
 import copy
 
 from django import forms
-from django.contrib.admin.templatetags.admin_static import static
-from django.core.urlresolvers import reverse
 from django.db.models.deletion import CASCADE
 from django.forms.utils import flatatt
-from django.forms.widgets import Media, RadioFieldRenderer
+from django.forms.widgets import RadioFieldRenderer
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.html import (
@@ -32,7 +31,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     @property
     def media(self):
         js = ["core.js", "SelectBox.js", "SelectFilter2.js"]
-        return forms.Media(js=[static("admin/js/%s" % path) for path in js])
+        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
         self.verbose_name = verbose_name
@@ -45,20 +44,18 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         attrs['class'] = 'selectfilter'
         if self.is_stacked:
             attrs['class'] += 'stacked'
-        output = [super(FilteredSelectMultiple, self).render(name, value, attrs, choices)]
-        output.append('<script type="text/javascript">addEvent(window, "load", function(e) {')
-        # TODO: "id_" is hard-coded here. This should instead use the correct
-        # API to determine the ID dynamically.
-        output.append('SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n'
-            % (name, self.verbose_name.replace('"', '\\"'), int(self.is_stacked), static('admin/')))
-        return mark_safe(''.join(output))
+
+        attrs['data-field-name'] = self.verbose_name
+        attrs['data-is-stacked'] = int(self.is_stacked)
+        output = super(FilteredSelectMultiple, self).render(name, value, attrs, choices)
+        return mark_safe(output)
 
 
 class AdminDateWidget(forms.DateInput):
     @property
     def media(self):
         js = ["calendar.js", "admin/DateTimeShortcuts.js"]
-        return forms.Media(js=[static("admin/js/%s" % path) for path in js])
+        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
         final_attrs = {'class': 'vDateField', 'size': '10'}
@@ -71,7 +68,7 @@ class AdminTimeWidget(forms.TimeInput):
     @property
     def media(self):
         js = ["calendar.js", "admin/DateTimeShortcuts.js"]
-        return forms.Media(js=[static("admin/js/%s" % path) for path in js])
+        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
         final_attrs = {'class': 'vTimeField', 'size': '8'}
@@ -151,7 +148,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
-        rel_to = self.rel.to
+        rel_to = self.rel.model
         if attrs is None:
             attrs = {}
         extra = []
@@ -196,9 +193,9 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     def label_for_value(self, value):
         key = self.rel.get_related_field().name
         try:
-            obj = self.rel.to._default_manager.using(self.db).get(**{key: value})
+            obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
             return '&nbsp;<strong>%s</strong>' % escape(Truncator(obj).words(14, truncate='...'))
-        except (ValueError, self.rel.to.DoesNotExist):
+        except (ValueError, self.rel.model.DoesNotExist):
             return ''
 
 
@@ -210,7 +207,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     def render(self, name, value, attrs=None):
         if attrs is None:
             attrs = {}
-        if self.rel.to in self.admin_site._registry:
+        if self.rel.model in self.admin_site._registry:
             # The related object is registered with the same AdminSite
             attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
@@ -248,7 +245,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         # Backwards compatible check for whether a user can add related
         # objects.
         if can_add_related is None:
-            can_add_related = rel.to in admin_site._registry
+            can_add_related = rel.model in admin_site._registry
         self.can_add_related = can_add_related
         # XXX: The UX does not support multiple selected values.
         multiple = getattr(widget, 'allow_multiple_selected', False)
@@ -272,8 +269,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     @property
     def media(self):
-        media = Media(js=['admin/js/related-widget-wrapper.js'])
-        return self.widget.media + media
+        return self.widget.media
 
     def get_related_url(self, info, action, *args):
         return reverse("admin:%s_%s_%s" % (info + (action,)),
@@ -281,7 +277,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     def render(self, name, value, *args, **kwargs):
         from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
-        rel_opts = self.rel.to._meta
+        rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
         self.widget.choices = self.choices
         url_params = '&'.join("%s=%s" % param for param in [

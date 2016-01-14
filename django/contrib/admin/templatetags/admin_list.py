@@ -1,23 +1,25 @@
 from __future__ import unicode_literals
 
 import datetime
+import warnings
 
-from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field, display_for_value, label_for_field, lookup_field,
 )
 from django.contrib.admin.views.main import (
-    ALL_VAR, EMPTY_CHANGELIST_VALUE, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
+    ALL_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
 )
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import NoReverseMatch
 from django.db import models
 from django.template import Library
 from django.template.loader import get_template
+from django.templatetags.static import static
+from django.urls import NoReverseMatch
 from django.utils import formats
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
-from django.utils.html import escapejs, format_html
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -174,7 +176,7 @@ def result_headers(cl):
 
 
 def _boolean_icon(field_val):
-    icon_url = static('admin/img/icon-%s.gif' %
+    icon_url = static('admin/img/icon-%s.svg' %
                       {True: 'yes', False: 'no', None: 'unknown'}[field_val])
     return format_html('<img src="{}" alt="{}" />', icon_url, field_val)
 
@@ -194,35 +196,39 @@ def items_for_result(cl, result, form):
     first = True
     pk = cl.lookup_opts.pk.attname
     for field_name in cl.list_display:
+        empty_value_display = cl.model_admin.get_empty_value_display()
         row_classes = ['field-%s' % field_name]
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
         except ObjectDoesNotExist:
-            result_repr = EMPTY_CHANGELIST_VALUE
+            result_repr = empty_value_display
         else:
-            if f is None:
+            empty_value_display = getattr(attr, 'empty_value_display', empty_value_display)
+            if f is None or f.auto_created:
                 if field_name == 'action_checkbox':
                     row_classes = ['action-checkbox']
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
-                if boolean:
-                    allow_tags = True
-                result_repr = display_for_value(value, boolean)
-                # Strip HTML tags in the resulting text, except if the
-                # function has an "allow_tags" attribute set to True.
+                result_repr = display_for_value(value, empty_value_display, boolean)
                 if allow_tags:
+                    warnings.warn(
+                        "Deprecated allow_tags attribute used on field {}. "
+                        "Use django.utils.safestring.format_html(), "
+                        "format_html_join(), or mark_safe() instead.".format(field_name),
+                        RemovedInDjango20Warning
+                    )
                     result_repr = mark_safe(result_repr)
                 if isinstance(value, (datetime.date, datetime.time)):
                     row_classes.append('nowrap')
             else:
-                if isinstance(f.rel, models.ManyToOneRel):
+                if isinstance(f.remote_field, models.ManyToOneRel):
                     field_val = getattr(result, f.name)
                     if field_val is None:
-                        result_repr = EMPTY_CHANGELIST_VALUE
+                        result_repr = empty_value_display
                     else:
                         result_repr = field_val
                 else:
-                    result_repr = display_for_field(value, f)
+                    result_repr = display_for_field(value, f, empty_value_display)
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
                     row_classes.append('nowrap')
         if force_text(result_repr) == '':
@@ -248,13 +254,11 @@ def items_for_result(cl, result, form):
                 else:
                     attr = pk
                 value = result.serializable_value(attr)
-                result_id = escapejs(value)
                 link_or_text = format_html(
                     '<a href="{}"{}>{}</a>',
                     url,
                     format_html(
-                        ' onclick="opener.dismissRelatedLookupPopup(window, '
-                        '&#39;{}&#39;); return false;"', result_id
+                        ' data-popup-opener="{}"', value
                     ) if cl.is_popup else '',
                     result_repr)
 

@@ -6,7 +6,7 @@ HTTP clients can send a number of headers to tell the server about copies of a
 resource that they have already seen. This is commonly used when retrieving a
 Web page (using an HTTP ``GET`` request) to avoid sending all the data for
 something the client has already retrieved. However, the same headers can be
-used for all HTTP methods (``POST``, ``PUT``, ``DELETE``, etc).
+used for all HTTP methods (``POST``, ``PUT``, ``DELETE``, etc.).
 
 For each page (response) that Django sends back from a view, it might provide
 two HTTP headers: the ``ETag`` header and the ``Last-Modified`` header. These
@@ -32,11 +32,6 @@ returned.
 
 When you need more fine-grained control you may use per-view conditional
 processing functions.
-
-.. versionchanged:: 1.8
-
-    Support for the ``If-unmodified-since`` header was added to conditional
-    view processing.
 
 .. _conditional-decorators:
 
@@ -189,7 +184,7 @@ Comparison with middleware conditional processing
 You may notice that Django already provides simple and straightforward
 conditional ``GET`` handling via the
 :class:`django.middleware.http.ConditionalGetMiddleware` and
-:class:`~django.middleware.common.CommonMiddleware`. Whilst certainly being
+:class:`~django.middleware.common.CommonMiddleware`. While certainly being
 easy to use and suitable for many situations, those pieces of middleware
 functionality have limitations for advanced usage:
 

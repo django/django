@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             "Book",
             [
                 ("id", models.AutoField(primary_key=True)),
-                ("user", models.ForeignKey("auth.User", null=True)),
+                ("user", models.ForeignKey("auth.User", models.SET_NULL, null=True)),
             ],
         )
 

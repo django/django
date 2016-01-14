@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import json
 import mimetypes
 import os
 import re
@@ -10,7 +11,6 @@ from io import BytesIO
 
 from django.apps import apps
 from django.conf import settings
-from django.core import urlresolvers
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8, WSGIRequest
 from django.core.signals import (
@@ -21,6 +21,7 @@ from django.http import HttpRequest, QueryDict, SimpleCookie
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.test.utils import ContextList
+from django.urls import resolve
 from django.utils import six
 from django.utils.encoding import force_bytes, force_str, uri_to_iri
 from django.utils.functional import SimpleLazyObject, curry
@@ -145,7 +146,9 @@ def store_rendered_templates(store, signal, sender, template, context, **kwargs)
     of rendering.
     """
     store.setdefault('templates', []).append(template)
-    store.setdefault('context', ContextList()).append(copy(context))
+    if 'context' not in store:
+        store['context'] = ContextList()
+    store['context'].append(copy(context))
 
 
 def encode_multipart(boundary, data):
@@ -354,7 +357,7 @@ class RequestFactory(object):
                 content_type='application/octet-stream', secure=False,
                 **extra):
         """Constructs an arbitrary HTTP request."""
-        parsed = urlparse(path)
+        parsed = urlparse(force_str(path))
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             'PATH_INFO': self._get_path(parsed),
@@ -414,7 +417,7 @@ class Client(RequestFactory):
         """
         if apps.is_installed('django.contrib.sessions'):
             engine = import_module(settings.SESSION_ENGINE)
-            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
+            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
             if cookie:
                 return engine.SessionStore(cookie.value)
             else:
@@ -441,9 +444,9 @@ class Client(RequestFactory):
         signal_uid = "template-render-%s" % id(request)
         signals.template_rendered.connect(on_template_render, dispatch_uid=signal_uid)
         # Capture exceptions created by the handler.
-        got_request_exception.connect(self.store_exc_info, dispatch_uid="request-exception")
+        exception_uid = "request-exception-%s" % id(request)
+        got_request_exception.connect(self.store_exc_info, dispatch_uid=exception_uid)
         try:
-
             try:
                 response = self.handler(environ)
             except TemplateDoesNotExist as e:
@@ -473,9 +476,10 @@ class Client(RequestFactory):
             response.templates = data.get("templates", [])
             response.context = data.get("context")
 
+            response.json = curry(self._parse_json, response)
+
             # Attach the ResolverMatch instance to the response
-            response.resolver_match = SimpleLazyObject(
-                lambda: urlresolvers.resolve(request['PATH_INFO']))
+            response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
 
             # Flatten a single context. Not really necessary anymore thanks to
             # the __getattr__ flattening in ContextList, but has some edge-case
@@ -490,7 +494,7 @@ class Client(RequestFactory):
             return response
         finally:
             signals.template_rendered.disconnect(dispatch_uid=signal_uid)
-            got_request_exception.disconnect(dispatch_uid="request-exception")
+            got_request_exception.disconnect(dispatch_uid=exception_uid)
 
     def get(self, path, data=None, follow=False, secure=False, **extra):
         """
@@ -589,39 +593,45 @@ class Client(RequestFactory):
         are incorrect, or the user is inactive, or if the sessions framework is
         not available.
         """
-        from django.contrib.auth import authenticate, login
+        from django.contrib.auth import authenticate
         user = authenticate(**credentials)
         if (user and user.is_active and
                 apps.is_installed('django.contrib.sessions')):
-            engine = import_module(settings.SESSION_ENGINE)
-
-            # Create a fake request to store login details.
-            request = HttpRequest()
-
-            if self.session:
-                request.session = self.session
-            else:
-                request.session = engine.SessionStore()
-            login(request, user)
-
-            # Save the session values.
-            request.session.save()
-
-            # Set the cookie to represent the session.
-            session_cookie = settings.SESSION_COOKIE_NAME
-            self.cookies[session_cookie] = request.session.session_key
-            cookie_data = {
-                'max-age': None,
-                'path': '/',
-                'domain': settings.SESSION_COOKIE_DOMAIN,
-                'secure': settings.SESSION_COOKIE_SECURE or None,
-                'expires': None,
-            }
-            self.cookies[session_cookie].update(cookie_data)
-
+            self._login(user)
             return True
         else:
             return False
+
+    def force_login(self, user, backend=None):
+        self._login(user, backend)
+
+    def _login(self, user, backend=None):
+        from django.contrib.auth import login
+        engine = import_module(settings.SESSION_ENGINE)
+
+        # Create a fake request to store login details.
+        request = HttpRequest()
+
+        if self.session:
+            request.session = self.session
+        else:
+            request.session = engine.SessionStore()
+        login(request, user, backend)
+
+        # Save the session values.
+        request.session.save()
+
+        # Set the cookie to represent the session.
+        session_cookie = settings.SESSION_COOKIE_NAME
+        self.cookies[session_cookie] = request.session.session_key
+        cookie_data = {
+            'max-age': None,
+            'path': '/',
+            'domain': settings.SESSION_COOKIE_DOMAIN,
+            'secure': settings.SESSION_COOKIE_SECURE or None,
+            'expires': None,
+        }
+        self.cookies[session_cookie].update(cookie_data)
 
     def logout(self):
         """
@@ -640,6 +650,14 @@ class Client(RequestFactory):
             request.session = engine.SessionStore()
         logout(request)
         self.cookies = SimpleCookie()
+
+    def _parse_json(self, response, **extra):
+        if 'application/json' not in response.get('Content-Type'):
+            raise ValueError(
+                'Content-Type header is "{0}", not "application/json"'
+                .format(response.get('Content-Type'))
+            )
+        return json.loads(response.content.decode(), **extra)
 
     def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."

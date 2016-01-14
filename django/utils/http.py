@@ -5,13 +5,14 @@ import calendar
 import datetime
 import re
 import sys
+import unicodedata
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, force_str, force_text
-from django.utils.functional import allow_lazy
+from django.utils.functional import keep_lazy_text
 from django.utils.six.moves.urllib.parse import (
     quote, quote_plus, unquote, unquote_plus, urlencode as original_urlencode,
     urlparse,
@@ -33,7 +34,13 @@ ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 RFC3986_GENDELIMS = str(":/?#[]@")
 RFC3986_SUBDELIMS = str("!$&'()*+,;=")
 
+PROTOCOL_TO_PORT = {
+    'http': 80,
+    'https': 443,
+}
 
+
+@keep_lazy_text
 def urlquote(url, safe='/'):
     """
     A version of Python's urllib.quote() function that can operate on unicode
@@ -42,9 +49,9 @@ def urlquote(url, safe='/'):
     without double-quoting occurring.
     """
     return force_text(quote(force_str(url), force_str(safe)))
-urlquote = allow_lazy(urlquote, six.text_type)
 
 
+@keep_lazy_text
 def urlquote_plus(url, safe=''):
     """
     A version of Python's urllib.quote_plus() function that can operate on
@@ -53,25 +60,24 @@ def urlquote_plus(url, safe=''):
     iri_to_uri() call without double-quoting occurring.
     """
     return force_text(quote_plus(force_str(url), force_str(safe)))
-urlquote_plus = allow_lazy(urlquote_plus, six.text_type)
 
 
+@keep_lazy_text
 def urlunquote(quoted_url):
     """
     A wrapper for Python's urllib.unquote() function that can operate on
     the result of django.utils.http.urlquote().
     """
     return force_text(unquote(force_str(quoted_url)))
-urlunquote = allow_lazy(urlunquote, six.text_type)
 
 
+@keep_lazy_text
 def urlunquote_plus(quoted_url):
     """
     A wrapper for Python's urllib.unquote_plus() function that can operate on
     the result of django.utils.http.urlquote_plus().
     """
     return force_text(unquote_plus(force_str(quoted_url)))
-urlunquote_plus = allow_lazy(urlunquote_plus, six.text_type)
 
 
 def urlencode(query, doseq=0):
@@ -247,15 +253,30 @@ def quote_etag(etag):
     return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
 
 
-def same_origin(url1, url2):
+def unquote_etag(etag):
     """
-    Checks if two URLs are 'same-origin'
+    Unquote an ETag string; i.e. revert quote_etag().
     """
-    p1, p2 = urlparse(url1), urlparse(url2)
-    try:
-        return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
-    except ValueError:
+    return etag.strip('"').replace('\\"', '"').replace('\\\\', '\\') if etag else etag
+
+
+def is_same_domain(host, pattern):
+    """
+    Return ``True`` if the host is either an exact match or a match
+    to the wildcard pattern.
+
+    Any pattern beginning with a period matches a domain and all of its
+    subdomains. (e.g. ``.example.com`` matches ``example.com`` and
+    ``foo.example.com``). Anything else is an exact string match.
+    """
+    if not pattern:
         return False
+
+    pattern = pattern.lower()
+    return (
+        pattern[0] == '.' and (host.endswith(pattern) or host == pattern[1:]) or
+        pattern == host
+    )
 
 
 def is_safe_url(url, host=None):
@@ -265,9 +286,10 @@ def is_safe_url(url, host=None):
 
     Always returns ``False`` on an empty url.
     """
+    if url is not None:
+        url = url.strip()
     if not url:
         return False
-    url = url.strip()
     # Chrome treats \ completely as /
     url = url.replace('\\', '/')
     # Chrome considers any URL with more than two slashes to be absolute, but
@@ -280,6 +302,11 @@ def is_safe_url(url, host=None):
     # Chrome will still consider example.com to be the hostname, so we must not
     # allow this syntax.
     if not url_info.netloc and url_info.scheme:
+        return False
+    # Forbid URLs that start with control characters. Some browsers (like
+    # Chrome) ignore quite a few control characters at the start of a
+    # URL and might consider the URL as scheme relative.
+    if unicodedata.category(url[0])[0] == 'C':
         return False
     return ((not url_info.netloc or url_info.netloc == host) and
             (not url_info.scheme or url_info.scheme in ['http', 'https']))

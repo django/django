@@ -3,14 +3,15 @@
 # Translators:
 # Carles Barrobés <carles@barrobes.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-16 10:50+0000\n"
-"Last-Translator: Carles Barrobés <carles@barrobes.com>\n"
-"Language-Team: Catalan (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-21 12:06+0000\n"
+"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
+"Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,15 +19,15 @@ msgstr ""
 "Language: ca\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
 msgstr "Redireccions"
 
-#: contrib/redirects/models.py:10
+msgid "site"
+msgstr "lloc"
+
 msgid "redirect from"
 msgstr "redirecció des de"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -34,11 +35,9 @@ msgstr ""
 "Aquesta ruta hauria de ser un camí absolut, excloent-ne el nom del domini. "
 "Exemple '/events/search/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "redirigir a"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -46,10 +45,8 @@ msgstr ""
 "Això pot ser bé una ruta absoluta (com a sobre) o una URL completa que "
 "comenci per 'http://'."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "redirecció"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "redireccions"

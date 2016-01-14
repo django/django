@@ -16,7 +16,7 @@ def delete_selected(modeladmin, request, queryset):
     """
     Default action which deletes the selected objects.
 
-    This action first displays a confirmation page whichs shows all the
+    This action first displays a confirmation page which shows all the
     deleteable objects, or, if the user has no permission one of the related
     childs (foreignkeys), a "permission denied" message.
 
@@ -68,12 +68,13 @@ def delete_selected(modeladmin, request, queryset):
         title=title,
         objects_name=objects_name,
         deletable_objects=[deletable_objects],
-        model_count=dict(model_count),
+        model_count=dict(model_count).items(),
         queryset=queryset,
         perms_lacking=perms_needed,
         protected=protected,
         opts=opts,
         action_checkbox_name=helpers.ACTION_CHECKBOX_NAME,
+        media=modeladmin.media,
     )
 
     request.current_app = modeladmin.admin_site.name

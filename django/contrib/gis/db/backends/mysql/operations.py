@@ -4,6 +4,7 @@ from django.contrib.gis.db.backends.base.operations import \
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
 from django.db.backends.mysql.operations import DatabaseOperations
+from django.utils.functional import cached_property
 
 
 class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
@@ -15,7 +16,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     from_text = 'GeomFromText'
 
     Adapter = WKTAdapter
-    Adaptor = Adapter  # Backwards-compatibility alias.
 
     gis_operators = {
         'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
@@ -32,7 +32,31 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         'within': SpatialOperator(func='MBRWithin'),
     }
 
-    disallowed_aggregates = (aggregates.Collect, aggregates.Extent, aggregates.Extent3D, aggregates.MakeLine, aggregates.Union)
+    function_names = {
+        'Difference': 'ST_Difference',
+        'Distance': 'ST_Distance',
+        'Intersection': 'ST_Intersection',
+        'Length': 'GLength',
+        'SymDifference': 'ST_SymDifference',
+        'Union': 'ST_Union',
+    }
+
+    disallowed_aggregates = (
+        aggregates.Collect, aggregates.Extent, aggregates.Extent3D,
+        aggregates.MakeLine, aggregates.Union,
+    )
+
+    @cached_property
+    def unsupported_functions(self):
+        unsupported = {
+            'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG', 'BoundingCircle',
+            'ForceRHR', 'GeoHash', 'MemSize',
+            'Perimeter', 'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid',
+            'Transform', 'Translate',
+        }
+        if self.connection.mysql_version < (5, 6, 1):
+            unsupported.update({'Difference', 'Distance', 'Intersection', 'SymDifference', 'Union'})
+        return unsupported
 
     def geo_db_type(self, f):
         return f.geom_type

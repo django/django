@@ -5,7 +5,9 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.query_utils import Q
-from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
+from django.db.models.sql.constants import (
+    CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
+)
 from django.db.models.sql.query import Query
 from django.utils import six
 
@@ -23,7 +25,8 @@ class DeleteQuery(Query):
     def do_query(self, table, where, using):
         self.tables = [table]
         self.where = where
-        self.get_compiler(using).execute_sql(NO_RESULTS)
+        cursor = self.get_compiler(using).execute_sql(CURSOR)
+        return cursor.rowcount if cursor else 0
 
     def delete_batch(self, pk_list, using, field=None):
         """
@@ -32,13 +35,16 @@ class DeleteQuery(Query):
         More than one physical query may be executed if there are a
         lot of values in pk_list.
         """
+        # number of objects deleted
+        num_deleted = 0
         if not field:
             field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.add_q(Q(
                 **{field.attname + '__in': pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]}))
-            self.do_query(self.get_meta().db_table, self.where, using=using)
+            num_deleted += self.do_query(self.get_meta().db_table, self.where, using=using)
+        return num_deleted
 
     def delete_qs(self, query, using):
         """
@@ -62,9 +68,8 @@ class DeleteQuery(Query):
                 # We can't do the delete using subquery.
                 values = list(query.values_list('pk', flat=True))
                 if not values:
-                    return
-                self.delete_batch(values, using)
-                return
+                    return 0
+                return self.delete_batch(values, using)
             else:
                 innerq.clear_select_clause()
                 innerq.select = [
@@ -73,7 +78,8 @@ class DeleteQuery(Query):
                 values = innerq
             self.where = self.where_class()
             self.add_q(Q(pk__in=values))
-        self.get_compiler(using).execute_sql(NO_RESULTS)
+        cursor = self.get_compiler(using).execute_sql(CURSOR)
+        return cursor.rowcount if cursor else 0
 
 
 class UpdateQuery(Query):
@@ -133,9 +139,9 @@ class UpdateQuery(Query):
 
     def add_update_fields(self, values_seq):
         """
-        Turn a sequence of (field, model, value) triples into an update query.
-        Used by add_update_values() as well as the "fast" update path when
-        saving models.
+        Append a sequence of (field, model, value) triples to the internal list
+        that will be used to generate the UPDATE query. Might be more usefully
+        called add_update_targets() to hint at the extra information here.
         """
         self.values.extend(values_seq)
 

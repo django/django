@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.utils.encoding import smart_text
+from django.utils.functional import cached_property
 from django.utils.six.moves import input
 
 
@@ -28,15 +29,17 @@ class Command(BaseCommand):
         self.post_processed_files = []
         self.storage = staticfiles_storage
         self.style = no_style()
+
+    @cached_property
+    def local(self):
         try:
             self.storage.path('')
         except NotImplementedError:
-            self.local = False
-        else:
-            self.local = True
+            return False
+        return True
 
     def add_arguments(self, parser):
-        parser.add_argument('--noinput',
+        parser.add_argument('--noinput', '--no-input',
             action='store_false', dest='interactive', default=True,
             help="Do NOT prompt the user for input of any kind.")
         parser.add_argument('--no-post-process',
@@ -105,6 +108,14 @@ class Command(BaseCommand):
                 if prefixed_path not in found_files:
                     found_files[prefixed_path] = (storage, path)
                     handler(path, prefixed_path, storage)
+                else:
+                    self.log(
+                        "Found another file with the destination path '%s'. It "
+                        "will be ignored since only the first encountered file "
+                        "is collected. If this is not what you want, make sure "
+                        "every static file has a unique path." % prefixed_path,
+                        level=1,
+                    )
 
         # Here we check if the storage backend has a post_process
         # method and pass it the list of modified files.
@@ -199,6 +210,9 @@ class Command(BaseCommand):
         """
         Deletes the given relative path using the destination storage backend.
         """
+        if not self.storage.exists(path):
+            return
+
         dirs, files = self.storage.listdir(path)
         for f in files:
             fpath = os.path.join(path, f)
@@ -207,7 +221,12 @@ class Command(BaseCommand):
                          smart_text(fpath), level=1)
             else:
                 self.log("Deleting '%s'" % smart_text(fpath), level=1)
-                self.storage.delete(fpath)
+                full_path = self.storage.path(fpath)
+                if not os.path.exists(full_path) and os.path.lexists(full_path):
+                    # Delete broken symlinks
+                    os.unlink(full_path)
+                else:
+                    self.storage.delete(fpath)
         for d in dirs:
             self.clear_dir(os.path.join(path, d))
 

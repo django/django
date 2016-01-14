@@ -4,6 +4,7 @@ YAML serializer.
 Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 """
 
+import collections
 import decimal
 import sys
 from io import StringIO
@@ -29,7 +30,11 @@ class DjangoSafeDumper(SafeDumper):
     def represent_decimal(self, data):
         return self.represent_scalar('tag:yaml.org,2002:str', str(data))
 
+    def represent_ordered_dict(self, data):
+        return self.represent_mapping('tag:yaml.org,2002:map', data.items())
+
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
+DjangoSafeDumper.add_representer(collections.OrderedDict, DjangoSafeDumper.represent_ordered_dict)
 
 
 class Serializer(PythonSerializer):

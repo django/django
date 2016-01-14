@@ -5,11 +5,12 @@ from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.test import TestCase
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
 
 from .models import (
-    Article, Category, Child, First, Parent, Record, Relation, Reporter,
-    School, Student, Third, ToFieldChild,
+    Article, Category, Child, City, District, First, Parent, Record, Relation,
+    Reporter, School, Student, Third, ToFieldChild,
 )
 
 
@@ -57,7 +58,11 @@ class ManyToOneTests(TestCase):
 
         # Create a new article, and add it to the article set.
         new_article2 = Article(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
-        self.r.article_set.add(new_article2)
+        msg = "<Article: Paul's story> instance isn't saved. Use bulk=False or save the object first."
+        with self.assertRaisesMessage(ValueError, msg):
+            self.r.article_set.add(new_article2)
+
+        self.r.article_set.add(new_article2, bulk=False)
         self.assertEqual(new_article2.reporter.id, self.r.id)
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
@@ -119,6 +124,15 @@ class ManyToOneTests(TestCase):
             ])
         self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
 
+    def test_reverse_assignment_deprecation(self):
+        msg = (
+            "Direct assignment to the reverse side of a related set is "
+            "deprecated due to the implicit save() that happens. Use "
+            "article_set.set() instead."
+        )
+        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
+            self.r2.article_set = []
+
     def test_assign(self):
         new_article = self.r.article_set.create(headline="John's second story",
                                                 pub_date=datetime.date(2005, 7, 29))
@@ -137,8 +151,8 @@ class ManyToOneTests(TestCase):
         ])
         self.assertQuerysetEqual(self.r2.article_set.all(), [])
 
-        # Set the article back again using set descriptor.
-        self.r2.article_set = [new_article, new_article2]
+        # Set the article back again using set() method.
+        self.r2.article_set.set([new_article, new_article2])
         self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
         self.assertQuerysetEqual(self.r2.article_set.all(),
             [
@@ -146,9 +160,9 @@ class ManyToOneTests(TestCase):
                 "<Article: Paul's story>",
             ])
 
-        # Funny case - assignment notation can only go so far; because the
-        # ForeignKey cannot be null, existing members of the set must remain.
-        self.r.article_set = [new_article]
+        # Because the ForeignKey cannot be null, existing members of the set
+        # must remain.
+        self.r.article_set.set([new_article])
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
                 "<Article: John's second story>",
@@ -481,10 +495,12 @@ class ManyToOneTests(TestCase):
                                  expected_message % ', '.join(sorted(f.name for f in Reporter._meta.get_fields())),
                                  Article.objects.values_list,
                                  'reporter__notafield')
-        self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(['EXTRA'] + sorted(f.name for f in Article._meta.get_fields())),
-                                 Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
-                                 'notafield')
+        self.assertRaisesMessage(
+            FieldError,
+            expected_message % ', '.join(['EXTRA'] + sorted(f.name for f in Article._meta.get_fields())),
+            Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
+            'notafield'
+        )
 
     def test_fk_assignment_and_related_object_cache(self):
         # Tests of ForeignKey assignment and the related-object cache (see #6886).
@@ -538,15 +554,13 @@ class ManyToOneTests(TestCase):
 
         # Creation using keyword argument and unsaved related instance (#8070).
         p = Parent()
-        with self.assertRaisesMessage(ValueError,
-                'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                % (p, Child.parent.field.rel.to._meta.object_name)):
-            Child(parent=p)
+        msg = "save() prohibited to prevent data loss due to unsaved related object 'parent'."
+        with self.assertRaisesMessage(ValueError, msg):
+            Child.objects.create(parent=p)
 
-        with self.assertRaisesMessage(ValueError,
-                'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                % (p, Child.parent.field.rel.to._meta.object_name)):
-            ToFieldChild(parent=p)
+        msg = "save() prohibited to prevent data loss due to unsaved related object 'parent'."
+        with self.assertRaisesMessage(ValueError, msg):
+            ToFieldChild.objects.create(parent=p)
 
         # Creation using attname keyword argument and an id will cause the
         # related object to be fetched.
@@ -554,6 +568,15 @@ class ManyToOneTests(TestCase):
         c = Child(parent_id=p.id)
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
+
+    def test_fk_to_bigautofield(self):
+        ch = City.objects.create(name='Chicago')
+        District.objects.create(city=ch, name='Far South')
+        District.objects.create(city=ch, name='North')
+
+        ny = City.objects.create(name='New York', id=2 ** 33)
+        District.objects.create(city=ny, name='Brooklyn')
+        District.objects.create(city=ny, name='Manhattan')
 
     def test_multiple_foreignkeys(self):
         # Test of multiple ForeignKeys to the same model (bug #7125).
@@ -584,8 +607,8 @@ class ManyToOneTests(TestCase):
     def test_fk_instantiation_outside_model(self):
         # Regression for #12190 -- Should be able to instantiate a FK outside
         # of a model, and interrogate its related field.
-        cat = models.ForeignKey(Category)
-        self.assertEqual('id', cat.rel.get_related_field().name)
+        cat = models.ForeignKey(Category, models.CASCADE)
+        self.assertEqual('id', cat.remote_field.get_related_field().name)
 
     def test_relation_unsaved(self):
         # Test that the <field>_set manager does not join on Null value fields (#17541)

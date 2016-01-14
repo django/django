@@ -17,7 +17,10 @@ from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.utils import six, timezone
-from django.utils.dateparse import parse_date, parse_duration, parse_time
+from django.utils.dateparse import (
+    parse_date, parse_datetime, parse_duration, parse_time,
+)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeBytes
 
@@ -42,21 +45,21 @@ from .features import DatabaseFeatures                      # isort:skip
 from .introspection import DatabaseIntrospection            # isort:skip
 from .operations import DatabaseOperations                  # isort:skip
 from .schema import DatabaseSchemaEditor                    # isort:skip
-from .utils import parse_datetime_with_timezone_support     # isort:skip
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 
-def adapt_datetime_with_timezone_support(value):
-    # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
-    if settings.USE_TZ:
-        if timezone.is_naive(value):
-            warnings.warn("SQLite received a naive datetime (%s)"
-                          " while time zone support is active." % value,
-                          RuntimeWarning)
-            default_timezone = timezone.get_default_timezone()
-            value = timezone.make_aware(value, default_timezone)
+def adapt_datetime_warn_on_aware_datetime(value):
+    # Remove this function and rely on the default adapter in Django 2.0.
+    if settings.USE_TZ and timezone.is_aware(value):
+        warnings.warn(
+            "The SQLite database adapter received an aware datetime (%s), "
+            "probably from cursor.execute(). Update your code to pass a "
+            "naive datetime in the database connection's time zone (UTC by "
+            "default).", RemovedInDjango20Warning)
+        # This doesn't account for the database connection's timezone,
+        # which isn't known. (That's why this adapter is deprecated.)
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
     return value.isoformat(str(" "))
 
@@ -71,12 +74,12 @@ def decoder(conv_func):
 Database.register_converter(str("bool"), decoder(lambda s: s == '1'))
 Database.register_converter(str("time"), decoder(parse_time))
 Database.register_converter(str("date"), decoder(parse_date))
-Database.register_converter(str("datetime"), decoder(parse_datetime_with_timezone_support))
-Database.register_converter(str("timestamp"), decoder(parse_datetime_with_timezone_support))
-Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime_with_timezone_support))
+Database.register_converter(str("datetime"), decoder(parse_datetime))
+Database.register_converter(str("timestamp"), decoder(parse_datetime))
+Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime))
 Database.register_converter(str("decimal"), decoder(backend_utils.typecast_decimal))
 
-Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
+Database.register_adapter(datetime.datetime, adapt_datetime_warn_on_aware_datetime)
 Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
 if six.PY2:
     Database.register_adapter(str, lambda s: s.decode('utf-8'))
@@ -90,6 +93,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # schema inspection is more useful.
     data_types = {
         'AutoField': 'integer',
+        'BigAutoField': 'integer',
         'BinaryField': 'BLOB',
         'BooleanField': 'bool',
         'CharField': 'varchar(%(max_length)s)',
@@ -117,6 +121,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
     data_types_suffix = {
         'AutoField': 'AUTOINCREMENT',
+        'BigAutoField': 'AUTOINCREMENT',
     }
     # SQLite requires LIKE statements to include an ESCAPE clause if the value
     # being escaped has a percent or underscore in it.
@@ -204,8 +209,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn = Database.connect(**conn_params)
         conn.create_function("django_date_extract", 2, _sqlite_date_extract)
         conn.create_function("django_date_trunc", 2, _sqlite_date_trunc)
+        conn.create_function("django_datetime_cast_date", 2, _sqlite_datetime_cast_date)
         conn.create_function("django_datetime_extract", 3, _sqlite_datetime_extract)
         conn.create_function("django_datetime_trunc", 3, _sqlite_datetime_trunc)
+        conn.create_function("django_time_extract", 2, _sqlite_time_extract)
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
@@ -299,7 +306,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.cursor().execute("BEGIN")
 
     def is_in_memory_db(self, name):
-        return name == ":memory:" or "mode=memory" in name
+        return name == ":memory:" or "mode=memory" in force_text(name)
 
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
@@ -351,7 +358,7 @@ def _sqlite_date_trunc(lookup_type, dt):
         return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
 
 
-def _sqlite_datetime_extract(lookup_type, dt, tzname):
+def _sqlite_datetime_parse(dt, tzname):
     if dt is None:
         return None
     try:
@@ -360,6 +367,20 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
         return None
     if tzname is not None:
         dt = timezone.localtime(dt, pytz.timezone(tzname))
+    return dt
+
+
+def _sqlite_datetime_cast_date(dt, tzname):
+    dt = _sqlite_datetime_parse(dt, tzname)
+    if dt is None:
+        return None
+    return dt.date().isoformat()
+
+
+def _sqlite_datetime_extract(lookup_type, dt, tzname):
+    dt = _sqlite_datetime_parse(dt, tzname)
+    if dt is None:
+        return None
     if lookup_type == 'week_day':
         return (dt.isoweekday() % 7) + 1
     else:
@@ -367,12 +388,9 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
 
 
 def _sqlite_datetime_trunc(lookup_type, dt, tzname):
-    try:
-        dt = backend_utils.typecast_timestamp(dt)
-    except (ValueError, TypeError):
+    dt = _sqlite_datetime_parse(dt, tzname)
+    if dt is None:
         return None
-    if tzname is not None:
-        dt = timezone.localtime(dt, pytz.timezone(tzname))
     if lookup_type == 'year':
         return "%i-01-01 00:00:00" % dt.year
     elif lookup_type == 'month':
@@ -385,6 +403,16 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname):
         return "%i-%02i-%02i %02i:%02i:00" % (dt.year, dt.month, dt.day, dt.hour, dt.minute)
     elif lookup_type == 'second':
         return "%i-%02i-%02i %02i:%02i:%02i" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+
+
+def _sqlite_time_extract(lookup_type, dt):
+    if dt is None:
+        return None
+    try:
+        dt = backend_utils.typecast_time(dt)
+    except (ValueError, TypeError):
+        return None
+    return getattr(dt, lookup_type)
 
 
 def _sqlite_format_dtdelta(conn, lhs, rhs):

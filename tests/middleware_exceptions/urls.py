@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^middleware_exceptions/error/$', views.server_error),
     url(r'^middleware_exceptions/null_view/$', views.null_view),
     url(r'^middleware_exceptions/permission_denied/$', views.permission_denied),
+    url(r'^middleware_exceptions/exception_in_render/$', views.exception_in_render),
 
     url(r'^middleware_exceptions/template_response/$', views.template_response),
     url(r'^middleware_exceptions/template_response_error/$', views.template_response_error),

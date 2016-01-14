@@ -45,8 +45,8 @@ database to match it.
 ``name`` is the model name, as would be written in the ``models.py`` file.
 
 ``fields`` is a list of 2-tuples of ``(field_name, field_instance)``.
-The field instance should be an unbound field (so just ``models.CharField()``,
-rather than a field takes from another model).
+The field instance should be an unbound field (so just
+``models.CharField(...)``, rather than a field taken from another model).
 
 ``options`` is an optional dictionary of values from the model's ``Meta`` class.
 
@@ -59,10 +59,6 @@ inheriting from the standard ``models.Model``.
 ``managers`` takes a list of 2-tuples of ``(manager_name, manager_instance)``.
 The first manager in the list will be the default manager for this model during
 migrations.
-
-.. versionchanged:: 1.8
-
-    The ``managers`` argument was added.
 
 DeleteModel
 -----------
@@ -132,8 +128,6 @@ should be a dictionary mapping option names to values.
 AlterModelManagers
 ------------------
 
-.. versionadded:: 1.8
-
 .. class:: AlterModelManagers(name, managers)
 
 Alters the managers that are available during migrations.
@@ -152,7 +146,7 @@ The ``preserve_default`` argument indicates whether the field's default
 value is permanent and should be baked into the project state (``True``),
 or if it is temporary and just for this migration (``False``) - usually
 because the migration is adding a non-nullable field to a table and needs
-a default value to put into existing rows. It does not effect the behavior
+a default value to put into existing rows. It does not affect the behavior
 of setting defaults in the database directly - Django never sets database
 defaults and always applies them in the Django ORM code.
 
@@ -180,7 +174,7 @@ The ``preserve_default`` argument indicates whether the field's default
 value is permanent and should be baked into the project state (``True``),
 or if it is temporary and just for this migration (``False``) - usually
 because the migration is altering a nullable field to a non-nullable one and
-needs a default value to put into existing rows. It does not effect the
+needs a default value to put into existing rows. It does not affect the
 behavior of setting defaults in the database directly - Django never sets
 database defaults and always applies them in the Django ORM code.
 
@@ -218,34 +212,44 @@ queries and parameters in the same way as :ref:`cursor.execute()
 <executing-custom-sql>`. These three operations are equivalent::
 
     migrations.RunSQL("INSERT INTO musician (name) VALUES ('Reinhardt');")
-    migrations.RunSQL(["INSERT INTO musician (name) VALUES ('Reinhardt');", None])
-    migrations.RunSQL(["INSERT INTO musician (name) VALUES (%s);", ['Reinhardt']])
+    migrations.RunSQL([("INSERT INTO musician (name) VALUES ('Reinhardt');", None)])
+    migrations.RunSQL([("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])])
 
 If you want to include literal percent signs in the query, you have to double
 them if you are passing parameters.
+
+The ``reverse_sql`` queries are executed when the migration is unapplied, so
+you can reverse the changes done in the forwards queries::
+
+    migrations.RunSQL(
+        [("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])],
+        [("DELETE FROM musician where name=%s;", ['Reinhardt'])],
+    )
 
 The ``state_operations`` argument is so you can supply operations that are
 equivalent to the SQL in terms of project state; for example, if you are
 manually creating a column, you should pass in a list containing an ``AddField``
 operation here so that the autodetector still has an up-to-date state of the
 model (otherwise, when you next run ``makemigrations``, it won't see any
-operation that adds that field and so will try to run it again).
+operation that adds that field and so will try to run it again). For example::
+
+    migrations.RunSQL(
+        "ALTER TABLE musician ADD COLUMN name varchar(255) NOT NULL;",
+        state_operations=[
+            migrations.AddField(
+                'musician',
+                'name',
+                models.CharField(max_length=255),
+            ),
+        ],
+    )
 
 The optional ``hints`` argument will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making
 routing decisions. See :ref:`topics-db-multi-db-hints` for more details on
 database hints.
 
-.. versionchanged:: 1.8
-
-    The ability to pass parameters to the ``sql`` and ``reverse_sql`` queries
-    was added.
-
-    The ``hints`` argument was added.
-
 .. attribute:: RunSQL.noop
-
-    .. versionadded:: 1.8
 
     Pass the ``RunSQL.noop`` attribute to ``sql`` or ``reverse_sql`` when you
     want the operation not to do anything in the given direction. This is
@@ -265,14 +269,14 @@ match the operation's place in the project history, and the second is an
 instance of :class:`SchemaEditor
 <django.db.backends.base.schema.BaseDatabaseSchemaEditor>`.
 
+The ``reverse_code`` argument is called when unapplying migrations. This
+callable should undo what is done in the ``code`` callable so that the
+migration is reversible.
+
 The optional ``hints`` argument will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making a
 routing decision. See :ref:`topics-db-multi-db-hints` for more details on
 database hints.
-
-.. versionadded:: 1.8
-
-    The ``hints`` argument was added.
 
 You are advised to write the code as a separate function above the ``Migration``
 class in the migration file, and just pass it to ``RunPython``. Here's an
@@ -280,7 +284,9 @@ example of using ``RunPython`` to create some initial objects on a ``Country``
 model::
 
     # -*- coding: utf-8 -*-
-    from django.db import models, migrations
+    from __future__ import unicode_literals
+
+    from django.db import migrations, models
 
     def forwards_func(apps, schema_editor):
         # We get the model from the versioned app registry;
@@ -292,20 +298,26 @@ model::
             Country(name="France", code="fr"),
         ])
 
+    def reverse_func(apps, schema_editor):
+        # forwards_func() creates two Country instances,
+        # so reverse_func() should delete them.
+        Country = apps.get_model("myapp", "Country")
+        db_alias = schema_editor.connection.alias
+        Country.objects.using(db_alias).filter(name="USA", code="us").delete()
+        Country.objects.using(db_alias).filter(name="France", code="fr").delete()
+
     class Migration(migrations.Migration):
 
         dependencies = []
 
         operations = [
-            migrations.RunPython(
-                forwards_func,
-            ),
+            migrations.RunPython(forwards_func, reverse_func),
         ]
 
 This is generally the operation you would use to create
 :ref:`data migrations <data-migrations>`, run
 custom data updates and alterations, and anything else you need access to an
-ORM and/or python code for.
+ORM and/or Python code for.
 
 If you're upgrading from South, this is basically the South pattern as an
 operation - one or two methods for forwards and backwards, with an ORM and
@@ -322,11 +334,23 @@ or that you use :class:`SeparateDatabaseAndState` to add in operations that will
 reflect your changes to the model state - otherwise, the versioned ORM and
 the autodetector will stop working correctly.
 
-By default, ``RunPython`` will run its contents inside a transaction even
-on databases that do not support DDL transactions (for example, MySQL and
+By default, ``RunPython`` will run its contents inside a transaction on
+databases that do not support DDL transactions (for example, MySQL and
 Oracle). This should be safe, but may cause a crash if you attempt to use
-the ``schema_editor`` provided on these backends; in this case, please
-set ``atomic=False``.
+the ``schema_editor`` provided on these backends; in this case, pass
+``atomic=False`` to the ``RunPython`` operation.
+
+On databases that do support DDL transactions (SQLite and PostgreSQL),
+``RunPython`` operations do not have any transactions automatically added
+besides the transactions created for each migration (the ``atomic`` parameter
+has no effect on these databases). Thus, on PostgreSQL, for example, you should
+avoid combining schema changes and ``RunPython`` operations in the same
+migration or you may hit errors like ``OperationalError: cannot ALTER TABLE
+"mytable" because it has pending trigger events``.
+
+If you have a different database and aren't sure if it supports DDL
+transactions, check the ``django.db.connection.features.can_rollback_ddl``
+attribute.
 
 .. warning::
 
@@ -337,8 +361,6 @@ set ``atomic=False``.
     argument to your function).
 
 .. staticmethod:: RunPython.noop
-
-    .. versionadded:: 1.8
 
     Pass the ``RunPython.noop`` method to ``code`` or ``reverse_code`` when
     you want the operation not to do anything in the given direction. This is
@@ -402,7 +424,8 @@ You can take this template and work from it, though we suggest looking at the
 built-in Django operations in ``django.db.migrations.operations`` - they're
 easy to read and cover a lot of the example usage of semi-internal aspects
 of the migration framework like ``ProjectState`` and the patterns used to get
-historical models.
+historical models, as well as ``ModelState`` and the patterns used to mutate
+historical models in ``state_forwards()``.
 
 Some things to note:
 
@@ -420,6 +443,16 @@ Some things to note:
 * You might see implementations of ``references_model`` on the built-in
   operations; this is part of the autodetection code and does not matter for
   custom operations.
+
+.. warning::
+
+    For performance reasons, the :class:`~django.db.models.Field` instances in
+    ``ModelState.fields`` are reused across migrations. You must never change
+    the attributes on these instances. If you need to mutate a field in
+    ``state_forwards()``, you must remove the old instance from
+    ``ModelState.fields`` and add a new instance in its place. The same is true
+    for the :class:`~django.db.models.Manager` instances in
+    ``ModelState.managers``.
 
 As a simple example, let's make an operation that loads PostgreSQL extensions
 (which contain some of PostgreSQL's more exciting features). It's simple enough;

@@ -11,10 +11,13 @@ class Tags(object):
     Built-in tags for internal checks.
     """
     admin = 'admin'
+    caches = 'caches'
     compatibility = 'compatibility'
     models = 'models'
     security = 'security'
     signals = 'signals'
+    templates = 'templates'
+    urls = 'urls'
 
 
 class CheckRegistry(object):
@@ -38,7 +41,6 @@ class CheckRegistry(object):
                 return errors
             # or
             registry.register(my_check, 'mytag', 'anothertag')
-
         """
         kwargs.setdefault('deploy', False)
 
@@ -59,7 +61,8 @@ class CheckRegistry(object):
             return inner
 
     def run_checks(self, app_configs=None, tags=None, include_deployment_checks=False):
-        """ Run all registered checks and return list of Errors and Warnings.
+        """
+        Run all registered checks and return list of Errors and Warnings.
         """
         errors = []
         checks = self.get_checks(include_deployment_checks)

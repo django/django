@@ -70,7 +70,7 @@ class File(FileProxyMixin):
 
     def chunks(self, chunk_size=None):
         """
-        Read the file and yield chucks of ``chunk_size`` bytes (defaults to
+        Read the file and yield chunks of ``chunk_size`` bytes (defaults to
         ``UploadedFile.DEFAULT_CHUNK_SIZE``).
         """
         if not chunk_size:

@@ -22,23 +22,27 @@ class Command(BaseCommand):
             default=DEFAULT_DB_ALIAS,
             help='Nominates a database onto which the cache tables will be '
             'installed. Defaults to the "default" database.')
+        parser.add_argument('--dry-run', action='store_true', dest='dry_run',
+            help='Does not create the table, just prints the SQL that would '
+            'be run.')
 
     def handle(self, *tablenames, **options):
         db = options.get('database')
         self.verbosity = int(options.get('verbosity'))
+        dry_run = options.get('dry_run')
         if len(tablenames):
             # Legacy behavior, tablename specified as argument
             for tablename in tablenames:
-                self.create_table(db, tablename)
+                self.create_table(db, tablename, dry_run)
         else:
             for cache_alias in settings.CACHES:
                 cache = caches[cache_alias]
                 if isinstance(cache, BaseDatabaseCache):
-                    self.create_table(db, cache._table)
+                    self.create_table(db, cache._table, dry_run)
 
-    def create_table(self, database, tablename):
+    def create_table(self, database, tablename, dry_run):
         cache = BaseDatabaseCache(tablename, {})
-        if not router.allow_migrate(database, cache.cache_model_class):
+        if not router.allow_migrate_model(database, cache.cache_model_class):
             return
         connection = connections[database]
 
@@ -57,8 +61,11 @@ class Command(BaseCommand):
         index_output = []
         qn = connection.ops.quote_name
         for f in fields:
-            field_output = [qn(f.name), f.db_type(connection=connection)]
-            field_output.append("%sNULL" % ("NOT " if not f.null else ""))
+            field_output = [
+                qn(f.name),
+                f.db_type(connection=connection),
+                '%sNULL' % ('NOT ' if not f.null else ''),
+            ]
             if f.primary_key:
                 field_output.append("PRIMARY KEY")
             elif f.unique:
@@ -74,11 +81,19 @@ class Command(BaseCommand):
             full_statement.append('    %s%s' % (line, ',' if i < len(table_output) - 1 else ''))
         full_statement.append(');')
 
+        full_statement = "\n".join(full_statement)
+
+        if dry_run:
+            self.stdout.write(full_statement)
+            for statement in index_output:
+                self.stdout.write(statement)
+            return
+
         with transaction.atomic(using=database,
                                 savepoint=connection.features.can_rollback_ddl):
             with connection.cursor() as curs:
                 try:
-                    curs.execute("\n".join(full_statement))
+                    curs.execute(full_statement)
                 except DatabaseError as e:
                     raise CommandError(
                         "Cache table '%s' could not be created.\nThe error was: %s." %

@@ -3,13 +3,12 @@ import os
 import pickle
 import subprocess
 import sys
-import warnings
 
 from django.core.files.temp import NamedTemporaryFile
 from django.db import DJANGO_VERSION_PICKLE_KEY, models
-from django.test import TestCase
-from django.utils.encoding import force_text
-from django.utils.version import get_major_version, get_version
+from django.test import TestCase, mock
+from django.utils._os import npath, upath
+from django.utils.version import get_version
 
 from .models import Article
 
@@ -30,11 +29,9 @@ class ModelPickleTestCase(TestCase):
                 return reduce_list
 
         p = MissingDjangoVersion(title="FooBar")
-        with warnings.catch_warnings(record=True) as recorded:
+        msg = "Pickled model instance's Django version is not specified."
+        with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(p))
-            msg = force_text(recorded.pop().message)
-            self.assertEqual(msg,
-                "Pickled model instance's Django version is not specified.")
 
     def test_unsupported_unpickle(self):
         """
@@ -47,17 +44,13 @@ class ModelPickleTestCase(TestCase):
             def __reduce__(self):
                 reduce_list = super(DifferentDjangoVersion, self).__reduce__()
                 data = reduce_list[-1]
-                data[DJANGO_VERSION_PICKLE_KEY] = str(float(get_major_version()) - 0.1)
+                data[DJANGO_VERSION_PICKLE_KEY] = '1.0'
                 return reduce_list
 
         p = DifferentDjangoVersion(title="FooBar")
-        with warnings.catch_warnings(record=True) as recorded:
+        msg = "Pickled model instance's Django version 1.0 does not match the current version %s." % get_version()
+        with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(p))
-            msg = force_text(recorded.pop().message)
-            self.assertEqual(msg,
-                "Pickled model instance's Django version %s does not "
-                "match the current version %s."
-                % (str(float(get_major_version()) - 0.1), get_version()))
 
     def test_unpickling_when_appregistrynotready(self):
         """
@@ -80,19 +73,19 @@ print(article.headline)"""
             article_text="This is an article",
         )
 
-        with NamedTemporaryFile(mode='w+', suffix=".py", dir='.') as script:
+        with NamedTemporaryFile(mode='w+', suffix=".py") as script:
             script.write(script_template % pickle.dumps(a))
             script.flush()
-            env = {
-                # Needed to run test outside of tests directory
-                str('PYTHONPATH'): os.pathsep.join(sys.path),
-                # Needed on Windows because http://bugs.python.org/issue8557
-                str('PATH'): os.environ['PATH'],
-            }
-            if 'SYSTEMROOT' in os.environ:  # Windows http://bugs.python.org/issue20614
-                env[str('SYSTEMROOT')] = os.environ['SYSTEMROOT']
-            try:
-                result = subprocess.check_output([sys.executable, script.name], env=env)
-            except subprocess.CalledProcessError:
-                self.fail("Unable to reload model pickled data")
+            # A path to model_regress must be set in PYTHONPATH
+            model_regress_dir = os.path.dirname(upath(__file__))
+            model_regress_path = os.path.abspath(model_regress_dir)
+            tests_path = os.path.split(model_regress_path)[0]
+            pythonpath = os.environ.get('PYTHONPATH', '')
+            pythonpath = npath(os.pathsep.join([tests_path, pythonpath]))
+
+            with mock.patch.dict('os.environ', {'PYTHONPATH': pythonpath}):
+                try:
+                    result = subprocess.check_output([sys.executable, script.name])
+                except subprocess.CalledProcessError:
+                    self.fail("Unable to reload model pickled data")
         self.assertEqual(result.strip().decode(), "Some object")

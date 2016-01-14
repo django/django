@@ -26,7 +26,10 @@ class FeedgeneratorTest(unittest.TestCase):
         numbers.
         """
         self.assertEqual(
-            feedgenerator.get_tag_uri('http://www.example.org:8000/2008/11/14/django#headline', datetime.datetime(2008, 11, 14, 13, 37, 0)),
+            feedgenerator.get_tag_uri(
+                'http://www.example.org:8000/2008/11/14/django#headline',
+                datetime.datetime(2008, 11, 14, 13, 37, 0),
+            ),
             'tag:www.example.org,2008-11-14:/2008/11/14/django/headline')
 
     def test_rfc2822_date(self):
@@ -89,7 +92,7 @@ class FeedgeneratorTest(unittest.TestCase):
         """
         atom_feed = feedgenerator.Atom1Feed("title", "link", "description")
         self.assertEqual(
-            atom_feed.mime_type, "application/atom+xml; charset=utf-8"
+            atom_feed.content_type, "application/atom+xml; charset=utf-8"
         )
 
     def test_rss_mime_type(self):
@@ -98,7 +101,7 @@ class FeedgeneratorTest(unittest.TestCase):
         """
         rss_feed = feedgenerator.Rss201rev2Feed("title", "link", "description")
         self.assertEqual(
-            rss_feed.mime_type, "application/rss+xml; charset=utf-8"
+            rss_feed.content_type, "application/rss+xml; charset=utf-8"
         )
 
     # Two regression tests for #14202

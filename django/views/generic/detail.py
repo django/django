@@ -32,8 +32,8 @@ class SingleObjectMixin(ContextMixin):
             queryset = self.get_queryset()
 
         # Next, try looking up by primary key.
-        pk = self.kwargs.get(self.pk_url_kwarg, None)
-        slug = self.kwargs.get(self.slug_url_kwarg, None)
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        slug = self.kwargs.get(self.slug_url_kwarg)
         if pk is not None:
             queryset = queryset.filter(pk=pk)
 
@@ -89,6 +89,8 @@ class SingleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif isinstance(obj, models.Model):
+            if obj._deferred:
+                obj = obj._meta.proxy_for_model
             return obj._meta.model_name
         else:
             return None
@@ -149,9 +151,12 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # The least-specific option is the default <app>/<model>_detail.html;
             # only use this if the object in question is a model.
             if isinstance(self.object, models.Model):
+                object_meta = self.object._meta
+                if self.object._deferred:
+                    object_meta = self.object._meta.proxy_for_model._meta
                 names.append("%s/%s%s.html" % (
-                    self.object._meta.app_label,
-                    self.object._meta.model_name,
+                    object_meta.app_label,
+                    object_meta.model_name,
                     self.template_name_suffix
                 ))
             elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):

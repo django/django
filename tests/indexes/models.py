@@ -8,17 +8,17 @@ class CurrentTranslation(models.ForeignObject):
     # Avoid validation
     requires_unique_target = False
 
-    def __init__(self, to, from_fields, to_fields, **kwargs):
+    def __init__(self, to, on_delete, from_fields, to_fields, **kwargs):
         # Disable reverse relation
         kwargs['related_name'] = '+'
         # Set unique to enable model cache.
         kwargs['unique'] = True
-        super(CurrentTranslation, self).__init__(to, from_fields, to_fields, **kwargs)
+        super(CurrentTranslation, self).__init__(to, on_delete, from_fields, to_fields, **kwargs)
 
 
 class ArticleTranslation(models.Model):
 
-    article = models.ForeignKey('indexes.Article')
+    article = models.ForeignKey('indexes.Article', models.CASCADE)
     language = models.CharField(max_length=10, unique=True)
     content = models.TextField()
 
@@ -28,7 +28,7 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
 
     # Add virtual relation to the ArticleTranslation model.
-    translation = CurrentTranslation(ArticleTranslation, ['id'], ['article'])
+    translation = CurrentTranslation(ArticleTranslation, models.CASCADE, ['id'], ['article'])
 
     class Meta:
         index_together = [

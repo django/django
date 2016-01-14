@@ -1,14 +1,19 @@
+import logging
 from collections import defaultdict
 
-from django.template.base import (
-    Library, Node, TemplateSyntaxError, TextNode, Variable, token_kwargs,
-)
 from django.utils import six
 from django.utils.safestring import mark_safe
+
+from .base import (
+    Node, Template, TemplateSyntaxError, TextNode, Variable, token_kwargs,
+)
+from .library import Library
 
 register = Library()
 
 BLOCK_CONTEXT_KEY = 'block_context'
+
+logger = logging.getLogger('django.template')
 
 
 class ExtendsError(Exception):
@@ -81,6 +86,7 @@ class BlockNode(Node):
 
 class ExtendsNode(Node):
     must_be_first = True
+    context_key = 'extends_context'
 
     def __init__(self, nodelist, parent_name, template_dirs=None):
         self.nodelist = nodelist
@@ -91,6 +97,39 @@ class ExtendsNode(Node):
     def __repr__(self):
         return '<ExtendsNode: extends %s>' % self.parent_name.token
 
+    def find_template(self, template_name, context):
+        """
+        This is a wrapper around engine.find_template(). A history is kept in
+        the render_context attribute between successive extends calls and
+        passed as the skip argument. This enables extends to work recursively
+        without extending the same template twice.
+        """
+        # RemovedInDjango20Warning: If any non-recursive loaders are installed
+        # do a direct template lookup. If the same template name appears twice,
+        # raise an exception to avoid system recursion.
+        for loader in context.template.engine.template_loaders:
+            if not loader.supports_recursion:
+                history = context.render_context.setdefault(
+                    self.context_key, [context.template.origin.template_name],
+                )
+                if template_name in history:
+                    raise ExtendsError(
+                        "Cannot extend templates recursively when using "
+                        "non-recursive template loaders",
+                    )
+                template = context.template.engine.get_template(template_name)
+                history.append(template_name)
+                return template
+
+        history = context.render_context.setdefault(
+            self.context_key, [context.template.origin],
+        )
+        template, origin = context.template.engine.find_template(
+            template_name, skip=history,
+        )
+        history.append(origin)
+        return template
+
     def get_parent(self, context):
         parent = self.parent_name.resolve(context)
         if not parent:
@@ -100,9 +139,13 @@ class ExtendsNode(Node):
                 error_msg += " Got this from the '%s' variable." %\
                     self.parent_name.token
             raise TemplateSyntaxError(error_msg)
-        if hasattr(parent, 'render'):
-            return parent  # parent is a Template object
-        return context.engine.get_template(parent)
+        if isinstance(parent, Template):
+            # parent is a django.template.Template
+            return parent
+        if isinstance(getattr(parent, 'template', None), Template):
+            # parent is a django.template.backends.django.Template
+            return parent.template
+        return self.find_template(parent, context)
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
@@ -131,6 +174,8 @@ class ExtendsNode(Node):
 
 
 class IncludeNode(Node):
+    context_key = '__include_context'
+
     def __init__(self, template, *args, **kwargs):
         self.template = template
         self.extra_context = kwargs.pop('extra_context', {})
@@ -138,12 +183,22 @@ class IncludeNode(Node):
         super(IncludeNode, self).__init__(*args, **kwargs)
 
     def render(self, context):
+        """
+        Render the specified template and context. Cache the template object
+        in render_context to avoid reparsing and loading when used in a for
+        loop.
+        """
         try:
             template = self.template.resolve(context)
             # Does this quack like a Template?
             if not callable(getattr(template, 'render', None)):
-                # If not, we'll try get_template
-                template = context.engine.get_template(template)
+                # If not, we'll try our cache, and get_template()
+                template_name = template
+                cache = context.render_context.setdefault(self.context_key, {})
+                template = cache.get(template_name)
+                if template is None:
+                    template = context.template.engine.get_template(template_name)
+                    cache[template_name] = template
             values = {
                 name: var.resolve(context)
                 for name, var in six.iteritems(self.extra_context)
@@ -153,8 +208,15 @@ class IncludeNode(Node):
             with context.push(**values):
                 return template.render(context)
         except Exception:
-            if context.engine.debug:
+            if context.template.engine.debug:
                 raise
+            template_name = getattr(context, 'template_name', None) or 'unknown'
+            logger.warning(
+                "Exception raised while rendering {%% include %%} for "
+                "template '%s'. Empty string rendered instead.",
+                template_name,
+                exc_info=True,
+            )
             return ''
 
 

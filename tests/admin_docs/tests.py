@@ -1,3 +1,4 @@
+import datetime
 import sys
 import unittest
 
@@ -6,10 +7,24 @@ from django.contrib.admindocs import utils
 from django.contrib.admindocs.views import get_return_data_type
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
 from django.test import TestCase, modify_settings, override_settings
+from django.test.utils import captured_stderr
+from django.urls import reverse
 
 from .models import Company, Person
+
+
+class TestDataMixin(object):
+
+    @classmethod
+    def setUpTestData(cls):
+        # password = "secret"
+        User.objects.create(
+            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
+            is_staff=True, last_login=datetime.datetime(2007, 5, 30, 13, 20, 10),
+            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
 
 
 @override_settings(
@@ -39,8 +54,7 @@ class MiscTests(AdminDocsTestCase):
 
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
-class AdminDocViewTests(AdminDocsTestCase):
-    fixtures = ['data.xml']
+class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -60,7 +74,7 @@ class AdminDocViewTests(AdminDocsTestCase):
 
     def test_bookmarklets(self):
         response = self.client.get(reverse('django-admindocs-bookmarklets'))
-        self.assertContains(response, 'http://testserver/admin/doc/views/')
+        self.assertContains(response, '/admindocs/views/')
 
     def test_templatetag_index(self):
         response = self.client.get(reverse('django-admindocs-tags'))
@@ -124,8 +138,31 @@ class AdminDocViewTests(AdminDocsTestCase):
             utils.docutils_is_available = True
 
 
-class XViewMiddlewareTest(AdminDocsTestCase):
-    fixtures = ['data.xml']
+@override_settings(TEMPLATES=[{
+    'NAME': 'ONE',
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'APP_DIRS': True,
+}, {
+    'NAME': 'TWO',
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'APP_DIRS': True,
+}])
+@unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
+class AdminDocViewWithMultipleEngines(AdminDocViewTests):
+    def test_templatefilter_index(self):
+        # Overridden because non-trivial TEMPLATES settings aren't supported
+        # but the page shouldn't crash (#24125).
+        response = self.client.get(reverse('django-admindocs-filters'))
+        self.assertContains(response, '<title>Template filters</title>', html=True)
+
+    def test_templatetag_index(self):
+        # Overridden because non-trivial TEMPLATES settings aren't supported
+        # but the page shouldn't crash (#24125).
+        response = self.client.get(reverse('django-admindocs-tags'))
+        self.assertContains(response, '<title>Template tags</title>', html=True)
+
+
+class XViewMiddlewareTest(TestDataMixin, AdminDocsTestCase):
 
     def test_xview_func(self):
         user = User.objects.get(username='super')
@@ -169,7 +206,7 @@ class DefaultRoleTest(AdminDocsTestCase):
 
     def test_parse_rst(self):
         """
-        Tests that ``django.contrib.admindocs.utils.parse_rst`` uses
+        ``django.contrib.admindocs.utils.parse_rst`` should use
         ``cmsreference`` as the default role.
         """
         markup = ('<p><a class="reference external" href="/admindocs/%s">'
@@ -187,7 +224,7 @@ class DefaultRoleTest(AdminDocsTestCase):
 
     def test_publish_parts(self):
         """
-        Tests that Django hasn't broken the default role for interpreted text
+        Django shouldn't break the default role for interpreted text
         when ``publish_parts`` is used directly, by setting it to
         ``cmsreference``. See #6681.
         """
@@ -201,24 +238,21 @@ class DefaultRoleTest(AdminDocsTestCase):
 
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
-class TestModelDetailView(AdminDocsTestCase):
+class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
     """
     Tests that various details render correctly
     """
 
-    fixtures = ['data.xml']
-
     def setUp(self):
         self.client.login(username='super', password='secret')
-        self.response = self.client.get(
-            reverse('django-admindocs-models-detail',
-                    args=['admin_docs', 'person']))
+        with captured_stderr() as self.docutils_stderr:
+            self.response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'Person']))
 
     def test_method_excludes(self):
         """
-        Test that methods that begin with strings defined in
+        Methods that begin with strings defined in
         ``django.contrib.admindocs.views.MODEL_METHODS_EXCLUDE``
-        do not get displayed in the admin docs
+        should not get displayed in the admin docs.
         """
         self.assertContains(self.response, "<td>get_full_name</td>")
         self.assertNotContains(self.response, "<td>_get_full_name</td>")
@@ -226,6 +260,34 @@ class TestModelDetailView(AdminDocsTestCase):
         self.assertNotContains(self.response, "<td>delete_image</td>")
         self.assertNotContains(self.response, "<td>set_status</td>")
         self.assertNotContains(self.response, "<td>save_changes</td>")
+
+    def test_methods_with_arguments(self):
+        """
+        Methods that take arguments should also displayed.
+        """
+        self.assertContains(self.response, "<h3>Methods with arguments</h3>")
+        self.assertContains(self.response, "<td>rename_company</td>")
+        self.assertContains(self.response, "<td>dummy_function</td>")
+        self.assertContains(self.response, "<td>suffix_company_name</td>")
+
+    def test_methods_with_arguments_display_arguments(self):
+        """
+        Methods with arguments should have their arguments displayed.
+        """
+        self.assertContains(self.response, "<td>new_name</td>")
+
+    def test_methods_with_arguments_display_arguments_default_value(self):
+        """
+        Methods with keyword arguments should have their arguments displayed.
+        """
+        self.assertContains(self.response, "<td>suffix=&#39;ltd&#39;</td>")
+
+    def test_methods_with_multiple_arguments_display_arguments(self):
+        """
+        Methods with multiple arguments should have all their arguments
+        displayed, but omitting 'self'.
+        """
+        self.assertContains(self.response, "<td>baz, rox, *some_args, **some_kwargs</td>")
 
     def test_method_data_types(self):
         """
@@ -280,6 +342,29 @@ class TestModelDetailView(AdminDocsTestCase):
             "all related %s objects" % (link % ("admin_docs.group", "admin_docs.Group"))
         )
 
+        # "raw" and "include" directives are disabled
+        self.assertContains(self.response, '<p>&quot;raw&quot; directive disabled.</p>',)
+        self.assertContains(self.response, '.. raw:: html\n    :file: admin_docs/evilfile.txt')
+        self.assertContains(self.response, '<p>&quot;include&quot; directive disabled.</p>',)
+        self.assertContains(self.response, '.. include:: admin_docs/evilfile.txt')
+        out = self.docutils_stderr.getvalue()
+        self.assertIn('"raw" directive disabled', out)
+        self.assertIn('"include" directive disabled', out)
+
+    def test_model_with_many_to_one(self):
+        link = '<a class="reference external" href="/admindocs/models/%s/">%s</a>'
+        response = self.client.get(
+            reverse('django-admindocs-models-detail', args=['admin_docs', 'company'])
+        )
+        self.assertContains(
+            response,
+            "number of related %s objects" % (link % ("admin_docs.person", "admin_docs.Person"))
+        )
+        self.assertContains(
+            response,
+            "all related %s objects" % (link % ("admin_docs.person", "admin_docs.Person"))
+        )
+
     def test_model_with_no_backward_relations_render_only_relevant_fields(self):
         """
         A model with ``related_name`` of `+` should not show backward relationship
@@ -311,6 +396,9 @@ class TestModelDetailView(AdminDocsTestCase):
         self.assertContains(self.response, body, html=True)
         self.assertContains(self.response, model_body, html=True)
 
+    def test_model_detail_title(self):
+        self.assertContains(self.response, '<h1>admin_docs.Person</h1>', html=True)
+
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class TestUtils(AdminDocsTestCase):
@@ -332,7 +420,6 @@ class TestUtils(AdminDocsTestCase):
     :template:`myapp/my_template.html` (DESCRIPTION)
 
     some_metadata: some data
-
     """
 
     def setUp(self):
@@ -398,3 +485,8 @@ class TestUtils(AdminDocsTestCase):
             '</p>\n'
         )
         self.assertHTMLEqual(description_output, description_rendered)
+
+    def test_initial_header_level(self):
+        header = 'should be h3...\n\nHeader\n------\n'
+        output = utils.parse_rst(header, 'header')
+        self.assertIn('<h3>Header</h3>', output)

@@ -35,8 +35,8 @@ class Article(models.Model):
 
 @python_2_unicode_compatible
 class Writer(models.Model):
-    reporter = models.ForeignKey(Reporter)
-    article = models.ForeignKey(Article)
+    reporter = models.ForeignKey(Reporter, models.CASCADE)
+    article = models.ForeignKey(Article, models.CASCADE)
     position = models.CharField(max_length=100)
 
     def __str__(self):

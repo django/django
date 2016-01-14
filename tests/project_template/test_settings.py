@@ -1,11 +1,11 @@
-import sys
 import unittest
 
 from django.test import TestCase
+from django.utils import six
 
 
-@unittest.skipIf(sys.version_info < (3, 3),
-    'Python < 3.3 cannot import the project template because '
+@unittest.skipIf(six.PY2,
+    'Python 2 cannot import the project template because '
     'django/conf/project_template doesn\'t have an __init__.py file.')
 class TestStartProjectSettings(TestCase):
 

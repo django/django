@@ -66,6 +66,12 @@ class BaseCustomManager(models.Manager):
 CustomManager = BaseCustomManager.from_queryset(CustomQuerySet)
 
 
+class CustomInitQuerySet(models.QuerySet):
+    # QuerySet with an __init__() method that takes an additional argument.
+    def __init__(self, custom_optional_arg=None, model=None, query=None, using=None, hints=None):
+        super(CustomInitQuerySet, self).__init__(model=model, query=query, using=using, hints=hints)
+
+
 class DeconstructibleCustomManager(BaseCustomManager.from_queryset(CustomQuerySet)):
 
     def __init__(self, a, b, c=1, d=2):
@@ -88,8 +94,8 @@ class Person(models.Model):
     last_name = models.CharField(max_length=30)
     fun = models.BooleanField(default=False)
 
-    favorite_book = models.ForeignKey('Book', null=True, related_name='favorite_books')
-    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
+    favorite_book = models.ForeignKey('Book', models.SET_NULL, null=True, related_name='favorite_books')
+    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', models.SET_NULL, null=True)
     favorite_thing_id = models.IntegerField(null=True)
     favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
 
@@ -99,6 +105,7 @@ class Person(models.Model):
 
     custom_queryset_default_manager = CustomQuerySet.as_manager()
     custom_queryset_custom_manager = CustomManager('hello')
+    custom_init_queryset_manager = CustomInitQuerySet.as_manager()
 
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
@@ -110,8 +117,13 @@ class FunPerson(models.Model):
     last_name = models.CharField(max_length=30)
     fun = models.BooleanField(default=True)
 
-    favorite_book = models.ForeignKey('Book', null=True, related_name='fun_people_favorite_books')
-    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
+    favorite_book = models.ForeignKey(
+        'Book',
+        models.SET_NULL,
+        null=True,
+        related_name='fun_people_favorite_books',
+    )
+    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', models.SET_NULL, null=True)
     favorite_thing_id = models.IntegerField(null=True)
     favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
 
@@ -174,7 +186,7 @@ class RelatedModel(models.Model):
 class RestrictedModel(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)
-    related = models.ForeignKey(RelatedModel)
+    related = models.ForeignKey(RelatedModel, models.CASCADE)
 
     objects = RestrictedManager()
     plain_manager = models.Manager()
@@ -187,10 +199,22 @@ class RestrictedModel(models.Model):
 class OneToOneRestrictedModel(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)
-    related = models.OneToOneField(RelatedModel)
+    related = models.OneToOneField(RelatedModel, models.CASCADE)
 
     objects = RestrictedManager()
     plain_manager = models.Manager()
 
     def __str__(self):
         return self.name
+
+
+class AbstractPerson(models.Model):
+    abstract_persons = models.Manager()
+    objects = models.CharField(max_length=30)
+
+    class Meta:
+        abstract = True
+
+
+class PersonFromAbstract(AbstractPerson):
+    pass

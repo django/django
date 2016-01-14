@@ -15,7 +15,7 @@ Django provides two convenient ways to access the current storage class:
     :setting:`DEFAULT_FILE_STORAGE`. :class:`DefaultStorage` uses
     :func:`~django.core.files.storage.get_storage_class` internally.
 
-.. function:: get_storage_class([import_path=None])
+.. function:: get_storage_class(import_path=None)
 
     Returns a class or module which implements the storage API.
 
@@ -29,7 +29,7 @@ Django provides two convenient ways to access the current storage class:
 The FileSystemStorage Class
 ---------------------------
 
-.. class:: FileSystemStorage([location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None])
+.. class:: FileSystemStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None)
 
     The :class:`~django.core.files.storage.FileSystemStorage` class implements
     basic file storage on a local filesystem. It inherits from
@@ -118,10 +118,6 @@ The Storage Class
         7 character alphanumeric string is appended to the filename before
         the extension.
 
-        .. versionchanged:: 1.8
-
-            The ``max_length`` argument was added.
-
     .. method:: get_valid_name(name)
 
         Returns a filename based on the ``name`` parameter that's suitable
@@ -167,10 +163,6 @@ The Storage Class
         The ``content`` argument must be an instance of
         :class:`django.core.files.File` or of a subclass of
         :class:`~django.core.files.File`.
-
-        .. versionchanged:: 1.8
-
-            The ``max_length`` argument was added.
 
     .. method:: size(name)
 

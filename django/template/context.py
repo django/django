@@ -1,12 +1,8 @@
-import warnings
+from contextlib import contextmanager
 from copy import copy
-
-from django.utils.deprecation import RemovedInDjango20Warning
 
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ('django.template.context_processors.csrf',)
-
-_current_app_undefined = object()
 
 
 class ContextPopException(Exception):
@@ -51,7 +47,13 @@ class BaseContext(object):
             yield d
 
     def push(self, *args, **kwargs):
-        return ContextDict(self, *args, **kwargs)
+        dicts = []
+        for d in args:
+            if isinstance(d, BaseContext):
+                dicts += d.dicts[1:]
+            else:
+                dicts.append(d)
+        return ContextDict(self, *dicts, **kwargs)
 
     def pop(self):
         if len(self.dicts) == 1:
@@ -88,6 +90,13 @@ class BaseContext(object):
                 return d[key]
         return otherwise
 
+    def setdefault(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            self[key] = default
+        return default
+
     def new(self, values=None):
         """
         Returns a new context with the same properties, but with only the
@@ -121,25 +130,26 @@ class BaseContext(object):
 
 class Context(BaseContext):
     "A stack container for variable context"
-    def __init__(self, dict_=None, autoescape=True,
-            current_app=_current_app_undefined,
-            use_l10n=None, use_tz=None, engine=None):
-        if current_app is not _current_app_undefined:
-            warnings.warn(
-                "The current_app argument of Context is deprecated. Use "
-                "RequestContext and set the current_app attribute of its "
-                "request instead.", RemovedInDjango20Warning, stacklevel=2)
+    def __init__(self, dict_=None, autoescape=True, use_l10n=None, use_tz=None):
         self.autoescape = autoescape
-        self._current_app = current_app
         self.use_l10n = use_l10n
         self.use_tz = use_tz
-        self.engine = engine
+        self.template_name = "unknown"
         self.render_context = RenderContext()
+        # Set to the original template -- as opposed to extended or included
+        # templates -- during rendering, see bind_template.
+        self.template = None
         super(Context, self).__init__(dict_)
 
-    @property
-    def current_app(self):
-        return None if self._current_app is _current_app_undefined else self._current_app
+    @contextmanager
+    def bind_template(self, template):
+        if self.template is not None:
+            raise RuntimeError("Context is already bound to a template")
+        self.template = template
+        try:
+            yield
+        finally:
+            self.template = None
 
     def __copy__(self):
         duplicate = super(Context, self).__copy__()
@@ -150,8 +160,9 @@ class Context(BaseContext):
         "Pushes other_dict to the stack of dictionaries in the Context"
         if not hasattr(other_dict, '__getitem__'):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
-        self.dicts.append(other_dict)
-        return other_dict
+        if isinstance(other_dict, BaseContext):
+            other_dict = other_dict.dicts[1:].pop()
+        return ContextDict(self, other_dict)
 
 
 class RenderContext(BaseContext):
@@ -190,42 +201,40 @@ class RequestContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
-    def __init__(self, request, dict_=None, processors=None,
-            current_app=_current_app_undefined,
-            use_l10n=None, use_tz=None, engine=None):
-        # current_app isn't passed here to avoid triggering the deprecation
-        # warning in Context.__init__.
+    def __init__(self, request, dict_=None, processors=None, use_l10n=None, use_tz=None, autoescape=True):
         super(RequestContext, self).__init__(
-            dict_, use_l10n=use_l10n, use_tz=use_tz, engine=engine)
-        if current_app is not _current_app_undefined:
-            warnings.warn(
-                "The current_app argument of RequestContext is deprecated. "
-                "Set the current_app attribute of its request instead.",
-                RemovedInDjango20Warning, stacklevel=2)
-        self._current_app = current_app
+            dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
         self.request = request
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)
-        self.update({})         # placeholder for context processors output
-        self.engine = engine    # re-run the setter in case engine is not None
 
-    @property
-    def engine(self):
-        return self._engine
+        # placeholder for context processors output
+        self.update({})
 
-    @engine.setter
-    def engine(self, engine):
-        self._engine = engine
-        if hasattr(self, '_processors_index'):
-            if engine is None:
-                # Unset context processors.
-                self.dicts[self._processors_index] = {}
-            else:
-                # Set context processors for this engine.
-                updates = {}
-                for processor in engine.template_context_processors + self._processors:
-                    updates.update(processor(self.request))
-                self.dicts[self._processors_index] = updates
+        # empty dict for any new modifications
+        # (so that context processors don't overwrite them)
+        self.update({})
+
+    @contextmanager
+    def bind_template(self, template):
+        if self.template is not None:
+            raise RuntimeError("Context is already bound to a template")
+
+        self.template = template
+        # Set context processors according to the template engine's settings.
+        processors = (template.engine.template_context_processors +
+                      self._processors)
+        updates = {}
+        for processor in processors:
+            updates.update(processor(self.request))
+        self.dicts[self._processors_index] = updates
+
+        try:
+            yield
+        finally:
+            self.template = None
+            # Unset context processors.
+            self.dicts[self._processors_index] = {}
 
     def new(self, values=None):
         new_context = super(RequestContext, self).new(values)
@@ -234,3 +243,19 @@ class RequestContext(Context):
         if hasattr(new_context, '_processors_index'):
             del new_context._processors_index
         return new_context
+
+
+def make_context(context, request=None, **kwargs):
+    """
+    Create a suitable Context from a plain dict and optionally an HttpRequest.
+    """
+    if request is None:
+        context = Context(context, **kwargs)
+    else:
+        # The following pattern is required to ensure values from
+        # context override those from template context processors.
+        original_context = context
+        context = RequestContext(request, **kwargs)
+        if original_context:
+            context.push(original_context)
+    return context

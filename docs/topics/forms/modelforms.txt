@@ -49,67 +49,74 @@ Each model field has a corresponding default form field. For example, a
 ``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is the
 full list of conversions:
 
-===============================  ========================================
-Model field                      Form field
-===============================  ========================================
-``AutoField``                    Not represented in the form
+.. currentmodule:: django.db.models
 
-``BigIntegerField``              ``IntegerField`` with ``min_value`` set
-                                 to -9223372036854775808 and ``max_value``
-                                 set to 9223372036854775807.
+=================================== ==================================================
+Model field                         Form field
+=================================== ==================================================
+:class:`AutoField`                  Not represented in the form
 
-``BooleanField``                 ``BooleanField``
+:class:`BigAutoField`               Not represented in the form
 
-``CharField``                    ``CharField`` with ``max_length`` set to
-                                 the model field's ``max_length``
+:class:`BigIntegerField`            :class:`~django.forms.IntegerField` with
+                                    ``min_value`` set to -9223372036854775808
+                                    and ``max_value`` set to 9223372036854775807.
 
-``CommaSeparatedIntegerField``   ``CharField``
+:class:`BooleanField`               :class:`~django.forms.BooleanField`
 
-``DateField``                    ``DateField``
+:class:`CharField`                  :class:`~django.forms.CharField` with
+                                    ``max_length`` set to the model field's
+                                    ``max_length``
 
-``DateTimeField``                ``DateTimeField``
+:class:`CommaSeparatedIntegerField` :class:`~django.forms.CharField`
 
-``DecimalField``                 ``DecimalField``
+:class:`DateField`                  :class:`~django.forms.DateField`
 
-``EmailField``                   ``EmailField``
+:class:`DateTimeField`              :class:`~django.forms.DateTimeField`
 
-``FileField``                    ``FileField``
+:class:`DecimalField`               :class:`~django.forms.DecimalField`
 
-``FilePathField``                ``FilePathField``
+:class:`EmailField`                 :class:`~django.forms.EmailField`
 
-``FloatField``                   ``FloatField``
+:class:`FileField`                  :class:`~django.forms.FileField`
 
-``ForeignKey``                   ``ModelChoiceField`` (see below)
+:class:`FilePathField`              :class:`~django.forms.FilePathField`
 
-``ImageField``                   ``ImageField``
+:class:`FloatField`                 :class:`~django.forms.FloatField`
 
-``IntegerField``                 ``IntegerField``
+:class:`ForeignKey`                 :class:`~django.forms.ModelChoiceField`
+                                    (see below)
 
-``IPAddressField``               ``IPAddressField``
+``ImageField``                      :class:`~django.forms.ImageField`
 
-``GenericIPAddressField``        ``GenericIPAddressField``
+:class:`IntegerField`               :class:`~django.forms.IntegerField`
 
-``ManyToManyField``              ``ModelMultipleChoiceField`` (see
-                                 below)
+``IPAddressField``                  ``IPAddressField``
 
-``NullBooleanField``             ``CharField``
+:class:`GenericIPAddressField`      :class:`~django.forms.GenericIPAddressField`
 
-``PositiveIntegerField``         ``IntegerField``
+:class:`ManyToManyField`            :class:`~django.forms.ModelMultipleChoiceField`
+                                    (see below)
 
-``PositiveSmallIntegerField``    ``IntegerField``
+:class:`NullBooleanField`           :class:`~django.forms.NullBooleanField`
 
-``SlugField``                    ``SlugField``
+:class:`PositiveIntegerField`       :class:`~django.forms.IntegerField`
 
-``SmallIntegerField``            ``IntegerField``
+:class:`PositiveSmallIntegerField`  :class:`~django.forms.IntegerField`
 
-``TextField``                    ``CharField`` with
-                                 ``widget=forms.Textarea``
+:class:`SlugField`                  :class:`~django.forms.SlugField`
 
-``TimeField``                    ``TimeField``
+:class:`SmallIntegerField`          :class:`~django.forms.IntegerField`
 
-``URLField``                     ``URLField``
-===============================  ========================================
+:class:`TextField`                  :class:`~django.forms.CharField` with
+                                    ``widget=forms.Textarea``
 
+:class:`TimeField`                  :class:`~django.forms.TimeField`
+
+:class:`URLField`                   :class:`~django.forms.URLField`
+=================================== ==================================================
+
+.. currentmodule:: django.forms
 
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
 types are special cases:
@@ -232,7 +239,7 @@ Overriding the clean() method
 You can override the ``clean()`` method on a model form to provide additional
 validation in the same way you can on a normal form.
 
-A model form instance bound to a model object will contain an ``instance``
+A model form instance attached to a model object will contain an ``instance``
 attribute that gives its methods access to that specific model instance.
 
 .. warning::
@@ -431,12 +438,6 @@ In addition, Django applies the following rule: if you set ``editable=False`` on
 the model field, *any* form created from the model via ``ModelForm`` will not
 include that field.
 
-.. versionchanged:: 1.8
-
-    In older versions, omitting both ``fields`` and ``exclude`` resulted in
-    a form with all the model's fields. Doing this now raises an
-    :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
-
 .. note::
 
     Any fields not included in a form by the above logic
@@ -475,9 +476,8 @@ Overriding the default fields
 
 The default field types, as described in the `Field types`_ table above, are
 sensible defaults. If you have a ``DateField`` in your model, chances are you'd
-want that to be represented as a ``DateField`` in your form. But
-``ModelForm`` gives you the flexibility of changing the form field type and
-widget for a given model field.
+want that to be represented as a ``DateField`` in your form. But ``ModelForm``
+gives you the flexibility of changing the form field for a given model.
 
 To specify a custom widget for a field, use the ``widgets`` attribute of the
 inner ``Meta`` class. This should be a dictionary mapping field names to widget
@@ -525,9 +525,8 @@ the ``name`` field::
                 },
             }
 
-Finally, if you want complete control over of a field -- including its type,
-validators, etc. -- you can do this by declaratively specifying fields like you
-would in a regular ``Form``.
+You can also specify ``field_classes`` to customize the type of fields
+instantiated by the form.
 
 For example, if you wanted to use ``MySlugFormField`` for the ``slug``
 field, you could do the following::
@@ -536,12 +535,17 @@ field, you could do the following::
     from myapp.models import Article
 
     class ArticleForm(ModelForm):
-        slug = MySlugFormField()
-
         class Meta:
             model = Article
             fields = ['pub_date', 'headline', 'content', 'reporter', 'slug']
+            field_classes = {
+                'slug': MySlugFormField,
+            }
 
+
+Finally, if you want complete control over of a field -- including its type,
+validators, required, etc. -- you can do this by declaratively specifying
+fields like you would in a regular ``Form``.
 
 If you want to specify a field's validators, you can do so by defining
 the field declaratively and setting its ``validators`` parameter::
@@ -555,6 +559,10 @@ the field declaratively and setting its ``validators`` parameter::
         class Meta:
             model = Article
             fields = ['pub_date', 'headline', 'content', 'reporter', 'slug']
+
+.. versionadded:: 1.9
+
+    The ``Meta.field_classes`` attribute was added.
 
 .. note::
 
@@ -667,6 +675,21 @@ There are a couple of things to note, however.
   a default field. To opt-out from default fields, see
   :ref:`modelforms-selecting-fields`.
 
+Providing initial values
+------------------------
+
+As with regular forms, it's possible to specify initial data for forms by
+specifying an ``initial`` parameter when instantiating the form. Initial
+values provided this way will override both initial values from the form field
+and values from an attached model instance. For example::
+
+    >>> article = Article.objects.get(pk=1)
+    >>> article.headline
+    'My headline'
+    >>> form = ArticleForm(initial={'headline': 'Initial headline'}, instance=article)
+    >>> form['headline'].value()
+    'Initial headline'
+
 .. _modelforms-factory:
 
 ModelForm factory function
@@ -677,7 +700,7 @@ You can create forms from a given model using the standalone function
 definition. This may be more convenient if you do not have many customizations
 to make::
 
-    >>> from django.forms.models import modelform_factory
+    >>> from django.forms import modelform_factory
     >>> from myapp.models import Book
     >>> BookForm = modelform_factory(Book, fields=("author", "title"))
 
@@ -708,7 +731,7 @@ Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
 of enhanced formset classes that make it easy to work with Django models. Let's
 reuse the ``Author`` model from above::
 
-    >>> from django.forms.models import modelformset_factory
+    >>> from django.forms import modelformset_factory
     >>> from myapp.models import Author
     >>> AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
 
@@ -717,12 +740,6 @@ Alternatively, you can take an "opt-out" approach, specifying which fields to
 exclude::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
-
-.. versionchanged:: 1.8
-
-    In older versions, omitting both ``fields`` and ``exclude`` resulted in
-    a formset with all the model's fields. Doing this now raises an
-    :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
 This will create a formset that is capable of working with the data associated
 with the ``Author`` model. It works just like a regular formset::
@@ -758,7 +775,7 @@ queryset that includes all objects in the model (e.g.,
 Alternatively, you can create a subclass that sets ``self.queryset`` in
 ``__init__``::
 
-    from django.forms.models import BaseModelFormSet
+    from django.forms import BaseModelFormSet
     from myapp.models import Author
 
     class BaseAuthorFormSet(BaseModelFormSet):
@@ -833,8 +850,9 @@ As with regular formsets, it's possible to :ref:`specify initial data
 <formsets-initial-data>` for forms in the formset by specifying an ``initial``
 parameter when instantiating the model formset class returned by
 :func:`~django.forms.models.modelformset_factory`. However, with model
-formsets, the initial values only apply to extra forms, those that aren't bound
-to an existing object instance.
+formsets, the initial values only apply to extra forms, those that aren't
+attached to an existing model instance. If the extra forms with initial data
+aren't changed by the user, they won't be validated or saved.
 
 .. _saving-objects-in-the-formset:
 
@@ -896,7 +914,7 @@ extra forms displayed.
 ``max_num`` does not prevent existing objects from being displayed::
 
     >>> Author.objects.order_by('name')
-    [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]
+    <QuerySet [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]>
 
     >>> AuthorFormSet = modelformset_factory(Author, fields=('name',), max_num=1)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
@@ -925,8 +943,8 @@ Using a model formset in a view
 Model formsets are very similar to formsets. Let's say we want to present a
 formset to edit ``Author`` model instances::
 
-    from django.forms.models import modelformset_factory
-    from django.shortcuts import render_to_response
+    from django.forms import modelformset_factory
+    from django.shortcuts import render
     from myapp.models import Author
 
     def manage_authors(request):
@@ -938,9 +956,7 @@ formset to edit ``Author`` model instances::
                 # do something.
         else:
             formset = AuthorFormSet()
-        return render_to_response("manage_authors.html", {
-            "formset": formset,
-        })
+        return render(request, 'manage_authors.html', {'formset': formset})
 
 As you can see, the view logic of a model formset isn't drastically different
 than that of a "normal" formset. The only difference is that we call
@@ -959,7 +975,7 @@ the unique constraints on your model (either ``unique``, ``unique_together`` or
 on a ``ModelFormSet`` and maintain this validation, you must call the parent
 class's ``clean`` method::
 
-    from django.forms.models import BaseModelFormSet
+    from django.forms import BaseModelFormSet
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
@@ -975,7 +991,7 @@ have already been created for each ``Form``. Modifying a value in
 to modify a value in ``ModelFormSet.clean()`` you must modify
 ``form.instance``::
 
-    from django.forms.models import BaseModelFormSet
+    from django.forms import BaseModelFormSet
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
@@ -993,8 +1009,8 @@ Using a custom queryset
 As stated earlier, you can override the default queryset used by the model
 formset::
 
-    from django.forms.models import modelformset_factory
-    from django.shortcuts import render_to_response
+    from django.forms import modelformset_factory
+    from django.shortcuts import render
     from myapp.models import Author
 
     def manage_authors(request):
@@ -1007,9 +1023,7 @@ formset::
                 # Do something.
         else:
             formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
-        return render_to_response("manage_authors.html", {
-            "formset": formset,
-        })
+        return render(request, 'manage_authors.html', {'formset': formset})
 
 Note that we pass the ``queryset`` argument in both the ``POST`` and ``GET``
 cases in this example.
@@ -1091,13 +1105,13 @@ you have these two models::
         name = models.CharField(max_length=100)
 
     class Book(models.Model):
-        author = models.ForeignKey(Author)
+        author = models.ForeignKey(Author, on_delete=models.CASCADE)
         title = models.CharField(max_length=100)
 
 If you want to create a formset that allows you to edit books belonging to
 a particular author, you could do this::
 
-    >>> from django.forms.models import inlineformset_factory
+    >>> from django.forms import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book, fields=('title',))
     >>> author = Author.objects.get(name='Mike Royko')
     >>> formset = BookFormSet(instance=author)
@@ -1121,7 +1135,7 @@ When overriding methods on ``InlineFormSet``, you should subclass
 
 For example, if you want to override ``clean()``::
 
-    from django.forms.models import BaseInlineFormSet
+    from django.forms import BaseInlineFormSet
 
     class CustomInlineFormSet(BaseInlineFormSet):
         def clean(self):
@@ -1136,7 +1150,7 @@ See also :ref:`model-formsets-overriding-clean`.
 Then when you create your inline formset, pass in the optional argument
 ``formset``::
 
-    >>> from django.forms.models import inlineformset_factory
+    >>> from django.forms import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book, fields=('title',),
     ...     formset=CustomInlineFormSet)
     >>> author = Author.objects.get(name='Mike Royko')
@@ -1150,8 +1164,16 @@ need to resolve the ambiguity manually using ``fk_name``. For example, consider
 the following model::
 
     class Friendship(models.Model):
-        from_friend = models.ForeignKey(Friend, related_name='from_friends')
-        to_friend = models.ForeignKey(Friend, related_name='friends')
+        from_friend = models.ForeignKey(
+            Friend,
+            on_delete=models.CASCADE,
+            related_name='from_friends',
+        )
+        to_friend = models.ForeignKey(
+            Friend,
+            on_delete=models.CASCADE,
+            related_name='friends',
+        )
         length_in_months = models.IntegerField()
 
 To resolve this, you can use ``fk_name`` to
@@ -1177,9 +1199,7 @@ of a model. Here's how you can do that::
                 return HttpResponseRedirect(author.get_absolute_url())
         else:
             formset = BookInlineFormSet(instance=author)
-        return render_to_response("manage_books.html", {
-            "formset": formset,
-        })
+        return render(request, 'manage_books.html', {'formset': formset})
 
 Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
 

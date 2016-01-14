@@ -1,22 +1,23 @@
 from __future__ import unicode_literals
 
 import logging
+import logging.config  # needed when logging_config doesn't start with logging.config
 import sys
 import warnings
+from copy import copy
 
 from django.conf import settings
 from django.core import mail
 from django.core.mail import get_connection
+from django.core.management.color import color_style
 from django.utils.deprecation import RemovedInNextVersionWarning
-from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.views.debug import ExceptionReporter, get_exception_reporter_filter
-
-getLogger = logging.getLogger
+from django.views.debug import ExceptionReporter
 
 # Default logging for Django. This sends an email to the site admins on every
 # HTTP 500 error. Depending on DEBUG, all other log records are either sent to
-# the console (DEBUG=True) or discarded by mean of the NullHandler (DEBUG=False).
+# the console (DEBUG=True) or discarded (DEBUG=False) by means of the
+# require_debug_true filter.
 DEFAULT_LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -28,14 +29,22 @@ DEFAULT_LOGGING = {
             '()': 'django.utils.log.RequireDebugTrue',
         },
     },
+    'formatters': {
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[%(server_time)s] %(message)s',
+        }
+    },
     'handlers': {
         'console': {
             'level': 'INFO',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
         },
-        'null': {
-            'class': 'logging.NullHandler',
+        'django.server': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
         },
         'mail_admins': {
             'level': 'ERROR',
@@ -45,16 +54,12 @@ DEFAULT_LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['console', 'mail_admins'],
+            'level': 'INFO',
         },
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        'django.security': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
             'propagate': False,
         },
         'py.warnings': {
@@ -104,24 +109,27 @@ class AdminEmailHandler(logging.Handler):
                  else 'EXTERNAL'),
                 record.getMessage()
             )
-            filter = get_exception_reporter_filter(request)
-            request_repr = '\n{}'.format(force_text(filter.get_request_repr(request)))
         except Exception:
             subject = '%s: %s' % (
                 record.levelname,
                 record.getMessage()
             )
             request = None
-            request_repr = "unavailable"
         subject = self.format_subject(subject)
+
+        # Since we add a nicely formatted traceback on our own, create a copy
+        # of the log record without the exception data.
+        no_exc_record = copy(record)
+        no_exc_record.exc_info = None
+        no_exc_record.exc_text = None
 
         if record.exc_info:
             exc_info = record.exc_info
         else:
             exc_info = (None, record.getMessage(), None)
 
-        message = "%s\n\nRequest repr(): %s" % (self.format(record), request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
+        message = "%s\n\n%s" % (self.format(no_exc_record), reporter.get_traceback_text())
         html_message = reporter.get_traceback_html() if self.include_html else None
         self.send_mail(subject, message, fail_silently=True, html_message=html_message)
 
@@ -146,7 +154,6 @@ class CallbackFilter(logging.Filter):
     A logging filter that checks the return value of a given callable (which
     takes the record-to-be-logged as its only parameter) to decide whether to
     log a record.
-
     """
     def __init__(self, callback):
         self.callback = callback
@@ -165,3 +172,36 @@ class RequireDebugFalse(logging.Filter):
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):
         return settings.DEBUG
+
+
+class ServerFormatter(logging.Formatter):
+    def __init__(self, *args, **kwargs):
+        self.style = color_style()
+        super(ServerFormatter, self).__init__(*args, **kwargs)
+
+    def format(self, record):
+        args = record.args
+        msg = record.msg
+
+        if len(args) == 0:
+            msg = self.style.HTTP_BAD_REQUEST(msg)
+        else:
+            if args[1][0] == '2':
+                # Put 2XX first, since it should be the common case
+                msg = self.style.HTTP_SUCCESS(msg)
+            elif args[1][0] == '1':
+                msg = self.style.HTTP_INFO(msg)
+            elif args[1] == '304':
+                msg = self.style.HTTP_NOT_MODIFIED(msg)
+            elif args[1][0] == '3':
+                msg = self.style.HTTP_REDIRECT(msg)
+            elif args[1] == '404':
+                msg = self.style.HTTP_NOT_FOUND(msg)
+            elif args[1][0] == '4':
+                msg = self.style.HTTP_BAD_REQUEST(msg)
+            else:
+                # Any 5XX, or any other response
+                msg = self.style.HTTP_SERVER_ERROR(msg)
+
+        record.msg = msg
+        return super(ServerFormatter, self).format(record)

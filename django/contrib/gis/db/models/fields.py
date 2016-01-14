@@ -1,8 +1,10 @@
 from django.contrib.gis import forms
 from django.contrib.gis.db.models.lookups import gis_lookups
-from django.contrib.gis.db.models.proxy import GeometryProxy
+from django.contrib.gis.db.models.proxy import SpatialProxy
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
-from django.db.models.expressions import ExpressionNode
+from django.core.exceptions import ImproperlyConfigured
+from django.db.models.expressions import Expression
 from django.db.models.fields import Field
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -65,22 +67,21 @@ class GeoSelectFormatMixin(object):
         return sel_fmt % sql, params
 
 
-class GeometryField(GeoSelectFormatMixin, Field):
-    "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+class BaseSpatialField(Field):
+    """
+    The Base GIS Field.
 
-    # The OpenGIS Geometry name.
-    geom_type = 'GEOMETRY'
-    form_class = forms.GeometryField
-
+    It's used as a base class for GeometryField and RasterField. Defines
+    properties that are common to all GIS fields such as the characteristics
+    of the spatial reference system of the field.
+    """
+    description = _("The base GIS field.")
     # Geodetic units.
     geodetic_units = ('decimal degree', 'degree')
 
-    description = _("The base GIS field -- maps to the OpenGIS Specification Geometry type.")
-
-    def __init__(self, verbose_name=None, srid=4326, spatial_index=True, dim=2,
-                 geography=False, **kwargs):
+    def __init__(self, verbose_name=None, srid=4326, spatial_index=True, **kwargs):
         """
-        The initialization function for geometry fields.  Takes the following
+        The initialization function for base spatial fields. Takes the following
         as keyword arguments:
 
         srid:
@@ -91,18 +92,6 @@ class GeometryField(GeoSelectFormatMixin, Field):
          Indicates whether to create a spatial index.  Defaults to True.
          Set this instead of 'db_index' for geographic fields since index
          creation is different for geometry columns.
-
-        dim:
-         The number of dimensions for this geometry.  Defaults to 2.
-
-        extent:
-         Customize the extent, in a 4-tuple of WGS 84 coordinates, for the
-         geometry field entry in the `USER_SDO_GEOM_METADATA` table.  Defaults
-         to (-180.0, -90.0, 180.0, 90.0).
-
-        tolerance:
-         Define the tolerance, in meters, to use for the geometry field
-         entry in the `USER_SDO_GEOM_METADATA` table.  Defaults to 0.05.
         """
 
         # Setting the index flag with the value of the `spatial_index` keyword.
@@ -112,38 +101,26 @@ class GeometryField(GeoSelectFormatMixin, Field):
         # easily available in the field instance for distance queries.
         self.srid = srid
 
-        # Setting the dimension of the geometry field.
-        self.dim = dim
-
         # Setting the verbose_name keyword argument with the positional
         # first parameter, so this works like normal fields.
         kwargs['verbose_name'] = verbose_name
 
-        # Is this a geography rather than a geometry column?
-        self.geography = geography
-
-        # Oracle-specific private attributes for creating the entry in
-        # `USER_SDO_GEOM_METADATA`
-        self._extent = kwargs.pop('extent', (-180.0, -90.0, 180.0, 90.0))
-        self._tolerance = kwargs.pop('tolerance', 0.05)
-
-        super(GeometryField, self).__init__(**kwargs)
+        super(BaseSpatialField, self).__init__(**kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(GeometryField, self).deconstruct()
-        # Always include SRID for less fragility; include others if they're
-        # not the default values.
+        name, path, args, kwargs = super(BaseSpatialField, self).deconstruct()
+        # Always include SRID for less fragility; include spatial index if it's
+        # not the default value.
         kwargs['srid'] = self.srid
-        if self.dim != 2:
-            kwargs['dim'] = self.dim
         if self.spatial_index is not True:
             kwargs['spatial_index'] = self.spatial_index
-        if self.geography is not False:
-            kwargs['geography'] = self.geography
         return name, path, args, kwargs
 
+    def db_type(self, connection):
+        return connection.ops.geo_db_type(self)
+
     # The following functions are used to get the units, their name, and
-    # the spheroid corresponding to the SRID of the GeometryField.
+    # the spheroid corresponding to the SRID of the BaseSpatialField.
     def _get_srid_info(self, connection):
         # Get attributes from `get_srid_info`.
         self._units, self._units_name, self._spheroid = get_srid_info(self.srid, connection)
@@ -163,14 +140,74 @@ class GeometryField(GeoSelectFormatMixin, Field):
             self._get_srid_info(connection)
         return self._units_name
 
-    # ### Routines specific to GeometryField ###
     def geodetic(self, connection):
         """
         Returns true if this field's SRID corresponds with a coordinate
         system that uses non-projected units (e.g., latitude/longitude).
         """
-        return self.units_name(connection).lower() in self.geodetic_units
+        units_name = self.units_name(connection)
+        # Some backends like MySQL cannot determine units name. In that case,
+        # test if srid is 4326 (WGS84), even if this is over-simplification.
+        return units_name.lower() in self.geodetic_units if units_name else self.srid == 4326
 
+    def get_placeholder(self, value, compiler, connection):
+        """
+        Returns the placeholder for the spatial column for the
+        given value.
+        """
+        return connection.ops.get_geom_placeholder(self, value, compiler)
+
+
+class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
+    """
+    The base Geometry field -- maps to the OpenGIS Specification Geometry type.
+    """
+    description = _("The base Geometry field -- maps to the OpenGIS Specification Geometry type.")
+    form_class = forms.GeometryField
+    # The OpenGIS Geometry name.
+    geom_type = 'GEOMETRY'
+
+    def __init__(self, verbose_name=None, dim=2, geography=False, **kwargs):
+        """
+        The initialization function for geometry fields. In addition to the
+        parameters from BaseSpatialField, it takes the following as keyword
+        arguments:
+
+        dim:
+         The number of dimensions for this geometry.  Defaults to 2.
+
+        extent:
+         Customize the extent, in a 4-tuple of WGS 84 coordinates, for the
+         geometry field entry in the `USER_SDO_GEOM_METADATA` table.  Defaults
+         to (-180.0, -90.0, 180.0, 90.0).
+
+        tolerance:
+         Define the tolerance, in meters, to use for the geometry field
+         entry in the `USER_SDO_GEOM_METADATA` table.  Defaults to 0.05.
+        """
+        # Setting the dimension of the geometry field.
+        self.dim = dim
+
+        # Is this a geography rather than a geometry column?
+        self.geography = geography
+
+        # Oracle-specific private attributes for creating the entry in
+        # `USER_SDO_GEOM_METADATA`
+        self._extent = kwargs.pop('extent', (-180.0, -90.0, 180.0, 90.0))
+        self._tolerance = kwargs.pop('tolerance', 0.05)
+
+        super(GeometryField, self).__init__(verbose_name=verbose_name, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(GeometryField, self).deconstruct()
+        # Include kwargs if they're not the default values.
+        if self.dim != 2:
+            kwargs['dim'] = self.dim
+        if self.geography is not False:
+            kwargs['geography'] = self.geography
+        return name, path, args, kwargs
+
+    # ### Routines specific to GeometryField ###
     def get_distance(self, value, lookup_type, connection):
         """
         Returns a distance number in units of the field.  For example, if
@@ -188,7 +225,7 @@ class GeometryField(GeoSelectFormatMixin, Field):
         returning to the caller.
         """
         value = super(GeometryField, self).get_prep_value(value)
-        if isinstance(value, ExpressionNode):
+        if isinstance(value, Expression):
             return value
         elif isinstance(value, (tuple, list)):
             geom = value[0]
@@ -219,9 +256,13 @@ class GeometryField(GeoSelectFormatMixin, Field):
         else:
             return geom
 
-    def from_db_value(self, value, connection, context):
-        if value and not isinstance(value, Geometry):
-            value = Geometry(value)
+    def from_db_value(self, value, expression, connection, context):
+        if value:
+            if not isinstance(value, Geometry):
+                value = Geometry(value)
+            srid = value.srid
+            if not srid and self.srid != -1:
+                value.srid = self.srid
         return value
 
     def get_srid(self, geom):
@@ -241,10 +282,7 @@ class GeometryField(GeoSelectFormatMixin, Field):
         super(GeometryField, self).contribute_to_class(cls, name, **kwargs)
 
         # Setup for lazy-instantiated Geometry object.
-        setattr(cls, self.attname, GeometryProxy(Geometry, self))
-
-    def db_type(self, connection):
-        return connection.ops.geo_db_type(self)
+        setattr(cls, self.attname, SpatialProxy(Geometry, self))
 
     def formfield(self, **kwargs):
         defaults = {'form_class': self.form_class,
@@ -282,7 +320,7 @@ class GeometryField(GeoSelectFormatMixin, Field):
                     pass
                 else:
                     params += value[1:]
-            elif isinstance(value, ExpressionNode):
+            elif isinstance(value, Expression):
                 params = []
             else:
                 params = [connection.ops.Adapter(value)]
@@ -305,13 +343,6 @@ class GeometryField(GeoSelectFormatMixin, Field):
             return None
         else:
             return connection.ops.Adapter(self.get_prep_value(value))
-
-    def get_placeholder(self, value, compiler, connection):
-        """
-        Returns the placeholder for the geometry column for the
-        given value.
-        """
-        return connection.ops.get_geom_placeholder(self, value, compiler)
 
 
 for klass in gis_lookups.values():
@@ -368,3 +399,46 @@ class ExtentField(GeoSelectFormatMixin, Field):
 
     def get_internal_type(self):
         return "ExtentField"
+
+
+class RasterField(BaseSpatialField):
+    """
+    Raster field for GeoDjango -- evaluates into GDALRaster objects.
+    """
+
+    description = _("Raster Field")
+    geom_type = 'RASTER'
+
+    def __init__(self, *args, **kwargs):
+        if not HAS_GDAL:
+            raise ImproperlyConfigured('RasterField requires GDAL.')
+        super(RasterField, self).__init__(*args, **kwargs)
+
+    def _check_connection(self, connection):
+        # Make sure raster fields are used only on backends with raster support.
+        if not connection.features.gis_enabled or not connection.features.supports_raster:
+            raise ImproperlyConfigured('Raster fields require backends with raster support.')
+
+    def db_type(self, connection):
+        self._check_connection(connection)
+        return super(RasterField, self).db_type(connection)
+
+    def from_db_value(self, value, expression, connection, context):
+        return connection.ops.parse_raster(value)
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        self._check_connection(connection)
+        # Prepare raster for writing to database.
+        if not prepared:
+            value = connection.ops.deconstruct_raster(value)
+        return super(RasterField, self).get_db_prep_value(value, connection, prepared)
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(RasterField, self).contribute_to_class(cls, name, **kwargs)
+        # Importing GDALRaster raises an exception on systems without gdal.
+        from django.contrib.gis.gdal import GDALRaster
+        # Setup for lazy-instantiated Raster object. For large querysets, the
+        # instantiation of all GDALRasters can potentially be expensive. This
+        # delays the instantiation of the objects to the moment of evaluation
+        # of the raster attribute.
+        setattr(cls, self.attname, SpatialProxy(GDALRaster, self))

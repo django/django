@@ -144,15 +144,25 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         error_message = "inspectdb generated an attribute name which is a python keyword"
         # Recursive foreign keys should be set to 'self'
-        self.assertIn("parent = models.ForeignKey('self')", output)
-        self.assertNotIn("from = models.ForeignKey(InspectdbPeople)", output, msg=error_message)
+        self.assertIn("parent = models.ForeignKey('self', models.DO_NOTHING)", output)
+        self.assertNotIn(
+            "from = models.ForeignKey(InspectdbPeople, models.DO_NOTHING)",
+            output,
+            msg=error_message,
+        )
         # As InspectdbPeople model is defined after InspectdbMessage, it should be quoted
-        self.assertIn("from_field = models.ForeignKey('InspectdbPeople', db_column='from_id')",
-                      output)
-        self.assertIn("people_pk = models.ForeignKey(InspectdbPeople, primary_key=True)",
-                      output)
-        self.assertIn("people_unique = models.ForeignKey(InspectdbPeople, unique=True)",
-                      output)
+        self.assertIn(
+            "from_field = models.ForeignKey('InspectdbPeople', models.DO_NOTHING, db_column='from_id')",
+            output,
+        )
+        self.assertIn(
+            "people_pk = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, primary_key=True)",
+            output,
+        )
+        self.assertIn(
+            "people_unique = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, unique=True)",
+            output,
+        )
 
     def test_digits_column_name_introspection(self):
         """Introspection of column names consist/start with digits (#16536/#17676)"""
@@ -224,7 +234,18 @@ class InspectDBTestCase(TestCase):
                      table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'),
                      stdout=out)
         output = out.getvalue()
-        self.assertIn("        unique_together = (('field1', 'field2'),)", output, msg='inspectdb should generate unique_together.')
+        unique_re = re.compile(r'.*unique_together = \((.+),\).*')
+        unique_together_match = re.findall(unique_re, output)
+        # There should be one unique_together tuple.
+        self.assertEqual(len(unique_together_match), 1)
+        fields = unique_together_match[0]
+        # Fields with db_column = field name.
+        self.assertIn("('field1', 'field2')", fields)
+        # Fields from columns whose names are Python keywords.
+        self.assertIn("('field1', 'field2')", fields)
+        # Fields whose names normalize to the same Python field name and hence
+        # are given an integer suffix.
+        self.assertIn("('non_unique_column', 'non_unique_column_0')", fields)
 
     @skipUnless(connection.vendor == 'sqlite',
                 "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")

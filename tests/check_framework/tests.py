@@ -4,17 +4,16 @@ from __future__ import unicode_literals
 import sys
 
 from django.apps import apps
-from django.conf import settings
 from django.core import checks
 from django.core.checks import Error, Warning
-from django.core.checks.compatibility.django_1_7_0 import \
-    check_1_7_compatibility
 from django.core.checks.registry import CheckRegistry
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import models
-from django.test import TestCase
-from django.test.utils import override_settings, override_system_checks
+from django.test import SimpleTestCase
+from django.test.utils import (
+    isolate_apps, override_settings, override_system_checks,
+)
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
@@ -26,7 +25,7 @@ class DummyObj(object):
         return "obj"
 
 
-class SystemCheckFrameworkTests(TestCase):
+class SystemCheckFrameworkTests(SimpleTestCase):
 
     def test_register_and_run_checks(self):
 
@@ -72,7 +71,7 @@ class SystemCheckFrameworkTests(TestCase):
         self.assertEqual(sorted(errors), [4, 5])
 
 
-class MessageTests(TestCase):
+class MessageTests(SimpleTestCase):
 
     def test_printing(self):
         e = Error("Message", hint="Hint", obj=DummyObj())
@@ -112,40 +111,6 @@ class MessageTests(TestCase):
         self.assertEqual(force_text(e), expected)
 
 
-class Django_1_7_0_CompatibilityChecks(TestCase):
-
-    @override_settings(MIDDLEWARE_CLASSES=['django.contrib.sessions.middleware.SessionMiddleware'])
-    def test_middleware_classes_overridden(self):
-        errors = check_1_7_compatibility()
-        self.assertEqual(errors, [])
-
-    def test_middleware_classes_not_set_explicitly(self):
-        # If MIDDLEWARE_CLASSES was set explicitly, temporarily pretend it wasn't
-        middleware_classes_overridden = False
-        if 'MIDDLEWARE_CLASSES' in settings._wrapped._explicit_settings:
-            middleware_classes_overridden = True
-            settings._wrapped._explicit_settings.remove('MIDDLEWARE_CLASSES')
-        try:
-            errors = check_1_7_compatibility()
-            expected = [
-                checks.Warning(
-                    "MIDDLEWARE_CLASSES is not set.",
-                    hint=("Django 1.7 changed the global defaults for the MIDDLEWARE_CLASSES. "
-                          "django.contrib.sessions.middleware.SessionMiddleware, "
-                          "django.contrib.auth.middleware.AuthenticationMiddleware, and "
-                          "django.contrib.messages.middleware.MessageMiddleware were removed from the defaults. "
-                          "If your project needs these middleware then you should configure this setting."),
-                    obj=None,
-                    id='1_7.W001',
-                )
-            ]
-            self.assertEqual(errors, expected)
-        finally:
-            # Restore settings value
-            if middleware_classes_overridden:
-                settings._wrapped._explicit_settings.add('MIDDLEWARE_CLASSES')
-
-
 def simple_system_check(**kwargs):
     simple_system_check.kwargs = kwargs
     return []
@@ -153,7 +118,7 @@ def simple_system_check(**kwargs):
 
 def tagged_system_check(**kwargs):
     tagged_system_check.kwargs = kwargs
-    return []
+    return [checks.Warning('System Check')]
 tagged_system_check.tags = ['simpletag']
 
 
@@ -163,7 +128,7 @@ def deployment_system_check(**kwargs):
 deployment_system_check.tags = ['deploymenttag']
 
 
-class CheckCommandTests(TestCase):
+class CheckCommandTests(SimpleTestCase):
 
     def setUp(self):
         simple_system_check.kwargs = None
@@ -229,6 +194,11 @@ class CheckCommandTests(TestCase):
         call_command('check', deploy=True, tags=['deploymenttag'])
         self.assertIn('Deployment Check', sys.stderr.getvalue())
 
+    @override_system_checks([tagged_system_check])
+    def test_fail_level(self):
+        with self.assertRaises(CommandError):
+            call_command('check', fail_level='WARNING')
+
 
 def custom_error_system_check(app_configs, **kwargs):
     return [
@@ -250,7 +220,7 @@ def custom_warning_system_check(app_configs, **kwargs):
     ]
 
 
-class SilencingCheckTests(TestCase):
+class SilencingCheckTests(SimpleTestCase):
 
     def setUp(self):
         self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
@@ -269,14 +239,8 @@ class SilencingCheckTests(TestCase):
             call_command('check', stdout=out, stderr=err)
         except CommandError:
             self.fail("The mycheck.E001 check should be silenced.")
-        self.assertEqual(out.getvalue(), '')
-        self.assertEqual(
-            err.getvalue(),
-            'System check identified some issues:\n\n'
-            'ERRORS:\n'
-            '?: (myerrorcheck.E001) Error\n\n'
-            'System check identified 1 issue (0 silenced).\n'
-        )
+        self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
+        self.assertEqual(err.getvalue(), '')
 
     @override_settings(SILENCED_SYSTEM_CHECKS=['mywarningcheck.E001'])
     @override_system_checks([custom_warning_system_check])
@@ -292,23 +256,10 @@ class SilencingCheckTests(TestCase):
         self.assertEqual(err.getvalue(), '')
 
 
-class IsolateModelsMixin(object):
-    def setUp(self):
-        self.current_models = apps.all_models[__package__]
-        self.saved_models = set(self.current_models)
-
-    def tearDown(self):
-        for model in (set(self.current_models) - self.saved_models):
-            del self.current_models[model]
-        apps.clear_cache()
-
-
-class CheckFrameworkReservedNamesTests(IsolateModelsMixin, TestCase):
-    @override_settings(
-        SILENCED_SYSTEM_CHECKS=['models.E20', 'fields.W342'],  # ForeignKey(unique=True)
-        INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'check_framework']
-    )
-    def test_model_check_method_not_shadowed(self):
+class CheckFrameworkReservedNamesTests(SimpleTestCase):
+    @isolate_apps('check_framework', kwarg_name='apps')
+    @override_system_checks([checks.model_checks.check_all_models])
+    def test_model_check_method_not_shadowed(self, apps):
         class ModelWithAttributeCalledCheck(models.Model):
             check = 42
 
@@ -319,10 +270,14 @@ class CheckFrameworkReservedNamesTests(IsolateModelsMixin, TestCase):
             pass
 
         class ModelWithDescriptorCalledCheck(models.Model):
-            check = models.ForeignKey(ModelWithRelatedManagerCalledCheck)
-            article = models.ForeignKey(ModelWithRelatedManagerCalledCheck, related_name='check')
+            check = models.ForeignKey(ModelWithRelatedManagerCalledCheck, models.CASCADE)
+            article = models.ForeignKey(
+                ModelWithRelatedManagerCalledCheck,
+                models.CASCADE,
+                related_name='check',
+            )
 
-        errors = checks.run_checks()
+        errors = checks.run_checks(app_configs=apps.get_app_configs())
         expected = [
             Error(
                 "The 'ModelWithAttributeCalledCheck.check()' class method is "
