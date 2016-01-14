@@ -34,4 +34,4 @@ Bugfixes
 * Fixed a regression where defining a relation on an abstract model's field
   using a string model name without an app_label no longer resolved that
   reference to the abstract model's app if using that model in another
-  application (:ticket`25858`).
+  application (:ticket:`25858`).
