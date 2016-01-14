@@ -92,15 +92,15 @@ So, for example, if we decided to start the deprecation of a function in
 Django 4.2:
 
 * Django 4.2 will contain a backwards-compatible replica of the function which
-  will raise a ``RemovedInDjango51Warning``. This warning is silent by
-  default; you can turn on display of these warnings with the ``-Wd`` option
-  of Python.
+  will raise a ``RemovedInDjango51Warning``.
 
 * Django 5.0 (the version that follows 4.2) will still contain the
-  backwards-compatible replica. This warning becomes *loud* by default and
-  will likely be quite annoying.
+  backwards-compatible replica.
 
 * Django 5.1 will remove the feature outright.
+
+The warnings are silent by default. You can turn on display of these warnings
+with the ``python -Wd`` option.
 
 A more generic example:
 

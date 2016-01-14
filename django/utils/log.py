@@ -2,15 +2,12 @@ from __future__ import unicode_literals
 
 import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
-import sys
-import warnings
 from copy import copy
 
 from django.conf import settings
 from django.core import mail
 from django.core.mail import get_connection
 from django.core.management.color import color_style
-from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.module_loading import import_string
 from django.views.debug import ExceptionReporter
 
@@ -62,21 +59,11 @@ DEFAULT_LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'py.warnings': {
-            'handlers': ['console'],
-        },
     }
 }
 
 
 def configure_logging(logging_config, logging_settings):
-    if not sys.warnoptions:
-        # Route warnings through python logging
-        logging.captureWarnings(True)
-        # RemovedInNextVersionWarning is a subclass of DeprecationWarning which
-        # is hidden by default, hence we force the "default" behavior
-        warnings.simplefilter("default", RemovedInNextVersionWarning)
-
     if logging_config:
         # First find the logging configuration function ...
         logging_config_func = import_string(logging_config)

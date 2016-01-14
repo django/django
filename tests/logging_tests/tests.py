@@ -12,12 +12,10 @@ from django.core.files.temp import NamedTemporaryFile
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.utils.deprecation import RemovedInNextVersionWarning
-from django.utils.encoding import force_text
 from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
     RequireDebugTrue,
 )
-from django.utils.six import StringIO
 
 from .logconfig import MyEmailBackend
 
@@ -121,38 +119,9 @@ class WarningLoggerTests(SimpleTestCase):
         self._old_capture_state = bool(getattr(logging, '_warnings_showwarning', False))
         logging.captureWarnings(True)
 
-        # this convoluted setup is to avoid printing this deprecation to
-        # stderr during test running - as the test runner forces deprecations
-        # to be displayed at the global py.warnings level
-        self.logger = logging.getLogger('py.warnings')
-        self.outputs = []
-        self.old_streams = []
-        for handler in self.logger.handlers:
-            self.old_streams.append(handler.stream)
-            self.outputs.append(StringIO())
-            handler.stream = self.outputs[-1]
-
     def tearDown(self):
-        for i, handler in enumerate(self.logger.handlers):
-            self.logger.handlers[i].stream = self.old_streams[i]
-
         # Reset warnings state.
         logging.captureWarnings(self._old_capture_state)
-
-    @override_settings(DEBUG=True)
-    def test_warnings_capture(self):
-        with warnings.catch_warnings():
-            warnings.filterwarnings('always')
-            warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
-            output = force_text(self.outputs[0].getvalue())
-            self.assertIn('Foo Deprecated', output)
-
-    def test_warnings_capture_debug_false(self):
-        with warnings.catch_warnings():
-            warnings.filterwarnings('always')
-            warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
-            output = force_text(self.outputs[0].getvalue())
-            self.assertNotIn('Foo Deprecated', output)
 
     @override_settings(DEBUG=True)
     def test_error_filter_still_raises(self):

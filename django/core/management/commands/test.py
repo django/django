@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 
@@ -53,21 +52,6 @@ class Command(BaseCommand):
 
         if hasattr(test_runner_class, 'add_arguments'):
             test_runner_class.add_arguments(parser)
-
-    def execute(self, *args, **options):
-        if options['verbosity'] > 0:
-            # ensure that deprecation warnings are displayed during testing
-            # the following state is assumed:
-            # logging.capturewarnings is true
-            # a "default" level warnings filter has been added for
-            # DeprecationWarning. See django.conf.LazySettings._configure_logging
-            logger = logging.getLogger('py.warnings')
-            handler = logging.StreamHandler()
-            logger.addHandler(handler)
-        super(Command, self).execute(*args, **options)
-        if options['verbosity'] > 0:
-            # remove the testing-specific handler
-            logger.removeHandler(handler)
 
     def handle(self, *test_labels, **options):
         from django.conf import settings
