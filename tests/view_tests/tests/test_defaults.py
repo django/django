@@ -4,8 +4,13 @@ import datetime
 
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.test import TestCase
+from django.http import Http404
+from django.template import TemplateDoesNotExist
+from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
+from django.views.defaults import (
+    bad_request, page_not_found, permission_denied, server_error,
+)
 
 from ..models import Article, Author, UrlArticle
 
@@ -123,3 +128,22 @@ class DefaultsTests(TestCase):
 
         response = self.client.get('/server_error/')
         self.assertEqual(response['Content-Type'], 'text/html')
+
+    def test_custom_templates_wrong(self):
+        """
+        Default error views should raise TemplateDoesNotExist when passed a
+        template that doesn't exist.
+        """
+        rf = RequestFactory()
+        request = rf.get('/')
+        with self.assertRaises(TemplateDoesNotExist):
+            bad_request(request, Exception(), template_name='nonexistent')
+
+        with self.assertRaises(TemplateDoesNotExist):
+            permission_denied(request, Exception(), template_name='nonexistent')
+
+        with self.assertRaises(TemplateDoesNotExist):
+            page_not_found(request, Http404(), template_name='nonexistent')
+
+        with self.assertRaises(TemplateDoesNotExist):
+            server_error(request, template_name='nonexistent')

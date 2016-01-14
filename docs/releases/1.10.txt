@@ -463,6 +463,8 @@ Miscellaneous
 * Instead of directly accessing the ``LogEntry.change_message`` attribute, it's
   now better to call the ``LogEntry.get_change_message()`` method which will
   provide the message in the current language.
+* The default error views now raise ``TemplateDoesNotExist`` if a nonexistent
+  ``template_name`` is specified.
 
 .. _deprecated-features-1.10:
 
