@@ -59,6 +59,9 @@ Minor features
 * Selected objects for fields in ``ModelAdmin.raw_id_fields`` now have a link
   to object's change form.
 
+* Added "No date" and "Has date" choices for ``DateFieldListFilter`` if the
+  field is nullable.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
