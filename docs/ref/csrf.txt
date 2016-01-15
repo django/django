@@ -139,6 +139,15 @@ newer:
         }
     });
 
+If you're using AngularJS 1.1.3 and newer instead of jQuery, you an skip the
+explicit cookie reading and header updates, and configure the $http provider
+with the cookie and header names instead:
+
+.. code-block:: javascript
+
+    $http.defaults.xsrfCookieName = 'csrftoken';
+    $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+
 Other template engines
 ----------------------
 
