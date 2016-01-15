@@ -75,3 +75,10 @@ Bugfixes
 * Fixed a crash when calling the ``migrate`` command in a test case with the
   ``available_apps`` attribute pointing to an application with migrations
   disabled using the ``MIGRATION_MODULES`` setting (:ticket:`26135`).
+
+* Restored the ability for testing and debugging tools to determine the
+  template from which a node came from, even during template inheritance or
+  inclusion. Prior to Django 1.9, debugging tools could access the template
+  origin from the node via ``Node.token.source[0]``. This was an undocumented,
+  private API. The origin is now available directly on each node using the
+  ``Node.origin`` attribute (:ticket:`25848`).
