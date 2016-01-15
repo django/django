@@ -403,9 +403,7 @@ class ListFiltersTests(TestCase):
             )
         )
 
-        request = self.request_factory.get('/', {
-            'date_registered__isnull': str(1),
-        })
+        request = self.request_factory.get('/', {'date_registered__isnull': True})
         changelist = self.get_changelist(request, Book, modeladmin)
 
         # Make sure the correct queryset is returned
@@ -418,11 +416,9 @@ class ListFiltersTests(TestCase):
         self.assertEqual(force_text(filterspec.title), 'date registered')
         choice = select_by(filterspec.choices(changelist), "display", "No date")
         self.assertEqual(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?date_registered__isnull=1')
+        self.assertEqual(choice['query_string'], '?date_registered__isnull=True')
 
-        request = self.request_factory.get('/', {
-            'date_registered__isnull': str(0),
-        })
+        request = self.request_factory.get('/', {'date_registered__isnull': False})
         changelist = self.get_changelist(request, Book, modeladmin)
 
         # Make sure the correct queryset is returned
@@ -435,7 +431,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(force_text(filterspec.title), 'date registered')
         choice = select_by(filterspec.choices(changelist), "display", "Has valid date")
         self.assertEqual(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?date_registered__isnull=0')
+        self.assertEqual(choice['query_string'], '?date_registered__isnull=False')
 
     @unittest.skipIf(
         sys.platform.startswith('win'),
