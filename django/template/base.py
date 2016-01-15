@@ -224,6 +224,7 @@ class Template(object):
         tokens = lexer.tokenize()
         parser = Parser(
             tokens, self.engine.template_libraries, self.engine.template_builtins,
+            self.origin,
         )
 
         try:
@@ -444,7 +445,7 @@ class DebugLexer(Lexer):
 
 
 class Parser(object):
-    def __init__(self, tokens, libraries=None, builtins=None):
+    def __init__(self, tokens, libraries=None, builtins=None, origin=None):
         self.tokens = tokens
         self.tags = {}
         self.filters = {}
@@ -458,6 +459,7 @@ class Parser(object):
         self.libraries = libraries
         for builtin in builtins:
             self.add_library(builtin)
+        self.origin = origin
 
     def parse(self, parse_until=None):
         """
@@ -534,8 +536,10 @@ class Parser(object):
             )
         if isinstance(nodelist, NodeList) and not isinstance(node, TextNode):
             nodelist.contains_nontext = True
-        # Set token here since we can't modify the node __init__ method
+        # Set origin and token here since we can't modify the node __init__()
+        # method.
         node.token = token
+        node.origin = self.origin
         nodelist.append(node)
 
     def error(self, token, e):

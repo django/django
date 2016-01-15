@@ -140,3 +140,12 @@ class TemplateTests(SimpleTestCase):
         child = engine.from_string(
             '{% extends parent %}{% block content %}child{% endblock %}')
         self.assertEqual(child.render(Context({'parent': parent})), 'child')
+
+    def test_node_origin(self):
+        """
+        #25848 -- Set origin on Node so debugging tools can determine which
+        template the node came from even if extending or including templates.
+        """
+        template = Engine().from_string('content')
+        for node in template.nodelist:
+            self.assertEqual(node.origin, template.origin)
