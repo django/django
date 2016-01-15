@@ -10,7 +10,7 @@ from django.utils import six
 
 from .models import (
     ConcreteModel, FooWithBrokenAbsoluteUrl, FooWithoutUrl, FooWithUrl,
-    ProxyModel,
+    ProxyModel, ModelWithEmptyFKToSite,
 )
 
 
@@ -244,6 +244,21 @@ class ContentTypesTests(TestCase):
         # Instead, just return the ContentType object and let the app detect stale states.
         ct_fetched = ContentType.objects.get_for_id(ct.pk)
         self.assertIsNone(ct_fetched.model_class())
+
+    def test_shortcut_view_with_empty_site_fk(self):
+        """
+        Check that the shortcut view catch an AttributeError raised when the
+        model's ForeignKey to site is equal to None.
+        Refs #26085.
+        """
+        request = HttpRequest()
+        request.META = {
+            "SERVER_NAME": "Example.com",
+            "SERVER_PORT": "80",
+        }
+        object_ct = ContentType.objects.get_for_model(ModelWithEmptyFKToSite)
+        obj = ModelWithEmptyFKToSite.objects.create(title="object title")
+        self.assertRaises(Http404, shortcut, request, object_ct.id, obj.id)
 
     @mock.patch('django.contrib.contenttypes.models.ContentTypeManager.get_or_create')
     @mock.patch('django.contrib.contenttypes.models.ContentTypeManager.get')
