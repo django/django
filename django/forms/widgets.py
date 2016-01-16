@@ -438,7 +438,7 @@ class Textarea(Widget):
         if value is None:
             value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        return format_html('<textarea{}>\r\n{}</textarea>',
+        return format_html('<textarea{}>{}</textarea>',
                            flatatt(final_attrs),
                            force_text(value))
 
