@@ -14,23 +14,22 @@ def linearize(func):
     up before the first has exited and saved its session. Doesn't guarantee
     ordering, just linearity.
     """
+    raise NotImplementedError("Not yet reimplemented")
     @functools.wraps(func)
     def inner(message, *args, **kwargs):
         # Make sure there's a reply channel
         if not message.reply_channel:
             raise ValueError(
-                "No reply_channel sent to consumer; @no_overlap can only be used on messages containing it."
+                "No reply_channel in message; @linearize can only be used on messages containing it."
             )
-
-        # Get the lock, or re-queue
-        locked = message.channel_backend.lock_channel(message.reply_channel)
-        if not locked:
-            raise message.Requeue()
+        # TODO: Get lock here
+        pass
         # OK, keep going
         try:
             return func(message, *args, **kwargs)
         finally:
-            message.channel_backend.unlock_channel(message.reply_channel)
+            # TODO: Release lock here
+            pass
     return inner
 
 
@@ -47,7 +46,8 @@ def channel_session(func):
         # Make sure there's a reply_channel
         if not message.reply_channel:
             raise ValueError(
-                "No reply_channel sent to consumer; @no_overlap can only be used on messages containing it."
+                "No reply_channel sent to consumer; @channel_session " +
+                "can only be used on messages containing it."
             )
 
         # Make sure there's NOT a channel_session already
