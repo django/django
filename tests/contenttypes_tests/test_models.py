@@ -10,7 +10,7 @@ from django.utils import six
 
 from .models import (
     ConcreteModel, FooWithBrokenAbsoluteUrl, FooWithoutUrl, FooWithUrl,
-    ProxyModel, ModelWithEmptyFKToSite,
+    ModelWithEmptyFKToSite, ProxyModel,
 )
 
 
