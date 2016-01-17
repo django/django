@@ -48,14 +48,16 @@ class ModelInheritanceTests(TestCase):
 
         # However, the CommonInfo class cannot be used as a normal model (it
         # doesn't exist as a model).
-        self.assertRaises(AttributeError, lambda: CommonInfo.objects.all())
+        with self.assertRaises(AttributeError):
+            CommonInfo.objects.all()
 
     def test_reverse_relation_for_different_hierarchy_tree(self):
         # Even though p.supplier for a Place 'p' (a parent of a Supplier), a
         # Restaurant object cannot access that reverse relation, since it's not
         # part of the Place-Supplier Hierarchy.
         self.assertQuerysetEqual(Place.objects.filter(supplier__name="foo"), [])
-        self.assertRaises(FieldError, Restaurant.objects.filter, supplier__name="foo")
+        with self.assertRaises(FieldError):
+            Restaurant.objects.filter(supplier__name="foo")
 
     def test_model_with_distinct_accessors(self):
         # The Post model has distinct accessors for the Comment and Link models.
@@ -68,9 +70,8 @@ class ModelInheritanceTests(TestCase):
 
         # The Post model doesn't have an attribute called
         # 'attached_%(class)s_set'.
-        self.assertRaises(
-            AttributeError, getattr, post, "attached_%(class)s_set"
-        )
+        with self.assertRaises(AttributeError):
+            getattr(post, "attached_%(class)s_set")
 
     def test_model_with_distinct_related_query_name(self):
         self.assertQuerysetEqual(Post.objects.filter(attached_model_inheritance_comments__is_spam=True), [])
@@ -220,25 +221,19 @@ class ModelInheritanceDataTests(TestCase):
     def test_parent_child_one_to_one_link_on_nonrelated_objects(self):
         # This won't work because the Demon Dogs restaurant is not an Italian
         # restaurant.
-        self.assertRaises(
-            ItalianRestaurant.DoesNotExist,
-            lambda: Place.objects.get(name="Demon Dogs").restaurant.italianrestaurant
-        )
+        with self.assertRaises(ItalianRestaurant.DoesNotExist):
+            Place.objects.get(name="Demon Dogs").restaurant.italianrestaurant
 
     def test_inherited_does_not_exist_exception(self):
         # An ItalianRestaurant which does not exist is also a Place which does
         # not exist.
-        self.assertRaises(
-            Place.DoesNotExist,
-            ItalianRestaurant.objects.get, name="The Noodle Void"
-        )
+        with self.assertRaises(Place.DoesNotExist):
+            ItalianRestaurant.objects.get(name="The Noodle Void")
 
     def test_inherited_multiple_objects_returned_exception(self):
         # MultipleObjectsReturned is also inherited.
-        self.assertRaises(
-            Place.MultipleObjectsReturned,
-            Restaurant.objects.get, id__lt=12321
-        )
+        with self.assertRaises(Place.MultipleObjectsReturned):
+            Restaurant.objects.get(id__lt=12321)
 
     def test_related_objects_for_inherited_models(self):
         # Related objects work just as they normally do.
@@ -250,9 +245,8 @@ class ModelInheritanceDataTests(TestCase):
         # This won't work because the Place we select is not a Restaurant (it's
         # a Supplier).
         p = Place.objects.get(name="Joe's Chickens")
-        self.assertRaises(
-            Restaurant.DoesNotExist, lambda: p.restaurant
-        )
+        with self.assertRaises(Restaurant.DoesNotExist):
+            p.restaurant
 
         self.assertEqual(p.supplier, s1)
         self.assertQuerysetEqual(

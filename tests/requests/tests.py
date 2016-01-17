@@ -345,7 +345,8 @@ class RequestsTests(SimpleTestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
         self.assertEqual(request.read(2), b'na')
-        self.assertRaises(RawPostDataException, lambda: request.body)
+        with self.assertRaises(RawPostDataException):
+            request.body
         self.assertEqual(request.POST, {})
 
     def test_non_ascii_POST(self):
@@ -390,7 +391,8 @@ class RequestsTests(SimpleTestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
         self.assertEqual(request.POST, {'name': ['value']})
-        self.assertRaises(RawPostDataException, lambda: request.body)
+        with self.assertRaises(RawPostDataException):
+            request.body
 
     def test_body_after_POST_multipart_related(self):
         """

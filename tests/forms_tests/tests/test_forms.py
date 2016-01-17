@@ -3227,7 +3227,8 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         """
         p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': 'fakedate'})
         repr(p)
-        self.assertRaises(AttributeError, lambda: p.cleaned_data)
+        with self.assertRaises(AttributeError):
+            p.cleaned_data
         self.assertFalse(p.is_valid())
         self.assertEqual(p.cleaned_data, {'first_name': 'John', 'last_name': 'Lennon'})
 

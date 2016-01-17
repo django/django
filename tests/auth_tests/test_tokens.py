@@ -63,6 +63,5 @@ class TokenGeneratorTest(TestCase):
         p0 = PasswordResetTokenGenerator()
 
         # This will put a 14-digit base36 timestamp into the token, which is too large.
-        self.assertRaises(ValueError,
-                          p0._make_token_with_timestamp,
-                          user, 175455491841851871349)
+        with self.assertRaises(ValueError):
+            p0._make_token_with_timestamp(user, 175455491841851871349)

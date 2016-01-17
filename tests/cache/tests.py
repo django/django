@@ -129,14 +129,18 @@ class DummyCacheTests(SimpleTestCase):
     def test_incr(self):
         "Dummy cache values can't be incremented"
         cache.set('answer', 42)
-        self.assertRaises(ValueError, cache.incr, 'answer')
-        self.assertRaises(ValueError, cache.incr, 'does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.incr('answer')
+        with self.assertRaises(ValueError):
+            cache.incr('does_not_exist')
 
     def test_decr(self):
         "Dummy cache values can't be decremented"
         cache.set('answer', 42)
-        self.assertRaises(ValueError, cache.decr, 'answer')
-        self.assertRaises(ValueError, cache.decr, 'does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.decr('answer')
+        with self.assertRaises(ValueError):
+            cache.decr('does_not_exist')
 
     def test_data_types(self):
         "All data types are ignored equally by the dummy cache"
@@ -193,14 +197,18 @@ class DummyCacheTests(SimpleTestCase):
     def test_incr_version(self):
         "Dummy cache versions can't be incremented"
         cache.set('answer', 42)
-        self.assertRaises(ValueError, cache.incr_version, 'answer')
-        self.assertRaises(ValueError, cache.incr_version, 'does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.incr_version('answer')
+        with self.assertRaises(ValueError):
+            cache.incr_version('does_not_exist')
 
     def test_decr_version(self):
         "Dummy cache versions can't be decremented"
         cache.set('answer', 42)
-        self.assertRaises(ValueError, cache.decr_version, 'answer')
-        self.assertRaises(ValueError, cache.decr_version, 'does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.decr_version('answer')
+        with self.assertRaises(ValueError):
+            cache.decr_version('does_not_exist')
 
     def test_get_or_set(self):
         self.assertEqual(cache.get_or_set('mykey', 'default'), 'default')
@@ -321,7 +329,8 @@ class BaseCacheTests(object):
         self.assertEqual(cache.incr('answer', 10), 52)
         self.assertEqual(cache.get('answer'), 52)
         self.assertEqual(cache.incr('answer', -10), 42)
-        self.assertRaises(ValueError, cache.incr, 'does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.incr('does_not_exist')
 
     def test_decr(self):
         # Cache values can be decremented
@@ -331,7 +340,8 @@ class BaseCacheTests(object):
         self.assertEqual(cache.decr('answer', 10), 32)
         self.assertEqual(cache.get('answer'), 32)
         self.assertEqual(cache.decr('answer', -10), 42)
-        self.assertRaises(ValueError, cache.decr, 'does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.decr('does_not_exist')
 
     def test_close(self):
         self.assertTrue(hasattr(cache, 'close'))
@@ -821,7 +831,8 @@ class BaseCacheTests(object):
         self.assertIsNone(caches['v2'].get('answer2', version=2))
         self.assertEqual(caches['v2'].get('answer2', version=3), 42)
 
-        self.assertRaises(ValueError, cache.incr_version, 'does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.incr_version('does_not_exist')
 
     def test_decr_version(self):
         cache.set('answer', 42, version=2)
@@ -844,7 +855,8 @@ class BaseCacheTests(object):
         self.assertEqual(caches['v2'].get('answer2', version=1), 42)
         self.assertIsNone(caches['v2'].get('answer2', version=2))
 
-        self.assertRaises(ValueError, cache.decr_version, 'does_not_exist', version=2)
+        with self.assertRaises(ValueError):
+            cache.decr_version('does_not_exist', version=2)
 
     def test_custom_key_func(self):
         # Two caches with different key functions aren't visible to each other
@@ -1138,9 +1150,11 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
         that a generic exception of some kind is raised.
         """
         # memcached does not allow whitespace or control characters in keys
-        self.assertRaises(Exception, cache.set, 'key with spaces', 'value')
+        with self.assertRaises(Exception):
+            cache.set('key with spaces', 'value')
         # memcached limits key length to 250
-        self.assertRaises(Exception, cache.set, 'a' * 251, 'value')
+        with self.assertRaises(Exception):
+            cache.set('a' * 251, 'value')
 
     # Explicitly display a skipped test if no configured cache uses MemcachedCache
     @unittest.skipUnless(

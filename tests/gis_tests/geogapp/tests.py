@@ -56,13 +56,16 @@ class GeographyTest(TestCase):
         # http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_GeographyFunctions
         z = Zipcode.objects.get(code='77002')
         # ST_Within not available.
-        self.assertRaises(ValueError, City.objects.filter(point__within=z.poly).count)
+        with self.assertRaises(ValueError):
+            City.objects.filter(point__within=z.poly).count()
         # `@` operator not available.
-        self.assertRaises(ValueError, City.objects.filter(point__contained=z.poly).count)
+        with self.assertRaises(ValueError):
+            City.objects.filter(point__contained=z.poly).count()
 
         # Regression test for #14060, `~=` was never really implemented for PostGIS.
         htown = City.objects.get(name='Houston')
-        self.assertRaises(ValueError, City.objects.get, point__exact=htown.point)
+        with self.assertRaises(ValueError):
+            City.objects.get(point__exact=htown.point)
 
     @skipUnless(HAS_GDAL, "GDAL is required.")
     def test05_geography_layermapping(self):

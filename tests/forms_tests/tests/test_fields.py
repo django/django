@@ -149,9 +149,12 @@ class FieldsTests(SimpleTestCase):
         Ensure that setting min_length or max_length to something that is not a
         number returns an exception.
         """
-        self.assertRaises(ValueError, CharField, min_length='a')
-        self.assertRaises(ValueError, CharField, max_length='a')
-        self.assertRaises(ValueError, CharField, 'a')
+        with self.assertRaises(ValueError):
+            CharField(min_length='a')
+        with self.assertRaises(ValueError):
+            CharField(max_length='a')
+        with self.assertRaises(ValueError):
+            CharField('a')
 
     def test_charfield_widget_attrs(self):
         """
@@ -1654,8 +1657,10 @@ class FieldsTests(SimpleTestCase):
     # GenericIPAddressField #######################################################
 
     def test_generic_ipaddress_invalid_arguments(self):
-        self.assertRaises(ValueError, GenericIPAddressField, protocol="hamster")
-        self.assertRaises(ValueError, GenericIPAddressField, protocol="ipv4", unpack_ipv4=True)
+        with self.assertRaises(ValueError):
+            GenericIPAddressField(protocol='hamster')
+        with self.assertRaises(ValueError):
+            GenericIPAddressField(protocol='ipv4', unpack_ipv4=True)
 
     def test_generic_ipaddress_as_generic(self):
         # The edge cases of the IPv6 validation code are not deeply tested

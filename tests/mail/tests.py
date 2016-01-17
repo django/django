@@ -143,11 +143,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_header_injection(self):
         email = EmailMessage('Subject\nInjection Test', 'Content', 'from@example.com', ['to@example.com'])
-        self.assertRaises(BadHeaderError, email.message)
+        with self.assertRaises(BadHeaderError):
+            email.message()
         email = EmailMessage(
             ugettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
         )
-        self.assertRaises(BadHeaderError, email.message)
+        with self.assertRaises(BadHeaderError):
+            email.message()
 
     def test_space_continuation(self):
         """
@@ -1193,7 +1195,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_ssl)
         try:
-            self.assertRaises(SSLError, backend.open)
+            with self.assertRaises(SSLError):
+                backend.open()
         finally:
             backend.close()
 

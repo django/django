@@ -111,8 +111,10 @@ class TestMiscFinder(SimpleTestCase):
         We can't determine if STATICFILES_DIRS is set correctly just by
         looking at the type, but we can determine if it's definitely wrong.
         """
-        self.assertRaises(ImproperlyConfigured, finders.FileSystemFinder)
+        with self.assertRaises(ImproperlyConfigured):
+            finders.FileSystemFinder()
 
     @override_settings(MEDIA_ROOT='')
     def test_location_empty(self):
-        self.assertRaises(ImproperlyConfigured, finders.DefaultStorageFinder)
+        with self.assertRaises(ImproperlyConfigured):
+            finders.DefaultStorageFinder()

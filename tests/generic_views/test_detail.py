@@ -49,7 +49,8 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.status_code, 404)
 
     def test_detail_object_does_not_exist(self):
-        self.assertRaises(ObjectDoesNotExist, self.client.get, '/detail/doesnotexist/1/')
+        with self.assertRaises(ObjectDoesNotExist):
+            self.client.get('/detail/doesnotexist/1/')
 
     def test_detail_by_custom_pk(self):
         res = self.client.get('/detail/author/bycustompk/%s/' % self.author1.pk)
@@ -173,10 +174,12 @@ class DetailViewTest(TestCase):
         self.assertEqual(form_context_data['author'], self.author1)
 
     def test_invalid_url(self):
-        self.assertRaises(AttributeError, self.client.get, '/detail/author/invalid/url/')
+        with self.assertRaises(AttributeError):
+            self.client.get('/detail/author/invalid/url/')
 
     def test_invalid_queryset(self):
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/detail/author/invalid/qs/')
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/detail/author/invalid/qs/')
 
     def test_non_model_object_with_meta(self):
         res = self.client.get('/detail/nonmodel/1/')

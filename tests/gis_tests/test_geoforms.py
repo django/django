@@ -17,7 +17,8 @@ class GeometryFieldTest(SimpleTestCase):
         "Testing GeometryField initialization with defaults."
         fld = forms.GeometryField()
         for bad_default in ('blah', 3, 'FoO', None, 0):
-            self.assertRaises(ValidationError, fld.clean, bad_default)
+            with self.assertRaises(ValidationError):
+                fld.clean(bad_default)
 
     def test_srid(self):
         "Testing GeometryField with a SRID set."
@@ -59,7 +60,8 @@ class GeometryFieldTest(SimpleTestCase):
         # a WKT for any other geom_type will be properly transformed by `to_python`
         self.assertEqual(GEOSGeometry('LINESTRING(0 0, 1 1)'), pnt_fld.to_python('LINESTRING(0 0, 1 1)'))
         # but rejected by `clean`
-        self.assertRaises(forms.ValidationError, pnt_fld.clean, 'LINESTRING(0 0, 1 1)')
+        with self.assertRaises(forms.ValidationError):
+            pnt_fld.clean('LINESTRING(0 0, 1 1)')
 
     def test_to_python(self):
         """
@@ -72,7 +74,8 @@ class GeometryFieldTest(SimpleTestCase):
             self.assertEqual(GEOSGeometry(wkt), fld.to_python(wkt))
         # but raises a ValidationError for any other string
         for wkt in ('POINT(5)', 'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'BLAH(0 0, 1 1)'):
-            self.assertRaises(forms.ValidationError, fld.to_python, wkt)
+            with self.assertRaises(forms.ValidationError):
+                fld.to_python(wkt)
 
     def test_field_with_text_widget(self):
         class PointForm(forms.Form):

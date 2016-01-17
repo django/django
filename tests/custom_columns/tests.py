@@ -40,10 +40,8 @@ class CustomColumnsTests(TestCase):
         )
 
     def test_field_error(self):
-        self.assertRaises(
-            FieldError,
-            lambda: Author.objects.filter(firstname__exact="John")
-        )
+        with self.assertRaises(FieldError):
+            Author.objects.filter(firstname__exact="John")
 
     def test_attribute_error(self):
         with self.assertRaises(AttributeError):

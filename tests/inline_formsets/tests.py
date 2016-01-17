@@ -135,11 +135,9 @@ class InlineFormsetFactoryTest(TestCase):
         If we specify fk_name, but it isn't a ForeignKey from the child model
         to the parent model, we should get an exception.
         """
-        self.assertRaises(
-            Exception,
-            "fk_name 'school' is not a ForeignKey to <class 'inline_formsets.models.Parent'>",
-            inlineformset_factory, Parent, Child, fk_name='school'
-        )
+        msg = "fk_name 'school' is not a ForeignKey to 'inline_formsets.Parent'."
+        with self.assertRaisesMessage(ValueError, msg):
+            inlineformset_factory(Parent, Child, fk_name='school')
 
     def test_non_foreign_key_field(self):
         """

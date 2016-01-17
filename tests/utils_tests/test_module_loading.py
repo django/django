@@ -34,15 +34,18 @@ class DefaultLoader(unittest.TestCase):
 
         # A child that exists, but will generate an import error if loaded
         self.assertTrue(module_has_submodule(test_module, 'bad_module'))
-        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.bad_module')
+        with self.assertRaises(ImportError):
+            import_module('utils_tests.test_module.bad_module')
 
         # A child that doesn't exist
         self.assertFalse(module_has_submodule(test_module, 'no_such_module'))
-        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.no_such_module')
+        with self.assertRaises(ImportError):
+            import_module('utils_tests.test_module.no_such_module')
 
         # A child that doesn't exist, but is the name of a package on the path
         self.assertFalse(module_has_submodule(test_module, 'django'))
-        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.django')
+        with self.assertRaises(ImportError):
+            import_module('utils_tests.test_module.django')
 
         # Don't be confused by caching of import misses
         import types  # NOQA: causes attempted import of utils_tests.types
@@ -50,8 +53,8 @@ class DefaultLoader(unittest.TestCase):
 
         # A module which doesn't have a __path__ (so no submodules)
         self.assertFalse(module_has_submodule(test_no_submodule, 'anything'))
-        self.assertRaises(ImportError, import_module,
-            'utils_tests.test_no_submodule.anything')
+        with self.assertRaises(ImportError):
+            import_module('utils_tests.test_no_submodule.anything')
 
 
 class EggLoader(unittest.TestCase):
@@ -82,11 +85,13 @@ class EggLoader(unittest.TestCase):
 
             # A child that exists, but will generate an import error if loaded
             self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
-            self.assertRaises(ImportError, import_module, 'egg_module.bad_module')
+            with self.assertRaises(ImportError):
+                import_module('egg_module.bad_module')
 
             # A child that doesn't exist
             self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
-            self.assertRaises(ImportError, import_module, 'egg_module.no_such_module')
+            with self.assertRaises(ImportError):
+                import_module('egg_module.no_such_module')
 
     def test_deep_loader(self):
         "Modules deep inside an egg can still be tested for existence"
@@ -101,11 +106,13 @@ class EggLoader(unittest.TestCase):
 
             # A child that exists, but will generate an import error if loaded
             self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
-            self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.bad_module')
+            with self.assertRaises(ImportError):
+                import_module('egg_module.sub1.sub2.bad_module')
 
             # A child that doesn't exist
             self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
-            self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
+            with self.assertRaises(ImportError):
+                import_module('egg_module.sub1.sub2.no_such_module')
 
 
 class ModuleImportTestCase(unittest.TestCase):
@@ -114,7 +121,8 @@ class ModuleImportTestCase(unittest.TestCase):
         self.assertEqual(cls, import_string)
 
         # Test exceptions raised
-        self.assertRaises(ImportError, import_string, 'no_dots_in_path')
+        with self.assertRaises(ImportError):
+            import_string('no_dots_in_path')
         msg = 'Module "utils_tests" does not define a "unexistent" attribute'
         with six.assertRaisesRegex(self, ImportError, msg):
             import_string('utils_tests.unexistent')

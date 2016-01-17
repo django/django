@@ -350,7 +350,8 @@ class GDALBandTests(unittest.TestCase):
         band = rs.bands[0]
 
         # Setting attributes in write mode raises exception in the _flush method
-        self.assertRaises(GDALException, setattr, band, 'nodata_value', 10)
+        with self.assertRaises(GDALException):
+            setattr(band, 'nodata_value', 10)
 
     def test_band_data_setters(self):
         # Create in-memory raster and get band

@@ -27,7 +27,8 @@ class TestEncodingUtils(unittest.TestCase):
         # str(s) raises a TypeError on python 3 if the result is not a text type.
         # python 2 fails when it tries converting from str to unicode (via ASCII).
         exception = TypeError if six.PY3 else UnicodeError
-        self.assertRaises(exception, force_text, MyString())
+        with self.assertRaises(exception):
+            force_text(MyString())
 
     def test_force_text_lazy(self):
         s = SimpleLazyObject(lambda: 'x')

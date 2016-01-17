@@ -135,7 +135,8 @@ class UserPassesTestTests(TestCase):
 
         request = self.factory.get('/rand')
         request.user = AnonymousUser()
-        self.assertRaises(PermissionDenied, AView.as_view(), request)
+        with self.assertRaises(PermissionDenied):
+            AView.as_view()(request)
 
     def test_raise_exception_custom_message(self):
         msg = "You don't have access here"
@@ -248,4 +249,5 @@ class PermissionsRequiredMixinTests(TestCase):
 
         request = self.factory.get('/rand')
         request.user = self.user
-        self.assertRaises(PermissionDenied, AView.as_view(), request)
+        with self.assertRaises(PermissionDenied):
+            AView.as_view()(request)

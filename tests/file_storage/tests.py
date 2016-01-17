@@ -52,8 +52,8 @@ class GetStorageClassTests(SimpleTestCase):
         """
         get_storage_class raises an error if the requested class don't exist.
         """
-        self.assertRaises(ImportError, get_storage_class,
-                          'django.core.files.storage.NonExistingStorage')
+        with self.assertRaises(ImportError):
+            get_storage_class('django.core.files.storage.NonExistingStorage')
 
     def test_get_nonexisting_storage_module(self):
         """
@@ -256,7 +256,8 @@ class FileStorageTests(SimpleTestCase):
             """/test_media_url/a/b/c.file""")
 
         self.storage.base_url = None
-        self.assertRaises(ValueError, self.storage.url, 'test.file')
+        with self.assertRaises(ValueError):
+            self.storage.url('test.file')
 
         # #22717: missing ending slash in base_url should be auto-corrected
         storage = self.storage_class(location=self.temp_dir,
@@ -292,8 +293,10 @@ class FileStorageTests(SimpleTestCase):
         File storage prevents directory traversal (files can only be accessed if
         they're below the storage location).
         """
-        self.assertRaises(SuspiciousOperation, self.storage.exists, '..')
-        self.assertRaises(SuspiciousOperation, self.storage.exists, '/etc/passwd')
+        with self.assertRaises(SuspiciousOperation):
+            self.storage.exists('..')
+        with self.assertRaises(SuspiciousOperation):
+            self.storage.exists('/etc/passwd')
 
     def test_file_storage_preserves_filename_case(self):
         """The storage backend should preserve case of filenames."""
@@ -342,8 +345,8 @@ class FileStorageTests(SimpleTestCase):
                 self.assertEqual(f.read(), b'saved with race')
 
             # Check that OSErrors aside from EEXIST are still raised.
-            self.assertRaises(OSError,
-                self.storage.save, 'error/test.file', ContentFile('not saved'))
+            with self.assertRaises(OSError):
+                self.storage.save('error/test.file', ContentFile('not saved'))
         finally:
             os.makedirs = real_makedirs
 
@@ -379,7 +382,8 @@ class FileStorageTests(SimpleTestCase):
 
             # Check that OSErrors aside from ENOENT are still raised.
             self.storage.save('error.file', ContentFile('delete with error'))
-            self.assertRaises(OSError, self.storage.delete, 'error.file')
+            with self.assertRaises(OSError):
+                self.storage.delete('error.file')
         finally:
             os.remove = real_remove
 
@@ -491,7 +495,8 @@ class FileFieldStorageTests(TestCase):
         # An object without a file has limited functionality.
         obj1 = Storage()
         self.assertEqual(obj1.normal.name, "")
-        self.assertRaises(ValueError, lambda: obj1.normal.size)
+        with self.assertRaises(ValueError):
+            obj1.normal.size
 
         # Saving a file enables full functionality.
         obj1.normal.save("django_test.txt", ContentFile("content"))

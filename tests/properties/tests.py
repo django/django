@@ -16,7 +16,8 @@ class PropertyTests(TestCase):
 
     def test_setter(self):
         # The "full_name" property hasn't provided a "set" method.
-        self.assertRaises(AttributeError, setattr, self.a, 'full_name', 'Paul McCartney')
+        with self.assertRaises(AttributeError):
+            setattr(self.a, 'full_name', 'Paul McCartney')
 
         # And cannot be used to initialize the class.
         with self.assertRaisesMessage(TypeError, "'full_name' is an invalid keyword argument"):

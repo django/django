@@ -44,7 +44,8 @@ class ManyToOneNullTests(TestCase):
         self.assertEqual(self.a3.reporter, None)
         # Need to reget a3 to refresh the cache
         a3 = Article.objects.get(pk=self.a3.pk)
-        self.assertRaises(AttributeError, getattr, a3.reporter, 'id')
+        with self.assertRaises(AttributeError):
+            getattr(a3.reporter, 'id')
         # Accessing an article's 'reporter' attribute returns None
         # if the reporter is set to None.
         self.assertEqual(a3.reporter, None)
@@ -71,7 +72,8 @@ class ManyToOneNullTests(TestCase):
     def test_remove_from_wrong_set(self):
         self.assertQuerysetEqual(self.r2.article_set.all(), ['<Article: Fourth>'])
         # Try to remove a4 from a set it does not belong to
-        self.assertRaises(Reporter.DoesNotExist, self.r.article_set.remove, self.a4)
+        with self.assertRaises(Reporter.DoesNotExist):
+            self.r.article_set.remove(self.a4)
         self.assertQuerysetEqual(self.r2.article_set.all(), ['<Article: Fourth>'])
 
     def test_set(self):

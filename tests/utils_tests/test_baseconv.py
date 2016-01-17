@@ -42,5 +42,6 @@ class TestBaseConv(TestCase):
         self.assertEqual(base7.decode('ghejd'), -1234)
 
     def test_exception(self):
-        self.assertRaises(ValueError, BaseConverter, 'abc', sign='a')
+        with self.assertRaises(ValueError):
+            BaseConverter('abc', sign='a')
         self.assertIsInstance(BaseConverter('abc', sign='d'), BaseConverter)
