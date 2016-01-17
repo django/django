@@ -116,7 +116,7 @@ pages along with any interesting information from the objects themselves::
     <div class="pagination">
         <span class="step-links">
             {% if contacts.has_previous %}
-                <a href="?page={{ contacts.previous_page_number }}">previous</a>
+                <a href="?page={{ contacts.previous_page_number() }}">previous</a>
             {% endif %}
 
             <span class="current">
@@ -124,7 +124,7 @@ pages along with any interesting information from the objects themselves::
             </span>
 
             {% if contacts.has_next %}
-                <a href="?page={{ contacts.next_page_number }}">next</a>
+                <a href="?page={{ contacts.next_page_number() }}">next</a>
             {% endif %}
         </span>
     </div>
