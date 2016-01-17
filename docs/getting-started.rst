@@ -47,7 +47,7 @@ custom consumer we wrote above. Here's what that looks like::
     # In settings.py
     CHANNEL_BACKENDS = {
         "default": {
-            "BACKEND": "channels.backends.database.DatabaseChannelBackend",
+            "BACKEND": "channels.database_layer.DatabaseChannelLayer",
             "ROUTING": "myproject.routing.channel_routing",
         },
     }

@@ -27,10 +27,10 @@ DATABASES = {
 
 CHANNEL_BACKENDS = {
     "default": {
-        "BACKEND": "channels.backends.database.DatabaseChannelBackend",
+        "BACKEND": "channels.database_layer.DatabaseChannelLayer",
         "ROUTING": "testproject.urls.channel_routing",
     },
 }
 
 if os.environ.get("USEREDIS", None):
-    CHANNEL_BACKENDS['default']['BACKEND'] = "channels.backends.redis_py.RedisChannelBackend"
+    CHANNEL_BACKENDS['default']['BACKEND'] = "asgi_redis.RedisChannelLayer"
