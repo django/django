@@ -274,7 +274,8 @@ class URLPatternReverse(SimpleTestCase):
 
     def test_reverse_none(self):
         # Reversing None should raise an error, not return the last un-named view.
-        self.assertRaises(NoReverseMatch, reverse, None)
+        with self.assertRaises(NoReverseMatch):
+            reverse(None)
 
     @override_script_prefix('/{{invalid}}/')
     def test_prefix_braces(self):
@@ -371,10 +372,14 @@ class ResolverTests(unittest.TestCase):
 
         Regression for #10834.
         """
-        self.assertRaises(Resolver404, resolve, '')
-        self.assertRaises(Resolver404, resolve, 'a')
-        self.assertRaises(Resolver404, resolve, '\\')
-        self.assertRaises(Resolver404, resolve, '.')
+        with self.assertRaises(Resolver404):
+            resolve('')
+        with self.assertRaises(Resolver404):
+            resolve('a')
+        with self.assertRaises(Resolver404):
+            resolve('\\')
+        with self.assertRaises(Resolver404):
+            resolve('.')
 
     def test_404_tried_urls_have_names(self):
         """
@@ -492,7 +497,8 @@ class ReverseShortcutTests(SimpleTestCase):
         self.assertEqual(res.url, '/places/1/')
         res = redirect('headlines', year='2008', month='02', day='17')
         self.assertEqual(res.url, '/headlines/2008.02.17/')
-        self.assertRaises(NoReverseMatch, redirect, 'not-a-view')
+        with self.assertRaises(NoReverseMatch):
+            redirect('not-a-view')
 
     def test_redirect_to_url(self):
         res = redirect('/foo/')
@@ -523,7 +529,8 @@ class ReverseShortcutTests(SimpleTestCase):
         from .views import absolute_kwargs_view
         res = redirect(absolute_kwargs_view)
         self.assertEqual(res.url, '/absolute_arg_view/')
-        self.assertRaises(NoReverseMatch, redirect, absolute_kwargs_view, wrong_argument=None)
+        with self.assertRaises(NoReverseMatch):
+            redirect(absolute_kwargs_view, wrong_argument=None)
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
@@ -532,20 +539,28 @@ class NamespaceTests(SimpleTestCase):
 
     def test_ambiguous_object(self):
         "Names deployed via dynamic URL objects that require namespaces can't be resolved"
-        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view')
-        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view', args=[37, 42])
-        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
+        with self.assertRaises(NoReverseMatch):
+            reverse('urlobject-view')
+        with self.assertRaises(NoReverseMatch):
+            reverse('urlobject-view', args=[37, 42])
+        with self.assertRaises(NoReverseMatch):
+            reverse('urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
 
     def test_ambiguous_urlpattern(self):
         "Names deployed via dynamic URL objects that require namespaces can't be resolved"
-        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing')
-        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing', args=[37, 42])
-        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing', kwargs={'arg1': 42, 'arg2': 37})
+        with self.assertRaises(NoReverseMatch):
+            reverse('inner-nothing')
+        with self.assertRaises(NoReverseMatch):
+            reverse('inner-nothing', args=[37, 42])
+        with self.assertRaises(NoReverseMatch):
+            reverse('inner-nothing', kwargs={'arg1': 42, 'arg2': 37})
 
     def test_non_existent_namespace(self):
         "Non-existent namespaces raise errors"
-        self.assertRaises(NoReverseMatch, reverse, 'blahblah:urlobject-view')
-        self.assertRaises(NoReverseMatch, reverse, 'test-ns1:blahblah:urlobject-view')
+        with self.assertRaises(NoReverseMatch):
+            reverse('blahblah:urlobject-view')
+        with self.assertRaises(NoReverseMatch):
+            reverse('test-ns1:blahblah:urlobject-view')
 
     def test_normal_name(self):
         "Normal lookups work as expected"
@@ -896,7 +911,8 @@ class DefaultErrorHandlerTests(SimpleTestCase):
             self.fail("Shouldn't get an AttributeError due to undefined 404 handler")
 
         try:
-            self.assertRaises(ValueError, self.client.get, '/bad_view/')
+            with self.assertRaises(ValueError):
+                self.client.get('/bad_view/')
         except AttributeError:
             self.fail("Shouldn't get an AttributeError due to undefined 500 handler")
 
@@ -906,7 +922,8 @@ class NoRootUrlConfTests(SimpleTestCase):
     """Tests for handler404 and handler500 if ROOT_URLCONF is None"""
 
     def test_no_handler_exception(self):
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/test/me/')
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')

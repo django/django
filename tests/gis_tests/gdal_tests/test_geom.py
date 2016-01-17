@@ -36,9 +36,12 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         OGRGeomType('Unknown')
 
         # Should throw TypeError on this input
-        self.assertRaises(GDALException, OGRGeomType, 23)
-        self.assertRaises(GDALException, OGRGeomType, 'fooD')
-        self.assertRaises(GDALException, OGRGeomType, 9)
+        with self.assertRaises(GDALException):
+            OGRGeomType(23)
+        with self.assertRaises(GDALException):
+            OGRGeomType('fooD')
+        with self.assertRaises(GDALException):
+            OGRGeomType(9)
 
         # Equivalence can take strings, ints, and other OGRGeomTypes
         self.assertEqual(OGRGeomType(1), OGRGeomType(1))
@@ -168,7 +171,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(ls.coords, linestr.tuple)
             self.assertEqual(linestr, OGRGeometry(ls.wkt))
             self.assertNotEqual(linestr, prev)
-            self.assertRaises(OGRIndexError, linestr.__getitem__, len(linestr))
+            with self.assertRaises(OGRIndexError):
+                linestr.__getitem__(len(linestr))
             prev = linestr
 
             # Testing the x, y properties.
@@ -192,7 +196,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             for ls in mlinestr:
                 self.assertEqual(2, ls.geom_type)
                 self.assertEqual('LINESTRING', ls.geom_name)
-            self.assertRaises(OGRIndexError, mlinestr.__getitem__, len(mlinestr))
+            with self.assertRaises(OGRIndexError):
+                mlinestr.__getitem__(len(mlinestr))
 
     def test_linearring(self):
         "Testing LinearRing objects."
@@ -263,7 +268,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             if mp.valid:
                 self.assertEqual(mp.n_p, mpoly.point_count)
                 self.assertEqual(mp.num_geom, len(mpoly))
-                self.assertRaises(OGRIndexError, mpoly.__getitem__, len(mpoly))
+                with self.assertRaises(OGRIndexError):
+                    mpoly.__getitem__(len(mpoly))
                 for p in mpoly:
                     self.assertEqual('POLYGON', p.geom_name)
                     self.assertEqual(3, p.geom_type)
@@ -415,7 +421,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         # Can't insert a Point into a MultiPolygon.
         mp = OGRGeometry('MultiPolygon')
         pnt = OGRGeometry('POINT(5 23)')
-        self.assertRaises(GDALException, mp.add, pnt)
+        with self.assertRaises(GDALException):
+            mp.add(pnt)
 
         # GeometryCollection.add may take an OGRGeometry (if another collection
         # of the same type all child geoms will be added individually) or WKT.

@@ -29,7 +29,8 @@ class BaseStaticFilesTestCase(object):
         )
 
     def assertFileNotFound(self, filepath):
-        self.assertRaises(IOError, self._get_file, filepath)
+        with self.assertRaises(IOError):
+            self._get_file(filepath)
 
     def render_template(self, template, **kwargs):
         if isinstance(template, six.string_types):
@@ -46,7 +47,8 @@ class BaseStaticFilesTestCase(object):
         self.assertEqual(self.render_template(template, **kwargs), result)
 
     def assertStaticRaises(self, exc, path, result, asvar=False, **kwargs):
-        self.assertRaises(exc, self.assertStaticRenders, path, result, **kwargs)
+        with self.assertRaises(exc):
+            self.assertStaticRenders(path, result, **kwargs)
 
 
 @override_settings(**TEST_SETTINGS)

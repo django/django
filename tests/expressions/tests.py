@@ -294,12 +294,14 @@ class BasicExpressionsTests(TestCase):
 
         def test():
             test_gmbh.point_of_contact = F("ceo")
-        self.assertRaises(ValueError, test)
+        with self.assertRaises(ValueError):
+            test()
 
         test_gmbh.point_of_contact = test_gmbh.ceo
         test_gmbh.save()
         test_gmbh.name = F("ceo__last_name")
-        self.assertRaises(FieldError, test_gmbh.save)
+        with self.assertRaises(FieldError):
+            test_gmbh.save()
 
     def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do

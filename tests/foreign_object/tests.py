@@ -57,7 +57,8 @@ class MultiColumnFKTests(TestCase):
         membership = Membership.objects.create(
             membership_country_id=self.usa.id, person_id=self.jane.id, group_id=self.cia.id)
 
-        self.assertRaises(Person.DoesNotExist, getattr, membership, 'person')
+        with self.assertRaises(Person.DoesNotExist):
+            getattr(membership, 'person')
 
     def test_reverse_query_returns_correct_result(self):
         # Creating a valid membership because it has the same country has the person

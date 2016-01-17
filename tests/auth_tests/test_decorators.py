@@ -115,4 +115,5 @@ class PermissionsRequiredDecoratorTest(TestCase):
             return HttpResponse()
         request = self.factory.get('/rand')
         request.user = self.user
-        self.assertRaises(PermissionDenied, a_view, request)
+        with self.assertRaises(PermissionDenied):
+            a_view(request)

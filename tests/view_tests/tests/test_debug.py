@@ -124,8 +124,8 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
 
     def test_view_exceptions(self):
         for n in range(len(except_args)):
-            self.assertRaises(BrokenException, self.client.get,
-                reverse('view_exception', args=(n,)))
+            with self.assertRaises(BrokenException):
+                self.client.get(reverse('view_exception', args=(n,)))
 
     def test_non_l10ned_numeric_ids(self):
         """
@@ -169,7 +169,8 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         """
         Make sure if you don't specify a template, the debug view doesn't blow up.
         """
-        self.assertRaises(TemplateDoesNotExist, self.client.get, '/render_no_template/')
+        with self.assertRaises(TemplateDoesNotExist):
+            self.client.get('/render_no_template/')
 
     @override_settings(ROOT_URLCONF='view_tests.default_urls')
     def test_default_urlconf_template(self):

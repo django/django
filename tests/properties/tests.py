@@ -16,7 +16,8 @@ class PropertyTests(TestCase):
 
     def test_setter(self):
         # The "full_name" property hasn't provided a "set" method.
-        self.assertRaises(AttributeError, setattr, self.a, 'full_name', 'Paul McCartney')
+        with self.assertRaises(AttributeError):
+            setattr(self.a, 'full_name', 'Paul McCartney')
 
         # But "full_name_2" has, and it can be used to initialize the class.
         a2 = Person(full_name_2='Paul McCartney')

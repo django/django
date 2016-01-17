@@ -82,8 +82,10 @@ class GEOSMutationTest(unittest.TestCase):
         p = Point(1, 2)
         for i in range(-2, 2):
             p._checkindex(i)
-        self.assertRaises(IndexError, p._checkindex, 2)
-        self.assertRaises(IndexError, p._checkindex, -3)
+        with self.assertRaises(IndexError):
+            p._checkindex(2)
+        with self.assertRaises(IndexError):
+            p._checkindex(-3)
 
     def test01_PointMutations(self):
         'Testing Point mutations'
@@ -100,8 +102,10 @@ class GEOSMutationTest(unittest.TestCase):
 
     def test02_PointExceptions(self):
         'Testing Point exceptions'
-        self.assertRaises(TypeError, Point, range(1))
-        self.assertRaises(TypeError, Point, range(4))
+        with self.assertRaises(TypeError):
+            Point(range(1))
+        with self.assertRaises(TypeError):
+            Point(range(4))
 
     def test03_PointApi(self):
         'Testing Point API'

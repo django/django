@@ -850,7 +850,8 @@ class ListFiltersTests(TestCase):
         """
         modeladmin = DecadeFilterBookAdminWithFailingQueryset(Book, site)
         request = self.request_factory.get('/', {})
-        self.assertRaises(ZeroDivisionError, self.get_changelist, request, Book, modeladmin)
+        with self.assertRaises(ZeroDivisionError):
+            self.get_changelist(request, Book, modeladmin)
 
     def test_simplelistfilter_with_queryset_based_lookups(self):
         modeladmin = DecadeFilterBookAdminWithQuerysetBasedLookups(Book, site)

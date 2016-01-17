@@ -2903,7 +2903,8 @@ class WhereNodeTest(TestCase):
     def test_empty_full_handling_conjunction(self):
         compiler = WhereNodeTest.MockCompiler()
         w = WhereNode(children=[NothingNode()])
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
+        with self.assertRaises(EmptyResultSet):
+            w.as_sql(compiler, connection)
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ('', []))
         w = WhereNode(children=[self.DummyNode(), self.DummyNode()])
@@ -2911,14 +2912,16 @@ class WhereNodeTest(TestCase):
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ('NOT (dummy AND dummy)', []))
         w = WhereNode(children=[NothingNode(), self.DummyNode()])
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
+        with self.assertRaises(EmptyResultSet):
+            w.as_sql(compiler, connection)
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ('', []))
 
     def test_empty_full_handling_disjunction(self):
         compiler = WhereNodeTest.MockCompiler()
         w = WhereNode(children=[NothingNode()], connector='OR')
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
+        with self.assertRaises(EmptyResultSet):
+            w.as_sql(compiler, connection)
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ('', []))
         w = WhereNode(children=[self.DummyNode(), self.DummyNode()], connector='OR')
@@ -2960,8 +2963,10 @@ class IteratorExceptionsTest(TestCase):
         # Test for #19895 - second iteration over invalid queryset
         # raises errors.
         qs = Article.objects.order_by('invalid_column')
-        self.assertRaises(FieldError, list, qs)
-        self.assertRaises(FieldError, list, qs)
+        with self.assertRaises(FieldError):
+            list(qs)
+        with self.assertRaises(FieldError):
+            list(qs)
 
 
 class NullJoinPromotionOrTest(TestCase):

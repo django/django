@@ -131,10 +131,8 @@ class BasicCustomPKTests(TestCase):
         self.assertEqual(Employee.objects.get(pk=123), self.dan)
         self.assertEqual(Employee.objects.get(pk=456), self.fran)
 
-        self.assertRaises(
-            Employee.DoesNotExist,
-            lambda: Employee.objects.get(pk=42)
-        )
+        with self.assertRaises(Employee.DoesNotExist):
+            Employee.objects.get(pk=42)
 
         # Use the name of the primary key, rather than pk.
         self.assertEqual(Employee.objects.get(employee_code=123), self.dan)
@@ -151,7 +149,8 @@ class BasicCustomPKTests(TestCase):
         # Or we can use the real attribute name for the primary key:
         self.assertEqual(e.employee_code, 123)
 
-        self.assertRaises(AttributeError, lambda: e.id)
+        with self.assertRaises(AttributeError):
+            e.id
 
     def test_in_bulk(self):
         """

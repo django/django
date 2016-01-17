@@ -1848,7 +1848,8 @@ class TranslationFilesMissing(SimpleTestCase):
         '''
         self.patchGettextFind()
         trans_real._translations = {}
-        self.assertRaises(IOError, activate, 'en')
+        with self.assertRaises(IOError):
+            activate('en')
 
 
 class NonDjangoLanguageTests(SimpleTestCase):

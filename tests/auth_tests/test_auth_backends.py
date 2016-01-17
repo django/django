@@ -429,7 +429,8 @@ class NoBackendsTest(TestCase):
         self.user = User.objects.create_user('test', 'test@example.com', 'test')
 
     def test_raises_exception(self):
-        self.assertRaises(ImproperlyConfigured, self.user.has_perm, ('perm', TestObj(),))
+        with self.assertRaises(ImproperlyConfigured):
+            self.user.has_perm(('perm', TestObj(),))
 
 
 @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.SimpleRowlevelBackend'])
@@ -575,7 +576,8 @@ class TypeErrorBackendTest(TestCase):
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend])
     def test_type_error_raised(self):
-        self.assertRaises(TypeError, authenticate, username='test', password='test')
+        with self.assertRaises(TypeError):
+            authenticate(username='test', password='test')
 
 
 class ImproperlyConfiguredUserModelTest(TestCase):
@@ -598,7 +600,8 @@ class ImproperlyConfiguredUserModelTest(TestCase):
         request = HttpRequest()
         request.session = self.client.session
 
-        self.assertRaises(ImproperlyConfigured, get_user, request)
+        with self.assertRaises(ImproperlyConfigured):
+            get_user(request)
 
 
 class ImportedModelBackend(ModelBackend):

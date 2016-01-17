@@ -36,9 +36,8 @@ class TestRegistration(SimpleTestCase):
 
     def test_prevent_double_registration(self):
         self.site.register(Person)
-        self.assertRaises(admin.sites.AlreadyRegistered,
-                          self.site.register,
-                          Person)
+        with self.assertRaises(admin.sites.AlreadyRegistered):
+            self.site.register(Person)
 
     def test_registration_with_star_star_options(self):
         self.site.register(Person, search_fields=['name'])
@@ -68,7 +67,8 @@ class TestRegistration(SimpleTestCase):
         Exception is raised when trying to register an abstract model.
         Refs #12004.
         """
-        self.assertRaises(ImproperlyConfigured, self.site.register, Location)
+        with self.assertRaises(ImproperlyConfigured):
+            self.site.register(Location)
 
     def test_is_registered_model(self):
         "Checks for registered models should return true."

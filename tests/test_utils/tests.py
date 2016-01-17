@@ -125,7 +125,8 @@ class AssertNumQueriesTests(TestCase):
         def test_func():
             raise ValueError
 
-        self.assertRaises(ValueError, self.assertNumQueries, 2, test_func)
+        with self.assertRaises(ValueError):
+            self.assertNumQueries(2, test_func)
 
     def test_assert_num_queries_with_client(self):
         person = Person.objects.create(name='test')
@@ -864,22 +865,29 @@ class OverrideSettingsTests(SimpleTestCase):
         reverse('second')
 
     def test_urlconf_cache(self):
-        self.assertRaises(NoReverseMatch, lambda: reverse('first'))
-        self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+        with self.assertRaises(NoReverseMatch):
+            reverse('first')
+        with self.assertRaises(NoReverseMatch):
+            reverse('second')
 
         with override_settings(ROOT_URLCONF=FirstUrls):
             self.client.get(reverse('first'))
-            self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+            with self.assertRaises(NoReverseMatch):
+                reverse('second')
 
             with override_settings(ROOT_URLCONF=SecondUrls):
-                self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+                with self.assertRaises(NoReverseMatch):
+                    reverse('first')
                 self.client.get(reverse('second'))
 
             self.client.get(reverse('first'))
-            self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+            with self.assertRaises(NoReverseMatch):
+                reverse('second')
 
-        self.assertRaises(NoReverseMatch, lambda: reverse('first'))
-        self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+        with self.assertRaises(NoReverseMatch):
+            reverse('first')
+        with self.assertRaises(NoReverseMatch):
+            reverse('second')
 
     def test_override_media_root(self):
         """

@@ -35,7 +35,8 @@ class SitesFrameworkTests(TestCase):
         s = Site.objects.get_current()
         self.assertIsInstance(s, Site)
         s.delete()
-        self.assertRaises(ObjectDoesNotExist, Site.objects.get_current)
+        with self.assertRaises(ObjectDoesNotExist):
+            Site.objects.get_current()
 
     def test_site_cache(self):
         # After updating a Site object (e.g. via the admin), we shouldn't return a
@@ -53,7 +54,8 @@ class SitesFrameworkTests(TestCase):
         # be cleared and get_current() should raise a DoesNotExist.
         self.assertIsInstance(Site.objects.get_current(), Site)
         Site.objects.all().delete()
-        self.assertRaises(Site.DoesNotExist, Site.objects.get_current)
+        with self.assertRaises(Site.DoesNotExist):
+            Site.objects.get_current()
 
     @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_get_current_site(self):
@@ -70,7 +72,8 @@ class SitesFrameworkTests(TestCase):
         # Test that an exception is raised if the sites framework is installed
         # but there is no matching Site
         site.delete()
-        self.assertRaises(ObjectDoesNotExist, get_current_site, request)
+        with self.assertRaises(ObjectDoesNotExist):
+            get_current_site(request)
 
         # A RequestSite is returned if the sites framework is not installed
         with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
@@ -112,7 +115,8 @@ class SitesFrameworkTests(TestCase):
 
         # Host header with non-matching domain
         request.META = {'HTTP_HOST': 'example.net'}
-        self.assertRaises(ObjectDoesNotExist, get_current_site, request)
+        with self.assertRaises(ObjectDoesNotExist):
+            get_current_site(request)
 
         # Ensure domain for RequestSite always matches host header
         with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
@@ -128,11 +132,14 @@ class SitesFrameworkTests(TestCase):
         # Regression for #17320
         # Domain names are not allowed contain whitespace characters
         site = Site(name="test name", domain="test test")
-        self.assertRaises(ValidationError, site.full_clean)
+        with self.assertRaises(ValidationError):
+            site.full_clean()
         site.domain = "test\ttest"
-        self.assertRaises(ValidationError, site.full_clean)
+        with self.assertRaises(ValidationError):
+            site.full_clean()
         site.domain = "test\ntest"
-        self.assertRaises(ValidationError, site.full_clean)
+        with self.assertRaises(ValidationError):
+            site.full_clean()
 
     def test_clear_site_cache(self):
         request = HttpRequest()

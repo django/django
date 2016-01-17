@@ -204,7 +204,8 @@ class ListViewTests(TestCase):
         self.assertTemplateUsed(res, 'generic_views/author_list.html')
 
     def test_missing_items(self):
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/list/authors/invalid/')
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/list/authors/invalid/')
 
     def test_paginated_list_view_does_not_load_entire_table(self):
         # Regression test for #17535

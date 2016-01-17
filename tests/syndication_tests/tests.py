@@ -461,9 +461,8 @@ class SyndicationFeedTest(FeedTestCase):
         Test that an ImproperlyConfigured is raised if no link could be found
         for the item(s).
         """
-        self.assertRaises(ImproperlyConfigured,
-                          self.client.get,
-                          '/syndication/articles/')
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/syndication/articles/')
 
     def test_template_feed(self):
         """

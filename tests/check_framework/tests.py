@@ -159,7 +159,8 @@ class CheckCommandTests(SimpleTestCase):
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_invalid_tag(self):
-        self.assertRaises(CommandError, call_command, 'check', tags=['missingtag'])
+        with self.assertRaises(CommandError):
+            call_command('check', tags=['missingtag'])
 
     @override_system_checks([simple_system_check])
     def test_list_tags_empty(self):

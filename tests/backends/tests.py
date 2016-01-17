@@ -128,19 +128,15 @@ class SQLiteTests(TestCase):
         #19360: Raise NotImplementedError when aggregating on date/time fields.
         """
         for aggregate in (Sum, Avg, Variance, StdDev):
-            self.assertRaises(
-                NotImplementedError,
-                models.Item.objects.all().aggregate, aggregate('time'))
-            self.assertRaises(
-                NotImplementedError,
-                models.Item.objects.all().aggregate, aggregate('date'))
-            self.assertRaises(
-                NotImplementedError,
-                models.Item.objects.all().aggregate, aggregate('last_modified'))
-            self.assertRaises(
-                NotImplementedError,
-                models.Item.objects.all().aggregate,
-                **{'complex': aggregate('last_modified') + aggregate('last_modified')})
+            with self.assertRaises(NotImplementedError):
+                models.Item.objects.all().aggregate(aggregate('time'))
+            with self.assertRaises(NotImplementedError):
+                models.Item.objects.all().aggregate(aggregate('date'))
+            with self.assertRaises(NotImplementedError):
+                models.Item.objects.all().aggregate(aggregate('last_modified'))
+            with self.assertRaises(NotImplementedError):
+                models.Item.objects.all().aggregate(
+                    **{'complex': aggregate('last_modified') + aggregate('last_modified')})
 
     def test_memory_db_test_name(self):
         """
@@ -437,8 +433,10 @@ class ParameterHandlingTest(TestCase):
             connection.ops.quote_name('root'),
             connection.ops.quote_name('square')
         ))
-        self.assertRaises(Exception, cursor.executemany, query, [(1, 2, 3)])
-        self.assertRaises(Exception, cursor.executemany, query, [(1,)])
+        with self.assertRaises(Exception):
+            cursor.executemany(query, [(1, 2, 3)])
+        with self.assertRaises(Exception):
+            cursor.executemany(query, [(1,)])
 
 
 # Unfortunately, the following tests would be a good test to run on all
@@ -847,7 +845,8 @@ class FkConstraintsTests(TransactionTestCase):
         a2 = models.Article(headline='This is another test', reporter=self.r,
                             pub_date=datetime.datetime(2012, 8, 3),
                             reporter_proxy_id=30)
-        self.assertRaises(IntegrityError, a2.save)
+        with self.assertRaises(IntegrityError):
+            a2.save()
 
     def test_integrity_checks_on_update(self):
         """
@@ -875,7 +874,8 @@ class FkConstraintsTests(TransactionTestCase):
         # Retrieve the second article from the DB
         a2 = models.Article.objects.get(headline='Another article')
         a2.reporter_proxy_id = 30
-        self.assertRaises(IntegrityError, a2.save)
+        with self.assertRaises(IntegrityError):
+            a2.save()
 
     def test_disable_constraint_checks_manually(self):
         """

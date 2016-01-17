@@ -144,7 +144,8 @@ class HTTPSitemapTests(SitemapTestsBase):
         Sitemap.get_urls and no Site objects exist
         """
         Site.objects.all().delete()
-        self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
+        with self.assertRaises(ImproperlyConfigured):
+            Sitemap().get_urls()
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_sitemap_get_urls_no_site_2(self):
@@ -153,7 +154,8 @@ class HTTPSitemapTests(SitemapTestsBase):
         Sitemap.get_urls if Site objects exists, but the sites framework is not
         actually installed.
         """
-        self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
+        with self.assertRaises(ImproperlyConfigured):
+            Sitemap().get_urls()
 
     def test_sitemap_item(self):
         """

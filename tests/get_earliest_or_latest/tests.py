@@ -17,7 +17,8 @@ class EarliestOrLatestTests(TestCase):
 
     def test_earliest(self):
         # Because no Articles exist yet, earliest() raises ArticleDoesNotExist.
-        self.assertRaises(Article.DoesNotExist, Article.objects.earliest)
+        with self.assertRaises(Article.DoesNotExist):
+            Article.objects.earliest()
 
         a1 = Article.objects.create(
             headline="Article 1", pub_date=datetime(2005, 7, 26),
@@ -65,7 +66,8 @@ class EarliestOrLatestTests(TestCase):
 
     def test_latest(self):
         # Because no Articles exist yet, latest() raises ArticleDoesNotExist.
-        self.assertRaises(Article.DoesNotExist, Article.objects.latest)
+        with self.assertRaises(Article.DoesNotExist):
+            Article.objects.latest()
 
         a1 = Article.objects.create(
             headline="Article 1", pub_date=datetime(2005, 7, 26),
@@ -117,7 +119,8 @@ class EarliestOrLatestTests(TestCase):
         # "get_latest_by" set -- just pass in the field name manually.
         Person.objects.create(name="Ralph", birthday=datetime(1950, 1, 1))
         p2 = Person.objects.create(name="Stephanie", birthday=datetime(1960, 2, 3))
-        self.assertRaises(AssertionError, Person.objects.latest)
+        with self.assertRaises(AssertionError):
+            Person.objects.latest()
         self.assertEqual(Person.objects.latest("birthday"), p2)
 
 
@@ -162,9 +165,12 @@ class TestFirstLast(TestCase):
         def check():
             # We know that we've broken the __iter__ method, so the queryset
             # should always raise an exception.
-            self.assertRaises(IndexError, lambda: IndexErrorArticle.objects.all()[0])
-            self.assertRaises(IndexError, IndexErrorArticle.objects.all().first)
-            self.assertRaises(IndexError, IndexErrorArticle.objects.all().last)
+            with self.assertRaises(IndexError):
+                IndexErrorArticle.objects.all()[0]
+            with self.assertRaises(IndexError):
+                IndexErrorArticle.objects.all().first()
+            with self.assertRaises(IndexError):
+                IndexErrorArticle.objects.all().last()
 
         check()
 

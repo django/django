@@ -498,12 +498,8 @@ class ModelLookupTest(TestCase):
         )
         # To avoid dict-ordering related errors check only one lookup
         # in single assert.
-        self.assertRaises(
-            ObjectDoesNotExist,
-            Article.objects.get,
-            pub_date__year=2005,
-            pub_date__month=8,
-        )
+        with self.assertRaises(ObjectDoesNotExist):
+            Article.objects.get(pub_date__year=2005, pub_date__month=8)
         six.assertRaisesRegex(
             self,
             ObjectDoesNotExist,

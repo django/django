@@ -123,8 +123,8 @@ class AdvancedTests(TestCase):
         We do not support update on already sliced query sets.
         """
         method = DataPoint.objects.all()[:2].update
-        self.assertRaises(AssertionError, method,
-                          another_value='another thing')
+        with self.assertRaises(AssertionError):
+            method(another_value='another thing')
 
     def test_update_respects_to_field(self):
         """

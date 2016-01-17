@@ -109,7 +109,8 @@ class DependencyOrderingTests(unittest.TestCase):
             'alpha': ['bravo'],
         }
 
-        self.assertRaises(ImproperlyConfigured, dependency_ordered, raw, dependencies=dependencies)
+        with self.assertRaises(ImproperlyConfigured):
+            dependency_ordered(raw, dependencies=dependencies)
 
     def test_own_alias_dependency(self):
         raw = [

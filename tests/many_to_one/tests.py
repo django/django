@@ -455,8 +455,8 @@ class ManyToOneTests(TestCase):
         self.assertEqual(a3.reporter.id, self.r2.id)
 
         # Get should respect explicit foreign keys as well.
-        self.assertRaises(MultipleObjectsReturned,
-                          Article.objects.get, reporter_id=self.r.id)
+        with self.assertRaises(MultipleObjectsReturned):
+            Article.objects.get(reporter_id=self.r.id)
         self.assertEqual(repr(a3),
                          repr(Article.objects.get(reporter_id=self.r2.id,
                                              pub_date=datetime.date(2011, 5, 7))))
@@ -533,15 +533,19 @@ class ManyToOneTests(TestCase):
         self.assertIsNone(p.bestchild)
 
         # Assigning None fails: Child.parent is null=False.
-        self.assertRaises(ValueError, setattr, c, "parent", None)
+        with self.assertRaises(ValueError):
+            setattr(c, "parent", None)
 
         # You also can't assign an object of the wrong type here
-        self.assertRaises(ValueError, setattr, c, "parent", First(id=1, second=1))
+        with self.assertRaises(ValueError):
+            setattr(c, "parent", First(id=1, second=1))
 
         # Nor can you explicitly assign None to Child.parent during object
         # creation (regression for #9649).
-        self.assertRaises(ValueError, Child, name='xyzzy', parent=None)
-        self.assertRaises(ValueError, Child.objects.create, name='xyzzy', parent=None)
+        with self.assertRaises(ValueError):
+            Child(name='xyzzy', parent=None)
+        with self.assertRaises(ValueError):
+            Child.objects.create(name='xyzzy', parent=None)
 
         # Creation using keyword argument should cache the related object.
         p = Parent.objects.get(name="Parent")
@@ -598,7 +602,8 @@ class ManyToOneTests(TestCase):
 
         p = Parent.objects.create(name="Parent")
         c = Child.objects.create(name="Child", parent=p)
-        self.assertRaises(ValueError, Child.objects.create, name="Grandchild", parent=c)
+        with self.assertRaises(ValueError):
+            Child.objects.create(name="Grandchild", parent=c)
 
     def test_fk_instantiation_outside_model(self):
         # Regression for #12190 -- Should be able to instantiate a FK outside
@@ -646,7 +651,8 @@ class ManyToOneTests(TestCase):
         School.objects.use_for_related_fields = True
         try:
             private_student = Student.objects.get(pk=private_student.pk)
-            self.assertRaises(School.DoesNotExist, lambda: private_student.school)
+            with self.assertRaises(School.DoesNotExist):
+                private_student.school
         finally:
             School.objects.use_for_related_fields = False
 
