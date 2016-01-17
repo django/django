@@ -178,8 +178,9 @@ code, and so has been made optional in order to enable lightweight
 channel layers for applications that don't need the full feature set defined
 here.
 
-There are two extensions defined here: the ``groups`` extension, which
-is expanded on below, and the ``statistics`` extension, which allows
+There are three extensions defined here: the ``groups`` extension, which
+is expanded on below, the ``flush`` extension, which allows easier testing
+and development, and the ``statistics`` extension, which allows
 channel layers to provide global and per-channel statistics.
 
 There is potential to add further extensions; these may be defined by
@@ -285,7 +286,7 @@ A *channel layer* should provide an object with these attributes
 
 * ``extensions``, a list of unicode string names indicating which
   extensions this layer provides, or empty if it supports none.
-  The only valid extension names are ``groups`` and ``statistics`.
+  The only valid extension names are ``groups``, ``flush`` and ``statistics`.
 
 A channel layer implementing the ``groups`` extension must also provide:
 
@@ -314,7 +315,12 @@ A channel layer implementing the ``statistics`` extension must also provide:
   * ``age``, how long the oldest message has been waiting, in seconds
   * ``per_second``, the number of messages processed in the last second
 
+A channel layer implementing the ``flush`` extension must also provide:
 
+* ``flush()``, a callable that resets the channel layer to no messages and
+  no groups (if groups is implemented). This call must block until the system
+  is cleared and will consistently look empty to any client, if the channel
+  layer is distributed.
 
 
 
@@ -358,6 +364,10 @@ In order to avoid a nasty set of bugs caused by these half-deleted sockets,
 protocol servers should quit and hard restart if they detect that the channel
 layer has gone down or lost data; shedding all existing connections and letting
 clients reconnect will immediately resolve the problem.
+
+If a channel layer implements the ``groups`` extension, it must persist group
+membership until at least the time when the member channel has a message
+expire due to non-consumption.
 
 
 Message Formats
