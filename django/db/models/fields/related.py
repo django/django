@@ -949,11 +949,14 @@ class ForeignKey(ForeignObject):
         defaults.update(kwargs)
         return super(ForeignKey, self).formfield(**defaults)
 
+    def db_check(self, connection):
+        return []
+
     def db_type(self, connection):
         return self.target_field.rel_db_type(connection=connection)
 
     def db_parameters(self, connection):
-        return {"type": self.db_type(connection), "check": []}
+        return {"type": self.db_type(connection), "check": self.db_check(connection)}
 
     def convert_empty_strings(self, value, expression, connection, context):
         if (not value) and isinstance(value, six.string_types):
@@ -1613,6 +1616,9 @@ class ManyToManyField(RelatedField):
                 initial = initial()
             defaults['initial'] = [i._get_pk_val() for i in initial]
         return super(ManyToManyField, self).formfield(**defaults)
+
+    def db_check(self, connection):
+        return None
 
     def db_type(self, connection):
         # A ManyToManyField is not represented by a single column,
