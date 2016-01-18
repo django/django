@@ -169,4 +169,3 @@ class ForTagTests(SimpleTestCase):
         d['one'].append(1)
         output = self.engine.render_to_string('for-tag-dictitems02', {'d': d})
         self.assertEqual(output, 'one:[1]')
-
