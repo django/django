@@ -210,6 +210,10 @@ Generic Views
 
 * The :class:`~django.views.generic.base.View` class can now be imported from
   ``django.views``.
+* :class:`~django.views.generic.edit.DeleteView` now inherits from
+  :class:`~django.views.generic.edit.ProcessFormView`. This allows compatibility
+  with features like the :class:`~django.contrib.messages.views.SuccessMessageMixin`
+  from :mod:`~django.contrib.messages`.
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^

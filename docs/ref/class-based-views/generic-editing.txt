@@ -39,6 +39,7 @@ FormView
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * ``django.views.generic.edit.BaseFormView``
     * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.base.ContextMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
 
@@ -97,6 +98,7 @@ CreateView
     * ``django.views.generic.edit.BaseCreateView``
     * :class:`django.views.generic.edit.ModelFormMixin`
     * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.base.ContextMixin`
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
@@ -154,6 +156,7 @@ UpdateView
     * ``django.views.generic.edit.BaseUpdateView``
     * :class:`django.views.generic.edit.ModelFormMixin`
     * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.base.ContextMixin`
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
@@ -198,9 +201,9 @@ DeleteView
 .. class:: django.views.generic.edit.DeleteView
 
     A view that displays a confirmation page and deletes an existing object.
-    The given object will only be deleted if the request method is ``POST``. If
-    this view is fetched via ``GET``, it will display a confirmation page that
-    should contain a form that POSTs to the same URL.
+    The given object will only be deleted if the request method is ``POST`` or
+    ``DELETE``. If this view is fetched via ``GET``, it will display a
+    confirmation page that should contain a form that POSTs to the same URL.
 
     **Ancestors (MRO)**
 
@@ -208,10 +211,13 @@ DeleteView
 
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.edit.BaseDeleteView``
+    * :class:`django.views.generic.edit.ModelFormMixin`
+    * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.base.ContextMixin`
     * :class:`django.views.generic.edit.DeletionMixin`
     * ``django.views.generic.detail.BaseDetailView``
     * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
 
     **Attributes**

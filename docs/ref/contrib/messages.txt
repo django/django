@@ -352,7 +352,9 @@ Adding messages in class-based views
 .. class:: views.SuccessMessageMixin
 
     Adds a success message attribute to
-    :class:`~django.views.generic.edit.FormView` based classes
+    :class:`~django.views.generic.edit.FormView` based classes (for example
+    :class:`~django.views.generic.edit.CreateView`, :class:`~django.views.generic.edit.UpdateView` and
+    :class:`~django.views.generic.edit.DeleteView`)
 
     .. method:: get_success_message(cleaned_data)
 
