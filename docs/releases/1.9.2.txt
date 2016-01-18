@@ -38,3 +38,6 @@ Bugfixes
 
 * Fixed a crash when destroying an existing test database on MySQL or
   PostgreSQL (:ticket:`26096`).
+
+* Fixed CSRF cookie check on POST requests when ``USE_X_FORWARDED_PORT=True``
+  (:ticket:`26094`).
