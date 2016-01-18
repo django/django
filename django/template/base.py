@@ -51,10 +51,10 @@ times with multiple contexts)
 
 from __future__ import unicode_literals
 
-from collections import defaultdict
 import inspect
 import logging
 import re
+from collections import defaultdict
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
@@ -865,7 +865,7 @@ class Variable(object):
         try:  # catch-all for silent variable failures
             for bit in self.lookups:
                 try:  # dictionary/defaultdict lookup
-                    if isinstance(current, defaultdict) and not bit in current:
+                    if isinstance(current, defaultdict) and bit not in current:
                         raise KeyError
                     current = current[bit]
                     # ValueError/IndexError are for numpy.array lookup on
