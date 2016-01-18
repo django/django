@@ -364,12 +364,12 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         )
 
         # Excluding a bogus app should throw an error
-        with six.assertRaisesRegex(self, management.CommandError,
+        with self.assertRaisesMessage(management.CommandError,
                 "No installed app with label 'foo_app'."):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['foo_app'])
 
         # Excluding a bogus model should throw an error
-        with six.assertRaisesRegex(self, management.CommandError,
+        with self.assertRaisesMessage(management.CommandError,
                 "Unknown model in excludes: fixtures.FooModel"):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
 
@@ -415,7 +415,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             primary_keys='2'
         )
 
-        with six.assertRaisesRegex(self, management.CommandError,
+        with self.assertRaisesMessage(management.CommandError,
                 "You can only use --pks option with one model"):
             self._dumpdata_assert(
                 ['fixtures'],
@@ -425,7 +425,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 primary_keys='2,3'
             )
 
-        with six.assertRaisesRegex(self, management.CommandError,
+        with self.assertRaisesMessage(management.CommandError,
                 "You can only use --pks option with one model"):
             self._dumpdata_assert(
                 '',
@@ -435,7 +435,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 primary_keys='2,3'
             )
 
-        with six.assertRaisesRegex(self, management.CommandError,
+        with self.assertRaisesMessage(management.CommandError,
                 "You can only use --pks option with one model"):
             self._dumpdata_assert(
                 ['fixtures.Article', 'fixtures.category'],

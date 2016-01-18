@@ -659,10 +659,11 @@ class PermissionTestCase(TestCase):
         # check duplicated default permission
         models.Permission._meta.permissions = [
             ('change_permission', 'Can edit permission (duplicate)')]
-        six.assertRaisesRegex(self, CommandError,
-            "The permission codename 'change_permission' clashes with a "
-            "builtin permission for model 'auth.Permission'.",
-            create_permissions, auth_app_config, verbosity=0)
+        with self.assertRaisesMessage(
+            CommandError,
+                "The permission codename 'change_permission' clashes with a "
+                "builtin permission for model 'auth.Permission'."):
+            create_permissions(auth_app_config, verbosity=0)
 
         # check duplicated custom permissions
         models.Permission._meta.permissions = [
@@ -670,10 +671,11 @@ class PermissionTestCase(TestCase):
             ('other_one', 'Some other permission'),
             ('my_custom_permission', 'Some permission with duplicate permission code'),
         ]
-        six.assertRaisesRegex(self, CommandError,
-            "The permission codename 'my_custom_permission' is duplicated for model "
-            "'auth.Permission'.",
-            create_permissions, auth_app_config, verbosity=0)
+        with self.assertRaisesMessage(
+            CommandError,
+                "The permission codename 'my_custom_permission' is duplicated for model "
+                "'auth.Permission'."):
+            create_permissions(auth_app_config, verbosity=0)
 
         # should not raise anything
         models.Permission._meta.permissions = [
@@ -712,9 +714,10 @@ class PermissionTestCase(TestCase):
         models.Permission.objects.filter(content_type=permission_content_type).delete()
         models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control" * 5
 
-        six.assertRaisesRegex(self, exceptions.ValidationError,
-            "The verbose_name of auth.permission is longer than 244 characters",
-            create_permissions, auth_app_config, verbosity=0)
+        with self.assertRaisesMessage(
+            exceptions.ValidationError,
+                "The verbose_name of auth.permission is longer than 244 characters"):
+            create_permissions(auth_app_config, verbosity=0)
 
     def test_custom_permission_name_length(self):
         auth_app_config = apps.get_app_config('auth')

@@ -499,7 +499,7 @@ class MakeMigrationsTests(MigrationTestBase):
         apps.register_model('migrations', UnserializableModel)
 
         with self.temporary_migration_module() as migration_dir:
-            with six.assertRaisesRegex(self, ValueError, r'Cannot serialize'):
+            with self.assertRaisesMessage(ValueError, 'Cannot serialize'):
                 call_command("makemigrations", "migrations", verbosity=0)
 
             initial_file = os.path.join(migration_dir, "0001_initial.py")

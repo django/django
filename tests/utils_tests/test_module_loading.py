@@ -5,7 +5,7 @@ import unittest
 from importlib import import_module
 from zipimport import zipimporter
 
-from django.test import SimpleTestCase, modify_settings
+from django.test import SimpleTestCase, TestCase, modify_settings
 from django.test.utils import extend_sys_path
 from django.utils import six
 from django.utils._os import upath
@@ -115,7 +115,7 @@ class EggLoader(unittest.TestCase):
                 import_module('egg_module.sub1.sub2.no_such_module')
 
 
-class ModuleImportTestCase(unittest.TestCase):
+class ModuleImportTestCase(TestCase):
     def test_import_string(self):
         cls = import_string('django.utils.module_loading.import_string')
         self.assertEqual(cls, import_string)
@@ -124,7 +124,7 @@ class ModuleImportTestCase(unittest.TestCase):
         with self.assertRaises(ImportError):
             import_string('no_dots_in_path')
         msg = 'Module "utils_tests" does not define a "unexistent" attribute'
-        with six.assertRaisesRegex(self, ImportError, msg):
+        with self.assertRaisesMessage(ImportError, msg):
             import_string('utils_tests.unexistent')
 
 
@@ -164,13 +164,13 @@ class AutodiscoverModulesTestCase(SimpleTestCase):
 
     def test_validate_registry_keeps_intact(self):
         from .test_module import site
-        with six.assertRaisesRegex(self, Exception, "Some random exception."):
+        with self.assertRaisesMessage(Exception, "Some random exception."):
             autodiscover_modules('another_bad_module', register_to=site)
         self.assertEqual(site._registry, {})
 
     def test_validate_registry_resets_after_erroneous_module(self):
         from .test_module import site
-        with six.assertRaisesRegex(self, Exception, "Some random exception."):
+        with self.assertRaisesMessage(Exception, "Some random exception."):
             autodiscover_modules('another_good_module', 'another_bad_module', register_to=site)
         self.assertEqual(site._registry, {'lorem': 'ipsum'})
 

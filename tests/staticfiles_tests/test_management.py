@@ -101,8 +101,8 @@ class TestConfiguration(StaticFilesTestCase):
         err = six.StringIO()
         for root in ['', None]:
             with override_settings(STATIC_ROOT=root):
-                with six.assertRaisesRegex(
-                        self, ImproperlyConfigured,
+                with self.assertRaisesMessage(
+                        ImproperlyConfigured,
                         'without having set the STATIC_ROOT setting to a filesystem path'):
                     call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
 

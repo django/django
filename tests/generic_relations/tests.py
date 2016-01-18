@@ -7,7 +7,6 @@ from django.core.exceptions import FieldError
 from django.db import IntegrityError
 from django.db.models import Q
 from django.test import SimpleTestCase, TestCase
-from django.utils import six
 
 from .models import (
     AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
@@ -721,7 +720,7 @@ class TestInitWithNoneArgument(SimpleTestCase):
     def test_none_not_allowed(self):
         # TaggedItem requires a content_type, initializing with None should
         # raise a ValueError.
-        with six.assertRaisesRegex(self, ValueError,
+        with self.assertRaisesMessage(ValueError,
           'Cannot assign None: "TaggedItem.content_type" does not allow null values'):
             TaggedItem(content_object=None)
 

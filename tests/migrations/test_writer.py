@@ -296,7 +296,7 @@ class WriterTests(SimpleTestCase):
         )
 
     def test_serialize_functions(self):
-        with six.assertRaisesRegex(self, ValueError, 'Cannot serialize function: lambda'):
+        with self.assertRaisesMessage(ValueError, 'Cannot serialize function: lambda'):
             self.assertSerializedEqual(lambda x: 42)
         self.assertSerializedEqual(models.SET_NULL)
         string, imports = MigrationWriter.serialize(models.SET(42))
@@ -461,8 +461,8 @@ class WriterTests(SimpleTestCase):
                 return "somewhere dynamic"
             thing = models.FileField(upload_to=upload_to)
 
-        with six.assertRaisesRegex(self, ValueError,
-                '^Could not find function upload_to in migrations.test_writer'):
+        with self.assertRaisesMessage(ValueError,
+                'Could not find function upload_to in migrations.test_writer'):
             self.serialize_round_trip(TestModel2.thing)
 
     def test_serialize_managers(self):

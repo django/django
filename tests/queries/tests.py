@@ -1362,7 +1362,7 @@ class Queries4Tests(BaseQuerysetTest):
 
     def test_ticket11811(self):
         unsaved_category = NamedCategory(name="Other")
-        with six.assertRaisesRegex(self, ValueError,
+        with self.assertRaisesMessage(ValueError,
                 'Unsaved model instance <NamedCategory: Other> '
                 'cannot be used in an ORM query.'):
             Tag.objects.filter(pk=self.t1.pk).update(category=unsaved_category)
@@ -2321,48 +2321,32 @@ class QuerySetSupportsPythonIdioms(TestCase):
              "<Article: Article 7>"])
 
     def test_slicing_cannot_filter_queryset_once_sliced(self):
-        six.assertRaisesRegex(
-            self,
+        with self.assertRaisesMessage(
             AssertionError,
-            "Cannot filter a query once a slice has been taken.",
-            Article.objects.all()[0:5].filter,
-            id=1,
-        )
+                "Cannot filter a query once a slice has been taken."):
+            Article.objects.all()[0:5].filter(id=1, )
 
     def test_slicing_cannot_reorder_queryset_once_sliced(self):
-        six.assertRaisesRegex(
-            self,
+        with self.assertRaisesMessage(
             AssertionError,
-            "Cannot reorder a query once a slice has been taken.",
-            Article.objects.all()[0:5].order_by,
-            'id',
-        )
+                "Cannot reorder a query once a slice has been taken."):
+            Article.objects.all()[0:5].order_by('id', )
 
     def test_slicing_cannot_combine_queries_once_sliced(self):
-        six.assertRaisesRegex(
-            self,
+        with self.assertRaisesMessage(
             AssertionError,
-            "Cannot combine queries once a slice has been taken.",
-            lambda: Article.objects.all()[0:1] & Article.objects.all()[4:5]
-        )
+                "Cannot combine queries once a slice has been taken."):
+            Article.objects.all()[0:1] & Article.objects.all()[4:5]
 
     def test_slicing_negative_indexing_not_supported_for_single_element(self):
         """hint: inverting your ordering might do what you need"""
-        six.assertRaisesRegex(
-            self,
-            AssertionError,
-            "Negative indexing is not supported.",
-            lambda: Article.objects.all()[-1]
-        )
+        with self.assertRaisesMessage(AssertionError, "Negative indexing is not supported."):
+            Article.objects.all()[-1]
 
     def test_slicing_negative_indexing_not_supported_for_range(self):
         """hint: inverting your ordering might do what you need"""
-        six.assertRaisesRegex(
-            self,
-            AssertionError,
-            "Negative indexing is not supported.",
-            lambda: Article.objects.all()[0:-5]
-        )
+        with self.assertRaisesMessage(AssertionError, "Negative indexing is not supported."):
+            Article.objects.all()[0:-5]
 
     def test_can_get_number_of_items_in_queryset_using_standard_len(self):
         self.assertEqual(len(Article.objects.filter(name__exact='Article 1')), 1)
