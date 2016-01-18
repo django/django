@@ -174,7 +174,7 @@ class CsrfViewMiddleware(object):
                     good_referer = request.get_host()
                 else:
                     good_referer = settings.CSRF_COOKIE_DOMAIN
-                    server_port = request.META['SERVER_PORT']
+                    server_port = request.get_port()
                     if server_port not in ('443', '80'):
                         good_referer = '%s:%s' % (good_referer, server_port)
 
