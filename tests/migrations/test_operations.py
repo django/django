@@ -582,6 +582,7 @@ class OperationTests(OperationTestBase):
 
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
             migrations.CreateModel("ReflexivePony", fields=[
+                ("id", models.AutoField(primary_key=True)),
                 ("ponies", models.ManyToManyField("self")),
             ]),
         ])
@@ -595,8 +596,11 @@ class OperationTests(OperationTestBase):
     def test_rename_model_with_m2m(self):
         app_label = "test_rename_model_with_m2m"
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
-            migrations.CreateModel("Rider", fields=[]),
+            migrations.CreateModel("Rider", fields=[
+                ("id", models.AutoField(primary_key=True)),
+            ]),
             migrations.CreateModel("Pony", fields=[
+                ("id", models.AutoField(primary_key=True)),
                 ("riders", models.ManyToManyField("Rider")),
             ]),
         ])
@@ -621,8 +625,11 @@ class OperationTests(OperationTestBase):
     def test_rename_m2m_target_model(self):
         app_label = "test_rename_m2m_target_model"
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
-            migrations.CreateModel("Rider", fields=[]),
+            migrations.CreateModel("Rider", fields=[
+                ("id", models.AutoField(primary_key=True)),
+            ]),
             migrations.CreateModel("Pony", fields=[
+                ("id", models.AutoField(primary_key=True)),
                 ("riders", models.ManyToManyField("Rider")),
             ]),
         ])
