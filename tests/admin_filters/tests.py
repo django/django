@@ -13,7 +13,6 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
-from django.utils import six
 from django.utils.encoding import force_text
 
 from .models import Book, Bookmark, Department, Employee, TaggedItem
@@ -818,9 +817,9 @@ class ListFiltersTests(TestCase):
         """
         modeladmin = DecadeFilterBookAdminWithoutTitle(Book, site)
         request = self.request_factory.get('/', {})
-        six.assertRaisesRegex(self, ImproperlyConfigured,
-            "The list filter 'DecadeListFilterWithoutTitle' does not specify a 'title'.",
-            self.get_changelist, request, Book, modeladmin)
+        msg = "The list filter 'DecadeListFilterWithoutTitle' does not specify a 'title'."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.get_changelist(request, Book, modeladmin)
 
     def test_simplelistfilter_without_parameter(self):
         """
@@ -828,9 +827,9 @@ class ListFiltersTests(TestCase):
         """
         modeladmin = DecadeFilterBookAdminWithoutParameter(Book, site)
         request = self.request_factory.get('/', {})
-        six.assertRaisesRegex(self, ImproperlyConfigured,
-            "The list filter 'DecadeListFilterWithoutParameter' does not specify a 'parameter_name'.",
-            self.get_changelist, request, Book, modeladmin)
+        msg = "The list filter 'DecadeListFilterWithoutParameter' does not specify a 'parameter_name'."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.get_changelist(request, Book, modeladmin)
 
     def test_simplelistfilter_with_none_returning_lookups(self):
         """

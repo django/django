@@ -98,12 +98,11 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
 
 class TestConfiguration(StaticFilesTestCase):
     def test_location_empty(self):
+        msg = 'without having set the STATIC_ROOT setting to a filesystem path'
         err = six.StringIO()
         for root in ['', None]:
             with override_settings(STATIC_ROOT=root):
-                with six.assertRaisesRegex(
-                        self, ImproperlyConfigured,
-                        'without having set the STATIC_ROOT setting to a filesystem path'):
+                with self.assertRaisesMessage(ImproperlyConfigured, msg):
                     call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
 
     def test_local_storage_detection_helper(self):

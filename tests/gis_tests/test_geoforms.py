@@ -5,7 +5,6 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry
 from django.forms import ValidationError
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
-from django.utils import six
 from django.utils.html import escape
 
 
@@ -40,8 +39,7 @@ class GeometryFieldTest(SimpleTestCase):
         "Testing GeometryField's handling of null (None) geometries."
         # Form fields, by default, are required (`required=True`)
         fld = forms.GeometryField()
-        with six.assertRaisesRegex(self, forms.ValidationError,
-                "No geometry value provided."):
+        with self.assertRaisesMessage(forms.ValidationError, "No geometry value provided."):
             fld.clean(None)
 
         # This will clean None as a geometry (See #10660).

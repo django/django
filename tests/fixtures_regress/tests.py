@@ -201,9 +201,8 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading data of an unknown format should fail
         Validate that error conditions are caught correctly
         """
-        with six.assertRaisesRegex(self, management.CommandError,
-                "Problem installing fixture 'bad_fixture1': "
-                "unkn is not a known serialization format."):
+        msg = "Problem installing fixture 'bad_fixture1': unkn is not a known serialization format."
+        with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command(
                 'loaddata',
                 'bad_fixture1.unkn',
@@ -460,8 +459,7 @@ class TestFixtures(TestCase):
         """
         Regression for #3615 - Ensure data with nonexistent child key references raises error
         """
-        with six.assertRaisesRegex(self, IntegrityError,
-                "Problem installing fixture"):
+        with self.assertRaisesMessage(IntegrityError, "Problem installing fixture"):
             management.call_command(
                 'loaddata',
                 'forward_ref_bad_data.json',
@@ -489,9 +487,8 @@ class TestFixtures(TestCase):
         """
         Regression for #7043 - Error is quickly reported when no fixtures is provided in the command line.
         """
-        with six.assertRaisesRegex(self, management.CommandError,
-                "No database fixture specified. Please provide the path of "
-                "at least one fixture in the command line."):
+        msg = "No database fixture specified. Please provide the path of at least one fixture in the command line."
+        with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command(
                 'loaddata',
                 verbosity=0,

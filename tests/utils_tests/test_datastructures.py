@@ -49,8 +49,8 @@ class MultiValueDictTests(SimpleTestCase):
             [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
         )
 
-        six.assertRaisesRegex(self, MultiValueDictKeyError, 'lastname',
-            d.__getitem__, 'lastname')
+        with self.assertRaisesMessage(MultiValueDictKeyError, 'lastname'):
+            d.__getitem__('lastname')
 
         self.assertEqual(d.get('lastname'), None)
         self.assertEqual(d.get('lastname', 'nonexistent'), 'nonexistent')
