@@ -594,6 +594,18 @@ class Field(RegisterLookupMixin):
         self.run_validators(value)
         return value
 
+    def db_check(self, connection):
+        """
+        Return the database column constraints for this field, for the provided
+        connection. Works the same way as db_type() for the case that
+        get_internal_type() does not map to a preexisting model field.
+        """
+        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        try:
+            return connection.data_type_check_constraints[self.get_internal_type()] % data
+        except KeyError:
+            return None
+
     def db_type(self, connection):
         """
         Returns the database column data type for this field, for the provided
@@ -634,12 +646,8 @@ class Field(RegisterLookupMixin):
         values (type, checks).
         This will look at db_type(), allowing custom model fields to override it.
         """
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         type_string = self.db_type(connection)
-        try:
-            check_string = connection.data_type_check_constraints[self.get_internal_type()] % data
-        except KeyError:
-            check_string = None
+        check_string = self.db_check(connection)
         return {
             "type": type_string,
             "check": check_string,
