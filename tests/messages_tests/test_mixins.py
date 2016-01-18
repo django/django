@@ -1,7 +1,8 @@
-from django.test import SimpleTestCase, override_settings
-from django.urls import reverse
 from tests.messages_tests.test_models import SomeObjects
 from tests.messages_tests.urls import (ContactFormViewWithMsg, DeleteFormViewWithMsg)
+
+from django.test import SimpleTestCase, override_settings
+from django.urls import reverse
 
 
 @override_settings(ROOT_URLCONF='messages_tests.urls')
