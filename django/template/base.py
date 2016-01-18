@@ -51,6 +51,7 @@ times with multiple contexts)
 
 from __future__ import unicode_literals
 
+from collections import defaultdict
 import inspect
 import logging
 import re
@@ -863,7 +864,9 @@ class Variable(object):
         current = context
         try:  # catch-all for silent variable failures
             for bit in self.lookups:
-                try:  # dictionary lookup
+                try:  # dictionary/defaultdict lookup
+                    if isinstance(current, defaultdict) and not bit in current:
+                        raise KeyError
                     current = current[bit]
                     # ValueError/IndexError are for numpy.array lookup on
                     # numpy < 1.9 and 1.9+ respectively
