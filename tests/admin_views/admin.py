@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
 from django.db import models
-from django.forms.models import BaseModelFormSet
+from django.forms.models import ModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -190,7 +190,7 @@ class FabricAdmin(admin.ModelAdmin):
     list_filter = ('surface',)
 
 
-class BasePersonModelFormSet(BaseModelFormSet):
+class BasePersonModelFormSet(ModelFormSet):
     def clean(self):
         for person_dict in self.cleaned_data:
             person = person_dict.get('id')
