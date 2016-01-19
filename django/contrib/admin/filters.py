@@ -345,7 +345,8 @@ class DateFieldListFilter(FieldListFilter):
             field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
-        return [self.lookup_kwarg_since, self.lookup_kwarg_until] + ([self.lookup_kwarg_isnull] if self.field.null else [])
+        return [self.lookup_kwarg_since, self.lookup_kwarg_until] + (
+               [self.lookup_kwarg_isnull] if self.field.null else [])
 
     def choices(self, changelist):
         for title, param_dict in self.links:
