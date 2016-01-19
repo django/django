@@ -29,7 +29,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
-    BaseInlineFormSet, inlineformset_factory, modelform_defines_fields,
+    InlineFormSet, inlineformset_factory, modelform_defines_fields,
     modelform_factory, modelformset_factory,
 )
 from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
@@ -1421,9 +1421,9 @@ class ModelAdmin(BaseModelAdmin):
                 object_id = None
                 obj = None
 
-        ModelForm = self.get_form(request, obj)
+        modelform = self.get_form(request, obj)
         if request.method == 'POST':
-            form = ModelForm(request.POST, request.FILES, instance=obj)
+            form = modelform(request.POST, request.FILES, instance=obj)
             if form.is_valid():
                 form_validated = True
                 new_object = self.save_form(request, form, change=not add)
@@ -1446,19 +1446,19 @@ class ModelAdmin(BaseModelAdmin):
         else:
             if add:
                 initial = self.get_changeform_initial_data(request)
-                form = ModelForm(initial=initial)
+                form = modelform(initial=initial)
                 formsets, inline_instances = self._create_formsets(request, form.instance, change=False)
             else:
-                form = ModelForm(instance=obj)
+                form = modelform(instance=obj)
                 formsets, inline_instances = self._create_formsets(request, obj, change=True)
 
-        adminForm = helpers.AdminForm(
+        adminform = helpers.AdminForm(
             form,
             list(self.get_fieldsets(request, obj)),
             self.get_prepopulated_fields(request, obj),
             self.get_readonly_fields(request, obj),
             model_admin=self)
-        media = self.media + adminForm.media
+        media = self.media + adminform.media
 
         inline_formsets = self.get_inline_formsets(request, formsets, inline_instances, obj)
         for inline_formset in inline_formsets:
@@ -1466,7 +1466,7 @@ class ModelAdmin(BaseModelAdmin):
 
         context = dict(self.admin_site.each_context(request),
             title=(_('Add %s') if add else _('Change %s')) % force_text(opts.verbose_name),
-            adminform=adminForm,
+            adminform=adminform,
             object_id=object_id,
             original=obj,
             is_popup=(IS_POPUP_VAR in request.POST or
@@ -1517,9 +1517,9 @@ class ModelAdmin(BaseModelAdmin):
             # Add the action checkboxes if there are any actions available.
             list_display = ['action_checkbox'] + list(list_display)
 
-        ChangeList = self.get_changelist(request)
+        changelist = self.get_changelist(request)
         try:
-            cl = ChangeList(request, self.model, list_display,
+            cl = changelist(request, self.model, list_display,
                 list_display_links, list_filter, self.date_hierarchy,
                 search_fields, list_select_related, self.list_per_page,
                 self.list_max_show_all, self.list_editable, self)
@@ -1578,8 +1578,8 @@ class ModelAdmin(BaseModelAdmin):
         # Handle POSTed bulk-edit data.
         if (request.method == "POST" and cl.list_editable and
                 '_save' in request.POST and not action_failed):
-            FormSet = self.get_changelist_formset(request)
-            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=cl.result_list)
+            formset = self.get_changelist_formset(request)
+            formset = cl.formset = formset(request.POST, request.FILES, queryset=cl.result_list)
             if formset.is_valid():
                 changecount = 0
                 for form in formset.forms:
@@ -1607,8 +1607,8 @@ class ModelAdmin(BaseModelAdmin):
 
         # Handle GET -- construct a formset for display.
         elif cl.list_editable:
-            FormSet = self.get_changelist_formset(request)
-            formset = cl.formset = FormSet(queryset=cl.result_list)
+            formset = self.get_changelist_formset(request)
+            formset = cl.formset = formset(queryset=cl.result_list)
 
         # Build the list of media to be used by the formset.
         if formset:
@@ -1801,7 +1801,7 @@ class InlineModelAdmin(BaseModelAdmin):
     """
     model = None
     fk_name = None
-    formset = BaseInlineFormSet
+    formset = InlineFormSet
     extra = 3
     min_num = None
     max_num = None
@@ -1883,7 +1883,7 @@ class InlineModelAdmin(BaseModelAdmin):
         base_model_form = defaults['form']
 
         class DeleteProtectedModelForm(base_model_form):
-            def hand_clean_DELETE(self):
+            def hand_clean_delete(self):
                 """
                 We don't validate the 'DELETE' field itself because on
                 templates it's not rendered using the field information, but
@@ -1915,7 +1915,7 @@ class InlineModelAdmin(BaseModelAdmin):
 
             def is_valid(self):
                 result = super(DeleteProtectedModelForm, self).is_valid()
-                self.hand_clean_DELETE()
+                self.hand_clean_delete()
                 return result
 
         defaults['form'] = DeleteProtectedModelForm

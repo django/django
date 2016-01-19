@@ -10,7 +10,7 @@ from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.forms.models import (
-    BaseModelForm, BaseModelFormSet, _get_foreign_key,
+    BaseModelForm, ModelFormSet, _get_foreign_key,
 )
 
 
@@ -929,10 +929,10 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             return []
 
     def _check_formset(self, obj):
-        """ Check formset is a subclass of BaseModelFormSet. """
+        """ Check formset is a subclass of ModelFormSet. """
 
-        if not issubclass(obj.formset, BaseModelFormSet):
-            return must_inherit_from(parent='BaseModelFormSet', option='formset',
+        if not issubclass(obj.formset, ModelFormSet):
+            return must_inherit_from(parent='ModelFormSet', option='formset',
                                      obj=obj, id='admin.E206')
         else:
             return []
