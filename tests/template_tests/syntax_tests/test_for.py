@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
 
@@ -154,3 +156,16 @@ class ForTagTests(SimpleTestCase):
     def test_for_tag_unpack14(self):
         with self.assertRaisesMessage(ValueError, 'Need 2 values to unpack in for loop; got 1.'):
             self.engine.render_to_string('for-tag-unpack14', {'items': (1, 2)})
+
+    @setup({'for-tag-dictitems01': '{% for k, v in d.items %}{{ k }}:{{ v }}{% endfor %}'})
+    def test_for_dictitems01(self):
+        d = {'one': [1]}
+        output = self.engine.render_to_string('for-tag-dictitems01', {'d': d})
+        self.assertEqual(output, 'one:[1]')
+
+    @setup({'for-tag-dictitems02': '{% for k, v in d.items %}{{ k }}:{{ v }}{% endfor %}'})
+    def test_for_dictitems02(self):
+        d = defaultdict(list)
+        d['one'].append(1)
+        output = self.engine.render_to_string('for-tag-dictitems02', {'d': d})
+        self.assertEqual(output, 'one:[1]')
