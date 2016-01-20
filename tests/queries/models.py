@@ -526,8 +526,12 @@ class Job(models.Model):
 
 
 class JobResponsibilities(models.Model):
-    job = models.ForeignKey(Job, models.SET_NULL, to_field='name')
-    responsibility = models.ForeignKey('Responsibility', models.SET_NULL, to_field='description')
+    job = models.ForeignKey(Job, models.CASCADE, to_field='name', related_name='job_to_responsibility')
+    responsibility = models.ForeignKey('Responsibility', models.CASCADE, to_field='description')
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
 
 
 @python_2_unicode_compatible
