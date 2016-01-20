@@ -161,6 +161,12 @@ TEST_DATA = [
     (validate_comma_separated_integer_list, '1,2,3', None),
     (validate_comma_separated_integer_list, '10,32', None),
 
+    (validate_comma_separated_integer_list, '-1', None),
+    (validate_comma_separated_integer_list, '-12', None),
+    (validate_comma_separated_integer_list, '-1,2', None),
+    (validate_comma_separated_integer_list, '1,-2,-3', None),
+    (validate_comma_separated_integer_list, '10,-32', None),
+
     (validate_comma_separated_integer_list, '', ValidationError),
     (validate_comma_separated_integer_list, 'a', ValidationError),
     (validate_comma_separated_integer_list, 'a,b,c', ValidationError),
@@ -170,6 +176,7 @@ TEST_DATA = [
     (validate_comma_separated_integer_list, '1,2,', ValidationError),
     (validate_comma_separated_integer_list, ',1', ValidationError),
     (validate_comma_separated_integer_list, '1,,2', ValidationError),
+    (validate_comma_separated_integer_list, '1-,2', ValidationError),
 
     (int_list_validator(sep='.'), '1.2.3', None),
     (int_list_validator(sep='.'), '1,2,3', ValidationError),
