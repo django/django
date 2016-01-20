@@ -375,6 +375,22 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_COOKIE_DOMAIN='.example.com', USE_X_FORWARDED_PORT=True)
+    def test_https_good_referer_behind_proxy(self):
+        """
+        Test that a POST HTTPS request accessed via proxy is accepted
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = '10.0.0.2'
+        req.META['HTTP_REFERER'] = 'https://www.example.com/somepage'
+        req.META['SERVER_PORT'] = '8080'
+        req.META['HTTP_X_FORWARDED_HOST'] = 'www.example.com'
+        req.META['HTTP_X_FORWARDED_PORT'] = '443'
+    
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNone(req2)
+
     @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['dashboard.example.com'])
     def test_https_csrf_trusted_origin_allowed(self):
         """
