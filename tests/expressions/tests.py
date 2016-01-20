@@ -870,8 +870,42 @@ class FTimeDeltaTests(TestCase):
             Experiment.objects.filter(end__gte=F('start') + F('estimated_time') + datetime.timedelta(hours=1))]
         self.assertEqual(delta_math, ['e4'])
 
-    @skipUnlessDBFeature("has_native_duration_field")
+    @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_date_subtraction(self):
+        queryset = Experiment.objects.annotate(
+            completion_duration=ExpressionWrapper(
+                F('completed') - F('assigned'), output_field=models.DurationField()
+            )
+        )
+
+        at_least_5_days = {e.name for e in queryset.filter(completion_duration__gte=datetime.timedelta(days=5))}
+        self.assertEqual(at_least_5_days, {'e3', 'e4'})
+
+        less_than_5_days = {e.name for e in queryset.filter(completion_duration__lt=datetime.timedelta(days=5))}
+        expected = {'e0', 'e2'}
+        if connection.features.supports_microsecond_precision:
+            expected.add('e1')
+        self.assertEqual(less_than_5_days, expected)
+
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_time_subtraction(self):
+        if connection.features.supports_microsecond_precision:
+            time = datetime.time(12, 30, 15, 2345)
+            timedelta = datetime.timedelta(hours=1, minutes=15, seconds=15, microseconds=2345)
+        else:
+            time = datetime.time(12, 30, 15)
+            timedelta = datetime.timedelta(hours=1, minutes=15, seconds=15)
+        Time.objects.create(time=time)
+        queryset = Time.objects.annotate(
+            difference=ExpressionWrapper(
+                F('time') - Value(datetime.time(11, 15, 0), output_field=models.TimeField()),
+                output_field=models.DurationField(),
+            )
+        )
+        self.assertEqual(queryset.get().difference, timedelta)
+
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_datetime_subtraction(self):
         under_estimate = [e.name for e in
             Experiment.objects.filter(estimated_time__gt=F('end') - F('start'))]
         self.assertEqual(under_estimate, ['e2'])

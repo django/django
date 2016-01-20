@@ -213,6 +213,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_datetime_extract", 3, _sqlite_datetime_extract)
         conn.create_function("django_datetime_trunc", 3, _sqlite_datetime_trunc)
         conn.create_function("django_time_extract", 2, _sqlite_time_extract)
+        conn.create_function("django_time_diff", 2, _sqlite_time_diff)
+        conn.create_function("django_timestamp_diff", 2, _sqlite_timestamp_diff)
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
@@ -442,6 +444,27 @@ def _sqlite_format_dtdelta(conn, lhs, rhs):
     # typecast_timestamp returns a date or a datetime without timezone.
     # It will be formatted as "%Y-%m-%d" or "%Y-%m-%d %H:%M:%S[.%f]"
     return str(out)
+
+
+def _sqlite_time_diff(lhs, rhs):
+    left = backend_utils.typecast_time(lhs)
+    right = backend_utils.typecast_time(rhs)
+    return (
+        (left.hour * 60 * 60 * 1000000) +
+        (left.minute * 60 * 1000000) +
+        (left.second * 1000000) +
+        (left.microsecond) -
+        (right.hour * 60 * 60 * 1000000) -
+        (right.minute * 60 * 1000000) -
+        (right.second * 1000000) -
+        (right.microsecond)
+    )
+
+
+def _sqlite_timestamp_diff(lhs, rhs):
+    left = backend_utils.typecast_timestamp(lhs)
+    right = backend_utils.typecast_timestamp(rhs)
+    return (left - right).total_seconds() * 1000000
 
 
 def _sqlite_regexp(re_pattern, re_string):

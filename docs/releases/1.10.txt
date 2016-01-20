@@ -201,7 +201,7 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* ...
+* Temporal data subtraction was unified on all backends.
 
 Email
 ~~~~~
@@ -397,6 +397,13 @@ Database backend API
   practice be any numeric Python type. ``decimal.Decimal`` values retrieved
   from the database are now converted to ``float`` to make it easier to combine
   them with values used by the GIS libraries.
+
+* In order to enable temporal subtraction you must set the
+  ``supports_temporal_subtraction`` database feature flag to ``True`` and
+  implement the ``DatabaseOperations.subtract_temporals()`` method. This
+  method should return the SQL and parameters required to compute the
+  difference in microseconds between the ``lhs`` and ``rhs`` arguments in the
+  datatype used to store :class:`~django.db.models.DurationField`.
 
 ``select_related()`` prohibits non-relational fields for nested relations
 -------------------------------------------------------------------------

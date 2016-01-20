@@ -64,6 +64,10 @@ class BaseDatabaseFeatures(object):
     # Is there a true datatype for timedeltas?
     has_native_duration_field = False
 
+    # Does the database driver supports same type temporal data subtraction
+    # by returning the type used to store duration field?
+    supports_temporal_subtraction = False
+
     # Does the database driver support timedeltas as arguments?
     # This is only relevant when there is a native duration field.
     # Specifically, there is a bug with cx_Oracle:
