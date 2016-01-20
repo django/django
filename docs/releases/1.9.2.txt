@@ -35,3 +35,6 @@ Bugfixes
   using a string model name without an app_label no longer resolved that
   reference to the abstract model's app if using that model in another
   application (:ticket:`25858`).
+  
+* Fixed check of CSRF cookie on POST requests done by ``CsrfViewMiddleware``
+  when request comes via a proxy (:ticket:`26094`).
