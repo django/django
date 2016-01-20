@@ -41,3 +41,6 @@ Bugfixes
 
 * Fixed CSRF cookie check on POST requests when ``USE_X_FORWARDED_PORT=True``
   (:ticket:`26094`).
+
+* Fixed a ``QuerySet.order_by()`` crash when ordering by a relational field of
+  a ``ManyToManyField`` ``through`` model (:ticket:`26092`).
