@@ -197,6 +197,20 @@ class M2mThroughTests(TestCase):
             attrgetter("name")
         )
 
+    def test_order_by_relational_field_through_model(self):
+        CustomMembership.objects.create(person=self.jim, group=self.rock)
+        CustomMembership.objects.create(person=self.bob, group=self.rock)
+        CustomMembership.objects.create(person=self.jane, group=self.roll)
+        CustomMembership.objects.create(person=self.jim, group=self.roll)
+        self.assertQuerysetEqual(
+            self.rock.custom_members.order_by('custom_person_related_name'),
+            [self.jim, self.bob], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            self.roll.custom_members.order_by('custom_person_related_name'),
+            [self.jane, self.jim], lambda x: x
+        )
+
     def test_query_first_model_by_intermediate_model_attribute(self):
         Membership.objects.create(
             person=self.jane, group=self.roll,
