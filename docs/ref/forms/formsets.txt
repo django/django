@@ -8,8 +8,12 @@ Formset API reference. For introductory material about formsets, see the
 .. module:: django.forms.formsets
    :synopsis: Django's functions for building formsets.
 
-.. function:: formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False, max_num=None, validate_max=False, min_num=None, validate_min=False)
+.. function:: formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False, max_num=None, validate_max=False, min_num=None, validate_min=False, can_delete_extra=True)
 
     Returns a ``FormSet`` class for the given ``form`` class.
 
     See :ref:`formsets` for example usage.
+
+.. versionchanged:: 1.10
+
+    The ``can_delete_extra`` argument was added.
