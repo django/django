@@ -167,8 +167,12 @@ class BrokenLinkEmailsMiddleware(object):
          - If a '?' in referer is identified as a search engine source.
          - If the referer is equal to the current URL, ignoring the scheme
            (assumed to be a poorly implemented bot).
+         - If the referer is equal to the current URL without trailing slash, ignoring the scheme
         """
         if not referer:
+            return True
+
+        if settings.APPEND_SLASH and uri.endswith("/") and referer == uri[:-1]:
             return True
 
         if not self.is_internal_request(domain, referer) and '?' in referer:
