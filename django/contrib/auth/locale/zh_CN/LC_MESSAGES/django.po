@@ -67,7 +67,7 @@ msgid "Password confirmation"
 msgstr "密码确认"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "输入之前的密码，以确认"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
@@ -79,7 +79,7 @@ msgstr ""
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
-msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是大区分大小写的."
+msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是区分大小写的."
 
 msgid "This account is inactive."
 msgstr "该帐号未激活。"
@@ -124,7 +124,7 @@ msgid "name"
 msgstr "名称"
 
 msgid "content type"
-msgstr ""
+msgstr "内容类型"
 
 msgid "codename"
 msgstr "代码名称"
@@ -222,22 +222,22 @@ msgstr[0] ""
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "密码和%(verbose_name)s太相似。"
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "你的密码不能和你的个人信息太相似。"
 
 msgid "This password is too common."
-msgstr ""
+msgstr "密码太普通。"
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "你的密码不能为常用密码。"
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "这个密码全是数字。"
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "你的密码不能全是数字。"
 
 #, python-format
 msgid "Password reset on %(site_name)s"
