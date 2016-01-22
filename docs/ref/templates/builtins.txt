@@ -432,7 +432,7 @@ Use of actual parentheses in the :ttag:`if` tag is invalid syntax. If you need
 them to indicate precedence, you should use nested :ttag:`if` tags.
 
 :ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
-``<=``, ``>=`` and ``in`` which work as follows:
+``<=``, ``>=``, ``in`` and ``is`` which work as follows:
 
 ``==`` operator
 ^^^^^^^^^^^^^^^
@@ -524,13 +524,22 @@ you should use::
 
     {% if a > b and b > c %}
 
+``is`` operator
+~~~~~~~~~~~~~~~~~~~
+
+Object identity. Tests if two values are the same object. Example::
+
+    {% if value is None %}
+      This will output if and only if value is None.
+    {% endif %}
+
 Filters
 ~~~~~~~
 
 You can also use filters in the :ttag:`if` expression. For example::
 
     {% if messages|length >= 100 %}
-       You have lots of messages today!
+      You have lots of messages today!
     {% endif %}
 
 Complex expressions
