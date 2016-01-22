@@ -1,3 +1,4 @@
+===================
 Quick install guide
 ===================
 
@@ -7,7 +8,7 @@ possibilities; this guide will guide you to a simple, minimal installation
 that'll work while you walk through the introduction.
 
 Install Python
---------------
+==============
 
 Being a Python Web framework, Django requires Python. See
 :ref:`faq-python-version-support` for details. Python includes a lightweight
@@ -34,21 +35,21 @@ you should see something like::
     >>>
 
 Set up a database
------------------
+=================
 
 This step is only necessary if you'd like to work with a "large" database engine
 like PostgreSQL, MySQL, or Oracle. To install such a database, consult the
 :ref:`database installation information <database-installation>`.
 
 Remove any old versions of Django
----------------------------------
+=================================
 
 If you are upgrading your installation of Django from a previous version, you
 will need to :ref:`uninstall the old Django version before installing the new
 version <removing-old-versions-of-django>`.
 
 Install Django
---------------
+==============
 
 You've got three easy options to install Django:
 
@@ -77,7 +78,7 @@ You've got three easy options to install Django:
 
 
 Verifying
----------
+=========
 
 To verify that Django can be seen by Python, type ``python`` from your shell.
 Then at the Python prompt, try to import Django:
@@ -91,6 +92,6 @@ Then at the Python prompt, try to import Django:
 You may have another version of Django installed.
 
 That's it!
-----------
+==========
 
 That's it -- you can now :doc:`move onto the tutorial </intro/tutorial01>`.

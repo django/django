@@ -20,7 +20,7 @@ Settings
 .. setting:: POSTGIS_VERSION
 
 ``POSTGIS_VERSION``
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 When GeoDjango's spatial backend initializes on PostGIS, it has to perform
 an SQL query to determine the version in order to figure out what
@@ -43,7 +43,7 @@ only needs to have the ability to create databases. In other configurations,
 you may be required to use a database superuser.
 
 Create database user
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 To make a database user with the ability to create databases, use the
 following command::
@@ -59,7 +59,7 @@ Alternatively, you may alter an existing user's role from the SQL shell
     postgres# ALTER ROLE <user_name> CREATEDB NOSUPERUSER NOCREATEROLE;
 
 Create database superuser
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This may be done at the time the user is created, for example::
 

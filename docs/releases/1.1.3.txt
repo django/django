@@ -19,7 +19,7 @@ Backwards incompatible changes
 ==============================
 
 Restricted filters in admin interface
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 The Django administrative interface, django.contrib.admin, supports
 filtering of displayed lists of objects by fields on the corresponding

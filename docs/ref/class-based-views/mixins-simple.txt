@@ -3,7 +3,7 @@ Simple mixins
 =============
 
 ContextMixin
-------------
+============
 
 .. class:: django.views.generic.base.ContextMixin
 
@@ -32,7 +32,7 @@ ContextMixin
             <alters-data-description>`.
 
 TemplateResponseMixin
----------------------
+=====================
 
 .. class:: django.views.generic.base.TemplateResponseMixin
 

@@ -1,10 +1,11 @@
+=========================
 FAQ: Databases and models
 =========================
 
 .. _faq-see-raw-sql-queries:
 
 How can I see the raw SQL queries Django is running?
-----------------------------------------------------
+====================================================
 
 Make sure your Django :setting:`DEBUG` setting is set to ``True``.
 Then, just do this::
@@ -37,12 +38,12 @@ just call ``reset_queries()``, like this::
     reset_queries()
 
 Can I use Django with a pre-existing database?
-----------------------------------------------
+==============================================
 
 Yes. See :doc:`Integrating with a legacy database </howto/legacy-databases>`.
 
 If I make changes to a model, how do I update the database?
------------------------------------------------------------
+===========================================================
 
 Take a look at Django's support for :mod:`schema migrations
 <django.db.migrations>`.
@@ -52,7 +53,7 @@ If you don't mind clearing data, your project's ``manage.py`` utility has a
 immediately after :djadmin:`migrate` was executed.
 
 Do Django models support multiple-column primary keys?
-------------------------------------------------------
+======================================================
 
 No. Only single-column primary keys are supported.
 
@@ -64,7 +65,7 @@ as the admin interface to work; e.g., you need a simple way of being able to
 specify an object to edit or delete.
 
 Does Django support NoSQL databases?
-------------------------------------
+====================================
 
 NoSQL databases are not officially supported by Django itself. There are,
 however, a number of side project and forks which allow NoSQL functionality in
@@ -76,7 +77,7 @@ You can also take a look on `the wiki page`_ which discusses some alternatives.
 .. _`the wiki page`: https://code.djangoproject.com/wiki/NoSqlSupport
 
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
-------------------------------------------------------------------------------------------------------------------
+==================================================================================================================
 
 We try to avoid adding special cases in the Django code to accommodate all the
 database-specific options such as table type, etc. If you'd like to use any of

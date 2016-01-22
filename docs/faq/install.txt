@@ -1,8 +1,9 @@
+=================
 FAQ: Installation
 =================
 
 How do I get started?
----------------------
+=====================
 
 #. `Download the code`_.
 #. Install Django (read the :doc:`installation guide </intro/install>`).
@@ -14,7 +15,7 @@ How do I get started?
 .. _ask questions: https://www.djangoproject.com/community/
 
 What are Django's prerequisites?
---------------------------------
+================================
 
 Django requires Python. See the table in the next question for the versions of
 Python that work with each version of Django. Other Python libraries may be
@@ -40,7 +41,7 @@ PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 .. _faq-python-version-support:
 
 What Python version can I use with Django?
-------------------------------------------
+==========================================
 
 ============== ===============
 Django version Python versions
@@ -60,7 +61,7 @@ version of Python ends. For example, Python 3.3 security support ends September
 is the last version to support Python 3.3.
 
 What Python version should I use with Django?
----------------------------------------------
+=============================================
 
 As of Django 1.6, Python 3 support is considered stable and you can safely use
 it in production. See also :doc:`/topics/python3`. However, the community is
@@ -81,7 +82,7 @@ Third-party applications for use with Django are, of course, free to set their
 own version requirements.
 
 Should I use the stable version or development version?
--------------------------------------------------------
+=======================================================
 
 Generally, if you're using code in production, you should be using a
 stable release. The Django project publishes a full stable release

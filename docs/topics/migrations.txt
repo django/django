@@ -11,7 +11,7 @@ designed to be mostly automatic, but you'll need to know when to make
 migrations, when to run them, and the common problems you might run into.
 
 The Commands
-------------
+============
 
 There are several commands which you will use to interact with migrations
 and Django's handling of database schema:
@@ -53,7 +53,7 @@ need those options in some data migrations later on (for example, if you've
 set custom validators).
 
 Backend Support
----------------
+===============
 
 Migrations are supported on all backends that Django ships with, as well
 as any third-party backends if they have programmed in support for schema
@@ -63,7 +63,7 @@ However, some databases are more capable than others when it comes to
 schema migrations; some of the caveats are covered below.
 
 PostgreSQL
-~~~~~~~~~~
+----------
 
 PostgreSQL is the most capable of all the databases here in terms of schema
 support; the only caveat is that adding columns with default values will
@@ -73,7 +73,7 @@ For this reason, it's recommended you always create new columns with
 ``null=True``, as this way they will be added immediately.
 
 MySQL
-~~~~~
+-----
 
 MySQL lacks support for transactions around schema alteration operations,
 meaning that if a migration fails to apply you will have to manually unpick
@@ -92,7 +92,7 @@ covers. This means that indexes that are possible on other backends will
 fail to be created under MySQL.
 
 SQLite
-~~~~~~
+------
 
 SQLite has very little built-in schema alteration support, and so Django
 attempts to emulate it by:
@@ -110,7 +110,7 @@ developers to use SQLite on their local machines to develop less complex
 Django projects without the need for a full database.
 
 Workflow
---------
+========
 
 Working with migrations is simple. Make changes to your models - say, add
 a field and remove a model - and then run :djadmin:`makemigrations`::
@@ -148,7 +148,7 @@ one, you can use the :option:`makemigrations --name` option::
     $ python manage.py makemigrations --name changed_my_model your_app_label
 
 Version control
-~~~~~~~~~~~~~~~
+---------------
 
 Because migrations are stored in version control, you'll occasionally
 come across situations where you and another developer have both committed
@@ -168,7 +168,7 @@ yourself - don't worry, this isn't difficult, and is explained more in
 :ref:`migration-files` below.
 
 Dependencies
-------------
+============
 
 While migrations are per-app, the tables and relationships implied by
 your models are too complex to be created for just one app at a time. When
@@ -192,7 +192,7 @@ will be.
 .. _migration-files:
 
 Migration files
----------------
+===============
 
 Migrations are stored as an on-disk format, referred to here as
 "migration files". These files are actually just normal Python files with
@@ -238,7 +238,7 @@ more complex operations are not autodetectable and are only available via
 a hand-written migration, so don't be scared about editing them if you have to.
 
 Custom fields
-~~~~~~~~~~~~~
+-------------
 
 You can't modify the number of positional arguments in an already migrated
 custom field without raising a ``TypeError``. The old migration will call the
@@ -249,7 +249,7 @@ argument, please create a keyword argument and add something like
 .. _using-managers-in-migrations:
 
 Model managers
-~~~~~~~~~~~~~~
+--------------
 
 You can optionally serialize managers into migrations and have them available
 in :class:`~django.db.migrations.operations.RunPython` operations. This is done
@@ -275,7 +275,7 @@ Please refer to the notes about :ref:`historical-models` in migrations to see
 the implications that come along.
 
 Initial migrations
-~~~~~~~~~~~~~~~~~~
+------------------
 
 .. attribute:: Migration.initial
 
@@ -301,7 +301,7 @@ and fake-applies the migration if so. Without ``--fake-initial``, initial
 migrations are treated no differently from any other migration.
 
 Adding migrations to apps
--------------------------
+=========================
 
 Adding migrations to new apps is straightforward - they come preconfigured to
 accept migrations, and so just run :djadmin:`makemigrations` once you've made
@@ -333,7 +333,7 @@ Note that this only works given two things:
 .. _historical-models:
 
 Historical models
------------------
+=================
 
 When you run migrations, Django is working from historical versions of your
 models stored in the migration files. If you write Python code using the
@@ -369,7 +369,7 @@ can opt to move them into a superclass.
 .. _migrations-removing-model-fields:
 
 Considerations when removing model fields
------------------------------------------
+=========================================
 
 Similar to the "references to historical functions" considerations described in
 the previous section, removing custom model fields from your project or
@@ -416,7 +416,7 @@ removing the old ones, you should be able to remove the field completely.
 .. _data-migrations:
 
 Data Migrations
----------------
+===============
 
 As well as changing the database schema, you can also use migrations to change
 the data in the database itself, in conjunction with the schema if you want.
@@ -501,7 +501,7 @@ want executed when migrating backwards. If this callable is omitted, migrating
 backwards will raise an exception.
 
 Accessing models from other apps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 When writing a ``RunPython`` function that uses models from apps other than the
 one in which the migration is located, the migration's ``dependencies``
@@ -528,7 +528,7 @@ added a dependency that specifies the last migration of ``app2``::
         ]
 
 More advanced migrations
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 If you're interested in the more advanced migration operations, or want
 to be able to write your own, see the :doc:`migration operations reference
@@ -538,7 +538,7 @@ to be able to write your own, see the :doc:`migration operations reference
 .. _migration-squashing:
 
 Squashing migrations
---------------------
+====================
 
 You are encouraged to make migrations freely and not worry about how many you
 have; the migration code is optimized to deal with hundreds at a time without
@@ -629,7 +629,7 @@ You must then transition the squashed migration to a normal migration by:
 .. _migration-serializing:
 
 Serializing values
-------------------
+==================
 
 Migrations are just Python files containing the old definitions of your models
 - thus, to write them, Django must take the current state of your models and
@@ -693,7 +693,7 @@ the main module body, rather than the class body.
 .. _custom-deconstruct-method:
 
 Adding a deconstruct() method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 You can let Django serialize your own custom class instances by giving the class
 a ``deconstruct()`` method. It takes no arguments, and should return a tuple
@@ -745,7 +745,7 @@ way into your constructor, and then returns those arguments exactly when
 deconstruct() is called.
 
 Supporting Python 2 and 3
--------------------------
+=========================
 
 In order to generate migrations that support both Python 2 and 3, all string
 literals used in your models and fields (e.g. ``verbose_name``,
@@ -765,7 +765,7 @@ changes as it converts all the bytestring attributes to text strings; this is
 normal and should only happen once.
 
 Supporting multiple Django versions
------------------------------------
+===================================
 
 If you are the maintainer of a third-party app with models, you may need to
 ship migrations that support multiple Django versions. In this case, you should
