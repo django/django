@@ -291,6 +291,8 @@ Templates
   :class:`~django.template.backends.django.DjangoTemplates` backend and the
   :class:`~django.template.Engine` class.
 
+* Added the ``is`` comparison operator to the :ttag:`if` tag.
+
 Tests
 ^^^^^
 
