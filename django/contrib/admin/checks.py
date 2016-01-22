@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from itertools import chain
 
+from django.apps import apps
+from django.conf import settings
 from django.contrib.admin.utils import (
     NotRelationField, flatten, get_fields_from_path,
 )
@@ -12,12 +14,55 @@ from django.db import models
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
+from django.template.engine import Engine
 
 
 def check_admin_app(**kwargs):
     from django.contrib.admin.sites import system_check_errors
 
     return system_check_errors
+
+
+def check_dependencies(**kwargs):
+    """
+    Check that all things needed to run the admin have been correctly installed.
+
+    The default implementation checks that the contenttypes app is
+    installed, as well as the auth context processor only if using
+    the default authentication backend.
+    """
+    errors = []
+    if not apps.is_installed('django.contrib.contenttypes'):
+        missing_app = checks.Error(
+            "'django.contrib.contenttypes' must be in INSTALLED_APPS "
+            "in order to use the admin application.",
+            id="admin.E401"
+            )
+        errors.append(missing_app)
+    try:
+        default_template_engine = Engine.get_default()
+    except Exception:
+        # Skip this non-critical check:
+        # 1. if the user has a non-trivial TEMPLATES setting and Django
+        #    can't find a default template engine
+        # 2. if anything goes wrong while loading template engines, in
+        #    order to avoid raising an exception from a confusing location
+        # Catching ImproperlyConfigured suffices for 1. but 2. requires
+        # catching all exceptions.
+        pass
+    else:
+        if ('django.contrib.auth.context_processors.auth'
+                not in default_template_engine.context_processors
+                and 'django.contrib.auth.backends.ModelBackend'
+                in settings.AUTHENTICATION_BACKENDS):
+            missing_template = checks.Error(
+                "'django.contrib.auth.context_processors.auth' must be in "
+                "TEMPLATES in order to use the admin application.",
+                id="admin.E402"
+                )
+            errors.append(missing_template)
+
+    return errors
 
 
 class BaseModelAdminChecks(object):
