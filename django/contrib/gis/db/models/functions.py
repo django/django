@@ -117,24 +117,23 @@ class OracleToleranceMixin(object):
 
 
 class Area(OracleToleranceMixin, GeoFunc):
+    output_field_class = AreaField
     arity = 1
 
     def as_sql(self, compiler, connection):
         if connection.ops.geography:
-            # Geography fields support area calculation, returns square meters.
-            self.output_field = AreaField('sq_m')
-        elif not self.output_field.geodetic(connection):
-            # Getting the area units of the geographic field.
-            units = self.output_field.units_name(connection)
-            if units:
-                self.output_field = AreaField(
-                    AreaMeasure.unit_attname(self.output_field.units_name(connection))
-                )
-            else:
-                self.output_field = FloatField()
+            self.output_field.area_att = 'sq_m'
         else:
-            # TODO: Do we want to support raw number areas for geodetic fields?
-            raise NotImplementedError('Area on geodetic coordinate systems not supported.')
+            # Getting the area units of the geographic field.
+            source_fields = self.get_source_fields()
+            if len(source_fields):
+                source_field = source_fields[0]
+                if source_field.geodetic(connection):
+                    # TODO: Do we want to support raw number areas for geodetic fields?
+                    raise NotImplementedError('Area on geodetic coordinate systems not supported.')
+                units_name = source_field.units_name(connection)
+                if units_name:
+                    self.output_field.area_att = AreaMeasure.unit_attname(units_name)
         return super(Area, self).as_sql(compiler, connection)
 
     def as_oracle(self, compiler, connection):
