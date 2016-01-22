@@ -124,7 +124,10 @@ class URLValidator(RegexValidator):
         except ValidationError as e:
             # Trivial case failed. Try for possible IDN domain
             if value:
-                scheme, netloc, path, query, fragment = urlsplit(value)
+                try:
+                    scheme, netloc, path, query, fragment = urlsplit(value)
+                except ValueError:  # for example, "Invalid IPv6 URL"
+                    raise ValidationError(self.message, code=self.code)
                 try:
                     netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
                 except UnicodeError:  # invalid domain part
