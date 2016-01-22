@@ -722,6 +722,10 @@ class FieldsTests(SimpleTestCase):
             str(f['duration'])
         )
 
+    def test_durationfield_integer_value(self):
+        f = DurationField()
+        self.assertEqual(datetime.timedelta(0, 10800), f.clean(10800))
+
     def test_durationfield_prepare_value(self):
         field = DurationField()
         td = datetime.timedelta(minutes=15, seconds=30)
