@@ -104,6 +104,12 @@ class URLValidator(RegexValidator):
         if schemes is not None:
             self.schemes = schemes
 
+    def split_url(self, value):
+        try:
+            return urlsplit(value)
+        except ValueError:
+            raise ValidationError(self.message, code=self.code)
+
     def __call__(self, value):
         value = force_text(value)
         # Check first if the scheme is valid
@@ -117,7 +123,7 @@ class URLValidator(RegexValidator):
         except ValidationError as e:
             # Trivial case failed. Try for possible IDN domain
             if value:
-                scheme, netloc, path, query, fragment = urlsplit(value)
+                scheme, netloc, path, query, fragment = self.split_url(value)
                 try:
                     netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
                 except UnicodeError:  # invalid domain part
@@ -128,7 +134,7 @@ class URLValidator(RegexValidator):
                 raise
         else:
             # Now verify IPv6 in the netloc part
-            host_match = re.search(r'^\[(.+)\](?::\d{2,5})?$', urlsplit(value).netloc)
+            host_match = re.search(r'^\[(.+)\](?::\d{2,5})?$', self.split_url(value).netloc)
             if host_match:
                 potential_ip = host_match.groups()[0]
                 try:
@@ -141,7 +147,7 @@ class URLValidator(RegexValidator):
         # section 3.1. It's defined to be 255 bytes or less, but this includes
         # one byte for the length of the name and one byte for the trailing dot
         # that's used to indicate absolute names in DNS.
-        if len(urlsplit(value).netloc) > 253:
+        if len(self.split_url(value).netloc) > 253:
             raise ValidationError(self.message, code=self.code)
 
 integer_validator = RegexValidator(

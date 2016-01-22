@@ -215,6 +215,8 @@ TEST_DATA = [
     (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br ', ValidationError),
     (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br z', ValidationError),
 
+    (URLValidator(), 'https://test.[com', ValidationError),
+
     (BaseValidator(True), True, None),
     (BaseValidator(True), False, ValidationError),
 
