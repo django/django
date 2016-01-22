@@ -22,6 +22,10 @@ class Country(NamedModel):
     mpoly = models.MultiPolygonField()  # SRID, by default, is 4326
 
 
+class CountryWebMercator(NamedModel):
+    mpoly = models.MultiPolygonField(srid=3857)
+
+
 class City(NamedModel):
     point = models.PointField()
 

@@ -21,13 +21,14 @@ class BaseField(object):
 
 class AreaField(BaseField):
     "Wrapper for Area values."
-    def __init__(self, area_att):
+    def __init__(self, area_att=None):
         self.area_att = area_att
 
     def from_db_value(self, value, expression, connection, context):
         if connection.features.interprets_empty_strings_as_nulls and value == '':
             value = None
-        if value is not None:
+        # If the units are known, convert value into area measure.
+        if value is not None and self.area_att:
             value = Area(**{self.area_att: value})
         return value
 
