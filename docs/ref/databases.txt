@@ -448,7 +448,7 @@ storage engine, you have a couple of options.
   creating your tables::
 
       'OPTIONS': {
-         'init_command': 'SET storage_engine=INNODB',
+         'init_command': 'SET default_storage_engine=INNODB',
       }
 
   This sets the default storage engine upon connecting to the database.
