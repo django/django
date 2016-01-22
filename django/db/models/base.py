@@ -435,7 +435,8 @@ class Model(six.with_metaclass(ModelBase)):
             for prop in list(kwargs):
                 try:
                     if isinstance(getattr(self.__class__, prop), property):
-                        setattr(self, prop, kwargs.pop(prop))
+                        setattr(self, prop, kwargs[prop])
+                        del kwargs[prop]
                 except AttributeError:
                     pass
             if kwargs:
