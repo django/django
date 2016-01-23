@@ -92,7 +92,7 @@ class GISFunctionsTests(TestCase):
 
     @skipUnlessDBFeature("has_AsGML_function")
     def test_asgml(self):
-        # Should throw a TypeError when tyring to obtain GML from a
+        # Should throw a TypeError when trying to obtain GML from a
         # non-geometry field.
         qs = City.objects.all()
         with self.assertRaises(TypeError):
