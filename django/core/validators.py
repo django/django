@@ -295,8 +295,11 @@ validate_comma_separated_integer_list = int_list_validator(
 
 @deconstructible
 class BaseValidator(object):
-    compare = lambda self, a, b: a is not b
-    clean = lambda self, x: x
+    def compare(self, a, b):
+        return a is not b
+
+    def clean(self, x):
+        return x
     message = _('Ensure this value is %(limit_value)s (it is %(show_value)s).')
     code = 'limit_value'
 
@@ -322,22 +325,27 @@ class BaseValidator(object):
 
 @deconstructible
 class MaxValueValidator(BaseValidator):
-    compare = lambda self, a, b: a > b
+    def compare(self, a, b):
+        return a > b
     message = _('Ensure this value is less than or equal to %(limit_value)s.')
     code = 'max_value'
 
 
 @deconstructible
 class MinValueValidator(BaseValidator):
-    compare = lambda self, a, b: a < b
+    def compare(self, a, b):
+        return a < b
     message = _('Ensure this value is greater than or equal to %(limit_value)s.')
     code = 'min_value'
 
 
 @deconstructible
 class MinLengthValidator(BaseValidator):
-    compare = lambda self, a, b: a < b
-    clean = lambda self, x: len(x)
+    def compare(self, a, b):
+        return a < b
+
+    def clean(self, x):
+        return len(x)
     message = ungettext_lazy(
         'Ensure this value has at least %(limit_value)d character (it has %(show_value)d).',
         'Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).',
@@ -347,8 +355,11 @@ class MinLengthValidator(BaseValidator):
 
 @deconstructible
 class MaxLengthValidator(BaseValidator):
-    compare = lambda self, a, b: a > b
-    clean = lambda self, x: len(x)
+    def compare(self, a, b):
+        return a > b
+
+    def clean(self, x):
+        return len(x)
     message = ungettext_lazy(
         'Ensure this value has at most %(limit_value)d character (it has %(show_value)d).',
         'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',

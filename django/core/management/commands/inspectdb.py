@@ -32,8 +32,11 @@ class Command(BaseCommand):
         # 'table_name_filter' is a stealth option
         table_name_filter = options.get('table_name_filter')
 
-        table2model = lambda table_name: re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
-        strip_prefix = lambda s: s[1:] if s.startswith("u'") else s
+        def table2model(table_name):
+            return re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
+
+        def strip_prefix(s):
+            return s[1:] if s.startswith("u'") else s
 
         with connection.cursor() as cursor:
             yield "# This is an auto-generated Django model module."

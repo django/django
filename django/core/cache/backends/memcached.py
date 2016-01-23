@@ -146,7 +146,8 @@ class BaseMemcachedCache(BaseCache):
         self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
 
     def delete_many(self, keys, version=None):
-        l = lambda x: self.make_key(x, version=version)
+        def l(x):
+            return self.make_key(x, version=version)
         self._cache.delete_multi(map(l, keys))
 
     def clear(self):

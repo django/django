@@ -6,7 +6,11 @@ from __future__ import unicode_literals
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-gettext_noop = lambda s: s
+
+
+def gettext_noop(s):
+    return s
+
 
 ####################
 # CORE             #

@@ -186,7 +186,9 @@ js_catalog_template = r"""
 
 def render_javascript_catalog(catalog=None, plural=None):
     template = Engine().from_string(js_catalog_template)
-    indent = lambda s: s.replace('\n', '\n  ')
+
+    def indent(s):
+        return s.replace('\n', '\n  ')
     context = Context({
         'catalog_str': indent(json.dumps(
             catalog, sort_keys=True, indent=2)) if catalog else None,

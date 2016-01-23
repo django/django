@@ -69,10 +69,12 @@ class KeysValidator(object):
 
 
 class RangeMaxValueValidator(MaxValueValidator):
-    compare = lambda self, a, b: a.upper > b
+    def compare(self, a, b):
+        return a.upper > b
     message = _('Ensure that this range is completely less than or equal to %(limit_value)s.')
 
 
 class RangeMinValueValidator(MinValueValidator):
-    compare = lambda self, a, b: a.lower < b
+    def compare(self, a, b):
+        return a.lower < b
     message = _('Ensure that this range is completely greater than or equal to %(limit_value)s.')

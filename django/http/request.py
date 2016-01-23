@@ -481,9 +481,12 @@ class QueryDict(MultiValueDict):
         output = []
         if safe:
             safe = force_bytes(safe, self.encoding)
-            encode = lambda k, v: '%s=%s' % ((quote(k, safe), quote(v, safe)))
+
+            def encode(k, v):
+                return '%s=%s' % ((quote(k, safe), quote(v, safe)))
         else:
-            encode = lambda k, v: urlencode({k: v})
+            def encode(k, v):
+                return urlencode({k: v})
         for k, list_ in self.lists():
             k = force_bytes(k, self.encoding)
             output.extend(encode(k, force_bytes(v, self.encoding))

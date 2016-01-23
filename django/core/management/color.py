@@ -46,7 +46,8 @@ def make_style(config_string=''):
             format = color_settings.get(role, {})
             style_func = termcolors.make_style(**format)
         else:
-            style_func = lambda x: x
+            def style_func(x):
+                return x
         setattr(style, role, style_func)
 
     # For backwards compatibility,

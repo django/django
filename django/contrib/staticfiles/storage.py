@@ -217,11 +217,13 @@ class HashedFilesMixin(object):
         hashed_files = OrderedDict()
 
         # build a list of adjustable files
-        matches = lambda path: matches_patterns(path, self._patterns.keys())
+        def matches(path):
+            return matches_patterns(path, self._patterns.keys())
         adjustable_paths = [path for path in paths if matches(path)]
 
         # then sort the files by the directory level
-        path_level = lambda name: len(name.split(os.sep))
+        def path_level(name):
+            return len(name.split(os.sep))
         for name in sorted(paths.keys(), key=path_level, reverse=True):
 
             # use the original, local file, not the copied-but-unprocessed
