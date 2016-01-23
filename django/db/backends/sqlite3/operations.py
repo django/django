@@ -108,7 +108,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         Only for last_executed_query! Don't use this to execute SQL queries!
         """
         # This function is limited both by SQLITE_LIMIT_VARIABLE_NUMBER (the
-        # number of paramters, default = 999) and SQLITE_MAX_COLUMN (the
+        # number of parameters, default = 999) and SQLITE_MAX_COLUMN (the
         # number of return values, default = 2000). Since Python's sqlite3
         # module doesn't expose the get_limit() C API, assume the default
         # limits are in effect and split the work in batches if needed.
