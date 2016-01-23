@@ -367,7 +367,7 @@ class Command(BaseCommand):
             filename = os.path.basename(path)
 
             def ignore(pattern):
-                return (fnmatch.fnmatchcase(filename, pattern) or 
+                return (fnmatch.fnmatchcase(filename, pattern) or
                 fnmatch.fnmatchcase(path, pattern))
             return any(ignore(pattern) for pattern in ignore_patterns)
 
