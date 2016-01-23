@@ -16,7 +16,7 @@ from django.utils.html import (
     strip_tags, urlize as _urlize,
 )
 from django.utils.http import urlquote
-from django.utils.safestring import SafeData, mark_for_escaping, mark_safe
+from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     Truncator, normalize_newlines, phone2numeric, slugify as _slugify, wrap,
 )
@@ -441,7 +441,7 @@ def escape_filter(value):
     """
     Marks the value as a string that should be auto-escaped.
     """
-    return mark_for_escaping(value)
+    return conditional_escape(value)
 
 
 @register.filter(is_safe=True)
