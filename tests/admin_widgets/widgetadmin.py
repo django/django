@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin.options import ForeignKeyAdminField
 
 from . import models
 
@@ -12,12 +13,17 @@ class CarAdmin(admin.ModelAdmin):
     list_editable = ['owner']
 
 
+class CarForeignKeyAdminField(ForeignKeyAdminField):
+    def formfield(self, **kwargs):
+        queryset = models.Car.objects.filter(owner=self.request.user) if self.db_field.name == 'car' else None
+        return super(CarForeignKeyAdminField, self).formfield(queryset=queryset, **kwargs)
+
+
 class CarTireAdmin(admin.ModelAdmin):
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "car":
-            kwargs["queryset"] = models.Car.objects.filter(owner=request.user)
-            return db_field.formfield(**kwargs)
-        return super(CarTireAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    def _admin_fields(self):
+        admin_fields = super(CarTireAdmin, self)._admin_fields()
+        admin_fields.update({'foreignkey': CarForeignKeyAdminField})
+        return admin_fields
 
 
 class EventAdmin(admin.ModelAdmin):
