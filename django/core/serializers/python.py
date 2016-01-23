@@ -70,9 +70,11 @@ class Serializer(base.Serializer):
     def handle_m2m_field(self, obj, field):
         if field.remote_field.through._meta.auto_created:
             if self.use_natural_foreign_keys and hasattr(field.remote_field.model, 'natural_key'):
-                m2m_value = lambda value: value.natural_key()
+                def m2m_value(value):
+                    return value.natural_key()
             else:
-                m2m_value = lambda value: force_text(value._get_pk_val(), strings_only=True)
+                def m2m_value(value):
+                    return force_text(value._get_pk_val(), strings_only=True)
             self._current[field.name] = [m2m_value(related)
                                for related in getattr(obj, field.name).iterator()]
 
@@ -136,7 +138,8 @@ def Deserializer(object_list, **options):
                         else:
                             return force_text(model._meta.pk.to_python(value), strings_only=True)
                 else:
-                    m2m_convert = lambda v: force_text(model._meta.pk.to_python(v), strings_only=True)
+                    def m2m_convert(v):
+                        return force_text(model._meta.pk.to_python(v), strings_only=True)
 
                 try:
                     m2m_data[field.name] = []

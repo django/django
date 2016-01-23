@@ -160,10 +160,13 @@ def encode_multipart(boundary, data):
     as an application/octet-stream; otherwise, str(value) will be sent.
     """
     lines = []
-    to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
+
+    def to_bytes(s):
+        return force_bytes(s, settings.DEFAULT_CHARSET)
 
     # Not by any means perfect, but good enough for our purposes.
-    is_file = lambda thing: hasattr(thing, "read") and callable(thing.read)
+    def is_file(thing):
+        return hasattr(thing, "read") and callable(thing.read)
 
     # Each bit of the multipart form data could be either a form value or a
     # file, or a *list* of form values and/or files. Remember that HTTP field
@@ -198,7 +201,8 @@ def encode_multipart(boundary, data):
 
 
 def encode_file(boundary, key, file):
-    to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
+    def to_bytes(s):
+        return force_bytes(s, settings.DEFAULT_CHARSET)
     filename = os.path.basename(file.name) if hasattr(file, 'name') else ''
     if hasattr(file, 'content_type'):
         content_type = file.content_type

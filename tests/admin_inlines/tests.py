@@ -729,8 +729,9 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             reverse('admin:admin_inlines_holder4_add')))
 
         inline_id = '#inner4stacked_set-group'
-        rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
-            '%s .dynamic-inner4stacked_set' % inline_id))
+
+        def rows_length():
+            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
         self.assertEqual(rows_length(), 3)
 
         add_button = self.selenium.find_element_by_link_text(
@@ -745,8 +746,9 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             reverse('admin:admin_inlines_holder4_add')))
 
         inline_id = '#inner4stacked_set-group'
-        rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
-            '%s .dynamic-inner4stacked_set' % inline_id))
+
+        def rows_length():
+            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
         self.assertEqual(rows_length(), 3)
 
         add_button = self.selenium.find_element_by_link_text(

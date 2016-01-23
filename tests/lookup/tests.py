@@ -141,7 +141,8 @@ class LookupTests(TestCase):
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
         # and you can specify which fields you want to retrieve.
-        identity = lambda x: x
+        def identity(x):
+            return x
         self.assertQuerysetEqual(Article.objects.values('headline'),
             [
                 {'headline': 'Article 5'},
@@ -276,7 +277,8 @@ class LookupTests(TestCase):
         # returned as a list of tuples, rather than a list of dictionaries.
         # Within each tuple, the order of the elements is the same as the order
         # of fields in the values_list() call.
-        identity = lambda x: x
+        def identity(x):
+            return x
         self.assertQuerysetEqual(Article.objects.values_list('headline'),
             [
                 ('Article 5',),

@@ -85,7 +85,10 @@ def add_lazy_relation(cls, field, relation, operation):
         "and related methods on the Apps class.",
         RemovedInDjango20Warning, stacklevel=2)
     # Rearrange args for new Apps.lazy_model_operation
-    function = lambda local, related, field: operation(field, related, local)
+
+    def function(local, related, field):
+        return operation(field, related, local)
+
     lazy_related_operation(function, cls, relation, field=field)
 
 

@@ -639,7 +639,8 @@ def unordered_list(value, autoescape=True):
     if autoescape:
         escaper = conditional_escape
     else:
-        escaper = lambda x: x
+        def escaper(x):
+            return x
 
     def walk_items(item_list):
         item_iterator = iter(item_list)
@@ -850,7 +851,8 @@ def filesizeformat(bytes_):
         value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
 
-    filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
+    def filesize_number_format(value):
+        return formats.number_format(round(value, 1), 1)
 
     KB = 1 << 10
     MB = 1 << 20

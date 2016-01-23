@@ -690,7 +690,8 @@ class CustomTestClientTest(SimpleTestCase):
         self.assertEqual(hasattr(self.client, "i_am_customized"), True)
 
 
-_generic_view = lambda request: HttpResponse(status=200)
+def _generic_view(request):
+    return HttpResponse(status=200)
 
 
 @override_settings(ROOT_URLCONF='test_client.urls')

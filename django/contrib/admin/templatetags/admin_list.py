@@ -143,7 +143,9 @@ def result_headers(cl):
         o_list_primary = []  # URL for making this field the primary sort
         o_list_remove = []  # URL for removing this field from sort
         o_list_toggle = []  # URL for toggling order type for this field
-        make_qs_param = lambda t, n: ('-' if t == 'desc' else '') + str(n)
+
+        def make_qs_param(t, n):
+            return ('-' if t == 'desc' else '') + str(n)
 
         for j, ot in ordering_field_columns.items():
             if j == i:  # Same column
@@ -341,7 +343,8 @@ def date_hierarchy(cl):
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)
 
-        link = lambda filters: cl.get_query_string(filters, [field_generic])
+        def link(filters):
+            return cl.get_query_string(filters, [field_generic])
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level
