@@ -455,8 +455,8 @@ Custom User models in tests
 The introduction of the new test runner has also slightly changed the way that
 test models are imported. As a result, any test that overrides ``AUTH_USER_MODEL``
 to test behavior with one of Django's test user models (
-:class:`~django.contrib.auth.tests.custom_user.CustomUser` and
-:class:`~django.contrib.auth.tests.custom_user.ExtensionUser`) must now
+``django.contrib.auth.tests.custom_user.CustomUser`` and
+``django.contrib.auth.tests.custom_user.ExtensionUser``) must now
 explicitly import the User model in your test module::
 
     from django.contrib.auth.tests.custom_user import CustomUser
