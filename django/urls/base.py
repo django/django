@@ -166,7 +166,6 @@ def translate_url(url, lang_code):
     the `lang_code` language (either by i18n_patterns or by translated regex).
     Return the original URL if no translated version is found.
     """
-    from django.urls import resolve, reverse
     parsed = urlsplit(url)
     try:
         match = resolve(parsed.path)
