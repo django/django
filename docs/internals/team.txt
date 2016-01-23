@@ -555,6 +555,32 @@ Daniele Procida
     .. _Django Girls: https://djangogirls.org
     .. _Potato: https://p.ota.to
 
+`Ola Sendecka`_
+    Ola started her adventure with Django when writing a university project in
+    2009. After that she attended her first DjangoCon Europe which
+    defined her future life as a Django professional.
+
+    Since then she has been an active community member. Ola co-organized a number of
+    Django sprints and conferences including:
+    `DjangoCon Europe 2013`_, `Django Under the Hood 2015`_ and
+    `DjangoCon Europe 2016`_. Together with Ola Sitarska she founded
+    `Django Girls`_, co-authored the `Django Girls Tutorial`_ and
+    is a member of the Django Girls Foundation. She is also an author of
+    the `Coding is for Girls`_ YouTube series teaching programming and Django
+    to beginners.
+
+    Originally from Poland, Ola currently lives in London, where she works for `Potato`_.
+
+    .. _Ola Sendecka: https://twitter.com/asendecka
+    .. _DjangoCon Europe 2013: http://love.djangocircus.com
+    .. _Django Under the Hood 2015: http://www.djangounderthehood.com/
+    .. _DjangoCon Europe 2016: http://2016.djangocon.eu
+    .. _Django Girls: https://djangogirls.org
+    .. _Django Girls Tutorial: http://tutorial.djangogirls.org
+    .. _Coding is for Girls: https://www.youtube.com/channel/UC0hNd2uW8jTR5K3KBzRuG2A
+    .. _Potato: https://p.ota.to
+
+
 Past team members
 =================
 
