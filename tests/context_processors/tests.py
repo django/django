@@ -85,5 +85,5 @@ class DebugContextProcessorTests(TestCase):
         response = self.client.get(url)
         self.assertContains(response, 'First query list: 0')
         self.assertContains(response, 'Second query list: 1')
-        # Check we have not actually memorized connection.queries
+        # Check we have not actually memoized connection.queries
         self.assertContains(response, 'Third query list: 2')
