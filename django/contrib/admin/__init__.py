@@ -9,6 +9,8 @@ from django.contrib.admin.filters import (
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.options import (
     HORIZONTAL, VERTICAL, ModelAdmin, StackedInline, TabularInline,
+    DefaultAdminField, ChoicesAdminField, ForeignKeyAdminField,
+    ManyToManyAdminField
 )
 from django.contrib.admin.sites import AdminSite, site
 from django.utils.module_loading import autodiscover_modules

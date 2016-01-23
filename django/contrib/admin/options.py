@@ -94,6 +94,149 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 csrf_protect_m = method_decorator(csrf_protect)
 
 
+class BaseAdminField(object):
+    def __init__(self, db_field, request, admin, **kwargs):
+        self.db_field = db_field
+        self.request = request
+        self.admin = admin
+
+    def formfield(self, db_field, request, admin, **kwargs):
+        pass
+
+    @property
+    def formfield_overrides(self):
+        return self.admin.formfield_overrides
+
+    @property
+    def admin_site(self):
+        return self.admin.admin_site
+
+    @property
+    def radio_fields(self):
+        return self.admin.radio_fields
+
+    @property
+    def raw_id_fields(self):
+        return self.admin.raw_id_fields
+
+
+class DefaultAdminField(BaseAdminField):
+    def formfield(self, **kwargs):
+        for klass in self.db_field.__class__.mro():
+            if klass in self.formfield_overrides:
+                kwargs = dict(copy.deepcopy(self.formfield_overrides[klass]), **kwargs)
+                return self.db_field.formfield(**kwargs)
+
+        return self.db_field.formfield(**kwargs)
+
+
+class RelatedAdminField(BaseAdminField):
+    def set_formfield_permissions(self, form_field):
+        if form_field and self.db_field.name not in self.raw_id_fields:
+            related_modeladmin = self.admin_site._registry.get(self.db_field.remote_field.model)
+            wrapper_kwargs = {}
+            if related_modeladmin:
+                wrapper_kwargs.update(
+                    can_add_related=related_modeladmin.has_add_permission(self.request),
+                    can_change_related=related_modeladmin.has_change_permission(self.request),
+                    can_delete_related=related_modeladmin.has_delete_permission(self.request),
+                )
+            form_field.widget = widgets.RelatedFieldWidgetWrapper(
+                form_field.widget, self.db_field.remote_field, self.admin.admin_site, **wrapper_kwargs
+            )
+        return form_field
+
+
+class ForeignKeyAdminField(RelatedAdminField):
+    def formfield(self, **kwargs):
+        """
+        Get a form Field for a ForeignKey.
+        """
+        if self.db_field.__class__ in self.formfield_overrides:
+            kwargs = dict(self.formfield_overrides[self.db_field.__class__], **kwargs)
+        db = kwargs.get('using')
+        if self.db_field.name in self.admin.raw_id_fields:
+            kwargs['widget'] = widgets.ForeignKeyRawIdWidget(self.db_field.remote_field,
+                                                             self.admin_site, using=db)
+        elif self.db_field.name in self.radio_fields:
+            kwargs['widget'] = widgets.AdminRadioSelect(attrs={
+                'class': get_ul_class(self.radio_fields[self.db_field.name]),
+            })
+            kwargs['empty_label'] = _('None') if self.db_field.blank else None
+
+        if 'queryset' not in kwargs:
+            queryset = self.admin.get_field_queryset(db, self.db_field, self.request)
+            if queryset is not None:
+                kwargs['queryset'] = queryset
+
+        form_field = self.db_field.formfield(**kwargs)
+        form_field = self.set_formfield_permissions(form_field)
+        return form_field
+
+
+class ManyToManyAdminField(RelatedAdminField):
+    def formfield(self, **kwargs):
+        """
+        Get a form Field for a ManyToManyField.
+        """
+        if self.db_field.__class__ in self.formfield_overrides:
+            kwargs = dict(self.formfield_overrides[self.db_field.__class__], **kwargs)
+        # If it uses an intermediary model that isn't auto created, don't show
+        # a field in admin.
+        if not self.db_field.remote_field.through._meta.auto_created:
+            return None
+        db = kwargs.get('using')
+
+        if self.db_field.name in self.raw_id_fields:
+            kwargs['widget'] = widgets.ManyToManyRawIdWidget(self.db_field.remote_field,
+                                                             self.admin_site, using=db)
+            kwargs['help_text'] = ''
+        elif self.db_field.name in (list(self.admin.filter_vertical) + list(self.admin.filter_horizontal)):
+            kwargs['widget'] = widgets.FilteredSelectMultiple(
+                self.db_field.verbose_name,
+                self.db_field.name in self.admin.filter_vertical
+            )
+
+        if 'queryset' not in kwargs:
+            queryset = self.admin.get_field_queryset(db, self.db_field, self.request)
+            if queryset is not None:
+                kwargs['queryset'] = queryset
+
+        form_field = self.db_field.formfield(**kwargs)
+        if isinstance(form_field.widget, SelectMultiple) and not isinstance(form_field.widget, CheckboxSelectMultiple):
+            msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
+            help_text = form_field.help_text
+            form_field.help_text = string_concat(help_text, ' ', msg) if help_text else msg
+        
+        form_field = self.set_formfield_permissions(form_field)
+        return form_field
+
+
+class ChoicesAdminField(BaseAdminField):
+    def __init__(self, db_field, request, admin, widget=None, choices=None, **kwargs):
+        super(ChoicesAdminField, self).__init__(db_field, request, admin, **kwargs)
+        self.widget = widget
+        self.choices = choices
+
+    def formfield(self, **kwargs):
+        """
+        Get a form Field for a database Field that has declared choices.
+        """
+        # If the field is named as a radio_field, use a RadioSelect
+        if self.db_field.name in self.radio_fields:
+            # Avoid stomping on custom widget/choices arguments.
+            if not self.widget:
+                kwargs['widget'] = widgets.AdminRadioSelect(attrs={
+                    'class': get_ul_class(self.admin.radio_fields[self.db_field.name]),
+                })
+            if not self.choices:
+                kwargs['choices'] = self.db_field.get_choices(
+                    include_blank=self.db_field.blank,
+                    blank_choice=[('', _('None'))]
+                )
+        return self.db_field.formfield(**kwargs)
+
+
 class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
@@ -112,6 +255,12 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     view_on_site = True
     show_full_result_count = True
     checks_class = BaseModelAdminChecks
+    admin_fields = {
+        'foreignkey': ForeignKeyAdminField,
+        'manytomany': ManyToManyAdminField,
+        'choices': ChoicesAdminField,
+        'default': DefaultAdminField
+    }
 
     def check(self, **kwargs):
         return self.checks_class().check(self, **kwargs)
@@ -121,79 +270,23 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         overrides.update(self.formfield_overrides)
         self.formfield_overrides = overrides
 
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        """
-        Hook for specifying the form Field instance for a given database Field
-        instance.
-
-        If kwargs are given, they're passed to the form Field's constructor.
-        """
-        # If the field specifies choices, we don't need to look for special
-        # admin widgets - we just need to use a select widget of some kind.
+    def admin_field_for_db_field(self, db_field, request, admin, **kwargs):
+        admin_fields = self._admin_fields()
+        if isinstance(db_field, models.ForeignKey):
+            return admin_fields['foreignkey'](db_field, request, admin, **kwargs)
+        if isinstance(db_field, models.ManyToManyField):
+            return admin_fields['manytomany'](db_field, request, admin, **kwargs)
         if db_field.choices:
-            return self.formfield_for_choice_field(db_field, request, **kwargs)
+            widget = kwargs.get('widget', None)
+            choices = kwargs.get('choices', None)
+            return admin_fields['choices'](db_field, request, admin, widget=widget, choices=choices, **kwargs)
+        return admin_fields['default'](db_field, request, admin, **kwargs)
 
-        # ForeignKey or ManyToManyFields
-        if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
-            # Combine the field kwargs with any options for formfield_overrides.
-            # Make sure the passed in **kwargs override anything in
-            # formfield_overrides because **kwargs is more specific, and should
-            # always win.
-            if db_field.__class__ in self.formfield_overrides:
-                kwargs = dict(self.formfield_overrides[db_field.__class__], **kwargs)
+    def _admin_fields(self):
+        return self.admin_fields
 
-            # Get the correct formfield.
-            if isinstance(db_field, models.ForeignKey):
-                formfield = self.formfield_for_foreignkey(db_field, request, **kwargs)
-            elif isinstance(db_field, models.ManyToManyField):
-                formfield = self.formfield_for_manytomany(db_field, request, **kwargs)
-
-            # For non-raw_id fields, wrap the widget with a wrapper that adds
-            # extra HTML -- the "add other" interface -- to the end of the
-            # rendered output. formfield can be None if it came from a
-            # OneToOneField with parent_link=True or a M2M intermediary.
-            if formfield and db_field.name not in self.raw_id_fields:
-                related_modeladmin = self.admin_site._registry.get(db_field.remote_field.model)
-                wrapper_kwargs = {}
-                if related_modeladmin:
-                    wrapper_kwargs.update(
-                        can_add_related=related_modeladmin.has_add_permission(request),
-                        can_change_related=related_modeladmin.has_change_permission(request),
-                        can_delete_related=related_modeladmin.has_delete_permission(request),
-                    )
-                formfield.widget = widgets.RelatedFieldWidgetWrapper(
-                    formfield.widget, db_field.remote_field, self.admin_site, **wrapper_kwargs
-                )
-
-            return formfield
-
-        # If we've got overrides for the formfield defined, use 'em. **kwargs
-        # passed to formfield_for_dbfield override the defaults.
-        for klass in db_field.__class__.mro():
-            if klass in self.formfield_overrides:
-                kwargs = dict(copy.deepcopy(self.formfield_overrides[klass]), **kwargs)
-                return db_field.formfield(**kwargs)
-
-        # For any other type of field, just call its formfield() method.
-        return db_field.formfield(**kwargs)
-
-    def formfield_for_choice_field(self, db_field, request, **kwargs):
-        """
-        Get a form Field for a database Field that has declared choices.
-        """
-        # If the field is named as a radio_field, use a RadioSelect
-        if db_field.name in self.radio_fields:
-            # Avoid stomping on custom widget/choices arguments.
-            if 'widget' not in kwargs:
-                kwargs['widget'] = widgets.AdminRadioSelect(attrs={
-                    'class': get_ul_class(self.radio_fields[db_field.name]),
-                })
-            if 'choices' not in kwargs:
-                kwargs['choices'] = db_field.get_choices(
-                    include_blank=db_field.blank,
-                    blank_choice=[('', _('None'))]
-                )
-        return db_field.formfield(**kwargs)
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        return self.admin_field_for_db_field(db_field, request, self, **kwargs).formfield()
 
     def get_field_queryset(self, db, db_field, request):
         """
@@ -207,59 +300,6 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             if ordering is not None and ordering != ():
                 return db_field.remote_field.model._default_manager.using(db).order_by(*ordering)
         return None
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """
-        Get a form Field for a ForeignKey.
-        """
-        db = kwargs.get('using')
-        if db_field.name in self.raw_id_fields:
-            kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.remote_field,
-                                    self.admin_site, using=db)
-        elif db_field.name in self.radio_fields:
-            kwargs['widget'] = widgets.AdminRadioSelect(attrs={
-                'class': get_ul_class(self.radio_fields[db_field.name]),
-            })
-            kwargs['empty_label'] = _('None') if db_field.blank else None
-
-        if 'queryset' not in kwargs:
-            queryset = self.get_field_queryset(db, db_field, request)
-            if queryset is not None:
-                kwargs['queryset'] = queryset
-
-        return db_field.formfield(**kwargs)
-
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        """
-        Get a form Field for a ManyToManyField.
-        """
-        # If it uses an intermediary model that isn't auto created, don't show
-        # a field in admin.
-        if not db_field.remote_field.through._meta.auto_created:
-            return None
-        db = kwargs.get('using')
-
-        if db_field.name in self.raw_id_fields:
-            kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.remote_field,
-                                    self.admin_site, using=db)
-            kwargs['help_text'] = ''
-        elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
-            kwargs['widget'] = widgets.FilteredSelectMultiple(
-                db_field.verbose_name,
-                db_field.name in self.filter_vertical
-            )
-
-        if 'queryset' not in kwargs:
-            queryset = self.get_field_queryset(db, db_field, request)
-            if queryset is not None:
-                kwargs['queryset'] = queryset
-
-        form_field = db_field.formfield(**kwargs)
-        if isinstance(form_field.widget, SelectMultiple) and not isinstance(form_field.widget, CheckboxSelectMultiple):
-            msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
-            help_text = form_field.help_text
-            form_field.help_text = string_concat(help_text, ' ', msg) if help_text else msg
-        return form_field
 
     def get_view_on_site_url(self, obj=None):
         if obj is None or not self.view_on_site:
