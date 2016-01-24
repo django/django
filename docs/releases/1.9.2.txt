@@ -82,3 +82,6 @@ Bugfixes
   origin from the node via ``Node.token.source[0]``. This was an undocumented,
   private API. The origin is now available directly on each node using the
   ``Node.origin`` attribute (:ticket:`25848`).
+
+* Fixed a regression in Django 1.8.5 that broke copying a ``SimpleLazyObject``
+  with ``copy.copy()`` (:ticket:`26122`).
