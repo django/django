@@ -4,8 +4,17 @@ Django 1.9.2 release notes
 
 *Under development*
 
-Django 1.9.2 fixes several bugs in 1.9.1 and makes a small backwards
-incompatible change that hopefully doesn't affect any users.
+Django 1.9.2 fixes a security regression in 1.9 and several bugs in 1.9.1. It
+also makes a small backwards incompatible change that hopefully doesn't affect
+any users.
+
+Security issue: User with "change" but not "add" permission can create objects for ``ModelAdmin``’s with ``save_as=True``
+=========================================================================================================================
+
+If a ``ModelAdmin`` uses ``save_as=True`` (not the default), the admin
+provides an option when editing objects to "Save as new". A regression in
+Django 1.9 prevented that form submission from raising a "Permission Denied"
+error for users without the "add" permission.
 
 Backwards incompatible change: ``.py-tpl`` files rewritten in project/app templates
 ===================================================================================
