@@ -4,7 +4,24 @@ Django 1.9.2 release notes
 
 *Under development*
 
-Django 1.9.2 fixes several bugs in 1.9.1.
+Django 1.9.2 fixes several bugs in 1.9.1 and makes a small backwards
+incompatible change that hopefully doesn't affect any users.
+
+Backwards incompatible change: ``.py-tpl`` files rewritten in project/app templates
+===================================================================================
+
+The addition of some Django template language syntax to the default app
+template in Django 1.9 means those files now have some invalid Python syntax.
+This causes difficulties for packaging systems that unconditionally
+byte-compile ``*.py`` files.
+
+To remedy this, a ``.py-tpl`` suffix is now used for the project and app
+template files included in Django. The ``.py-tpl`` suffix is replaced with
+``.py`` by the ``startproject`` and ``startapp`` commands. For example, a
+template with the filename ``manage.py-tpl`` will be created as ``manage.py``.
+
+Please file a ticket if you have a custom project template containing
+``.py-tpl`` files and find this behavior problematic.
 
 Bugfixes
 ========
