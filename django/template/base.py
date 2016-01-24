@@ -1012,8 +1012,7 @@ def render_value_in_context(value, context):
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
     value = force_text(value)
-    if ((context.autoescape and not isinstance(value, SafeData)) or
-            isinstance(value, EscapeData)):
+    if context.autoescape or isinstance(value, EscapeData):
         return conditional_escape(value)
     else:
         return value
