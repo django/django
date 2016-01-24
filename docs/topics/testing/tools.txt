@@ -1037,9 +1037,9 @@ Fixture loading
 .. attribute:: TransactionTestCase.fixtures
 
 A test case for a database-backed website isn't much use if there isn't any
-data in the database. To make it easy to put test data into the database,
-Django's custom ``TransactionTestCase`` class provides a way of loading
-**fixtures**.
+data in the database. Tests are more readable and it's more maintainable to
+create objects using the ORM, for example in :meth:`TestCase.setUpTestData`,
+however, you can also use fixtures.
 
 A fixture is a collection of data that Django knows how to import into a
 database. For example, if your site has user accounts, you might set up a
