@@ -1399,6 +1399,10 @@ class ModelAdmin(BaseModelAdmin):
 
         model = self.model
         opts = model._meta
+
+        if request.method == 'POST' and '_saveasnew' in request.POST:
+            object_id = None
+
         add = object_id is None
 
         if add:
@@ -1415,10 +1419,6 @@ class ModelAdmin(BaseModelAdmin):
             if obj is None:
                 raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
                     'name': force_text(opts.verbose_name), 'key': escape(object_id)})
-
-            if request.method == 'POST' and "_saveasnew" in request.POST:
-                object_id = None
-                obj = None
 
         ModelForm = self.get_form(request, obj)
         if request.method == 'POST':
@@ -1482,6 +1482,8 @@ class ModelAdmin(BaseModelAdmin):
         if request.method == 'POST' and not form_validated and "_saveasnew" in request.POST:
             context['show_save'] = False
             context['show_save_and_continue'] = False
+            # Use the change template instead of the add template.
+            add = False
 
         context.update(extra_context or {})
 
