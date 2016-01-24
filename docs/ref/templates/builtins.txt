@@ -187,8 +187,8 @@ call to ``{% cycle %}`` doesn't specify ``silent``::
 
 .. templatetag:: debug
 
-debug
------
+``debug``
+---------
 
 Outputs a whole load of debugging information, including the current context
 and imported modules.
@@ -214,8 +214,8 @@ See :ref:`template-inheritance` for more information.
 
 .. templatetag:: filter
 
-filter
-------
+``filter``
+----------
 
 Filters the contents of the block through one or more filters. Multiple
 filters can be specified with pipes and filters can have arguments, just as
@@ -238,8 +238,8 @@ Sample usage::
 
 .. templatetag:: firstof
 
-firstof
--------
+``firstof``
+-----------
 
 Outputs the first argument variable that is not ``False``. Outputs nothing if
 all the passed variables are ``False``.
@@ -282,8 +282,8 @@ output inside a variable.
 
 .. templatetag:: for
 
-for
----
+``for``
+-------
 
 Loops over each item in an array, making the item available in a context
 variable. For example, to display a list of athletes provided in
@@ -340,8 +340,8 @@ Variable                    Description
                             the current one
 ==========================  ===============================================
 
-for ... empty
--------------
+``for`` ... ``empty``
+---------------------
 
 The ``for`` tag can take an optional ``{% empty %}`` clause whose text is
 displayed if the given array is empty or could not be found::
@@ -369,8 +369,8 @@ than -- the following::
 
 .. templatetag:: if
 
-if
---
+``if``
+------
 
 The ``{% if %}`` tag evaluates a variable, and if that variable is "true" (i.e.
 exists, is not empty, and is not a false boolean value) the contents of the
@@ -583,8 +583,8 @@ The ``ifequal`` and ``ifnotequal`` tags will be deprecated in a future release.
 
 .. templatetag:: ifchanged
 
-ifchanged
----------
+``ifchanged``
+-------------
 
 Check if a value has changed from the last iteration of a loop.
 
@@ -628,8 +628,8 @@ will be displayed if the value has not changed::
 
 .. templatetag:: include
 
-include
--------
+``include``
+-----------
 
 Loads a template and renders it with the current context. This is a way of
 "including" other templates within a template.
@@ -701,8 +701,8 @@ and returns an empty string.
 
 .. templatetag:: load
 
-load
-----
+``load``
+--------
 
 Loads a custom template tag set.
 
@@ -723,8 +723,8 @@ more information.
 
 .. templatetag:: lorem
 
-lorem
------
+``lorem``
+---------
 
 Displays random "lorem ipsum" Latin text. This is useful for providing sample
 data in templates.
@@ -796,8 +796,8 @@ output (as a string) inside a variable. This is useful if you want to use
 
 .. templatetag:: regroup
 
-regroup
--------
+``regroup``
+-----------
 
 Regroups a list of alike objects by a common attribute.
 
@@ -932,8 +932,8 @@ attribute, allowing  you to group on the display string rather than the
 
 .. templatetag:: spaceless
 
-spaceless
----------
+``spaceless``
+-------------
 
 Removes whitespace between HTML tags. This includes tab
 characters and newlines.
@@ -961,8 +961,8 @@ this example, the space around ``Hello`` won't be stripped::
 
 .. templatetag:: templatetag
 
-templatetag
------------
+``templatetag``
+---------------
 
 Outputs one of the syntax characters used to compose template tags.
 
@@ -990,8 +990,8 @@ Sample usage::
 
 .. templatetag:: url
 
-url
----
+``url``
+-------
 
 Returns an absolute path reference (a URL without the domain name) matching a
 given view and optional parameters. Any special characters in the resulting
@@ -1071,8 +1071,8 @@ by the context as to the current application.
 
 .. templatetag:: verbatim
 
-verbatim
---------
+``verbatim``
+------------
 
 Stops the template engine from rendering the contents of this block tag.
 
@@ -1092,8 +1092,8 @@ You can also designate a specific closing tag, allowing the use of
 
 .. templatetag:: widthratio
 
-widthratio
-----------
+``widthratio``
+--------------
 
 For creating bar charts and such, this tag calculates the ratio of a given
 value to a maximum value, and then applies that ratio to a constant.
@@ -1115,8 +1115,8 @@ variable. It can be useful, for instance, in a :ttag:`blocktrans` like this::
 
 .. templatetag:: with
 
-with
-----
+``with``
+--------
 
 Caches a complex variable under a simpler name. This is useful when accessing
 an "expensive" method (e.g., one that hits the database) multiple times.
@@ -1146,8 +1146,8 @@ Built-in filter reference
 
 .. templatefilter:: add
 
-add
----
+``add``
+-------
 
 Adds the argument to the value.
 
@@ -1176,8 +1176,8 @@ output will be ``[1, 2, 3, 4, 5, 6]``.
 
 .. templatefilter:: addslashes
 
-addslashes
-----------
+``addslashes``
+--------------
 
 Adds slashes before quotes. Useful for escaping strings in CSV, for example.
 
@@ -1190,8 +1190,8 @@ If ``value`` is ``"I'm using Django"``, the output will be
 
 .. templatefilter:: capfirst
 
-capfirst
---------
+``capfirst``
+------------
 
 Capitalizes the first character of the value. If the first character is not
 a letter, this filter has no effect.
@@ -1204,8 +1204,8 @@ If ``value`` is ``"django"``, the output will be ``"Django"``.
 
 .. templatefilter:: center
 
-center
-------
+``center``
+----------
 
 Centers the value in a field of a given width.
 
@@ -1217,8 +1217,8 @@ If ``value`` is ``"Django"``, the output will be ``"     Django    "``.
 
 .. templatefilter:: cut
 
-cut
----
+``cut``
+-------
 
 Removes all values of arg from the given string.
 
@@ -1231,8 +1231,8 @@ If ``value`` is ``"String with spaces"``, the output will be
 
 .. templatefilter:: date
 
-date
-----
+``date``
+--------
 
 Formats a date according to the given format.
 
@@ -1360,8 +1360,8 @@ representation of a ``datetime`` value. E.g.::
 
 .. templatefilter:: default
 
-default
--------
+``default``
+-----------
 
 If value evaluates to ``False``, uses the given default. Otherwise, uses the
 value.
@@ -1374,8 +1374,8 @@ If ``value`` is ``""`` (the empty string), the output will be ``nothing``.
 
 .. templatefilter:: default_if_none
 
-default_if_none
----------------
+``default_if_none``
+-------------------
 
 If (and only if) value is ``None``, uses the given default. Otherwise, uses the
 value.
@@ -1391,8 +1391,8 @@ If ``value`` is ``None``, the output will be the string ``"nothing"``.
 
 .. templatefilter:: dictsort
 
-dictsort
---------
+``dictsort``
+------------
 
 Takes a list of dictionaries and returns that list sorted by the key given in
 the argument.
@@ -1445,8 +1445,8 @@ then the output would be::
 
 .. templatefilter:: dictsortreversed
 
-dictsortreversed
-----------------
+``dictsortreversed``
+--------------------
 
 Takes a list of dictionaries and returns that list sorted in reverse order by
 the key given in the argument. This works exactly the same as the above filter,
@@ -1454,8 +1454,8 @@ but the returned value will be in reverse order.
 
 .. templatefilter:: divisibleby
 
-divisibleby
------------
+``divisibleby``
+---------------
 
 Returns ``True`` if the value is divisible by the argument.
 
@@ -1467,8 +1467,8 @@ If ``value`` is ``21``, the output would be ``True``.
 
 .. templatefilter:: escape
 
-escape
-------
+``escape``
+----------
 
 Escapes a string's HTML. Specifically, it makes these replacements:
 
@@ -1496,8 +1496,8 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off::
 
 .. templatefilter:: escapejs
 
-escapejs
---------
+``escapejs``
+------------
 
 Escapes characters for use in JavaScript strings. This does *not* make the
 string safe for use in HTML, but does protect you from syntax errors when using
@@ -1512,8 +1512,8 @@ the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u00
 
 .. templatefilter:: filesizeformat
 
-filesizeformat
---------------
+``filesizeformat``
+------------------
 
 Formats the value like a 'human-readable' file size (i.e. ``'13 KB'``,
 ``'4.1 MB'``, ``'102 bytes'``, etc.).
@@ -1534,8 +1534,8 @@ If ``value`` is 123456789, the output would be ``117.7 MB``.
 
 .. templatefilter:: first
 
-first
------
+``first``
+---------
 
 Returns the first item in a list.
 
@@ -1547,8 +1547,8 @@ If ``value`` is the list ``['a', 'b', 'c']``, the output will be ``'a'``.
 
 .. templatefilter:: floatformat
 
-floatformat
------------
+``floatformat``
+---------------
 
 When used without an argument, rounds a floating-point number to one decimal
 place -- but only if there's a decimal part to be displayed. For example:
@@ -1600,8 +1600,8 @@ with an argument of ``-1``.
 
 .. templatefilter:: force_escape
 
-force_escape
-------------
+``force_escape``
+----------------
 
 Applies HTML escaping to a string (see the :tfilter:`escape` filter for
 details). This filter is applied *immediately* and returns a new, escaped
@@ -1618,8 +1618,8 @@ the :tfilter:`linebreaks` filter::
 
 .. templatefilter:: get_digit
 
-get_digit
----------
+``get_digit``
+-------------
 
 Given a whole number, returns the requested digit, where 1 is the right-most
 digit, 2 is the second-right-most digit, etc. Returns the original value for
@@ -1634,8 +1634,8 @@ If ``value`` is ``123456789``, the output will be ``8``.
 
 .. templatefilter:: iriencode
 
-iriencode
----------
+``iriencode``
+-------------
 
 Converts an IRI (Internationalized Resource Identifier) to a string that is
 suitable for including in a URL. This is necessary if you're trying to use
@@ -1652,8 +1652,8 @@ If ``value`` is ``"?test=1&me=2"``, the output will be ``"?test=1&amp;me=2"``.
 
 .. templatefilter:: join
 
-join
-----
+``join``
+--------
 
 Joins a list with a string, like Python's ``str.join(list)``
 
@@ -1666,8 +1666,8 @@ If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
 
 .. templatefilter:: last
 
-last
-----
+``last``
+--------
 
 Returns the last item in a list.
 
@@ -1680,8 +1680,8 @@ string ``"d"``.
 
 .. templatefilter:: length
 
-length
-------
+``length``
+----------
 
 Returns the length of the value. This works for both strings and lists.
 
@@ -1710,8 +1710,8 @@ If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 
 .. templatefilter:: linebreaks
 
-linebreaks
-----------
+``linebreaks``
+--------------
 
 Replaces line breaks in plain text with appropriate HTML; a single
 newline becomes an HTML line break (``<br />``) and a new line
@@ -1741,8 +1741,8 @@ slug``.
 
 .. templatefilter:: linenumbers
 
-linenumbers
------------
+``linenumbers``
+---------------
 
 Displays text with line numbers.
 
@@ -1764,8 +1764,8 @@ the output will be::
 
 .. templatefilter:: ljust
 
-ljust
------
+``ljust``
+---------
 
 Left-aligns the value in a field of a given width.
 
@@ -1779,8 +1779,8 @@ If ``value`` is ``Django``, the output will be ``"Django    "``.
 
 .. templatefilter:: lower
 
-lower
------
+``lower``
+---------
 
 Converts a string into all lowercase.
 
@@ -1793,8 +1793,8 @@ If ``value`` is ``Totally LOVING this Album!``, the output will be
 
 .. templatefilter:: make_list
 
-make_list
----------
+``make_list``
+-------------
 
 Returns the value turned into a list. For a string, it's a list of characters.
 For an integer, the argument is cast into an unicode string before creating a
@@ -1810,8 +1810,8 @@ list ``['1', '2', '3']``.
 
 .. templatefilter:: phone2numeric
 
-phone2numeric
--------------
+``phone2numeric``
+-----------------
 
 Converts a phone number (possibly containing letters) to its numerical
 equivalent.
@@ -1827,8 +1827,8 @@ If ``value`` is ``800-COLLECT``, the output will be ``800-2655328``.
 
 .. templatefilter:: pluralize
 
-pluralize
----------
+``pluralize``
+-------------
 
 Returns a plural suffix if the value is not 1. By default, this suffix is
 ``'s'``.
@@ -1858,15 +1858,15 @@ Example::
 
 .. templatefilter:: pprint
 
-pprint
-------
+``pprint``
+----------
 
 A wrapper around :func:`pprint.pprint` -- for debugging, really.
 
 .. templatefilter:: random
 
-random
-------
+``random``
+----------
 
 Returns a random item from the given list.
 
@@ -1878,8 +1878,8 @@ If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output could be ``"b"``.
 
 .. templatefilter:: rjust
 
-rjust
------
+``rjust``
+---------
 
 Right-aligns the value in a field of a given width.
 
@@ -1893,8 +1893,8 @@ If ``value`` is ``Django``, the output will be ``"    Django"``.
 
 .. templatefilter:: safe
 
-safe
-----
+``safe``
+--------
 
 Marks a string as not requiring further HTML escaping prior to output. When
 autoescaping is off, this filter has no effect.
@@ -1909,8 +1909,8 @@ autoescaping is off, this filter has no effect.
 
 .. templatefilter:: safeseq
 
-safeseq
--------
+``safeseq``
+-----------
 
 Applies the :tfilter:`safe` filter to each element of a sequence. Useful in
 conjunction with other filters that operate on sequences, such as
@@ -1924,8 +1924,8 @@ individual elements of the sequence.
 
 .. templatefilter:: slice
 
-slice
------
+``slice``
+---------
 
 Returns a slice of the list.
 
@@ -1941,8 +1941,8 @@ If ``some_list`` is ``['a', 'b', 'c']``, the output will be ``['a', 'b']``.
 
 .. templatefilter:: slugify
 
-slugify
--------
+``slugify``
+-----------
 
 Converts to ASCII. Converts spaces to hyphens. Removes characters that aren't
 alphanumerics, underscores, or hyphens. Converts to lowercase. Also strips
@@ -1956,8 +1956,8 @@ If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
 
 .. templatefilter:: stringformat
 
-stringformat
-------------
+``stringformat``
+----------------
 
 Formats the variable according to the argument, a string formatting specifier.
 This specifier uses Python string formatting syntax, with the exception that
@@ -1974,8 +1974,8 @@ If ``value`` is ``10``, the output will be ``1.000000E+01``.
 
 .. templatefilter:: striptags
 
-striptags
----------
+``striptags``
+-------------
 
 Makes all possible efforts to strip all [X]HTML tags.
 
@@ -1998,8 +1998,8 @@ output will be ``"Joel is a slug"``.
 
 .. templatefilter:: time
 
-time
-----
+``time``
+--------
 
 Formats a time according to the given format.
 
@@ -2044,8 +2044,8 @@ used, without applying any localization.
 
 .. templatefilter:: timesince
 
-timesince
----------
+``timesince``
+-------------
 
 Formats a date as the time since that date (e.g., "4 days, 6 hours").
 
@@ -2064,8 +2064,8 @@ date that is in the future relative to the comparison point.
 
 .. templatefilter:: timeuntil
 
-timeuntil
----------
+``timeuntil``
+-------------
 
 Similar to ``timesince``, except that it measures the time from now until the
 given date or datetime. For example, if today is 1 June 2006 and
@@ -2085,8 +2085,8 @@ date that is in the past relative to the comparison point.
 
 .. templatefilter:: title
 
-title
------
+``title``
+---------
 
 Converts a string into titlecase by making words start with an uppercase
 character and the remaining characters lowercase. This tag makes no effort to
@@ -2100,8 +2100,8 @@ If ``value`` is ``"my FIRST post"``, the output will be ``"My First Post"``.
 
 .. templatefilter:: truncatechars
 
-truncatechars
--------------
+``truncatechars``
+-----------------
 
 Truncates a string if it is longer than the specified number of characters.
 Truncated strings will end with a translatable ellipsis sequence ("...").
@@ -2116,8 +2116,8 @@ If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i..."``.
 
 .. templatefilter:: truncatechars_html
 
-truncatechars_html
-------------------
+``truncatechars_html``
+----------------------
 
 Similar to :tfilter:`truncatechars`, except that it is aware of HTML tags. Any
 tags that are opened in the string and not closed before the truncation point
@@ -2134,8 +2134,8 @@ Newlines in the HTML content will be preserved.
 
 .. templatefilter:: truncatewords
 
-truncatewords
--------------
+``truncatewords``
+-----------------
 
 Truncates a string after a certain number of words.
 
@@ -2151,8 +2151,8 @@ Newlines within the string will be removed.
 
 .. templatefilter:: truncatewords_html
 
-truncatewords_html
-------------------
+``truncatewords_html``
+----------------------
 
 Similar to :tfilter:`truncatewords`, except that it is aware of HTML tags. Any
 tags that are opened in the string and not closed before the truncation point,
@@ -2172,8 +2172,8 @@ Newlines in the HTML content will be preserved.
 
 .. templatefilter:: unordered_list
 
-unordered_list
---------------
+``unordered_list``
+------------------
 
 Recursively takes a self-nested list and returns an HTML unordered list --
 WITHOUT opening and closing <ul> tags.
@@ -2196,8 +2196,8 @@ contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
 
 .. templatefilter:: upper
 
-upper
------
+``upper``
+---------
 
 Converts a string into all uppercase.
 
@@ -2209,8 +2209,8 @@ If ``value`` is ``"Joel is a slug"``, the output will be ``"JOEL IS A SLUG"``.
 
 .. templatefilter:: urlencode
 
-urlencode
----------
+``urlencode``
+-------------
 
 Escapes a value for use in a URL.
 
@@ -2234,8 +2234,8 @@ If ``value`` is ``"https://www.example.org/"``, the output will be
 
 .. templatefilter:: urlize
 
-urlize
-------
+``urlize``
+----------
 
 Converts URLs and email addresses in text into clickable links.
 
@@ -2278,8 +2278,8 @@ Django's built-in :tfilter:`escape` filter. The default value for
 
 .. templatefilter:: urlizetrunc
 
-urlizetrunc
------------
+``urlizetrunc``
+---------------
 
 Converts URLs and email addresses into clickable links just like urlize_, but
 truncates URLs longer than the given character limit.
@@ -2299,8 +2299,8 @@ As with urlize_, this filter should only be applied to plain text.
 
 .. templatefilter:: wordcount
 
-wordcount
----------
+``wordcount``
+-------------
 
 Returns the number of words.
 
@@ -2312,8 +2312,8 @@ If ``value`` is ``"Joel is a slug"``, the output will be ``4``.
 
 .. templatefilter:: wordwrap
 
-wordwrap
---------
+``wordwrap``
+------------
 
 Wraps words at specified line length.
 
@@ -2331,8 +2331,8 @@ If ``value`` is ``Joel is a slug``, the output would be::
 
 .. templatefilter:: yesno
 
-yesno
------
+``yesno``
+---------
 
 Maps values for ``True``, ``False``, and (optionally) ``None``, to the strings
 "yes", "no", "maybe", or a custom mapping passed as a comma-separated list, and
@@ -2360,8 +2360,8 @@ Django provides template tags and filters to control each aspect of
 :doc:`internationalization </topics/i18n/index>` in templates. They allow for
 granular control of translations, formatting, and time zone conversions.
 
-i18n
-----
+``i18n``
+--------
 
 This library allows specifying translatable text in templates.
 To enable it, set :setting:`USE_I18N` to ``True``, then load it with
@@ -2369,8 +2369,8 @@ To enable it, set :setting:`USE_I18N` to ``True``, then load it with
 
 See :ref:`specifying-translation-strings-in-template-code`.
 
-l10n
-----
+``l10n``
+--------
 
 This library provides control over the localization of values in templates.
 You only need to load the library using ``{% load l10n %}``, but you'll often
@@ -2378,8 +2378,8 @@ set :setting:`USE_L10N` to ``True`` so that localization is active by default.
 
 See :ref:`topic-l10n-templates`.
 
-tz
---
+``tz``
+------
 
 This library provides control over time zone conversions in templates.
 Like ``l10n``, you only need to load the library using ``{% load tz %}``,
@@ -2395,19 +2395,19 @@ Django comes with a couple of other template-tag libraries that you have to
 enable explicitly in your :setting:`INSTALLED_APPS` setting and enable in your
 template with the :ttag:`{% load %}<load>` tag.
 
-django.contrib.humanize
------------------------
+``django.contrib.humanize``
+---------------------------
 
 A set of Django template filters useful for adding a "human touch" to data. See
 :doc:`/ref/contrib/humanize`.
 
-static
-------
+``static``
+----------
 
 .. templatetag:: static
 
-static
-~~~~~~
+``static``
+~~~~~~~~~~
 
 To link to static files that are saved in :setting:`STATIC_ROOT` Django ships
 with a :ttag:`static` template tag. If the :mod:`django.contrib.staticfiles`
@@ -2443,8 +2443,8 @@ slightly different call::
 
 .. templatetag:: get_static_prefix
 
-get_static_prefix
-~~~~~~~~~~~~~~~~~
+``get_static_prefix``
+~~~~~~~~~~~~~~~~~~~~~
 
 You should prefer the :ttag:`static` template tag, but if you need more control
 over exactly where and how :setting:`STATIC_URL` is injected into the template,
@@ -2464,8 +2464,8 @@ the value multiple times::
 
 .. templatetag:: get_media_prefix
 
-get_media_prefix
-~~~~~~~~~~~~~~~~
+``get_media_prefix``
+~~~~~~~~~~~~~~~~~~~~
 
 Similar to the :ttag:`get_static_prefix`, ``get_media_prefix`` populates a
 template variable with the media prefix :setting:`MEDIA_URL`, e.g.::

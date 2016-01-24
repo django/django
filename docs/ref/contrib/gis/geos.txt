@@ -1,6 +1,6 @@
-========
-GEOS API
-========
+============
+``GEOS`` API
+============
 
 .. module:: django.contrib.gis.geos
    :synopsis: GeoDjango's high-level interface to the GEOS library.
@@ -8,8 +8,8 @@ GEOS API
 Background
 ==========
 
-What is GEOS?
--------------
+What is ``GEOS``?
+-----------------
 
 `GEOS`__ stands for **Geometry Engine - Open Source**,
 and is a C++ library, ported from the  `Java Topology Suite`__.  GEOS

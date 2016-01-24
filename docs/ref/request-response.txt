@@ -19,8 +19,8 @@ This document explains the APIs for :class:`HttpRequest` and
 :class:`HttpResponse` objects, which are defined in the :mod:`django.http`
 module.
 
-HttpRequest objects
-===================
+``HttpRequest`` objects
+=======================
 
 .. class:: HttpRequest
 
@@ -374,8 +374,8 @@ Methods
             process(element)
 
 
-QueryDict objects
-=================
+``QueryDict`` objects
+=====================
 
 .. class:: QueryDict
 
@@ -921,8 +921,8 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
 
-JsonResponse objects
-====================
+``JsonResponse`` objects
+========================
 
 .. class:: JsonResponse(data, encoder=DjangoJSONEncoder, safe=True, json_dumps_params=None, **kwargs)
 
@@ -1069,8 +1069,8 @@ Attributes
 
     This is always ``True``.
 
-FileResponse objects
-====================
+``FileResponse`` objects
+========================
 
 .. class:: FileResponse
 

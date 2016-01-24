@@ -1,6 +1,6 @@
-==========================
-django-admin and manage.py
-==========================
+==================================
+``django-admin`` and ``manage.py``
+==================================
 
 ``django-admin`` is Django's command-line utility for administrative tasks.
 This document outlines all it can do.
@@ -96,8 +96,8 @@ information that ``django-admin`` prints to the console.
 Available commands
 ==================
 
-check
------
+``check``
+---------
 
 .. django-admin:: check [app_label [app_label ...]]
 
@@ -147,8 +147,8 @@ make it part of your integration test suite.
 Specifies the message level that will cause the command to exit with a non-zero
 status. Default is ``ERROR``.
 
-compilemessages
----------------
+``compilemessages``
+-------------------
 
 .. django-admin:: compilemessages
 
@@ -184,8 +184,8 @@ Example usage::
     django-admin compilemessages -x pt_BR
     django-admin compilemessages -x pt_BR -x fr
 
-createcachetable
-----------------
+``createcachetable``
+--------------------
 
 .. django-admin:: createcachetable
 
@@ -207,8 +207,8 @@ customize it or use the migrations framework.
 
     The ``--dry-run`` option was added.
 
-dbshell
--------
+``dbshell``
+-----------
 
 .. django-admin:: dbshell
 
@@ -230,8 +230,8 @@ program manually.
 
 Specifies the database onto which to open a shell. Defaults to ``default``.
 
-diffsettings
-------------
+``diffsettings``
+----------------
 
 .. django-admin:: diffsettings
 
@@ -248,8 +248,8 @@ example, the default settings don't define :setting:`ROOT_URLCONF`, so
 Displays all settings, even if they have Django's default value. Such settings
 are prefixed by ``"###"``.
 
-dumpdata
---------
+``dumpdata``
+------------
 
 .. django-admin:: dumpdata [app_label[.ModelName] [app_label[.ModelName] ...]]
 
@@ -328,8 +328,8 @@ progress bar is shown in the terminal.
 
     The progress bar in the terminal was added.
 
-flush
------
+``flush``
+---------
 
 .. django-admin:: flush
 
@@ -351,8 +351,8 @@ Suppresses all user prompts.
 
 Specifies the database to flush. Defaults to ``default``.
 
-inspectdb
----------
+``inspectdb``
+-------------
 
 .. django-admin:: inspectdb
 
@@ -410,8 +410,8 @@ it because ``True`` is its default value).
 
 Specifies the database to introspect. Defaults to ``default``.
 
-loaddata
---------
+``loaddata``
+------------
 
 .. django-admin:: loaddata fixture [fixture ...]
 
@@ -559,8 +559,8 @@ defined, name the fixture ``mydata.master.json`` or
 ``mydata.master.json.gz`` and the fixture will only be loaded when you
 specify you want to load data into the ``master`` database.
 
-makemessages
-------------
+``makemessages``
+----------------
 
 .. django-admin:: makemessages
 
@@ -660,8 +660,8 @@ language files from being created.
     See :ref:`customizing-makemessages` for instructions on how to customize
     the keywords that :djadmin:`makemessages` passes to ``xgettext``.
 
-makemigrations
---------------
+``makemigrations``
+------------------
 
 .. django-admin:: makemigrations [app_label [app_label ...]]
 
@@ -719,8 +719,8 @@ Makes ``makemigrations`` exit with error code 1 when no migrations are created
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
 
-migrate
--------
+``migrate``
+-----------
 
 .. django-admin:: migrate [app_label] [migration_name]
 
@@ -774,8 +774,8 @@ Allows creating tables for apps without migrations. While this isn't
 recommended, the migrations framework is sometimes too slow on large projects
 with hundreds of models.
 
-runserver
----------
+``runserver``
+-------------
 
 .. django-admin:: runserver [addrport]
 
@@ -905,8 +905,8 @@ By default, the development server doesn't serve any static files for your site
 you want to configure Django to serve static media, read
 :doc:`/howto/static-files/index`.
 
-sendtestemail
--------------
+``sendtestemail``
+-----------------
 
 .. django-admin:: sendtestemail [email [email ...]]
 
@@ -930,8 +930,8 @@ Mails the email addresses specified in :setting:`MANAGERS` using
 Mails the email addresses specified in :setting:`ADMINS` using
 :meth:`~django.core.mail.mail_admins()`.
 
-shell
------
+``shell``
+---------
 
 .. django-admin:: shell
 
@@ -977,8 +977,8 @@ Lets you pass a command as a string to execute it as Django, like so::
 
     django-admin shell --command="import django; print(django.__version__)"
 
-showmigrations
---------------
+``showmigrations``
+------------------
 
 .. django-admin:: showmigrations [app_label [app_label ...]]
 
@@ -1006,8 +1006,8 @@ of 2 and above, all dependencies of a migration will also be shown.
 
 Specifies the database to examine. Defaults to ``default``.
 
-sqlflush
---------
+``sqlflush``
+------------
 
 .. django-admin:: sqlflush
 
@@ -1018,8 +1018,8 @@ command.
 
 Specifies the database for which to print the SQL. Defaults to ``default``.
 
-sqlmigrate
-----------
+``sqlmigrate``
+--------------
 
 .. django-admin:: sqlmigrate app_label migration_name
 
@@ -1044,8 +1044,8 @@ Specifies the database for which to generate the SQL. Defaults to ``default``.
     generated for each migration operation is preceded by the operation's
     description.
 
-sqlsequencereset
-----------------
+``sqlsequencereset``
+--------------------
 
 .. django-admin:: sqlsequencereset app_label [app_label ...]
 
@@ -1061,8 +1061,8 @@ of sync with its automatically incremented field data.
 
 Specifies the database for which to print the SQL. Defaults to ``default``.
 
-squashmigrations
-----------------
+``squashmigrations``
+--------------------
 
 .. django-admin:: squashmigrations app_label [start_migration_name] migration_name
 
@@ -1094,8 +1094,8 @@ Suppresses all user prompts.
 
     The ``--no-input`` alias was added.
 
-startapp
---------
+``startapp``
+------------
 
 .. django-admin:: startapp name [directory]
 
@@ -1177,8 +1177,8 @@ files is:
 
 .. _source: https://github.com/django/django/tree/master/django/conf/app_template/
 
-startproject
-------------
+``startproject``
+----------------
 
 .. django-admin:: startproject name [directory]
 
@@ -1231,8 +1231,8 @@ for :djadmin:`startapp`.
 
 .. _`template source`: https://github.com/django/django/tree/master/django/conf/project_template/
 
-test
-----
+``test``
+--------
 
 .. django-admin:: test [test_label [test_label ...]]
 
@@ -1339,8 +1339,8 @@ don't.
     in order to exchange them between processes. See
     :ref:`python:pickle-picklable` for details.
 
-testserver
-----------
+``testserver``
+--------------
 
 .. django-admin:: testserver [fixture [fixture ...]]
 
@@ -1418,8 +1418,8 @@ their application.
 ``django.contrib.auth``
 -----------------------
 
-changepassword
-~~~~~~~~~~~~~~
+``changepassword``
+~~~~~~~~~~~~~~~~~~
 
 .. django-admin:: changepassword [<username>]
 
@@ -1439,8 +1439,8 @@ Example usage::
 
     django-admin changepassword ringo
 
-createsuperuser
-~~~~~~~~~~~~~~~
+``createsuperuser``
+~~~~~~~~~~~~~~~~~~~
 
 .. django-admin:: createsuperuser
 
@@ -1479,8 +1479,8 @@ instance.
 ``django.contrib.gis``
 ----------------------
 
-ogrinspect
-~~~~~~~~~~
+``ogrinspect``
+~~~~~~~~~~~~~~
 
 This command is only available if :doc:`GeoDjango </ref/contrib/gis/index>`
 (``django.contrib.gis``) is installed.
@@ -1491,8 +1491,8 @@ documentation.
 ``django.contrib.sessions``
 ---------------------------
 
-clearsessions
-~~~~~~~~~~~~~~~
+``clearsessions``
+~~~~~~~~~~~~~~~~~
 
 .. django-admin:: clearsessions
 
@@ -1501,8 +1501,8 @@ Can be run as a cron job or directly to clean out expired sessions.
 ``django.contrib.sitemaps``
 ---------------------------
 
-ping_google
-~~~~~~~~~~~
+``ping_google``
+~~~~~~~~~~~~~~~
 
 This command is only available if the :doc:`Sitemaps framework
 </ref/contrib/sitemaps>` (``django.contrib.sitemaps``) is installed.
@@ -1513,8 +1513,8 @@ documentation.
 ``django.contrib.staticfiles``
 ------------------------------
 
-collectstatic
-~~~~~~~~~~~~~
+``collectstatic``
+~~~~~~~~~~~~~~~~~
 
 This command is only available if the :doc:`static files application
 </howto/static-files/index>` (``django.contrib.staticfiles``) is installed.
@@ -1522,8 +1522,8 @@ This command is only available if the :doc:`static files application
 Please refer to its :djadmin:`description <collectstatic>` in the
 :doc:`staticfiles </ref/contrib/staticfiles>` documentation.
 
-findstatic
-~~~~~~~~~~
+``findstatic``
+~~~~~~~~~~~~~~
 
 This command is only available if the :doc:`static files application
 </howto/static-files/index>` (``django.contrib.staticfiles``) is installed.

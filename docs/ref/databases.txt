@@ -281,8 +281,8 @@ Python 3. In order to use MySQLdb under Python 3, you'll have to install
     :djadmin:`dumpdata` with rows that may have ``0000-00-00`` values, as they
     will be converted to ``None``.
 
-mysqlclient
-~~~~~~~~~~~
+``mysqlclient``
+~~~~~~~~~~~~~~~
 
 Django requires `mysqlclient`_ 1.3.3 or later. Note that Python 3.2 is not
 supported. Except for the Python 3.3+ support, mysqlclient should mostly behave

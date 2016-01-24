@@ -1,6 +1,6 @@
-==================
-Installing PostGIS
-==================
+======================
+Installing ``PostGIS``
+======================
 
 `PostGIS`__ adds geographic object support to PostgreSQL, turning it
 into a spatial database. :ref:`geosbuild`, :ref:`proj4` and
