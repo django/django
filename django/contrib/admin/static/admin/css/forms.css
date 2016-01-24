@@ -180,7 +180,7 @@ fieldset .field-box {
     width: 200px;
 }
 
-form .wide p, form .wide input + p.help {
+form .wide p, form .wide input + p.help, form .wide ul {
     margin-left: 200px;
 }
 
