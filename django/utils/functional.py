@@ -240,6 +240,8 @@ class LazyObject(object):
     _wrapped = None
 
     def __init__(self):
+        # Note: if a subclass overrides __init__(), it will likely need to
+        # override __copy__() and __deepcopy__() as well.
         self._wrapped = empty
 
     __getattr__ = new_method_proxy(getattr)
@@ -291,6 +293,15 @@ class LazyObject(object):
     # ignored by our __reduce__ and custom unpickler.
     def __getstate__(self):
         return {}
+
+    def __copy__(self):
+        if self._wrapped is empty:
+            # If uninitialized, copy the wrapper. Use type(self), not
+            # self.__class__, because the latter is proxied.
+            return type(self)()
+        else:
+            # If initialized, return a copy of the wrapped object.
+            return copy.copy(self._wrapped)
 
     def __deepcopy__(self, memo):
         if self._wrapped is empty:
@@ -372,6 +383,15 @@ class SimpleLazyObject(LazyObject):
         else:
             repr_attr = self._wrapped
         return '<%s: %r>' % (type(self).__name__, repr_attr)
+
+    def __copy__(self):
+        if self._wrapped is empty:
+            # If uninitialized, copy the wrapper. Use SimpleLazyObject, not
+            # self.__class__, because the latter is proxied.
+            return SimpleLazyObject(self._setupfunc)
+        else:
+            # If initialized, return a copy of the wrapped object.
+            return copy.copy(self._wrapped)
 
     def __deepcopy__(self, memo):
         if self._wrapped is empty:

@@ -31,3 +31,6 @@ Bugfixes
 
 * Fixed a crash when using a reverse ``OneToOneField`` in
   ``ModelAdmin.readonly_fields`` (:ticket:`26060`).
+
+* Fixed a regression in Django 1.8.5 that broke copying a ``SimpleLazyObject``
+  with ``copy.copy()`` (:ticket:`26122`).
