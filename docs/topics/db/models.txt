@@ -686,8 +686,8 @@ provided in :doc:`/howto/custom-model-fields`.
 
 .. _meta-options:
 
-Meta options
-============
+``Meta`` options
+================
 
 Give your model metadata by using an inner ``class Meta``, like so::
 
@@ -1215,8 +1215,8 @@ order by the ``last_name`` attribute when you use the proxy. This is easy::
 Now normal ``Person`` queries will be unordered
 and ``OrderedPerson`` queries will be ordered by ``last_name``.
 
-QuerySets still return the model that was requested
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``QuerySet``\s still return the model that was requested
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There is no way to have Django return, say, a ``MyPerson`` object whenever you
 query for ``Person`` objects. A queryset for ``Person`` objects will return

@@ -94,8 +94,8 @@ to create a return class for any status code you like. For example::
 Because 404 errors are by far the most common HTTP error, there's an easier way
 to handle those errors.
 
-The Http404 exception
----------------------
+The ``Http404`` exception
+-------------------------
 
 .. class:: django.http.Http404()
 

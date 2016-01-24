@@ -193,8 +193,8 @@ sent without any data)::
 
 .. _understanding-the-managementform:
 
-Understanding the ManagementForm
---------------------------------
+Understanding the ``ManagementForm``
+------------------------------------
 
 You may have noticed the additional data (``form-TOTAL_FORMS``,
 ``form-INITIAL_FORMS`` and ``form-MAX_NUM_FORMS``) that was required

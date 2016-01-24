@@ -117,8 +117,8 @@ following methods:
     Defines the type of class returned by the ``get_lookup()`` method. It must
     be a :class:`~django.db.models.Field` instance.
 
-Transform reference
-===================
+``Transform`` reference
+=======================
 
 .. class:: Transform
 
@@ -162,8 +162,8 @@ Transform reference
         :class:`~django.db.models.Field` instance. By default is the same as
         its ``lhs.output_field``.
 
-Lookup reference
-================
+``Lookup`` reference
+====================
 
 .. class:: Lookup
 

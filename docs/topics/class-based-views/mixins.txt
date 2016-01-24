@@ -86,8 +86,8 @@ date-based generic views. These are
 covered in the :doc:`mixin reference
 documentation</ref/class-based-views/mixins>`.
 
-DetailView: working with a single Django object
------------------------------------------------
+``DetailView``: working with a single Django object
+---------------------------------------------------
 
 To show the detail of an object, we basically need to do two things:
 we need to look up the object and then we need to make a
@@ -124,8 +124,8 @@ on a subclass to something else. (For instance, the :doc:`generic edit
 views<generic-editing>` use ``_form`` for create and update views, and
 ``_confirm_delete`` for delete views.)
 
-ListView: working with many Django objects
-------------------------------------------
+``ListView``: working with many Django objects
+----------------------------------------------
 
 Lists of objects follow roughly the same pattern: we need a (possibly
 paginated) list of objects, typically a
@@ -208,8 +208,8 @@ the box.
 
 .. _method resolution order: https://www.python.org/download/releases/2.3/mro/
 
-Using SingleObjectMixin with View
----------------------------------
+Using ``SingleObjectMixin`` with View
+-------------------------------------
 
 If we want to write a simple class-based view that responds only to
 ``POST``, we'll subclass :class:`~django.views.generic.base.View` and
@@ -271,8 +271,8 @@ to look up the ``Author`` instance. You could also use a slug, or
 any of the other features of
 :class:`~django.views.generic.detail.SingleObjectMixin`.
 
-Using SingleObjectMixin with ListView
--------------------------------------
+Using ``SingleObjectMixin`` with ``ListView``
+---------------------------------------------
 
 :class:`~django.views.generic.list.ListView` provides built-in
 pagination, but you might want to paginate a list of objects that are
@@ -404,8 +404,8 @@ is a simpler solution. First, let's look at a naive attempt to combine
 ``POST`` a Django :class:`~django.forms.Form` to the same URL as we're
 displaying an object using :class:`DetailView`.
 
-Using FormMixin with DetailView
--------------------------------
+Using ``FormMixin`` with ``DetailView``
+---------------------------------------
 
 Think back to our earlier example of using :class:`View` and
 :class:`~django.views.generic.detail.SingleObjectMixin` together. We were

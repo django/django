@@ -321,8 +321,8 @@ with the admin site:
 * **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
   attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
 
-ModelAdmin
-~~~~~~~~~~
+``ModelAdmin``
+~~~~~~~~~~~~~~
 
 The following checks are performed on any
 :class:`~django.contrib.admin.ModelAdmin` that is registered
@@ -377,8 +377,8 @@ with the admin site:
 * **admin.E128**: The value of ``date_hierarchy`` must be a ``DateField`` or
   ``DateTimeField``.
 
-InlineModelAdmin
-~~~~~~~~~~~~~~~~
+``InlineModelAdmin``
+~~~~~~~~~~~~~~~~~~~~
 
 The following checks are performed on any
 :class:`~django.contrib.admin.InlineModelAdmin` that is registered as an
@@ -394,8 +394,8 @@ inline on a :class:`~django.contrib.admin.ModelAdmin`.
 * **admin.E206**: The value of ``formset`` must inherit from
   ``BaseModelFormSet``.
 
-GenericInlineModelAdmin
-~~~~~~~~~~~~~~~~~~~~~~~
+``GenericInlineModelAdmin``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following checks are performed on any
 :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin` that is
@@ -409,8 +409,8 @@ registered as an inline on a :class:`~django.contrib.admin.ModelAdmin`.
 * **admin.E304**: ``<model>`` has no ``GenericForeignKey`` using content type
   field ``<field name>`` and object ID field ``<field name>``.
 
-AdminSite
-~~~~~~~~~
+``AdminSite``
+~~~~~~~~~~~~~
 
 The following checks are performed on the default
 :class:`~django.contrib.admin.AdminSite`:

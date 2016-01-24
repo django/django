@@ -68,7 +68,7 @@ be serialized.
     serialized object doesn't specify all the fields that are required by a
     model, the deserializer will not be able to save deserialized instances.
 
-Inherited Models
+Inherited models
 ----------------
 
 If you have a model that is defined using an :ref:`abstract base class

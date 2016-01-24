@@ -1,6 +1,6 @@
-==================
-GeoJSON Serializer
-==================
+======================
+``GeoJSON`` Serializer
+======================
 
 .. module:: django.contrib.gis.serializers.geojson
    :synopsis: Serialization of GeoDjango models in the GeoJSON format.

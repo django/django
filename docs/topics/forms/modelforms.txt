@@ -793,8 +793,8 @@ instances of the model, you can specify an empty QuerySet::
 
    >>> AuthorFormSet(queryset=Author.objects.none())
 
-Changing the ``form``
----------------------
+Changing the form
+-----------------
 
 By default, when you use ``modelformset_factory``, a model form will
 be created using :func:`~django.forms.models.modelform_factory`.

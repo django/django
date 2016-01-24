@@ -2,8 +2,8 @@
 GeoDjango Management Commands
 =============================
 
-inspectdb
-=========
+``inspectdb``
+=============
 
 .. describe:: django-admin inspectdb
 
@@ -12,8 +12,8 @@ When :mod:`django.contrib.gis` is in your :setting:`INSTALLED_APPS`, the
 The overridden command is spatially-aware, and places geometry fields in the
 auto-generated model definition, where appropriate.
 
-ogrinspect
-==========
+``ogrinspect``
+==============
 
 .. django-admin:: ogrinspect data_source model_name
 

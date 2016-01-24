@@ -23,8 +23,8 @@ We don't usually recommend allowing ``null=True`` for ``CharField`` since this
 allows the field to have two "empty values", but it's important for the
 ``Coalesce`` example below.
 
-Coalesce
-========
+``Coalesce``
+============
 
 .. class:: Coalesce(*expressions, **extra)
 
@@ -64,8 +64,8 @@ Usage examples::
     >>> now_sql = RawSQL("cast(%s as datetime)", (now,))
     >>> Coalesce('updated', now_sql)
 
-Concat
-======
+``Concat``
+==========
 
 .. class:: Concat(*expressions, **extra)
 
@@ -91,8 +91,8 @@ Usage example::
     >>> print(author.screen_name)
     Margaret Smith (Maggie)
 
-Greatest
-========
+``Greatest``
+============
 
 .. class:: Greatest(*expressions, **extra)
 
@@ -135,8 +135,8 @@ and ``comment.modified``.
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
     a sensible minimum value to provide as a default.
 
-Least
-=====
+``Least``
+=========
 
 .. class:: Least(*expressions, **extra)
 
@@ -159,8 +159,8 @@ will result in a database error.
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
     a sensible maximum value to provide as a default.
 
-Length
-======
+``Length``
+==========
 
 .. class:: Length(expression, **extra)
 
@@ -190,8 +190,8 @@ It can also be registered as a transform. For example::
 
     The ability to register the function as a transform was added.
 
-Lower
-=====
+``Lower``
+=========
 
 .. class:: Lower(expression, **extra)
 
@@ -212,8 +212,8 @@ Usage example::
 
     The ability to register the function as a transform was added.
 
-Now
-===
+``Now``
+=======
 
 .. class:: Now()
 
@@ -235,8 +235,8 @@ Usage example::
     ``Now()`` uses ``STATEMENT_TIMESTAMP`` instead. If you need the transaction
     timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
 
-Substr
-======
+``Substr``
+==========
 
 .. class:: Substr(expression, pos, length=None, **extra)
 
@@ -254,8 +254,8 @@ Usage example::
     >>> print(Author.objects.get(name='Margaret Smith').alias)
     marga
 
-Upper
-=====
+``Upper``
+=========
 
 .. class:: Upper(expression, **extra)
 

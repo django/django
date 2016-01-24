@@ -25,8 +25,8 @@ your operating system's package manager.
     If you are just starting with Django and using Windows, you may find
     :doc:`/howto/windows` useful.
 
-Install Apache and mod_wsgi
-=============================
+Install Apache and ``mod_wsgi``
+===============================
 
 If you just want to experiment with Django, skip ahead to the next
 section; Django includes a lightweight web server you can use for

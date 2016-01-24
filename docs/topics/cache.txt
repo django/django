@@ -1049,8 +1049,8 @@ pages. We'll look at some of these headers in the sections that follow.
 
 .. _using-vary-headers:
 
-Using Vary headers
-==================
+Using ``Vary`` headers
+======================
 
 The ``Vary`` header defines which request headers a cache
 mechanism should take into account when building its cache key. For example, if
@@ -1231,8 +1231,8 @@ Example::
 
 .. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
-Order of MIDDLEWARE_CLASSES
-===========================
+Order of ``MIDDLEWARE_CLASSES``
+===============================
 
 If you use caching middleware, it's important to put each half in the right
 place within the :setting:`MIDDLEWARE_CLASSES` setting. That's because the cache

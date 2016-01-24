@@ -13,7 +13,7 @@ Implementing this yourself often results in a lot of repeated boilerplate code
 this, Django provides a collection of generic class-based views for form
 processing.
 
-Basic Forms
+Basic forms
 ===========
 
 Given a simple contact form:
@@ -60,7 +60,7 @@ Notes:
   :meth:`~django.views.generic.edit.FormMixin.form_valid` simply
   redirects to the :attr:`~django.views.generic.edit.FormMixin.success_url`.
 
-Model Forms
+Model forms
 ===========
 
 Generic views really shine when working with models.  These generic
@@ -180,8 +180,8 @@ Finally, we hook these new views into the URLconf:
     :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
     on your view class.
 
-Models and request.user
-=======================
+Models and ``request.user``
+===========================
 
 To track the user that created an object using a :class:`CreateView`,
 you can use a custom :class:`~django.forms.ModelForm` to do this. First, add

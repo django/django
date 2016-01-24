@@ -31,8 +31,8 @@ feed, write a :class:`~django.contrib.syndication.views.Feed` class
 and point to an instance of it in your :doc:`URLconf
 </topics/http/urls>`.
 
-Feed classes
-------------
+``Feed`` classes
+----------------
 
 A :class:`~django.contrib.syndication.views.Feed` class is a Python
 class that represents a syndication feed. A feed can be simple (e.g.,
@@ -381,8 +381,8 @@ And the accompanying URLconf::
         # ...
     ]
 
-Feed class reference
---------------------
+``Feed`` class reference
+------------------------
 
 .. class:: views.Feed
 
