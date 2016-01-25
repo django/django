@@ -307,12 +307,7 @@ class MultipleHiddenInput(HiddenInput):
     A widget that handles <input type="hidden"> for fields that have a list
     of values.
     """
-    def __init__(self, attrs=None, choices=()):
-        super(MultipleHiddenInput, self).__init__(attrs)
-        # choices can be any iterable
-        self.choices = choices
-
-    def render(self, name, value, attrs=None, choices=()):
+    def render(self, name, value, attrs=None):
         if value is None:
             value = []
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
