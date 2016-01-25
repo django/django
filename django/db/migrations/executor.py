@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.apps.registry import apps as global_apps
-from django.db import migrations
+from django.db import migrations, router
 
 from .exceptions import InvalidMigrationPlan
 from .loader import MigrationLoader
@@ -250,6 +250,19 @@ class MigrationExecutor(object):
         tables or columns it would create exist. This is intended only for use
         on initial migrations (as it only looks for CreateModel and AddField).
         """
+        def should_skip_detecting_model(migration, model):
+            """
+            No need to detect tables for proxy models, unmanaged models, or
+            models that can't be migrated on the current database.
+            """
+            return (
+                model._meta.proxy or not model._meta.managed or not
+                router.allow_migrate(
+                    self.connection.alias, migration.app_label,
+                    model_name=model._meta.model_name,
+                )
+            )
+
         if migration.initial is None:
             # Bail if the migration isn't the first one in its app
             if any(app == migration.app_label for app, name in migration.dependencies):
@@ -274,7 +287,7 @@ class MigrationExecutor(object):
                     # We have to fetch the model to test with from the
                     # main app cache, as it's not a direct dependency.
                     model = global_apps.get_model(model._meta.swapped)
-                if model._meta.proxy or not model._meta.managed:
+                if should_skip_detecting_model(migration, model):
                     continue
                 if model._meta.db_table not in existing_table_names:
                     return False, project_state
@@ -285,7 +298,7 @@ class MigrationExecutor(object):
                     # We have to fetch the model to test with from the
                     # main app cache, as it's not a direct dependency.
                     model = global_apps.get_model(model._meta.swapped)
-                if model._meta.proxy or not model._meta.managed:
+                if should_skip_detecting_model(migration, model):
                     continue
 
                 table = model._meta.db_table

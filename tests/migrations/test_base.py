@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from importlib import import_module
 
 from django.apps import apps
-from django.db import connection
+from django.db import connections
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TransactionTestCase
 from django.test.utils import extend_sys_path
@@ -21,40 +21,44 @@ class MigrationTestBase(TransactionTestCase):
 
     def tearDown(self):
         # Reset applied-migrations state.
-        recorder = MigrationRecorder(connection)
-        recorder.migration_qs.filter(app='migrations').delete()
+        for db in connections:
+            recorder = MigrationRecorder(connections[db])
+            recorder.migration_qs.filter(app='migrations').delete()
 
-    def get_table_description(self, table):
-        with connection.cursor() as cursor:
-            return connection.introspection.get_table_description(cursor, table)
+    def get_table_description(self, table, using='default'):
+        with connections[using].cursor() as cursor:
+            return connections[using].introspection.get_table_description(cursor, table)
 
-    def assertTableExists(self, table):
-        with connection.cursor() as cursor:
-            self.assertIn(table, connection.introspection.table_names(cursor))
+    def assertTableExists(self, table, using='default'):
+        with connections[using].cursor() as cursor:
+            self.assertIn(table, connections[using].introspection.table_names(cursor))
 
-    def assertTableNotExists(self, table):
-        with connection.cursor() as cursor:
-            self.assertNotIn(table, connection.introspection.table_names(cursor))
+    def assertTableNotExists(self, table, using='default'):
+        with connections[using].cursor() as cursor:
+            self.assertNotIn(table, connections[using].introspection.table_names(cursor))
 
-    def assertColumnExists(self, table, column):
-        self.assertIn(column, [c.name for c in self.get_table_description(table)])
+    def assertColumnExists(self, table, column, using='default'):
+        self.assertIn(column, [c.name for c in self.get_table_description(table, using=using)])
 
-    def assertColumnNotExists(self, table, column):
-        self.assertNotIn(column, [c.name for c in self.get_table_description(table)])
+    def assertColumnNotExists(self, table, column, using='default'):
+        self.assertNotIn(column, [c.name for c in self.get_table_description(table, using=using)])
 
-    def assertColumnNull(self, table, column):
-        self.assertEqual([c.null_ok for c in self.get_table_description(table) if c.name == column][0], True)
+    def _get_column_allows_null(self, table, column, using):
+        return [c.null_ok for c in self.get_table_description(table, using=using) if c.name == column][0]
 
-    def assertColumnNotNull(self, table, column):
-        self.assertEqual([c.null_ok for c in self.get_table_description(table) if c.name == column][0], False)
+    def assertColumnNull(self, table, column, using='default'):
+        self.assertEqual(self._get_column_allows_null(table, column, using), True)
 
-    def assertIndexExists(self, table, columns, value=True):
-        with connection.cursor() as cursor:
+    def assertColumnNotNull(self, table, column, using='default'):
+        self.assertEqual(self._get_column_allows_null(table, column, using), False)
+
+    def assertIndexExists(self, table, columns, value=True, using='default'):
+        with connections[using].cursor() as cursor:
             self.assertEqual(
                 value,
                 any(
                     c["index"]
-                    for c in connection.introspection.get_constraints(cursor, table).values()
+                    for c in connections[using].introspection.get_constraints(cursor, table).values()
                     if c['columns'] == list(columns)
                 ),
             )
@@ -62,13 +66,13 @@ class MigrationTestBase(TransactionTestCase):
     def assertIndexNotExists(self, table, columns):
         return self.assertIndexExists(table, columns, False)
 
-    def assertFKExists(self, table, columns, to, value=True):
-        with connection.cursor() as cursor:
+    def assertFKExists(self, table, columns, to, value=True, using='default'):
+        with connections[using].cursor() as cursor:
             self.assertEqual(
                 value,
                 any(
                     c["foreign_key"] == to
-                    for c in connection.introspection.get_constraints(cursor, table).values()
+                    for c in connections[using].introspection.get_constraints(cursor, table).values()
                     if c['columns'] == list(columns)
                 ),
             )
