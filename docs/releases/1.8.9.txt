@@ -19,10 +19,12 @@ Bugfixes
   the admin calendar widget for timezones from GMT+0100 to GMT+1200
   (:ticket:`24980`).
 
-* Fixed incorrect index handling in migrations on PostgreSQL when adding
-  ``db_index=True`` or ``unique=True`` to a ``CharField`` or ``TextField`` that
-  already had the other specified, or when removing one of them from a field
-  that had both (:ticket:`26034`).
+* Fixed a regression in 1.8.8 causing incorrect index handling in migrations on
+  PostgreSQL when adding ``db_index=True`` or ``unique=True`` to a
+  ``CharField`` or ``TextField`` that already had the other specified, or when
+  removing one of them from a field that had both, or when adding
+  ``unique=True`` to a field already listed in ``unique_together``
+  (:ticket:`26034`).
 
 * Fixed a crash when using an ``__in`` lookup inside a ``Case`` expression
   (:ticket:`26071`).
