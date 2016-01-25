@@ -707,7 +707,8 @@ class GZipMiddlewareTest(SimpleTestCase):
         """
         Compression is performed on FileResponse.
         """
-        open_file = lambda: open(__file__, 'rb')
+        def open_file():
+            return open(__file__, 'rb')
         with open_file() as file1:
             file_resp = FileResponse(file1)
             file_resp['Content-Type'] = 'text/html; charset=UTF-8'

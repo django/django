@@ -111,7 +111,8 @@ class UtilsTests(SimpleTestCase):
             def get_admin_value(self, obj):
                 return ADMIN_METHOD
 
-        simple_function = lambda obj: SIMPLE_FUNCTION
+        def simple_function(obj):
+            return SIMPLE_FUNCTION
 
         site_obj = Site(domain=SITE_NAME)
         article = Article(

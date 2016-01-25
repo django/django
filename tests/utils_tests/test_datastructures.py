@@ -126,7 +126,8 @@ class ImmutableListTests(SimpleTestCase):
 class DictWrapperTests(SimpleTestCase):
 
     def test_dictwrapper(self):
-        f = lambda x: "*%s" % x
+        def f(x):
+            return "*%s" % x
         d = DictWrapper({'a': 'a'}, f, 'xx_')
         self.assertEqual(
             "Normal: %(a)s. Modified: %(xx_a)s" % d,
