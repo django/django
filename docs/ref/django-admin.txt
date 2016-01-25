@@ -1175,6 +1175,15 @@ files is:
     To work around this problem, you can use the :ttag:`templatetag`
     templatetag to "escape" the various parts of the template syntax.
 
+    In addition, to allow Python template files that contain Django template
+    language syntax while also preventing packaging systems from trying to
+    byte-compile invalid ``*.py`` files, template files ending with ``.py-tpl``
+    will be renamed to ``.py``.
+
+    .. versionchanged:: 1.9.2
+
+        Renaming of ``.py-tpl`` to ``.py`` was added.
+
 .. _source: https://github.com/django/django/tree/master/django/conf/app_template/
 
 startproject

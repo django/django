@@ -1017,7 +1017,7 @@ a Django application with this structure::
 ``SyntaxError`` when installing Django setuptools 5.5.x
 -------------------------------------------------------
 
-When installing Django 1.9+ with setuptools 5.5.x, you'll see::
+When installing Django 1.9 or 1.9.1 with setuptools 5.5.x, you'll see::
 
     Compiling django/conf/app_template/apps.py ...
       File "django/conf/app_template/apps.py", line 4
@@ -1034,7 +1034,8 @@ When installing Django 1.9+ with setuptools 5.5.x, you'll see::
 It's safe to ignore these errors (Django will still install just fine), but you
 can avoid them by upgrading setuptools to a more recent version. If you're
 using pip, you can upgrade pip using ``pip install -U pip`` which will also
-upgrade setuptools.
+upgrade setuptools. This is resolved in later versions as described in the
+:doc:`/releases/1.9.2`.
 
 Miscellaneous
 -------------
