@@ -11,9 +11,9 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     mysql = True
     name = 'mysql'
-    select = 'AsText(%s)'
-    from_wkb = 'GeomFromWKB'
-    from_text = 'GeomFromText'
+    select = 'ST_AsText(%s)'
+    from_wkb = 'ST_GeomFromWKB'
+    from_text = 'ST_GeomFromText'
 
     Adapter = WKTAdapter
 
@@ -36,7 +36,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         'Difference': 'ST_Difference',
         'Distance': 'ST_Distance',
         'Intersection': 'ST_Intersection',
-        'Length': 'GLength',
+        'Length': 'ST_Length',
         'SymDifference': 'ST_SymDifference',
         'Union': 'ST_Union',
     }
