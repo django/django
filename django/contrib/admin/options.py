@@ -1407,116 +1407,12 @@ class ModelAdmin(BaseModelAdmin):
     @csrf_protect_m
     @transaction.atomic
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        return self._changeform_view_cbv(request, object_id, form_url, extra_context)
-
-    def _changeform_view_cbv(self, request, object_id=None, form_url='', extra_context=None):
-        to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
-        if to_field and not self.to_field_allowed(request, to_field):
-            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
-        model = self.model
-        opts = model._meta
-        add = object_id is None
-        obj = None if add else self.get_object(request, unquote(object_id), to_field)
-        ModelForm = self.get_form(request, obj)
-        admin = self
-        extra_context = extra_context or {}
-        from django.views.generic.base import View
-
-        class ChangeFormView(View):
-            def _check_field_can_be_referenced(self, request):
-                if to_field and not admin.to_field_allowed(request, to_field):
-                    raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
-
-            def _check_permissions_and_existence(self, request):
-                if add:
-                    if not admin.has_add_permission(request):
-                        raise PermissionDenied
-                else:
-                    if not admin.has_change_permission(request, obj):
-                        raise PermissionDenied
-                    if obj is None:
-                        raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-                            'name': force_text(opts.verbose_name), 'key': escape(object_id)})
-
-            def dispatch(self, request, *args, **kwargs):
-                self._check_field_can_be_referenced(request)
-                self._check_permissions_and_existence(request)
-                return super(ChangeFormView, self).dispatch(request, *args, **kwargs)
-
-            def post(self, request, *args, **kwargs):
-                obj_instance = obj if '_saveasnew' not in request.POST else None
-                form = ModelForm(request.POST, request.FILES, instance=obj_instance)
-                form_validated, new_object = form.validate_and_save(request, change=not add)
-                formsets, inline_instances = admin._create_formsets(request, new_object, change=not add)
-                if all_valid(formsets) and form_validated:
-                    admin.save_model(request, new_object, form, not add)
-                    admin.save_related(request, form, formsets, not add)
-                    change_message = admin.construct_change_message(request, form, formsets, add)
-                    if add:
-                        admin.log_addition(request, new_object, change_message)
-                        return admin.response_add(request, new_object)
-                    else:
-                        admin.log_change(request, new_object, change_message)
-                        return admin.response_change(request, new_object)
-
-                form_validated = False
-
-                return self.render_change_form(
-                    form, form_validated, formsets, inline_instances, initial=None, **kwargs)
-
-            def get(self, request, *args, **kwargs):
-                initial = None
-                if add:
-                    initial = admin.get_changeform_initial_data(request)
-                    form = ModelForm(initial=initial)
-                    formsets, inline_instances = admin._create_formsets(request, form.instance, change=False)
-                else:
-                    form = ModelForm(instance=obj)
-                    formsets, inline_instances = admin._create_formsets(request, obj, change=True)
-                form_validated = False
-                return self.render_change_form(
-                    form, form_validated, formsets, inline_instances, initial=initial, **kwargs)
-
-            def render_change_form(self, form, form_validated, formsets, inline_instances,
-                                   initial=None, **kwargs):
-                adminForm = helpers.AdminForm(
-                    form,
-                    list(admin.get_fieldsets(request, obj)),
-                    admin.get_prepopulated_fields(request, obj),
-                    admin.get_readonly_fields(request, obj),
-                    model_admin=admin)
-                media = admin.media + adminForm.media
-
-                inline_formsets = admin.get_inline_formsets(request, formsets, inline_instances, obj)
-                for inline_formset in inline_formsets:
-                    media = media + inline_formset.media
-
-                context = dict(admin.admin_site.each_context(request),
-                    title=(_('Add %s') if add else _('Change %s')) % force_text(opts.verbose_name),
-                    adminform=adminForm,
-                    object_id=object_id,
-                    original=obj,
-                    is_popup=(IS_POPUP_VAR in request.POST or
-                              IS_POPUP_VAR in request.GET),
-                    to_field=to_field,
-                    media=media,
-                    inline_admin_formsets=inline_formsets,
-                    errors=helpers.AdminErrorList(form, formsets),
-                    preserved_filters=admin.get_preserved_filters(request),
-                )
-
-                # Hide the "Save" and "Save and continue" buttons if "Save as New" was
-                # previously chosen to prevent the interface from getting confusing.
-                if request.method == 'POST' and not form_validated and "_saveasnew" in request.POST:
-                    context['show_save'] = False
-                    context['show_save_and_continue'] = False
-
-                context.update(extra_context or {})
-
-                return admin.render_change_form(
-                    request, context, add=add, change=not add, obj=obj, form_url=form_url)
-
-        return ChangeFormView.as_view()(request)
+        from django.contrib.admin.views.options import ChangeFormView
+        return ChangeFormView.as_view(
+            admin=self,
+            object_id=object_id,
+            extra_context=extra_context,
+            form_url=form_url)(request)
 
     def add_view(self, request, form_url='', extra_context=None):
         return self.changeform_view(request, None, form_url, extra_context)
