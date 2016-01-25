@@ -258,7 +258,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         e = self._create_object(Episode)
         request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
         request.user = User(username='super', is_superuser=True)
-        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        response = modeladmin.change_view(request, object_id=str(e.pk))
         formset = response.context_data['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 1)
         self.assertEqual(formset.initial_form_count(), 1)
@@ -278,7 +278,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         e = self._create_object(Episode)
         request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
         request.user = User(username='super', is_superuser=True)
-        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        response = modeladmin.change_view(request, object_id=str(e.pk))
         formset = response.context_data['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 2)
         self.assertEqual(formset.initial_form_count(), 1)
@@ -298,7 +298,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         e = self._create_object(Episode)
         request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
         request.user = User(username='super', is_superuser=True)
-        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        response = modeladmin.change_view(request, object_id=str(e.pk))
         formset = response.context_data['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 5)
         self.assertEqual(formset.initial_form_count(), 1)
@@ -317,7 +317,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         e = self._create_object(Episode)
         request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
         request.user = User(username='super', is_superuser=True)
-        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        response = modeladmin.change_view(request, object_id=str(e.pk))
         formset = response.context_data['inline_admin_formsets'][0].formset
 
         self.assertEqual(formset.extra, 2)
@@ -336,7 +336,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         e = self._create_object(Episode)
         request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
         request.user = User(username='super', is_superuser=True)
-        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        response = modeladmin.change_view(request, object_id=str(e.pk))
         formset = response.context_data['inline_admin_formsets'][0].formset
 
         self.assertEqual(formset.min_num, 2)
@@ -355,7 +355,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         e = self._create_object(Episode)
         request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
         request.user = User(username='super', is_superuser=True)
-        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        response = modeladmin.change_view(request, object_id=str(e.pk))
         formset = response.context_data['inline_admin_formsets'][0].formset
 
         self.assertEqual(formset.max_num, 2)

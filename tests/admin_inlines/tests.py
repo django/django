@@ -298,7 +298,7 @@ class TestInline(TestDataMixin, TestCase):
         )
         request = self.factory.get(reverse('admin:admin_inlines_binarytree_add'))
         request.user = User(username='super', is_superuser=True)
-        response = modeladmin.changeform_view(request)
+        response = modeladmin.add_view(request)
         self.assertContains(response, min_forms)
         self.assertContains(response, total_forms)
 
@@ -330,13 +330,13 @@ class TestInline(TestDataMixin, TestCase):
         )
         request = self.factory.get(reverse('admin:admin_inlines_binarytree_add'))
         request.user = User(username='super', is_superuser=True)
-        response = modeladmin.changeform_view(request)
+        response = modeladmin.add_view(request)
         self.assertContains(response, min_forms % 2)
         self.assertContains(response, total_forms % 5)
 
         request = self.factory.get(reverse('admin:admin_inlines_binarytree_change', args=(bt_head.id,)))
         request.user = User(username='super', is_superuser=True)
-        response = modeladmin.changeform_view(request, object_id=str(bt_head.id))
+        response = modeladmin.change_view(request, object_id=str(bt_head.id))
         self.assertContains(response, min_forms % 5)
         self.assertContains(response, total_forms % 8)
 

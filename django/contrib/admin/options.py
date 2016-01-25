@@ -27,7 +27,7 @@ from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
-from django.forms.formsets import DELETION_FIELD_NAME, all_valid
+from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import (
     BaseInlineFormSet, inlineformset_factory, modelform_defines_fields,
     modelform_factory, modelformset_factory,
@@ -1041,15 +1041,33 @@ class ModelAdmin(BaseModelAdmin):
         for formset in formsets:
             self.save_formset(request, form, formset, change=change)
 
-    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+    def render_add_form(self, request, context, form_url='', obj=None):
+        context.update({'add': True, 'change': False})
+        form_template = self.add_form_template or self.change_form_template
+        return self._render_change_form(request, context, form_template, form_url, obj)
+
+    def render_change_form(self, request, context, form_url='', obj=None):
+        context.update({'add': False, 'change': True})
+        return self._render_change_form(request, context, self.change_form_template, form_url, obj)
+
+    def _render_change_form(self, request, context, form_template=None, form_url='', obj=None):
+        context.update(self._add_change_form_context(request, context, form_url, obj))
+        request.current_app = self.admin_site.name
+        opts = self.model._meta
+        app_label = opts.app_label
+        return TemplateResponse(request, form_template or [
+            "admin/%s/%s/change_form.html" % (app_label, opts.model_name),
+            "admin/%s/change_form.html" % app_label,
+            "admin/change_form.html"
+        ], context)
+
+    def _add_change_form_context(self, request, context, form_url='', obj=None):
         opts = self.model._meta
         app_label = opts.app_label
         preserved_filters = self.get_preserved_filters(request)
         form_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, form_url)
         view_on_site_url = self.get_view_on_site_url(obj)
         context.update({
-            'add': add,
-            'change': change,
             'has_add_permission': self.has_add_permission(request),
             'has_change_permission': self.has_change_permission(request, obj),
             'has_delete_permission': self.has_delete_permission(request, obj),
@@ -1065,18 +1083,7 @@ class ModelAdmin(BaseModelAdmin):
             'is_popup_var': IS_POPUP_VAR,
             'app_label': app_label,
         })
-        if add and self.add_form_template is not None:
-            form_template = self.add_form_template
-        else:
-            form_template = self.change_form_template
-
-        request.current_app = self.admin_site.name
-
-        return TemplateResponse(request, form_template or [
-            "admin/%s/%s/change_form.html" % (app_label, opts.model_name),
-            "admin/%s/change_form.html" % app_label,
-            "admin/change_form.html"
-        ], context)
+        return context
 
     def response_add(self, request, obj, post_url_continue=None):
         """
@@ -1406,19 +1413,19 @@ class ModelAdmin(BaseModelAdmin):
 
     @csrf_protect_m
     @transaction.atomic
-    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        from django.contrib.admin.views.options import ChangeFormView
-        return ChangeFormView.as_view(
-            admin=self,
-            object_id=object_id,
-            extra_context=extra_context,
+    def add_view(self, request, form_url='', extra_context=None):
+        from django.contrib.admin.views.options import AddView
+        return AddView.as_view(
+            admin=self, object_id=None, extra_context=extra_context,
             form_url=form_url)(request)
 
-    def add_view(self, request, form_url='', extra_context=None):
-        return self.changeform_view(request, None, form_url, extra_context)
-
+    @csrf_protect_m
+    @transaction.atomic
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        return self.changeform_view(request, object_id, form_url, extra_context)
+        from django.contrib.admin.views.options import ChangeView
+        return ChangeView.as_view(
+            admin=self, object_id=object_id, extra_context=extra_context,
+            form_url=form_url)(request)
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
