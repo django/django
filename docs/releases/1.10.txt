@@ -483,6 +483,11 @@ Miscellaneous
 * The default error views now raise ``TemplateDoesNotExist`` if a nonexistent
   ``template_name`` is specified.
 
+* The unused ``choices`` keyword argument of the ``Select`` and
+  ``SelectMultiple`` widgets' ``render()`` method is removed. The ``choices``
+  argument of the ``render_options()`` method is also removed, making
+  ``selected_choices`` the first argument.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
