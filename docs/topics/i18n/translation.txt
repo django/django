@@ -70,8 +70,6 @@ as a shorter alias, ``_``, to save typing.
        global ``_()`` function causes interference. Explicitly importing
        ``ugettext()`` as ``_()`` avoids this problem.
 
-.. highlightlang:: python
-
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
@@ -1158,6 +1156,8 @@ Additionally, if there are complex rules around pluralization, the catalog view
 will render a conditional expression. This will evaluate to either a ``true``
 (should pluralize) or ``false`` (should **not** pluralize) value.
 
+.. highlightlang:: python
+
 Note on performance
 -------------------
 
@@ -1269,8 +1269,8 @@ After defining these URL patterns, Django will automatically add the
 language prefix to the URL patterns that were added by the ``i18n_patterns``
 function. Example::
 
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import activate
+    >>> from django.core.urlresolvers import reverse
+    >>> from django.utils.translation import activate
 
     >>> activate('en')
     >>> reverse('sitemap-xml')
@@ -1327,8 +1327,8 @@ After you've created the translations, the
 :func:`~django.core.urlresolvers.reverse` function will return the URL in the
 active language. Example::
 
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import activate
+    >>> from django.core.urlresolvers import reverse
+    >>> from django.utils.translation import activate
 
     >>> activate('en')
     >>> reverse('news:category', kwargs={'slug': 'recent'})
@@ -1624,8 +1624,6 @@ translation utilities with a ``gettext`` package if the command ``xgettext
 Customizing the ``makemessages`` command
 ----------------------------------------
 
-.. highlightlang:: python
-
 If you want to pass additional parameters to ``xgettext``, you need to create a
 custom :djadmin:`makemessages` command and override its ``xgettext_options``
 attribute::
@@ -1663,8 +1661,6 @@ Miscellaneous
 
 The ``set_language`` redirect view
 ----------------------------------
-
-.. highlightlang:: python
 
 .. currentmodule:: django.views.i18n
 
@@ -1727,8 +1723,6 @@ redirected in the ``redirect_to`` context variable.
 
 Explicitly setting the active language
 --------------------------------------
-
-.. highlightlang:: python
 
 You may want to set the active language for the current session explicitly. Perhaps
 a user's language preference is retrieved from another system, for example.
