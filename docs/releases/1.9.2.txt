@@ -26,10 +26,12 @@ Bugfixes
   escaped value to be displayed in the select dropdown of the parent window
   (:ticket:`25997`).
 
-* Fixed incorrect index handling in migrations on PostgreSQL when adding
-  ``db_index=True`` or ``unique=True`` to a ``CharField`` or ``TextField`` that
-  already had the other specified, or when removing one of them from a field
-  that had both (:ticket:`26034`).
+* Fixed a regression in 1.8.8 causing incorrect index handling in migrations on
+  PostgreSQL when adding ``db_index=True`` or ``unique=True`` to a
+  ``CharField`` or ``TextField`` that already had the other specified, or when
+  removing one of them from a field that had both, or when adding
+  ``unique=True`` to a field already listed in ``unique_together``
+  (:ticket:`26034`).
 
 * Fixed a regression where defining a relation on an abstract model's field
   using a string model name without an app_label no longer resolved that
