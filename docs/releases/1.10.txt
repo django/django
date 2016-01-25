@@ -129,7 +129,8 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* For convenience, :class:`~django.contrib.postgres.fields.HStoreField` now
+  casts its keys and values to strings.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
