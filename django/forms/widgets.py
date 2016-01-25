@@ -514,12 +514,12 @@ class Select(Widget):
         memo[id(self)] = obj
         return obj
 
-    def render(self, name, value, attrs=None, choices=()):
+    def render(self, name, value, attrs=None):
         if value is None:
             value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         output = [format_html('<select{}>', flatatt(final_attrs))]
-        options = self.render_options(choices, [value])
+        options = self.render_options([value])
         if options:
             output.append(options)
         output.append('</select>')
@@ -541,11 +541,11 @@ class Select(Widget):
                            selected_html,
                            force_text(option_label))
 
-    def render_options(self, choices, selected_choices):
+    def render_options(self, selected_choices):
         # Normalize to strings.
         selected_choices = set(force_text(v) for v in selected_choices)
         output = []
-        for option_value, option_label in chain(self.choices, choices):
+        for option_value, option_label in self.choices:
             if isinstance(option_label, (list, tuple)):
                 output.append(format_html('<optgroup label="{}">', force_text(option_value)))
                 for option in option_label:
@@ -566,12 +566,12 @@ class NullBooleanSelect(Select):
                    ('3', ugettext_lazy('No')))
         super(NullBooleanSelect, self).__init__(attrs, choices)
 
-    def render(self, name, value, attrs=None, choices=()):
+    def render(self, name, value, attrs=None):
         try:
             value = {True: '2', False: '3', '2': '2', '3': '3'}[value]
         except KeyError:
             value = '1'
-        return super(NullBooleanSelect, self).render(name, value, attrs, choices)
+        return super(NullBooleanSelect, self).render(name, value, attrs)
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
@@ -586,12 +586,12 @@ class NullBooleanSelect(Select):
 class SelectMultiple(Select):
     allow_multiple_selected = True
 
-    def render(self, name, value, attrs=None, choices=()):
+    def render(self, name, value, attrs=None):
         if value is None:
             value = []
         final_attrs = self.build_attrs(attrs, name=name)
         output = [format_html('<select multiple="multiple"{}>', flatatt(final_attrs))]
-        options = self.render_options(choices, value)
+        options = self.render_options(value)
         if options:
             output.append(options)
         output.append('</select>')
@@ -625,7 +625,7 @@ class ChoiceInput(SubWidget):
     def __str__(self):
         return self.render()
 
-    def render(self, name=None, value=None, attrs=None, choices=()):
+    def render(self, name=None, value=None, attrs=None):
         if self.id_for_label:
             label_for = format_html(' for="{}"', self.id_for_label)
         else:
