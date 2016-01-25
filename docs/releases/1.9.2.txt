@@ -71,3 +71,7 @@ Bugfixes
 
 * Fixed a crash when using a reverse ``OneToOneField`` in
   ``ModelAdmin.readonly_fields`` (:ticket:`26060`).
+
+* Fixed a crash when calling the ``migrate`` command in a test case with the
+  ``available_apps`` attribute pointing to an application with migrations
+  disabled using the ``MIGRATION_MODULES`` setting (:ticket:`26135`).
