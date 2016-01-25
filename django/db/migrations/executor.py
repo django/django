@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.apps.registry import apps as global_apps
-from django.db import migrations
+from django.db import migrations, router
 
 from .exceptions import InvalidMigrationPlan
 from .loader import MigrationLoader
@@ -274,7 +274,9 @@ class MigrationExecutor(object):
                     # We have to fetch the model to test with from the
                     # main app cache, as it's not a direct dependency.
                     model = global_apps.get_model(model._meta.swapped)
-                if model._meta.proxy or not model._meta.managed:
+                if model._meta.proxy or not model._meta.managed or not \
+                    router.allow_migrate(self.connection.alias, migration.app_label,
+                                         model_name=model._meta.model_name):
                     continue
                 if model._meta.db_table not in existing_table_names:
                     return False, project_state
@@ -285,7 +287,9 @@ class MigrationExecutor(object):
                     # We have to fetch the model to test with from the
                     # main app cache, as it's not a direct dependency.
                     model = global_apps.get_model(model._meta.swapped)
-                if model._meta.proxy or not model._meta.managed:
+                if model._meta.proxy or not model._meta.managed or not \
+                    router.allow_migrate(self.connection.alias, migration.app_label,
+                                         model_name=model._meta.model_name):
                     continue
 
                 table = model._meta.db_table

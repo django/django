@@ -29,6 +29,21 @@ class Migration(migrations.Migration):
             ],
         ),
 
+        migrations.CreateModel(
+            "ExoPlanet",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=255)),
+                ("inhabitable", models.BooleanField(default=False)),
+            ],
+        ),
+
+        migrations.AddField(
+            model_name='exoplanet',
+            name='colonized',
+            field=models.BooleanField(default=False),
+        ),
+
         migrations.AlterUniqueTogether(
             name='author',
             unique_together=set([('name', 'slug')]),
