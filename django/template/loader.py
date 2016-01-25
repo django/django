@@ -33,6 +33,13 @@ def select_template(template_name_list, using=None):
 
     Raises TemplateDoesNotExist if no such template exists.
     """
+    if isinstance(template_name_list, six.string_types):
+        raise TypeError(
+            "select_template() takes an iterable of template names. "
+            "Use get_template() if you want to load a single template "
+            "with its name."
+        )
+
     chain = []
     engines = _engine_list(using)
     for template_name in template_name_list:
