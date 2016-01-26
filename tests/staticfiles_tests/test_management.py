@@ -102,8 +102,9 @@ class TestConfiguration(StaticFilesTestCase):
         for root in ['', None]:
             with override_settings(STATIC_ROOT=root):
                 with self.assertRaisesMessage(
-                        ImproperlyConfigured,
-                        'without having set the STATIC_ROOT setting to a filesystem path'):
+                    ImproperlyConfigured,
+                    'without having set the STATIC_ROOT setting to a filesystem path'
+                ):
                     call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
 
     def test_local_storage_detection_helper(self):

@@ -426,8 +426,10 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertEqual(u.group, group)
 
         non_existent_email = 'mymail2@gmail.com'
-        with self.assertRaisesMessage(CommandError,
-                'email instance with email %r does not exist.' % non_existent_email):
+        with self.assertRaisesMessage(
+            CommandError,
+            'email instance with email %r does not exist.' % non_existent_email
+        ):
             call_command(
                 'createsuperuser',
                 interactive=False,
@@ -659,10 +661,11 @@ class PermissionTestCase(TestCase):
         # check duplicated default permission
         models.Permission._meta.permissions = [
             ('change_permission', 'Can edit permission (duplicate)')]
-        with self.assertRaisesMessage(
-            CommandError,
-                "The permission codename 'change_permission' clashes with a "
-                "builtin permission for model 'auth.Permission'."):
+        msg = (
+            "The permission codename 'change_permission' clashes with a "
+            "builtin permission for model 'auth.Permission'."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
             create_permissions(auth_app_config, verbosity=0)
 
         # check duplicated custom permissions
@@ -671,10 +674,11 @@ class PermissionTestCase(TestCase):
             ('other_one', 'Some other permission'),
             ('my_custom_permission', 'Some permission with duplicate permission code'),
         ]
-        with self.assertRaisesMessage(
-            CommandError,
-                "The permission codename 'my_custom_permission' is duplicated for model "
-                "'auth.Permission'."):
+        msg = (
+            "The permission codename 'my_custom_permission' is duplicated for model "
+            "'auth.Permission'."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
             create_permissions(auth_app_config, verbosity=0)
 
         # should not raise anything
@@ -716,7 +720,8 @@ class PermissionTestCase(TestCase):
 
         with self.assertRaisesMessage(
             exceptions.ValidationError,
-                "The verbose_name of auth.permission is longer than 244 characters"):
+            "The verbose_name of auth.permission is longer than 244 characters"
+        ):
             create_permissions(auth_app_config, verbosity=0)
 
     def test_custom_permission_name_length(self):

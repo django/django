@@ -431,9 +431,15 @@ class Queries1Tests(BaseQuerysetTest):
     def test_heterogeneous_qs_combination(self):
         # Combining querysets built on different models should behave in a well-defined
         # fashion. We raise an error.
-        with self.assertRaisesMessage(AssertionError, 'Cannot combine queries on two different base models.'):
+        with self.assertRaisesMessage(
+            AssertionError,
+            'Cannot combine queries on two different base models.'
+        ):
             Author.objects.all() & Tag.objects.all()
-        with self.assertRaisesMessage(AssertionError, 'Cannot combine queries on two different base models.'):
+        with self.assertRaisesMessage(
+            AssertionError,
+            'Cannot combine queries on two different base models.'
+        ):
             Author.objects.all() | Tag.objects.all()
 
     def test_ticket3141(self):
@@ -460,7 +466,10 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
     def test_error_raised_on_filter_with_dictionary(self):
-        with self.assertRaisesMessage(FieldError, 'Cannot parse keyword query as dict'):
+        with self.assertRaisesMessage(
+            FieldError,
+            'Cannot parse keyword query as dict'
+        ):
             Note.objects.filter({'note': 'n1', 'misc': 'foo'})
 
     def test_tickets_2076_7256(self):
@@ -753,7 +762,10 @@ class Queries1Tests(BaseQuerysetTest):
                 []
             )
             q.query.low_mark = 1
-            with self.assertRaisesMessage(AssertionError, 'Cannot change a query once a slice has been taken'):
+            with self.assertRaisesMessage(
+                AssertionError,
+                'Cannot change a query once a slice has been taken'
+            ):
                 q.extra(select={'foo': "1"})
             self.assertQuerysetEqual(q.reverse(), [])
             self.assertQuerysetEqual(q.defer('meal'), [])
@@ -781,9 +793,15 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
         # Multi-valued values() and values_list() querysets should raise errors.
-        with self.assertRaisesMessage(TypeError, 'Cannot use multi-field values as a filter value.'):
+        with self.assertRaisesMessage(
+            TypeError,
+            'Cannot use multi-field values as a filter value.'
+        ):
             Tag.objects.filter(name__in=Tag.objects.filter(parent=self.t1).values('name', 'id'))
-        with self.assertRaisesMessage(TypeError, 'Cannot use multi-field values as a filter value.'):
+        with self.assertRaisesMessage(
+            TypeError,
+            'Cannot use multi-field values as a filter value.'
+        ):
             Tag.objects.filter(name__in=Tag.objects.filter(parent=self.t1).values_list('name', 'id'))
 
     def test_ticket9985(self):
@@ -1318,12 +1336,16 @@ class Queries3Tests(BaseQuerysetTest):
             Item.objects.datetimes('name', 'month')
 
     def test_ticket22023(self):
-        with self.assertRaisesMessage(TypeError,
-                "Cannot call only() after .values() or .values_list()"):
+        with self.assertRaisesMessage(
+            TypeError,
+            "Cannot call only() after .values() or .values_list()"
+        ):
             Valid.objects.values().only()
 
-        with self.assertRaisesMessage(TypeError,
-                "Cannot call defer() after .values() or .values_list()"):
+        with self.assertRaisesMessage(
+            TypeError,
+            "Cannot call defer() after .values() or .values_list()"
+        ):
             Valid.objects.values().defer()
 
 
@@ -1362,9 +1384,11 @@ class Queries4Tests(BaseQuerysetTest):
 
     def test_ticket11811(self):
         unsaved_category = NamedCategory(name="Other")
-        with self.assertRaisesMessage(ValueError,
-                'Unsaved model instance <NamedCategory: Other> '
-                'cannot be used in an ORM query.'):
+        msg = (
+            'Unsaved model instance <NamedCategory: Other> '
+            'cannot be used in an ORM query.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             Tag.objects.filter(pk=self.t1.pk).update(category=unsaved_category)
 
     def test_ticket14876(self):
@@ -2245,9 +2269,11 @@ class ValuesQuerysetTests(BaseQuerysetTest):
 
     def test_field_error_values_list(self):
         # see #23443
-        with self.assertRaisesMessage(FieldError,
-                "Cannot resolve keyword %r into field."
-                " Join on 'name' not permitted." % 'foo'):
+        msg = (
+            "Cannot resolve keyword %r into field."
+            " Join on 'name' not permitted." % 'foo'
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.values_list('name__foo')
 
 
@@ -2323,29 +2349,38 @@ class QuerySetSupportsPythonIdioms(TestCase):
     def test_slicing_cannot_filter_queryset_once_sliced(self):
         with self.assertRaisesMessage(
             AssertionError,
-                "Cannot filter a query once a slice has been taken."):
+            "Cannot filter a query once a slice has been taken."
+        ):
             Article.objects.all()[0:5].filter(id=1, )
 
     def test_slicing_cannot_reorder_queryset_once_sliced(self):
         with self.assertRaisesMessage(
             AssertionError,
-                "Cannot reorder a query once a slice has been taken."):
+            "Cannot reorder a query once a slice has been taken."
+        ):
             Article.objects.all()[0:5].order_by('id', )
 
     def test_slicing_cannot_combine_queries_once_sliced(self):
         with self.assertRaisesMessage(
             AssertionError,
-                "Cannot combine queries once a slice has been taken."):
+            "Cannot combine queries once a slice has been taken."
+        ):
             Article.objects.all()[0:1] & Article.objects.all()[4:5]
 
     def test_slicing_negative_indexing_not_supported_for_single_element(self):
         """hint: inverting your ordering might do what you need"""
-        with self.assertRaisesMessage(AssertionError, "Negative indexing is not supported."):
+        with self.assertRaisesMessage(
+            AssertionError,
+            "Negative indexing is not supported."
+        ):
             Article.objects.all()[-1]
 
     def test_slicing_negative_indexing_not_supported_for_range(self):
         """hint: inverting your ordering might do what you need"""
-        with self.assertRaisesMessage(AssertionError, "Negative indexing is not supported."):
+        with self.assertRaisesMessage(
+            AssertionError,
+            "Negative indexing is not supported."
+        ):
             Article.objects.all()[0:-5]
 
     def test_can_get_number_of_items_in_queryset_using_standard_len(self):
@@ -2379,7 +2414,10 @@ class WeirdQuerysetSlicingTests(BaseQuerysetTest):
         self.assertQuerysetEqual(Article.objects.all()[0:0], [])
         self.assertQuerysetEqual(Article.objects.all()[0:0][:10], [])
         self.assertEqual(Article.objects.all()[:0].count(), 0)
-        with self.assertRaisesMessage(AssertionError, 'Cannot change a query once a slice has been taken.'):
+        with self.assertRaisesMessage(
+            AssertionError,
+            'Cannot change a query once a slice has been taken.'
+        ):
             Article.objects.all()[:0].latest('created')
 
     def test_empty_resultset_sql(self):
@@ -3469,29 +3507,41 @@ class RelatedLookupTypeTests(TestCase):
         query lookup.
         """
         # Passing incorrect object type
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+        with self.assertRaisesMessage(
+            ValueError,
+            self.error % (self.wrong_type, ObjectA._meta.object_name)
+        ):
             ObjectB.objects.get(objecta=self.wrong_type)
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+        with self.assertRaisesMessage(
+            ValueError,
+            self.error % (self.wrong_type, ObjectA._meta.object_name)
+        ):
             ObjectB.objects.filter(objecta__in=[self.wrong_type])
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+        with self.assertRaisesMessage(
+            ValueError,
+            self.error % (self.wrong_type, ObjectA._meta.object_name)
+        ):
             ObjectB.objects.filter(objecta=self.wrong_type)
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.wrong_type, ObjectB._meta.object_name)):
+        with self.assertRaisesMessage(
+            ValueError,
+            self.error % (self.wrong_type, ObjectB._meta.object_name)
+        ):
             ObjectA.objects.filter(objectb__in=[self.wrong_type, self.ob])
 
         # Passing an object of the class on which query is done.
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.ob, ObjectA._meta.object_name)):
+        with self.assertRaisesMessage(
+            ValueError,
+            self.error % (self.ob, ObjectA._meta.object_name)
+        ):
             ObjectB.objects.filter(objecta__in=[self.poa, self.ob])
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.ob, ChildObjectA._meta.object_name)):
+        with self.assertRaisesMessage(
+            ValueError,
+            self.error % (self.ob, ChildObjectA._meta.object_name)
+        ):
             ObjectC.objects.exclude(childobjecta__in=[self.coa, self.ob])
 
     def test_wrong_backward_lookup(self):
@@ -3499,16 +3549,22 @@ class RelatedLookupTypeTests(TestCase):
         A ValueError is raised when the incorrect object type is passed to a
         query lookup for backward relations.
         """
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.oa, ObjectB._meta.object_name)):
+        with self.assertRaisesMessage(
+            ValueError,
+            self.error % (self.oa, ObjectB._meta.object_name)
+        ):
             ObjectA.objects.filter(objectb__in=[self.oa, self.ob])
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.oa, ObjectB._meta.object_name)):
+        with self.assertRaisesMessage(
+            ValueError,
+            self.error % (self.oa, ObjectB._meta.object_name)
+        ):
             ObjectA.objects.exclude(objectb=self.oa)
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.wrong_type, ObjectB._meta.object_name)):
+        with self.assertRaisesMessage(
+            ValueError,
+            self.error % (self.wrong_type, ObjectB._meta.object_name)
+        ):
             ObjectA.objects.get(objectb=self.wrong_type)
 
     def test_correct_lookup(self):

@@ -258,11 +258,11 @@ class ContentTypesTests(TestCase):
         def _test_message(mocked_method):
             for ExceptionClass in (IntegrityError, OperationalError, ProgrammingError):
                 mocked_method.side_effect = ExceptionClass
-                with self.assertRaisesMessage(
-                    RuntimeError,
+                msg = (
                     "Error creating new content types. Please make sure contenttypes "
                     "is migrated before trying to migrate apps individually."
-                ):
+                )
+                with self.assertRaisesMessage(RuntimeError, msg):
                     ContentType.objects.get_for_model(ContentType)
 
         _test_message(mocked_get)

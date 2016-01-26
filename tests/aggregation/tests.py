@@ -906,7 +906,10 @@ class AggregateTestCase(TestCase):
         self.assertEqual(book['price_sum'], Decimal("99999.80"))
 
     def test_nonaggregate_aggregation_throws(self):
-        with self.assertRaisesMessage(TypeError, 'fail is not an aggregate expression'):
+        with self.assertRaisesMessage(
+            TypeError,
+            'fail is not an aggregate expression'
+        ):
             Book.objects.aggregate(fail=F('price'))
 
     def test_nonfield_annotation(self):
@@ -918,7 +921,10 @@ class AggregateTestCase(TestCase):
         self.assertEqual(book.val, 2)
 
     def test_missing_output_field_raises_error(self):
-        with self.assertRaisesMessage(FieldError, 'Cannot resolve expression type, unknown output_field'):
+        with self.assertRaisesMessage(
+            FieldError,
+            'Cannot resolve expression type, unknown output_field'
+        ):
             Book.objects.annotate(val=Max(2)).first()
 
     def test_annotation_expressions(self):
@@ -962,7 +968,10 @@ class AggregateTestCase(TestCase):
         self.assertEqual(p2, {'avg_price': Approximate(53.39, places=2)})
 
     def test_combine_different_types(self):
-        with self.assertRaisesMessage(FieldError, 'Expression contains mixed types. You must set output_field'):
+        with self.assertRaisesMessage(
+            FieldError,
+            'Expression contains mixed types. You must set output_field'
+        ):
             Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price')).get(pk=self.b4.pk)
 
         b1 = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
@@ -1079,7 +1088,10 @@ class AggregateTestCase(TestCase):
         self.assertEqual(author.sum_age, other_author.sum_age)
 
     def test_annotated_aggregate_over_annotated_aggregate(self):
-        with self.assertRaisesMessage(FieldError, "Cannot compute Sum('id__max'): 'id__max' is an aggregate"):
+        with self.assertRaisesMessage(
+            FieldError,
+            "Cannot compute Sum('id__max'): 'id__max' is an aggregate"
+        ):
             Book.objects.annotate(Max('id')).annotate(Sum('id__max'))
 
         class MyMax(Max):
@@ -1087,7 +1099,10 @@ class AggregateTestCase(TestCase):
                 self.set_source_expressions(self.get_source_expressions()[0:1])
                 return super(MyMax, self).as_sql(compiler, connection)
 
-        with self.assertRaisesMessage(FieldError, "Cannot compute Max('id__max'): 'id__max' is an aggregate"):
+        with self.assertRaisesMessage(
+            FieldError,
+            "Cannot compute Max('id__max'): 'id__max' is an aggregate"
+        ):
             Book.objects.annotate(Max('id')).annotate(my_max=MyMax('id__max', 'price'))
 
     def test_multi_arg_aggregate(self):

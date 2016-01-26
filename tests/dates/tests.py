@@ -104,7 +104,8 @@ class DatesTests(TestCase):
     def test_dates_fails_when_given_invalid_kind_argument(self):
         with self.assertRaisesMessage(
             AssertionError,
-                "'kind' must be one of 'year', 'month' or 'day'."):
+            "'kind' must be one of 'year', 'month' or 'day'."
+        ):
             Article.objects.dates(
                 "pub_date",
                 "bad_kind",
@@ -113,7 +114,8 @@ class DatesTests(TestCase):
     def test_dates_fails_when_given_invalid_order_argument(self):
         with self.assertRaisesMessage(
             AssertionError,
-                "'order' must be either 'ASC' or 'DESC'."):
+            "'order' must be either 'ASC' or 'DESC'."
+        ):
             Article.objects.dates(
                 "pub_date",
                 "year",

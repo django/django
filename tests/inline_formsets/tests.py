@@ -123,10 +123,11 @@ class InlineFormsetFactoryTest(TestCase):
         Child has two ForeignKeys to Parent, so if we don't specify which one
         to use for the inline formset, we should get an exception.
         """
-        with self.assertRaisesMessage(
-            ValueError,
-                "'inline_formsets.Child' has more than one "
-                "ForeignKey to 'inline_formsets.Parent'."):
+        msg = (
+            "'inline_formsets.Child' has more than one "
+            "ForeignKey to 'inline_formsets.Parent'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             inlineformset_factory(Parent, Child)
 
     def test_fk_name_not_foreign_key_field_from_child(self):
@@ -146,7 +147,8 @@ class InlineFormsetFactoryTest(TestCase):
         """
         with self.assertRaisesMessage(
             ValueError,
-                "'inline_formsets.Child' has no field named 'test'."):
+            "'inline_formsets.Child' has no field named 'test'."
+        ):
             inlineformset_factory(Parent, Child, fk_name='test')
 
     def test_any_iterable_allowed_as_argument_to_exclude(self):

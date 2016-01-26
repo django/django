@@ -39,8 +39,10 @@ class GeometryFieldTest(SimpleTestCase):
         "Testing GeometryField's handling of null (None) geometries."
         # Form fields, by default, are required (`required=True`)
         fld = forms.GeometryField()
-        with self.assertRaisesMessage(forms.ValidationError,
-                "No geometry value provided."):
+        with self.assertRaisesMessage(
+            forms.ValidationError,
+            "No geometry value provided."
+        ):
             fld.clean(None)
 
         # This will clean None as a geometry (See #10660).

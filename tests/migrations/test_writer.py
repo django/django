@@ -412,7 +412,10 @@ class WriterTests(SimpleTestCase):
             MigrationWriter.serialize(validator)
 
         validator = deconstructible(path="django.core.validators.EmailValidator2")(EmailValidator)(message="hello")
-        with self.assertRaisesMessage(ValueError, "Could not find object EmailValidator2 in django.core.validators."):
+        with self.assertRaisesMessage(
+            ValueError,
+            "Could not find object EmailValidator2 in django.core.validators."
+        ):
             MigrationWriter.serialize(validator)
 
     def test_serialize_empty_nonempty_tuple(self):
@@ -461,8 +464,10 @@ class WriterTests(SimpleTestCase):
                 return "somewhere dynamic"
             thing = models.FileField(upload_to=upload_to)
 
-        with self.assertRaisesMessage(ValueError,
-                'Could not find function upload_to in migrations.test_writer'):
+        with self.assertRaisesMessage(
+            ValueError,
+            'Could not find function upload_to in migrations.test_writer'
+        ):
             self.serialize_round_trip(TestModel2.thing)
 
     def test_serialize_managers(self):

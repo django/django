@@ -1188,11 +1188,9 @@ class BackendUtilTests(SimpleTestCase):
         equal('123.12', 5, None,
               '123.12')
         with self.assertRaises(Rounded):
-            equal('0.1234567890', 5, None,
-                  '0.12346')
+            equal('0.1234567890', 5, None, '0.12346')
         with self.assertRaises(Rounded):
-            equal('1234567890.1234', 5, None,
-                  '1234600000')
+            equal('1234567890.1234', 5, None, '1234600000')
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite specific test.')

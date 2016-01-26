@@ -58,7 +58,10 @@ class ManyToOneTests(TestCase):
 
         # Create a new article, and add it to the article set.
         new_article2 = Article(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
-        msg = "<Article: Paul's story> instance isn't saved. Use bulk=False or save the object first."
+        msg = (
+            "<Article: Paul's story> instance isn't saved. "
+            "Use bulk=False or save the object first."
+        )
         with self.assertRaisesMessage(ValueError, msg):
             self.r.article_set.add(new_article2)
 
@@ -491,11 +494,15 @@ class ManyToOneTests(TestCase):
     def test_values_list_exception(self):
         expected_message = "Cannot resolve keyword 'notafield' into field. Choices are: %s"
 
-        with self.assertRaisesMessage(FieldError,
-                expected_message % ', '.join(sorted(f.name for f in Reporter._meta.get_fields()))):
+        with self.assertRaisesMessage(
+            FieldError,
+            expected_message % ', '.join(sorted(f.name for f in Reporter._meta.get_fields()))
+        ):
             Article.objects.values_list('reporter__notafield')
-        with self.assertRaisesMessage(FieldError,
-                expected_message % ', '.join(['EXTRA'] + sorted(f.name for f in Article._meta.get_fields()))):
+        with self.assertRaisesMessage(
+            FieldError,
+            expected_message % ', '.join(['EXTRA'] + sorted(f.name for f in Article._meta.get_fields()))
+        ):
             Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list('notafield')
 
     def test_fk_assignment_and_related_object_cache(self):

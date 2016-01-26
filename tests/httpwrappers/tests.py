@@ -508,9 +508,11 @@ class JsonResponseTests(SimpleTestCase):
         self.assertEqual(json.loads(response.content.decode()), data)
 
     def test_json_response_raises_type_error_with_default_setting(self):
-        with self.assertRaisesMessage(TypeError,
-                'In order to allow non-dict objects to be serialized set the '
-                'safe parameter to False'):
+        msg = (
+            'In order to allow non-dict objects to be serialized set the '
+            'safe parameter to False'
+        )
+        with self.assertRaisesMessage(TypeError, msg):
             JsonResponse([1, 2, 3])
 
     def test_json_response_text(self):

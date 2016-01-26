@@ -102,14 +102,13 @@ class CustomColumnsTests(TestCase):
         a = Author.objects.get(last_name__exact='Smith')
         self.assertEqual('John', a.first_name)
         self.assertEqual('Smith', a.last_name)
-        with self.assertRaisesMessage(
-            AttributeError,
-                "'Author' object has no attribute 'firstname'"):
+
+        msg = "'Author' object has no attribute 'firstname'"
+        with self.assertRaisesMessage(AttributeError, msg):
             getattr(a, 'firstname')
 
-        with self.assertRaisesMessage(
-            AttributeError,
-                "'Author' object has no attribute 'last'"):
+        msg = "'Author' object has no attribute 'last'"
+        with self.assertRaisesMessage(AttributeError, msg):
             getattr(a, 'last')
 
     def test_m2m_table(self):
