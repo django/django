@@ -194,7 +194,64 @@ class LazyObjectTestCase(TestCase):
         self.assertEqual(unpickled, obj)
         self.assertEqual(unpickled.foo, obj.foo)
 
-    def test_deepcopy(self):
+    # We want to test copying lazy objects wrapping both builtin types and
+    # user-defined classes, since a lot of the relevant code does __dict__
+    # manipulation, and builtin types don't have __dict__.
+    def test_copy_list(self):
+        # Check that we *can* do copy, and that it returns the right
+        # objects.
+
+        l = [1, 2, 3]
+
+        obj = self.lazy_wrap(l)
+        len(l)  # forces evaluation
+        obj2 = copy.copy(obj)
+
+        self.assertIsNot(obj, obj2)
+        self.assertIsInstance(obj2, list)
+        self.assertEqual(obj2, [1, 2, 3])
+
+    def test_copy_list_no_evaluation(self):
+        # copying doesn't force evaluation
+
+        l = [1, 2, 3]
+
+        obj = self.lazy_wrap(l)
+        obj2 = copy.copy(obj)
+
+        # Copying shouldn't force evaluation
+        self.assertIsNot(obj, obj2)
+        self.assertIs(obj._wrapped, empty)
+        self.assertIs(obj2._wrapped, empty)
+
+    def test_copy_class(self):
+        # Check that we *can* do copy, and that it returns the right
+        # objects.
+
+        foo = Foo()
+
+        obj = self.lazy_wrap(foo)
+        str(foo)  # forces evaluation
+        obj2 = copy.copy(obj)
+
+        self.assertIsNot(obj, obj2)
+        self.assertIsInstance(obj2, Foo)
+        self.assertEqual(obj2, Foo())
+
+    def test_copy_class_no_evaluation(self):
+        # copying doesn't force evaluation
+
+        foo = Foo()
+
+        obj = self.lazy_wrap(foo)
+        obj2 = copy.copy(obj)
+
+        # Copying shouldn't force evaluation
+        self.assertIsNot(obj, obj2)
+        self.assertIs(obj._wrapped, empty)
+        self.assertIs(obj2._wrapped, empty)
+
+    def test_deepcopy_list(self):
         # Check that we *can* do deep copy, and that it returns the right
         # objects.
 
@@ -204,11 +261,12 @@ class LazyObjectTestCase(TestCase):
         len(l)  # forces evaluation
         obj2 = copy.deepcopy(obj)
 
+        self.assertIsNot(obj, obj2)
         self.assertIsInstance(obj2, list)
         self.assertEqual(obj2, [1, 2, 3])
 
-    def test_deepcopy_no_evaluation(self):
-        # copying doesn't force evaluation
+    def test_deepcopy_list_no_evaluation(self):
+        # deep copying doesn't force evaluation
 
         l = [1, 2, 3]
 
@@ -216,6 +274,34 @@ class LazyObjectTestCase(TestCase):
         obj2 = copy.deepcopy(obj)
 
         # Copying shouldn't force evaluation
+        self.assertIsNot(obj, obj2)
+        self.assertIs(obj._wrapped, empty)
+        self.assertIs(obj2._wrapped, empty)
+
+    def test_deepcopy_class(self):
+        # Check that we *can* do deep copy, and that it returns the right
+        # objects.
+
+        foo = Foo()
+
+        obj = self.lazy_wrap(foo)
+        str(foo)  # forces evaluation
+        obj2 = copy.deepcopy(obj)
+
+        self.assertIsNot(obj, obj2)
+        self.assertIsInstance(obj2, Foo)
+        self.assertEqual(obj2, Foo())
+
+    def test_deepcopy_class_no_evaluation(self):
+        # deep copying doesn't force evaluation
+
+        foo = Foo()
+
+        obj = self.lazy_wrap(foo)
+        obj2 = copy.deepcopy(obj)
+
+        # Copying shouldn't force evaluation
+        self.assertIsNot(obj, obj2)
         self.assertIs(obj._wrapped, empty)
         self.assertIs(obj2._wrapped, empty)
 
