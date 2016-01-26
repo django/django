@@ -1552,6 +1552,29 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
+.. method:: SimpleTestCase.assertFormValid(form, msg=None)
+
+    .. versionadded:: 1.10
+
+    Asserts that a form is valid. If form is not valid, displays clean output
+    with form errors.
+
+    ``form`` is the form to be validated.
+
+.. method:: SimpleTestCase.assertFormNotValid(form, expected_errors=None, msg=None)
+
+    .. versionadded:: 1.10
+
+   Asserts that a form is not valid and that errors are ``expected_errors``.
+
+   ``form`` is the form to be validated.
+
+   ``expected_errors`` is a list of (field, code) errors that are expected on
+   the form.
+
+   ``allow_other_errors`` is a boolean that when set (by default) allows other
+   errors not within ``expected_errors`` to be raised by the form.
+
 .. method:: SimpleTestCase.assertInHTML(needle, haystack, count=None, msg_prefix='')
 
     Asserts that the HTML fragment ``needle`` is contained in the ``haystack`` one.
