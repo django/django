@@ -461,6 +461,16 @@ Since the introduction of migrations for the contrib apps in Django 1.8, the
 tables of these custom user test models were not created anymore making them
 unusable in a testing context.
 
+Apps registry is no longer auto-populated when unpickling models outside of Django
+----------------------------------------------------------------------------------
+
+The apps registry is no longer auto-populated when unpickling models. This was
+added in Django 1.7.2 as an attempt to allow unpickling models outside of
+Django, such as in an RQ worker, without calling ``django.setup()``, but it
+creates the possibility of a deadlock. To adapt your code in the case of RQ,
+you can `provide your own worker script <http://python-rq.org/docs/workers/>`_
+that calls ``django.setup()``.
+
 Miscellaneous
 -------------
 
