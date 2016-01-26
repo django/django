@@ -1521,6 +1521,7 @@ def get_prefetcher(instance, attr):
                 rel_obj = getattr(instance, attr)
                 if hasattr(rel_obj, 'get_prefetch_queryset'):
                     prefetcher = rel_obj
+                is_fetched = attr in instance._prefetched_objects_cache
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched
 
 
@@ -1597,6 +1598,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         else:
             if as_attr:
                 setattr(obj, to_attr, vals)
+                obj._prefetched_objects_cache[cache_name] = vals
             else:
                 # Cache in the QuerySet.all().
                 qs = getattr(obj, to_attr).all()
