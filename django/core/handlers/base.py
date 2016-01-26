@@ -7,12 +7,13 @@ import warnings
 
 from django import http
 from django.conf import settings
-from django.core import signals, urlresolvers
+from django.core import signals
 from django.core.exceptions import (
     MiddlewareNotUsed, PermissionDenied, SuspiciousOperation,
 )
 from django.db import connections, transaction
 from django.http.multipartparser import MultiPartParserError
+from django.urls import get_resolver, set_urlconf
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -111,8 +112,8 @@ class BaseHandler(object):
         # variable" exception in the event an exception is raised before
         # resolver is set
         urlconf = settings.ROOT_URLCONF
-        urlresolvers.set_urlconf(urlconf)
-        resolver = urlresolvers.get_resolver(urlconf)
+        set_urlconf(urlconf)
+        resolver = get_resolver(urlconf)
         # Use a flag to check if the response was rendered to prevent
         # multiple renderings or to force rendering if necessary.
         response_is_rendered = False
@@ -128,8 +129,8 @@ class BaseHandler(object):
                 if hasattr(request, 'urlconf'):
                     # Reset url resolver with a custom URLconf.
                     urlconf = request.urlconf
-                    urlresolvers.set_urlconf(urlconf)
-                    resolver = urlresolvers.get_resolver(urlconf)
+                    set_urlconf(urlconf)
+                    resolver = get_resolver(urlconf)
 
                 resolver_match = resolver.resolve(request.path_info)
                 callback, callback_args, callback_kwargs = resolver_match

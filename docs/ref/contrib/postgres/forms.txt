@@ -1,3 +1,4 @@
+===========================================
 PostgreSQL specific form fields and widgets
 ===========================================
 
@@ -5,6 +6,9 @@ All of these fields and widgets are available from the
 ``django.contrib.postgres.forms`` module.
 
 .. currentmodule:: django.contrib.postgres.forms
+
+Fields
+======
 
 SimpleArrayField
 ----------------
@@ -217,10 +221,10 @@ DateRangeField
     :class:`~django.contrib.postgres.fields.DateRangeField`.
 
 Widgets
--------
+=======
 
 RangeWidget
-~~~~~~~~~~~
+-----------
 
 .. class:: RangeWidget(base_widget, attrs=None)
 

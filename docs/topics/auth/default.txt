@@ -70,8 +70,9 @@ Create superusers using the :djadmin:`createsuperuser` command::
     $ python manage.py createsuperuser --username=joe --email=joe@example.com
 
 You will be prompted for a password. After you enter one, the user will be
-created immediately. If you leave off the :djadminopt:`--username` or the
-:djadminopt:`--email` options, it will prompt you for those values.
+created immediately. If you leave off the :option:`--username <createsuperuser
+--username>` or :option:`--email <createsuperuser --email>` options, it will
+prompt you for those values.
 
 Changing passwords
 ------------------
@@ -322,7 +323,7 @@ How to log a user in
 If you have an authenticated user you want to attach to the current session
 - this is done with a :func:`~django.contrib.auth.login` function.
 
-.. function:: login(request, user)
+.. function:: login(request, user, backend=None)
 
     To log a user in, from a view, use :func:`~django.contrib.auth.login()`. It
     takes an :class:`~django.http.HttpRequest` object and a
@@ -354,18 +355,35 @@ If you have an authenticated user you want to attach to the current session
                 # Return an 'invalid login' error message.
                 ...
 
-.. admonition:: Calling ``authenticate()`` first
+    .. versionchanged:: 1.10
 
-    When you're manually logging a user in, you *must* successfully authenticate
-    the user with :func:`~django.contrib.auth.authenticate()` before you call
-    :func:`~django.contrib.auth.login()`.
-    :func:`~django.contrib.auth.authenticate()`
-    sets an attribute on the :class:`~django.contrib.auth.models.User` noting
-    which authentication backend successfully authenticated that user (see the
-    :ref:`backends documentation <authentication-backends>` for details), and
-    this information is needed later during the login process. An error will be
-    raised if you try to login a user object retrieved from the database
-    directly.
+        In older versions, when you're manually logging a user in, you *must*
+        successfully authenticate the user with
+        :func:`~django.contrib.auth.authenticate()` before you call
+        :func:`~django.contrib.auth.login()`. Now you can set the backend using
+        the new ``backend`` argument.
+
+Selecting the :ref:`authentication backend <authentication-backends>`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When a user logs in, the user's ID and the backend that was used for
+authentication are saved in the user's session. This allows the same
+authentication backend to fetch the user's details on a future request. The
+authentication backend to save in the session is selected as follows:
+
+#. Use the value of the optional ``backend`` argument, if provided.
+#. Use the value of the ``user.backend`` attribute, if present. This allows
+   pairing :func:`~django.contrib.auth.authenticate()` and
+   :func:`~django.contrib.auth.login()`:
+   :func:`~django.contrib.auth.authenticate()`
+   sets the ``user.backend`` attribute on the ``User`` object it returns.
+#. Use the ``backend`` in :setting:`AUTHENTICATION_BACKENDS`, if there is only
+   one.
+#. Otherwise, raise an exception.
+
+In cases 1 and 2, the value of the ``backend`` argument or the ``user.backend``
+attribute should be a dotted import path string (like that found in
+:setting:`AUTHENTICATION_BACKENDS`), not the actual backend class.
 
 How to log a user out
 ---------------------

@@ -225,7 +225,7 @@ annotate
 Annotates each object in the ``QuerySet`` with the provided list of :doc:`query
 expressions </ref/models/expressions>`. An expression may be a simple value, a
 reference to a field on the model (or any related models), or an aggregate
-expression (averages, sums, etc) that has been computed over the objects that
+expression (averages, sums, etc.) that has been computed over the objects that
 are related to the objects in the ``QuerySet``.
 
 Each argument to ``annotate()`` is an annotation that will be added
@@ -1836,10 +1836,11 @@ database query like ``count()`` would.
 in_bulk
 ~~~~~~~
 
-.. method:: in_bulk(id_list)
+.. method:: in_bulk(id_list=None)
 
 Takes a list of primary-key values and returns a dictionary mapping each
-primary-key value to an instance of the object with the given ID.
+primary-key value to an instance of the object with the given ID. If a list
+isn't provided, all objects in the queryset are returned.
 
 Example::
 
@@ -1849,8 +1850,14 @@ Example::
     {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>}
     >>> Blog.objects.in_bulk([])
     {}
+    >>> Blog.objects.in_bulk()
+    {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Django Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
+
+.. versionchanged:: 1.10
+
+    In older versions, ``id_list`` was a required argument.
 
 iterator
 ~~~~~~~~
@@ -1947,7 +1954,7 @@ aggregate
 
 .. method:: aggregate(*args, **kwargs)
 
-Returns a dictionary of aggregate values (averages, sums, etc) calculated over
+Returns a dictionary of aggregate values (averages, sums, etc.) calculated over
 the ``QuerySet``. Each argument to ``aggregate()`` specifies a value that will
 be included in the dictionary that is returned.
 

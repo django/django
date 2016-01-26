@@ -93,6 +93,10 @@ Three things to note about 404 views:
     second parameter, the exception that triggered the error. A useful
     representation of the exception is also passed in the template context.
 
+.. versionchanged:: 1.10
+
+    Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.
+
 .. _http_internal_server_error_view:
 
 The 500 (server error) view
@@ -112,6 +116,10 @@ rendered with an empty ``Context`` to lessen the chance of additional errors.
 If :setting:`DEBUG` is set to ``True`` (in your settings module), then
 your 500 view will never be used, and the traceback will be displayed
 instead, with some debug information.
+
+.. versionchanged:: 1.10
+
+    Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.
 
 .. _http_forbidden_view:
 
@@ -148,6 +156,10 @@ view you can use code like this::
     unicode representation of the exception is also passed in the template
     context.
 
+.. versionchanged:: 1.10
+
+    Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.
+
 .. _http_bad_request_view:
 
 The 400 (bad request) view
@@ -173,3 +185,7 @@ filesystem paths.
 
     The signature of ``bad_request()`` changed in Django 1.9. The function
     now accepts a second parameter, the exception that triggered the error.
+
+.. versionchanged:: 1.10
+
+    Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.

@@ -1252,7 +1252,7 @@ subclass::
     For example::
 
         from django.contrib import admin
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
 
         class PersonAdmin(admin.ModelAdmin):
             def view_on_site(self, obj):
@@ -2823,7 +2823,18 @@ password box.
 .. attribute:: LogEntry.change_message
 
     The detailed description of the modification. In the case of an edit, for
-    example, the message contains a list of the edited fields.
+    example, the message contains a list of the edited fields. The Django admin
+    site formats this content as a JSON structure, so that
+    :meth:`get_change_message` can recompose a message translated in the current
+    user language. Custom code might set this as a plain string though. You are
+    advised to use the :meth:`get_change_message` method to retrieve this value
+    instead of accessing it directly.
+
+    .. versionchanged:: 1.10
+
+        Previously, this attribute was always a plain string. It is
+        now JSON-structured so that the message can be translated in the current
+        user language. Old messages are untouched.
 
 ``LogEntry`` methods
 --------------------
@@ -2831,6 +2842,14 @@ password box.
 .. method:: LogEntry.get_edited_object()
 
     A shortcut that returns the referenced object.
+
+.. method:: LogEntry.get_change_message()
+
+    .. versionadded:: 1.10
+
+    Formats and translates :attr:`change_message` into the current user
+    language. Messages created before Django 1.10 will always be displayed in
+    the language in which they were logged.
 
 .. currentmodule:: django.contrib.admin
 
@@ -2883,9 +2902,9 @@ So - if you wanted to get a reference to the Change view for a particular
 ``Choice`` object (from the polls application) in the default admin, you would
 call::
 
-    >>> from django.core import urlresolvers
+    >>> from django.urls import reverse
     >>> c = Choice.objects.get(...)
-    >>> change_url = urlresolvers.reverse('admin:polls_choice_change', args=(c.id,))
+    >>> change_url = reverse('admin:polls_choice_change', args=(c.id,))
 
 This will find the first registered instance of the admin application
 (whatever the instance name), and resolve to the view for changing
@@ -2896,8 +2915,7 @@ that instance as a ``current_app`` hint to the reverse call. For example,
 if you specifically wanted the admin view from the admin instance named
 ``custom``, you would need to call::
 
-    >>> change_url = urlresolvers.reverse('admin:polls_choice_change',
-    ...                                   args=(c.id,), current_app='custom')
+    >>> change_url = reverse('admin:polls_choice_change', args=(c.id,), current_app='custom')
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.

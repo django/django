@@ -7,8 +7,8 @@ from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase, override_settings
+from django.urls import reverse
 
 from .admin import InnerInline, site as admin_site
 from .models import (
@@ -729,8 +729,9 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             reverse('admin:admin_inlines_holder4_add')))
 
         inline_id = '#inner4stacked_set-group'
-        rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
-            '%s .dynamic-inner4stacked_set' % inline_id))
+
+        def rows_length():
+            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
         self.assertEqual(rows_length(), 3)
 
         add_button = self.selenium.find_element_by_link_text(
@@ -745,8 +746,9 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             reverse('admin:admin_inlines_holder4_add')))
 
         inline_id = '#inner4stacked_set-group'
-        rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
-            '%s .dynamic-inner4stacked_set' % inline_id))
+
+        def rows_length():
+            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
         self.assertEqual(rows_length(), 3)
 
         add_button = self.selenium.find_element_by_link_text(
@@ -879,19 +881,19 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_author_add'))
         # One field is in a stacked inline, other in a tabular one.
-        test_fields = ['id_nonautopkbook_set-0-title', 'id_nonautopkbook_set-2-0-title']
+        test_fields = ['#id_nonautopkbook_set-0-title', '#id_nonautopkbook_set-2-0-title']
         show_links = self.selenium.find_elements_by_link_text('SHOW')
         self.assertEqual(len(show_links), 2)
         for show_index, field_name in enumerate(test_fields, 0):
-            self.assertFalse(self.selenium.find_element_by_id(field_name).is_displayed())
+            self.wait_until_invisible(field_name)
             show_links[show_index].click()
-            self.assertTrue(self.selenium.find_element_by_id(field_name).is_displayed())
+            self.wait_until_visible(field_name)
         hide_links = self.selenium.find_elements_by_link_text('HIDE')
         self.assertEqual(len(hide_links), 2)
         for hide_index, field_name in enumerate(test_fields, 0):
-            self.assertTrue(self.selenium.find_element_by_id(field_name).is_displayed())
+            self.wait_until_visible(field_name)
             hide_links[hide_index].click()
-            self.assertFalse(self.selenium.find_element_by_id(field_name).is_displayed())
+            self.wait_until_invisible(field_name)
 
 
 class SeleniumChromeTests(SeleniumFirefoxTests):

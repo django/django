@@ -722,6 +722,10 @@ class FieldsTests(SimpleTestCase):
             str(f['duration'])
         )
 
+    def test_durationfield_integer_value(self):
+        f = DurationField()
+        self.assertEqual(datetime.timedelta(0, 10800), f.clean(10800))
+
     def test_durationfield_prepare_value(self):
         field = DurationField()
         td = datetime.timedelta(minutes=15, seconds=30)
@@ -1169,7 +1173,8 @@ class FieldsTests(SimpleTestCase):
         )
 
     def test_choicefield_callable(self):
-        choices = lambda: [('J', 'John'), ('P', 'Paul')]
+        def choices():
+            return [('J', 'John'), ('P', 'Paul')]
         f = ChoiceField(choices=choices)
         self.assertEqual('J', f.clean('J'))
 
@@ -1574,7 +1579,7 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, allow_folders=True, allow_files=False)
         f.choices.sort()
         expected = [
-            ('/tests/forms_tests/tests/filepath_test_files/directory', 'directory'),
+            ('/forms_tests/tests/filepath_test_files/directory', 'directory'),
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
@@ -1583,12 +1588,12 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, allow_folders=True, allow_files=True)
         f.choices.sort()
         expected = [
-            ('/tests/forms_tests/tests/filepath_test_files/.dot-file', '.dot-file'),
-            ('/tests/forms_tests/tests/filepath_test_files/1x1.bmp', '1x1.bmp'),
-            ('/tests/forms_tests/tests/filepath_test_files/1x1.png', '1x1.png'),
-            ('/tests/forms_tests/tests/filepath_test_files/directory', 'directory'),
-            ('/tests/forms_tests/tests/filepath_test_files/fake-image.jpg', 'fake-image.jpg'),
-            ('/tests/forms_tests/tests/filepath_test_files/real-text-file.txt', 'real-text-file.txt'),
+            ('/forms_tests/tests/filepath_test_files/.dot-file', '.dot-file'),
+            ('/forms_tests/tests/filepath_test_files/1x1.bmp', '1x1.bmp'),
+            ('/forms_tests/tests/filepath_test_files/1x1.png', '1x1.png'),
+            ('/forms_tests/tests/filepath_test_files/directory', 'directory'),
+            ('/forms_tests/tests/filepath_test_files/fake-image.jpg', 'fake-image.jpg'),
+            ('/forms_tests/tests/filepath_test_files/real-text-file.txt', 'real-text-file.txt'),
         ]
 
         actual = fix_os_paths(f.choices)

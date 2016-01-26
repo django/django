@@ -49,8 +49,8 @@ can help show you which files are found.
 On subsequent ``collectstatic`` runs (if ``STATIC_ROOT`` isn't empty), files
 are copied only if they have a modified timestamp greater than the timestamp of
 the file in ``STATIC_ROOT``. Therefore if you remove an application from
-:setting:`INSTALLED_APPS`, it's a good idea to use the :djadminopt:`--clear`
-option in order to remove stale static files.
+:setting:`INSTALLED_APPS`, it's a good idea to use the :option:`collectstatic
+--clear` option in order to remove stale static files.
 
 Files are searched by using the :setting:`enabled finders
 <STATICFILES_FINDERS>`. The default is to look in all locations defined in
@@ -88,33 +88,28 @@ Then set the :setting:`STATICFILES_STORAGE` setting to
 
 Some commonly used options are:
 
-.. django-admin-option:: --noinput
+.. django-admin-option:: --noinput, --no-input
 
-    Do NOT prompt the user for input of any kind. You can use ``--no-input``
-    as an alias for this option.
+    Do NOT prompt the user for input of any kind.
 
     .. versionchanged:: 1.9
 
         The ``--no-input`` alias was added.
 
-.. django-admin-option:: -i <pattern>
-.. django-admin-option:: --ignore <pattern>
+.. django-admin-option:: --ignore PATTERN, -i PATTERN
 
     Ignore files or directories matching this glob-style pattern. Use multiple
     times to ignore more.
 
-.. django-admin-option:: -n
-.. django-admin-option:: --dry-run
+.. django-admin-option:: --dry-run, -n
 
     Do everything except modify the filesystem.
 
-.. django-admin-option:: -c
-.. django-admin-option:: --clear
+.. django-admin-option:: --clear, -c
 
     Clear the existing files before trying to copy or link the original file.
 
-.. django-admin-option:: -l
-.. django-admin-option:: --link
+.. django-admin-option:: --link, -l
 
     Create a symbolic link to each file instead of copying.
 
@@ -136,7 +131,7 @@ For a full list of options, refer to the commands own help by running::
 findstatic
 ----------
 
-.. django-admin:: findstatic
+.. django-admin:: findstatic static file [static file ...]
 
 Searches for one or more relative paths with the enabled finders.
 
@@ -149,6 +144,8 @@ For example::
    Found 'admin/js/core.js' here:
      /home/polls.com/src/django/contrib/admin/media/js/core.js
 
+.. django-admin-option:: findstatic --first
+
 By default, all matching locations are found. To only return the first match
 for each relative path, use the ``--first`` option::
 
@@ -159,15 +156,15 @@ for each relative path, use the ``--first`` option::
 This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
 
-By setting the :djadminopt:`--verbosity` flag to 0, you can suppress the extra
-output and just get the path names::
+By setting the ``--verbosity`` flag to 0, you can suppress the extra output and
+just get the path names::
 
    $ python manage.py findstatic css/base.css --verbosity 0
    /home/special.polls.com/core/static/css/base.css
    /home/polls.com/core/static/css/base.css
 
-On the other hand, by setting the :djadminopt:`--verbosity` flag to 2, you can
-get all the directories which were searched::
+On the other hand, by setting the ``--verbosity`` flag to 2, you can get all
+the directories which were searched::
 
    $ python manage.py findstatic css/base.css --verbosity 2
    Found 'css/base.css' here:
@@ -183,7 +180,7 @@ get all the directories which were searched::
 runserver
 ---------
 
-.. django-admin:: runserver
+.. django-admin:: runserver [addrport]
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static

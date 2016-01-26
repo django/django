@@ -216,7 +216,7 @@ Like :djadmin:`migrate`, :djadmin:`createcachetable` won't touch an existing
 table. It will only create missing tables.
 
 To print the SQL that would be run, rather than run it, use the
-:djadminopt:`--dry-run` option.
+:option:`createcachetable --dry-run` option.
 
 Multiple databases
 ~~~~~~~~~~~~~~~~~~

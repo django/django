@@ -158,8 +158,10 @@ class ETagProcessingTests(unittest.TestCase):
         self.assertEqual(etags, ['', 'etag', 'e"t"ag', r'e\tag', 'weak'])
 
     def test_quoting(self):
-        quoted_etag = http.quote_etag(r'e\t"ag')
+        original_etag = r'e\t"ag'
+        quoted_etag = http.quote_etag(original_etag)
         self.assertEqual(quoted_etag, r'"e\\t\"ag"')
+        self.assertEqual(http.unquote_etag(quoted_etag), original_etag)
 
 
 class HttpDateProcessingTests(unittest.TestCase):

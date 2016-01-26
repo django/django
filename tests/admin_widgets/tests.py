@@ -15,9 +15,9 @@ from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
 from django.db.models import CharField, DateField
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.urls import reverse
 from django.utils import six, translation
 
 from . import models
@@ -1068,9 +1068,9 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         for field_name in ['students', 'alumni']:
             from_box = '#id_%s_from' % field_name
             to_box = '#id_%s_to' % field_name
-            choose_link = '#id_%s_add_link' % field_name
-            remove_link = '#id_%s_remove_link' % field_name
-            input = self.selenium.find_element_by_css_selector('#id_%s_input' % field_name)
+            choose_link = 'id_%s_add_link' % field_name
+            remove_link = 'id_%s_remove_link' % field_name
+            input = self.selenium.find_element_by_id('id_%s_input' % field_name)
 
             # Initial values
             self.assertSelectOptions(from_box,
@@ -1099,14 +1099,14 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
             input.send_keys('a')
             self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.jason.id)])
             self.get_select_option(from_box, str(self.jason.id)).click()
-            self.selenium.find_element_by_css_selector(choose_link).click()
+            self.selenium.find_element_by_id(choose_link).click()
             self.assertSelectOptions(from_box, [str(self.arthur.id)])
             self.assertSelectOptions(to_box,
                         [str(self.lisa.id), str(self.peter.id),
                          str(self.jason.id)])
 
             self.get_select_option(to_box, str(self.lisa.id)).click()
-            self.selenium.find_element_by_css_selector(remove_link).click()
+            self.selenium.find_element_by_id(remove_link).click()
             self.assertSelectOptions(from_box,
                         [str(self.arthur.id), str(self.lisa.id)])
             self.assertSelectOptions(to_box,
@@ -1124,7 +1124,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
             # Check that pressing enter on a filtered option sends it properly
             # to the 'to' box.
             self.get_select_option(to_box, str(self.jason.id)).click()
-            self.selenium.find_element_by_css_selector(remove_link).click()
+            self.selenium.find_element_by_id(remove_link).click()
             input.send_keys('ja')
             self.assertSelectOptions(from_box, [str(self.jason.id)])
             input.send_keys([Keys.ENTER])
@@ -1139,6 +1139,55 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
                          [self.jason, self.peter])
         self.assertEqual(list(self.school.alumni.all()),
                          [self.jason, self.peter])
+
+    def test_back_button_bug(self):
+        """
+        Some browsers had a bug where navigating away from the change page
+        and then clicking the browser's back button would clear the
+        filter_horizontal/filter_vertical widgets (#13614).
+        """
+        self.school.students.set([self.lisa, self.peter])
+        self.school.alumni.set([self.lisa, self.peter])
+        self.admin_login(username='super', password='secret', login_url='/')
+        change_url = reverse('admin:admin_widgets_school_change', args=(self.school.id,))
+        self.selenium.get(self.live_server_url + change_url)
+        # Navigate away and go back to the change form page.
+        self.selenium.find_element_by_link_text('Home').click()
+        self.selenium.back()
+        expected_unselected_values = [
+            str(self.arthur.id), str(self.bob.id), str(self.cliff.id),
+            str(self.jason.id), str(self.jenny.id), str(self.john.id),
+        ]
+        expected_selected_values = [str(self.lisa.id), str(self.peter.id)]
+        # Check that everything is still in place
+        self.assertSelectOptions('#id_students_from', expected_unselected_values)
+        self.assertSelectOptions('#id_students_to', expected_selected_values)
+        self.assertSelectOptions('#id_alumni_from', expected_unselected_values)
+        self.assertSelectOptions('#id_alumni_to', expected_selected_values)
+
+    def test_refresh_page(self):
+        """
+        Horizontal and vertical filter widgets keep selected options on page
+        reload (#22955).
+        """
+        self.school.students.add(self.arthur, self.jason)
+        self.school.alumni.add(self.arthur, self.jason)
+
+        self.admin_login(username='super', password='secret', login_url='/')
+        change_url = reverse('admin:admin_widgets_school_change', args=(self.school.id,))
+        self.selenium.get(self.live_server_url + change_url)
+
+        options_len = len(self.selenium.find_elements_by_css_selector('#id_students_to > option'))
+        self.assertEqual(options_len, 2)
+
+        # self.selenium.refresh() or send_keys(Keys.F5) does hard reload and
+        # doesn't replicate what happens when a user clicks the browser's
+        # 'Refresh' button.
+        self.selenium.execute_script("location.reload()")
+        self.wait_page_loaded()
+
+        options_len = len(self.selenium.find_elements_by_css_selector('#id_students_to > option'))
+        self.assertEqual(options_len, 2)
 
 
 class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
@@ -1256,7 +1305,6 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         self.selenium.find_element_by_id('add_id_user').click()
         self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
-        self.wait_for('#id_password')
         password_field = self.selenium.find_element_by_id('id_password')
         password_field.send_keys('password')
 
@@ -1268,14 +1316,13 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
         self.selenium.switch_to.window(main_window)
         # The field now contains the new user
-        self.wait_for('#id_user option[value="newuser"]')
+        self.selenium.find_element_by_css_selector('#id_user option[value=newuser]')
 
         # Click the Change User button to change it
         self.selenium.find_element_by_id('change_id_user').click()
         self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
 
-        self.wait_for('#id_username')
         username_field = self.selenium.find_element_by_id('id_username')
         username_value = 'changednewuser'
         username_field.clear()
@@ -1284,10 +1331,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         save_button_css_selector = '.submit-row > input[type=submit]'
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
         self.selenium.switch_to.window(main_window)
-        # Wait up to 2 seconds for the new option to show up after clicking save in the popup.
-        self.selenium.implicitly_wait(2)
         self.selenium.find_element_by_css_selector('#id_user option[value=changednewuser]')
-        self.selenium.implicitly_wait(0)
 
         # Go ahead and submit the form to make sure it works
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()

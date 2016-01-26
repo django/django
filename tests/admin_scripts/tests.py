@@ -181,7 +181,7 @@ class AdminScriptTestCase(unittest.TestCase):
                 pass
 
         conf_dir = os.path.dirname(upath(conf.__file__))
-        template_manage_py = os.path.join(conf_dir, 'project_template', 'manage.py')
+        template_manage_py = os.path.join(conf_dir, 'project_template', 'manage.py-tpl')
 
         test_manage_py = os.path.join(self.test_dir, 'manage.py')
         shutil.copyfile(template_manage_py, test_manage_py)

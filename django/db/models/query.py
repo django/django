@@ -559,16 +559,19 @@ class QuerySet(object):
             return objects[0]
         return None
 
-    def in_bulk(self, id_list):
+    def in_bulk(self, id_list=None):
         """
         Returns a dictionary mapping each of the given IDs to the object with
-        that ID.
+        that ID. If `id_list` isn't provided, the entire QuerySet is evaluated.
         """
         assert self.query.can_filter(), \
             "Cannot use 'limit' or 'offset' with in_bulk"
-        if not id_list:
-            return {}
-        qs = self.filter(pk__in=id_list).order_by()
+        if id_list is not None:
+            if not id_list:
+                return {}
+            qs = self.filter(pk__in=id_list).order_by()
+        else:
+            qs = self._clone()
         return {obj._get_pk_val(): obj for obj in qs}
 
     def delete(self):
@@ -1168,7 +1171,7 @@ class QuerySet(object):
 
 class InstanceCheckMeta(type):
     def __instancecheck__(self, instance):
-        return instance.query.is_empty()
+        return isinstance(instance, QuerySet) and instance.query.is_empty()
 
 
 class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
@@ -1518,6 +1521,7 @@ def get_prefetcher(instance, attr):
                 rel_obj = getattr(instance, attr)
                 if hasattr(rel_obj, 'get_prefetch_queryset'):
                     prefetcher = rel_obj
+                is_fetched = attr in instance._prefetched_objects_cache
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched
 
 
@@ -1594,6 +1598,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         else:
             if as_attr:
                 setattr(obj, to_attr, vals)
+                obj._prefetched_objects_cache[cache_name] = vals
             else:
                 # Cache in the QuerySet.all().
                 qs = getattr(obj, to_attr).all()

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from django.apps import apps
-from django.apps.registry import Apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
 from django.db import models
@@ -12,6 +11,7 @@ from django.db.models.query_utils import (
     DeferredAttribute, deferred_class_factory,
 )
 from django.test import TestCase, override_settings
+from django.test.utils import isolate_apps
 
 from .models import (
     Base, Child, Derived, Feature, Item, ItemAndSimpleItem, Leaf, Location,
@@ -265,22 +265,20 @@ class DeferRegressionTest(TestCase):
         deferred_cls = deferred_class_factory(Item, ())
         self.assertFalse(deferred_cls._deferred)
 
-    def test_deferred_class_factory_apps_reuse(self):
+    @isolate_apps('defer_regress', kwarg_name='apps')
+    def test_deferred_class_factory_apps_reuse(self, apps):
         """
         #25563 - model._meta.apps should be used for caching and
         retrieval of the created proxy class.
         """
-        isolated_apps = Apps(['defer_regress'])
-
         class BaseModel(models.Model):
             field = models.BooleanField()
 
             class Meta:
-                apps = isolated_apps
                 app_label = 'defer_regress'
 
         deferred_model = deferred_class_factory(BaseModel, ['field'])
-        self.assertIs(deferred_model._meta.apps, isolated_apps)
+        self.assertIs(deferred_model._meta.apps, apps)
         self.assertIs(deferred_class_factory(BaseModel, ['field']), deferred_model)
 
 

@@ -2,15 +2,15 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.apps import apps
 from django.contrib import admin
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks, management
-from django.core.urlresolvers import reverse
 from django.db import DEFAULT_DB_ALIAS, models
 from django.db.models import signals
 from django.test import TestCase, override_settings
+from django.test.utils import isolate_apps
+from django.urls import reverse
 
 from .admin import admin as force_admin_model_registration  # NOQA
 from .models import (
@@ -129,6 +129,7 @@ class ProxyModelTests(TestCase):
                     proxy = True
         self.assertRaises(TypeError, build_abc)
 
+    @isolate_apps('proxy_models')
     def test_no_cbc(self):
         """
         The proxy must actually have one concrete base class
@@ -139,6 +140,7 @@ class ProxyModelTests(TestCase):
                     proxy = True
         self.assertRaises(TypeError, build_no_cbc)
 
+    @isolate_apps('proxy_models')
     def test_no_base_classes(self):
         def build_no_base_classes():
             class NoBaseClasses(models.Model):
@@ -146,15 +148,13 @@ class ProxyModelTests(TestCase):
                     proxy = True
         self.assertRaises(TypeError, build_no_base_classes)
 
+    @isolate_apps('proxy_models')
     def test_new_fields(self):
         class NoNewFields(Person):
             newfield = models.BooleanField()
 
             class Meta:
                 proxy = True
-                # don't register this model in the app_cache for the current app,
-                # otherwise the check fails when other tests are being run.
-                app_label = 'no_such_app'
 
         errors = NoNewFields.check()
         expected = [
@@ -168,30 +168,22 @@ class ProxyModelTests(TestCase):
         self.assertEqual(errors, expected)
 
     @override_settings(TEST_SWAPPABLE_MODEL='proxy_models.AlternateModel')
+    @isolate_apps('proxy_models')
     def test_swappable(self):
-        # The models need to be removed after the test in order to prevent bad
-        # interactions with the flush operation in other tests.
-        _old_models = apps.app_configs['proxy_models'].models.copy()
+        class SwappableModel(models.Model):
 
-        try:
-            class SwappableModel(models.Model):
+            class Meta:
+                swappable = 'TEST_SWAPPABLE_MODEL'
+
+        class AlternateModel(models.Model):
+            pass
+
+        # You can't proxy a swapped model
+        with self.assertRaises(TypeError):
+            class ProxyModel(SwappableModel):
 
                 class Meta:
-                    swappable = 'TEST_SWAPPABLE_MODEL'
-
-            class AlternateModel(models.Model):
-                pass
-
-            # You can't proxy a swapped model
-            with self.assertRaises(TypeError):
-                class ProxyModel(SwappableModel):
-
-                    class Meta:
-                        proxy = True
-        finally:
-            apps.app_configs['proxy_models'].models = _old_models
-            apps.all_models['proxy_models'] = _old_models
-            apps.clear_cache()
+                    proxy = True
 
     def test_myperson_manager(self):
         Person.objects.create(name="fred")

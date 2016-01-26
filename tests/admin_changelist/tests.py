@@ -10,10 +10,10 @@ from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR, ChangeList
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
 from django.template import Context, Template
 from django.test import TestCase, ignore_warnings, override_settings
 from django.test.client import RequestFactory
+from django.urls import reverse
 from django.utils import formats, six
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -21,9 +21,10 @@ from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
     CustomPaginationAdmin, CustomPaginator, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, DynamicListFilterChildAdmin,
-    DynamicSearchFieldsChildAdmin, EmptyValueChildAdmin, FilteredChildAdmin,
-    GroupAdmin, InvitationAdmin, NoListDisplayLinksParentAdmin, ParentAdmin,
-    QuartetAdmin, SwallowAdmin, site as custom_site,
+    DynamicSearchFieldsChildAdmin, EmptyValueChildAdmin, EventAdmin,
+    FilteredChildAdmin, GroupAdmin, InvitationAdmin,
+    NoListDisplayLinksParentAdmin, ParentAdmin, QuartetAdmin, SwallowAdmin,
+    site as custom_site,
 )
 from .models import (
     Band, Child, ChordsBand, ChordsMusician, Concert, CustomIdUser, Event,
@@ -760,6 +761,20 @@ class ChangeListTests(TestCase):
                 expected_page_range,
                 list(real_page_range),
             )
+
+    def test_object_tools_displayed_no_add_permission(self):
+        """
+        When ModelAdmin.has_add_permission() returns False, the object-tools
+        block is still shown.
+        """
+        superuser = self._create_superuser('superuser')
+        m = EventAdmin(Event, custom_site)
+        request = self._mocked_authenticated_request('/event/', superuser)
+        self.assertFalse(m.has_add_permission(request))
+        response = m.changelist_view(request)
+        self.assertIn('<ul class="object-tools">', response.rendered_content)
+        # The "Add" button inside the object-tools shouldn't appear.
+        self.assertNotIn('Add', response.rendered_content)
 
 
 class AdminLogNodeTestCase(TestCase):

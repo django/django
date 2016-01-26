@@ -56,7 +56,7 @@ To get from a URL to a view, Django uses what are known as 'URLconfs'. A
 URLconf maps URL patterns (described as regular expressions) to views.
 
 This tutorial provides basic instruction in the use of URLconfs, and you can
-refer to :mod:`django.core.urlresolvers` for more information.
+refer to :mod:`django.urls` for more information.
 
 Writing more views
 ==================
@@ -449,6 +449,8 @@ file, go ahead and add an ``app_name`` to set the application namespace:
     :filename: polls/urls.py
 
     from django.conf.urls import url
+
+    from . import views
 
     app_name = 'polls'
     urlpatterns = [

@@ -375,15 +375,16 @@ CSRF_FAILURE_VIEW
 
 Default: ``'django.views.csrf.csrf_failure'``
 
-A dotted path to the view function to be used when an incoming request
-is rejected by the CSRF protection.  The function should have this signature::
+A dotted path to the view function to be used when an incoming request is
+rejected by the :doc:`CSRF protection </ref/csrf>`. The function should have
+this signature::
 
     def csrf_failure(request, reason=""):
         ...
 
-where ``reason`` is a short message (intended for developers or logging, not for
-end users) indicating the reason the request was rejected.  See
-:doc:`/ref/csrf`.
+where ``reason`` is a short message (intended for developers or logging, not
+for end users) indicating the reason the request was rejected. It should return
+an :class:`~django.http.HttpResponseForbidden`.
 
 ``django.views.csrf.csrf_failure()`` accepts an additional ``template_name``
 parameter that defaults to ``'403_csrf.html'``. If a template with that name
@@ -1563,8 +1564,8 @@ It serves two purposes:
 * If the locale middleware isn't in use, it decides which translation is served
   to all users.
 * If the locale middleware is active, it provides a fallback language in case the
-  user's preferred language can't be determined or is not supported by the Web
-  site. It also provides the fallback translation when a translation for a
+  user's preferred language can't be determined or is not supported by the
+  website. It also provides the fallback translation when a translation for a
   given literal doesn't exist for the user's preferred language.
 
 See :ref:`how-django-discovers-language-preference` for more details.
@@ -1829,8 +1830,8 @@ When you supply ``None`` as a value for an app, Django will consider the app as
 an app without migrations regardless of an existing ``migrations`` submodule.
 This can be used, for example, in a test settings file to skip migrations while
 testing (tables will still be created for the apps' models). If this is used in
-your general project settings, remember to use the migrate
-:djadminopt:`--run-syncdb` option if you want to create tables for the app.
+your general project settings, remember to use the :option:`migrate
+--run-syncdb` option if you want to create tables for the app.
 
 .. setting:: MONTH_DAY_FORMAT
 
@@ -2473,7 +2474,9 @@ Default: ``False``
 A boolean that specifies whether to display numbers using a thousand separator.
 When :setting:`USE_L10N` is set to ``True`` and if this is also set to
 ``True``, Django will use the values of :setting:`THOUSAND_SEPARATOR` and
-:setting:`NUMBER_GROUPING` to format numbers.
+:setting:`NUMBER_GROUPING` to format numbers unless the locale already has an
+existing thousands separator. If there is a thousands separator in the locale
+format, it will have higher precedence and will be applied instead.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 :setting:`THOUSAND_SEPARATOR`.

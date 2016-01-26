@@ -2,7 +2,7 @@
 Django 1.8.8 release notes
 ==========================
 
-*Under development*
+*January 2, 2016*
 
 Django 1.8.8 fixes several bugs in 1.8.7.
 
@@ -48,3 +48,13 @@ Bugfixes
   ``filter_horizontal`` and ``filter_vertical`` widgets, which could result
   in inadvertent data loss if a user didn't notice that and then submitted the
   form (:ticket:`22955`).
+
+* Fixed a regression in the admin which ignored line breaks in read-only fields
+  instead of converting them to ``<br>`` (:ticket:`25465`).
+
+* Made ``loaddata`` skip disabling and enabling database constraints when it
+  doesn't load any fixtures (:ticket:`23372`).
+
+* Fixed a crash in ``QuerySet.values()/values_list()`` after an ``annotate()``
+  and ``order_by()`` when ``values()/values_list()`` includes a field not in
+  the ``order_by()`` (:ticket:`25316`).

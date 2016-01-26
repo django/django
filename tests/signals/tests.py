@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import signals
 from django.dispatch import receiver
 from django.test import TestCase
+from django.test.utils import isolate_apps
 from django.utils import six
 
 from .models import Author, Book, Car, Person
@@ -285,6 +286,7 @@ class LazyModelRefTest(BaseSignalTest):
         finally:
             signals.post_init.disconnect(self.receiver, sender=Book)
 
+    @isolate_apps('signals')
     def test_not_loaded_model(self):
         signals.post_init.connect(
             self.receiver, sender='signals.Created', weak=False

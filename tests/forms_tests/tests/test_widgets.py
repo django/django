@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
-from django.core.urlresolvers import reverse
 from django.forms import (
     CheckboxSelectMultiple, ClearableFileInput, RadioSelect, TextInput,
 )
@@ -10,6 +9,7 @@ from django.forms.widgets import (
     ChoiceFieldRenderer, ChoiceInput, RadioFieldRenderer,
 )
 from django.test import SimpleTestCase, override_settings
+from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import SafeData

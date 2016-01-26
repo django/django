@@ -3,7 +3,7 @@ Single object mixins
 ====================
 
 SingleObjectMixin
------------------
+=================
 
 .. class:: django.views.generic.detail.SingleObjectMixin
 
@@ -132,7 +132,7 @@ SingleObjectMixin
 
 
 SingleObjectTemplateResponseMixin
----------------------------------
+=================================
 
 .. class:: django.views.generic.detail.SingleObjectTemplateResponseMixin
 

@@ -19,7 +19,8 @@ if six.PY2:
 
 
 # Capitalizes the first letter of a string.
-capfirst = lambda x: x and force_text(x)[0].upper() + force_text(x)[1:]
+def capfirst(x):
+    return x and force_text(x)[0].upper() + force_text(x)[1:]
 capfirst = keep_lazy_text(capfirst)
 
 # Set up regular expressions

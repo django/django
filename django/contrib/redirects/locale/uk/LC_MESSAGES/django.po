@@ -4,13 +4,14 @@
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
+# Vitaliy Kozlovskyi <ubombi@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-12-03 13:25+0000\n"
+"Last-Translator: Vitaliy Kozlovskyi <ubombi@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +25,7 @@ msgid "Redirects"
 msgstr "Перенаправлення"
 
 msgid "site"
-msgstr ""
+msgstr "сайт"
 
 msgid "redirect from"
 msgstr "перенаправлення з"

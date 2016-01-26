@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import atexit
 import copy
-import logging
 import os
 import shutil
 import subprocess
@@ -150,25 +149,17 @@ def setup(verbosity, test_labels, parallel):
     settings.SITE_ID = 1
     settings.MIDDLEWARE_CLASSES = ALWAYS_MIDDLEWARE_CLASSES
     settings.MIGRATION_MODULES = {
-        # these 'tests.migrations' modules don't actually exist, but this lets
-        # us skip creating migrations for the test models.
-        'auth': 'django.contrib.auth.tests.migrations',
-        'contenttypes': 'contenttypes_tests.migrations',
-        'sessions': 'sessions_tests.migrations',
+        # This lets us skip creating migrations for the test models as many of
+        # them depend on one of the following contrib applications.
+        'auth': None,
+        'contenttypes': None,
+        'sessions': None,
     }
     log_config = copy.deepcopy(DEFAULT_LOGGING)
     # Filter out non-error logging so we don't have to capture it in lots of
     # tests.
     log_config['loggers']['django']['level'] = 'ERROR'
     settings.LOGGING = log_config
-
-    if verbosity > 0:
-        # Ensure any warnings captured to logging are piped through a verbose
-        # logging handler.  If any -W options were passed explicitly on command
-        # line, warnings are not captured, and this has no effect.
-        logger = logging.getLogger('py.warnings')
-        handler = logging.StreamHandler()
-        logger.addHandler(handler)
 
     warnings.filterwarnings(
         'ignore',
@@ -270,8 +261,8 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     return failures
 
 
-def bisect_tests(bisection_label, options, test_labels):
-    state = setup(options.verbosity, test_labels)
+def bisect_tests(bisection_label, options, test_labels, parallel):
+    state = setup(options.verbosity, test_labels, parallel)
 
     test_labels = test_labels or get_installed()
 
@@ -328,8 +319,8 @@ def bisect_tests(bisection_label, options, test_labels):
     teardown(state)
 
 
-def paired_tests(paired_test, options, test_labels):
-    state = setup(options.verbosity, test_labels)
+def paired_tests(paired_test, options, test_labels, parallel):
+    state = setup(options.verbosity, test_labels, parallel)
 
     test_labels = test_labels or get_installed()
 
@@ -440,9 +431,9 @@ if __name__ == "__main__":
         os.environ['DJANGO_SELENIUM_TESTS'] = '1'
 
     if options.bisect:
-        bisect_tests(options.bisect, options, options.modules)
+        bisect_tests(options.bisect, options, options.modules, options.parallel)
     elif options.pair:
-        paired_tests(options.pair, options, options.modules)
+        paired_tests(options.pair, options, options.modules, options.parallel)
     else:
         failures = django_tests(options.verbosity, options.interactive,
                                 options.failfast, options.keepdb,

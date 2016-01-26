@@ -4,16 +4,16 @@ import os
 import sys
 import tempfile
 import unittest
-import warnings
 
 from django.apps import apps
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.files.temp import NamedTemporaryFile
+from django.core.management import CommandError
 from django.core.serializers.base import ProgressBar
 from django.db import IntegrityError, connection
 from django.test import (
-    TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
+    TestCase, TransactionTestCase, mock, skipUnlessDBFeature,
 )
 from django.utils import six
 from django.utils.encoding import force_text
@@ -532,12 +532,12 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             management.call_command('loaddata', 'invalid.json', verbosity=0)
             self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])
 
-    @ignore_warnings(category=UserWarning, message="No fixture named")
     def test_loaddata_app_option(self):
         """
         Verifies that the --app option works.
         """
-        management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="someotherapp")
+        with self.assertRaisesMessage(CommandError, "No fixture named 'db_fixture_1' found."):
+            management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="someotherapp")
         self.assertQuerysetEqual(Article.objects.all(), [])
         management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="fixtures")
         self.assertQuerysetEqual(Article.objects.all(), [
@@ -563,11 +563,12 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<Article: Who needs to use compressed data?>',
         ])
 
-    @ignore_warnings(category=UserWarning, message="No fixture named")
     def test_unmatched_identifier_loading(self):
         # Try to load db fixture 3. This won't load because the database identifier doesn't match
-        management.call_command('loaddata', 'db_fixture_3', verbosity=0)
-        management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default')
+        with self.assertRaisesMessage(CommandError, "No fixture named 'db_fixture_3' found."):
+            management.call_command('loaddata', 'db_fixture_3', verbosity=0)
+        with self.assertRaisesMessage(CommandError, "No fixture named 'db_fixture_3' found."):
+            management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default')
         self.assertQuerysetEqual(Article.objects.all(), [])
 
     def test_output_formats(self):
@@ -628,20 +629,21 @@ class NonExistentFixtureTests(TestCase):
 
     def test_loaddata_not_existent_fixture_file(self):
         stdout_output = six.StringIO()
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            # With verbosity=2, we get both stdout output and a warning
-            management.call_command(
-                'loaddata',
-                'this_fixture_doesnt_exist',
-                verbosity=2,
-                stdout=stdout_output,
-            )
-        self.assertIn("No fixture 'this_fixture_doesnt_exist' in",
-            force_text(stdout_output.getvalue()))
-        self.assertEqual(len(w), 1)
-        self.assertEqual(force_text(w[0].message),
-            "No fixture named 'this_fixture_doesnt_exist' found.")
+        with self.assertRaisesMessage(CommandError, "No fixture named 'this_fixture_doesnt_exist' found."):
+            management.call_command('loaddata', 'this_fixture_doesnt_exist', stdout=stdout_output)
+
+    @mock.patch('django.db.connection.enable_constraint_checking')
+    @mock.patch('django.db.connection.disable_constraint_checking')
+    def test_nonexistent_fixture_no_constraint_checking(self,
+            disable_constraint_checking, enable_constraint_checking):
+        """
+        If no fixtures match the loaddata command, constraints checks on the
+        database shouldn't be disabled. This is performance critical on MSSQL.
+        """
+        with self.assertRaisesMessage(CommandError, "No fixture named 'this_fixture_doesnt_exist' found."):
+            management.call_command('loaddata', 'this_fixture_doesnt_exist', verbosity=0)
+        disable_constraint_checking.assert_not_called()
+        enable_constraint_checking.assert_not_called()
 
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):

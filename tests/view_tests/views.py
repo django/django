@@ -6,17 +6,17 @@ import logging
 import sys
 
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
-from django.core.urlresolvers import get_resolver
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
+from django.urls import get_resolver
+from django.views import View
 from django.views.debug import (
     SafeExceptionReporterFilter, technical_500_response,
 )
 from django.views.decorators.debug import (
     sensitive_post_parameters, sensitive_variables,
 )
-from django.views.generic import View
 
 from . import BrokenException, except_args
 

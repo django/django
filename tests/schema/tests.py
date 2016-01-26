@@ -116,6 +116,14 @@ class SchemaTests(TransactionTestCase):
         with connection.cursor() as cursor:
             return connection.introspection.get_constraints(cursor, table)
 
+    def get_constraints_for_column(self, model, column_name):
+        constraints = self.get_constraints(model._meta.db_table)
+        constraints_for_column = []
+        for name, details in constraints.items():
+            if details['columns'] == [column_name]:
+                constraints_for_column.append(name)
+        return sorted(constraints_for_column)
+
     # Tests
 
     def test_creation_deletion(self):
@@ -818,7 +826,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Author)
 
         old_field = Author._meta.get_field("id")
-        new_field = IntegerField(primary_key=True)
+        new_field = AutoField(primary_key=True)
         new_field.set_attributes_from_name("id")
         new_field.model = Author
         with connection.schema_editor() as editor:
@@ -826,6 +834,7 @@ class SchemaTests(TransactionTestCase):
         # This will fail if DROP DEFAULT is inadvertently executed on this
         # field which drops the id sequence, at least on PostgreSQL.
         Author.objects.create(name='Foo')
+        Author.objects.create(name='Bar')
 
     def test_alter_int_pk_to_autofield_pk(self):
         """
@@ -1710,68 +1719,102 @@ class SchemaTests(TransactionTestCase):
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_add_index_to_charfield(self):
-        # Create the table
+        # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
             editor.create_model(Author)
-        # Ensure the table is there and has no index
-        self.assertNotIn('name', self.get_indexes(Author._meta.db_table))
-        # Alter to add the index
+        self.assertEqual(self.get_constraints_for_column(Author, 'name'), [])
+        # Alter to add db_index=True and create 2 indexes.
         old_field = Author._meta.get_field('name')
         new_field = CharField(max_length=255, db_index=True)
         new_field.set_attributes_from_name('name')
         with connection.schema_editor() as editor:
             editor.alter_field(Author, old_field, new_field, strict=True)
-        # Check that all the constraints are there
-        constraints = self.get_constraints(Author._meta.db_table)
-        name_indexes = []
-        for name, details in constraints.items():
-            if details['columns'] == ['name']:
-                name_indexes.append(name)
-        self.assertEqual(2, len(name_indexes), 'Indexes are missing for name column')
-        # Check that one of the indexes ends with `_like`
-        like_index = [x for x in name_indexes if x.endswith('_like')]
-        self.assertEqual(1, len(like_index), 'Index with the operator class is missing for the name column')
-        # Remove the index
+        self.assertEqual(
+            self.get_constraints_for_column(Author, 'name'),
+            ['schema_author_name_1fbc5617_like', 'schema_author_name_1fbc5617_uniq']
+        )
+        # Remove db_index=True to drop both indexes.
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, old_field, strict=True)
-        # Ensure the name constraints where dropped
-        constraints = self.get_constraints(Author._meta.db_table)
-        name_indexes = []
-        for details in constraints.values():
-            if details['columns'] == ['name']:
-                name_indexes.append(details)
-        self.assertEqual(0, len(name_indexes), 'Indexes were not dropped for the name column')
+        self.assertEqual(self.get_constraints_for_column(Author, 'name'), [])
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_add_index_to_textfield(self):
-        # Create the table
+        # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
             editor.create_model(Note)
-        # Ensure the table is there and has no index
-        self.assertNotIn('info', self.get_indexes(Note._meta.db_table))
-        # Alter to add the index
+        self.assertEqual(self.get_constraints_for_column(Note, 'info'), [])
+        # Alter to add db_index=True and create 2 indexes.
         old_field = Note._meta.get_field('info')
         new_field = TextField(db_index=True)
         new_field.set_attributes_from_name('info')
         with connection.schema_editor() as editor:
             editor.alter_field(Note, old_field, new_field, strict=True)
-        # Check that all the constraints are there
-        constraints = self.get_constraints(Note._meta.db_table)
-        info_indexes = []
-        for name, details in constraints.items():
-            if details['columns'] == ['info']:
-                info_indexes.append(name)
-        self.assertEqual(2, len(info_indexes), 'Indexes are missing for info column')
-        # Check that one of the indexes ends with `_like`
-        like_index = [x for x in info_indexes if x.endswith('_like')]
-        self.assertEqual(1, len(like_index), 'Index with the operator class is missing for the info column')
-        # Remove the index
+        self.assertEqual(
+            self.get_constraints_for_column(Note, 'info'),
+            ['schema_note_info_4b0ea695_like', 'schema_note_info_4b0ea695_uniq']
+        )
+        # Remove db_index=True to drop both indexes.
         with connection.schema_editor() as editor:
             editor.alter_field(Note, new_field, old_field, strict=True)
-        # Ensure the info constraints where dropped
-        constraints = self.get_constraints(Note._meta.db_table)
-        info_indexes = []
-        for details in constraints.values():
-            if details['columns'] == ['info']:
-                info_indexes.append(details)
-        self.assertEqual(0, len(info_indexes), 'Indexes were not dropped for the info column')
+        self.assertEqual(self.get_constraints_for_column(Note, 'info'), [])
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_alter_field_add_unique_to_charfield_with_db_index(self):
+        # Create the table and verify initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(BookWithoutAuthor)
+        self.assertEqual(
+            self.get_constraints_for_column(BookWithoutAuthor, 'title'),
+            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like']
+        )
+        # Alter to add unique=True (should add 1 index)
+        old_field = BookWithoutAuthor._meta.get_field('title')
+        new_field = CharField(max_length=100, db_index=True, unique=True)
+        new_field.set_attributes_from_name('title')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(BookWithoutAuthor, 'title'),
+            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like', 'schema_book_title_2dfb2dff_uniq']
+        )
+        # Alter to remove unique=True (should drop unique index) # XXX: bug!
+        old_field = BookWithoutAuthor._meta.get_field('title')
+        new_field = CharField(max_length=100, db_index=True)
+        new_field.set_attributes_from_name('title')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(BookWithoutAuthor, 'title'),
+            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like', 'schema_book_title_2dfb2dff_uniq']
+        )
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_alter_field_add_db_index_to_charfield_with_unique(self):
+        # Create the table and verify initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+        self.assertEqual(
+            self.get_constraints_for_column(Tag, 'slug'),
+            ['schema_tag_slug_2c418ba3_like', 'schema_tag_slug_key']
+        )
+        # Alter to add db_index=True
+        old_field = Tag._meta.get_field('slug')
+        new_field = SlugField(db_index=True, unique=True)
+        new_field.set_attributes_from_name('slug')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Tag, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(Tag, 'slug'),
+            ['schema_tag_slug_2c418ba3_like', 'schema_tag_slug_key']
+        )
+        # Alter to remove db_index=True
+        old_field = Tag._meta.get_field('slug')
+        new_field = SlugField(unique=True)
+        new_field.set_attributes_from_name('slug')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Tag, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(Tag, 'slug'),
+            ['schema_tag_slug_2c418ba3_like', 'schema_tag_slug_key']
+        )

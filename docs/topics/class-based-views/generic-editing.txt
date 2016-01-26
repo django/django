@@ -1,3 +1,4 @@
+====================================
 Form handling with class-based views
 ====================================
 
@@ -13,7 +14,7 @@ this, Django provides a collection of generic class-based views for form
 processing.
 
 Basic Forms
------------
+===========
 
 Given a simple contact form:
 
@@ -60,7 +61,7 @@ Notes:
   redirects to the :attr:`~django.views.generic.edit.FormMixin.success_url`.
 
 Model Forms
------------
+===========
 
 Generic views really shine when working with models.  These generic
 views will automatically create a :class:`~django.forms.ModelForm`, so long as
@@ -98,7 +99,7 @@ First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
 .. snippet::
     :filename: models.py
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.db import models
 
     class Author(models.Model):
@@ -115,7 +116,7 @@ here; we don't have to write any logic ourselves:
     :filename: views.py
 
     from django.views.generic.edit import CreateView, UpdateView, DeleteView
-    from django.core.urlresolvers import reverse_lazy
+    from django.urls import reverse_lazy
     from myapp.models import Author
 
     class AuthorCreate(CreateView):
@@ -131,8 +132,8 @@ here; we don't have to write any logic ourselves:
         success_url = reverse_lazy('author-list')
 
 .. note::
-    We have to use :func:`~django.core.urlresolvers.reverse_lazy` here, not
-    just ``reverse`` as the urls are not loaded when the file is imported.
+    We have to use :func:`~django.urls.reverse_lazy` here, not just
+    ``reverse()`` as the urls are not loaded when the file is imported.
 
 The ``fields`` attribute works the same way as the ``fields`` attribute on the
 inner ``Meta`` class on :class:`~django.forms.ModelForm`. Unless you define the
@@ -180,7 +181,7 @@ Finally, we hook these new views into the URLconf:
     on your view class.
 
 Models and request.user
------------------------
+=======================
 
 To track the user that created an object using a :class:`CreateView`,
 you can use a custom :class:`~django.forms.ModelForm` to do this. First, add
@@ -223,7 +224,7 @@ alternatively handle unauthorized users in the
 :meth:`~django.views.generic.edit.ModelFormMixin.form_valid()`.
 
 AJAX example
-------------
+============
 
 Here is a simple example showing how you might go about implementing a form that
 works for AJAX requests as well as 'normal' form POSTs::

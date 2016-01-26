@@ -116,6 +116,18 @@ class LookupTests(TestCase):
         arts = Article.objects.in_bulk([self.a1.id, self.a2.id])
         self.assertEqual(arts[self.a1.id], self.a1)
         self.assertEqual(arts[self.a2.id], self.a2)
+        self.assertEqual(
+            Article.objects.in_bulk(),
+            {
+                self.a1.id: self.a1,
+                self.a2.id: self.a2,
+                self.a3.id: self.a3,
+                self.a4.id: self.a4,
+                self.a5.id: self.a5,
+                self.a6.id: self.a6,
+                self.a7.id: self.a7,
+            }
+        )
         self.assertEqual(Article.objects.in_bulk([self.a3.id]), {self.a3.id: self.a3})
         self.assertEqual(Article.objects.in_bulk({self.a3.id}), {self.a3.id: self.a3})
         self.assertEqual(Article.objects.in_bulk(frozenset([self.a3.id])), {self.a3.id: self.a3})
@@ -124,13 +136,13 @@ class LookupTests(TestCase):
         self.assertEqual(Article.objects.in_bulk([]), {})
         self.assertEqual(Article.objects.in_bulk(iter([self.a1.id])), {self.a1.id: self.a1})
         self.assertEqual(Article.objects.in_bulk(iter([])), {})
-        self.assertRaises(TypeError, Article.objects.in_bulk)
         self.assertRaises(TypeError, Article.objects.in_bulk, headline__startswith='Blah')
 
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
         # and you can specify which fields you want to retrieve.
-        identity = lambda x: x
+        def identity(x):
+            return x
         self.assertQuerysetEqual(Article.objects.values('headline'),
             [
                 {'headline': 'Article 5'},
@@ -265,7 +277,8 @@ class LookupTests(TestCase):
         # returned as a list of tuples, rather than a list of dictionaries.
         # Within each tuple, the order of the elements is the same as the order
         # of fields in the values_list() call.
-        identity = lambda x: x
+        def identity(x):
+            return x
         self.assertQuerysetEqual(Article.objects.values_list('headline'),
             [
                 ('Article 5',),

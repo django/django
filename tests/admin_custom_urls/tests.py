@@ -4,9 +4,9 @@ import datetime
 
 from django.contrib.admin.utils import quote
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
+from django.urls import reverse
 
 from .models import Action, Car, Person
 

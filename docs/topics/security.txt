@@ -29,7 +29,8 @@ which are particularly dangerous to HTML. While this protects users from most
 malicious input, it is not entirely foolproof. For example, it will not
 protect the following:
 
-.. code-block:: html+django
+.. code-block:: text
+..   highlighting as html+django fails due to intentionally missing quotes.
 
     <style class={{ var }}>...</style>
 

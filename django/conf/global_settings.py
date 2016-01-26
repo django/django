@@ -1,9 +1,15 @@
-# Default Django settings. Override these with settings in the module
-# pointed-to by the DJANGO_SETTINGS_MODULE environment variable.
+# -*- coding: utf-8 -*-
+"""
+Default Django settings. Override these with settings in the module pointed to
+by the DJANGO_SETTINGS_MODULE environment variable.
+"""
+from __future__ import unicode_literals
+
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-gettext_noop = lambda s: s
+def gettext_noop(s):
+    return s
 
 ####################
 # CORE             #
@@ -104,7 +110,7 @@ LANGUAGES = [
     ('mn', gettext_noop('Mongolian')),
     ('mr', gettext_noop('Marathi')),
     ('my', gettext_noop('Burmese')),
-    ('nb', gettext_noop('Norwegian Bokmal')),
+    ('nb', gettext_noop('Norwegian Bokmål')),
     ('ne', gettext_noop('Nepali')),
     ('nl', gettext_noop('Dutch')),
     ('nn', gettext_noop('Norwegian Nynorsk')),

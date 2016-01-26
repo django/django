@@ -555,7 +555,7 @@ class SQLCompiler(object):
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model unless the attribute name
         # of the field is specified.
-        if field.is_relation and path and opts.ordering and name != field.attname:
+        if field.is_relation and opts.ordering and getattr(field, 'attname', None) != name:
             # Firstly, avoid infinite loops.
             if not already_seen:
                 already_seen = set()

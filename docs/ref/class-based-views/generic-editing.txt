@@ -15,7 +15,7 @@ editing content:
     Some of the examples on this page assume that an ``Author`` model has been
     defined as follows in ``myapp/models.py``::
 
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
         from django.db import models
 
         class Author(models.Model):
@@ -25,7 +25,7 @@ editing content:
                 return reverse('author-detail', kwargs={'pk': self.pk})
 
 FormView
---------
+========
 
 .. class:: django.views.generic.edit.FormView
 
@@ -81,7 +81,7 @@ FormView
 
 
 CreateView
-----------
+==========
 
 .. class:: django.views.generic.edit.CreateView
 
@@ -136,7 +136,7 @@ CreateView
         </form>
 
 UpdateView
-----------
+==========
 
 .. class:: django.views.generic.edit.UpdateView
 
@@ -193,7 +193,7 @@ UpdateView
         </form>
 
 DeleteView
-----------
+==========
 
 .. class:: django.views.generic.edit.DeleteView
 
@@ -227,7 +227,7 @@ DeleteView
     **Example myapp/views.py**::
 
         from django.views.generic.edit import DeleteView
-        from django.core.urlresolvers import reverse_lazy
+        from django.urls import reverse_lazy
         from myapp.models import Author
 
         class AuthorDelete(DeleteView):

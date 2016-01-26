@@ -26,11 +26,11 @@ import datetime
 
 from django.contrib.auth.models import User
 from django.core import mail
-from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.test import (
     Client, RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
+from django.urls import reverse_lazy
 
 from .views import get_view, post_view, trace_view
 
@@ -522,7 +522,6 @@ class ClientTest(TestCase):
 
         # Log in
         self.client.force_login(self.u1, backend='test_client.auth_backends.TestClientBackend')
-        self.assertEqual(self.u1.backend, 'test_client.auth_backends.TestClientBackend')
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')
@@ -691,7 +690,8 @@ class CustomTestClientTest(SimpleTestCase):
         self.assertEqual(hasattr(self.client, "i_am_customized"), True)
 
 
-_generic_view = lambda request: HttpResponse(status=200)
+def _generic_view(request):
+    return HttpResponse(status=200)
 
 
 @override_settings(ROOT_URLCONF='test_client.urls')

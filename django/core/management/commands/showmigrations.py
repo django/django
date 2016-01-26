@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = "Shows all available migrations for the current project"
 
     def add_arguments(self, parser):
-        parser.add_argument('app_labels', nargs='*',
+        parser.add_argument('app_label', nargs='*',
             help='App labels of applications to limit the output to.')
         parser.add_argument('--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to synchronize. Defaults to the "default" database.')
@@ -33,7 +33,7 @@ class Command(BaseCommand):
         if options['format'] == "plan":
             return self.show_plan(connection)
         else:
-            return self.show_list(connection, options['app_labels'])
+            return self.show_list(connection, options['app_label'])
 
     def show_list(self, connection, app_names=None):
         """

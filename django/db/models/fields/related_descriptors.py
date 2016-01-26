@@ -300,7 +300,10 @@ class ReverseOneToOneDescriptor(object):
         queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = attrgetter(self.related.field.attname)
-        instance_attr = lambda obj: obj._get_pk_val()
+
+        def instance_attr(obj):
+            return obj._get_pk_val()
+
         instances_dict = {instance_attr(inst): inst for inst in instances}
         query = {'%s__in' % self.related.field.name: instances}
         queryset = queryset.filter(**query)

@@ -84,7 +84,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: ViewDoesNotExist
 
     The :exc:`ViewDoesNotExist` exception is raised by
-    :mod:`django.core.urlresolvers` when a requested view does not exist.
+    :mod:`django.urls` when a requested view does not exist.
 
 ``MiddlewareNotUsed``
 ---------------------
@@ -142,12 +142,18 @@ or model are classified as ``NON_FIELD_ERRORS``. This constant is used
 as a key in dictionaries that otherwise map fields to their respective
 list of errors.
 
-.. currentmodule:: django.core.urlresolvers
+.. currentmodule:: django.urls
 
 URL Resolver exceptions
 =======================
 
-URL Resolver exceptions are defined in ``django.core.urlresolvers``.
+URL Resolver exceptions are defined in ``django.urls``.
+
+.. deprecated:: 1.10
+
+    In older versions, these exceptions are located in
+    ``django.core.urlresolvers``. Importing from the old location will continue
+    to work until Django 2.0.
 
 ``Resolver404``
 ---------------
@@ -155,18 +161,17 @@ URL Resolver exceptions are defined in ``django.core.urlresolvers``.
 .. exception:: Resolver404
 
     The :exc:`Resolver404` exception is raised by
-    :func:`django.core.urlresolvers.resolve()` if the path passed to
-    ``resolve()`` doesn't map to a view. It's a subclass of
-    :class:`django.http.Http404`.
+    :func:`~django.urls.resolve()` if the path passed to ``resolve()`` doesn't
+    map to a view. It's a subclass of :class:`django.http.Http404`.
 
 ``NoReverseMatch``
 ------------------
 
 .. exception:: NoReverseMatch
 
-    The :exc:`NoReverseMatch` exception is raised by
-    :mod:`django.core.urlresolvers` when a matching URL in your URLconf
-    cannot be identified based on the parameters supplied.
+    The :exc:`NoReverseMatch` exception is raised by :mod:`django.urls` when a
+    matching URL in your URLconf cannot be identified based on the parameters
+    supplied.
 
 .. currentmodule:: django.db
 

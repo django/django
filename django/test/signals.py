@@ -120,15 +120,7 @@ def language_changed(**kwargs):
 
 @receiver(setting_changed)
 def file_storage_changed(**kwargs):
-    file_storage_settings = {
-        'DEFAULT_FILE_STORAGE',
-        'FILE_UPLOAD_DIRECTORY_PERMISSIONS',
-        'FILE_UPLOAD_PERMISSIONS',
-        'MEDIA_ROOT',
-        'MEDIA_URL',
-    }
-
-    if kwargs['setting'] in file_storage_settings:
+    if kwargs['setting'] == 'DEFAULT_FILE_STORAGE':
         from django.core.files.storage import default_storage
         default_storage._wrapped = empty
 
@@ -145,7 +137,7 @@ def complex_setting_changed(**kwargs):
 @receiver(setting_changed)
 def root_urlconf_changed(**kwargs):
     if kwargs['setting'] == 'ROOT_URLCONF':
-        from django.core.urlresolvers import clear_url_caches, set_urlconf
+        from django.urls import clear_url_caches, set_urlconf
         clear_url_caches()
         set_urlconf(None)
 

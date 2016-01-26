@@ -6,9 +6,8 @@ import unittest
 from django.conf import settings
 from django.core.checks import Error
 from django.db import connections, models
-from django.test.utils import override_settings
-
-from .base import IsolatedModelsTestCase
+from django.test import SimpleTestCase
+from django.test.utils import isolate_apps, override_settings
 
 
 def get_max_column_name_length():
@@ -31,7 +30,8 @@ def get_max_column_name_length():
     return (allowed_len, db_alias)
 
 
-class IndexTogetherTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class IndexTogetherTests(SimpleTestCase):
 
     def test_non_iterable(self):
         class Model(models.Model):
@@ -146,7 +146,8 @@ class IndexTogetherTests(IsolatedModelsTestCase):
 
 
 # unique_together tests are very similar to index_together tests.
-class UniqueTogetherTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class UniqueTogetherTests(SimpleTestCase):
 
     def test_non_iterable(self):
         class Model(models.Model):
@@ -251,7 +252,8 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class FieldNamesTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class FieldNamesTests(SimpleTestCase):
 
     def test_ending_with_underscore(self):
         class Model(models.Model):
@@ -434,7 +436,8 @@ class FieldNamesTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ShadowingFieldsTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ShadowingFieldsTests(SimpleTestCase):
 
     def test_field_name_clash_with_child_accessor(self):
         class Parent(models.Model):
@@ -558,7 +561,8 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class OtherModelTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class OtherModelTests(SimpleTestCase):
 
     def test_unique_primary_key(self):
         invalid_id = models.IntegerField(primary_key=False)

@@ -1,11 +1,11 @@
 from django.core import checks
 from django.db import models
 from django.test import SimpleTestCase
+from django.test.utils import isolate_apps
 
-from .tests import IsolateModelsMixin
 
-
-class TestDeprecatedField(IsolateModelsMixin, SimpleTestCase):
+@isolate_apps('check_framework')
+class TestDeprecatedField(SimpleTestCase):
     def test_default_details(self):
         class MyField(models.Field):
             system_check_deprecated_details = {}
@@ -45,7 +45,8 @@ class TestDeprecatedField(IsolateModelsMixin, SimpleTestCase):
         ])
 
 
-class TestRemovedField(IsolateModelsMixin, SimpleTestCase):
+@isolate_apps('check_framework')
+class TestRemovedField(SimpleTestCase):
     def test_default_details(self):
         class MyField(models.Field):
             system_check_removed_details = {}

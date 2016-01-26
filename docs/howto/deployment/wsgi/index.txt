@@ -22,7 +22,7 @@ Django includes getting-started documentation for the following WSGI servers:
    uwsgi
 
 The ``application`` object
---------------------------
+==========================
 
 The key concept of deploying with WSGI is the ``application`` callable which
 the application server uses to communicate with your code. It's commonly
@@ -42,7 +42,7 @@ set to ``<project_name>.wsgi.application``, which points to the ``application``
 callable in :file:`<project_name>/wsgi.py`.
 
 Configuring the settings module
--------------------------------
+===============================
 
 When the WSGI server loads your application, Django needs to import the
 settings module — that's where your entire application is defined.
@@ -68,7 +68,7 @@ If this variable isn't set, the default :file:`wsgi.py` sets it to
 
 
 Applying WSGI middleware
-------------------------
+========================
 
 To apply `WSGI middleware`_ you can simply wrap the application object. For
 instance you could add these lines at the bottom of :file:`wsgi.py`::

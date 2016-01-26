@@ -5,7 +5,6 @@ from decimal import Decimal
 
 from django import forms
 from django.conf import settings
-from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
     NestedObjects, display_for_field, flatten, flatten_fieldsets,
@@ -13,7 +12,6 @@ from django.contrib.admin.utils import (
 )
 from django.db import DEFAULT_DB_ALIAS, models
 from django.test import SimpleTestCase, TestCase, override_settings
-from django.utils import six
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 
@@ -113,7 +111,8 @@ class UtilsTests(SimpleTestCase):
             def get_admin_value(self, obj):
                 return ADMIN_METHOD
 
-        simple_function = lambda obj: SIMPLE_FUNCTION
+        def simple_function(obj):
+            return SIMPLE_FUNCTION
 
         site_obj = Site(domain=SITE_NAME)
         article = Article(
@@ -205,12 +204,12 @@ class UtilsTests(SimpleTestCase):
             "title"
         )
         self.assertEqual(
-            label_for_field("title2", Article),
-            "another name"
+            label_for_field("hist", Article),
+            "History"
         )
         self.assertEqual(
-            label_for_field("title2", Article, return_attr=True),
-            ("another name", None)
+            label_for_field("hist", Article, return_attr=True),
+            ("History", None)
         )
 
         self.assertEqual(
@@ -302,31 +301,6 @@ class UtilsTests(SimpleTestCase):
             label_for_field('guest', Event, return_attr=True),
             ('awesome guest', None),
         )
-
-    def test_logentry_unicode(self):
-        """
-        Regression test for #15661
-        """
-        log_entry = admin.models.LogEntry()
-
-        log_entry.action_flag = admin.models.ADDITION
-        self.assertTrue(
-            six.text_type(log_entry).startswith('Added ')
-        )
-
-        log_entry.action_flag = admin.models.CHANGE
-        self.assertTrue(
-            six.text_type(log_entry).startswith('Changed ')
-        )
-
-        log_entry.action_flag = admin.models.DELETION
-        self.assertTrue(
-            six.text_type(log_entry).startswith('Deleted ')
-        )
-
-        # Make sure custom action_flags works
-        log_entry.action_flag = 4
-        self.assertEqual(six.text_type(log_entry), 'LogEntry Object')
 
     def test_safestring_in_field_label(self):
         # safestring should not be escaped

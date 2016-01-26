@@ -48,8 +48,8 @@ The Git repository includes several `branches`_:
 The Git repository also contains `tags`_. These are the exact revisions from
 which packaged Django releases were produced, since version 1.0.
 
-The source code for the `Djangoproject.com <https://www.djangoproject.com/>`_ web
-site can be found at `github.com/django/djangoproject.com
+The source code for the `Djangoproject.com <https://www.djangoproject.com/>`_
+website can be found at `github.com/django/djangoproject.com
 <https://github.com/django/djangoproject.com>`_.
 
 .. _Git: http://git-scm.com/

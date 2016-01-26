@@ -141,7 +141,8 @@ class FlatpageTemplateTagTests(TestCase):
 
     def test_parsing_errors(self):
         "There are various ways that the flatpages template tag won't parse"
-        render = lambda t: Template(t).render(Context())
+        def render(t):
+            return Template(t).render(Context())
 
         self.assertRaises(TemplateSyntaxError, render,
                           "{% load flatpages %}{% get_flatpages %}")

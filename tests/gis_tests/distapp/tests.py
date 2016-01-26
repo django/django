@@ -444,6 +444,8 @@ Distance_Sphere(geom1, geom2)                 |    N/A             |   OK (meter
 
 Distance_Spheroid(geom1, geom2, spheroid)     |    N/A             |   OK (meters)    |    N/A
 
+ST_Perimeter(geom1)                           |    OK              |   :-( (degrees)  |    OK
+
 
 ================================
 Distance functions on Spatialite
@@ -456,6 +458,8 @@ ST_Distance(geom1, geom2)                       |    OK (meters)     |      N/A
 ST_Distance(geom1, geom2, use_ellipsoid=True)   |    N/A             |      OK (meters)
 
 ST_Distance(geom1, geom2, use_ellipsoid=False)  |    N/A             |      OK (meters), less accurate, quick
+
+Perimeter(geom1)                                |    OK              |      :-( (degrees)
 
 '''  # NOQA
 
@@ -687,6 +691,20 @@ class DistanceFunctionsTests(TestCase):
         qs = SouthTexasCity.objects.annotate(perim=Perimeter('point'))
         for city in qs:
             self.assertEqual(0, city.perim.m)
+
+    @skipUnlessDBFeature("has_Perimeter_function")
+    def test_perimeter_geodetic(self):
+        # Currently only Oracle supports calculating the perimeter on geodetic
+        # geometries (without being transformed).
+        qs1 = CensusZipcode.objects.annotate(perim=Perimeter('poly'))
+        if connection.features.supports_perimeter_geodetic:
+            self.assertAlmostEqual(qs1[0].perim.m, 18406.3818954314, 3)
+        else:
+            with self.assertRaises(NotImplementedError):
+                list(qs1)
+        # But should work fine when transformed to projected coordinates
+        qs2 = CensusZipcode.objects.annotate(perim=Perimeter(Transform('poly', 32140))).filter(name='77002')
+        self.assertAlmostEqual(qs2[0].perim.m, 18404.355, 3)
 
     @skipUnlessDBFeature("supports_null_geometries", "has_Area_function", "has_Distance_function")
     def test_measurement_null_fields(self):

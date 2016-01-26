@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ian Y. Choi <ianyrchoi@gmail.com>, 2015
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeong Seongtae <magno79@gmail.com>, 2014
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-12-06 04:31+0000\n"
+"Last-Translator: Ian Y. Choi <ianyrchoi@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,7 +37,7 @@ msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"이 문자열은 문자, 수자, 점, 언더스코어, 대쉬, 슬래쉬, 틸드만 사용해야 합니다."
+"이 문자열은 문자, 숫자, 점, 언더스코어, 대쉬, 슬래쉬, 틸드만 사용해야 합니다."
 
 msgid "URL is missing a leading slash."
 msgstr "URL 맨 앞의 슬래시가 없습니다."
@@ -74,7 +75,7 @@ msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "체크할 경우, 로그인 사용자만 해당 페이지를 볼 수 있습니다."
 
 msgid "sites"
-msgstr ""
+msgstr "사이트"
 
 msgid "flat page"
 msgstr "플랫 페이지"

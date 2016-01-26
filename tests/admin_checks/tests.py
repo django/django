@@ -54,6 +54,44 @@ class SystemChecksTestCase(SimpleTestCase):
             admin.site.unregister(Song)
             admin.sites.system_check_errors = []
 
+    @override_settings(INSTALLED_APPS=['django.contrib.admin'])
+    def test_contenttypes_dependency(self):
+        errors = admin.checks.check_dependencies()
+        expected = [
+            checks.Error(
+                "'django.contrib.contenttypes' must be in "
+                "INSTALLED_APPS in order to use the admin application.",
+                id="admin.E401",
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    @override_settings(
+        INSTALLED_APPS=[
+            'django.contrib.admin',
+            'django.contrib.auth',
+            'django.contrib.contenttypes',
+        ],
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [],
+            },
+        }],
+    )
+    def test_auth_contextprocessor_dependency(self):
+        errors = admin.checks.check_dependencies()
+        expected = [
+            checks.Error(
+                "'django.contrib.auth.context_processors.auth' must be in "
+                "TEMPLATES in order to use the admin application.",
+                id="admin.E402",
+            )
+        ]
+        self.assertEqual(errors, expected)
+
     @override_settings(DEBUG=True)
     def test_custom_adminsite(self):
         class CustomAdminSite(admin.AdminSite):

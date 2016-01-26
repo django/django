@@ -11,7 +11,6 @@ from io import BytesIO
 
 from django.apps import apps
 from django.conf import settings
-from django.core import urlresolvers
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8, WSGIRequest
 from django.core.signals import (
@@ -22,6 +21,7 @@ from django.http import HttpRequest, QueryDict, SimpleCookie
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.test.utils import ContextList
+from django.urls import resolve
 from django.utils import six
 from django.utils.encoding import force_bytes, force_str, uri_to_iri
 from django.utils.functional import SimpleLazyObject, curry
@@ -146,7 +146,9 @@ def store_rendered_templates(store, signal, sender, template, context, **kwargs)
     of rendering.
     """
     store.setdefault('templates', []).append(template)
-    store.setdefault('context', ContextList()).append(copy(context))
+    if 'context' not in store:
+        store['context'] = ContextList()
+    store['context'].append(copy(context))
 
 
 def encode_multipart(boundary, data):
@@ -158,10 +160,13 @@ def encode_multipart(boundary, data):
     as an application/octet-stream; otherwise, str(value) will be sent.
     """
     lines = []
-    to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
+
+    def to_bytes(s):
+        return force_bytes(s, settings.DEFAULT_CHARSET)
 
     # Not by any means perfect, but good enough for our purposes.
-    is_file = lambda thing: hasattr(thing, "read") and callable(thing.read)
+    def is_file(thing):
+        return hasattr(thing, "read") and callable(thing.read)
 
     # Each bit of the multipart form data could be either a form value or a
     # file, or a *list* of form values and/or files. Remember that HTTP field
@@ -196,7 +201,8 @@ def encode_multipart(boundary, data):
 
 
 def encode_file(boundary, key, file):
-    to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
+    def to_bytes(s):
+        return force_bytes(s, settings.DEFAULT_CHARSET)
     filename = os.path.basename(file.name) if hasattr(file, 'name') else ''
     if hasattr(file, 'content_type'):
         content_type = file.content_type
@@ -477,8 +483,7 @@ class Client(RequestFactory):
             response.json = curry(self._parse_json, response)
 
             # Attach the ResolverMatch instance to the response
-            response.resolver_match = SimpleLazyObject(
-                lambda: urlresolvers.resolve(request['PATH_INFO']))
+            response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
 
             # Flatten a single context. Not really necessary anymore thanks to
             # the __getattr__ flattening in ContextList, but has some edge-case
@@ -602,12 +607,9 @@ class Client(RequestFactory):
             return False
 
     def force_login(self, user, backend=None):
-        if backend is None:
-            backend = settings.AUTHENTICATION_BACKENDS[0]
-        user.backend = backend
-        self._login(user)
+        self._login(user, backend)
 
-    def _login(self, user):
+    def _login(self, user, backend=None):
         from django.contrib.auth import login
         engine = import_module(settings.SESSION_ENGINE)
 
@@ -618,7 +620,7 @@ class Client(RequestFactory):
             request.session = self.session
         else:
             request.session = engine.SessionStore()
-        login(request, user)
+        login(request, user, backend)
 
         # Save the session values.
         request.session.save()

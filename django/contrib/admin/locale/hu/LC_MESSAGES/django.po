@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ádám Krizsány <krizsany1302@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János Péter Ronkay <transifex2@hangya.net>, 2014
 # Kristóf Gruber <>, 2012
@@ -11,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-12-10 16:29+0000\n"
+"Last-Translator: Ádám Krizsány <krizsany1302@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -81,10 +82,10 @@ msgid "action time"
 msgstr "művelet időpontja"
 
 msgid "user"
-msgstr ""
+msgstr "felhasználó"
 
 msgid "content type"
-msgstr ""
+msgstr "tartalom típusa"
 
 msgid "object id"
 msgstr "objektum id"
@@ -125,9 +126,11 @@ msgstr "Egyik sem"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Tartsa lenyomva a \"Control\"-t, vagy Mac-en a \"Command\"-ot több elem "
+"kiválasztásához."
 
 msgid "Added."
-msgstr ""
+msgstr "Hozzáadva."
 
 #, python-format
 msgid "Changed %s."
@@ -320,7 +323,7 @@ msgid "Please correct the error below."
 msgstr "Kérem, javítsa az alábbi hibákat."
 
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Kérem javítsa ki a lenti hibákat."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -450,7 +453,7 @@ msgid " By %(filter_title)s "
 msgstr " %(filter_title)s szerint "
 
 msgid "Summary"
-msgstr ""
+msgstr "Összegzés"
 
 #, python-format
 msgid "Models in the %(name)s application"

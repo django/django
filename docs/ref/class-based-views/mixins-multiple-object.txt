@@ -3,7 +3,7 @@ Multiple object mixins
 ======================
 
 MultipleObjectMixin
--------------------
+===================
 
 .. class:: django.views.generic.list.MultipleObjectMixin
 
@@ -193,7 +193,7 @@ MultipleObjectMixin
 
 
 MultipleObjectTemplateResponseMixin
------------------------------------
+===================================
 
 .. class:: django.views.generic.list.MultipleObjectTemplateResponseMixin
 

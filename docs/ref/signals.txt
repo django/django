@@ -389,7 +389,7 @@ Arguments sent with this signal:
 
 ``verbosity``
     Indicates how much information manage.py is printing on screen. See
-    the :djadminopt:`--verbosity` flag for details.
+    the :option:`--verbosity` flag for details.
 
     Functions which listen for :data:`pre_migrate` should adjust what they
     output to the screen based on the value of this argument.
@@ -430,7 +430,7 @@ Arguments sent with this signal:
 
 ``verbosity``
     Indicates how much information manage.py is printing on screen. See
-    the :djadminopt:`--verbosity` flag for details.
+    the :option:`--verbosity` flag for details.
 
     Functions which listen for :data:`post_migrate` should adjust what they
     output to the screen based on the value of this argument.

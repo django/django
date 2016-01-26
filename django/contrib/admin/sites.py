@@ -5,11 +5,10 @@ from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponseRedirect
-from django.template.engine import Engine
 from django.template.response import TemplateResponse
+from django.urls import NoReverseMatch, reverse
 from django.utils import six
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _, ugettext_lazy
@@ -172,40 +171,6 @@ class AdminSite(object):
         """
         return request.user.is_active and request.user.is_staff
 
-    def check_dependencies(self):
-        """
-        Check that all things needed to run the admin have been correctly installed.
-
-        The default implementation checks that admin and contenttypes apps are
-        installed, as well as the auth context processor.
-        """
-        if not apps.is_installed('django.contrib.admin'):
-            raise ImproperlyConfigured(
-                "Put 'django.contrib.admin' in your INSTALLED_APPS "
-                "setting in order to use the admin application.")
-        if not apps.is_installed('django.contrib.contenttypes'):
-            raise ImproperlyConfigured(
-                "Put 'django.contrib.contenttypes' in your INSTALLED_APPS "
-                "setting in order to use the admin application.")
-        try:
-            default_template_engine = Engine.get_default()
-        except Exception:
-            # Skip this non-critical check:
-            # 1. if the user has a non-trivial TEMPLATES setting and Django
-            #    can't find a default template engine
-            # 2. if anything goes wrong while loading template engines, in
-            #    order to avoid raising an exception from a confusing location
-            # Catching ImproperlyConfigured suffices for 1. but 2. requires
-            # catching all exceptions.
-            pass
-        else:
-            if ('django.contrib.auth.context_processors.auth'
-                    not in default_template_engine.context_processors):
-                raise ImproperlyConfigured(
-                    "Enable 'django.contrib.auth.context_processors.auth' "
-                    "in your TEMPLATES setting in order to use the admin "
-                    "application.")
-
     def admin_view(self, view, cacheable=False):
         """
         Decorator to create an admin view attached to this ``AdminSite``. This
@@ -256,9 +221,6 @@ class AdminSite(object):
         # it cannot import models from other applications at the module level,
         # and django.contrib.contenttypes.views imports ContentType.
         from django.contrib.contenttypes import views as contenttype_views
-
-        if settings.DEBUG:
-            self.check_dependencies()
 
         def wrap(view, cacheable=False):
             def wrapper(*args, **kwargs):
@@ -372,7 +334,13 @@ class AdminSite(object):
         """
         from django.contrib.auth.views import logout
         defaults = {
-            'extra_context': dict(self.each_context(request), **(extra_context or {})),
+            'extra_context': dict(
+                self.each_context(request),
+                # Since the user isn't logged out at this point, the value of
+                # has_permission must be overridden.
+                has_permission=False,
+                **(extra_context or {})
+            ),
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
