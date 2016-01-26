@@ -13,11 +13,10 @@ from django.contrib.admin import helpers, widgets
 from django.contrib.admin.checks import (
     BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
 )
-from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
-    NestedObjects, flatten_fieldsets, get_deleted_objects,
-    lookup_needs_distinct, model_format_dict, quote, unquote,
+    NestedObjects, flatten_fieldsets, lookup_needs_distinct, model_format_dict,
+    quote, unquote,
 )
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import (
@@ -1569,69 +1568,9 @@ class ModelAdmin(BaseModelAdmin):
     @csrf_protect_m
     @transaction.atomic
     def delete_view(self, request, object_id, extra_context=None):
-        "The 'delete' admin view for this model."
-        opts = self.model._meta
-        app_label = opts.app_label
-
-        to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
-        if to_field and not self.to_field_allowed(request, to_field):
-            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
-
-        obj = self.get_object(request, unquote(object_id), to_field)
-
-        if not self.has_delete_permission(request, obj):
-            raise PermissionDenied
-
-        if obj is None:
-            raise Http404(
-                _('%(name)s object with primary key %(key)r does not exist.') %
-                {'name': force_text(opts.verbose_name), 'key': escape(object_id)}
-            )
-
-        using = router.db_for_write(self.model)
-
-        # Populate deleted_objects, a data structure of all related objects that
-        # will also be deleted.
-        (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-            [obj], opts, request.user, self.admin_site, using)
-
-        if request.POST:  # The user has already confirmed the deletion.
-            if perms_needed:
-                raise PermissionDenied
-            obj_display = force_text(obj)
-            attr = str(to_field) if to_field else opts.pk.attname
-            obj_id = obj.serializable_value(attr)
-            self.log_deletion(request, obj, obj_display)
-            self.delete_model(request, obj)
-
-            return self.response_delete(request, obj_display, obj_id)
-
-        object_name = force_text(opts.verbose_name)
-
-        if perms_needed or protected:
-            title = _("Cannot delete %(name)s") % {"name": object_name}
-        else:
-            title = _("Are you sure?")
-
-        context = dict(
-            self.admin_site.each_context(request),
-            title=title,
-            object_name=object_name,
-            object=obj,
-            deleted_objects=deleted_objects,
-            model_count=dict(model_count).items(),
-            perms_lacking=perms_needed,
-            protected=protected,
-            opts=opts,
-            app_label=app_label,
-            preserved_filters=self.get_preserved_filters(request),
-            is_popup=(IS_POPUP_VAR in request.POST or
-                      IS_POPUP_VAR in request.GET),
-            to_field=to_field,
-        )
-        context.update(extra_context or {})
-
-        return self.render_delete_form(request, context)
+        from django.contrib.admin.views.options import DeleteView
+        return DeleteView.as_view(
+            admin=self, object_id=object_id, extra_context=extra_context)(request)
 
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
