@@ -4,12 +4,14 @@ import os
 import sys
 import tempfile
 import unittest
+import warnings
 
 from django.apps import apps
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import CommandError
+from django.core.management.commands.dumpdata import ProxyModelWarning
 from django.core.serializers.base import ProgressBar
 from django.db import IntegrityError, connection
 from django.test import (
@@ -18,7 +20,7 @@ from django.test import (
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .models import Article, Spy, Tag, Visa
+from .models import Article, ProxySpy, Spy, Tag, Visa
 
 
 class TestCaseFixtureLoadingTests(TestCase):
@@ -475,6 +477,38 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             new_io.isatty = lambda: True
             management.call_command('dumpdata', 'fixtures', **options)
             self.assertEqual(new_io.getvalue(), '')
+
+    def test_dumpdata_proxy_without_concrete(self):
+        """
+        A warning is displayed if a proxy model is dumped without its concrete
+        parent.
+        """
+        ProxySpy.objects.create(name='Paul')
+
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter('always')
+            self._dumpdata_assert(['fixtures.ProxySpy'], '[]')
+        warning = warning_list.pop()
+        self.assertEqual(warning.category, ProxyModelWarning)
+        self.assertEqual(
+            str(warning.message),
+            "fixtures.ProxySpy is a proxy model and won't be serialized."
+        )
+
+    def test_dumpdata_proxy_with_concrete(self):
+        """
+        A warning isn't displayed if a proxy model is dumped with its concrete
+        parent.
+        """
+        spy = ProxySpy.objects.create(name='Paul')
+
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter('always')
+            self._dumpdata_assert(
+                ['fixtures.ProxySpy', 'fixtures.Spy'],
+                '[{"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": false}}]' % spy.pk
+            )
+        self.assertEqual(len(warning_list), 0)
 
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification

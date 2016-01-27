@@ -245,6 +245,9 @@ Management Commands
 * The new :option:`shell --command` option lets you run a command as Django and
   exit, instead of opening the interactive shell.
 
+* Added a warning to :djadmin:`dumpdata` if a proxy model is specified (which
+  results in no output) without its concrete parent.
+
 Migrations
 ~~~~~~~~~~
 
