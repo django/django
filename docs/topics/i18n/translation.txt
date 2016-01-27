@@ -988,7 +988,7 @@ You hook it up like this::
     }
 
     urlpatterns = [
-        url(r'^jsi18n/$', javascript_catalog, js_info_dict),
+        url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
     ]
 
 Each string in ``packages`` should be in Python dotted-package syntax (the
@@ -1008,7 +1008,7 @@ changed by altering the ``domain`` argument.
 You can make the view dynamic by putting the packages into the URL pattern::
 
     urlpatterns = [
-        url(r'^jsi18n/(?P<packages>\S+?)/$', javascript_catalog),
+        url(r'^jsi18n/(?P<packages>\S+?)/$', javascript_catalog, name='javascript-catalog'),
     ]
 
 With this, you specify the packages as a list of package names delimited by '+'
@@ -1058,7 +1058,7 @@ To use the catalog, just pull in the dynamically generated script like this:
 
 .. code-block:: html+django
 
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 
 This uses reverse URL lookup to find the URL of the JavaScript catalog view.
 When the catalog is loaded, your JavaScript code can use the following methods:
