@@ -921,6 +921,12 @@ extra forms displayed.
     >>> [x.name for x in formset.get_queryset()]
     ['Charles Baudelaire', 'Paul Verlaine', 'Walt Whitman']
 
+Also, ``extra=0`` doesn't prevent creation of new model instances as you can
+:ref:`add additional forms with JavaScript <understanding-the-managementform>`
+or just send additional POST data. Formsets `don't yet provide functionality
+<https://code.djangoproject.com/ticket/26142>`_ for an "edit only" view that
+prevents creation of new instances.
+
 If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``::
