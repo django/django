@@ -65,6 +65,11 @@ class BaseFormSet(object):
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
+        if not self.can_create:
+            self.max_num = len(self.initial) if self.initial else 0
+            self.min_num = self.max_num
+            self.validate_min = self.validate_max = True
+            self.extra = 0
 
     def __str__(self):
         return self.as_table()
