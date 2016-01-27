@@ -34,3 +34,6 @@ Bugfixes
 
 * Fixed a regression in Django 1.8.5 that broke copying a ``SimpleLazyObject``
   with ``copy.copy()`` (:ticket:`26122`).
+
+* Fixed the ``contrib.gis`` map widgets when using
+  ``USE_THOUSAND_SEPARATOR=True`` (:ticket:`20415`).

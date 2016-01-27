@@ -2,7 +2,7 @@ from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.forms import ValidationError
-from django.test import SimpleTestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 from django.utils import six
 from django.utils.html import escape
 
@@ -154,6 +154,7 @@ class SpecializedFieldTest(SimpleTestCase):
         self.assertTrue(form_instance.is_valid())
         rendered = form_instance.as_p()
         self.assertIn('new MapWidget(options);', rendered)
+        self.assertIn('map_srid: 4326,', rendered)
         self.assertIn('gis/js/OLMapWidget.js', str(form_instance.media))
 
     def assertTextarea(self, geom, rendered):
@@ -163,6 +164,8 @@ class SpecializedFieldTest(SimpleTestCase):
         self.assertIn('required', rendered)
         self.assertIn(geom.wkt, rendered)
 
+    # map_srid in operlayers.html template must not be localized.
+    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_pointfield(self):
         class PointForm(forms.Form):
             p = forms.PointField()
