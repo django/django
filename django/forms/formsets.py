@@ -425,8 +425,8 @@ class BaseFormSet(object):
 
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
-                    can_delete=False, max_num=None, validate_max=False,
-                    min_num=None, validate_min=False):
+                    can_delete=False, can_create=True, max_num=None,
+                    validate_max=False, min_num=None, validate_min=False):
     """Return a FormSet for the given form class."""
     if min_num is None:
         min_num = DEFAULT_MIN_NUM
@@ -438,6 +438,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     absolute_max = max_num + DEFAULT_MAX_NUM
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
+             'can_create': can_create,
              'min_num': min_num, 'max_num': max_num,
              'absolute_max': absolute_max, 'validate_min': validate_min,
              'validate_max': validate_max}
