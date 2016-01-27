@@ -1,3 +1,4 @@
+import warnings
 from collections import OrderedDict
 
 from django.apps import apps
@@ -135,6 +136,11 @@ class Command(BaseCommand):
             for model in serializers.sort_dependencies(app_list.items()):
                 if model in excluded_models:
                     continue
+                if model._meta.proxy:
+                    warnings.warn(
+                        "%s is a Proxy model. It won't be serialized." %
+                        model.__name__,
+                        category=RuntimeWarning)
                 if not model._meta.proxy and router.allow_migrate_model(using, model):
                     if use_base_manager:
                         objects = model._base_manager

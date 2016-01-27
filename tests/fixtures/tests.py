@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import unittest
+import warnings
 
 from django.apps import apps
 from django.contrib.sites.models import Site
@@ -18,7 +19,7 @@ from django.test import (
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .models import Article, Spy, Tag, Visa
+from .models import Article, ProxySpy, Spy, Tag, Visa
 
 
 class TestCaseFixtureLoadingTests(TestCase):
@@ -480,6 +481,21 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             new_io.isatty = lambda: True
             management.call_command('dumpdata', 'fixtures', **options)
             self.assertEqual(new_io.getvalue(), '')
+
+    def test_dumpdata_proxy(self):
+        ProxySpy.objects.create(name='Paul')
+
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter("always")
+            self._dumpdata_assert(
+                ['fixtures.ProxySpy'],
+                '[]'
+            )
+            warning = warning_list.pop()
+            self.assertEqual(warning.category, RuntimeWarning)
+            self.assertEqual(
+                str(warning.message),
+                "ProxySpy is a Proxy model. It won't be serialized.")
 
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
