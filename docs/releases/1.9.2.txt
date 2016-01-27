@@ -88,3 +88,6 @@ Bugfixes
 
 * Always included ``geometry_field`` in the GeoJSON serializer output regardless
   of the ``fields`` parameter (:ticket:`26138`).
+
+* Fixed the ``contrib.gis`` map widgets when using
+  ``USE_THOUSAND_SEPARATOR=True`` (:ticket:`20415`).
