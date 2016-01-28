@@ -177,6 +177,8 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
         For most fields, this will simply be data; FileFields need to handle it
         a bit differently.
         """
+        if self.disabled:
+            return initial
         return data
 
     def widget_attrs(self, widget):
