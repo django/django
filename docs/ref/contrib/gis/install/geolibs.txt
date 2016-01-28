@@ -13,7 +13,7 @@ Program                   Description                           Required        
 :doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes (SQLite only)                 2.0, 1.11, 1.10, 1.9, 1.8, 1.7
 :doc:`GeoIP <../geoip>`   IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.1, 2.0
-`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.1, 4.0, 3.0, 2.4
+`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.3, 4.2, 4.1, 4.0, 3.0, 2.4
 ========================  ====================================  ================================  ============================
 
 Note that older or more recent versions of these libraries *may* also work
@@ -35,6 +35,8 @@ totally fine with GeoDjango. Your mileage may vary.
     Spatialite 3.0.0 2011-12-30
     Spatialite 4.0.0 2012-11-25
     Spatialite 4.1.0 2013-06-04
+    Spatialite 4.2.0 2014-07-25
+    Spatialite 4.3.0 2015-09-07
 
 .. admonition::  Install GDAL
 

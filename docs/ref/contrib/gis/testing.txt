@@ -3,7 +3,7 @@ Testing GeoDjango apps
 ======================
 
 Included in this documentation are some additional notes and settings
-for :ref:`testing-postgis` and :ref:`testing-spatialite` users.
+for :ref:`testing-postgis` users.
 
 .. _testing-postgis:
 
@@ -78,16 +78,6 @@ a simple way to add superuser privileges to your database user.
 
 By default, the PostGIS installer on Windows includes a template
 spatial database entitled ``template_postgis``.
-
-.. _testing-spatialite:
-
-SpatiaLite
-==========
-
-Make sure the necessary spatial tables are created in your test spatial
-database, as described in :ref:`create_spatialite_db`. Then just do this::
-
-    $ python manage.py test
 
 .. _geodjango-tests:
 
