@@ -93,31 +93,19 @@ class ProxyModelTests(TestCase):
         LowerStatusPerson.objects.create(status="low", name="homer")
         max_id = Person.objects.aggregate(max_id=models.Max('id'))['max_id']
 
-        self.assertRaises(
-            Person.DoesNotExist,
-            MyPersonProxy.objects.get,
-            name='Zathras'
-        )
-        self.assertRaises(
-            Person.MultipleObjectsReturned,
-            MyPersonProxy.objects.get,
-            id__lt=max_id + 1
-        )
-        self.assertRaises(
-            Person.DoesNotExist,
-            StatusPerson.objects.get,
-            name='Zathras'
-        )
+        with self.assertRaises(Person.DoesNotExist):
+            MyPersonProxy.objects.get(name='Zathras')
+        with self.assertRaises(Person.MultipleObjectsReturned):
+            MyPersonProxy.objects.get(id__lt=max_id + 1)
+        with self.assertRaises(Person.DoesNotExist):
+            StatusPerson.objects.get(name='Zathras')
 
         StatusPerson.objects.create(name='Bazza Jr.')
         StatusPerson.objects.create(name='Foo Jr.')
         max_id = Person.objects.aggregate(max_id=models.Max('id'))['max_id']
 
-        self.assertRaises(
-            Person.MultipleObjectsReturned,
-            StatusPerson.objects.get,
-            id__lt=max_id + 1
-        )
+        with self.assertRaises(Person.MultipleObjectsReturned):
+            StatusPerson.objects.get(id__lt=max_id + 1)
 
     def test_abc(self):
         """
@@ -127,7 +115,8 @@ class ProxyModelTests(TestCase):
             class NoAbstract(Abstract):
                 class Meta:
                     proxy = True
-        self.assertRaises(TypeError, build_abc)
+        with self.assertRaises(TypeError):
+            build_abc()
 
     @isolate_apps('proxy_models')
     def test_no_cbc(self):
@@ -138,7 +127,8 @@ class ProxyModelTests(TestCase):
             class TooManyBases(Person, Abstract):
                 class Meta:
                     proxy = True
-        self.assertRaises(TypeError, build_no_cbc)
+        with self.assertRaises(TypeError):
+            build_no_cbc()
 
     @isolate_apps('proxy_models')
     def test_no_base_classes(self):
@@ -146,7 +136,8 @@ class ProxyModelTests(TestCase):
             class NoBaseClasses(models.Model):
                 class Meta:
                     proxy = True
-        self.assertRaises(TypeError, build_no_base_classes)
+        with self.assertRaises(TypeError):
+            build_no_base_classes()
 
     @isolate_apps('proxy_models')
     def test_new_fields(self):

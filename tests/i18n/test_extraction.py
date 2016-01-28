@@ -762,8 +762,10 @@ class CustomLayoutExtractionTests(ExtractorTests):
 
     def test_no_locale_raises(self):
         os.chdir(self.test_dir)
-        with six.assertRaisesRegex(self, management.CommandError,
-                "Unable to find a locale path to store translations for file"):
+        with self.assertRaisesMessage(
+            management.CommandError,
+            "Unable to find a locale path to store translations for file"
+        ):
             management.call_command('makemessages', locale=LOCALE, verbosity=0)
 
     @override_settings(

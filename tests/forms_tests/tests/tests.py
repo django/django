@@ -251,7 +251,8 @@ class RelatedModelFormTests(SimpleTestCase):
             model = A
             fields = '__all__'
 
-        self.assertRaises(ValueError, ModelFormMetaclass, str('Form'), (ModelForm,), {'Meta': Meta})
+        with self.assertRaises(ValueError):
+            ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta})
 
         class B(models.Model):
             pass

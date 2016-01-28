@@ -201,9 +201,11 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading data of an unknown format should fail
         Validate that error conditions are caught correctly
         """
-        with six.assertRaisesRegex(self, management.CommandError,
-                "Problem installing fixture 'bad_fixture1': "
-                "unkn is not a known serialization format."):
+        msg = (
+            "Problem installing fixture 'bad_fixture1': "
+            "unkn is not a known serialization format."
+        )
+        with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command(
                 'loaddata',
                 'bad_fixture1.unkn',
@@ -216,8 +218,7 @@ class TestFixtures(TestCase):
         """
         Test that failing serializer import raises the proper error
         """
-        with six.assertRaisesRegex(self, ImportError,
-                r"No module named.*unexistent"):
+        with six.assertRaisesRegex(self, ImportError, r"No module named.*unexistent"):
             management.call_command(
                 'loaddata',
                 'bad_fixture1.unkn',
@@ -460,8 +461,7 @@ class TestFixtures(TestCase):
         """
         Regression for #3615 - Ensure data with nonexistent child key references raises error
         """
-        with six.assertRaisesRegex(self, IntegrityError,
-                "Problem installing fixture"):
+        with self.assertRaisesMessage(IntegrityError, "Problem installing fixture"):
             management.call_command(
                 'loaddata',
                 'forward_ref_bad_data.json',
@@ -489,9 +489,11 @@ class TestFixtures(TestCase):
         """
         Regression for #7043 - Error is quickly reported when no fixtures is provided in the command line.
         """
-        with six.assertRaisesRegex(self, management.CommandError,
-                "No database fixture specified. Please provide the path of "
-                "at least one fixture in the command line."):
+        msg = (
+            "No database fixture specified. Please provide the path of "
+            "at least one fixture in the command line."
+        )
+        with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command(
                 'loaddata',
                 verbosity=0,
@@ -537,14 +539,8 @@ class TestFixtures(TestCase):
         settings.FIXTURE_DIRS cannot contain duplicates in order to avoid
         repeated fixture loading.
         """
-        self.assertRaisesMessage(
-            ImproperlyConfigured,
-            "settings.FIXTURE_DIRS contains duplicates.",
-            management.call_command,
-            'loaddata',
-            'absolute.json',
-            verbosity=0,
-        )
+        with self.assertRaisesMessage(ImproperlyConfigured, "settings.FIXTURE_DIRS contains duplicates."):
+            management.call_command('loaddata', 'absolute.json', verbosity=0)
 
     @skipIfNonASCIIPath
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures')])
@@ -553,16 +549,13 @@ class TestFixtures(TestCase):
         settings.FIXTURE_DIRS cannot contain a default fixtures directory
         for application (app/fixtures) in order to avoid repeated fixture loading.
         """
-        self.assertRaisesMessage(
-            ImproperlyConfigured,
+        msg = (
             "'%s' is a default fixture directory for the '%s' app "
             "and cannot be listed in settings.FIXTURE_DIRS."
-            % (os.path.join(_cur_dir, 'fixtures'), 'fixtures_regress'),
-            management.call_command,
-            'loaddata',
-            'absolute.json',
-            verbosity=0,
+            % (os.path.join(_cur_dir, 'fixtures'), 'fixtures_regress')
         )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            management.call_command('loaddata', 'absolute.json', verbosity=0)
 
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
                                      os.path.join(_cur_dir, 'fixtures_2')])
@@ -734,41 +727,40 @@ class NaturalKeyFixtureTests(TestCase):
         )
 
     def test_dependency_sorting_tight_circular(self):
-        self.assertRaisesMessage(
-            RuntimeError,
+        msg = (
             "Can't resolve dependencies for fixtures_regress.Circle1, "
-            "fixtures_regress.Circle2 in serialized app list.",
-            serializers.sort_dependencies,
-            [('fixtures_regress', [Person, Circle2, Circle1, Store, Book])],
+            "fixtures_regress.Circle2 in serialized app list."
         )
+        with self.assertRaisesMessage(RuntimeError, msg):
+            serializers.sort_dependencies([('fixtures_regress', [Person, Circle2, Circle1, Store, Book])])
 
     def test_dependency_sorting_tight_circular_2(self):
-        self.assertRaisesMessage(
-            RuntimeError,
+        msg = (
             "Can't resolve dependencies for fixtures_regress.Circle1, "
-            "fixtures_regress.Circle2 in serialized app list.",
-            serializers.sort_dependencies,
-            [('fixtures_regress', [Circle1, Book, Circle2])],
+            "fixtures_regress.Circle2 in serialized app list."
         )
+        with self.assertRaisesMessage(RuntimeError, msg):
+            serializers.sort_dependencies([('fixtures_regress', [Circle1, Book, Circle2])])
 
     def test_dependency_self_referential(self):
-        self.assertRaisesMessage(
-            RuntimeError,
+        msg = (
             "Can't resolve dependencies for fixtures_regress.Circle3 in "
-            "serialized app list.",
-            serializers.sort_dependencies,
-            [('fixtures_regress', [Book, Circle3])],
+            "serialized app list."
         )
+        with self.assertRaisesMessage(RuntimeError, msg):
+            serializers.sort_dependencies([('fixtures_regress', [Book, Circle3])])
 
     def test_dependency_sorting_long(self):
-        self.assertRaisesMessage(
-            RuntimeError,
+        msg = (
             "Can't resolve dependencies for fixtures_regress.Circle1, "
             "fixtures_regress.Circle2, fixtures_regress.Circle3 in serialized "
-            "app list.",
-            serializers.sort_dependencies,
-            [('fixtures_regress', [Person, Circle2, Circle1, Circle3, Store, Book])],
+            "app list."
         )
+        with self.assertRaisesMessage(RuntimeError, msg):
+            serializers.sort_dependencies([(
+                'fixtures_regress',
+                [Person, Circle2, Circle1, Circle3, Store, Book]
+            )])
 
     def test_dependency_sorting_normal(self):
         sorted_deps = serializers.sort_dependencies(
@@ -830,13 +822,15 @@ class M2MNaturalKeyFixtureTests(TestCase):
         Resolving circular M2M relations without explicit through models should
         fail loudly
         """
-        self.assertRaisesMessage(
-            RuntimeError,
+        msg = (
             "Can't resolve dependencies for fixtures_regress.M2MSimpleCircularA, "
-            "fixtures_regress.M2MSimpleCircularB in serialized app list.",
-            serializers.sort_dependencies,
-            [('fixtures_regress', [M2MSimpleCircularA, M2MSimpleCircularB])]
+            "fixtures_regress.M2MSimpleCircularB in serialized app list."
         )
+        with self.assertRaisesMessage(RuntimeError, msg):
+            serializers.sort_dependencies([(
+                'fixtures_regress',
+                [M2MSimpleCircularA, M2MSimpleCircularB]
+            )])
 
     def test_dependency_sorting_m2m_complex(self):
         """

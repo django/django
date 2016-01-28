@@ -12,7 +12,6 @@ from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.utils import six
 from django.utils.translation import ugettext_lazy
 
 from .models import Article, ArticleSelectOnSave, SelfRef
@@ -70,16 +69,16 @@ class ModelInstanceCreationTests(TestCase):
         self.assertEqual(a.headline, 'Fourth article')
 
     def test_cannot_create_instance_with_invalid_kwargs(self):
-        six.assertRaisesRegex(
-            self,
+        with self.assertRaisesMessage(
             TypeError,
-            "'foo' is an invalid keyword argument for this function",
-            Article,
-            id=None,
-            headline='Some headline',
-            pub_date=datetime(2005, 7, 31),
-            foo='bar',
-        )
+            "'foo' is an invalid keyword argument for this function"
+        ):
+            Article(
+                id=None,
+                headline='Some headline',
+                pub_date=datetime(2005, 7, 31),
+                foo='bar',
+            )
 
     def test_can_leave_off_value_for_autofield_and_it_gets_value_on_save(self):
         """
@@ -143,14 +142,11 @@ class ModelInstanceCreationTests(TestCase):
 
 class ModelTest(TestCase):
     def test_objects_attribute_is_only_available_on_the_class_itself(self):
-        six.assertRaisesRegex(
-            self,
+        with self.assertRaisesMessage(
             AttributeError,
-            "Manager isn't accessible via Article instances",
-            getattr,
-            Article(),
-            "objects",
-        )
+            "Manager isn't accessible via Article instances"
+        ):
+            getattr(Article(), "objects",)
         self.assertFalse(hasattr(Article(), 'objects'))
         self.assertTrue(hasattr(Article, 'objects'))
 
@@ -490,28 +486,20 @@ class ModelLookupTest(TestCase):
     def test_does_not_exist(self):
         # Django raises an Article.DoesNotExist exception for get() if the
         # parameters don't match any object.
-        six.assertRaisesRegex(
-            self,
+        with self.assertRaisesMessage(
             ObjectDoesNotExist,
-            "Article matching query does not exist.",
-            Article.objects.get,
-            id__exact=2000,
-        )
+            "Article matching query does not exist."
+        ):
+            Article.objects.get(id__exact=2000,)
         # To avoid dict-ordering related errors check only one lookup
         # in single assert.
-        self.assertRaises(
+        with self.assertRaises(ObjectDoesNotExist):
+            Article.objects.get(pub_date__year=2005, pub_date__month=8)
+        with self.assertRaisesMessage(
             ObjectDoesNotExist,
-            Article.objects.get,
-            pub_date__year=2005,
-            pub_date__month=8,
-        )
-        six.assertRaisesRegex(
-            self,
-            ObjectDoesNotExist,
-            "Article matching query does not exist.",
-            Article.objects.get,
-            pub_date__week_day=6,
-        )
+            "Article matching query does not exist."
+        ):
+            Article.objects.get(pub_date__week_day=6,)
 
     def test_lookup_by_primary_key(self):
         # Lookup by a primary key is the most common case, so Django
@@ -541,28 +529,24 @@ class ModelLookupTest(TestCase):
 
         # Django raises an Article.MultipleObjectsReturned exception if the
         # lookup matches more than one object
-        six.assertRaisesRegex(
-            self,
+        with self.assertRaisesMessage(
             MultipleObjectsReturned,
-            "get\(\) returned more than one Article -- it returned 2!",
-            Article.objects.get,
-            headline__startswith='Swallow',
-        )
-        six.assertRaisesRegex(
-            self,
+            "get() returned more than one Article -- it returned 2!"
+        ):
+            Article.objects.get(headline__startswith='Swallow',)
+        with self.assertRaisesMessage(
             MultipleObjectsReturned,
-            "get\(\) returned more than one Article -- it returned 2!",
-            Article.objects.get,
-            pub_date__year=2005,
-        )
-        six.assertRaisesRegex(
-            self,
+            "get() returned more than one Article -- it returned 2!"
+        ):
+            Article.objects.get(pub_date__year=2005,)
+        with self.assertRaisesMessage(
             MultipleObjectsReturned,
-            "get\(\) returned more than one Article -- it returned 2!",
-            Article.objects.get,
-            pub_date__year=2005,
-            pub_date__month=7,
-        )
+            "get() returned more than one Article -- it returned 2!"
+        ):
+            Article.objects.get(
+                pub_date__year=2005,
+                pub_date__month=7,
+            )
 
 
 class ConcurrentSaveTests(TransactionTestCase):

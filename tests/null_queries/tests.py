@@ -40,10 +40,12 @@ class NullQueriesTests(TestCase):
         )
 
         # Valid query, but fails because foo isn't a keyword
-        self.assertRaises(FieldError, Choice.objects.filter, foo__exact=None)
+        with self.assertRaises(FieldError):
+            Choice.objects.filter(foo__exact=None)
 
         # Can't use None on anything other than __exact and __iexact
-        self.assertRaises(ValueError, Choice.objects.filter, id__gt=None)
+        with self.assertRaises(ValueError):
+            Choice.objects.filter(id__gt=None)
 
         # Related managers use __exact=None implicitly if the object hasn't been saved.
         p2 = Poll(question="How?")

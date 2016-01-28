@@ -33,7 +33,8 @@ class ManyToManyTests(TestCase):
         # Create an Article.
         a5 = Article(id=None, headline='Django lets you reate Web apps easily')
         # You can't associate it with a Publication until it's been saved.
-        self.assertRaises(ValueError, getattr, a5, 'publications')
+        with self.assertRaises(ValueError):
+            getattr(a5, 'publications')
         # Save it!
         a5.save()
         # Associate the Article with a Publication.

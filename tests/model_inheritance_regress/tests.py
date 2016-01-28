@@ -171,14 +171,10 @@ class ModelInheritanceTest(TestCase):
         # the ItalianRestaurant.
         Restaurant.objects.all().delete()
 
-        self.assertRaises(
-            Place.DoesNotExist,
-            Place.objects.get,
-            pk=ident)
-        self.assertRaises(
-            ItalianRestaurant.DoesNotExist,
-            ItalianRestaurant.objects.get,
-            pk=ident)
+        with self.assertRaises(Place.DoesNotExist):
+            Place.objects.get(pk=ident)
+        with self.assertRaises(ItalianRestaurant.DoesNotExist):
+            ItalianRestaurant.objects.get(pk=ident)
 
     def test_issue_6755(self):
         """
@@ -241,14 +237,12 @@ class ModelInheritanceTest(TestCase):
 
         self.assertEqual(c1.get_next_by_pub_date(), c2)
         self.assertEqual(c2.get_next_by_pub_date(), c3)
-        self.assertRaises(
-            ArticleWithAuthor.DoesNotExist,
-            c3.get_next_by_pub_date)
+        with self.assertRaises(ArticleWithAuthor.DoesNotExist):
+            c3.get_next_by_pub_date()
         self.assertEqual(c3.get_previous_by_pub_date(), c2)
         self.assertEqual(c2.get_previous_by_pub_date(), c1)
-        self.assertRaises(
-            ArticleWithAuthor.DoesNotExist,
-            c1.get_previous_by_pub_date)
+        with self.assertRaises(ArticleWithAuthor.DoesNotExist):
+            c1.get_previous_by_pub_date()
 
     def test_inherited_fields(self):
         """

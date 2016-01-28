@@ -376,12 +376,8 @@ class FileUploadTests(TestCase):
             file.seek(0)
 
             # AttributeError: You cannot alter upload handlers after the upload has been processed.
-            self.assertRaises(
-                AttributeError,
-                self.client.post,
-                '/quota/broken/',
-                {'f': file}
-            )
+            with self.assertRaises(AttributeError):
+                self.client.post('/quota/broken/', {'f': file})
 
     def test_fileupload_getlist(self):
         file = tempfile.NamedTemporaryFile

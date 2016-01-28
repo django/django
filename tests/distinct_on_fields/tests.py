@@ -90,11 +90,10 @@ class DistinctOnTests(TestCase):
 
         # Combining queries with different distinct_fields is not allowed.
         base_qs = Celebrity.objects.all()
-        self.assertRaisesMessage(
-            AssertionError,
-            "Cannot combine queries with different distinct fields.",
-            lambda: (base_qs.distinct('id') & base_qs.distinct('name'))
-        )
+
+        msg = "Cannot combine queries with different distinct fields."
+        with self.assertRaisesMessage(AssertionError, msg):
+            base_qs.distinct('id') & base_qs.distinct('name')
 
         # Test join unreffing
         c1 = Celebrity.objects.distinct('greatest_fan__id', 'greatest_fan__fan_of')

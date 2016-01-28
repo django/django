@@ -136,7 +136,8 @@ class LookupTests(TestCase):
         self.assertEqual(Article.objects.in_bulk([]), {})
         self.assertEqual(Article.objects.in_bulk(iter([self.a1.id])), {self.a1.id: self.a1})
         self.assertEqual(Article.objects.in_bulk(iter([])), {})
-        self.assertRaises(TypeError, Article.objects.in_bulk, headline__startswith='Blah')
+        with self.assertRaises(TypeError):
+            Article.objects.in_bulk(headline__startswith='Blah')
 
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
@@ -260,9 +261,8 @@ class LookupTests(TestCase):
         # However, an exception FieldDoesNotExist will be thrown if you specify
         # a non-existent field name in values() (a field that is neither in the
         # model nor in extra(select)).
-        self.assertRaises(FieldError,
-            Article.objects.extra(select={'id_plus_one': 'id + 1'}).values,
-            'id', 'id_plus_two')
+        with self.assertRaises(FieldError):
+            Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_two')
         # If you don't specify field names to values(), all are returned.
         self.assertQuerysetEqual(Article.objects.filter(id=self.a5.id).values(),
             [{
@@ -344,7 +344,8 @@ class LookupTests(TestCase):
                 (self.au2.name, self.a6.headline, self.t3.name),
                 (self.au2.name, self.a7.headline, self.t3.name),
             ], transform=identity)
-        self.assertRaises(TypeError, Article.objects.values_list, 'id', 'headline', flat=True)
+        with self.assertRaises(TypeError):
+            Article.objects.values_list('id', 'headline', flat=True)
 
     def test_get_next_previous_by(self):
         # Every DateField and DateTimeField creates get_next_by_FOO() and
@@ -361,7 +362,8 @@ class LookupTests(TestCase):
                          '<Article: Article 7>')
         self.assertEqual(repr(self.a4.get_next_by_pub_date()),
                          '<Article: Article 6>')
-        self.assertRaises(Article.DoesNotExist, self.a5.get_next_by_pub_date)
+        with self.assertRaises(Article.DoesNotExist):
+            self.a5.get_next_by_pub_date()
         self.assertEqual(repr(self.a6.get_next_by_pub_date()),
                          '<Article: Article 5>')
         self.assertEqual(repr(self.a7.get_next_by_pub_date()),

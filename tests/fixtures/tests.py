@@ -364,13 +364,17 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         )
 
         # Excluding a bogus app should throw an error
-        with six.assertRaisesRegex(self, management.CommandError,
-                "No installed app with label 'foo_app'."):
+        with self.assertRaisesMessage(
+            management.CommandError,
+            "No installed app with label 'foo_app'."
+        ):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['foo_app'])
 
         # Excluding a bogus model should throw an error
-        with six.assertRaisesRegex(self, management.CommandError,
-                "Unknown model in excludes: fixtures.FooModel"):
+        with self.assertRaisesMessage(
+            management.CommandError,
+            "Unknown model in excludes: fixtures.FooModel"
+        ):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
 
     @unittest.skipIf(sys.platform.startswith('win'), "Windows doesn't support '?' in filenames.")
@@ -415,8 +419,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             primary_keys='2'
         )
 
-        with six.assertRaisesRegex(self, management.CommandError,
-                "You can only use --pks option with one model"):
+        with self.assertRaisesMessage(
+            management.CommandError,
+            "You can only use --pks option with one model"
+        ):
             self._dumpdata_assert(
                 ['fixtures'],
                 '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", '
@@ -425,8 +431,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 primary_keys='2,3'
             )
 
-        with six.assertRaisesRegex(self, management.CommandError,
-                "You can only use --pks option with one model"):
+        with self.assertRaisesMessage(
+            management.CommandError,
+            "You can only use --pks option with one model"
+        ):
             self._dumpdata_assert(
                 '',
                 '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", '
@@ -435,8 +443,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 primary_keys='2,3'
             )
 
-        with six.assertRaisesRegex(self, management.CommandError,
-                "You can only use --pks option with one model"):
+        with self.assertRaisesMessage(
+            management.CommandError,
+            "You can only use --pks option with one model"
+        ):
             self._dumpdata_assert(
                 ['fixtures.Article', 'fixtures.category'],
                 '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", '

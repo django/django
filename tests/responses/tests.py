@@ -26,14 +26,23 @@ class HttpResponseBaseTests(SimpleTestCase):
         r = HttpResponseBase()
         self.assertIs(r.writable(), False)
 
-        with self.assertRaisesMessage(IOError, 'This HttpResponseBase instance is not writable'):
+        with self.assertRaisesMessage(
+            IOError,
+            'This HttpResponseBase instance is not writable'
+        ):
             r.write('asdf')
-        with self.assertRaisesMessage(IOError, 'This HttpResponseBase instance is not writable'):
+        with self.assertRaisesMessage(
+            IOError,
+            'This HttpResponseBase instance is not writable'
+        ):
             r.writelines(['asdf\n', 'qwer\n'])
 
     def test_tell(self):
         r = HttpResponseBase()
-        with self.assertRaisesMessage(IOError, 'This HttpResponseBase instance cannot tell its position'):
+        with self.assertRaisesMessage(
+            IOError,
+            'This HttpResponseBase instance cannot tell its position'
+        ):
             r.tell()
 
     def test_setdefault(self):
@@ -127,7 +136,8 @@ class HttpResponseTests(SimpleTestCase):
         generator = ("{}".format(i) for i in range(10))
         response = HttpResponse(content=generator)
         self.assertEqual(response.content, b'0123456789')
-        self.assertRaises(StopIteration, next, generator)
+        with self.assertRaises(StopIteration):
+            next(generator)
 
         cache.set('my-response-key', response)
         response = cache.get('my-response-key')

@@ -45,7 +45,8 @@ class TestFieldWithValidators(TestCase):
             'string': '2 is not correct',
             'ignore_case_string': "IgnORE Case strIng",
         })
-        self.assertRaises(ValidationError, form.fields['full_name'].clean, 'not int nor mail')
+        with self.assertRaises(ValidationError):
+            form.fields['full_name'].clean('not int nor mail')
 
         try:
             form.fields['full_name'].clean('not int nor mail')

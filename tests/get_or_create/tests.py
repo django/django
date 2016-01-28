@@ -62,10 +62,8 @@ class GetOrCreateTests(TestCase):
         If you don't specify a value or default value for all required
         fields, you will get an error.
         """
-        self.assertRaises(
-            IntegrityError,
-            Person.objects.get_or_create, first_name="Tom", last_name="Smith"
-        )
+        with self.assertRaises(IntegrityError):
+            Person.objects.get_or_create(first_name="Tom", last_name="Smith")
 
     def test_get_or_create_on_related_manager(self):
         p = Publisher.objects.create(name="Acme Publishing")
@@ -159,10 +157,8 @@ class GetOrCreateTestsWithManualPKs(TestCase):
         If you specify an existing primary key, but different other fields,
         then you will get an error and data will not be updated.
         """
-        self.assertRaises(
-            IntegrityError,
-            ManualPrimaryKeyTest.objects.get_or_create, id=1, data="Different"
-        )
+        with self.assertRaises(IntegrityError):
+            ManualPrimaryKeyTest.objects.get_or_create(id=1, data="Different")
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")
 
     def test_get_or_create_raises_IntegrityError_plus_traceback(self):
@@ -246,7 +242,8 @@ class GetOrCreateThroughManyToMany(TestCase):
     def test_something(self):
         Tag.objects.create(text='foo')
         a_thing = Thing.objects.create(name='a')
-        self.assertRaises(IntegrityError, a_thing.tags.get_or_create, text='foo')
+        with self.assertRaises(IntegrityError):
+            a_thing.tags.get_or_create(text='foo')
 
 
 class UpdateOrCreateTests(TestCase):
@@ -292,8 +289,8 @@ class UpdateOrCreateTests(TestCase):
         If you don't specify a value or default value for all required
         fields, you will get an error.
         """
-        self.assertRaises(IntegrityError,
-            Person.objects.update_or_create, first_name="Tom", last_name="Smith")
+        with self.assertRaises(IntegrityError):
+            Person.objects.update_or_create(first_name="Tom", last_name="Smith")
 
     def test_manual_primary_key_test(self):
         """
@@ -301,10 +298,8 @@ class UpdateOrCreateTests(TestCase):
         then you will get an error and data will not be updated.
         """
         ManualPrimaryKeyTest.objects.create(id=1, data="Original")
-        self.assertRaises(
-            IntegrityError,
-            ManualPrimaryKeyTest.objects.update_or_create, id=1, data="Different"
-        )
+        with self.assertRaises(IntegrityError):
+            ManualPrimaryKeyTest.objects.update_or_create(id=1, data="Different")
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")
 
     def test_error_contains_full_traceback(self):

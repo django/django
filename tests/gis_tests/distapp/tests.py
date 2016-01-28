@@ -95,7 +95,8 @@ class DistanceTest(TestCase):
             if type_error:
                 # A ValueError should be raised on PostGIS when trying to pass
                 # Distance objects into a DWithin query using a geodetic field.
-                self.assertRaises(ValueError, AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist)).count)
+                with self.assertRaises(ValueError):
+                    AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist)).count()
             else:
                 self.assertListEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
 
@@ -289,11 +290,12 @@ class DistanceTest(TestCase):
 
         # Too many params (4 in this case) should raise a ValueError.
         queryset = AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4'))
-        self.assertRaises(ValueError, len, queryset)
+        with self.assertRaises(ValueError):
+            len(queryset)
 
         # Not enough params should raise a ValueError.
-        self.assertRaises(ValueError, len,
-                          AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)',)))
+        with self.assertRaises(ValueError):
+            len(AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)',)))
 
         # Getting all cities w/in 550 miles of Hobart.
         hobart = AustraliaCity.objects.get(name='Hobart')
@@ -382,7 +384,8 @@ class DistanceTest(TestCase):
             self.assertAlmostEqual(len_m1, qs[0].length.m, tol)
         else:
             # Does not support geodetic coordinate systems.
-            self.assertRaises(ValueError, Interstate.objects.length)
+            with self.assertRaises(ValueError):
+                Interstate.objects.length()
 
         # Now doing length on a projected coordinate system.
         i10 = SouthTexasInterstate.objects.length().get(name='I-10')

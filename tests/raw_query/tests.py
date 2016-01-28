@@ -275,7 +275,8 @@ class RawQueryTests(TestCase):
         first_two = Author.objects.raw(query)[0:2]
         self.assertEqual(len(first_two), 2)
 
-        self.assertRaises(TypeError, lambda: Author.objects.raw(query)['test'])
+        with self.assertRaises(TypeError):
+            Author.objects.raw(query)['test']
 
     def test_inheritance(self):
         # date is the end of the Cuban Missile Crisis, I have no idea when

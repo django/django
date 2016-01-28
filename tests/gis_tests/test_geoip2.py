@@ -47,23 +47,29 @@ class GeoIPTest(unittest.TestCase):
         # Improper parameters.
         bad_params = (23, 'foo', 15.23)
         for bad in bad_params:
-            self.assertRaises(GeoIP2Exception, GeoIP2, cache=bad)
+            with self.assertRaises(GeoIP2Exception):
+                GeoIP2(cache=bad)
             if isinstance(bad, six.string_types):
                 e = GeoIP2Exception
             else:
                 e = TypeError
-            self.assertRaises(e, GeoIP2, bad, 0)
+            with self.assertRaises(e):
+                GeoIP2(bad, 0)
 
     def test02_bad_query(self):
         "GeoIP query parameter checking."
         cntry_g = GeoIP2(city='<foo>')
         # No city database available, these calls should fail.
-        self.assertRaises(GeoIP2Exception, cntry_g.city, 'tmc.edu')
-        self.assertRaises(GeoIP2Exception, cntry_g.coords, 'tmc.edu')
+        with self.assertRaises(GeoIP2Exception):
+            cntry_g.city('tmc.edu')
+        with self.assertRaises(GeoIP2Exception):
+            cntry_g.coords('tmc.edu')
 
         # Non-string query should raise TypeError
-        self.assertRaises(TypeError, cntry_g.country_code, 17)
-        self.assertRaises(TypeError, cntry_g.country_name, GeoIP2)
+        with self.assertRaises(TypeError):
+            cntry_g.country_code(17)
+        with self.assertRaises(TypeError):
+            cntry_g.country_name(GeoIP2)
 
     @mock.patch('socket.gethostbyname')
     def test03_country(self, gethostbyname):

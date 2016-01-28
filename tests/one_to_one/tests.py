@@ -229,10 +229,12 @@ class OneToOneTests(TestCase):
         self.assertIsNone(ug_bar.place)
 
         # Assigning None fails: Place.restaurant is null=False
-        self.assertRaises(ValueError, setattr, p, 'restaurant', None)
+        with self.assertRaises(ValueError):
+            setattr(p, 'restaurant', None)
 
         # You also can't assign an object of the wrong type here
-        self.assertRaises(ValueError, setattr, p, 'restaurant', p)
+        with self.assertRaises(ValueError):
+            setattr(p, 'restaurant', p)
 
         # Creation using keyword argument should cache the related object.
         p = Place.objects.get(name="Demon Dogs")
@@ -459,14 +461,16 @@ class OneToOneTests(TestCase):
         School.objects.use_for_related_fields = True
         try:
             private_director = Director._base_manager.get(pk=private_director.pk)
-            self.assertRaises(School.DoesNotExist, lambda: private_director.school)
+            with self.assertRaises(School.DoesNotExist):
+                private_director.school
         finally:
             School.objects.use_for_related_fields = False
 
         Director.objects.use_for_related_fields = True
         try:
             private_school = School._base_manager.get(pk=private_school.pk)
-            self.assertRaises(Director.DoesNotExist, lambda: private_school.director)
+            with self.assertRaises(Director.DoesNotExist):
+                private_school.director
         finally:
             Director.objects.use_for_related_fields = False
 

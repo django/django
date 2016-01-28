@@ -221,10 +221,8 @@ class UtilsTests(SimpleTestCase):
             str("article")
         )
 
-        self.assertRaises(
-            AttributeError,
-            lambda: label_for_field("unknown", Article)
-        )
+        with self.assertRaises(AttributeError):
+            label_for_field("unknown", Article)
 
         def test_callable(obj):
             return "nothing"

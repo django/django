@@ -601,7 +601,8 @@ class ClientTest(TestCase):
 
     def test_view_with_exception(self):
         "Request a page that is known to throw an error"
-        self.assertRaises(KeyError, self.client.get, "/broken_view/")
+        with self.assertRaises(KeyError):
+            self.client.get("/broken_view/")
 
         # Try the same assertion, a different way
         try:

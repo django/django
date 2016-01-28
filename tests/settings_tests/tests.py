@@ -179,24 +179,29 @@ class SettingsTests(SimpleTestCase):
         del settings.TEST
 
     def test_override_doesnt_leak(self):
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST')
         with self.settings(TEST='override'):
             self.assertEqual('override', settings.TEST)
             settings.TEST = 'test'
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST')
 
     @override_settings(TEST='override')
     def test_decorator(self):
         self.assertEqual('override', settings.TEST)
 
     def test_context_manager(self):
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST')
         override = override_settings(TEST='override')
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST')
         override.enable()
         self.assertEqual('override', settings.TEST)
         override.disable()
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST')
 
     def test_class_decorator(self):
         # SimpleTestCase can be decorated by override_settings, but not ut.TestCase
@@ -215,7 +220,8 @@ class SettingsTests(SimpleTestCase):
             decorated = override_settings(TEST='override')(UnittestTestCaseSubclass)
 
     def test_signal_callback_context_manager(self):
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST')
         with self.settings(TEST='override'):
             self.assertEqual(self.testvalue, 'override')
         self.assertEqual(self.testvalue, None)
@@ -232,10 +238,12 @@ class SettingsTests(SimpleTestCase):
         settings.TEST = 'test'
         self.assertEqual('test', settings.TEST)
         del settings.TEST
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST')
 
     def test_settings_delete_wrapped(self):
-        self.assertRaises(TypeError, delattr, settings, '_wrapped')
+        with self.assertRaises(TypeError):
+            delattr(settings, '_wrapped')
 
     def test_override_settings_delete(self):
         """
@@ -245,10 +253,12 @@ class SettingsTests(SimpleTestCase):
         previous_l10n = settings.USE_L10N
         with self.settings(USE_I18N=False):
             del settings.USE_I18N
-            self.assertRaises(AttributeError, getattr, settings, 'USE_I18N')
+            with self.assertRaises(AttributeError):
+                getattr(settings, 'USE_I18N')
             # Should also work for a non-overridden setting
             del settings.USE_L10N
-            self.assertRaises(AttributeError, getattr, settings, 'USE_L10N')
+            with self.assertRaises(AttributeError):
+                getattr(settings, 'USE_L10N')
         self.assertEqual(settings.USE_I18N, previous_i18n)
         self.assertEqual(settings.USE_L10N, previous_l10n)
 
@@ -258,8 +268,10 @@ class SettingsTests(SimpleTestCase):
         runtime, not when it was instantiated.
         """
 
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
-        self.assertRaises(AttributeError, getattr, settings, 'TEST2')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST2')
 
         inner = override_settings(TEST2='override')
         with override_settings(TEST='override'):
@@ -270,10 +282,13 @@ class SettingsTests(SimpleTestCase):
             # inner's __exit__ should have restored the settings of the outer
             # context manager, not those when the class was instantiated
             self.assertEqual('override', settings.TEST)
-            self.assertRaises(AttributeError, getattr, settings, 'TEST2')
+            with self.assertRaises(AttributeError):
+                getattr(settings, 'TEST2')
 
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
-        self.assertRaises(AttributeError, getattr, settings, 'TEST2')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST')
+        with self.assertRaises(AttributeError):
+            getattr(settings, 'TEST2')
 
 
 class TestComplexSettingOverride(SimpleTestCase):

@@ -144,17 +144,17 @@ class FlatpageTemplateTagTests(TestCase):
         def render(t):
             return Template(t).render(Context())
 
-        self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages %}")
-        self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages as %}")
-        self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages cheesecake flatpages %}")
-        self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages as flatpages asdf %}")
-        self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages cheesecake user as flatpages %}")
-        self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages for user as flatpages asdf %}")
-        self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf %}")
+        with self.assertRaises(TemplateSyntaxError):
+            render("{% load flatpages %}{% get_flatpages %}")
+        with self.assertRaises(TemplateSyntaxError):
+            render("{% load flatpages %}{% get_flatpages as %}")
+        with self.assertRaises(TemplateSyntaxError):
+            render("{% load flatpages %}{% get_flatpages cheesecake flatpages %}")
+        with self.assertRaises(TemplateSyntaxError):
+            render("{% load flatpages %}{% get_flatpages as flatpages asdf %}")
+        with self.assertRaises(TemplateSyntaxError):
+            render("{% load flatpages %}{% get_flatpages cheesecake user as flatpages %}")
+        with self.assertRaises(TemplateSyntaxError):
+            render("{% load flatpages %}{% get_flatpages for user as flatpages asdf %}")
+        with self.assertRaises(TemplateSyntaxError):
+            render("{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf %}")
