@@ -774,7 +774,7 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         self.assertIn('<ul class="object-tools">', response.rendered_content)
         # The "Add" button inside the object-tools shouldn't appear.
-        self.assertNotIn('Add', response.rendered_content)
+        self.assertNotIn('Add ', response.rendered_content)
 
 
 class AdminLogNodeTestCase(TestCase):
