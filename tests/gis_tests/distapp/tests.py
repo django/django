@@ -142,7 +142,7 @@ class DistanceTest(TestCase):
         """
         Test the `distance` GeoQuerySet method on geodetic coordinate systems.
         """
-        tol = 2 if oracle else 5
+        tol = 2 if oracle else 4
 
         # Testing geodetic distance calculation with a non-point geometry
         # (a LineString of Wollongong and Shellharbour coords).
