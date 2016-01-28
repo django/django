@@ -91,3 +91,6 @@ Bugfixes
 
 * Fixed the ``contrib.gis`` map widgets when using
   ``USE_THOUSAND_SEPARATOR=True`` (:ticket:`20415`).
+
+* Made invalid forms display the initial of values of their disabled fields
+  (:ticket:`26129`).

@@ -718,6 +718,14 @@ class FormsTestCase(SimpleTestCase):
                 {'birthday': datetime.date(1974, 8, 16), 'name': 'John Doe'}
             )
 
+        # Initial data remains present on invalid forms.
+        data = {}
+        f1 = PersonForm(data, initial={'birthday': datetime.date(1974, 8, 16)})
+        f2 = PersonFormFieldInitial(data)
+        for form in (f1, f2):
+            self.assertFalse(form.is_valid())
+            self.assertEqual(form['birthday'].value(), datetime.date(1974, 8, 16))
+
     def test_hidden_data(self):
         class SongForm(Form):
             name = CharField()
