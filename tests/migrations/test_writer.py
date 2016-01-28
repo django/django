@@ -281,6 +281,8 @@ class WriterTests(TestCase):
             SettingsReference("someapp.model", "AUTH_USER_MODEL"),
             ("settings.AUTH_USER_MODEL", {"from django.conf import settings"})
         )
+
+    def test_serialize_iterators(self):
         self.assertSerializedResultEqual(
             ((x, x * x) for x in range(3)),
             ("((0, 0), (1, 1), (2, 4))", set())
