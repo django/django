@@ -480,8 +480,9 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             '<input type="text" name="test" value="%(bandpk)s" '
             'class="vForeignKeyRawIdAdminField" />'
             '<a href="/admin_widgets/band/?_to_field=id" class="related-lookup" '
-            'id="lookup_id_test" title="Lookup"></a>&nbsp;<strong>Linkin Park</strong>'
-            % {'bandpk': band.pk}
+            'id="lookup_id_test" title="Lookup"></a>&nbsp;<strong>'
+            '<a href="/admin_widgets/band/%(bandpk)s/change/">Linkin Park</a>'
+            '</strong>' % {'bandpk': band.pk}
         )
 
     def test_relations_to_non_primary_key(self):
@@ -500,7 +501,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             'class="vForeignKeyRawIdAdminField" />'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
-            '&nbsp;<strong>Apple</strong>'
+            '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
+            'Apple</a></strong>' % {'pk': apple.pk}
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -549,7 +551,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" />'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
-            '&nbsp;<strong>Hidden</strong>'
+            '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
+            'Hidden</a></strong>' % {'pk': hidden.pk}
         )
 
 
