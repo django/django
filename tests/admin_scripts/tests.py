@@ -61,6 +61,7 @@ class AdminScriptTestCase(unittest.TestCase):
                 'SECRET_KEY',
                 'TEST_RUNNER',  # We need to include TEST_RUNNER, otherwise we get a compatibility warning.
                 'MIDDLEWARE_CLASSES',  # We need to include MIDDLEWARE_CLASSES, otherwise we get a compatibility warning.
+                'SPATIALITE_LIBRARY_PATH',
             ]
             for s in exports:
                 if hasattr(settings, s):
