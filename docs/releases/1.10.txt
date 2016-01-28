@@ -56,6 +56,9 @@ Minor features
   using the current active language. A new ``LogEntry.get_change_message()``
   method is now the preferred way of retrieving the change message.
 
+* Selected objects for fields in ``ModelAdmin.raw_id_fields`` now have a link
+  to object's change form.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
