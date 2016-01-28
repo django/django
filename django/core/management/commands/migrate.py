@@ -122,12 +122,12 @@ class Command(BaseCommand):
             if run_syncdb:
                 self.stdout.write(
                     self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
-                    (", ".join(executor.loader.unmigrated_apps))
+                    (", ".join(sorted(executor.loader.unmigrated_apps)))
                 )
             if target_app_labels_only:
                 self.stdout.write(
                     self.style.MIGRATE_LABEL("  Apply all migrations: ") +
-                    (", ".join(set(a for a, n in targets)) or "(none)")
+                    (", ".join(sorted(set(a for a, n in targets))) or "(none)")
                 )
             else:
                 if targets[0][1] is None:

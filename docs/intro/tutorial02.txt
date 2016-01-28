@@ -328,7 +328,7 @@ Now, run :djadmin:`migrate` again to create those model tables in your database:
 
     $ python manage.py migrate
     Operations to perform:
-      Apply all migrations: admin, contenttypes, polls, auth, sessions
+      Apply all migrations: admin, auth, contenttypes, polls, sessions
     Running migrations:
       Rendering model states... DONE
       Applying polls.0001_initial... OK
