@@ -220,19 +220,6 @@ Tim Graham
 
     Tim works as a software engineer and lives in Philadelphia, PA, USA.
 
-`Idan Gazit`_
-    As a self-professed design geek, Idan was initially attracted to Django
-    sometime between magic-removal and queryset-refactor. Formally trained
-    as a software engineer, Idan straddles the worlds of design and code,
-    jack of two trades and master of none. He is passionate about usability
-    and finding novel ways to extract meaning from data, and is a longtime
-    photographer_.
-
-    Idan is currently hacking on all things data and visualization at Heroku_.
-
-    .. _Idan Gazit: http://gazit.me
-    .. _photographer: https://flickr.com/photos/idangazit
-
 Paul McMillan
     Paul found Django in 2008 while looking for a more
     structured approach to web programming. He stuck around after
@@ -651,6 +638,19 @@ Malcolm Tredinnick
     Preston lives with his family and animal menagerie in Santa Barbara, CA, USA.
 
     .. _Preston Holmes: http://www.ptone.com/
+
+`Idan Gazit`_
+    As a self-professed design geek, Idan was initially attracted to Django
+    sometime between magic-removal and queryset-refactor. Formally trained
+    as a software engineer, Idan straddles the worlds of design and code,
+    jack of two trades and master of none. He is passionate about usability
+    and finding novel ways to extract meaning from data, and is a longtime
+    photographer_.
+
+    Idan is currently hacking on all things data and visualization at Heroku_.
+
+    .. _Idan Gazit: http://gazit.me
+    .. _photographer: https://flickr.com/photos/idangazit
 
 Matt Boersma
     Matt helped with Django's Oracle support.
