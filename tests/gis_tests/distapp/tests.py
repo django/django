@@ -146,7 +146,7 @@ class DistanceTest(TestCase):
         """
         Test the `distance` GeoQuerySet method on geodetic coordinate systems.
         """
-        tol = 2 if oracle else 5
+        tol = 2 if oracle else 4
 
         # Testing geodetic distance calculation with a non-point geometry
         # (a LineString of Wollongong and Shellharbour coords).
@@ -526,7 +526,7 @@ class DistanceFunctionsTests(TestCase):
 
     @skipUnlessDBFeature("has_Distance_function", "supports_distance_geodetic")
     def test_distance_geodetic_spheroid(self):
-        tol = 2 if oracle else 5
+        tol = 2 if oracle else 4
 
         # Got the reference distances using the raw SQL statements:
         #  SELECT ST_distance_spheroid(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326),

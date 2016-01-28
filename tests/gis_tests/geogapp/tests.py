@@ -98,10 +98,12 @@ class GeographyTest(TestCase):
     def test06_geography_area(self):
         "Testing that Area calculations work on geography columns."
         # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
-        ref_area = 5439100.13586914 if oracle else 5439084.70637573
-        tol = 5
         z = Zipcode.objects.area().get(code='77002')
-        self.assertAlmostEqual(z.area.sq_m, ref_area, tol)
+        # Round to the nearest thousand as possible values (depending on
+        # the database and geolib) include 5439084, 5439100, 5439101.
+        rounded_value = z.area.sq_m
+        rounded_value -= z.area.sq_m % 1000
+        self.assertEqual(rounded_value, 5439000)
 
 
 @skipUnlessDBFeature("gis_enabled")
@@ -128,7 +130,9 @@ class GeographyFunctionTests(TestCase):
         Testing that Area calculations work on geography columns.
         """
         # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
-        ref_area = 5439100.13587 if oracle else 5439084.70637573
-        tol = 5
         z = Zipcode.objects.annotate(area=Area('poly')).get(code='77002')
-        self.assertAlmostEqual(z.area.sq_m, ref_area, tol)
+        # Round to the nearest thousand as possible values (depending on
+        # the database and geolib) include 5439084, 5439100, 5439101.
+        rounded_value = z.area.sq_m
+        rounded_value -= z.area.sq_m % 1000
+        self.assertEqual(rounded_value, 5439000)
