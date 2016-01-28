@@ -168,7 +168,9 @@ urlpatterns = [
     url(r'^cached/index\.xml$', cache_page(1)(views.index),
         {'sitemaps': simple_sitemaps, 'sitemap_url_name': 'cached_sitemap'}),
     url(r'^cached/sitemap-(?P<section>.+)\.xml', cache_page(1)(views.sitemap),
-        {'sitemaps': simple_sitemaps}, name='cached_sitemap')
+        {'sitemaps': simple_sitemaps}, name='cached_sitemap'),
+    url(r'^sitemap-without-entries/sitemap\.xml$', views.sitemap,
+        {'sitemaps': {}}, name='django.contrib.sitemaps.views.sitemap')
 ]
 
 urlpatterns += i18n_patterns(

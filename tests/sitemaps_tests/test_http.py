@@ -232,3 +232,14 @@ class HTTPSitemapTests(SitemapTestsBase):
 </urlset>
 """.format(self.base_url, self.i18n_model.pk)
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+
+    def test_sitemap_without_entries(self):
+        """
+        Test for regression of #26015
+        """
+        response = self.client.get('/sitemap-without-entries/sitemap.xml')
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+</urlset>"""
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
