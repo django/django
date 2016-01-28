@@ -291,6 +291,19 @@ Note that calling ``django.setup()`` is only necessary if your code is truly
 standalone. When invoked by your Web server, or through :doc:`django-admin
 </ref/django-admin>`, Django will handle this for you.
 
+Note that django.setup() should only ever be called once, so in standalone
+scripts, it's best to put calls to django.setup() inside an `if __main__`
+block, like this:
+
+    if __name__ == '__main__':
+        import django
+        django.setup()
+
+That will avoid problems if your main application ever imports from a 
+standalone script. Better still, try to keep standlone scripts minimal
+and keep the bulk of your application logic elsewhere.
+
+
 .. seealso::
 
     :doc:`The Settings Reference </ref/settings>`
