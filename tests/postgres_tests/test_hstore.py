@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import json
 
 from django.core import exceptions, serializers
@@ -36,6 +39,21 @@ class SimpleTests(PostgreSQLTestCase):
         instance.save()
         reloaded = HStoreModel.objects.get()
         self.assertEqual(reloaded.field, value)
+
+    def test_key_val_cast_to_string(self):
+        value = {'a': 1, 'b': 'B', 2: 'c', 'ï': 'ê', b'x': b'test'}
+        expected_value = {'a': '1', 'b': 'B', '2': 'c', 'ï': 'ê', 'x': 'test'}
+
+        instance = HStoreModel(field=value)
+        instance.save()
+        instance = HStoreModel.objects.get()
+        self.assertDictEqual(instance.field, expected_value)
+
+        instance = HStoreModel.objects.get(field__a=1)
+        self.assertDictEqual(instance.field, expected_value)
+
+        instance = HStoreModel.objects.get(field__has_keys=[2, 'a'])
+        self.assertDictEqual(instance.field, expected_value)
 
 
 class TestQuerying(PostgreSQLTestCase):
