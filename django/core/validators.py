@@ -284,7 +284,7 @@ def ip_address_validators(protocol, unpack_ipv4):
 
 
 def int_list_validator(sep=',', message=None, code='invalid'):
-    regexp = _lazy_re_compile('^\d+(?:%s\d+)*\Z' % re.escape(sep))
+    regexp = _lazy_re_compile('^(-)?\d+(?:%s(-)?\d+)*\Z' % re.escape(sep))
     return RegexValidator(regexp, message=message, code=code)
 
 
