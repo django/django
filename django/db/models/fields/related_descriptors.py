@@ -164,7 +164,7 @@ class ForwardManyToOneDescriptor(object):
                 rel_obj = None
             else:
                 qs = self.get_queryset(instance=instance)
-                qs = qs.filter(**self.field.get_reverse_related_filter(instance))
+                qs = qs.filter(self.field.get_reverse_related_filter(instance))
                 # Assuming the database enforces foreign keys, this won't fail.
                 rel_obj = qs.get()
                 # If this is a one-to-one relation, set the reverse accessor

@@ -8,6 +8,7 @@ from django.apps import apps
 from django.core import checks, exceptions
 from django.db import connection, router
 from django.db.backends import utils
+from django.db.models import Q
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
@@ -332,8 +333,13 @@ class RelatedField(Field):
             rh_field.attname: getattr(obj, lh_field.attname)
             for lh_field, rh_field in self.related_fields
         }
-        base_filter.update(self.get_extra_descriptor_filter(obj) or {})
-        return base_filter
+        descriptor_filter = self.get_extra_descriptor_filter(obj)
+        base_q = Q(**base_filter)
+        if isinstance(descriptor_filter, dict):
+            return base_q & Q(**descriptor_filter)
+        elif descriptor_filter:
+            return base_q & descriptor_filter
+        return base_q
 
     @property
     def swappable_setting(self):
