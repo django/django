@@ -415,11 +415,15 @@ class Client(RequestFactory):
         """
         self.exc_info = sys.exc_info()
 
+    @property
+    def _session_app_is_installed(self):
+        return apps.is_installed(settings.SESSION_APP)
+
     def _session(self):
         """
         Obtains the current session variables.
         """
-        if apps.is_installed('django.contrib.sessions'):
+        if self._session_app_is_installed:
             engine = import_module(settings.SESSION_ENGINE)
             cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
             if cookie:
@@ -599,8 +603,7 @@ class Client(RequestFactory):
         """
         from django.contrib.auth import authenticate
         user = authenticate(**credentials)
-        if (user and user.is_active and
-                apps.is_installed('django.contrib.sessions')):
+        if user and user.is_active and self._session_app_is_installed:
             self._login(user)
             return True
         else:

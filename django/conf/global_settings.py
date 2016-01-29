@@ -437,6 +437,9 @@ MIDDLEWARE_CLASSES = [
 # SESSIONS #
 ############
 
+# The session app. Override when using a custom one built upon
+# django.contrib.sessions
+SESSION_APP = 'django.contrib.sessions'
 # Cache to store session data if using the cache session backend.
 SESSION_CACHE_ALIAS = 'default'
 # Cookie name. This can be whatever you want.

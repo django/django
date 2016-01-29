@@ -623,6 +623,7 @@ Settings
 A few :ref:`Django settings <settings-sessions>` give you control over session
 behavior:
 
+* :setting:`SESSION_APP`
 * :setting:`SESSION_CACHE_ALIAS`
 * :setting:`SESSION_COOKIE_AGE`
 * :setting:`SESSION_COOKIE_DOMAIN`
@@ -692,6 +693,10 @@ namely:
 In order to build a custom session engine or to customize an existing one, you
 may create a new class inheriting from :class:`~backends.base.SessionBase` or
 any other existing ``SessionStore`` class.
+
+In case your custom session engine and related parts (e.g. models, middlewares)
+are added to a project as a separate app replacing Django's
+:mod:`django.contrib.sessions`, you must specify it in :setting:`SESSION_APP`.
 
 Extending most of the session engines is quite straightforward, but doing so
 with database-backed session engines generally requires some extra effort (see

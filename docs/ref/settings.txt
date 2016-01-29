@@ -2767,6 +2767,18 @@ Sessions
 
 Settings for :mod:`django.contrib.sessions`.
 
+.. setting:: SESSION_APP
+
+SESSION_APP
+-----------
+
+Default: ``'django.contrib.sessions'``
+
+If you're using a custom sessions app built upon :mod:`django.contrib.sessions`
+(see :ref:`custom-session-engines`), override this setting. This is required
+for other Django parts to integrate with it properly (namely, for
+:ref:`test client <test-client>` to handle sessions and authentication).
+
 .. setting:: SESSION_CACHE_ALIAS
 
 SESSION_CACHE_ALIAS
