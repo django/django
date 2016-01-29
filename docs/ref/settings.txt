@@ -237,7 +237,7 @@ identifying name for a local memory cache. e.g.::
 OPTIONS
 ~~~~~~~
 
-Default: None
+Default: ``None``
 
 Extra parameters to pass to the cache backend. Available parameters
 vary depending on your cache backend.
@@ -251,7 +251,7 @@ consult your backend module's own documentation.
 TIMEOUT
 ~~~~~~~
 
-Default: 300
+Default: ``300``
 
 The number of seconds before a cache entry is considered stale. If the value of
 this settings is ``None``, cache entries will not expire.
@@ -665,7 +665,7 @@ The username to use when connecting to the database. Not used with SQLite.
 TEST
 ~~~~
 
-Default: ``{}``
+Default: ``{}`` (Empty dictionary)
 
 A dictionary of settings for test databases; for more details about the
 creation and use of test databases, see :ref:`the-test-database`.
@@ -1121,7 +1121,7 @@ the ``Content-Type`` header.
 DEFAULT_EXCEPTION_REPORTER_FILTER
 ---------------------------------
 
-Default: :class:`django.views.debug.SafeExceptionReporterFilter`
+Default: ``'``:class:`django.views.debug.SafeExceptionReporterFilter`\ ``'``
 
 Default exception reporter filter class to be used if none has been assigned to
 the :class:`~django.http.HttpRequest` instance yet.
@@ -1132,7 +1132,7 @@ See :ref:`Filtering error reports<filtering-error-reports>`.
 DEFAULT_FILE_STORAGE
 --------------------
 
-Default: :class:`django.core.files.storage.FileSystemStorage`
+Default: ``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'``
 
 Default file storage class to be used for any file-related operations that don't
 specify a particular storage system. See :doc:`/topics/files`.
@@ -1185,7 +1185,7 @@ This is only used if ``CommonMiddleware`` is installed (see
 EMAIL_BACKEND
 -------------
 
-Default: ``'django.core.mail.backends.smtp.EmailBackend'``
+Default: ``'``:class:`django.core.mail.backends.smtp.EmailBackend`\ ``'``
 
 The backend to use for sending emails. For the list of available backends see
 :doc:`/topics/email`.
@@ -1664,7 +1664,7 @@ application). See :doc:`/topics/i18n/index`.
 LANGUAGE_COOKIE_PATH
 --------------------
 
-Default: ``/``
+Default: ``'/'``
 
 The path set on the language cookie. This should either match the URL path of your
 Django installation or be a parent of that path.
@@ -1852,9 +1852,7 @@ A list of middleware classes to use. See :doc:`/topics/http/middleware`.
 MIGRATION_MODULES
 -----------------
 
-Default::
-
-    {}  # empty dictionary
+Default: ``{}`` (Empty dictionary)
 
 A dictionary specifying the package where migration modules can be found on a
 per-app basis. The default value of this setting is an empty dictionary, but
@@ -2151,7 +2149,7 @@ SECURE_SSL_REDIRECT
 
 .. versionadded:: 1.8
 
-Default: ``False``.
+Default: ``False``
 
 If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
 :ref:`redirects <ssl-redirect>` all non-HTTPS requests to HTTPS (except for
@@ -2171,7 +2169,7 @@ those URLs matching a regular expression listed in
 SERIALIZATION_MODULES
 ---------------------
 
-Default: Not defined.
+Default: Not defined
 
 A dictionary of modules containing serializer definitions (provided as
 strings), keyed by a string identifier for that serialization type. For
@@ -2200,7 +2198,7 @@ The email address that error messages come from, such as those sent to
 SHORT_DATE_FORMAT
 -----------------
 
-Default: ``m/d/Y`` (e.g. ``12/31/2003``)
+Default: ``'m/d/Y'`` (e.g. ``12/31/2003``)
 
 An available formatting that can be used for displaying date fields on
 templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
@@ -2214,7 +2212,7 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 SHORT_DATETIME_FORMAT
 ---------------------
 
-Default: ``m/d/Y P`` (e.g. ``12/31/2003 4 p.m.``)
+Default: ``'m/d/Y P'`` (e.g. ``12/31/2003 4 p.m.``)
 
 An available formatting that can be used for displaying datetime fields on
 templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
@@ -2282,7 +2280,7 @@ The following options are available for all backends.
 BACKEND
 ~~~~~~~
 
-Default: not defined
+Default: Not defined
 
 The template backend to use. The built-in template backends are:
 
@@ -2486,7 +2484,7 @@ process.
 THOUSAND_SEPARATOR
 ------------------
 
-Default: ``,`` (Comma)
+Default: ``','`` (Comma)
 
 Default thousand separator used when formatting numbers. This setting is
 used only when :setting:`USE_THOUSAND_SEPARATOR` is ``True`` and
@@ -2768,7 +2766,7 @@ authenticate a user. See the :ref:`authentication backends documentation
 AUTH_USER_MODEL
 ---------------
 
-Default: 'auth.User'
+Default: ``'auth.User'``
 
 The model to use to represent a User. See :ref:`auth-custom-user`.
 
@@ -2954,7 +2952,7 @@ Settings for :mod:`django.contrib.sessions`.
 SESSION_CACHE_ALIAS
 -------------------
 
-Default: ``default``
+Default: ``'default'``
 
 If you're using :ref:`cache-based session storage <cached-sessions-backend>`,
 this selects the cache to use.
@@ -3058,7 +3056,7 @@ requests and that's a good thing.
 SESSION_ENGINE
 --------------
 
-Default: ``django.contrib.sessions.backends.db``
+Default: ``'django.contrib.sessions.backends.db'``
 
 Controls where Django stores session data. Included engines are:
 
