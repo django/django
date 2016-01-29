@@ -634,6 +634,7 @@ behavior:
 * :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE`
 * :setting:`SESSION_FILE_PATH`
 * :setting:`SESSION_SAVE_EVERY_REQUEST`
+* :setting:`SESSION_SERIALIZER`
 
 .. _topics-session-security:
 
