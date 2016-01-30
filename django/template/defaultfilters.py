@@ -7,7 +7,6 @@ from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from pprint import pformat
 
-from django.conf import settings
 from django.utils import formats, six
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import force_text, iri_to_uri
@@ -727,8 +726,6 @@ def date(value, arg=None):
     """Formats a date according to the given format."""
     if value in (None, ''):
         return ''
-    if arg is None:
-        arg = settings.DATE_FORMAT
     try:
         return formats.date_format(value, arg)
     except AttributeError:
@@ -743,8 +740,6 @@ def time(value, arg=None):
     """Formats a time according to the given format."""
     if value in (None, ''):
         return ''
-    if arg is None:
-        arg = settings.TIME_FORMAT
     try:
         return formats.time_format(value, arg)
     except AttributeError:
