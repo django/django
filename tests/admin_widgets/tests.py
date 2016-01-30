@@ -1255,6 +1255,12 @@ class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDr
             self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
             '')
 
+        # Help text for the field is displayed
+        self.assertEqual(
+            self.selenium.find_element_by_css_selector('.field-supporting_bands p.help').text,
+            'Supporting Bands.'
+        )
+
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
         self.wait_for_popup()
