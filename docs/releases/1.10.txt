@@ -258,6 +258,9 @@ Migrations
   :class:`~django.db.migrations.operations.RunPython` operations to allow them
   to be removed when squashing migrations.
 
+* Added support for :ref:`non-atomic migrations <non-atomic-migrations>` by
+  setting the ``atomic`` attribute on a ``Migration``.
+
 Models
 ~~~~~~
 

@@ -184,6 +184,53 @@ the respective field according to your needs.
   migration is running. Objects created after the ``AddField`` and before
   ``RunPython`` will have their original ``uuid``’s overwritten.
 
+.. _non-atomic-migrations:
+
+Non-atomic migrations
+~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.10
+
+On databases that support DDL transactions (SQLite and PostgreSQL), migrations
+will run inside a transaction by default. For use cases such as performing data
+migrations on large tables, you may want to prevent a migration from running in
+a transaction by setting the ``atomic`` attribute to ``False``::
+
+    from django.db import migrations
+
+    class Migration(migrations.Migration):
+        atomic = False
+
+Within such a migration, all operations are run without a transaction. It's
+possible to execute parts of the migration inside a transaction using
+:func:`~django.db.transaction.atomic()` or by passing ``atomic=True`` to
+``RunPython``.
+
+Here's an example of a non-atomic data migration that updates a large table in
+smaller batches::
+
+    import uuid
+
+    from django.db import migrations, transaction
+
+    def gen_uuid(apps, schema_editor):
+        MyModel = apps.get_model('myapp', 'MyModel')
+        while MyModel.objects.filter(uuid__isnull=True).exists():
+            with transaction.atomic():
+                for row in MyModel.objects.filter(uuid__isnull=True)[:1000]:
+                    row.uuid = uuid.uuid4()
+                    row.save()
+
+    class Migration(migrations.Migration):
+        atomic = False
+
+        operations = [
+            migrations.RunPython(gen_uuid),
+        ]
+
+The ``atomic`` attribute doesn't have an effect on databases that don't support
+DDL transactions (e.g. MySQL, Oracle).
+
 Controlling the order of migrations
 ===================================
 

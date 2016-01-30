@@ -139,7 +139,7 @@ class RunPython(Operation):
 
     reduces_to_sql = False
 
-    def __init__(self, code, reverse_code=None, atomic=True, hints=None, elidable=False):
+    def __init__(self, code, reverse_code=None, atomic=None, hints=None, elidable=False):
         self.atomic = atomic
         # Forwards code
         if not callable(code):
@@ -161,7 +161,7 @@ class RunPython(Operation):
         }
         if self.reverse_code is not None:
             kwargs['reverse_code'] = self.reverse_code
-        if self.atomic is not True:
+        if self.atomic is not None:
             kwargs['atomic'] = self.atomic
         if self.hints:
             kwargs['hints'] = self.hints

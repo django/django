@@ -48,6 +48,10 @@ class Migration(object):
     # introspection. If False, never perform introspection.
     initial = None
 
+    # Whether to wrap the whole migration in a transaction. Only has an effect
+    # on database backends which support transactional DDL.
+    atomic = True
+
     def __init__(self, name, app_label):
         self.name = name
         self.app_label = app_label
@@ -114,8 +118,10 @@ class Migration(object):
             old_state = project_state.clone()
             operation.state_forwards(self.app_label, project_state)
             # Run the operation
-            if not schema_editor.connection.features.can_rollback_ddl and operation.atomic:
-                # We're forcing a transaction on a non-transactional-DDL backend
+            atomic_operation = operation.atomic or (self.atomic and operation.atomic is not False)
+            if not schema_editor.atomic_migration and atomic_operation:
+                # Force a transaction on a non-transactional-DDL backend or an
+                # atomic operation inside a non-atomic migration.
                 with atomic(schema_editor.connection.alias):
                     operation.database_forwards(self.app_label, schema_editor, old_state, project_state)
             else:
