@@ -362,6 +362,19 @@ class MigrateTests(MigrationTestBase):
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_non_atomic"})
+    def test_sqlmigrate_for_non_atomic_migration(self):
+        """
+        Transaction wrappers aren't shown for non-atomic migrations.
+        """
+        out = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=out)
+        output = out.getvalue().lower()
+        queries = [q.strip() for q in output.splitlines()]
+        if connection.ops.start_transaction_sql():
+            self.assertNotIn(connection.ops.start_transaction_sql().lower(), queries)
+        self.assertNotIn(connection.ops.end_transaction_sql().lower(), queries)
+
     @override_settings(
         INSTALLED_APPS=[
             "migrations.migrations_test_apps.migrated_app",

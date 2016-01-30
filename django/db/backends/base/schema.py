@@ -69,17 +69,18 @@ class BaseDatabaseSchemaEditor(object):
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
     sql_delete_pk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    def __init__(self, connection, collect_sql=False):
+    def __init__(self, connection, collect_sql=False, atomic=True):
         self.connection = connection
         self.collect_sql = collect_sql
         if self.collect_sql:
             self.collected_sql = []
+        self.atomic_migration = self.connection.features.can_rollback_ddl and atomic
 
     # State-managing methods
 
     def __enter__(self):
         self.deferred_sql = []
-        if self.connection.features.can_rollback_ddl:
+        if self.atomic_migration:
             self.atomic = atomic(self.connection.alias)
             self.atomic.__enter__()
         return self
@@ -88,7 +89,7 @@ class BaseDatabaseSchemaEditor(object):
         if exc_type is None:
             for sql in self.deferred_sql:
                 self.execute(sql)
-        if self.connection.features.can_rollback_ddl:
+        if self.atomic_migration:
             self.atomic.__exit__(exc_type, exc_value, traceback)
 
     # Core utility functions

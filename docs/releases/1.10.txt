@@ -246,6 +246,8 @@ Migrations
 
 * Added support for serialization of ``enum.Enum`` objects.
 
+* Added support for :ref:`non-atomic migrations <non-atomic-migrations>` by
+  setting the ``atomic`` class attribute on a ``Migration``.
 * Added the ``elidable`` argument to the
   :class:`~django.db.migrations.operations.RunSQL` and
   :class:`~django.db.migrations.operations.RunPython` operations to allow them

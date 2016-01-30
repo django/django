@@ -170,7 +170,7 @@ class MigrationExecutor(object):
         statements = []
         state = None
         for migration, backwards in plan:
-            with self.connection.schema_editor(collect_sql=True) as schema_editor:
+            with self.connection.schema_editor(collect_sql=True, atomic=migration.atomic) as schema_editor:
                 if state is None:
                     state = self.loader.project_state((migration.app_label, migration.name), at_end=False)
                 if not backwards:
@@ -194,7 +194,7 @@ class MigrationExecutor(object):
                     fake = True
             if not fake:
                 # Alright, do it normally
-                with self.connection.schema_editor() as schema_editor:
+                with self.connection.schema_editor(atomic=migration.atomic) as schema_editor:
                     state = migration.apply(state, schema_editor)
         # For replacement migrations, record individual statuses
         if migration.replaces:
@@ -214,7 +214,7 @@ class MigrationExecutor(object):
         if self.progress_callback:
             self.progress_callback("unapply_start", migration, fake)
         if not fake:
-            with self.connection.schema_editor() as schema_editor:
+            with self.connection.schema_editor(atomic=migration.atomic) as schema_editor:
                 state = migration.unapply(state, schema_editor)
         # For replacement migrations, record individual statuses
         if migration.replaces:
