@@ -631,6 +631,11 @@ achieve that, use ``values_list()`` followed by a ``get()`` call::
     >>> Entry.objects.values_list('headline', flat=True).get(pk=1)
     'First entry'
 
+While dealing with :class:`~django.db.models.ManyToManyField` attributes and reverse relations, you may want to keep in mind the effect multiple related rows can have on the size of your result set. For example, see how the following query produces 4 results::
+
+    >>> Author.objects.values_list('name', 'entry__headline')
+    [('Noam Chomsky', 'Impressions of Gaza'), ('George Orwell', 'Why Socialists Do Not Believe in Fun'), ('George Orwell', 'In Defence of English Cooking'), ('Don Quixote', None)]
+
 dates
 ~~~~~
 
