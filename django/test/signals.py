@@ -98,6 +98,9 @@ def reset_template_engines(**kwargs):
         from django.template.engine import Engine
         Engine.get_default.cache_clear()
 
+        from django.forms.renderers import get_default_renderer
+        get_default_renderer.cache_clear()
+
 
 @receiver(setting_changed)
 def clear_serializers_cache(**kwargs):

@@ -1,0 +1,1 @@
+{% for name, value in widget.attrs.items %} {{ name }}{% if not value is True %}="{{ value }}"{% endif %}{% endfor %}

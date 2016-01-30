@@ -16,7 +16,7 @@ class OpenLayersWidget(Textarea):
     """
     Renders an OpenLayers map using the WKT of the geometry.
     """
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         # Update the template parameters with any attributes passed in.
         if attrs:
             self.params.update(attrs)
