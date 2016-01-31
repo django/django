@@ -2329,8 +2329,8 @@ See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
 
 .. setting:: TIME_FORMAT
 
-TIME_FORMAT
------------
+``TIME_FORMAT``
+---------------
 
 Default: ``'P'`` (e.g. ``4 p.m.``)
 

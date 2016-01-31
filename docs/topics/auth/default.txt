@@ -17,8 +17,8 @@ are somewhat coupled.
 
 .. _user-objects:
 
-User objects
-============
+``User`` objects
+================
 
 :class:`~django.contrib.auth.models.User` objects are the core of the
 authentication system. They typically represent the people interacting with

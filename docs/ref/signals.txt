@@ -42,8 +42,8 @@ model system.
     as ``'polls.Answer'``. This sort of reference can be quite handy when
     dealing with circular import dependencies and swappable models.
 
-pre_init
---------
+``pre_init``
+------------
 
 .. attribute:: django.db.models.signals.pre_init
    :module:
@@ -343,8 +343,8 @@ Argument        Value
 ``using``       ``"default"`` (since the default router sends writes here)
 ==============  ============================================================
 
-class_prepared
---------------
+``class_prepared``
+------------------
 
 .. data:: django.db.models.signals.class_prepared
    :module:

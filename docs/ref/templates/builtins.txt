@@ -16,8 +16,8 @@ Built-in tag reference
 
 .. templatetag:: autoescape
 
-autoescape
-----------
+``autoescape``
+--------------
 
 Controls the current auto-escaping behavior. This tag takes either ``on`` or
 ``off`` as an argument and that determines whether auto-escaping is in effect
@@ -40,16 +40,16 @@ Sample usage::
 
 .. templatetag:: block
 
-block
------
+``block``
+---------
 
 Defines a block that can be overridden by child templates. See
 :ref:`Template inheritance <template-inheritance>` for more information.
 
 .. templatetag:: comment
 
-comment
--------
+``comment``
+-----------
 
 Ignores everything between ``{% comment %}`` and ``{% endcomment %}``.
 An optional note may be inserted in the first tag. For example, this is
@@ -66,16 +66,16 @@ Sample usage::
 
 .. templatetag:: csrf_token
 
-csrf_token
-----------
+``csrf_token``
+--------------
 
 This tag is used for CSRF protection, as described in the documentation for
 :doc:`Cross Site Request Forgeries </ref/csrf>`.
 
 .. templatetag:: cycle
 
-cycle
------
+``cycle``
+---------
 
 Produces one of its arguments each time this tag is encountered. The first
 argument is produced on the first encounter, the second argument on the second
@@ -195,8 +195,8 @@ and imported modules.
 
 .. templatetag:: extends
 
-extends
--------
+``extends``
+-----------
 
 Signals that this template extends a parent template.
 
@@ -757,8 +757,8 @@ Examples:
 
 .. templatetag:: now
 
-now
----
+``now``
+-------
 
 Displays the current date and/or time, using a format according to the given
 string. Such string can contain format specifiers characters as described

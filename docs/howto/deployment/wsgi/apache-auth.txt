@@ -25,8 +25,8 @@ version >= 2.2 and mod_wsgi >= 2.0. For example, you could:
 .. _Subversion: http://subversion.tigris.org/
 .. _mod_dav: https://httpd.apache.org/docs/2.2/mod/mod_dav.html
 
-Authentication with mod_wsgi
-============================
+Authentication with ``mod_wsgi``
+================================
 
 .. note::
 

@@ -99,8 +99,8 @@ Other topics
 
             admin.site.register(Author)
 
-The register decorator
-----------------------
+The ``register`` decorator
+--------------------------
 
 .. function:: register(*models, site=django.admin.sites.site)
 

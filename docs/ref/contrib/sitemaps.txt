@@ -75,8 +75,8 @@ The sitemap view takes an extra, required argument: ``{'sitemaps': sitemaps}``.
 a :class:`~django.contrib.sitemaps.Sitemap` class (e.g.,
 ``BlogSitemap(some_var)``).
 
-Sitemap classes
-===============
+``Sitemap`` classes
+===================
 
 A :class:`~django.contrib.sitemaps.Sitemap` class is a simple Python
 class that represents a "section" of entries in your sitemap. For example,
@@ -129,8 +129,8 @@ Note:
   :attr:`~Sitemap.location()` calls ``get_absolute_url()`` on each object
   and returns the result.
 
-Sitemap class reference
-=======================
+``Sitemap`` class reference
+===========================
 
 .. class:: Sitemap
 

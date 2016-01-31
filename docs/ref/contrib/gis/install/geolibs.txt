@@ -157,8 +157,8 @@ See also :ref:`My logs are filled with GEOS-related errors <geos-exceptions-in-l
 
 .. _proj4:
 
-``PROJ.4``
-----------
+PROJ.4
+------
 
 `PROJ.4`_ is a library for converting geospatial data to different coordinate
 reference systems.
@@ -185,8 +185,8 @@ Finally, configure, make and install PROJ.4::
 
 .. _gdalbuild:
 
-``GDAL``
---------
+GDAL
+----
 
 `GDAL`__ is an excellent open source geospatial library that has support for
 reading most vector and raster spatial data formats.  Currently, GeoDjango only

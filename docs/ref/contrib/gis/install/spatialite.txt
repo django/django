@@ -1,6 +1,6 @@
-=========================
-Installing ``Spatialite``
-=========================
+=====================
+Installing Spatialite
+=====================
 
 `SpatiaLite`__ adds spatial support to SQLite, turning it into a full-featured
 spatial database.
@@ -86,8 +86,8 @@ Mac OS X-specific instructions
 To install the SpatiaLite library and tools, Mac OS X users can choose between
 :ref:`kyngchaos` and `Homebrew`_.
 
-``KyngChaos``
--------------
+KyngChaos
+---------
 
 First, follow the instructions in the :ref:`kyngchaos` section.
 

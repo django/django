@@ -59,8 +59,8 @@ settings file. Here's an explanation of all available values for
 
 .. _memcached:
 
-Memcached
----------
+``Memcached``
+-------------
 
 The fastest, most efficient type of cache supported natively by Django,
 Memcached__ is an entirely memory-based cache server, originally developed
@@ -1231,8 +1231,8 @@ Example::
 
 .. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
-Order of MIDDLEWARE_CLASSES
-===========================
+Order of ``MIDDLEWARE_CLASSES``
+===============================
 
 If you use caching middleware, it's important to put each half in the right
 place within the :setting:`MIDDLEWARE_CLASSES` setting. That's because the cache

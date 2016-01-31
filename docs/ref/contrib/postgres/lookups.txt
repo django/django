@@ -2,8 +2,8 @@
 PostgreSQL specific lookups
 ===========================
 
-Unaccent
-========
+``Unaccent``
+============
 
 .. fieldlookup:: unaccent
 

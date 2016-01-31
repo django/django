@@ -22,8 +22,8 @@ views for displaying drilldown pages for date-based data.
             def get_absolute_url(self):
                 return reverse('article-detail', kwargs={'pk': self.pk})
 
-ArchiveIndexView
-================
+``ArchiveIndexView``
+====================
 
 .. class:: ArchiveIndexView
 
@@ -86,8 +86,8 @@ ArchiveIndexView
 
     This will output all articles.
 
-YearArchiveView
-===============
+``YearArchiveView``
+===================
 
 .. class:: YearArchiveView
 

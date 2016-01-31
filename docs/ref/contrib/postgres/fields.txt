@@ -425,8 +425,8 @@ Returns objects where all of the given keys are in the data. Uses the SQL operat
 
 .. fieldlookup:: hstorefield.keys
 
-keys
-~~~~
+``keys``
+~~~~~~~~
 
 Returns objects where the array of keys is the given value. Note that the order
 is not guaranteed to be reliable, so this transform is mainly useful for using
@@ -442,8 +442,8 @@ in conjunction with lookups on
 
 .. fieldlookup:: hstorefield.values
 
-values
-~~~~~~
+``values``
+~~~~~~~~~~
 
 Returns objects where the array of values is the given value. Note that the
 order is not guaranteed to be reliable, so this transform is mainly useful for
@@ -598,8 +598,8 @@ excluded.
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
-BigIntegerRangeField
---------------------
+``BigIntegerRangeField``
+------------------------
 
 .. class:: BigIntegerRangeField(**options)
 

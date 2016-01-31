@@ -1,6 +1,6 @@
-===========================================
-TemplateResponse and SimpleTemplateResponse
-===========================================
+===================================================
+``TemplateResponse`` and ``SimpleTemplateResponse``
+===================================================
 
 .. module:: django.template.response
    :synopsis: Classes dealing with lazy-rendered HTTP responses.

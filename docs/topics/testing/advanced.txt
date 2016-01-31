@@ -534,8 +534,8 @@ Methods
 Testing utilities
 -----------------
 
-django.test.utils
-~~~~~~~~~~~~~~~~~
+``django.test.utils``
+~~~~~~~~~~~~~~~~~~~~~
 
 .. module:: django.test.utils
    :synopsis: Helpers to write custom test runners.
@@ -555,8 +555,8 @@ utility methods in the ``django.test.utils`` module.
     magic hooks into the template system and restoring normal email
     services.
 
-django.db.connection.creation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.db.connection.creation``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentmodule:: django.db.connection.creation
 

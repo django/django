@@ -29,8 +29,8 @@ matches the version you installed by executing::
 
     python --version
 
-About pip
-=========
+About ``pip``
+=============
 
 `pip`_ is a package manage for Python. It makes installing and uninstalling
 Python packages (such as Django!) very easy. For the rest of the installation,

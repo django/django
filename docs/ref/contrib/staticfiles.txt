@@ -318,6 +318,7 @@ hashing algorithm.
 .. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
 
 ``CachedStaticFilesStorage``
+----------------------------
 
 .. class:: storage.CachedStaticFilesStorage
 

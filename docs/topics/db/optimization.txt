@@ -58,14 +58,14 @@ work. This document also does not address other optimization techniques that
 apply to all expensive operations, such as :doc:`general purpose caching
 </topics/cache>`.
 
-Understand QuerySets
-====================
+Understand ``QuerySets``
+========================
 
 Understanding :doc:`QuerySets </ref/models/querysets>` is vital to getting good
 performance with simple code. In particular:
 
-Understand QuerySet evaluation
-------------------------------
+Understand ``QuerySet`` evaluation
+----------------------------------
 
 To avoid performance problems, it is important to understand:
 
