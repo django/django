@@ -48,6 +48,10 @@ class Student(CommonInfo):
         inherit_permissions = True
 
 
+class StudentWorker(Student, Worker):
+    pass
+
+
 class Teacher(CommonInfo):
     school_class = models.CharField(max_length=10)
 
