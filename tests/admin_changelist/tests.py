@@ -608,6 +608,70 @@ class ChangeListTests(TestCase):
         self.assertContains(response, '<td class="field-swallowonetoone">-</td>')
         self.assertContains(response, '<td class="field-swallowonetoone">%s</td>' % swallow_o2o)
 
+    def test_multiuser_edit(self):
+        """
+        Regression test for #11313
+        (Simultaneous edits of list editable fields on the changelist by multiple
+        users can result in one user's edits creating a new object instead of
+        modifying the correct existing object.)
+        """
+        # To replicate this issue we must simulate the following steps:
+        # 1) User1 opens an admin changelist for a model with list-editable fields
+        # 2) User2 edits object "Foo" of that same model such that it moves to
+        # another page in the pagination order and saves
+        # 3) User1 edits object "Foo" and saves
+        # 4) The edit made by User1 does not get applied to object "Foo" but
+        # instead are used to create a new object
+
+        # For this test we will order the changelist by the 'speed' attribute
+        # and will display 3 objects per page.
+
+        # We will setup our test to reflect the DB state right after Step 2,
+        # where User2 has edited the first swallow object's speed from '4' to '1'.
+        Swallow.objects.create(origin='A', load='4', speed='1')
+        Swallow.objects.create(origin='B', load='2', speed='2')
+        Swallow.objects.create(origin='C', load='5', speed='5')
+        Swallow.objects.create(origin='D', load='9', speed='9')
+
+        User.objects.create_superuser(
+            username='User1', email='user1@localhost', password='secret')
+        self.client.login(username='User1', password='secret')
+
+        changelist_url = reverse('admin:admin_changelist_swallow_changelist')
+
+        # Here we send the POST from User1 for Step 3.  Note that it is still
+        # using the changelist ordering from before User2's edits in Step 2.
+        self.client.post(changelist_url, {'form-TOTAL_FORMS': '3',
+                                          'form-INITIAL_FORMS': '3',
+                                          'form-MIN_NUM_FORMS': '0',
+                                          'form-MAX_NUM_FORMS': '1000',
+                                          'form-0-id': '4',
+                                          'form-1-id': '3',
+                                          'form-2-id': '1',
+                                          'form-0-load': '9.0',
+                                          'form-0-speed': '9.0',
+                                          'form-1-load': '5.0',
+                                          'form-1-speed': '5.0',
+                                          'form-2-load': '5',
+                                          'form-2-speed': '4.0',
+                                          '_save': 'Save'
+                                          }, follow=True, extra={'o': '-2'})
+
+        response = self.client.get(changelist_url, {'o': '-2'})
+
+        # Now we check to see that the object User1 edited in Step 3 is displayed
+        # on the changelist and has the correct edits applied.
+        self.assertContains(response,
+        '<a href="/admin/admin_changelist/swallow/1/change/?_changelist_filters=o%3D-2">A</a>')
+        self.assertContains(response,
+        '<input id="id_form-2-load" name="form-2-load" step="any" type="number" value="5.0" />')
+        self.assertContains(response,
+        '<input id="id_form-2-speed" name="form-2-speed" step="any" type="number" value="4.0" />')
+        # As an additional check, we can make sure that the number of swallow
+        # objects is still the same, ensuring no new objects were created.
+        self.assertContains(response, '4 swallows')
+        self.assertEqual(4, len(Swallow.objects.all()))
+
     def test_deterministic_order_for_unordered_model(self):
         """
         Ensure that the primary key is systematically used in the ordering of
