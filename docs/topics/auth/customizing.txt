@@ -300,8 +300,8 @@ change to what is stored in the database, you can create a :ref:`proxy model
 allows for any of the features offered by proxy models including default
 ordering, custom managers, or custom model methods.
 
-If you wish to store information related to ``User``, you can use a :ref:`one-to-one
-relationship <ref-onetoone>` to a model containing the fields for
+If you wish to store information related to ``User``, you can use a
+:class:`~django.db.models.OneToOneField` to a model containing the fields for
 additional information. This one-to-one model is often called a profile model,
 as it might store non-auth related information about a site user. For example
 you might create an Employee model::
