@@ -184,7 +184,7 @@ Generic Views
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* New parameter `prefix_default_language` for :func:`~django.conf.urls.i18n.i18n_patterns`.
 
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
