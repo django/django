@@ -47,8 +47,8 @@ There are two reasons you might want to customize a ``Manager``: to add extra
 ``Manager`` methods, and/or to modify the initial ``QuerySet`` the ``Manager``
 returns.
 
-Adding extra Manager methods
-----------------------------
+Adding extra ``Manager`` methods
+--------------------------------
 
 Adding extra ``Manager`` methods is the preferred way to add "table-level"
 functionality to your models. (For "row-level" functionality -- i.e., functions
@@ -97,8 +97,8 @@ that list of ``OpinionPoll`` objects with ``num_responses`` attributes.
 Another thing to note about this example is that ``Manager`` methods can
 access ``self.model`` to get the model class to which they're attached.
 
-Modifying initial Manager QuerySets
------------------------------------
+Modifying initial ``Manager`` ``QuerySets``
+-------------------------------------------
 
 A ``Manager``’s base ``QuerySet`` returns all objects in the system. For
 example, using this model::
@@ -288,8 +288,8 @@ For example::
             return
         _opted_in_private_method.queryset_only = False
 
-from_queryset
-~~~~~~~~~~~~~
+``from_queryset``
+~~~~~~~~~~~~~~~~~
 
 .. classmethod:: from_queryset(queryset_class)
 
@@ -438,8 +438,8 @@ be copied.
 
 .. _manager-types:
 
-Controlling automatic Manager types
-===================================
+Controlling automatic ``Manager`` types
+=======================================
 
 This document has already mentioned a couple of places where Django creates a
 manager class for you: `default managers`_ and the "plain" manager used to

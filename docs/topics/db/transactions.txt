@@ -589,8 +589,8 @@ will handle transactions as explained in this document.
 
 .. _information on MySQL transactions: https://dev.mysql.com/doc/refman/5.6/en/sql-syntax-transactions.html
 
-Handling exceptions within PostgreSQL transactions
---------------------------------------------------
+Handling exceptions within ``PostgreSQL`` transactions
+------------------------------------------------------
 
 .. note::
 

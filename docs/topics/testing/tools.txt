@@ -742,8 +742,8 @@ to test the effects of commit and rollback:
 
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
 
-TestCase
---------
+``TestCase``
+------------
 
 .. class:: TestCase()
 
@@ -811,8 +811,8 @@ additions, including:
 
 .. _live-test-server:
 
-LiveServerTestCase
-------------------
+``LiveServerTestCase``
+----------------------
 
 .. class:: LiveServerTestCase()
 

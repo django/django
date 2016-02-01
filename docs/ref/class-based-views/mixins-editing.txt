@@ -14,8 +14,8 @@ The following mixins are used to construct Django's editing views:
     Examples of how these are combined into editing views can be found at
     the documentation on :doc:`/ref/class-based-views/generic-editing`.
 
-FormMixin
-=========
+``FormMixin``
+=============
 
 .. class:: django.views.generic.edit.FormMixin
 
@@ -94,8 +94,8 @@ FormMixin
         Calls :meth:`get_form` and adds the result to the context data with the
         name 'form'.
 
-ModelFormMixin
-==============
+``ModelFormMixin``
+==================
 
 .. class:: django.views.generic.edit.ModelFormMixin
 
@@ -180,8 +180,8 @@ ModelFormMixin
         Renders a response, providing the invalid form as context.
 
 
-ProcessFormView
-===============
+``ProcessFormView``
+===================
 
 .. class:: django.views.generic.edit.ProcessFormView
 
@@ -220,8 +220,8 @@ ProcessFormView
         through to :meth:`post`.
 
 
-DeletionMixin
-=============
+``DeletionMixin``
+=================
 
 .. class:: django.views.generic.edit.DeletionMixin
 

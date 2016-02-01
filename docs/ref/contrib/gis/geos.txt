@@ -1107,8 +1107,8 @@ Settings
 
 .. setting:: GEOS_LIBRARY_PATH
 
-GEOS_LIBRARY_PATH
------------------
+``GEOS_LIBRARY_PATH``
+---------------------
 
 A string specifying the location of the GEOS C library.  Typically,
 this setting is only used if the GEOS C library is in a non-standard

@@ -265,8 +265,8 @@ refinement process.
 
 .. _querysets-are-lazy:
 
-QuerySets are lazy
-~~~~~~~~~~~~~~~~~~
+``QuerySets`` are lazy
+~~~~~~~~~~~~~~~~~~~~~~
 
 ``QuerySets`` are lazy -- the act of creating a
 :class:`~django.db.models.query.QuerySet` doesn't involve any database
@@ -324,8 +324,8 @@ Similarly, Django will complain if more than one item matches the
 attribute of the model class itself.
 
 
-Other QuerySet methods
-----------------------
+Other ``QuerySet`` methods
+--------------------------
 
 Most of the time you'll use :meth:`~django.db.models.query.QuerySet.all`,
 :meth:`~django.db.models.query.QuerySet.get`,
@@ -337,8 +337,8 @@ various :class:`~django.db.models.query.QuerySet` methods.
 
 .. _limiting-querysets:
 
-Limiting QuerySets
-------------------
+Limiting ``QuerySets``
+----------------------
 
 Use a subset of Python's array-slicing syntax to limit your
 :class:`~django.db.models.query.QuerySet` to a certain number of results. This
@@ -720,8 +720,8 @@ for you transparently.
 
 .. _caching-and-querysets:
 
-Caching and QuerySets
----------------------
+Caching and ``QuerySets``
+-------------------------
 
 Each :class:`~django.db.models.query.QuerySet` contains a cache to minimize
 database access. Understanding how it works will allow you to write the most
@@ -756,8 +756,8 @@ To avoid this problem, simply save the
     >>> print([p.headline for p in queryset]) # Evaluate the query set.
     >>> print([p.pub_date for p in queryset]) # Re-use the cache from the evaluation.
 
-When querysets are not cached
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When ``QuerySets`` are not cached
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Querysets do not always cache their results.  When evaluating only *part* of
 the queryset, the cache is checked, but if it is not populated then the items

@@ -180,8 +180,8 @@ Finally, we hook these new views into the URLconf:
     :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
     on your view class.
 
-Models and request.user
-=======================
+Models and ``request.user``
+===========================
 
 To track the user that created an object using a :class:`CreateView`,
 you can use a custom :class:`~django.forms.ModelForm` to do this. First, add

@@ -1,6 +1,6 @@
-===================
-The staticfiles app
-===================
+=======================
+The ``staticfiles`` app
+=======================
 
 .. module:: django.contrib.staticfiles
    :synopsis: An app for handling static files.
@@ -34,8 +34,8 @@ Management Commands
 
 ``django.contrib.staticfiles`` exposes three management commands.
 
-collectstatic
--------------
+``collectstatic``
+-----------------
 
 .. django-admin:: collectstatic
 
@@ -128,8 +128,8 @@ For a full list of options, refer to the commands own help by running::
 
    $ python manage.py collectstatic --help
 
-findstatic
-----------
+``findstatic``
+--------------
 
 .. django-admin:: findstatic static file [static file ...]
 
@@ -177,8 +177,8 @@ the directories which were searched::
 
 .. _staticfiles-runserver:
 
-runserver
----------
+``runserver``
+-------------
 
 .. django-admin:: runserver [addrport]
 
@@ -218,8 +218,8 @@ Example usage::
 Storages
 ========
 
-StaticFilesStorage
-------------------
+``StaticFilesStorage``
+----------------------
 
 .. class:: storage.StaticFilesStorage
 
@@ -238,8 +238,8 @@ The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
 uses this behind the scenes to replace the paths with their hashed
 counterparts and update the cache appropriately.
 
-ManifestStaticFilesStorage
---------------------------
+``ManifestStaticFilesStorage``
+------------------------------
 
 .. class:: storage.ManifestStaticFilesStorage
 
@@ -317,8 +317,8 @@ hashing algorithm.
 .. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
 
-CachedStaticFilesStorage
-------------------------
+``CachedStaticFilesStorage``
+----------------------------
 
 .. class:: storage.CachedStaticFilesStorage
 

@@ -60,8 +60,8 @@ usage::
 
 .. setting:: GEOIP_PATH
 
-GEOIP_PATH
-----------
+``GEOIP_PATH``
+--------------
 
 A string specifying the directory where the GeoIP data files are
 located.  This setting is *required* unless manually specified
@@ -69,8 +69,8 @@ with ``path`` keyword when initializing the :class:`GeoIP` object.
 
 .. setting:: GEOIP_LIBRARY_PATH
 
-GEOIP_LIBRARY_PATH
-------------------
+``GEOIP_LIBRARY_PATH``
+----------------------
 
 A string specifying the location of the GeoIP C library.  Typically,
 this setting is only used if the GeoIP C library is in a non-standard
@@ -78,16 +78,16 @@ location (e.g., ``/home/sue/lib/libGeoIP.so``).
 
 .. setting:: GEOIP_COUNTRY
 
-GEOIP_COUNTRY
--------------
+``GEOIP_COUNTRY``
+-----------------
 
 The basename to use for the GeoIP country data file.
 Defaults to ``'GeoIP.dat'``.
 
 .. setting:: GEOIP_CITY
 
-GEOIP_CITY
-----------
+``GEOIP_CITY``
+--------------
 
 The basename to use for the GeoIP city data file.
 Defaults to ``'GeoLiteCity.dat'``.

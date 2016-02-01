@@ -76,8 +76,8 @@ Template tags
 
 .. templatetag:: localize
 
-localize
-~~~~~~~~
+``localize``
+~~~~~~~~~~~~
 
 Enables or disables localization of template variables in the
 contained block.
@@ -110,8 +110,8 @@ Template filters
 
 .. templatefilter:: localize
 
-localize
-~~~~~~~~
+``localize``
+~~~~~~~~~~~~
 
 Forces localization of a single value.
 

@@ -9,8 +9,8 @@ topic guide </topics/auth/index>`.
 
 .. currentmodule:: django.contrib.auth
 
-User
-====
+``User`` model
+==============
 
 Fields
 ------
@@ -262,8 +262,8 @@ Manager methods
         :attr:`~models.User.is_superuser` to ``True``.
 
 
-Anonymous users
-===============
+``AnonymousUser`` object
+========================
 
 .. class:: models.AnonymousUser
 
@@ -296,8 +296,8 @@ In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
 they're used by Web requests, as explained in the next section.
 
-Permission
-==========
+``Permission`` model
+====================
 
 .. class:: models.Permission
 
@@ -328,8 +328,8 @@ Methods
 :class:`~django.contrib.auth.models.Permission` objects have the standard
 data-access methods like any other :doc:`Django model </ref/models/instances>`.
 
-Group
-=====
+``Group`` model
+===============
 
 .. class:: models.Group
 
