@@ -9,4 +9,5 @@ Django 1.9.3 fixes several bugs in 1.9.2.
 Bugfixes
 ========
 
-* ...
+* Skipped URL checks (new in 1.9) if the ``ROOT_URLCONF`` setting isn't defined
+  (:ticket:`26155`).

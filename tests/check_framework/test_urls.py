@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.checks.urls import check_url_config
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -35,3 +36,9 @@ class CheckUrlsTest(SimpleTestCase):
         self.assertEqual(warning.id, 'urls.W003')
         expected_msg = "Your URL pattern '^$' [name='name_with:colon'] has a name including a ':'."
         self.assertIn(expected_msg, warning.msg)
+
+    @override_settings(ROOT_URLCONF=None)
+    def test_no_root_urlconf_in_settings(self):
+        delattr(settings, 'ROOT_URLCONF')
+        result = check_url_config(None)
+        self.assertEqual(result, [])
