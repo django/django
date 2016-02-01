@@ -13,11 +13,10 @@ from django.contrib.admin import helpers, widgets
 from django.contrib.admin.checks import (
     BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
 )
-from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
-    NestedObjects, flatten_fieldsets, get_deleted_objects,
-    lookup_needs_distinct, model_format_dict, quote, unquote,
+    NestedObjects, flatten_fieldsets, lookup_needs_distinct, model_format_dict,
+    quote, unquote,
 )
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import (
@@ -27,7 +26,7 @@ from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
-from django.forms.formsets import DELETION_FIELD_NAME, all_valid
+from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import (
     BaseInlineFormSet, inlineformset_factory, modelform_defines_fields,
     modelform_factory, modelformset_factory,
@@ -1391,107 +1390,19 @@ class ModelAdmin(BaseModelAdmin):
 
     @csrf_protect_m
     @transaction.atomic
-    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-
-        to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
-        if to_field and not self.to_field_allowed(request, to_field):
-            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
-
-        model = self.model
-        opts = model._meta
-        add = object_id is None
-
-        if add:
-            if not self.has_add_permission(request):
-                raise PermissionDenied
-            obj = None
-
-        else:
-            obj = self.get_object(request, unquote(object_id), to_field)
-
-            if not self.has_change_permission(request, obj):
-                raise PermissionDenied
-
-            if obj is None:
-                raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-                    'name': force_text(opts.verbose_name), 'key': escape(object_id)})
-
-            if request.method == 'POST' and "_saveasnew" in request.POST:
-                object_id = None
-                obj = None
-
-        ModelForm = self.get_form(request, obj)
-        if request.method == 'POST':
-            form = ModelForm(request.POST, request.FILES, instance=obj)
-            if form.is_valid():
-                form_validated = True
-                new_object = self.save_form(request, form, change=not add)
-            else:
-                form_validated = False
-                new_object = form.instance
-            formsets, inline_instances = self._create_formsets(request, new_object, change=not add)
-            if all_valid(formsets) and form_validated:
-                self.save_model(request, new_object, form, not add)
-                self.save_related(request, form, formsets, not add)
-                change_message = self.construct_change_message(request, form, formsets, add)
-                if add:
-                    self.log_addition(request, new_object, change_message)
-                    return self.response_add(request, new_object)
-                else:
-                    self.log_change(request, new_object, change_message)
-                    return self.response_change(request, new_object)
-            else:
-                form_validated = False
-        else:
-            if add:
-                initial = self.get_changeform_initial_data(request)
-                form = ModelForm(initial=initial)
-                formsets, inline_instances = self._create_formsets(request, form.instance, change=False)
-            else:
-                form = ModelForm(instance=obj)
-                formsets, inline_instances = self._create_formsets(request, obj, change=True)
-
-        adminForm = helpers.AdminForm(
-            form,
-            list(self.get_fieldsets(request, obj)),
-            self.get_prepopulated_fields(request, obj),
-            self.get_readonly_fields(request, obj),
-            model_admin=self)
-        media = self.media + adminForm.media
-
-        inline_formsets = self.get_inline_formsets(request, formsets, inline_instances, obj)
-        for inline_formset in inline_formsets:
-            media = media + inline_formset.media
-
-        context = dict(self.admin_site.each_context(request),
-            title=(_('Add %s') if add else _('Change %s')) % force_text(opts.verbose_name),
-            adminform=adminForm,
-            object_id=object_id,
-            original=obj,
-            is_popup=(IS_POPUP_VAR in request.POST or
-                      IS_POPUP_VAR in request.GET),
-            to_field=to_field,
-            media=media,
-            inline_admin_formsets=inline_formsets,
-            errors=helpers.AdminErrorList(form, formsets),
-            preserved_filters=self.get_preserved_filters(request),
-        )
-
-        # Hide the "Save" and "Save and continue" buttons if "Save as New" was
-        # previously chosen to prevent the interface from getting confusing.
-        if request.method == 'POST' and not form_validated and "_saveasnew" in request.POST:
-            context['show_save'] = False
-            context['show_save_and_continue'] = False
-
-        context.update(extra_context or {})
-
-        return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
-
     def add_view(self, request, form_url='', extra_context=None):
-        return self.changeform_view(request, None, form_url, extra_context)
+        from django.contrib.admin.views.options import AddView
+        return AddView.as_view(
+            admin=self, object_id=None, extra_context=extra_context,
+            form_url=form_url)(request)
 
+    @csrf_protect_m
+    @transaction.atomic
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        return self.changeform_view(request, object_id, form_url, extra_context)
+        from django.contrib.admin.views.options import ChangeView
+        return ChangeView.as_view(
+            admin=self, object_id=object_id, extra_context=extra_context,
+            form_url=form_url)(request)
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
@@ -1656,69 +1567,9 @@ class ModelAdmin(BaseModelAdmin):
     @csrf_protect_m
     @transaction.atomic
     def delete_view(self, request, object_id, extra_context=None):
-        "The 'delete' admin view for this model."
-        opts = self.model._meta
-        app_label = opts.app_label
-
-        to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
-        if to_field and not self.to_field_allowed(request, to_field):
-            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
-
-        obj = self.get_object(request, unquote(object_id), to_field)
-
-        if not self.has_delete_permission(request, obj):
-            raise PermissionDenied
-
-        if obj is None:
-            raise Http404(
-                _('%(name)s object with primary key %(key)r does not exist.') %
-                {'name': force_text(opts.verbose_name), 'key': escape(object_id)}
-            )
-
-        using = router.db_for_write(self.model)
-
-        # Populate deleted_objects, a data structure of all related objects that
-        # will also be deleted.
-        (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-            [obj], opts, request.user, self.admin_site, using)
-
-        if request.POST:  # The user has already confirmed the deletion.
-            if perms_needed:
-                raise PermissionDenied
-            obj_display = force_text(obj)
-            attr = str(to_field) if to_field else opts.pk.attname
-            obj_id = obj.serializable_value(attr)
-            self.log_deletion(request, obj, obj_display)
-            self.delete_model(request, obj)
-
-            return self.response_delete(request, obj_display, obj_id)
-
-        object_name = force_text(opts.verbose_name)
-
-        if perms_needed or protected:
-            title = _("Cannot delete %(name)s") % {"name": object_name}
-        else:
-            title = _("Are you sure?")
-
-        context = dict(
-            self.admin_site.each_context(request),
-            title=title,
-            object_name=object_name,
-            object=obj,
-            deleted_objects=deleted_objects,
-            model_count=dict(model_count).items(),
-            perms_lacking=perms_needed,
-            protected=protected,
-            opts=opts,
-            app_label=app_label,
-            preserved_filters=self.get_preserved_filters(request),
-            is_popup=(IS_POPUP_VAR in request.POST or
-                      IS_POPUP_VAR in request.GET),
-            to_field=to_field,
-        )
-        context.update(extra_context or {})
-
-        return self.render_delete_form(request, context)
+        from django.contrib.admin.views.options import DeleteView
+        return DeleteView.as_view(
+            admin=self, object_id=object_id, extra_context=extra_context)(request)
 
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."

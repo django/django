@@ -1016,7 +1016,7 @@ class ModelFormsetTest(TestCase):
         self.assertTrue(formset.is_valid())
 
         # The Poet instance is saved after the formset instantiation. This
-        # happens in admin's changeform_view() when adding a new object and
+        # happens in admin's add_view() when adding a new object and
         # some inlines in the same request.
         poet.name = 'Lamartine'
         poet.save()
