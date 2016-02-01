@@ -8,6 +8,9 @@ Model Form API reference. For introductory material about model forms, see the
 .. module:: django.forms.models
    :synopsis: Django's functions for building model forms and formsets.
 
+``modelform_factory``
+=====================
+
 .. function:: modelform_factory(model, form=ModelForm, fields=None, exclude=None, formfield_callback=None, widgets=None, localized_fields=None, labels=None, help_texts=None, error_messages=None, field_classes=None)
 
     Returns a :class:`~django.forms.ModelForm` class for the given ``model``.
@@ -55,6 +58,9 @@ Model Form API reference. For introductory material about model forms, see the
 
         The ``field_classes`` keyword argument was added.
 
+``modelformset_factory``
+========================
+
 .. function:: modelformset_factory(model, form=ModelForm, formfield_callback=None, formset=BaseModelFormSet, extra=1, can_delete=False, can_order=False, max_num=None, fields=None, exclude=None, widgets=None, validate_max=False, localized_fields=None, labels=None, help_texts=None, error_messages=None, min_num=None, validate_min=False, field_classes=None)
 
     Returns a ``FormSet`` class for the given ``model`` class.
@@ -74,6 +80,9 @@ Model Form API reference. For introductory material about model forms, see the
     .. versionadded:: 1.9
 
         The ``field_classes`` keyword argument was added.
+
+``inlineformset_factory``
+=========================
 
 .. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None, validate_max=False, localized_fields=None, labels=None, help_texts=None, error_messages=None, min_num=None, validate_min=False, field_classes=None)
 

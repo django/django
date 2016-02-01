@@ -2,8 +2,8 @@
 Multiple object mixins
 ======================
 
-MultipleObjectMixin
-===================
+``MultipleObjectMixin``
+=======================
 
 .. class:: django.views.generic.list.MultipleObjectMixin
 
@@ -196,8 +196,8 @@ MultipleObjectMixin
       this context variable will be ``None``.
 
 
-MultipleObjectTemplateResponseMixin
-===================================
+``MultipleObjectTemplateResponseMixin``
+=======================================
 
 .. class:: django.views.generic.list.MultipleObjectTemplateResponseMixin
 

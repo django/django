@@ -37,8 +37,8 @@ those packages have.
    syndication
    webdesign
 
-admin
-=====
+``admin``
+=========
 
 The automatic Django administrative interface. For more information, see
 :doc:`Tutorial 2 </intro/tutorial02>` and the
@@ -46,23 +46,23 @@ The automatic Django administrative interface. For more information, see
 
 Requires the auth_ and contenttypes_ contrib packages to be installed.
 
-auth
-====
+``auth``
+========
 
 Django's authentication framework.
 
 See :doc:`/topics/auth/index`.
 
-contenttypes
-============
+``contenttypes``
+================
 
 A light framework for hooking into "types" of content, where each installed
 Django model is a separate content type.
 
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
 
-flatpages
-=========
+``flatpages``
+=============
 
 A framework for managing simple "flat" HTML content in a database.
 
@@ -70,52 +70,52 @@ See the :doc:`flatpages documentation </ref/contrib/flatpages>`.
 
 Requires the sites_ contrib package to be installed as well.
 
-gis
-====
+``gis``
+=======
 
 A world-class geospatial framework built on top of Django, that enables
 storage, manipulation and display of spatial data.
 
 See the :doc:`/ref/contrib/gis/index` documentation for more.
 
-humanize
-========
+``humanize``
+============
 
 A set of Django template filters useful for adding a "human touch" to data.
 
 See the :doc:`humanize documentation </ref/contrib/humanize>`.
 
-messages
-========
+``messages``
+============
 
 A framework for storing and retrieving temporary cookie- or session-based
 messages
 
 See the :doc:`messages documentation </ref/contrib/messages>`.
 
-postgres
-========
+``postgres``
+============
 
 A collection of PostgreSQL specific features.
 
 See the :doc:`contrib.postgres documentation </ref/contrib/postgres/index>`.
 
-redirects
-=========
+``redirects``
+=============
 
 A framework for managing redirects.
 
 See the :doc:`redirects documentation </ref/contrib/redirects>`.
 
-sessions
-========
+``sessions``
+============
 
 A framework for storing data in anonymous sessions.
 
 See the :doc:`sessions documentation </topics/http/sessions>`.
 
-sites
-=====
+``sites``
+=========
 
 A light framework that lets you operate multiple websites off of the same
 database and Django installation. It gives you hooks for associating objects to
@@ -123,15 +123,15 @@ one or more sites.
 
 See the :doc:`sites documentation </ref/contrib/sites>`.
 
-sitemaps
-========
+``sitemaps``
+============
 
 A framework for generating Google sitemap XML files.
 
 See the :doc:`sitemaps documentation </ref/contrib/sitemaps>`.
 
-syndication
-===========
+``syndication``
+===============
 
 A framework for generating syndication feeds, in RSS and Atom, quite easily.
 

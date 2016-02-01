@@ -1473,8 +1473,8 @@ Settings
 
 .. setting:: GDAL_LIBRARY_PATH
 
-GDAL_LIBRARY_PATH
------------------
+``GDAL_LIBRARY_PATH``
+---------------------
 
 A string specifying the location of the GDAL library.  Typically,
 this setting is only used if the GDAL library is in a non-standard

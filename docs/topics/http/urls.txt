@@ -234,8 +234,8 @@ Performance
 Each regular expression in a ``urlpatterns`` is compiled the first time it's
 accessed. This makes the system blazingly fast.
 
-Syntax of the urlpatterns variable
-==================================
+Syntax of the ``urlpatterns`` variable
+======================================
 
 ``urlpatterns`` should be a Python list of :func:`~django.conf.urls.url`
 instances.

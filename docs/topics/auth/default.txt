@@ -17,8 +17,8 @@ are somewhat coupled.
 
 .. _user-objects:
 
-User objects
-============
+``User`` objects
+================
 
 :class:`~django.contrib.auth.models.User` objects are the core of the
 authentication system. They typically represent the people interacting with
@@ -113,7 +113,7 @@ Changing a user's password will log out all their sessions if the
 :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` is
 enabled. See :ref:`session-invalidation-on-password-change` for details.
 
-Authenticating Users
+Authenticating users
 --------------------
 
 .. function:: authenticate(\**credentials)
@@ -368,6 +368,29 @@ If you have an authenticated user you want to attach to the current session
     this information is needed later during the login process. An error will be
     raised if you try to login a user object retrieved from the database
     directly.
+
+Selecting the authentication backend
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When a user logs in, the user's ID and the backend that was used for
+authentication are saved in the user's session. This allows the same
+:ref:`authentication backend <authentication-backends>` to fetch the user's
+details on a future request. The authentication backend to save in the session
+is selected as follows:
+
+#. Use the value of the optional ``backend`` argument, if provided.
+#. Use the value of the ``user.backend`` attribute, if present. This allows
+   pairing :func:`~django.contrib.auth.authenticate()` and
+   :func:`~django.contrib.auth.login()`:
+   :func:`~django.contrib.auth.authenticate()`
+   sets the ``user.backend`` attribute on the ``User`` object it returns.
+#. Use the ``backend`` in :setting:`AUTHENTICATION_BACKENDS`, if there is only
+   one.
+#. Otherwise, raise an exception.
+
+In cases 1 and 2, the value of the ``backend`` argument or the ``user.backend``
+attribute should be a dotted import path string (like that found in
+:setting:`AUTHENTICATION_BACKENDS`), not the actual backend class.
 
 How to log a user out
 ---------------------
@@ -1679,7 +1702,7 @@ model. Groups can be created, and permissions can be assigned to users or
 groups. A log of user edits to models made within the admin is also stored and
 displayed.
 
-Creating Users
+Creating users
 --------------
 
 You should see a link to "Users" in the "Auth"
@@ -1701,7 +1724,7 @@ non-superuser the ability to edit users, this is ultimately the same as giving
 them superuser status because they will be able to elevate permissions of
 users including themselves!
 
-Changing Passwords
+Changing passwords
 ------------------
 
 User passwords are not displayed in the admin (nor stored in the database), but

@@ -402,8 +402,8 @@ Adds protection against Cross Site Request Forgeries by adding hidden form
 fields to POST forms and checking requests for the correct value. See the
 :doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
 
-X-Frame-Options middleware
---------------------------
+``X-Frame-Options`` middleware
+------------------------------
 
 .. module:: django.middleware.clickjacking
    :synopsis: Clickjacking protection

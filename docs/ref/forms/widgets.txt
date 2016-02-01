@@ -68,8 +68,8 @@ widget on the field. In the following example, the
 See the :ref:`built-in widgets` for more information about which widgets
 are available and which arguments they accept.
 
-Widgets inheriting from the Select widget
-=========================================
+Widgets inheriting from the ``Select`` widget
+=============================================
 
 Widgets inheriting from the :class:`Select` widget deal with choices. They
 present the user with a list of options to choose from. The different widgets

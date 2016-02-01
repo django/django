@@ -35,8 +35,8 @@ a secure connection is used.
     The character set of email sent with ``django.core.mail`` will be set to
     the value of your :setting:`DEFAULT_CHARSET` setting.
 
-send_mail()
-===========
+``send_mail()``
+===============
 
 .. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
@@ -74,8 +74,8 @@ are required.
 The return value will be the number of successfully delivered messages (which
 can be ``0`` or ``1`` since it can only send one message).
 
-send_mass_mail()
-================
+``send_mass_mail()``
+====================
 
 .. function:: send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
@@ -103,8 +103,8 @@ mail server would be opened::
 
 The return value will be the number of successfully delivered messages.
 
-send_mass_mail() vs. send_mail()
---------------------------------
+``send_mass_mail()`` vs. ``send_mail()``
+----------------------------------------
 
 The main difference between :meth:`~django.core.mail.send_mass_mail()` and
 :meth:`~django.core.mail.send_mail()` is that
@@ -113,8 +113,8 @@ each time it's executed, while :meth:`~django.core.mail.send_mass_mail()` uses
 a single connection for all of its messages. This makes
 :meth:`~django.core.mail.send_mass_mail()` slightly more efficient.
 
-mail_admins()
-=============
+``mail_admins()``
+=================
 
 .. function:: mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
 
@@ -134,8 +134,8 @@ If ``html_message`` is provided, the resulting email will be a
 :mimetype:`text/plain` content type and ``html_message`` as the
 :mimetype:`text/html` content type.
 
-mail_managers()
-===============
+``mail_managers()``
+===================
 
 .. function:: mail_managers(subject, message, fail_silently=False, connection=None, html_message=None)
 
@@ -205,8 +205,8 @@ from the request's POST data, sends that to admin@example.com and redirects to
 
 .. _emailmessage-and-smtpconnection:
 
-The EmailMessage class
-======================
+The ``EmailMessage`` class
+==========================
 
 Django's :meth:`~django.core.mail.send_mail()` and
 :meth:`~django.core.mail.send_mass_mail()` functions are actually thin
@@ -235,8 +235,8 @@ For convenience, :class:`~django.core.mail.EmailMessage` provides a simple
 messages, the email backend API :ref:`provides an alternative
 <topics-sending-multiple-emails>`.
 
-EmailMessage Objects
---------------------
+``EmailMessage`` Objects
+------------------------
 
 .. class:: EmailMessage
 

@@ -745,8 +745,8 @@ equivalent to XSS or CSRF attacks.
 columns with a default max length of 100 characters. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
-FileField and FieldFile
-~~~~~~~~~~~~~~~~~~~~~~~
+``FileField`` and ``FieldFile``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentmodule:: django.db.models.fields.files
 

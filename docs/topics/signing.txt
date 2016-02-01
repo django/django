@@ -25,8 +25,8 @@ You may also find signing useful for the following:
   protected resource, for example a downloadable file that a user has
   paid for.
 
-Protecting the SECRET_KEY
-=========================
+Protecting the ``SECRET_KEY``
+=============================
 
 When you create a new Django project using :djadmin:`startproject`, the
 ``settings.py`` file is generated automatically and gets a random
@@ -79,8 +79,8 @@ generate signatures. You can use a different secret by passing it to the
     <https://tools.ietf.org/html/rfc4648#section-5>`_.  This alphabet contains
     alphanumeric characters, hyphens, and underscores.
 
-Using the salt argument
------------------------
+Using the ``salt`` argument
+---------------------------
 
 If you do not wish for every occurrence of a particular string to have the same
 signature hash, you can use the optional ``salt`` argument to the ``Signer``

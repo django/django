@@ -477,8 +477,8 @@ directly with the ``number`` argument::
                 raise forms.ValidationError(self.error_message % number)
 
 
-Joining strings: string_concat()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Joining strings: ``string_concat()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Standard Python string joins (``''.join([...])``) will not work on lists
 containing lazy translation objects. Instead, you can use

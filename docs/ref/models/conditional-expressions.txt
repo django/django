@@ -36,8 +36,8 @@ We'll be using the following model in the subsequent examples::
             default=REGULAR,
         )
 
-When
-----
+``When``
+--------
 
 .. class:: When(condition=None, then=None, **lookups)
 
@@ -76,8 +76,8 @@ Keep in mind that each of these values can be an expression.
         >>> When(then__exact=0, then=1)
         >>> When(Q(then=0), then=1)
 
-Case
-----
+``Case``
+--------
 
 .. class:: Case(*cases, **extra)
 

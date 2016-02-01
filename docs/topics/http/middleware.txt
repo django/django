@@ -86,8 +86,8 @@ Python class that defines one or more of the following methods:
 
 .. _request-middleware:
 
-``process_request``
--------------------
+``process_request()``
+---------------------
 
 .. method:: process_request(request)
 
@@ -107,8 +107,8 @@ return the result.
 
 .. _view-middleware:
 
-``process_view``
-----------------
+``process_view()``
+------------------
 
 .. method:: process_view(request, view_func, view_args, view_kwargs)
 
@@ -146,8 +146,8 @@ view; it'll apply response middleware to that
 
 .. _template-response-middleware:
 
-``process_template_response``
------------------------------
+``process_template_response()``
+-------------------------------
 
 .. method:: process_template_response(request, response)
 
@@ -173,8 +173,8 @@ includes ``process_template_response()``.
 
 .. _response-middleware:
 
-``process_response``
---------------------
+``process_response()``
+----------------------
 
 .. method:: process_response(request, response)
 
@@ -230,8 +230,8 @@ must test for streaming responses and adjust their behavior accordingly::
 
 .. _exception-middleware:
 
-``process_exception``
----------------------
+``process_exception()``
+-----------------------
 
 .. method:: process_exception(request, exception)
 
@@ -249,8 +249,8 @@ Again, middleware are run in reverse order during the response phase, which
 includes ``process_exception``. If an exception middleware returns a response,
 the middleware classes above that middleware will not be called at all.
 
-``__init__``
-------------
+``__init__()``
+--------------
 
 Most middleware classes won't need an initializer since middleware classes are
 essentially placeholders for the ``process_*`` methods. If you do need some

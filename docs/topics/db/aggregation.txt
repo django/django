@@ -88,8 +88,8 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     >>> pubs[0].num_books
     1323
 
-Generating aggregates over a QuerySet
-=====================================
+Generating aggregates over a ``QuerySet``
+=========================================
 
 Django provides two ways to generate aggregates. The first way is to generate
 summary values over an entire ``QuerySet``. For example, say you wanted to
@@ -134,8 +134,8 @@ the maximum and minimum price of all books, we would issue the query::
     >>> Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))
     {'price__avg': 34.35, 'price__max': Decimal('81.20'), 'price__min': Decimal('12.99')}
 
-Generating aggregates for each item in a QuerySet
-=================================================
+Generating aggregates for each item in a ``QuerySet``
+=====================================================
 
 The second way to generate summary values is to generate an independent
 summary for each object in a ``QuerySet``. For example, if you are retrieving
@@ -297,8 +297,8 @@ file::
 (The resulting dictionary will have a key called ``'average__rating'``. If no
 such alias were specified, it would be the rather long ``'book__rating__avg'``.)
 
-Aggregations and other QuerySet clauses
-=======================================
+Aggregations and other ``QuerySet`` clauses
+===========================================
 
 ``filter()`` and ``exclude()``
 ------------------------------

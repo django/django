@@ -699,8 +699,8 @@ the main module body, rather than the class body.
 
 .. _custom-deconstruct-method:
 
-Adding a deconstruct() method
------------------------------
+Adding a ``deconstruct()`` method
+---------------------------------
 
 You can let Django serialize your own custom class instances by giving the class
 a ``deconstruct()`` method. It takes no arguments, and should return a tuple

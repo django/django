@@ -1,6 +1,6 @@
-==========================================
-How to use Django with Apache and mod_wsgi
-==========================================
+==============================================
+How to use Django with Apache and ``mod_wsgi``
+==============================================
 
 Deploying Django with Apache_ and `mod_wsgi`_ is a tried and tested way to get
 Django into production.
@@ -91,8 +91,8 @@ should put in this file, and what else you can add to it.
     See the :ref:`unicode-files` section of the Unicode reference guide for
     details.
 
-Using a virtualenv
-==================
+Using a ``virtualenv``
+======================
 
 If you install your project's Python dependencies inside a `virtualenv`_,
 you'll need to add the path to this virtualenv's ``site-packages`` directory to
@@ -113,8 +113,8 @@ Make sure you give the correct path to your virtualenv, and replace
 
 .. _daemon-mode:
 
-Using mod_wsgi daemon mode
-==========================
+Using ``mod_wsgi`` daemon mode
+==============================
 
 "Daemon mode" is the recommended mode for running mod_wsgi (on non-Windows
 platforms). To create the required daemon process group and delegate the

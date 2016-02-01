@@ -23,8 +23,8 @@ compatible with a particular spatial backend, refer to the
 
 .. fieldlookup:: bbcontains
 
-bbcontains
-----------
+``bbcontains``
+--------------
 
 *Availability*: PostGIS, MySQL, SpatiaLite
 
@@ -45,8 +45,8 @@ SpatiaLite  ``MbrContains(poly, geom)``
 
 .. fieldlookup:: bboverlaps
 
-bboverlaps
-----------
+``bboverlaps``
+--------------
 
 *Availability*: PostGIS, MySQL, SpatiaLite
 
@@ -67,8 +67,8 @@ SpatiaLite  ``MbrOverlaps(poly, geom)``
 
 .. fieldlookup:: contained
 
-contained
----------
+``contained``
+-------------
 
 *Availability*: PostGIS, MySQL, SpatiaLite
 
@@ -89,8 +89,8 @@ SpatiaLite  ``MbrWithin(poly, geom)``
 
 .. fieldlookup:: gis-contains
 
-contains
---------
+``contains``
+------------
 
 *Availability*: PostGIS, Oracle, MySQL, SpatiaLite
 
@@ -111,8 +111,8 @@ SpatiaLite  ``Contains(poly, geom)``
 
 .. fieldlookup:: contains_properly
 
-contains_properly
------------------
+``contains_properly``
+---------------------
 
 *Availability*: PostGIS
 
@@ -131,8 +131,8 @@ PostGIS     ``ST_ContainsProperly(poly, geom)``
 
 .. fieldlookup:: coveredby
 
-coveredby
----------
+``coveredby``
+-------------
 
 *Availability*: PostGIS, Oracle
 
@@ -152,8 +152,8 @@ Oracle      ``SDO_COVEREDBY(poly, geom)``
 
 .. fieldlookup:: covers
 
-covers
-------
+``covers``
+----------
 
 *Availability*: PostGIS, Oracle
 
@@ -173,8 +173,8 @@ Oracle      ``SDO_COVERS(poly, geom)``
 
 .. fieldlookup:: crosses
 
-crosses
--------
+``crosses``
+-----------
 
 *Availability*: PostGIS, SpatiaLite
 
@@ -193,8 +193,8 @@ SpatiaLite  ``Crosses(poly, geom)``
 
 .. fieldlookup:: disjoint
 
-disjoint
---------
+``disjoint``
+------------
 
 *Availability*: PostGIS, Oracle, MySQL, SpatiaLite
 
@@ -215,23 +215,23 @@ SpatiaLite  ``Disjoint(poly, geom)``
 
 .. fieldlookup:: equals
 
-equals
-------
+``equals``
+----------
 
 *Availability*: PostGIS, Oracle, MySQL, SpatiaLite
 
 .. fieldlookup:: exact
 .. fieldlookup:: same_as
 
-exact, same_as
---------------
+``exact``, ``same_as``
+----------------------
 
 *Availability*: PostGIS, Oracle, MySQL, SpatiaLite
 
 .. fieldlookup:: intersects
 
-intersects
-----------
+``intersects``
+--------------
 
 *Availability*: PostGIS, Oracle, MySQL, SpatiaLite
 
@@ -252,15 +252,15 @@ SpatiaLite  ``Intersects(poly, geom)``
 
 .. fieldlookup:: overlaps
 
-overlaps
---------
+``overlaps``
+------------
 
 *Availability*: PostGIS, Oracle, MySQL, SpatiaLite
 
 .. fieldlookup:: relate
 
-relate
-------
+``relate``
+----------
 
 *Availability*: PostGIS, Oracle, SpatiaLite
 
@@ -311,8 +311,8 @@ Oracle SQL equivalent::
 
 .. fieldlookup:: touches
 
-touches
--------
+``touches``
+-----------
 
 *Availability*: PostGIS, Oracle, MySQL, SpatiaLite
 
@@ -333,8 +333,8 @@ SpatiaLite  ``Touches(poly, geom)``
 
 .. fieldlookup:: within
 
-within
-------
+``within``
+----------
 
 *Availability*: PostGIS, Oracle, MySQL, SpatiaLite
 
@@ -355,8 +355,8 @@ SpatiaLite  ``Within(poly, geom)``
 
 .. fieldlookup:: left
 
-left
-----
+``left``
+--------
 
 *Availability*: PostGIS
 
@@ -373,8 +373,8 @@ PostGIS equivalent::
 
 .. fieldlookup:: right
 
-right
------
+``right``
+---------
 
 *Availability*: PostGIS
 
@@ -391,8 +391,8 @@ PostGIS equivalent::
 
 .. fieldlookup:: overlaps_left
 
-overlaps_left
--------------
+``overlaps_left``
+-----------------
 
 *Availability*: PostGIS
 
@@ -410,8 +410,8 @@ PostGIS equivalent::
 
 .. fieldlookup:: overlaps_right
 
-overlaps_right
---------------
+``overlaps_right``
+------------------
 
 *Availability*: PostGIS
 
@@ -428,8 +428,8 @@ PostGIS equivalent::
 
 .. fieldlookup:: overlaps_above
 
-overlaps_above
---------------
+``overlaps_above``
+------------------
 
 *Availability*: PostGIS
 
@@ -446,8 +446,8 @@ PostGIS equivalent::
 
 .. fieldlookup:: overlaps_below
 
-overlaps_below
---------------
+``overlaps_below``
+------------------
 
 *Availability*: PostGIS
 
@@ -464,8 +464,8 @@ PostGIS equivalent::
 
 .. fieldlookup:: strictly_above
 
-strictly_above
---------------
+``strictly_above``
+------------------
 
 *Availability*: PostGIS
 
@@ -482,8 +482,8 @@ PostGIS equivalent::
 
 .. fieldlookup:: strictly_below
 
-strictly_below
---------------
+``strictly_below``
+------------------
 
 *Availability*: PostGIS
 
@@ -526,8 +526,8 @@ function is used with projected coordinate systems.
 
 .. fieldlookup:: distance_gt
 
-distance_gt
------------
+``distance_gt``
+---------------
 
 Returns models where the distance to the geometry field from the lookup
 geometry is greater than the given distance value.
@@ -546,8 +546,8 @@ SpatiaLite  ``Distance(poly, geom) > 5``
 
 .. fieldlookup:: distance_gte
 
-distance_gte
-------------
+``distance_gte``
+----------------
 
 Returns models where the distance to the geometry field from the lookup
 geometry is greater than or equal to the given distance value.
@@ -566,8 +566,8 @@ SpatiaLite  ``Distance(poly, geom) >= 5``
 
 .. fieldlookup:: distance_lt
 
-distance_lt
------------
+``distance_lt``
+---------------
 
 Returns models where the distance to the geometry field from the lookup
 geometry is less than the given distance value.
@@ -586,8 +586,8 @@ SpatiaLite  ``Distance(poly, geom) < 5``
 
 .. fieldlookup:: distance_lte
 
-distance_lte
-------------
+``distance_lte``
+----------------
 
 Returns models where the distance to the geometry field from the lookup
 geometry is less than or equal to the given distance value.
@@ -606,8 +606,8 @@ SpatiaLite  ``Distance(poly, geom) <= 5``
 
 .. fieldlookup:: dwithin
 
-dwithin
--------
+``dwithin``
+-----------
 
 Returns models where the distance to the geometry field from the lookup
 geometry are within the given distance from one another. Note that you can only

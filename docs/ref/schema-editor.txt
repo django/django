@@ -42,8 +42,8 @@ migrations will look for: ``can_rollback_ddl`` and
 Methods
 =======
 
-execute
--------
+``execute()``
+-------------
 
 .. method:: BaseDatabaseSchemaEditor.execute(sql, params=[])
 
@@ -51,24 +51,24 @@ Executes the SQL statement passed in, with parameters if supplied. This
 is a simple wrapper around the normal database cursors that allows
 capture of the SQL to a ``.sql`` file if the user wishes.
 
-create_model
-------------
+``create_model()``
+------------------
 
 .. method:: BaseDatabaseSchemaEditor.create_model(model)
 
 Creates a new table in the database for the provided model, along with any
 unique constraints or indexes it requires.
 
-delete_model
-------------
+``delete_model()``
+------------------
 
 .. method:: BaseDatabaseSchemaEditor.delete_model(model)
 
 Drops the model's table in the database along with any unique constraints
 or indexes it has.
 
-alter_unique_together
----------------------
+``alter_unique_together()``
+---------------------------
 
 .. method:: BaseDatabaseSchemaEditor.alter_unique_together(model, old_unique_together, new_unique_together)
 
@@ -76,8 +76,8 @@ Changes a model's :attr:`~django.db.models.Options.unique_together` value; this
 will add or remove unique constraints from the model's table until they match
 the new value.
 
-alter_index_together
---------------------
+``alter_index_together()``
+--------------------------
 
 .. method:: BaseDatabaseSchemaEditor.alter_index_together(model, old_index_together, new_index_together)
 
@@ -85,22 +85,22 @@ Changes a model's :attr:`~django.db.models.Options.index_together` value; this
 will add or remove indexes from the model's table until they match the new
 value.
 
-alter_db_table
---------------
+``alter_db_table()``
+--------------------
 
 .. method:: BaseDatabaseSchemaEditor.alter_db_table(model, old_db_table, new_db_table)
 
 Renames the model's table from ``old_db_table`` to ``new_db_table``.
 
-alter_db_tablespace
--------------------
+``alter_db_tablespace()``
+-------------------------
 
 .. method:: BaseDatabaseSchemaEditor.alter_db_tablespace(model, old_db_tablespace, new_db_tablespace)
 
 Moves the model's table from one tablespace to another.
 
-add_field
----------
+``add_field()``
+---------------
 
 .. method:: BaseDatabaseSchemaEditor.add_field(model, field)
 
@@ -115,8 +115,8 @@ of creating a column, it will make a table to represent the relationship. If
 If the field is a ``ForeignKey``, this will also add the foreign key
 constraint to the column.
 
-remove_field
-------------
+``remove_field()``
+------------------
 
 .. method:: BaseDatabaseSchemaEditor.remove_field(model, field)
 
@@ -128,8 +128,8 @@ If the field is a ManyToManyField without a value for ``through``, it will
 remove the table created to track the relationship. If
 ``through`` is provided, it is a no-op.
 
-alter_field
-------------
+``alter_field()``
+-----------------
 
 .. method:: BaseDatabaseSchemaEditor.alter_field(model, old_field, new_field, strict=False)
 
@@ -155,8 +155,8 @@ Attributes
 
 All attributes should be considered read-only unless stated otherwise.
 
-connection
-----------
+``connection``
+--------------
 
 .. attribute:: SchemaEditor.connection
 

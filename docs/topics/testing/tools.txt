@@ -626,8 +626,8 @@ Normal Python unit test classes extend a base class of
 
    Hierarchy of Django unit testing classes
 
-SimpleTestCase
---------------
+``SimpleTestCase``
+------------------
 
 .. class:: SimpleTestCase()
 
@@ -711,8 +711,8 @@ then you should use :class:`~django.test.TransactionTestCase` or
     :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
     calling ``super()`` to avoid this.
 
-TransactionTestCase
--------------------
+``TransactionTestCase``
+-----------------------
 
 .. class:: TransactionTestCase()
 
@@ -760,8 +760,8 @@ to test the effects of commit and rollback:
 
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
 
-TestCase
---------
+``TestCase``
+------------
 
 .. class:: TestCase()
 
@@ -831,8 +831,8 @@ additions, including:
 
 .. _live-test-server:
 
-LiveServerTestCase
-------------------
+``LiveServerTestCase``
+----------------------
 
 .. class:: LiveServerTestCase()
 

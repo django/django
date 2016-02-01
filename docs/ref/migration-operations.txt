@@ -34,8 +34,8 @@ For introductory material, see the :doc:`migrations topic guide
 Schema Operations
 =================
 
-CreateModel
------------
+``CreateModel``
+---------------
 
 .. class:: CreateModel(name, fields, options=None, bases=None, managers=None)
 
@@ -64,15 +64,15 @@ migrations.
 
     The ``managers`` argument was added.
 
-DeleteModel
------------
+``DeleteModel``
+---------------
 
 .. class:: DeleteModel(name)
 
 Deletes the model from the project history and its table from the database.
 
-RenameModel
------------
+``RenameModel``
+---------------
 
 .. class:: RenameModel(old_name, new_name)
 
@@ -84,16 +84,16 @@ the autodetector, this will look like you deleted a model with the old name
 and added a new one with a different name, and the migration it creates will
 lose any data in the old table.
 
-AlterModelTable
----------------
+``AlterModelTable``
+-------------------
 
 .. class:: AlterModelTable(name, table)
 
 Changes the model's table name (the :attr:`~django.db.models.Options.db_table`
 option on the ``Meta`` subclass).
 
-AlterUniqueTogether
--------------------
+``AlterUniqueTogether``
+-----------------------
 
 .. class:: AlterUniqueTogether(name, unique_together)
 
@@ -101,8 +101,8 @@ Changes the model's set of unique constraints (the
 :attr:`~django.db.models.Options.unique_together` option on the ``Meta``
 subclass).
 
-AlterIndexTogether
-------------------
+``AlterIndexTogether``
+----------------------
 
 .. class:: AlterIndexTogether(name, index_together)
 
@@ -110,8 +110,8 @@ Changes the model's set of custom indexes (the
 :attr:`~django.db.models.Options.index_together` option on the ``Meta``
 subclass).
 
-AlterOrderWithRespectTo
------------------------
+``AlterOrderWithRespectTo``
+---------------------------
 
 .. class:: AlterOrderWithRespectTo(name, order_with_respect_to)
 
@@ -119,8 +119,8 @@ Makes or deletes the ``_order`` column needed for the
 :attr:`~django.db.models.Options.order_with_respect_to` option on the ``Meta``
 subclass.
 
-AlterModelOptions
------------------
+``AlterModelOptions``
+---------------------
 
 .. class:: AlterModelOptions(name, options)
 
@@ -129,8 +129,8 @@ like ``permissions`` and ``verbose_name``. Does not affect the database, but
 persists these changes for :class:`RunPython` instances to use. ``options``
 should be a dictionary mapping option names to values.
 
-AlterModelManagers
-------------------
+``AlterModelManagers``
+----------------------
 
 .. versionadded:: 1.8
 
@@ -138,8 +138,8 @@ AlterModelManagers
 
 Alters the managers that are available during migrations.
 
-AddField
---------
+``AddField``
+------------
 
 .. class:: AddField(model_name, name, field, preserve_default=True)
 
@@ -156,8 +156,8 @@ a default value to put into existing rows. It does not affect the behavior
 of setting defaults in the database directly - Django never sets database
 defaults and always applies them in the Django ORM code.
 
-RemoveField
------------
+``RemoveField``
+---------------
 
 .. class:: RemoveField(model_name, name)
 
@@ -169,8 +169,8 @@ irreversible) if the field is nullable or if it has a default value that can be
 used to populate the recreated column. If the field is not nullable and does
 not have a default value, the operation is irreversible.
 
-AlterField
-----------
+``AlterField``
+--------------
 
 .. class:: AlterField(model_name, name, field, preserve_default=True)
 
@@ -190,8 +190,8 @@ Note that not all changes are possible on all databases - for example, you
 cannot change a text-type field like ``models.TextField()`` into a number-type
 field like ``models.IntegerField()`` on most databases.
 
-RenameField
------------
+``RenameField``
+---------------
 
 .. class:: RenameField(model_name, old_name, new_name)
 
@@ -201,8 +201,8 @@ is set, its column name).
 Special Operations
 ==================
 
-RunSQL
-------
+``RunSQL``
+----------
 
 .. class:: RunSQL(sql, reverse_sql=None, state_operations=None, hints=None)
 
@@ -274,8 +274,8 @@ database hints.
 
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
-RunPython
----------
+``RunPython``
+-------------
 
 .. class:: RunPython(code, reverse_code=None, atomic=True, hints=None)
 
@@ -389,8 +389,8 @@ attribute.
     you want the operation not to do anything in the given direction. This is
     especially useful in making the operation reversible.
 
-SeparateDatabaseAndState
-------------------------
+``SeparateDatabaseAndState``
+----------------------------
 
 .. class:: SeparateDatabaseAndState(database_operations=None, state_operations=None)
 

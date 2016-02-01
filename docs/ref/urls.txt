@@ -4,8 +4,8 @@
 
 .. module:: django.conf.urls
 
-patterns()
-----------
+``patterns()``
+==============
 
 .. function:: patterns(prefix, pattern_description, ...)
 
@@ -75,8 +75,8 @@ The ``optional_dictionary`` and ``optional_name`` parameters are described in
     patterns you can construct. The only limit is that you can only create 254
     at a time (the 255th argument is the initial prefix argument).
 
-static()
-========
+``static()``
+============
 
 .. function:: static.static(prefix, view=django.views.static.serve, **kwargs)
 
@@ -94,8 +94,8 @@ Helper function to return a URL pattern for serving files in debug mode::
     The ``view`` argument changed from a string
     (``'django.views.static.serve'``) to the function.
 
-url()
-=====
+``url()``
+=========
 
 .. function:: url(regex, view, kwargs=None, name=None, prefix='')
 
@@ -125,8 +125,8 @@ parameter is useful.
     ``patterns()`` and is only relevant when you're passing a string as the
     ``view`` parameter.
 
-include()
-=========
+``include()``
+=============
 
 .. function:: include(module, namespace=None, app_name=None)
               include(pattern_list)
@@ -174,8 +174,8 @@ See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
     has been deprecated and will be removed in Django 2.0. Specify the
     application namespace or remove the instance namespace.
 
-handler400
-==========
+``handler400``
+==============
 
 .. data:: handler400
 
@@ -190,8 +190,8 @@ implement a custom view, be sure it returns an
 See the documentation about :ref:`the 400 (bad request) view
 <http_bad_request_view>` for more information.
 
-handler403
-==========
+``handler403``
+==============
 
 .. data:: handler403
 
@@ -206,8 +206,8 @@ implement a custom view, be sure it returns an
 See the documentation about :ref:`the 403 (HTTP Forbidden) view
 <http_forbidden_view>` for more information.
 
-handler404
-==========
+``handler404``
+==============
 
 .. data:: handler404
 
@@ -221,8 +221,8 @@ implement a custom view, be sure it returns an
 See the documentation about :ref:`the 404 (HTTP Not Found) view
 <http_not_found_view>` for more information.
 
-handler500
-==========
+``handler500``
+==============
 
 .. data:: handler500
 

@@ -19,8 +19,8 @@ This document explains the APIs for :class:`HttpRequest` and
 :class:`HttpResponse` objects, which are defined in the :mod:`django.http`
 module.
 
-HttpRequest objects
-===================
+``HttpRequest`` objects
+=======================
 
 .. class:: HttpRequest
 
@@ -376,8 +376,8 @@ Methods
             process(element)
 
 
-QueryDict objects
-=================
+``QueryDict`` objects
+=====================
 
 .. class:: QueryDict
 
@@ -577,8 +577,8 @@ In addition, ``QueryDict`` has the following methods:
         >>> q.urlencode(safe='/')
         'next=/a%26b/'
 
-HttpResponse objects
-====================
+``HttpResponse`` objects
+========================
 
 .. class:: HttpResponse
 
@@ -857,8 +857,8 @@ Methods
 
 .. _ref-httpresponse-subclasses:
 
-HttpResponse subclasses
------------------------
+``HttpResponse`` subclasses
+---------------------------
 
 Django includes a number of ``HttpResponse`` subclasses that handle different
 types of HTTP responses. Like ``HttpResponse``, these subclasses live in
@@ -923,8 +923,8 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
 
-JsonResponse objects
-====================
+``JsonResponse`` objects
+========================
 
 .. class:: JsonResponse(data, encoder=DjangoJSONEncoder, safe=True, json_dumps_params=None, **kwargs)
 
@@ -996,8 +996,8 @@ parameter to the constructor method::
 
 .. _httpresponse-streaming:
 
-StreamingHttpResponse objects
-=============================
+``StreamingHttpResponse`` objects
+=================================
 
 .. class:: StreamingHttpResponse
 
@@ -1071,8 +1071,8 @@ Attributes
 
     This is always ``True``.
 
-FileResponse objects
-====================
+``FileResponse`` objects
+========================
 
 .. class:: FileResponse
 

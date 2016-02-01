@@ -1,6 +1,6 @@
-====================================
-Writing custom django-admin commands
-====================================
+========================================
+Writing custom ``django-admin`` commands
+========================================
 
 .. module:: django.core.management
 
@@ -378,8 +378,8 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. _ref-basecommand-subclasses:
 
-BaseCommand subclasses
-----------------------
+``BaseCommand`` subclasses
+--------------------------
 
 .. class:: AppCommand
 

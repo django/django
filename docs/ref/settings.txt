@@ -23,8 +23,8 @@ guide </topics/settings>`.
 
 .. setting:: ABSOLUTE_URL_OVERRIDES
 
-ABSOLUTE_URL_OVERRIDES
-----------------------
+``ABSOLUTE_URL_OVERRIDES``
+--------------------------
 
 Default: ``{}`` (Empty dictionary)
 
@@ -42,8 +42,8 @@ of the case of the actual model class name.
 
 .. setting:: ADMINS
 
-ADMINS
-------
+``ADMINS``
+----------
 
 Default: ``[]`` (Empty list)
 
@@ -59,8 +59,8 @@ See :doc:`/howto/error-reporting` for more information.
 
 .. setting:: ALLOWED_HOSTS
 
-ALLOWED_HOSTS
--------------
+``ALLOWED_HOSTS``
+-----------------
 
 Default: ``[]`` (Empty list)
 
@@ -127,8 +127,8 @@ wouldn't.
 
 .. setting:: APPEND_SLASH
 
-APPEND_SLASH
-------------
+``APPEND_SLASH``
+----------------
 
 Default: ``True``
 
@@ -143,8 +143,8 @@ The :setting:`APPEND_SLASH` setting is only used if
 
 .. setting:: CACHES
 
-CACHES
-------
+``CACHES``
+----------
 
 Default::
 
@@ -166,8 +166,8 @@ The following cache options are available.
 
 .. setting:: CACHES-BACKEND
 
-BACKEND
-~~~~~~~
+``BACKEND``
+~~~~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -186,8 +186,8 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 
 .. setting:: CACHES-KEY_FUNCTION
 
-KEY_FUNCTION
-~~~~~~~~~~~~
+``KEY_FUNCTION``
+~~~~~~~~~~~~~~~~
 
 A string containing a dotted path to a function (or any callable) that defines how to
 compose a prefix, version and key into a final cache key. The default
@@ -204,8 +204,8 @@ information.
 
 .. setting:: CACHES-KEY_PREFIX
 
-KEY_PREFIX
-~~~~~~~~~~
+``KEY_PREFIX``
+~~~~~~~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -216,8 +216,8 @@ See the :ref:`cache documentation <cache_key_prefixing>` for more information.
 
 .. setting:: CACHES-LOCATION
 
-LOCATION
-~~~~~~~~
+``LOCATION``
+~~~~~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -234,8 +234,8 @@ identifying name for a local memory cache. e.g.::
 
 .. setting:: CACHES-OPTIONS
 
-OPTIONS
-~~~~~~~
+``OPTIONS``
+~~~~~~~~~~~
 
 Default: ``None``
 
@@ -248,8 +248,8 @@ consult your backend module's own documentation.
 
 .. setting:: CACHES-TIMEOUT
 
-TIMEOUT
-~~~~~~~
+``TIMEOUT``
+~~~~~~~~~~~
 
 Default: ``300``
 
@@ -258,8 +258,8 @@ this settings is ``None``, cache entries will not expire.
 
 .. setting:: CACHES-VERSION
 
-VERSION
-~~~~~~~
+``VERSION``
+~~~~~~~~~~~
 
 Default: ``1``
 
@@ -269,8 +269,8 @@ See the :ref:`cache documentation <cache_versioning>` for more information.
 
 .. setting:: CACHE_MIDDLEWARE_ALIAS
 
-CACHE_MIDDLEWARE_ALIAS
-----------------------
+``CACHE_MIDDLEWARE_ALIAS``
+--------------------------
 
 Default: ``default``
 
@@ -279,8 +279,8 @@ The cache connection to use for the :ref:`cache middleware
 
 .. setting:: CACHE_MIDDLEWARE_KEY_PREFIX
 
-CACHE_MIDDLEWARE_KEY_PREFIX
----------------------------
+``CACHE_MIDDLEWARE_KEY_PREFIX``
+-------------------------------
 
 Default: ``''`` (Empty string)
 
@@ -292,8 +292,8 @@ See :doc:`/topics/cache`.
 
 .. setting:: CACHE_MIDDLEWARE_SECONDS
 
-CACHE_MIDDLEWARE_SECONDS
-------------------------
+``CACHE_MIDDLEWARE_SECONDS``
+----------------------------
 
 Default: ``600``
 
@@ -306,8 +306,8 @@ See :doc:`/topics/cache`.
 
 .. setting:: CSRF_COOKIE_AGE
 
-CSRF_COOKIE_AGE
----------------
+``CSRF_COOKIE_AGE``
+-------------------
 
 Default: ``31449600`` (approximately 1 year, in seconds)
 
@@ -326,8 +326,8 @@ keep the cookies in-memory instead of on persistent storage.
 
 .. setting:: CSRF_COOKIE_DOMAIN
 
-CSRF_COOKIE_DOMAIN
-------------------
+``CSRF_COOKIE_DOMAIN``
+----------------------
 
 Default: ``None``
 
@@ -343,8 +343,8 @@ protection is safe from cross-subdomain attacks by default - please see the
 
 .. setting:: CSRF_COOKIE_HTTPONLY
 
-CSRF_COOKIE_HTTPONLY
---------------------
+``CSRF_COOKIE_HTTPONLY``
+------------------------
 
 Default: ``False``
 
@@ -360,8 +360,8 @@ See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
 .. setting:: CSRF_COOKIE_NAME
 
-CSRF_COOKIE_NAME
-----------------
+``CSRF_COOKIE_NAME``
+--------------------
 
 Default: ``'csrftoken'``
 
@@ -371,8 +371,8 @@ your application). See :doc:`/ref/csrf`.
 
 .. setting:: CSRF_COOKIE_PATH
 
-CSRF_COOKIE_PATH
-----------------
+``CSRF_COOKIE_PATH``
+--------------------
 
 Default: ``'/'``
 
@@ -385,8 +385,8 @@ its own CSRF cookie.
 
 .. setting:: CSRF_COOKIE_SECURE
 
-CSRF_COOKIE_SECURE
-------------------
+``CSRF_COOKIE_SECURE``
+----------------------
 
 Default: ``False``
 
@@ -396,8 +396,8 @@ cookie is only sent with an HTTPS connection.
 
 .. setting:: CSRF_FAILURE_VIEW
 
-CSRF_FAILURE_VIEW
------------------
+``CSRF_FAILURE_VIEW``
+---------------------
 
 Default: ``'django.views.csrf.csrf_failure'``
 
@@ -414,8 +414,8 @@ an :class:`~django.http.HttpResponseForbidden`.
 
 .. setting:: CSRF_HEADER_NAME
 
-CSRF_HEADER_NAME
-----------------
+``CSRF_HEADER_NAME``
+--------------------
 
 .. versionadded:: 1.9
 
@@ -431,8 +431,8 @@ should be ``'HTTP_X_XSRF_TOKEN'``.
 
 .. setting:: CSRF_TRUSTED_ORIGINS
 
-CSRF_TRUSTED_ORIGINS
---------------------
+``CSRF_TRUSTED_ORIGINS``
+------------------------
 
 .. versionadded:: 1.9
 
@@ -450,8 +450,8 @@ example, to allow access from all subdomains of ``example.com``.
 
 .. setting:: DATABASES
 
-DATABASES
----------
+``DATABASES``
+-------------
 
 Default: ``{}`` (Empty dictionary)
 
@@ -493,8 +493,8 @@ configurations are available:
 
 .. setting:: DATABASE-ATOMIC_REQUESTS
 
-ATOMIC_REQUESTS
-~~~~~~~~~~~~~~~
+``ATOMIC_REQUESTS``
+~~~~~~~~~~~~~~~~~~~
 
 Default: ``False``
 
@@ -503,8 +503,8 @@ Set this to ``True`` to wrap each view in a transaction on this database. See
 
 .. setting:: DATABASE-AUTOCOMMIT
 
-AUTOCOMMIT
-~~~~~~~~~~
+``AUTOCOMMIT``
+~~~~~~~~~~~~~~
 
 Default: ``True``
 
@@ -513,8 +513,8 @@ management <deactivate-transaction-management>` and implement your own.
 
 .. setting:: DATABASE-ENGINE
 
-ENGINE
-~~~~~~
+``ENGINE``
+~~~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -536,8 +536,8 @@ You can use a database backend that doesn't ship with Django by setting
 
 .. setting:: HOST
 
-HOST
-~~~~
+``HOST``
+~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -563,8 +563,8 @@ are not available.
 
 .. setting:: NAME
 
-NAME
-~~~~
+``NAME``
+~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -574,8 +574,8 @@ file. When specifying the path, always use forward slashes, even on Windows
 
 .. setting:: CONN_MAX_AGE
 
-CONN_MAX_AGE
-~~~~~~~~~~~~
+``CONN_MAX_AGE``
+~~~~~~~~~~~~~~~~
 
 Default: ``0``
 
@@ -585,8 +585,8 @@ connections at the end of each request — Django's historical behavior — and
 
 .. setting:: OPTIONS
 
-OPTIONS
-~~~~~~~
+``OPTIONS``
+~~~~~~~~~~~
 
 Default: ``{}`` (Empty dictionary)
 
@@ -599,8 +599,8 @@ consult your backend module's own documentation.
 
 .. setting:: PASSWORD
 
-PASSWORD
-~~~~~~~~
+``PASSWORD``
+~~~~~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -608,8 +608,8 @@ The password to use when connecting to the database. Not used with SQLite.
 
 .. setting:: PORT
 
-PORT
-~~~~
+``PORT``
+~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -618,8 +618,8 @@ default port. Not used with SQLite.
 
 .. setting:: DATABASE-TIME_ZONE
 
-TIME_ZONE
-~~~~~~~~~
+``TIME_ZONE``
+~~~~~~~~~~~~~
 
 .. versionadded:: 1.9
 
@@ -653,8 +653,8 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
 
 .. setting:: USER
 
-USER
-~~~~
+``USER``
+~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -662,8 +662,8 @@ The username to use when connecting to the database. Not used with SQLite.
 
 .. setting:: DATABASE-TEST
 
-TEST
-~~~~
+``TEST``
+~~~~~~~~
 
 Default: ``{}`` (Empty dictionary)
 
@@ -687,8 +687,8 @@ The following keys in the ``TEST`` dictionary are available:
 
 .. setting:: TEST_CHARSET
 
-CHARSET
-^^^^^^^
+``CHARSET``
+^^^^^^^^^^^
 
 Default: ``None``
 
@@ -703,8 +703,8 @@ Supported by the PostgreSQL_ (``postgresql``) and MySQL_ (``mysql``) backends.
 
 .. setting:: TEST_COLLATION
 
-COLLATION
-^^^^^^^^^
+``COLLATION``
+^^^^^^^^^^^^^
 
 Default: ``None``
 
@@ -717,8 +717,8 @@ Only supported for the ``mysql`` backend (see the `MySQL manual`_ for details).
 
 .. setting:: TEST_DEPENDENCIES
 
-DEPENDENCIES
-^^^^^^^^^^^^
+``DEPENDENCIES``
+^^^^^^^^^^^^^^^^
 
 Default: ``['default']``, for all databases other than ``default``,
 which has no dependencies.
@@ -729,8 +729,8 @@ on :ref:`controlling the creation order of test databases
 
 .. setting:: TEST_MIRROR
 
-MIRROR
-^^^^^^
+``MIRROR``
+^^^^^^^^^^
 
 Default: ``None``
 
@@ -745,8 +745,8 @@ configurations of multiple databases. See the documentation on
 
 .. setting:: TEST_NAME
 
-NAME
-^^^^
+``NAME``
+^^^^^^^^
 
 Default: ``None``
 
@@ -760,8 +760,8 @@ See :ref:`the-test-database`.
 
 .. setting:: TEST_SERIALIZE
 
-SERIALIZE
-^^^^^^^^^
+``SERIALIZE``
+^^^^^^^^^^^^^
 
 Boolean value to control whether or not the default test runner serializes the
 database into an in-memory JSON string before running tests (used to restore
@@ -771,8 +771,8 @@ with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
 
 .. setting:: TEST_CREATE
 
-CREATE_DB
-^^^^^^^^^
+``CREATE_DB``
+^^^^^^^^^^^^^
 
 Default: ``True``
 
@@ -783,8 +783,8 @@ at the beginning of the tests or dropped at the end.
 
 .. setting:: TEST_USER_CREATE
 
-CREATE_USER
-^^^^^^^^^^^
+``CREATE_USER``
+^^^^^^^^^^^^^^^
 
 Default: ``True``
 
@@ -795,8 +795,8 @@ beginning of the tests and dropped at the end.
 
 .. setting:: TEST_USER
 
-USER
-^^^^
+``USER``
+^^^^^^^^
 
 Default: ``None``
 
@@ -807,8 +807,8 @@ when running tests. If not provided, Django will use ``'test_' + USER``.
 
 .. setting:: TEST_PASSWD
 
-PASSWORD
-^^^^^^^^
+``PASSWORD``
+^^^^^^^^^^^^
 
 Default: ``None``
 
@@ -819,8 +819,8 @@ when running tests. If not provided, Django will use a hardcoded default value.
 
 .. setting:: TEST_TBLSPACE
 
-TBLSPACE
-^^^^^^^^
+``TBLSPACE``
+^^^^^^^^^^^^
 
 Default: ``None``
 
@@ -835,8 +835,8 @@ provided, Django will use ``'test_' + USER``.
 
 .. setting:: TEST_TBLSPACE_TMP
 
-TBLSPACE_TMP
-^^^^^^^^^^^^
+``TBLSPACE_TMP``
+^^^^^^^^^^^^^^^^
 
 Default: ``None``
 
@@ -851,8 +851,8 @@ not provided, Django will use ``'test_' + USER + '_temp'``.
 
 .. setting:: DATAFILE
 
-DATAFILE
-^^^^^^^^
+``DATAFILE``
+^^^^^^^^^^^^
 
 .. versionadded:: 1.8
 
@@ -865,8 +865,8 @@ use ``TBLSPACE + '.dbf'``.
 
 .. setting:: DATAFILE_TMP
 
-DATAFILE_TMP
-^^^^^^^^^^^^
+``DATAFILE_TMP``
+^^^^^^^^^^^^^^^^
 
 .. versionadded:: 1.8
 
@@ -879,8 +879,8 @@ will use ``TBLSPACE_TMP + '.dbf'``.
 
 .. setting:: DATAFILE_MAXSIZE
 
-DATAFILE_MAXSIZE
-^^^^^^^^^^^^^^^^
+``DATAFILE_MAXSIZE``
+^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 1.8
 
@@ -896,8 +896,8 @@ The maximum size that the DATAFILE is allowed to grow to.
 
 .. setting:: DATAFILE_TMP_MAXSIZE
 
-DATAFILE_TMP_MAXSIZE
-^^^^^^^^^^^^^^^^^^^^
+``DATAFILE_TMP_MAXSIZE``
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 1.8
 
@@ -913,8 +913,8 @@ The maximum size that the DATAFILE_TMP is allowed to grow to.
 
 .. setting:: DATABASE_ROUTERS
 
-DATABASE_ROUTERS
-----------------
+``DATABASE_ROUTERS``
+--------------------
 
 Default: ``[]`` (Empty list)
 
@@ -926,8 +926,8 @@ database configurations <topics-db-multi-db-routing>`.
 
 .. setting:: DATE_FORMAT
 
-DATE_FORMAT
------------
+``DATE_FORMAT``
+---------------
 
 Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
 
@@ -940,8 +940,8 @@ See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_
 
 .. setting:: DATE_INPUT_FORMATS
 
-DATE_INPUT_FORMATS
-------------------
+``DATE_INPUT_FORMATS``
+----------------------
 
 Default::
 
@@ -967,8 +967,8 @@ See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
 .. setting:: DATETIME_FORMAT
 
-DATETIME_FORMAT
----------------
+``DATETIME_FORMAT``
+-------------------
 
 Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
 
@@ -981,8 +981,8 @@ See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE
 
 .. setting:: DATETIME_INPUT_FORMATS
 
-DATETIME_INPUT_FORMATS
-----------------------
+``DATETIME_INPUT_FORMATS``
+--------------------------
 
 Default::
 
@@ -1015,8 +1015,8 @@ See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
 .. setting:: DEBUG
 
-DEBUG
------
+``DEBUG``
+---------
 
 Default: ``False``
 
@@ -1068,8 +1068,8 @@ requests being returned as "Bad Request (400)".
 
 .. setting:: DEBUG_PROPAGATE_EXCEPTIONS
 
-DEBUG_PROPAGATE_EXCEPTIONS
---------------------------
+``DEBUG_PROPAGATE_EXCEPTIONS``
+------------------------------
 
 Default: ``False``
 
@@ -1080,8 +1080,8 @@ site.
 
 .. setting:: DECIMAL_SEPARATOR
 
-DECIMAL_SEPARATOR
------------------
+``DECIMAL_SEPARATOR``
+---------------------
 
 Default: ``'.'`` (Dot)
 
@@ -1096,8 +1096,8 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 
 .. setting:: DEFAULT_CHARSET
 
-DEFAULT_CHARSET
----------------
+``DEFAULT_CHARSET``
+-------------------
 
 Default: ``'utf-8'``
 
@@ -1107,8 +1107,8 @@ manually specified. Used with :setting:`DEFAULT_CONTENT_TYPE` to construct the
 
 .. setting:: DEFAULT_CONTENT_TYPE
 
-DEFAULT_CONTENT_TYPE
---------------------
+``DEFAULT_CONTENT_TYPE``
+------------------------
 
 Default: ``'text/html'``
 
@@ -1118,8 +1118,8 @@ the ``Content-Type`` header.
 
 .. setting:: DEFAULT_EXCEPTION_REPORTER_FILTER
 
-DEFAULT_EXCEPTION_REPORTER_FILTER
----------------------------------
+``DEFAULT_EXCEPTION_REPORTER_FILTER``
+-------------------------------------
 
 Default: ``'``:class:`django.views.debug.SafeExceptionReporterFilter`\ ``'``
 
@@ -1129,8 +1129,8 @@ See :ref:`Filtering error reports<filtering-error-reports>`.
 
 .. setting:: DEFAULT_FILE_STORAGE
 
-DEFAULT_FILE_STORAGE
---------------------
+``DEFAULT_FILE_STORAGE``
+------------------------
 
 Default: ``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'``
 
@@ -1139,8 +1139,8 @@ specify a particular storage system. See :doc:`/topics/files`.
 
 .. setting:: DEFAULT_FROM_EMAIL
 
-DEFAULT_FROM_EMAIL
-------------------
+``DEFAULT_FROM_EMAIL``
+----------------------
 
 Default: ``'webmaster@localhost'``
 
@@ -1150,8 +1150,8 @@ and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
-DEFAULT_INDEX_TABLESPACE
-------------------------
+``DEFAULT_INDEX_TABLESPACE``
+----------------------------
 
 Default: ``''`` (Empty string)
 
@@ -1160,8 +1160,8 @@ one, if the backend supports it (see :doc:`/topics/db/tablespaces`).
 
 .. setting:: DEFAULT_TABLESPACE
 
-DEFAULT_TABLESPACE
-------------------
+``DEFAULT_TABLESPACE``
+----------------------
 
 Default: ``''`` (Empty string)
 
@@ -1170,8 +1170,8 @@ backend supports it (see :doc:`/topics/db/tablespaces`).
 
 .. setting:: DISALLOWED_USER_AGENTS
 
-DISALLOWED_USER_AGENTS
-----------------------
+``DISALLOWED_USER_AGENTS``
+--------------------------
 
 Default: ``[]`` (Empty list)
 
@@ -1182,8 +1182,8 @@ This is only used if ``CommonMiddleware`` is installed (see
 
 .. setting:: EMAIL_BACKEND
 
-EMAIL_BACKEND
--------------
+``EMAIL_BACKEND``
+-----------------
 
 Default: ``'``:class:`django.core.mail.backends.smtp.EmailBackend`\ ``'``
 
@@ -1192,8 +1192,8 @@ The backend to use for sending emails. For the list of available backends see
 
 .. setting:: EMAIL_FILE_PATH
 
-EMAIL_FILE_PATH
----------------
+``EMAIL_FILE_PATH``
+-------------------
 
 Default: Not defined
 
@@ -1201,8 +1201,8 @@ The directory used by the ``file`` email backend to store output files.
 
 .. setting:: EMAIL_HOST
 
-EMAIL_HOST
-----------
+``EMAIL_HOST``
+--------------
 
 Default: ``'localhost'``
 
@@ -1212,8 +1212,8 @@ See also :setting:`EMAIL_PORT`.
 
 .. setting:: EMAIL_HOST_PASSWORD
 
-EMAIL_HOST_PASSWORD
--------------------
+``EMAIL_HOST_PASSWORD``
+-----------------------
 
 Default: ``''`` (Empty string)
 
@@ -1226,8 +1226,8 @@ See also :setting:`EMAIL_HOST_USER`.
 
 .. setting:: EMAIL_HOST_USER
 
-EMAIL_HOST_USER
----------------
+``EMAIL_HOST_USER``
+-------------------
 
 Default: ``''`` (Empty string)
 
@@ -1238,8 +1238,8 @@ See also :setting:`EMAIL_HOST_PASSWORD`.
 
 .. setting:: EMAIL_PORT
 
-EMAIL_PORT
-----------
+``EMAIL_PORT``
+--------------
 
 Default: ``25``
 
@@ -1247,8 +1247,8 @@ Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
 
 .. setting:: EMAIL_SUBJECT_PREFIX
 
-EMAIL_SUBJECT_PREFIX
---------------------
+``EMAIL_SUBJECT_PREFIX``
+------------------------
 
 Default: ``'[Django] '``
 
@@ -1258,8 +1258,8 @@ trailing space.
 
 .. setting:: EMAIL_USE_TLS
 
-EMAIL_USE_TLS
--------------
+``EMAIL_USE_TLS``
+-----------------
 
 Default: ``False``
 
@@ -1270,8 +1270,8 @@ experiencing hanging connections, see the implicit TLS setting
 
 .. setting:: EMAIL_USE_SSL
 
-EMAIL_USE_SSL
--------------
+``EMAIL_USE_SSL``
+-----------------
 
 Default: ``False``
 
@@ -1285,8 +1285,8 @@ exclusive, so only set one of those settings to ``True``.
 
 .. setting:: EMAIL_SSL_CERTFILE
 
-EMAIL_SSL_CERTFILE
-------------------
+``EMAIL_SSL_CERTFILE``
+----------------------
 
 .. versionadded:: 1.8
 
@@ -1298,8 +1298,8 @@ for the SSL connection.
 
 .. setting:: EMAIL_SSL_KEYFILE
 
-EMAIL_SSL_KEYFILE
------------------
+``EMAIL_SSL_KEYFILE``
+---------------------
 
 .. versionadded:: 1.8
 
@@ -1317,8 +1317,8 @@ file and private key file are handled.
 
 .. setting:: EMAIL_TIMEOUT
 
-EMAIL_TIMEOUT
--------------
+``EMAIL_TIMEOUT``
+-----------------
 
 .. versionadded:: 1.8
 
@@ -1329,8 +1329,8 @@ attempt.
 
 .. setting:: FILE_CHARSET
 
-FILE_CHARSET
-------------
+``FILE_CHARSET``
+----------------
 
 Default: ``'utf-8'``
 
@@ -1339,8 +1339,8 @@ template files and initial SQL data files.
 
 .. setting:: FILE_UPLOAD_HANDLERS
 
-FILE_UPLOAD_HANDLERS
---------------------
+``FILE_UPLOAD_HANDLERS``
+------------------------
 
 Default::
 
@@ -1354,8 +1354,8 @@ See :doc:`/topics/files` for details.
 
 .. setting:: FILE_UPLOAD_MAX_MEMORY_SIZE
 
-FILE_UPLOAD_MAX_MEMORY_SIZE
----------------------------
+``FILE_UPLOAD_MAX_MEMORY_SIZE``
+-------------------------------
 
 Default: ``2621440`` (i.e. 2.5 MB).
 
@@ -1364,8 +1364,8 @@ the file system. See :doc:`/topics/files` for details.
 
 .. setting:: FILE_UPLOAD_DIRECTORY_PERMISSIONS
 
-FILE_UPLOAD_DIRECTORY_PERMISSIONS
----------------------------------
+``FILE_UPLOAD_DIRECTORY_PERMISSIONS``
+-------------------------------------
 
 Default: ``None``
 
@@ -1381,8 +1381,8 @@ This value mirrors the functionality and caveats of the
 
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
-FILE_UPLOAD_PERMISSIONS
------------------------
+``FILE_UPLOAD_PERMISSIONS``
+---------------------------
 
 Default: ``None``
 
@@ -1413,8 +1413,8 @@ when using the :djadmin:`collectstatic` management command. See
 
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
-FILE_UPLOAD_TEMP_DIR
---------------------
+``FILE_UPLOAD_TEMP_DIR``
+------------------------
 
 Default: ``None``
 
@@ -1428,8 +1428,8 @@ See :doc:`/topics/files` for details.
 
 .. setting:: FIRST_DAY_OF_WEEK
 
-FIRST_DAY_OF_WEEK
------------------
+``FIRST_DAY_OF_WEEK``
+---------------------
 
 Default: ``0`` (Sunday)
 
@@ -1443,8 +1443,8 @@ Monday and so on.
 
 .. setting:: FIXTURE_DIRS
 
-FIXTURE_DIRS
--------------
+``FIXTURE_DIRS``
+-----------------
 
 Default: ``[]`` (Empty list)
 
@@ -1457,8 +1457,8 @@ See :ref:`initial-data-via-fixtures` and :ref:`topics-testing-fixtures`.
 
 .. setting:: FORCE_SCRIPT_NAME
 
-FORCE_SCRIPT_NAME
-------------------
+``FORCE_SCRIPT_NAME``
+---------------------
 
 Default: ``None``
 
@@ -1469,8 +1469,8 @@ of the preferred value or not supplied at all.
 
 .. setting:: FORMAT_MODULE_PATH
 
-FORMAT_MODULE_PATH
-------------------
+``FORMAT_MODULE_PATH``
+----------------------
 
 Default: ``None``
 
@@ -1513,8 +1513,8 @@ Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
 
 .. setting:: IGNORABLE_404_URLS
 
-IGNORABLE_404_URLS
-------------------
+``IGNORABLE_404_URLS``
+----------------------
 
 Default: ``[]`` (Empty list)
 
@@ -1532,8 +1532,8 @@ This is only used if
 
 .. setting:: INSTALLED_APPS
 
-INSTALLED_APPS
---------------
+``INSTALLED_APPS``
+------------------
 
 Default: ``[]`` (Empty list)
 
@@ -1573,8 +1573,8 @@ listed first in :setting:`INSTALLED_APPS` has precedence.
 
 .. setting:: INTERNAL_IPS
 
-INTERNAL_IPS
-------------
+``INTERNAL_IPS``
+----------------
 
 Default: ``[]`` (Empty list)
 
@@ -1589,8 +1589,8 @@ A list of IP addresses, as strings, that:
 
 .. setting:: LANGUAGE_CODE
 
-LANGUAGE_CODE
--------------
+``LANGUAGE_CODE``
+-----------------
 
 Default: ``'en-us'``
 
@@ -1620,8 +1620,8 @@ See :ref:`how-django-discovers-language-preference` for more details.
 
 .. setting:: LANGUAGE_COOKIE_AGE
 
-LANGUAGE_COOKIE_AGE
--------------------
+``LANGUAGE_COOKIE_AGE``
+-----------------------
 
 Default: ``None`` (expires at browser close)
 
@@ -1629,8 +1629,8 @@ The age of the language cookie, in seconds.
 
 .. setting:: LANGUAGE_COOKIE_DOMAIN
 
-LANGUAGE_COOKIE_DOMAIN
-----------------------
+``LANGUAGE_COOKIE_DOMAIN``
+--------------------------
 
 Default: ``None``
 
@@ -1650,8 +1650,8 @@ deletes the old one.
 
 .. setting:: LANGUAGE_COOKIE_NAME
 
-LANGUAGE_COOKIE_NAME
---------------------
+``LANGUAGE_COOKIE_NAME``
+------------------------
 
 Default: ``'django_language'``
 
@@ -1661,8 +1661,8 @@ application). See :doc:`/topics/i18n/index`.
 
 .. setting:: LANGUAGE_COOKIE_PATH
 
-LANGUAGE_COOKIE_PATH
---------------------
+``LANGUAGE_COOKIE_PATH``
+------------------------
 
 Default: ``'/'``
 
@@ -1684,8 +1684,8 @@ deletes the one.
 
 .. setting:: LANGUAGES
 
-LANGUAGES
----------
+``LANGUAGES``
+-------------
 
 Default: A list of all available languages. This list is continually growing
 and including a copy here would inevitably become rapidly out of date. You can
@@ -1718,8 +1718,8 @@ Here's a sample settings file::
 
 .. setting:: LOCALE_PATHS
 
-LOCALE_PATHS
-------------
+``LOCALE_PATHS``
+----------------
 
 Default: ``[]`` (Empty list)
 
@@ -1738,8 +1738,8 @@ directories containing the actual translation files.
 
 .. setting:: LOGGING
 
-LOGGING
--------
+``LOGGING``
+-----------
 
 Default: A logging configuration dictionary.
 
@@ -1758,8 +1758,8 @@ __ https://github.com/django/django/blob/master/django/utils/log.py
 
 .. setting:: LOGGING_CONFIG
 
-LOGGING_CONFIG
---------------
+``LOGGING_CONFIG``
+------------------
 
 Default: ``'logging.config.dictConfig'``
 
@@ -1774,8 +1774,8 @@ configuration process will be skipped.
 
 .. setting:: MANAGERS
 
-MANAGERS
---------
+``MANAGERS``
+------------
 
 Default: ``[]`` (Empty list)
 
@@ -1785,8 +1785,8 @@ broken link notifications when
 
 .. setting:: MEDIA_ROOT
 
-MEDIA_ROOT
-----------
+``MEDIA_ROOT``
+--------------
 
 Default: ``''`` (Empty string)
 
@@ -1807,8 +1807,8 @@ See also :setting:`MEDIA_URL`.
 
 .. setting:: MEDIA_URL
 
-MEDIA_URL
----------
+``MEDIA_URL``
+-------------
 
 Default: ``''`` (Empty string)
 
@@ -1837,8 +1837,8 @@ Example: ``"http://media.example.com/"``
 
 .. setting:: MIDDLEWARE_CLASSES
 
-MIDDLEWARE_CLASSES
-------------------
+``MIDDLEWARE_CLASSES``
+----------------------
 
 Default::
 
@@ -1849,8 +1849,8 @@ A list of middleware classes to use. See :doc:`/topics/http/middleware`.
 
 .. setting:: MIGRATION_MODULES
 
-MIGRATION_MODULES
------------------
+``MIGRATION_MODULES``
+---------------------
 
 Default: ``{}`` (Empty dictionary)
 
@@ -1879,8 +1879,8 @@ your general project settings, remember to use the :option:`migrate
 
 .. setting:: MONTH_DAY_FORMAT
 
-MONTH_DAY_FORMAT
-----------------
+``MONTH_DAY_FORMAT``
+--------------------
 
 Default: ``'F j'``
 
@@ -1902,8 +1902,8 @@ See :tfilter:`allowed date format strings <date>`. See also
 
 .. setting:: NUMBER_GROUPING
 
-NUMBER_GROUPING
-----------------
+``NUMBER_GROUPING``
+--------------------
 
 Default: ``0``
 
@@ -1922,8 +1922,8 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 
 .. setting:: PREPEND_WWW
 
-PREPEND_WWW
------------
+``PREPEND_WWW``
+---------------
 
 Default: ``False``
 
@@ -1933,8 +1933,8 @@ used if :class:`~django.middleware.common.CommonMiddleware` is installed
 
 .. setting:: ROOT_URLCONF
 
-ROOT_URLCONF
-------------
+``ROOT_URLCONF``
+----------------
 
 Default: Not defined
 
@@ -1945,8 +1945,8 @@ object. See :ref:`how-django-processes-a-request` for details.
 
 .. setting:: SECRET_KEY
 
-SECRET_KEY
-----------
+``SECRET_KEY``
+--------------
 
 Default: ``''`` (Empty string)
 
@@ -1994,8 +1994,8 @@ affect them.
 
 .. setting:: SECURE_BROWSER_XSS_FILTER
 
-SECURE_BROWSER_XSS_FILTER
--------------------------
+``SECURE_BROWSER_XSS_FILTER``
+-----------------------------
 
 .. versionadded:: 1.8
 
@@ -2006,8 +2006,8 @@ the :ref:`x-xss-protection` header on all responses that do not already have it.
 
 .. setting:: SECURE_CONTENT_TYPE_NOSNIFF
 
-SECURE_CONTENT_TYPE_NOSNIFF
----------------------------
+``SECURE_CONTENT_TYPE_NOSNIFF``
+-------------------------------
 
 .. versionadded:: 1.8
 
@@ -2019,8 +2019,8 @@ already have it.
 
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
-SECURE_HSTS_INCLUDE_SUBDOMAINS
-------------------------------
+``SECURE_HSTS_INCLUDE_SUBDOMAINS``
+----------------------------------
 
 .. versionadded:: 1.8
 
@@ -2038,8 +2038,8 @@ non-zero value.
 
 .. setting:: SECURE_HSTS_SECONDS
 
-SECURE_HSTS_SECONDS
--------------------
+``SECURE_HSTS_SECONDS``
+-----------------------
 
 .. versionadded:: 1.8
 
@@ -2056,8 +2056,8 @@ already have it.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
 
-SECURE_PROXY_SSL_HEADER
------------------------
+``SECURE_PROXY_SSL_HEADER``
+---------------------------
 
 Default: ``None``
 
@@ -2117,8 +2117,8 @@ available in ``request.META``.)
 
 .. setting:: SECURE_REDIRECT_EXEMPT
 
-SECURE_REDIRECT_EXEMPT
-----------------------
+``SECURE_REDIRECT_EXEMPT``
+--------------------------
 
 .. versionadded:: 1.8
 
@@ -2130,8 +2130,8 @@ setting has no effect.
 
 .. setting:: SECURE_SSL_HOST
 
-SECURE_SSL_HOST
----------------
+``SECURE_SSL_HOST``
+-------------------
 
 .. versionadded:: 1.8
 
@@ -2144,8 +2144,8 @@ setting has no effect.
 
 .. setting:: SECURE_SSL_REDIRECT
 
-SECURE_SSL_REDIRECT
--------------------
+``SECURE_SSL_REDIRECT``
+-----------------------
 
 .. versionadded:: 1.8
 
@@ -2166,8 +2166,8 @@ those URLs matching a regular expression listed in
 
 .. setting:: SERIALIZATION_MODULES
 
-SERIALIZATION_MODULES
----------------------
+``SERIALIZATION_MODULES``
+-------------------------
 
 Default: Not defined
 
@@ -2179,8 +2179,8 @@ example, to define a YAML serializer, use::
 
 .. setting:: SERVER_EMAIL
 
-SERVER_EMAIL
-------------
+``SERVER_EMAIL``
+----------------
 
 Default: ``'root@localhost'``
 
@@ -2195,8 +2195,8 @@ The email address that error messages come from, such as those sent to
 
 .. setting:: SHORT_DATE_FORMAT
 
-SHORT_DATE_FORMAT
------------------
+``SHORT_DATE_FORMAT``
+---------------------
 
 Default: ``'m/d/Y'`` (e.g. ``12/31/2003``)
 
@@ -2209,8 +2209,8 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
 .. setting:: SHORT_DATETIME_FORMAT
 
-SHORT_DATETIME_FORMAT
----------------------
+``SHORT_DATETIME_FORMAT``
+-------------------------
 
 Default: ``'m/d/Y P'`` (e.g. ``12/31/2003 4 p.m.``)
 
@@ -2223,8 +2223,8 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
 .. setting:: SIGNING_BACKEND
 
-SIGNING_BACKEND
----------------
+``SIGNING_BACKEND``
+-------------------
 
 Default: ``'django.core.signing.TimestampSigner'``
 
@@ -2234,8 +2234,8 @@ See also the :doc:`/topics/signing` documentation.
 
 .. setting:: SILENCED_SYSTEM_CHECKS
 
-SILENCED_SYSTEM_CHECKS
-----------------------
+``SILENCED_SYSTEM_CHECKS``
+--------------------------
 
 Default: ``[]`` (Empty list)
 
@@ -2252,8 +2252,8 @@ See also the :doc:`/ref/checks` documentation.
 
 .. setting:: TEMPLATES
 
-TEMPLATES
----------
+``TEMPLATES``
+-------------
 
 .. versionadded:: 1.8
 
@@ -2277,8 +2277,8 @@ The following options are available for all backends.
 
 .. setting:: TEMPLATES-BACKEND
 
-BACKEND
-~~~~~~~
+``BACKEND``
+~~~~~~~~~~~
 
 Default: Not defined
 
@@ -2292,8 +2292,8 @@ You can use a template backend that doesn't ship with Django by setting
 
 .. setting:: TEMPLATES-NAME
 
-NAME
-~~~~
+``NAME``
+~~~~~~~~
 
 Default: see below
 
@@ -2308,8 +2308,8 @@ its default name is ``'whatever'``.
 
 .. setting:: TEMPLATES-DIRS
 
-DIRS
-~~~~
+``DIRS``
+~~~~~~~~
 
 Default: ``[]`` (Empty list)
 
@@ -2318,8 +2318,8 @@ order.
 
 .. setting:: TEMPLATES-APP_DIRS
 
-APP_DIRS
-~~~~~~~~
+``APP_DIRS``
+~~~~~~~~~~~~
 
 Default: ``False``
 
@@ -2333,8 +2333,8 @@ applications.
 
 .. setting:: TEMPLATES-OPTIONS
 
-OPTIONS
-~~~~~~~
+``OPTIONS``
+~~~~~~~~~~~
 
 Default: ``{}`` (Empty dict)
 
@@ -2453,8 +2453,8 @@ misspelled) variables. See :ref:`invalid-template-variables`.
 
 .. setting:: TEST_RUNNER
 
-TEST_RUNNER
------------
+``TEST_RUNNER``
+---------------
 
 Default: ``'django.test.runner.DiscoverRunner'``
 
@@ -2463,8 +2463,8 @@ The name of the class to use for starting the test suite. See
 
 .. setting:: TEST_NON_SERIALIZED_APPS
 
-TEST_NON_SERIALIZED_APPS
-------------------------
+``TEST_NON_SERIALIZED_APPS``
+----------------------------
 
 Default: ``[]`` (Empty list)
 
@@ -2481,8 +2481,8 @@ process.
 
 .. setting:: THOUSAND_SEPARATOR
 
-THOUSAND_SEPARATOR
-------------------
+``THOUSAND_SEPARATOR``
+----------------------
 
 Default: ``','`` (Comma)
 
@@ -2498,8 +2498,8 @@ See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
 
 .. setting:: TIME_FORMAT
 
-TIME_FORMAT
------------
+``TIME_FORMAT``
+---------------
 
 Default: ``'P'`` (e.g. ``4 p.m.``)
 
@@ -2512,8 +2512,8 @@ See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 
 .. setting:: TIME_INPUT_FORMATS
 
-TIME_INPUT_FORMATS
-------------------
+``TIME_INPUT_FORMATS``
+----------------------
 
 Default::
 
@@ -2537,8 +2537,8 @@ See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
 .. setting:: TIME_ZONE
 
-TIME_ZONE
----------
+``TIME_ZONE``
+-------------
 
 Default: ``'America/Chicago'``
 
@@ -2586,8 +2586,8 @@ to ensure your processes are running in the correct environment.
 
 .. setting:: USE_ETAGS
 
-USE_ETAGS
----------
+``USE_ETAGS``
+-------------
 
 Default: ``False``
 
@@ -2598,8 +2598,8 @@ bandwidth but slows down performance. This is used by the ``CommonMiddleware``
 
 .. setting:: USE_I18N
 
-USE_I18N
---------
+``USE_I18N``
+------------
 
 Default: ``True``
 
@@ -2617,8 +2617,8 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 
 .. setting:: USE_L10N
 
-USE_L10N
---------
+``USE_L10N``
+------------
 
 Default: ``False``
 
@@ -2635,8 +2635,8 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
 .. setting:: USE_THOUSAND_SEPARATOR
 
-USE_THOUSAND_SEPARATOR
-----------------------
+``USE_THOUSAND_SEPARATOR``
+--------------------------
 
 Default: ``False``
 
@@ -2652,8 +2652,8 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 
 .. setting:: USE_TZ
 
-USE_TZ
-------
+``USE_TZ``
+----------
 
 Default: ``False``
 
@@ -2671,8 +2671,8 @@ See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
 .. setting:: USE_X_FORWARDED_HOST
 
-USE_X_FORWARDED_HOST
---------------------
+``USE_X_FORWARDED_HOST``
+------------------------
 
 Default: ``False``
 
@@ -2682,8 +2682,8 @@ which sets this header is in use.
 
 .. setting:: USE_X_FORWARDED_PORT
 
-USE_X_FORWARDED_PORT
---------------------
+``USE_X_FORWARDED_PORT``
+------------------------
 
 .. versionadded:: 1.9
 
@@ -2695,8 +2695,8 @@ enabled if a proxy which sets this header is in use.
 
 .. setting:: WSGI_APPLICATION
 
-WSGI_APPLICATION
-----------------
+``WSGI_APPLICATION``
+--------------------
 
 Default: ``None``
 
@@ -2712,8 +2712,8 @@ identical to previous Django versions.
 
 .. setting:: YEAR_MONTH_FORMAT
 
-YEAR_MONTH_FORMAT
------------------
+``YEAR_MONTH_FORMAT``
+---------------------
 
 Default: ``'F Y'``
 
@@ -2735,8 +2735,8 @@ and :setting:`MONTH_DAY_FORMAT`.
 
 .. setting:: X_FRAME_OPTIONS
 
-X_FRAME_OPTIONS
----------------
+``X_FRAME_OPTIONS``
+-------------------
 
 Default: ``'SAMEORIGIN'``
 
@@ -2752,8 +2752,8 @@ Settings for :mod:`django.contrib.auth`.
 
 .. setting:: AUTHENTICATION_BACKENDS
 
-AUTHENTICATION_BACKENDS
------------------------
+``AUTHENTICATION_BACKENDS``
+---------------------------
 
 Default: ``['django.contrib.auth.backends.ModelBackend']``
 
@@ -2763,8 +2763,8 @@ authenticate a user. See the :ref:`authentication backends documentation
 
 .. setting:: AUTH_USER_MODEL
 
-AUTH_USER_MODEL
----------------
+``AUTH_USER_MODEL``
+-------------------
 
 Default: ``'auth.User'``
 
@@ -2780,8 +2780,8 @@ The model to use to represent a User. See :ref:`auth-custom-user`.
 
 .. setting:: LOGIN_REDIRECT_URL
 
-LOGIN_REDIRECT_URL
-------------------
+``LOGIN_REDIRECT_URL``
+----------------------
 
 Default: ``'/accounts/profile/'``
 
@@ -2797,8 +2797,8 @@ since you don't have to define the URL in two places (``settings`` and URLconf).
 
 .. setting:: LOGIN_URL
 
-LOGIN_URL
----------
+``LOGIN_URL``
+-------------
 
 Default: ``'/accounts/login/'``
 
@@ -2820,8 +2820,8 @@ LOGIN_URL counterpart.
 
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
-PASSWORD_RESET_TIMEOUT_DAYS
----------------------------
+``PASSWORD_RESET_TIMEOUT_DAYS``
+-------------------------------
 
 Default: ``3``
 
@@ -2830,8 +2830,8 @@ The number of days a password reset link is valid for. Used by the
 
 .. setting:: PASSWORD_HASHERS
 
-PASSWORD_HASHERS
-----------------
+``PASSWORD_HASHERS``
+--------------------
 
 See :ref:`auth_password_storage`.
 
@@ -2847,8 +2847,8 @@ Default::
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
 
-AUTH_PASSWORD_VALIDATORS
-------------------------
+``AUTH_PASSWORD_VALIDATORS``
+----------------------------
 
 .. versionadded:: 1.9
 
@@ -2867,8 +2867,8 @@ Settings for :mod:`django.contrib.messages`.
 
 .. setting:: MESSAGE_LEVEL
 
-MESSAGE_LEVEL
--------------
+``MESSAGE_LEVEL``
+-----------------
 
 Default: ``messages.INFO``
 
@@ -2890,8 +2890,8 @@ framework. See :ref:`message levels <message-level>` for more details.
 
 .. setting:: MESSAGE_STORAGE
 
-MESSAGE_STORAGE
----------------
+``MESSAGE_STORAGE``
+-------------------
 
 Default: ``'django.contrib.messages.storage.fallback.FallbackStorage'``
 
@@ -2911,8 +2911,8 @@ and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
 
 .. setting:: MESSAGE_TAGS
 
-MESSAGE_TAGS
-------------
+``MESSAGE_TAGS``
+----------------
 
 Default::
 
@@ -2949,8 +2949,8 @@ Settings for :mod:`django.contrib.sessions`.
 
 .. setting:: SESSION_CACHE_ALIAS
 
-SESSION_CACHE_ALIAS
--------------------
+``SESSION_CACHE_ALIAS``
+-----------------------
 
 Default: ``'default'``
 
@@ -2959,8 +2959,8 @@ this selects the cache to use.
 
 .. setting:: SESSION_COOKIE_AGE
 
-SESSION_COOKIE_AGE
-------------------
+``SESSION_COOKIE_AGE``
+----------------------
 
 Default: ``1209600`` (2 weeks, in seconds)
 
@@ -2968,8 +2968,8 @@ The age of session cookies, in seconds.
 
 .. setting:: SESSION_COOKIE_DOMAIN
 
-SESSION_COOKIE_DOMAIN
----------------------
+``SESSION_COOKIE_DOMAIN``
+-------------------------
 
 Default: ``None``
 
@@ -2987,8 +2987,8 @@ This setting also affects cookies set by :mod:`django.contrib.messages`.
 
 .. setting:: SESSION_COOKIE_HTTPONLY
 
-SESSION_COOKIE_HTTPONLY
------------------------
+``SESSION_COOKIE_HTTPONLY``
+---------------------------
 
 Default: ``True``
 
@@ -3011,8 +3011,8 @@ session cookies from JavaScript, you're probably doing it wrong.
 
 .. setting:: SESSION_COOKIE_NAME
 
-SESSION_COOKIE_NAME
--------------------
+``SESSION_COOKIE_NAME``
+-----------------------
 
 Default: ``'sessionid'``
 
@@ -3021,8 +3021,8 @@ The name of the cookie to use for sessions. This can be whatever you want
 
 .. setting:: SESSION_COOKIE_PATH
 
-SESSION_COOKIE_PATH
--------------------
+``SESSION_COOKIE_PATH``
+-----------------------
 
 Default: ``'/'``
 
@@ -3035,8 +3035,8 @@ its own session cookie.
 
 .. setting:: SESSION_COOKIE_SECURE
 
-SESSION_COOKIE_SECURE
----------------------
+``SESSION_COOKIE_SECURE``
+-------------------------
 
 Default: ``False``
 
@@ -3053,8 +3053,8 @@ requests and that's a good thing.
 
 .. setting:: SESSION_ENGINE
 
-SESSION_ENGINE
---------------
+``SESSION_ENGINE``
+------------------
 
 Default: ``'django.contrib.sessions.backends.db'``
 
@@ -3070,8 +3070,8 @@ See :ref:`configuring-sessions` for more details.
 
 .. setting:: SESSION_EXPIRE_AT_BROWSER_CLOSE
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE
--------------------------------
+``SESSION_EXPIRE_AT_BROWSER_CLOSE``
+-----------------------------------
 
 Default: ``False``
 
@@ -3080,8 +3080,8 @@ Whether to expire the session when the user closes their browser. See
 
 .. setting:: SESSION_FILE_PATH
 
-SESSION_FILE_PATH
------------------
+``SESSION_FILE_PATH``
+---------------------
 
 Default: ``None``
 
@@ -3092,8 +3092,8 @@ used, Django will use the standard temporary directory for the system.
 
 .. setting:: SESSION_SAVE_EVERY_REQUEST
 
-SESSION_SAVE_EVERY_REQUEST
---------------------------
+``SESSION_SAVE_EVERY_REQUEST``
+------------------------------
 
 Default: ``False``
 
@@ -3104,8 +3104,8 @@ sessions won't be created, even if this setting is active.
 
 .. setting:: SESSION_SERIALIZER
 
-SESSION_SERIALIZER
-------------------
+``SESSION_SERIALIZER``
+----------------------
 
 Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
 
@@ -3126,8 +3126,8 @@ Settings for :mod:`django.contrib.sites`.
 
 .. setting:: SITE_ID
 
-SITE_ID
--------
+``SITE_ID``
+-----------
 
 Default: Not defined
 
@@ -3145,8 +3145,8 @@ Settings for :mod:`django.contrib.staticfiles`.
 
 .. setting:: STATIC_ROOT
 
-STATIC_ROOT
------------
+``STATIC_ROOT``
+---------------
 
 Default: ``None``
 
@@ -3173,8 +3173,8 @@ files</howto/static-files/index>` for more details about usage.
 
 .. setting:: STATIC_URL
 
-STATIC_URL
-----------
+``STATIC_URL``
+--------------
 
 Default: ``None``
 
@@ -3194,8 +3194,8 @@ You may need to :ref:`configure these files to be served in development
 
 .. setting:: STATICFILES_DIRS
 
-STATICFILES_DIRS
-----------------
+``STATICFILES_DIRS``
+--------------------
 
 Default: ``[]`` (Empty list)
 
@@ -3242,8 +3242,8 @@ This would allow you to refer to the local file
 
 .. setting:: STATICFILES_STORAGE
 
-STATICFILES_STORAGE
--------------------
+``STATICFILES_STORAGE``
+-----------------------
 
 Default: ``'django.contrib.staticfiles.storage.StaticFilesStorage'``
 
@@ -3257,8 +3257,8 @@ For an example, see :ref:`staticfiles-from-cdn`.
 
 .. setting:: STATICFILES_FINDERS
 
-STATICFILES_FINDERS
--------------------
+``STATICFILES_FINDERS``
+-----------------------
 
 Default::
 
@@ -3351,8 +3351,8 @@ File uploads
 * :setting:`MEDIA_ROOT`
 * :setting:`MEDIA_URL`
 
-Globalization (i18n/l10n)
--------------------------
+Globalization (``i18n``/``l10n``)
+---------------------------------
 * :setting:`DATE_FORMAT`
 * :setting:`DATE_INPUT_FORMATS`
 * :setting:`DATETIME_FORMAT`

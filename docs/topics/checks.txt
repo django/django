@@ -126,7 +126,7 @@ The code below is equivalent to the code above::
 
 .. _field-checking:
 
-Field, Model, and Manager checks
+Field, model, and manager checks
 --------------------------------
 
 In some cases, you won't need to register your check function -- you can
@@ -191,7 +191,7 @@ the only difference is that the check is a classmethod, not an instance method::
             # ... your own checks ...
             return errors
 
-Writing Tests
+Writing tests
 -------------
 
 Messages are comparable. That allows you to easily write tests::

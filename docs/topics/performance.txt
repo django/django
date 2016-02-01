@@ -232,8 +232,8 @@ until it's strictly required.
 Databases
 =========
 
-:doc:`Database optimization </topics/db/optimization>`
-------------------------------------------------------
+Database optimization
+---------------------
 
 Django’s database layer provides various ways to help developers get the best
 performance from their databases. The :doc:`database optimization documentation
