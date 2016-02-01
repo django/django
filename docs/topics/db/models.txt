@@ -387,8 +387,7 @@ For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
 As with :class:`~django.db.models.ForeignKey`, you can also create
 :ref:`recursive relationships <recursive-relationships>` (an object with a
 many-to-many relationship to itself) and :ref:`relationships to models not yet
-defined <lazy-relationships>`; see :ref:`the model field reference
-<ref-manytomany>` for details.
+defined <lazy-relationships>`.
 
 It's suggested, but not required, that the name of a
 :class:`~django.db.models.ManyToManyField` (``toppings`` in the example above)
@@ -599,20 +598,17 @@ restaurant "is a" place; in fact, to handle this you'd typically use
 :ref:`inheritance <model-inheritance>`, which involves an implicit
 one-to-one relation).
 
-As with :class:`~django.db.models.ForeignKey`, a
-:ref:`recursive relationship <recursive-relationships>`
-can be defined and
-:ref:`references to as-yet undefined models <lazy-relationships>`
-can be made; see :ref:`the model field reference <ref-onetoone>` for details.
+As with :class:`~django.db.models.ForeignKey`, a :ref:`recursive relationship
+<recursive-relationships>` can be defined and :ref:`references to as-yet
+undefined models <lazy-relationships>` can be made.
 
 .. seealso::
 
     See the :doc:`One-to-one relationship model example
     </topics/db/examples/one_to_one>` for a full example.
 
-:class:`~django.db.models.OneToOneField` fields also accept one specific,
-optional ``parent_link`` argument described in the :ref:`model field
-reference <ref-onetoone>`.
+:class:`~django.db.models.OneToOneField` fields also accept an optional
+:attr:`~django.db.models.OneToOneField.parent_link` argument.
 
 :class:`~django.db.models.OneToOneField` classes used to automatically become
 the primary key on a model. This is no longer true (although you can manually
