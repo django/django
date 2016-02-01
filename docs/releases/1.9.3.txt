@@ -9,4 +9,6 @@ Django 1.9.3 fixes several bugs in 1.9.2.
 Bugfixes
 ========
 
-* ...
+* Fixed an issue where if you don't have a ``ROOT_URLCONF`` and the full checks
+  framework is run you get an exception with the urls check. Now if no
+  ``ROOT_URLCONF`` setting is set the check is skipped (:ticket: `26155`).
