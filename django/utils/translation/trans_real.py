@@ -14,6 +14,7 @@ from django.conf import settings
 from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
+from django.core.urlresolvers import LocaleRegexURLResolver, get_resolver
 from django.dispatch import receiver
 from django.utils import lru_cache, six
 from django.utils._os import upath
@@ -453,6 +454,13 @@ def get_supported_language_variant(lang_code, strict=False):
     raise LookupError(lang_code)
 
 
+def unprefixed_default_language_used():
+    for url_pattern in get_resolver(None).url_patterns:
+        if isinstance(url_pattern, LocaleRegexURLResolver) and url_pattern.prefix_default_language is False:
+            return True
+        return False
+
+
 def get_language_from_path(path, strict=False):
     """
     Returns the language-code if there is a valid language-code
@@ -463,11 +471,15 @@ def get_language_from_path(path, strict=False):
     """
     regex_match = language_code_prefix_re.match(path)
     if not regex_match:
+        if unprefixed_default_language_used():
+            return settings.LANGUAGE_CODE
         return None
     lang_code = regex_match.group(1)
     try:
         return get_supported_language_variant(lang_code, strict=strict)
     except LookupError:
+        if unprefixed_default_language_used():
+            return settings.LANGUAGE_CODE
         return None
 
 
