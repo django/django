@@ -13,14 +13,14 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
         return
 
     try:
-        ContentType = apps.get_model('contenttypes', 'ContentType')
+        contenttype = apps.get_model('contenttypes', 'contenttype')
     except LookupError:
         return
 
-    if not router.allow_migrate_model(using, ContentType):
+    if not router.allow_migrate_model(using, contenttype):
         return
 
-    ContentType.objects.clear_cache()
+    contenttype.objects.clear_cache()
 
     app_label = app_config.label
 
@@ -34,7 +34,7 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     # Get all the content types
     content_types = {
         ct.model: ct
-        for ct in ContentType.objects.using(using).filter(app_label=app_label)
+        for ct in contenttype.objects.using(using).filter(app_label=app_label)
     }
     to_remove = [
         ct
@@ -43,14 +43,14 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     ]
 
     cts = [
-        ContentType(
+        contenttype(
             app_label=app_label,
             model=model_name,
         )
         for (model_name, model) in six.iteritems(app_models)
         if model_name not in content_types
     ]
-    ContentType.objects.using(using).bulk_create(cts)
+    contenttype.objects.using(using).bulk_create(cts)
     if verbosity >= 2:
         for ct in cts:
             print("Adding content type '%s | %s'" % (ct.app_label, ct.model))

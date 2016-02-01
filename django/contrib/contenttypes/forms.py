@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.forms import ModelForm, modelformset_factory
-from django.forms.models import BaseModelFormSet
+from django.forms.models import ModelFormSet
 
 
-class BaseGenericInlineFormSet(BaseModelFormSet):
+class BaseGenericInlineFormSet(ModelFormSet):
     """
     A formset for generic inline objects to a parent.
     """
@@ -76,14 +76,14 @@ def generic_inlineformset_factory(model, form=ModelForm,
         exclude.extend([ct_field.name, fk_field.name])
     else:
         exclude = [ct_field.name, fk_field.name]
-    FormSet = modelformset_factory(model, form=form,
+    formset = modelformset_factory(model, form=form,
                                    formfield_callback=formfield_callback,
                                    formset=formset,
                                    extra=extra, can_delete=can_delete, can_order=can_order,
                                    fields=fields, exclude=exclude, max_num=max_num,
                                    validate_max=validate_max, min_num=min_num,
                                    validate_min=validate_min)
-    FormSet.ct_field = ct_field
-    FormSet.ct_fk_field = fk_field
-    FormSet.for_concrete_model = for_concrete_model
-    return FormSet
+    formset.ct_field = ct_field
+    formset.ct_fk_field = fk_field
+    formset.for_concrete_model = for_concrete_model
+    return formset
