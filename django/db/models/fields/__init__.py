@@ -20,7 +20,7 @@ from django.core import checks, exceptions, validators
 # purposes.
 from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
-from django.db.models.query_utils import RegisterLookupMixin
+from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import six, timezone
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
@@ -504,10 +504,6 @@ class Field(RegisterLookupMixin):
             # class self.__class__, then update its dict with self.__dict__
             # values - so, this is very close to normal pickle.
             return _empty, (self.__class__,), self.__dict__
-        if self.model._deferred:
-            # Deferred model will not be found from the app registry. This
-            # could be fixed by reconstructing the deferred model on unpickle.
-            raise RuntimeError("Fields of deferred models can't be reduced")
         return _load_field, (self.model._meta.app_label, self.model._meta.object_name,
                              self.name)
 
@@ -696,6 +692,12 @@ class Field(RegisterLookupMixin):
             cls._meta.add_field(self, private=True)
         else:
             cls._meta.add_field(self)
+        if self.column:
+            # Don't override classmethods with the descriptor. This means that
+            # if you have a classmethod and a field with the same name, then
+            # such fields can't be deferred (we don't have a check for this).
+            if not getattr(cls, self.attname, None):
+                setattr(cls, self.attname, DeferredAttribute(self.attname, cls))
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
                     curry(cls._get_FIELD_display, field=self))

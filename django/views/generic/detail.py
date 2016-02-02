@@ -89,8 +89,6 @@ class SingleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif isinstance(obj, models.Model):
-            if obj._deferred:
-                obj = obj._meta.proxy_for_model
             return obj._meta.model_name
         else:
             return None
@@ -152,8 +150,6 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # only use this if the object in question is a model.
             if isinstance(self.object, models.Model):
                 object_meta = self.object._meta
-                if self.object._deferred:
-                    object_meta = self.object._meta.proxy_for_model._meta
                 names.append("%s/%s%s.html" % (
                     object_meta.app_label,
                     object_meta.model_name,

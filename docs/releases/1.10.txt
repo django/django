@@ -785,6 +785,12 @@ Miscellaneous
   Web servers already implement this behavior. Responses retrieved using the
   Django test client continue to have these "response fixes" applied.
 
+* ``Model.__init__()`` now receives ``django.db.models.DEFERRED`` as the value
+  of deferred fields.
+
+* The ``Model._deferred`` attribute is removed as dynamic model classes when
+  using ``QuerySet.defer()`` and ``only()`` is removed.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
