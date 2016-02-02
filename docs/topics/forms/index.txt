@@ -364,7 +364,7 @@ by a view, and rendered as an HTML ``<form>``.
 
 That's all you need to get started, but the forms framework puts a lot more at
 your fingertips. Once you understand the basics of the process described above,
-you should be prepared to understand other features of the forms system and
+you should be prepared to understand other features of the forms system and be
 ready to learn a bit more about the underlying machinery.
 
 More about Django :class:`Form` classes
