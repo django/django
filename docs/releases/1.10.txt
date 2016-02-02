@@ -212,6 +212,9 @@ Forms
 * Form and widget ``Media`` is now served using
   :mod:`django.contrib.staticfiles` if installed.
 
+* ``Select`` and ``SelectMultiple`` widgets ``render()`` method does not take
+  the choices argument anymore.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -482,6 +485,10 @@ Miscellaneous
 
 * The default error views now raise ``TemplateDoesNotExist`` if a nonexistent
   ``template_name`` is specified.
+
+* ``render_options()``. ``render_options()`` has changed too, and does not take
+  the first ``choices`` argument anymore, making ``selected_choices`` the first
+  argument to ``render_options()``.
 
 .. _deprecated-features-1.10:
 

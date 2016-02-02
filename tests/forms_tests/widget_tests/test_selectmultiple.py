@@ -4,11 +4,11 @@ from .base import WidgetTest
 
 
 class SelectMultipleTest(WidgetTest):
-    widget = SelectMultiple()
+    widget = SelectMultiple
     numeric_choices = (('0', '0'), ('1', '1'), ('2', '2'), ('3', '3'), ('0', 'extra'))
 
     def test_render_selected(self):
-        self.check_html(self.widget, 'beatles', ['J'], choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatles', ['J'], html=(
             """<select multiple="multiple" name="beatles">
             <option value="J" selected="selected">John</option>
             <option value="P">Paul</option>
@@ -18,7 +18,7 @@ class SelectMultipleTest(WidgetTest):
         ))
 
     def test_render_multiple_selected(self):
-        self.check_html(self.widget, 'beatles', ['J', 'P'], choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatles', ['J', 'P'], html=(
             """<select multiple="multiple" name="beatles">
             <option value="J" selected="selected">John</option>
             <option value="P" selected="selected">Paul</option>
@@ -31,7 +31,7 @@ class SelectMultipleTest(WidgetTest):
         """
         If the value is None, none of the options are selected.
         """
-        self.check_html(self.widget, 'beatles', None, choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatles', None, html=(
             """<select multiple="multiple" name="beatles">
             <option value="J">John</option>
             <option value="P">Paul</option>
@@ -45,7 +45,7 @@ class SelectMultipleTest(WidgetTest):
         If the value corresponds to a label (but not to an option value), none
         of the options are selected.
         """
-        self.check_html(self.widget, 'beatles', ['John'], choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatles', ['John'], html=(
             """<select multiple="multiple" name="beatles">
             <option value="J">John</option>
             <option value="P">Paul</option>
@@ -58,7 +58,7 @@ class SelectMultipleTest(WidgetTest):
         """
         Multiple options with the same value can be selected (#8103).
         """
-        self.check_html(self.widget, 'choices', ['0'], choices=self.numeric_choices, html=(
+        self.check_html(self.widget(choices=self.numeric_choices), 'choices', ['0'], html=(
             """<select multiple="multiple" name="choices">
             <option value="0" selected="selected">0</option>
             <option value="1">1</option>
@@ -73,7 +73,7 @@ class SelectMultipleTest(WidgetTest):
         If multiple values are given, but some of them are not valid, the valid
         ones are selected.
         """
-        self.check_html(self.widget, 'beatles', ['J', 'G', 'foo'], choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatles', ['J', 'G', 'foo'], html=(
             """<select multiple="multiple" name="beatles">
             <option value="J" selected="selected">John</option>
             <option value="P">Paul</option>
@@ -85,7 +85,7 @@ class SelectMultipleTest(WidgetTest):
     def test_compare_string(self):
         choices = [('1', '1'), ('2', '2'), ('3', '3')]
 
-        self.check_html(self.widget, 'nums', [2], choices=choices, html=(
+        self.check_html(self.widget(choices=choices), 'nums', [2], html=(
             """<select multiple="multiple" name="nums">
             <option value="1">1</option>
             <option value="2" selected="selected">2</option>
@@ -93,7 +93,7 @@ class SelectMultipleTest(WidgetTest):
             </select>"""
         ))
 
-        self.check_html(self.widget, 'nums', ['2'], choices=choices, html=(
+        self.check_html(self.widget(choices=choices), 'nums', ['2'], html=(
             """<select multiple="multiple" name="nums">
             <option value="1">1</option>
             <option value="2" selected="selected">2</option>
@@ -101,7 +101,7 @@ class SelectMultipleTest(WidgetTest):
             </select>"""
         ))
 
-        self.check_html(self.widget, 'nums', [2], choices=choices, html=(
+        self.check_html(self.widget(choices=choices), 'nums', [2], html=(
             """<select multiple="multiple" name="nums">
             <option value="1">1</option>
             <option value="2" selected="selected">2</option>

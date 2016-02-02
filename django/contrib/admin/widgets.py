@@ -37,7 +37,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         self.is_stacked = is_stacked
         super(FilteredSelectMultiple, self).__init__(attrs, choices)
 
-    def render(self, name, value, attrs=None, choices=()):
+    def render(self, name, value, attrs=None):
         if attrs is None:
             attrs = {}
         attrs['class'] = 'selectfilter'
@@ -46,7 +46,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
 
         attrs['data-field-name'] = self.verbose_name
         attrs['data-is-stacked'] = int(self.is_stacked)
-        output = super(FilteredSelectMultiple, self).render(name, value, attrs, choices)
+        output = super(FilteredSelectMultiple, self).render(name, value, attrs)
         return mark_safe(output)
 
 
