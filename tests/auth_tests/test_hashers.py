@@ -90,41 +90,6 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
 
-    def test_unsalted_md5(self):
-        encoded = make_password('lètmein', '', 'unsalted_md5')
-        self.assertEqual(encoded, '88a434c88cca4e900f7874cd98123f43')
-        self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password('lètmein', encoded))
-        self.assertFalse(check_password('lètmeinz', encoded))
-        self.assertEqual(identify_hasher(encoded).algorithm, "unsalted_md5")
-        # Alternate unsalted syntax
-        alt_encoded = "md5$$%s" % encoded
-        self.assertTrue(is_password_usable(alt_encoded))
-        self.assertTrue(check_password('lètmein', alt_encoded))
-        self.assertFalse(check_password('lètmeinz', alt_encoded))
-        # Blank passwords
-        blank_encoded = make_password('', '', 'unsalted_md5')
-        self.assertTrue(is_password_usable(blank_encoded))
-        self.assertTrue(check_password('', blank_encoded))
-        self.assertFalse(check_password(' ', blank_encoded))
-
-    def test_unsalted_sha1(self):
-        encoded = make_password('lètmein', '', 'unsalted_sha1')
-        self.assertEqual(encoded, 'sha1$$6d138ca3ae545631b3abd71a4f076ce759c5700b')
-        self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password('lètmein', encoded))
-        self.assertFalse(check_password('lètmeinz', encoded))
-        self.assertEqual(identify_hasher(encoded).algorithm, "unsalted_sha1")
-        # Raw SHA1 isn't acceptable
-        alt_encoded = encoded[6:]
-        self.assertFalse(check_password('lètmein', alt_encoded))
-        # Blank passwords
-        blank_encoded = make_password('', '', 'unsalted_sha1')
-        self.assertTrue(blank_encoded.startswith('sha1$'))
-        self.assertTrue(is_password_usable(blank_encoded))
-        self.assertTrue(check_password('', blank_encoded))
-        self.assertFalse(check_password(' ', blank_encoded))
-
     @skipUnless(crypt, "no crypt module to generate password.")
     def test_crypt(self):
         encoded = make_password('lètmei', 'ab', 'crypt')
