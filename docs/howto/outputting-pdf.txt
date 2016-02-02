@@ -153,7 +153,7 @@ Further resources
   using ``system`` or ``popen`` and retrieve the output in Python.
 
 .. _PDFlib: http://www.pdflib.org/
-.. _`Pisa XHTML2PDF`: http://www.xhtml2pdf.com/
+.. _`Pisa XHTML2PDF`: https://github.com/xhtml2pdf/xhtml2pdf
 .. _HTMLdoc: https://www.msweet.org/projects.php?Z1
 
 Other formats
