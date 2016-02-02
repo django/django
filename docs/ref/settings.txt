@@ -1344,8 +1344,10 @@ template files and initial SQL data files.
 
 Default::
 
-    ["django.core.files.uploadhandler.MemoryFileUploadHandler",
-     "django.core.files.uploadhandler.TemporaryFileUploadHandler"]
+    [
+        'django.core.files.uploadhandler.MemoryFileUploadHandler',
+        'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+    ]
 
 A list of handlers to use for uploading. Changing this setting allows complete
 customization -- even replacement -- of Django's upload process.
@@ -1842,8 +1844,10 @@ Example: ``"http://media.example.com/"``
 
 Default::
 
-    ['django.middleware.common.CommonMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware']
+    [
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+    ]
 
 A list of middleware classes to use. See :doc:`/topics/http/middleware`.
 
@@ -2837,13 +2841,17 @@ See :ref:`auth_password_storage`.
 
 Default::
 
-    ['django.contrib.auth.hashers.PBKDF2PasswordHasher',
-     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-     'django.contrib.auth.hashers.BCryptPasswordHasher',
-     'django.contrib.auth.hashers.SHA1PasswordHasher',
-     'django.contrib.auth.hashers.MD5PasswordHasher',
-     'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-     'django.contrib.auth.hashers.CryptPasswordHasher']
+    [
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+        'django.contrib.auth.hashers.BCryptPasswordHasher',
+        'django.contrib.auth.hashers.SHA1PasswordHasher',
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher',
+        'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
+        'django.contrib.auth.hashers.CryptPasswordHasher',
+    ]
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
 
@@ -2916,11 +2924,13 @@ and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
 
 Default::
 
-    {messages.DEBUG: 'debug',
-    messages.INFO: 'info',
-    messages.SUCCESS: 'success',
-    messages.WARNING: 'warning',
-    messages.ERROR: 'error'}
+    {
+        messages.DEBUG: 'debug',
+        messages.INFO: 'info',
+        messages.SUCCESS: 'success',
+        messages.WARNING: 'warning',
+        messages.ERROR: 'error',
+    }
 
 This sets the mapping of message level to message tag, which is typically
 rendered as a CSS class in HTML. If you specify a value, it will extend
@@ -3262,8 +3272,10 @@ For an example, see :ref:`staticfiles-from-cdn`.
 
 Default::
 
-    ["django.contrib.staticfiles.finders.FileSystemFinder",
-     "django.contrib.staticfiles.finders.AppDirectoriesFinder"]
+    [
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    ]
 
 The list of finder backends that know how to find static files in
 various locations.
