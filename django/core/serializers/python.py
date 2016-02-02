@@ -37,7 +37,7 @@ class Serializer(base.Serializer):
         self._current = None
 
     def get_dump_object(self, obj):
-        model = obj._meta.proxy_for_model if obj._deferred else obj.__class__
+        model = obj.__class__
         data = OrderedDict([('model', force_text(model._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
             data["pk"] = force_text(obj._get_pk_val(), strings_only=True)

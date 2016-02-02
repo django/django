@@ -38,6 +38,7 @@ from django.utils.ipv6 import clean_ipv6_address
 from django.utils.itercompat import is_iterable
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.query_utils import DeferredAttribute
 
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
@@ -510,10 +511,6 @@ class Field(RegisterLookupMixin):
             # class self.__class__, then update its dict with self.__dict__
             # values - so, this is very close to normal pickle.
             return _empty, (self.__class__,), self.__dict__
-        if self.model._deferred:
-            # Deferred model will not be found from the app registry. This
-            # could be fixed by reconstructing the deferred model on unpickle.
-            raise RuntimeError("Fields of deferred models can't be reduced")
         return _load_field, (self.model._meta.app_label, self.model._meta.object_name,
                              self.name)
 
@@ -678,6 +675,12 @@ class Field(RegisterLookupMixin):
             cls._meta.add_field(self, virtual=True)
         else:
             cls._meta.add_field(self)
+        if self.column:
+            # Refuse to override class methods with the descriptor. This leads to a situation
+            # where if you have a classmethod and a field similarly named, then such fields
+            # can't be deferred (we don't have a check for this yet).
+            if not getattr(cls, self.attname, None):
+                setattr(cls, self.attname, DeferredAttribute(self.attname, cls))
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
                     curry(cls._get_FIELD_display, field=self))

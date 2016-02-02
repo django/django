@@ -17,7 +17,7 @@ from django.db.models.manager import Manager  # NOQA
 from django.db.models.query import Q, Prefetch, QuerySet  # NOQA
 
 # Imports that would create circular imports if sorted
-from django.db.models.base import Model  # NOQA isort:skip
+from django.db.models.base import DEFERRED, Model  # NOQA isort:skip
 from django.db.models.fields.related import (  # NOQA isort:skip
     ForeignKey, ForeignObject, OneToOneField, ManyToManyField,
     ManyToOneRel, ManyToManyRel, OneToOneRel,

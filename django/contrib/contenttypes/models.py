@@ -25,8 +25,6 @@ class ContentTypeManager(models.Manager):
     def _get_opts(self, model, for_concrete_model):
         if for_concrete_model:
             model = model._meta.concrete_model
-        elif model._deferred:
-            model = model._meta.proxy_for_model
         return model._meta
 
     def _get_from_cache(self, opts):

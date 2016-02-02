@@ -3568,7 +3568,7 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertContains(
             response,
             '<li class="success">The short message "<a href="%s">'
-            'ShortMessage_Deferred_timestamp object</a>" was changed successfully.</li>' %
+            'ShortMessage object</a>" was changed successfully.</li>' %
             reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)), html=True
         )
 
@@ -3617,7 +3617,7 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertContains(
             response,
             '<li class="success">The paper "<a href="%s">'
-            'Paper_Deferred_author object</a>" was changed successfully.</li>' %
+            'Paper object</a>" was changed successfully.</li>' %
             reverse('admin:admin_views_paper_change', args=(p.pk,)), html=True
         )
 
