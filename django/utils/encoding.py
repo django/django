@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import codecs
 import datetime
 import locale
+import re
 from decimal import Decimal
 
 from django.utils import six
@@ -107,6 +108,43 @@ def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
         # The input is the result of a gettext_lazy() call.
         return s
     return force_bytes(s, encoding, strings_only, errors)
+
+
+def convert_encodings(uri):
+    """Convert the %encodings back to their octet except the encoding for the '%' sign"""
+    _hexdig = '0123456789ABCDEFabcdef'
+    _hextochr = dict((a + b, chr(int(a + b, 16)))
+                 for a in _hexdig for b in _hexdig)
+    _asciire = re.compile('([\x00-\x7f]+)')
+
+    if isinstance(uri, unicode):
+        if '%' not in uri:
+            return uri
+        parts = _asciire.split(uri)
+        ans = [parts[0]]
+        for i in range(1, len(parts), 2):
+            if str(parts[i][1:3]) != "25":
+                ans.append(unquote(str(parts[i])).decode('latin1'))
+                ans.append(parts[i + 1])
+            else:
+                ans.append("%")
+                ans.append(parts[i][1:3])
+        return ''.join(ans)
+    else:
+        parts = uri.split('%')
+        ans = [parts[0]]
+        for i in parts[1:]:
+            try:
+                if i[:2] != "25":
+                    ans.append(_hextochr[i[:2]])
+                    ans.append(i[2:])
+                else:
+                    ans.append('%')
+                    ans.append(i)
+            except KeyError:
+                ans.append('%')
+                ans.append(i)
+        return ''.join(ans)
 
 
 def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
