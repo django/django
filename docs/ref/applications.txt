@@ -132,20 +132,20 @@ For application users
 ---------------------
 
 If you're using "Rock ’n’ roll" in a project called ``anthology``, but you
-want it to show up as "Gypsy jazz" instead, you can provide your own
+want it to show up as "Jazz Manouche" instead, you can provide your own
 configuration::
 
     # anthology/apps.py
 
     from rock_n_roll.apps import RockNRollConfig
 
-    class GypsyJazzConfig(RockNRollConfig):
-        verbose_name = "Gypsy jazz"
+    class JazzManoucheConfig(RockNRollConfig):
+        verbose_name = "Jazz Manouche"
 
     # anthology/settings.py
 
     INSTALLED_APPS = [
-        'anthology.apps.GypsyJazzConfig',
+        'anthology.apps.JazzManoucheConfig',
         # ...
     ]
 
