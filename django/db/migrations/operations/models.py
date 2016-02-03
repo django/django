@@ -397,7 +397,10 @@ class AlterModelTable(ModelOperation):
         )
 
     def state_forwards(self, app_label, state):
-        state.models[app_label, self.name_lower].options["db_table"] = self.table
+        if isinstance(self.table, models.ModelTable):
+            state.models[app_label, self.name_lower].options["table_cls"] = self.table
+        else:
+            state.models[app_label, self.name_lower].options["db_table"] = self.table
         state.reload_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):

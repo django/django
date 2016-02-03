@@ -967,12 +967,22 @@ class MigrationAutodetector(object):
             new_model_state = self.to_state.models[app_label, model_name]
             old_db_table_name = old_model_state.options.get('db_table')
             new_db_table_name = new_model_state.options.get('db_table')
+            old_table_cls = old_model_state.options.get('table_cls')
+            new_table_cls = new_model_state.options.get('table_cls')
             if old_db_table_name != new_db_table_name:
                 self.add_operation(
                     app_label,
                     operations.AlterModelTable(
                         name=model_name,
                         table=new_db_table_name,
+                    )
+                )
+            if old_table_cls != new_table_cls:
+                self.add_operation(
+                    app_label,
+                    operations.AlterModelTable(
+                        name=model_name,
+                        table=new_table_cls
                     )
                 )
 

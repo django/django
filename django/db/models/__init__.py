@@ -22,6 +22,7 @@ from django.db.models.fields.related import (  # NOQA isort:skip
     ForeignKey, ForeignObject, OneToOneField, ManyToManyField,
     ManyToOneRel, ManyToManyRel, OneToOneRel,
 )
+from django.db.models.options import ModelTable  # NOQA isort:skip
 
 
 def permalink(func):

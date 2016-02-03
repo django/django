@@ -28,13 +28,14 @@ IMMUTABLE_WARNING = (
     "for your own use, make a copy first."
 )
 
-DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
+DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save', 'default_related_name',
-                 'required_db_features', 'required_db_vendor')
+                 'required_db_features', 'required_db_vendor', 'db_table',
+                 'table_cls')
 
 
 def normalize_together(option_together):
@@ -63,6 +64,72 @@ def make_immutable_fields_list(name, data):
     return ImmutableList(data, warning=IMMUTABLE_WARNING % name)
 
 
+class ModelTable(object):
+    """
+    The _meta.table_cls can hold either a regular table reference,
+    or anything else usable in a subquery. If table_cls is a
+    regular table reference, then plain_table_ref should be set
+    to True, and the table_cls must contain table and schema
+    attributes.
+
+    Note that currently there is no support for schema qualified
+    tables for migrations.
+    """
+    plain_table_ref = True
+
+    def __init__(self, schema, table):
+        self.schema = schema
+        self.table = table
+        # Cache for the quoted table name per connection.
+        self.cache = {}
+
+    def as_sql(self, compiler, connection):
+        try:
+            sql, params = self.cache[connection.vendor]
+            return sql, params[:]
+        except KeyError:
+            if self.schema:
+                sql = '%s.%s' % (connection.ops.quote_name(self.schema),
+                                 connection.ops.quote_name(self.table))
+            else:
+                sql = connection.ops.quote_name(self.table)
+            self.cache[connection.vendor] = (sql, [])
+            return sql, []
+
+    @cached_property
+    def default_alias(self):
+        """
+        String to use as default alias for this table.
+        """
+        return self.table
+
+    def requires_alias(self, table_alias, compiler):
+        """
+        Does this table require usage of aliases always?
+        """
+        return self.schema is not None or table_alias != self.default_alias
+
+    def __eq__(self, other):
+        if isinstance(other, ModelTable):
+            return self.schema == other.schema and self.table == other.table
+        return False
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return hash((self.schema, self.table))
+
+    def deconstruct(self):
+        return ("django.db.models.ModelTable", [self.schema, self.table], {})
+
+    def __str__(self):
+        if self.schema:
+            return "%s.%s" % (self.schema, self.table)
+        else:
+            return "%s" % self.table
+
+
 @python_2_unicode_compatible
 class Options(object):
     FORWARD_PROPERTIES = {'fields', 'many_to_many', 'concrete_fields',
@@ -79,7 +146,8 @@ class Options(object):
         self.model_name = None
         self.verbose_name = None
         self.verbose_name_plural = None
-        self.db_table = ''
+        # Note - db_table is assigned to table_cls.
+        self.table_cls = None
         self.ordering = []
         self._ordering_clash = False
         self.unique_together = []
@@ -162,9 +230,6 @@ class Options(object):
         ]
 
     def contribute_to_class(self, cls, name):
-        from django.db import connection
-        from django.db.backends.utils import truncate_name
-
         cls._meta = self
         self.model = cls
         # First, construct the default values for these options.
@@ -213,8 +278,32 @@ class Options(object):
 
         # If the db_table wasn't provided, use the app_label + model_name.
         if not self.db_table:
-            self.db_table = "%s_%s" % (self.app_label, self.model_name)
-            self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
+            from django.db import connection
+            from django.db.backends.utils import truncate_name
+            db_table = "%s_%s" % (self.app_label, self.model_name)
+            self.db_table = truncate_name(db_table, connection.ops.max_name_length())
+
+    @property
+    def db_table(self):
+        """
+        Provide db_table as a backwards compatibility property. The actual value is
+        always stored in table_cls. When table_cls is a plain_table_ref, then the
+        db_table property is usable. For other cases, the table_cls must be accessed
+        directly.
+        """
+        if self.table_cls is None:
+            return ''
+        if self.table_cls.plain_table_ref:
+            return self.table_cls.table
+        raise AttributeError("This class has a table_cls that can't be returned directly as a string.")
+
+    @db_table.setter
+    def db_table(self, table):
+        if hasattr(table, 'plain_table_ref'):
+            raise TypeError("Can't assign a class to db_table property. "
+                            "Use table_cls instead.")
+        else:
+            self.table_cls = ModelTable(None, table)
 
     def _prepare(self, model):
         if self.order_with_respect_to:
@@ -295,7 +384,7 @@ class Options(object):
         """
         self.pk = target._meta.pk
         self.proxy_for_model = target
-        self.db_table = target._meta.db_table
+        self.table_cls = target._meta.table_cls
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
