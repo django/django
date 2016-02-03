@@ -279,11 +279,11 @@ class ListFiltersTests(TestCase):
             title='The Django Book', year=None, author=self.bob,
             is_best_seller=None, date_registered=self.today, no=103,
         )
-        self.gipsy_book = Book.objects.create(
-            title='Gipsy guitar for dummies', year=2002, is_best_seller=True,
+        self.guitar_book = Book.objects.create(
+            title='Guitar for dummies', year=2002, is_best_seller=True,
             date_registered=self.one_week_ago,
         )
-        self.gipsy_book.contributors.set([self.bob, self.lisa])
+        self.guitar_book.contributors.set([self.bob, self.lisa])
 
         # Departments
         self.dev = Department.objects.create(code='DEV', description='Development')
@@ -337,7 +337,7 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         if (self.today.year, self.today.month) == (self.one_week_ago.year, self.one_week_ago.month):
             # In case one week ago is in the same month.
-            self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
         else:
             self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
 
@@ -362,7 +362,7 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         if self.today.year == self.one_week_ago.year:
             # In case one week ago is in the same year.
-            self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
         else:
             self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
 
@@ -387,7 +387,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -424,7 +424,7 @@ class ListFiltersTests(TestCase):
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
         self.assertEqual(queryset.count(), 3)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -502,7 +502,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book])
+        self.assertEqual(list(queryset), [self.guitar_book])
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][1]
@@ -711,7 +711,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.djangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][3]
@@ -807,7 +807,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.djangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
