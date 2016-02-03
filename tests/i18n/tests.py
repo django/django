@@ -1117,6 +1117,10 @@ class FormattingTests(SimpleTestCase):
                     form6.as_ul()
                 )
 
+    def test_localized_input_func(self):
+        with self.settings(USE_THOUSAND_SEPARATOR=True):
+            self.assertEqual(localize_input(True), 'True')
+
     def test_sanitize_separators(self):
         """
         Tests django.utils.formats.sanitize_separators.
