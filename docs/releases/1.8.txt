@@ -1084,10 +1084,10 @@ Miscellaneous
   parameters. Internally, Django will continue to provide the
   ``pk`` parameter in ``params`` for backwards compatibility.
 
-* ``UserCreationForm.errors_messages['duplicate_username']`` is no longer used.
+* ``UserCreationForm.error_messages['duplicate_username']`` is no longer used.
   If you wish to customize that error message, :ref:`override it on the form
   <modelforms-overriding-default-fields>` using the ``'unique'`` key in
-  ``Meta.errors_messages['username']`` or, if you have a custom form field for
+  ``Meta.error_messages['username']`` or, if you have a custom form field for
   ``'username'``, using the the ``'unique'`` key in its
   :attr:`~django.forms.Field.error_messages` argument.
 
