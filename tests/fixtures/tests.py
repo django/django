@@ -18,7 +18,7 @@ from django.test import (
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .models import Article, Spy, Tag, Visa
+from .models import Article, Category, Spy, Tag, Visa
 
 
 class TestCaseFixtureLoadingTests(TestCase):
@@ -614,6 +614,40 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             'Prince</field></object></django-objects>',
             format='xml', natural_foreign_keys=True
         )
+
+    def test_loading_with_excludes(self):
+        Site.objects.all().delete()
+
+        management.call_command('loaddata', 'fixture1', exclude=['fixtures'], verbosity=0)
+        self.assertFalse(Article.objects.exists())
+        self.assertFalse(Category.objects.exists())
+        self.assertQuerysetEqual(Site.objects.all(), [
+            '<Site: example.com>',
+        ])
+
+        Site.objects.all().delete()
+        Article.objects.all().delete()
+        Category.objects.all().delete()
+
+        management.call_command('loaddata', 'fixture1', exclude=['fixtures.Article'], verbosity=0)
+        self.assertFalse(Article.objects.exists())
+        self.assertQuerysetEqual(Category.objects.all(), [
+            '<Category: News Stories>',
+        ])
+        self.assertQuerysetEqual(Site.objects.all(), [
+            '<Site: example.com>',
+        ])
+
+    def test_exclude_option_errors(self):
+        # Excluding a bogus app should throw an error.
+        with self.assertRaisesMessage(management.CommandError,
+                                      "No installed app with label 'foo_app'."):
+            management.call_command('loaddata', 'fixture1', exclude=['foo_app'], verbosity=0)
+
+        # Excluding a bogus model should throw an error.
+        with self.assertRaisesMessage(management.CommandError,
+                                      "Unknown model in excludes: fixtures.FooModel"):
+            management.call_command('loaddata', 'fixture1', exclude=['fixtures.FooModel'], verbosity=0)
 
 
 class NonExistentFixtureTests(TestCase):

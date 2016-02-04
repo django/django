@@ -4,6 +4,7 @@ import os
 import sys
 from subprocess import PIPE, Popen
 
+from django.apps import apps as installed_apps
 from django.utils import six
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_text
 
@@ -75,3 +76,37 @@ def find_command(cmd, path=None, pathext=None):
             if os.path.isfile(fext):
                 return fext
     return None
+
+
+def parse_model_labels(labels, source=None):
+    """
+    Parse a list of "app_label.ModelName" or "app_label" strings into actual objects.
+
+    Return a two-element tuple, with the former one being a set of model
+    classes, and the latter a set of app configs.
+
+    Raise a CommandError if some specified models or apps do not exist.
+    """
+    apps = set()
+    models = set()
+
+    if source:
+        unknown_model_msg = 'Unknown model in %s: %%s' % source
+    else:
+        unknown_model_msg = 'Unknown model: %s'
+
+    for label in labels:
+        if '.' in label:
+            try:
+                model = installed_apps.get_model(label)
+            except LookupError:
+                raise CommandError(unknown_model_msg % label)
+            models.add(model)
+        else:
+            try:
+                app_config = installed_apps.get_app_config(label)
+            except LookupError as e:
+                raise CommandError(str(e))
+            apps.add(app_config)
+
+    return models, apps
