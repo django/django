@@ -111,8 +111,9 @@ class EarliestOrLatestTests(TestCase):
         Article.objects.model._meta.get_latest_by = None
         with self.assertRaisesMessage(
             AssertionError,
-                "earliest() and latest() require either a field_name parameter or "
-                "'get_latest_by' in the model"):
+            "earliest() and latest() require either a field_name parameter or "
+            "'get_latest_by' in the model"
+        ):
             Article.objects.latest()
 
     def test_latest_manual(self):

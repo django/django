@@ -1318,12 +1318,10 @@ class Queries3Tests(BaseQuerysetTest):
             Item.objects.datetimes('name', 'month')
 
     def test_ticket22023(self):
-        with self.assertRaisesMessage(TypeError,
-                "Cannot call only() after .values() or .values_list()"):
+        with self.assertRaisesMessage(TypeError, "Cannot call only() after .values() or .values_list()"):
             Valid.objects.values().only()
 
-        with self.assertRaisesMessage(TypeError,
-                "Cannot call defer() after .values() or .values_list()"):
+        with self.assertRaisesMessage(TypeError, "Cannot call defer() after .values() or .values_list()"):
             Valid.objects.values().defer()
 
 
@@ -2244,9 +2242,8 @@ class ValuesQuerysetTests(BaseQuerysetTest):
 
     def test_field_error_values_list(self):
         # see #23443
-        with self.assertRaisesMessage(FieldError,
-                "Cannot resolve keyword %r into field."
-                " Join on 'name' not permitted." % 'foo'):
+        msg = "Cannot resolve keyword %r into field. Join on 'name' not permitted." % 'foo'
+        with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.values_list('name__foo')
 
 
@@ -3462,25 +3459,20 @@ class RelatedLookupTypeTests(TestCase):
         query lookup.
         """
         # Passing incorrect object type
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+        with self.assertRaisesMessage(ValueError, self.error % (self.wrong_type, ObjectA._meta.object_name)):
             ObjectB.objects.get(objecta=self.wrong_type)
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+        with self.assertRaisesMessage(ValueError, self.error % (self.wrong_type, ObjectA._meta.object_name)):
             ObjectB.objects.filter(objecta__in=[self.wrong_type])
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+        with self.assertRaisesMessage(ValueError, self.error % (self.wrong_type, ObjectA._meta.object_name)):
             ObjectB.objects.filter(objecta=self.wrong_type)
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.wrong_type, ObjectB._meta.object_name)):
+        with self.assertRaisesMessage(ValueError, self.error % (self.wrong_type, ObjectB._meta.object_name)):
             ObjectA.objects.filter(objectb__in=[self.wrong_type, self.ob])
 
         # Passing an object of the class on which query is done.
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.ob, ObjectA._meta.object_name)):
+        with self.assertRaisesMessage(ValueError, self.error % (self.ob, ObjectA._meta.object_name)):
             ObjectB.objects.filter(objecta__in=[self.poa, self.ob])
 
         with self.assertRaisesMessage(ValueError,
@@ -3492,16 +3484,13 @@ class RelatedLookupTypeTests(TestCase):
         A ValueError is raised when the incorrect object type is passed to a
         query lookup for backward relations.
         """
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.oa, ObjectB._meta.object_name)):
+        with self.assertRaisesMessage(ValueError, self.error % (self.oa, ObjectB._meta.object_name)):
             ObjectA.objects.filter(objectb__in=[self.oa, self.ob])
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.oa, ObjectB._meta.object_name)):
+        with self.assertRaisesMessage(ValueError, self.error % (self.oa, ObjectB._meta.object_name)):
             ObjectA.objects.exclude(objectb=self.oa)
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.wrong_type, ObjectB._meta.object_name)):
+        with self.assertRaisesMessage(ValueError, self.error % (self.wrong_type, ObjectB._meta.object_name)):
             ObjectA.objects.get(objectb=self.wrong_type)
 
     def test_correct_lookup(self):
