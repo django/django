@@ -34,7 +34,7 @@ from django.utils import six, timezone
 from django.utils.encoding import force_text
 from django.utils.six.moves import http_cookies
 
-from .custom_db_backend import SessionStore as CustomDatabaseSession
+from .models import SessionStore as CustomDatabaseSession
 
 
 class SessionTestsMixin(object):
@@ -433,7 +433,7 @@ class DatabaseSessionWithTimeZoneTests(DatabaseSessionTests):
 
 class CustomDatabaseSessionTests(DatabaseSessionTests):
     backend = CustomDatabaseSession
-    session_engine = 'sessions_tests.custom_db_backend'
+    session_engine = 'sessions_tests.models'
 
     def test_extra_session_field(self):
         # Set the account ID to be picked up by a custom session storage
