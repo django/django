@@ -4,11 +4,10 @@ Django permissions model. This allows us to check that the PermissionsMixin
 includes everything that is needed to interact with the ModelBackend.
 """
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.contrib.auth.tests.custom_user import (
-    CustomUserManager, RemoveGroupsAndPermissions,
-)
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+
+from .custom_user import CustomUserManager, RemoveGroupsAndPermissions
 
 
 class CustomPermissionsUserManager(CustomUserManager):

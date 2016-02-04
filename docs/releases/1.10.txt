@@ -448,6 +448,13 @@ output::
         }
     }
 
+``auth.CustomUser`` and ``auth.ExtensionUser`` test models were removed.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since the introduction of migrations for the contrib apps in Django 1.8, the
+tables of these custom user test models were not created anymore making them
+unusable in a testing context.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
