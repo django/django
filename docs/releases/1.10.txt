@@ -448,6 +448,37 @@ output::
         }
     }
 
+Support for unsalted password hashers is removed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 0.90 stored passwords as unsalted MD5. In Django 1.4, the password
+hashing infrastructure was improved and the ``UnsaltedSHA1PasswordHasher`` and
+``UnsaltedMD5PasswordHasher`` hashers were added to allow those passwords to
+continue to be accepted. If a user has logged in since then, their password
+hash will be upgraded. You can check if you have any hashes with the removed
+algorithms like this::
+
+    >>> from django.contrib.auth import get_user_model
+    >>> User = get_user_model()
+    >>> # Unsalted MD5/SHA1 have the following prefixes:
+    >>> User.objects.filter(password__startswith='md5$$')
+    >>> User.objects.filter(password__startswith='sha1$$')
+
+    >>> from django.db.models import CharField
+    >>> from django.db.models.functions import Length
+    >>> CharField.register_lookup(Length)
+    >>> # Some MD5 passwords don't have an MD5 prefix
+    >>> User.objects.filter(password__length=32)
+
+If you still have these passwords in your database, we recommend them setting
+them as unusable and forcing those users to reset their password::
+
+    >>> for user in users:
+    ...     user.set_unusable_password()
+    ...     user.save(update_fields=['password'])
+
+Chances are probably low that these users will return to your site anyway.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

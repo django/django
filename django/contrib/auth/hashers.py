@@ -133,16 +133,7 @@ def identify_hasher(encoded):
     get_hasher() to return hasher. Raises ValueError if
     algorithm cannot be identified, or if hasher is not loaded.
     """
-    # Ancient versions of Django created plain MD5 passwords and accepted
-    # MD5 passwords with an empty salt.
-    if ((len(encoded) == 32 and '$' not in encoded) or
-            (len(encoded) == 37 and encoded.startswith('md5$$'))):
-        algorithm = 'unsalted_md5'
-    # Ancient versions of Django accepted SHA1 passwords with an empty salt.
-    elif len(encoded) == 46 and encoded.startswith('sha1$$'):
-        algorithm = 'unsalted_sha1'
-    else:
-        algorithm = encoded.split('$', 1)[0]
+    algorithm = encoded.split('$', 1)[0]
     return get_hasher(algorithm)
 
 
@@ -414,71 +405,6 @@ class MD5PasswordHasher(BasePasswordHasher):
             (_('algorithm'), algorithm),
             (_('salt'), mask_hash(salt, show=2)),
             (_('hash'), mask_hash(hash)),
-        ])
-
-
-class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
-    """
-    Very insecure algorithm that you should *never* use; stores SHA1 hashes
-    with an empty salt.
-
-    This class is implemented because Django used to accept such password
-    hashes. Some older Django installs still have these values lingering
-    around so we need to handle and upgrade them properly.
-    """
-    algorithm = "unsalted_sha1"
-
-    def salt(self):
-        return ''
-
-    def encode(self, password, salt):
-        assert salt == ''
-        hash = hashlib.sha1(force_bytes(password)).hexdigest()
-        return 'sha1$$%s' % hash
-
-    def verify(self, password, encoded):
-        encoded_2 = self.encode(password, '')
-        return constant_time_compare(encoded, encoded_2)
-
-    def safe_summary(self, encoded):
-        assert encoded.startswith('sha1$$')
-        hash = encoded[6:]
-        return OrderedDict([
-            (_('algorithm'), self.algorithm),
-            (_('hash'), mask_hash(hash)),
-        ])
-
-
-class UnsaltedMD5PasswordHasher(BasePasswordHasher):
-    """
-    Incredibly insecure algorithm that you should *never* use; stores unsalted
-    MD5 hashes without the algorithm prefix, also accepts MD5 hashes with an
-    empty salt.
-
-    This class is implemented because Django used to store passwords this way
-    and to accept such password hashes. Some older Django installs still have
-    these values lingering around so we need to handle and upgrade them
-    properly.
-    """
-    algorithm = "unsalted_md5"
-
-    def salt(self):
-        return ''
-
-    def encode(self, password, salt):
-        assert salt == ''
-        return hashlib.md5(force_bytes(password)).hexdigest()
-
-    def verify(self, password, encoded):
-        if len(encoded) == 37 and encoded.startswith('md5$$'):
-            encoded = encoded[5:]
-        encoded_2 = self.encode(password, '')
-        return constant_time_compare(encoded, encoded_2)
-
-    def safe_summary(self, encoded):
-        return OrderedDict([
-            (_('algorithm'), self.algorithm),
-            (_('hash'), mask_hash(encoded, show=3)),
         ])
 
 
