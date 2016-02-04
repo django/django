@@ -878,6 +878,18 @@ class LogoutTest(AuthViewsTestCase):
         self.client.get('/logout/')
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'pl')
 
+    @override_settings(LOGOUT_REDIRECT_URL='/custom/')
+    def test_logout_redirect_url_setting(self):
+        self.login()
+        response = self.client.get('/logout/')
+        self.assertRedirects(response, '/custom/', fetch_redirect_response=False)
+
+    @override_settings(LOGOUT_REDIRECT_URL='logout')
+    def test_logout_redirect_url_named_setting(self):
+        self.login()
+        response = self.client.get('/logout/')
+        self.assertRedirects(response, '/logout/', fetch_redirect_response=False)
+
 
 # Redirect in test_user_change_password will fail if session auth hash
 # isn't updated after password change (#21649)
