@@ -247,7 +247,7 @@ def uri_to_iri(uri):
     if uri is None:
         return uri
     uri = force_bytes(uri)
-    iri = unquote_to_bytes(uri) if six.PY3 else unquote(uri)
+    iri = convert_encodings(uri)
     return repercent_broken_unicode(iri).decode('utf-8')
 
 
