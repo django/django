@@ -117,7 +117,7 @@ def convert_encodings(uri):
                  for a in _hexdig for b in _hexdig)
     _asciire = re.compile('([\x00-\x7f]+)')
 
-    if isinstance(uri, unicode):
+    if isinstance(uri, (str, unicode)):
         if '%' not in uri:
             return uri
         parts = _asciire.split(uri)
