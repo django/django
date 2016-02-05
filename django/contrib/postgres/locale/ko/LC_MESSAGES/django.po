@@ -3,6 +3,7 @@
 # Translators:
 # Jun-Gu Kang <chr0m3.kr@gmail.com>, 2015
 # minsung kang, 2015
+# Park Hyunwoo <ez@smartstudy.co.kr>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -28,7 +29,7 @@ msgid "Nested arrays must have the same length."
 msgstr "네스팅된 배열은 반드시 같은 길이를 가져야 합니다."
 
 msgid "Map of strings to strings"
-msgstr ""
+msgstr "문자열과 문자열간의 맵"
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string."
@@ -89,19 +90,21 @@ msgstr[0] ""
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
-msgstr "일부 키가 누락되어있습니다: %(keys)s"
+msgstr "일부 키가 빠져있습니다: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
-msgstr "일부 알 수 없는 키가 제공되었습니다. : %(keys)s"
+msgstr "일부 알 수 없는 키가 제공되었습니다 : %(keys)s"
 
 #, python-format
 msgid ""
 "Ensure that this range is completely less than or equal to %(limit_value)s."
 msgstr ""
+"이 범위는 %(limit_value)s 보다 모두 작거나 같아야 합니다."
 
 #, python-format
 msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
 msgstr ""
+"이 범위는 %(limit_value)s 보다 모두 크거나 같아야 합니다."

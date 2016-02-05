@@ -5,6 +5,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeong Seongtae <magno79@gmail.com>, 2014
 # Jun-Gu Kang <chr0m3.kr@gmail.com>, 2015
+# Park Hyunwoo <ez@smartstudy.co.kr>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -23,11 +24,11 @@ msgid "GIS"
 msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "기본 GIS 필드"
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
+msgstr "기본 지리적 필드 -- OpenGIS 형식의 지리적 유형에 해당합니다."
 
 msgid "Point"
 msgstr "위치"
@@ -51,10 +52,10 @@ msgid "Geometry collection"
 msgstr "지리적 위치 모음"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "넓이 계산 필드"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "래스터 필드"
 
 msgid "No geometry value provided."
 msgstr "Geometry 값이 없습니다."
