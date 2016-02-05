@@ -4,6 +4,7 @@
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeong Seongtae <magno79@gmail.com>, 2014
+# Park Hyunwoo <ez@smartstudy.co.kr>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -110,7 +111,7 @@ msgid "Now"
 msgstr "현재"
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "시간 선택"
 
 msgid "Choose a time"
 msgstr "시간 선택"
@@ -125,7 +126,7 @@ msgid "Noon"
 msgstr "정오"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "오후 6시"
 
 msgid "Cancel"
 msgstr "취소"
@@ -134,7 +135,7 @@ msgid "Today"
 msgstr "오늘"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "날짜 선택"
 
 msgid "Yesterday"
 msgstr "어제"

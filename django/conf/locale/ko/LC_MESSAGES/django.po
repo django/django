@@ -9,6 +9,7 @@
 # JuneHyeon Bae <devunt@gmail.com>, 2014
 # Jun-Gu Kang <chr0m3.kr@gmail.com>, 2015
 # Taesik Yoon <xotlr43@gmail.com>, 2015
+# Park Hyunwoo <ez@smartstudy.co.kr>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -1048,23 +1049,34 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"웹 브라우저에서 이 HTTPS 사이트에서 요구하는 'Referer' 헤더를 보내지 않았기 "
+"때문에 이 메세지가 표시되었습니다. 보안상 제삼자에 의해 브라우저가 탈취되고 "
+"있지 않음을 보장하기 위해 이 헤더가 필요합니다."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"브라우저에서 'Referer' 헤더를 사용하지 않도록 설정하였다면, 최소한 이 사이트"
+" 또는 HTTPS 연결에 한해서 또는 'same-origin' 요청에 대해서 사용하도록 다시 "
+"설정해주세요."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"이 사이트에 폼을 제출할 때 CSRF 쿠키가 필요하므로 이 메시지가 표시됩니다. "
+"보안상 제삼자에 의해 브라우저가 탈취되고 있지 않음을 보장하기 위해 이 "
+"쿠키가 필요합니다."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"브라우저에서 쿠키를 사용하지 않도록 설정하였다면, 최소한 이 사이트 또는 "
+"'same-origin' 요청에 대해서 허용해주세요."
 
 msgid "More information is available with DEBUG=True."
 msgstr "DEBUG=True 로 더 많은 정보를 확인할 수 있습니다."
@@ -1082,11 +1094,15 @@ msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"물론, 아직 아무 것도 된 것은 없습니다. 다음으로, <code>python manage.py "
+"startapp [app_label]</code>를 실행해서 첫번째 앱을 시작하세요."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"URL이 설정되지 않은 상태에서 Django 설정파일에 <code>DEBUG = True</code>"
+"가 있는 경우에 이 메세지가 표시됩니다. 이제 시작하세요!"
 
 msgid "No year specified"
 msgstr "년도가 없습니다."

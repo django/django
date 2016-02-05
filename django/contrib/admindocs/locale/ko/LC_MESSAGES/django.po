@@ -3,6 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeong Seongtae <magno79@gmail.com>, 2014
+# Park Hyunwoo <ez@smartstudy.co.kr>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -37,6 +38,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"북마크릿을 설치하려면 링크를 당신의 북마크 툴바로 끌어 놓거나, 링크 위에서 "
+"우클릭하여 북마크에 추가하세요. 이 사이트의 모든 페이지에서 북마크릿을 "
+"선택할 수 있습니다."
 
 msgid "Documentation for this page"
 msgstr "이 페이지의 문서"
@@ -106,7 +110,7 @@ msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "필드"
 
 msgid "Field"
 msgstr "필드"
@@ -118,13 +122,13 @@ msgid "Description"
 msgstr "설명"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "인수가 있는 메소드"
 
 msgid "Method"
-msgstr ""
+msgstr "메소드"
 
 msgid "Arguments"
-msgstr ""
+msgstr "인수"
 
 msgid "Back to Model Documentation"
 msgstr "모델 문서로 돌아가기"
