@@ -22,6 +22,8 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
+import unittest
+
 from django.contrib.auth.models import User
 from django.core import mail
 from django.http import HttpResponse
@@ -431,6 +433,10 @@ class ClientTest(TestCase):
         login = self.client.login(username='otheruser', password='nopassword')
         self.assertFalse(login)
 
+    @unittest.skip(
+        "This test is skipped since authentication backend will make decision "
+        "to allow or reject inactive user."
+    )
     def test_view_with_inactive_login(self):
         "Request a page that is protected with @login, but use an inactive login"
 

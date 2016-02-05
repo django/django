@@ -332,14 +332,14 @@ Use the ``django.test.Client`` class to make requests.
         If your site uses Django's :doc:`authentication system</topics/auth/index>`
         and you deal with logging in users, you can use the test client's
         ``login()`` method to simulate the effect of a user logging into the
-        site.
+        site. Decision whether to permit or reject user is done by the
+        authentication backend.
 
-        Inactive users (:attr:`is_active=False
-        <django.contrib.auth.models.User.is_active>`) are not permitted to
-        login as this method is meant to be equivalent to the
-        :func:`~django.contrib.auth.login` view which uses
-        :class:`~django.contrib.auth.forms.AuthenticationForm` and therefore
-        defaults to rejecting users who are inactive.
+         .. versionchanged:: 1.10
+
+            In previous versions inactive users (:attr:`is_active=False
+            <django.contrib.auth.models.User.is_active>`) were not permitted
+            to login and rejected by default.
 
         After you call this method, the test client will have all the cookies
         and session data required to pass any login-based tests that may form
