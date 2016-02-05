@@ -235,10 +235,12 @@ for example, to control anonymous access.
 Authorization for inactive users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-An inactive user is a one that is authenticated but has its attribute
-``is_active`` set to ``False``. However this does not mean they are not
-authorized to do anything. For example they are allowed to activate their
-account.
+An inactive users is a one that has its attribute ``is_active`` set to
+``False``. By default, they can't authorize until their accounts will be
+activated. You can also use
+:class:`~django.contrib.auth.backends.AllowInactiveUsersModelBackend`
+authentication backend if you want the opposite behavior. Also, if users
+don't have ``is_active`` field, they will be allowed to login.
 
 The support for anonymous users in the permission system allows for a scenario
 where anonymous users have permissions to do something while inactive

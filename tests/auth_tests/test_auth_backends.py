@@ -15,7 +15,10 @@ from django.test import (
     SimpleTestCase, TestCase, modify_settings, override_settings,
 )
 
-from .models import CustomPermissionsUser, CustomUser, ExtensionUser, UUIDUser
+from .models import (
+    CustomPermissionsUser, CustomUser, CustomUserWithoutIsActiveField,
+    ExtensionUser, UUIDUser,
+)
 
 
 class CountingMD5PasswordHasher(MD5PasswordHasher):
@@ -212,6 +215,31 @@ class ModelBackendTest(BaseModelBackendTest, TestCase):
             email='test2@example.com',
             password='test',
         )
+
+    def test_authenticate_inactive(self):
+        """
+        To verify that inactive user being rejected.
+        """
+        self.user.is_active = False
+        self.user.save()
+        self.assertIsNone(
+            authenticate(
+                username='test',
+                email='test@example.com',
+                password='test'
+            )
+        )
+
+    # To make sure user without `is_active` field is allowed to
+    # authenticate.
+    @override_settings(
+        AUTH_USER_MODEL='auth_tests.CustomUserWithoutIsActiveField'
+    )
+    def test_authenticate_user_without_is_active_field(self):
+        user = CustomUserWithoutIsActiveField.objects._create_user(
+            username='test', email='test@example.com', password='test'
+        )
+        self.assertEqual(authenticate(username='test', password='test'), user)
 
 
 @override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser')
@@ -667,3 +695,43 @@ class SelectingBackendTests(TestCase):
         user = User.objects.create_user(self.username, 'email', self.password)
         self.client._login(user, self.other_backend)
         self.assertBackendInSession(self.other_backend)
+
+
+@override_settings(
+    AUTHENTICATION_BACKENDS=[
+        'django.contrib.auth.backends.AllowInactiveUsersModelBackend'
+    ],
+)
+class AllowInactiveUsersModelBackendTest(TestCase):
+    """
+    To verify that the login form rejects inactive users, use an
+    authentication backend that allows them.
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username='test',
+            email='test@example.com',
+            password='test',
+            is_active=False
+        )
+
+    def test_authenticate(self):
+        self.assertEqual(
+            authenticate(
+                username='test',
+                email='test@example.com',
+                password='test'
+            ),
+            self.user
+        )
+
+    def test_get_user(self):
+        self.client.force_login(self.user)
+
+        # Prepare a request object
+        request = HttpRequest()
+        request.session = self.client.session
+
+        user = get_user(request)
+        self.assertEqual(user, self.user)

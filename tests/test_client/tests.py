@@ -437,6 +437,12 @@ class ClientTest(TestCase):
         login = self.client.login(username='inactive', password='password')
         self.assertFalse(login)
 
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            'django.contrib.auth.backends.ModelBackend',
+            'django.contrib.auth.backends.AllowInactiveUsersModelBackend',
+        ]
+    )
     def test_view_with_inactive_force_login(self):
         "Request a page that is protected with @login, but use an inactive login"
 
@@ -445,7 +451,7 @@ class ClientTest(TestCase):
         self.assertRedirects(response, '/accounts/login/?next=/login_protected_view/')
 
         # Log in
-        self.client.force_login(self.u2)
+        self.client.force_login(self.u2, backend='django.contrib.auth.backends.AllowInactiveUsersModelBackend')
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')

@@ -140,6 +140,9 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
 
 
+@override_settings(
+    AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowInactiveUsersModelBackend'],
+)
 class AuthenticationFormTest(TestDataMixin, TestCase):
 
     def test_invalid_username(self):
