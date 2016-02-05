@@ -625,7 +625,7 @@ class WriterTests(SimpleTestCase):
                 migrations.AlterModelOptions(
                     name='model',
                     options={'verbose_name': 'model', 'verbose_name_plural': 'models'},
-                    ),
+                ),
             ]
         })
         writer = MigrationWriter(migration)

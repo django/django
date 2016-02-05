@@ -58,7 +58,7 @@ def check_dependencies(**kwargs):
                 "'django.contrib.auth.context_processors.auth' must be in "
                 "TEMPLATES in order to use the admin application.",
                 id="admin.E402"
-                )
+            )
             errors.append(missing_template)
     return errors
 
