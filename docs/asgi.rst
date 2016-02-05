@@ -367,7 +367,8 @@ clients reconnect will immediately resolve the problem.
 
 If a channel layer implements the ``groups`` extension, it must persist group
 membership until at least the time when the member channel has a message
-expire due to non-consumption.
+expire due to non-consumption. It should drop membership after a while to
+prevent collision of old messages with new clients with the same random ID.
 
 
 Message Formats
