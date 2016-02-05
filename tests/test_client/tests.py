@@ -432,10 +432,14 @@ class ClientTest(TestCase):
         self.assertFalse(login)
 
     def test_view_with_inactive_login(self):
-        "Request a page that is protected with @login, but use an inactive login"
+        """
+        An inactive user may login if the authenticate backend allows it.
+        """
+        credentials = {'username': 'inactive', 'password': 'password'}
+        self.assertFalse(self.client.login(**credentials))
 
-        login = self.client.login(username='inactive', password='password')
-        self.assertFalse(login)
+        with self.settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend']):
+            self.assertTrue(self.client.login(**credentials))
 
     @override_settings(
         AUTHENTICATION_BACKENDS=[

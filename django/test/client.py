@@ -599,8 +599,7 @@ class Client(RequestFactory):
         """
         from django.contrib.auth import authenticate
         user = authenticate(**credentials)
-        if (user and user.is_active and
-                apps.is_installed('django.contrib.sessions')):
+        if user and apps.is_installed('django.contrib.sessions'):
             self._login(user)
             return True
         else:

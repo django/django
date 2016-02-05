@@ -678,6 +678,10 @@ Miscellaneous
   :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend`
   in :setting:`AUTHENTICATION_BACKENDS` instead.
 
+* In light of the previous change, the test client's
+  :meth:`~django.test.Client.login()` method no longer always rejects inactive
+  users but instead delegates this decision to the authentication backend.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
