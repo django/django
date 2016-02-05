@@ -1,4 +1,3 @@
-import inspect
 import warnings
 from collections import OrderedDict
 
@@ -142,7 +141,7 @@ class Command(BaseCommand):
             for model in models:
                 if model in excluded_models:
                     continue
-                if model._meta.proxy and inspect.getmro(model)[1] not in models:
+                if model._meta.proxy and model._meta.proxy_for_model not in models:
                     warnings.warn(
                         "%s is a proxy model and won't be serialized." % model._meta.label,
                         category=ProxyModelWarning,
