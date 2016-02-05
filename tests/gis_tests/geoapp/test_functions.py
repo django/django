@@ -89,7 +89,7 @@ class GISFunctionsTests(TestCase):
             chicago_json,
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True, crs=True, precision=5)
-                ).get(name='Chicago').geojson
+            ).get(name='Chicago').geojson
         )
 
     @skipUnlessDBFeature("has_AsGML_function")

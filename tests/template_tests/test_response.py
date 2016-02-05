@@ -270,7 +270,8 @@ class TemplateResponseTest(SimpleTestCase):
     def test_pickling(self):
         # Create a template response. The context is
         # known to be unpicklable (e.g., a function).
-        response = TemplateResponse(self.factory.get('/'),
+        response = TemplateResponse(
+            self.factory.get('/'),
             'first/test.html', {
                 'value': 123,
                 'fn': datetime.now,
