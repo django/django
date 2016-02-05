@@ -669,6 +669,15 @@ Miscellaneous
   calling ``Command.execute()``, pass the command object as the first argument
   to ``call_command()``.
 
+* :class:`~django.contrib.auth.backends.ModelBackend` and
+  :class:`~django.contrib.auth.backends.RemoteUserBackend` now reject inactive
+  users. This means that inactive users can't login and will be logged
+  out if they are switched from ``is_active=True`` to ``False``. If you need
+  the previous behavior, use the new
+  :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend` or
+  :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend`
+  in :setting:`AUTHENTICATION_BACKENDS` instead.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10

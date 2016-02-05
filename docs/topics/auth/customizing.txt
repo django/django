@@ -235,10 +235,17 @@ for example, to control anonymous access.
 Authorization for inactive users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-An inactive user is a one that is authenticated but has its attribute
-``is_active`` set to ``False``. However this does not mean they are not
-authorized to do anything. For example they are allowed to activate their
-account.
+An inactive user is a one that has its
+:attr:`~django.contrib.auth.models.User.is_active` field set to ``False``. The
+:class:`~django.contrib.auth.backends.ModelBackend` and
+:class:`~django.contrib.auth.backends.RemoteUserBackend` authentication
+backends prohibits these users from authenticating. If a custom user model
+doesn't have an :attr:`~django.contrib.auth.models.CustomUser.is_active` field,
+all users will be allowed to authenticate.
+
+You can use :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend`
+or :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if you
+want to allow inactive users to authenticate.
 
 The support for anonymous users in the permission system allows for a scenario
 where anonymous users have permissions to do something while inactive
@@ -247,6 +254,10 @@ authenticated users do not.
 Do not forget to test for the ``is_active`` attribute of the user in your own
 backend permission methods.
 
+.. versionchanged:: 1.10
+
+    In older versions, the :class:`~django.contrib.auth.backends.ModelBackend`
+    allowed inactive users to authenticate.
 
 Handling object permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

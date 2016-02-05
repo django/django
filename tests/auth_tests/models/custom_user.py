@@ -97,6 +97,15 @@ class RemoveGroupsAndPermissions(object):
         PermissionsMixin._meta.local_many_to_many = self._old_pm_local_m2m
 
 
+class CustomUserWithoutIsActiveField(AbstractBaseUser):
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
+
+
 # The extension user is a simple extension of the built-in user class,
 # adding a required date_of_birth field. This allows us to check for
 # any hard references to the name "User" in forms/handlers etc.
