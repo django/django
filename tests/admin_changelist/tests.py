@@ -480,9 +480,8 @@ class ChangeListTests(TestCase):
         Regression test for #13196: output of functions should be  localized
         in the changelist.
         """
-        User.objects.create_superuser(
-            username='super', email='super@localhost', password='secret')
-        self.client.login(username='super', password='secret')
+        superuser = User.objects.create_superuser(username='super', email='super@localhost', password='secret')
+        self.client.force_login(superuser)
         event = Event.objects.create(date=datetime.date.today())
         response = self.client.get(reverse('admin:admin_changelist_event_changelist'))
         self.assertContains(response, formats.localize(event.date))
@@ -882,21 +881,14 @@ class AdminLogNodeTestCase(TestCase):
         self.assertEqual(t.render(Context({})), 'Added "<User: jondoe>".')
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF="admin_changelist.urls")
+@override_settings(ROOT_URLCONF='admin_changelist.urls')
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_changelist'] + AdminSeleniumWebDriverTestCase.available_apps
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def setUp(self):
-        # password = "secret"
-        User.objects.create(
-            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
-            is_staff=True, last_login=datetime.datetime(2007, 5, 30, 13, 20, 10),
-            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
+        User.objects.create_superuser(username='super', password='secret', email=None)
 
     def test_add_row_selection(self):
         """

@@ -437,10 +437,10 @@ class ReverseLazyTest(TestCase):
         self.assertRedirects(response, "/redirected_to/", status_code=302)
 
     def test_user_permission_with_lazy_reverse(self):
-        User.objects.create_user('alfred', 'alfred@example.com', password='testpw')
+        alfred = User.objects.create_user('alfred', 'alfred@example.com', password='testpw')
         response = self.client.get('/login_required_view/')
         self.assertRedirects(response, "/login/?next=/login_required_view/", status_code=302)
-        self.client.login(username='alfred', password='testpw')
+        self.client.force_login(alfred)
         response = self.client.get('/login_required_view/')
         self.assertEqual(response.status_code, 200)
 

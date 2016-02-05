@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import datetime
-
 from django.contrib import admin
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
@@ -382,18 +380,12 @@ class ProxyModelTests(TestCase):
         self.assertEqual(MyPerson(id=100), Person(id=100))
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='proxy_models.urls',)
+@override_settings(ROOT_URLCONF='proxy_models.urls')
 class ProxyModelAdminTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = AuthUser.objects.create(
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
-            first_name='Super', last_name='User', email='super@example.com', is_staff=True, is_active=True,
-            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
+        cls.superuser = AuthUser.objects.create(is_superuser=True, is_staff=True)
         cls.tu1 = ProxyTrackerUser.objects.create(name='Django Pony', status='emperor')
         cls.i1 = Issue.objects.create(summary="Pony's Issue", assignee=cls.tu1)
 
@@ -427,11 +419,10 @@ class ProxyModelAdminTests(TestCase):
             reverse('admin_proxy:proxy_models_proxytrackeruser_change', args=(proxy.pk,)), proxy
         )
 
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
         response = self.client.get(reverse('admin_proxy:proxy_models_trackeruser_delete', args=(user.pk,)))
         delete_str = response.context['deleted_objects'][0]
         self.assertEqual(delete_str, user_str)
         response = self.client.get(reverse('admin_proxy:proxy_models_proxytrackeruser_delete', args=(proxy.pk,)))
         delete_str = response.context['deleted_objects'][0]
         self.assertEqual(delete_str, proxy_str)
-        self.client.logout()

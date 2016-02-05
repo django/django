@@ -35,13 +35,9 @@ from .settings import AUTH_TEMPLATES
 
 
 @override_settings(
-    LANGUAGES=[
-        ('en', 'English'),
-    ],
+    LANGUAGES=[('en', 'English')],
     LANGUAGE_CODE='en',
     TEMPLATES=AUTH_TEMPLATES,
-    USE_TZ=False,
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='auth_tests.urls',
 )
 class AuthViewsTestCase(TestCase):
@@ -51,41 +47,8 @@ class AuthViewsTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
-            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u2 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
-            first_name='Inactive', last_name='User', email='testclient2@example.com', is_staff=False, is_active=False,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u3 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
-            first_name='Staff', last_name='Member', email='staffmember@example.com', is_staff=True, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u4 = User.objects.create(
-            password='', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='empty_password', first_name='Empty', last_name='Password', email='empty_password@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u5 = User.objects.create(
-            password='$', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='unmanageable_password', first_name='Unmanageable', last_name='Password',
-            email='unmanageable_password@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u6 = User.objects.create(
-            password='foo$bar', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='unknown_password', first_name='Unknown', last_name='Password',
-            email='unknown_password@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
+        cls.u1 = User.objects.create_user(username='testclient', password='password', email='testclient@example.com')
+        cls.u3 = User.objects.create_user(username='staff', password='password', email='staffmember@example.com')
 
     def login(self, username='testclient', password='password'):
         response = self.client.post('/login/', {
@@ -373,10 +336,11 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.u1 = CustomUser.custom_objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), email='staffmember@example.com', is_active=True,
-            is_admin=False, date_of_birth=datetime.date(1976, 11, 8)
+            email='staffmember@example.com',
+            date_of_birth=datetime.date(1976, 11, 8),
         )
+        cls.u1.set_password('password')
+        cls.u1.save()
 
     def _test_confirm_start(self):
         # Start by creating the email
@@ -892,10 +856,7 @@ class LogoutTest(AuthViewsTestCase):
 
 # Redirect in test_user_change_password will fail if session auth hash
 # isn't updated after password change (#21649)
-@override_settings(
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='auth_tests.urls_admin',
-)
+@override_settings(ROOT_URLCONF='auth_tests.urls_admin')
 class ChangelistTests(AuthViewsTestCase):
 
     def setUp(self):

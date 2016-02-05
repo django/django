@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import datetime
-
 from django.contrib.admin import ModelAdmin, TabularInline
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
@@ -26,17 +24,10 @@ class TestDataMixin(object):
 
     @classmethod
     def setUpTestData(cls):
-        # password = "secret"
-        User.objects.create(
-            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
-            is_staff=True, last_login=datetime.datetime(2007, 5, 30, 13, 20, 10),
-            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
+        cls.superuser = User.objects.create_superuser(username='super', email='super@example.com', password='secret')
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF="admin_inlines.urls")
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
 class TestInline(TestDataMixin, TestCase):
 
     def setUp(self):
@@ -44,8 +35,7 @@ class TestInline(TestDataMixin, TestCase):
         holder.save()
         Inner(dummy=42, holder=holder).save()
 
-        result = self.client.login(username='super', password='secret')
-        self.assertEqual(result, True)
+        self.client.force_login(self.superuser)
         self.factory = RequestFactory()
 
     def test_can_delete(self):
@@ -418,13 +408,11 @@ class TestInline(TestDataMixin, TestCase):
         self.assertNotContains(response, INLINE_CHANGELINK_HTML)
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF="admin_inlines.urls")
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
 class TestInlineMedia(TestDataMixin, TestCase):
 
     def setUp(self):
-        result = self.client.login(username='super', password='secret')
-        self.assertEqual(result, True)
+        self.client.force_login(self.superuser)
 
     def test_inline_media_only_base(self):
         holder = Holder(dummy=13)
@@ -452,7 +440,7 @@ class TestInlineMedia(TestDataMixin, TestCase):
         self.assertContains(response, 'my_awesome_inline_scripts.js')
 
 
-@override_settings(ROOT_URLCONF="admin_inlines.urls")
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
 class TestInlineAdminForm(TestCase):
 
     def test_immutable_content_type(self):
@@ -471,13 +459,11 @@ class TestInlineAdminForm(TestCase):
         self.assertEqual(iaf.original.content_type, parent_ct)
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF="admin_inlines.urls")
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
 class TestInlineProtectedOnDelete(TestDataMixin, TestCase):
 
     def setUp(self):
-        result = self.client.login(username='super', password='secret')
-        self.assertEqual(result, True)
+        self.client.force_login(self.superuser)
 
     def test_deleting_inline_with_protected_delete_does_not_validate(self):
         lotr = Novel.objects.create(name='Lord of the rings')
@@ -503,7 +489,7 @@ class TestInlineProtectedOnDelete(TestDataMixin, TestCase):
                             % (chapter, foot_note))
 
 
-@override_settings(ROOT_URLCONF="admin_inlines.urls")
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
 class TestInlinePermissions(TestCase):
     """
     Make sure the admin respects permissions for objects that are edited
@@ -546,9 +532,7 @@ class TestInlinePermissions(TestCase):
         self.holder_change_url = reverse('admin:admin_inlines_holder2_change', args=(holder.id,))
         self.inner2_id = inner2.id
 
-        self.assertEqual(
-            self.client.login(username='admin', password='secret'),
-            True)
+        self.client.force_login(self.user)
 
     def test_inline_add_m2m_noperm(self):
         response = self.client.get(reverse('admin:admin_inlines_author_add'))
@@ -703,21 +687,14 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF="admin_inlines.urls")
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_inlines'] + AdminSeleniumWebDriverTestCase.available_apps
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def setUp(self):
-        # password = "secret"
-        User.objects.create(
-            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
-            is_staff=True, last_login=datetime.datetime(2007, 5, 30, 13, 20, 10),
-            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
+        User.objects.create_superuser(username='super', password='secret', email='super@example.com')
 
     def test_add_stackeds(self):
         """

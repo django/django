@@ -1200,16 +1200,19 @@ class NewFormsTests(TestCase):
             self.assertIn("2011-09-01 17:20:30", str(form))
 
 
-@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True,
-                  PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                  ROOT_URLCONF='timezones.urls')
+@override_settings(
+    DATETIME_FORMAT='c',
+    TIME_ZONE='Africa/Nairobi',
+    USE_L10N=False,
+    USE_TZ=True,
+    ROOT_URLCONF='timezones.urls',
+)
 class AdminTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # password = "secret"
-        cls.u1 = User.objects.create(
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+        cls.u1 = User.objects.create_user(
+            password='secret',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10, tzinfo=UTC),
             is_superuser=True, username='super', first_name='Super', last_name='User',
             email='super@example.com', is_staff=True, is_active=True,
@@ -1217,7 +1220,7 @@ class AdminTests(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
 
     @requires_tz_support
     def test_changelist(self):

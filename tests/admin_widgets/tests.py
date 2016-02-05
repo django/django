@@ -33,30 +33,15 @@ class TestDataMixin(object):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
-            is_staff=True, last_login=datetime(2007, 5, 30, 13, 20, 10),
-            date_joined=datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u2 = User.objects.create(
-            pk=101, username='testser', first_name='Add', last_name='User', email='auser@example.com',
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=False,
-            is_staff=True, last_login=datetime(2007, 5, 30, 13, 20, 10),
-            date_joined=datetime(2007, 5, 30, 13, 20, 10)
-        )
-        models.Car.objects.create(id=1, owner=cls.u1, make='Volkswagen', model='Passat')
-        models.Car.objects.create(id=2, owner=cls.u2, make='BMW', model='M3')
+        cls.superuser = User.objects.create_superuser(username='super', password='secret', email=None)
+        cls.u2 = User.objects.create_user(username='testser', password='secret')
+        models.Car.objects.create(owner=cls.superuser, make='Volkswagen', model='Passat')
+        models.Car.objects.create(owner=cls.u2, make='BMW', model='M3')
 
 
 class SeleniumDataMixin(object):
     def setUp(self):
-        self.u1 = User.objects.create(
-            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
-            is_staff=True, last_login=datetime(2007, 5, 30, 13, 20, 10),
-            date_joined=datetime(2007, 5, 30, 13, 20, 10)
-        )
+        self.u1 = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
 
 
 class AdminFormfieldForDBFieldTests(SimpleTestCase):
@@ -195,38 +180,35 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         )
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='admin_widgets.urls')
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class AdminFormfieldForDBFieldWithRequestTests(TestDataMixin, TestCase):
 
     def test_filter_choices_by_request_user(self):
         """
         Ensure the user can only see their own cars in the foreign key dropdown.
         """
-        self.client.login(username="super", password="secret")
+        self.client.force_login(self.superuser)
         response = self.client.get(reverse('admin:admin_widgets_cartire_add'))
         self.assertNotContains(response, "BMW M3")
         self.assertContains(response, "Volkswagen Passat")
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='admin_widgets.urls')
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class AdminForeignKeyWidgetChangeList(TestDataMixin, TestCase):
 
     def setUp(self):
-        self.client.login(username="super", password="secret")
+        self.client.force_login(self.superuser)
 
     def test_changelist_ForeignKey(self):
         response = self.client.get(reverse('admin:admin_widgets_car_changelist'))
         self.assertContains(response, '/auth/user/add/')
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='admin_widgets.urls')
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
 
     def setUp(self):
-        self.client.login(username="super", password="secret")
+        self.client.force_login(self.superuser)
 
     def test_nonexistent_target_id(self):
         band = models.Band.objects.create(name='Bogey Blues')
@@ -407,10 +389,7 @@ class AdminURLWidgetTest(SimpleTestCase):
         )
 
 
-@override_settings(
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='admin_widgets.urls',
-)
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class AdminFileWidgetTests(TestDataMixin, TestCase):
 
     @classmethod
@@ -443,7 +422,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         """
         File widgets should render as a link when they're marked "read only."
         """
-        self.client.login(username="super", password="secret")
+        self.client.force_login(self.superuser)
         response = self.client.get(reverse('admin:admin_widgets_album_change', args=(self.album.id,)))
         self.assertContains(
             response,
@@ -639,8 +618,7 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         self.assertFalse(wrapper.can_delete_related)
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='admin_widgets.urls')
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
@@ -818,8 +796,7 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
 
 @skipIf(pytz is None, "this test requires pytz")
 @override_settings(TIME_ZONE='Asia/Singapore')
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='admin_widgets.urls')
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class DateTimePickerShortcutsSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
@@ -900,8 +877,7 @@ class DateTimePickerAltTimezoneSeleniumIETests(DateTimePickerAltTimezoneSelenium
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='admin_widgets.urls')
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
@@ -1201,8 +1177,7 @@ class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFi
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='admin_widgets.urls')
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
@@ -1297,8 +1272,7 @@ class AdminRawIdWidgetSeleniumIETests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='admin_widgets.urls')
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'

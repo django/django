@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.http import Http404
 from django.template import TemplateDoesNotExist
@@ -23,12 +22,6 @@ class DefaultsTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
-            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
         Author.objects.create(name='Boris')
         Article.objects.create(
             title='Old Article', slug='old_article', author_id=1,
