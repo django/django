@@ -9,6 +9,7 @@ from django.core.handlers import base
 from django.core import signals
 from django.core.urlresolvers import set_script_prefix
 from django.utils.functional import cached_property
+from django.utils import six
 
 logger = logging.getLogger('django.request')
 
@@ -21,8 +22,10 @@ class AsgiRequest(http.HttpRequest):
 
     def __init__(self, message):
         self.message = message
-        self.reply_channel = self.message['reply_channel']
+        self.reply_channel = self.message.reply_channel
         self._content_length = 0
+        self._post_parse_error = False
+        self.resolver_match = None
         # Path info
         self.path = self.message['path']
         self.script_name = self.message.get('root_path', '')
@@ -63,7 +66,7 @@ class AsgiRequest(http.HttpRequest):
             except (ValueError, TypeError):
                 pass
         # Body handling
-        self._body = message.get("body", "")
+        self._body = message.get("body", b"")
         if message.get("body_channel", None):
             while True:
                 # Get the next chunk from the request body channel
@@ -78,6 +81,7 @@ class AsgiRequest(http.HttpRequest):
                 # Exit loop if this was the last
                 if not chunk.get("more_content", False):
                     break
+        assert isinstance(self._body, six.binary_type), "Body is not bytes"
         # Other bits
         self.resolver_match = None
 
@@ -97,7 +101,13 @@ class AsgiRequest(http.HttpRequest):
     def _set_post(self, post):
         self._post = post
 
+    def _get_files(self):
+        if not hasattr(self, '_files'):
+            self._load_post_and_files()
+        return self._files
+
     POST = property(_get_post, _set_post)
+    FILES = property(_get_files)
 
     @cached_property
     def COOKIES(self):
@@ -113,6 +123,9 @@ class AsgiHandler(base.BaseHandler):
 
     initLock = Lock()
     request_class = AsgiRequest
+
+    # Size to chunk response bodies into for multiple response messages
+    chunk_size = 512 * 1024
 
     def __call__(self, message):
         # Set up middleware if needed. We couldn't do this earlier, because
@@ -148,7 +161,9 @@ class AsgiHandler(base.BaseHandler):
         """
         Encodes a Django HTTP response into an ASGI http.response message(s).
         """
-        # Collect cookies into headers
+        # Collect cookies into headers.
+        # Note that we have to preserve header case as there are some non-RFC
+        # compliant clients that want things like Content-Type correct. Ugh.
         response_headers = [(str(k), str(v)) for k, v in response.items()]
         for c in response.cookies.values():
             response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
@@ -186,14 +201,13 @@ class AsgiHandler(base.BaseHandler):
 
         Yields (chunk, last_chunk) tuples.
         """
-        CHUNK_SIZE = 512 * 1024
         position = 0
         while position < len(data):
             yield (
-                data[position:position+CHUNK_SIZE],
-                (position + CHUNK_SIZE) >= len(data),
+                data[position:position + self.chunk_size],
+                (position + self.chunk_size) >= len(data),
             )
-            position += CHUNK_SIZE
+            position += self.chunk_size
 
 
 class ViewConsumer(object):
@@ -205,5 +219,5 @@ class ViewConsumer(object):
         self.handler = AsgiHandler()
 
     def __call__(self, message):
-        for reply_message in self.handler(message.content):
+        for reply_message in self.handler(message):
             message.reply_channel.send(reply_message)

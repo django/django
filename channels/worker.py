@@ -35,7 +35,6 @@ class Worker(object):
                 content=content,
                 channel=channel,
                 channel_layer=self.channel_layer,
-                reply_channel=content.get("reply_channel", None),
             )
             # Handle the message
             consumer = self.channel_layer.registry.consumer_for_channel(channel)
