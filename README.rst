@@ -2,7 +2,7 @@ Django Channels
 ===============
 
 .. image:: https://api.travis-ci.org/andrewgodwin/channels.svg
-    :target: https://api.travis-ci.org/andrewgodwin/channels
+    :target: https://travis-ci.org/andrewgodwin/channels
 
 **NOTE: The current master branch is in flux as it changes to match the final
 structure and the new ASGI spec. If you wish to use this in the meantime,
