@@ -1,12 +1,12 @@
+import base64
 import datetime
 import json
 import random
 import string
 import time
-import base64
 
 from django.apps.registry import Apps
-from django.db import DEFAULT_DB_ALIAS, IntegrityError, connections, models
+from django.db import DEFAULT_DB_ALIAS, connections, models
 from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -30,7 +30,7 @@ class DatabaseChannelLayer(object):
         self.expiry = expiry
         self.db_alias = db_alias
 
-    ### ASGI API ###
+    # ASGI API
 
     extensions = ["groups", "flush"]
 
@@ -75,7 +75,7 @@ class DatabaseChannelLayer(object):
             if not self.channel_model.objects.filter(channel=new_name).exists():
                 return new_name
 
-    ### ASGI Group extension ###
+    # ASGI Group extension
 
     def group_add(self, group, channel):
         """
@@ -102,13 +102,13 @@ class DatabaseChannelLayer(object):
         for channel in self.group_model.objects.filter(group=group).values_list("channel", flat=True):
             self.send(channel, message)
 
-    ### ASGI Flush extension ###
+    # ASGI Flush extension
 
     def flush(self):
         self.channel_model.objects.all().delete()
         self.group_model.objects.all().delete()
 
-    ### Serialization ###
+    # Serialization
 
     def serialize(self, message):
         return AsgiJsonEncoder().encode(message)
@@ -116,7 +116,7 @@ class DatabaseChannelLayer(object):
     def deserialize(self, message):
         return AsgiJsonDecoder().decode(message)
 
-    ### Database state mgmt ###
+    # Database state mgmt
 
     @property
     def connection(self):

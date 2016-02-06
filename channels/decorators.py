@@ -15,6 +15,7 @@ def linearize(func):
     ordering, just linearity.
     """
     raise NotImplementedError("Not yet reimplemented")
+
     @functools.wraps(func)
     def inner(message, *args, **kwargs):
         # Make sure there's a reply channel
