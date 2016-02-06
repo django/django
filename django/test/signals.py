@@ -69,7 +69,7 @@ def update_connections_time_zone(**kwargs):
             except AttributeError:
                 pass
             tz_sql = conn.ops.set_time_zone_sql()
-            if tz_sql:
+            if tz_sql and conn.timezone_name:
                 with conn.cursor() as cursor:
                     cursor.execute(tz_sql, [conn.timezone_name])
 

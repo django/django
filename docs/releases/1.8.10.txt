@@ -9,4 +9,5 @@ Django 1.8.10 fixes several bugs in 1.8.9.
 Bugfixes
 ========
 
-* ...
+* Fixed a crash on PostgreSQL that prevented using ``TIME_ZONE=None`` and
+  ``USE_TZ=False`` (:ticket:`26177`).
