@@ -5,11 +5,11 @@ import logging
 from threading import Lock
 
 from django import http
-from django.core.handlers import base
 from django.core import signals
+from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
-from django.utils.functional import cached_property
 from django.utils import six
+from django.utils.functional import cached_property
 
 logger = logging.getLogger('django.request')
 
