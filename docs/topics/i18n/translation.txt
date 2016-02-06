@@ -1694,25 +1694,8 @@ updating message files, just run :djadmin:`django-admin compilemessages
 This is only needed for people who either want to extract message IDs or compile
 message files (``.po``). Translation work itself just involves editing existing
 files of this type, but if you want to create your own message files, or want to
-test or compile a changed message file, you will need the ``gettext`` utilities:
-
-* Download the following zip files from the GNOME servers
-  https://download.gnome.org/binaries/win32/dependencies/
-
-  * ``gettext-runtime-X.zip``
-  * ``gettext-tools-X.zip``
-
-  ``X`` is the version number, we are requiring ``0.15`` or higher.
-
-* Extract the contents of the ``bin\`` directories in both files to the
-  same folder on your system (i.e. ``C:\Program Files\gettext-utils``)
-
-* Update the system PATH:
-
-  * ``Control Panel > System > Advanced > Environment Variables``.
-  * In the ``System variables`` list, click ``Path``, click ``Edit``.
-  * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
-    ``Variable value`` field.
+test or compile a changed message file, download `a precompiled binary
+installer <http://mlocati.github.io/gettext-iconv-windows/>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
