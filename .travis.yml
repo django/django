@@ -3,5 +3,5 @@ language: python
 python:
   - "2.7"
   - "3.5"
-install: pip install tox-travis
+install: pip install tox-travis Django asgiref
 script: tox
