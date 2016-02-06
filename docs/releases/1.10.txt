@@ -356,7 +356,7 @@ Database backend API
 * ...
 
 ``select_related()`` prohibits non-relational fields for nested relations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------------
 
 Django 1.8 added validation for non-relational fields in ``select_related()``::
 
@@ -373,7 +373,7 @@ But it didn't prohibit nested non-relation fields as it does now::
     FieldError: Non-relational field given in select_related: 'name'
 
 ``_meta.get_fields()`` returns consistent reverse fields for proxy models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------------
 
 Before Django 1.10, the :meth:`~django.db.models.options.Options.get_fields`
 method returned different reverse fields when called on a proxy model compared
@@ -382,7 +382,7 @@ full set of fields pointing to a concrete class or one of its proxies in both
 cases.
 
 :attr:`AbstractUser.username <django.contrib.auth.models.User.username>` ``max_length`` increased to 150
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------------------------------------------------------------
 
 A migration for :attr:`django.contrib.auth.models.User.username` is included.
 If you have a custom user model inheriting from ``AbstractUser``, you'll need
@@ -419,13 +419,13 @@ to use this form::
     admin.site.register(User, UserAdmin)
 
 Dropped support for PostgreSQL 9.1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 Upstream support for PostgreSQL 9.1 ends in September 2016. As a consequence,
 Django 1.10 sets PostgreSQL 9.2 as the minimum version it officially supports.
 
 ``runserver`` output goes through logging
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 Request and response handling of the ``runserver`` command is sent to the
 :ref:`django-server-logger` logger instead of to ``sys.stderr``. If you
@@ -454,15 +454,15 @@ output::
         }
     }
 
-``auth.CustomUser`` and ``auth.ExtensionUser`` test models were removed.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``auth.CustomUser`` and ``auth.ExtensionUser`` test models were removed
+-----------------------------------------------------------------------
 
 Since the introduction of migrations for the contrib apps in Django 1.8, the
 tables of these custom user test models were not created anymore making them
 unusable in a testing context.
 
 Miscellaneous
-~~~~~~~~~~~~~
+-------------
 
 * The ``repr()`` of a ``QuerySet`` is wrapped in ``<QuerySet >`` to
   disambiguate it from a plain list when debugging.
