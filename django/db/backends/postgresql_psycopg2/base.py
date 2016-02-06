@@ -198,7 +198,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         tz = self.settings_dict['TIME_ZONE']
         conn_tz = self.connection.get_parameter_status('TimeZone')
 
-        if conn_tz != tz:
+        if tz and conn_tz != tz:
             cursor = self.connection.cursor()
             try:
                 cursor.execute(self.ops.set_time_zone_sql(), [tz])

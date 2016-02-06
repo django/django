@@ -73,7 +73,7 @@ def update_connections_time_zone(**kwargs):
     for conn in connections.all():
         conn.settings_dict['TIME_ZONE'] = tz
         tz_sql = conn.ops.set_time_zone_sql()
-        if tz_sql:
+        if tz_sql and tz:
             conn.cursor().execute(tz_sql, [tz])
 
 
