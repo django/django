@@ -71,7 +71,7 @@ class DatabaseChannelLayer(object):
         # Keep making channel names till one isn't present.
         while True:
             random_string = "".join(random.choice(string.ascii_letters) for i in range(8))
-            new_name = pattern.replace(b"?", random_string)
+            new_name = pattern.replace("?", random_string)
             if not self.channel_model.objects.filter(channel=new_name).exists():
                 return new_name
 

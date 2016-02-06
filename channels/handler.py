@@ -58,12 +58,14 @@ class AsgiRequest(http.HttpRequest):
                 corrected_name = "CONTENT_TYPE"
             else:
                 corrected_name = 'HTTP_%s' % name.upper().replace("-", "_")
-            self.META[corrected_name] = value
+            # TODO: Look at request encoding for unicode decode
+            self.META[corrected_name] = value.decode("latin1")
         # Pull out content length info
         if self.META.get('CONTENT_LENGTH', None):
             try:
                 self._content_length = int(self.META['CONTENT_LENGTH'])
-            except (ValueError, TypeError):
+            except (ValueError, TypeError) as e:
+                print (self.META)
                 pass
         # Body handling
         self._body = message.get("body", b"")
@@ -164,9 +166,25 @@ class AsgiHandler(base.BaseHandler):
         # Collect cookies into headers.
         # Note that we have to preserve header case as there are some non-RFC
         # compliant clients that want things like Content-Type correct. Ugh.
-        response_headers = [(str(k), str(v)) for k, v in response.items()]
+        response_headers = []
+        for header, value in response.items():
+            if isinstance(header, six.binary_type):
+                header = header.decode("latin1")
+            if isinstance(value, six.text_type):
+                value = value.encode("latin1")
+            response_headers.append(
+                (
+                    six.text_type(header),
+                    six.binary_type(value),
+                )
+            )
         for c in response.cookies.values():
-            response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
+            response_headers.append(
+                (
+                    'Set-Cookie',
+                    six.binary_type(c.output(header='')),
+                )
+            )
         # Make initial response message
         message = {
             "status": response.status_code,

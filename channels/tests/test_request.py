@@ -159,7 +159,7 @@ class RequestTests(SimpleTestCase):
             "body_channel": "test-input",
             "headers": {
                 "content-type": b"multipart/form-data; boundary=BOUNDARY",
-                "content-length": six.binary_type(len(body)),
+                "content-length": six.text_type(len(body)).encode("ascii"),
             },
         }, "test")
         self.channel_layer.send("test-input", {
@@ -175,4 +175,4 @@ class RequestTests(SimpleTestCase):
         self.assertTrue(request.META["CONTENT_TYPE"].startswith("multipart/form-data"))
         self.assertFalse(request._post_parse_error)
         self.assertEqual(request.POST["title"], "My First Book")
-        self.assertEqual(request.FILES["pdf"].read(), "FAKEPDFBYTESGOHERE")
+        self.assertEqual(request.FILES["pdf"].read(), b"FAKEPDFBYTESGOHERE")
