@@ -257,7 +257,7 @@ class StateApps(Apps):
         """
         def extract_field(operation):
             # operation is annotated with the field in
-            # apps.register.Apps.lazy_model_operation().
+            # apps.registry.Apps.lazy_model_operation().
             return getattr(operation, 'field', None)
 
         def extract_field_names(operations):
@@ -343,6 +343,17 @@ class StateApps(Apps):
             del self.app_configs[app_label].models[model_name]
         except KeyError:
             pass
+
+    def get_app_config(self, app_label):
+        """
+        Overrides apps.registry.Apps.get_app_config function to add
+        additional message.
+        """
+        try:
+            super(StateApps, self).get_app_config(app_label)
+        except LookupError as e:
+            e.args[0] += ' Or possibly missing dependency on a migration?'
+            raise
 
 
 class ModelState(object):
