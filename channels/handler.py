@@ -64,8 +64,7 @@ class AsgiRequest(http.HttpRequest):
         if self.META.get('CONTENT_LENGTH', None):
             try:
                 self._content_length = int(self.META['CONTENT_LENGTH'])
-            except (ValueError, TypeError) as e:
-                print (self.META)
+            except (ValueError, TypeError):
                 pass
         # Body handling
         self._body = message.get("body", b"")
