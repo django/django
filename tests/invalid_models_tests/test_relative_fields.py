@@ -1008,44 +1008,68 @@ class ExplicitRelatedNameClashTests(SimpleTestCase):
 @isolate_apps('invalid_models_tests')
 class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
 
-    def test_fk_to_integer(self):
+    def test_fk_to_integer(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.IntegerField(),
             relative=models.ForeignKey('Target',
                 models.CASCADE,
+                related_name=related_name,
                 related_query_name='clash'))
 
-    def test_fk_to_fk(self):
+    def test_hidden_fk_to_integer(self, related_name=None):
+        self.test_fk_to_integer(related_name='+')
+
+    def test_fk_to_fk(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ForeignKey('Another', models.CASCADE),
             relative=models.ForeignKey('Target',
                 models.CASCADE,
+                related_name=related_name,
                 related_query_name='clash'))
 
-    def test_fk_to_m2m(self):
+    def test_hidden_fk_to_fk(self):
+        self.test_fk_to_fk(related_name='+')
+
+    def test_fk_to_m2m(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ForeignKey('Target',
                 models.CASCADE,
+                related_name=related_name,
                 related_query_name='clash'))
 
-    def test_m2m_to_integer(self):
+    def test_hidden_fk_to_m2m(self):
+        self.test_fk_to_m2m(related_name='+')
+
+    def test_m2m_to_integer(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.IntegerField(),
             relative=models.ManyToManyField('Target',
+                related_name=related_name,
                 related_query_name='clash'))
 
-    def test_m2m_to_fk(self):
+    def test_hidden_m2m_to_integer(self):
+        self.test_m2m_to_integer(related_name='+')
+
+    def test_m2m_to_fk(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ForeignKey('Another', models.CASCADE),
             relative=models.ManyToManyField('Target',
+                related_name=related_name,
                 related_query_name='clash'))
 
-    def test_m2m_to_m2m(self):
+    def test_hidden_m2m_to_fk(self):
+        self.test_m2m_to_fk(related_name='+')
+
+    def test_m2m_to_m2m(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ManyToManyField('Target',
+                related_name=related_name,
                 related_query_name='clash'))
+
+    def test_hidden_m2m_to_m2m(self):
+        self.test_m2m_to_m2m(related_name='+')
 
     def _test_explicit_related_query_name_clash(self, target, relative):
         class Another(models.Model):
