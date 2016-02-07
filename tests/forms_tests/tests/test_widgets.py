@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.forms import (
     CheckboxSelectMultiple, ClearableFileInput, RadioSelect, TextInput,
 )
@@ -161,9 +161,9 @@ beatle J R Ringo False""")
 
 
 @override_settings(ROOT_URLCONF='forms_tests.urls')
-class LiveWidgetTests(AdminSeleniumWebDriverTestCase):
+class LiveWidgetTests(AdminSeleniumTestCase):
 
-    available_apps = ['forms_tests'] + AdminSeleniumWebDriverTestCase.available_apps
+    available_apps = ['forms_tests'] + AdminSeleniumTestCase.available_apps
 
     def test_textarea_trailing_newlines(self):
         """

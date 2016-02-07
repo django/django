@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.contrib.admin import ModelAdmin, TabularInline
 from django.contrib.admin.helpers import InlineAdminForm
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.test import RequestFactory, TestCase, override_settings
@@ -688,13 +688,13 @@ class TestInlinePermissions(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
-class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+class SeleniumTests(AdminSeleniumTestCase):
 
-    available_apps = ['admin_inlines'] + AdminSeleniumWebDriverTestCase.available_apps
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+    available_apps = ['admin_inlines'] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):
         User.objects.create_superuser(username='super', password='secret', email='super@example.com')
+        super(SeleniumTests, self).setUp()
 
     def test_add_stackeds(self):
         """
@@ -871,11 +871,3 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             self.wait_until_visible(field_name)
             hide_links[hide_index].click()
             self.wait_until_invisible(field_name)
-
-
-class SeleniumChromeTests(SeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class SeleniumIETests(SeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

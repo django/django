@@ -3,19 +3,17 @@ from __future__ import unicode_literals
 
 import gettext
 import json
-import os
-import unittest
 from os import path
 
 from django.conf import settings
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, modify_settings,
-    override_settings, tag,
+    override_settings,
 )
+from django.test.selenium import SeleniumTestCaseMixin
 from django.urls import reverse
 from django.utils import six
 from django.utils._os import upath
-from django.utils.module_loading import import_string
 from django.utils.translation import LANGUAGE_SESSION_KEY, override
 
 from ..urls import locale_dir
@@ -256,35 +254,14 @@ class JsI18NTestsMultiPackage(SimpleTestCase):
                     'este texto de app3 debe ser traducido')
 
 
-skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
-
-
-@unittest.skipIf(skip_selenium, 'Selenium tests not requested')
-@tag('selenium')
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class JavascriptI18nTests(LiveServerTestCase):
+class JavascriptI18nTests(SeleniumTestCaseMixin, LiveServerTestCase):
 
     # The test cases use fixtures & translations from these apps.
     available_apps = [
         'django.contrib.admin', 'django.contrib.auth',
         'django.contrib.contenttypes', 'view_tests',
     ]
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
-
-    @classmethod
-    def setUpClass(cls):
-        try:
-            cls.selenium = import_string(cls.webdriver_class)()
-        except Exception as e:
-            raise unittest.SkipTest('Selenium webdriver "%s" not installed or '
-                                    'not operational: %s' % (cls.webdriver_class, str(e)))
-        cls.selenium.implicitly_wait(10)
-        super(JavascriptI18nTests, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.selenium.quit()
-        super(JavascriptI18nTests, cls).tearDownClass()
 
     @override_settings(LANGUAGE_CODE='de')
     def test_javascript_gettext(self):
@@ -312,11 +289,3 @@ class JavascriptI18nTests(LiveServerTestCase):
         self.assertEqual(elem.text, 'il faut traduire cette chaîne de caractères de app1')
         elem = self.selenium.find_element_by_id('app2string')
         self.assertEqual(elem.text, 'il faut traduire cette chaîne de caractères de app2')
-
-
-class JavascriptI18nChromeTests(JavascriptI18nTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class JavascriptI18nIETests(JavascriptI18nTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

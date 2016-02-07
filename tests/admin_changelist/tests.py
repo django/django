@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.templatetags.admin_list import pagination
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR, ChangeList
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -882,13 +882,13 @@ class AdminLogNodeTestCase(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_changelist.urls')
-class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+class SeleniumTests(AdminSeleniumTestCase):
 
-    available_apps = ['admin_changelist'] + AdminSeleniumWebDriverTestCase.available_apps
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+    available_apps = ['admin_changelist'] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):
         User.objects.create_superuser(username='super', password='secret', email=None)
+        super(SeleniumTests, self).setUp()
 
     def test_add_row_selection(self):
         """
@@ -915,11 +915,3 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             '%s #result_list tbody tr:first-child .action-select' % form_id)
         row_selector.click()
         self.assertEqual(selection_indicator.text, "1 of 1 selected")
-
-
-class SeleniumChromeTests(SeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class SeleniumIETests(SeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
