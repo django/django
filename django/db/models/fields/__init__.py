@@ -1144,6 +1144,17 @@ class CharField(Field):
 class CommaSeparatedIntegerField(CharField):
     default_validators = [validators.validate_comma_separated_integer_list]
     description = _("Comma-separated integers")
+    system_check_deprecated_details = {
+        'msg': (
+            'CommaSeparatedIntegerField has been deprecated. Support '
+            'for it (except in historical migrations) will be removed '
+            'in Django 2.0.'
+        ),
+        'hint': (
+            'Use CharField(validators=[validate_comma_separated_integer_list]) instead.'
+        ),
+        'id': 'fields.W901',
+    }
 
     def formfield(self, **kwargs):
         defaults = {

@@ -130,6 +130,9 @@ details on these changes.
 
 * The ``django.core.urlresolvers`` module will be removed.
 
+* The model ``CommaSeparatedIntegerField`` will be removed. A stub field will
+  remain for compatibility with historical migrations.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
