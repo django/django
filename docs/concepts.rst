@@ -109,11 +109,11 @@ message. Suddenly, a view is merely another example of a consumer::
     # Listens on http.request
     def my_consumer(message):
         # Decode the request from JSON-compat to a full object
-        django_request = Request.decode(message.content)
+        django_request = Request.channel_decode(message.content)
         # Run view
         django_response = view(django_request)
         # Encode the response into JSON-compat format
-        message.reply_channel.send(django_response.encode())
+        message.reply_channel.send(django_response.channel_encode())
 
 In fact, this is how Channels works. The interface servers transform connections
 from the outside world (HTTP, WebSockets, etc.) into messages on channels,
