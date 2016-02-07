@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a crash on PostgreSQL that prevented using ``TIME_ZONE=None`` and
   ``USE_TZ=False`` (:ticket:`26177`).
+
+* Added system checks for query name clashes of hidden relationships
+  (:ticket:`26162`).
