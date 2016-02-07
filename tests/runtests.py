@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import argparse
 import atexit
 import copy
 import os
@@ -7,7 +8,6 @@ import subprocess
 import sys
 import tempfile
 import warnings
-from argparse import ArgumentParser
 
 import django
 from django.apps import apps
@@ -15,6 +15,7 @@ from django.conf import settings
 from django.db import connection, connections
 from django.test import TestCase, TransactionTestCase
 from django.test.runner import default_test_processes
+from django.test.selenium import SeleniumTestCaseBase
 from django.test.utils import get_runner
 from django.utils import six
 from django.utils._os import upath
@@ -233,6 +234,20 @@ def actual_test_processes(parallel):
         return parallel
 
 
+class ActionSelenium(argparse.Action):
+    """
+    Validate the comma-separated list of requested browsers.
+    """
+    def __call__(self, parser, namespace, values, option_string=None):
+        browsers = values.split(',')
+        for browser in browsers:
+            try:
+                SeleniumTestCaseBase.import_webdriver(browser)
+            except ImportError:
+                raise argparse.ArgumentError(self, "Selenium browser specification '%s' is not valid." % browser)
+        setattr(namespace, self.dest, browsers)
+
+
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags):
     state = setup(verbosity, test_labels, parallel)
@@ -360,7 +375,7 @@ def paired_tests(paired_test, options, test_labels, parallel):
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description="Run the Django test suite.")
+    parser = argparse.ArgumentParser(description="Run the Django test suite.")
     parser.add_argument('modules', nargs='*', metavar='module',
         help='Optional path(s) to test modules; e.g. "i18n" or '
              '"i18n.tests.TranslationTests.test_lazy_objects".')
@@ -396,8 +411,8 @@ if __name__ == "__main__":
              'LiveServerTestCase) is expected to run from. The default value '
              'is localhost:8081-8179.')
     parser.add_argument(
-        '--selenium', action='store_true', dest='selenium', default=False,
-        help='Run only the Selenium tests (equivalent to "--tag selenium").')
+        '--selenium', dest='selenium', action=ActionSelenium, metavar='BROWSERS',
+        help='A comma-separated list of browsers to run the Selenium tests against.')
     parser.add_argument(
         '--debug-sql', action='store_true', dest='debug_sql', default=False,
         help='Turn on the SQL query logger within tests.')
@@ -438,11 +453,11 @@ if __name__ == "__main__":
         os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options.liveserver
 
     if options.selenium:
-        os.environ['DJANGO_SELENIUM_TESTS'] = '1'
         if not options.tags:
             options.tags = ['selenium']
         elif 'selenium' not in options.tags:
             options.tags.append('selenium')
+        SeleniumTestCaseBase.browsers = options.selenium
 
     if options.bisect:
         bisect_tests(options.bisect, options, options.modules, options.parallel)
