@@ -220,7 +220,6 @@ class SimpleTestCase(unittest.TestCase):
         """Performs any pre-test setup. This includes:
 
         * Creating a test client.
-        * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
         self.client = self.client_class()
