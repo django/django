@@ -17,7 +17,7 @@ from django.utils.html import escape
 from .models import Article, ArticleProxy, Site
 
 
-@override_settings(ROOT_URLCONF="admin_utils.urls")
+@override_settings(ROOT_URLCONF='admin_utils.urls')
 class LogEntryTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_superuser(username='super', password='secret', email='super@example.com')

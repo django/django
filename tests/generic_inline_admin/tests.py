@@ -380,7 +380,7 @@ class GenericInlineAdminWithUniqueTogetherTest(TestDataMixin, TestCase):
         self.assertContains(response, 'Are you sure you want to delete')
 
 
-@override_settings(ROOT_URLCONF="generic_inline_admin.urls")
+@override_settings(ROOT_URLCONF='generic_inline_admin.urls')
 class NoInlineDeletionTest(SimpleTestCase):
 
     def test_no_deletion(self):
@@ -402,7 +402,7 @@ request = MockRequest()
 request.user = MockSuperUser()
 
 
-@override_settings(ROOT_URLCONF="generic_inline_admin.urls")
+@override_settings(ROOT_URLCONF='generic_inline_admin.urls')
 class GenericInlineModelAdminTest(SimpleTestCase):
 
     def setUp(self):

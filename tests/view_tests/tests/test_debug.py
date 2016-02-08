@@ -56,7 +56,7 @@ class CallableSettingWrapperTests(SimpleTestCase):
         self.assertEqual(actual, "repr from the wrapped callable")
 
 
-@override_settings(DEBUG=True, ROOT_URLCONF="view_tests.urls")
+@override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
 class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
 
     def test_files(self):
@@ -225,7 +225,7 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
 
 @override_settings(
     DEBUG=True,
-    ROOT_URLCONF="view_tests.urls",
+    ROOT_URLCONF='view_tests.urls',
     # No template directories are configured, so no templates will be found.
     TEMPLATES=[{
         'BACKEND': 'django.template.backends.dummy.TemplateStrings',

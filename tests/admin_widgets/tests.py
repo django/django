@@ -795,8 +795,7 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
 
 
 @skipIf(pytz is None, "this test requires pytz")
-@override_settings(TIME_ZONE='Asia/Singapore')
-@override_settings(ROOT_URLCONF='admin_widgets.urls')
+@override_settings(ROOT_URLCONF='admin_widgets.urls', TIME_ZONE='Asia/Singapore')
 class DateTimePickerShortcutsSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
