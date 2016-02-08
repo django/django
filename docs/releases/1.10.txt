@@ -502,6 +502,50 @@ In older versions, assigning ``None`` to a non-nullable ``ForeignKey`` or
 not allow null values.')``. For consistency with other model fields which don't
 have a similar check, this check is removed.
 
+Removed weak password hashers from the default ``PASSWORD_HASHERS`` setting
+---------------------------------------------------------------------------
+
+Django 0.90 stored passwords as unsalted MD5. Django 0.91 added support for
+salted SHA1 with automatic upgrade of passwords when a user logs in. Django 1.4
+added PBKDF2 as the default password hasher.
+
+If you have an old Django project with MD5 or SHA1 (even salted) encoded
+passwords, be aware that these can be cracked fairly easily with today's
+hardware. To make Django users acknowledge continued use of weak hashers, the
+following hashers are removed from the default :setting:`PASSWORD_HASHERS`
+setting::
+
+    'django.contrib.auth.hashers.SHA1PasswordHasher'
+    'django.contrib.auth.hashers.MD5PasswordHasher'
+    'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'
+    'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'
+    'django.contrib.auth.hashers.CryptPasswordHasher'
+
+Consider using a :ref:`wrapped password hasher <wrapping-password-hashers>` to
+strengthen the hashes in your database. If that's not feasible, add the
+:setting:`PASSWORD_HASHERS` setting to your project and add back any hashers
+that you need.
+
+You can check if your database has any of the removed hashers like this::
+
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+
+    # Unsalted MD5/SHA1:
+    User.objects.filter(password__startswith='md5$$')
+    User.objects.filter(password__startswith='sha1$$')
+    # Salted MD5/SHA1:
+    User.objects.filter(password__startswith='md5$').exclude(password__startswith='md5$$')
+    User.objects.filter(password__startswith='sha1$').exclude(password__startswith='sha1$$')
+    # Crypt hasher:
+    User.objects.filter(password__startswith='crypt$$')
+
+    from django.db.models import CharField
+    from django.db.models.functions import Length
+    CharField.register_lookup(Length)
+    # Unsalted MD5 passwords might not have an 'md5$$' prefix:
+    User.objects.filter(password__length=32)
+
 Miscellaneous
 -------------
 

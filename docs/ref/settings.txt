@@ -2686,12 +2686,21 @@ Default::
         'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
         'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
         'django.contrib.auth.hashers.BCryptPasswordHasher',
-        'django.contrib.auth.hashers.SHA1PasswordHasher',
-        'django.contrib.auth.hashers.MD5PasswordHasher',
-        'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher',
-        'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-        'django.contrib.auth.hashers.CryptPasswordHasher',
     ]
+
+.. versionchanged:: 1.10
+
+    The following hashers were removed from the defaults::
+
+        'django.contrib.auth.hashers.SHA1PasswordHasher'
+        'django.contrib.auth.hashers.MD5PasswordHasher'
+        'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'
+        'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'
+        'django.contrib.auth.hashers.CryptPasswordHasher'
+
+    Consider using a :ref:`wrapped password hasher <wrapping-password-hashers>`
+    to strengthen the hashes in your database. If that's not feasible, add this
+    setting to your project and add back any hashers that you need.
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
 
