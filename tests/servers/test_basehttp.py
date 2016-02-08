@@ -5,7 +5,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core.servers.basehttp import WSGIRequestHandler
 from django.test import SimpleTestCase
 from django.test.client import RequestFactory
-from django.test.utils import captured_stderr, patch_logger
+from django.test.utils import patch_logger
 
 
 class Stub(object):
@@ -105,7 +105,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         server = Stub(base_environ={}, get_app=lambda: test_app)
 
         # We don't need to check stderr, but we don't want it in test output
-        with captured_stderr():
+        with patch_logger('django.server', 'info'):
             # instantiating a handler runs the request as side effect
             WSGIRequestHandler(request, '192.168.0.2', server)
 
