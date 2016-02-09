@@ -203,7 +203,13 @@ Email
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* Storage backends now present a timezone-aware API with new methods
+  :meth:`~django.core.files.storage.Storage.get_accessed_time`,
+  :meth:`~django.core.files.storage.Storage.get_created_time`, and
+  :meth:`~django.core.files.storage.Storage.get_modified_time`. They return a
+  timezone-aware ``datetime`` if :setting:`USE_TZ` is ``True`` and a naive
+  ``datetime`` in the local timezone otherwise.
+
 
 File Uploads
 ~~~~~~~~~~~~
@@ -622,6 +628,21 @@ added in Django 1.9::
         >>> e.related_set.set([obj1, obj2, obj3])
 
 This prevents confusion about an assignment resulting in an implicit save.
+
+Non-timezone-aware :class:`~django.core.files.storage.Storage` API
+------------------------------------------------------------------
+
+The old, non-timezone-aware methods ``accessed_time()``, ``created_time()``,
+and ``modified_time()`` are deprecated in favor of the new ``get_*_time()``
+methods.
+
+Third-party storage backends should implement the new methods and mark the old
+ones as deprecated. Until then, the new ``get_*_time()`` methods on the base
+:class:`~django.core.files.storage.Storage` class convert ``datetime``\s from
+the old methods as required and emit a deprecation warning as they do so.
+
+Third-party storage backends may retain the old methods as long as they
+wish to support earlier versions of Django.
 
 :mod:`django.contrib.gis`
 -------------------------
