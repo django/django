@@ -100,6 +100,33 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_book")
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_non_atomic"})
+    def test_non_atomic_migration(self):
+        """
+        Applying a non-atomic migration works as expected.
+        """
+        executor = MigrationExecutor(connection)
+        with self.assertRaisesMessage(RuntimeError, "Abort migration"):
+            executor.migrate([("migrations", "0001_initial")])
+        self.assertTableExists("migrations_publisher")
+        migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).apps
+        Publisher = migrations_apps.get_model("migrations", "Publisher")
+        self.assertTrue(Publisher.objects.exists())
+        self.assertTableNotExists("migrations_book")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_atomic_operation"})
+    def test_atomic_operation_in_non_atomic_migration(self):
+        """
+        An atomic operation is properly rolled back inside a non-atomic
+        migration.
+        """
+        executor = MigrationExecutor(connection)
+        with self.assertRaisesMessage(RuntimeError, "Abort migration"):
+            executor.migrate([("migrations", "0001_initial")])
+        migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).apps
+        Editor = migrations_apps.get_model("migrations", "Editor")
+        self.assertFalse(Editor.objects.exists())
+
     @override_settings(MIGRATION_MODULES={
         "migrations": "migrations.test_migrations",
         "migrations2": "migrations2.test_migrations_2",

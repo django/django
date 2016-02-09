@@ -1,0 +1,19 @@
+==========================
+Django 1.9.3 release notes
+==========================
+
+*Under development*
+
+Django 1.9.3 fixes several bugs in 1.9.2.
+
+Bugfixes
+========
+
+* Skipped URL checks (new in 1.9) if the ``ROOT_URLCONF`` setting isn't defined
+  (:ticket:`26155`).
+
+* Fixed a crash on PostgreSQL that prevented using ``TIME_ZONE=None`` and
+  ``USE_TZ=False`` (:ticket:`26177`).
+
+* Added system checks for query name clashes of hidden relationships
+  (:ticket:`26162`).

@@ -17,15 +17,10 @@ from django.utils.html import escape
 from .models import Article, ArticleProxy, Site
 
 
-@override_settings(ROOT_URLCONF="admin_utils.urls")
+@override_settings(ROOT_URLCONF='admin_utils.urls')
 class LogEntryTests(TestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            is_superuser=True, username='super',
-            first_name='Super', last_name='User', email='super@example.com',
-            is_staff=True, is_active=True, date_joined=datetime(2007, 5, 30, 13, 20, 10)
-        )
+        self.user = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
         self.site = Site.objects.create(domain='example.org')
         self.a1 = Article.objects.create(
             site=self.site,

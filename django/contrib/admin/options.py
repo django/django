@@ -242,7 +242,6 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         if db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.remote_field,
                                     self.admin_site, using=db)
-            kwargs['help_text'] = ''
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
             kwargs['widget'] = widgets.FilteredSelectMultiple(
                 db_field.verbose_name,
@@ -1400,6 +1399,10 @@ class ModelAdmin(BaseModelAdmin):
 
         model = self.model
         opts = model._meta
+
+        if request.method == 'POST' and '_saveasnew' in request.POST:
+            object_id = None
+
         add = object_id is None
 
         if add:
@@ -1416,10 +1419,6 @@ class ModelAdmin(BaseModelAdmin):
             if obj is None:
                 raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
                     'name': force_text(opts.verbose_name), 'key': escape(object_id)})
-
-            if request.method == 'POST' and "_saveasnew" in request.POST:
-                object_id = None
-                obj = None
 
         ModelForm = self.get_form(request, obj)
         if request.method == 'POST':
@@ -1483,6 +1482,8 @@ class ModelAdmin(BaseModelAdmin):
         if request.method == 'POST' and not form_validated and "_saveasnew" in request.POST:
             context['show_save'] = False
             context['show_save_and_continue'] = False
+            # Use the change template instead of the add template.
+            add = False
 
         context.update(extra_context or {})
 
@@ -1579,7 +1580,7 @@ class ModelAdmin(BaseModelAdmin):
         if (request.method == "POST" and cl.list_editable and
                 '_save' in request.POST and not action_failed):
             FormSet = self.get_changelist_formset(request)
-            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=cl.result_list)
+            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=self.get_queryset(request))
             if formset.is_valid():
                 changecount = 0
                 for form in formset.forms:

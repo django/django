@@ -65,6 +65,7 @@ class CustomMembership(models.Model):
 
     class Meta:
         db_table = "test_table"
+        ordering = ["date_joined"]
 
 
 class TestNoDefaultsOrNulls(models.Model):

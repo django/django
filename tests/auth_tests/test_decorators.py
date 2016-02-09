@@ -68,7 +68,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_many_permissions_pass(self):
 
-        @permission_required(['auth.add_customuser', 'auth.change_customuser'])
+        @permission_required(['auth_tests.add_customuser', 'auth_tests.change_customuser'])
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -78,7 +78,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_many_permissions_in_set_pass(self):
 
-        @permission_required({'auth.add_customuser', 'auth.change_customuser'})
+        @permission_required({'auth_tests.add_customuser', 'auth_tests.change_customuser'})
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -88,7 +88,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_single_permission_pass(self):
 
-        @permission_required('auth.add_customuser')
+        @permission_required('auth_tests.add_customuser')
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -98,7 +98,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_permissioned_denied_redirect(self):
 
-        @permission_required(['auth.add_customuser', 'auth.change_customuser', 'non-existent-permission'])
+        @permission_required(['auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission'])
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -109,10 +109,11 @@ class PermissionsRequiredDecoratorTest(TestCase):
     def test_permissioned_denied_exception_raised(self):
 
         @permission_required([
-            'auth.add_customuser', 'auth.change_customuser', 'non-existent-permission'
+            'auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission'
         ], raise_exception=True)
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
         request.user = self.user
-        self.assertRaises(PermissionDenied, a_view, request)
+        with self.assertRaises(PermissionDenied):
+            a_view(request)

@@ -35,12 +35,12 @@ class AlwaysFalseView(AlwaysFalseMixin, EmptyResponseView):
 
 
 class StackedMixinsView1(LoginRequiredMixin, PermissionRequiredMixin, EmptyResponseView):
-    permission_required = ['auth.add_customuser', 'auth.change_customuser']
+    permission_required = ['auth_tests.add_customuser', 'auth_tests.change_customuser']
     raise_exception = True
 
 
 class StackedMixinsView2(PermissionRequiredMixin, LoginRequiredMixin, EmptyResponseView):
-    permission_required = ['auth.add_customuser', 'auth.change_customuser']
+    permission_required = ['auth_tests.add_customuser', 'auth_tests.change_customuser']
     raise_exception = True
 
 
@@ -135,7 +135,8 @@ class UserPassesTestTests(TestCase):
 
         request = self.factory.get('/rand')
         request.user = AnonymousUser()
-        self.assertRaises(PermissionDenied, AView.as_view(), request)
+        with self.assertRaises(PermissionDenied):
+            AView.as_view()(request)
 
     def test_raise_exception_custom_message(self):
         msg = "You don't have access here"
@@ -216,7 +217,7 @@ class PermissionsRequiredMixinTests(TestCase):
 
     def test_many_permissions_pass(self):
         class AView(PermissionRequiredMixin, EmptyResponseView):
-            permission_required = ['auth.add_customuser', 'auth.change_customuser']
+            permission_required = ['auth_tests.add_customuser', 'auth_tests.change_customuser']
 
         request = self.factory.get('/rand')
         request.user = self.user
@@ -225,7 +226,7 @@ class PermissionsRequiredMixinTests(TestCase):
 
     def test_single_permission_pass(self):
         class AView(PermissionRequiredMixin, EmptyResponseView):
-            permission_required = 'auth.add_customuser'
+            permission_required = 'auth_tests.add_customuser'
 
         request = self.factory.get('/rand')
         request.user = self.user
@@ -234,7 +235,9 @@ class PermissionsRequiredMixinTests(TestCase):
 
     def test_permissioned_denied_redirect(self):
         class AView(PermissionRequiredMixin, EmptyResponseView):
-            permission_required = ['auth.add_customuser', 'auth.change_customuser', 'non-existent-permission']
+            permission_required = [
+                'auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission',
+            ]
 
         request = self.factory.get('/rand')
         request.user = self.user
@@ -243,9 +246,12 @@ class PermissionsRequiredMixinTests(TestCase):
 
     def test_permissioned_denied_exception_raised(self):
         class AView(PermissionRequiredMixin, EmptyResponseView):
-            permission_required = ['auth.add_customuser', 'auth.change_customuser', 'non-existent-permission']
+            permission_required = [
+                'auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission',
+            ]
             raise_exception = True
 
         request = self.factory.get('/rand')
         request.user = self.user
-        self.assertRaises(PermissionDenied, AView.as_view(), request)
+        with self.assertRaises(PermissionDenied):
+            AView.as_view()(request)

@@ -4,8 +4,8 @@
 
 .. module:: django.conf.urls
 
-static()
---------
+``static()``
+============
 
 .. function:: static.static(prefix, view=django.views.static.serve, **kwargs)
 
@@ -18,8 +18,8 @@ Helper function to return a URL pattern for serving files in debug mode::
         # ... the rest of your URLconf goes here ...
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-url()
------
+``url()``
+=========
 
 .. function:: url(regex, view, kwargs=None, name=None)
 
@@ -36,8 +36,8 @@ function or method. See :ref:`views-extra-options` for an example.
 See :ref:`Naming URL patterns <naming-url-patterns>` for why the ``name``
 parameter is useful.
 
-include()
----------
+``include()``
+=============
 
 .. function:: include(module, namespace=None, app_name=None)
               include(pattern_list)
@@ -85,8 +85,8 @@ See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
     has been deprecated and will be removed in Django 2.0. Specify the
     application namespace or remove the instance namespace.
 
-handler400
-----------
+``handler400``
+==============
 
 .. data:: handler400
 
@@ -101,8 +101,8 @@ implement a custom view, be sure it returns an
 See the documentation about :ref:`the 400 (bad request) view
 <http_bad_request_view>` for more information.
 
-handler403
-----------
+``handler403``
+==============
 
 .. data:: handler403
 
@@ -117,8 +117,8 @@ implement a custom view, be sure it returns an
 See the documentation about :ref:`the 403 (HTTP Forbidden) view
 <http_forbidden_view>` for more information.
 
-handler404
-----------
+``handler404``
+==============
 
 .. data:: handler404
 
@@ -132,8 +132,8 @@ implement a custom view, be sure it returns an
 See the documentation about :ref:`the 404 (HTTP Not Found) view
 <http_not_found_view>` for more information.
 
-handler500
-----------
+``handler500``
+==============
 
 .. data:: handler500
 

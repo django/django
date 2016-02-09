@@ -31,17 +31,25 @@ class QueryDictTests(unittest.TestCase):
 
     def test_missing_key(self):
         q = QueryDict()
-        self.assertRaises(KeyError, q.__getitem__, 'foo')
+        with self.assertRaises(KeyError):
+            q.__getitem__('foo')
 
     def test_immutability(self):
         q = QueryDict()
-        self.assertRaises(AttributeError, q.__setitem__, 'something', 'bar')
-        self.assertRaises(AttributeError, q.setlist, 'foo', ['bar'])
-        self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
-        self.assertRaises(AttributeError, q.update, {'foo': 'bar'})
-        self.assertRaises(AttributeError, q.pop, 'foo')
-        self.assertRaises(AttributeError, q.popitem)
-        self.assertRaises(AttributeError, q.clear)
+        with self.assertRaises(AttributeError):
+            q.__setitem__('something', 'bar')
+        with self.assertRaises(AttributeError):
+            q.setlist('foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.appendlist('foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.update({'foo': 'bar'})
+        with self.assertRaises(AttributeError):
+            q.pop('foo')
+        with self.assertRaises(AttributeError):
+            q.popitem()
+        with self.assertRaises(AttributeError):
+            q.clear()
 
     def test_immutable_get_with_default(self):
         q = QueryDict()
@@ -65,16 +73,20 @@ class QueryDictTests(unittest.TestCase):
 
         q = QueryDict(str('foo=bar'))
         self.assertEqual(q['foo'], 'bar')
-        self.assertRaises(KeyError, q.__getitem__, 'bar')
-        self.assertRaises(AttributeError, q.__setitem__, 'something', 'bar')
+        with self.assertRaises(KeyError):
+            q.__getitem__('bar')
+        with self.assertRaises(AttributeError):
+            q.__setitem__('something', 'bar')
 
         self.assertEqual(q.get('foo', 'default'), 'bar')
         self.assertEqual(q.get('bar', 'default'), 'default')
         self.assertEqual(q.getlist('foo'), ['bar'])
         self.assertEqual(q.getlist('bar'), [])
 
-        self.assertRaises(AttributeError, q.setlist, 'foo', ['bar'])
-        self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.setlist('foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.appendlist('foo', ['bar'])
 
         if six.PY2:
             self.assertTrue(q.has_key('foo'))
@@ -89,11 +101,16 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(list(six.itervalues(q)), ['bar'])
         self.assertEqual(len(q), 1)
 
-        self.assertRaises(AttributeError, q.update, {'foo': 'bar'})
-        self.assertRaises(AttributeError, q.pop, 'foo')
-        self.assertRaises(AttributeError, q.popitem)
-        self.assertRaises(AttributeError, q.clear)
-        self.assertRaises(AttributeError, q.setdefault, 'foo', 'bar')
+        with self.assertRaises(AttributeError):
+            q.update({'foo': 'bar'})
+        with self.assertRaises(AttributeError):
+            q.pop('foo')
+        with self.assertRaises(AttributeError):
+            q.popitem()
+        with self.assertRaises(AttributeError):
+            q.clear()
+        with self.assertRaises(AttributeError):
+            q.setdefault('foo', 'bar')
 
         self.assertEqual(q.urlencode(), 'foo=bar')
 
@@ -110,7 +127,8 @@ class QueryDictTests(unittest.TestCase):
     def test_mutable_copy(self):
         """A copy of a QueryDict is mutable."""
         q = QueryDict().copy()
-        self.assertRaises(KeyError, q.__getitem__, "foo")
+        with self.assertRaises(KeyError):
+            q.__getitem__("foo")
         q['name'] = 'john'
         self.assertEqual(q['name'], 'john')
 
@@ -169,16 +187,20 @@ class QueryDictTests(unittest.TestCase):
         q = QueryDict(str('vote=yes&vote=no'))
 
         self.assertEqual(q['vote'], 'no')
-        self.assertRaises(AttributeError, q.__setitem__, 'something', 'bar')
+        with self.assertRaises(AttributeError):
+            q.__setitem__('something', 'bar')
 
         self.assertEqual(q.get('vote', 'default'), 'no')
         self.assertEqual(q.get('foo', 'default'), 'default')
         self.assertEqual(q.getlist('vote'), ['yes', 'no'])
         self.assertEqual(q.getlist('foo'), [])
 
-        self.assertRaises(AttributeError, q.setlist, 'foo', ['bar', 'baz'])
-        self.assertRaises(AttributeError, q.setlist, 'foo', ['bar', 'baz'])
-        self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.setlist('foo', ['bar', 'baz'])
+        with self.assertRaises(AttributeError):
+            q.setlist('foo', ['bar', 'baz'])
+        with self.assertRaises(AttributeError):
+            q.appendlist('foo', ['bar'])
 
         if six.PY2:
             self.assertEqual(q.has_key('vote'), True)
@@ -192,12 +214,18 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(list(six.itervalues(q)), ['no'])
         self.assertEqual(len(q), 1)
 
-        self.assertRaises(AttributeError, q.update, {'foo': 'bar'})
-        self.assertRaises(AttributeError, q.pop, 'foo')
-        self.assertRaises(AttributeError, q.popitem)
-        self.assertRaises(AttributeError, q.clear)
-        self.assertRaises(AttributeError, q.setdefault, 'foo', 'bar')
-        self.assertRaises(AttributeError, q.__delitem__, 'vote')
+        with self.assertRaises(AttributeError):
+            q.update({'foo': 'bar'})
+        with self.assertRaises(AttributeError):
+            q.pop('foo')
+        with self.assertRaises(AttributeError):
+            q.popitem()
+        with self.assertRaises(AttributeError):
+            q.clear()
+        with self.assertRaises(AttributeError):
+            q.setdefault('foo', 'bar')
+        with self.assertRaises(AttributeError):
+            q.__delitem__('vote')
 
     if six.PY2:
         def test_invalid_input_encoding(self):
@@ -295,8 +323,10 @@ class HttpResponseTests(unittest.TestCase):
         self.assertIsInstance(l[0][0], str)
 
         r = HttpResponse()
-        self.assertRaises(UnicodeError, r.__setitem__, 'føø', 'bar')
-        self.assertRaises(UnicodeError, r.__setitem__, 'føø'.encode('utf-8'), 'bar')
+        with self.assertRaises(UnicodeError):
+            r.__setitem__('føø', 'bar')
+        with self.assertRaises(UnicodeError):
+            r.__setitem__('føø'.encode('utf-8'), 'bar')
 
     def test_long_line(self):
         # Bug #20889: long lines trigger newlines to be added to headers
@@ -312,8 +342,10 @@ class HttpResponseTests(unittest.TestCase):
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
         r = HttpResponse()
-        self.assertRaises(BadHeaderError, r.__setitem__, 'test\rstr', 'test')
-        self.assertRaises(BadHeaderError, r.__setitem__, 'test\nstr', 'test')
+        with self.assertRaises(BadHeaderError):
+            r.__setitem__('test\rstr', 'test')
+        with self.assertRaises(BadHeaderError):
+            r.__setitem__('test\nstr', 'test')
 
     def test_dict_behavior(self):
         """
@@ -418,10 +450,10 @@ class HttpResponseTests(unittest.TestCase):
             'file:///etc/passwd',
         ]
         for url in bad_urls:
-            self.assertRaises(SuspiciousOperation,
-                              HttpResponseRedirect, url)
-            self.assertRaises(SuspiciousOperation,
-                              HttpResponsePermanentRedirect, url)
+            with self.assertRaises(SuspiciousOperation):
+                HttpResponseRedirect(url)
+            with self.assertRaises(SuspiciousOperation):
+                HttpResponsePermanentRedirect(url)
 
 
 class HttpResponseSubclassesTests(SimpleTestCase):
@@ -476,9 +508,11 @@ class JsonResponseTests(SimpleTestCase):
         self.assertEqual(json.loads(response.content.decode()), data)
 
     def test_json_response_raises_type_error_with_default_setting(self):
-        with self.assertRaisesMessage(TypeError,
-                'In order to allow non-dict objects to be serialized set the '
-                'safe parameter to False'):
+        with self.assertRaisesMessage(
+            TypeError,
+            'In order to allow non-dict objects to be serialized set the '
+            'safe parameter to False'
+        ):
             JsonResponse([1, 2, 3])
 
     def test_json_response_text(self):

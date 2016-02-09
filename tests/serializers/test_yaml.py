@@ -72,15 +72,17 @@ class NoYamlSerializerTestCase(SimpleTestCase):
     def test_serializer_pyyaml_error_message(self):
         """Using yaml serializer without pyyaml raises ImportError"""
         jane = Author(name="Jane")
-        self.assertRaises(ImportError, serializers.serialize, "yaml", [jane])
+        with self.assertRaises(ImportError):
+            serializers.serialize("yaml", [jane])
 
     def test_deserializer_pyyaml_error_message(self):
         """Using yaml deserializer without pyyaml raises ImportError"""
-        self.assertRaises(ImportError, serializers.deserialize, "yaml", "")
+        with self.assertRaises(ImportError):
+            serializers.deserialize("yaml", "")
 
     def test_dumpdata_pyyaml_error_message(self):
         """Calling dumpdata produces an error when yaml package missing"""
-        with six.assertRaisesRegex(self, management.CommandError, YAML_IMPORT_ERROR_MESSAGE):
+        with self.assertRaisesMessage(management.CommandError, YAML_IMPORT_ERROR_MESSAGE):
             management.call_command('dumpdata', format='yaml')
 
 

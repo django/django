@@ -13,7 +13,6 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
-from django.utils import six
 from django.utils.encoding import force_text
 
 from .models import Book, Bookmark, Department, Employee, TaggedItem
@@ -280,11 +279,11 @@ class ListFiltersTests(TestCase):
             title='The Django Book', year=None, author=self.bob,
             is_best_seller=None, date_registered=self.today, no=103,
         )
-        self.gipsy_book = Book.objects.create(
-            title='Gipsy guitar for dummies', year=2002, is_best_seller=True,
+        self.guitar_book = Book.objects.create(
+            title='Guitar for dummies', year=2002, is_best_seller=True,
             date_registered=self.one_week_ago,
         )
-        self.gipsy_book.contributors.set([self.bob, self.lisa])
+        self.guitar_book.contributors.set([self.bob, self.lisa])
 
         # Departments
         self.dev = Department.objects.create(code='DEV', description='Development')
@@ -338,7 +337,7 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         if (self.today.year, self.today.month) == (self.one_week_ago.year, self.one_week_ago.month):
             # In case one week ago is in the same month.
-            self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
         else:
             self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
 
@@ -363,7 +362,7 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         if self.today.year == self.one_week_ago.year:
             # In case one week ago is in the same year.
-            self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
         else:
             self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
 
@@ -388,7 +387,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -403,7 +402,8 @@ class ListFiltersTests(TestCase):
             )
         )
 
-        request = self.request_factory.get('/', {'date_registered__isnull': True})
+        # Null/not null queries
+        request = self.request_factory.get('/', {'date_registered__isnull': 'True'})
         changelist = self.get_changelist(request, Book, modeladmin)
 
         # Make sure the correct queryset is returned
@@ -414,22 +414,22 @@ class ListFiltersTests(TestCase):
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
         self.assertEqual(force_text(filterspec.title), 'date registered')
-        choice = select_by(filterspec.choices(changelist), "display", "No date")
+        choice = select_by(filterspec.choices(changelist), 'display', 'No date')
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__isnull=True')
 
-        request = self.request_factory.get('/', {'date_registered__isnull': False})
+        request = self.request_factory.get('/', {'date_registered__isnull': 'False'})
         changelist = self.get_changelist(request, Book, modeladmin)
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
         self.assertEqual(queryset.count(), 3)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
         self.assertEqual(force_text(filterspec.title), 'date registered')
-        choice = select_by(filterspec.choices(changelist), "display", "Has valid date")
+        choice = select_by(filterspec.choices(changelist), 'display', 'Has date')
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__isnull=False')
 
@@ -503,7 +503,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book])
+        self.assertEqual(list(queryset), [self.guitar_book])
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][1]
@@ -712,7 +712,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.djangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][3]
@@ -808,7 +808,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.djangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
@@ -849,9 +849,9 @@ class ListFiltersTests(TestCase):
         """
         modeladmin = DecadeFilterBookAdminWithoutTitle(Book, site)
         request = self.request_factory.get('/', {})
-        six.assertRaisesRegex(self, ImproperlyConfigured,
-            "The list filter 'DecadeListFilterWithoutTitle' does not specify a 'title'.",
-            self.get_changelist, request, Book, modeladmin)
+        msg = "The list filter 'DecadeListFilterWithoutTitle' does not specify a 'title'."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.get_changelist(request, Book, modeladmin)
 
     def test_simplelistfilter_without_parameter(self):
         """
@@ -859,9 +859,9 @@ class ListFiltersTests(TestCase):
         """
         modeladmin = DecadeFilterBookAdminWithoutParameter(Book, site)
         request = self.request_factory.get('/', {})
-        six.assertRaisesRegex(self, ImproperlyConfigured,
-            "The list filter 'DecadeListFilterWithoutParameter' does not specify a 'parameter_name'.",
-            self.get_changelist, request, Book, modeladmin)
+        msg = "The list filter 'DecadeListFilterWithoutParameter' does not specify a 'parameter_name'."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.get_changelist(request, Book, modeladmin)
 
     def test_simplelistfilter_with_none_returning_lookups(self):
         """
@@ -881,7 +881,8 @@ class ListFiltersTests(TestCase):
         """
         modeladmin = DecadeFilterBookAdminWithFailingQueryset(Book, site)
         request = self.request_factory.get('/', {})
-        self.assertRaises(ZeroDivisionError, self.get_changelist, request, Book, modeladmin)
+        with self.assertRaises(ZeroDivisionError):
+            self.get_changelist(request, Book, modeladmin)
 
     def test_simplelistfilter_with_queryset_based_lookups(self):
         modeladmin = DecadeFilterBookAdminWithQuerysetBasedLookups(Book, site)

@@ -11,11 +11,26 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     mysql = True
     name = 'mysql'
-    select = 'AsText(%s)'
-    from_wkb = 'GeomFromWKB'
-    from_text = 'GeomFromText'
 
     Adapter = WKTAdapter
+
+    @cached_property
+    def select(self):
+        if self.connection.mysql_version < (5, 6, 0):
+            return 'AsText(%s)'
+        return 'ST_AsText(%s)'
+
+    @cached_property
+    def from_wkb(self):
+        if self.connection.mysql_version < (5, 6, 0):
+            return 'GeomFromWKB'
+        return 'ST_GeomFromWKB'
+
+    @cached_property
+    def from_text(self):
+        if self.connection.mysql_version < (5, 6, 0):
+            return 'GeomFromText'
+        return 'ST_GeomFromText'
 
     gis_operators = {
         'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
@@ -32,14 +47,16 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         'within': SpatialOperator(func='MBRWithin'),
     }
 
-    function_names = {
-        'Difference': 'ST_Difference',
-        'Distance': 'ST_Distance',
-        'Intersection': 'ST_Intersection',
-        'Length': 'GLength',
-        'SymDifference': 'ST_SymDifference',
-        'Union': 'ST_Union',
-    }
+    @cached_property
+    def function_names(self):
+        return {
+            'Difference': 'ST_Difference',
+            'Distance': 'ST_Distance',
+            'Intersection': 'ST_Intersection',
+            'Length': 'GLength' if self.connection.mysql_version < (5, 6, 0) else 'ST_Length',
+            'SymDifference': 'ST_SymDifference',
+            'Union': 'ST_Union',
+        }
 
     disallowed_aggregates = (
         aggregates.Collect, aggregates.Extent, aggregates.Extent3D,

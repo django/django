@@ -145,10 +145,8 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency("app_b.0002", ("app_b", "0002"), ("app_b", "0001"))
         graph.add_dependency("app_b.0001", ("app_b", "0001"), ("app_a", "0003"))
         # Test whole graph
-        self.assertRaises(
-            CircularDependencyError,
-            graph.forwards_plan, ("app_a", "0003"),
-        )
+        with self.assertRaises(CircularDependencyError):
+            graph.forwards_plan(("app_a", "0003"), )
 
     def test_circular_graph_2(self):
         graph = MigrationGraph()
@@ -159,10 +157,8 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency('B.0001', ('B', '0001'), ('A', '0001'))
         graph.add_dependency('C.0001', ('C', '0001'), ('B', '0001'))
 
-        self.assertRaises(
-            CircularDependencyError,
-            graph.forwards_plan, ('C', '0001')
-        )
+        with self.assertRaises(CircularDependencyError):
+            graph.forwards_plan(('C', '0001'))
 
     def test_graph_recursive(self):
         graph = MigrationGraph()

@@ -204,7 +204,8 @@ class BaseDatabaseOperations(object):
         according to their own quoting schemes.
         """
         # Convert params to contain Unicode values.
-        to_unicode = lambda s: force_text(s, strings_only=True, errors='replace')
+        def to_unicode(s):
+            return force_text(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple(to_unicode(val) for val in params)
         elif params is None:

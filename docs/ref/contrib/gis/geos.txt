@@ -302,7 +302,7 @@ another object.
 .. attribute:: GEOSGeometry.ewkt
 
 Returns the "extended" Well-Known Text of the geometry.  This representation
-is specific to PostGIS and is a super set of the OGC WKT standard. [#fnogc]_
+is specific to PostGIS and is a superset of the OGC WKT standard. [#fnogc]_
 Essentially the SRID is prepended to the WKT representation, for example
 ``SRID=4326;POINT(5 23)``.
 
@@ -1107,8 +1107,8 @@ Settings
 
 .. setting:: GEOS_LIBRARY_PATH
 
-GEOS_LIBRARY_PATH
------------------
+``GEOS_LIBRARY_PATH``
+---------------------
 
 A string specifying the location of the GEOS C library.  Typically,
 this setting is only used if the GEOS C library is in a non-standard

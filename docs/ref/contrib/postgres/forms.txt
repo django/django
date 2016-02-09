@@ -1,3 +1,4 @@
+===========================================
 PostgreSQL specific form fields and widgets
 ===========================================
 
@@ -6,8 +7,11 @@ All of these fields and widgets are available from the
 
 .. currentmodule:: django.contrib.postgres.forms
 
-SimpleArrayField
-----------------
+Fields
+======
+
+``SimpleArrayField``
+--------------------
 
 .. class:: SimpleArrayField(base_field, delimiter=',', max_length=None, min_length=None)
 
@@ -78,8 +82,8 @@ SimpleArrayField
         however it is a useful way to format data from a client-side widget for
         submission to the server.
 
-SplitArrayField
----------------
+``SplitArrayField``
+-------------------
 
 .. class:: SplitArrayField(base_field, size, remove_trailing_nulls=False)
 
@@ -134,8 +138,8 @@ SplitArrayField
             ['1', '', '3']  # -> [1, None, 3]
             ['', '2', '']  # -> [None, 2]
 
-HStoreField
------------
+``HStoreField``
+---------------
 
 .. class:: HStoreField
 
@@ -155,8 +159,8 @@ HStoreField
         valid for a given field. This can be done using the
         :class:`~django.contrib.postgres.validators.KeysValidator`.
 
-JSONField
----------
+``JSONField``
+-------------
 
 .. class:: JSONField
 
@@ -179,8 +183,8 @@ omitted value as an unbounded range. They also validate that the lower bound is
 not greater than the upper bound. All of these fields use
 :class:`~django.contrib.postgres.forms.RangeWidget`.
 
-IntegerRangeField
-~~~~~~~~~~~~~~~~~
+``IntegerRangeField``
+~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: IntegerRangeField
 
@@ -189,8 +193,8 @@ IntegerRangeField
     :class:`~django.contrib.postgres.fields.IntegerRangeField` and
     :class:`~django.contrib.postgres.fields.BigIntegerRangeField`.
 
-FloatRangeField
-~~~~~~~~~~~~~~~
+``FloatRangeField``
+~~~~~~~~~~~~~~~~~~~
 
 .. class:: FloatRangeField
 
@@ -198,8 +202,8 @@ FloatRangeField
     :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
     :class:`~django.contrib.postgres.fields.FloatRangeField`.
 
-DateTimeRangeField
-~~~~~~~~~~~~~~~~~~
+``DateTimeRangeField``
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: DateTimeRangeField
 
@@ -207,8 +211,8 @@ DateTimeRangeField
     :class:`~psycopg2:psycopg2.extras.DateTimeTZRange`. Default for
     :class:`~django.contrib.postgres.fields.DateTimeRangeField`.
 
-DateRangeField
-~~~~~~~~~~~~~~
+``DateRangeField``
+~~~~~~~~~~~~~~~~~~
 
 .. class:: DateRangeField
 
@@ -217,10 +221,10 @@ DateRangeField
     :class:`~django.contrib.postgres.fields.DateRangeField`.
 
 Widgets
--------
+=======
 
-RangeWidget
-~~~~~~~~~~~
+``RangeWidget``
+---------------
 
 .. class:: RangeWidget(base_widget, attrs=None)
 

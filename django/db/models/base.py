@@ -435,7 +435,8 @@ class Model(six.with_metaclass(ModelBase)):
             for prop in list(kwargs):
                 try:
                     if isinstance(getattr(self.__class__, prop), property):
-                        setattr(self, prop, kwargs.pop(prop))
+                        setattr(self, prop, kwargs[prop])
+                        del kwargs[prop]
                 except AttributeError:
                     pass
             if kwargs:
@@ -1693,8 +1694,6 @@ def model_unpickle(model_id, attrs, factory):
     Used to unpickle Model subclasses with deferred fields.
     """
     if isinstance(model_id, tuple):
-        if not apps.ready:
-            apps.populate(settings.INSTALLED_APPS)
         model = apps.get_model(*model_id)
     else:
         # Backwards compat - the model was cached directly in earlier versions.

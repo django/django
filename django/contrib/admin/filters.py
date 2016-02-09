@@ -334,19 +334,17 @@ class DateFieldListFilter(FieldListFilter):
         if field.null:
             self.lookup_kwarg_isnull = '%s__isnull' % field_path
             self.links += (
-                (_('No date'), {
-                    self.field_generic + 'isnull': u'True'
-                }),
-                (_('Has valid date'), {
-                    self.field_generic + 'isnull': u'False'
-                }),
+                (_('No date'), {self.field_generic + 'isnull': 'True'}),
+                (_('Has date'), {self.field_generic + 'isnull': 'False'}),
             )
         super(DateFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
-        return [self.lookup_kwarg_since, self.lookup_kwarg_until] + (
-               [self.lookup_kwarg_isnull] if self.field.null else [])
+        params = [self.lookup_kwarg_since, self.lookup_kwarg_until]
+        if self.field.null:
+            params.append(self.lookup_kwarg_isnull)
+        return params
 
     def choices(self, changelist):
         for title, param_dict in self.links:

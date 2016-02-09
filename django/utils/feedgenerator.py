@@ -91,7 +91,8 @@ class SyndicationFeed(object):
     def __init__(self, title, link, description, language=None, author_email=None,
             author_name=None, author_link=None, subtitle=None, categories=None,
             feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
-        to_unicode = lambda s: force_text(s, strings_only=True)
+        def to_unicode(s):
+            return force_text(s, strings_only=True)
         if categories:
             categories = [force_text(c) for c in categories]
         if ttl is not None:
@@ -126,7 +127,8 @@ class SyndicationFeed(object):
         objects, and enclosures, which is an iterable of instances of the
         Enclosure class.
         """
-        to_unicode = lambda s: force_text(s, strings_only=True)
+        def to_unicode(s):
+            return force_text(s, strings_only=True)
         if categories:
             categories = [to_unicode(c) for c in categories]
         if ttl is not None:

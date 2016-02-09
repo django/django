@@ -68,8 +68,8 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         "A flatpage served through a view can require authentication"
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertRedirects(response, '/accounts/login/?next=/flatpage_root/sekrit/')
-        User.objects.create_user('testuser', 'test@example.com', 's3krit')
-        self.client.login(username='testuser', password='s3krit')
+        user = User.objects.create_user('testuser', 'test@example.com', 's3krit')
+        self.client.force_login(user)
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertContains(response, "<p>Isn't it sekrit!</p>")
 
@@ -87,8 +87,8 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         "A flatpage served by the middleware can require authentication"
         response = self.client.get('/sekrit/')
         self.assertRedirects(response, '/accounts/login/?next=/sekrit/')
-        User.objects.create_user('testuser', 'test@example.com', 's3krit')
-        self.client.login(username='testuser', password='s3krit')
+        user = User.objects.create_user('testuser', 'test@example.com', 's3krit')
+        self.client.force_login(user)
         response = self.client.get('/sekrit/')
         self.assertContains(response, "<p>Isn't it sekrit!</p>")
 

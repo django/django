@@ -35,15 +35,16 @@ from .models import (
     InlineReference, InlineReferer, Inquisition, Language, Link,
     MainPrepopulated, ModelWithStringPrimaryKey, NotReferenced, OldSubscriber,
     OtherStory, Paper, Parent, ParentWithDependentChildren, ParentWithUUIDPK,
-    Person, Persona, Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson,
-    Podcast, Post, PrePopulatedPost, PrePopulatedPostLargeSlug,
-    PrePopulatedSubPost, Promo, Question, Recipe, Recommendation, Recommender,
-    ReferencedByGenRel, ReferencedByInline, ReferencedByParent,
-    RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Reservation,
-    Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
-    Sketch, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
-    Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
-    UserMessenger, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
+    Person, Persona, Picture, Pizza, Plot, PlotDetails, PlotProxy,
+    PluggableSearchPerson, Podcast, Post, PrePopulatedPost,
+    PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo, Question, Recipe,
+    Recommendation, Recommender, ReferencedByGenRel, ReferencedByInline,
+    ReferencedByParent, RelatedPrepopulated, RelatedWithUUIDPKModel, Report,
+    Reservation, Restaurant, RowLevelChangePermissionModel, Section,
+    ShortMessage, Simple, Sketch, State, Story, StumpJoke, Subscriber,
+    SuperVillain, Telegram, Thing, Topping, UnchangeableObject,
+    UndeletableObject, UnorderedObject, UserMessenger, Villain, Vodcast,
+    Whatsit, Widget, Worker, WorkHour,
 )
 
 
@@ -89,7 +90,7 @@ class ChapterXtra1Admin(admin.ModelAdmin):
 class ArticleAdmin(admin.ModelAdmin):
     list_display = (
         'content', 'date', callable_year, 'model_year', 'modeladmin_year',
-        'model_year_reversed', 'section',
+        'model_year_reversed', 'section', lambda obj: obj.title,
     )
     list_editable = ('section',)
     list_filter = ('date', 'section')
@@ -866,6 +867,10 @@ class InlineRefererAdmin(admin.ModelAdmin):
     inlines = [InlineReferenceInline]
 
 
+class PlotReadonlyAdmin(admin.ModelAdmin):
+    readonly_fields = ('plotdetails',)
+
+
 class GetFormsetsArgumentCheckingAdmin(admin.ModelAdmin):
     fields = ['name']
 
@@ -920,6 +925,7 @@ site.register(Villain)
 site.register(SuperVillain)
 site.register(Plot)
 site.register(PlotDetails)
+site.register(PlotProxy, PlotReadonlyAdmin)
 site.register(Bookmark)
 site.register(CyclicOne)
 site.register(CyclicTwo)

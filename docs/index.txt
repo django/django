@@ -1,6 +1,3 @@
-
-.. _index:
-
 ====================
 Django documentation
 ====================
@@ -42,8 +39,7 @@ will help you know where to look for certain things:
   application development. Also look at the ":ref:`index-first-steps`" below.
 
 * :doc:`Topic guides </topics/index>` discuss key topics and concepts at a
-  fairly a fairly high level and provide useful background information and
-  explanation.
+  fairly high level and provide useful background information and explanation.
 
 * :doc:`Reference guides </ref/index>` contain technical reference for APIs and
   other aspects of Django's machinery. They describe how it works and how to

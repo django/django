@@ -40,10 +40,8 @@ class CustomColumnsTests(TestCase):
         )
 
     def test_field_error(self):
-        self.assertRaises(
-            FieldError,
-            lambda: Author.objects.filter(firstname__exact="John")
-        )
+        with self.assertRaises(FieldError):
+            Author.objects.filter(firstname__exact="John")
 
     def test_attribute_error(self):
         with self.assertRaises(AttributeError):
@@ -93,31 +91,22 @@ class CustomColumnsTests(TestCase):
         self.assertEqual(self.a1, Author.objects.get(first_name__exact='John'))
 
     def test_filter_on_nonexistent_field(self):
-        self.assertRaisesMessage(
-            FieldError,
+        msg = (
             "Cannot resolve keyword 'firstname' into field. Choices are: "
-            "Author_ID, article, first_name, last_name, primary_set",
-            Author.objects.filter,
-            firstname__exact='John'
+            "Author_ID, article, first_name, last_name, primary_set"
         )
+        with self.assertRaisesMessage(FieldError, msg):
+            Author.objects.filter(firstname__exact='John')
 
     def test_author_get_attributes(self):
         a = Author.objects.get(last_name__exact='Smith')
         self.assertEqual('John', a.first_name)
         self.assertEqual('Smith', a.last_name)
-        self.assertRaisesMessage(
-            AttributeError,
-            "'Author' object has no attribute 'firstname'",
-            getattr,
-            a, 'firstname'
-        )
+        with self.assertRaisesMessage(AttributeError, "'Author' object has no attribute 'firstname'"):
+            getattr(a, 'firstname')
 
-        self.assertRaisesMessage(
-            AttributeError,
-            "'Author' object has no attribute 'last'",
-            getattr,
-            a, 'last'
-        )
+        with self.assertRaisesMessage(AttributeError, "'Author' object has no attribute 'last'"):
+            getattr(a, 'last')
 
     def test_m2m_table(self):
         self.assertQuerysetEqual(

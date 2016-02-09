@@ -111,7 +111,8 @@ class GenericRelationTests(TestCase):
         # Fails with another, ORM-level error
         dev1 = Developer(name='Joe')
         note = Note(note='Deserves promotion', content_object=dev1)
-        self.assertRaises(IntegrityError, note.save)
+        with self.assertRaises(IntegrityError):
+            note.save()
 
     def test_target_model_len_zero(self):
         """Test for #13085 -- __len__() returns 0"""

@@ -49,7 +49,9 @@ For reference, here are the requirements:
 7. Hook the ``AdminSite`` instance into your URLconf.
 
 After you've taken these steps, you'll be able to use your Django admin site
-by visiting the URL you hooked it into (``/admin/``, by default).
+by visiting the URL you hooked it into (``/admin/``, by default). If you need
+to create a user to login with, you can use the :djadmin:`createsuperuser`
+command.
 
 Other topics
 ------------
@@ -99,8 +101,8 @@ Other topics
 
             admin.site.register(Author)
 
-The register decorator
-----------------------
+The ``register`` decorator
+--------------------------
 
 .. function:: register(*models, site=django.admin.sites.site)
 

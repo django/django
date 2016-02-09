@@ -178,7 +178,7 @@ Related objects reference
        related manager's methods are disabled.
 
 Direct Assignment
------------------
+=================
 
 A related object set can be replaced in bulk with one operation by assigning a
 new iterable of objects to it::

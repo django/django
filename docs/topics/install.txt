@@ -25,8 +25,8 @@ your operating system's package manager.
     If you are just starting with Django and using Windows, you may find
     :doc:`/howto/windows` useful.
 
-Install Apache and mod_wsgi
-=============================
+Install Apache and ``mod_wsgi``
+===============================
 
 If you just want to experiment with Django, skip ahead to the next
 section; Django includes a lightweight web server you can use for
@@ -158,15 +158,14 @@ It's easy, no matter which way you choose.
 .. _installing-official-release:
 
 Installing an official release with ``pip``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
 
 This is the recommended way to install Django.
 
 1. Install pip_. The easiest is to use the `standalone pip installer`_. If your
    distribution already has ``pip`` installed, you might need to update it if
    it's outdated. If it's outdated, you'll know because installation won't
-   work. If you're using an old version of setuptools, you might see some
-   :ref:`harmless SyntaxErrors <syntax-error-old-setuptools-django-19>` also.
+   work.
 
 2. Take a look at virtualenv_ and virtualenvwrapper_. These tools provide
    isolated Python environments, which are more practical than installing
@@ -183,7 +182,7 @@ This is the recommended way to install Django.
 .. _standalone pip installer: https://pip.pypa.io/en/latest/installing.html#install-pip
 
 Installing a distribution-specific package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 Check the :doc:`distribution specific notes </misc/distributions>` to see if
 your platform/distribution provides official Django packages/installers.
@@ -194,7 +193,7 @@ contain the latest release of Django.
 .. _installing-development-version:
 
 Installing the development version
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 .. admonition:: Tracking Django development
 

@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import datetime
 import re
 
 from django import forms
@@ -27,44 +26,14 @@ class TestDataMixin(object):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
-            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u2 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
-            first_name='Inactive', last_name='User', email='testclient2@example.com', is_staff=False, is_active=False,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u3 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
-            first_name='Staff', last_name='Member', email='staffmember@example.com', is_staff=True, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u4 = User.objects.create(
-            password='', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='empty_password', first_name='Empty', last_name='Password', email='empty_password@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u5 = User.objects.create(
-            password='$', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='unmanageable_password', first_name='Unmanageable', last_name='Password',
-            email='unmanageable_password@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u6 = User.objects.create(
-            password='foo$bar', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='unknown_password', first_name='Unknown', last_name='Password',
-            email='unknown_password@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
+        cls.u1 = User.objects.create_user(username='testclient', password='password', email='testclient@example.com')
+        cls.u2 = User.objects.create_user(username='inactive', password='password', is_active=False)
+        cls.u3 = User.objects.create_user(username='staff', password='password')
+        cls.u4 = User.objects.create(username='empty_password', password='')
+        cls.u5 = User.objects.create(username='unmanageable_password', password='$')
+        cls.u6 = User.objects.create(username='unknown_password', password='foo$bar')
 
 
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class UserCreationFormTest(TestDataMixin, TestCase):
 
     def test_user_already_exists(self):
@@ -154,7 +123,6 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         )
 
 
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class AuthenticationFormTest(TestDataMixin, TestCase):
 
     def test_invalid_username(self):
@@ -264,7 +232,6 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.fields['username'].label, "")
 
 
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class SetPasswordFormTest(TestDataMixin, TestCase):
 
     def test_password_verification(self):
@@ -315,7 +282,6 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         )
 
 
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class PasswordChangeFormTest(TestDataMixin, TestCase):
 
     def test_incorrect_password(self):
@@ -366,7 +332,6 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
                          ['old_password', 'new_password1', 'new_password2'])
 
 
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class UserChangeFormTest(TestDataMixin, TestCase):
 
     def test_username_validity(self):
@@ -431,7 +396,8 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         form = UserChangeForm(instance=user, data=post_data)
 
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data['password'], 'sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161')
+        # original hashed password contains $
+        self.assertIn('$', form.cleaned_data['password'])
 
     def test_bug_19349_bound_password_field(self):
         user = User.objects.get(username='testclient')
@@ -442,11 +408,7 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.initial['password'], form['password'].value())
 
 
-@override_settings(
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    TEMPLATES=AUTH_TEMPLATES,
-    USE_TZ=False,
-)
+@override_settings(TEMPLATES=AUTH_TEMPLATES)
 class PasswordResetFormTest(TestDataMixin, TestCase):
 
     @classmethod
@@ -623,7 +585,6 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
         self.assertFalse(field.has_changed('aaa', 'bbb'))
 
 
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
 
     @mock.patch('django.contrib.auth.password_validation.password_changed')

@@ -289,8 +289,8 @@ example, the following checks if a user may view tasks::
 
 .. _extending-user:
 
-Extending the existing User model
-=================================
+Extending the existing ``User`` model
+=====================================
 
 There are two ways to extend the default
 :class:`~django.contrib.auth.models.User` model without substituting your own
@@ -300,8 +300,8 @@ change to what is stored in the database, you can create a :ref:`proxy model
 allows for any of the features offered by proxy models including default
 ordering, custom managers, or custom model methods.
 
-If you wish to store information related to ``User``, you can use a :ref:`one-to-one
-relationship <ref-onetoone>` to a model containing the fields for
+If you wish to store information related to ``User``, you can use a
+:class:`~django.db.models.OneToOneField` to a model containing the fields for
 additional information. This one-to-one model is often called a profile model,
 as it might store non-auth related information about a site user. For example
 you might create an Employee model::
@@ -360,8 +360,8 @@ the extra database load.
 
 .. _auth-custom-user:
 
-Substituting a custom User model
-================================
+Substituting a custom ``User`` model
+====================================
 
 Some kinds of projects may have authentication requirements for which Django's
 built-in :class:`~django.contrib.auth.models.User` model is not always
@@ -414,8 +414,8 @@ use as your User model.
    :class:`~django.db.models.OneToOneField` to ``settings.AUTH_USER_MODEL``
    as described below.
 
-Referencing the User model
---------------------------
+Referencing the ``User`` model
+------------------------------
 
 .. currentmodule:: django.contrib.auth
 
@@ -462,8 +462,8 @@ different User model.
 
 .. _specifying-custom-user-model:
 
-Specifying a custom User model
-------------------------------
+Specifying a custom ``User`` model
+----------------------------------
 
 .. admonition:: Model design considerations
 
@@ -716,8 +716,8 @@ utility methods:
         * ``o``, ``O``, and ``0`` (lowercase letter o, uppercase letter o,
           and zero)
 
-Extending Django's default User
--------------------------------
+Extending Django's default ``User``
+-----------------------------------
 
 If you're entirely happy with Django's :class:`~django.contrib.auth.models.User`
 model and you just want to add some additional profile information, you could
@@ -875,16 +875,16 @@ methods and attributes:
         (the Django app label). If the user is inactive, this method will
         always return ``False``.
 
-.. admonition:: ModelBackend
+.. admonition:: ``PermissionsMixin`` and ``ModelBackend``
 
     If you don't include the
     :class:`~django.contrib.auth.models.PermissionsMixin`, you must ensure you
     don't invoke the permissions methods on ``ModelBackend``. ``ModelBackend``
-    assumes that certain fields are available on your user model. If your User
-    model doesn't provide  those fields, you will receive database errors when
-    you check permissions.
+    assumes that certain fields are available on your user model. If your
+    ``User`` model doesn't provide  those fields, you will receive database
+    errors when you check permissions.
 
-Custom users and Proxy models
+Custom users and proxy models
 -----------------------------
 
 One limitation of custom User models is that installing a custom User model
@@ -895,69 +895,6 @@ model, you remove the ability of Django to reliably identify the base class.
 If your project uses proxy models, you must either modify the proxy to extend
 the User model that is currently in use in your project, or merge your proxy's
 behavior into your User subclass.
-
-Custom users and testing/fixtures
----------------------------------
-
-If you are writing an application that interacts with the User model, you must
-take some precautions to ensure that your test suite will run regardless of
-the User model that is being used by a project. Any test that instantiates an
-instance of User will fail if the User model has been swapped out. This
-includes any attempt to create an instance of User with a fixture.
-
-To ensure that your test suite will pass in any project configuration,
-``django.contrib.auth.tests.utils`` defines a ``@skipIfCustomUser`` decorator.
-This decorator will cause a test case to be skipped if any User model other
-than the default Django user is in use. This decorator can be applied to a
-single test, or to an entire test class.
-
-.. deprecated:: 1.9
-
-    With the test discovery changes in Django 1.6, the tests for
-    ``django.contrib`` apps are no longer run as part of the user's project.
-    Therefore, the ``@skipIfCustomUser`` decorator is no longer needed to
-    decorate tests in ``django.contrib.auth``.
-
-Depending on your application, tests may also be needed to be added to ensure
-that the application works with *any* user model, not just the default User
-model. To assist with this, Django provides two substitute user models that
-can be used in test suites:
-
-.. class:: tests.custom_user.CustomUser
-
-  A custom user model that uses an ``email`` field as the username, and has a basic
-  admin-compliant permissions setup
-
-.. class:: tests.custom_user.ExtensionUser
-
-  A custom user model that extends ``django.contrib.auth.models.AbstractUser``,
-  adding a ``date_of_birth`` field.
-
-You can then use the ``@override_settings`` decorator to make that test run
-with the custom User model. For example, here is a skeleton for a test that
-would test three possible User models -- the default, plus the two User
-models provided by ``auth`` app::
-
-    from django.contrib.auth.tests.utils import skipIfCustomUser
-    from django.contrib.auth.tests.custom_user import CustomUser, ExtensionUser
-    from django.test import TestCase, override_settings
-
-
-    class ApplicationTestCase(TestCase):
-        @skipIfCustomUser
-        def test_normal_user(self):
-            "Run tests for the normal user model"
-            self.assertSomething()
-
-        @override_settings(AUTH_USER_MODEL='auth.CustomUser')
-        def test_custom_user(self):
-            "Run tests for a custom user model with email-based authentication"
-            self.assertSomething()
-
-        @override_settings(AUTH_USER_MODEL='auth.ExtensionUser')
-        def test_extension_user(self):
-            "Run tests for a simple extension of the built-in User."
-            self.assertSomething()
 
 A full example
 --------------

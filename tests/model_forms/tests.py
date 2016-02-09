@@ -177,7 +177,8 @@ class ModelFormBaseTest(TestCase):
     def test_no_model_class(self):
         class NoModelModelForm(forms.ModelForm):
             pass
-        self.assertRaises(ValueError, NoModelModelForm)
+        with self.assertRaises(ValueError):
+            NoModelModelForm()
 
     def test_empty_fields_to_fields_for_model(self):
         """
@@ -282,8 +283,8 @@ class ModelFormBaseTest(TestCase):
             self.fail('Declarative field raised FieldError incorrectly')
 
     def test_extra_field_modelform_factory(self):
-        self.assertRaises(FieldError, modelform_factory,
-                          Person, fields=['no-field', 'name'])
+        with self.assertRaises(FieldError):
+            modelform_factory(Person, fields=['no-field', 'name'])
 
     def test_replace_field(self):
         class ReplaceField(forms.ModelForm):
@@ -1836,7 +1837,8 @@ class FileAndImageFieldTests(TestCase):
         """
         f = forms.FileField(required=True)
         self.assertEqual(f.clean(False, 'initial'), 'initial')
-        self.assertRaises(ValidationError, f.clean, False)
+        with self.assertRaises(ValidationError):
+            f.clean(False)
 
     def test_full_clear(self):
         """
@@ -2682,8 +2684,8 @@ class FormFieldCallbackTests(SimpleTestCase):
 
     def test_bad_callback(self):
         # A bad callback provided by user still gives an error
-        self.assertRaises(TypeError, modelform_factory, Person, fields="__all__",
-                          formfield_callback='not a function or callable')
+        with self.assertRaises(TypeError):
+            modelform_factory(Person, fields="__all__", formfield_callback='not a function or callable')
 
 
 class LocalizedModelFormTest(TestCase):

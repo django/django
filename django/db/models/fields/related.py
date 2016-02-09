@@ -85,7 +85,10 @@ def add_lazy_relation(cls, field, relation, operation):
         "and related methods on the Apps class.",
         RemovedInDjango20Warning, stacklevel=2)
     # Rearrange args for new Apps.lazy_model_operation
-    function = lambda local, related, field: operation(field, related, local)
+
+    def function(local, related, field):
+        return operation(field, related, local)
+
     lazy_related_operation(function, cls, relation, field=field)
 
 
@@ -191,12 +194,6 @@ class RelatedField(Field):
         if not isinstance(self.remote_field.model, ModelBase):
             return []
 
-        # If the field doesn't install backward relation on the target model (so
-        # `is_hidden` returns True), then there are no clashes to check and we
-        # can skip these fields.
-        if self.remote_field.is_hidden():
-            return []
-
         # Consider that we are checking field `Model.foreign` and the models
         # are:
         #
@@ -208,12 +205,15 @@ class RelatedField(Field):
         #         foreign = models.ForeignKey(Target)
         #         m2m = models.ManyToManyField(Target)
 
-        rel_opts = self.remote_field.model._meta
         # rel_opts.object_name == "Target"
+        rel_opts = self.remote_field.model._meta
+        # If the field doesn't install a backward relation on the target model
+        # (so `is_hidden` returns True), then there are no clashes to check
+        # and we can skip these fields.
+        rel_is_hidden = self.remote_field.is_hidden()
         rel_name = self.remote_field.get_accessor_name()  # i. e. "model_set"
         rel_query_name = self.related_query_name()  # i. e. "model"
-        field_name = "%s.%s" % (opts.object_name,
-            self.name)  # i. e. "Model.field"
+        field_name = "%s.%s" % (opts.object_name, self.name)  # i. e. "Model.field"
 
         # Check clashes between accessor or reverse query name of `field`
         # and any other field name -- i.e. accessor for Model.foreign is
@@ -222,7 +222,7 @@ class RelatedField(Field):
         for clash_field in potential_clashes:
             clash_name = "%s.%s" % (rel_opts.object_name,
                 clash_field.name)  # i. e. "Target.model_set"
-            if clash_field.name == rel_name:
+            if not rel_is_hidden and clash_field.name == rel_name:
                 errors.append(
                     checks.Error(
                         "Reverse accessor for '%s' clashes with field name '%s'." % (field_name, clash_name),
@@ -252,7 +252,7 @@ class RelatedField(Field):
             clash_name = "%s.%s" % (  # i. e. "Model.m2m"
                 clash_field.related_model._meta.object_name,
                 clash_field.field.name)
-            if clash_field.get_accessor_name() == rel_name:
+            if not rel_is_hidden and clash_field.get_accessor_name() == rel_name:
                 errors.append(
                     checks.Error(
                         "Reverse accessor for '%s' clashes with reverse accessor for '%s'." % (field_name, clash_name),
@@ -295,6 +295,13 @@ class RelatedField(Field):
                     'app_label': cls._meta.app_label.lower()
                 }
                 self.remote_field.related_name = related_name
+
+            if self.remote_field.related_query_name:
+                related_query_name = force_text(self.remote_field.related_query_name) % {
+                    'class': cls.__name__.lower(),
+                    'app_label': cls._meta.app_label.lower(),
+                }
+                self.remote_field.related_query_name = related_query_name
 
             def resolve_related_class(model, related, field):
                 field.remote_field.model = related

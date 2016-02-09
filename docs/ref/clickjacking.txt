@@ -51,8 +51,8 @@ decorators if it is not already present in the response.
 How to use it
 =============
 
-Setting X-Frame-Options for all responses
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Setting ``X-Frame-Options`` for all responses
+---------------------------------------------
 
 To set the same ``X-Frame-Options`` value for all responses in your site, put
 ``'django.middleware.clickjacking.XFrameOptionsMiddleware'`` to
@@ -85,8 +85,8 @@ that tells the middleware not to set the header::
         return HttpResponse("This page is safe to load in a frame on any site.")
 
 
-Setting X-Frame-Options per view
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Setting ``X-Frame-Options`` per view
+------------------------------------
 
 To set the ``X-Frame-Options`` header on a per view basis, Django provides these
 decorators::
@@ -113,8 +113,8 @@ The ``X-Frame-Options`` header will only protect against clickjacking in a
 modern browser. Older browsers will quietly ignore the header and need `other
 clickjacking prevention techniques`_.
 
-Browsers that support X-Frame-Options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Browsers that support ``X-Frame-Options``
+-----------------------------------------
 
 * Internet Explorer 8+
 * Firefox 3.6.9+
@@ -123,7 +123,7 @@ Browsers that support X-Frame-Options
 * Chrome 4.1+
 
 See also
-~~~~~~~~
+--------
 
 A `complete list`_ of browsers supporting ``X-Frame-Options``.
 

@@ -98,6 +98,7 @@ OPERATORS = {
     'not': prefix(8, lambda context, x: not x.eval(context)),
     'in': infix(9, lambda context, x, y: x.eval(context) in y.eval(context)),
     'not in': infix(9, lambda context, x, y: x.eval(context) not in y.eval(context)),
+    'is': infix(10, lambda context, x, y: x.eval(context) is y.eval(context)),
     '==': infix(10, lambda context, x, y: x.eval(context) == y.eval(context)),
     '!=': infix(10, lambda context, x, y: x.eval(context) != y.eval(context)),
     '>': infix(10, lambda context, x, y: x.eval(context) > y.eval(context)),

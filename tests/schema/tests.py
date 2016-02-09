@@ -139,10 +139,8 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.delete_model(Author)
         # Check that it's gone
-        self.assertRaises(
-            DatabaseError,
-            lambda: list(Author.objects.all()),
-        )
+        with self.assertRaises(DatabaseError):
+            list(Author.objects.all())
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk(self):
@@ -826,7 +824,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Author)
 
         old_field = Author._meta.get_field("id")
-        new_field = IntegerField(primary_key=True)
+        new_field = AutoField(primary_key=True)
         new_field.set_attributes_from_name("id")
         new_field.model = Author
         with connection.schema_editor() as editor:
@@ -834,6 +832,7 @@ class SchemaTests(TransactionTestCase):
         # This will fail if DROP DEFAULT is inadvertently executed on this
         # field which drops the id sequence, at least on PostgreSQL.
         Author.objects.create(name='Foo')
+        Author.objects.create(name='Bar')
 
     def test_alter_int_pk_to_autofield_pk(self):
         """
@@ -1025,7 +1024,8 @@ class SchemaTests(TransactionTestCase):
         new_field = M2MFieldClass("schema.TagM2MTest", related_name="authors")
         new_field.contribute_to_class(LocalAuthorWithM2M, "tags")
         # Ensure there's no m2m table there
-        self.assertRaises(DatabaseError, self.column_classes, new_field.remote_field.through)
+        with self.assertRaises(DatabaseError):
+            self.column_classes(new_field.remote_field.through)
         # Add the field
         with connection.schema_editor() as editor:
             editor.add_field(LocalAuthorWithM2M, new_field)
@@ -1041,7 +1041,8 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.remove_field(LocalAuthorWithM2M, new_field)
         # Ensure there's no m2m table there
-        self.assertRaises(DatabaseError, self.column_classes, new_field.remote_field.through)
+        with self.assertRaises(DatabaseError):
+            self.column_classes(new_field.remote_field.through)
 
         # Make sure the model state is coherent with the table one now that
         # we've removed the tags field.
@@ -1144,10 +1145,8 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(LocalBookWithM2M, old_field, new_field)
         # Ensure old M2M is gone
-        self.assertRaises(
-            DatabaseError,
-            self.column_classes, LocalBookWithM2M._meta.get_field("tags").remote_field.through
-        )
+        with self.assertRaises(DatabaseError):
+            self.column_classes(LocalBookWithM2M._meta.get_field("tags").remote_field.through)
 
         # This model looks like the new model and is used for teardown.
         opts = LocalBookWithM2M._meta
@@ -1216,7 +1215,8 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Tag)
         # Ensure the field is unique to begin with
         Tag.objects.create(title="foo", slug="foo")
-        self.assertRaises(IntegrityError, Tag.objects.create, title="bar", slug="foo")
+        with self.assertRaises(IntegrityError):
+            Tag.objects.create(title="bar", slug="foo")
         Tag.objects.all().delete()
         # Alter the slug field to be non-unique
         old_field = Tag._meta.get_field("slug")
@@ -1235,7 +1235,8 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Tag, new_field, new_field2, strict=True)
         # Ensure the field is unique again
         Tag.objects.create(title="foo", slug="foo")
-        self.assertRaises(IntegrityError, Tag.objects.create, title="bar", slug="foo")
+        with self.assertRaises(IntegrityError):
+            Tag.objects.create(title="bar", slug="foo")
         Tag.objects.all().delete()
         # Rename the field
         new_field3 = SlugField(unique=True)
@@ -1244,7 +1245,8 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Tag, new_field2, new_field3, strict=True)
         # Ensure the field is still unique
         TagUniqueRename.objects.create(title="foo", slug2="foo")
-        self.assertRaises(IntegrityError, TagUniqueRename.objects.create, title="bar", slug2="foo")
+        with self.assertRaises(IntegrityError):
+            TagUniqueRename.objects.create(title="bar", slug2="foo")
         Tag.objects.all().delete()
 
     def test_unique_together(self):
@@ -1258,7 +1260,8 @@ class SchemaTests(TransactionTestCase):
         UniqueTest.objects.create(year=2012, slug="foo")
         UniqueTest.objects.create(year=2011, slug="foo")
         UniqueTest.objects.create(year=2011, slug="bar")
-        self.assertRaises(IntegrityError, UniqueTest.objects.create, year=2012, slug="foo")
+        with self.assertRaises(IntegrityError):
+            UniqueTest.objects.create(year=2012, slug="foo")
         UniqueTest.objects.all().delete()
         # Alter the model to its non-unique-together companion
         with connection.schema_editor() as editor:
@@ -1274,7 +1277,8 @@ class SchemaTests(TransactionTestCase):
             editor.alter_unique_together(UniqueTest, [], UniqueTest._meta.unique_together)
         # Ensure the fields are unique again
         UniqueTest.objects.create(year=2012, slug="foo")
-        self.assertRaises(IntegrityError, UniqueTest.objects.create, year=2012, slug="foo")
+        with self.assertRaises(IntegrityError):
+            UniqueTest.objects.create(year=2012, slug="foo")
         UniqueTest.objects.all().delete()
 
     def test_unique_together_with_fk(self):
@@ -1575,10 +1579,8 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.delete_model(Thing)
         # Check that it's gone
-        self.assertRaises(
-            DatabaseError,
-            lambda: list(Thing.objects.all()),
-        )
+        with self.assertRaises(DatabaseError):
+            list(Thing.objects.all())
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_remove_constraints_capital_letters(self):

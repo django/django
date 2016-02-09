@@ -566,6 +566,9 @@ def templatize(src, origin=None):
     comment = []
     lineno_comment_map = {}
     comment_lineno_cache = None
+    # Adding the u prefix allows gettext to recognize the Unicode string
+    # (#26093).
+    raw_prefix = 'u' if six.PY3 else ''
 
     def join_tokens(tokens, trim=False):
         message = ''.join(tokens)
@@ -597,26 +600,34 @@ def templatize(src, origin=None):
                 if endbmatch:
                     if inplural:
                         if message_context:
-                            out.write(' npgettext(%r, %r, %r,count) ' % (
+                            out.write(' npgettext({p}{!r}, {p}{!r}, {p}{!r},count) '.format(
                                 message_context,
                                 join_tokens(singular, trimmed),
-                                join_tokens(plural, trimmed)))
+                                join_tokens(plural, trimmed),
+                                p=raw_prefix,
+                            ))
                         else:
-                            out.write(' ngettext(%r, %r, count) ' % (
+                            out.write(' ngettext({p}{!r}, {p}{!r}, count) '.format(
                                 join_tokens(singular, trimmed),
-                                join_tokens(plural, trimmed)))
+                                join_tokens(plural, trimmed),
+                                p=raw_prefix,
+                            ))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                         for part in plural:
                             out.write(blankout(part, 'P'))
                     else:
                         if message_context:
-                            out.write(' pgettext(%r, %r) ' % (
+                            out.write(' pgettext({p}{!r}, {p}{!r}) '.format(
                                 message_context,
-                                join_tokens(singular, trimmed)))
+                                join_tokens(singular, trimmed),
+                                p=raw_prefix,
+                            ))
                         else:
-                            out.write(' gettext(%r) ' % join_tokens(singular,
-                                                                    trimmed))
+                            out.write(' gettext({p}{!r}) '.format(
+                                join_tokens(singular, trimmed),
+                                p=raw_prefix,
+                            ))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                     message_context = None
@@ -685,10 +696,12 @@ def templatize(src, origin=None):
                             message_context = message_context.strip('"')
                         elif message_context[0] == "'":
                             message_context = message_context.strip("'")
-                        out.write(' pgettext(%r, %r) ' % (message_context, g))
+                        out.write(' pgettext({p}{!r}, {p}{!r}) '.format(
+                            message_context, g, p=raw_prefix
+                        ))
                         message_context = None
                     else:
-                        out.write(' gettext(%r) ' % g)
+                        out.write(' gettext({p}{!r}) '.format(g, p=raw_prefix))
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(' _(%s) ' % fmatch)

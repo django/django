@@ -1,9 +1,14 @@
+import warnings
 from collections import OrderedDict
 
 from django.apps import apps
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, router
+
+
+class ProxyModelWarning(Warning):
+    pass
 
 
 class Command(BaseCommand):
@@ -132,9 +137,15 @@ class Command(BaseCommand):
             Collate the objects to be serialized. If count_only is True, just
             count the number of objects to be serialized.
             """
-            for model in serializers.sort_dependencies(app_list.items()):
+            models = serializers.sort_dependencies(app_list.items())
+            for model in models:
                 if model in excluded_models:
                     continue
+                if model._meta.proxy and model._meta.proxy_for_model not in models:
+                    warnings.warn(
+                        "%s is a proxy model and won't be serialized." % model._meta.label,
+                        category=ProxyModelWarning,
+                    )
                 if not model._meta.proxy and router.allow_migrate_model(using, model):
                     if use_base_manager:
                         objects = model._base_manager

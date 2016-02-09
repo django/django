@@ -167,6 +167,8 @@ class Field(object):
         For most fields, this will simply be data; FileFields need to handle it
         a bit differently.
         """
+        if self.disabled:
+            return initial
         return data
 
     def widget_attrs(self, widget):
@@ -488,7 +490,7 @@ class DurationField(Field):
             return None
         if isinstance(value, datetime.timedelta):
             return value
-        value = parse_duration(value)
+        value = parse_duration(force_text(value))
         if value is None:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value

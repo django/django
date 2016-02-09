@@ -68,7 +68,8 @@ class DataTests(OptionsBaseTests):
             self.assertEqual([f.attname for f in fields], expected_result)
 
     def test_local_fields(self):
-        is_data_field = lambda f: isinstance(f, Field) and not isinstance(f, related.ManyToManyField)
+        def is_data_field(f):
+            return isinstance(f, Field) and not isinstance(f, related.ManyToManyField)
 
         for model, expected_result in TEST_RESULTS['local_fields'].items():
             fields = model._meta.local_fields
@@ -101,7 +102,8 @@ class M2MTests(OptionsBaseTests):
 
 
 class RelatedObjectsTests(OptionsBaseTests):
-    key_name = lambda self, r: r[0]
+    def key_name(self, r):
+        return r[0]
 
     def test_related_objects(self):
         result_key = 'get_all_related_objects_with_model'

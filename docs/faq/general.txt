@@ -1,8 +1,9 @@
+============
 FAQ: General
 ============
 
 Why does this project exist?
-----------------------------
+============================
 
 Django grew from a very practical need: World Online, a newspaper Web
 operation, is responsible for building intensive Web applications on journalism
@@ -29,9 +30,9 @@ thrilled to be able to give something back to the open-source community.
 .. _PostgreSQL: http://www.postgresql.org/
 
 What does "Django" mean, and how do you pronounce it?
------------------------------------------------------
+=====================================================
 
-Django is named after `Django Reinhardt`_, a gypsy jazz guitarist from the 1930s
+Django is named after `Django Reinhardt`_, a jazz manouche guitarist from the 1930s
 to early 1950s. To this day, he's considered one of the best guitarists of all time.
 
 Listen to his music. You'll like it.
@@ -44,14 +45,14 @@ We've also recorded an `audio clip of the pronunciation`_.
 .. _audio clip of the pronunciation: http://red-bean.com/~adrian/django_pronunciation.mp3
 
 Is Django stable?
------------------
+=================
 
 Yes, it's quite stable. Companies like Disqus, Instagram, Pinterest, and
 Mozilla have been using Django for many years. Sites built on Django have
 weathered traffic spikes of over 50 thousand hits per second.
 
 Does Django scale?
-------------------
+==================
 
 Yes. Compared to development time, hardware is cheap, and so Django is
 designed to take advantage of as much hardware as you can throw at it.
@@ -64,14 +65,14 @@ application layer. And it ships with a simple-yet-powerful
 :doc:`cache framework </topics/cache>`.
 
 Who's behind this?
-------------------
+==================
 
 Django was originally developed at World Online, the Web department of a
 newspaper in Lawrence, Kansas, USA. Django's now run by an international
 :doc:`team of volunteers </internals/team>`.
 
 Which sites use Django?
------------------------
+=======================
 
 `DjangoSites.org`_ features a constantly growing list of Django-powered sites.
 
@@ -80,7 +81,7 @@ Which sites use Django?
 .. _faq-mtv:
 
 Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
------------------------------------------------------------------------------------------------------------------------------------------------------
+=====================================================================================================================================================
 
 Well, the standard names are debatable.
 
@@ -110,7 +111,7 @@ regardless of how things are named, Django gets stuff done in a way that's most
 logical to us.
 
 <Framework X> does <feature Y> -- why doesn't Django?
------------------------------------------------------
+=====================================================
 
 We're well aware that there are other awesome Web frameworks out there, and
 we're not averse to borrowing ideas where appropriate. However, Django was
@@ -119,7 +120,7 @@ aware that "because <Framework X> does it" is not going to be sufficient reason
 to add a given feature to Django.
 
 Why did you write all of Django from scratch, instead of using other Python libraries?
---------------------------------------------------------------------------------------
+======================================================================================
 
 When Django was originally written a couple of years ago, Adrian and Simon
 spent quite a bit of time exploring the various Python Web frameworks
@@ -145,7 +146,7 @@ We've documented our philosophies on the
 :doc:`design philosophies page </misc/design-philosophies>`.
 
 Is Django a content-management-system (CMS)?
---------------------------------------------
+============================================
 
 No, Django is not a CMS, or any sort of "turnkey product" in and of itself.
 It's a Web framework; it's a programming tool that lets you build websites.
@@ -162,7 +163,7 @@ means!).
 .. _Drupal: https://drupal.org/
 
 How can I download the Django documentation to read it offline?
----------------------------------------------------------------
+===============================================================
 
 The Django docs are available in the ``docs`` directory of each Django tarball
 release. These docs are in reST (reStructuredText) format, and each text file
@@ -178,7 +179,7 @@ information than the docs that come with the latest Django release.
 .. _stored in revision control: https://github.com/django/django/tree/master/docs/
 
 Where can I find Django developers for hire?
---------------------------------------------
+============================================
 
 Consult our `developers for hire page`_ for a list of Django developers who
 would be happy to help you.
@@ -190,7 +191,7 @@ https://people.djangoproject.com/ .
 .. _developers for hire page: https://code.djangoproject.com/wiki/DevelopersForHire
 
 How do I cite Django?
----------------------
+=====================
 
 It's difficult to give an official citation format, for two reasons: citation
 formats can vary wildly between publications, and citation standards for

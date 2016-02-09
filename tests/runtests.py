@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import atexit
 import copy
-import logging
 import os
 import shutil
 import subprocess
@@ -150,25 +149,17 @@ def setup(verbosity, test_labels, parallel):
     settings.SITE_ID = 1
     settings.MIDDLEWARE_CLASSES = ALWAYS_MIDDLEWARE_CLASSES
     settings.MIGRATION_MODULES = {
-        # these 'tests.migrations' modules don't actually exist, but this lets
-        # us skip creating migrations for the test models.
-        'auth': 'django.contrib.auth.tests.migrations',
-        'contenttypes': 'contenttypes_tests.migrations',
-        'sessions': 'sessions_tests.migrations',
+        # This lets us skip creating migrations for the test models as many of
+        # them depend on one of the following contrib applications.
+        'auth': None,
+        'contenttypes': None,
+        'sessions': None,
     }
     log_config = copy.deepcopy(DEFAULT_LOGGING)
     # Filter out non-error logging so we don't have to capture it in lots of
     # tests.
     log_config['loggers']['django']['level'] = 'ERROR'
     settings.LOGGING = log_config
-
-    if verbosity > 0:
-        # Ensure any warnings captured to logging are piped through a verbose
-        # logging handler.  If any -W options were passed explicitly on command
-        # line, warnings are not captured, and this has no effect.
-        logger = logging.getLogger('py.warnings')
-        handler = logging.StreamHandler()
-        logger.addHandler(handler)
 
     warnings.filterwarnings(
         'ignore',

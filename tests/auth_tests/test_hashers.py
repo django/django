@@ -219,7 +219,8 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password('', encoded))
         self.assertFalse(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
-        self.assertRaises(ValueError, identify_hasher, encoded)
+        with self.assertRaises(ValueError):
+            identify_hasher(encoded)
         # Assert that the unusable passwords actually contain a random part.
         # This might fail one day due to a hash collision.
         self.assertNotEqual(encoded, make_password(None), "Random password collision?")
@@ -234,7 +235,8 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_bad_algorithm(self):
         with self.assertRaises(ValueError):
             make_password('lètmein', hasher='lolcat')
-        self.assertRaises(ValueError, identify_hasher, "lolcat$salt$hash")
+        with self.assertRaises(ValueError):
+            identify_hasher('lolcat$salt$hash')
 
     def test_bad_encoded(self):
         self.assertFalse(is_password_usable('lètmein_badencoded'))

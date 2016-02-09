@@ -47,13 +47,11 @@ class TestSaveLoad(TestCase):
             PrimaryKeyUUIDModel.objects.get(pk=[])
 
     def test_wrong_value(self):
-        self.assertRaisesMessage(
-            ValueError, 'badly formed hexadecimal UUID string',
-            UUIDModel.objects.get, field='not-a-uuid')
+        with self.assertRaisesMessage(ValueError, 'badly formed hexadecimal UUID string'):
+            UUIDModel.objects.get(field='not-a-uuid')
 
-        self.assertRaisesMessage(
-            ValueError, 'badly formed hexadecimal UUID string',
-            UUIDModel.objects.create, field='not-a-uuid')
+        with self.assertRaisesMessage(ValueError, 'badly formed hexadecimal UUID string'):
+            UUIDModel.objects.create(field='not-a-uuid')
 
 
 class TestMigrations(SimpleTestCase):

@@ -77,7 +77,8 @@ class URLPrefixTests(URLTestCaseBase):
 
     @override_settings(ROOT_URLCONF='i18n.patterns.urls.wrong')
     def test_invalid_prefix_use(self):
-        self.assertRaises(ImproperlyConfigured, lambda: reverse('account:register'))
+        with self.assertRaises(ImproperlyConfigured):
+            reverse('account:register')
 
 
 @override_settings(ROOT_URLCONF='i18n.patterns.urls.disabled')

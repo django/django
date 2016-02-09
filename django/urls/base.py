@@ -153,7 +153,6 @@ def is_valid_path(path, urlconf=None):
     False otherwise. This is a convenience method to make working with "is
     this a match?" cases easier, avoiding try...except blocks.
     """
-    from django.urls.base import resolve
     try:
         resolve(path, urlconf)
         return True
@@ -167,7 +166,6 @@ def translate_url(url, lang_code):
     the `lang_code` language (either by i18n_patterns or by translated regex).
     Return the original URL if no translated version is found.
     """
-    from django.urls import resolve, reverse
     parsed = urlsplit(url)
     try:
         match = resolve(parsed.path)

@@ -128,19 +128,16 @@ class SQLiteTests(TestCase):
         #19360: Raise NotImplementedError when aggregating on date/time fields.
         """
         for aggregate in (Sum, Avg, Variance, StdDev):
-            self.assertRaises(
-                NotImplementedError,
-                models.Item.objects.all().aggregate, aggregate('time'))
-            self.assertRaises(
-                NotImplementedError,
-                models.Item.objects.all().aggregate, aggregate('date'))
-            self.assertRaises(
-                NotImplementedError,
-                models.Item.objects.all().aggregate, aggregate('last_modified'))
-            self.assertRaises(
-                NotImplementedError,
-                models.Item.objects.all().aggregate,
-                **{'complex': aggregate('last_modified') + aggregate('last_modified')})
+            with self.assertRaises(NotImplementedError):
+                models.Item.objects.all().aggregate(aggregate('time'))
+            with self.assertRaises(NotImplementedError):
+                models.Item.objects.all().aggregate(aggregate('date'))
+            with self.assertRaises(NotImplementedError):
+                models.Item.objects.all().aggregate(aggregate('last_modified'))
+            with self.assertRaises(NotImplementedError):
+                models.Item.objects.all().aggregate(
+                    **{'complex': aggregate('last_modified') + aggregate('last_modified')}
+                )
 
     def test_memory_db_test_name(self):
         """
@@ -426,6 +423,18 @@ class LastExecutedQueryTest(TestCase):
         substituted = "SELECT '\"''\\'"
         self.assertEqual(connection.queries[-1]['sql'], substituted)
 
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "This test is specific to SQLite.")
+    def test_large_number_of_parameters_on_sqlite(self):
+        # If SQLITE_MAX_VARIABLE_NUMBER (default = 999) has been changed to be
+        # greater than SQLITE_MAX_COLUMN (default = 2000), last_executed_query
+        # can hit the SQLITE_MAX_COLUMN limit. See #26063.
+        cursor = connection.cursor()
+        sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 2001)
+        params = list(range(2001))
+        # This should not raise an exception.
+        cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
+
 
 class ParameterHandlingTest(TestCase):
 
@@ -437,8 +446,10 @@ class ParameterHandlingTest(TestCase):
             connection.ops.quote_name('root'),
             connection.ops.quote_name('square')
         ))
-        self.assertRaises(Exception, cursor.executemany, query, [(1, 2, 3)])
-        self.assertRaises(Exception, cursor.executemany, query, [(1,)])
+        with self.assertRaises(Exception):
+            cursor.executemany(query, [(1, 2, 3)])
+        with self.assertRaises(Exception):
+            cursor.executemany(query, [(1,)])
 
 
 # Unfortunately, the following tests would be a good test to run on all
@@ -814,6 +825,11 @@ class BackendTestCase(TransactionTestCase):
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
 
+    def test_timezone_none_use_tz_false(self):
+        connection.ensure_connection()
+        with self.settings(TIME_ZONE=None, USE_TZ=False):
+            connection.init_connection_state()
+
 
 # We don't make these tests conditional because that means we would need to
 # check and differentiate between:
@@ -847,7 +863,8 @@ class FkConstraintsTests(TransactionTestCase):
         a2 = models.Article(headline='This is another test', reporter=self.r,
                             pub_date=datetime.datetime(2012, 8, 3),
                             reporter_proxy_id=30)
-        self.assertRaises(IntegrityError, a2.save)
+        with self.assertRaises(IntegrityError):
+            a2.save()
 
     def test_integrity_checks_on_update(self):
         """
@@ -875,7 +892,8 @@ class FkConstraintsTests(TransactionTestCase):
         # Retrieve the second article from the DB
         a2 = models.Article.objects.get(headline='Another article')
         a2.reporter_proxy_id = 30
-        self.assertRaises(IntegrityError, a2.save)
+        with self.assertRaises(IntegrityError):
+            a2.save()
 
     def test_disable_constraint_checks_manually(self):
         """

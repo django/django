@@ -70,8 +70,8 @@ class TestSigner(SimpleTestCase):
         )
         self.assertEqual(value, signer.unsign(signed_value))
         for transform in transforms:
-            self.assertRaises(
-                signing.BadSignature, signer.unsign, transform(signed_value))
+            with self.assertRaises(signing.BadSignature):
+                signer.unsign(transform(signed_value))
 
     def test_dumps_loads(self):
         "dumps and loads be reversible for any JSON serializable object"
@@ -103,8 +103,8 @@ class TestSigner(SimpleTestCase):
         encoded = signing.dumps(value)
         self.assertEqual(value, signing.loads(encoded))
         for transform in transforms:
-            self.assertRaises(
-                signing.BadSignature, signing.loads, transform(encoded))
+            with self.assertRaises(signing.BadSignature):
+                signing.loads(transform(encoded))
 
     def test_works_with_non_ascii_keys(self):
         binary_key = b'\xe7'  # Set some binary (non-ASCII key)
@@ -142,4 +142,5 @@ class TestTimestampSigner(SimpleTestCase):
             self.assertEqual(signer.unsign(ts, max_age=12), value)
             # max_age parameter can also accept a datetime.timedelta object
             self.assertEqual(signer.unsign(ts, max_age=datetime.timedelta(seconds=11)), value)
-            self.assertRaises(signing.SignatureExpired, signer.unsign, ts, max_age=10)
+            with self.assertRaises(signing.SignatureExpired):
+                signer.unsign(ts, max_age=10)

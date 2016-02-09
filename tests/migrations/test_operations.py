@@ -9,7 +9,6 @@ from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
 from django.test import override_settings, skipUnlessDBFeature
-from django.utils import six
 
 from .models import FoodManager, FoodQuerySet
 from .test_base import MigrationTestBase
@@ -1532,6 +1531,10 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RunSQL")
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2]), ["reverse_sql", "sql", "state_operations"])
+        # And elidable reduction
+        self.assertIs(False, operation.reduce(operation, []))
+        elidable_operation = migrations.RunSQL('SELECT 1 FROM void;', elidable=True)
+        self.assertEqual(elidable_operation.reduce(operation, []), [operation])
 
     def test_run_sql_params(self):
         """
@@ -1603,16 +1606,12 @@ class OperationTests(OperationTestBase):
         )
 
         with connection.schema_editor() as editor:
-            six.assertRaisesRegex(self, ValueError,
-                "Expected a 2-tuple but got 1",
-                operation.database_forwards,
-                "test_runsql", editor, project_state, new_state)
+            with self.assertRaisesMessage(ValueError, "Expected a 2-tuple but got 1"):
+                operation.database_forwards("test_runsql", editor, project_state, new_state)
 
         with connection.schema_editor() as editor:
-            six.assertRaisesRegex(self, ValueError,
-                "Expected a 2-tuple but got 3",
-                operation.database_backwards,
-                "test_runsql", editor, new_state, project_state)
+            with self.assertRaisesMessage(ValueError, "Expected a 2-tuple but got 3"):
+                operation.database_backwards("test_runsql", editor, new_state, project_state)
 
     def test_run_sql_noop(self):
         """
@@ -1705,6 +1704,10 @@ class OperationTests(OperationTestBase):
             operation.database_forwards("test_runpython", editor, project_state, new_state)
         self.assertEqual(project_state.apps.get_model("test_runpython", "Pony").objects.count(), 6)
         self.assertEqual(project_state.apps.get_model("test_runpython", "ShetlandPony").objects.count(), 2)
+        # And elidable reduction
+        self.assertIs(False, operation.reduce(operation, []))
+        elidable_operation = migrations.RunPython(inner_method, elidable=True)
+        self.assertEqual(elidable_operation.reduce(operation, []), [operation])
 
     def test_run_python_atomic(self):
         """

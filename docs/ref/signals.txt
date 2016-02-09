@@ -42,8 +42,8 @@ model system.
     as ``'polls.Answer'``. This sort of reference can be quite handy when
     dealing with circular import dependencies and swappable models.
 
-pre_init
---------
+``pre_init``
+------------
 
 .. attribute:: django.db.models.signals.pre_init
    :module:
@@ -81,8 +81,8 @@ Argument    Value
 ``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
 ==========  ===============================================================
 
-post_init
----------
+``post_init``
+-------------
 
 .. data:: django.db.models.signals.post_init
    :module:
@@ -97,8 +97,8 @@ Arguments sent with this signal:
 ``instance``
     The actual instance of the model that's just been created.
 
-pre_save
---------
+``pre_save``
+------------
 
 .. data:: django.db.models.signals.pre_save
    :module:
@@ -127,8 +127,8 @@ Arguments sent with this signal:
     The set of fields to update explicitly specified in the ``save()`` method.
     ``None`` if this argument was not used in the ``save()`` call.
 
-post_save
----------
+``post_save``
+-------------
 
 .. data:: django.db.models.signals.post_save
    :module:
@@ -160,8 +160,8 @@ Arguments sent with this signal:
     The set of fields to update explicitly specified in the ``save()`` method.
     ``None`` if this argument was not used in the ``save()`` call.
 
-pre_delete
-----------
+``pre_delete``
+--------------
 
 .. data:: django.db.models.signals.pre_delete
    :module:
@@ -180,8 +180,8 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
-post_delete
------------
+``post_delete``
+---------------
 
 .. data:: django.db.models.signals.post_delete
    :module:
@@ -204,8 +204,8 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
-m2m_changed
------------
+``m2m_changed``
+---------------
 
 .. data:: django.db.models.signals.m2m_changed
    :module:
@@ -343,8 +343,8 @@ Argument        Value
 ``using``       ``"default"`` (since the default router sends writes here)
 ==============  ============================================================
 
-class_prepared
---------------
+``class_prepared``
+------------------
 
 .. data:: django.db.models.signals.class_prepared
    :module:
@@ -369,8 +369,8 @@ Management signals
 
 Signals sent by :doc:`django-admin </ref/django-admin>`.
 
-pre_migrate
------------
+``pre_migrate``
+---------------
 
 .. data:: django.db.models.signals.pre_migrate
    :module:
@@ -389,7 +389,7 @@ Arguments sent with this signal:
 
 ``verbosity``
     Indicates how much information manage.py is printing on screen. See
-    the :djadminopt:`--verbosity` flag for details.
+    the :option:`--verbosity` flag for details.
 
     Functions which listen for :data:`pre_migrate` should adjust what they
     output to the screen based on the value of this argument.
@@ -405,8 +405,8 @@ Arguments sent with this signal:
 ``using``
     The alias of database on which a command will operate.
 
-post_migrate
-------------
+``post_migrate``
+----------------
 
 .. data:: django.db.models.signals.post_migrate
    :module:
@@ -430,7 +430,7 @@ Arguments sent with this signal:
 
 ``verbosity``
     Indicates how much information manage.py is printing on screen. See
-    the :djadminopt:`--verbosity` flag for details.
+    the :option:`--verbosity` flag for details.
 
     Functions which listen for :data:`post_migrate` should adjust what they
     output to the screen based on the value of this argument.
@@ -480,8 +480,8 @@ Request/response signals
 
 Signals sent by the core framework when processing a request.
 
-request_started
----------------
+``request_started``
+-------------------
 
 .. data:: django.core.signals.request_started
    :module:
@@ -496,8 +496,8 @@ Arguments sent with this signal:
 ``environ``
     The ``environ`` dictionary provided to the request.
 
-request_finished
-----------------
+``request_finished``
+--------------------
 
 .. data:: django.core.signals.request_finished
    :module:
@@ -517,8 +517,8 @@ Arguments sent with this signal:
 ``sender``
     The handler class, as above.
 
-got_request_exception
----------------------
+``got_request_exception``
+-------------------------
 
 .. data:: django.core.signals.got_request_exception
    :module:
@@ -541,8 +541,8 @@ Test signals
 
 Signals only sent when :ref:`running tests <running-tests>`.
 
-setting_changed
----------------
+``setting_changed``
+-------------------
 
 .. data:: django.test.signals.setting_changed
    :module:
@@ -573,8 +573,8 @@ Arguments sent with this signal:
 ``enter``
     A boolean; ``True`` if the setting is applied, ``False`` if restored.
 
-template_rendered
------------------
+``template_rendered``
+---------------------
 
 .. data:: django.test.signals.template_rendered
    :module:
@@ -603,8 +603,8 @@ Database Wrappers
 Signals sent by the database wrapper when a database connection is
 initiated.
 
-connection_created
-------------------
+``connection_created``
+----------------------
 
 .. data:: django.db.backends.signals.connection_created
    :module:

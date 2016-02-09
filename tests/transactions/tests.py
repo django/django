@@ -12,7 +12,6 @@ from django.db import (
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.utils import six
 
 from .models import Reporter
 
@@ -45,7 +44,7 @@ class AtomicTests(TransactionTestCase):
         def make_reporter():
             Reporter.objects.create(first_name="Haddock")
             raise Exception("Oops, that's his last name")
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             make_reporter()
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
@@ -61,7 +60,7 @@ class AtomicTests(TransactionTestCase):
         def make_reporter():
             Reporter.objects.create(first_name="Haddock")
             raise Exception("Oops, that's his last name")
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             make_reporter()
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
@@ -71,7 +70,7 @@ class AtomicTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
 
     def test_rollback(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(first_name="Haddock")
                 raise Exception("Oops, that's his last name")
@@ -88,14 +87,14 @@ class AtomicTests(TransactionTestCase):
     def test_nested_commit_rollback(self):
         with transaction.atomic():
             Reporter.objects.create(first_name="Tintin")
-            with six.assertRaisesRegex(self, Exception, "Oops"):
+            with self.assertRaisesMessage(Exception, "Oops"):
                 with transaction.atomic():
                     Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
 
     def test_nested_rollback_commit(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(last_name="Tintin")
                 with transaction.atomic():
@@ -104,10 +103,10 @@ class AtomicTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_nested_rollback_rollback(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(last_name="Tintin")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
                     with transaction.atomic():
                         Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
@@ -125,7 +124,7 @@ class AtomicTests(TransactionTestCase):
     def test_merged_commit_rollback(self):
         with transaction.atomic():
             Reporter.objects.create(first_name="Tintin")
-            with six.assertRaisesRegex(self, Exception, "Oops"):
+            with self.assertRaisesMessage(Exception, "Oops"):
                 with transaction.atomic(savepoint=False):
                     Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
@@ -133,7 +132,7 @@ class AtomicTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_merged_rollback_commit(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(last_name="Tintin")
                 with transaction.atomic(savepoint=False):
@@ -142,10 +141,10 @@ class AtomicTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_merged_rollback_rollback(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(last_name="Tintin")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
                     with transaction.atomic(savepoint=False):
                         Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
@@ -165,7 +164,7 @@ class AtomicTests(TransactionTestCase):
         atomic = transaction.atomic()
         with atomic:
             Reporter.objects.create(first_name="Tintin")
-            with six.assertRaisesRegex(self, Exception, "Oops"):
+            with self.assertRaisesMessage(Exception, "Oops"):
                 with atomic:
                     Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
@@ -173,7 +172,7 @@ class AtomicTests(TransactionTestCase):
 
     def test_reuse_rollback_commit(self):
         atomic = transaction.atomic()
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with atomic:
                 Reporter.objects.create(last_name="Tintin")
                 with atomic:
@@ -183,10 +182,10 @@ class AtomicTests(TransactionTestCase):
 
     def test_reuse_rollback_rollback(self):
         atomic = transaction.atomic()
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with atomic:
                 Reporter.objects.create(last_name="Tintin")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
                     with atomic:
                         Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
@@ -256,7 +255,7 @@ class AtomicMergeTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with transaction.atomic(savepoint=False):
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
                     with transaction.atomic(savepoint=False):
                         Reporter.objects.create(first_name="Calculus")
                         raise Exception("Oops, that's his last name")
@@ -280,7 +279,7 @@ class AtomicMergeTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with transaction.atomic():
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
                     with transaction.atomic(savepoint=False):
                         Reporter.objects.create(first_name="Calculus")
                         raise Exception("Oops, that's his last name")
@@ -383,7 +382,7 @@ class AtomicMySQLTests(TransactionTestCase):
         other_thread.start()
         other_thread_ready.wait()
 
-        with six.assertRaisesRegex(self, OperationalError, 'Deadlock found'):
+        with self.assertRaisesMessage(OperationalError, 'Deadlock found'):
             # Double atomic to enter a transaction and create a savepoint.
             with transaction.atomic():
                 with transaction.atomic():
@@ -419,7 +418,7 @@ class AtomicMiscTests(TransactionTestCase):
             with transaction.atomic():
 
                 # Swallow the intentional error raised in the sub-transaction.
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
 
                     # Start a sub-transaction with a savepoint.
                     with transaction.atomic():

@@ -127,7 +127,8 @@ class HttpResponseTests(SimpleTestCase):
         generator = ("{}".format(i) for i in range(10))
         response = HttpResponse(content=generator)
         self.assertEqual(response.content, b'0123456789')
-        self.assertRaises(StopIteration, next, generator)
+        with self.assertRaises(StopIteration):
+            next(generator)
 
         cache.set('my-response-key', response)
         response = cache.get('my-response-key')

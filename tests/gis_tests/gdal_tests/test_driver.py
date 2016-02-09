@@ -40,7 +40,8 @@ class DriverTest(unittest.TestCase):
     def test02_invalid_driver(self):
         "Testing invalid GDAL/OGR Data Source Drivers."
         for i in invalid_drivers:
-            self.assertRaises(GDALException, Driver, i)
+            with self.assertRaises(GDALException):
+                Driver(i)
 
     def test03_aliases(self):
         "Testing driver aliases."

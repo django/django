@@ -38,6 +38,9 @@ class MigrationQuestioner(object):
         except LookupError:         # It's a fake app.
             return self.defaults.get("ask_initial", False)
         migrations_import_path = MigrationLoader.migrations_module(app_config.label)
+        if migrations_import_path is None:
+            # It's an application with migrations disabled.
+            return self.defaults.get("ask_initial", False)
         try:
             migrations_module = importlib.import_module(migrations_import_path)
         except ImportError:

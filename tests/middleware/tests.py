@@ -707,12 +707,11 @@ class GZipMiddlewareTest(SimpleTestCase):
         """
         Compression is performed on FileResponse.
         """
-        open_file = lambda: open(__file__, 'rb')
-        with open_file() as file1:
+        with open(__file__, 'rb') as file1:
             file_resp = FileResponse(file1)
             file_resp['Content-Type'] = 'text/html; charset=UTF-8'
             r = GZipMiddleware().process_response(self.req, file_resp)
-            with open_file() as file2:
+            with open(__file__, 'rb') as file2:
                 self.assertEqual(self.decompress(b''.join(r)), file2.read())
             self.assertEqual(r.get('Content-Encoding'), 'gzip')
             self.assertIsNot(r.file_to_stream, file1)

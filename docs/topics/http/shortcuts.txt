@@ -12,8 +12,8 @@ The package ``django.shortcuts`` collects helper functions and classes that
 "span" multiple levels of MVC. In other words, these functions/classes
 introduce controlled coupling for convenience's sake.
 
-``render``
-==========
+``render()``
+============
 
 .. function:: render(request, template_name, context=None, content_type=None, status=None, using=None)
 
@@ -81,8 +81,8 @@ This example is equivalent to::
         return HttpResponse(t.render(c, request),
             content_type="application/xhtml+xml")
 
-``render_to_response``
-======================
+``render_to_response()``
+========================
 
 .. function:: render_to_response(template_name, context=None, content_type=None, status=None, using=None)
 
@@ -90,8 +90,8 @@ This example is equivalent to::
    similarly except that it doesn't make the ``request`` available in the
    response. It's not recommended and is likely to be deprecated in the future.
 
-``redirect``
-============
+``redirect()``
+==============
 
 .. function:: redirect(to, permanent=False, *args, **kwargs)
 
@@ -157,8 +157,8 @@ will be returned::
         object = MyModel.objects.get(...)
         return redirect(object, permanent=True)
 
-``get_object_or_404``
-=====================
+``get_object_or_404()``
+=======================
 
 .. function:: get_object_or_404(klass, *args, **kwargs)
 
@@ -230,8 +230,8 @@ Note: As with ``get()``, a
 :class:`~django.core.exceptions.MultipleObjectsReturned` exception
 will be raised if more than one object is found.
 
-``get_list_or_404``
-===================
+``get_list_or_404()``
+=====================
 
 .. function:: get_list_or_404(klass, *args, **kwargs)
 

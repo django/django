@@ -63,7 +63,8 @@ class OnDeleteTests(TestCase):
 
     def test_protect(self):
         a = create_a('protect')
-        self.assertRaises(IntegrityError, a.protect.delete)
+        with self.assertRaises(IntegrityError):
+            a.protect.delete()
 
     def test_do_nothing(self):
         # Testing DO_NOTHING is a bit harder: It would raise IntegrityError for a normal model,

@@ -34,7 +34,7 @@ from django.utils import six, timezone
 from django.utils.encoding import force_text
 from django.utils.six.moves import http_cookies
 
-from .custom_db_backend import SessionStore as CustomDatabaseSession
+from .models import SessionStore as CustomDatabaseSession
 
 
 class SessionTestsMixin(object):
@@ -223,7 +223,8 @@ class SessionTestsMixin(object):
     def test_session_key_is_read_only(self):
         def set_session_key(session):
             session.session_key = session._get_new_session_key()
-        self.assertRaises(AttributeError, set_session_key, self.session)
+        with self.assertRaises(AttributeError):
+            set_session_key(self.session)
 
     # Custom session expiry
     def test_default_expiry(self):
@@ -432,7 +433,7 @@ class DatabaseSessionWithTimeZoneTests(DatabaseSessionTests):
 
 class CustomDatabaseSessionTests(DatabaseSessionTests):
     backend = CustomDatabaseSession
-    session_engine = 'sessions_tests.custom_db_backend'
+    session_engine = 'sessions_tests.models'
 
     def test_extra_session_field(self):
         # Set the account ID to be picked up by a custom session storage
@@ -474,7 +475,8 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
     @override_settings(SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
         # 21000 - CacheDB backend should respect SESSION_CACHE_ALIAS.
-        self.assertRaises(InvalidCacheBackendError, self.backend)
+        with self.assertRaises(InvalidCacheBackendError):
+            self.backend()
 
 
 @override_settings(USE_TZ=True)
@@ -506,20 +508,21 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
     def test_configuration_check(self):
         del self.backend._storage_path
         # Make sure the file backend checks for a good storage dir
-        self.assertRaises(ImproperlyConfigured, self.backend)
+        with self.assertRaises(ImproperlyConfigured):
+            self.backend()
 
     def test_invalid_key_backslash(self):
         # Ensure we don't allow directory-traversal.
         # This is tested directly on _key_to_file, as load() will swallow
         # a SuspiciousOperation in the same way as an IOError - by creating
         # a new session, making it unclear whether the slashes were detected.
-        self.assertRaises(InvalidSessionKey,
-                          self.backend()._key_to_file, "a\\b\\c")
+        with self.assertRaises(InvalidSessionKey):
+            self.backend()._key_to_file("a\\b\\c")
 
     def test_invalid_key_forwardslash(self):
         # Ensure we don't allow directory-traversal
-        self.assertRaises(InvalidSessionKey,
-                          self.backend()._key_to_file, "a/b/c")
+        with self.assertRaises(InvalidSessionKey):
+            self.backend()._key_to_file("a/b/c")
 
     @override_settings(
         SESSION_ENGINE="django.contrib.sessions.backends.file",

@@ -14,7 +14,6 @@ from django.contrib.auth.management.commands import (
 from django.contrib.auth.models import (
     AbstractBaseUser, Group, Permission, User,
 )
-from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks, exceptions
 from django.core.management import call_command
@@ -28,7 +27,9 @@ from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
 
-from .models import CustomUserNonUniqueUsername, CustomUserWithFK, Email
+from .models import (
+    CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK, Email,
+)
 
 
 def mock_inputs(inputs):
@@ -287,7 +288,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertEqual(u.email, 'joe@somewhere.org')
         self.assertFalse(u.has_usable_password())
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_swappable_user(self):
         "A superuser can be created when a custom User model is in use"
         # We can use the management command to create a superuser
@@ -309,7 +310,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_swappable_user_missing_required_field(self):
         "A Custom superuser won't be created when a required field isn't provided"
         # We can use the management command to create a superuser
@@ -427,8 +428,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertEqual(u.group, group)
 
         non_existent_email = 'mymail2@gmail.com'
-        with self.assertRaisesMessage(CommandError,
-                'email instance with email %r does not exist.' % non_existent_email):
+        msg = 'email instance with email %r does not exist.' % non_existent_email
+        with self.assertRaisesMessage(CommandError, msg):
             call_command(
                 'createsuperuser',
                 interactive=False,
@@ -670,10 +671,12 @@ class PermissionTestCase(TestCase):
         # check duplicated default permission
         Permission._meta.permissions = [
             ('change_permission', 'Can edit permission (duplicate)')]
-        six.assertRaisesRegex(self, CommandError,
+        msg = (
             "The permission codename 'change_permission' clashes with a "
-            "builtin permission for model 'auth.Permission'.",
-            create_permissions, auth_app_config, verbosity=0)
+            "builtin permission for model 'auth.Permission'."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            create_permissions(auth_app_config, verbosity=0)
 
         # check duplicated custom permissions
         Permission._meta.permissions = [
@@ -681,10 +684,9 @@ class PermissionTestCase(TestCase):
             ('other_one', 'Some other permission'),
             ('my_custom_permission', 'Some permission with duplicate permission code'),
         ]
-        six.assertRaisesRegex(self, CommandError,
-            "The permission codename 'my_custom_permission' is duplicated for model "
-            "'auth.Permission'.",
-            create_permissions, auth_app_config, verbosity=0)
+        msg = "The permission codename 'my_custom_permission' is duplicated for model 'auth.Permission'."
+        with self.assertRaisesMessage(CommandError, msg):
+            create_permissions(auth_app_config, verbosity=0)
 
         # should not raise anything
         Permission._meta.permissions = [
@@ -723,9 +725,9 @@ class PermissionTestCase(TestCase):
         Permission.objects.filter(content_type=permission_content_type).delete()
         Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control" * 5
 
-        six.assertRaisesRegex(self, exceptions.ValidationError,
-            "The verbose_name of auth.permission is longer than 244 characters",
-            create_permissions, auth_app_config, verbosity=0)
+        msg = "The verbose_name of auth.permission is longer than 244 characters"
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
+            create_permissions(auth_app_config, verbosity=0)
 
     def test_custom_permission_name_length(self):
         auth_app_config = apps.get_app_config('auth')

@@ -718,6 +718,14 @@ class FormsTestCase(SimpleTestCase):
                 {'birthday': datetime.date(1974, 8, 16), 'name': 'John Doe'}
             )
 
+        # Initial data remains present on invalid forms.
+        data = {}
+        f1 = PersonForm(data, initial={'birthday': datetime.date(1974, 8, 16)})
+        f2 = PersonFormFieldInitial(data)
+        for form in (f1, f2):
+            self.assertFalse(form.is_valid())
+            self.assertEqual(form['birthday'].value(), datetime.date(1974, 8, 16))
+
     def test_hidden_data(self):
         class SongForm(Form):
             name = CharField()
@@ -2725,14 +2733,19 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         # An empty value for any field will raise a `required` error on a
         # required `MultiValueField`.
         f = PhoneField()
-        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
-        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
-        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, [])
-        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, ['+61'])
-        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, ['+61', '287654321', '123'])
+        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
+            f.clean('')
+        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
+            f.clean(None)
+        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
+            f.clean([])
+        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
+            f.clean(['+61'])
+        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
+            f.clean(['+61', '287654321', '123'])
         self.assertEqual('+61.287654321 ext. 123 (label: Home)', f.clean(['+61', '287654321', '123', 'Home']))
-        self.assertRaisesMessage(ValidationError,
-            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+        with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
+            f.clean(['61', '287654321', '123', 'Home'])
 
         # Empty values for fields will NOT raise a `required` error on an
         # optional `MultiValueField`
@@ -2743,23 +2756,27 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertEqual('+61. ext.  (label: )', f.clean(['+61']))
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
         self.assertEqual('+61.287654321 ext. 123 (label: Home)', f.clean(['+61', '287654321', '123', 'Home']))
-        self.assertRaisesMessage(ValidationError,
-            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+        with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
+            f.clean(['61', '287654321', '123', 'Home'])
 
         # For a required `MultiValueField` with `require_all_fields=False`, a
         # `required` error will only be raised if all fields are empty. Fields
         # can individually be required or optional. An empty value for any
         # required field will raise an `incomplete` error.
         f = PhoneField(require_all_fields=False)
-        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
-        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
-        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, [])
-        self.assertRaisesMessage(ValidationError, "'Enter a complete value.'", f.clean, ['+61'])
+        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
+            f.clean('')
+        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
+            f.clean(None)
+        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
+            f.clean([])
+        with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
+            f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
         six.assertRaisesRegex(self, ValidationError,
             "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home'])
-        self.assertRaisesMessage(ValidationError,
-            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+        with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
+            f.clean(['61', '287654321', '123', 'Home'])
 
         # For an optional `MultiValueField` with `require_all_fields=False`, we
         # don't get any `required` error but we still get `incomplete` errors.
@@ -2767,12 +2784,13 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertIsNone(f.clean(''))
         self.assertIsNone(f.clean(None))
         self.assertIsNone(f.clean([]))
-        self.assertRaisesMessage(ValidationError, "'Enter a complete value.'", f.clean, ['+61'])
+        with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
+            f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
         six.assertRaisesRegex(self, ValidationError,
             "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home'])
-        self.assertRaisesMessage(ValidationError,
-            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+        with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
+            f.clean(['61', '287654321', '123', 'Home'])
 
     def test_custom_empty_values(self):
         """
@@ -3219,7 +3237,8 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         """
         p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': 'fakedate'})
         repr(p)
-        self.assertRaises(AttributeError, lambda: p.cleaned_data)
+        with self.assertRaises(AttributeError):
+            p.cleaned_data
         self.assertFalse(p.is_valid())
         self.assertEqual(p.cleaned_data, {'first_name': 'John', 'last_name': 'Lennon'})
 

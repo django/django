@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import date, datetime
 
 from django.conf.urls import url
@@ -55,6 +56,10 @@ class FixedLastmodMixedSitemap(Sitemap):
         return [o1, o2]
 
 
+class FixedNewerLastmodSitemap(SimpleSitemap):
+    lastmod = datetime(2013, 4, 20, 5, 0, 0)
+
+
 class DateSiteMap(SimpleSitemap):
     lastmod = date(2013, 3, 13)
 
@@ -86,6 +91,28 @@ fixed_lastmod_sitemaps = {
 fixed_lastmod__mixed_sitemaps = {
     'fixed-lastmod-mixed': FixedLastmodMixedSitemap,
 }
+
+sitemaps_lastmod_mixed_ascending = OrderedDict([
+    ('no-lastmod', EmptySitemap),
+    ('lastmod', FixedLastmodSitemap),
+])
+
+sitemaps_lastmod_mixed_descending = OrderedDict([
+    ('lastmod', FixedLastmodSitemap),
+    ('no-lastmod', EmptySitemap),
+])
+
+sitemaps_lastmod_ascending = OrderedDict([
+    ('date', DateSiteMap),
+    ('datetime', FixedLastmodSitemap),
+    ('datetime-newer', FixedNewerLastmodSitemap),
+])
+
+sitemaps_lastmod_descending = OrderedDict([
+    ('datetime-newer', FixedNewerLastmodSitemap),
+    ('datetime', FixedLastmodSitemap),
+    ('date', DateSiteMap),
+])
 
 generic_sitemaps = {
     'generic': GenericSitemap({'queryset': TestModel.objects.all()}),
@@ -123,13 +150,27 @@ urlpatterns = [
     url(r'^lastmod/tz-sitemap.xml$', views.sitemap,
         {'sitemaps': {'tz-sitemap': TimezoneSiteMap}},
         name='django.contrib.sitemaps.views.sitemap'),
+    url(r'^lastmod-sitemaps/mixed-ascending.xml$', views.sitemap,
+        {'sitemaps': sitemaps_lastmod_mixed_ascending},
+        name='django.contrib.sitemaps.views.sitemap'),
+    url(r'^lastmod-sitemaps/mixed-descending.xml$', views.sitemap,
+        {'sitemaps': sitemaps_lastmod_mixed_descending},
+        name='django.contrib.sitemaps.views.sitemap'),
+    url(r'^lastmod-sitemaps/ascending.xml$', views.sitemap,
+        {'sitemaps': sitemaps_lastmod_ascending},
+        name='django.contrib.sitemaps.views.sitemap'),
+    url(r'^lastmod-sitemaps/descending.xml$', views.sitemap,
+        {'sitemaps': sitemaps_lastmod_descending},
+        name='django.contrib.sitemaps.views.sitemap'),
     url(r'^generic/sitemap\.xml$', views.sitemap,
         {'sitemaps': generic_sitemaps},
         name='django.contrib.sitemaps.views.sitemap'),
     url(r'^cached/index\.xml$', cache_page(1)(views.index),
         {'sitemaps': simple_sitemaps, 'sitemap_url_name': 'cached_sitemap'}),
     url(r'^cached/sitemap-(?P<section>.+)\.xml', cache_page(1)(views.sitemap),
-        {'sitemaps': simple_sitemaps}, name='cached_sitemap')
+        {'sitemaps': simple_sitemaps}, name='cached_sitemap'),
+    url(r'^sitemap-without-entries/sitemap\.xml$', views.sitemap,
+        {'sitemaps': {}}, name='django.contrib.sitemaps.views.sitemap'),
 ]
 
 urlpatterns += i18n_patterns(

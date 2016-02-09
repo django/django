@@ -210,7 +210,7 @@ Validation on a ``ModelForm``
 
 There are two main steps involved in validating a ``ModelForm``:
 
-1. :ref:`Validating the form <form-and-field-validation>`
+1. :doc:`Validating the form </ref/forms/validation>`
 2. :ref:`Validating the model instance <validating-objects>`
 
 Just like normal form validation, model form validation is triggered implicitly
@@ -234,7 +234,7 @@ validation step, right after the form's ``clean()`` method is called.
 .. _overriding-modelform-clean-method:
 
 Overriding the clean() method
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can override the ``clean()`` method on a model form to provide additional
 validation in the same way you can on a normal form.
@@ -253,7 +253,7 @@ attribute that gives its methods access to that specific model instance.
     validation, you must call the parent class's ``clean()`` method.
 
 Interaction with model validation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As part of the validation process, ``ModelForm`` will call the ``clean()``
 method of each field on your model that has a corresponding field on your form.
@@ -268,7 +268,7 @@ on the model's ``clean()`` hook.
 .. _considerations-regarding-model-errormessages:
 
 Considerations regarding model's ``error_messages``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Error messages defined at the
 :attr:`form field <django.forms.Field.error_messages>` level or at the
@@ -793,8 +793,8 @@ instances of the model, you can specify an empty QuerySet::
 
    >>> AuthorFormSet(queryset=Author.objects.none())
 
-Changing the ``form``
----------------------
+Changing the form
+-----------------
 
 By default, when you use ``modelformset_factory``, a model form will
 be created using :func:`~django.forms.models.modelform_factory`.
@@ -920,6 +920,12 @@ extra forms displayed.
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
     >>> [x.name for x in formset.get_queryset()]
     ['Charles Baudelaire', 'Paul Verlaine', 'Walt Whitman']
+
+Also, ``extra=0`` doesn't prevent creation of new model instances as you can
+:ref:`add additional forms with JavaScript <understanding-the-managementform>`
+or just send additional POST data. Formsets `don't yet provide functionality
+<https://code.djangoproject.com/ticket/26142>`_ for an "edit only" view that
+prevents creation of new instances.
 
 If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,

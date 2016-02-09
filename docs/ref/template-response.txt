@@ -1,6 +1,6 @@
-===========================================
-TemplateResponse and SimpleTemplateResponse
-===========================================
+===================================================
+``TemplateResponse`` and ``SimpleTemplateResponse``
+===================================================
 
 .. module:: django.template.response
    :synopsis: Classes dealing with lazy-rendered HTTP responses.
@@ -21,8 +21,8 @@ the details of the template and context that was provided by the view to
 compute the response. The final output of the response is not computed until
 it is needed, later in the response process.
 
-SimpleTemplateResponse objects
-==============================
+``SimpleTemplateResponse`` objects
+==================================
 
 .. class:: SimpleTemplateResponse()
 
@@ -137,8 +137,8 @@ Methods
     subsequent calls, it will return the result obtained from the first call.
 
 
-TemplateResponse objects
-========================
+``TemplateResponse`` objects
+============================
 
 .. class:: TemplateResponse()
 
@@ -278,8 +278,8 @@ has been rendered, and will be provided the fully rendered
 If the template has already been rendered, the callback will be
 invoked immediately.
 
-Using TemplateResponse and SimpleTemplateResponse
-=================================================
+Using ``TemplateResponse`` and ``SimpleTemplateResponse``
+=========================================================
 
 A :class:`TemplateResponse` object can be used anywhere that a normal
 :class:`django.http.HttpResponse` can be used. It can also be used as an

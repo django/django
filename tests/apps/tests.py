@@ -159,12 +159,12 @@ class AppsTests(SimpleTestCase):
         self.assertEqual(apps.get_app_config('relabeled').name, 'apps')
 
     def test_duplicate_labels(self):
-        with six.assertRaisesRegex(self, ImproperlyConfigured, "Application labels aren't unique"):
+        with self.assertRaisesMessage(ImproperlyConfigured, "Application labels aren't unique"):
             with self.settings(INSTALLED_APPS=['apps.apps.PlainAppsConfig', 'apps']):
                 pass
 
     def test_duplicate_names(self):
-        with six.assertRaisesRegex(self, ImproperlyConfigured, "Application names aren't unique"):
+        with self.assertRaisesMessage(ImproperlyConfigured, "Application names aren't unique"):
             with self.settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig', 'apps']):
                 pass
 
@@ -172,7 +172,7 @@ class AppsTests(SimpleTestCase):
         """
         App discovery should preserve stack traces. Regression test for #22920.
         """
-        with six.assertRaisesRegex(self, ImportError, "Oops"):
+        with self.assertRaisesMessage(ImportError, "Oops"):
             with self.settings(INSTALLED_APPS=['import_error_package']):
                 pass
 

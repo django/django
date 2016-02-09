@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import datetime
-
 from django.contrib.admin.utils import quote
 from django.contrib.auth.models import User
 from django.template.response import TemplateResponse
@@ -11,8 +9,7 @@ from django.urls import reverse
 from .models import Action, Car, Person
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='admin_custom_urls.urls',)
+@override_settings(ROOT_URLCONF='admin_custom_urls.urls',)
 class AdminCustomUrlsTest(TestCase):
     """
     Remember that:
@@ -23,13 +20,7 @@ class AdminCustomUrlsTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # password = "secret"
-        User.objects.create(
-            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
-            is_staff=True, last_login=datetime.datetime(2007, 5, 30, 13, 20, 10),
-            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
+        cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
         Action.objects.create(name='delete', description='Remove things.')
         Action.objects.create(name='rename', description='Gives things other names.')
         Action.objects.create(name='add', description='Add things.')
@@ -44,7 +35,7 @@ class AdminCustomUrlsTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_basic_add_GET(self):
         """

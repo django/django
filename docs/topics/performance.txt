@@ -53,7 +53,7 @@ It's no good just guessing or assuming where the inefficiencies lie in your
 code.
 
 Django tools
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 `django-debug-toolbar
 <https://github.com/django-debug-toolbar/django-debug-toolbar/>`_ is a very
@@ -65,7 +65,7 @@ Third-party panels are also available for the toolbar, that can (for example)
 report on cache performance and template rendering times.
 
 Third-party services
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 There are a number of free services that will analyze and report on the
 performance of your site's pages from the perspective of a remote HTTP client,
@@ -96,7 +96,7 @@ most skills, learning what "looks right" takes practice, but one of the most
 useful guidelines is:
 
 Work at the appropriate level
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django offers many different ways of approaching things, but just because it's
 possible to do something in a certain way doesn't mean that it's the most
@@ -232,8 +232,8 @@ until it's strictly required.
 Databases
 =========
 
-:doc:`Database optimization </topics/db/optimization>`
-------------------------------------------------------
+Database optimization
+---------------------
 
 Django’s database layer provides various ways to help developers get the best
 performance from their databases. The :doc:`database optimization documentation
@@ -259,13 +259,13 @@ Django comes with a few helpful pieces of :doc:`middleware </ref/middleware>`
 that can help optimize your site's performance. They include:
 
 :class:`~django.middleware.http.ConditionalGetMiddleware`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Adds support for modern browsers to conditionally GET responses based on the
 ``ETag`` and ``Last-Modified`` headers.
 
 :class:`~django.middleware.gzip.GZipMiddleware`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Compresses responses for all modern browsers, saving bandwidth and transfer
 time. Note that GZipMiddleware is currently considered a security risk, and is
@@ -276,7 +276,7 @@ Sessions
 --------
 
 Using cached sessions
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
 :ref:`Using cached sessions <cached-sessions-backend>` may be a way to increase
 performance by eliminating the need to load session data from a slower storage
@@ -290,7 +290,7 @@ Static files, which by definition are not dynamic, make an excellent target for
 optimization gains.
 
 :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By taking advantage of web browsers' caching abilities, you can
 eliminate network hits entirely for a given file after the initial download.
@@ -302,7 +302,7 @@ long-term without missing future changes - when a file changes, so will the
 tag, so browsers will reload the asset automatically.
 
 "Minification"
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 Several third-party Django tools and packages provide the ability to "minify"
 HTML, CSS, and JavaScript. They remove unnecessary whitespace, newlines, and
@@ -410,7 +410,7 @@ performance gains for your application to outweigh the potential risks.
 With these caveats in mind, you should be aware of:
 
 `PyPy <http://pypy.org/>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `PyPy <http://pypy.org/>`_ is an implementation of Python in Python itself (the
 'standard' Python implementation is in C). PyPy can offer substantial
@@ -422,7 +422,7 @@ Django is compatible, but you will need to check the compatibility of other
 libraries you rely on.
 
 C implementations of Python libraries
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some Python libraries are also implemented in C, and can be much faster. They
 aim to offer the same APIs. Note that compatibility issues and behavior
