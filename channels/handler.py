@@ -34,7 +34,7 @@ class AsgiRequest(http.HttpRequest):
         # Path info
         # TODO: probably needs actual URL decoding
         self.path = self.message['path'].decode("ascii")
-        self.script_name = self.message.get('root_path', '')
+        self.script_name = self.message.get('root_path', b'')
         if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
             self.path_info = self.path[len(self.script_name):]
@@ -44,7 +44,7 @@ class AsgiRequest(http.HttpRequest):
         self.method = self.message['method'].upper()
         self.META = {
             "REQUEST_METHOD": self.method,
-            "QUERY_STRING": self.message.get('query_string', '').decode("ascii"),
+            "QUERY_STRING": self.message.get('query_string', b'').decode("ascii"),
             # Old code will need these for a while
             "wsgi.multithread": True,
             "wsgi.multiprocess": True,
