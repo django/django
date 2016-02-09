@@ -20,13 +20,22 @@ from django.core.files.uploadedfile import (
 )
 from django.db.models.fields.files import FileDescriptor
 from django.test import (
-    LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
+    LiveServerTestCase, SimpleTestCase, TestCase, ignore_warnings,
+    override_settings,
 )
-from django.utils import six
+from django.test.utils import requires_tz_support
+from django.utils import six, timezone
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Storage, temp_storage, temp_storage_location
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
+
 
 FILE_SUFFIX_REGEX = '[A-Za-z0-9]{7}'
 
@@ -83,7 +92,13 @@ class FileStorageDeconstructionTests(unittest.TestCase):
         self.assertEqual(kwargs, kwargs_orig)
 
 
-class FileStorageTests(SimpleTestCase):
+# Tests for TZ-aware time methods need pytz.
+requires_pytz = unittest.skipIf(pytz is None, "this test requires pytz")
+
+
+class FileStorageTests(TestCase):
+    # We're not doing "real" database queries, but by changing TIME_ZONE
+    # we may set the database's underlying timezone, hence TestCase.
     storage_class = FileSystemStorage
 
     def setUp(self):
@@ -123,7 +138,92 @@ class FileStorageTests(SimpleTestCase):
         self.storage.delete('storage_test')
         self.assertFalse(self.storage.exists('storage_test'))
 
-    def test_file_accessed_time(self):
+    def _test_file_time_getter(self, getter):
+        # Check for correct behavior under both USE_TZ=True and USE_TZ=False.
+        # The tests are similar since they both set up a situation where the
+        # system time zone, Django's TIME_ZONE, and UTC are distinct.
+        self._test_file_time_getter_tz_handling_on(getter)
+        self._test_file_time_getter_tz_handling_off(getter)
+
+    @override_settings(USE_TZ=True, TIME_ZONE='Africa/Algiers')
+    def _test_file_time_getter_tz_handling_on(self, getter):
+        # Django's TZ (and hence the system TZ) is set to Africa/Algiers which
+        # is UTC+1 and has no DST change. We can set the Django TZ to something
+        # else so that UTC, Django's TIME_ZONE, and the system timezone are all
+        # different.
+
+        now_in_algiers = timezone.make_aware(datetime.now())
+
+        # Use a fixed offset timezone so we don't need pytz.
+        with timezone.override(timezone.get_fixed_timezone(-300)):
+            # At this point the system TZ is +1 and the Django TZ
+            # is -5. The following will be aware in UTC.
+            now = timezone.now()
+
+            self.assertFalse(self.storage.exists('test.file.tz.on'))
+
+            f = ContentFile('custom contents')
+            f_name = self.storage.save('test.file.tz.on', f)
+            self.addCleanup(self.storage.delete, f_name)
+            dt = getter(f_name)
+            # dt should be aware, in UTC
+
+            self.assertTrue(timezone.is_aware(dt))
+            self.assertEqual(now.tzname(), dt.tzname())
+
+            # Check that the three timezones are indeed distinct.
+            naive_now = datetime.now()
+            algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
+            django_offset = timezone.get_current_timezone().utcoffset(naive_now)
+            utc_offset = timezone.utc.utcoffset(naive_now)
+            self.assertGreater(algiers_offset, utc_offset)
+            self.assertLess(django_offset, utc_offset)
+
+            # dt and now should be the same effective time.
+            self.assertLess(abs(dt - now), timedelta(seconds=2))
+
+    @override_settings(USE_TZ=False, TIME_ZONE='Africa/Algiers')
+    def _test_file_time_getter_tz_handling_off(self, getter):
+        # Django's TZ (and hence the system TZ) is set to Africa/Algiers which
+        # is UTC+1 and has no DST change. We can set the Django TZ to something
+        # else so that UTC, Django's TIME_ZONE, and the system timezone are all
+        # different.
+
+        now_in_algiers = timezone.make_aware(datetime.now())
+
+        # Use a fixed offset timezone so we don't need pytz.
+        with timezone.override(timezone.get_fixed_timezone(-300)):
+            # At this point the system TZ is +1 and the Django TZ
+            # is -5.
+
+            self.assertFalse(self.storage.exists('test.file.tz.off'))
+
+            f = ContentFile('custom contents')
+            f_name = self.storage.save('test.file.tz.off', f)
+            self.addCleanup(self.storage.delete, f_name)
+            dt = getter(f_name)
+            # dt should be naive, in system (+1) TZ
+
+            self.assertTrue(timezone.is_naive(dt))
+
+            # Check that the three timezones are indeed distinct.
+            naive_now = datetime.now()
+            algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
+            django_offset = timezone.get_current_timezone().utcoffset(naive_now)
+            utc_offset = timezone.utc.utcoffset(naive_now)
+            self.assertGreater(algiers_offset, utc_offset)
+            self.assertLess(django_offset, utc_offset)
+
+            # dt and naive_now should be the same effective time.
+            self.assertLess(abs(dt - naive_now), timedelta(seconds=2))
+            # If we convert dt to an aware object using the Algiers
+            # timezone then it should be the same effective time to
+            # now_in_algiers.
+            _dt = timezone.make_aware(dt, now_in_algiers.tzinfo)
+            self.assertLess(abs(_dt - now_in_algiers), timedelta(seconds=2))
+
+    @requires_pytz
+    def test_file_get_accessed_time(self):
         """
         File storage returns a Datetime object for the last accessed time of
         a file.
@@ -132,17 +232,57 @@ class FileStorageTests(SimpleTestCase):
 
         f = ContentFile('custom contents')
         f_name = self.storage.save('test.file', f)
+        atime = self.storage.get_accessed_time(f_name)
+
+        self.assertEqual(atime, datetime.fromtimestamp(os.path.getatime(self.storage.path(f_name))))
+        self.assertLess(timezone.now() - self.storage.get_accessed_time(f_name), timedelta(seconds=2))
+        self.storage.delete(f_name)
+
+    @requires_pytz
+    @requires_tz_support
+    def test_file_get_accessed_time_timezone(self):
+        self._test_file_time_getter(self.storage.get_accessed_time)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_file_accessed_time(self):
+        """
+        File storage returns a datetime for the last accessed time of a file.
+        """
+        self.assertFalse(self.storage.exists('test.file'))
+
+        f = ContentFile('custom contents')
+        f_name = self.storage.save('test.file', f)
         atime = self.storage.accessed_time(f_name)
 
-        self.assertEqual(atime, datetime.fromtimestamp(
-            os.path.getatime(self.storage.path(f_name))))
+        self.assertEqual(atime, datetime.fromtimestamp(os.path.getatime(self.storage.path(f_name))))
         self.assertLess(datetime.now() - self.storage.accessed_time(f_name), timedelta(seconds=2))
         self.storage.delete(f_name)
 
+    @requires_pytz
+    def test_file_get_created_time(self):
+        """
+        File storage returns a datetime for the creation time of a file.
+        """
+        self.assertFalse(self.storage.exists('test.file'))
+
+        f = ContentFile('custom contents')
+        f_name = self.storage.save('test.file', f)
+        ctime = self.storage.get_created_time(f_name)
+
+        self.assertEqual(ctime, datetime.fromtimestamp(os.path.getctime(self.storage.path(f_name))))
+        self.assertLess(timezone.now() - self.storage.get_created_time(f_name), timedelta(seconds=2))
+
+        self.storage.delete(f_name)
+
+    @requires_pytz
+    @requires_tz_support
+    def test_file_get_created_time_timezone(self):
+        self._test_file_time_getter(self.storage.get_created_time)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_file_created_time(self):
         """
-        File storage returns a Datetime object for the creation time of
-        a file.
+        File storage returns a datetime for the creation time of a file.
         """
         self.assertFalse(self.storage.exists('test.file'))
 
@@ -150,16 +290,36 @@ class FileStorageTests(SimpleTestCase):
         f_name = self.storage.save('test.file', f)
         ctime = self.storage.created_time(f_name)
 
-        self.assertEqual(ctime, datetime.fromtimestamp(
-            os.path.getctime(self.storage.path(f_name))))
+        self.assertEqual(ctime, datetime.fromtimestamp(os.path.getctime(self.storage.path(f_name))))
         self.assertLess(datetime.now() - self.storage.created_time(f_name), timedelta(seconds=2))
 
         self.storage.delete(f_name)
 
+    @requires_pytz
+    def test_file_get_modified_time(self):
+        """
+        File storage returns a datetime for the last modified time of a file.
+        """
+        self.assertFalse(self.storage.exists('test.file'))
+
+        f = ContentFile('custom contents')
+        f_name = self.storage.save('test.file', f)
+        mtime = self.storage.get_modified_time(f_name)
+
+        self.assertEqual(mtime, datetime.fromtimestamp(os.path.getmtime(self.storage.path(f_name))))
+        self.assertLess(timezone.now() - self.storage.get_modified_time(f_name), timedelta(seconds=2))
+
+        self.storage.delete(f_name)
+
+    @requires_pytz
+    @requires_tz_support
+    def test_file_get_modified_time_timezone(self):
+        self._test_file_time_getter(self.storage.get_modified_time)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_file_modified_time(self):
         """
-        File storage returns a Datetime object for the last modified time of
-        a file.
+        File storage returns a datetime for the last modified time of a file.
         """
         self.assertFalse(self.storage.exists('test.file'))
 
@@ -167,8 +327,7 @@ class FileStorageTests(SimpleTestCase):
         f_name = self.storage.save('test.file', f)
         mtime = self.storage.modified_time(f_name)
 
-        self.assertEqual(mtime, datetime.fromtimestamp(
-            os.path.getmtime(self.storage.path(f_name))))
+        self.assertEqual(mtime, datetime.fromtimestamp(os.path.getmtime(self.storage.path(f_name))))
         self.assertLess(datetime.now() - self.storage.modified_time(f_name), timedelta(seconds=2))
 
         self.storage.delete(f_name)
@@ -471,6 +630,28 @@ class CustomStorageTests(FileStorageTests):
         self.assertEqual(second, 'custom_storage.2')
         self.storage.delete(first)
         self.storage.delete(second)
+
+
+class CustomStorageLegacyDatetimeHandling(FileSystemStorage):
+    # bit messy, but easier that implementing FileSystemStorage all
+    # over again. We use the _legacy_ accessed_time() et al from
+    # FileSystemStorage, and the shim get_accessed_time() et al
+    # from the Storage baseclass. (Both of those will raise warnings,
+    # so the testcase class below has to ignore them all.)
+
+    def get_accessed_time(self, name):
+        return super(FileSystemStorage, self).get_accessed_time(name)
+
+    def get_created_time(self, name):
+        return super(FileSystemStorage, self).get_created_time(name)
+
+    def get_modified_time(self, name):
+        return super(FileSystemStorage, self).get_modified_time(name)
+
+
+@ignore_warnings(category=RemovedInDjango20Warning)
+class CustomStorageLegacyDatetimeHandlingTests(FileStorageTests):
+    storage_class = CustomStorageLegacyDatetimeHandling
 
 
 class FileFieldStorageTests(TestCase):
