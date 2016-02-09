@@ -42,7 +42,5 @@ class Worker(object):
                 self.callback(channel, message)
             try:
                 consumer(message)
-            except Message.Requeue:
-                self.channel_layer.send(channel, content)
             except:
                 logger.exception("Error processing message with consumer %s:", name_that_thing(consumer))
