@@ -43,6 +43,10 @@ Minor features
 * You can now :ref:`override the the default admin site
   <overriding-default-admin-site>`.
 
+* The new :attr:`.ModelAdmin.sortable_by` attribute and
+  :meth:`.ModelAdmin.get_sortable_by` method allow limiting the columns that
+  can be sorted in the change list page.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

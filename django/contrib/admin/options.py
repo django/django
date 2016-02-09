@@ -111,6 +111,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     formfield_overrides = {}
     readonly_fields = ()
     ordering = None
+    sortable_by = None
     view_on_site = True
     show_full_result_count = True
     checks_class = BaseModelAdminChecks
@@ -352,6 +353,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         if ordering:
             qs = qs.order_by(*ordering)
         return qs
+
+    def get_sortable_by(self, request):
+        """Hook for specifying which fields can be sorted in the changelist."""
+        return self.sortable_by if self.sortable_by is not None else self.get_list_display(request)
 
     def lookup_allowed(self, lookup, value):
         from django.contrib.admin.filters import SimpleListFilter
@@ -688,6 +693,7 @@ class ModelAdmin(BaseModelAdmin):
         # Add the action checkboxes if any actions are available.
         if self.get_actions(request):
             list_display = ['action_checkbox'] + list(list_display)
+        sortable_by = self.get_sortable_by(request)
         ChangeList = self.get_changelist(request)
         return ChangeList(
             request,
@@ -702,6 +708,7 @@ class ModelAdmin(BaseModelAdmin):
             self.list_max_show_all,
             self.list_editable,
             self,
+            sortable_by,
         )
 
     def get_object(self, request, object_id, from_field=None):
