@@ -144,8 +144,8 @@ If you're using AngularJS 1.1.3 and newer, it's sufficient to configure the
 
 .. code-block:: javascript
 
-    $http.defaults.xsrfCookieName = 'csrftoken';
-    $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 Other template engines
 ----------------------
