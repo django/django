@@ -85,7 +85,7 @@ class CommonMiddleware(object):
         Return the full path of the request with a trailing slash appended.
 
         Raise a RuntimeError if settings.DEBUG is True and request.method is
-        GET, PUT, or PATCH.
+        POST, PUT, or PATCH.
         """
         new_path = request.get_full_path(force_append_slash=True)
         if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
