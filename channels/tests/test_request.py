@@ -28,7 +28,7 @@ class RequestTests(SimpleTestCase):
             "reply_channel": "test-reply",
             "http_version": "1.1",
             "method": "GET",
-            "path": "/test/",
+            "path": b"/test/",
         }, "test")
         request = AsgiRequest(message)
         self.assertEqual(request.path, "/test/")
@@ -52,7 +52,7 @@ class RequestTests(SimpleTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "GET",
-            "path": "/test2/",
+            "path": b"/test2/",
             "query_string": b"x=1&y=foo%20bar+baz",
             "headers": {
                 "host": b"example.com",
@@ -85,7 +85,7 @@ class RequestTests(SimpleTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
-            "path": "/test2/",
+            "path": b"/test2/",
             "query_string": b"django=great",
             "body": b"ponies=are+awesome",
             "headers": {
@@ -115,7 +115,7 @@ class RequestTests(SimpleTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
-            "path": "/test/",
+            "path": b"/test/",
             "body": b"there_a",
             "body_channel": "test-input",
             "headers": {
@@ -155,7 +155,7 @@ class RequestTests(SimpleTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
-            "path": "/test/",
+            "path": b"/test/",
             "body_channel": "test-input",
             "headers": {
                 "content-type": b"multipart/form-data; boundary=BOUNDARY",

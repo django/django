@@ -46,7 +46,7 @@ class HandlerTests(SimpleTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "GET",
-            "path": "/test/",
+            "path": b"/test/",
         }, "test")
         response = HttpResponse(b"Hi there!", content_type="text/plain")
         # Run the handler
@@ -74,7 +74,7 @@ class HandlerTests(SimpleTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "GET",
-            "path": "/test/",
+            "path": b"/test/",
         }, "test")
         response = HttpResponse(b"Thefirstthirtybytesisrighthereandhereistherest")
         # Run the handler
