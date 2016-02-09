@@ -58,7 +58,7 @@ class HandlerTests(SimpleTestCase):
         # Make sure the message looks correct
         self.assertEqual(reply_message["content"], b"Hi there!")
         self.assertEqual(reply_message["status"], 200)
-        self.assertEqual(reply_message["status_text"], "OK")
+        self.assertEqual(reply_message["status_text"], b"OK")
         self.assertEqual(reply_message.get("more_content", False), False)
         self.assertEqual(
             reply_message["headers"],
