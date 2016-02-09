@@ -1,5 +1,7 @@
+import os
 import threading
 
+from django.utils import autoreload
 from django.core.management.commands.runserver import \
     Command as RunserverCommand
 
@@ -17,21 +19,18 @@ class Command(RunserverCommand):
         super(Command, self).handle(*args, **options)
 
     def run(self, *args, **options):
-        # Don't autoreload for now
-        self.inner_run(None, **options)
-
-    def inner_run(self, *args, **options):
         # Check a handler is registered for http reqs; if not, add default one
         self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
         if not self.channel_layer.registry.consumer_for_channel("http.request"):
             self.channel_layer.registry.add_consumer(ViewConsumer(), ["http.request"])
-        # Note that this is the channel-enabled one on the console
+        # Helpful note to say this is the Channels runserver
         self.logger.info("Worker thread running, channels enabled")
-        # Launch a worker thread
+        # Launch worker as subthread (including autoreload logic)
         worker = WorkerThread(self.channel_layer)
         worker.daemon = True
         worker.start()
-        # Launch server in main thread
+        # Launch server in main thread (Twisted doesn't like being in a
+        # subthread, and it doesn't need to autoreload as there's no user code)
         from daphne.server import Server
         Server(
             channel_layer=self.channel_layer,
@@ -50,4 +49,8 @@ class WorkerThread(threading.Thread):
         self.channel_layer = channel_layer
 
     def run(self):
-        Worker(channel_layer=self.channel_layer).run()
+        worker = Worker(channel_layer=self.channel_layer)
+        # We need to set run_main so it doesn't try to relaunch the entire
+        # program - that will make Daphne run twice.
+        os.environ["RUN_MAIN"] = "true"
+        autoreload.main(worker.run)

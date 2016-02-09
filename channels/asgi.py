@@ -52,6 +52,9 @@ class ChannelLayerManager(object):
             self.backends[key] = self.make_backend(key)
         return self.backends[key]
 
+    def __contains__(self, key):
+        return key in self.configs
+
 
 class ChannelLayerWrapper(object):
     """

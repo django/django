@@ -20,6 +20,11 @@ class AsgiRequest(http.HttpRequest):
     dict, and wraps request body handling.
     """
 
+    # Exception that will cause any handler to skip around response
+    # transmission and presume something else will do it later.
+    class ResponseLater(Exception):
+        pass
+
     def __init__(self, message):
         self.message = message
         self.reply_channel = self.message.reply_channel
@@ -27,7 +32,8 @@ class AsgiRequest(http.HttpRequest):
         self._post_parse_error = False
         self.resolver_match = None
         # Path info
-        self.path = self.message['path']
+        # TODO: probably needs actual URL decoding
+        self.path = self.message['path'].decode("ascii")
         self.script_name = self.message.get('root_path', '')
         if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
@@ -38,7 +44,7 @@ class AsgiRequest(http.HttpRequest):
         self.method = self.message['method'].upper()
         self.META = {
             "REQUEST_METHOD": self.method,
-            "QUERY_STRING": self.message.get('query_string', ''),
+            "QUERY_STRING": self.message.get('query_string', '').decode("ascii"),
             # Old code will need these for a while
             "wsgi.multithread": True,
             "wsgi.multiprocess": True,
@@ -151,6 +157,10 @@ class AsgiHandler(base.BaseHandler):
                 }
             )
             response = http.HttpResponseBadRequest()
+        except AsgiRequest.ResponseLater:
+            # The view has promised something else
+            # will send a response at a later time
+            return
         else:
             response = self.get_response(request)
         # Transform response into messages, which we yield back to caller
@@ -158,9 +168,10 @@ class AsgiHandler(base.BaseHandler):
             # TODO: file_to_stream
             yield message
 
-    def encode_response(self, response):
+    @classmethod
+    def encode_response(cls, response):
         """
-        Encodes a Django HTTP response into an ASGI http.response message(s).
+        Encodes a Django HTTP response into ASGI http.response message(s).
         """
         # Collect cookies into headers.
         # Note that we have to preserve header case as there are some non-RFC
@@ -181,19 +192,19 @@ class AsgiHandler(base.BaseHandler):
             response_headers.append(
                 (
                     'Set-Cookie',
-                    six.binary_type(c.output(header='')),
+                    c.output(header='').encode("ascii"),
                 )
             )
         # Make initial response message
         message = {
             "status": response.status_code,
-            "status_text": response.reason_phrase,
+            "status_text": response.reason_phrase.encode("ascii"),
             "headers": response_headers,
         }
         # Streaming responses need to be pinned to their iterator
         if response.streaming:
             for part in response.streaming_content:
-                for chunk in self.chunk_bytes(part):
+                for chunk in cls.chunk_bytes(part):
                     message['content'] = chunk
                     message['more_content'] = True
                     yield message
@@ -205,13 +216,14 @@ class AsgiHandler(base.BaseHandler):
         # Other responses just need chunking
         else:
             # Yield chunks of response
-            for chunk, last in self.chunk_bytes(response.content):
+            for chunk, last in cls.chunk_bytes(response.content):
                 message['content'] = chunk
                 message['more_content'] = not last
                 yield message
                 message = {}
 
-    def chunk_bytes(self, data):
+    @classmethod
+    def chunk_bytes(cls, data):
         """
         Chunks some data into chunks based on the current ASGI channel layer's
         message size and reasonable defaults.
@@ -221,10 +233,10 @@ class AsgiHandler(base.BaseHandler):
         position = 0
         while position < len(data):
             yield (
-                data[position:position + self.chunk_size],
-                (position + self.chunk_size) >= len(data),
+                data[position:position + cls.chunk_size],
+                (position + cls.chunk_size) >= len(data),
             )
-            position += self.chunk_size
+            position += cls.chunk_size
 
 
 class ViewConsumer(object):
@@ -232,8 +244,10 @@ class ViewConsumer(object):
     Dispatches channel HTTP requests into django's URL/View system.
     """
 
+    handler_class = AsgiHandler
+
     def __init__(self):
-        self.handler = AsgiHandler()
+        self.handler = self.handler_class()
 
     def __call__(self, message):
         for reply_message in self.handler(message):
