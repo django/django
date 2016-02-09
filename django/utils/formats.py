@@ -214,6 +214,8 @@ def localize_input(value, default=None):
     """
     if isinstance(value, six.string_types):  # Handle strings first for performance reasons.
         return value
+    elif isinstance(value, bool):  # Make sure booleans don't get treated as numbers
+        return mark_safe(six.text_type(value))        
     elif isinstance(value, (decimal.Decimal, float) + six.integer_types):
         return number_format(value)
     elif isinstance(value, datetime.datetime):
