@@ -1287,6 +1287,20 @@ subclass::
     a full count on the table which can be expensive if the table contains a
     large number of rows.
 
+.. attribute:: ModelAdmin.sortable_by
+
+    .. versionadded:: 1.10
+
+    By default, Django admin allows to sort by all model fields and callables,
+    that have ``admin_order_field`` property set. However, you might want to
+    disable interactive sorting for any of them.
+
+    ``sortable_by`` is a list of fields and callables you would like to be
+    available for sorting in the changelist header.
+
+    If you need to specify this list dynamically - you can implement a
+    :meth:`~ModelAdmin.get_sortable_by` method.
+
 .. attribute:: ModelAdmin.view_on_site
 
     Set ``view_on_site`` to control whether or not to display the "View on site" link.
@@ -1471,6 +1485,22 @@ templates used by the :class:`ModelAdmin` views:
     ('name', '=age')`` which results in a string comparison for the numeric
     field, for example ``... OR UPPER("polls_choice"."votes"::text) = UPPER('4')``
     on PostgreSQL.
+
+.. method:: ModelAdmin.get_sortable_by(request)
+
+    .. versionadded:: 1.10
+
+    The ``get_sortable_by`` method is given the ``HttpRequest`` and is expected
+    to return a list or tuple of field names that will be available for the
+    interactive ordering in changelist header. If :attr:`sortable_by` is not
+    set, it returns field names from :meth:`get_list_display` method. You
+    could exclude one or more fields from ordering by overriding this
+    method::
+
+        class PersonAdmin(admin.ModelAdmin):
+
+            def get_sortable_by(self, request):
+                return set(self.get_list_display(request)) - {'rank'}
 
 .. method:: ModelAdmin.save_related(request, form, formsets, change)
 
