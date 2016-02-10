@@ -216,6 +216,7 @@ class BaseHandler(object):
 
                 handler = mw_instance
 
+            # TODO: We could also wrap unconditionally here to catch exceptions raised from middlewares?
             if not exception_middleware_in_place:
                 handler = ExceptionMiddleware(handler)
 
