@@ -21,13 +21,12 @@ class Command(RunserverCommand):
         self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
         if not self.channel_layer.registry.consumer_for_channel("http.request"):
             self.channel_layer.registry.add_consumer(ViewConsumer(), ["http.request"])
-        # Report starting up
-        # Launch worker as subthread (including autoreload logic)
+        # Launch worker as subthread
         worker = WorkerThread(self.channel_layer, self.logger)
         worker.daemon = True
         worker.start()
-        # Launch server in main thread (Twisted doesn't like being in a
-        # subthread, and it doesn't need to autoreload as there's no user code)
+        # Launch server in 'main' thread. Signals are disabled as it's still
+        # actually a subthread under the autoreloader.
         self.logger.info("Daphne running, listening on %s:%s", self.addr, self.port)
         from daphne.server import Server
         Server(
