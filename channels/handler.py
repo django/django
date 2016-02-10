@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import sys
 import logging
+from io import BytesIO
 from threading import Lock
 
 from django import http
@@ -89,6 +90,8 @@ class AsgiRequest(http.HttpRequest):
                 if not chunk.get("more_content", False):
                     break
         assert isinstance(self._body, six.binary_type), "Body is not bytes"
+        # Add a stream-a-like for the body
+        self._stream = BytesIO(self._body)
         # Other bits
         self.resolver_match = None
 

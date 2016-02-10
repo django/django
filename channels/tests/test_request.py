@@ -176,3 +176,23 @@ class RequestTests(SimpleTestCase):
         self.assertFalse(request._post_parse_error)
         self.assertEqual(request.POST["title"], "My First Book")
         self.assertEqual(request.FILES["pdf"].read(), b"FAKEPDFBYTESGOHERE")
+
+    def test_stream(self):
+        """
+        Tests the body stream is emulated correctly.
+        """
+        message = self.make_message({
+            "reply_channel": "test",
+            "http_version": "1.1",
+            "method": "PUT",
+            "path": b"/",
+            "body": b"onetwothree",
+            "headers": {
+                "host": b"example.com",
+                "content-length": b"11",
+            },
+        }, "test")
+        request = AsgiRequest(message)
+        self.assertEqual(request.method, "PUT")
+        self.assertEqual(request.read(3), b"one")
+        self.assertEqual(request.read(), b"twothree")
