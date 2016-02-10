@@ -1,7 +1,5 @@
-import os
 import threading
 
-from django.utils import autoreload
 from django.core.management.commands.runserver import \
     Command as RunserverCommand
 
