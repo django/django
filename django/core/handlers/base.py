@@ -27,19 +27,29 @@ logger = logging.getLogger('django.request')
 def get_exception_response(request, status_code, exception):
     resolver = get_resolver(get_urlconf())
 
-    callback, param_dict = resolver.resolve_error_handler(status_code)
-    # Unfortunately, inspect.getargspec result is not trustable enough
-    # depending on the callback wrapping in decorators (frequent for handlers).
-    # Falling back on try/except:
     try:
-        response = callback(request, **dict(param_dict, exception=exception))
-    except TypeError:
-        warnings.warn(
-            "Error handlers should accept an exception parameter. Update "
-            "your code as this parameter will be required in Django 2.0",
-            RemovedInDjango20Warning, stacklevel=2
-        )
-        response = callback(request, **param_dict)
+        callback, param_dict = resolver.resolve_error_handler(status_code)
+        # Unfortunately, inspect.getargspec result is not trustable enough
+        # depending on the callback wrapping in decorators (frequent for handlers).
+        # Falling back on try/except:
+        try:
+            response = callback(request, **dict(param_dict, exception=exception))
+        except TypeError:
+            warnings.warn(
+                "Error handlers should accept an exception parameter. Update "
+                "your code as this parameter will be required in Django 2.0",
+                RemovedInDjango20Warning, stacklevel=2
+            )
+            response = callback(request, **param_dict)
+    except SystemExit:
+        # Allow sys.exit() to actually exit. See tickets #1023 and #4701
+        raise
+
+    except Exception:  # Handle everything else.
+        # Get the exception info now, in case another exception is thrown later.
+        # FIXME: BaseHandler here as sender is not nice, but who cares?
+        signals.got_request_exception.send(sender=BaseHandler, request=request)
+        return handle_uncaught_exception(request, sys.exc_info())
 
     return response
 
@@ -72,10 +82,7 @@ class ExceptionMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def handle_uncaught_exception(self, request, exc_info):
-        return handle_uncaught_exception(request, exc_info)
-
-    def handle_response_exceptions(self, request):
+    def __call__(self, request):
         try:
             response = self.get_response(request)
         except http.Http404 as exc:
@@ -123,11 +130,6 @@ class ExceptionMiddleware(object):
 
             response = get_exception_response(request, 400, exc)
 
-        return response
-
-    def __call__(self, request):
-        try:
-            return self.handle_response_exceptions(request)
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
@@ -136,7 +138,9 @@ class ExceptionMiddleware(object):
             # Get the exception info now, in case another exception is thrown later.
             # FIXME: BaseHandler here as sender is not nice, but who cares?
             signals.got_request_exception.send(sender=BaseHandler, request=request)
-            return self.handle_uncaught_exception(request, sys.exc_info())
+            return handle_uncaught_exception(request, sys.exc_info())
+
+        return response
 
 
 class BaseHandler(object):
@@ -168,23 +172,6 @@ class BaseHandler(object):
         #settings.MIDDLEWARE = settings.MIDDLEWARE_CLASSES
         if settings.MIDDLEWARE is None:
             handler = ExceptionMiddleware(self._legacy_get_response)
-
-            def make_response_middleware_handler(get_response):
-                def handler(request):
-                    response = get_response(request)
-
-                    try:
-                        response = self._legacy_apply_response_middleware(request, response)
-                    except Exception:  # Any exception should be gathered and handled
-                        signals.got_request_exception.send(sender=self.__class__, request=request)
-                        response = handle_uncaught_exception(request, sys.exc_info())
-
-                    return response
-
-                return handler
-
-            handler = make_response_middleware_handler(handler)
-
             self._legacy_load_middleware()
         else:
             handler = self._get_response
@@ -239,8 +226,12 @@ class BaseHandler(object):
 
         response = self._middleware_chain(request)
 
-        # Response fixes are just not allowed to error out (We have only one, lets remove it)
-        response = self.apply_response_fixes(request, response)
+        try:
+            response = self._legacy_apply_response_middleware(request, response)
+            response = self.apply_response_fixes(request, response)
+        except Exception:  # Any exception should be gathered and handled
+            signals.got_request_exception.send(sender=self.__class__, request=request)
+            response = handle_uncaught_exception(request, sys.exc_info())
 
         response._closable_objects.append(request)
 
