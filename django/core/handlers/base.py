@@ -24,6 +24,118 @@ from django.views import debug
 logger = logging.getLogger('django.request')
 
 
+def handle_uncaught_exception(request, exc_info):
+    resolver = get_resolver(get_urlconf())
+    if settings.DEBUG_PROPAGATE_EXCEPTIONS:
+        raise
+
+    logger.error('Internal Server Error: %s', request.path,
+        exc_info=exc_info,
+        extra={
+            'status_code': 500,
+            'request': request
+        }
+    )
+
+    if settings.DEBUG:
+        return debug.technical_500_response(request, *exc_info)
+
+    # If Http500 handler is not installed, re-raise last exception
+    if resolver.urlconf_module is None:
+        six.reraise(*exc_info)
+    # Return an HttpResponse that displays a friendly error message.
+    callback, param_dict = resolver.resolve_error_handler(500)
+    return callback(request, **param_dict)
+
+
+def get_exception_response(request, status_code, exception):
+    resolver = get_resolver(get_urlconf())
+    try:
+        callback, param_dict = resolver.resolve_error_handler(status_code)
+        # Unfortunately, inspect.getargspec result is not trustable enough
+        # depending on the callback wrapping in decorators (frequent for handlers).
+        # Falling back on try/except:
+        try:
+            response = callback(request, **dict(param_dict, exception=exception))
+        except TypeError:
+            warnings.warn(
+                "Error handlers should accept an exception parameter. Update "
+                "your code as this parameter will be required in Django 2.0",
+                RemovedInDjango20Warning, stacklevel=2
+            )
+            response = callback(request, **param_dict)
+    except Exception:
+        # FIXME: BaseHandler here as sender is not nice, but who cares?
+        signals.got_request_exception.send(sender=BaseHandler, request=request)
+        response = handle_uncaught_exception(request, sys.exc_info())
+
+    return response
+
+
+class ExceptionMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        try:
+            response = self.get_response(request)
+        except http.Http404 as exc:
+            logger.warning('Not Found: %s', request.path,
+                        extra={
+                            'status_code': 404,
+                            'request': request
+                        })
+            if settings.DEBUG:
+                response = debug.technical_404_response(request, exc)
+            else:
+                response = get_exception_response(request, 404, exc)
+
+        except PermissionDenied as exc:
+            logger.warning(
+                'Forbidden (Permission denied): %s', request.path,
+                extra={
+                    'status_code': 403,
+                    'request': request
+                })
+            response = get_exception_response(request, 403, exc)
+
+        except MultiPartParserError as exc:
+            logger.warning(
+                'Bad request (Unable to parse request body): %s', request.path,
+                extra={
+                    'status_code': 400,
+                    'request': request
+                })
+            response = get_exception_response(request, 400, exc)
+
+        except SuspiciousOperation as exc:
+            # The request logger receives events for any problematic request
+            # The security logger receives events for all SuspiciousOperations
+            security_logger = logging.getLogger('django.security.%s' %
+                            exc.__class__.__name__)
+            security_logger.error(
+                force_text(exc),
+                extra={
+                    'status_code': 400,
+                    'request': request
+                })
+            if settings.DEBUG:
+                return debug.technical_500_response(request, *sys.exc_info(), status_code=400)
+
+            response = get_exception_response(request, 400, exc)
+
+        except SystemExit:
+            # Allow sys.exit() to actually exit. See tickets #1023 and #4701
+            raise
+
+        except Exception:  # Handle everything else.
+            # Get the exception info now, in case another exception is thrown later.
+            signals.got_request_exception.send(sender=BaseHandler, request=request)
+            response = handle_uncaught_exception(request, sys.exc_info())
+
+        return response
+
+
 class BaseHandler(object):
     # Changes that are always applied to a response (in this order).
     response_fixes = [
@@ -52,12 +164,33 @@ class BaseHandler(object):
 
         #settings.MIDDLEWARE = settings.MIDDLEWARE_CLASSES
         if settings.MIDDLEWARE is None:
-            handler = self._legacy_get_response
+            handler = ExceptionMiddleware(self._legacy_get_response)
+
+            def make_response_middleware_handler(get_response):
+                def handler(request):
+                    response = get_response(request)
+
+                    try:
+                        response = self._legacy_apply_response_middleware(request, response)
+                    except Exception:  # Any exception should be gathered and handled
+                        signals.got_request_exception.send(sender=self.__class__, request=request)
+                        response = handle_uncaught_exception(request, sys.exc_info())
+
+                    return response
+
+                return handler
+
+            handler = make_response_middleware_handler(handler)
+
             self._legacy_load_middleware()
         else:
             handler = self._get_response
+            # TODO: Easier check to allow users to override where in the chain exceptions are transformed?
+            exception_middleware_in_place = False
             for middleware_path in reversed(settings.MIDDLEWARE):
                 middleware = import_string(middleware_path)
+                if isinstance(middleware, ExceptionMiddleware):
+                    exception_middleware_in_place = True
                 try:
                     mw_instance = middleware(handler)
                 except MiddlewareNotUsed as exc:
@@ -80,6 +213,9 @@ class BaseHandler(object):
 
                 handler = mw_instance
 
+            if not exception_middleware_in_place:
+                handler = ExceptionMiddleware(handler)
+
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
         self._middleware_chain = handler
@@ -92,96 +228,15 @@ class BaseHandler(object):
                 view = transaction.atomic(using=db.alias)(view)
         return view
 
-    def get_exception_response(self, request, status_code, exception):
-        resolver = get_resolver(get_urlconf())
-        try:
-            callback, param_dict = resolver.resolve_error_handler(status_code)
-            # Unfortunately, inspect.getargspec result is not trustable enough
-            # depending on the callback wrapping in decorators (frequent for handlers).
-            # Falling back on try/except:
-            try:
-                response = callback(request, **dict(param_dict, exception=exception))
-            except TypeError:
-                warnings.warn(
-                    "Error handlers should accept an exception parameter. Update "
-                    "your code as this parameter will be required in Django 2.0",
-                    RemovedInDjango20Warning, stacklevel=2
-                )
-                response = callback(request, **param_dict)
-        except Exception:
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, sys.exc_info())
-
-        return response
-
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
         # Setup default url resolver for this thread
         set_urlconf(settings.ROOT_URLCONF)
 
-        try:
-            response = self._middleware_chain(request)
-        except http.Http404 as exc:
-            logger.warning('Not Found: %s', request.path,
-                        extra={
-                            'status_code': 404,
-                            'request': request
-                        })
-            if settings.DEBUG:
-                response = debug.technical_404_response(request, exc)
-            else:
-                response = self.get_exception_response(request, 404, exc)
+        response = self._middleware_chain(request)
 
-        except PermissionDenied as exc:
-            logger.warning(
-                'Forbidden (Permission denied): %s', request.path,
-                extra={
-                    'status_code': 403,
-                    'request': request
-                })
-            response = self.get_exception_response(request, 403, exc)
-
-        except MultiPartParserError as exc:
-            logger.warning(
-                'Bad request (Unable to parse request body): %s', request.path,
-                extra={
-                    'status_code': 400,
-                    'request': request
-                })
-            response = self.get_exception_response(request, 400, exc)
-
-        except SuspiciousOperation as exc:
-            # The request logger receives events for any problematic request
-            # The security logger receives events for all SuspiciousOperations
-            security_logger = logging.getLogger('django.security.%s' %
-                            exc.__class__.__name__)
-            security_logger.error(
-                force_text(exc),
-                extra={
-                    'status_code': 400,
-                    'request': request
-                })
-            if settings.DEBUG:
-                return debug.technical_500_response(request, *sys.exc_info(), status_code=400)
-
-            response = self.get_exception_response(request, 400, exc)
-
-        except SystemExit:
-            # Allow sys.exit() to actually exit. See tickets #1023 and #4701
-            raise
-
-        except Exception:  # Handle everything else.
-            # Get the exception info now, in case another exception is thrown later.
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, sys.exc_info())
-
-        try:
-            # This is a noop with new style middlewares!
-            response = self._legacy_apply_response_middleware(request, response)
-            response = self.apply_response_fixes(request, response)
-        except Exception:  # Any exception should be gathered and handled
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, sys.exc_info())
+        # Response fixes are just not allowed to error out (We have only one, lets remove it)
+        response = self.apply_response_fixes(request, response)
 
         response._closable_objects.append(request)
 
@@ -253,38 +308,6 @@ class BaseHandler(object):
                 response = self._legacy_process_exception_by_middleware(e, request)
 
         return response
-
-    def handle_uncaught_exception(self, request, exc_info):
-        """
-        Processing for any otherwise uncaught exceptions (those that will
-        generate HTTP 500 responses). Can be overridden by subclasses who want
-        customised 500 handling.
-
-        Be *very* careful when overriding this because the error could be
-        caused by anything, so assuming something like the database is always
-        available would be an error.
-        """
-        resolver = get_resolver(get_urlconf())
-        if settings.DEBUG_PROPAGATE_EXCEPTIONS:
-            raise
-
-        logger.error('Internal Server Error: %s', request.path,
-            exc_info=exc_info,
-            extra={
-                'status_code': 500,
-                'request': request
-            }
-        )
-
-        if settings.DEBUG:
-            return debug.technical_500_response(request, *exc_info)
-
-        # If Http500 handler is not installed, re-raise last exception
-        if resolver.urlconf_module is None:
-            six.reraise(*exc_info)
-        # Return an HttpResponse that displays a friendly error message.
-        callback, param_dict = resolver.resolve_error_handler(500)
-        return callback(request, **param_dict)
 
     def apply_response_fixes(self, request, response):
         """
