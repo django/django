@@ -17,7 +17,6 @@ def setup_logger(name, verbosity=1):
     logger.addHandler(handler)
     if verbosity > 1:
         logger.setLevel(logging.DEBUG)
-        logger.debug("Logging set to DEBUG")
 
     # Set up daphne protocol loggers
     for module in ["daphne.ws_protocol", "daphne.http_protocol"]:
