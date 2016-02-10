@@ -79,6 +79,16 @@ class RelatedIn(In):
                         [source.name for source in self.lhs.sources], self.rhs),
                     AND)
             return root_constraint.as_sql(compiler, connection)
+        elif not self.rhs_is_direct_value():
+            from django.db.models.sql.where import WhereNode, SubqueryConstraint, AND, OR
+            root_constraint = WhereNode(connector=OR)
+            root_constraint.add(
+                SubqueryConstraint(
+                    self.lhs.alias, [self.lhs.target.column],
+                    [f.get_attname_column()[1] for f in self.lhs.output_field.get_path_info()[0].target_fields],
+                    self.rhs),
+                AND)
+            return root_constraint.as_sql(compiler, connection)
         else:
             return super(RelatedIn, self).as_sql(compiler, connection)
 
