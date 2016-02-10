@@ -94,7 +94,7 @@ single process tied to a WSGI server, Django runs in three separate layers:
 * The workers, that listen on all relevant channels and run consumer code
   when a message is ready.
 
-This may seem quite simplistic, but that's part of the design; rather than
+This may seem relatively simplistic, but that's part of the design; rather than
 try and have a full asynchronous architecture, we're just introducing a
 slightly more complex abstraction than that presented by Django views.
 
@@ -108,22 +108,25 @@ message. Suddenly, a view is merely another example of a consumer::
 
     # Listens on http.request
     def my_consumer(message):
-        # Decode the request from JSON-compat to a full object
-        django_request = Request.channel_decode(message.content)
+        # Decode the request from message format to a Request object
+        django_request = AsgiRequest(message)
         # Run view
         django_response = view(django_request)
-        # Encode the response into JSON-compat format
-        message.reply_channel.send(django_response.channel_encode())
+        # Encode the response into message format
+        for chunk in AsgiHandler.encode_response(django_response):
+            message.reply_channel.send(chunk)
 
 In fact, this is how Channels works. The interface servers transform connections
 from the outside world (HTTP, WebSockets, etc.) into messages on channels,
-and then you write workers to handle these messages.
+and then you write workers to handle these messages. Usually you leave normal
+HTTP up to Django's built-in consumers that plug it into the view/template
+system, but you can override it to add functionality if you want.
 
-However, the key here is that you can run code (and so send on channels) in
+However, the crucial part is that you can run code (and so send on channels) in
 response to any event - and that includes ones you create. You can trigger
 on model saves, on other incoming messages, or from code paths inside views
 and forms. That approach comes in handy for push-style
-code - where you use HTML5's server-sent events or a WebSocket to notify
+code - where you WebSockets or HTTP long-polling to notify
 clients of changes in real time (messages in a chat, perhaps, or live updates
 in an admin as another user edits something).
 
@@ -168,8 +171,8 @@ Because channels only deliver to a single listener, they can't do broadcast;
 if you want to send a message to an arbitrary group of clients, you need to
 keep track of which response channels of those you wish to send to.
 
-Say I had a live blog where I wanted to push out updates whenever a new post is
-saved, I would register a handler for the ``post_save`` signal and keep a
+If I had a liveblog where I wanted to push out updates whenever a new post is
+saved, I could register a handler for the ``post_save`` signal and keep a
 set of channels (here, using Redis) to send updates to::
 
     redis_conn = redis.Redis("localhost", 6379)
@@ -194,7 +197,7 @@ listens to ``websocket.disconnect`` to do that, but we'd also need to
 have some kind of expiry in case an interface server is forced to quit or
 loses power before it can send disconnect signals - your code will never
 see any disconnect notification but the response channel is completely
-invalid and messages you send there will never get consumed and just expire.
+invalid and messages you send there will sit there until they expire.
 
 Because the basic design of channels is stateless, the channel server has no
 concept of "closing" a channel if an interface server goes away - after all,
@@ -202,15 +205,17 @@ channels are meant to hold messages until a consumer comes along (and some
 types of interface server, e.g. an SMS gateway, could theoretically serve
 any client from any interface server).
 
-That means that we need to follow a keepalive model, where the interface server
-(or, if you want even better accuracy, the client browser/connection) sends
-a periodic message saying it's still connected (though only for persistent
-connection types like WebSockets; normal HTTP doesn't need this as it won't
-stay connected for more than its own timeout).
+We don't particularly care if a disconnected client doesn't get the messages
+sent to the group - after all, it disconnected - but we do care about
+cluttering up the channel backend tracking all of these clients that are no
+longer around (and possibly, eventually getting a collision on the reply
+channel name and sending someone messages not meant for them, though that would
+likely take weeks).
 
 Now, we could go back into our example above and add an expiring set and keep
-track of expiry times and so forth, but this is such a common pattern that
-we don't need to; Channels has it built in, as a feature called Groups::
+track of expiry times and so forth, but what would be the point of a framework
+if it made you add boilerplate code? Instead, Channels implements this
+abstraction as a core concept called Groups::
 
     @receiver(post_save, sender=BlogUpdate)
     def send_update(sender, instance, **kwargs):
@@ -219,19 +224,27 @@ we don't need to; Channels has it built in, as a feature called Groups::
             content=instance.content,
         )
 
-    # Connected to websocket.connect and websocket.keepalive
+    # Connected to websocket.connect
     def ws_connect(message):
         # Add to reader group
         Group("liveblog").add(message.reply_channel)
 
+    # Connected to websocket.disconnect
+    def ws_disconnect(message):
+        # Remove from reader group on clean disconnect
+        Group("liveblog").discard(message.reply_channel)
+
 Not only do groups have their own ``send()`` method (which backends can provide
 an efficient implementation of), they also automatically manage expiry of
-the group members. You'll have to re-call ``Group.add()`` every so often to
-keep existing members from expiring, but that's easy, and can be done in the
-same handler for both ``connect`` and ``keepalive``, as you can see above.
+the group members - when the channel starts having messages expire on it due
+to non-consumption, we go in and remove it from all the groups it's in as well.
+Of course, you should still remove things from the group on disconnect if you
+can; the expiry code is there to catch cases where the disconnect message
+doesn't make it for some reason.
 
 Groups are generally only useful for response channels (ones starting with
-the character ``!``), as these are unique-per-client.
+the character ``!``), as these are unique-per-client, but can be used for
+normal channels as well if you wish.
 
 Next Steps
 ----------

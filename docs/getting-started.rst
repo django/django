@@ -18,34 +18,40 @@ only one consumer can listen to any given channel.
 
 As a very basic example, let's write a consumer that overrides the built-in
 handling and handles every HTTP request directly. This isn't something you'd
-usually do in a project, but it's a good illustration of how channels
-now underlie every part of Django.
+usually do in a project, but it's a good illustration of how Channels
+actually underlies even core Django.
 
 Make a new project, a new app, and put this in a ``consumers.py`` file in the app::
 
     from django.http import HttpResponse
+    from channels.handler import AsgiHandler
 
     def http_consumer(message):
+        # Make standard HTTP response - access ASGI path attribute directly
         response = HttpResponse("Hello world! You asked for %s" % message.content['path'])
-        message.reply_channel.send(response.channel_encode())
+        # Encode that response into message format (ASGI)
+        for chunk in AsgiHandler.encode_response(response):
+            message.reply_channel.send(chunk)
 
 The most important thing to note here is that, because things we send in
 messages must be JSON serializable, the request and response messages
-are in a key-value format. There are ``channel_decode()`` and
-``channel_encode()`` methods on both Django's request and response classes,
-but here we just use the message's ``content`` attribute directly for simplicity
-(message content is always a dict).
+are in a key-value format. You can read more about that format in the
+:doc:`ASGI specification <asgi>`, but you don't need to worry about it too much;
+just know that there's an ``AsgiRequest`` class that translates from ASGI into
+Django request objects, and the ``AsgiHandler`` class handles translation of
+``HttpResponse`` into ASGI messages, which you see used above. Usually,
+Django's built-in code will do all this for you when you're using normal views.
 
-Now, go into your ``settings.py`` file, and set up a channel backend; by default,
-Django will just use a local backend and route HTTP requests to the normal
-URL resolver (we'll come back to backends in a minute).
+Now, go into your ``settings.py`` file, and set up a channel layer; by default,
+Django will just use an in-memory layer and route HTTP requests to the normal
+URL resolver (we'll come back to channel layers in a minute).
 
 For now, we want to override the *channel routing* so that, rather than going
 to the URL resolver and our normal view stack, all HTTP requests go to our
 custom consumer we wrote above. Here's what that looks like::
 
     # In settings.py
-    CHANNEL_BACKENDS = {
+    CHANNEL_LAYERS = {
         "default": {
             "BACKEND": "channels.database_layer.DatabaseChannelLayer",
             "ROUTING": "myproject.routing.channel_routing",
@@ -58,11 +64,12 @@ custom consumer we wrote above. Here's what that looks like::
     }
 
 As you can see, this is a little like Django's ``DATABASES`` setting; there are
-named channel backends, with a default one called ``default``. Each backend
+named channel layers, with a default one called ``default``. Each layer
 needs a class specified which powers it - we'll come to the options there later -
 and a routing scheme, which points to a dict containing the routing settings.
 It's recommended you call this ``routing.py`` and put it alongside ``urls.py``
-in your project.
+in your project, but you can put it wherever you like, as long as the path is
+correct.
 
 If you start up ``python manage.py runserver`` and go to
 ``http://localhost:8000``, you'll see that, rather than a default Django page,
@@ -74,7 +81,8 @@ been able to do for a long time. Let's try some WebSockets, and make a basic
 chat server!
 
 Delete that consumer and its routing - we'll want the normal Django view layer to
-serve HTTP requests from now on - and make this WebSocket consumer instead::
+serve HTTP requests from now on, which happens if you don't specify a consumer
+for ``http.request`` - and make this WebSocket consumer instead::
 
     # In consumers.py
     from channels import Group
@@ -85,8 +93,10 @@ serve HTTP requests from now on - and make this WebSocket consumer instead::
 Hook it up to the ``websocket.connect`` channel like this::
 
     # In routing.py
+    from myproject.myapp.consumers import ws_add
+
     channel_routing = {
-        "websocket.connect": "myproject.myapp.consumers.ws_add",
+        "websocket.connect": ws_add,
     }
 
 Now, let's look at what this is doing. It's tied to the
@@ -98,39 +108,15 @@ is the unique response channel for that client, and adds it to the ``chat``
 group, which means we can send messages to all connected chat clients.
 
 Of course, if you've read through :doc:`concepts`, you'll know that channels
-added to groups expire out after a while unless you keep renewing their
-membership. This is because Channels is stateless; the worker processes
-don't keep track of the open/close states of the potentially thousands of
-connections you have open at any one time.
+added to groups expire out if their messages expire (every channel layer has
+a message expiry time, usually between 30 seconds and a few minutes, and it's
+often configurable).
 
-The solution to this is that the WebSocket interface servers will send
-periodic "keepalive" messages on the ``websocket.keepalive`` channel,
-so we can hook that up to re-add the channel::
-
-    # In consumers.py
-    from channels import Group
-
-    # Connected to websocket.keepalive
-    def ws_keepalive(message):
-        Group("chat").add(message.reply_channel)
-
-It's safe to add the channel to a group it's already in - similarly, it's
-safe to discard a channel from a group it's not in.
-Of course, this is exactly the same code as the ``connect`` handler, so let's
-just route both channels to the same consumer::
-
-    # In routing.py
-    channel_routing = {
-        "websocket.connect": "myproject.myapp.consumers.ws_add",
-        "websocket.keepalive": "myproject.myapp.consumers.ws_add",
-    }
-
-And, even though channels will expire out, let's add an explicit ``disconnect``
-handler to clean up as people disconnect (most channels will cleanly disconnect
-and get this called)::
-
-    # In consumers.py
-    from channels import Group
+However, we'll still get disconnection messages most of the time when a
+WebSocket disconnects; the expiry/garbage collection of group membership is
+mostly there for when a disconnect message gets lost (channels are not
+guaranteed delivery, just mostly reliable). Let's add an explicit disconnect
+handler::
 
     # Connected to websocket.disconnect
     def ws_disconnect(message):
@@ -144,13 +130,17 @@ any message sent in to all connected clients. Here's all the code::
     # In consumers.py
     from channels import Group
 
-    # Connected to websocket.connect and websocket.keepalive
+    # Connected to websocket.connect
     def ws_add(message):
         Group("chat").add(message.reply_channel)
 
     # Connected to websocket.receive
     def ws_message(message):
-        Group("chat").send(message.content)
+        # ASGI WebSocket packet-received and send-packet message types
+        # both have a "text" key for their textual data. 
+        Group("chat").send({
+            "text": "[user] %s" % message.content['text'],
+        })
 
     # Connected to websocket.disconnect
     def ws_disconnect(message):
@@ -158,11 +148,12 @@ any message sent in to all connected clients. Here's all the code::
 
 And what our routing should look like in ``routing.py``::
 
+    from myproject.myapp.consumers import ws_add, ws_message, ws_disconnect
+
     channel_routing = {
-        "websocket.connect": "myproject.myapp.consumers.ws_add",
-        "websocket.keepalive": "myproject.myapp.consumers.ws_add",
-        "websocket.receive": "myproject.myapp.consumers.ws_message",
-        "websocket.disconnect": "myproject.myapp.consumers.ws_disconnect",
+        "websocket.connect": ws_add,
+        "websocket.receive": ws_message,
+        "websocket.disconnect": ws_disconnect,
     }
 
 With all that code, you now have a working set of a logic for a chat server.
@@ -172,49 +163,52 @@ hard.
 Running with Channels
 ---------------------
 
-Because Channels takes Django into a multi-process model, you can no longer
-just run one process if you want to serve more than one protocol type.
+Because Channels takes Django into a multi-process model, you no longer run
+everything in one process along with a WSGI server (of course, you're still
+free to do that if you don't want to use Channels). Instead, you run one or
+more *interface servers*, and one or more *worker servers*, connected by
+that *channel layer* you configured earlier.
 
 There are multiple kinds of "interface servers", and each one will service a
-different type of request - one might do WSGI requests, one might handle
-WebSockets, or you might have one that handles both.
+different type of request - one might do both WebSocket and HTTP requests, while
+another might act as an SMS message gateway, for example.
 
 These are separate from the "worker servers" where Django will run actual logic,
-though, and so you'll need to configure a channel backend to allow the
-channels to run over the network. By default, when you're using Django out of
-the box, the channel backend is set to an in-memory one that only works in
-process; this is enough to serve normal WSGI style requests (``runserver`` is
-just running a WSGI interface and a worker in two separate threads), but now we want
-WebSocket support we'll need a separate process to keep things clean.
+though, and so the *channel layer* transports the content of channels across
+the network. In a production scenario, you'd usually run *worker servers*
+as a separate cluster from the *interface servers*, though of course you
+can run both as separate processes on one machine too.
 
-If you notice, in the example above we switched our default backend to the
-database channel backend. This uses two tables
-in the database to do message handling, and isn't particularly fast but
-requires no extra dependencies. When you deploy to production, you'll want to
-use a backend like the Redis backend that has much better throughput.
+By default, Django doesn't have a channel layer configured - it doesn't need one to run
+normal WSGI requests, after all. As soon as you try to add some consumers,
+though, you'll need to configure one.
+
+In the example above we used the database channel layer implementation
+as our default channel layer. This uses two tables
+in the ``default`` database to do message handling, and isn't particularly fast but
+requires no extra dependencies, so it's handy for development.
+When you deploy to production, though, you'll want to
+use a backend like the Redis backend that has much better throughput and
+lower latency.
 
 The second thing, once we have a networked channel backend set up, is to make
-sure we're running the WebSocket interface server. Even in development, we need
-to do this; ``runserver`` will take care of normal Web requests and running
-a worker for us, but WebSockets isn't compatible with WSGI and needs to run
-separately.
+sure we're running an interface server that's capable of serving WebSockets.
+Luckily, installing Channels will also install ``daphne``, an interface server
+that can handle both HTTP and WebSockets at the same time, and then ties this
+in to run when you run ``runserver`` - you shouldn't notice any difference
+from the normal Django ``runserver``, though some of the options may be a little
+different.
 
-The easiest way to do this is to use the ``runwsserver`` management command
-that ships with Django; just make sure you've installed the latest release
-of ``autobahn`` first::
+*(Under the hood, runserver is now running Daphne in one thread and a worker
+with autoreload in another - it's basically a miniature version of a deployment,
+but all in one process)*
 
-    pip install -U autobahn[twisted]
-    python manage.py runwsserver
+Now, let's test our code. Open a browser and put the following into the
+JavaScript console to open a WebSocket and send some data down it::
 
-Run that alongside ``runserver`` and you'll have two interface servers, a
-worker thread, and the channel backend all connected and running. You can
-even launch separate worker processes with ``runworker`` if you like (you'll
-need at least one of those if you're not also running ``runserver``).
-
-Now, just open a browser and put the following into the JavaScript console
-to test your new code::
-
-    socket = new WebSocket("ws://127.0.0.1:9000");
+    // Note that the path doesn't matter right now; any WebSocket
+    // connection gets bumped over to WebSocket consumers
+    socket = new WebSocket("ws://127.0.0.1:8000/chat/");
     socket.onmessage = function(e) {
         alert(e.data);
     }
@@ -230,15 +224,16 @@ receive the message and show an alert, as any incoming message is sent to the
 been put into the ``chat`` group when they connected.
 
 Feel free to put some calls to ``print`` in your handler functions too, if you
-like, so you can understand when they're called. If you run three or four
-copies of ``runworker`` you'll probably be able to see the tasks running
-on different workers.
+like, so you can understand when they're called. You can also run separate
+worker processes with ``manage.py runworker`` as well - if you do this, you
+should see some of the consumers being handled in the ``runserver`` thread and
+some in the separate worker process.
 
 Persisting Data
 ---------------
 
-Echoing messages is a nice simple example, but it's
-skirting around the real design pattern - persistent state for connections.
+Echoing messages is a nice simple example, but it's ignoring the real
+need for a system like this - persistent state for connections.
 Let's consider a basic chat site where a user requests a chat room upon initial
 connection, as part of the query string (e.g. ``wss://host/websocket?room=abc``).
 
@@ -250,8 +245,8 @@ global variables or similar.
 
 Instead, the solution is to persist information keyed by the ``reply_channel`` in
 some other data store - sound familiar? This is what Django's session framework
-does for HTTP requests, only there it uses cookies as the lookup key rather
-than the ``reply_channel``.
+does for HTTP requests, using a cookie as the key. Wouldn't it be useful if
+we could get a session using the ``reply_channel`` as a key?
 
 Channels provides a ``channel_session`` decorator for this purpose - it
 provides you with an attribute called ``message.channel_session`` that acts
@@ -272,11 +267,6 @@ name in the path of your WebSocket request (we'll ignore auth for now - that's n
         # Save room in session and add us to the group
         message.channel_session['room'] = room
         Group("chat-%s" % room).add(message.reply_channel)
-
-    # Connected to websocket.keepalive
-    @channel_session
-    def ws_keepalive(message):
-        Group("chat-%s" % message.channel_session['room']).add(message.reply_channel)
 
     # Connected to websocket.receive
     @channel_session
@@ -316,16 +306,16 @@ In addition, we don't want the interface servers storing data or trying to run
 authentication; they're meant to be simple, lean, fast processes without much
 state, and so we'll need to do our authentication inside our consumer functions.
 
-Fortunately, because Channels has standardised WebSocket event
-:doc:`message-standards`, it ships with decorators that help you with
+Fortunately, because Channels has an underlying spec for WebSockets and other
+messages (:doc:`ASGI <asgi>`), it ships with decorators that help you with
 both authentication and getting the underlying Django session (which is what
 Django authentication relies on).
 
-Channels can use Django sessions either from cookies (if you're running your websocket
-server on the same port as your main site, which requires a reverse proxy that
-understands WebSockets), or from a ``session_key`` GET parameter, which
-is much more portable, and works in development where you need to run a separate
-WebSocket server (by default, on port 9000).
+Channels can use Django sessions either from cookies (if you're running your
+websocket server on the same port as your main site, using something like Daphne),
+or from a ``session_key`` GET parameter, which is works if you want to keep
+running your HTTP requests through a WSGI server and offload WebSockets to a
+second server process on another port.
 
 You get access to a user's normal Django session using the ``http_session``
 decorator - that gives you a ``message.http_session`` attribute that behaves
@@ -334,12 +324,12 @@ which will provide a ``message.user`` attribute as well as the session attribute
 
 Now, one thing to note is that you only get the detailed HTTP information
 during the ``connect`` message of a WebSocket connection (you can read more
-about what you get when in :doc:`message-standards`) - this means we're not
+about that in the :doc:`ASGI spec <asgi>`) - this means we're not
 wasting bandwidth sending the same information over the wire needlessly.
 
 This also means we'll have to grab the user in the connection handler and then
 store it in the session; thankfully, Channels ships with both a ``channel_session_user``
-decorator that works like the ``http_session_user`` decorator you saw above but
+decorator that works like the ``http_session_user`` decorator we mentioned above but
 loads the user from the *channel* session rather than the *HTTP* session,
 and a function called ``transfer_user`` which replicates a user from one session
 to another.
@@ -361,12 +351,6 @@ chat to people with the same first letter of their username::
         # Add them to the right group
         Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
 
-    # Connected to websocket.keepalive
-    @channel_session_user
-    def ws_keepalive(message):
-        # Keep them in the right group
-        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
-
     # Connected to websocket.receive
     @channel_session_user
     def ws_message(message):
@@ -377,7 +361,9 @@ chat to people with the same first letter of their username::
     def ws_disconnect(message):
         Group("chat-%s" % message.user.username[0]).discard(message.reply_channel)
 
-Now, when we connect to the WebSocket we'll have to remember to provide the
+If you're just using ``runserver`` (and so Daphne), you can just connect
+and your cookies should transfer your auth over. If you were running WebSockets
+on a separate port, you'd have to remember to provide the
 Django session ID as part of the URL, like this::
 
     socket = new WebSocket("ws://127.0.0.1:9000/?session_key=abcdefg");
@@ -436,11 +422,6 @@ have a ChatMessage model with ``message`` and ``room`` fields::
         # Save room in session and add us to the group
         message.channel_session['room'] = room
         Group("chat-%s" % room).add(message.reply_channel)
-
-    # Connected to websocket.keepalive
-    @channel_session
-    def ws_add(message):
-        Group("chat-%s" % message.channel_session['room']).add(message.reply_channel)
 
     # Connected to websocket.receive
     @channel_session
