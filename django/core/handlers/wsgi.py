@@ -98,14 +98,14 @@ class WSGIRequest(http.HttpRequest):
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
-        _, content_params = cgi.parse_header(environ.get('CONTENT_TYPE', ''))
-        if 'charset' in content_params:
+        self.content_type, self.content_params = cgi.parse_header(environ.get('CONTENT_TYPE', ''))
+        if 'charset' in self.content_params:
             try:
-                codecs.lookup(content_params['charset'])
+                codecs.lookup(self.content_params['charset'])
             except LookupError:
                 pass
             else:
-                self.encoding = content_params['charset']
+                self.encoding = self.content_params['charset']
         self._post_parse_error = False
         try:
             content_length = int(environ.get('CONTENT_LENGTH'))

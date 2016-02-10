@@ -61,6 +61,8 @@ class HttpRequest(object):
         self.method = None
         self.resolver_match = None
         self._post_parse_error = False
+        self.content_type = None
+        self.content_params = None
 
     def __repr__(self):
         if self.method is None or not self.get_full_path():
@@ -278,7 +280,7 @@ class HttpRequest(object):
             self._mark_post_parse_error()
             return
 
-        if self.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
+        if self.content_type == 'multipart/form-data':
             if hasattr(self, '_body'):
                 # Use already read data
                 data = BytesIO(self._body)
@@ -296,7 +298,7 @@ class HttpRequest(object):
                 # empty POST
                 self._mark_post_parse_error()
                 raise
-        elif self.META.get('CONTENT_TYPE', '').startswith('application/x-www-form-urlencoded'):
+        elif self.content_type == 'application/x-www-form-urlencoded':
             self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
         else:
             self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
