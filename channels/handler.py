@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
-import sys
+import cgi
+import codecs
 import logging
+import sys
 from io import BytesIO
 from threading import Lock
 
@@ -33,7 +35,6 @@ class AsgiRequest(http.HttpRequest):
         self._post_parse_error = False
         self.resolver_match = None
         # Path info
-        # TODO: probably needs actual URL decoding
         self.path = self.message['path'].decode("ascii")
         self.script_name = self.message.get('root_path', b'')
         if self.script_name:
@@ -65,8 +66,18 @@ class AsgiRequest(http.HttpRequest):
                 corrected_name = "CONTENT_TYPE"
             else:
                 corrected_name = 'HTTP_%s' % name.upper().replace("-", "_")
-            # TODO: Look at request encoding for unicode decode
-            self.META[corrected_name] = value.decode("latin1")
+            # HTTPbis say only ASCII chars are allowed in headers
+            self.META[corrected_name] = value.decode("ascii")
+        # Pull out request encoding if we find it
+        if "CONTENT_TYPE" in self.META:
+            _, content_params = cgi.parse_header(self.META["CONTENT_TYPE"])
+            if 'charset' in content_params:
+                try:
+                    codecs.lookup(content_params['charset'])
+                except LookupError:
+                    pass
+                else:
+                    self.encoding = content_params['charset']
         # Pull out content length info
         if self.META.get('CONTENT_LENGTH', None):
             try:
