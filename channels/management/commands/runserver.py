@@ -102,7 +102,6 @@ class Command(RunserverCommand):
         elif protocol == "websocket" and action == "disconnected":
             msg += "WebSocket DISCONNECT %(path)s [%(client)s]\n" % details
 
-
         sys.stderr.write(msg)
 
 class WorkerThread(threading.Thread):
