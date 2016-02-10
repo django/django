@@ -24,6 +24,26 @@ from django.views import debug
 logger = logging.getLogger('django.request')
 
 
+def get_exception_response(request, status_code, exception):
+    resolver = get_resolver(get_urlconf())
+
+    callback, param_dict = resolver.resolve_error_handler(status_code)
+    # Unfortunately, inspect.getargspec result is not trustable enough
+    # depending on the callback wrapping in decorators (frequent for handlers).
+    # Falling back on try/except:
+    try:
+        response = callback(request, **dict(param_dict, exception=exception))
+    except TypeError:
+        warnings.warn(
+            "Error handlers should accept an exception parameter. Update "
+            "your code as this parameter will be required in Django 2.0",
+            RemovedInDjango20Warning, stacklevel=2
+        )
+        response = callback(request, **param_dict)
+
+    return response
+
+
 def handle_uncaught_exception(request, exc_info):
     resolver = get_resolver(get_urlconf())
     if settings.DEBUG_PROPAGATE_EXCEPTIONS:
@@ -48,35 +68,14 @@ def handle_uncaught_exception(request, exc_info):
     return callback(request, **param_dict)
 
 
-def get_exception_response(request, status_code, exception):
-    resolver = get_resolver(get_urlconf())
-    try:
-        callback, param_dict = resolver.resolve_error_handler(status_code)
-        # Unfortunately, inspect.getargspec result is not trustable enough
-        # depending on the callback wrapping in decorators (frequent for handlers).
-        # Falling back on try/except:
-        try:
-            response = callback(request, **dict(param_dict, exception=exception))
-        except TypeError:
-            warnings.warn(
-                "Error handlers should accept an exception parameter. Update "
-                "your code as this parameter will be required in Django 2.0",
-                RemovedInDjango20Warning, stacklevel=2
-            )
-            response = callback(request, **param_dict)
-    except Exception:
-        # FIXME: BaseHandler here as sender is not nice, but who cares?
-        signals.got_request_exception.send(sender=BaseHandler, request=request)
-        response = handle_uncaught_exception(request, sys.exc_info())
-
-    return response
-
-
 class ExceptionMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def __call__(self, request):
+    def handle_uncaught_exception(self, request, exc_info):
+        return handle_uncaught_exception(request, exc_info)
+
+    def handle_response_exceptions(self, request):
         try:
             response = self.get_response(request)
         except http.Http404 as exc:
@@ -124,16 +123,20 @@ class ExceptionMiddleware(object):
 
             response = get_exception_response(request, 400, exc)
 
+        return response
+
+    def __call__(self, request):
+        try:
+            return self.handle_response_exceptions(request)
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
 
         except Exception:  # Handle everything else.
             # Get the exception info now, in case another exception is thrown later.
+            # FIXME: BaseHandler here as sender is not nice, but who cares?
             signals.got_request_exception.send(sender=BaseHandler, request=request)
-            response = handle_uncaught_exception(request, sys.exc_info())
-
-        return response
+            return self.handle_uncaught_exception(request, sys.exc_info())
 
 
 class BaseHandler(object):
