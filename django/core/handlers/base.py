@@ -50,16 +50,14 @@ class BaseHandler(object):
         self._response_middleware = []
         self._exception_middleware = []
 
-        settings.MIDDLEWARE = settings.MIDDLEWARE_CLASSES
-        print settings.MIDDLEWARE
+        #settings.MIDDLEWARE = settings.MIDDLEWARE_CLASSES
         if settings.MIDDLEWARE is None:
-            handler = self._get_response_old
-            self._load_middleware_old()
+            handler = self._legacy_get_response
+            self._legacy_load_middleware()
         else:
             handler = self._get_response
-            for middleware_path in settings.MIDDLEWARE[::-1]:
+            for middleware_path in reversed(settings.MIDDLEWARE):
                 middleware = import_string(middleware_path)
-                print middleware_path
                 try:
                     mw_instance = middleware(handler)
                 except MiddlewareNotUsed as exc:
@@ -179,7 +177,7 @@ class BaseHandler(object):
 
         try:
             # This is a noop with new style middlewares!
-            response = self._apply_old_response_middleware(request, response)
+            response = self._legacy_apply_response_middleware(request, response)
             response = self.apply_response_fixes(request, response)
         except Exception:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
@@ -218,12 +216,12 @@ class BaseHandler(object):
 
         wrapped_callback = self.make_view_atomic(callback)
 
-        # TODO: It would be nice if we could move the try/except in _get_response_old,
+        # TODO: It would be nice if we could move the try/except in _legacy_get_response,
         # but that would break semantics.
         try:
             response = wrapped_callback(request, *callback_args, **callback_kwargs)
         except Exception as e:
-            response = self.process_exception_by_middleware(e, request)
+            response = self._legacy_process_exception_by_middleware(e, request)
 
         # Complain if the view returned None (a common error).
         # TODO: New style middlewares will actually be able to handle that, good or not?!
@@ -252,7 +250,7 @@ class BaseHandler(object):
             try:
                 response = response.render()
             except Exception as e:
-                response = self.process_exception_by_middleware(e, request)
+                response = self._legacy_process_exception_by_middleware(e, request)
 
         return response
 
@@ -299,7 +297,7 @@ class BaseHandler(object):
         return response
 
     # LEGACY methods, remove after old style middlewares are removed.
-    def process_exception_by_middleware(self, exception, request):
+    def _legacy_process_exception_by_middleware(self, exception, request):
         """
         Pass the exception to the exception middleware. If no middleware
         return a response for this exception, raise it.
@@ -310,7 +308,7 @@ class BaseHandler(object):
                 return response
         raise
 
-    def _apply_old_response_middleware(self, request, response):
+    def _legacy_apply_response_middleware(self, request, response):
         # Apply response middleware, regardless of the response
         for middleware_method in self._response_middleware:
             response = middleware_method(request, response)
@@ -323,7 +321,7 @@ class BaseHandler(object):
 
         return response
 
-    def _get_response_old(self, request):
+    def _legacy_get_response(self, request):
         response = None
         # Apply request middleware
         for middleware_method in self._request_middleware:
@@ -335,7 +333,7 @@ class BaseHandler(object):
             response = self._get_response(request)
         return response
 
-    def _load_middleware_old(self):
+    def _legacy_load_middleware(self):
         for middleware_path in settings.MIDDLEWARE_CLASSES:
             mw_class = import_string(middleware_path)
             try:

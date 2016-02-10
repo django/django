@@ -1,6 +1,6 @@
 from django import http
 from django.conf import settings
-from django.core.handler.middleware import MiddlewareMixin
+from django.core.handlers.middleware import MiddlewareMixin
 
 
 class XViewMiddleware(MiddlewareMixin):
