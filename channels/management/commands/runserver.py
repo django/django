@@ -104,6 +104,7 @@ class Command(RunserverCommand):
 
         sys.stderr.write(msg)
 
+
 class WorkerThread(threading.Thread):
     """
     Class that runs a worker

@@ -10,7 +10,6 @@ from threading import Lock
 from django import http
 from django.core import signals
 from django.core.handlers import base
-from django.core.management.color import color_style
 from django.core.urlresolvers import set_script_prefix
 from django.utils import six
 from django.utils.functional import cached_property
