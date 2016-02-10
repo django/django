@@ -7,8 +7,8 @@ class TestRouter(object):
     """
     Routes to the 'other' database if the model name starts with 'Other'.
     """
-    def allow_migrate(self, db, app_label, model=None, **hints):
-        return db == ('other' if model._meta.verbose_name.startswith('other') else 'default')
+    def allow_migrate(self, db, app_label, model_name=None, **hints):
+        return db == ('other' if model_name.startswith('other') else 'default')
 
 
 @override_settings(DATABASE_ROUTERS=[TestRouter()])
