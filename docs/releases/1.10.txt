@@ -561,6 +561,30 @@ This prevents confusion about an assignment resulting in an implicit save.
   :class:`~django.contrib.gis.geos.MultiPolygon` is deprecated in favor of the
   :attr:`~django.contrib.gis.geos.GEOSGeometry.unary_union` property.
 
+``CommaSeparatedIntegerField`` model field
+------------------------------------------
+
+``CommaSeparatedIntegerField`` is deprecated in favor of
+:class:`~django.db.models.CharField` with the
+:func:`~django.core.validators.validate_comma_separated_integer_list`
+validator::
+
+    from django.core.validators import validate_comma_separated_integer_list
+    from django.db import models
+
+    class MyModel(models.Model):
+        numbers = models.CharField(..., validators=[validate_comma_separated_integer_list])
+
+If you're using Oracle, ``CharField`` uses a different database field 
+type (``NVARCHAR2``) than ``CommaSeparatedIntegerField`` (``VARCHAR2``). 
+Depending on your database settings, this might imply a different 
+encoding, and thus a different length (in bytes) for the same contents. 
+If your stored values are longer than the 4000 byte limit of 
+``NVARCHAR2``, you should use ``TextField`` (``NCLOB``) instead. In this 
+case, if you have any queries that group by the field (e.g. annotating 
+the model with an aggregation or using ``distinct()``) you will need to 
+change them (to defer the field).
+
 Miscellaneous
 -------------
 
