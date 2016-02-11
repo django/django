@@ -732,7 +732,7 @@ class Field(RegisterLookupMixin):
         Perform preliminary non-db specific lookup checks and conversions
         """
         if hasattr(value, '_prepare'):
-            return value._prepare()
+            return value._prepare(self)
 
         if lookup_type in {
             'iexact', 'contains', 'icontains',

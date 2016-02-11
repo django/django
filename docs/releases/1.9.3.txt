@@ -21,3 +21,6 @@ Bugfixes
 * Fixed a regression for cases where
   ``ForeignObject.get_extra_descriptor_filter()`` returned a ``Q`` object
   (:ticket:`26153`).
+
+* Fixed regression with an ``__in=qs`` lookup for a ``ForeignKey`` with
+  ``to_field`` set (:ticket:`26196`).
