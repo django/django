@@ -17,3 +17,7 @@ Bugfixes
 
 * Added system checks for query name clashes of hidden relationships
   (:ticket:`26162`).
+
+* Fixed a regression for cases where 
+  ``ForeignObject.get_extra_descriptor_filter()`` returned a Q-object
+  (:ticket:`26153`).
