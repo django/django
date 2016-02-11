@@ -25,7 +25,7 @@ What's new in Django 1.10
 =========================
 
 Maximum size of a request body is now limited
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------
 
 The new :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` setting limits the size that a
 request body may be before a
@@ -33,7 +33,7 @@ request body may be before a
 not count towards this limit.
 
 Maximum number of form parameters is now limited
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 The new :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS` setting limits the number of
 form fields parsed before a
