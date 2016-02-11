@@ -85,7 +85,14 @@ class URLValidator(RegexValidator):
     # Host patterns
     hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]*[a-z' + ul + r'0-9])?'
     domain_re = r'(?:\.(?!-)[a-z' + ul + r'0-9-]+(?<!-))*'
-    tld_re = r'\.(?:[a-z' + ul + r']{2,}|xn--[a-z0-9]+)\.?'
+    tld_re = (
+        '\.'                                # dot
+        '(?!-)'                             # can't start with a dash
+        '(?:[a-z' + ul + '-]{2,}'           # domain label
+        '|xn--[a-z0-9]+)'                   # or punycode label
+        '(?<!-)'                            # can't end with a dash
+        '\.?'                               # may have a trailing dot
+    )
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
     regex = _lazy_re_compile(
