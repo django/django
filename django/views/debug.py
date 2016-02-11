@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 # regardless of the project's TEMPLATES setting.
 DEBUG_ENGINE = Engine(debug=True)
 
-HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE')
+HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
 
 CLEANSED_SUBSTITUTE = '********************'
 
