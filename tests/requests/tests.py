@@ -7,7 +7,7 @@ from io import BytesIO
 from itertools import chain
 
 from django.core.exceptions import (
-    RequestBodyTooBig, SuspiciousOperation, TooManyFieldsSent,
+    RequestDataTooBig, SuspiciousOperation, TooManyFieldsSent,
 )
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import (
@@ -825,7 +825,7 @@ class DataUploadMaxMemorySizeFPostTests(SimpleTestCase):
 
     def test_size_exceeded(self):
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=12):
-            with self.assertRaisesMessage(RequestBodyTooBig,
+            with self.assertRaisesMessage(RequestDataTooBig,
                                           'Request body too big. Check DATA_UPLOAD_MAX_MEMORY_SIZE.'):
                 self.request._load_post_and_files()
 
@@ -858,7 +858,7 @@ class DataUploadMaxMemorySizeMPostTests(SimpleTestCase):
     def test_size_exceeded(self):
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=10):
             with self.assertRaisesMessage(
-                    RequestBodyTooBig,
+                    RequestDataTooBig,
                     'The size of the request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'
             ):
                 self.request._load_post_and_files()

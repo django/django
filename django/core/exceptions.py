@@ -61,9 +61,9 @@ class TooManyFieldsSent(SuspiciousOperation):
     pass
 
 
-class RequestBodyTooBig(SuspiciousOperation):
+class RequestDataTooBig(SuspiciousOperation):
     """
-    The size of the request body (excluding any file uploads)
+    The size of the request (excluding any file uploads)
     exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.
     """
     pass

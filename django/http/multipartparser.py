@@ -13,7 +13,7 @@ import sys
 
 from django.conf import settings
 from django.core.exceptions import (
-    RequestBodyTooBig, SuspiciousMultipartForm, TooManyFieldsSent,
+    RequestDataTooBig, SuspiciousMultipartForm, TooManyFieldsSent,
 )
 from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,
@@ -202,8 +202,8 @@ class MultiPartParser(object):
                     self._data_size += len(field_name) + 2
                     if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
                             (self._data_size > settings.DATA_UPLOAD_MAX_MEMORY_SIZE or field_stream.read(1))):
-                        raise RequestBodyTooBig(
-                            'The size of the request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'
+                        raise RequestDataTooBig(
+                            'The amount of data in the request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'
                         )
 
                     self._post.appendlist(field_name,
