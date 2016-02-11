@@ -42,6 +42,7 @@ PROTOCOL_TO_PORT = {
 
 FIELDS_MATCH = re.compile('[&;]')
 
+
 @keep_lazy_text
 def urlquote(url, safe='/'):
     """
