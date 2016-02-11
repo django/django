@@ -1108,12 +1108,18 @@ class QuerySet(object):
         for field, objects in other._known_related_objects.items():
             self._known_related_objects.setdefault(field, {}).update(objects)
 
-    def _prepare(self):
+    def _prepare(self, field):
         if self._fields is not None:
             # values() queryset can only be used as nested queries
             # if they are set up to select only a single field.
             if len(self._fields or self.model._meta.concrete_fields) > 1:
                 raise TypeError('Cannot use multi-field values as a filter value.')
+        else:
+            # If the query is used as a subquery for a ForeignKey with non-pk
+            # target field, make sure to select the target field in the subquery.
+            foreign_fields = getattr(field, 'foreign_related_fields', ())
+            if len(foreign_fields) == 1 and not foreign_fields[0].primary_key:
+                return self.values(foreign_fields[0].name)
         return self
 
     def _as_sql(self, connection):
