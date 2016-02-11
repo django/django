@@ -111,7 +111,8 @@ Each field in your model should be an instance of the appropriate
 :class:`~django.db.models.Field` class. Django uses the field class types to
 determine a few things:
 
-* The database column type (e.g. ``INTEGER``, ``VARCHAR``).
+* The column type, which tells the database what kind of data to store (e.g.
+  ``INTEGER``, ``VARCHAR``, ``TEXT``).
 
 * The default HTML :doc:`widget </ref/forms/widgets>` to use when rendering a form
   field (e.g. ``<input type="text">``, ``<select>``).
