@@ -486,20 +486,9 @@ class ManyToOneTests(TestCase):
         p = Parent.objects.get(name="Parent")
         self.assertIsNone(p.bestchild)
 
-        # Assigning None fails: Child.parent is null=False.
-        with self.assertRaises(ValueError):
-            setattr(c, "parent", None)
-
         # You also can't assign an object of the wrong type here
         with self.assertRaises(ValueError):
             setattr(c, "parent", First(id=1, second=1))
-
-        # Nor can you explicitly assign None to Child.parent during object
-        # creation (regression for #9649).
-        with self.assertRaises(ValueError):
-            Child(name='xyzzy', parent=None)
-        with self.assertRaises(ValueError):
-            Child.objects.create(name='xyzzy', parent=None)
 
         # Creation using keyword argument should cache the related object.
         p = Parent.objects.get(name="Parent")

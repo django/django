@@ -228,10 +228,6 @@ class OneToOneTests(TestCase):
         ug_bar.place = None
         self.assertIsNone(ug_bar.place)
 
-        # Assigning None fails: Place.restaurant is null=False
-        with self.assertRaises(ValueError):
-            setattr(p, 'restaurant', None)
-
         # You also can't assign an object of the wrong type here
         with self.assertRaises(ValueError):
             setattr(p, 'restaurant', p)

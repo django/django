@@ -717,12 +717,6 @@ class ProxyRelatedModelTest(TestCase):
 
 
 class TestInitWithNoneArgument(SimpleTestCase):
-    def test_none_not_allowed(self):
-        # TaggedItem requires a content_type, initializing with None should
-        # raise a ValueError.
-        msg = 'Cannot assign None: "TaggedItem.content_type" does not allow null values'
-        with self.assertRaisesMessage(ValueError, msg):
-            TaggedItem(content_object=None)
 
     def test_none_allowed(self):
         # AllowsNullGFK doesn't require a content_type, so None argument should
