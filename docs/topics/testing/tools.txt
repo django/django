@@ -1090,18 +1090,20 @@ subclass::
 
 Here's specifically what will happen:
 
-* At the start of each test case, before ``setUp()`` is run, Django will
-  flush the database, returning the database to the state it was in
-  directly after :djadmin:`migrate` was called.
+* At the start of each test, before ``setUp()`` is run, Django will flush the
+  database, returning the database to the state it was in directly after
+  :djadmin:`migrate` was called.
 
 * Then, all the named fixtures are installed. In this example, Django will
   install any JSON fixture named ``mammals``, followed by any fixture named
   ``birds``. See the :djadmin:`loaddata` documentation for more
   details on defining and installing fixtures.
 
-This flush/load procedure is repeated for each test in the test case, so you
-can be certain that the outcome of a test will not be affected by another test,
-or by the order of test execution.
+For performance reasons, :class:`TestCase` loads fixtures once for the entire
+test class, before :meth:`~TestCase.setUpTestData`, instead of before each
+test, and it uses transactions to clean the database before each test. In any case,
+you can be certain that the outcome of a test will not be affected by another
+test or by the order of test execution.
 
 By default, fixtures are only loaded into the ``default`` database. If you are
 using multiple databases and set :attr:`multi_db=True
