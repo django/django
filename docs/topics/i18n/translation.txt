@@ -1248,7 +1248,6 @@ The view is hooked up to your application and configured in the same fashion as
 The response format is as follows:
 
 .. code-block:: text
-..   JSON doesn't allow comments so highlighting as JSON won't work here.
 
     {
         "catalog": {
@@ -1259,6 +1258,8 @@ The response format is as follows:
         },
         "plural": "..."  # Expression for plural forms, or null.
     }
+
+.. JSON doesn't allow comments so highlighting as JSON won't work here.
 
 Note on performance
 -------------------
