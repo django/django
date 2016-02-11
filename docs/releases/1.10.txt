@@ -479,6 +479,14 @@ creates the possibility of a deadlock. To adapt your code in the case of RQ,
 you can `provide your own worker script <http://python-rq.org/docs/workers/>`_
 that calls ``django.setup()``.
 
+Removed null assignment check for non-null foreign key fields
+-------------------------------------------------------------
+
+In older versions, assigning ``None`` to a non-nullable ``ForeignKey`` or
+``OneToOneField`` raised ``ValueError('Cannot assign None: "model.field" does
+not allow null values.')``. For consistency with other model fields which don't
+have a similar check, this check is removed.
+
 Miscellaneous
 -------------
 
