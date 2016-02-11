@@ -19,7 +19,7 @@ class BaseUserManager(models.Manager):
     @classmethod
     def normalize_email(cls, email):
         """
-        Normalize the email address by lowercasing the domain part of the it.
+        Normalize the email address by lowercasing the domain part of it.
         """
         email = email or ''
         try:
