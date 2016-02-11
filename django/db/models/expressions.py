@@ -210,7 +210,7 @@ class BaseExpression(object):
         ])
         return c
 
-    def _prepare(self):
+    def _prepare(self, field):
         """
         Hook used by Field.get_prep_lookup() to do custom preparation.
         """
