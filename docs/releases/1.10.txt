@@ -479,6 +479,14 @@ creates the possibility of a deadlock. To adapt your code in the case of RQ,
 you can `provide your own worker script <http://python-rq.org/docs/workers/>`_
 that calls ``django.setup()``.
 
+Removed null assignment check for non-nullable foreign key fields
+----------------------------------------------------------------------------------
+
+Before 1.10 assign None to a non-nullable foreign key field with raise ValueError.
+This check has been removed in 1.10 and the check will be left to database. So if
+a non-nullable foreign key is assigned None. An IntegrityError will be raised when
+trying to save the instance.
+
 Miscellaneous
 -------------
 
