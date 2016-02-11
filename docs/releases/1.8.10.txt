@@ -21,3 +21,6 @@ Bugfixes
 * Fixed :class:`~django.contrib.postgres.fields.RangeField` and
   :class:`~django.contrib.postgres.fields.ArrayField` serialization with
   ``None`` values (:ticket:`26215`).
+
+* Reallowed dashes in top-level domain names of URLs checked by
+  ``URLValidator`` to fix a regression in Django 1.8 (:ticket:`26204`).
