@@ -859,7 +859,7 @@ class DataUploadMaxMemorySizeMPostTests(SimpleTestCase):
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=10):
             with self.assertRaisesMessage(
                     RequestDataTooBig,
-                    'The size of the request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'
+                    'The amount of data in the request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'
             ):
                 self.request._load_post_and_files()
 
