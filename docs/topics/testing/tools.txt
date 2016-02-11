@@ -1071,7 +1071,7 @@ subclass::
 
 Here's specifically what will happen:
 
-* At the start of each test case, before ``setUp()`` is run, Django will
+* At the start of each test, before ``setUp()`` is run, Django will
   flush the database, returning the database to the state it was in
   directly after :djadmin:`migrate` was called.
 
@@ -1080,8 +1080,10 @@ Here's specifically what will happen:
   ``birds``. See the :djadmin:`loaddata` documentation for more
   details on defining and installing fixtures.
 
-This flush/load procedure is repeated for each test in the test case, so you
-can be certain that the outcome of a test will not be affected by another test,
+Note that for performance reasons, ``TestCase`` overrides this behavior to load
+fixtures only once before calling ``setUpTestData()`` and not once per test, and
+uses transactions to clean the database before each test. In any case you can be
+certain that the outcome of a test will not be affected by another test,
 or by the order of test execution.
 
 By default, fixtures are only loaded into the ``default`` database. If you are
