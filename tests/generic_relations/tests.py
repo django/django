@@ -722,3 +722,5 @@ class TestInitWithNoneArgument(SimpleTestCase):
         # AllowsNullGFK doesn't require a content_type, so None argument should
         # also be allowed.
         AllowsNullGFK(content_object=None)
+        # TaggedItem requires a content_type, initializing with None should also be allowed (#26179)
+        TaggedItem(content_object=None)
