@@ -17,3 +17,6 @@ Bugfixes
 
 * Added system checks for query name clashes of hidden relationships
   (:ticket:`26162`).
+
+* Fixed regression when using `__in=qs` lookup for a `ForeignKey` with
+  `to_field` set (:ticket:`26196`).

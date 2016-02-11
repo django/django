@@ -2416,6 +2416,19 @@ class ToFieldTests(TestCase):
             {lunch, dinner},
         )
 
+    def test_in_subquery(self):
+        apple = Food.objects.create(name="apple")
+        lunch = Eaten.objects.create(food=apple, meal="lunch")
+        print(Eaten.objects.filter(food__in=Food.objects.filter(name='apple')).query)
+        self.assertEqual(
+            set(Eaten.objects.filter(food__in=Food.objects.filter(name='apple'))),
+            {lunch},
+        )
+        self.assertEqual(
+            set(Eaten.objects.filter(food__in=Food.objects.filter(name='apple').values('eaten__meal'))),
+            set(),
+        )
+
     def test_reverse_in(self):
         apple = Food.objects.create(name="apple")
         pear = Food.objects.create(name="pear")
