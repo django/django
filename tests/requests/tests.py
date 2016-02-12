@@ -14,7 +14,7 @@ from django.http import (
 )
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
-from django.test.utils import str_prefix
+from django.test.utils import freeze_time, str_prefix
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.http import cookie_date, urlencode
@@ -213,10 +213,12 @@ class RequestsTests(SimpleTestCase):
     def test_max_age_expiration(self):
         "Cookie will expire if max_age is provided"
         response = HttpResponse()
-        response.set_cookie('max_age', max_age=10)
+        set_cookie_time = time.time()
+        with freeze_time(set_cookie_time):
+            response.set_cookie('max_age', max_age=10)
         max_age_cookie = response.cookies['max_age']
         self.assertEqual(max_age_cookie['max-age'], 10)
-        self.assertEqual(max_age_cookie['expires'], cookie_date(time.time() + 10))
+        self.assertEqual(max_age_cookie['expires'], cookie_date(set_cookie_time + 10))
 
     def test_httponly_cookie(self):
         response = HttpResponse()
