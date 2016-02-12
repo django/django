@@ -11,7 +11,7 @@ class Tag(object):
         self.tag_id = tag_id
 
     def __eq__(self, other):
-        return type(other) is Tag and self.tag_id == other.tag_id
+        return isinstance(other, Tag) and self.tag_id == other.tag_id
 
 
 class TagField(models.SmallIntegerField):
