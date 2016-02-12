@@ -333,7 +333,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Added methods :meth:`~django.test.SimpleTestCase.assertFormValid` and
+  :meth:`~django.test.SimpleTestCase.assertFormNotValid`.
 
 URLs
 ~~~~

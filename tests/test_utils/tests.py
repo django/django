@@ -9,7 +9,7 @@ from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import default_storage
 from django.db import connection, models, router
-from django.forms import EmailField, IntegerField
+from django.forms import CharField, EmailField, Form, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import (
@@ -842,6 +842,98 @@ class AssertFieldOutputTests(SimpleTestCase):
                 'required': 'This is really required.',
             }
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
+
+
+class AssertFormValidTests(SimpleTestCase):
+    class TestForm(Form):
+        name = CharField(label='Name', max_length=4)
+        age = IntegerField(label='Age')
+
+    def test_with_valid_form(self):
+        form = self.TestForm(data={
+            'name': 'John',
+            'age': 7,
+        })
+        self.assertFormValid(form)
+
+    def test_error_message_with_invalid_form(self):
+        form = self.TestForm(data={
+            'name': 'John',
+            'age': None,
+        })
+
+        expected_message = (
+            'Form validation failed. Error(s):\n'
+            '- age:\n'
+            '    - This field is required.\n')
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            self.assertFormValid(form)
+
+
+class AssertFormNotValidTests(SimpleTestCase):
+    class TestForm(Form):
+        name = CharField(label='Name', max_length=4)
+        age = IntegerField(label='Age')
+
+    def test_with_valid_form(self):
+        form = self.TestForm(data={
+            'name': 'John',
+            'age': 7,
+        })
+        expected_message = (
+            'FormNotValid failed. Error(s):\n'
+            '- Form is valid\n')
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            self.assertFormNotValid(form)
+
+    def test_with_invalid_form_with_redundant_expected_errors(self):
+        form = self.TestForm(data={
+            'name': 'John',
+            'age': None,
+        })
+        expected_message = (
+            'FormNotValid failed. Error(s):\n'
+            '- \'name\' expected error not found.\n')
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            self.assertFormNotValid(
+                form,
+                expected_errors=[
+                    ('age', 'required'),
+                    ('name', 'max_length')])
+
+    def test_with_invalid_form_with_expected_errors_allow_other_errors(self):
+        form = self.TestForm(data={
+            'name': 'John',
+            'age': None,
+        })
+        self.assertFormNotValid(
+            form,
+            expected_errors=[('age', 'required'), ])
+
+    def test_with_invalid_form_with_unexpected_errors_allow_other_errors(self):
+        form = self.TestForm(data={
+            'name': 'Johnny',
+            'age': None,
+        })
+        self.assertFormNotValid(
+            form,
+            expected_errors=[('age', 'required'), ])
+
+    def test_with_invalid_form_with_unexpected_errors_disallow_other_errors(self):
+        form = self.TestForm(data={
+            'name': 'Johnny',
+            'age': None,
+        })
+        expected_message = (
+            'FormNotValid failed. Error(s):\n'
+            '- Other errors reported:\n'
+            '- name\n'
+            '    - Ensure this value has at most 4 characters (it has 6).\n')
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            self.assertFormNotValid(
+                form,
+                expected_errors=[('age', 'required'), ],
+                allow_other_errors=False)
 
 
 class FirstUrls:

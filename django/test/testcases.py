@@ -783,6 +783,48 @@ class SimpleTestCase(unittest.TestCase):
                 standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 self.fail(self._formatMessage(msg, standardMsg))
 
+    def assertFormValid(self, form, msg=None):
+        """
+        Asserts that a form is valid
+        """
+        if not form.is_valid():
+            standardMsg = "Form validation failed. Error(s):\n"
+            for field, field_errors in form.errors.items():
+                standardMsg += "- %s:\n" % field
+                for error in field_errors:
+                    standardMsg += "    - %s\n" % error
+            self.fail(self._formatMessage(msg, standardMsg))
+
+    def assertFormNotValid(self, form, expected_errors=None,
+                           allow_other_errors=True, msg=None):
+        """
+        Asserts that a form is not valid
+        """
+        to_report = ""
+        if form.is_valid():
+            to_report = "Form is valid\n"
+        else:
+            for error in expected_errors:
+                # if test passes additional expected errors which are not
+                # found, fail the test
+                if not form.has_error(*error):
+                    to_report = "'{0}' expected error not found.\n".format(error[0])
+
+        if not to_report:
+            other_errors = [
+                verr for verr in form.errors.keys() if (
+                    verr not in [err[0] for err in expected_errors])]
+            if not allow_other_errors and other_errors:
+                to_report = 'Other errors reported:'
+                for error in other_errors:
+                    to_report += '\n- %s' % error
+                    for err_msg in form.errors[error]:
+                        to_report += "\n    - %s\n" % err_msg
+
+        if to_report:
+            self.fail(self._formatMessage(
+                msg, 'FormNotValid failed. Error(s):\n- %s' % to_report))
+
 
 class TransactionTestCase(SimpleTestCase):
 
