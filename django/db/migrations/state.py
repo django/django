@@ -344,6 +344,17 @@ class StateApps(Apps):
         except KeyError:
             pass
 
+    def get_app_config(self, app_label):
+        """
+        Overrides apps.registry.Apps.get_app_config function to add
+        additional message.
+        """
+        try:
+            super(StateApps, self).get_app_config(app_label)
+        except LookupError as e:
+            e.args[0] += ' Or possibly missing dependency on a migration?'
+            raise
+
 
 class ModelState(object):
     """
