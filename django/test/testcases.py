@@ -928,6 +928,16 @@ class TransactionTestCase(SimpleTestCase):
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=inhibit_post_migrate)
 
+            # If there was some initial data from migrated apps, restore them for the next test.
+            if self.serialized_rollback and hasattr(connections[db_name], "_test_serialized_contents"):
+                if self.available_apps is not None:
+                    apps.unset_available_apps()
+                connections[db_name].creation.deserialize_db_from_string(
+                    connections[db_name]._test_serialized_contents
+                )
+                if self.available_apps is not None:
+                    apps.set_available_apps(self.available_apps)
+
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
         items = six.moves.map(transform, qs)
         if not ordered:

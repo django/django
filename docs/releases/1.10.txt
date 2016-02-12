@@ -600,6 +600,17 @@ You can check if your database has any of the removed hashers like this::
     # Unsalted MD5 passwords might not have an 'md5$$' prefix:
     User.objects.filter(password__length=32)
 
+``TransactionTestCase`` serialized data loading
+-----------------------------------------------
+
+Initial data migrations are now loaded in ``TransactionTestCase`` at the end of
+the test, after the database flush.
+In older versions, these data were loaded at the beginning of the test, but
+this behavior was preventing ``--keepdb`` option to work properly (the
+database was empty at the end of the whole test suite).
+It shouldn't have any impact on your test suite if you have not customized
+``TransactionTestCase`` internal logic.
+
 Miscellaneous
 -------------
 
