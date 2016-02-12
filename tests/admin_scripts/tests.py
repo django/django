@@ -1367,7 +1367,7 @@ class ManageRunserver(AdminScriptTestCase):
         Ensure runserver.check_migrations doesn't choke on empty DATABASES.
         """
         tested_connections = ConnectionHandler({})
-        with mock.patch('django.core.management.commands.runserver.connections', new=tested_connections):
+        with mock.patch('django.core.management.base.connections', new=tested_connections):
             self.cmd.check_migrations()
 
     def test_readonly_database(self):

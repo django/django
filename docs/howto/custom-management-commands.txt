@@ -236,6 +236,14 @@ All attributes can be set in your derived class and can be used in
     A boolean; if ``True``, the entire Django project will be checked for
     potential problems prior to executing the command. Default value is ``True``.
 
+.. versionadded:: 1.10
+
+.. attribute:: BaseCommand.requires_migrations_checks
+
+    A boolean; if ``True``, checks to see if the set of migrations on disk matches the
+    migrations in the database. Prints a warning if they don't match. Default value is
+    ``False``.
+
 .. attribute:: BaseCommand.leave_locale_alone
 
     A boolean indicating whether the locale set in settings should be preserved
