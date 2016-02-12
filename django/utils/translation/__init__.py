@@ -134,7 +134,12 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                 return translated
 
         proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
+        proxy.__reduce__ = lambda: (_lazy_number_unpickle, (func, resultclass, number, kwargs))
     return proxy
+
+
+def _lazy_number_unpickle(func, resultclass, number, kwargs):
+    return lazy_number(func, resultclass, number=number, **kwargs)
 
 
 def ngettext_lazy(singular, plural, number=None):
