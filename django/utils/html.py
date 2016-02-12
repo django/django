@@ -17,7 +17,12 @@ from django.utils.text import normalize_newlines
 from .html_parser import HTMLParseError, HTMLParser
 
 # Configuration for urlize() function.
-TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'', '!']
+TRAILING_PUNCTUATION_RE = re.compile(
+    '^'           # Beginning of word
+    '(.*?)'       # The URL in word
+    '([.,:;!]+)'  # Allowed non-wrapping, trailing punctuation
+    '$'           # End of word
+)
 WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
 
 # List of possible strings used for bullets in bulleted lists.
@@ -268,24 +273,46 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             trail = ''
         return text, unescaped, trail
 
-    words = word_split_re.split(force_text(text))
-    for i, word in enumerate(words):
-        if '.' in word or '@' in word or ':' in word:
-            # Deal with punctuation.
-            lead, middle, trail = '', word, ''
-            for punctuation in TRAILING_PUNCTUATION:
-                if middle.endswith(punctuation):
-                    middle = middle[:-len(punctuation)]
-                    trail = punctuation + trail
+    def trim_punctuation(lead, middle, trail):
+        """
+        Trim trailing and wrapping punctuation from `middle`. Return
+        the items of the new state.
+        """
+        # Continue trimming until middle remains unchanged.
+        trimmed_something = True
+        while trimmed_something:
+            trimmed_something = False
+
+            # Trim trailing punctuation.
+            match = TRAILING_PUNCTUATION_RE.match(middle)
+            if match:
+                middle = match.group(1)
+                trail = match.group(2) + trail
+                trimmed_something = True
+
+            # Trim wrapping punctuation.
             for opening, closing in WRAPPING_PUNCTUATION:
                 if middle.startswith(opening):
                     middle = middle[len(opening):]
-                    lead = lead + opening
+                    lead += opening
+                    trimmed_something = True
                 # Keep parentheses at the end only if they're balanced.
-                if (middle.endswith(closing)
-                        and middle.count(closing) == middle.count(opening) + 1):
+                if (middle.endswith(closing) and
+                        middle.count(closing) == middle.count(opening) + 1):
                     middle = middle[:-len(closing)]
                     trail = closing + trail
+                    trimmed_something = True
+        return lead, middle, trail
+
+    words = word_split_re.split(force_text(text))
+    for i, word in enumerate(words):
+        if '.' in word or '@' in word or ':' in word:
+            # lead: Current punctuation trimmed from the beginning of the word.
+            # middle: Current state of the word.
+            # trail: Current punctuation trimmed from the end of the word.
+            lead, middle, trail = '', word, ''
+            # Deal with punctuation.
+            lead, middle, trail = trim_punctuation(lead, middle, trail)
 
             # Make URL we want to point to.
             url = None
