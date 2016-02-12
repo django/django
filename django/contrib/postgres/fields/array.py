@@ -48,7 +48,6 @@ class ArrayField(Field):
             errors.append(
                 checks.Error(
                     'Base field for array cannot be a related field.',
-                    hint=None,
                     obj=self,
                     id='postgres.E002'
                 )
@@ -61,7 +60,6 @@ class ArrayField(Field):
                 errors.append(
                     checks.Error(
                         'Base field for array has errors:\n    %s' % messages,
-                        hint=None,
                         obj=self,
                         id='postgres.E001'
                     )

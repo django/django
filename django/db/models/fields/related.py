@@ -153,9 +153,8 @@ class RelatedField(Field):
         if rel_is_missing and (rel_is_string or not self.remote_field.model._meta.swapped):
             return [
                 checks.Error(
-                    ("Field defines a relation with model '%s', which "
-                     "is either not installed, or is abstract.") % model_name,
-                    hint=None,
+                    "Field defines a relation with model '%s', which is either "
+                    "not installed, or is abstract." % model_name,
                     obj=self,
                     id='fields.E300',
                 )
@@ -172,8 +171,8 @@ class RelatedField(Field):
             )
             return [
                 checks.Error(
-                    ("Field defines a relation with the model '%s', "
-                     "which has been swapped out.") % model,
+                    "Field defines a relation with the model '%s', which has "
+                    "been swapped out." % model,
                     hint="Update the relation to point at 'settings.%s'." % self.remote_field.model._meta.swappable,
                     obj=self,
                     id='fields.E301',
@@ -511,9 +510,8 @@ class ForeignObject(RelatedField):
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
-                    ("'%s.%s' must set unique=True "
-                     "because it is referenced by a foreign key.") % (model_name, field_name),
-                    hint=None,
+                    "'%s.%s' must set unique=True because it is referenced by "
+                    "a foreign key." % (model_name, field_name),
                     obj=self,
                     id='fields.E311',
                 )
@@ -1161,7 +1159,6 @@ class ManyToManyField(RelatedField):
             return [
                 checks.Error(
                     'ManyToManyFields cannot be unique.',
-                    hint=None,
                     obj=self,
                     id='fields.E330',
                 )
@@ -1175,7 +1172,6 @@ class ManyToManyField(RelatedField):
             warnings.append(
                 checks.Warning(
                     'null has no effect on ManyToManyField.',
-                    hint=None,
                     obj=self,
                     id='fields.W340',
                 )
@@ -1185,7 +1181,6 @@ class ManyToManyField(RelatedField):
             warnings.append(
                 checks.Warning(
                     'ManyToManyField does not support validators.',
-                    hint=None,
                     obj=self,
                     id='fields.W341',
                 )
@@ -1206,23 +1201,19 @@ class ManyToManyField(RelatedField):
             # The relationship model is not installed.
             errors.append(
                 checks.Error(
-                    ("Field specifies a many-to-many relation through model "
-                     "'%s', which has not been installed.") %
-                    qualified_model_name,
-                    hint=None,
+                    "Field specifies a many-to-many relation through model "
+                    "'%s', which has not been installed." % qualified_model_name,
                     obj=self,
                     id='fields.E331',
                 )
             )
 
         else:
-
             assert from_model is not None, (
                 "ManyToManyField with intermediate "
                 "tables cannot be checked if you don't pass the model "
                 "where the field is attached to."
             )
-
             # Set some useful local variables
             to_model = resolve_relation(from_model, self.remote_field.model)
             from_model_name = from_model._meta.object_name
@@ -1239,7 +1230,6 @@ class ManyToManyField(RelatedField):
                 errors.append(
                     checks.Error(
                         'Many-to-many fields with intermediate tables must not be symmetrical.',
-                        hint=None,
                         obj=self,
                         id='fields.E332',
                     )
@@ -1253,13 +1243,12 @@ class ManyToManyField(RelatedField):
                 if seen_self > 2 and not self.remote_field.through_fields:
                     errors.append(
                         checks.Error(
-                            ("The model is used as an intermediate model by "
-                             "'%s', but it has more than two foreign keys "
-                             "to '%s', which is ambiguous. You must specify "
-                             "which two foreign keys Django should use via the "
-                             "through_fields keyword argument.") % (self, from_model_name),
-                            hint=("Use through_fields to specify which two "
-                                  "foreign keys Django should use."),
+                            "The model is used as an intermediate model by "
+                            "'%s', but it has more than two foreign keys "
+                            "to '%s', which is ambiguous. You must specify "
+                            "which two foreign keys Django should use via the "
+                            "through_fields keyword argument." % (self, from_model_name),
+                            hint="Use through_fields to specify which two foreign keys Django should use.",
                             obj=self.remote_field.through,
                             id='fields.E333',
                         )
@@ -1280,9 +1269,10 @@ class ManyToManyField(RelatedField):
                              "from '%s', which is ambiguous. You must specify "
                              "which foreign key Django should use via the "
                              "through_fields keyword argument.") % (self, from_model_name),
-                            hint=('If you want to create a recursive relationship, '
-                                  'use ForeignKey("self", symmetrical=False, '
-                                  'through="%s").') % relationship_model_name,
+                            hint=(
+                                'If you want to create a recursive relationship, '
+                                'use ForeignKey("self", symmetrical=False, through="%s").'
+                            ) % relationship_model_name,
                             obj=self,
                             id='fields.E334',
                         )
@@ -1291,14 +1281,15 @@ class ManyToManyField(RelatedField):
                 if seen_to > 1 and not self.remote_field.through_fields:
                     errors.append(
                         checks.Error(
-                            ("The model is used as an intermediate model by "
-                             "'%s', but it has more than one foreign key "
-                             "to '%s', which is ambiguous. You must specify "
-                             "which foreign key Django should use via the "
-                             "through_fields keyword argument.") % (self, to_model_name),
-                            hint=('If you want to create a recursive '
-                                  'relationship, use ForeignKey("self", '
-                                  'symmetrical=False, through="%s").') % relationship_model_name,
+                            "The model is used as an intermediate model by "
+                            "'%s', but it has more than one foreign key "
+                            "to '%s', which is ambiguous. You must specify "
+                            "which foreign key Django should use via the "
+                            "through_fields keyword argument." % (self, to_model_name),
+                            hint=(
+                                'If you want to create a recursive relationship, '
+                                'use ForeignKey("self", symmetrical=False, through="%s").'
+                            ) % relationship_model_name,
                             obj=self,
                             id='fields.E335',
                         )
@@ -1307,11 +1298,10 @@ class ManyToManyField(RelatedField):
                 if seen_from == 0 or seen_to == 0:
                     errors.append(
                         checks.Error(
-                            ("The model is used as an intermediate model by "
-                             "'%s', but it does not have a foreign key to '%s' or '%s'.") % (
+                            "The model is used as an intermediate model by "
+                            "'%s', but it does not have a foreign key to '%s' or '%s'." % (
                                 self, from_model_name, to_model_name
                             ),
-                            hint=None,
                             obj=self.remote_field.through,
                             id='fields.E336',
                         )
@@ -1325,12 +1315,10 @@ class ManyToManyField(RelatedField):
                     self.remote_field.through_fields[0] and self.remote_field.through_fields[1]):
                 errors.append(
                     checks.Error(
-                        ("Field specifies 'through_fields' but does not "
-                         "provide the names of the two link fields that should be "
-                         "used for the relation through model "
-                         "'%s'.") % qualified_model_name,
-                        hint=("Make sure you specify 'through_fields' as "
-                              "through_fields=('field1', 'field2')"),
+                        "Field specifies 'through_fields' but does not provide "
+                        "the names of the two link fields that should be used "
+                        "for the relation through model '%s'." % qualified_model_name,
+                        hint="Make sure you specify 'through_fields' as through_fields=('field1', 'field2')",
                         obj=self,
                         id='fields.E337',
                     )
@@ -1357,9 +1345,10 @@ class ManyToManyField(RelatedField):
                         if hasattr(f, 'remote_field') and getattr(f.remote_field, 'model', None) == related_model:
                             possible_field_names.append(f.name)
                     if possible_field_names:
-                        hint = ("Did you mean one of the following foreign "
-                                "keys to '%s': %s?") % (related_model._meta.object_name,
-                                                        ', '.join(possible_field_names))
+                        hint = "Did you mean one of the following foreign keys to '%s': %s?" % (
+                            related_model._meta.object_name,
+                            ', '.join(possible_field_names),
+                        )
                     else:
                         hint = None
 
@@ -1368,8 +1357,8 @@ class ManyToManyField(RelatedField):
                     except exceptions.FieldDoesNotExist:
                         errors.append(
                             checks.Error(
-                                ("The intermediary model '%s' has no field '%s'.") % (
-                                    qualified_model_name, field_name),
+                                "The intermediary model '%s' has no field '%s'."
+                                % (qualified_model_name, field_name),
                                 hint=hint,
                                 obj=self,
                                 id='fields.E338',
@@ -1382,7 +1371,8 @@ class ManyToManyField(RelatedField):
                                 checks.Error(
                                     "'%s.%s' is not a foreign key to '%s'." % (
                                         through._meta.object_name, field_name,
-                                        related_model._meta.object_name),
+                                        related_model._meta.object_name,
+                                    ),
                                     hint=hint,
                                     obj=self,
                                     id='fields.E339',

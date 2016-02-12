@@ -37,7 +37,6 @@ class AutoFieldTests(SimpleTestCase):
         expected = [
             Error(
                 'AutoFields must set primary_key=True.',
-                hint=None,
                 obj=field,
                 id='fields.E100',
             ),
@@ -92,7 +91,6 @@ class CharFieldTests(TestCase):
         expected = [
             Error(
                 "CharFields must define a 'max_length' attribute.",
-                hint=None,
                 obj=field,
                 id='fields.E120',
             ),
@@ -108,7 +106,6 @@ class CharFieldTests(TestCase):
         expected = [
             Error(
                 "'max_length' must be a positive integer.",
-                hint=None,
                 obj=field,
                 id='fields.E121',
             ),
@@ -124,7 +121,6 @@ class CharFieldTests(TestCase):
         expected = [
             Error(
                 "'max_length' must be a positive integer.",
-                hint=None,
                 obj=field,
                 id='fields.E121',
             ),
@@ -140,7 +136,6 @@ class CharFieldTests(TestCase):
         expected = [
             Error(
                 "'max_length' must be a positive integer.",
-                hint=None,
                 obj=field,
                 id='fields.E121',
             ),
@@ -156,7 +151,6 @@ class CharFieldTests(TestCase):
         expected = [
             Error(
                 "'choices' must be an iterable (e.g., a list or tuple).",
-                hint=None,
                 obj=field,
                 id='fields.E004',
             ),
@@ -172,7 +166,6 @@ class CharFieldTests(TestCase):
         expected = [
             Error(
                 "'choices' must be an iterable containing (actual value, human readable name) tuples.",
-                hint=None,
                 obj=field,
                 id='fields.E005',
             ),
@@ -188,7 +181,6 @@ class CharFieldTests(TestCase):
         expected = [
             Error(
                 "'db_index' must be None, True or False.",
-                hint=None,
                 obj=field,
                 id='fields.E006',
             ),
@@ -209,7 +201,6 @@ class CharFieldTests(TestCase):
         expected = [
             Error(
                 'MySQL does not allow unique CharFields to have a max_length > 255.',
-                hint=None,
                 obj=field,
                 id='mysql.E001',
             )
@@ -235,7 +226,6 @@ class DateFieldTests(TestCase):
                 "The options auto_now, auto_now_add, and default "
                 "are mutually exclusive. Only one of these options "
                 "may be present.",
-                hint=None,
                 obj=field,
                 id='fields.E160',
             ))
@@ -341,13 +331,11 @@ class DecimalFieldTests(SimpleTestCase):
         expected = [
             Error(
                 "DecimalFields must define a 'decimal_places' attribute.",
-                hint=None,
                 obj=field,
                 id='fields.E130',
             ),
             Error(
                 "DecimalFields must define a 'max_digits' attribute.",
-                hint=None,
                 obj=field,
                 id='fields.E132',
             ),
@@ -363,13 +351,11 @@ class DecimalFieldTests(SimpleTestCase):
         expected = [
             Error(
                 "'decimal_places' must be a non-negative integer.",
-                hint=None,
                 obj=field,
                 id='fields.E131',
             ),
             Error(
                 "'max_digits' must be a positive integer.",
-                hint=None,
                 obj=field,
                 id='fields.E133',
             ),
@@ -385,13 +371,11 @@ class DecimalFieldTests(SimpleTestCase):
         expected = [
             Error(
                 "'decimal_places' must be a non-negative integer.",
-                hint=None,
                 obj=field,
                 id='fields.E131',
             ),
             Error(
                 "'max_digits' must be a positive integer.",
-                hint=None,
                 obj=field,
                 id='fields.E133',
             ),
@@ -407,7 +391,6 @@ class DecimalFieldTests(SimpleTestCase):
         expected = [
             Error(
                 "'max_digits' must be greater or equal to 'decimal_places'.",
-                hint=None,
                 obj=field,
                 id='fields.E134',
             ),
@@ -445,7 +428,6 @@ class FileFieldTests(SimpleTestCase):
         expected = [
             Error(
                 "'unique' is not a valid argument for a FileField.",
-                hint=None,
                 obj=field,
                 id='fields.E200',
             )
@@ -461,7 +443,6 @@ class FileFieldTests(SimpleTestCase):
         expected = [
             Error(
                 "'primary_key' is not a valid argument for a FileField.",
-                hint=None,
                 obj=field,
                 id='fields.E201',
             )
@@ -481,7 +462,6 @@ class FilePathFieldTests(SimpleTestCase):
         expected = [
             Error(
                 "FilePathFields must have either 'allow_files' or 'allow_folders' set to True.",
-                hint=None,
                 obj=field,
                 id='fields.E140',
             ),
@@ -502,7 +482,6 @@ class GenericIPAddressFieldTests(SimpleTestCase):
             Error(
                 ('GenericIPAddressFields cannot have blank=True if null=False, '
                  'as blank values are stored as nulls.'),
-                hint=None,
                 obj=field,
                 id='fields.E150',
             ),

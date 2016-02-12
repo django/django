@@ -584,7 +584,6 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "'REQUIRED_FIELDS' must be a list or tuple.",
-                hint=None,
                 obj=CustomUserNonListRequiredFields,
                 id='auth.E001',
             ),
@@ -606,9 +605,8 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
         errors = checks.run_checks(apps.get_app_configs())
         expected = [
             checks.Error(
-                ("The field named as the 'USERNAME_FIELD' for a custom user model "
-                 "must not be included in 'REQUIRED_FIELDS'."),
-                hint=None,
+                "The field named as the 'USERNAME_FIELD' for a custom user model "
+                "must not be included in 'REQUIRED_FIELDS'.",
                 obj=CustomUserBadRequiredFields,
                 id='auth.E002',
             ),
@@ -625,9 +623,8 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
         errors = checks.run_checks()
         expected = [
             checks.Error(
-                ("'CustomUserNonUniqueUsername.username' must be "
-                 "unique because it is named as the 'USERNAME_FIELD'."),
-                hint=None,
+                "'CustomUserNonUniqueUsername.username' must be "
+                "unique because it is named as the 'USERNAME_FIELD'.",
                 obj=CustomUserNonUniqueUsername,
                 id='auth.E003',
             ),
@@ -637,10 +634,9 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
             errors = checks.run_checks()
             expected = [
                 checks.Warning(
-                    ("'CustomUserNonUniqueUsername.username' is named as "
-                     "the 'USERNAME_FIELD', but it is not unique."),
-                    hint=('Ensure that your authentication backend(s) can handle '
-                          'non-unique usernames.'),
+                    "'CustomUserNonUniqueUsername.username' is named as "
+                    "the 'USERNAME_FIELD', but it is not unique.",
+                    hint='Ensure that your authentication backend(s) can handle non-unique usernames.',
                     obj=CustomUserNonUniqueUsername,
                     id='auth.W004',
                 )

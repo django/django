@@ -42,7 +42,6 @@ class IndexTogetherTests(SimpleTestCase):
         expected = [
             Error(
                 "'index_together' must be a list or tuple.",
-                hint=None,
                 obj=Model,
                 id='models.E008',
             ),
@@ -58,7 +57,6 @@ class IndexTogetherTests(SimpleTestCase):
         expected = [
             Error(
                 "'index_together' must be a list or tuple.",
-                hint=None,
                 obj=Model,
                 id='models.E008',
             ),
@@ -74,7 +72,6 @@ class IndexTogetherTests(SimpleTestCase):
         expected = [
             Error(
                 "All 'index_together' elements must be lists or tuples.",
-                hint=None,
                 obj=Model,
                 id='models.E009',
             ),
@@ -92,7 +89,6 @@ class IndexTogetherTests(SimpleTestCase):
         expected = [
             Error(
                 "'index_together' refers to the non-existent field 'missing_field'.",
-                hint=None,
                 obj=Model,
                 id='models.E012',
             ),
@@ -137,7 +133,6 @@ class IndexTogetherTests(SimpleTestCase):
             Error(
                 "'index_together' refers to a ManyToManyField 'm2m', but "
                 "ManyToManyFields are not permitted in 'index_together'.",
-                hint=None,
                 obj=Model,
                 id='models.E013',
             ),
@@ -158,7 +153,6 @@ class UniqueTogetherTests(SimpleTestCase):
         expected = [
             Error(
                 "'unique_together' must be a list or tuple.",
-                hint=None,
                 obj=Model,
                 id='models.E010',
             ),
@@ -177,7 +171,6 @@ class UniqueTogetherTests(SimpleTestCase):
         expected = [
             Error(
                 "All 'unique_together' elements must be lists or tuples.",
-                hint=None,
                 obj=Model,
                 id='models.E011',
             ),
@@ -193,7 +186,6 @@ class UniqueTogetherTests(SimpleTestCase):
         expected = [
             Error(
                 "'unique_together' must be a list or tuple.",
-                hint=None,
                 obj=Model,
                 id='models.E010',
             ),
@@ -223,7 +215,6 @@ class UniqueTogetherTests(SimpleTestCase):
         expected = [
             Error(
                 "'unique_together' refers to the non-existent field 'missing_field'.",
-                hint=None,
                 obj=Model,
                 id='models.E012',
             ),
@@ -244,7 +235,6 @@ class UniqueTogetherTests(SimpleTestCase):
             Error(
                 "'unique_together' refers to a ManyToManyField 'm2m', but "
                 "ManyToManyFields are not permitted in 'unique_together'.",
-                hint=None,
                 obj=Model,
                 id='models.E013',
             ),
@@ -264,13 +254,11 @@ class FieldNamesTests(SimpleTestCase):
         expected = [
             Error(
                 'Field names must not end with an underscore.',
-                hint=None,
                 obj=Model._meta.get_field('field_'),
                 id='fields.E001',
             ),
             Error(
                 'Field names must not end with an underscore.',
-                hint=None,
                 obj=Model._meta.get_field('m2m_'),
                 id='fields.E001',
             ),
@@ -413,7 +401,6 @@ class FieldNamesTests(SimpleTestCase):
         expected = [
             Error(
                 'Field names must not contain "__".',
-                hint=None,
                 obj=Model._meta.get_field('some__field'),
                 id='fields.E002',
             )
@@ -428,7 +415,6 @@ class FieldNamesTests(SimpleTestCase):
         expected = [
             Error(
                 "'pk' is a reserved word that cannot be used as a field name.",
-                hint=None,
                 obj=Model._meta.get_field('pk'),
                 id='fields.E003',
             )
@@ -451,7 +437,6 @@ class ShadowingFieldsTests(SimpleTestCase):
             Error(
                 "The field 'child' clashes with the field "
                 "'child' from model 'invalid_models_tests.parent'.",
-                hint=None,
                 obj=Child._meta.get_field('child'),
                 id='models.E006',
             )
@@ -476,7 +461,6 @@ class ShadowingFieldsTests(SimpleTestCase):
                 "The field 'id' from parent model "
                 "'invalid_models_tests.mother' clashes with the field 'id' "
                 "from parent model 'invalid_models_tests.father'.",
-                hint=None,
                 obj=Child,
                 id='models.E005',
             ),
@@ -484,7 +468,6 @@ class ShadowingFieldsTests(SimpleTestCase):
                 "The field 'clash' from parent model "
                 "'invalid_models_tests.mother' clashes with the field 'clash' "
                 "from parent model 'invalid_models_tests.father'.",
-                hint=None,
                 obj=Child,
                 id='models.E005',
             )
@@ -508,7 +491,6 @@ class ShadowingFieldsTests(SimpleTestCase):
             Error(
                 "The field 'f' clashes with the field 'f_id' "
                 "from model 'invalid_models_tests.parent'.",
-                hint=None,
                 obj=Child._meta.get_field('f'),
                 id='models.E006',
             )
@@ -533,7 +515,6 @@ class ShadowingFieldsTests(SimpleTestCase):
             Error(
                 "The field 'clash' clashes with the field 'clash' "
                 "from model 'invalid_models_tests.grandparent'.",
-                hint=None,
                 obj=GrandChild._meta.get_field('clash'),
                 id='models.E006',
             )
@@ -553,7 +534,6 @@ class ShadowingFieldsTests(SimpleTestCase):
             Error(
                 "The field 'fk_id' clashes with the field 'fk' from model "
                 "'invalid_models_tests.model'.",
-                hint=None,
                 obj=Model._meta.get_field('fk_id'),
                 id='models.E006',
             )
@@ -575,7 +555,6 @@ class OtherModelTests(SimpleTestCase):
             Error(
                 "'id' can only be used as a field name if the field also sets "
                 "'primary_key=True'.",
-                hint=None,
                 obj=Model,
                 id='models.E004',
             ),
@@ -592,7 +571,6 @@ class OtherModelTests(SimpleTestCase):
             Error(
                 "'ordering' must be a tuple or list "
                 "(even if you want to order by only one field).",
-                hint=None,
                 obj=Model,
                 id='models.E014',
             ),
@@ -636,7 +614,6 @@ class OtherModelTests(SimpleTestCase):
         expected = [
             Error(
                 "'ordering' and 'order_with_respect_to' cannot be used together.",
-                hint=None,
                 obj=Answer,
                 id='models.E021',
             ),
@@ -657,7 +634,6 @@ class OtherModelTests(SimpleTestCase):
         expected = [
             Error(
                 "'ordering' refers to the non-existent field 'relation'.",
-                hint=None,
                 obj=Model,
                 id='models.E015',
             ),
@@ -673,7 +649,6 @@ class OtherModelTests(SimpleTestCase):
         expected = [
             Error(
                 "'ordering' refers to the non-existent field 'missing_field'.",
-                hint=None,
                 obj=Model,
                 id='models.E015',
             )
@@ -693,7 +668,6 @@ class OtherModelTests(SimpleTestCase):
         expected = [
             Error(
                 "'ordering' refers to the non-existent field 'missing_fk_field_id'.",
-                hint=None,
                 obj=Model,
                 id='models.E015',
             )
@@ -724,8 +698,6 @@ class OtherModelTests(SimpleTestCase):
         expected = [
             Error(
                 "'TEST_SWAPPED_MODEL_BAD_VALUE' is not of the form 'app_label.app_name'.",
-                hint=None,
-                obj=None,
                 id='models.E001',
             ),
         ]
@@ -742,8 +714,6 @@ class OtherModelTests(SimpleTestCase):
             Error(
                 "'TEST_SWAPPED_MODEL_BAD_MODEL' references 'not_an_app.Target', "
                 'which has not been installed, or is abstract.',
-                hint=None,
-                obj=None,
                 id='models.E002',
             ),
         ]
@@ -768,7 +738,6 @@ class OtherModelTests(SimpleTestCase):
             Error(
                 "The model has two many-to-many relations through "
                 "the intermediate model 'invalid_models_tests.Membership'.",
-                hint=None,
                 obj=Group,
                 id='models.E003',
             )

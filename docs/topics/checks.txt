@@ -39,7 +39,7 @@ check function::
             errors.append(
                 Error(
                     'an error',
-                    hint=None,
+                    hint='A hint.',
                     obj=checked_object,
                     id='myapp.E001',
                 )
@@ -195,7 +195,7 @@ Messages are comparable. That allows you to easily write tests::
     expected_errors = [
         Error(
             'an error',
-            hint=None,
+            hint='A hint.',
             obj=checked_object,
             id='myapp.E001',
         )

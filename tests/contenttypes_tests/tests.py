@@ -135,7 +135,6 @@ class GenericForeignKeyTests(SimpleTestCase):
         expected = [
             checks.Error(
                 "The GenericForeignKey content type references the non-existent field 'TaggedItem.content_type'.",
-                hint=None,
                 obj=TaggedItem.content_object,
                 id='contenttypes.E002',
             )
@@ -194,7 +193,6 @@ class GenericForeignKeyTests(SimpleTestCase):
         expected = [
             checks.Error(
                 "The GenericForeignKey object ID references the non-existent field 'object_id'.",
-                hint=None,
                 obj=TaggedItem.content_object,
                 id='contenttypes.E001',
             )
@@ -212,7 +210,6 @@ class GenericForeignKeyTests(SimpleTestCase):
         expected = [
             checks.Error(
                 'Field names must not end with an underscore.',
-                hint=None,
                 obj=Model.content_object_,
                 id='fields.E001',
             )
@@ -269,9 +266,8 @@ class GenericRelationshipTests(SimpleTestCase):
         errors = Model.rel.field.check()
         expected = [
             checks.Error(
-                ("Field defines a relation with model 'MissingModel', "
-                 "which is either not installed, or is abstract."),
-                hint=None,
+                "Field defines a relation with model 'MissingModel', "
+                "which is either not installed, or is abstract.",
                 obj=Model.rel.field,
                 id='fields.E300',
             )
@@ -300,10 +296,9 @@ class GenericRelationshipTests(SimpleTestCase):
         errors = Bookmark.tags.field.check()
         expected = [
             checks.Error(
-                ("The GenericRelation defines a relation with the model "
-                 "'contenttypes_tests.TaggedItem', but that model does not have a "
-                 "GenericForeignKey."),
-                hint=None,
+                "The GenericRelation defines a relation with the model "
+                "'contenttypes_tests.TaggedItem', but that model does not have a "
+                "GenericForeignKey.",
                 obj=Bookmark.tags.field,
                 id='contenttypes.E004',
             )
@@ -329,9 +324,9 @@ class GenericRelationshipTests(SimpleTestCase):
         errors = Model.rel.field.check()
         expected = [
             checks.Error(
-                ("Field defines a relation with the model "
-                 "'contenttypes_tests.SwappedModel', "
-                 "which has been swapped out."),
+                "Field defines a relation with the model "
+                "'contenttypes_tests.SwappedModel', "
+                "which has been swapped out.",
                 hint="Update the relation to point at 'settings.TEST_SWAPPED_MODEL'.",
                 obj=Model.rel.field,
                 id='fields.E301',
@@ -352,7 +347,6 @@ class GenericRelationshipTests(SimpleTestCase):
         expected = [
             checks.Error(
                 'Field names must not end with an underscore.',
-                hint=None,
                 obj=InvalidBookmark.tags_.field,
                 id='fields.E001',
             )

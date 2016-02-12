@@ -217,7 +217,6 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     'Field names must not end with an underscore.',
-                    hint=None,
                     obj=self,
                     id='fields.E001',
                 )
@@ -226,7 +225,6 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     'Field names must not contain "__".',
-                    hint=None,
                     obj=self,
                     id='fields.E002',
                 )
@@ -235,7 +233,6 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     "'pk' is a reserved word that cannot be used as a field name.",
-                    hint=None,
                     obj=self,
                     id='fields.E003',
                 )
@@ -257,7 +254,6 @@ class Field(RegisterLookupMixin):
                 return [
                     checks.Error(
                         "'choices' must be an iterable (e.g., a list or tuple).",
-                        hint=None,
                         obj=self,
                         id='fields.E004',
                     )
@@ -267,9 +263,8 @@ class Field(RegisterLookupMixin):
                      for choice in self.choices):
                 return [
                     checks.Error(
-                        ("'choices' must be an iterable containing "
-                         "(actual value, human readable name) tuples."),
-                        hint=None,
+                        "'choices' must be an iterable containing "
+                        "(actual value, human readable name) tuples.",
                         obj=self,
                         id='fields.E005',
                     )
@@ -284,7 +279,6 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     "'db_index' must be None, True or False.",
-                    hint=None,
                     obj=self,
                     id='fields.E006',
                 )
@@ -939,7 +933,6 @@ class AutoField(Field):
             return [
                 checks.Error(
                     'AutoFields must set primary_key=True.',
-                    hint=None,
                     obj=self,
                     id='fields.E100',
                 ),
@@ -1103,7 +1096,6 @@ class CharField(Field):
             return [
                 checks.Error(
                     "CharFields must define a 'max_length' attribute.",
-                    hint=None,
                     obj=self,
                     id='fields.E120',
                 )
@@ -1112,7 +1104,6 @@ class CharField(Field):
             return [
                 checks.Error(
                     "'max_length' must be a positive integer.",
-                    hint=None,
                     obj=self,
                     id='fields.E121',
                 )
@@ -1188,7 +1179,6 @@ class DateTimeCheckMixin(object):
                     "The options auto_now, auto_now_add, and default "
                     "are mutually exclusive. Only one of these options "
                     "may be present.",
-                    hint=None,
                     obj=self,
                     id='fields.E160',
                 )
@@ -1535,7 +1525,6 @@ class DecimalField(Field):
             return [
                 checks.Error(
                     "DecimalFields must define a 'decimal_places' attribute.",
-                    hint=None,
                     obj=self,
                     id='fields.E130',
                 )
@@ -1544,7 +1533,6 @@ class DecimalField(Field):
             return [
                 checks.Error(
                     "'decimal_places' must be a non-negative integer.",
-                    hint=None,
                     obj=self,
                     id='fields.E131',
                 )
@@ -1561,7 +1549,6 @@ class DecimalField(Field):
             return [
                 checks.Error(
                     "DecimalFields must define a 'max_digits' attribute.",
-                    hint=None,
                     obj=self,
                     id='fields.E132',
                 )
@@ -1570,7 +1557,6 @@ class DecimalField(Field):
             return [
                 checks.Error(
                     "'max_digits' must be a positive integer.",
-                    hint=None,
                     obj=self,
                     id='fields.E133',
                 )
@@ -1583,7 +1569,6 @@ class DecimalField(Field):
             return [
                 checks.Error(
                     "'max_digits' must be greater or equal to 'decimal_places'.",
-                    hint=None,
                     obj=self,
                     id='fields.E134',
                 )
@@ -1762,7 +1747,6 @@ class FilePathField(Field):
             return [
                 checks.Error(
                     "FilePathFields must have either 'allow_files' or 'allow_folders' set to True.",
-                    hint=None,
                     obj=self,
                     id='fields.E140',
                 )
@@ -1982,9 +1966,8 @@ class GenericIPAddressField(Field):
         if not getattr(self, 'null', False) and getattr(self, 'blank', False):
             return [
                 checks.Error(
-                    ('GenericIPAddressFields cannot have blank=True if null=False, '
-                     'as blank values are stored as nulls.'),
-                    hint=None,
+                    'GenericIPAddressFields cannot have blank=True if null=False, '
+                    'as blank values are stored as nulls.',
                     obj=self,
                     id='fields.E150',
                 )

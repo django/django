@@ -1239,17 +1239,17 @@ class OrderingCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             "The value of 'ordering' must be a list or tuple.",
-            'admin.E031')
+            'admin.E031'
+        )
 
         class ValidationTestModelAdmin(ModelAdmin):
             ordering = ('non_existent_field',)
 
         self.assertIsInvalid(
-            ValidationTestModelAdmin,
-            ValidationTestModel, (
-                "The value of 'ordering[0]' refers to 'non_existent_field', "
-                "which is not an attribute of 'modeladmin.ValidationTestModel'."
-            ), 'admin.E033'
+            ValidationTestModelAdmin, ValidationTestModel,
+            "The value of 'ordering[0]' refers to 'non_existent_field', "
+            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            'admin.E033'
         )
 
     def test_random_marker_not_alone(self):
@@ -1258,10 +1258,11 @@ class OrderingCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            ("The value of 'ordering' has the random ordering marker '?', but contains "
-             "other fields as well."),
+            "The value of 'ordering' has the random ordering marker '?', but contains "
+            "other fields as well.",
             'admin.E032',
-            hint='Either remove the "?", or remove the other fields.')
+            hint='Either remove the "?", or remove the other fields.'
+        )
 
     def test_valid_random_marker_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1288,7 +1289,8 @@ class ListSelectRelatedCheckTests(CheckTestCase):
         class ValidationTestModelAdmin(ModelAdmin):
             list_select_related = 1
 
-        self.assertIsInvalid(ValidationTestModelAdmin, ValidationTestModel,
+        self.assertIsInvalid(
+            ValidationTestModelAdmin, ValidationTestModel,
             "The value of 'list_select_related' must be a boolean, tuple or list.",
             'admin.E117')
 
