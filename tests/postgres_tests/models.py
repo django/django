@@ -52,30 +52,21 @@ class TextFieldModel(models.Model):
     field = models.TextField()
 
 
-# Only create this model for postgres >= 9.2
-if connection.vendor == 'postgresql' and connection.pg_version >= 90200:
-    class RangesModel(PostgreSQLModel):
-        ints = IntegerRangeField(blank=True, null=True)
-        bigints = BigIntegerRangeField(blank=True, null=True)
-        floats = FloatRangeField(blank=True, null=True)
-        timestamps = DateTimeRangeField(blank=True, null=True)
-        dates = DateRangeField(blank=True, null=True)
+class RangesModel(PostgreSQLModel):
+    ints = IntegerRangeField(blank=True, null=True)
+    bigints = BigIntegerRangeField(blank=True, null=True)
+    floats = FloatRangeField(blank=True, null=True)
+    timestamps = DateTimeRangeField(blank=True, null=True)
+    dates = DateRangeField(blank=True, null=True)
 
-    class RangeLookupsModel(PostgreSQLModel):
-        parent = models.ForeignKey(RangesModel, models.SET_NULL, blank=True, null=True)
-        integer = models.IntegerField(blank=True, null=True)
-        big_integer = models.BigIntegerField(blank=True, null=True)
-        float = models.FloatField(blank=True, null=True)
-        timestamp = models.DateTimeField(blank=True, null=True)
-        date = models.DateField(blank=True, null=True)
 
-else:
-    # create an object with this name so we don't have failing imports
-    class RangesModel(object):
-        pass
-
-    class RangeLookupsModel(object):
-        pass
+class RangeLookupsModel(PostgreSQLModel):
+    parent = models.ForeignKey(RangesModel, models.SET_NULL, blank=True, null=True)
+    integer = models.IntegerField(blank=True, null=True)
+    big_integer = models.BigIntegerField(blank=True, null=True)
+    float = models.FloatField(blank=True, null=True)
+    timestamp = models.DateTimeField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
 
 
 # Only create this model for postgres >= 9.4
