@@ -7,7 +7,7 @@ from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import find_command, popen_wrapper
 from django.db import connection
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
 from django.utils._os import upath
@@ -160,6 +160,19 @@ class CommandTests(SimpleTestCase):
             self.assertEqual(self.counter, 1)
         finally:
             BaseCommand.check = saved_check
+
+    def test_check_migrations(self):
+        from .management.commands import dance
+        try:
+            with mock.patch.object(BaseCommand, 'check_migrations',
+                                   return_value=None) as mock_method:
+                management.call_command("dance", verbosity=0)
+                self.assertFalse(mock_method.called)
+                dance.Command.requires_migrations_checks = True
+                management.call_command("dance", verbosity=0)
+                self.assertTrue(mock_method.called)
+        finally:
+            dance.Command.requires_migrations_checks = False
 
 
 class CommandRunTests(AdminScriptTestCase):

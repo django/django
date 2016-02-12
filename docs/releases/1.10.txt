@@ -248,6 +248,10 @@ Management Commands
 * Added a warning to :djadmin:`dumpdata` if a proxy model is specified (which
   results in no output) without its concrete parent.
 
+* BaseCommand has a new attribute requires_migrations_checks if ``True`` checks
+  to see if the set of migrations on disk matches the migrations in the database.
+  Prints a warning if they don't match.
+
 Migrations
 ~~~~~~~~~~
 
