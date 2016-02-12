@@ -239,6 +239,14 @@ class TranslationTests(SimpleTestCase):
         )
         self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
 
+    def test_ungettext_lazy_pickle(self):
+        s1 = ungettext_lazy('%d good result', '%d good results')
+        self.assertEqual(s1 % 1, '1 good result')
+        self.assertEqual(s1 % 8, '8 good results')
+        s2 = pickle.loads(pickle.dumps(s1))
+        self.assertEqual(s2 % 1, '1 good result')
+        self.assertEqual(s2 % 8, '8 good results')
+
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
         trans_real._active = local()

@@ -14,3 +14,6 @@ Bugfixes
 
 * Added system checks for query name clashes of hidden relationships
   (:ticket:`26162`).
+
+* Made ``forms.FileField`` and ``utils.translation.lazy_number()`` picklable
+  (:ticket:`26212`).
