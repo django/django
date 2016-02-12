@@ -24,3 +24,6 @@ Bugfixes
 
 * Fixed regression with an ``__in=qs`` lookup for a ``ForeignKey`` with
   ``to_field`` set (:ticket:`26196`).
+
+* Made ``forms.FileField`` and ``utils.translation.lazy_number()`` picklable
+  (:ticket:`26212`).
