@@ -171,16 +171,12 @@ class BaseHandler(object):
 
         #settings.MIDDLEWARE = settings.MIDDLEWARE_CLASSES
         if settings.MIDDLEWARE is None:
-            handler = ExceptionMiddleware(self._legacy_get_response)
+            handler = self._legacy_get_response
             self._legacy_load_middleware()
         else:
             handler = self._get_response
-            # TODO: Easier check to allow users to override where in the chain exceptions are transformed?
-            exception_middleware_in_place = False
             for middleware_path in reversed(settings.MIDDLEWARE):
                 middleware = import_string(middleware_path)
-                if isinstance(middleware, ExceptionMiddleware):
-                    exception_middleware_in_place = True
                 try:
                     mw_instance = middleware(handler)
                 except MiddlewareNotUsed as exc:
@@ -203,9 +199,7 @@ class BaseHandler(object):
 
                 handler = mw_instance
 
-            # TODO: We could also wrap unconditionally here to catch exceptions raised from middlewares?
-            if not exception_middleware_in_place:
-                handler = ExceptionMiddleware(handler)
+        handler = ExceptionMiddleware(handler)
 
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
