@@ -106,6 +106,8 @@ def lazy_number(func, resultclass, number=None, **kwargs):
         kwargs['number'] = number
         proxy = lazy(func, resultclass)(**kwargs)
     else:
+        original_kwargs = kwargs.copy()
+
         class NumberAwareString(resultclass):
             def __bool__(self):
                 return bool(kwargs['singular'])
@@ -134,7 +136,7 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                 return translated
 
         proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
-        proxy.__reduce__ = lambda: (_lazy_number_unpickle, (func, resultclass, number, kwargs))
+        proxy.__reduce__ = lambda: (_lazy_number_unpickle, (func, resultclass, number, original_kwargs))
     return proxy
 
 
