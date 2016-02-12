@@ -248,6 +248,12 @@ Management Commands
 * Added a warning to :djadmin:`dumpdata` if a proxy model is specified (which
   results in no output) without its concrete parent.
 
+* The new :attr:`BaseCommand.requires_migrations_checks
+  <django.core.management.BaseCommand.requires_migrations_checks>` attribute
+  may be set to ``True`` if you want your command to print a warning, like
+  :djadmin:`runserver` does, if the set of migrations on disk don't match the
+  migrations in the database.
+
 Migrations
 ~~~~~~~~~~
 

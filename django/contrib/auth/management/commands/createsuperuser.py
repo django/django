@@ -23,6 +23,7 @@ class NotRunningInTTYException(Exception):
 
 class Command(BaseCommand):
     help = 'Used to create a superuser.'
+    requires_migrations_checks = True
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
