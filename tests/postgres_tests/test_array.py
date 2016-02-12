@@ -92,7 +92,7 @@ class TestSaveLoad(PostgreSQLTestCase):
             ips=['192.168.0.1', '::1'],
             uuids=[uuid.uuid4()],
             decimals=[decimal.Decimal(1.25), 1.75],
-            tags=[Tag(1), Tag(2), Tag(3)]
+            tags=[Tag(1), Tag(2), Tag(3)],
         )
         instance.save()
         loaded = OtherTypesArrayModel.objects.get()
@@ -308,11 +308,13 @@ class TestOtherTypesExactQuerying(PostgreSQLTestCase):
         self.ips = ['192.168.0.1', '::1']
         self.uuids = [uuid.uuid4()]
         self.decimals = [decimal.Decimal(1.25), 1.75]
+        self.tags = [Tag(1), Tag(2), Tag(3)]
         self.objs = [
             OtherTypesArrayModel.objects.create(
                 ips=self.ips,
                 uuids=self.uuids,
                 decimals=self.decimals,
+                tags=self.tags,
             )
         ]
 
@@ -331,6 +333,12 @@ class TestOtherTypesExactQuerying(PostgreSQLTestCase):
     def test_exact_decimals(self):
         self.assertSequenceEqual(
             OtherTypesArrayModel.objects.filter(decimals=self.decimals),
+            self.objs
+        )
+
+    def test_exact_tags(self):
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(tags=self.tags),
             self.objs
         )
 
