@@ -230,6 +230,9 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
+* :func:`~django.core.management.call_command` now returns the value returned
+  from the ``command.handle()`` method.
+
 * The new :option:`check --fail-level` option allows specifying the message
   level that will cause the command to exit with a non-zero status.
 
