@@ -246,6 +246,24 @@ class FunctionTests(SimpleTestCase):
             '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)',
         )
 
+    def test_trailing_multiple_punctuation(self):
+        self.assertEqual(
+            urlize('A test http://testing.com/example..'),
+            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>..'
+        )
+        self.assertEqual(
+            urlize('A test http://testing.com/example!!'),
+            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>!!'
+        )
+        self.assertEqual(
+            urlize('A test http://testing.com/example!!!'),
+            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>!!!'
+        )
+        self.assertEqual(
+            urlize('A test http://testing.com/example.,:;)"!'),
+            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>.,:;)&quot;!'
+        )
+
     def test_brackets(self):
         """
         #19070 - Check urlize handles brackets properly
