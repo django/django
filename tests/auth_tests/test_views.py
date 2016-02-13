@@ -991,3 +991,9 @@ class UUIDUserTests(TestCase):
         self.assertEqual(row.user_id, 1)  # hardcoded in CustomUserAdmin.log_change()
         self.assertEqual(row.object_id, str(u.pk))
         self.assertEqual(row.get_change_message(), 'Changed password.')
+
+        # LogEntry.user column doesn't get altered to expect a UUID,
+        # so it is set to an integer manually in CustomUserAdmin to
+        # avoid causing an error. To avoid causing a constraint error,
+        # delete the entry before constraints are checked.
+        row.delete()
