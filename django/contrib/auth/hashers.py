@@ -4,6 +4,7 @@ import base64
 import binascii
 import hashlib
 import importlib
+import warnings
 from collections import OrderedDict
 
 from django.conf import settings
@@ -46,10 +47,17 @@ def check_password(password, encoded, setter=None, preferred='default'):
     preferred = get_hasher(preferred)
     hasher = identify_hasher(encoded)
 
-    must_update = hasher.algorithm != preferred.algorithm
-    if not must_update:
-        must_update = preferred.must_update(encoded)
+    hasher_changed = hasher.algorithm != preferred.algorithm
+    must_update = hasher_changed or preferred.must_update(encoded)
     is_correct = hasher.verify(password, encoded)
+
+    # If the hasher didn't change (we don't protect against enumeration if it
+    # does) and the password should get updated, try to close the timing gap
+    # between the work factor of the current encoded password and the default
+    # work factor.
+    if not is_correct and not hasher_changed and must_update:
+        hasher.harden_runtime(password, encoded)
+
     if setter and is_correct and must_update:
         setter(password)
     return is_correct
@@ -216,6 +224,19 @@ class BasePasswordHasher(object):
     def must_update(self, encoded):
         return False
 
+    def harden_runtime(self, password, encoded):
+        """
+        Bridge the runtime gap between the work factor supplied in `encoded`
+        and the work factor suggested by this hasher.
+
+        Taking PBKDF2 as an example, if `encoded` contains 20000 iterations and
+        `self.iterations` is 30000, this method should run password through
+        another 10000 iterations of PBKDF2. Similar approaches should exist
+        for any hasher that has a work factor. If not, this method should be
+        defined as a no-op to silence the warning.
+        """
+        warnings.warn('subclasses of BasePasswordHasher should provide a harden_runtime() method')
+
 
 class PBKDF2PasswordHasher(BasePasswordHasher):
     """
@@ -257,6 +278,12 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     def must_update(self, encoded):
         algorithm, iterations, salt, hash = encoded.split('$', 3)
         return int(iterations) != self.iterations
+
+    def harden_runtime(self, password, encoded):
+        algorithm, iterations, salt, hash = encoded.split('$', 3)
+        extra_iterations = self.iterations - int(iterations)
+        if extra_iterations > 0:
+            self.encode(password, salt, extra_iterations)
 
 
 class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
@@ -305,23 +332,8 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
     def verify(self, password, encoded):
         algorithm, data = encoded.split('$', 1)
         assert algorithm == self.algorithm
-        bcrypt = self._load_library()
-
-        # Hash the password prior to using bcrypt to prevent password
-        # truncation as described in #20138.
-        if self.digest is not None:
-            # Use binascii.hexlify() because a hex encoded bytestring is
-            # Unicode on Python 3.
-            password = binascii.hexlify(self.digest(force_bytes(password)).digest())
-        else:
-            password = force_bytes(password)
-
-        # Ensure that our data is a bytestring
-        data = force_bytes(data)
-        # force_bytes() necessary for py-bcrypt compatibility
-        hashpw = force_bytes(bcrypt.hashpw(password, data))
-
-        return constant_time_compare(data, hashpw)
+        encoded_2 = self.encode(password, force_bytes(data))
+        return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
         algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
@@ -337,6 +349,16 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
     def must_update(self, encoded):
         algorithm, empty, algostr, rounds, data = encoded.split('$', 4)
         return int(rounds) != self.rounds
+
+    def harden_runtime(self, password, encoded):
+        _, data = encoded.split('$', 1)
+        salt = data[:29]  # Length of the salt in bcrypt.
+        rounds = data.split('$')[2]
+        # work factor is logarithmic, adding one doubles the load.
+        diff = 2**(self.rounds - int(rounds)) - 1
+        while diff > 0:
+            self.encode(password, force_bytes(salt))
+            diff -= 1
 
 
 class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
@@ -385,6 +407,9 @@ class SHA1PasswordHasher(BasePasswordHasher):
             (_('hash'), mask_hash(hash)),
         ])
 
+    def harden_runtime(self, password, encoded):
+        pass
+
 
 class MD5PasswordHasher(BasePasswordHasher):
     """
@@ -412,6 +437,9 @@ class MD5PasswordHasher(BasePasswordHasher):
             (_('salt'), mask_hash(salt, show=2)),
             (_('hash'), mask_hash(hash)),
         ])
+
+    def harden_runtime(self, password, encoded):
+        pass
 
 
 class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
@@ -445,6 +473,9 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
             (_('hash'), mask_hash(hash)),
         ])
 
+    def harden_runtime(self, password, encoded):
+        pass
+
 
 class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     """
@@ -477,6 +508,9 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
             (_('algorithm'), self.algorithm),
             (_('hash'), mask_hash(encoded, show=3)),
         ])
+
+    def harden_runtime(self, password, encoded):
+        pass
 
 
 class CryptPasswordHasher(BasePasswordHasher):
@@ -512,3 +546,6 @@ class CryptPasswordHasher(BasePasswordHasher):
             (_('salt'), salt),
             (_('hash'), mask_hash(data, show=3)),
         ])
+
+    def harden_runtime(self, password, encoded):
+        pass
