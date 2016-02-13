@@ -578,6 +578,13 @@ class BaseDatabaseOperations(object):
     def combine_duration_expression(self, connector, sub_expressions):
         return self.combine_expression(connector, sub_expressions)
 
+    def binary_placeholder_sql(self, value):
+        """
+        Some backends require special syntax to insert binary content (MySQL
+        for example uses '_binary %s').
+        """
+        return '%s'
+
     def modify_insert_params(self, placeholder, params):
         """Allow modification of insert parameters. Needed for Oracle Spatial
         backend due to #10888.

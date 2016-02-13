@@ -212,6 +212,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             value = uuid.UUID(value)
         return value
 
+    def binary_placeholder_sql(self, value):
+        return '_binary %s' if value is not None else '%s'
+
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
         rhs_sql, rhs_params = rhs

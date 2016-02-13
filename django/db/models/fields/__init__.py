@@ -2371,6 +2371,9 @@ class BinaryField(Field):
     def get_internal_type(self):
         return "BinaryField"
 
+    def get_placeholder(self, value, compiler, connection):
+        return connection.ops.binary_placeholder_sql(value)
+
     def get_default(self):
         if self.has_default() and not callable(self.default):
             return self.default
