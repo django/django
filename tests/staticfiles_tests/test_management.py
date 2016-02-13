@@ -39,21 +39,16 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
     Test ``findstatic`` management command.
     """
     def _get_file(self, filepath):
-        out = six.StringIO()
-        call_command('findstatic', filepath, all=False, verbosity=0, stdout=out)
-        out.seek(0)
-        lines = [l.strip() for l in out.readlines()]
-        with codecs.open(force_text(lines[0].strip()), "r", "utf-8") as f:
+        path = call_command('findstatic', filepath, all=False, verbosity=0, stdout=six.StringIO())
+        with codecs.open(force_text(path), "r", "utf-8") as f:
             return f.read()
 
     def test_all_files(self):
         """
         Test that findstatic returns all candidate files if run without --first and -v1.
         """
-        out = six.StringIO()
-        call_command('findstatic', 'test/file.txt', verbosity=1, stdout=out)
-        out.seek(0)
-        lines = [l.strip() for l in out.readlines()]
+        result = call_command('findstatic', 'test/file.txt', verbosity=1, stdout=six.StringIO())
+        lines = [l.strip() for l in result.split('\n')]
         self.assertEqual(len(lines), 3)  # three because there is also the "Found <file> here" line
         self.assertIn('project', force_text(lines[1]))
         self.assertIn('apps', force_text(lines[2]))
@@ -62,10 +57,8 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         """
         Test that findstatic returns all candidate files if run without --first and -v0.
         """
-        out = six.StringIO()
-        call_command('findstatic', 'test/file.txt', verbosity=0, stdout=out)
-        out.seek(0)
-        lines = [l.strip() for l in out.readlines()]
+        result = call_command('findstatic', 'test/file.txt', verbosity=0, stdout=six.StringIO())
+        lines = [l.strip() for l in result.split('\n')]
         self.assertEqual(len(lines), 2)
         self.assertIn('project', force_text(lines[0]))
         self.assertIn('apps', force_text(lines[1]))
@@ -75,10 +68,8 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         Test that findstatic returns all candidate files if run without --first and -v2.
         Also, test that findstatic returns the searched locations with -v2.
         """
-        out = six.StringIO()
-        call_command('findstatic', 'test/file.txt', verbosity=2, stdout=out)
-        out.seek(0)
-        lines = [l.strip() for l in out.readlines()]
+        result = call_command('findstatic', 'test/file.txt', verbosity=2, stdout=six.StringIO())
+        lines = [l.strip() for l in result.split('\n')]
         self.assertIn('project', force_text(lines[1]))
         self.assertIn('apps', force_text(lines[2]))
         self.assertIn("Looking in the following locations:", force_text(lines[3]))

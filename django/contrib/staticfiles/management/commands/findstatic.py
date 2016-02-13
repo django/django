@@ -22,7 +22,7 @@ class Command(LabelCommand):
         result = finders.find(path, all=options['all'])
         path = force_text(path)
         if verbosity >= 2:
-            searched_locations = ("Looking in the following locations:\n  %s" %
+            searched_locations = ("\nLooking in the following locations:\n  %s" %
                                   "\n  ".join(force_text(location)
                                   for location in finders.searched_locations))
         else:
@@ -33,7 +33,7 @@ class Command(LabelCommand):
             result = (force_text(os.path.realpath(path)) for path in result)
             if verbosity >= 1:
                 file_list = '\n  '.join(result)
-                return ("Found '%s' here:\n  %s\n%s" %
+                return ("Found '%s' here:\n  %s%s" %
                         (path, file_list, searched_locations))
             else:
                 return '\n'.join(result)

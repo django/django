@@ -194,7 +194,7 @@ class Command(BaseCommand):
                                    ', %s post-processed'
                                    % post_processed_count or ''),
             }
-            self.stdout.write(summary)
+            return summary
 
     def log(self, msg, level=2):
         """
