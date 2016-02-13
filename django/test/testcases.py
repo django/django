@@ -1044,7 +1044,18 @@ class TestCase(TransactionTestCase):
     def _fixture_teardown(self):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
-        self._rollback_atomics(self.atomics)
+        try:
+            for db_name in reversed(self._databases_names()):
+                if self._should_check_constraints(connections[db_name]):
+                    connections[db_name].check_constraints()
+        finally:
+            self._rollback_atomics(self.atomics)
+
+    def _should_check_constraints(self, connection):
+        return (
+            connection.features.can_defer_constraint_checks and
+            not connection.needs_rollback and connection.is_usable()
+        )
 
 
 class CheckCondition(object):

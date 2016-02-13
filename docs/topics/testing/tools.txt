@@ -761,10 +761,16 @@ additions, including:
 * Wraps the tests within two nested ``atomic`` blocks: one for the whole class
   and one for each test.
 
+* Deferrable database constraints checked at the end of each test.
+
 * Creates a TestClient instance.
 
 * Django-specific assertions for testing for things like redirection and form
   errors.
+
+.. versionchanged:: 1.10
+
+  Added check for deferrable database constraints at the end of each test.
 
 .. classmethod:: TestCase.setUpTestData()
 

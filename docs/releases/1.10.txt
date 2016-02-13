@@ -327,7 +327,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* To better catch bugs, :class:`~django.test.TestCase` now checks deferrable
+  database constraints at the end of each test.
 
 URLs
 ~~~~
@@ -534,6 +535,9 @@ Miscellaneous
 * On Oracle/GIS, the :class:`~django.contrib.gis.db.models.functions.Area`
   aggregate function now returns a ``float`` instead of ``decimal.Decimal``.
   (It's still wrapped in a measure of square meters.)
+
+* Tests that violate deferrable database constraints will now error when run on
+  a database that supports deferrable constraints.
 
 .. _deprecated-features-1.10:
 
