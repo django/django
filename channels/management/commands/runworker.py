@@ -13,20 +13,18 @@ class Command(BaseCommand):
         # Get the backend to use
         self.verbosity = options.get("verbosity", 1)
         self.logger = setup_logger('django.channels', self.verbosity)
-        channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
+        self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
         # Check a handler is registered for http reqs
-        if not channel_layer.registry.consumer_for_channel("http.request"):
-            # Register the default one
-            channel_layer.registry.add_consumer(ViewConsumer(), ["http.request"])
+        self.channel_layer.registry.check_default()
         # Launch a worker
-        self.logger.info("Running worker against backend %s", channel_layer.alias)
+        self.logger.info("Running worker against backend %s", self.channel_layer.alias)
         # Optionally provide an output callback
         callback = None
         if self.verbosity > 1:
             callback = self.consumer_called
         # Run the worker
         try:
-            Worker(channel_layer=channel_layer, callback=callback).run()
+            Worker(channel_layer=self.channel_layer, callback=callback).run()
         except KeyboardInterrupt:
             pass
 

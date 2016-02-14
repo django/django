@@ -5,6 +5,7 @@ import importlib
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
 
+from .handler import ViewConsumer
 from .utils import name_that_thing
 
 
@@ -75,3 +76,11 @@ class ConsumerRegistry(object):
         message.reply_channel.send({
             "content": message.content.get("content", None),
         })
+
+    def check_default(self):
+        """
+        Checks to see if default handlers need to be registered
+        for channels, and adds them if they need to be.
+        """
+        if not self.consumer_for_channel("http.request"):
+            self.add_consumer(ViewConsumer(), ["http.request"])

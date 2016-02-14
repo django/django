@@ -24,8 +24,7 @@ class Command(RunserverCommand):
     def inner_run(self, *args, **options):
         # Check a handler is registered for http reqs; if not, add default one
         self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
-        if not self.channel_layer.registry.consumer_for_channel("http.request"):
-            self.channel_layer.registry.add_consumer(ViewConsumer(), ["http.request"])
+        self.channel_layer.registry.check_default()
         # Run checks
         self.stdout.write("Performing system checks...\n\n")
         self.check(display_num_errors=True)
