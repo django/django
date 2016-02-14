@@ -88,3 +88,30 @@ class HandlerTests(SimpleTestCase):
         self.assertEqual(reply_messages[0]["more_content"], True)
         self.assertEqual(reply_messages[1]["content"], b"andhereistherest")
         self.assertEqual(reply_messages[1].get("more_content", False), False)
+
+    def test_chunk_bytes(self):
+        """
+        Makes sure chunk_bytes works correctly
+        """
+        # Empty string should still return one chunk
+        result = list(FakeAsgiHandler.chunk_bytes(b""))
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0][0], b"")
+        self.assertEqual(result[0][1], True)
+        # Below chunk size
+        result = list(FakeAsgiHandler.chunk_bytes(b"12345678901234567890123456789"))
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0][0], b"12345678901234567890123456789")
+        self.assertEqual(result[0][1], True)
+        # Exactly chunk size
+        result = list(FakeAsgiHandler.chunk_bytes(b"123456789012345678901234567890"))
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0][0], b"123456789012345678901234567890")
+        self.assertEqual(result[0][1], True)
+        # Just above chunk size
+        result = list(FakeAsgiHandler.chunk_bytes(b"123456789012345678901234567890a"))
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0][0], b"123456789012345678901234567890")
+        self.assertEqual(result[0][1], False)
+        self.assertEqual(result[1][0], b"a")
+        self.assertEqual(result[1][1], True)

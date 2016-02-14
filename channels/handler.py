@@ -268,6 +268,9 @@ class AsgiHandler(base.BaseHandler):
         Yields (chunk, last_chunk) tuples.
         """
         position = 0
+        if not data:
+            yield data, True
+            return
         while position < len(data):
             yield (
                 data[position:position + cls.chunk_size],
