@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import datetime
 import re
 
 from django import forms
@@ -19,6 +20,7 @@ from django.utils.encoding import force_text
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
+from .models.custom_user import ExtensionUser
 from .settings import AUTH_TEMPLATES
 
 
@@ -121,6 +123,21 @@ class UserCreationFormTest(TestDataMixin, TestCase):
             'This password is too short. It must contain at least 12 characters.',
             form['password2'].errors
         )
+
+    def test_custom_form(self):
+        class CustomUserCreationForm(UserCreationForm):
+            class Meta(UserCreationForm.Meta):
+                model = ExtensionUser
+                fields = UserCreationForm.Meta.fields + ('date_of_birth',)
+
+        data = {
+            'username': 'testclient',
+            'password1': 'testclient',
+            'password2': 'testclient',
+            'date_of_birth': '1988-02-24',
+        }
+        form = CustomUserCreationForm(data)
+        self.assertTrue(form.is_valid())
 
 
 class AuthenticationFormTest(TestDataMixin, TestCase):
@@ -406,6 +423,24 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         # ReadOnlyPasswordHashWidget needs the initial
         # value to render correctly
         self.assertEqual(form.initial['password'], form['password'].value())
+
+    def test_custom_form(self):
+        class CustomUserChangeForm(UserChangeForm):
+            class Meta(UserChangeForm.Meta):
+                model = ExtensionUser
+                fields = ('username', 'password', 'date_of_birth',)
+
+        user = User.objects.get(username='testclient')
+        data = {
+            'username': 'testclient',
+            'password': 'testclient',
+            'date_of_birth': '1998-02-24',
+        }
+        form = CustomUserChangeForm(data, instance=user)
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(form.cleaned_data['username'], 'testclient')
+        self.assertEqual(form.cleaned_data['date_of_birth'], datetime.date(1998, 2, 24))
 
 
 @override_settings(TEMPLATES=AUTH_TEMPLATES)

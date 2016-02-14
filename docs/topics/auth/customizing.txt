@@ -737,24 +737,18 @@ As you may expect, built-in Django's :ref:`forms <built-in-auth-forms>` and
 :ref:`views <built-in-auth-views>` make certain assumptions about the user
 model that they are working with.
 
-If your user model doesn't follow the same assumptions, it may be necessary to define
-a replacement form, and pass that form in as part of the configuration of the
-auth views.
-
-* :class:`~django.contrib.auth.forms.UserCreationForm`
-
-  Depends on the :class:`~django.contrib.auth.models.User` model.
-  Must be re-written for any custom user model.
-
-* :class:`~django.contrib.auth.forms.UserChangeForm`
-
-  Depends on the :class:`~django.contrib.auth.models.User` model.
-  Must be re-written for any custom user model.
+The following forms are compatible with any subclass of
+:class:`~django.contrib.auth.models.AbstractBaseUser`:
 
 * :class:`~django.contrib.auth.forms.AuthenticationForm`
 
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`,
-  and will adapt to use the field defined in ``USERNAME_FIELD``.
+  Uses the field defined in ``USERNAME_FIELD``.
+* :class:`~django.contrib.auth.forms.SetPasswordForm`
+* :class:`~django.contrib.auth.forms.PasswordChangeForm`
+* :class:`~django.contrib.auth.forms.AdminPasswordChangeForm`
+
+The following forms make assumptions about the user model and can be used as-is
+if they are met:
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm`
 
@@ -762,18 +756,25 @@ auth views.
   identify the user and a boolean field named ``is_active`` to prevent
   password resets for inactive users.
 
-* :class:`~django.contrib.auth.forms.SetPasswordForm`
+Finally, the following forms are tied directly to
+:class:`~django.contrib.auth.models.User` and need to be re-written or extended
+to work with a custom user model:
 
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+* :class:`~django.contrib.auth.forms.UserCreationForm`
+* :class:`~django.contrib.auth.forms.UserChangeForm`
 
-* :class:`~django.contrib.auth.forms.PasswordChangeForm`
+If your custom user model is a simple subclass of
+``django.contrib.auth.models.AbstractUser``, then you can extend the forms in
+this manner::
 
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+    from django.contrib.auth.forms import UserCreationForm
+    from myapp.models import CustomUser
 
-* :class:`~django.contrib.auth.forms.AdminPasswordChangeForm`
+    class CustomUserCreationForm(UserCreationForm):
 
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
-
+        class Meta(UserCreationForm.Meta):
+            model = CustomUser
+            fields = UserCreationForm.Meta.fields + ('custom_field',)
 
 Custom users and :mod:`django.contrib.admin`
 --------------------------------------------
