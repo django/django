@@ -372,7 +372,7 @@ class ClearableFileInput(FileInput):
         """
         Return whether value is considered to be initial value.
         """
-        return bool(value and hasattr(value, 'url'))
+        return bool(value and getattr(value, 'url', False))
 
     def get_template_substitution_values(self, value):
         """
