@@ -84,6 +84,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         "Tests that Last-Modified header is set correctly"
         response = self.client.get('/lastmod/sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
+        self.assertContains(response, '<lastmod>2013-03-13T10:00:00-05:51</lastmod>')
 
     def test_sitemap_last_modified_date(self):
         """
@@ -91,6 +92,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         """
         response = self.client.get('/lastmod/date-sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 00:00:00 GMT')
+        self.assertContains(response, '<lastmod>2013-03-13</lastmod>')
 
     def test_sitemap_last_modified_tz(self):
         """
@@ -99,16 +101,35 @@ class HTTPSitemapTests(SitemapTestsBase):
         """
         response = self.client.get('/lastmod/tz-sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 15:00:00 GMT')
+        self.assertContains(response, '<lastmod>2013-03-13T10:00:00-05:00</lastmod>')
 
     def test_sitemap_last_modified_missing(self):
         "Tests that Last-Modified header is missing when sitemap has no lastmod"
-        response = self.client.get('/generic/sitemap.xml')
+        response = self.client.get('/simple/i18n.xml')
         self.assertFalse(response.has_header('Last-Modified'))
+        self.assertNotContains(response, '<lastmod>')
 
     def test_sitemap_last_modified_mixed(self):
         "Tests that Last-Modified header is omitted when lastmod not on all items"
         response = self.client.get('/lastmod-mixed/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
+        self.assertNotContains(response, '<lastmod>')
+
+    def test_sitemap_get_latest_lastmod_none(self):
+        """
+        Tests that sitemapindex.lastmod is ommitted when Sitemap.lastmod is 
+        callable and Sitemap.get_latest_lastmod is not implemented
+        """
+        response = self.client.get('/lastmod/get-latest-lastmod-none-sitemap.xml')
+        self.assertNotContains(response, '<lastmod>')
+
+    def test_sitemap_get_latest_lastmod(self):
+        """
+        Tests that sitemapindex.lastmod is ommitted when Sitemap.lastmod is 
+        callable and Sitemap.get_latest_lastmod is not implemented
+        """
+        response = self.client.get('/lastmod/get-latest-lastmod-sitemap.xml')
+        self.assertContains(response, '<lastmod>2013-03-13T10:00:00-05:51</lastmod>')
 
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     @override_settings(USE_L10N=True)

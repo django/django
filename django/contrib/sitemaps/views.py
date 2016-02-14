@@ -8,7 +8,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils.http import http_date
-from django.contrib.sitemaps import format_time
+from django.contrib.sitemaps import sitemap_time
 
 
 def x_robots_tag(func):
@@ -36,7 +36,7 @@ def index(request, sitemaps,
         sitemap_url = urlresolvers.reverse(
             sitemap_url_name, kwargs={'section': section})
         absolute_url = '%s://%s%s' % (protocol, req_site.domain, sitemap_url)
-        lastmod = format_time(site.get_latest_lastmod())
+        lastmod = sitemap_time(site.get_latest_lastmod())
         sites.append({'location': absolute_url, 'lastmod': lastmod})
         for page in range(2, site.paginator.num_pages + 1):
             sites.append({'location': '%s?p=%s' % (absolute_url, page), 'lastmod': lastmod})

@@ -4,7 +4,7 @@ from django.apps import apps as django_apps
 from django.conf import settings
 from django.core import paginator, urlresolvers
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import translation
+from django.utils import translation, timezone
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import urlopen
 
@@ -45,14 +45,12 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     urlopen("%s?%s" % (ping_url, params))
 
 
-def format_time(t):
+def sitemap_time(t):
     if t is None:
         return None
-    if isinstance(t, datetime.date):
-        return t.strftime('%Y-%m-%d')
-    if isinstance(t, datetime.datetime):
-        return t.strftime('%Y-%m-%dT%H:%M:%SZ')
-    raise ValueError('unexpected time type, should be date or datetime')
+    if isinstance(t, datetime.datetime) and (t.tzinfo == None or t.tzinfo.utcoffset(t) == None):
+        t = t.replace(tzinfo=timezone.get_default_timezone())
+    return t.isoformat()
 
 
 class Sitemap(object):
@@ -80,7 +78,8 @@ class Sitemap(object):
         return obj.get_absolute_url()
 
     def get_latest_lastmod(self):
-        return self.lastmod if hasattr(self, 'lastmod') and not callable(self.lastmod) else None
+        if hasattr(self, 'lastmod') and not callable(self.lastmod):
+            return self.lastmod
 
     def _get_paginator(self):
         return paginator.Paginator(self.items(), self.limit)
@@ -136,7 +135,7 @@ class Sitemap(object):
             url_info = {
                 'item': item,
                 'location': loc,
-                'lastmod': format_time(lastmod),
+                'lastmod': sitemap_time(lastmod),
                 'changefreq': self.__get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
             }
