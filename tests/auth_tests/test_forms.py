@@ -10,6 +10,7 @@ from django.contrib.auth.forms import (
     SetPasswordForm, UserChangeForm, UserCreationForm,
 )
 from django.contrib.auth.models import User
+from django.contrib.auth.tests.custom_user import ExtensionUser
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
@@ -152,6 +153,21 @@ class UserCreationFormTest(TestDataMixin, TestCase):
             'This password is too short. It must contain at least 12 characters.',
             form['password2'].errors
         )
+
+    def test_custom_form(self):
+        class CustomUserCreationForm(UserCreationForm):
+            class Meta(UserCreationForm.Meta):
+                model = ExtensionUser
+                fields = UserCreationForm.Meta.fields + ('date_of_birth',)
+
+        data = {
+            'username': 'testclient',
+            'password1': 'testclient',
+            'password2': 'testclient',
+            'date_of_birth': '1988-02-24',
+        }
+        form = CustomUserCreationForm(data)
+        self.assertTrue(form.is_valid())
 
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
@@ -440,6 +456,24 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         # ReadOnlyPasswordHashWidget needs the initial
         # value to render correctly
         self.assertEqual(form.initial['password'], form['password'].value())
+
+    def test_custom_form(self):
+        class CustomUserChangeForm(UserChangeForm):
+            class Meta(UserChangeForm.Meta):
+                model = ExtensionUser
+                fields = ('username', 'password', 'date_of_birth',)
+
+        user = User.objects.get(username='testclient')
+        data = {
+            'username': 'testclient',
+            'password': 'testclient',
+            'date_of_birth': '1998-02-24',
+        }
+        form = CustomUserChangeForm(data, instance=user)
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(form.cleaned_data['username'], 'testclient')
+        self.assertEqual(form.cleaned_data['date_of_birth'], datetime.date(1998, 2, 24))
 
 
 @override_settings(
