@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from django.core.management import BaseCommand
 from channels import channel_layers, DEFAULT_CHANNEL_LAYER
 from channels.log import setup_logger
-from channels.handler import ViewConsumer
 from channels.worker import Worker
 
 

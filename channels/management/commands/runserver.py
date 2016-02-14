@@ -9,7 +9,6 @@ from django.utils import six
 from django.utils.encoding import get_system_encoding
 
 from channels import DEFAULT_CHANNEL_LAYER, channel_layers
-from channels.handler import ViewConsumer
 from channels.log import setup_logger
 from channels.worker import Worker
 
