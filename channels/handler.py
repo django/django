@@ -23,10 +23,13 @@ class AsgiRequest(http.HttpRequest):
     dict, and wraps request body handling.
     """
 
-    # Exception that will cause any handler to skip around response
-    # transmission and presume something else will do it later.
     class ResponseLater(Exception):
-        pass
+        """
+        Exception that will cause any handler to skip around response
+        transmission and presume something else will do it later.
+        """
+        def __init__(self):
+            Exception.__init__(self, "Response later")
 
     def __init__(self, message):
         self.message = message
@@ -171,16 +174,36 @@ class AsgiHandler(base.BaseHandler):
                 }
             )
             response = http.HttpResponseBadRequest()
-        except AsgiRequest.ResponseLater:
-            # The view has promised something else
-            # will send a response at a later time
-            return
         else:
-            response = self.get_response(request)
+            try:
+                response = self.get_response(request)
+            except AsgiRequest.ResponseLater:
+                # The view has promised something else
+                # will send a response at a later time
+                return
         # Transform response into messages, which we yield back to caller
         for message in self.encode_response(response):
             # TODO: file_to_stream
             yield message
+
+    def process_exception_by_middleware(self, exception, request):
+        """
+        Catches ResponseLater and re-raises it, else tries to delegate
+        to middleware exception handling.
+        """
+        if isinstance(exception, AsgiRequest.ResponseLater):
+            raise
+        else:
+            return super(AsgiHandler, self).process_exception_by_middleware(exception, request)
+
+    def handle_uncaught_exception(self, request, resolver, exc_info):
+        """
+        Propagates ResponseLater up into the higher handler method,
+        processes everything else
+        """
+        if issubclass(exc_info[0], AsgiRequest.ResponseLater):
+            raise
+        return super(AsgiHandler, self).handle_uncaught_exception(request, resolver, exc_info)
 
     @classmethod
     def encode_response(cls, response):

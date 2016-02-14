@@ -565,6 +565,21 @@ Keys:
   server-pushed requests, and applications should not create reply channels.
 
 
+Disconnect
+''''''''''
+
+Sent when a HTTP connection is closed. This is mainly useful for long-polling,
+where you may have added the response channel to a Group or other set of
+channels you want to trigger a reply to when data arrives.
+
+Channel: ``http.disconnect``
+
+Keys:
+
+* ``reply_channel``: Channel name responses would have been sent on. No longer
+  valid after this message is sent; all messages to it will be dropped.
+
+
 WebSocket
 ---------
 
