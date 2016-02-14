@@ -12,9 +12,12 @@ class Message(object):
     to use to reply to this message's end user, if that makes sense.
     """
 
-    def __init__(self, content, channel, channel_layer):
+    def __init__(self, content, channel_name, channel_layer):
         self.content = content
-        self.channel = channel
+        self.channel = Channel(
+            channel_name,
+            channel_layer=channel_layer,
+        )
         self.channel_layer = channel_layer
         if content.get("reply_channel", None):
             self.reply_channel = Channel(

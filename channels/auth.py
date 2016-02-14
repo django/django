@@ -1,8 +1,9 @@
 import functools
 
 from django.contrib import auth
+from django.contrib.auth.models import AnonymousUser
 
-from .decorators import channel_session, http_session
+from .sessions import channel_session, http_session
 
 
 def transfer_user(from_session, to_session):
@@ -26,7 +27,7 @@ def channel_session_user(func):
         if not hasattr(message, "channel_session"):
             raise ValueError("Did not see a channel session to get auth from")
         if message.channel_session is None:
-            message.user = None
+            message.user = AnonymousUser()
         # Otherwise, be a bit naughty and make a fake Request with just
         # a "session" attribute (later on, perhaps refactor contrib.auth to
         # pass around session rather than request)
@@ -55,7 +56,7 @@ def http_session_user(func):
         if not hasattr(message, "http_session"):
             raise ValueError("Did not see a http session to get auth from")
         if message.http_session is None:
-            message.user = None
+            message.user = AnonymousUser()
         # Otherwise, be a bit naughty and make a fake Request with just
         # a "session" attribute (later on, perhaps refactor contrib.auth to
         # pass around session rather than request)
@@ -63,5 +64,20 @@ def http_session_user(func):
             fake_request = type("FakeRequest", (object, ), {"session": message.http_session})
             message.user = auth.get_user(fake_request)
         # Run the consumer
+        return func(message, *args, **kwargs)
+    return inner
+
+
+def channel_session_user_from_http(func):
+    """
+    Decorator that automatically transfers the user from HTTP sessions to
+    channel-based sessions, and returns the user as message.user as well.
+    Useful for things that consume e.g. websocket.connect
+    """
+    @http_session_user
+    @channel_session
+    def inner(message, *args, **kwargs):
+        if message.http_session is not None:
+            transfer_user(message.http_session, message.channel_session)
         return func(message, *args, **kwargs)
     return inner

@@ -34,7 +34,7 @@ class Worker(object):
             # Create message wrapper
             message = Message(
                 content=content,
-                channel=channel,
+                channel_name=channel,
                 channel_layer=self.channel_layer,
             )
             # Handle the message
