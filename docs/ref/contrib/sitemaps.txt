@@ -256,6 +256,8 @@ Sitemap class reference
 
     .. method:: Sitemap.get_latest_lastmod()
 
+        .. versionadded:: 1.10
+
         **Optional.** A method that returns the latest value returned by 
         :attr:`~Sitemap.lastmod()`.
 
@@ -264,8 +266,6 @@ Sitemap class reference
         * If :attr:`~Sitemap.lastmod` is an attribute: 
           :attr:`~Sitemap.lastmod`.
         * If :attr:`~Sitemap.lastmod` is a method: ``None``.
-
-        .. versionadded:: 1.10
 
 Shortcuts
 =========
