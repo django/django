@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 
 from .consumer_registry import ConsumerRegistry
+from .utils import name_that_thing
 
 
 class InvalidChannelLayerError(ValueError):
@@ -70,6 +71,9 @@ class ChannelLayerWrapper(object):
 
     def __getattr__(self, name):
         return getattr(self.channel_layer, name)
+
+    def __str__(self):
+        return "%s (%s)" % (self.alias, name_that_thing(self.channel_layer))
 
 
 def get_channel_layer(alias="default"):

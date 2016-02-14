@@ -11,4 +11,6 @@ def name_that_thing(thing):
                 return name_that_thing(thing.__class__)
         if hasattr(thing, "__module__"):
             return "%s.%s" % (thing.__module__, thing.__name__)
+    if hasattr(thing, "__class__"):
+        return name_that_thing(thing.__class__)
     return repr(thing)

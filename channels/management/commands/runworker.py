@@ -17,7 +17,7 @@ class Command(BaseCommand):
         # Check a handler is registered for http reqs
         self.channel_layer.registry.check_default()
         # Launch a worker
-        self.logger.info("Running worker against backend %s", self.channel_layer.alias)
+        self.logger.info("Running worker against backend %s", self.channel_layer)
         # Optionally provide an output callback
         callback = None
         if self.verbosity > 1:

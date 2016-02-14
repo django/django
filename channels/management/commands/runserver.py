@@ -16,6 +16,11 @@ from channels.worker import Worker
 
 class Command(RunserverCommand):
 
+    def add_arguments(self, parser):
+        super(Command, self).add_arguments(parser)
+        parser.add_argument('--noworker', action='store_false', dest='run_worker', default=True,
+            help='Tells Django not to run a worker thread; you\'ll need to run one separately.')
+
     def handle(self, *args, **options):
         self.verbosity = options.get("verbosity", 1)
         self.logger = setup_logger('django.channels', self.verbosity)
@@ -38,6 +43,7 @@ class Command(RunserverCommand):
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
             "Starting Channels development server at http://%(addr)s:%(port)s/\n"
+            "Channel layer %(layer)s\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
             "version": self.get_version(),
@@ -45,12 +51,14 @@ class Command(RunserverCommand):
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
+            "layer": self.channel_layer,
         })
 
         # Launch worker as subthread
-        worker = WorkerThread(self.channel_layer, self.logger)
-        worker.daemon = True
-        worker.start()
+        if options.get("run_worker", True):
+            worker = WorkerThread(self.channel_layer, self.logger)
+            worker.daemon = True
+            worker.start()
         # Launch server in 'main' thread. Signals are disabled as it's still
         # actually a subthread under the autoreloader.
         self.logger.debug("Daphne running, listening on %s:%s", self.addr, self.port)
@@ -60,9 +68,10 @@ class Command(RunserverCommand):
                 channel_layer=self.channel_layer,
                 host=self.addr,
                 port=int(self.port),
-                signal_handlers=False,
+                signal_handlers=not options['use_reloader'],
                 action_logger=self.log_action,
             ).run()
+            self.logger.debug("Daphne exited")
         except KeyboardInterrupt:
             shutdown_message = options.get('shutdown_message', '')
             if shutdown_message:
@@ -118,3 +127,4 @@ class WorkerThread(threading.Thread):
         self.logger.debug("Worker thread running")
         worker = Worker(channel_layer=self.channel_layer)
         worker.run()
+        self.logger.debug("Worker thread exited")
