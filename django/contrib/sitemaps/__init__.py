@@ -1,3 +1,5 @@
+import datetime
+
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core import paginator, urlresolvers
@@ -41,6 +43,16 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     url = "http://%s%s" % (current_site.domain, sitemap_url)
     params = urlencode({'sitemap': url})
     urlopen("%s?%s" % (ping_url, params))
+
+
+def format_time(t):
+    if t is None:
+        return None
+    if isinstance(t, datetime.date):
+        return t.strftime('%Y-%m-%d')
+    if isinstance(t, datetime.datetime):
+        return t.strftime('%Y-%m-%dT%H:%M:%SZ')
+    raise ValueError('unexpected time type, should be date or datetime')
 
 
 class Sitemap(object):
@@ -124,7 +136,7 @@ class Sitemap(object):
             url_info = {
                 'item': item,
                 'location': loc,
-                'lastmod': lastmod,
+                'lastmod': format_time(lastmod),
                 'changefreq': self.__get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
             }

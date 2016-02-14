@@ -5,7 +5,7 @@
 {% for section in sitemaps %}
   <sitemap>
     <loc>{{ section.location }}</loc>
-    {% if section.lastmod %}<lastmod>{{ section.lastmod|date:"c" }}</lastmod>{% endif %}
+    {% if section.lastmod %}<lastmod>{{ section.lastmod }}</lastmod>{% endif %}
   </sitemap>
 {% endfor %}
 {% endspaceless %}
