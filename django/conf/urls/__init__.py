@@ -74,12 +74,12 @@ def include(arg, namespace=None, app_name=None):
     return (urlconf_module, app_name, namespace)
 
 
-def url(regex, view, kwargs=None, name=None):
+def url(regex, view, kwargs=None, name=None, wrap=None):
     if isinstance(view, (list, tuple)):
         # For include(...) processing.
         urlconf_module, app_name, namespace = view
-        return RegexURLResolver(regex, urlconf_module, kwargs, app_name=app_name, namespace=namespace)
+        return RegexURLResolver(regex, urlconf_module, kwargs, app_name=app_name, namespace=namespace, wrap=wrap)
     elif callable(view):
-        return RegexURLPattern(regex, view, kwargs, name)
+        return RegexURLPattern(regex, view, kwargs, name, wrap=wrap)
     else:
         raise TypeError('view must be a callable or a list/tuple in the case of include().')
