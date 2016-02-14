@@ -193,7 +193,7 @@ this. For a small app like polls, this process isn't too difficult.
        :filename: django-polls/setup.py
 
        import os
-       from setuptools import setup
+       from setuptools import find_packages, setup
 
        with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
            README = readme.read()
@@ -204,7 +204,7 @@ this. For a small app like polls, this process isn't too difficult.
        setup(
            name='django-polls',
            version='0.1',
-           packages=['polls'],
+           packages=find_packages(),
            include_package_data=True,
            license='BSD License',  # example license
            description='A simple Django app to conduct Web-based polls.',
