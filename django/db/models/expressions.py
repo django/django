@@ -534,7 +534,7 @@ class Func(Expression):
             c.source_expressions[pos] = arg.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         return c
 
-    def as_sql(self, compiler, connection, function=None, template=None):
+    def as_sql(self, compiler, connection, function=None, template=None, arg_joiner=None, **extra_context):
         connection.ops.check_expression_support(self)
         sql_parts = []
         params = []
@@ -542,16 +542,24 @@ class Func(Expression):
             arg_sql, arg_params = compiler.compile(arg)
             sql_parts.append(arg_sql)
             params.extend(arg_params)
-        if function is None:
-            self.extra['function'] = self.extra.get('function', self.function)
-        else:
-            self.extra['function'] = function
-        self.extra['expressions'] = self.extra['field'] = self.arg_joiner.join(sql_parts)
-        template = template or self.extra.get('template', self.template)
-        return template % self.extra, params
+        data = self.extra.copy()
+        data.update(**extra_context)
+        # we add to the data dict because these values could have been supplied
+        # in self.extra also
+        if function is not None:
+            data['function'] = function
+        if template is not None:
+            data['template'] = template
+        if arg_joiner is not None:
+            data['arg_joiner'] = arg_joiner
+        data.setdefault('function', self.function)
+        template = data.get('template', self.template)
+        arg_joiner = data.get('arg_joiner', self.arg_joiner)
+        data['expressions'] = data['field'] = arg_joiner.join(sql_parts)
+        return template % data, params
 
-    def as_sqlite(self, *args, **kwargs):
-        sql, params = self.as_sql(*args, **kwargs)
+    def as_sqlite(self, compiler, connection):
+        sql, params = self.as_sql(compiler, connection)
         try:
             if self.output_field.get_internal_type() == 'DecimalField':
                 sql = 'CAST(%s AS NUMERIC)' % sql
@@ -778,9 +786,9 @@ class When(Expression):
         c.result = c.result.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         return c
 
-    def as_sql(self, compiler, connection, template=None):
+    def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
-        template_params = {}
+        template_params = extra_context
         sql_params = []
         condition_sql, condition_params = compiler.compile(self.condition)
         template_params['condition'] = condition_sql
@@ -849,22 +857,24 @@ class Case(Expression):
         c.cases = c.cases[:]
         return c
 
-    def as_sql(self, compiler, connection, template=None, extra=None):
+    def as_sql(self, compiler, connection, template=None, case_joiner=None, **extra_context):
         connection.ops.check_expression_support(self)
         if not self.cases:
             return compiler.compile(self.default)
-        template_params = dict(extra) if extra else {}
+        template_params = self.extra.copy()
+        template_params.update(extra_context)
         case_parts = []
         sql_params = []
         for case in self.cases:
             case_sql, case_params = compiler.compile(case)
             case_parts.append(case_sql)
             sql_params.extend(case_params)
-        template_params['cases'] = self.case_joiner.join(case_parts)
+        case_joiner = case_joiner or self.case_joiner
+        template_params['cases'] = case_joiner.join(case_parts)
         default_sql, default_params = compiler.compile(self.default)
         template_params['default'] = default_sql
         sql_params.extend(default_params)
-        template = template or self.template
+        template = template_params.get('template', self.template)
         sql = template % template_params
         if self._output_field_or_none is not None:
             sql = connection.ops.unification_cast_sql(self.output_field) % sql
@@ -995,14 +1005,16 @@ class OrderBy(BaseExpression):
     def get_source_expressions(self):
         return [self.expression]
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)
         placeholders = {
             'expression': expression_sql,
             'ordering': 'DESC' if self.descending else 'ASC',
         }
-        return (self.template % placeholders).rstrip(), params
+        placeholders.update(extra_context)
+        template = template or self.template
+        return (template % placeholders).rstrip(), params
 
     def get_group_by_cols(self):
         cols = []
