@@ -212,6 +212,13 @@ Database backends
   ``DatabaseOperations.fetch_returned_insert_ids()`` to set primary keys
   on objects created using ``QuerySet.bulk_create()``.
 
+* Added keyword arguments to the ``as_sql()`` methods of various expressions
+  (``Func``, ``When``, ``Case``, and ``OrderBy``) to allow database backends to
+  customize them without mutating ``self``, which isn't safe when using
+  different database backends. See the ``arg_joiner`` and ``**extra_context``
+  parameters of :meth:`Func.as_sql() <django.db.models.Func.as_sql>` for an
+  example.
+
 Email
 ~~~~~
 

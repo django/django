@@ -43,9 +43,8 @@ class ConcatPair(Func):
 
     def as_sqlite(self, compiler, connection):
         coalesced = self.coalesce()
-        coalesced.arg_joiner = ' || '
         return super(ConcatPair, coalesced).as_sql(
-            compiler, connection, template='%(expressions)s',
+            compiler, connection, template='%(expressions)s', arg_joiner=' || '
         )
 
     def as_mysql(self, compiler, connection):
