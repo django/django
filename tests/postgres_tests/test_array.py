@@ -462,17 +462,17 @@ class TestMigrations(TransactionTestCase):
 
 class TestSerialization(PostgreSQLTestCase):
     test_data = (
-        '[{"fields": {"field": "[\\"1\\", \\"2\\"]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'
+        '[{"fields": {"field": "[\\"1\\", \\"2\\", null]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'
     )
 
     def test_dumping(self):
-        instance = IntegerArrayModel(field=[1, 2])
+        instance = IntegerArrayModel(field=[1, 2, None])
         data = serializers.serialize('json', [instance])
         self.assertEqual(json.loads(data), json.loads(self.test_data))
 
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
-        self.assertEqual(instance.field, [1, 2])
+        self.assertEqual(instance.field, [1, 2, None])
 
 
 class TestValidation(PostgreSQLTestCase):
