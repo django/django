@@ -51,8 +51,12 @@ class RangeField(models.Field):
         base_field = self.base_field
         result = {"bounds": value._bounds}
         for end in ('lower', 'upper'):
-            obj = AttributeSetter(base_field.attname, getattr(value, end))
-            result[end] = base_field.value_to_string(obj)
+            val = getattr(value, end)
+            if val is None:
+                result[end] = None
+            else:
+                obj = AttributeSetter(base_field.attname, val)
+                result[end] = base_field.value_to_string(obj)
         return json.dumps(result)
 
     def formfield(self, **kwargs):

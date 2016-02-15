@@ -130,7 +130,8 @@ class TestQuerying(TestCase):
 
 
 class TestSerialization(TestCase):
-    test_data = '[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, "model": "postgres_tests.hstoremodel", "pk": null}]'
+    test_data = ('[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, '
+                 '"model": "postgres_tests.hstoremodel", "pk": null}]')
 
     def test_dumping(self):
         instance = HStoreModel(field={'a': 'b'})
@@ -140,6 +141,12 @@ class TestSerialization(TestCase):
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.field, {'a': 'b'})
+
+    def test_roundtrip_with_null(self):
+        instance = HStoreModel(field={'a': 'b', 'c': None})
+        data = serializers.serialize('json', [instance])
+        new_instance = list(serializers.deserialize('json', data))[0].object
+        self.assertEqual(instance.field, new_instance.field)
 
 
 class TestValidation(TestCase):

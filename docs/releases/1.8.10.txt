@@ -17,3 +17,7 @@ Bugfixes
 
 * Made ``forms.FileField`` and ``utils.translation.lazy_number()`` picklable
   (:ticket:`26212`).
+
+* Fixed :class:`~django.contrib.postgres.fields.RangeField` and
+  :class:`~django.contrib.postgres.fields.ArrayField` serialization with
+  ``None`` values (:ticket:`26215`).
