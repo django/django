@@ -98,9 +98,9 @@ class ModelBase(type):
                 if not abstract:
                     raise RuntimeError(
                         "Model class %s.%s doesn't declare an explicit "
-                        "app_label and either isn't in an application in "
-                        "INSTALLED_APPS or else was imported before its "
-                        "application was loaded. " % (module, name))
+                        "app_label and isn't in an application in "
+                        "INSTALLED_APPS." % (module, name)
+                    )
 
             else:
                 app_label = app_config.label
@@ -435,7 +435,8 @@ class Model(six.with_metaclass(ModelBase)):
             for prop in list(kwargs):
                 try:
                     if isinstance(getattr(self.__class__, prop), property):
-                        setattr(self, prop, kwargs.pop(prop))
+                        setattr(self, prop, kwargs[prop])
+                        del kwargs[prop]
                 except AttributeError:
                     pass
             if kwargs:
@@ -1193,8 +1194,6 @@ class Model(six.with_metaclass(ModelBase)):
                 errors.append(
                     checks.Error(
                         "'%s' is not of the form 'app_label.app_name'." % cls._meta.swappable,
-                        hint=None,
-                        obj=None,
                         id='models.E001',
                     )
                 )
@@ -1206,8 +1205,6 @@ class Model(six.with_metaclass(ModelBase)):
                         "installed, or is abstract." % (
                             cls._meta.swappable, app_label, model_name
                         ),
-                        hint=None,
-                        obj=None,
                         id='models.E002',
                     )
                 )
@@ -1221,8 +1218,6 @@ class Model(six.with_metaclass(ModelBase)):
                 errors.append(
                     checks.Error(
                         "Proxy model '%s' contains model fields." % cls.__name__,
-                        hint=None,
-                        obj=None,
                         id='models.E017',
                     )
                 )
@@ -1271,7 +1266,6 @@ class Model(six.with_metaclass(ModelBase)):
                     checks.Error(
                         "The model has two many-to-many relations through "
                         "the intermediate model '%s'." % f.remote_field.through._meta.label,
-                        hint=None,
                         obj=cls,
                         id='models.E003',
                     )
@@ -1292,7 +1286,6 @@ class Model(six.with_metaclass(ModelBase)):
                 checks.Error(
                     "'id' can only be used as a field name if the field also "
                     "sets 'primary_key=True'.",
-                    hint=None,
                     obj=cls,
                     id='models.E004',
                 )
@@ -1320,7 +1313,6 @@ class Model(six.with_metaclass(ModelBase)):
                                 clash.name, clash.model._meta,
                                 f.name, f.model._meta
                             ),
-                            hint=None,
                             obj=cls,
                             id='models.E005',
                         )
@@ -1351,7 +1343,6 @@ class Model(six.with_metaclass(ModelBase)):
                         "from model '%s'." % (
                             f.name, clash.name, clash.model._meta
                         ),
-                        hint=None,
                         obj=f,
                         id='models.E006',
                     )
@@ -1393,7 +1384,6 @@ class Model(six.with_metaclass(ModelBase)):
             return [
                 checks.Error(
                     "'index_together' must be a list or tuple.",
-                    hint=None,
                     obj=cls,
                     id='models.E008',
                 )
@@ -1404,7 +1394,6 @@ class Model(six.with_metaclass(ModelBase)):
             return [
                 checks.Error(
                     "All 'index_together' elements must be lists or tuples.",
-                    hint=None,
                     obj=cls,
                     id='models.E009',
                 )
@@ -1423,7 +1412,6 @@ class Model(six.with_metaclass(ModelBase)):
             return [
                 checks.Error(
                     "'unique_together' must be a list or tuple.",
-                    hint=None,
                     obj=cls,
                     id='models.E010',
                 )
@@ -1434,7 +1422,6 @@ class Model(six.with_metaclass(ModelBase)):
             return [
                 checks.Error(
                     "All 'unique_together' elements must be lists or tuples.",
-                    hint=None,
                     obj=cls,
                     id='models.E011',
                 )
@@ -1466,7 +1453,6 @@ class Model(six.with_metaclass(ModelBase)):
                         "'%s' refers to the non-existent field '%s'." % (
                             option, field_name,
                         ),
-                        hint=None,
                         obj=cls,
                         id='models.E012',
                     )
@@ -1479,7 +1465,6 @@ class Model(six.with_metaclass(ModelBase)):
                             "ManyToManyFields are not permitted in '%s'." % (
                                 option, field_name, option,
                             ),
-                            hint=None,
                             obj=cls,
                             id='models.E013',
                         )
@@ -1487,12 +1472,9 @@ class Model(six.with_metaclass(ModelBase)):
                 elif field not in cls._meta.local_fields:
                     errors.append(
                         checks.Error(
-                            ("'%s' refers to field '%s' which is not local "
-                             "to model '%s'.") % (
-                                option, field_name, cls._meta.object_name,
-                            ),
-                            hint=("This issue may be caused by multi-table "
-                                  "inheritance."),
+                            "'%s' refers to field '%s' which is not local to model '%s'."
+                            % (option, field_name, cls._meta.object_name),
+                            hint="This issue may be caused by multi-table inheritance.",
                             obj=cls,
                             id='models.E016',
                         )
@@ -1507,7 +1489,6 @@ class Model(six.with_metaclass(ModelBase)):
             return [
                 checks.Error(
                     "'ordering' and 'order_with_respect_to' cannot be used together.",
-                    hint=None,
                     obj=cls,
                     id='models.E021',
                 ),
@@ -1519,9 +1500,7 @@ class Model(six.with_metaclass(ModelBase)):
         if not isinstance(cls._meta.ordering, (list, tuple)):
             return [
                 checks.Error(
-                    ("'ordering' must be a tuple or list "
-                     "(even if you want to order by only one field)."),
-                    hint=None,
+                    "'ordering' must be a tuple or list (even if you want to order by only one field).",
                     obj=cls,
                     id='models.E014',
                 )
@@ -1561,7 +1540,6 @@ class Model(six.with_metaclass(ModelBase)):
             errors.append(
                 checks.Error(
                     "'ordering' refers to the non-existent field '%s'." % invalid_field,
-                    hint=None,
                     obj=cls,
                     id='models.E015',
                 )
@@ -1628,9 +1606,10 @@ class Model(six.with_metaclass(ModelBase)):
                             'Autogenerated column name too long for M2M field '
                             '"%s". Maximum length is "%s" for database "%s".'
                             % (rel_name, allowed_len, db_alias),
-                            hint=("Use 'through' to create a separate model "
-                                "for M2M and then set column_name using "
-                                "'db_column'."),
+                            hint=(
+                                "Use 'through' to create a separate model for "
+                                "M2M and then set column_name using 'db_column'."
+                            ),
                             obj=cls,
                             id='models.E019',
                         )
@@ -1693,8 +1672,6 @@ def model_unpickle(model_id, attrs, factory):
     Used to unpickle Model subclasses with deferred fields.
     """
     if isinstance(model_id, tuple):
-        if not apps.ready:
-            apps.populate(settings.INSTALLED_APPS)
         model = apps.get_model(*model_id)
     else:
         # Backwards compat - the model was cached directly in earlier versions.

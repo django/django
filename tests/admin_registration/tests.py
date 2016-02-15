@@ -36,9 +36,8 @@ class TestRegistration(SimpleTestCase):
 
     def test_prevent_double_registration(self):
         self.site.register(Person)
-        self.assertRaises(admin.sites.AlreadyRegistered,
-                          self.site.register,
-                          Person)
+        with self.assertRaises(admin.sites.AlreadyRegistered):
+            self.site.register(Person)
 
     def test_registration_with_star_star_options(self):
         self.site.register(Person, search_fields=['name'])
@@ -68,7 +67,8 @@ class TestRegistration(SimpleTestCase):
         Exception is raised when trying to register an abstract model.
         Refs #12004.
         """
-        self.assertRaises(ImproperlyConfigured, self.site.register, Location)
+        with self.assertRaises(ImproperlyConfigured):
+            self.site.register(Location)
 
     def test_is_registered_model(self):
         "Checks for registered models should return true."
@@ -127,12 +127,12 @@ class TestRegistrationDecorator(SimpleTestCase):
         self.default_site.unregister(Place)
 
     def test_wrapped_class_not_a_model_admin(self):
-        self.assertRaisesMessage(ValueError, 'Wrapped class must subclass ModelAdmin.',
-            register(Person), CustomSite)
+        with self.assertRaisesMessage(ValueError, 'Wrapped class must subclass ModelAdmin.'):
+            register(Person)(CustomSite)
 
     def test_custom_site_not_an_admin_site(self):
-        self.assertRaisesMessage(ValueError, 'site must subclass AdminSite',
-            register(Person, site=Traveler), NameAdmin)
+        with self.assertRaisesMessage(ValueError, 'site must subclass AdminSite'):
+            register(Person, site=Traveler)(NameAdmin)
 
     def test_empty_models_list_registration_fails(self):
         with self.assertRaisesMessage(ValueError, 'At least one model must be passed to register.'):

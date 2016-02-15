@@ -1,5 +1,3 @@
-import datetime
-
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import get_hasher
@@ -12,49 +10,10 @@ from django.db.models.signals import post_save
 from django.test import TestCase, mock, override_settings
 
 
-@override_settings(USE_TZ=False)
 class NaturalKeysTestCase(TestCase):
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
-            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u2 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
-            first_name='Inactive', last_name='User', email='testclient2@example.com', is_staff=False, is_active=False,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u3 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
-            first_name='Staff', last_name='Member', email='staffmember@example.com', is_staff=True, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u4 = User.objects.create(
-            password='', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='empty_password', first_name='Empty', last_name='Password', email='empty_password@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u5 = User.objects.create(
-            password='$', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='unmanageable_password', first_name='Unmanageable', last_name='Password',
-            email='unmanageable_password@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u6 = User.objects.create(
-            password='foo$bar', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='unknown_password', first_name='Unknown', last_name='Password',
-            email='unknown_password@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-
     def test_user_natural_key(self):
-        staff_user = User.objects.get(username='staff')
+        staff_user = User.objects.create_user(username='staff')
         self.assertEqual(User.objects.get_by_natural_key('staff'), staff_user)
         self.assertEqual(staff_user.natural_key(), ('staff',))
 
@@ -63,7 +22,6 @@ class NaturalKeysTestCase(TestCase):
         self.assertEqual(Group.objects.get_by_natural_key('users'), users_group)
 
 
-@override_settings(USE_TZ=False)
 class LoadDataWithoutNaturalKeysTestCase(TestCase):
     fixtures = ['regular.json']
 
@@ -73,7 +31,6 @@ class LoadDataWithoutNaturalKeysTestCase(TestCase):
         self.assertEqual(group, user.groups.get())
 
 
-@override_settings(USE_TZ=False)
 class LoadDataWithNaturalKeysTestCase(TestCase):
     fixtures = ['natural.json']
 
@@ -161,11 +118,8 @@ class UserManagerTestCase(TestCase):
         self.assertEqual(returned, 'email\ with_whitespace@d.com')
 
     def test_empty_username(self):
-        self.assertRaisesMessage(
-            ValueError,
-            'The given username must be set',
-            User.objects.create_user, username=''
-        )
+        with self.assertRaisesMessage(ValueError, 'The given username must be set'):
+            User.objects.create_user(username='')
 
     def test_create_user_is_staff(self):
         email = 'normal@normal.com'

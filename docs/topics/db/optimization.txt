@@ -58,14 +58,14 @@ work. This document also does not address other optimization techniques that
 apply to all expensive operations, such as :doc:`general purpose caching
 </topics/cache>`.
 
-Understand QuerySets
-====================
+Understand ``QuerySet``\s
+=========================
 
 Understanding :doc:`QuerySets </ref/models/querysets>` is vital to getting good
 performance with simple code. In particular:
 
-Understand QuerySet evaluation
-------------------------------
+Understand ``QuerySet`` evaluation
+----------------------------------
 
 To avoid performance problems, it is important to understand:
 
@@ -232,13 +232,13 @@ are most useful when you can avoid loading a lot of text data or for fields
 that might take a lot of processing to convert back to Python. As always,
 profile first, then optimize.
 
-Use QuerySet.count()
---------------------
+Use ``QuerySet.count()``
+------------------------
 
 ...if you only want the count, rather than doing ``len(queryset)``.
 
-Use QuerySet.exists()
----------------------
+Use ``QuerySet.exists()``
+-------------------------
 
 ...if you only want to find out if at least one result exists, rather than ``if
 queryset``.

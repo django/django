@@ -34,7 +34,8 @@ class DistanceTest(unittest.TestCase):
 
     def testInitInvalid(self):
         "Testing initialization from invalid units"
-        self.assertRaises(AttributeError, D, banana=100)
+        with self.assertRaises(AttributeError):
+            D(banana=100)
 
     def testAccess(self):
         "Testing access in different units"
@@ -161,7 +162,8 @@ class AreaTest(unittest.TestCase):
 
     def testInitInvaliA(self):
         "Testing initialization from invalid units"
-        self.assertRaises(AttributeError, A, banana=100)
+        with self.assertRaises(AttributeError):
+            A(banana=100)
 
     def testAccess(self):
         "Testing access in different units"

@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.client import RequestFactory
+from django.urls import reverse
 from django.views.generic.base import View
 from django.views.generic.edit import CreateView, FormMixin, ModelFormMixin
 
@@ -232,6 +232,7 @@ class UpdateViewTests(TestCase):
         self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
         self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
+        self.assertEqual(res.context['view'].get_form_called_count, 1)
 
         # Modification with both POST and PUT (browser compatible)
         res = self.client.post('/edit/author/%d/update/' % a.pk,
@@ -251,6 +252,7 @@ class UpdateViewTests(TestCase):
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
         self.assertEqual(len(res.context['form'].errors), 1)
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe>'])
+        self.assertEqual(res.context['view'].get_form_called_count, 1)
 
     def test_update_with_object_url(self):
         a = Artist.objects.create(name='Rene Magritte')

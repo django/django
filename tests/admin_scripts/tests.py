@@ -26,7 +26,7 @@ from django.db import ConnectionHandler
 from django.db.migrations.exceptions import MigrationSchemaMissing
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
-    LiveServerTestCase, SimpleTestCase, mock, override_settings,
+    LiveServerTestCase, SimpleTestCase, TestCase, mock, override_settings,
 )
 from django.test.runner import DiscoverRunner
 from django.utils._os import npath, upath
@@ -181,7 +181,7 @@ class AdminScriptTestCase(unittest.TestCase):
                 pass
 
         conf_dir = os.path.dirname(upath(conf.__file__))
-        template_manage_py = os.path.join(conf_dir, 'project_template', 'manage.py')
+        template_manage_py = os.path.join(conf_dir, 'project_template', 'manage.py-tpl')
 
         test_manage_py = os.path.join(self.test_dir, 'manage.py')
         shutil.copyfile(template_manage_py, test_manage_py)
@@ -610,17 +610,17 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, app_path)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
+        unicode_literals_import = "from __future__ import unicode_literals\n"
         with open(os.path.join(app_path, 'apps.py'), 'r') as f:
             content = f.read()
             self.assertIn("class SettingsTestConfig(AppConfig)", content)
             self.assertIn("name = 'settings_test'", content)
+            if not PY3:
+                self.assertIn(unicode_literals_import, content)
         if not PY3:
             with open(os.path.join(app_path, 'models.py'), 'r') as fp:
                 content = fp.read()
-            self.assertIn(
-                "from __future__ import unicode_literals\n",
-                content,
-            )
+            self.assertIn(unicode_literals_import, content)
 
     def test_setup_environ_custom_template(self):
         "directory: startapp creates the correct directory with a custom template"
@@ -1367,7 +1367,7 @@ class ManageRunserver(AdminScriptTestCase):
         Ensure runserver.check_migrations doesn't choke on empty DATABASES.
         """
         tested_connections = ConnectionHandler({})
-        with mock.patch('django.core.management.commands.runserver.connections', new=tested_connections):
+        with mock.patch('django.core.management.base.connections', new=tested_connections):
             self.cmd.check_migrations()
 
     def test_readonly_database(self):
@@ -1381,6 +1381,36 @@ class ManageRunserver(AdminScriptTestCase):
             self.cmd.check_migrations()
         # Check a warning is emitted
         self.assertIn("Not checking migrations", self.output.getvalue())
+
+
+class ManageRunserverMigrationWarning(TestCase):
+
+    def setUp(self):
+        from django.core.management.commands.runserver import Command
+        self.stdout = StringIO()
+        self.runserver_command = Command(stdout=self.stdout)
+
+    @override_settings(INSTALLED_APPS=["admin_scripts.app_waiting_migration"])
+    def test_migration_warning_one_app(self):
+        self.runserver_command.check_migrations()
+        output = self.stdout.getvalue()
+        self.assertIn('You have 1 unapplied migration(s)', output)
+        self.assertIn('apply the migrations for app(s): app_waiting_migration.', output)
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "admin_scripts.app_waiting_migration",
+            "admin_scripts.another_app_waiting_migration",
+        ],
+    )
+    def test_migration_warning_multiple_apps(self):
+        self.runserver_command.check_migrations()
+        output = self.stdout.getvalue()
+        self.assertIn('You have 2 unapplied migration(s)', output)
+        self.assertIn(
+            'apply the migrations for app(s): another_app_waiting_migration, '
+            'app_waiting_migration.', output
+        )
 
 
 class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):

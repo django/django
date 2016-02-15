@@ -17,7 +17,8 @@ class DateParseTests(unittest.TestCase):
         self.assertEqual(parse_date('2012-4-9'), date(2012, 4, 9))
         # Invalid inputs
         self.assertEqual(parse_date('20120423'), None)
-        self.assertRaises(ValueError, parse_date, '2012-04-56')
+        with self.assertRaises(ValueError):
+            parse_date('2012-04-56')
 
     def test_parse_time(self):
         # Valid inputs
@@ -27,7 +28,8 @@ class DateParseTests(unittest.TestCase):
         self.assertEqual(parse_time('4:8:16'), time(4, 8, 16))
         # Invalid inputs
         self.assertEqual(parse_time('091500'), None)
-        self.assertRaises(ValueError, parse_time, '09:15:90')
+        with self.assertRaises(ValueError):
+            parse_time('09:15:90')
 
     def test_parse_datetime(self):
         # Valid inputs
@@ -47,7 +49,8 @@ class DateParseTests(unittest.TestCase):
             datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120)))
         # Invalid inputs
         self.assertEqual(parse_datetime('20120423091500'), None)
-        self.assertRaises(ValueError, parse_datetime, '2012-04-56T09:15:90')
+        with self.assertRaises(ValueError):
+            parse_datetime('2012-04-56T09:15:90')
 
 
 class DurationParseTests(unittest.TestCase):

@@ -56,6 +56,8 @@ Model field                         Form field
 =================================== ==================================================
 :class:`AutoField`                  Not represented in the form
 
+:class:`BigAutoField`               Not represented in the form
+
 :class:`BigIntegerField`            :class:`~django.forms.IntegerField` with
                                     ``min_value`` set to -9223372036854775808
                                     and ``max_value`` set to 9223372036854775807.
@@ -208,7 +210,7 @@ Validation on a ``ModelForm``
 
 There are two main steps involved in validating a ``ModelForm``:
 
-1. :ref:`Validating the form <form-and-field-validation>`
+1. :doc:`Validating the form </ref/forms/validation>`
 2. :ref:`Validating the model instance <validating-objects>`
 
 Just like normal form validation, model form validation is triggered implicitly
@@ -232,7 +234,7 @@ validation step, right after the form's ``clean()`` method is called.
 .. _overriding-modelform-clean-method:
 
 Overriding the clean() method
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can override the ``clean()`` method on a model form to provide additional
 validation in the same way you can on a normal form.
@@ -251,7 +253,7 @@ attribute that gives its methods access to that specific model instance.
     validation, you must call the parent class's ``clean()`` method.
 
 Interaction with model validation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As part of the validation process, ``ModelForm`` will call the ``clean()``
 method of each field on your model that has a corresponding field on your form.
@@ -266,7 +268,7 @@ on the model's ``clean()`` hook.
 .. _considerations-regarding-model-errormessages:
 
 Considerations regarding model's ``error_messages``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Error messages defined at the
 :attr:`form field <django.forms.Field.error_messages>` level or at the
@@ -791,8 +793,8 @@ instances of the model, you can specify an empty QuerySet::
 
    >>> AuthorFormSet(queryset=Author.objects.none())
 
-Changing the ``form``
----------------------
+Changing the form
+-----------------
 
 By default, when you use ``modelformset_factory``, a model form will
 be created using :func:`~django.forms.models.modelform_factory`.
@@ -919,6 +921,12 @@ extra forms displayed.
     >>> [x.name for x in formset.get_queryset()]
     ['Charles Baudelaire', 'Paul Verlaine', 'Walt Whitman']
 
+Also, ``extra=0`` doesn't prevent creation of new model instances as you can
+:ref:`add additional forms with JavaScript <understanding-the-managementform>`
+or just send additional POST data. Formsets `don't yet provide functionality
+<https://code.djangoproject.com/ticket/26142>`_ for an "edit only" view that
+prevents creation of new instances.
+
 If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``::
@@ -942,7 +950,7 @@ Model formsets are very similar to formsets. Let's say we want to present a
 formset to edit ``Author`` model instances::
 
     from django.forms import modelformset_factory
-    from django.shortcuts import render_to_response
+    from django.shortcuts import render
     from myapp.models import Author
 
     def manage_authors(request):
@@ -954,9 +962,7 @@ formset to edit ``Author`` model instances::
                 # do something.
         else:
             formset = AuthorFormSet()
-        return render_to_response("manage_authors.html", {
-            "formset": formset,
-        })
+        return render(request, 'manage_authors.html', {'formset': formset})
 
 As you can see, the view logic of a model formset isn't drastically different
 than that of a "normal" formset. The only difference is that we call
@@ -1010,7 +1016,7 @@ As stated earlier, you can override the default queryset used by the model
 formset::
 
     from django.forms import modelformset_factory
-    from django.shortcuts import render_to_response
+    from django.shortcuts import render
     from myapp.models import Author
 
     def manage_authors(request):
@@ -1023,9 +1029,7 @@ formset::
                 # Do something.
         else:
             formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
-        return render_to_response("manage_authors.html", {
-            "formset": formset,
-        })
+        return render(request, 'manage_authors.html', {'formset': formset})
 
 Note that we pass the ``queryset`` argument in both the ``POST`` and ``GET``
 cases in this example.
@@ -1201,9 +1205,7 @@ of a model. Here's how you can do that::
                 return HttpResponseRedirect(author.get_absolute_url())
         else:
             formset = BookInlineFormSet(instance=author)
-        return render_to_response("manage_books.html", {
-            "formset": formset,
-        })
+        return render(request, 'manage_books.html', {'formset': formset})
 
 Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
 

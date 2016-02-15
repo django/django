@@ -208,7 +208,8 @@ class ContentTypesTests(TestCase):
         user_ct = ContentType.objects.get_for_model(FooWithoutUrl)
         obj = FooWithoutUrl.objects.create(name="john")
 
-        self.assertRaises(Http404, shortcut, request, user_ct.id, obj.id)
+        with self.assertRaises(Http404):
+            shortcut(request, user_ct.id, obj.id)
 
     def test_shortcut_view_with_broken_get_absolute_url(self):
         """
@@ -224,7 +225,8 @@ class ContentTypesTests(TestCase):
         user_ct = ContentType.objects.get_for_model(FooWithBrokenAbsoluteUrl)
         obj = FooWithBrokenAbsoluteUrl.objects.create(name="john")
 
-        self.assertRaises(AttributeError, shortcut, request, user_ct.id, obj.id)
+        with self.assertRaises(AttributeError):
+            shortcut(request, user_ct.id, obj.id)
 
     def test_missing_model(self):
         """

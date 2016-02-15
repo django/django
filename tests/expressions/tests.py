@@ -294,12 +294,14 @@ class BasicExpressionsTests(TestCase):
 
         def test():
             test_gmbh.point_of_contact = F("ceo")
-        self.assertRaises(ValueError, test)
+        with self.assertRaises(ValueError):
+            test()
 
         test_gmbh.point_of_contact = test_gmbh.ceo
         test_gmbh.save()
         test_gmbh.name = F("ceo__last_name")
-        self.assertRaises(FieldError, test_gmbh.save)
+        with self.assertRaises(FieldError):
+            test_gmbh.save()
 
     def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do
@@ -316,7 +318,8 @@ class BasicExpressionsTests(TestCase):
             'expressions.Company.num_employees. F() expressions can only be '
             'used to update, not to insert.'
         )
-        self.assertRaisesMessage(ValueError, msg, acme.save)
+        with self.assertRaisesMessage(ValueError, msg):
+            acme.save()
 
         acme.num_employees = 12
         acme.name = Lower(F('name'))
@@ -325,7 +328,8 @@ class BasicExpressionsTests(TestCase):
             'expressions.Company.name))" on expressions.Company.name. F() '
             'expressions can only be used to update, not to insert.'
         )
-        self.assertRaisesMessage(ValueError, msg, acme.save)
+        with self.assertRaisesMessage(ValueError, msg):
+            acme.save()
 
     def test_ticket_11722_iexact_lookup(self):
         Employee.objects.create(firstname="John", lastname="Doe")

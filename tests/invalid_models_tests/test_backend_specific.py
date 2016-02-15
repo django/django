@@ -3,9 +3,8 @@ from __future__ import unicode_literals
 
 from django.core.checks import Error
 from django.db import connections, models
-from django.test import mock
-
-from .base import IsolatedModelsTestCase
+from django.test import SimpleTestCase, mock
+from django.test.utils import isolate_apps
 
 
 def dummy_allow_migrate(db, app_label, **hints):
@@ -14,12 +13,13 @@ def dummy_allow_migrate(db, app_label, **hints):
     return db == 'default'
 
 
-class BackendSpecificChecksTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class BackendSpecificChecksTests(SimpleTestCase):
 
     @mock.patch('django.db.models.fields.router.allow_migrate', new=dummy_allow_migrate)
     def test_check_field(self):
         """ Test if backend specific checks are performed. """
-        error = Error('an error', hint=None)
+        error = Error('an error')
 
         class Model(models.Model):
             field = models.IntegerField()

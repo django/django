@@ -13,7 +13,7 @@ views for displaying drilldown pages for date-based data.
     defined as follows in ``myapp/models.py``::
 
         from django.db import models
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
 
         class Article(models.Model):
             title = models.CharField(max_length=200)
@@ -22,8 +22,8 @@ views for displaying drilldown pages for date-based data.
             def get_absolute_url(self):
                 return reverse('article-detail', kwargs={'pk': self.pk})
 
-ArchiveIndexView
-----------------
+``ArchiveIndexView``
+====================
 
 .. class:: ArchiveIndexView
 
@@ -86,8 +86,8 @@ ArchiveIndexView
 
     This will output all articles.
 
-YearArchiveView
----------------
+``YearArchiveView``
+===================
 
 .. class:: YearArchiveView
 
@@ -191,8 +191,8 @@ YearArchiveView
             {% endfor %}
         </div>
 
-MonthArchiveView
-----------------
+``MonthArchiveView``
+====================
 
 .. class:: MonthArchiveView
 
@@ -288,8 +288,8 @@ MonthArchiveView
             {% endif %}
         </p>
 
-WeekArchiveView
----------------
+``WeekArchiveView``
+===================
 
 .. class:: WeekArchiveView
 
@@ -391,8 +391,8 @@ WeekArchiveView
     output format that supports the US based week system. The :tfilter:`date`
     filter ``'%U'`` outputs the number of seconds since the Unix epoch.
 
-DayArchiveView
---------------
+``DayArchiveView``
+==================
 
 .. class:: DayArchiveView
 
@@ -493,8 +493,8 @@ DayArchiveView
             {% endif %}
         </p>
 
-TodayArchiveView
-----------------
+``TodayArchiveView``
+====================
 
 .. class:: TodayArchiveView
 
@@ -550,8 +550,8 @@ TodayArchiveView
         a different template, set the ``template_name`` attribute to be the
         name of the new template.
 
-DateDetailView
---------------
+``DateDetailView``
+==================
 
 .. class:: DateDetailView
 

@@ -7,11 +7,13 @@ from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import find_command, popen_wrapper
 from django.db import connection
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
 from django.utils._os import upath
 from django.utils.six import StringIO
+
+from .management.commands import dance
 
 
 # A minimal set of apps to avoid system checks running on all apps.
@@ -44,7 +46,8 @@ class CommandTests(SimpleTestCase):
 
     def test_explode(self):
         """ Test that an unknown command raises CommandError """
-        self.assertRaises(CommandError, management.call_command, ('explode',))
+        with self.assertRaises(CommandError):
+            management.call_command(('explode',))
 
     def test_system_exit(self):
         """ Exception raised in a command should raise CommandError with
@@ -160,6 +163,18 @@ class CommandTests(SimpleTestCase):
         finally:
             BaseCommand.check = saved_check
 
+    def test_check_migrations(self):
+        requires_migrations_checks = dance.Command.requires_migrations_checks
+        try:
+            with mock.patch.object(BaseCommand, 'check_migrations') as check_migrations:
+                management.call_command('dance', verbosity=0)
+                self.assertFalse(check_migrations.called)
+                dance.Command.requires_migrations_checks = True
+                management.call_command('dance', verbosity=0)
+                self.assertTrue(check_migrations.called)
+        finally:
+            dance.Command.requires_migrations_checks = requires_migrations_checks
+
 
 class CommandRunTests(AdminScriptTestCase):
     """
@@ -181,4 +196,5 @@ class CommandRunTests(AdminScriptTestCase):
 class UtilsTests(SimpleTestCase):
 
     def test_no_existent_external_program(self):
-        self.assertRaises(CommandError, popen_wrapper, ['a_42_command_that_doesnt_exist_42'])
+        with self.assertRaises(CommandError):
+            popen_wrapper(['a_42_command_that_doesnt_exist_42'])

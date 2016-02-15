@@ -8,6 +8,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
+# Mikhail Kolesnik <mike@openbunker.org>, 2015
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
 msgid ""
@@ -15,8 +16,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-12-01 21:41+0000\n"
+"Last-Translator: Mikhail Kolesnik <mike@openbunker.org>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -527,7 +528,7 @@ msgid "Save"
 msgstr "Зберегти"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Закриття спливаючого вікна..."
 
 #, python-format
 msgid "Change selected %(model)s"

@@ -13,10 +13,10 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
@@ -104,6 +104,8 @@ def logout(request, next_page=None,
 
     if next_page is not None:
         next_page = resolve_url(next_page)
+    elif settings.LOGOUT_REDIRECT_URL:
+        next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
 
     if (redirect_field_name in request.POST or
             redirect_field_name in request.GET):

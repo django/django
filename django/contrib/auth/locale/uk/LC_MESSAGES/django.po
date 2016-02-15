@@ -9,13 +9,14 @@
 # captain_m4l <qotsaman@gmail.com>, 2012
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
 # Oleksandr Bolotov <oleksandr.bolotov@gmail.com>, 2013
+# Vitaliy Kozlovskyi <ubombi@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-16 12:18+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-12-03 13:45+0000\n"
+"Last-Translator: Vitaliy Kozlovskyi <ubombi@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -70,13 +71,16 @@ msgid "Password confirmation"
 msgstr "Підтвердження пароля"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Введіть той же пароль, що і раніше, для підтвердження."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"../password/"
 "\">this form</a>."
 msgstr ""
+"Відкритими паролі не зберігаються, тому немає можливості їх переглянути, але "
+"ви можете змінити пароль використовуючи <a href=\"../password/\">цю форму</"
+"a>."
 
 #, python-format
 msgid ""
@@ -228,34 +232,37 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Пароль надто короткий. Він повинен містити як мінімум %(min_length)d символ"
 msgstr[1] ""
+"Пароль надто короткий. Він повинен містити як мінімум %(min_length)d символи"
 msgstr[2] ""
+"Пароль надто короткий. Він повинен містити як мінімум %(min_length)d символів"
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Ваш пароль повинен містити як мінімум %(min_length)d символ"
+msgstr[1] "Ваш пароль повинен містити як мінімум %(min_length)d символи"
+msgstr[2] "Ваш пароль повинен містити як мінімум %(min_length)d символів"
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Пароль надто схожий на %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "Пароль не повинен бути надто схожим на іншу персональну інформацію."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Пароль надто відомий."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Ваш пароль не повинен бути загальновідомим."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Цей пароль повністю складається із цифр."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Ваш пароль не може складається лише із цифр."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

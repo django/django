@@ -92,7 +92,7 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 9.1 and higher. It requires the use of `psycopg2`_
+Django supports PostgreSQL 9.2 and higher. It requires the use of `psycopg2`_
 2.4.5 or higher (or 2.5+ if you want to use :mod:`django.contrib.postgres`).
 
 .. _psycopg2: http://initd.org/psycopg/
@@ -461,7 +461,7 @@ storage engine, you have a couple of options.
   creating your tables::
 
       'OPTIONS': {
-         'init_command': 'SET storage_engine=INNODB',
+         'init_command': 'SET default_storage_engine=INNODB',
       }
 
   This sets the default storage engine upon connecting to the database.

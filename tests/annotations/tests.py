@@ -428,8 +428,9 @@ class NonAggregateAnnotationTestCase(TestCase):
                 F('ticker_name'),
                 F('description'),
                 Value('No Tag'),
-                function='COALESCE')
-            ).order_by('name')
+                function='COALESCE'
+            )
+        ).order_by('name')
 
         self.assertQuerysetEqual(
             qs, [

@@ -286,18 +286,15 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
 
     def salt(self):
         bcrypt = self._load_library()
-        return bcrypt.gensalt(rounds=self.rounds)
+        return bcrypt.gensalt(self.rounds)
 
     def encode(self, password, salt):
         bcrypt = self._load_library()
-        # Need to reevaluate the force_bytes call once bcrypt is supported on
-        # Python 3
-
-        # Hash the password prior to using bcrypt to prevent password truncation
-        #   See: https://code.djangoproject.com/ticket/20138
+        # Hash the password prior to using bcrypt to prevent password
+        # truncation as described in #20138.
         if self.digest is not None:
-            # We use binascii.hexlify here because Python3 decided that a hex encoded
-            #   bytestring is somehow a unicode.
+            # Use binascii.hexlify() because a hex encoded bytestring is
+            # Unicode on Python 3.
             password = binascii.hexlify(self.digest(force_bytes(password)).digest())
         else:
             password = force_bytes(password)
@@ -310,11 +307,11 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
         assert algorithm == self.algorithm
         bcrypt = self._load_library()
 
-        # Hash the password prior to using bcrypt to prevent password truncation
-        #   See: https://code.djangoproject.com/ticket/20138
+        # Hash the password prior to using bcrypt to prevent password
+        # truncation as described in #20138.
         if self.digest is not None:
-            # We use binascii.hexlify here because Python3 decided that a hex encoded
-            #   bytestring is somehow a unicode.
+            # Use binascii.hexlify() because a hex encoded bytestring is
+            # Unicode on Python 3.
             password = binascii.hexlify(self.digest(force_bytes(password)).digest())
         else:
             password = force_bytes(password)
@@ -353,7 +350,7 @@ class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
 
     This hasher does not first hash the password which means it is subject to
     the 72 character bcrypt password truncation, most use cases should prefer
-    the BCryptSha512PasswordHasher.
+    the BCryptSHA256PasswordHasher.
 
     See: https://code.djangoproject.com/ticket/20138
     """

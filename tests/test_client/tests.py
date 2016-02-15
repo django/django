@@ -22,43 +22,24 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
-import datetime
-
 from django.contrib.auth.models import User
 from django.core import mail
-from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.test import (
     Client, RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
+from django.urls import reverse_lazy
 
 from .views import get_view, post_view, trace_view
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='test_client.urls',)
+@override_settings(ROOT_URLCONF='test_client.urls')
 class ClientTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
-            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u2 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
-            first_name='Inactive', last_name='User', email='testclient@example.com', is_staff=False, is_active=False,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u3 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
-            first_name='Staff', last_name='Member', email='testclient@example.com', is_staff=True, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
+        cls.u1 = User.objects.create_user(username='testclient', password='password')
+        cls.u2 = User.objects.create_user(username='inactive', password='password', is_active=False)
 
     def test_get_view(self):
         "GET a view"
@@ -522,7 +503,6 @@ class ClientTest(TestCase):
 
         # Log in
         self.client.force_login(self.u1, backend='test_client.auth_backends.TestClientBackend')
-        self.assertEqual(self.u1.backend, 'test_client.auth_backends.TestClientBackend')
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')
@@ -602,7 +582,8 @@ class ClientTest(TestCase):
 
     def test_view_with_exception(self):
         "Request a page that is known to throw an error"
-        self.assertRaises(KeyError, self.client.get, "/broken_view/")
+        with self.assertRaises(KeyError):
+            self.client.get("/broken_view/")
 
         # Try the same assertion, a different way
         try:
@@ -691,7 +672,8 @@ class CustomTestClientTest(SimpleTestCase):
         self.assertEqual(hasattr(self.client, "i_am_customized"), True)
 
 
-_generic_view = lambda request: HttpResponse(status=200)
+def _generic_view(request):
+    return HttpResponse(status=200)
 
 
 @override_settings(ROOT_URLCONF='test_client.urls')

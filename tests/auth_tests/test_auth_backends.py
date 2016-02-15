@@ -8,7 +8,6 @@ from django.contrib.auth import (
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
 from django.contrib.auth.models import AnonymousUser, Group, Permission, User
-from django.contrib.auth.tests.custom_user import CustomUser, ExtensionUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
@@ -16,7 +15,7 @@ from django.test import (
     SimpleTestCase, TestCase, modify_settings, override_settings,
 )
 
-from .models import CustomPermissionsUser, UUIDUser
+from .models import CustomPermissionsUser, CustomUser, ExtensionUser, UUIDUser
 
 
 class CountingMD5PasswordHasher(MD5PasswordHasher):
@@ -215,7 +214,7 @@ class ModelBackendTest(BaseModelBackendTest, TestCase):
         )
 
 
-@override_settings(AUTH_USER_MODEL='auth.ExtensionUser')
+@override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser')
 class ExtensionUserModelBackendTest(BaseModelBackendTest, TestCase):
     """
     Tests for the ModelBackend using the custom ExtensionUser model.
@@ -275,7 +274,7 @@ class CustomPermissionsUserModelBackendTest(BaseModelBackendTest, TestCase):
         )
 
 
-@override_settings(AUTH_USER_MODEL='auth.CustomUser')
+@override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
 class CustomUserModelBackendAuthenticateTest(TestCase):
     """
     Tests that the model backend can accept a credentials kwarg labeled with
@@ -429,7 +428,8 @@ class NoBackendsTest(TestCase):
         self.user = User.objects.create_user('test', 'test@example.com', 'test')
 
     def test_raises_exception(self):
-        self.assertRaises(ImproperlyConfigured, self.user.has_perm, ('perm', TestObj(),))
+        with self.assertRaises(ImproperlyConfigured):
+            self.user.has_perm(('perm', TestObj()))
 
 
 @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.SimpleRowlevelBackend'])
@@ -575,7 +575,8 @@ class TypeErrorBackendTest(TestCase):
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend])
     def test_type_error_raised(self):
-        self.assertRaises(TypeError, authenticate, username='test', password='test')
+        with self.assertRaises(TypeError):
+            authenticate(username='test', password='test')
 
 
 class ImproperlyConfiguredUserModelTest(TestCase):
@@ -598,10 +599,19 @@ class ImproperlyConfiguredUserModelTest(TestCase):
         request = HttpRequest()
         request.session = self.client.session
 
-        self.assertRaises(ImproperlyConfigured, get_user, request)
+        with self.assertRaises(ImproperlyConfigured):
+            get_user(request)
 
 
 class ImportedModelBackend(ModelBackend):
+    pass
+
+
+class CustomModelBackend(ModelBackend):
+    pass
+
+
+class OtherModelBackend(ModelBackend):
     pass
 
 
@@ -622,3 +632,38 @@ class ImportedBackendTests(TestCase):
         request = HttpRequest()
         request.session = self.client.session
         self.assertEqual(request.session[BACKEND_SESSION_KEY], self.backend)
+
+
+class SelectingBackendTests(TestCase):
+    backend = 'auth_tests.test_auth_backends.CustomModelBackend'
+    other_backend = 'auth_tests.test_auth_backends.OtherModelBackend'
+    username = 'username'
+    password = 'password'
+
+    def assertBackendInSession(self, backend):
+        request = HttpRequest()
+        request.session = self.client.session
+        self.assertEqual(request.session[BACKEND_SESSION_KEY], backend)
+
+    @override_settings(AUTHENTICATION_BACKENDS=[backend])
+    def test_backend_path_login_without_authenticate_single_backend(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        self.client._login(user)
+        self.assertBackendInSession(self.backend)
+
+    @override_settings(AUTHENTICATION_BACKENDS=[backend, other_backend])
+    def test_backend_path_login_without_authenticate_multiple_backends(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        expected_message = (
+            'You have multiple authentication backends configured and '
+            'therefore must provide the `backend` argument or set the '
+            '`backend` attribute on the user.'
+        )
+        with self.assertRaisesMessage(ValueError, expected_message):
+            self.client._login(user)
+
+    @override_settings(AUTHENTICATION_BACKENDS=[backend, other_backend])
+    def test_backend_path_login_with_explicit_backends(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        self.client._login(user, self.other_backend)
+        self.assertBackendInSession(self.other_backend)

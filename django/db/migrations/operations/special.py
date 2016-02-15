@@ -45,13 +45,17 @@ class SeparateDatabaseAndState(Operation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         # We calculate state separately in here since our state functions aren't useful
-        base_state = to_state
-        for pos, database_operation in enumerate(reversed(self.database_operations)):
-            to_state = base_state.clone()
-            for dbop in self.database_operations[:-(pos + 1)]:
-                dbop.state_forwards(app_label, to_state)
-            from_state = to_state.clone()
-            database_operation.state_forwards(app_label, from_state)
+        to_states = {}
+        for dbop in self.database_operations:
+            to_states[dbop] = to_state
+            to_state = to_state.clone()
+            dbop.state_forwards(app_label, to_state)
+        # to_state now has the states of all the database_operations applied
+        # which is the from_state for the backwards migration of the last
+        # operation.
+        for database_operation in reversed(self.database_operations):
+            from_state = to_state
+            to_state = to_states[database_operation]
             database_operation.database_backwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
@@ -67,11 +71,12 @@ class RunSQL(Operation):
     """
     noop = ''
 
-    def __init__(self, sql, reverse_sql=None, state_operations=None, hints=None):
+    def __init__(self, sql, reverse_sql=None, state_operations=None, hints=None, elidable=False):
         self.sql = sql
         self.reverse_sql = reverse_sql
         self.state_operations = state_operations or []
         self.hints = hints or {}
+        self.elidable = elidable
 
     def deconstruct(self):
         kwargs = {
@@ -134,7 +139,7 @@ class RunPython(Operation):
 
     reduces_to_sql = False
 
-    def __init__(self, code, reverse_code=None, atomic=True, hints=None):
+    def __init__(self, code, reverse_code=None, atomic=None, hints=None, elidable=False):
         self.atomic = atomic
         # Forwards code
         if not callable(code):
@@ -148,6 +153,7 @@ class RunPython(Operation):
                 raise ValueError("RunPython must be supplied with callable arguments")
             self.reverse_code = reverse_code
         self.hints = hints or {}
+        self.elidable = elidable
 
     def deconstruct(self):
         kwargs = {
@@ -155,7 +161,7 @@ class RunPython(Operation):
         }
         if self.reverse_code is not None:
             kwargs['reverse_code'] = self.reverse_code
-        if self.atomic is not True:
+        if self.atomic is not None:
             kwargs['atomic'] = self.atomic
         if self.hints:
             kwargs['hints'] = self.hints

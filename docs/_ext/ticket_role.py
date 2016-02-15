@@ -36,3 +36,4 @@ def ticket_role(name, rawtext, text, lineno, inliner, options=None, content=None
 def setup(app):
     app.add_config_value('ticket_url', None, 'env')
     app.add_role('ticket', ticket_role)
+    return {'parallel_read_safe': True}

@@ -54,8 +54,8 @@ Here is an example of its usage::
 
 .. setting:: GEOIP_PATH
 
-GEOIP_PATH
-----------
+``GEOIP_PATH``
+--------------
 
 A string specifying the directory where the GeoIP data files are
 located. This setting is *required* unless manually specified
@@ -63,16 +63,16 @@ with ``path`` keyword when initializing the :class:`GeoIP2` object.
 
 .. setting:: GEOIP_COUNTRY
 
-GEOIP_COUNTRY
--------------
+``GEOIP_COUNTRY``
+-----------------
 
 The basename to use for the GeoIP country data file. Defaults to
 ``'GeoLite2-Country.mmdb'``.
 
 .. setting:: GEOIP_CITY
 
-GEOIP_CITY
-----------
+``GEOIP_CITY``
+--------------
 
 The basename to use for the GeoIP city data file. Defaults to
 ``'GeoLite2-City.mmdb'``.

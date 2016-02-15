@@ -32,6 +32,24 @@ class Article(models.Model):
         ordering = ('headline',)
 
 
+@python_2_unicode_compatible
+class City(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class District(models.Model):
+    city = models.ForeignKey(City, models.CASCADE)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
 # If ticket #1578 ever slips back in, these models will not be able to be
 # created (the field names being lower-cased versions of their opposite
 # classes is important here).

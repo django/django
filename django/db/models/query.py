@@ -484,9 +484,7 @@ class QuerySet(object):
                 return obj, created
         for k, v in six.iteritems(defaults):
             setattr(obj, k, v)
-
-        with transaction.atomic(using=self.db, savepoint=False):
-            obj.save(using=self.db)
+        obj.save(using=self.db)
         return obj, False
 
     def _create_object_from_params(self, lookup, params):
@@ -561,16 +559,19 @@ class QuerySet(object):
             return objects[0]
         return None
 
-    def in_bulk(self, id_list):
+    def in_bulk(self, id_list=None):
         """
         Returns a dictionary mapping each of the given IDs to the object with
-        that ID.
+        that ID. If `id_list` isn't provided, the entire QuerySet is evaluated.
         """
         assert self.query.can_filter(), \
             "Cannot use 'limit' or 'offset' with in_bulk"
-        if not id_list:
-            return {}
-        qs = self.filter(pk__in=id_list).order_by()
+        if id_list is not None:
+            if not id_list:
+                return {}
+            qs = self.filter(pk__in=id_list).order_by()
+        else:
+            qs = self._clone()
         return {obj._get_pk_val(): obj for obj in qs}
 
     def delete(self):
@@ -1107,12 +1108,18 @@ class QuerySet(object):
         for field, objects in other._known_related_objects.items():
             self._known_related_objects.setdefault(field, {}).update(objects)
 
-    def _prepare(self):
+    def _prepare(self, field):
         if self._fields is not None:
             # values() queryset can only be used as nested queries
             # if they are set up to select only a single field.
             if len(self._fields or self.model._meta.concrete_fields) > 1:
                 raise TypeError('Cannot use multi-field values as a filter value.')
+        else:
+            # If the query is used as a subquery for a ForeignKey with non-pk
+            # target field, make sure to select the target field in the subquery.
+            foreign_fields = getattr(field, 'foreign_related_fields', ())
+            if len(foreign_fields) == 1 and not foreign_fields[0].primary_key:
+                return self.values(foreign_fields[0].name)
         return self
 
     def _as_sql(self, connection):
@@ -1170,7 +1177,7 @@ class QuerySet(object):
 
 class InstanceCheckMeta(type):
     def __instancecheck__(self, instance):
-        return instance.query.is_empty()
+        return isinstance(instance, QuerySet) and instance.query.is_empty()
 
 
 class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
@@ -1520,6 +1527,7 @@ def get_prefetcher(instance, attr):
                 rel_obj = getattr(instance, attr)
                 if hasattr(rel_obj, 'get_prefetch_queryset'):
                     prefetcher = rel_obj
+                is_fetched = attr in instance._prefetched_objects_cache
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched
 
 
@@ -1596,6 +1604,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         else:
             if as_attr:
                 setattr(obj, to_attr, vals)
+                obj._prefetched_objects_cache[cache_name] = vals
             else:
                 # Cache in the QuerySet.all().
                 qs = getattr(obj, to_attr).all()

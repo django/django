@@ -3,21 +3,19 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.apps.registry import Apps
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
 from django.db.models.fields.related import ForeignObject
 from django.test import ignore_warnings
-from django.test.testcases import skipIfDBFeature
-from django.test.utils import override_settings
+from django.test.testcases import SimpleTestCase, skipIfDBFeature
+from django.test.utils import isolate_apps, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.version import get_docs_version
 
-from .base import IsolatedModelsTestCase
 
-
-class RelativeFieldTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class RelativeFieldTests(SimpleTestCase):
 
     def test_valid_foreign_key_without_accessor(self):
         class Target(models.Model):
@@ -53,9 +51,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertEqual(
                 str(warns[0].message),
                 'on_delete will be a required arg for ForeignKey in Django '
-                '2.0. Set it to models.CASCADE if you want to maintain the '
-                'current default behavior. See '
-                'https://docs.djangoproject.com/en/%s/ref/models/fields/'
+                '2.0. Set it to models.CASCADE on models and in existing '
+                'migrations if you want to maintain the current default '
+                'behavior. See https://docs.djangoproject.com/en/%s/ref/models/fields/'
                 '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
             )
 
@@ -90,9 +88,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertEqual(
                 str(warns[0].message),
                 'on_delete will be a required arg for OneToOneField in Django '
-                '2.0. Set it to models.CASCADE if you want to maintain the '
-                'current default behavior. See '
-                'https://docs.djangoproject.com/en/%s/ref/models/fields/'
+                '2.0. Set it to models.CASCADE on models and in existing '
+                'migrations if you want to maintain the current default '
+                'behavior. See https://docs.djangoproject.com/en/%s/ref/models/fields/'
                 '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
             )
 
@@ -124,31 +122,25 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                ("Field defines a relation with model 'Rel1', "
-                 "which is either not installed, or is abstract."),
-                hint=None,
+                "Field defines a relation with model 'Rel1', "
+                "which is either not installed, or is abstract.",
                 obj=field,
                 id='fields.E300',
             ),
         ]
         self.assertEqual(errors, expected)
 
-    def test_foreign_key_to_isolated_apps_model(self):
+    @isolate_apps('invalid_models_tests')
+    def test_foreign_key_to_isolate_apps_model(self):
         """
         #25723 - Referenced model registration lookup should be run against the
         field's model registry.
         """
-        test_apps = Apps(['invalid_models_tests'])
-
         class OtherModel(models.Model):
-            class Meta:
-                apps = test_apps
+            pass
 
         class Model(models.Model):
             foreign_key = models.ForeignKey('OtherModel', models.CASCADE)
-
-            class Meta:
-                apps = test_apps
 
         field = Model._meta.get_field('foreign_key')
         self.assertEqual(field.check(from_model=Model), [])
@@ -161,31 +153,25 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Model)
         expected = [
             Error(
-                ("Field defines a relation with model 'Rel2', "
-                 "which is either not installed, or is abstract."),
-                hint=None,
+                "Field defines a relation with model 'Rel2', "
+                "which is either not installed, or is abstract.",
                 obj=field,
                 id='fields.E300',
             ),
         ]
         self.assertEqual(errors, expected)
 
-    def test_many_to_many_to_isolated_apps_model(self):
+    @isolate_apps('invalid_models_tests')
+    def test_many_to_many_to_isolate_apps_model(self):
         """
         #25723 - Referenced model registration lookup should be run against the
         field's model registry.
         """
-        test_apps = Apps(['invalid_models_tests'])
-
         class OtherModel(models.Model):
-            class Meta:
-                apps = test_apps
+            pass
 
         class Model(models.Model):
             m2m = models.ManyToManyField('OtherModel')
-
-            class Meta:
-                apps = test_apps
 
         field = Model._meta.get_field('m2m')
         self.assertEqual(field.check(from_model=Model), [])
@@ -203,7 +189,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         expected = [
             DjangoWarning(
                 'null has no effect on ManyToManyField.',
-                hint=None,
                 obj=field,
                 id='fields.W340',
             )
@@ -211,7 +196,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         expected.append(
             DjangoWarning(
                 'ManyToManyField does not support validators.',
-                hint=None,
                 obj=field,
                 id='fields.W341',
             )
@@ -225,8 +209,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             pass
 
         class Group(models.Model):
-            field = models.ManyToManyField('Person',
-                through="AmbiguousRelationship", related_name='tertiary')
+            field = models.ManyToManyField('Person', through="AmbiguousRelationship", related_name='tertiary')
 
         class AmbiguousRelationship(models.Model):
             # Too much foreign keys to Person.
@@ -238,14 +221,15 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Group)
         expected = [
             Error(
-                ("The model is used as an intermediate model by "
-                 "'invalid_models_tests.Group.field', but it has more than one "
-                 "foreign key to 'Person', which is ambiguous. You must specify "
-                 "which foreign key Django should use via the through_fields "
-                 "keyword argument."),
-                hint=('If you want to create a recursive relationship, use '
-                      'ForeignKey("self", symmetrical=False, '
-                      'through="AmbiguousRelationship").'),
+                "The model is used as an intermediate model by "
+                "'invalid_models_tests.Group.field', but it has more than one "
+                "foreign key to 'Person', which is ambiguous. You must specify "
+                "which foreign key Django should use via the through_fields "
+                "keyword argument.",
+                hint=(
+                    'If you want to create a recursive relationship, use '
+                    'ForeignKey("self", symmetrical=False, through="AmbiguousRelationship").'
+                ),
                 obj=field,
                 id='fields.E335',
             ),
@@ -260,8 +244,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             pass
 
         class Group(models.Model):
-            members = models.ManyToManyField('Person',
-                through="InvalidRelationship")
+            members = models.ManyToManyField('Person', through="InvalidRelationship")
 
         class InvalidRelationship(models.Model):
             person = models.ForeignKey(Person, models.CASCADE)
@@ -272,10 +255,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Group)
         expected = [
             Error(
-                ("The model is used as an intermediate model by "
-                 "'invalid_models_tests.Group.members', but it does not "
-                 "have a foreign key to 'Group' or 'Person'."),
-                hint=None,
+                "The model is used as an intermediate model by "
+                "'invalid_models_tests.Group.members', but it does not "
+                "have a foreign key to 'Group' or 'Person'.",
                 obj=InvalidRelationship,
                 id='fields.E336',
             ),
@@ -287,8 +269,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             pass
 
         class Group(models.Model):
-            members = models.ManyToManyField('Person',
-                through="InvalidRelationship")
+            members = models.ManyToManyField('Person', through="InvalidRelationship")
 
         class InvalidRelationship(models.Model):
             group = models.ForeignKey(Group, models.CASCADE)
@@ -298,10 +279,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Group)
         expected = [
             Error(
-                ("The model is used as an intermediate model by "
-                 "'invalid_models_tests.Group.members', but it does not have "
-                 "a foreign key to 'Group' or 'Person'."),
-                hint=None,
+                "The model is used as an intermediate model by "
+                "'invalid_models_tests.Group.members', but it does not have "
+                "a foreign key to 'Group' or 'Person'.",
                 obj=InvalidRelationship,
                 id='fields.E336',
             ),
@@ -313,45 +293,35 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             pass
 
         class Group(models.Model):
-            members = models.ManyToManyField('Person',
-                through="MissingM2MModel")
+            members = models.ManyToManyField('Person', through="MissingM2MModel")
 
         field = Group._meta.get_field('members')
         errors = field.check(from_model=Group)
         expected = [
             Error(
-                ("Field specifies a many-to-many relation through model "
-                 "'MissingM2MModel', which has not been installed."),
-                hint=None,
+                "Field specifies a many-to-many relation through model "
+                "'MissingM2MModel', which has not been installed.",
                 obj=field,
                 id='fields.E331',
             ),
         ]
         self.assertEqual(errors, expected)
 
-    def test_many_to_many_through_isolated_apps_model(self):
+    @isolate_apps('invalid_models_tests')
+    def test_many_to_many_through_isolate_apps_model(self):
         """
         #25723 - Through model registration lookup should be run against the
         field's model registry.
         """
-        test_apps = Apps(['invalid_models_tests'])
-
         class GroupMember(models.Model):
             person = models.ForeignKey('Person', models.CASCADE)
             group = models.ForeignKey('Group', models.CASCADE)
 
-            class Meta:
-                apps = test_apps
-
         class Person(models.Model):
-            class Meta:
-                apps = test_apps
+            pass
 
         class Group(models.Model):
             members = models.ManyToManyField('Person', through='GroupMember')
-
-            class Meta:
-                apps = test_apps
 
         field = Group._meta.get_field('members')
         self.assertEqual(field.check(from_model=Group), [])
@@ -370,7 +340,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Many-to-many fields with intermediate tables must not be symmetrical.',
-                hint=None,
                 obj=field,
                 id='fields.E332',
             ),
@@ -379,8 +348,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
     def test_too_many_foreign_keys_in_self_referential_model(self):
         class Person(models.Model):
-            friends = models.ManyToManyField('self',
-                through="InvalidRelationship", symmetrical=False)
+            friends = models.ManyToManyField('self', through="InvalidRelationship", symmetrical=False)
 
         class InvalidRelationship(models.Model):
             first = models.ForeignKey(Person, models.CASCADE, related_name="rel_from_set_2")
@@ -391,11 +359,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Person)
         expected = [
             Error(
-                ("The model is used as an intermediate model by "
-                 "'invalid_models_tests.Person.friends', but it has more than two "
-                 "foreign keys to 'Person', which is ambiguous. You must specify "
-                 "which two foreign keys Django should use via the through_fields "
-                 "keyword argument."),
+                "The model is used as an intermediate model by "
+                "'invalid_models_tests.Person.friends', but it has more than two "
+                "foreign keys to 'Person', which is ambiguous. You must specify "
+                "which two foreign keys Django should use via the through_fields "
+                "keyword argument.",
                 hint='Use through_fields to specify which two foreign keys Django should use.',
                 obj=InvalidRelationship,
                 id='fields.E333',
@@ -406,8 +374,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
     def test_symmetric_self_reference_with_intermediate_table(self):
         class Person(models.Model):
             # Explicit symmetrical=True.
-            friends = models.ManyToManyField('self',
-                through="Relationship", symmetrical=True)
+            friends = models.ManyToManyField('self', through="Relationship", symmetrical=True)
 
         class Relationship(models.Model):
             first = models.ForeignKey(Person, models.CASCADE, related_name="rel_from_set")
@@ -418,7 +385,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Many-to-many fields with intermediate tables must not be symmetrical.',
-                hint=None,
                 obj=field,
                 id='fields.E332',
             ),
@@ -432,10 +398,12 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         """
         class Person(models.Model):
             # Explicit symmetrical=True.
-            friends = models.ManyToManyField('self',
+            friends = models.ManyToManyField(
+                'self',
                 symmetrical=True,
                 through="Relationship",
-                through_fields=('first', 'second'))
+                through_fields=('first', 'second'),
+            )
 
         class Relationship(models.Model):
             first = models.ForeignKey(Person, models.CASCADE, related_name="rel_from_set")
@@ -447,7 +415,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Many-to-many fields with intermediate tables must not be symmetrical.',
-                hint=None,
                 obj=field,
                 id='fields.E332',
             ),
@@ -512,7 +479,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'ManyToManyFields cannot be unique.',
-                hint=None,
                 obj=field,
                 id='fields.E330',
             ),
@@ -531,7 +497,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'Target.bad' must set unique=True because it is referenced by a foreign key.",
-                hint=None,
                 obj=field,
                 id='fields.E311',
             ),
@@ -550,7 +515,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'Target.bad' must set unique=True because it is referenced by a foreign key.",
-                hint=None,
                 obj=field,
                 id='fields.E311',
             ),
@@ -567,10 +531,12 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             person_country_id = models.IntegerField()
             person_city_id = models.IntegerField()
 
-            person = models.ForeignObject(Person,
+            person = models.ForeignObject(
+                Person,
                 on_delete=models.CASCADE,
                 from_fields=['person_country_id', 'person_city_id'],
-                to_fields=['country_id', 'city_id'])
+                to_fields=['country_id', 'city_id'],
+            )
 
         field = MMembership._meta.get_field('person')
         errors = field.check()
@@ -650,17 +616,21 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 swappable = 'TEST_SWAPPABLE_MODEL'
 
         class Model(models.Model):
-            explicit_fk = models.ForeignKey(SwappableModel,
+            explicit_fk = models.ForeignKey(
+                SwappableModel,
                 models.CASCADE,
-                related_name='explicit_fk')
-            implicit_fk = models.ForeignKey('invalid_models_tests.SwappableModel',
+                related_name='explicit_fk',
+            )
+            implicit_fk = models.ForeignKey(
+                'invalid_models_tests.SwappableModel',
                 models.CASCADE,
-                related_name='implicit_fk')
-            explicit_m2m = models.ManyToManyField(SwappableModel,
-                related_name='explicit_m2m')
+                related_name='implicit_fk',
+            )
+            explicit_m2m = models.ManyToManyField(SwappableModel, related_name='explicit_m2m')
             implicit_m2m = models.ManyToManyField(
                 'invalid_models_tests.SwappableModel',
-                related_name='implicit_m2m')
+                related_name='implicit_m2m',
+            )
 
         explicit_fk = Model._meta.get_field('explicit_fk')
         self.assertEqual(explicit_fk.check(), [])
@@ -684,17 +654,21 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 swappable = 'TEST_SWAPPED_MODEL'
 
         class Model(models.Model):
-            explicit_fk = models.ForeignKey(SwappedModel,
+            explicit_fk = models.ForeignKey(
+                SwappedModel,
                 models.CASCADE,
-                related_name='explicit_fk')
-            implicit_fk = models.ForeignKey('invalid_models_tests.SwappedModel',
+                related_name='explicit_fk',
+            )
+            implicit_fk = models.ForeignKey(
+                'invalid_models_tests.SwappedModel',
                 models.CASCADE,
-                related_name='implicit_fk')
-            explicit_m2m = models.ManyToManyField(SwappedModel,
-                related_name='explicit_m2m')
+                related_name='implicit_fk',
+            )
+            explicit_m2m = models.ManyToManyField(SwappedModel, related_name='explicit_m2m')
             implicit_m2m = models.ManyToManyField(
                 'invalid_models_tests.SwappedModel',
-                related_name='implicit_m2m')
+                related_name='implicit_m2m',
+            )
 
         fields = [
             Model._meta.get_field('explicit_fk'),
@@ -790,7 +764,8 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertFalse(errors)
 
 
-class AccessorClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class AccessorClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_accessor_clash(
@@ -857,15 +832,19 @@ class AccessorClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse accessor for 'Model.foreign' clashes with reverse accessor for 'Model.m2m'.",
-                hint=("Add or change a related_name argument to the definition "
-                      "for 'Model.foreign' or 'Model.m2m'."),
+                hint=(
+                    "Add or change a related_name argument to the definition "
+                    "for 'Model.foreign' or 'Model.m2m'."
+                ),
                 obj=Model._meta.get_field('foreign'),
                 id='fields.E304',
             ),
             Error(
                 "Reverse accessor for 'Model.m2m' clashes with reverse accessor for 'Model.foreign'.",
-                hint=("Add or change a related_name argument to the definition "
-                      "for 'Model.m2m' or 'Model.foreign'."),
+                hint=(
+                    "Add or change a related_name argument to the definition "
+                    "for 'Model.m2m' or 'Model.foreign'."
+                ),
                 obj=Model._meta.get_field('m2m'),
                 id='fields.E304',
             ),
@@ -892,9 +871,10 @@ class AccessorClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse accessor for 'Model.children' clashes with field name 'Child.m2m_clash'.",
-                hint=("Rename field 'Child.m2m_clash', or add/change "
-                      "a related_name argument to the definition "
-                      "for field 'Model.children'."),
+                hint=(
+                    "Rename field 'Child.m2m_clash', or add/change a related_name "
+                    "argument to the definition for field 'Model.children'."
+                ),
                 obj=Model._meta.get_field('children'),
                 id='fields.E302',
             )
@@ -902,7 +882,8 @@ class AccessorClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ReverseQueryNameClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ReverseQueryNameClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_reverse_query_name_clash(
@@ -948,9 +929,10 @@ class ReverseQueryNameClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse query name for 'Model.rel' clashes with field name 'Target.model'.",
-                hint=("Rename field 'Target.model', or add/change "
-                      "a related_name argument to the definition "
-                      "for field 'Model.rel'."),
+                hint=(
+                    "Rename field 'Target.model', or add/change a related_name "
+                    "argument to the definition for field 'Model.rel'."
+                ),
                 obj=Model._meta.get_field('rel'),
                 id='fields.E303',
             ),
@@ -958,7 +940,8 @@ class ReverseQueryNameClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ExplicitRelatedNameClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_explicit_related_name_clash(
@@ -1004,17 +987,19 @@ class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse accessor for 'Model.rel' clashes with field name 'Target.clash'.",
-                hint=("Rename field 'Target.clash', or add/change "
-                      "a related_name argument to the definition "
-                      "for field 'Model.rel'."),
+                hint=(
+                    "Rename field 'Target.clash', or add/change a related_name "
+                    "argument to the definition for field 'Model.rel'."
+                ),
                 obj=Model._meta.get_field('rel'),
                 id='fields.E302',
             ),
             Error(
                 "Reverse query name for 'Model.rel' clashes with field name 'Target.clash'.",
-                hint=("Rename field 'Target.clash', or add/change "
-                      "a related_name argument to the definition "
-                      "for field 'Model.rel'."),
+                hint=(
+                    "Rename field 'Target.clash', or add/change a related_name "
+                    "argument to the definition for field 'Model.rel'."
+                ),
                 obj=Model._meta.get_field('rel'),
                 id='fields.E303',
             ),
@@ -1022,46 +1007,71 @@ class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
 
-    def test_fk_to_integer(self):
+    def test_fk_to_integer(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.IntegerField(),
             relative=models.ForeignKey('Target',
                 models.CASCADE,
+                related_name=related_name,
                 related_query_name='clash'))
 
-    def test_fk_to_fk(self):
+    def test_hidden_fk_to_integer(self, related_name=None):
+        self.test_fk_to_integer(related_name='+')
+
+    def test_fk_to_fk(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ForeignKey('Another', models.CASCADE),
             relative=models.ForeignKey('Target',
                 models.CASCADE,
+                related_name=related_name,
                 related_query_name='clash'))
 
-    def test_fk_to_m2m(self):
+    def test_hidden_fk_to_fk(self):
+        self.test_fk_to_fk(related_name='+')
+
+    def test_fk_to_m2m(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ForeignKey('Target',
                 models.CASCADE,
+                related_name=related_name,
                 related_query_name='clash'))
 
-    def test_m2m_to_integer(self):
+    def test_hidden_fk_to_m2m(self):
+        self.test_fk_to_m2m(related_name='+')
+
+    def test_m2m_to_integer(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.IntegerField(),
             relative=models.ManyToManyField('Target',
+                related_name=related_name,
                 related_query_name='clash'))
 
-    def test_m2m_to_fk(self):
+    def test_hidden_m2m_to_integer(self):
+        self.test_m2m_to_integer(related_name='+')
+
+    def test_m2m_to_fk(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ForeignKey('Another', models.CASCADE),
             relative=models.ManyToManyField('Target',
+                related_name=related_name,
                 related_query_name='clash'))
 
-    def test_m2m_to_m2m(self):
+    def test_hidden_m2m_to_fk(self):
+        self.test_m2m_to_fk(related_name='+')
+
+    def test_m2m_to_m2m(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ManyToManyField('Target',
+                related_name=related_name,
                 related_query_name='clash'))
+
+    def test_hidden_m2m_to_m2m(self):
+        self.test_m2m_to_m2m(related_name='+')
 
     def _test_explicit_related_query_name_clash(self, target, relative):
         class Another(models.Model):
@@ -1077,8 +1087,10 @@ class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse query name for 'Model.rel' clashes with field name 'Target.clash'.",
-                hint=("Rename field 'Target.clash', or add/change a related_name "
-                      "argument to the definition for field 'Model.rel'."),
+                hint=(
+                    "Rename field 'Target.clash', or add/change a related_name "
+                    "argument to the definition for field 'Model.rel'."
+                ),
                 obj=Model._meta.get_field('rel'),
                 id='fields.E303',
             ),
@@ -1086,7 +1098,8 @@ class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class SelfReferentialM2MClashTests(SimpleTestCase):
 
     def test_clash_between_accessors(self):
         class Model(models.Model):
@@ -1097,15 +1110,19 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse accessor for 'Model.first_m2m' clashes with reverse accessor for 'Model.second_m2m'.",
-                hint=("Add or change a related_name argument to the definition "
-                      "for 'Model.first_m2m' or 'Model.second_m2m'."),
+                hint=(
+                    "Add or change a related_name argument to the definition "
+                    "for 'Model.first_m2m' or 'Model.second_m2m'."
+                ),
                 obj=Model._meta.get_field('first_m2m'),
                 id='fields.E304',
             ),
             Error(
                 "Reverse accessor for 'Model.second_m2m' clashes with reverse accessor for 'Model.first_m2m'.",
-                hint=("Add or change a related_name argument to the definition "
-                      "for 'Model.second_m2m' or 'Model.first_m2m'."),
+                hint=(
+                    "Add or change a related_name argument to the definition "
+                    "for 'Model.second_m2m' or 'Model.first_m2m'."
+                ),
                 obj=Model._meta.get_field('second_m2m'),
                 id='fields.E304',
             ),
@@ -1120,9 +1137,10 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse accessor for 'Model.model_set' clashes with field name 'Model.model_set'.",
-                hint=("Rename field 'Model.model_set', or add/change "
-                      "a related_name argument to the definition "
-                      "for field 'Model.model_set'."),
+                hint=(
+                    "Rename field 'Model.model_set', or add/change a related_name "
+                    "argument to the definition for field 'Model.model_set'."
+                ),
                 obj=Model._meta.get_field('model_set'),
                 id='fields.E302',
             ),
@@ -1137,8 +1155,10 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse query name for 'Model.model' clashes with field name 'Model.model'.",
-                hint=("Rename field 'Model.model', or add/change a related_name "
-                      "argument to the definition for field 'Model.model'."),
+                hint=(
+                    "Rename field 'Model.model', or add/change a related_name "
+                    "argument to the definition for field 'Model.model'."
+                ),
                 obj=Model._meta.get_field('model'),
                 id='fields.E303',
             ),
@@ -1148,22 +1168,25 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
     def test_clash_under_explicit_related_name(self):
         class Model(models.Model):
             clash = models.IntegerField()
-            m2m = models.ManyToManyField("self",
-                symmetrical=False, related_name='clash')
+            m2m = models.ManyToManyField("self", symmetrical=False, related_name='clash')
 
         errors = Model.check()
         expected = [
             Error(
                 "Reverse accessor for 'Model.m2m' clashes with field name 'Model.clash'.",
-                hint=("Rename field 'Model.clash', or add/change a related_name "
-                      "argument to the definition for field 'Model.m2m'."),
+                hint=(
+                    "Rename field 'Model.clash', or add/change a related_name "
+                    "argument to the definition for field 'Model.m2m'."
+                ),
                 obj=Model._meta.get_field('m2m'),
                 id='fields.E302',
             ),
             Error(
                 "Reverse query name for 'Model.m2m' clashes with field name 'Model.clash'.",
-                hint=("Rename field 'Model.clash', or add/change a related_name "
-                      "argument to the definition for field 'Model.m2m'."),
+                hint=(
+                    "Rename field 'Model.clash', or add/change a related_name "
+                    "argument to the definition for field 'Model.m2m'."
+                ),
                 obj=Model._meta.get_field('m2m'),
                 id='fields.E303',
             ),
@@ -1172,16 +1195,15 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
 
     def test_valid_model(self):
         class Model(models.Model):
-            first = models.ManyToManyField("self",
-                symmetrical=False, related_name='first_accessor')
-            second = models.ManyToManyField("self",
-                symmetrical=False, related_name='second_accessor')
+            first = models.ManyToManyField("self", symmetrical=False, related_name='first_accessor')
+            second = models.ManyToManyField("self", symmetrical=False, related_name='second_accessor')
 
         errors = Model.check()
         self.assertEqual(errors, [])
 
 
-class SelfReferentialFKClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class SelfReferentialFKClashTests(SimpleTestCase):
 
     def test_accessor_clash(self):
         class Model(models.Model):
@@ -1191,9 +1213,11 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse accessor for 'Model.model_set' clashes with field name 'Model.model_set'.",
-                hint=("Rename field 'Model.model_set', or add/change "
-                      "a related_name argument to the definition "
-                      "for field 'Model.model_set'."),
+                hint=(
+                    "Rename field 'Model.model_set', or add/change "
+                    "a related_name argument to the definition "
+                    "for field 'Model.model_set'."
+                ),
                 obj=Model._meta.get_field('model_set'),
                 id='fields.E302',
             ),
@@ -1208,9 +1232,10 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse query name for 'Model.model' clashes with field name 'Model.model'.",
-                hint=("Rename field 'Model.model', or add/change "
-                      "a related_name argument to the definition "
-                      "for field 'Model.model'."),
+                hint=(
+                    "Rename field 'Model.model', or add/change a related_name "
+                    "argument to the definition for field 'Model.model'."
+                ),
                 obj=Model._meta.get_field('model'),
                 id='fields.E303',
             ),
@@ -1226,17 +1251,19 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "Reverse accessor for 'Model.foreign' clashes with field name 'Model.clash'.",
-                hint=("Rename field 'Model.clash', or add/change "
-                      "a related_name argument to the definition "
-                      "for field 'Model.foreign'."),
+                hint=(
+                    "Rename field 'Model.clash', or add/change a related_name "
+                    "argument to the definition for field 'Model.foreign'."
+                ),
                 obj=Model._meta.get_field('foreign'),
                 id='fields.E302',
             ),
             Error(
                 "Reverse query name for 'Model.foreign' clashes with field name 'Model.clash'.",
-                hint=("Rename field 'Model.clash', or add/change "
-                      "a related_name argument to the definition "
-                      "for field 'Model.foreign'."),
+                hint=(
+                    "Rename field 'Model.clash', or add/change a related_name "
+                    "argument to the definition for field 'Model.foreign'."
+                ),
                 obj=Model._meta.get_field('foreign'),
                 id='fields.E303',
             ),
@@ -1244,7 +1271,8 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ComplexClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ComplexClashTests(SimpleTestCase):
 
     # New tests should not be included here, because this is a single,
     # self-contained sanity check, not a test of everything.
@@ -1358,7 +1386,8 @@ class ComplexClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class M2mThroughFieldsTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class M2mThroughFieldsTests(SimpleTestCase):
     def test_m2m_field_argument_validation(self):
         """
         Tests that ManyToManyField accepts the ``through_fields`` kwarg
@@ -1367,9 +1396,8 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
         class Fan(models.Model):
             pass
 
-        self.assertRaisesMessage(
-            ValueError, 'Cannot specify through_fields without a through model',
-            models.ManyToManyField, Fan, through_fields=('f1', 'f2'))
+        with self.assertRaisesMessage(ValueError, 'Cannot specify through_fields without a through model'):
+            models.ManyToManyField(Fan, through_fields=('f1', 'f2'))
 
     def test_invalid_order(self):
         """
@@ -1391,15 +1419,17 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Event)
         expected = [
             Error(
-                ("'Invitation.invitee' is not a foreign key to 'Event'."),
+                "'Invitation.invitee' is not a foreign key to 'Event'.",
                 hint="Did you mean one of the following foreign keys to 'Event': event?",
                 obj=field,
-                id='fields.E339'),
+                id='fields.E339',
+            ),
             Error(
-                ("'Invitation.event' is not a foreign key to 'Fan'."),
+                "'Invitation.event' is not a foreign key to 'Fan'.",
                 hint="Did you mean one of the following foreign keys to 'Fan': invitee, inviter?",
                 obj=field,
-                id='fields.E339'),
+                id='fields.E339',
+            ),
         ]
         self.assertEqual(expected, errors)
 
@@ -1430,12 +1460,14 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
                 "The intermediary model 'invalid_models_tests.Invitation' has no field 'invalid_field_1'.",
                 hint="Did you mean one of the following foreign keys to 'Event': event?",
                 obj=field,
-                id='fields.E338'),
+                id='fields.E338',
+            ),
             Error(
                 "The intermediary model 'invalid_models_tests.Invitation' has no field 'invalid_field_2'.",
                 hint="Did you mean one of the following foreign keys to 'Fan': invitee, inviter?",
                 obj=field,
-                id='fields.E338'),
+                id='fields.E338',
+            ),
         ]
         self.assertEqual(expected, errors)
 
@@ -1462,8 +1494,7 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
                 "Field specifies 'through_fields' but does not provide the names "
                 "of the two link fields that should be used for the relation "
                 "through model 'invalid_models_tests.Invitation'.",
-                hint=("Make sure you specify 'through_fields' as "
-                      "through_fields=('field1', 'field2')"),
+                hint="Make sure you specify 'through_fields' as through_fields=('field1', 'field2')",
                 obj=field,
                 id='fields.E337')]
         self.assertEqual(expected, errors)

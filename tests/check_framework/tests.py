@@ -11,7 +11,9 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import models
 from django.test import SimpleTestCase
-from django.test.utils import override_settings, override_system_checks
+from django.test.utils import (
+    isolate_apps, override_settings, override_system_checks,
+)
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
@@ -77,12 +79,12 @@ class MessageTests(SimpleTestCase):
         self.assertEqual(force_text(e), expected)
 
     def test_printing_no_hint(self):
-        e = Error("Message", hint=None, obj=DummyObj())
+        e = Error("Message", obj=DummyObj())
         expected = "obj: Message"
         self.assertEqual(force_text(e), expected)
 
     def test_printing_no_object(self):
-        e = Error("Message", hint="Hint", obj=None)
+        e = Error("Message", hint="Hint")
         expected = "?: Message\n\tHINT: Hint"
         self.assertEqual(force_text(e), expected)
 
@@ -93,18 +95,18 @@ class MessageTests(SimpleTestCase):
 
     def test_printing_field_error(self):
         field = SimpleModel._meta.get_field('field')
-        e = Error("Error", hint=None, obj=field)
+        e = Error("Error", obj=field)
         expected = "check_framework.SimpleModel.field: Error"
         self.assertEqual(force_text(e), expected)
 
     def test_printing_model_error(self):
-        e = Error("Error", hint=None, obj=SimpleModel)
+        e = Error("Error", obj=SimpleModel)
         expected = "check_framework.SimpleModel: Error"
         self.assertEqual(force_text(e), expected)
 
     def test_printing_manager_error(self):
         manager = SimpleModel.manager
-        e = Error("Error", hint=None, obj=manager)
+        e = Error("Error", obj=manager)
         expected = "check_framework.SimpleModel.manager: Error"
         self.assertEqual(force_text(e), expected)
 
@@ -159,7 +161,8 @@ class CheckCommandTests(SimpleTestCase):
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_invalid_tag(self):
-        self.assertRaises(CommandError, call_command, 'check', tags=['missingtag'])
+        with self.assertRaises(CommandError):
+            call_command('check', tags=['missingtag'])
 
     @override_system_checks([simple_system_check])
     def test_list_tags_empty(self):
@@ -199,23 +202,11 @@ class CheckCommandTests(SimpleTestCase):
 
 
 def custom_error_system_check(app_configs, **kwargs):
-    return [
-        Error(
-            'Error',
-            hint=None,
-            id='myerrorcheck.E001',
-        )
-    ]
+    return [Error('Error', id='myerrorcheck.E001')]
 
 
 def custom_warning_system_check(app_configs, **kwargs):
-    return [
-        Warning(
-            'Warning',
-            hint=None,
-            id='mywarningcheck.E001',
-        )
-    ]
+    return [Warning('Warning', id='mywarningcheck.E001')]
 
 
 class SilencingCheckTests(SimpleTestCase):
@@ -254,23 +245,10 @@ class SilencingCheckTests(SimpleTestCase):
         self.assertEqual(err.getvalue(), '')
 
 
-class IsolateModelsMixin(object):
-    def setUp(self):
-        self.current_models = apps.all_models[__package__]
-        self.saved_models = set(self.current_models)
-
-    def tearDown(self):
-        for model in (set(self.current_models) - self.saved_models):
-            del self.current_models[model]
-        apps.clear_cache()
-
-
-class CheckFrameworkReservedNamesTests(IsolateModelsMixin, SimpleTestCase):
-    @override_settings(
-        SILENCED_SYSTEM_CHECKS=['models.E20', 'fields.W342'],  # ForeignKey(unique=True)
-        INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'check_framework']
-    )
-    def test_model_check_method_not_shadowed(self):
+class CheckFrameworkReservedNamesTests(SimpleTestCase):
+    @isolate_apps('check_framework', kwarg_name='apps')
+    @override_system_checks([checks.model_checks.check_all_models])
+    def test_model_check_method_not_shadowed(self, apps):
         class ModelWithAttributeCalledCheck(models.Model):
             check = 42
 
@@ -288,26 +266,23 @@ class CheckFrameworkReservedNamesTests(IsolateModelsMixin, SimpleTestCase):
                 related_name='check',
             )
 
-        errors = checks.run_checks()
+        errors = checks.run_checks(app_configs=apps.get_app_configs())
         expected = [
             Error(
                 "The 'ModelWithAttributeCalledCheck.check()' class method is "
                 "currently overridden by 42.",
-                hint=None,
                 obj=ModelWithAttributeCalledCheck,
                 id='models.E020'
             ),
             Error(
                 "The 'ModelWithRelatedManagerCalledCheck.check()' class method is "
                 "currently overridden by %r." % ModelWithRelatedManagerCalledCheck.check,
-                hint=None,
                 obj=ModelWithRelatedManagerCalledCheck,
                 id='models.E020'
             ),
             Error(
                 "The 'ModelWithDescriptorCalledCheck.check()' class method is "
                 "currently overridden by %r." % ModelWithDescriptorCalledCheck.check,
-                hint=None,
                 obj=ModelWithDescriptorCalledCheck,
                 id='models.E020'
             ),

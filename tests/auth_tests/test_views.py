@@ -15,34 +15,29 @@ from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
 )
 from django.contrib.auth.models import User
-from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.views import login as login_view, redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
-from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
 from django.db import connection
 from django.http import HttpRequest, QueryDict
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import TestCase, override_settings
 from django.test.utils import patch_logger
+from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import ParseResult, urlparse
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
-from .models import UUIDUser
+from .models import CustomUser, UUIDUser
 from .settings import AUTH_TEMPLATES
 
 
 @override_settings(
-    LANGUAGES=[
-        ('en', 'English'),
-    ],
+    LANGUAGES=[('en', 'English')],
     LANGUAGE_CODE='en',
     TEMPLATES=AUTH_TEMPLATES,
-    USE_TZ=False,
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='auth_tests.urls',
 )
 class AuthViewsTestCase(TestCase):
@@ -52,41 +47,8 @@ class AuthViewsTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
-            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u2 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
-            first_name='Inactive', last_name='User', email='testclient2@example.com', is_staff=False, is_active=False,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u3 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
-            first_name='Staff', last_name='Member', email='staffmember@example.com', is_staff=True, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u4 = User.objects.create(
-            password='', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='empty_password', first_name='Empty', last_name='Password', email='empty_password@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u5 = User.objects.create(
-            password='$', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='unmanageable_password', first_name='Unmanageable', last_name='Password',
-            email='unmanageable_password@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u6 = User.objects.create(
-            password='foo$bar', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
-            username='unknown_password', first_name='Unknown', last_name='Password',
-            email='unknown_password@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
+        cls.u1 = User.objects.create_user(username='testclient', password='password', email='testclient@example.com')
+        cls.u3 = User.objects.create_user(username='staff', password='password', email='staffmember@example.com')
 
     def login(self, username='testclient', password='password'):
         response = self.client.post('/login/', {
@@ -367,17 +329,18 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertContains(response, "Hello, .")
 
 
-@override_settings(AUTH_USER_MODEL='auth.CustomUser')
+@override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
 class CustomUserPasswordResetTest(AuthViewsTestCase):
     user_email = 'staffmember@example.com'
 
     @classmethod
     def setUpTestData(cls):
         cls.u1 = CustomUser.custom_objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), email='staffmember@example.com', is_active=True,
-            is_admin=False, date_of_birth=datetime.date(1976, 11, 8)
+            email='staffmember@example.com',
+            date_of_birth=datetime.date(1976, 11, 8),
         )
+        cls.u1.set_password('password')
+        cls.u1.save()
 
     def _test_confirm_start(self):
         # Start by creating the email
@@ -878,13 +841,22 @@ class LogoutTest(AuthViewsTestCase):
         self.client.get('/logout/')
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'pl')
 
+    @override_settings(LOGOUT_REDIRECT_URL='/custom/')
+    def test_logout_redirect_url_setting(self):
+        self.login()
+        response = self.client.get('/logout/')
+        self.assertRedirects(response, '/custom/', fetch_redirect_response=False)
+
+    @override_settings(LOGOUT_REDIRECT_URL='logout')
+    def test_logout_redirect_url_named_setting(self):
+        self.login()
+        response = self.client.get('/logout/')
+        self.assertRedirects(response, '/logout/', fetch_redirect_response=False)
+
 
 # Redirect in test_user_change_password will fail if session auth hash
 # isn't updated after password change (#21649)
-@override_settings(
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='auth_tests.urls_admin',
-)
+@override_settings(ROOT_URLCONF='auth_tests.urls_admin')
 class ChangelistTests(AuthViewsTestCase):
 
     def setUp(self):
@@ -931,7 +903,7 @@ class ChangelistTests(AuthViewsTestCase):
         )
         self.assertRedirects(response, reverse('auth_test_admin:auth_user_changelist'))
         row = LogEntry.objects.latest('id')
-        self.assertEqual(row.change_message, 'Changed email.')
+        self.assertEqual(row.get_change_message(), 'Changed email.')
 
     def test_user_not_change(self):
         response = self.client.post(
@@ -940,7 +912,7 @@ class ChangelistTests(AuthViewsTestCase):
         )
         self.assertRedirects(response, reverse('auth_test_admin:auth_user_changelist'))
         row = LogEntry.objects.latest('id')
-        self.assertEqual(row.change_message, 'No fields changed.')
+        self.assertEqual(row.get_change_message(), 'No fields changed.')
 
     def test_user_change_password(self):
         user_change_url = reverse('auth_test_admin:auth_user_change', args=(self.admin.pk,))
@@ -966,7 +938,7 @@ class ChangelistTests(AuthViewsTestCase):
         )
         self.assertRedirects(response, user_change_url)
         row = LogEntry.objects.latest('id')
-        self.assertEqual(row.change_message, 'Changed password.')
+        self.assertEqual(row.get_change_message(), 'Changed password.')
         self.logout()
         self.login(password='password1')
 
@@ -983,7 +955,7 @@ class ChangelistTests(AuthViewsTestCase):
         row = LogEntry.objects.latest('id')
         self.assertEqual(row.user_id, self.admin.pk)
         self.assertEqual(row.object_id, str(u.pk))
-        self.assertEqual(row.change_message, 'Changed password.')
+        self.assertEqual(row.get_change_message(), 'Changed password.')
 
     def test_password_change_bad_url(self):
         response = self.client.get(reverse('auth_test_admin:auth_user_password_change', args=('foobar',)))
@@ -1018,4 +990,10 @@ class UUIDUserTests(TestCase):
         row = LogEntry.objects.latest('id')
         self.assertEqual(row.user_id, 1)  # hardcoded in CustomUserAdmin.log_change()
         self.assertEqual(row.object_id, str(u.pk))
-        self.assertEqual(row.change_message, 'Changed password.')
+        self.assertEqual(row.get_change_message(), 'Changed password.')
+
+        # The LogEntry.user column isn't altered to a UUID type so it's set to
+        # an integer manually in CustomUserAdmin to avoid an error. To avoid a
+        # constraint error, delete the entry before constraints are checked
+        # after the test.
+        row.delete()

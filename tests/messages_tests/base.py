@@ -4,8 +4,8 @@ from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.contrib.messages.storage import base, default_storage
 from django.contrib.messages.storage.base import Message
-from django.core.urlresolvers import reverse
 from django.test import modify_settings, override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy
 
 
@@ -238,8 +238,8 @@ class BaseTests(object):
         reverse('show_message')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
             add_url = reverse('add_message', args=(level,))
-            self.assertRaises(MessageFailure, self.client.post, add_url,
-                              data, follow=True)
+            with self.assertRaises(MessageFailure):
+                self.client.post(add_url, data, follow=True)
 
     @modify_settings(
         INSTALLED_APPS={'remove': 'django.contrib.messages'},

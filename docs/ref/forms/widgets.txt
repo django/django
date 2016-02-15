@@ -22,7 +22,7 @@ dictionary that corresponds to the widget.
 .. _widget-to-field:
 
 Specifying widgets
-------------------
+==================
 
 Whenever you specify a field on a form, Django will use a default widget
 that is appropriate to the type of data that is to be displayed. To find
@@ -43,9 +43,8 @@ example::
 This would specify a form with a comment that uses a larger :class:`Textarea`
 widget, rather than the default :class:`TextInput` widget.
 
-
 Setting arguments for widgets
------------------------------
+=============================
 
 Many widgets have optional extra arguments; they can be set when defining the
 widget on the field. In the following example, the
@@ -69,9 +68,8 @@ widget on the field. In the following example, the
 See the :ref:`built-in widgets` for more information about which widgets
 are available and which arguments they accept.
 
-
-Widgets inheriting from the Select widget
------------------------------------------
+Widgets inheriting from the ``Select`` widget
+=============================================
 
 Widgets inheriting from the :class:`Select` widget deal with choices. They
 present the user with a list of options to choose from. The different widgets
@@ -96,14 +94,13 @@ example::
     >>> choice_field.widget.choices
     [('1', 'First and only')]
 
-
 Widgets which offer a :attr:`~Select.choices` attribute can however be used
 with fields which are not based on choice -- such as a :class:`CharField` --
 but it is recommended to use a :class:`ChoiceField`-based field when the
 choices are inherent to the model and not just the representational widget.
 
 Customizing widget instances
-----------------------------
+============================
 
 When Django renders a widget as HTML, it only renders very minimal markup -
 Django doesn't add class names, or any other widget-specific attributes. This
@@ -116,7 +113,7 @@ There are two ways to customize widgets: :ref:`per widget instance
 .. _styling-widget-instances:
 
 Styling widget instances
-^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------
 
 If you want to make one widget instance look different from another, you will
 need to specify additional attributes at the time when the widget object is
@@ -167,7 +164,7 @@ You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
 .. _styling-widget-classes:
 
 Styling widget classes
-^^^^^^^^^^^^^^^^^^^^^^
+----------------------
 
 With widgets, it is possible to add assets (``css`` and ``javascript``)
 and more deeply customize their appearance and behavior.
@@ -181,12 +178,15 @@ detail in the :doc:`Form Assets </topics/forms/media>` topic guide.
 
 .. _base-widget-classes:
 
-Base Widget classes
--------------------
+Base widget classes
+===================
 
 Base widget classes :class:`Widget` and :class:`MultiWidget` are subclassed by
 all the :ref:`built-in widgets <built-in widgets>` and may serve as a
 foundation for custom widgets.
+
+``Widget``
+----------
 
 .. class:: Widget(attrs=None)
 
@@ -256,6 +256,9 @@ foundation for custom widgets.
         be called more than once during handling of form data, so if you
         customize it and add expensive processing, you should implement some
         caching mechanism yourself.
+
+``MultiWidget``
+---------------
 
 .. class:: MultiWidget(widgets, attrs=None)
 
@@ -410,7 +413,7 @@ foundation for custom widgets.
 .. _built-in widgets:
 
 Built-in widgets
-----------------
+================
 
 Django provides a representation of all the basic HTML widgets, plus some
 commonly used groups of widgets in the ``django.forms.widgets`` module,
@@ -421,7 +424,7 @@ and :ref:`handling of multi-valued input <composite-widgets>`.
 .. _text-widgets:
 
 Widgets handling input of text
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------
 
 These widgets make use of the HTML elements ``input`` and ``textarea``.
 
@@ -496,7 +499,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`DATE_INPUT_FORMATS` and respects
-    :ref:`format-localization`.
+    :doc:`/topics/i18n/formatting`.
 
 ``DateTimeInput``
 ~~~~~~~~~~~~~~~~~
@@ -513,7 +516,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`DATETIME_INPUT_FORMATS` and respects
-    :ref:`format-localization`.
+    :doc:`/topics/i18n/formatting`.
 
     By default, the microseconds part of the time value is always set to ``0``.
     If microseconds are required, use a subclass with the
@@ -534,7 +537,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`TIME_INPUT_FORMATS` and respects
-    :ref:`format-localization`.
+    :doc:`/topics/i18n/formatting`.
 
     For the treatment of microseconds, see :class:`DateTimeInput`.
 
@@ -548,7 +551,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. _selector-widgets:
 
 Selector and checkbox widgets
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------
 
 ``CheckboxInput``
 ~~~~~~~~~~~~~~~~~
@@ -712,7 +715,7 @@ When looping over the checkboxes, the ``label`` and ``input`` tags include
 .. _file-upload-widgets:
 
 File upload widgets
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 ``FileInput``
 ~~~~~~~~~~~~~
@@ -733,7 +736,7 @@ File upload widgets
 .. _composite-widgets:
 
 Composite widgets
-^^^^^^^^^^^^^^^^^
+-----------------
 
 ``MultipleHiddenInput``
 ~~~~~~~~~~~~~~~~~~~~~~~

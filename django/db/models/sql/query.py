@@ -235,7 +235,7 @@ class Query(object):
         memo[id(self)] = result
         return result
 
-    def _prepare(self):
+    def _prepare(self, field):
         return self
 
     def get_compiler(self, using=None, connection=None):
@@ -1549,6 +1549,9 @@ class Query(object):
                 self.low_mark = min(self.high_mark, self.low_mark + low)
             else:
                 self.low_mark = self.low_mark + low
+
+        if self.low_mark == self.high_mark:
+            self.set_empty()
 
     def clear_limits(self):
         """

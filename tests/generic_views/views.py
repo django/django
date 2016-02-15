@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
 
@@ -32,6 +32,17 @@ class ArtistDetail(generic.DetailView):
 
 class AuthorDetail(generic.DetailView):
     queryset = Author.objects.all()
+
+
+class AuthorCustomDetail(generic.DetailView):
+    template_name = 'generic_views/author_detail.html'
+    queryset = Author.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        # Ensures get_context_object_name() doesn't reference self.object.
+        author = self.get_object()
+        context = {'custom_' + self.get_context_object_name(author): author}
+        return self.render_to_response(context)
 
 
 class PageDetail(generic.DetailView):
@@ -136,9 +147,14 @@ class NaiveAuthorUpdate(generic.UpdateView):
 
 
 class AuthorUpdate(generic.UpdateView):
+    get_form_called_count = 0  # Used to ensure get_form() is called once.
     model = Author
     success_url = '/list/authors/'
     fields = '__all__'
+
+    def get_form(self, *args, **kwargs):
+        self.get_form_called_count += 1
+        return super(AuthorUpdate, self).get_form(*args, **kwargs)
 
 
 class OneAuthorUpdate(generic.UpdateView):

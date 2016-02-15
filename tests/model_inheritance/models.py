@@ -56,7 +56,12 @@ class Post(models.Model):
 
 @python_2_unicode_compatible
 class Attachment(models.Model):
-    post = models.ForeignKey(Post, models.CASCADE, related_name='attached_%(class)s_set')
+    post = models.ForeignKey(
+        Post,
+        models.CASCADE,
+        related_name='attached_%(class)s_set',
+        related_query_name='attached_%(app_label)s_%(class)ss',
+    )
     content = models.TextField()
 
     class Meta:

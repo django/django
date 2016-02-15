@@ -5,10 +5,10 @@ import sys
 import types
 
 from django.conf import settings
-from django.core.urlresolvers import Resolver404, resolve
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
+from django.urls import Resolver404, resolve
 from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, smart_text
@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 # regardless of the project's TEMPLATES setting.
 DEBUG_ENGINE = Engine(debug=True)
 
-HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE')
+HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
 
 CLEANSED_SUBSTITUTE = '********************'
 
@@ -882,7 +882,7 @@ Exception Type: {{ exception_type|escape }}{% if request %} at {{ request.path_i
 Exception Value: {{ exception_value|force_escape }}
 </textarea>
   <br><br>
-  <input type="submit" value="Share this traceback on a public Web site">
+  <input type="submit" value="Share this traceback on a public website">
   </div>
 </form>
 </div>

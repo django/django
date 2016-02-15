@@ -75,8 +75,8 @@ The sitemap view takes an extra, required argument: ``{'sitemaps': sitemaps}``.
 a :class:`~django.contrib.sitemaps.Sitemap` class (e.g.,
 ``BlogSitemap(some_var)``).
 
-Sitemap classes
-===============
+``Sitemap`` classes
+===================
 
 A :class:`~django.contrib.sitemaps.Sitemap` class is a simple Python
 class that represents a "section" of entries in your sitemap. For example,
@@ -129,8 +129,8 @@ Note:
   :attr:`~Sitemap.location()` calls ``get_absolute_url()`` on each object
   and returns the result.
 
-Sitemap class reference
-=======================
+``Sitemap`` class reference
+===========================
 
 .. class:: Sitemap
 
@@ -319,13 +319,12 @@ Sitemap for static views
 
 Often you want the search engine crawlers to index views which are neither
 object detail pages nor flatpages. The solution is to explicitly list URL
-names for these views in ``items`` and call
-:func:`~django.core.urlresolvers.reverse` in the ``location`` method of
-the sitemap. For example::
+names for these views in ``items`` and call :func:`~django.urls.reverse` in
+the ``location`` method of the sitemap. For example::
 
     # sitemaps.py
     from django.contrib import sitemaps
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 
     class StaticViewSitemap(sitemaps.Sitemap):
         priority = 0.5
@@ -543,7 +542,7 @@ each time you call ``save()``.
 Pinging Google via ``manage.py``
 --------------------------------
 
-.. django-admin:: ping_google
+.. django-admin:: ping_google [sitemap_url]
 
 Once the sitemaps application is added to your project, you may also
 ping Google using the ``ping_google`` management command::

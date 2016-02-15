@@ -216,6 +216,7 @@ class AdminReadonlyField(object):
                     result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f, self.empty_value_display)
+                result_repr = linebreaksbr(result_repr)
         return conditional_escape(result_repr)
 
 
@@ -235,6 +236,7 @@ class InlineAdminFormSet(object):
         if prepopulated_fields is None:
             prepopulated_fields = {}
         self.prepopulated_fields = prepopulated_fields
+        self.classes = ' '.join(inline.classes) if inline.classes else ''
 
     def __iter__(self):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):

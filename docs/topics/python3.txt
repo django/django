@@ -131,8 +131,8 @@ and ``SafeText`` respectively.
 
 For forwards compatibility, the new names work as of Django 1.4.2.
 
-:meth:`~object.__str__` and ` __unicode__()`_ methods
------------------------------------------------------
+``__str__()`` and ``__unicode__()`` methods
+-------------------------------------------
 
 In Python 2, the object model specifies :meth:`~object.__str__` and
 ` __unicode__()`_ methods. If these methods exist, they must return
@@ -370,8 +370,8 @@ Some modules were renamed in Python 3. The ``django.utils.six.moves``
 module (based on the :mod:`six.moves module <six.moves>`) provides a
 compatible location to import them.
 
-PY2
-~~~
+``PY2``
+~~~~~~~
 
 If you need different code in Python 2 and Python 3, check :data:`six.PY2`::
 
@@ -383,8 +383,8 @@ function.
 
 .. module:: django.utils.six
 
-Django customized version of six
---------------------------------
+Django customized version of ``six``
+------------------------------------
 
 The version of six bundled with Django (``django.utils.six``) includes a few
 customizations for internal use only.

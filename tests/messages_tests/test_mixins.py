@@ -1,5 +1,5 @@
-from django.core.urlresolvers import reverse
 from django.test import SimpleTestCase, override_settings
+from django.urls import reverse
 
 from .urls import ContactFormViewWithMsg
 

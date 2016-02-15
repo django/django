@@ -72,6 +72,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # If a column type is set to None, it won't be included in the output.
     data_types = {
         'AutoField': 'serial',
+        'BigAutoField': 'bigserial',
         'BinaryField': 'bytea',
         'BooleanField': 'boolean',
         'CharField': 'varchar(%(max_length)s)',
@@ -196,7 +197,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         conn_timezone_name = self.connection.get_parameter_status('TimeZone')
 
-        if conn_timezone_name != self.timezone_name:
+        if self.timezone_name and conn_timezone_name != self.timezone_name:
             cursor = self.connection.cursor()
             try:
                 cursor.execute(self.ops.set_time_zone_sql(), [self.timezone_name])

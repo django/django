@@ -31,7 +31,7 @@ A lookup expression consists of three parts:
 .. _lookup-registration-api:
 
 Registration API
-~~~~~~~~~~~~~~~~
+================
 
 Django uses :class:`~lookups.RegisterLookupMixin` to give a class the interface to
 register lookups on itself. The two prominent examples are
@@ -75,7 +75,7 @@ follow this API.
 .. _query-expression:
 
 The Query Expression API
-~~~~~~~~~~~~~~~~~~~~~~~~
+========================
 
 The query expression API is a common set of methods that classes define to be
 usable in query expressions to translate themselves into SQL expressions. Direct
@@ -117,8 +117,8 @@ following methods:
     Defines the type of class returned by the ``get_lookup()`` method. It must
     be a :class:`~django.db.models.Field` instance.
 
-Transform reference
-~~~~~~~~~~~~~~~~~~~
+``Transform`` reference
+=======================
 
 .. class:: Transform
 
@@ -162,8 +162,8 @@ Transform reference
         :class:`~django.db.models.Field` instance. By default is the same as
         its ``lhs.output_field``.
 
-Lookup reference
-~~~~~~~~~~~~~~~~
+``Lookup`` reference
+====================
 
 .. class:: Lookup
 

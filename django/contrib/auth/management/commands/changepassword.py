@@ -12,7 +12,7 @@ from django.utils.encoding import force_str
 
 class Command(BaseCommand):
     help = "Change a user's password for django.contrib.auth."
-
+    requires_migrations_checks = True
     requires_system_checks = False
 
     def _get_pass(self, prompt="Password: "):

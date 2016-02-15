@@ -11,8 +11,10 @@ from argparse import ArgumentParser
 
 import django
 from django.core import checks
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
-from django.db import connections
+from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.migrations.exceptions import MigrationSchemaMissing
 from django.utils.encoding import force_str
 
 
@@ -165,6 +167,10 @@ class BaseCommand(object):
         wrapped with ``BEGIN;`` and ``COMMIT;``. Default value is
         ``False``.
 
+    ``requires_migrations_checks``
+        A boolean; if ``True``, the command prints a warning if the set of
+        migrations on disk don't match the migrations in the database.
+
     ``requires_system_checks``
         A boolean; if ``True``, entire Django project will be checked for errors
         prior to executing the command. Default value is ``True``.
@@ -199,6 +205,7 @@ class BaseCommand(object):
     can_import_settings = True
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     leave_locale_alone = False
+    requires_migrations_checks = False
     requires_system_checks = True
 
     def __init__(self, stdout=None, stderr=None, no_color=False):
@@ -334,10 +341,10 @@ class BaseCommand(object):
             translation.deactivate_all()
 
         try:
-            if (self.requires_system_checks and
-                    not options.get('skip_validation') and  # Remove at the end of deprecation for `skip_validation`.
-                    not options.get('skip_checks')):
+            if self.requires_system_checks and not options.get('skip_checks'):
                 self.check()
+            if self.requires_migrations_checks:
+                self.check_migrations()
             output = self.handle(*args, **options)
             if output:
                 if self.output_transaction:
@@ -420,6 +427,38 @@ class BaseCommand(object):
                 self.stderr.write(msg, lambda x: x)
             else:
                 self.stdout.write(msg)
+
+    def check_migrations(self):
+        """
+        Print a warning if the set of migrations on disk don't match the
+        migrations in the database.
+        """
+        from django.db.migrations.executor import MigrationExecutor
+        try:
+            executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
+        except ImproperlyConfigured:
+            # No databases are configured (or the dummy one)
+            return
+        except MigrationSchemaMissing:
+            self.stdout.write(self.style.NOTICE(
+                "\nNot checking migrations as it is not possible to access/create the django_migrations table."
+            ))
+            return
+
+        plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
+        if plan:
+            apps_waiting_migration = sorted(set(migration.app_label for migration, backwards in plan))
+            self.stdout.write(
+                self.style.NOTICE(
+                    "\nYou have %(unpplied_migration_count)s unapplied migration(s). "
+                    "Your project may not work properly until you apply the "
+                    "migrations for app(s): %(apps_waiting_migration)s." % {
+                        "unpplied_migration_count": len(plan),
+                        "apps_waiting_migration": ", ".join(apps_waiting_migration),
+                    }
+                )
+            )
+            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
 
     def handle(self, *args, **options):
         """

@@ -66,23 +66,29 @@ class GeoIPTest(unittest.TestCase):
         # Improper parameters.
         bad_params = (23, 'foo', 15.23)
         for bad in bad_params:
-            self.assertRaises(GeoIPException, GeoIP, cache=bad)
+            with self.assertRaises(GeoIPException):
+                GeoIP(cache=bad)
             if isinstance(bad, six.string_types):
                 e = GeoIPException
             else:
                 e = TypeError
-            self.assertRaises(e, GeoIP, bad, 0)
+            with self.assertRaises(e):
+                GeoIP(bad, 0)
 
     def test02_bad_query(self):
         "Testing GeoIP query parameter checking."
         cntry_g = GeoIP(city='<foo>')
         # No city database available, these calls should fail.
-        self.assertRaises(GeoIPException, cntry_g.city, 'google.com')
-        self.assertRaises(GeoIPException, cntry_g.coords, 'yahoo.com')
+        with self.assertRaises(GeoIPException):
+            cntry_g.city('google.com')
+        with self.assertRaises(GeoIPException):
+            cntry_g.coords('yahoo.com')
 
         # Non-string query should raise TypeError
-        self.assertRaises(TypeError, cntry_g.country_code, 17)
-        self.assertRaises(TypeError, cntry_g.country_name, GeoIP)
+        with self.assertRaises(TypeError):
+            cntry_g.country_code(17)
+        with self.assertRaises(TypeError):
+            cntry_g.country_name(GeoIP)
 
     def test03_country(self):
         "Testing GeoIP country querying methods."

@@ -2,14 +2,12 @@ from __future__ import unicode_literals
 
 import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
-import sys
-import warnings
 from copy import copy
 
 from django.conf import settings
 from django.core import mail
 from django.core.mail import get_connection
-from django.utils.deprecation import RemovedInNextVersionWarning
+from django.core.management.color import color_style
 from django.utils.module_loading import import_string
 from django.views.debug import ExceptionReporter
 
@@ -28,11 +26,22 @@ DEFAULT_LOGGING = {
             '()': 'django.utils.log.RequireDebugTrue',
         },
     },
+    'formatters': {
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[%(server_time)s] %(message)s',
+        }
+    },
     'handlers': {
         'console': {
             'level': 'INFO',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
+        },
+        'django.server': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
         },
         'mail_admins': {
             'level': 'ERROR',
@@ -45,21 +54,16 @@ DEFAULT_LOGGING = {
             'handlers': ['console', 'mail_admins'],
             'level': 'INFO',
         },
-        'py.warnings': {
-            'handlers': ['console'],
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False,
         },
     }
 }
 
 
 def configure_logging(logging_config, logging_settings):
-    if not sys.warnoptions:
-        # Route warnings through python logging
-        logging.captureWarnings(True)
-        # RemovedInNextVersionWarning is a subclass of DeprecationWarning which
-        # is hidden by default, hence we force the "default" behavior
-        warnings.simplefilter("default", RemovedInNextVersionWarning)
-
     if logging_config:
         # First find the logging configuration function ...
         logging_config_func = import_string(logging_config)
@@ -155,3 +159,36 @@ class RequireDebugFalse(logging.Filter):
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):
         return settings.DEBUG
+
+
+class ServerFormatter(logging.Formatter):
+    def __init__(self, *args, **kwargs):
+        self.style = color_style()
+        super(ServerFormatter, self).__init__(*args, **kwargs)
+
+    def format(self, record):
+        args = record.args
+        msg = record.msg
+
+        if len(args) == 0:
+            msg = self.style.HTTP_BAD_REQUEST(msg)
+        else:
+            if args[1][0] == '2':
+                # Put 2XX first, since it should be the common case
+                msg = self.style.HTTP_SUCCESS(msg)
+            elif args[1][0] == '1':
+                msg = self.style.HTTP_INFO(msg)
+            elif args[1] == '304':
+                msg = self.style.HTTP_NOT_MODIFIED(msg)
+            elif args[1][0] == '3':
+                msg = self.style.HTTP_REDIRECT(msg)
+            elif args[1] == '404':
+                msg = self.style.HTTP_NOT_FOUND(msg)
+            elif args[1][0] == '4':
+                msg = self.style.HTTP_BAD_REQUEST(msg)
+            else:
+                # Any 5XX, or any other response
+                msg = self.style.HTTP_SERVER_ERROR(msg)
+
+        record.msg = msg
+        return super(ServerFormatter, self).format(record)

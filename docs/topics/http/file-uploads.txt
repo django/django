@@ -45,7 +45,7 @@ form as described in :ref:`binding-uploaded-files`. This would look
 something like::
 
     from django.http import HttpResponseRedirect
-    from django.shortcuts import render_to_response
+    from django.shortcuts import render
     from .forms import UploadFileForm
 
     # Imaginary function to handle an uploaded file.
@@ -59,7 +59,7 @@ something like::
                 return HttpResponseRedirect('/success/url/')
         else:
             form = UploadFileForm()
-        return render_to_response('upload.html', {'form': form})
+        return render(request, 'upload.html', {'form': form})
 
 Notice that we have to pass :attr:`request.FILES <django.http.HttpRequest.FILES>`
 into the form's constructor; this is how file data gets bound into a form.

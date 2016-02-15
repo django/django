@@ -157,8 +157,8 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
 
         # The city shapefile is 2D, and won't be able to fill the coordinates
         # in the 3D model -- thus, a LayerMapError is raised.
-        self.assertRaises(LayerMapError, LayerMapping,
-                          Point3D, city_file, point_mapping, transform=False)
+        with self.assertRaises(LayerMapError):
+            LayerMapping(Point3D, city_file, point_mapping, transform=False)
 
         # 3D model should take 3D data just fine.
         lm = LayerMapping(Point3D, vrt_file, point_mapping, transform=False)

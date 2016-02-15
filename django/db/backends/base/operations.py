@@ -204,7 +204,8 @@ class BaseDatabaseOperations(object):
         according to their own quoting schemes.
         """
         # Convert params to contain Unicode values.
-        to_unicode = lambda s: force_text(s, strings_only=True, errors='replace')
+        def to_unicode(s):
+            return force_text(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple(to_unicode(val) for val in params)
         elif params is None:
@@ -227,7 +228,7 @@ class BaseDatabaseOperations(object):
     def lookup_cast(self, lookup_type, internal_type=None):
         """
         Returns the string to use in a query when performing lookups
-        ("contains", "like", etc). The resulting string should contain a '%s'
+        ("contains", "like", etc.). The resulting string should contain a '%s'
         placeholder for the column being searched against.
         """
         return "%s"

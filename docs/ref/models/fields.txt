@@ -388,12 +388,22 @@ according to available IDs. You usually won't need to use this directly; a
 primary key field will automatically be added to your model if you don't specify
 otherwise. See :ref:`automatic-primary-key-fields`.
 
+``BigAutoField``
+----------------
+
+.. class:: BigAutoField(**options)
+
+.. versionadded:: 1.10
+
+A 64-bit integer, much like an :class:`AutoField` except that it is
+guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
+
 ``BigIntegerField``
 -------------------
 
 .. class:: BigIntegerField(**options)
 
-A 64 bit integer, much like an :class:`IntegerField` except that it is
+A 64-bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from ``-9223372036854775808`` to
 ``9223372036854775807``. The default form widget for this field is a
 :class:`~django.forms.TextInput`.
@@ -461,11 +471,16 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
     of. Refer to the :ref:`MySQL database notes <mysql-collation>` for
     details.
 
-
 ``CommaSeparatedIntegerField``
 ------------------------------
 
 .. class:: CommaSeparatedIntegerField(max_length=None, **options)
+
+.. deprecated:: 1.9
+
+    This field is deprecated in favor of :class:`~django.db.models.CharField`
+    with ``validators=[``\ :func:`validate_comma_separated_integer_list
+    <django.core.validators.validate_comma_separated_integer_list>`\ ``]``.
 
 A field of integers separated by commas. As in :class:`CharField`, the
 :attr:`~CharField.max_length` argument is required and the note about database
@@ -733,8 +748,8 @@ equivalent to XSS or CSRF attacks.
 columns with a default max length of 100 characters. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
-FileField and FieldFile
-~~~~~~~~~~~~~~~~~~~~~~~
+``FileField`` and ``FieldFile``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentmodule:: django.db.models.fields.files
 
@@ -783,7 +798,7 @@ Python file object like this::
 
     from django.core.files import File
     # Open an existing file using Python's built-in open()
-    f = open('/tmp/hello.world')
+    f = open('/path/to/hello.world')
     myfile = File(f)
 
 Or you can construct one from a Python string like this::
@@ -1334,6 +1349,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
         # That's now the name of the reverse filter
         Article.objects.filter(tag__name="important")
 
+    Like :attr:`related_name`, ``related_query_name`` supports app label and
+    class interpolation via :ref:`some special syntax <abstract-related-name>`.
+
 .. attribute:: ForeignKey.to_field
 
     The field on the related object that the relation is to. By default, Django
@@ -1372,8 +1390,6 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     support, for example).
 
     If in doubt, leave it to its default of ``True``.
-
-.. _ref-manytomany:
 
 ``ManyToManyField``
 -------------------
@@ -1577,8 +1593,6 @@ that control how the relationship functions.
 
 :attr:`~Field.null` has no effect since there is no way to require a
 relationship at the database level.
-
-.. _ref-onetoone:
 
 ``OneToOneField``
 -----------------

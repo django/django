@@ -26,9 +26,10 @@ class BaseSpatialFeatures(object):
     supports_real_shape_operations = True
     # Can geometry fields be null?
     supports_null_geometries = True
-    # Can the `distance`/`length` functions be applied on geodetic coordinate systems?
+    # Can the the function be applied on geodetic coordinate systems?
     supports_distance_geodetic = True
     supports_length_geodetic = True
+    supports_perimeter_geodetic = False
     # Is the database able to count vertices on polygons (with `num_points`)?
     supports_num_points_poly = True
 

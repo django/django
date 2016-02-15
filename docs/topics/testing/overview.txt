@@ -115,9 +115,10 @@ wait for the currently running test to complete and then exit gracefully.
 During a graceful exit the test runner will output details of any test
 failures, report on how many tests were run and how many errors and failures
 were encountered, and destroy any test databases as usual. Thus pressing
-``Ctrl-C`` can be very useful if you forget to pass the :djadminopt:`--failfast`
-option, notice that some tests are unexpectedly failing, and want to get details
-on the failures without waiting for the full test run to complete.
+``Ctrl-C`` can be very useful if you forget to pass the :option:`--failfast
+<test --failfast>` option, notice that some tests are unexpectedly failing and
+want to get details on the failures without waiting for the full test run to
+complete.
 
 If you do not want to wait for the currently running test to finish, you
 can press ``Ctrl-C`` a second time and the test run will halt immediately,
@@ -145,19 +146,19 @@ Tests that require a database (namely, model tests) will not use your "real"
 Regardless of whether the tests pass or fail, the test databases are destroyed
 when all the tests have been executed.
 
-You can prevent the test databases from being destroyed by adding the
-:djadminopt:`--keepdb` flag to the test command. This will preserve the test
-database between runs. If the database does not exist, it will first be
-created. Any migrations will also be applied in order to keep it p to date.
+You can prevent the test databases from being destroyed by using the
+:option:`test --keepdb` option. This will preserve the test database between
+runs. If the database does not exist, it will first be created. Any migrations
+will also be applied in order to keep it p to date.
 
-By default the test databases get their names by prepending ``test_``
-to the value of the :setting:`NAME` settings for the databases
-defined in :setting:`DATABASES`. When using the SQLite database engine
-the tests will by default use an in-memory database (i.e., the
-database will be created in memory, bypassing the filesystem
-entirely!). If you want to use a different database name, specify
-:setting:`NAME <TEST_NAME>` in the :setting:`TEST <DATABASE-TEST>`
-dictionary for any given database in :setting:`DATABASES`.
+The default test database names are created by prepending ``test_`` to the
+value of each :setting:`NAME` in :setting:`DATABASES`. When using SQLite, the
+tests will use an in-memory database by default (i.e., the database will be
+created in memory, bypassing the filesystem entirely!). The :setting:`TEST
+<DATABASE-TEST>` dictionary in :setting:`DATABASES` offers a number of settings
+to configure your test database. For example, if you want to use a different
+database name, specify :setting:`NAME <TEST_NAME>` in the :setting:`TEST
+<DATABASE-TEST>` dictionary for any given database in :setting:`DATABASES`.
 
 On PostgreSQL, :setting:`USER` will also need read access to the built-in
 ``postgres`` database.
@@ -221,9 +222,9 @@ the Django test runner reorders tests in the following way:
     database by a given :class:`~django.test.TransactionTestCase` test, they
     must be updated to be able to run independently.
 
-You may reverse the execution order inside groups by passing
-:djadminopt:`--reverse` to the test command. This can help with ensuring your
-tests are independent from each other.
+You may reverse the execution order inside groups using the :option:`test
+--reverse` option. This can help with ensuring your tests are independent from
+each other.
 
 .. _test-case-serialized-rollback:
 

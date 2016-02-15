@@ -149,7 +149,7 @@ class FileDescriptor(object):
 
     Assigns a file object on assignment so you can do::
 
-        >>> with open('/tmp/hello.world', 'r') as f:
+        >>> with open('/path/to/hello.world', 'r') as f:
         ...     instance.file = File(f)
     """
     def __init__(self, field):
@@ -245,7 +245,6 @@ class FileField(Field):
             return [
                 checks.Error(
                     "'unique' is not a valid argument for a %s." % self.__class__.__name__,
-                    hint=None,
                     obj=self,
                     id='fields.E200',
                 )
@@ -258,7 +257,6 @@ class FileField(Field):
             return [
                 checks.Error(
                     "'primary_key' is not a valid argument for a %s." % self.__class__.__name__,
-                    hint=None,
                     obj=self,
                     id='fields.E201',
                 )

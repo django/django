@@ -19,49 +19,49 @@ These functions are described in more detail in the `PostgreSQL docs
         {'arr': [0, 1, 2]}
 
 General-purpose aggregation functions
--------------------------------------
+=====================================
 
-ArrayAgg
-~~~~~~~~
+``ArrayAgg``
+------------
 
 .. class:: ArrayAgg(expression, **extra)
 
     Returns a list of values, including nulls, concatenated into an array.
 
-BitAnd
-~~~~~~
+``BitAnd``
+----------
 
 .. class:: BitAnd(expression, **extra)
 
     Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
     ``None`` if all values are null.
 
-BitOr
-~~~~~
+``BitOr``
+---------
 
 .. class:: BitOr(expression, **extra)
 
     Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
     ``None`` if all values are null.
 
-BoolAnd
-~~~~~~~~
+``BoolAnd``
+-----------
 
 .. class:: BoolAnd(expression, **extra)
 
     Returns ``True``, if all input values are true, ``None`` if all values are
     null or if there are no values, otherwise ``False`` .
 
-BoolOr
-~~~~~~
+``BoolOr``
+----------
 
 .. class:: BoolOr(expression, **extra)
 
     Returns ``True`` if at least one input value is true, ``None`` if all
     values are null or if there are no values, otherwise ``False``.
 
-StringAgg
-~~~~~~~~~
+``StringAgg``
+-------------
 
 .. class:: StringAgg(expression, delimiter)
 
@@ -73,24 +73,24 @@ StringAgg
         Required argument. Needs to be a string.
 
 Aggregate functions for statistics
-----------------------------------
+==================================
 
 ``y`` and ``x``
-~~~~~~~~~~~~~~~
+---------------
 
 The arguments ``y`` and ``x`` for all these functions can be the name of a
 field or an expression returning a numeric data. Both are required.
 
-Corr
-~~~~
+``Corr``
+--------
 
 .. class:: Corr(y, x)
 
     Returns the correlation coefficient as a ``float``, or ``None`` if there
     aren't any matching rows.
 
-CovarPop
-~~~~~~~~
+``CovarPop``
+------------
 
 .. class:: CovarPop(y, x, sample=False)
 
@@ -105,32 +105,32 @@ CovarPop
         However, if ``sample=True``, the return value will be the sample
         population covariance.
 
-RegrAvgX
-~~~~~~~~
+``RegrAvgX``
+------------
 
 .. class:: RegrAvgX(y, x)
 
     Returns the average of the independent variable (``sum(x)/N``) as a
     ``float``, or ``None`` if there aren't any matching rows.
 
-RegrAvgY
-~~~~~~~~
+``RegrAvgY``
+------------
 
 .. class:: RegrAvgY(y, x)
 
     Returns the average of the independent variable (``sum(y)/N``) as a
     ``float``, or ``None`` if there aren't any matching rows.
 
-RegrCount
-~~~~~~~~~
+``RegrCount``
+-------------
 
 .. class:: RegrCount(y, x)
 
     Returns an ``int`` of the number of input rows in which both expressions
     are not null.
 
-RegrIntercept
-~~~~~~~~~~~~~
+``RegrIntercept``
+-----------------
 
 .. class:: RegrIntercept(y, x)
 
@@ -138,16 +138,16 @@ RegrIntercept
     by the ``(x, y)`` pairs as a ``float``, or ``None`` if there aren't any
     matching rows.
 
-RegrR2
-~~~~~~
+``RegrR2``
+----------
 
 .. class:: RegrR2(y, x)
 
     Returns the square of the correlation coefficient as a ``float``, or
     ``None`` if there aren't any matching rows.
 
-RegrSlope
-~~~~~~~~~
+``RegrSlope``
+-------------
 
 .. class:: RegrSlope(y, x)
 
@@ -155,16 +155,16 @@ RegrSlope
     by the ``(x, y)`` pairs as a ``float``, or ``None`` if there aren't any
     matching rows.
 
-RegrSXX
-~~~~~~~
+``RegrSXX``
+-----------
 
 .. class:: RegrSXX(y, x)
 
     Returns ``sum(x^2) - sum(x)^2/N`` ("sum of squares" of the independent
     variable) as a ``float``, or ``None`` if there aren't any matching rows.
 
-RegrSXY
-~~~~~~~
+``RegrSXY``
+-----------
 
 .. class:: RegrSXY(y, x)
 
@@ -172,8 +172,8 @@ RegrSXY
     times dependent variable) as a ``float``, or ``None`` if there aren't any
     matching rows.
 
-RegrSYY
-~~~~~~~
+``RegrSYY``
+-----------
 
 .. class:: RegrSYY(y, x)
 
@@ -181,7 +181,7 @@ RegrSYY
     variable)  as a ``float``, or ``None`` if there aren't any matching rows.
 
 Usage examples
---------------
+==============
 
 We will use this example table::
 

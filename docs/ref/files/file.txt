@@ -1,3 +1,4 @@
+===================
 The ``File`` object
 ===================
 
@@ -6,8 +7,8 @@ for basic file handling in Django.
 
 .. currentmodule:: django.core.files
 
-The ``File`` Class
-------------------
+The ``File`` class
+==================
 
 .. class:: File(file_object)
 
@@ -89,8 +90,8 @@ The ``File`` Class
 
 .. currentmodule:: django.core.files.base
 
-The ``ContentFile`` Class
--------------------------
+The ``ContentFile`` class
+=========================
 
 .. class:: ContentFile(File)
 
@@ -106,8 +107,8 @@ The ``ContentFile`` Class
 
 .. currentmodule:: django.core.files.images
 
-The ``ImageFile`` Class
------------------------
+The ``ImageFile`` class
+=======================
 
 .. class:: ImageFile(file_object)
 
@@ -127,7 +128,7 @@ The ``ImageFile`` Class
 .. currentmodule:: django.core.files
 
 Additional methods on files attached to objects
------------------------------------------------
+===============================================
 
 Any :class:`File` that is associated with an object (as with ``Car.photo``,
 below) will also have a couple of extra methods:

@@ -1,17 +1,17 @@
 from __future__ import unicode_literals
 
 import binascii
-import unittest
 from unittest import skipUnless
 
 from django.contrib.gis.geos import (
-    HAS_GEOS, GEOSGeometry, WKBReader, WKBWriter, WKTReader, WKTWriter,
+    HAS_GEOS, GEOSGeometry, Point, WKBReader, WKBWriter, WKTReader, WKTWriter,
 )
+from django.test import SimpleTestCase
 from django.utils.six import memoryview
 
 
 @skipUnless(HAS_GEOS, "Geos is required.")
-class GEOSIOTest(unittest.TestCase):
+class GEOSIOTest(SimpleTestCase):
 
     def test01_wktreader(self):
         # Creating a WKTReader instance
@@ -27,13 +27,16 @@ class GEOSIOTest(unittest.TestCase):
             self.assertEqual(ref, geom)
 
         # Should only accept six.string_types objects.
-        self.assertRaises(TypeError, wkt_r.read, 1)
-        self.assertRaises(TypeError, wkt_r.read, memoryview(b'foo'))
+        with self.assertRaises(TypeError):
+            wkt_r.read(1)
+        with self.assertRaises(TypeError):
+            wkt_r.read(memoryview(b'foo'))
 
     def test02_wktwriter(self):
         # Creating a WKTWriter instance, testing its ptr property.
         wkt_w = WKTWriter()
-        self.assertRaises(TypeError, wkt_w._set_ptr, WKTReader.ptr_type())
+        with self.assertRaises(TypeError):
+            wkt_w._set_ptr(WKTReader.ptr_type())
 
         ref = GEOSGeometry('POINT (5 23)')
         ref_wkt = 'POINT (5.0000000000000000 23.0000000000000000)'
@@ -56,7 +59,8 @@ class GEOSIOTest(unittest.TestCase):
 
         bad_input = (1, 5.23, None, False)
         for bad_wkb in bad_input:
-            self.assertRaises(TypeError, wkb_r.read, bad_wkb)
+            with self.assertRaises(TypeError):
+                wkb_r.read(bad_wkb)
 
     def test04_wkbwriter(self):
         wkb_w = WKBWriter()
@@ -75,7 +79,8 @@ class GEOSIOTest(unittest.TestCase):
         # Ensuring bad byteorders are not accepted.
         for bad_byteorder in (-1, 2, 523, 'foo', None):
             # Equivalent of `wkb_w.byteorder = bad_byteorder`
-            self.assertRaises(ValueError, wkb_w._set_byteorder, bad_byteorder)
+            with self.assertRaises(ValueError):
+                wkb_w._set_byteorder(bad_byteorder)
 
         # Setting the byteorder to 0 (for Big Endian)
         wkb_w.byteorder = 0
@@ -97,7 +102,8 @@ class GEOSIOTest(unittest.TestCase):
         # Ensuring bad output dimensions are not accepted
         for bad_outdim in (-1, 0, 1, 4, 423, 'foo', None):
             # Equivalent of `wkb_w.outdim = bad_outdim`
-            self.assertRaises(ValueError, wkb_w._set_outdim, bad_outdim)
+            with self.assertRaises(ValueError):
+                wkb_w._set_outdim(bad_outdim)
 
         # Now setting the output dimensions to be 3
         wkb_w.outdim = 3
@@ -109,3 +115,38 @@ class GEOSIOTest(unittest.TestCase):
         wkb_w.srid = True
         self.assertEqual(hex3d_srid, wkb_w.write_hex(g))
         self.assertEqual(wkb3d_srid, wkb_w.write(g))
+
+    def test_wkt_writer_trim(self):
+        wkt_w = WKTWriter()
+        self.assertFalse(wkt_w.trim)
+        self.assertEqual(wkt_w.write(Point(1, 1)), b'POINT (1.0000000000000000 1.0000000000000000)')
+
+        wkt_w.trim = True
+        self.assertTrue(wkt_w.trim)
+        self.assertEqual(wkt_w.write(Point(1, 1)), b'POINT (1 1)')
+        self.assertEqual(wkt_w.write(Point(1.1, 1)), b'POINT (1.1 1)')
+        self.assertEqual(wkt_w.write(Point(1. / 3, 1)), b'POINT (0.3333333333333333 1)')
+
+        wkt_w.trim = False
+        self.assertFalse(wkt_w.trim)
+        self.assertEqual(wkt_w.write(Point(1, 1)), b'POINT (1.0000000000000000 1.0000000000000000)')
+
+    def test_wkt_writer_precision(self):
+        wkt_w = WKTWriter()
+        self.assertEqual(wkt_w.precision, None)
+        self.assertEqual(wkt_w.write(Point(1. / 3, 2. / 3)), b'POINT (0.3333333333333333 0.6666666666666666)')
+
+        wkt_w.precision = 1
+        self.assertEqual(wkt_w.precision, 1)
+        self.assertEqual(wkt_w.write(Point(1. / 3, 2. / 3)), b'POINT (0.3 0.7)')
+
+        wkt_w.precision = 0
+        self.assertEqual(wkt_w.precision, 0)
+        self.assertEqual(wkt_w.write(Point(1. / 3, 2. / 3)), b'POINT (0 1)')
+
+        wkt_w.precision = None
+        self.assertEqual(wkt_w.precision, None)
+        self.assertEqual(wkt_w.write(Point(1. / 3, 2. / 3)), b'POINT (0.3333333333333333 0.6666666666666666)')
+
+        with self.assertRaisesMessage(AttributeError, 'WKT output rounding precision must be '):
+            wkt_w.precision = 'potato'

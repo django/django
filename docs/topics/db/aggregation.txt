@@ -88,8 +88,8 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     >>> pubs[0].num_books
     1323
 
-Generating aggregates over a QuerySet
-=====================================
+Generating aggregates over a ``QuerySet``
+=========================================
 
 Django provides two ways to generate aggregates. The first way is to generate
 summary values over an entire ``QuerySet``. For example, say you wanted to
@@ -134,8 +134,8 @@ the maximum and minimum price of all books, we would issue the query::
     >>> Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))
     {'price__avg': 34.35, 'price__max': Decimal('81.20'), 'price__min': Decimal('12.99')}
 
-Generating aggregates for each item in a QuerySet
-=================================================
+Generating aggregates for each item in a ``QuerySet``
+=====================================================
 
 The second way to generate summary values is to generate an independent
 summary for each object in a ``QuerySet``. For example, if you are retrieving
@@ -190,9 +190,8 @@ Combining multiple aggregations
 -------------------------------
 
 Combining multiple aggregations with ``annotate()`` will `yield the wrong
-results <https://code.djangoproject.com/ticket/10060>`_, as multiple tables are
-cross joined. Due to the use of ``LEFT OUTER JOIN``, duplicate records will be
-generated if some of the joined tables contain more records than the others:
+results <https://code.djangoproject.com/ticket/10060>`_ because joins are used
+instead of subqueries:
 
     >>> Book.objects.first().authors.count()
     2
@@ -298,8 +297,8 @@ file::
 (The resulting dictionary will have a key called ``'average__rating'``. If no
 such alias were specified, it would be the rather long ``'book__rating__avg'``.)
 
-Aggregations and other QuerySet clauses
-=======================================
+Aggregations and other ``QuerySet`` clauses
+===========================================
 
 ``filter()`` and ``exclude()``
 ------------------------------
@@ -374,8 +373,8 @@ Both queries return a list of publishers that have at least one book with a
 rating exceeding 3.0, hence publisher C is excluded.
 
 In the first query, the annotation precedes the filter, so the filter has no
-effect on the annotation. ``distinct=True`` is required to avoid a
-:ref:`cross-join bug <combining-multiple-aggregations>`.
+effect on the annotation. ``distinct=True`` is required to avoid a :ref:`query
+bug <combining-multiple-aggregations>`.
 
 The second query counts the number of books that have a rating exceeding 3.0
 for each publisher. The filter precedes the annotation, so the filter

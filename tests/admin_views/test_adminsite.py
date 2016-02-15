@@ -1,13 +1,11 @@
 from __future__ import unicode_literals
 
-import datetime
-
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
+from django.urls import reverse
 
 from .models import Article
 
@@ -20,10 +18,7 @@ urlpatterns = [
 ]
 
 
-@override_settings(
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF="admin_views.test_adminsite",
-)
+@override_settings(ROOT_URLCONF='admin_views.test_adminsite')
 class SiteEachContextTest(TestCase):
     """
     Check each_context contains the documented variables and that available_apps context
@@ -31,12 +26,7 @@ class SiteEachContextTest(TestCase):
     """
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
-            first_name='Super', last_name='User', email='super@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10),
-        )
+        cls.u1 = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
 
     def setUp(self):
         factory = RequestFactory()

@@ -275,7 +275,8 @@ class Deserializer(base.Deserializer):
                     obj_pk = model._meta.pk.to_python(n.getAttribute('pk'))
                 return obj_pk
         else:
-            m2m_convert = lambda n: model._meta.pk.to_python(n.getAttribute('pk'))
+            def m2m_convert(n):
+                return model._meta.pk.to_python(n.getAttribute('pk'))
         return [m2m_convert(c) for c in node.getElementsByTagName("object")]
 
     def _get_model_from_node(self, node, attr):

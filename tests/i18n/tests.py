@@ -1117,6 +1117,10 @@ class FormattingTests(SimpleTestCase):
                     form6.as_ul()
                 )
 
+    def test_localized_input_func(self):
+        with self.settings(USE_THOUSAND_SEPARATOR=True):
+            self.assertEqual(localize_input(True), 'True')
+
     def test_sanitize_separators(self):
         """
         Tests django.utils.formats.sanitize_separators.
@@ -1384,7 +1388,7 @@ class MiscTests(SimpleTestCase):
     )
     def test_support_for_deprecated_chinese_language_codes(self):
         """
-        Some browsers (Firefox, IE etc) use deprecated language codes. As these
+        Some browsers (Firefox, IE, etc.) use deprecated language codes. As these
         language codes will be removed in Django 1.9, these will be incorrectly
         matched. For example zh-tw (traditional) will be interpreted as zh-hans
         (simplified), which is wrong. So we should also accept these deprecated
@@ -1581,6 +1585,10 @@ class TestLanguageInfo(SimpleTestCase):
 
     def test_unknown_language_code(self):
         six.assertRaisesRegex(self, KeyError, r"Unknown language code xx\.", get_language_info, 'xx')
+        with translation.override('xx'):
+            # A language with no translation catalogs should fallback to the
+            # untranslated string.
+            self.assertEqual(ugettext("Title"), "Title")
 
     def test_unknown_only_country_code(self):
         li = get_language_info('de-xx')
@@ -1848,4 +1856,24 @@ class TranslationFilesMissing(SimpleTestCase):
         '''
         self.patchGettextFind()
         trans_real._translations = {}
-        self.assertRaises(IOError, activate, 'en')
+        with self.assertRaises(IOError):
+            activate('en')
+
+
+class NonDjangoLanguageTests(SimpleTestCase):
+    """
+    A language non present in default Django languages can still be
+    installed/used by a Django project.
+    """
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGES=[
+            ('en-us', 'English'),
+            ('xxx', 'Somelanguage'),
+        ],
+        LANGUAGE_CODE='xxx',
+        LOCALE_PATHS=[os.path.join(here, 'commands', 'locale')],
+    )
+    def test_non_django_language(self):
+        self.assertEqual(get_language(), 'xxx')
+        self.assertEqual(ugettext("year"), "reay")

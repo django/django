@@ -141,9 +141,6 @@ class Migration(migrations.Migration):
                 ('when', models.DateTimeField(null=True, default=None)),
             ]
         ),
-    ]
-
-    pg_92_operations = [
         migrations.CreateModel(
             name='RangesModel',
             fields=[
@@ -199,8 +196,6 @@ class Migration(migrations.Migration):
         except AttributeError:
             pass  # We are probably not on PostgreSQL
         else:
-            if PG_VERSION >= 90200:
-                self.operations = self.operations + self.pg_92_operations
             if PG_VERSION >= 90400:
                 self.operations = self.operations + self.pg_94_operations
         return super(Migration, self).apply(project_state, schema_editor, collect_sql)

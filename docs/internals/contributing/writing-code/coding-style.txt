@@ -5,7 +5,7 @@ Coding style
 Please follow these coding standards when writing code for inclusion in Django.
 
 Python style
-------------
+============
 
 * Please conform to the indentation style dictated in the ``.editorconfig``
   file. We recommend using a text editor with `EditorConfig`_ support to avoid
@@ -45,8 +45,14 @@ Python style
           """
           ...
 
+* In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` instead
+  of :meth:`~unittest.TestCase.assertRaises` so you can check the exception
+  message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
+  (``six.assertRaisesRegex()`` as long as we support Python 2) only if you need
+  to use regular expression matching.
+
 Imports
--------
+=======
 
 * Use `isort <https://github.com/timothycrosley/isort#readme>`_ to automate
   import sorting using the guidelines below.
@@ -119,14 +125,14 @@ Imports
 
 * Use convenience imports whenever available. For example, do this::
 
-      from django.views.generic import View
+      from django.views import View
 
   instead of::
 
       from django.views.generic.base import View
 
 Template style
---------------
+==============
 
 * In Django template code, put one (and only one) space between the curly
   brackets and the tag contents.
@@ -144,7 +150,7 @@ Template style
       {{foo}}
 
 View style
-----------
+==========
 
 * In Django views, the first parameter in a view function should be called
   ``request``.
@@ -160,7 +166,7 @@ View style
           # ...
 
 Model style
------------
+===========
 
 * Field names should be all lowercase, using underscores instead of
   camelCase.
@@ -234,7 +240,7 @@ Model style
         )
 
 Use of ``django.conf.settings``
--------------------------------
+===============================
 
 Modules should not in general use settings stored in ``django.conf.settings``
 at the top level (i.e. evaluated when the module is imported). The explanation
@@ -256,7 +262,7 @@ already been configured).
 So, if there is a module containing some code as follows::
 
     from django.conf import settings
-    from django.core.urlresolvers import get_callable
+    from django.urls import get_callable
 
     default_foo_view = get_callable(settings.FOO_VIEW)
 
@@ -270,7 +276,7 @@ such as ``django.utils.functional.LazyObject``,
 ``django.utils.functional.lazy()`` or ``lambda``.
 
 Miscellaneous
--------------
+=============
 
 * Mark all strings for internationalization; see the :doc:`i18n
   documentation </topics/i18n/index>` for details.
@@ -293,7 +299,7 @@ Miscellaneous
   single trivial change.
 
 JavaScript style
-----------------
+================
 
 For details about the JavaScript code style used by Django, see
 :doc:`javascript`.

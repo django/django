@@ -1,15 +1,13 @@
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.geometry import (
-    GEOSGeometry, ProjectInterpolateMixin,
-)
+from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.shortcuts import numpy
 from django.utils.six.moves import range
 
 
-class LineString(ProjectInterpolateMixin, GEOSGeometry):
+class LineString(LinearGeometryMixin, GEOSGeometry):
     _init_func = capi.create_linestring
     _minlength = 2
     has_cs = True
@@ -35,7 +33,14 @@ class LineString(ProjectInterpolateMixin, GEOSGeometry):
         if not (isinstance(coords, (tuple, list)) or numpy and isinstance(coords, numpy.ndarray)):
             raise TypeError('Invalid initialization input for LineStrings.')
 
+        # If SRID was passed in with the keyword arguments
+        srid = kwargs.get('srid')
+
         ncoords = len(coords)
+        if not ncoords:
+            super(LineString, self).__init__(self._init_func(None), srid=srid)
+            return
+
         if ncoords < self._minlength:
             raise ValueError(
                 '%s requires at least %d points, got %s.' % (
@@ -79,9 +84,6 @@ class LineString(ProjectInterpolateMixin, GEOSGeometry):
                 cs[i] = coords[i].tuple
             else:
                 cs[i] = coords[i]
-
-        # If SRID was passed in with the keyword arguments
-        srid = kwargs.get('srid')
 
         # Calling the base geometry initialization with the returned pointer
         #  from the function.
@@ -149,11 +151,6 @@ class LineString(ProjectInterpolateMixin, GEOSGeometry):
     def array(self):
         "Returns a numpy array for the LineString."
         return self._listarr(self._cs.__getitem__)
-
-    @property
-    def merged(self):
-        "Returns the line merge of this LineString."
-        return self._topology(capi.geos_linemerge(self.ptr))
 
     @property
     def x(self):

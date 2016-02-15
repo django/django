@@ -9,7 +9,7 @@ from django.contrib.admin.models import LogEntry
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import models
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import extend_sys_path
+from django.test.utils import extend_sys_path, isolate_apps
 from django.utils import six
 from django.utils._os import upath
 
@@ -159,12 +159,12 @@ class AppsTests(SimpleTestCase):
         self.assertEqual(apps.get_app_config('relabeled').name, 'apps')
 
     def test_duplicate_labels(self):
-        with six.assertRaisesRegex(self, ImproperlyConfigured, "Application labels aren't unique"):
+        with self.assertRaisesMessage(ImproperlyConfigured, "Application labels aren't unique"):
             with self.settings(INSTALLED_APPS=['apps.apps.PlainAppsConfig', 'apps']):
                 pass
 
     def test_duplicate_names(self):
-        with six.assertRaisesRegex(self, ImproperlyConfigured, "Application names aren't unique"):
+        with self.assertRaisesMessage(ImproperlyConfigured, "Application names aren't unique"):
             with self.settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig', 'apps']):
                 pass
 
@@ -172,7 +172,7 @@ class AppsTests(SimpleTestCase):
         """
         App discovery should preserve stack traces. Regression test for #22920.
         """
-        with six.assertRaisesRegex(self, ImportError, "Oops"):
+        with self.assertRaisesMessage(ImportError, "Oops"):
             with self.settings(INSTALLED_APPS=['import_error_package']):
                 pass
 
@@ -260,7 +260,8 @@ class AppsTests(SimpleTestCase):
         finally:
             apps.apps_ready = True
 
-    def test_lazy_model_operation(self):
+    @isolate_apps('apps', kwarg_name='apps')
+    def test_lazy_model_operation(self, apps):
         """
         Tests apps.lazy_model_operation().
         """
@@ -396,7 +397,7 @@ class NamespacePackageAppTests(SimpleTestCase):
         A Py3.3+ namespace package with multiple locations cannot be an app.
 
         (Because then we wouldn't know where to load its templates, static
-        assets, etc from.)
+        assets, etc. from.)
         """
         # Temporarily add two directories to sys.path that both contain
         # components of the "nsapp" package.

@@ -55,16 +55,21 @@ class TestUtilsHttp(unittest.TestCase):
             self.assertEqual(sys.maxint, http.base36_to_int(http.int_to_base36(sys.maxint)))
 
         # bad input
-        self.assertRaises(ValueError, http.int_to_base36, -1)
+        with self.assertRaises(ValueError):
+            http.int_to_base36(-1)
         if six.PY2:
-            self.assertRaises(ValueError, http.int_to_base36, sys.maxint + 1)
+            with self.assertRaises(ValueError):
+                http.int_to_base36(sys.maxint + 1)
         for n in ['1', 'foo', {1: 2}, (1, 2, 3), 3.141]:
-            self.assertRaises(TypeError, http.int_to_base36, n)
+            with self.assertRaises(TypeError):
+                http.int_to_base36(n)
 
         for n in ['#', ' ']:
-            self.assertRaises(ValueError, http.base36_to_int, n)
+            with self.assertRaises(ValueError):
+                http.base36_to_int(n)
         for n in [123, {1: 2}, (1, 2, 3), 3.141]:
-            self.assertRaises(TypeError, http.base36_to_int, n)
+            with self.assertRaises(TypeError):
+                http.base36_to_int(n)
 
         # more explicit output testing
         for n, b36 in [(0, '0'), (1, '1'), (42, '16'), (818469960, 'django')]:
@@ -158,8 +163,10 @@ class ETagProcessingTests(unittest.TestCase):
         self.assertEqual(etags, ['', 'etag', 'e"t"ag', r'e\tag', 'weak'])
 
     def test_quoting(self):
-        quoted_etag = http.quote_etag(r'e\t"ag')
+        original_etag = r'e\t"ag'
+        quoted_etag = http.quote_etag(original_etag)
         self.assertEqual(quoted_etag, r'"e\\t\"ag"')
+        self.assertEqual(http.unquote_etag(quoted_etag), original_etag)
 
 
 class HttpDateProcessingTests(unittest.TestCase):

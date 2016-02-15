@@ -363,14 +363,10 @@ class SQLCompiler(object):
         If 'with_limits' is False, any limit/offset information is not included
         in the query.
         """
-        if with_limits and self.query.low_mark == self.query.high_mark:
-            return '', ()
         self.subquery = subquery
         refcounts_before = self.query.alias_refcount.copy()
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()
-            if with_limits and self.query.low_mark == self.query.high_mark:
-                return '', ()
             distinct_fields = self.get_distinct()
 
             # This must come after 'select', 'ordering', and 'distinct' -- see
@@ -559,7 +555,7 @@ class SQLCompiler(object):
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model unless the attribute name
         # of the field is specified.
-        if field.is_relation and path and opts.ordering and name != field.attname:
+        if field.is_relation and opts.ordering and getattr(field, 'attname', None) != name:
             # Firstly, avoid infinite loops.
             if not already_seen:
                 already_seen = set()

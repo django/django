@@ -111,7 +111,8 @@ Each field in your model should be an instance of the appropriate
 :class:`~django.db.models.Field` class. Django uses the field class types to
 determine a few things:
 
-* The database column type (e.g. ``INTEGER``, ``VARCHAR``).
+* The column type, which tells the database what kind of data to store (e.g.
+  ``INTEGER``, ``VARCHAR``, ``TEXT``).
 
 * The default HTML :doc:`widget </ref/forms/widgets>` to use when rendering a form
   field (e.g. ``<input type="text">``, ``<select>``).
@@ -387,8 +388,7 @@ For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
 As with :class:`~django.db.models.ForeignKey`, you can also create
 :ref:`recursive relationships <recursive-relationships>` (an object with a
 many-to-many relationship to itself) and :ref:`relationships to models not yet
-defined <lazy-relationships>`; see :ref:`the model field reference
-<ref-manytomany>` for details.
+defined <lazy-relationships>`.
 
 It's suggested, but not required, that the name of a
 :class:`~django.db.models.ManyToManyField` (``toppings`` in the example above)
@@ -610,20 +610,17 @@ restaurant "is a" place; in fact, to handle this you'd typically use
 :ref:`inheritance <model-inheritance>`, which involves an implicit
 one-to-one relation).
 
-As with :class:`~django.db.models.ForeignKey`, a
-:ref:`recursive relationship <recursive-relationships>`
-can be defined and
-:ref:`references to as-yet undefined models <lazy-relationships>`
-can be made; see :ref:`the model field reference <ref-onetoone>` for details.
+As with :class:`~django.db.models.ForeignKey`, a :ref:`recursive relationship
+<recursive-relationships>` can be defined and :ref:`references to as-yet
+undefined models <lazy-relationships>` can be made.
 
 .. seealso::
 
     See the :doc:`One-to-one relationship model example
     </topics/db/examples/one_to_one>` for a full example.
 
-:class:`~django.db.models.OneToOneField` fields also accept one specific,
-optional ``parent_link`` argument described in the :ref:`model field
-reference <ref-onetoone>`.
+:class:`~django.db.models.OneToOneField` fields also accept an optional
+:attr:`~django.db.models.OneToOneField.parent_link` argument.
 
 :class:`~django.db.models.OneToOneField` classes used to automatically become
 the primary key on a model. This is no longer true (although you can manually
@@ -686,8 +683,8 @@ provided in :doc:`/howto/custom-model-fields`.
 
 .. _meta-options:
 
-Meta options
-============
+``Meta`` options
+================
 
 Give your model metadata by using an inner ``class Meta``, like so::
 
@@ -928,7 +925,7 @@ model, since it is an abstract base class. It does not generate a database
 table or have a manager, and cannot be instantiated or saved directly.
 
 For many uses, this type of model inheritance will be exactly what you want.
-It provides a way to factor out common information at the Python level, whilst
+It provides a way to factor out common information at the Python level, while
 still only creating one database table per child model at the database level.
 
 ``Meta`` inheritance
@@ -967,18 +964,23 @@ the same database table, which is almost certainly not what you want.
 
 .. _abstract-related-name:
 
-Be careful with ``related_name``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Be careful with ``related_name`` and ``related_query_name``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are using the :attr:`~django.db.models.ForeignKey.related_name` attribute on a ``ForeignKey`` or
-``ManyToManyField``, you must always specify a *unique* reverse name for the
-field. This would normally cause a problem in abstract base classes, since the
-fields on this class are included into each of the child classes, with exactly
-the same values for the attributes (including :attr:`~django.db.models.ForeignKey.related_name`) each time.
+If you are using :attr:`~django.db.models.ForeignKey.related_name` or
+:attr:`~django.db.models.ForeignKey.related_query_name` on a ``ForeignKey`` or
+``ManyToManyField``, you must always specify a *unique* reverse name and query
+name for the field. This would normally cause a problem in abstract base
+classes, since the fields on this class are included into each of the child
+classes, with exactly the same values for the attributes (including
+:attr:`~django.db.models.ForeignKey.related_name` and
+:attr:`~django.db.models.ForeignKey.related_query_name`) each time.
 
-To work around this problem, when you are using :attr:`~django.db.models.ForeignKey.related_name` in an
-abstract base class (only), part of the name should contain
-``'%(app_label)s'`` and ``'%(class)s'``.
+To work around this problem, when you are using
+:attr:`~django.db.models.ForeignKey.related_name` or
+:attr:`~django.db.models.ForeignKey.related_query_name` in an abstract base
+class (only), part of the value should contain ``'%(app_label)s'`` and
+``'%(class)s'``.
 
 - ``'%(class)s'`` is replaced by the lower-cased name of the child class
   that the field is used in.
@@ -992,7 +994,11 @@ For example, given an app ``common/models.py``::
     from django.db import models
 
     class Base(models.Model):
-        m2m = models.ManyToManyField(OtherModel, related_name="%(app_label)s_%(class)s_related")
+        m2m = models.ManyToManyField(
+            OtherModel,
+            related_name="%(app_label)s_%(class)s_related",
+            related_query_name="%(app_label)s_%(class)ss",
+        )
 
         class Meta:
             abstract = True
@@ -1011,12 +1017,15 @@ Along with another app ``rare/models.py``::
         pass
 
 The reverse name of the ``common.ChildA.m2m`` field will be
-``common_childa_related``, whilst the reverse name of the
-``common.ChildB.m2m`` field will be ``common_childb_related``, and finally the
-reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
-It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion
-to construct your related name, but if you forget to use it, Django will raise
-errors when you perform system checks (or run :djadmin:`migrate`).
+``common_childa_related`` and the reverse query name will be ``common_childas``.
+The reverse name of the ``common.ChildB.m2m`` field will be
+``common_childb_related`` and the reverse query name will be
+``common_childbs``. Finally, the reverse name of the ``rare.ChildB.m2m`` field
+will be ``rare_childb_related`` and the reverse query name will be
+``rare_childbs``. It's up to you how you use the `'%(class)s'`` and
+``'%(app_label)s`` portion to construct your related name or related query name
+but if you forget to use it, Django will raise errors when you perform system
+checks (or run :djadmin:`migrate`).
 
 If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
 attribute for a field in an abstract base class, the default reverse name will
@@ -1026,6 +1035,11 @@ in the above code, if the :attr:`~django.db.models.ForeignKey.related_name`
 attribute was omitted, the reverse name for the ``m2m`` field would be
 ``childa_set`` in the ``ChildA`` case and ``childb_set`` for the ``ChildB``
 field.
+
+.. versionchanged:: 1.10
+
+   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` for
+   ``related_query_name`` was added.
 
 .. _multi-table-inheritance:
 
@@ -1198,8 +1212,8 @@ order by the ``last_name`` attribute when you use the proxy. This is easy::
 Now normal ``Person`` queries will be unordered
 and ``OrderedPerson`` queries will be ordered by ``last_name``.
 
-QuerySets still return the model that was requested
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``QuerySet``\s still return the model that was requested
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There is no way to have Django return, say, a ``MyPerson`` object whenever you
 query for ``Person`` objects. A queryset for ``Person`` objects will return

@@ -29,9 +29,11 @@ which are particularly dangerous to HTML. While this protects users from most
 malicious input, it is not entirely foolproof. For example, it will not
 protect the following:
 
-.. code-block:: html+django
+.. code-block:: text
 
     <style class={{ var }}>...</style>
+
+.. highlighting as html+django fails due to intentionally missing quotes.
 
 If ``var`` is set to ``'class1 onmouseover=javascript:func()'``, this can result
 in unauthorized JavaScript execution, depending on how the browser renders
@@ -120,11 +122,11 @@ for a small section of the site.
 SSL/HTTPS
 =========
 
-It is always better for security, though not always practical in all cases, to
-deploy your site behind HTTPS. Without this, it is possible for malicious
-network users to sniff authentication credentials or any other information
-transferred between client and server, and in some cases -- **active** network
-attackers -- to alter data that is sent in either direction.
+It is always better for security to deploy your site behind HTTPS. Without
+this, it is possible for malicious network users to sniff authentication
+credentials or any other information transferred between client and server, and
+in some cases -- **active** network attackers -- to alter data that is sent in
+either direction.
 
 If you want the protection that HTTPS provides, and have enabled it on your
 server, there are some additional steps you may need:

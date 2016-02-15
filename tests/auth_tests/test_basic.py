@@ -3,12 +3,13 @@ from __future__ import unicode_literals
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, User
-from django.contrib.auth.tests.custom_user import CustomUser
 from django.core.exceptions import ImproperlyConfigured
 from django.dispatch import receiver
 from django.test import TestCase, override_settings
 from django.test.signals import setting_changed
 from django.utils import translation
+
+from .models import CustomUser
 
 
 @receiver(setting_changed)
@@ -87,7 +88,7 @@ class BasicTestCase(TestCase):
         "The current user model can be retrieved"
         self.assertEqual(get_user_model(), User)
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_swappable_user(self):
         "The current user model can be swapped out for another"
         self.assertEqual(get_user_model(), CustomUser)

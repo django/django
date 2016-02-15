@@ -4,21 +4,22 @@ Regression tests for the Test Client, especially the customized assertions.
 """
 from __future__ import unicode_literals
 
-import datetime
 import itertools
 import os
 
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.core.urlresolvers import NoReverseMatch, reverse
 from django.http import HttpResponse
-from django.template import Context, TemplateSyntaxError, engines
+from django.template import (
+    Context, RequestContext, TemplateSyntaxError, engines,
+)
 from django.template.response import SimpleTemplateResponse
 from django.test import (
     Client, SimpleTestCase, TestCase, ignore_warnings, override_settings,
 )
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
+from django.urls import NoReverseMatch, reverse
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
@@ -31,24 +32,8 @@ class TestDataMixin(object):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
-            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u2 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
-            first_name='Inactive', last_name='User', email='testclient@example.com', is_staff=False, is_active=False,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u3 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
-            first_name='Staff', last_name='Member', email='testclient@example.com', is_staff=True, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
+        cls.u1 = User.objects.create_user(username='testclient', password='password')
+        cls.staff = User.objects.create_user(username='staff', password='password', is_staff=True)
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
@@ -215,8 +200,7 @@ class AssertContainsTests(SimpleTestCase):
         self.assertNotContains(response, 'Bye')
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='test_client_regress.urls',)
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class AssertTemplateUsedTests(TestDataMixin, TestCase):
 
     def test_no_context(self):
@@ -879,8 +863,7 @@ class AssertFormsetErrorTests(SimpleTestCase):
                                     **kwargs)
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='test_client_regress.urls',)
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class LoginTests(TestDataMixin, TestCase):
 
     def test_login_different_client(self):
@@ -901,7 +884,6 @@ class LoginTests(TestDataMixin, TestCase):
 
 
 @override_settings(
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     SESSION_ENGINE='test_client_regress.session',
     ROOT_URLCONF='test_client_regress.urls',
 )
@@ -946,8 +928,7 @@ class URLEscapingTests(SimpleTestCase):
         self.assertEqual(response.content, b'Hi, Arthur')
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='test_client_regress.urls',)
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class ExceptionTests(TestDataMixin, TestCase):
 
     def test_exception_cleared(self):
@@ -1014,14 +995,13 @@ class zzUrlconfSubstitutionTests(SimpleTestCase):
             reverse('arg_view', args=['somename'])
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='test_client_regress.urls',)
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class ContextTests(TestDataMixin, TestCase):
 
     def test_single_context(self):
         "Context variables can be retrieved from a single context"
         response = self.client.get("/request_data/", data={'foo': 'whiz'})
-        self.assertEqual(response.context.__class__, Context)
+        self.assertIsInstance(response.context, RequestContext)
         self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'sausage')
@@ -1083,12 +1063,11 @@ class ContextTests(TestDataMixin, TestCase):
         response.context is not lost when view call another view.
         """
         response = self.client.get("/nested_view/")
-        self.assertEqual(response.context.__class__, Context)
+        self.assertIsInstance(response.context, RequestContext)
         self.assertEqual(response.context['nested'], 'yes')
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='test_client_regress.urls',)
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class SessionTests(TestDataMixin, TestCase):
 
     def test_session(self):

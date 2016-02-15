@@ -365,8 +365,10 @@ class Command(BaseCommand):
             Check if the given path should be ignored or not.
             """
             filename = os.path.basename(path)
-            ignore = lambda pattern: (fnmatch.fnmatchcase(filename, pattern) or
-                fnmatch.fnmatchcase(path, pattern))
+
+            def ignore(pattern):
+                return fnmatch.fnmatchcase(filename, pattern) or fnmatch.fnmatchcase(path, pattern)
+
             return any(ignore(pattern) for pattern in ignore_patterns)
 
         ignore_patterns = [os.path.normcase(p) for p in self.ignore_patterns]

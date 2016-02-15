@@ -12,7 +12,7 @@ from email.utils import formatdate
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, force_str, force_text
-from django.utils.functional import allow_lazy
+from django.utils.functional import keep_lazy_text
 from django.utils.six.moves.urllib.parse import (
     quote, quote_plus, unquote, unquote_plus, urlencode as original_urlencode,
     urlparse,
@@ -40,6 +40,7 @@ PROTOCOL_TO_PORT = {
 }
 
 
+@keep_lazy_text
 def urlquote(url, safe='/'):
     """
     A version of Python's urllib.quote() function that can operate on unicode
@@ -48,9 +49,9 @@ def urlquote(url, safe='/'):
     without double-quoting occurring.
     """
     return force_text(quote(force_str(url), force_str(safe)))
-urlquote = allow_lazy(urlquote, six.text_type)
 
 
+@keep_lazy_text
 def urlquote_plus(url, safe=''):
     """
     A version of Python's urllib.quote_plus() function that can operate on
@@ -59,25 +60,24 @@ def urlquote_plus(url, safe=''):
     iri_to_uri() call without double-quoting occurring.
     """
     return force_text(quote_plus(force_str(url), force_str(safe)))
-urlquote_plus = allow_lazy(urlquote_plus, six.text_type)
 
 
+@keep_lazy_text
 def urlunquote(quoted_url):
     """
     A wrapper for Python's urllib.unquote() function that can operate on
     the result of django.utils.http.urlquote().
     """
     return force_text(unquote(force_str(quoted_url)))
-urlunquote = allow_lazy(urlunquote, six.text_type)
 
 
+@keep_lazy_text
 def urlunquote_plus(quoted_url):
     """
     A wrapper for Python's urllib.unquote_plus() function that can operate on
     the result of django.utils.http.urlquote_plus().
     """
     return force_text(unquote_plus(force_str(quoted_url)))
-urlunquote_plus = allow_lazy(urlunquote_plus, six.text_type)
 
 
 def urlencode(query, doseq=0):
@@ -251,6 +251,13 @@ def quote_etag(etag):
     Wraps a string in double quotes escaping contents as necessary.
     """
     return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
+
+
+def unquote_etag(etag):
+    """
+    Unquote an ETag string; i.e. revert quote_etag().
+    """
+    return etag.strip('"').replace('\\"', '"').replace('\\\\', '\\') if etag else etag
 
 
 def is_same_domain(host, pattern):

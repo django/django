@@ -13,16 +13,17 @@ from unittest import skipIf
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
 from django.db import DatabaseError, connection
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin
+from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import SimpleLazyObject
 from django.views.debug import (
-    CallableSettingWrapper, ExceptionReporter, technical_500_response,
+    CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
+    cleanse_setting, technical_500_response,
 )
 
 from .. import BrokenException, except_args
@@ -56,7 +57,7 @@ class CallableSettingWrapperTests(SimpleTestCase):
         self.assertEqual(actual, "repr from the wrapped callable")
 
 
-@override_settings(DEBUG=True, ROOT_URLCONF="view_tests.urls")
+@override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
 class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
 
     def test_files(self):
@@ -124,8 +125,8 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
 
     def test_view_exceptions(self):
         for n in range(len(except_args)):
-            self.assertRaises(BrokenException, self.client.get,
-                reverse('view_exception', args=(n,)))
+            with self.assertRaises(BrokenException):
+                self.client.get(reverse('view_exception', args=(n,)))
 
     def test_non_l10ned_numeric_ids(self):
         """
@@ -169,7 +170,8 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         """
         Make sure if you don't specify a template, the debug view doesn't blow up.
         """
-        self.assertRaises(TemplateDoesNotExist, self.client.get, '/render_no_template/')
+        with self.assertRaises(TemplateDoesNotExist):
+            self.client.get('/render_no_template/')
 
     @override_settings(ROOT_URLCONF='view_tests.default_urls')
     def test_default_urlconf_template(self):
@@ -224,7 +226,7 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
 
 @override_settings(
     DEBUG=True,
-    ROOT_URLCONF="view_tests.urls",
+    ROOT_URLCONF='view_tests.urls',
     # No template directories are configured, so no templates will be found.
     TEMPLATES=[{
         'BACKEND': 'django.template.backends.dummy.TemplateStrings',
@@ -943,3 +945,18 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
         with self.settings(DEBUG=False):
             self.verify_unsafe_response(custom_exception_reporter_filter_view,
                 check_for_vars=False)
+
+
+class HelperFunctionTests(SimpleTestCase):
+
+    def test_cleanse_setting_basic(self):
+        self.assertEqual(cleanse_setting('TEST', 'TEST'), 'TEST')
+        self.assertEqual(cleanse_setting('PASSWORD', 'super_secret'), CLEANSED_SUBSTITUTE)
+
+    def test_cleanse_setting_ignore_case(self):
+        self.assertEqual(cleanse_setting('password', 'super_secret'), CLEANSED_SUBSTITUTE)
+
+    def test_cleanse_setting_recurses_in_dictionary(self):
+        initial = {'login': 'cooper', 'password': 'secret'}
+        expected = {'login': 'cooper', 'password': CLEANSED_SUBSTITUTE}
+        self.assertEqual(cleanse_setting('SETTING_NAME', initial), expected)

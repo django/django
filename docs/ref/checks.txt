@@ -17,7 +17,7 @@ API Reference
 ``CheckMessage``
 -----------------
 
-.. class:: CheckMessage(level, msg, hint, obj=None, id=None)
+.. class:: CheckMessage(level, msg, hint=None, obj=None, id=None)
 
 The warnings and errors raised by system checks must be instances of
 ``CheckMessage``. An instance encapsulates a single reportable error or
@@ -60,14 +60,16 @@ There are subclasses to make creating messages with common levels easier. When
 using them you can omit the ``level`` argument because it is implied by the
 class name.
 
-.. class:: Debug(msg, hint, obj=None, id=None)
-.. class:: Info(msg, hint, obj=None, id=None)
-.. class:: Warning(msg, hint, obj=None, id=None)
-.. class:: Error(msg, hint, obj=None, id=None)
-.. class:: Critical(msg, hint, obj=None, id=None)
+.. class:: Debug(msg, hint=None, obj=None, id=None)
+.. class:: Info(msg, hint=None, obj=None, id=None)
+.. class:: Warning(msg, hint=None obj=None, id=None)
+.. class:: Error(msg, hint=None, obj=None, id=None)
+.. class:: Critical(msg, hint=None, obj=None, id=None)
 
 Builtin checks
 ==============
+
+.. _system-check-builtin-tags:
 
 Builtin tags
 ------------
@@ -163,6 +165,8 @@ Fields
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
   (except in historical migrations) will be removed in Django 1.9. *This check
   appeared in Django 1.7 and 1.8*.
+* **fields.W901**: ``CommaSeparatedIntegerField`` has been deprecated. Support
+  for it (except in historical migrations) will be removed in Django 2.0.
 
 File Fields
 ~~~~~~~~~~~
@@ -319,8 +323,8 @@ with the admin site:
 * **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
   attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
 
-ModelAdmin
-~~~~~~~~~~
+``ModelAdmin``
+~~~~~~~~~~~~~~
 
 The following checks are performed on any
 :class:`~django.contrib.admin.ModelAdmin` that is registered
@@ -375,8 +379,8 @@ with the admin site:
 * **admin.E128**: The value of ``date_hierarchy`` must be a ``DateField`` or
   ``DateTimeField``.
 
-InlineModelAdmin
-~~~~~~~~~~~~~~~~
+``InlineModelAdmin``
+~~~~~~~~~~~~~~~~~~~~
 
 The following checks are performed on any
 :class:`~django.contrib.admin.InlineModelAdmin` that is registered as an
@@ -392,8 +396,8 @@ inline on a :class:`~django.contrib.admin.ModelAdmin`.
 * **admin.E206**: The value of ``formset`` must inherit from
   ``BaseModelFormSet``.
 
-GenericInlineModelAdmin
-~~~~~~~~~~~~~~~~~~~~~~~
+``GenericInlineModelAdmin``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following checks are performed on any
 :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin` that is
@@ -407,6 +411,16 @@ registered as an inline on a :class:`~django.contrib.admin.ModelAdmin`.
 * **admin.E304**: ``<model>`` has no ``GenericForeignKey`` using content type
   field ``<field name>`` and object ID field ``<field name>``.
 
+``AdminSite``
+~~~~~~~~~~~~~
+
+The following checks are performed on the default
+:class:`~django.contrib.admin.AdminSite`:
+
+* **admin.E401**: :mod:`django.contrib.contenttypes` must be in
+  :setting:`INSTALLED_APPS` in order to use the admin application.
+* **admin.E402**: :mod:`django.contrib.auth.context_processors.auth`
+  must be in :setting:`TEMPLATES` in order to use the admin application.
 
 Auth
 ----
@@ -449,8 +463,7 @@ balancer, it'd be irritating to be constantly warned about not having enabled
 :setting:`SECURE_SSL_REDIRECT`. Use :setting:`SILENCED_SYSTEM_CHECKS` to
 silence unneeded checks.
 
-The following checks will be run if you use the :djadminopt:`--deploy` option
-of the :djadmin:`check` command:
+The following checks are run if you use the :option:`check --deploy` option:
 
 * **security.W001**: You do not have
   :class:`django.middleware.security.SecurityMiddleware` in your

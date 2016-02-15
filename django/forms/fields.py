@@ -167,6 +167,8 @@ class Field(object):
         For most fields, this will simply be data; FileFields need to handle it
         a bit differently.
         """
+        if self.disabled:
+            return initial
         return data
 
     def widget_attrs(self, widget):
@@ -181,17 +183,16 @@ class Field(object):
         """
         Return True if data differs from initial.
         """
-        # For purposes of seeing whether something has changed, None is
-        # the same as an empty string, if the data or initial value we get
-        # is None, replace it w/ ''.
-        initial_value = initial if initial is not None else ''
         try:
             data = self.to_python(data)
             if hasattr(self, '_coerce'):
-                data = self._coerce(data)
-                initial_value = self._coerce(initial_value)
+                return self._coerce(data) != self._coerce(initial)
         except ValidationError:
             return True
+        # For purposes of seeing whether something has changed, None is
+        # the same as an empty string, if the data or initial value we get
+        # is None, replace it with ''.
+        initial_value = initial if initial is not None else ''
         data_value = data if data is not None else ''
         return initial_value != data_value
 
@@ -489,7 +490,7 @@ class DurationField(Field):
             return None
         if isinstance(value, datetime.timedelta):
             return value
-        value = parse_duration(value)
+        value = parse_duration(force_text(value))
         if value is None:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value

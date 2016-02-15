@@ -93,6 +93,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # schema inspection is more useful.
     data_types = {
         'AutoField': 'integer',
+        'BigAutoField': 'integer',
         'BinaryField': 'BLOB',
         'BooleanField': 'bool',
         'CharField': 'varchar(%(max_length)s)',
@@ -120,6 +121,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
     data_types_suffix = {
         'AutoField': 'AUTOINCREMENT',
+        'BigAutoField': 'AUTOINCREMENT',
     }
     # SQLite requires LIKE statements to include an ESCAPE clause if the value
     # being escaped has a percent or underscore in it.

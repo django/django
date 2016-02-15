@@ -19,18 +19,18 @@ Install Python
 Django is a Python web framework, thus requiring Python to be installed on your
 machine. At the time of writing, Python 3.5 is the latest version.
 
-To install Python on your machine go to https://python.org/downloads/. The Web
-site should offer you a download button for the latest Python version. Download
-the executable installer and run it. Check the box next to ``Add Python 3.5 to
-PATH`` and then click ``Install Now``.
+To install Python on your machine go to https://python.org/downloads/. The
+website should offer you a download button for the latest Python version.
+Download the executable installer and run it. Check the box next to ``Add
+Python 3.5 to PATH`` and then click ``Install Now``.
 
 After installation, open the command prompt and check that the Python version
 matches the version you installed by executing::
 
     python --version
 
-About pip
-=========
+About ``pip``
+=============
 
 `pip`_ is a package manage for Python. It makes installing and uninstalling
 Python packages (such as Django!) very easy. For the rest of the installation,

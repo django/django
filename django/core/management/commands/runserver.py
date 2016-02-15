@@ -8,12 +8,8 @@ import sys
 from datetime import datetime
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import get_internal_wsgi_application, run
-from django.db import DEFAULT_DB_ALIAS, connections
-from django.db.migrations.exceptions import MigrationSchemaMissing
-from django.db.migrations.executor import MigrationExecutor
 from django.utils import autoreload, six
 from django.utils.encoding import force_text, get_system_encoding
 
@@ -114,6 +110,8 @@ class Command(BaseCommand):
 
         self.stdout.write("Performing system checks...\n\n")
         self.check(display_num_errors=True)
+        # Need to check migrations here, so can't use the
+        # requires_migrations_check attribute.
         self.check_migrations()
         now = datetime.now().strftime('%B %d, %Y - %X')
         if six.PY2:
@@ -153,29 +151,6 @@ class Command(BaseCommand):
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
-
-    def check_migrations(self):
-        """
-        Checks to see if the set of migrations on disk matches the
-        migrations in the database. Prints a warning if they don't match.
-        """
-        try:
-            executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
-        except ImproperlyConfigured:
-            # No databases are configured (or the dummy one)
-            return
-        except MigrationSchemaMissing:
-            self.stdout.write(self.style.NOTICE(
-                "\nNot checking migrations as it is not possible to access/create the django_migrations table."
-            ))
-            return
-
-        plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
-        if plan:
-            self.stdout.write(self.style.NOTICE(
-                "\nYou have unapplied migrations; your app may not work properly until they are applied."
-            ))
-            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
 
 # Kept for backward compatibility
 BaseRunserverCommand = Command

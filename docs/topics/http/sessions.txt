@@ -329,8 +329,8 @@ easily available on the internet. Although the cookie session storage signs the
 cookie-stored data to prevent tampering, a :setting:`SECRET_KEY` leak
 immediately escalates to a remote code execution vulnerability.
 
-Bundled Serializers
-^^^^^^^^^^^^^^^^^^^
+Bundled serializers
+~~~~~~~~~~~~~~~~~~~
 
 .. class:: serializers.JSONSerializer
 
@@ -359,8 +359,8 @@ Bundled Serializers
 
 .. _custom-serializers:
 
-Write Your Own Serializer
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Write your own serializer
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that unlike :class:`~django.contrib.sessions.serializers.PickleSerializer`,
 the :class:`~django.contrib.sessions.serializers.JSONSerializer` cannot handle
@@ -451,6 +451,9 @@ yourself. Do this after you've verified that the test cookie worked.
 
 Here's a typical usage example::
 
+    from django.http import HttpResponse
+    from django.shortcuts import render
+
     def login(request):
         if request.method == 'POST':
             if request.session.test_cookie_worked():
@@ -459,7 +462,7 @@ Here's a typical usage example::
             else:
                 return HttpResponse("Please enable cookies and try again.")
         request.session.set_test_cookie()
-        return render_to_response('foo/login_form.html')
+        return render(request, 'foo/login_form.html')
 
 Using sessions out of views
 ===========================
@@ -631,6 +634,7 @@ behavior:
 * :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE`
 * :setting:`SESSION_FILE_PATH`
 * :setting:`SESSION_SAVE_EVERY_REQUEST`
+* :setting:`SESSION_SERIALIZER`
 
 .. _topics-session-security:
 

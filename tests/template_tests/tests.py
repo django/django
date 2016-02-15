@@ -4,10 +4,10 @@ from __future__ import unicode_literals
 import sys
 
 from django.contrib.auth.models import Group
-from django.core import urlresolvers
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
+from django.urls import NoReverseMatch
 
 
 class TemplateTests(SimpleTestCase):
@@ -26,7 +26,7 @@ class TemplateTests(SimpleTestCase):
         """
         t = Engine(debug=True).from_string('{% url will_not_match %}')
         c = Context()
-        with self.assertRaises(urlresolvers.NoReverseMatch):
+        with self.assertRaises(NoReverseMatch):
             t.render(c)
 
     def test_url_reverse_view_name(self):
@@ -38,7 +38,7 @@ class TemplateTests(SimpleTestCase):
         c = Context()
         try:
             t.render(c)
-        except urlresolvers.NoReverseMatch:
+        except NoReverseMatch:
             tb = sys.exc_info()[2]
             depth = 0
             while tb.tb_next is not None:
@@ -118,7 +118,7 @@ class TemplateTests(SimpleTestCase):
         """
         engine = Engine(app_dirs=True)
         t = engine.get_template('included_content.html')
-        with self.assertRaises(urlresolvers.NoReverseMatch):
+        with self.assertRaises(NoReverseMatch):
             t.render(Context())
 
     def test_debug_tag_non_ascii(self):
@@ -140,3 +140,12 @@ class TemplateTests(SimpleTestCase):
         child = engine.from_string(
             '{% extends parent %}{% block content %}child{% endblock %}')
         self.assertEqual(child.render(Context({'parent': parent})), 'child')
+
+    def test_node_origin(self):
+        """
+        #25848 -- Set origin on Node so debugging tools can determine which
+        template the node came from even if extending or including templates.
+        """
+        template = Engine().from_string('content')
+        for node in template.nodelist:
+            self.assertEqual(node.origin, template.origin)

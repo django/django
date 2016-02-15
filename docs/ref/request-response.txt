@@ -19,8 +19,8 @@ This document explains the APIs for :class:`HttpRequest` and
 :class:`HttpResponse` objects, which are defined in the :mod:`django.http`
 module.
 
-HttpRequest objects
-===================
+``HttpRequest`` objects
+=======================
 
 .. class:: HttpRequest
 
@@ -83,6 +83,20 @@ All attributes should be considered read-only, unless stated otherwise.
     accessing the form data. Any subsequent attribute accesses (such as reading
     from ``GET`` or ``POST``) will use the new ``encoding`` value.  Useful if
     you know the form data is not in the :setting:`DEFAULT_CHARSET` encoding.
+
+.. attribute:: HttpRequest.content_type
+
+    .. versionadded:: 1.10
+
+    A string representing the MIME type of the request, parsed from the
+    ``CONTENT_TYPE`` header.
+
+.. attribute:: HttpRequest.content_params
+
+    .. versionadded:: 1.10
+
+    A dictionary of key/value parameters included in the ``CONTENT_TYPE``
+    header.
 
 .. attribute:: HttpRequest.GET
 
@@ -160,11 +174,11 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.resolver_match
 
-    An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing
-    the resolved url. This attribute is only set after url resolving took place,
-    which means it's available in all views but not in middleware methods which
-    are executed before url resolving takes place (like ``process_request``, you
-    can use ``process_view`` instead).
+    An instance of :class:`~django.urls.ResolverMatch` representing the
+    resolved URL. This attribute is only set after URL resolving took place,
+    which means it's available in all views but not in middleware methods
+    which are executed before URL resolving takes place (like
+    ``process_request()``, you can use ``process_view()`` instead).
 
 Attributes set by application code
 ----------------------------------
@@ -175,7 +189,7 @@ application.
 .. attribute:: HttpRequest.current_app
 
     The :ttag:`url` template tag will use its value as the ``current_app``
-    argument to :func:`~django.core.urlresolvers.reverse()`.
+    argument to :func:`~django.urls.reverse()`.
 
 .. attribute:: HttpRequest.urlconf
 
@@ -374,8 +388,8 @@ Methods
             process(element)
 
 
-QueryDict objects
-=================
+``QueryDict`` objects
+=====================
 
 .. class:: QueryDict
 
@@ -571,8 +585,8 @@ In addition, ``QueryDict`` has the following methods:
         >>> q.urlencode(safe='/')
         'next=/a%26b/'
 
-HttpResponse objects
-====================
+``HttpResponse`` objects
+========================
 
 .. class:: HttpResponse
 
@@ -608,10 +622,16 @@ Passing iterators
 
 Finally, you can pass ``HttpResponse`` an iterator rather than strings.
 ``HttpResponse`` will consume the iterator immediately, store its content as a
-string, and discard it.
+string, and discard it. Objects with a ``close()`` method such as files and
+generators are immediately closed.
 
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
+
+.. versionchanged:: 1.10
+
+    Objects with a ``close()`` method used to be closed when the WSGI server
+    called ``close()`` on the response.
 
 Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
@@ -849,8 +869,8 @@ Methods
 
 .. _ref-httpresponse-subclasses:
 
-HttpResponse subclasses
------------------------
+``HttpResponse`` subclasses
+---------------------------
 
 Django includes a number of ``HttpResponse`` subclasses that handle different
 types of HTTP responses. Like ``HttpResponse``, these subclasses live in
@@ -915,8 +935,8 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
 
-JsonResponse objects
-====================
+``JsonResponse`` objects
+========================
 
 .. class:: JsonResponse(data, encoder=DjangoJSONEncoder, safe=True, json_dumps_params=None, **kwargs)
 
@@ -988,8 +1008,8 @@ parameter to the constructor method::
 
 .. _httpresponse-streaming:
 
-StreamingHttpResponse objects
-=============================
+``StreamingHttpResponse`` objects
+=================================
 
 .. class:: StreamingHttpResponse
 
@@ -1063,8 +1083,8 @@ Attributes
 
     This is always ``True``.
 
-FileResponse objects
-====================
+``FileResponse`` objects
+========================
 
 .. class:: FileResponse
 

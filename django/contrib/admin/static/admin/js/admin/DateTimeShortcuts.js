@@ -21,7 +21,7 @@
         init: function() {
             var body = document.getElementsByTagName('body')[0];
             var serverOffset = body.getAttribute('data-admin-utc-offset');
-            if (serverOffset !== undefined) {
+            if (serverOffset) {
                 var localOffset = new Date().getTimezoneOffset() * -60;
                 DateTimeShortcuts.timezoneOffset = localOffset - serverOffset;
             }
@@ -43,7 +43,7 @@
         now: function() {
             var body = document.getElementsByTagName('body')[0];
             var serverOffset = body.getAttribute('data-admin-utc-offset');
-            if (serverOffset !== undefined) {
+            if (serverOffset) {
                 var localNow = new Date();
                 var localOffset = localNow.getTimezoneOffset() * -60;
                 localNow.setTime(localNow.getTime() + 1000 * (serverOffset - localOffset));
@@ -368,8 +368,8 @@
             if (inp.value) {
                 var format = get_format('DATE_INPUT_FORMATS')[0];
                 var selected = inp.value.strptime(format);
-                var year = selected.getFullYear();
-                var month = selected.getMonth() + 1;
+                var year = selected.getUTCFullYear();
+                var month = selected.getUTCMonth() + 1;
                 var re = /\d{4}/;
                 if (re.test(year.toString()) && month >= 1 && month <= 12) {
                     DateTimeShortcuts.calendars[num].drawDate(month, year, selected);

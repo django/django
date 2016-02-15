@@ -67,10 +67,12 @@ class M2MThroughTestCase(TestCase):
             self.roll.members.set([])
 
     def test_cannot_use_create_on_m2m_with_intermediary_model(self):
-        self.assertRaises(AttributeError, self.rock.members.create, name="Anne")
+        with self.assertRaises(AttributeError):
+            self.rock.members.create(name="Anne")
 
     def test_cannot_use_create_on_reverse_m2m_with_intermediary_model(self):
-        self.assertRaises(AttributeError, self.bob.group_set.create, name="Funk")
+        with self.assertRaises(AttributeError):
+            self.bob.group_set.create(name="Funk")
 
     def test_retrieve_reverse_m2m_items_via_custom_id_intermediary(self):
         self.assertQuerysetEqual(

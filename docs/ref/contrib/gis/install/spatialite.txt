@@ -5,28 +5,38 @@ Installing Spatialite
 `SpatiaLite`__ adds spatial support to SQLite, turning it into a full-featured
 spatial database.
 
-Check first if you can install Spatialite from system packages or binaries. For
-example, on Debian-based distributions, try to install the ``spatialite-bin``
-package. For Mac OS X, follow the
-:ref:`specific instructions below<spatialite_macosx>`. For Windows, you may
-find binaries on `Gaia-SINS`__ home page. In any case, you should always
-be able to :ref:`install from source<spatialite_source>`.
+First, check if you can install Spatialite from system packages or binaries.
 
-When you are done with the installation process, skip to :ref:`create_spatialite_db`.
+For example, on Debian-based distributions, try to install the
+``spatialite-bin`` package. For distributions that package SpatiaLite 4.2+,
+install ``libsqlite3-mod-spatialite``.
+
+For Mac OS X, follow the :ref:`instructions below<spatialite_macosx>`.
+
+For Windows, you may find binaries on the `Gaia-SINS`__ home page.
+
+In any case, you should always be able to :ref:`install from source
+<spatialite_source>`.
 
 __ https://www.gaia-gis.it/fossil/libspatialite
 __ http://www.gaia-gis.it/gaia-sins/
 
 .. _spatialite_source:
 
+.. admonition:: ``SPATIALITE_LIBRARY_PATH`` setting required for SpatiaLite 4.2+
+
+    If you're using SpatiaLite 4.2+, you must put this in your settings::
+
+        SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
+
 Installing from source
-~~~~~~~~~~~~~~~~~~~~~~
+======================
 
 :doc:`GEOS and PROJ.4</ref/contrib/gis/install/geolibs>` should be installed
 prior to building SpatiaLite.
 
 SQLite
-^^^^^^
+------
 
 Check first if SQLite is compiled with the `R*Tree module`__. Run the sqlite3
 command line interface and enter the following query::
@@ -57,7 +67,7 @@ __ https://www.sqlite.org/download.html
 .. _spatialitebuild:
 
 SpatiaLite library (``libspatialite``)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------
 
 Get the latest SpatiaLite library source bundle from the
 `download page`__::
@@ -81,17 +91,17 @@ __ http://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 .. _spatialite_macosx:
 
 Mac OS X-specific instructions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==============================
 
 To install the SpatiaLite library and tools, Mac OS X users can choose between
 :ref:`kyngchaos` and `Homebrew`_.
 
 KyngChaos
-^^^^^^^^^
+---------
 
 First, follow the instructions in the :ref:`kyngchaos` section.
 
-When :ref:`create_spatialite_db`, the ``spatialite`` program is required.
+When creating a SpatiaLite database, the ``spatialite`` program is required.
 However, instead of attempting to compile the SpatiaLite tools from source,
 download the `SpatiaLite Binaries`__ for OS X, and install ``spatialite`` in a
 location available in your ``PATH``.  For example::
@@ -109,7 +119,7 @@ add the following to your ``settings.py``::
 __ http://www.gaia-gis.it/spatialite-2.3.1/binaries.html
 
 Homebrew
-^^^^^^^^
+--------
 
 `Homebrew`_ handles all the SpatiaLite related packages on your behalf,
 including SQLite3, SpatiaLite, PROJ, and GEOS. Install them like this::
@@ -124,12 +134,3 @@ following to your ``settings.py``::
     SPATIALITE_LIBRARY_PATH='/usr/local/lib/mod_spatialite.dylib'
 
 .. _Homebrew: http://brew.sh/
-
-.. _create_spatialite_db:
-
-Creating a spatial database for SpatiaLite
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When running ``manage.py migrate`` with a SQLite or SpatiaLite database, the
-database file will be automatically created if it doesn't exist. Django will
-also ensure that the spatial metadata are initialized in the database.

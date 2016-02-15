@@ -240,8 +240,8 @@ The full documentation for `dictConfig format`_ is the best source of
 information about logging configuration dictionaries. However, to give
 you a taste of what is possible, here are several examples.
 
-First, here's a simple configuration which writes all request logging from the
-:ref:`django-request-logger` logger to a local file::
+First, here's a simple configuration which writes all logging from the
+:ref:`django-logger` logger to a local file::
 
     LOGGING = {
         'version': 1,
@@ -254,7 +254,7 @@ First, here's a simple configuration which writes all request logging from the
             },
         },
         'loggers': {
-            'django.request': {
+            'django': {
                 'handlers': ['file'],
                 'level': 'DEBUG',
                 'propagate': True,
@@ -459,6 +459,8 @@ Loggers
 
 Django provides several built-in loggers.
 
+.. _django-logger:
+
 ``django``
 ~~~~~~~~~~
 
@@ -481,6 +483,24 @@ Messages to this logger have the following extra context:
 
 * ``request``: The request object that generated the logging
   message.
+
+.. _django-server-logger:
+
+``django.server``
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.10
+
+Log messages related to the handling of requests received by the server invoked
+by the :djadmin:`runserver` command. HTTP 5XX responses are logged as ``ERROR``
+messages, 4XX responses are logged as ``WARNING`` messages, and everything else
+is logged as ``INFO``.
+
+Messages to this logger have the following extra context:
+
+* ``status_code``: The HTTP response code associated with the request.
+
+* ``request``: The request object that generated the logging message.
 
 .. _django-template-logger:
 
@@ -719,13 +739,15 @@ When :setting:`DEBUG` is ``True``:
 * The ``django`` catch-all logger sends all messages at the ``INFO`` level or
   higher to the console.
 
-* The ``py.warnings`` logger, which handles messages from ``warnings.warn()``,
-  sends messages to the console.
-
 When :setting:`DEBUG` is ``False``:
 
 * The ``django`` logger send messages with ``ERROR`` or ``CRITICAL`` level to
   :class:`AdminEmailHandler`.
+
+Independent of the value of :setting:`DEBUG`:
+
+* The :ref:`django-server-logger` logger sends all messages at the ``INFO``
+  level or higher to the console.
 
 .. versionchanged:: 1.9
 

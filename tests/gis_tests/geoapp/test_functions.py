@@ -5,12 +5,14 @@ from decimal import Decimal
 
 from django.contrib.gis.db.models import functions
 from django.contrib.gis.geos import LineString, Point, Polygon, fromstr
+from django.contrib.gis.measure import Area
 from django.db import connection
+from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
 from ..utils import mysql, oracle, postgis, spatialite
-from .models import City, Country, State, Track
+from .models import City, Country, CountryWebMercator, State, Track
 
 
 @skipUnlessDBFeature("gis_enabled")
@@ -87,12 +89,12 @@ class GISFunctionsTests(TestCase):
             chicago_json,
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True, crs=True, precision=5)
-                ).get(name='Chicago').geojson
+            ).get(name='Chicago').geojson
         )
 
     @skipUnlessDBFeature("has_AsGML_function")
     def test_asgml(self):
-        # Should throw a TypeError when tyring to obtain GML from a
+        # Should throw a TypeError when trying to obtain GML from a
         # non-geometry field.
         qs = City.objects.all()
         with self.assertRaises(TypeError):
@@ -230,6 +232,22 @@ class GISFunctionsTests(TestCase):
             else:
                 expected = c.mpoly.intersection(geom)
             self.assertEqual(c.inter, expected)
+
+    @skipUnlessDBFeature("has_Area_function")
+    def test_area_with_regular_aggregate(self):
+        # Create projected country objects, for this test to work on all backends.
+        for c in Country.objects.all():
+            CountryWebMercator.objects.create(name=c.name, mpoly=c.mpoly)
+        # Test in projected coordinate system
+        qs = CountryWebMercator.objects.annotate(area_sum=Sum(functions.Area('mpoly')))
+        # Some backends (e.g. Oracle) cannot group by multipolygon values, so
+        # defer such fields in the aggregation query.
+        for c in qs.defer('mpoly'):
+            result = c.area_sum
+            # If the result is a measure object, get value.
+            if isinstance(result, Area):
+                result = result.sq_m
+            self.assertAlmostEqual((result - c.mpoly.area) / c.mpoly.area, 0)
 
     @skipUnlessDBFeature("has_MemSize_function")
     def test_memsize(self):

@@ -7,8 +7,27 @@ from django.db.models.options import normalize_together
 from django.utils import six
 from django.utils.functional import cached_property
 
+from .fields import (
+    AddField, AlterField, FieldOperation, RemoveField, RenameField,
+)
 
-class CreateModel(Operation):
+
+class ModelOperation(Operation):
+    def __init__(self, name):
+        self.name = name
+
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
+    def reduce(self, operation, in_between, app_label=None):
+        return (
+            super(ModelOperation, self).reduce(operation, in_between, app_label=app_label) or
+            not operation.references_model(self.name, app_label)
+        )
+
+
+class CreateModel(ModelOperation):
     """
     Create a model's table.
     """
@@ -16,15 +35,11 @@ class CreateModel(Operation):
     serialization_expand_args = ['fields', 'options', 'managers']
 
     def __init__(self, name, fields, options=None, bases=None, managers=None):
-        self.name = name
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model,)
         self.managers = managers or []
-
-    @cached_property
-    def name_lower(self):
-        return self.name.lower()
+        super(CreateModel, self).__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -83,18 +98,101 @@ class CreateModel(Operation):
                 return True
         return False
 
+    def model_to_key(self, model):
+        """
+        Take either a model class or an "app_label.ModelName" string
+        and return (app_label, object_name).
+        """
+        if isinstance(model, six.string_types):
+            return model.split(".", 1)
+        else:
+            return model._meta.app_label, model._meta.object_name
 
-class DeleteModel(Operation):
+    def reduce(self, operation, in_between, app_label=None):
+        if (isinstance(operation, DeleteModel) and
+                self.name_lower == operation.name_lower and
+                not self.options.get("proxy", False)):
+            return []
+        elif isinstance(operation, RenameModel) and self.name_lower == operation.old_name_lower:
+            return [
+                CreateModel(
+                    operation.new_name,
+                    fields=self.fields,
+                    options=self.options,
+                    bases=self.bases,
+                    managers=self.managers,
+                ),
+            ]
+        elif isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
+            if isinstance(operation, AddField):
+                # Don't allow optimizations of FKs through models they reference
+                if hasattr(operation.field, "remote_field") and operation.field.remote_field:
+                    for between in in_between:
+                        # Check that it doesn't point to the model
+                        app_label, object_name = self.model_to_key(operation.field.remote_field.model)
+                        if between.references_model(object_name, app_label):
+                            return False
+                        # Check that it's not through the model
+                        if getattr(operation.field.remote_field, "through", None):
+                            app_label, object_name = self.model_to_key(operation.field.remote_field.through)
+                            if between.references_model(object_name, app_label):
+                                return False
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=self.fields + [(operation.name, operation.field)],
+                        options=self.options,
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
+            elif isinstance(operation, AlterField):
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=[
+                            (n, operation.field if n == operation.name else v)
+                            for n, v in self.fields
+                        ],
+                        options=self.options,
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
+            elif isinstance(operation, RemoveField):
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=[
+                            (n, v)
+                            for n, v in self.fields
+                            if n.lower() != operation.name_lower
+                        ],
+                        options=self.options,
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
+            elif isinstance(operation, RenameField):
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=[
+                            (operation.new_name if n == operation.old_name else n, v)
+                            for n, v in self.fields
+                        ],
+                        options=self.options,
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
+        return super(CreateModel, self).reduce(operation, in_between, app_label=app_label)
+
+
+class DeleteModel(ModelOperation):
     """
     Drops a model's table.
     """
-
-    def __init__(self, name):
-        self.name = name
-
-    @cached_property
-    def name_lower(self):
-        return self.name.lower()
 
     def deconstruct(self):
         kwargs = {
@@ -126,7 +224,7 @@ class DeleteModel(Operation):
         return "Delete model %s" % (self.name, )
 
 
-class RenameModel(Operation):
+class RenameModel(ModelOperation):
     """
     Renames a model.
     """
@@ -134,6 +232,7 @@ class RenameModel(Operation):
     def __init__(self, old_name, new_name):
         self.old_name = old_name
         self.new_name = new_name
+        super(RenameModel, self).__init__(old_name)
 
     @cached_property
     def old_name_lower(self):
@@ -260,19 +359,31 @@ class RenameModel(Operation):
     def describe(self):
         return "Rename model %s to %s" % (self.old_name, self.new_name)
 
+    def reduce(self, operation, in_between, app_label=None):
+        if (isinstance(operation, RenameModel) and
+                self.new_name_lower == operation.old_name_lower):
+            return [
+                RenameModel(
+                    self.old_name,
+                    operation.new_name,
+                ),
+            ]
+        # Skip `ModelOperation.reduce` as we want to run `references_model`
+        # against self.new_name.
+        return (
+            super(ModelOperation, self).reduce(operation, in_between, app_label=app_label) or
+            not operation.references_model(self.new_name, app_label)
+        )
 
-class AlterModelTable(Operation):
+
+class AlterModelTable(ModelOperation):
     """
     Renames a model's table
     """
 
     def __init__(self, name, table):
-        self.name = name
         self.table = table
-
-    @cached_property
-    def name_lower(self):
-        return self.name.lower()
+        super(AlterModelTable, self).__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -316,8 +427,29 @@ class AlterModelTable(Operation):
     def describe(self):
         return "Rename table for %s to %s" % (self.name, self.table)
 
+    def reduce(self, operation, in_between, app_label=None):
+        if isinstance(operation, (AlterModelTable, DeleteModel)) and self.name_lower == operation.name_lower:
+            return [operation]
+        return super(AlterModelTable, self).reduce(operation, in_between, app_label=app_label)
 
-class AlterUniqueTogether(Operation):
+
+class ModelOptionOperation(ModelOperation):
+    def reduce(self, operation, in_between, app_label=None):
+        if isinstance(operation, (self.__class__, DeleteModel)) and self.name_lower == operation.name_lower:
+            return [operation]
+        return super(ModelOptionOperation, self).reduce(operation, in_between, app_label=app_label)
+
+
+class FieldRelatedOptionOperation(ModelOptionOperation):
+    def reduce(self, operation, in_between, app_label=None):
+        if (isinstance(operation, FieldOperation) and
+                self.name_lower == operation.model_name_lower and
+                not self.references_field(operation.model_name, operation.name)):
+            return [operation, self]
+        return super(FieldRelatedOptionOperation, self).reduce(operation, in_between, app_label=app_label)
+
+
+class AlterUniqueTogether(FieldRelatedOptionOperation):
     """
     Changes the value of unique_together to the target one.
     Input value of unique_together must be a set of tuples.
@@ -325,13 +457,9 @@ class AlterUniqueTogether(Operation):
     option_name = "unique_together"
 
     def __init__(self, name, unique_together):
-        self.name = name
         unique_together = normalize_together(unique_together)
         self.unique_together = set(tuple(cons) for cons in unique_together)
-
-    @cached_property
-    def name_lower(self):
-        return self.name.lower()
+        super(AlterUniqueTogether, self).__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -378,7 +506,7 @@ class AlterUniqueTogether(Operation):
         return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.unique_together or ''))
 
 
-class AlterIndexTogether(Operation):
+class AlterIndexTogether(FieldRelatedOptionOperation):
     """
     Changes the value of index_together to the target one.
     Input value of index_together must be a set of tuples.
@@ -386,13 +514,9 @@ class AlterIndexTogether(Operation):
     option_name = "index_together"
 
     def __init__(self, name, index_together):
-        self.name = name
         index_together = normalize_together(index_together)
         self.index_together = set(tuple(cons) for cons in index_together)
-
-    @cached_property
-    def name_lower(self):
-        return self.name.lower()
+        super(AlterIndexTogether, self).__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -439,18 +563,14 @@ class AlterIndexTogether(Operation):
         return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.index_together or ''))
 
 
-class AlterOrderWithRespectTo(Operation):
+class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
     """
     Represents a change with the order_with_respect_to option.
     """
 
     def __init__(self, name, order_with_respect_to):
-        self.name = name
         self.order_with_respect_to = order_with_respect_to
-
-    @cached_property
-    def name_lower(self):
-        return self.name.lower()
+        super(AlterOrderWithRespectTo, self).__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -505,7 +625,7 @@ class AlterOrderWithRespectTo(Operation):
         return "Set order_with_respect_to on %s to %s" % (self.name, self.order_with_respect_to)
 
 
-class AlterModelOptions(Operation):
+class AlterModelOptions(ModelOptionOperation):
     """
     Sets new model options that don't directly affect the database schema
     (like verbose_name, permissions, ordering). Python code in migrations
@@ -525,12 +645,8 @@ class AlterModelOptions(Operation):
     ]
 
     def __init__(self, name, options):
-        self.name = name
         self.options = options
-
-    @cached_property
-    def name_lower(self):
-        return self.name.lower()
+        super(AlterModelOptions, self).__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -565,7 +681,7 @@ class AlterModelOptions(Operation):
         return "Change Meta options on %s" % (self.name, )
 
 
-class AlterModelManagers(Operation):
+class AlterModelManagers(ModelOptionOperation):
     """
     Alters the model's managers
     """
@@ -573,12 +689,8 @@ class AlterModelManagers(Operation):
     serialization_expand_args = ['managers']
 
     def __init__(self, name, managers):
-        self.name = name
         self.managers = managers
-
-    @cached_property
-    def name_lower(self):
-        return self.name.lower()
+        super(AlterModelManagers, self).__init__(name)
 
     def deconstruct(self):
         return (
@@ -590,6 +702,7 @@ class AlterModelManagers(Operation):
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name_lower]
         model_state.managers = list(self.managers)
+        state.reload_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         pass

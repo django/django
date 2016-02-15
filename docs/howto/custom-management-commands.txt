@@ -1,6 +1,6 @@
-====================================
-Writing custom django-admin commands
-====================================
+========================================
+Writing custom ``django-admin`` commands
+========================================
 
 .. module:: django.core.management
 
@@ -87,9 +87,9 @@ The new custom command can be called using ``python manage.py closepoll
 
 The ``handle()`` method takes one or more ``poll_ids`` and sets ``poll.opened``
 to ``False`` for each one. If the user referenced any nonexistent polls, a
-:class:`CommandError` is raised. The ``poll.opened`` attribute does not exist
-in the :doc:`tutorial</intro/tutorial01>` and was added to
-``polls.models.Poll`` for this example.
+:exc:`CommandError` is raised. The ``poll.opened`` attribute does not exist in
+the :doc:`tutorial</intro/tutorial01>` and was added to ``polls.models.Poll``
+for this example.
 
 .. _custom-commands-options:
 
@@ -123,8 +123,8 @@ parameter of the handle method. See the :py:mod:`argparse` Python documentation
 for more about ``add_argument`` usage.
 
 In addition to being able to add custom command line options, all
-:doc:`management commands</ref/django-admin>` can accept some
-default options such as :djadminopt:`--verbosity` and :djadminopt:`--traceback`.
+:doc:`management commands</ref/django-admin>` can accept some default options
+such as :option:`--verbosity` and :option:`--traceback`.
 
 .. _management-commands-and-locales:
 
@@ -231,6 +231,14 @@ All attributes can be set in your derived class and can be used in
     ``True``, the output will automatically be wrapped with ``BEGIN;`` and
     ``COMMIT;``. Default value is ``False``.
 
+.. attribute:: BaseCommand.requires_migrations_checks
+
+    .. versionadded:: 1.10
+
+    A boolean; if ``True``, the command prints a warning if the set of
+    migrations on disk don't match the migrations in the database. A warning
+    doesn't prevent the command from executing. Default value is ``False``.
+
 .. attribute:: BaseCommand.requires_system_checks
 
     A boolean; if ``True``, the entire Django project will be checked for
@@ -254,7 +262,7 @@ All attributes can be set in your derived class and can be used in
     This option can't be ``False`` when the
     :data:`~BaseCommand.can_import_settings` option is set to ``False`` too
     because attempting to set the locale needs access to settings. This
-    condition will generate a :class:`CommandError`.
+    condition will generate a :exc:`CommandError`.
 
 .. attribute:: BaseCommand.style
 
@@ -267,9 +275,8 @@ All attributes can be set in your derived class and can be used in
     see the available styles (use uppercased versions of the "roles" described
     in that section).
 
-    If you pass the :djadminopt:`--no-color` option when running your
-    command, all ``self.style()`` calls will return the original string
-    uncolored.
+    If you pass the :option:`--no-color` option when running your command, all
+    ``self.style()`` calls will return the original string uncolored.
 
 Methods
 -------
@@ -304,12 +311,12 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     Tries to execute this command, performing system checks if needed (as
     controlled by the :attr:`requires_system_checks` attribute). If the command
-    raises a :class:`CommandError`, it's intercepted and printed to stderr.
+    raises a :exc:`CommandError`, it's intercepted and printed to stderr.
 
 .. admonition:: Calling a management command in your code
 
     ``execute()`` should not be called directly from your code to execute a
-    command. Use :ref:`call_command <call-command>` instead.
+    command. Use :func:`~django.core.management.call_command` instead.
 
 .. method:: BaseCommand.handle(*args, **options)
 
@@ -321,7 +328,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 .. method:: BaseCommand.check(app_configs=None, tags=None, display_num_errors=False)
 
     Uses the system check framework to inspect the entire Django project for
-    potential problems. Serious problems are raised as a :class:`CommandError`;
+    potential problems. Serious problems are raised as a :exc:`CommandError`;
     warnings are output to stderr; minor notifications are output to stdout.
 
     If ``app_configs`` and ``tags`` are both ``None``, all system checks are
@@ -330,8 +337,8 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. _ref-basecommand-subclasses:
 
-BaseCommand subclasses
-----------------------
+``BaseCommand`` subclasses
+--------------------------
 
 .. class:: AppCommand
 
@@ -361,12 +368,10 @@ Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
     Perform the command's actions for ``label``, which will be the string as
     given on the command line.
 
-.. _ref-command-exceptions:
-
 Command exceptions
 ------------------
 
-.. class:: CommandError
+.. exception:: CommandError
 
 Exception class indicating a problem while executing a management command.
 
@@ -376,5 +381,6 @@ message to the appropriate output stream (i.e., stderr); as a result, raising
 this exception (with a sensible description of the error) is the preferred way
 to indicate that something has gone wrong in the execution of a command.
 
-If a management command is called from code through :ref:`call_command
-<call-command>`, it's up to you to catch the exception when needed.
+If a management command is called from code through
+:func:`~django.core.management.call_command`, it's up to you to catch the
+exception when needed.

@@ -94,8 +94,8 @@ to create a return class for any status code you like. For example::
 Because 404 errors are by far the most common HTTP error, there's an easier way
 to handle those errors.
 
-The Http404 exception
----------------------
+The ``Http404`` exception
+-------------------------
 
 .. class:: django.http.Http404()
 
@@ -112,7 +112,7 @@ standard error page for your application, along with an HTTP error code 404.
 Example usage::
 
     from django.http import Http404
-    from django.shortcuts import render_to_response
+    from django.shortcuts import render
     from polls.models import Poll
 
     def detail(request, poll_id):
@@ -120,7 +120,7 @@ Example usage::
             p = Poll.objects.get(pk=poll_id)
         except Poll.DoesNotExist:
             raise Http404("Poll does not exist")
-        return render_to_response('polls/detail.html', {'poll': p})
+        return render(request, 'polls/detail.html', {'poll': p})
 
 In order to show customized HTML when Django returns a 404, you can create an
 HTML template named ``404.html`` and place it in the top level of your

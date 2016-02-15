@@ -216,7 +216,7 @@ Like :djadmin:`migrate`, :djadmin:`createcachetable` won't touch an existing
 table. It will only create missing tables.
 
 To print the SQL that would be run, rather than run it, use the
-:djadminopt:`--dry-run` option.
+:option:`createcachetable --dry-run` option.
 
 Multiple databases
 ~~~~~~~~~~~~~~~~~~
@@ -1049,8 +1049,8 @@ pages. We'll look at some of these headers in the sections that follow.
 
 .. _using-vary-headers:
 
-Using Vary headers
-==================
+Using ``Vary`` headers
+======================
 
 The ``Vary`` header defines which request headers a cache
 mechanism should take into account when building its cache key. For example, if
@@ -1114,11 +1114,12 @@ The headers you pass to ``vary_on_headers`` are not case sensitive;
 You can also use a helper function, :func:`django.utils.cache.patch_vary_headers`,
 directly. This function sets, or adds to, the ``Vary header``. For example::
 
+    from django.shortcuts import render
     from django.utils.cache import patch_vary_headers
 
     def my_view(request):
         # ...
-        response = render_to_response('template_name', context)
+        response = render(request, 'template_name', context)
         patch_vary_headers(response, ['Cookie'])
         return response
 
@@ -1230,8 +1231,8 @@ Example::
 
 .. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
-Order of MIDDLEWARE_CLASSES
-===========================
+Order of ``MIDDLEWARE_CLASSES``
+===============================
 
 If you use caching middleware, it's important to put each half in the right
 place within the :setting:`MIDDLEWARE_CLASSES` setting. That's because the cache

@@ -1,4 +1,5 @@
 from django.contrib.staticfiles import storage
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms import Media
 from django.test import SimpleTestCase, override_settings
 from django.utils.six.moves.urllib.parse import urljoin
@@ -18,7 +19,12 @@ class StaticFilesFormsMediaTestCase(SimpleTestCase):
     def test_absolute_url(self):
         m = Media(
             css={'all': ('path/to/css1', '/path/to/css2')},
-            js=('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3'),
+            js=(
+                '/path/to/js1',
+                'http://media.other.com/path/to/js2',
+                'https://secure.other.com/path/to/js3',
+                static('relative/path/to/js4'),
+            ),
         )
         self.assertEqual(
             str(m),
@@ -26,5 +32,6 @@ class StaticFilesFormsMediaTestCase(SimpleTestCase):
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
+<script type="text/javascript" src="https://example.com/assets/relative/path/to/js4"></script>"""
         )

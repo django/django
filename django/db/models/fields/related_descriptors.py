@@ -166,7 +166,7 @@ class ForwardManyToOneDescriptor(object):
                 rel_obj = None
             else:
                 qs = self.get_queryset(instance=instance)
-                qs = qs.filter(**self.field.get_reverse_related_filter(instance))
+                qs = qs.filter(self.field.get_reverse_related_filter(instance))
                 # Assuming the database enforces foreign keys, this won't fail.
                 rel_obj = qs.get()
                 # If this is a one-to-one relation, set the reverse accessor
@@ -193,14 +193,8 @@ class ForwardManyToOneDescriptor(object):
         - ``instance`` is the ``child`` instance
         - ``value`` in the ``parent`` instance on the right of the equal sign
         """
-        # If null=True, we can assign null here, but otherwise the value needs
-        # to be an instance of the related class.
-        if value is None and self.field.null is False:
-            raise ValueError(
-                'Cannot assign None: "%s.%s" does not allow null values.' %
-                (instance._meta.object_name, self.field.name)
-            )
-        elif value is not None and not isinstance(value, self.field.remote_field.model._meta.concrete_model):
+        # An object must be an instance of the related class.
+        if value is not None and not isinstance(value, self.field.remote_field.model._meta.concrete_model):
             raise ValueError(
                 'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
                     value,
@@ -300,7 +294,10 @@ class ReverseOneToOneDescriptor(object):
         queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = attrgetter(self.related.field.attname)
-        instance_attr = lambda obj: obj._get_pk_val()
+
+        def instance_attr(obj):
+            return obj._get_pk_val()
+
         instances_dict = {instance_attr(inst): inst for inst in instances}
         query = {'%s__in' % self.related.field.name: instances}
         queryset = queryset.filter(**query)
@@ -376,26 +373,17 @@ class ReverseOneToOneDescriptor(object):
         # ForwardManyToOneDescriptor is annoying, but there's a bunch
         # of small differences that would make a common base class convoluted.
 
-        # If null=True, we can assign null here, but otherwise the value needs
-        # to be an instance of the related class.
         if value is None:
-            if self.related.field.null:
-                # Update the cached related instance (if any) & clear the cache.
-                try:
-                    rel_obj = getattr(instance, self.cache_name)
-                except AttributeError:
-                    pass
-                else:
-                    delattr(instance, self.cache_name)
-                    setattr(rel_obj, self.related.field.name, None)
+            # Update the cached related instance (if any) & clear the cache.
+            try:
+                rel_obj = getattr(instance, self.cache_name)
+            except AttributeError:
+                pass
             else:
-                raise ValueError(
-                    'Cannot assign None: "%s.%s" does not allow null values.' % (
-                        instance._meta.object_name,
-                        self.related.get_accessor_name(),
-                    )
-                )
+                delattr(instance, self.cache_name)
+                setattr(rel_obj, self.related.field.name, None)
         elif not isinstance(value, self.related.related_model):
+            # An object must be an instance of the related class.
             raise ValueError(
                 'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
                     value,

@@ -295,7 +295,7 @@ class SessionBase(object):
 
     def cycle_key(self):
         """
-        Creates a new session key, whilst retaining the current session data.
+        Creates a new session key, while retaining the current session data.
         """
         data = self._session_cache
         key = self.session_key

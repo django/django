@@ -4,7 +4,7 @@ Managing files
 
 This document describes Django's file access APIs for files such as those
 uploaded by a user. The lower level APIs are general enough that you could use
-them for other purposes. If you want to handle "static files" (JS, CSS, etc),
+them for other purposes. If you want to handle "static files" (JS, CSS, etc.),
 see :doc:`/howto/static-files/index`.
 
 By default, Django stores files locally, using the :setting:`MEDIA_ROOT` and
@@ -91,7 +91,7 @@ using a Python built-in ``file`` object::
     >>> from django.core.files import File
 
     # Create a Python file object using open()
-    >>> f = open('/tmp/hello.world', 'w')
+    >>> f = open('/path/to/hello.world', 'w')
     >>> myfile = File(f)
 
 Now you can use any of the documented attributes and methods
@@ -103,7 +103,7 @@ The following approach may be used to close files automatically::
     >>> from django.core.files import File
 
     # Create a Python file object using open() and the with statement
-    >>> with open('/tmp/hello.world', 'w') as f:
+    >>> with open('/path/to/hello.world', 'w') as f:
     ...     myfile = File(f)
     ...     myfile.write('Hello World')
     ...

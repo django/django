@@ -77,7 +77,8 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         def iteration():
             for x in response:
                 pass
-        self.assertRaises(ContentNotRenderedError, iteration)
+        with self.assertRaises(ContentNotRenderedError):
+            iteration()
         self.assertFalse(response.is_rendered)
 
     def test_iteration_rendered(self):
@@ -90,7 +91,8 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         # unrendered response raises an exception when content is accessed
         response = self._response()
         self.assertFalse(response.is_rendered)
-        self.assertRaises(ContentNotRenderedError, lambda: response.content)
+        with self.assertRaises(ContentNotRenderedError):
+            response.content
         self.assertFalse(response.is_rendered)
 
     def test_content_access_rendered(self):
@@ -160,8 +162,8 @@ class SimpleTemplateResponseTest(SimpleTestCase):
             'value': 123,
             'fn': datetime.now,
         })
-        self.assertRaises(ContentNotRenderedError,
-                          pickle.dumps, response)
+        with self.assertRaises(ContentNotRenderedError):
+            pickle.dumps(response)
 
         # But if we render the response, we can pickle it.
         response.render()
@@ -188,8 +190,8 @@ class SimpleTemplateResponseTest(SimpleTestCase):
             'value': 123,
             'fn': datetime.now,
         })
-        self.assertRaises(ContentNotRenderedError,
-                          pickle.dumps, response)
+        with self.assertRaises(ContentNotRenderedError):
+            pickle.dumps(response)
 
         response.render()
         pickled_response = pickle.dumps(response)
@@ -268,14 +270,15 @@ class TemplateResponseTest(SimpleTestCase):
     def test_pickling(self):
         # Create a template response. The context is
         # known to be unpicklable (e.g., a function).
-        response = TemplateResponse(self.factory.get('/'),
+        response = TemplateResponse(
+            self.factory.get('/'),
             'first/test.html', {
                 'value': 123,
                 'fn': datetime.now,
             }
         )
-        self.assertRaises(ContentNotRenderedError,
-                          pickle.dumps, response)
+        with self.assertRaises(ContentNotRenderedError):
+            pickle.dumps(response)
 
         # But if we render the response, we can pickle it.
         response.render()
@@ -307,8 +310,8 @@ class TemplateResponseTest(SimpleTestCase):
             'value': 123,
             'fn': datetime.now,
         })
-        self.assertRaises(ContentNotRenderedError,
-                          pickle.dumps, response)
+        with self.assertRaises(ContentNotRenderedError):
+            pickle.dumps(response)
 
         response.render()
         pickled_response = pickle.dumps(response)

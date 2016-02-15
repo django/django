@@ -1,6 +1,6 @@
-======================
-QuerySet API reference
-======================
+==========================
+``QuerySet`` API reference
+==========================
 
 .. currentmodule:: django.db.models.query
 
@@ -15,8 +15,8 @@ Throughout this reference we'll use the :ref:`example Weblog models
 
 .. _when-querysets-are-evaluated:
 
-When QuerySets are evaluated
-============================
+When ``QuerySet``\s are evaluated
+=================================
 
 Internally, a ``QuerySet`` can be constructed, filtered, sliced, and generally
 passed around without actually hitting the database. No database activity
@@ -80,8 +80,8 @@ You can evaluate a ``QuerySet`` in the following ways:
 
 .. _pickling QuerySets:
 
-Pickling QuerySets
-------------------
+Pickling ``QuerySet``\s
+-----------------------
 
 If you :mod:`pickle` a ``QuerySet``, this will force all the results to be loaded
 into memory prior to pickling. Pickling is usually used as a precursor to
@@ -121,8 +121,8 @@ described here.
 
 .. _queryset-api:
 
-QuerySet API
-============
+``QuerySet`` API
+================
 
 Here's the formal declaration of a ``QuerySet``:
 
@@ -157,15 +157,15 @@ Here's the formal declaration of a ``QuerySet``:
 
 .. currentmodule:: django.db.models.query.QuerySet
 
-Methods that return new QuerySets
----------------------------------
+Methods that return new ``QuerySet``\s
+--------------------------------------
 
 Django provides a range of ``QuerySet`` refinement methods that modify either
 the types of results returned by the ``QuerySet`` or the way its SQL query is
 executed.
 
-filter
-~~~~~~
+``filter()``
+~~~~~~~~~~~~
 
 .. method:: filter(**kwargs)
 
@@ -179,8 +179,8 @@ underlying SQL statement.
 If you need to execute more complex queries (for example, queries with ``OR`` statements),
 you can use :class:`Q objects <django.db.models.Q>`.
 
-exclude
-~~~~~~~
+``exclude()``
+~~~~~~~~~~~~~
 
 .. method:: exclude(**kwargs)
 
@@ -217,15 +217,15 @@ Note the second example is more restrictive.
 If you need to execute more complex queries (for example, queries with ``OR`` statements),
 you can use :class:`Q objects <django.db.models.Q>`.
 
-annotate
-~~~~~~~~
+``annotate()``
+~~~~~~~~~~~~~~
 
 .. method:: annotate(*args, **kwargs)
 
 Annotates each object in the ``QuerySet`` with the provided list of :doc:`query
 expressions </ref/models/expressions>`. An expression may be a simple value, a
 reference to a field on the model (or any related models), or an aggregate
-expression (averages, sums, etc) that has been computed over the objects that
+expression (averages, sums, etc.) that has been computed over the objects that
 are related to the objects in the ``QuerySet``.
 
 Each argument to ``annotate()`` is an annotation that will be added
@@ -265,8 +265,8 @@ control the name of the annotation::
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
 
-order_by
-~~~~~~~~
+``order_by()``
+~~~~~~~~~~~~~~
 
 .. method:: order_by(*fields)
 
@@ -387,8 +387,8 @@ query will be ordered by ``pub_date`` and not ``headline``::
     incurs a cost to your database. Each foreign key you add will
     implicitly include all of its default orderings as well.
 
-reverse
-~~~~~~~
+``reverse()``
+~~~~~~~~~~~~~
 
 .. method:: reverse()
 
@@ -414,8 +414,8 @@ defined for a given ``QuerySet``, calling ``reverse()`` on it has no real
 effect (the ordering was undefined prior to calling ``reverse()``, and will
 remain undefined afterward).
 
-distinct
-~~~~~~~~
+``distinct()``
+~~~~~~~~~~~~~~
 
 .. method:: distinct(*fields)
 
@@ -497,8 +497,8 @@ Examples (those after the first will only work on PostgreSQL)::
     by the relation `_id` field (``blog_id`` in this case) or the referenced
     one (``blog__pk``) to make sure both expressions match.
 
-values
-~~~~~~
+``values()``
+~~~~~~~~~~~~
 
 .. method:: values(*fields)
 
@@ -597,8 +597,8 @@ You can also refer to fields on related models with reverse relations through
    pronounced if you include multiple such fields in your ``values()`` query,
    in which case all possible combinations will be returned.
 
-values_list
-~~~~~~~~~~~
+``values_list()``
+~~~~~~~~~~~~~~~~~
 
 .. method:: values_list(*fields, flat=False)
 
@@ -631,8 +631,8 @@ achieve that, use ``values_list()`` followed by a ``get()`` call::
     >>> Entry.objects.values_list('headline', flat=True).get(pk=1)
     'First entry'
 
-dates
-~~~~~
+``dates()``
+~~~~~~~~~~~
 
 .. method:: dates(field, kind, order='ASC')
 
@@ -667,8 +667,8 @@ Examples::
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
     [datetime.date(2005, 3, 20)]
 
-datetimes
-~~~~~~~~~
+``datetimes()``
+~~~~~~~~~~~~~~~
 
 .. method:: datetimes(field_name, kind, order='ASC', tzinfo=None)
 
@@ -711,8 +711,8 @@ object. If it's ``None``, Django uses the :ref:`current time zone
     .. _Choosing a Time Zone File: https://docs.oracle.com/cd/E11882_01/server.112/e10729/ch4datetime.htm#NLSPG258
     .. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
-none
-~~~~
+``none()``
+~~~~~~~~~~
 
 .. method:: none()
 
@@ -728,8 +728,8 @@ Examples::
     >>> isinstance(Entry.objects.none(), EmptyQuerySet)
     True
 
-all
-~~~
+``all()``
+~~~~~~~~~
 
 .. method:: all()
 
@@ -743,8 +743,8 @@ typically caches its results. If the data in the database might have changed
 since a ``QuerySet`` was evaluated, you can get updated results for the same
 query by calling ``all()`` on a previously evaluated ``QuerySet``.
 
-select_related
-~~~~~~~~~~~~~~
+``select_related()``
+~~~~~~~~~~~~~~~~~~~~
 
 .. method:: select_related(*fields)
 
@@ -849,8 +849,8 @@ Chaining ``select_related`` calls works in a similar way to other methods -
 that is that ``select_related('foo', 'bar')`` is equivalent to
 ``select_related('foo').select_related('bar')``.
 
-prefetch_related
-~~~~~~~~~~~~~~~~
+``prefetch_related()``
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: prefetch_related(*lookups)
 
@@ -1103,8 +1103,8 @@ where prefetching with a custom ``QuerySet`` is useful:
     specific order to avoid creating extra queries; therefore it's recommended
     to always carefully order ``prefetch_related`` arguments.
 
-extra
-~~~~~
+``extra()``
+~~~~~~~~~~~
 
 .. method:: extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)
 
@@ -1311,8 +1311,8 @@ of the arguments is required, but you should use at least one of them.
     both rows will match. To prevent this, perform the correct typecasting
     before using the value in a query.
 
-defer
-~~~~~
+``defer()``
+~~~~~~~~~~~
 
 .. method:: defer(*fields)
 
@@ -1410,9 +1410,8 @@ one, doing so will result in an error.
     deferred fields, only the loaded fields will be saved. See
     :meth:`~django.db.models.Model.save()` for more details.
 
-
-only
-~~~~
+``only()``
+~~~~~~~~~~
 
 .. method:: only(*fields)
 
@@ -1460,8 +1459,8 @@ is an error as well.
     deferred fields, only the loaded fields will be saved. See
     :meth:`~django.db.models.Model.save()` for more details.
 
-using
-~~~~~
+``using()``
+~~~~~~~~~~~
 
 .. method:: using(alias)
 
@@ -1478,8 +1477,8 @@ For example::
     # queries the database with the 'backup' alias
     >>> Entry.objects.using('backup')
 
-select_for_update
-~~~~~~~~~~~~~~~~~
+``select_for_update()``
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: select_for_update(nowait=False)
 
@@ -1533,8 +1532,8 @@ raised if ``select_for_update()`` is used in autocommit mode.
     ``select_for_update()`` you should use
     :class:`~django.test.TransactionTestCase`.
 
-raw
-~~~
+``raw()``
+~~~~~~~~~
 
 .. method:: raw(raw_query, params=None, translations=None)
 
@@ -1550,8 +1549,8 @@ See the :doc:`/topics/db/sql` for more information.
   filtering. As such, it should generally be called from the ``Manager`` or
   from a fresh ``QuerySet`` instance.
 
-Methods that do not return QuerySets
-------------------------------------
+Methods that do not return ``QuerySet``\s
+-----------------------------------------
 
 The following ``QuerySet`` methods evaluate the ``QuerySet`` and return
 something *other than* a ``QuerySet``.
@@ -1559,8 +1558,8 @@ something *other than* a ``QuerySet``.
 These methods do not use a cache (see :ref:`caching-and-querysets`). Rather,
 they query the database each time they're called.
 
-get
-~~~
+``get()``
+~~~~~~~~~
 
 .. method:: get(**kwargs)
 
@@ -1589,8 +1588,8 @@ The :exc:`~django.db.models.Model.DoesNotExist` exception inherits from
     except ObjectDoesNotExist:
         print("Either the entry or blog doesn't exist.")
 
-create
-~~~~~~
+``create()``
+~~~~~~~~~~~~
 
 .. method:: create(**kwargs)
 
@@ -1613,8 +1612,8 @@ database, a call to ``create()`` will fail with an
 :exc:`~django.db.IntegrityError` since primary keys must be unique. Be
 prepared to handle the exception if you are using manual primary keys.
 
-get_or_create
-~~~~~~~~~~~~~
+``get_or_create()``
+~~~~~~~~~~~~~~~~~~~
 
 .. method:: get_or_create(defaults=None, **kwargs)
 
@@ -1728,8 +1727,8 @@ whenever a request to a page has a side effect on your data. For more, see
   chapter because it isn't related to that book, but it can't create it either
   because ``title`` field should be unique.
 
-update_or_create
-~~~~~~~~~~~~~~~~
+``update_or_create()``
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: update_or_create(defaults=None, **kwargs)
 
@@ -1770,8 +1769,8 @@ As described above in :meth:`get_or_create`, this method is prone to a
 race-condition which can result in multiple rows being inserted simultaneously
 if uniqueness is not enforced at the database level.
 
-bulk_create
-~~~~~~~~~~~
+``bulk_create()``
+~~~~~~~~~~~~~~~~~
 
 .. method:: bulk_create(objs, batch_size=None)
 
@@ -1802,8 +1801,8 @@ The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at most 999 variables per query are used.
 
-count
-~~~~~
+``count()``
+~~~~~~~~~~~
 
 .. method:: count()
 
@@ -1833,13 +1832,14 @@ retrieving model instances from it (for example, by iterating over it), it's
 probably more efficient to use ``len(queryset)`` which won't cause an extra
 database query like ``count()`` would.
 
-in_bulk
-~~~~~~~
+``in_bulk()``
+~~~~~~~~~~~~~
 
-.. method:: in_bulk(id_list)
+.. method:: in_bulk(id_list=None)
 
 Takes a list of primary-key values and returns a dictionary mapping each
-primary-key value to an instance of the object with the given ID.
+primary-key value to an instance of the object with the given ID. If a list
+isn't provided, all objects in the queryset are returned.
 
 Example::
 
@@ -1849,11 +1849,17 @@ Example::
     {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>}
     >>> Blog.objects.in_bulk([])
     {}
+    >>> Blog.objects.in_bulk()
+    {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Django Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
-iterator
-~~~~~~~~
+.. versionchanged:: 1.10
+
+    In older versions, ``id_list`` was a required argument.
+
+``iterator()``
+~~~~~~~~~~~~~~
 
 .. method:: iterator()
 
@@ -1882,8 +1888,8 @@ ignored since these two optimizations do not make sense together.
 
 .. _server side cursors: http://initd.org/psycopg/docs/usage.html#server-side-cursors
 
-latest
-~~~~~~
+``latest()``
+~~~~~~~~~~~~
 
 .. method:: latest(field_name=None)
 
@@ -1907,16 +1913,16 @@ given parameters.
 Note that ``earliest()`` and ``latest()`` exist purely for convenience and
 readability.
 
-earliest
-~~~~~~~~
+``earliest()``
+~~~~~~~~~~~~~~
 
 .. method:: earliest(field_name=None)
 
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
 
-first
-~~~~~
+``first()``
+~~~~~~~~~~~
 
 .. method:: first()
 
@@ -1936,18 +1942,19 @@ equivalent to the above example::
     except IndexError:
         p = None
 
-last
-~~~~
+``last()``
+~~~~~~~~~~
+
 .. method:: last()
 
 Works like  :meth:`first()`, but returns the last object in the queryset.
 
-aggregate
-~~~~~~~~~
+``aggregate()``
+~~~~~~~~~~~~~~~
 
 .. method:: aggregate(*args, **kwargs)
 
-Returns a dictionary of aggregate values (averages, sums, etc) calculated over
+Returns a dictionary of aggregate values (averages, sums, etc.) calculated over
 the ``QuerySet``. Each argument to ``aggregate()`` specifies a value that will
 be included in the dictionary that is returned.
 
@@ -1978,8 +1985,8 @@ control the name of the aggregation value that is returned::
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
 
-exists
-~~~~~~
+``exists()``
+~~~~~~~~~~~~
 
 .. method:: exists()
 
@@ -2024,8 +2031,8 @@ more overall work (one query for the existence check plus an extra one to later
 retrieve the results) than simply using ``bool(some_queryset)``, which
 retrieves the results and then checks if any were returned.
 
-update
-~~~~~~
+``update()``
+~~~~~~~~~~~~
 
 .. method:: update(**kwargs)
 
@@ -2098,8 +2105,8 @@ update a bunch of records for a model that has a custom
         e.comments_on = False
         e.save()
 
-delete
-~~~~~~
+``delete()``
+~~~~~~~~~~~~
 
 .. method:: delete()
 
@@ -2156,8 +2163,8 @@ ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
 
-as_manager
-~~~~~~~~~~
+``as_manager()``
+~~~~~~~~~~~~~~~~
 
 .. classmethod:: as_manager()
 
@@ -2167,8 +2174,8 @@ with a copy of the ``QuerySet``’s methods. See
 
 .. _field-lookups:
 
-Field lookups
--------------
+``Field`` lookups
+-----------------
 
 Field lookups are how you specify the meat of an SQL ``WHERE`` clause. They're
 specified as keyword arguments to the ``QuerySet`` methods :meth:`filter()`,
@@ -2185,8 +2192,8 @@ As a convenience when no lookup type is provided (like in
 
 .. fieldlookup:: exact
 
-exact
-~~~~~
+``exact``
+~~~~~~~~~
 
 Exact match. If the value provided for comparison is ``None``, it will be
 interpreted as an SQL ``NULL`` (see :lookup:`isnull` for more details).
@@ -2212,8 +2219,8 @@ SQL equivalents::
 
 .. fieldlookup:: iexact
 
-iexact
-~~~~~~
+``iexact``
+~~~~~~~~~~
 
 Case-insensitive exact match. If the value provided for comparison is ``None``,
 it will be interpreted as an SQL ``NULL`` (see :lookup:`isnull` for more
@@ -2241,8 +2248,8 @@ Note the first query will match ``'Beatles Blog'``, ``'beatles blog'``,
 
 .. fieldlookup:: contains
 
-contains
-~~~~~~~~
+``contains``
+~~~~~~~~~~~~
 
 Case-sensitive containment test.
 
@@ -2266,8 +2273,8 @@ honored today'``.
 
 .. fieldlookup:: icontains
 
-icontains
-~~~~~~~~~
+``icontains``
+~~~~~~~~~~~~~
 
 Case-insensitive containment test.
 
@@ -2287,8 +2294,8 @@ SQL equivalent::
 
 .. fieldlookup:: in
 
-in
-~~
+``in``
+~~~~~~
 
 In a given list.
 
@@ -2346,8 +2353,8 @@ extract two field values, where only one is expected::
 
 .. fieldlookup:: gt
 
-gt
-~~
+``gt``
+~~~~~~
 
 Greater than.
 
@@ -2361,29 +2368,29 @@ SQL equivalent::
 
 .. fieldlookup:: gte
 
-gte
-~~~
+``gte``
+~~~~~~~
 
 Greater than or equal to.
 
 .. fieldlookup:: lt
 
-lt
-~~
+``lt``
+~~~~~~
 
 Less than.
 
 .. fieldlookup:: lte
 
-lte
-~~~
+``lte``
+~~~~~~~
 
 Less than or equal to.
 
 .. fieldlookup:: startswith
 
-startswith
-~~~~~~~~~~
+``startswith``
+~~~~~~~~~~~~~~
 
 Case-sensitive starts-with.
 
@@ -2400,8 +2407,8 @@ like ``istartswith`` for SQLite.
 
 .. fieldlookup:: istartswith
 
-istartswith
-~~~~~~~~~~~
+``istartswith``
+~~~~~~~~~~~~~~~
 
 Case-insensitive starts-with.
 
@@ -2421,8 +2428,8 @@ SQL equivalent::
 
 .. fieldlookup:: endswith
 
-endswith
-~~~~~~~~
+``endswith``
+~~~~~~~~~~~~
 
 Case-sensitive ends-with.
 
@@ -2442,8 +2449,8 @@ SQL equivalent::
 
 .. fieldlookup:: iendswith
 
-iendswith
-~~~~~~~~~
+``iendswith``
+~~~~~~~~~~~~~
 
 Case-insensitive ends-with.
 
@@ -2463,8 +2470,8 @@ SQL equivalent::
 
 .. fieldlookup:: range
 
-range
-~~~~~
+``range``
+~~~~~~~~~
 
 Range test (inclusive).
 
@@ -2495,8 +2502,8 @@ numbers and even characters.
 
 .. fieldlookup:: date
 
-date
-~~~~
+``date``
+~~~~~~~~
 
 .. versionadded:: 1.9
 
@@ -2516,8 +2523,8 @@ zone before filtering.
 
 .. fieldlookup:: year
 
-year
-~~~~
+``year``
+~~~~~~~~
 
 For date and datetime fields, an exact year match. Allows chaining additional
 field lookups. Takes an integer year.
@@ -2543,8 +2550,8 @@ current time zone before filtering.
 
 .. fieldlookup:: month
 
-month
-~~~~~
+``month``
+~~~~~~~~~
 
 For date and datetime fields, an exact month match. Allows chaining additional
 field lookups. Takes an integer 1 (January) through 12 (December).
@@ -2571,8 +2578,8 @@ in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: day
 
-day
-~~~
+``day``
+~~~~~~~
 
 For date and datetime fields, an exact day match. Allows chaining additional
 field lookups. Takes an integer day.
@@ -2602,8 +2609,8 @@ in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: week_day
 
-week_day
-~~~~~~~~
+``week_day``
+~~~~~~~~~~~~
 
 For date and datetime fields, a 'day of the week' match. Allows chaining
 additional field lookups.
@@ -2633,8 +2640,8 @@ in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: hour
 
-hour
-~~~~
+``hour``
+~~~~~~~~
 
 For datetime and time fields, an exact hour match. Allows chaining additional
 field lookups. Takes an integer between 0 and 23.
@@ -2667,8 +2674,8 @@ to the current time zone before filtering.
 
 .. fieldlookup:: minute
 
-minute
-~~~~~~
+``minute``
+~~~~~~~~~~
 
 For datetime and time fields, an exact minute match. Allows chaining additional
 field lookups. Takes an integer between 0 and 59.
@@ -2701,8 +2708,8 @@ to the current time zone before filtering.
 
 .. fieldlookup:: second
 
-second
-~~~~~~
+``second``
+~~~~~~~~~~
 
 For datetime and time fields, an exact second match. Allows chaining additional
 field lookups. Takes an integer between 0 and 59.
@@ -2735,8 +2742,8 @@ to the current time zone before filtering.
 
 .. fieldlookup:: isnull
 
-isnull
-~~~~~~
+``isnull``
+~~~~~~~~~~
 
 Takes either ``True`` or ``False``, which correspond to SQL queries of
 ``IS NULL`` and ``IS NOT NULL``, respectively.
@@ -2751,8 +2758,8 @@ SQL equivalent::
 
 .. fieldlookup:: search
 
-search
-~~~~~~
+``search``
+~~~~~~~~~~
 
 A boolean full-text search, taking advantage of full-text indexing. This is
 like :lookup:`contains` but is significantly faster due to full-text indexing.
@@ -2773,8 +2780,8 @@ full text searches. See the `MySQL documentation`_ for additional details.
 
 .. fieldlookup:: regex
 
-regex
-~~~~~
+``regex``
+~~~~~~~~~
 
 Case-sensitive regular expression match.
 
@@ -2802,8 +2809,8 @@ regular expression syntax is recommended.
 
 .. fieldlookup:: iregex
 
-iregex
-~~~~~~
+``iregex``
+~~~~~~~~~~
 
 Case-insensitive regular expression match.
 
@@ -2875,8 +2882,8 @@ of the return value
 Keyword arguments that can provide extra context for the SQL generated
 by the aggregate.
 
-Avg
-~~~
+``Avg``
+~~~~~~~
 
 .. class:: Avg(expression, output_field=FloatField(), **extra)
 
@@ -2892,8 +2899,8 @@ Avg
         The ``output_field`` parameter was added to allow aggregating over
         non-numeric columns, such as ``DurationField``.
 
-Count
-~~~~~
+``Count``
+~~~~~~~~~
 
 .. class:: Count(expression, distinct=False, **extra)
 
@@ -2911,8 +2918,8 @@ Count
         This is the SQL equivalent of ``COUNT(DISTINCT <field>)``. The default
         value is ``False``.
 
-Max
-~~~
+``Max``
+~~~~~~~
 
 .. class:: Max(expression, output_field=None, **extra)
 
@@ -2921,8 +2928,8 @@ Max
     * Default alias: ``<field>__max``
     * Return type: same as input field, or ``output_field`` if supplied
 
-Min
-~~~
+``Min``
+~~~~~~~
 
 .. class:: Min(expression, output_field=None, **extra)
 
@@ -2931,8 +2938,8 @@ Min
     * Default alias: ``<field>__min``
     * Return type: same as input field, or ``output_field`` if supplied
 
-StdDev
-~~~~~~
+``StdDev``
+~~~~~~~~~~
 
 .. class:: StdDev(expression, sample=False, **extra)
 
@@ -2955,8 +2962,8 @@ StdDev
         documentation`_ for instructions on obtaining and installing this
         extension.
 
-Sum
-~~~
+``Sum``
+~~~~~~~
 
 .. class:: Sum(expression, output_field=None, **extra)
 
@@ -2965,8 +2972,8 @@ Sum
     * Default alias: ``<field>__sum``
     * Return type: same as input field, or ``output_field`` if supplied
 
-Variance
-~~~~~~~~
+``Variance``
+~~~~~~~~~~~~
 
 .. class:: Variance(expression, sample=False, **extra)
 

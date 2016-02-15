@@ -44,9 +44,22 @@ class ActiveTranslationField(models.ForeignObject):
         setattr(cls, self.name, ArticleTranslationDescriptor(self))
 
 
+class ActiveTranslationFieldWithQ(ActiveTranslationField):
+    def get_extra_descriptor_filter(self, instance):
+        return models.Q(lang=get_language())
+
+
 @python_2_unicode_compatible
 class Article(models.Model):
     active_translation = ActiveTranslationField(
+        'ArticleTranslation',
+        from_fields=['id'],
+        to_fields=['article'],
+        related_name='+',
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    active_translation_q = ActiveTranslationFieldWithQ(
         'ArticleTranslation',
         from_fields=['id'],
         to_fields=['article'],

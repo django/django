@@ -527,3 +527,13 @@ class IfTagTests(SimpleTestCase):
         # A single equals sign is a syntax error.
         with self.assertRaises(TemplateSyntaxError):
             self.engine.render_to_string('if-tag-single-eq', {'foo': 1})
+
+    @setup({'template': '{% if foo is True %}yes{% else %}no{% endif %}'})
+    def test_if_is_match(self):
+        output = self.engine.render_to_string('template', {'foo': True})
+        self.assertEqual(output, 'yes')
+
+    @setup({'template': '{% if foo is True %}yes{% else %}no{% endif %}'})
+    def test_if_is_no_match(self):
+        output = self.engine.render_to_string('template', {'foo': 1})
+        self.assertEqual(output, 'no')

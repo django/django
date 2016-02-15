@@ -83,8 +83,10 @@ class ImageFieldTestMixin(SerializeMixin):
         field = getattr(instance, field_name)
         # Check height/width attributes of field.
         if width is None and height is None:
-            self.assertRaises(ValueError, getattr, field, 'width')
-            self.assertRaises(ValueError, getattr, field, 'height')
+            with self.assertRaises(ValueError):
+                getattr(field, 'width')
+            with self.assertRaises(ValueError):
+                getattr(field, 'height')
         else:
             self.assertEqual(field.width, width)
             self.assertEqual(field.height, height)

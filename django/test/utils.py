@@ -5,20 +5,22 @@ import time
 import warnings
 from contextlib import contextmanager
 from functools import wraps
-from unittest import skipIf, skipUnless
+from unittest import TestCase, skipIf, skipUnless
 from xml.dom.minidom import Node, parseString
 
 from django.apps import apps
+from django.apps.registry import Apps
 from django.conf import UserSettingsHolder, settings
 from django.core import mail
 from django.core.signals import request_started
-from django.core.urlresolvers import get_script_prefix, set_script_prefix
 from django.db import reset_queries
+from django.db.models.options import Options
 from django.http import request
 from django.template import Template
 from django.test.signals import setting_changed, template_rendered
+from django.urls import get_script_prefix, set_script_prefix
 from django.utils import six
-from django.utils.decorators import ContextDecorator
+from django.utils.decorators import available_attrs
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
@@ -149,45 +151,81 @@ def get_runner(settings, test_runner_class=None):
     return test_runner
 
 
-class override_settings(object):
+class TestContextDecorator(object):
     """
-    Acts as either a decorator, or a context manager. If it's a decorator it
+    A base class that can either be used as a context manager during tests
+    or as a test function or unittest.TestCase subclass decorator to perform
+    temporary alterations.
+
+    `attr_name`: attribute assigned the return value of enable() if used as
+                 a class decorator.
+
+    `kwarg_name`: keyword argument passing the return value of enable() if
+                  used as a function decorator.
+    """
+    def __init__(self, attr_name=None, kwarg_name=None):
+        self.attr_name = attr_name
+        self.kwarg_name = kwarg_name
+
+    def enable(self):
+        raise NotImplementedError
+
+    def disable(self):
+        raise NotImplementedError
+
+    def __enter__(self):
+        return self.enable()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.disable()
+
+    def decorate_class(self, cls):
+        if issubclass(cls, TestCase):
+            decorated_setUp = cls.setUp
+            decorated_tearDown = cls.tearDown
+
+            def setUp(inner_self):
+                context = self.enable()
+                if self.attr_name:
+                    setattr(inner_self, self.attr_name, context)
+                decorated_setUp(inner_self)
+
+            def tearDown(inner_self):
+                decorated_tearDown(inner_self)
+                self.disable()
+
+            cls.setUp = setUp
+            cls.tearDown = tearDown
+            return cls
+        raise TypeError('Can only decorate subclasses of unittest.TestCase')
+
+    def decorate_callable(self, func):
+        @wraps(func, assigned=available_attrs(func))
+        def inner(*args, **kwargs):
+            with self as context:
+                if self.kwarg_name:
+                    kwargs[self.kwarg_name] = context
+                return func(*args, **kwargs)
+        return inner
+
+    def __call__(self, decorated):
+        if isinstance(decorated, type):
+            return self.decorate_class(decorated)
+        elif callable(decorated):
+            return self.decorate_callable(decorated)
+        raise TypeError('Cannot decorate object of type %s' % type(decorated))
+
+
+class override_settings(TestContextDecorator):
+    """
+    Acts as either a decorator or a context manager. If it's a decorator it
     takes a function and returns a wrapped function. If it's a contextmanager
     it's used with the ``with`` statement. In either event entering/exiting
     are called before and after, respectively, the function/block is executed.
     """
     def __init__(self, **kwargs):
         self.options = kwargs
-
-    def __enter__(self):
-        self.enable()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.disable()
-
-    def __call__(self, test_func):
-        from django.test import SimpleTestCase
-        if isinstance(test_func, type):
-            if not issubclass(test_func, SimpleTestCase):
-                raise Exception(
-                    "Only subclasses of Django SimpleTestCase can be decorated "
-                    "with override_settings")
-            self.save_options(test_func)
-            return test_func
-        else:
-            @wraps(test_func)
-            def inner(*args, **kwargs):
-                with self:
-                    return test_func(*args, **kwargs)
-        return inner
-
-    def save_options(self, test_func):
-        if test_func._overridden_settings is None:
-            test_func._overridden_settings = self.options
-        else:
-            # Duplicate dict to prevent subclasses from altering their parent.
-            test_func._overridden_settings = dict(
-                test_func._overridden_settings, **self.options)
+        super(override_settings, self).__init__()
 
     def enable(self):
         # Keep this code at the beginning to leave the settings unchanged
@@ -217,6 +255,23 @@ class override_settings(object):
             setting_changed.send(sender=settings._wrapped.__class__,
                                  setting=key, value=new_value, enter=False)
 
+    def save_options(self, test_func):
+        if test_func._overridden_settings is None:
+            test_func._overridden_settings = self.options
+        else:
+            # Duplicate dict to prevent subclasses from altering their parent.
+            test_func._overridden_settings = dict(
+                test_func._overridden_settings, **self.options)
+
+    def decorate_class(self, cls):
+        from django.test import SimpleTestCase
+        if not issubclass(cls, SimpleTestCase):
+            raise ValueError(
+                "Only subclasses of Django SimpleTestCase can be decorated "
+                "with override_settings")
+        self.save_options(cls)
+        return cls
+
 
 class modify_settings(override_settings):
     """
@@ -231,6 +286,7 @@ class modify_settings(override_settings):
         else:
             assert not args
             self.operations = list(kwargs.items())
+        super(override_settings, self).__init__()
 
     def save_options(self, test_func):
         if test_func._modified_settings is None:
@@ -265,28 +321,29 @@ class modify_settings(override_settings):
         super(modify_settings, self).enable()
 
 
-def override_system_checks(new_checks, deployment_checks=None):
-    """ Acts as a decorator. Overrides list of registered system checks.
+class override_system_checks(TestContextDecorator):
+    """
+    Acts as a decorator. Overrides list of registered system checks.
     Useful when you override `INSTALLED_APPS`, e.g. if you exclude `auth` app,
-    you also need to exclude its system checks. """
+    you also need to exclude its system checks.
+    """
+    def __init__(self, new_checks, deployment_checks=None):
+        from django.core.checks.registry import registry
+        self.registry = registry
+        self.new_checks = new_checks
+        self.deployment_checks = deployment_checks
+        super(override_system_checks, self).__init__()
 
-    from django.core.checks.registry import registry
+    def enable(self):
+        self.old_checks = self.registry.registered_checks
+        self.registry.registered_checks = self.new_checks
+        self.old_deployment_checks = self.registry.deployment_checks
+        if self.deployment_checks is not None:
+            self.registry.deployment_checks = self.deployment_checks
 
-    def outer(test_func):
-        @wraps(test_func)
-        def inner(*args, **kwargs):
-            old_checks = registry.registered_checks
-            registry.registered_checks = new_checks
-            old_deployment_checks = registry.deployment_checks
-            if deployment_checks is not None:
-                registry.deployment_checks = deployment_checks
-            try:
-                return test_func(*args, **kwargs)
-            finally:
-                registry.registered_checks = old_checks
-                registry.deployment_checks = old_deployment_checks
-        return inner
-    return outer
+    def disable(self):
+        self.registry.registered_checks = self.old_checks
+        self.registry.deployment_checks = self.old_deployment_checks
 
 
 def compare_xml(want, got):
@@ -426,40 +483,22 @@ class CaptureQueriesContext(object):
         self.final_queries = len(self.connection.queries_log)
 
 
-class ignore_warnings(object):
+class ignore_warnings(TestContextDecorator):
     def __init__(self, **kwargs):
         self.ignore_kwargs = kwargs
         if 'message' in self.ignore_kwargs or 'module' in self.ignore_kwargs:
             self.filter_func = warnings.filterwarnings
         else:
             self.filter_func = warnings.simplefilter
+        super(ignore_warnings, self).__init__()
 
-    def __call__(self, decorated):
-        if isinstance(decorated, type):
-            # A class is decorated
-            saved_setUp = decorated.setUp
-            saved_tearDown = decorated.tearDown
+    def enable(self):
+        self.catch_warnings = warnings.catch_warnings()
+        self.catch_warnings.__enter__()
+        self.filter_func('ignore', **self.ignore_kwargs)
 
-            def setUp(inner_self):
-                self.catch_warnings = warnings.catch_warnings()
-                self.catch_warnings.__enter__()
-                self.filter_func('ignore', **self.ignore_kwargs)
-                saved_setUp(inner_self)
-
-            def tearDown(inner_self):
-                saved_tearDown(inner_self)
-                self.catch_warnings.__exit__(*sys.exc_info())
-
-            decorated.setUp = setUp
-            decorated.tearDown = tearDown
-            return decorated
-        else:
-            @wraps(decorated)
-            def inner(*args, **kwargs):
-                with warnings.catch_warnings():
-                    self.filter_func('ignore', **self.ignore_kwargs)
-                    return decorated(*args, **kwargs)
-            return inner
+    def disable(self):
+        self.catch_warnings.__exit__(*sys.exc_info())
 
 
 @contextmanager
@@ -608,23 +647,20 @@ def require_jinja2(test_func):
     return test_func
 
 
-class ScriptPrefix(ContextDecorator):
-    def __enter__(self):
-        set_script_prefix(self.prefix)
-
-    def __exit__(self, exc_type, exc_val, traceback):
-        set_script_prefix(self.old_prefix)
-
-    def __init__(self, prefix):
-        self.prefix = prefix
-        self.old_prefix = get_script_prefix()
-
-
-def override_script_prefix(prefix):
+class override_script_prefix(TestContextDecorator):
     """
     Decorator or context manager to temporary override the script prefix.
     """
-    return ScriptPrefix(prefix)
+    def __init__(self, prefix):
+        self.prefix = prefix
+        super(override_script_prefix, self).__init__()
+
+    def enable(self):
+        self.old_prefix = get_script_prefix()
+        set_script_prefix(self.prefix)
+
+    def disable(self):
+        set_script_prefix(self.old_prefix)
 
 
 class LoggingCaptureMixin(object):
@@ -640,3 +676,34 @@ class LoggingCaptureMixin(object):
 
     def tearDown(self):
         self.logger.handlers[0].stream = self.old_stream
+
+
+class isolate_apps(TestContextDecorator):
+    """
+    Act as either a decorator or a context manager to register models defined
+    in its wrapped context to an isolated registry.
+
+    The list of installed apps the isolated registry should contain must be
+    passed as arguments.
+
+    Two optional keyword arguments can be specified:
+
+    `attr_name`: attribute assigned the isolated registry if used as a class
+                 decorator.
+
+    `kwarg_name`: keyword argument passing the isolated registry if used as a
+                  function decorator.
+    """
+
+    def __init__(self, *installed_apps, **kwargs):
+        self.installed_apps = installed_apps
+        super(isolate_apps, self).__init__(**kwargs)
+
+    def enable(self):
+        self.old_apps = Options.default_apps
+        apps = Apps(self.installed_apps)
+        setattr(Options, 'default_apps', apps)
+        return apps
+
+    def disable(self):
+        setattr(Options, 'default_apps', self.old_apps)

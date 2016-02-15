@@ -27,7 +27,7 @@ sys.path.append(abspath(join(dirname(__file__), "_ext")))
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.0.8'
+needs_sphinx = '1.3'  # Actually 1.3.4, but micro versions aren't supported here.
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -79,10 +79,10 @@ except ImportError:
     release = version
 else:
     def django_release():
-        pep386ver = get_version()
-        if VERSION[3:5] == ('alpha', 0) and 'dev' not in pep386ver:
-            return pep386ver + '.dev'
-        return pep386ver
+        pep440ver = get_version()
+        if VERSION[3:5] == ('alpha', 0) and 'dev' not in pep440ver:
+            return pep440ver + '.dev'
+        return pep440ver
 
     release = django_release()
 

@@ -63,7 +63,8 @@ class OnDeleteTests(TestCase):
 
     def test_protect(self):
         a = create_a('protect')
-        self.assertRaises(IntegrityError, a.protect.delete)
+        with self.assertRaises(IntegrityError):
+            a.protect.delete()
 
     def test_do_nothing(self):
         # Testing DO_NOTHING is a bit harder: It would raise IntegrityError for a normal model,
@@ -503,3 +504,15 @@ class FastDeleteTests(TestCase):
         # that + fast delete of the related objs.
         self.assertNumQueries(2, a.delete)
         self.assertEqual(User.objects.count(), 0)
+
+    def test_fast_delete_empty_no_update_can_self_select(self):
+        """
+        #25932 - Fast deleting on backends that don't have the
+        `no_update_can_self_select` feature should work even if the specified
+        filter doesn't match any row.
+        """
+        with self.assertNumQueries(1):
+            self.assertEqual(
+                User.objects.filter(avatar__desc='missing').delete(),
+                (0, {'delete.User': 0})
+            )

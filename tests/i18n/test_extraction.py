@@ -204,6 +204,14 @@ class BasicExtractorTests(ExtractorTests):
                 po_contents
             )
 
+    def test_special_char_extracted(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertMsgId("Non-breaking space\xa0:", po_contents)
+
     def test_blocktrans_trimmed(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
@@ -754,8 +762,8 @@ class CustomLayoutExtractionTests(ExtractorTests):
 
     def test_no_locale_raises(self):
         os.chdir(self.test_dir)
-        with six.assertRaisesRegex(self, management.CommandError,
-                "Unable to find a locale path to store translations for file"):
+        msg = "Unable to find a locale path to store translations for file"
+        with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command('makemessages', locale=LOCALE, verbosity=0)
 
     @override_settings(

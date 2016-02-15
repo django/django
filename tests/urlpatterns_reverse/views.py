@@ -1,8 +1,8 @@
 from functools import partial, update_wrapper
 
 from django.contrib.auth.decorators import user_passes_test
-from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
+from django.urls import reverse_lazy
 from django.views.generic import RedirectView
 
 
@@ -55,8 +55,7 @@ def bad_view(request, *args, **kwargs):
 
 
 empty_view_partial = partial(empty_view, template_name="template.html")
-
-
+empty_view_nested_partial = partial(empty_view_partial, template_name="nested_partial.html")
 empty_view_wrapped = update_wrapper(
     partial(empty_view, template_name="template.html"), empty_view,
 )

@@ -7,7 +7,6 @@ from django.core.exceptions import FieldError
 from django.db import IntegrityError
 from django.db.models import Q
 from django.test import SimpleTestCase, TestCase
-from django.utils import six
 
 from .models import (
     AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
@@ -405,6 +404,13 @@ class GenericRelationsTests(TestCase):
         # GenericRelations to models that use multi-table inheritance work.
         granite = ValuableRock.objects.create(name='granite', hardness=5)
         ValuableTaggedItem.objects.create(content_object=granite, tag="countertop", value=1)
+        self.assertEqual(ValuableRock.objects.filter(tags__value=1).count(), 1)
+        # We're generating a slightly inefficient query for tags__tag - we
+        # first join ValuableRock -> TaggedItem -> ValuableTaggedItem, and then
+        # we fetch tag by joining TaggedItem from ValuableTaggedItem. The last
+        # join isn't necessary, as TaggedItem <-> ValuableTaggedItem is a
+        # one-to-one join.
+        self.assertEqual(ValuableRock.objects.filter(tags__tag="countertop").count(), 1)
         granite.delete()  # deleting the rock should delete the related tag.
         self.assertEqual(ValuableTaggedItem.objects.count(), 0)
 
@@ -711,14 +717,11 @@ class ProxyRelatedModelTest(TestCase):
 
 
 class TestInitWithNoneArgument(SimpleTestCase):
-    def test_none_not_allowed(self):
-        # TaggedItem requires a content_type, initializing with None should
-        # raise a ValueError.
-        with six.assertRaisesRegex(self, ValueError,
-          'Cannot assign None: "TaggedItem.content_type" does not allow null values'):
-            TaggedItem(content_object=None)
 
     def test_none_allowed(self):
         # AllowsNullGFK doesn't require a content_type, so None argument should
         # also be allowed.
         AllowsNullGFK(content_object=None)
+        # TaggedItem requires a content_type but initializing with None should
+        # be allowed.
+        TaggedItem(content_object=None)

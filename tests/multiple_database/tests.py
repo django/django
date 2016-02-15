@@ -49,11 +49,8 @@ class QueryTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('"Pro Django" should exist on default database')
 
-        self.assertRaises(
-            Book.DoesNotExist,
-            Book.objects.using('other').get,
-            title="Pro Django"
-        )
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.using('other').get(title="Pro Django")
 
         try:
             Book.objects.get(title="Dive into Python")
@@ -61,11 +58,8 @@ class QueryTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('"Dive into Python" should exist on default database')
 
-        self.assertRaises(
-            Book.DoesNotExist,
-            Book.objects.using('other').get,
-            title="Dive into Python"
-        )
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.using('other').get(title="Dive into Python")
 
     def test_other_creation(self):
         "Objects created on another database don't leak onto the default database"
@@ -85,32 +79,20 @@ class QueryTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('"Pro Django" should exist on other database')
 
-        self.assertRaises(
-            Book.DoesNotExist,
-            Book.objects.get,
-            title="Pro Django"
-        )
-        self.assertRaises(
-            Book.DoesNotExist,
-            Book.objects.using('default').get,
-            title="Pro Django"
-        )
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.get(title="Pro Django")
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.using('default').get(title="Pro Django")
 
         try:
             Book.objects.using('other').get(title="Dive into Python")
         except Book.DoesNotExist:
             self.fail('"Dive into Python" should exist on other database')
 
-        self.assertRaises(
-            Book.DoesNotExist,
-            Book.objects.get,
-            title="Dive into Python"
-        )
-        self.assertRaises(
-            Book.DoesNotExist,
-            Book.objects.using('default').get,
-            title="Dive into Python"
-        )
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.get(title="Dive into Python")
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.using('default').get(title="Dive into Python")
 
     def test_refresh(self):
         dive = Book()
@@ -137,20 +119,24 @@ class QueryTestCase(TestCase):
 
         dive = Book.objects.using('other').get(published=datetime.date(2009, 5, 4))
         self.assertEqual(dive.title, "Dive into Python")
-        self.assertRaises(Book.DoesNotExist, Book.objects.using('default').get, published=datetime.date(2009, 5, 4))
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.using('default').get(published=datetime.date(2009, 5, 4))
 
         dive = Book.objects.using('other').get(title__icontains="dive")
         self.assertEqual(dive.title, "Dive into Python")
-        self.assertRaises(Book.DoesNotExist, Book.objects.using('default').get, title__icontains="dive")
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.using('default').get(title__icontains="dive")
 
         dive = Book.objects.using('other').get(title__iexact="dive INTO python")
         self.assertEqual(dive.title, "Dive into Python")
-        self.assertRaises(Book.DoesNotExist, Book.objects.using('default').get, title__iexact="dive INTO python")
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.using('default').get(title__iexact="dive INTO python")
 
         dive = Book.objects.using('other').get(published__year=2009)
         self.assertEqual(dive.title, "Dive into Python")
         self.assertEqual(dive.published, datetime.date(2009, 5, 4))
-        self.assertRaises(Book.DoesNotExist, Book.objects.using('default').get, published__year=2009)
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.using('default').get(published__year=2009)
 
         years = Book.objects.using('other').dates('published', 'year')
         self.assertEqual([o.year for o in years], [2009])
@@ -965,7 +951,8 @@ class QueryTestCase(TestCase):
         # When you call __str__ on the query object, it doesn't know about using
         # so it falls back to the default. If the subquery explicitly uses a
         # different database, an error should be raised.
-        self.assertRaises(ValueError, str, qs.query)
+        with self.assertRaises(ValueError):
+            str(qs.query)
 
         # Evaluating the query shouldn't work, either
         with self.assertRaises(ValueError):
@@ -1605,7 +1592,8 @@ class AuthTestCase(TestCase):
         self.assertEqual(alice.username, 'alice')
         self.assertEqual(alice._state.db, 'other')
 
-        self.assertRaises(User.DoesNotExist, User.objects.using('default').get, username='alice')
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.using('default').get(username='alice')
 
         # The second user only exists on the default database
         bob = User.objects.using('default').get(username='bob')
@@ -1613,7 +1601,8 @@ class AuthTestCase(TestCase):
         self.assertEqual(bob.username, 'bob')
         self.assertEqual(bob._state.db, 'default')
 
-        self.assertRaises(User.DoesNotExist, User.objects.using('other').get, username='bob')
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.using('other').get(username='bob')
 
         # That is... there is one user on each database
         self.assertEqual(User.objects.using('default').count(), 1)
@@ -1663,11 +1652,8 @@ class FixtureTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('"Pro Django" should exist on default database')
 
-        self.assertRaises(
-            Book.DoesNotExist,
-            Book.objects.using('other').get,
-            title="Pro Django"
-        )
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.using('other').get(title="Pro Django")
 
         # Check that "Dive into Python" exists on the default database, but not on other database
         try:
@@ -1675,16 +1661,10 @@ class FixtureTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('"Dive into Python" should exist on other database')
 
-        self.assertRaises(
-            Book.DoesNotExist,
-            Book.objects.get,
-            title="Dive into Python"
-        )
-        self.assertRaises(
-            Book.DoesNotExist,
-            Book.objects.using('default').get,
-            title="Dive into Python"
-        )
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.get(title="Dive into Python")
+        with self.assertRaises(Book.DoesNotExist):
+            Book.objects.using('default').get(title="Dive into Python")
 
         # Check that "Definitive Guide" exists on the both databases
         try:
@@ -1846,7 +1826,8 @@ class RouterAttributeErrorTestCase(TestCase):
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         with self.override_router():
-            self.assertRaises(AttributeError, Book.objects.get, pk=b.pk)
+            with self.assertRaises(AttributeError):
+                Book.objects.get(pk=b.pk)
 
     def test_attribute_error_save(self):
         "Check that the AttributeError from AttributeErrorRouter bubbles up"
@@ -1854,7 +1835,8 @@ class RouterAttributeErrorTestCase(TestCase):
         dive.title = "Dive into Python"
         dive.published = datetime.date(2009, 5, 4)
         with self.override_router():
-            self.assertRaises(AttributeError, dive.save)
+            with self.assertRaises(AttributeError):
+                dive.save()
 
     def test_attribute_error_delete(self):
         "Check that the AttributeError from AttributeErrorRouter bubbles up"
@@ -1864,7 +1846,8 @@ class RouterAttributeErrorTestCase(TestCase):
         b.authors.set([p])
         b.editor = p
         with self.override_router():
-            self.assertRaises(AttributeError, b.delete)
+            with self.assertRaises(AttributeError):
+                b.delete()
 
     def test_attribute_error_m2m(self):
         "Check that the AttributeError from AttributeErrorRouter bubbles up"

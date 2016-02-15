@@ -3,11 +3,12 @@ import re
 
 from django import http
 from django.conf import settings
-from django.core import urlresolvers
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
+from django.urls import is_valid_path
 from django.utils.cache import get_conditional_response, set_response_etag
 from django.utils.encoding import force_text
+from django.utils.http import unquote_etag
 from django.utils.six.moves.urllib.parse import urlparse
 
 logger = logging.getLogger('django.request')
@@ -74,8 +75,8 @@ class CommonMiddleware(object):
         if settings.APPEND_SLASH and not request.get_full_path().endswith('/'):
             urlconf = getattr(request, 'urlconf', None)
             return (
-                not urlresolvers.is_valid_path(request.path_info, urlconf)
-                and urlresolvers.is_valid_path('%s/' % request.path_info, urlconf)
+                not is_valid_path(request.path_info, urlconf)
+                and is_valid_path('%s/' % request.path_info, urlconf)
             )
         return False
 
@@ -84,7 +85,7 @@ class CommonMiddleware(object):
         Return the full path of the request with a trailing slash appended.
 
         Raise a RuntimeError if settings.DEBUG is True and request.method is
-        GET, PUT, or PATCH.
+        POST, PUT, or PATCH.
         """
         new_path = request.get_full_path(force_append_slash=True)
         if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
@@ -120,9 +121,7 @@ class CommonMiddleware(object):
             if response.has_header('ETag'):
                 return get_conditional_response(
                     request,
-                    # get_conditional_response() requires an unquoted version
-                    # of the response's ETag.
-                    etag=response['ETag'].strip('"'),
+                    etag=unquote_etag(response['ETag']),
                     response=response,
                 )
 

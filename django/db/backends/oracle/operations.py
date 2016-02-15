@@ -44,10 +44,12 @@ END;
     def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
         # create a sequence and a trigger.
-        sq_name = self._get_sequence_name(table)
-        tr_name = self._get_trigger_name(table)
-        tbl_name = self.quote_name(table)
-        col_name = self.quote_name(column)
+        args = {
+            'sq_name': self._get_sequence_name(table),
+            'tr_name': self._get_trigger_name(table),
+            'tbl_name': self.quote_name(table),
+            'col_name': self.quote_name(column),
+        }
         sequence_sql = """
 DECLARE
     i INTEGER;
@@ -58,7 +60,7 @@ BEGIN
         EXECUTE IMMEDIATE 'CREATE SEQUENCE "%(sq_name)s"';
     END IF;
 END;
-/""" % locals()
+/""" % args
         trigger_sql = """
 CREATE OR REPLACE TRIGGER "%(tr_name)s"
 BEFORE INSERT ON %(tbl_name)s
@@ -68,7 +70,7 @@ WHEN (new.%(col_name)s IS NULL)
         SELECT "%(sq_name)s".nextval
         INTO :new.%(col_name)s FROM dual;
     END;
-/""" % locals()
+/""" % args
         return sequence_sql, trigger_sql
 
     def cache_key_culling_sql(self):

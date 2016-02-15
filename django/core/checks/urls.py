@@ -1,20 +1,24 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
+
 from . import Tags, Warning, register
 
 
 @register(Tags.urls)
 def check_url_config(app_configs, **kwargs):
-    from django.core.urlresolvers import get_resolver
-    resolver = get_resolver()
-    return check_resolver(resolver)
+    if getattr(settings, 'ROOT_URLCONF', None):
+        from django.urls import get_resolver
+        resolver = get_resolver()
+        return check_resolver(resolver)
+    return []
 
 
 def check_resolver(resolver):
     """
     Recursively check the resolver.
     """
-    from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
+    from django.urls import RegexURLPattern, RegexURLResolver
     warnings = []
     for pattern in resolver.url_patterns:
         if isinstance(pattern, RegexURLResolver):

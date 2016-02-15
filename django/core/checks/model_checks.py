@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import inspect
 import types
+from itertools import chain
 
 from django.apps import apps
 from django.core.checks import Error, Tags, register
@@ -11,21 +12,22 @@ from django.core.checks import Error, Tags, register
 @register(Tags.models)
 def check_all_models(app_configs=None, **kwargs):
     errors = []
-    for model in apps.get_models():
-        if app_configs is None or model._meta.app_config in app_configs:
-            if not inspect.ismethod(model.check):
-                errors.append(
-                    Error(
-                        "The '%s.check()' class method is "
-                        "currently overridden by %r." % (
-                            model.__name__, model.check),
-                        hint=None,
-                        obj=model,
-                        id='models.E020'
-                    )
+    if app_configs is None:
+        models = apps.get_models()
+    else:
+        models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
+    for model in models:
+        if not inspect.ismethod(model.check):
+            errors.append(
+                Error(
+                    "The '%s.check()' class method is currently overridden by %r."
+                    % (model.__name__, model.check),
+                    obj=model,
+                    id='models.E020'
                 )
-            else:
-                errors.extend(model.check(**kwargs))
+            )
+        else:
+            errors.extend(model.check(**kwargs))
     return errors
 
 
@@ -57,7 +59,6 @@ def check_model_signals(app_configs=None, **kwargs):
                                 description, name, '.'.join(reference)
                             ),
                             obj=receiver.__module__,
-                            hint=None,
                             id='signals.E001'
                         )
                     )

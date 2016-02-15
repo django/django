@@ -172,7 +172,12 @@ class Command(BaseCommand):
                 # Describe the migration
                 writer = MigrationWriter(migration)
                 if self.verbosity >= 1:
-                    self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(writer.filename),))
+                    # Display a relative path if it's below the current working
+                    # directory, or an absolute path otherwise.
+                    migration_string = os.path.relpath(writer.path)
+                    if migration_string.startswith('..'):
+                        migration_string = writer.path
+                    self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(migration_string),))
                     for operation in migration.operations:
                         self.stdout.write("    - %s\n" % operation.describe())
                 if not self.dry_run:
@@ -219,7 +224,10 @@ class Command(BaseCommand):
                     if mig[0] == migration.app_label
                 ]
                 merge_migrations.append(migration)
-            all_items_equal = lambda seq: all(item == seq[0] for item in seq[1:])
+
+            def all_items_equal(seq):
+                return all(item == seq[0] for item in seq[1:])
+
             merge_migrations_generations = zip(*[m.ancestry for m in merge_migrations])
             common_ancestor_count = sum(1 for common_ancestor_generation
                                         in takewhile(all_items_equal, merge_migrations_generations))

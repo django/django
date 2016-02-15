@@ -1,10 +1,11 @@
-##########################
+==========================
 Many-to-many relationships
-##########################
+==========================
 
 .. highlight:: pycon
 
-To define a many-to-many relationship, use :ref:`ref-manytomany`.
+To define a many-to-many relationship, use
+:class:`~django.db.models.ManyToManyField`.
 
 In this example, an ``Article`` can be published in multiple ``Publication``
 objects, and a ``Publication`` has multiple ``Article`` objects:

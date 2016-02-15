@@ -70,8 +70,6 @@ as a shorter alias, ``_``, to save typing.
        global ``_()`` function causes interference. Explicitly importing
        ``ugettext()`` as ``_()`` avoids this problem.
 
-.. highlightlang:: python
-
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
@@ -479,8 +477,8 @@ directly with the ``number`` argument::
                 raise forms.ValidationError(self.error_message % number)
 
 
-Joining strings: string_concat()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Joining strings: ``string_concat()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Standard Python string joins (``''.join([...])``) will not work on lists
 containing lazy translation objects. Instead, you can use
@@ -986,7 +984,7 @@ You hook it up like this::
     }
 
     urlpatterns = [
-        url(r'^jsi18n/$', javascript_catalog, js_info_dict),
+        url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
     ]
 
 Each string in ``packages`` should be in Python dotted-package syntax (the
@@ -1006,7 +1004,7 @@ changed by altering the ``domain`` argument.
 You can make the view dynamic by putting the packages into the URL pattern::
 
     urlpatterns = [
-        url(r'^jsi18n/(?P<packages>\S+?)/$', javascript_catalog),
+        url(r'^jsi18n/(?P<packages>\S+?)/$', javascript_catalog, name='javascript-catalog'),
     ]
 
 With this, you specify the packages as a list of package names delimited by '+'
@@ -1056,7 +1054,7 @@ To use the catalog, just pull in the dynamically generated script like this:
 
 .. code-block:: html+django
 
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 
 This uses reverse URL lookup to find the URL of the JavaScript catalog view.
 When the catalog is loaded, your JavaScript code can use the following methods:
@@ -1209,6 +1207,8 @@ Additionally, if there are complex rules around pluralization, the catalog view
 will render a conditional expression. This will evaluate to either a ``true``
 (should pluralize) or ``false`` (should **not** pluralize) value.
 
+.. highlight:: python
+
 The ``json_catalog`` view
 -------------------------
 
@@ -1243,7 +1243,7 @@ The view is hooked up to your application and configured in the same fashion as
 
 The response format is as follows:
 
-.. code-block:: json
+.. code-block:: text
 
     {
         "catalog": {
@@ -1254,6 +1254,8 @@ The response format is as follows:
         },
         "plural": "..."  # Expression for plural forms, or null.
     }
+
+.. JSON doesn't allow comments so highlighting as JSON won't work here.
 
 Note on performance
 -------------------
@@ -1266,9 +1268,7 @@ Server-side caching will reduce CPU load. It's easily implemented with the
 :func:`~django.views.decorators.cache.cache_page` decorator. To trigger cache
 invalidation when your translations change, provide a version-dependent key
 prefix, as shown in the example below, or map the view at a version-dependent
-URL.
-
-.. code-block:: python
+URL::
 
     from django.views.decorators.cache import cache_page
     from django.views.i18n import javascript_catalog
@@ -1282,9 +1282,7 @@ Client-side caching will save bandwidth and make your site load faster. If
 you're using ETags (:setting:`USE_ETAGS = True <USE_ETAGS>`), you're already
 covered. Otherwise, you can apply :ref:`conditional decorators
 <conditional-decorators>`. In the following example, the cache is invalidated
-whenever you restart your application server.
-
-.. code-block:: python
+whenever you restart your application server::
 
     from django.utils import timezone
     from django.views.decorators.http import last_modified
@@ -1360,8 +1358,8 @@ After defining these URL patterns, Django will automatically add the
 language prefix to the URL patterns that were added by the ``i18n_patterns``
 function. Example::
 
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import activate
+    >>> from django.urls import reverse
+    >>> from django.utils.translation import activate
 
     >>> activate('en')
     >>> reverse('sitemap-xml')
@@ -1414,12 +1412,11 @@ URL patterns can also be marked translatable using the
         url(_(r'^news/'), include(news_patterns, namespace='news')),
     )
 
-After you've created the translations, the
-:func:`~django.core.urlresolvers.reverse` function will return the URL in the
-active language. Example::
+After you've created the translations, the :func:`~django.urls.reverse`
+function will return the URL in the active language. Example::
 
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import activate
+    >>> from django.urls import reverse
+    >>> from django.utils.translation import activate
 
     >>> activate('en')
     >>> reverse('news:category', kwargs={'slug': 'recent'})
@@ -1686,25 +1683,8 @@ updating message files, just run :djadmin:`django-admin compilemessages
 This is only needed for people who either want to extract message IDs or compile
 message files (``.po``). Translation work itself just involves editing existing
 files of this type, but if you want to create your own message files, or want to
-test or compile a changed message file, you will need the ``gettext`` utilities:
-
-* Download the following zip files from the GNOME servers
-  https://download.gnome.org/binaries/win32/dependencies/
-
-  * ``gettext-runtime-X.zip``
-  * ``gettext-tools-X.zip``
-
-  ``X`` is the version number, we are requiring ``0.15`` or higher.
-
-* Extract the contents of the ``bin\`` directories in both files to the
-  same folder on your system (i.e. ``C:\Program Files\gettext-utils``)
-
-* Update the system PATH:
-
-  * ``Control Panel > System > Advanced > Environment Variables``.
-  * In the ``System variables`` list, click ``Path``, click ``Edit``.
-  * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
-    ``Variable value`` field.
+test or compile a changed message file, download `a precompiled binary
+installer <http://mlocati.github.io/gettext-iconv-windows/>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
@@ -1716,8 +1696,6 @@ translation utilities with a ``gettext`` package if the command ``xgettext
 
 Customizing the ``makemessages`` command
 ----------------------------------------
-
-.. highlightlang:: python
 
 If you want to pass additional parameters to ``xgettext``, you need to create a
 custom :djadmin:`makemessages` command and override its ``xgettext_options``
@@ -1756,8 +1734,6 @@ Miscellaneous
 
 The ``set_language`` redirect view
 ----------------------------------
-
-.. highlightlang:: python
 
 .. currentmodule:: django.views.i18n
 

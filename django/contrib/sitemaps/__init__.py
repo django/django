@@ -2,8 +2,9 @@ import datetime
 
 from django.apps import apps as django_apps
 from django.conf import settings
-from django.core import paginator, urlresolvers
+from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import NoReverseMatch, reverse
 from django.utils import timezone, translation
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import urlopen
@@ -20,17 +21,17 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     Alerts Google that the sitemap for the current site has been updated.
     If sitemap_url is provided, it should be an absolute path to the sitemap
     for this site -- e.g., '/sitemap.xml'. If sitemap_url is not provided, this
-    function will attempt to deduce it by using urlresolvers.reverse().
+    function will attempt to deduce it by using urls.reverse().
     """
     if sitemap_url is None:
         try:
             # First, try to get the "index" sitemap URL.
-            sitemap_url = urlresolvers.reverse('django.contrib.sitemaps.views.index')
-        except urlresolvers.NoReverseMatch:
+            sitemap_url = reverse('django.contrib.sitemaps.views.index')
+        except NoReverseMatch:
             try:
                 # Next, try for the "global" sitemap URL.
-                sitemap_url = urlresolvers.reverse('django.contrib.sitemaps.views.sitemap')
-            except urlresolvers.NoReverseMatch:
+                sitemap_url = reverse('django.contrib.sitemaps.views.sitemap')
+            except NoReverseMatch:
                 pass
 
     if sitemap_url is None:

@@ -39,10 +39,9 @@ Journal-World`_ of Lawrence, Kansas, USA.
 
 `Wilson Miner`_
     Wilson's design-fu is what makes Django look so nice. He created the design
-    that was used for nearly the first ten years on the Django Project Web
-    site, as well as the current design for Django's acclaimed admin interface.
-    Wilson was the designer for EveryBlock and Rdio_. He now designs for
-    Facebook.
+    that was used for nearly the first ten years on the Django Project website,
+    as well as the current design for Django's acclaimed admin interface. Wilson
+    was the designer for EveryBlock and Rdio_. He now designs for Facebook.
 
     Wilson lives in San Francisco, USA.
 
@@ -100,18 +99,20 @@ team <core-team>`.
     .. _russell keith-magee: http://cecinestpasun.com/
 
 `James Bennett`_
-    James is one of Django's release managers, and also contributes to the
-    documentation and provide the occasional bugfix.
+    James has been one of Django's release managers, and also
+    contributes to the documentation and provide the occasional
+    bugfix.
 
     James came to Web development from philosophy when he discovered
     that programmers get to argue just as much while collecting much
-    better pay. He lives in Lawrence, Kansas and previously worked at
-    World Online; currently, he's part of the Web development team at
-    Mozilla.
+    better pay. He lives in San Mateo, California and previously
+    worked at World Online and Mozilla; currently, he's part of the
+    Web engineering team at `Clover`_.
 
     He `keeps a blog`_, and enjoys fine port and talking to his car.
 
     .. _james bennett: http://b-list.org/
+    .. _Clover: https://www.cloverhealth.com/
     .. _keeps a blog: `james bennett`_
 
 Justin Bronn
@@ -219,19 +220,6 @@ Tim Graham
 
     Tim works as a software engineer and lives in Philadelphia, PA, USA.
 
-`Idan Gazit`_
-    As a self-professed design geek, Idan was initially attracted to Django
-    sometime between magic-removal and queryset-refactor. Formally trained
-    as a software engineer, Idan straddles the worlds of design and code,
-    jack of two trades and master of none. He is passionate about usability
-    and finding novel ways to extract meaning from data, and is a longtime
-    photographer_.
-
-    Idan is currently hacking on all things data and visualization at Heroku_.
-
-    .. _Idan Gazit: http://gazit.me
-    .. _photographer: https://flickr.com/photos/idangazit
-
 Paul McMillan
     Paul found Django in 2008 while looking for a more
     structured approach to web programming. He stuck around after
@@ -263,10 +251,7 @@ Paul McMillan
     a continuous integration server, and likes proving that Django is a good
     choice for enterprise software.
 
-    He's the CTO of Oscaro_, an e-commerce company based in Paris, France.
-
     .. _Aymeric Augustin: https://myks.org/
-    .. _Oscaro: http://www.oscaro.com/
 
 `Claude Paroz`_
     Claude is a former teacher who fell in love with free software at the
@@ -557,6 +542,32 @@ Daniele Procida
     .. _Django Girls: https://djangogirls.org
     .. _Potato: https://p.ota.to
 
+`Ola Sendecka`_
+    Ola started her adventure with Django when writing a university project in
+    2009. After that she attended her first DjangoCon Europe which
+    defined her future life as a Django professional.
+
+    Since then she has been an active community member. Ola co-organized a number of
+    Django sprints and conferences including:
+    `DjangoCon Europe 2013`_, `Django Under the Hood 2015`_ and
+    `DjangoCon Europe 2016`_. Together with Ola Sitarska she founded
+    `Django Girls`_, co-authored the `Django Girls Tutorial`_ and
+    is a member of the Django Girls Foundation. She is also an author of
+    the `Coding is for Girls`_ YouTube series teaching programming and Django
+    to beginners.
+
+    Originally from Poland, Ola currently lives in London, where she works for `Potato`_.
+
+    .. _Ola Sendecka: https://twitter.com/asendecka
+    .. _DjangoCon Europe 2013: http://love.djangocircus.com
+    .. _Django Under the Hood 2015: http://www.djangounderthehood.com/
+    .. _DjangoCon Europe 2016: http://2016.djangocon.eu
+    .. _Django Girls: https://djangogirls.org
+    .. _Django Girls Tutorial: http://tutorial.djangogirls.org
+    .. _Coding is for Girls: https://www.youtube.com/channel/UC0hNd2uW8jTR5K3KBzRuG2A
+    .. _Potato: https://p.ota.to
+
+
 Past team members
 =================
 
@@ -627,6 +638,19 @@ Malcolm Tredinnick
     Preston lives with his family and animal menagerie in Santa Barbara, CA, USA.
 
     .. _Preston Holmes: http://www.ptone.com/
+
+`Idan Gazit`_
+    As a self-professed design geek, Idan was initially attracted to Django
+    sometime between magic-removal and queryset-refactor. Formally trained
+    as a software engineer, Idan straddles the worlds of design and code,
+    jack of two trades and master of none. He is passionate about usability
+    and finding novel ways to extract meaning from data, and is a longtime
+    photographer_.
+
+    Idan is currently hacking on all things data and visualization at Heroku_.
+
+    .. _Idan Gazit: http://gazit.me
+    .. _photographer: https://flickr.com/photos/idangazit
 
 Matt Boersma
     Matt helped with Django's Oracle support.

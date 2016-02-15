@@ -62,7 +62,8 @@ get_band_ds = voidptr_output(std_call('GDALGetBandDataset'), [c_void_p])
 get_band_datatype = int_output(std_call('GDALGetRasterDataType'), [c_void_p])
 get_band_nodata_value = double_output(std_call('GDALGetRasterNoDataValue'), [c_void_p, POINTER(c_int)])
 set_band_nodata_value = void_output(std_call('GDALSetRasterNoDataValue'), [c_void_p, c_double])
-get_band_statistics = void_output(std_call('GDALGetRasterStatistics'),
+get_band_statistics = void_output(
+    std_call('GDALGetRasterStatistics'),
     [
         c_void_p, c_int, c_int, POINTER(c_double), POINTER(c_double),
         POINTER(c_double), POINTER(c_double), c_void_p, c_void_p,

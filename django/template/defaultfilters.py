@@ -7,7 +7,6 @@ from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from pprint import pformat
 
-from django.conf import settings
 from django.utils import formats, six
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import force_text, iri_to_uri
@@ -639,7 +638,8 @@ def unordered_list(value, autoescape=True):
     if autoescape:
         escaper = conditional_escape
     else:
-        escaper = lambda x: x
+        def escaper(x):
+            return x
 
     def walk_items(item_list):
         item_iterator = iter(item_list)
@@ -726,8 +726,6 @@ def date(value, arg=None):
     """Formats a date according to the given format."""
     if value in (None, ''):
         return ''
-    if arg is None:
-        arg = settings.DATE_FORMAT
     try:
         return formats.date_format(value, arg)
     except AttributeError:
@@ -742,8 +740,6 @@ def time(value, arg=None):
     """Formats a time according to the given format."""
     if value in (None, ''):
         return ''
-    if arg is None:
-        arg = settings.TIME_FORMAT
     try:
         return formats.time_format(value, arg)
     except AttributeError:
@@ -842,7 +838,7 @@ def yesno(value, arg=None):
 def filesizeformat(bytes_):
     """
     Formats the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB,
-    102 bytes, etc).
+    102 bytes, etc.).
     """
     try:
         bytes_ = float(bytes_)
@@ -850,7 +846,8 @@ def filesizeformat(bytes_):
         value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
 
-    filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
+    def filesize_number_format(value):
+        return formats.number_format(round(value, 1), 1)
 
     KB = 1 << 10
     MB = 1 << 20

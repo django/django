@@ -220,7 +220,6 @@ class SimpleTestCase(unittest.TestCase):
         """Performs any pre-test setup. This includes:
 
         * Creating a test client.
-        * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
         self.client = self.client_class()
@@ -1045,7 +1044,18 @@ class TestCase(TransactionTestCase):
     def _fixture_teardown(self):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
-        self._rollback_atomics(self.atomics)
+        try:
+            for db_name in reversed(self._databases_names()):
+                if self._should_check_constraints(connections[db_name]):
+                    connections[db_name].check_constraints()
+        finally:
+            self._rollback_atomics(self.atomics)
+
+    def _should_check_constraints(self, connection):
+        return (
+            connection.features.can_defer_constraint_checks and
+            not connection.needs_rollback and connection.is_usable()
+        )
 
 
 class CheckCondition(object):
@@ -1252,7 +1262,7 @@ class LiveServerThread(threading.Thread):
             self.is_ready.set()
 
     def _create_server(self, port):
-        return WSGIServer((self.host, port), QuietWSGIRequestHandler)
+        return WSGIServer((self.host, port), QuietWSGIRequestHandler, allow_reuse_address=False)
 
     def terminate(self):
         if hasattr(self, 'httpd'):

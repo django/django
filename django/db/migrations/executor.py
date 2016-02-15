@@ -170,7 +170,7 @@ class MigrationExecutor(object):
         statements = []
         state = None
         for migration, backwards in plan:
-            with self.connection.schema_editor(collect_sql=True) as schema_editor:
+            with self.connection.schema_editor(collect_sql=True, atomic=migration.atomic) as schema_editor:
                 if state is None:
                     state = self.loader.project_state((migration.app_label, migration.name), at_end=False)
                 if not backwards:
@@ -194,7 +194,7 @@ class MigrationExecutor(object):
                     fake = True
             if not fake:
                 # Alright, do it normally
-                with self.connection.schema_editor() as schema_editor:
+                with self.connection.schema_editor(atomic=migration.atomic) as schema_editor:
                     state = migration.apply(state, schema_editor)
         # For replacement migrations, record individual statuses
         if migration.replaces:
@@ -214,7 +214,7 @@ class MigrationExecutor(object):
         if self.progress_callback:
             self.progress_callback("unapply_start", migration, fake)
         if not fake:
-            with self.connection.schema_editor() as schema_editor:
+            with self.connection.schema_editor(atomic=migration.atomic) as schema_editor:
                 state = migration.unapply(state, schema_editor)
         # For replacement migrations, record individual statuses
         if migration.replaces:
@@ -265,6 +265,7 @@ class MigrationExecutor(object):
         apps = after_state.apps
         found_create_model_migration = False
         found_add_field_migration = False
+        existing_table_names = self.connection.introspection.table_names(self.connection.cursor())
         # Make sure all create model and add field operations are done
         for operation in migration.operations:
             if isinstance(operation, migrations.CreateModel):
@@ -275,7 +276,7 @@ class MigrationExecutor(object):
                     model = global_apps.get_model(model._meta.swapped)
                 if model._meta.proxy or not model._meta.managed:
                     continue
-                if model._meta.db_table not in self.connection.introspection.table_names(self.connection.cursor()):
+                if model._meta.db_table not in existing_table_names:
                     return False, project_state
                 found_create_model_migration = True
             elif isinstance(operation, migrations.AddField):
@@ -288,9 +289,21 @@ class MigrationExecutor(object):
                     continue
 
                 table = model._meta.db_table
-                db_field = model._meta.get_field(operation.name).column
-                fields = self.connection.introspection.get_table_description(self.connection.cursor(), table)
-                if db_field not in (f.name for f in fields):
+                field = model._meta.get_field(operation.name)
+
+                # Handle implicit many-to-many tables created by AddField.
+                if field.many_to_many:
+                    if field.remote_field.through._meta.db_table not in existing_table_names:
+                        return False, project_state
+                    else:
+                        found_add_field_migration = True
+                        continue
+
+                column_names = [
+                    column.name for column in
+                    self.connection.introspection.get_table_description(self.connection.cursor(), table)
+                ]
+                if field.column not in column_names:
                     return False, project_state
                 found_add_field_migration = True
         # If we get this far and we found at least one CreateModel or AddField migration,

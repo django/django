@@ -296,7 +296,7 @@ class WriterTests(SimpleTestCase):
         )
 
     def test_serialize_functions(self):
-        with six.assertRaisesRegex(self, ValueError, 'Cannot serialize function: lambda'):
+        with self.assertRaisesMessage(ValueError, 'Cannot serialize function: lambda'):
             self.assertSerializedEqual(lambda x: 42)
         self.assertSerializedEqual(models.SET_NULL)
         string, imports = MigrationWriter.serialize(models.SET(42))
@@ -357,6 +357,8 @@ class WriterTests(SimpleTestCase):
             SettingsReference("someapp.model", "AUTH_USER_MODEL"),
             ("settings.AUTH_USER_MODEL", {"from django.conf import settings"})
         )
+
+    def test_serialize_iterators(self):
         self.assertSerializedResultEqual(
             ((x, x * x) for x in range(3)),
             ("((0, 0), (1, 1), (2, 4))", set())
@@ -461,8 +463,7 @@ class WriterTests(SimpleTestCase):
                 return "somewhere dynamic"
             thing = models.FileField(upload_to=upload_to)
 
-        with six.assertRaisesRegex(self, ValueError,
-                '^Could not find function upload_to in migrations.test_writer'):
+        with self.assertRaisesMessage(ValueError, 'Could not find function upload_to in migrations.test_writer'):
             self.serialize_round_trip(TestModel2.thing)
 
     def test_serialize_managers(self):
@@ -624,7 +625,7 @@ class WriterTests(SimpleTestCase):
                 migrations.AlterModelOptions(
                     name='model',
                     options={'verbose_name': 'model', 'verbose_name_plural': 'models'},
-                    ),
+                ),
             ]
         })
         writer = MigrationWriter(migration)

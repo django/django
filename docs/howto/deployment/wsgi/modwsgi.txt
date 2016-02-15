@@ -1,6 +1,6 @@
-==========================================
-How to use Django with Apache and mod_wsgi
-==========================================
+==============================================
+How to use Django with Apache and ``mod_wsgi``
+==============================================
 
 Deploying Django with Apache_ and `mod_wsgi`_ is a tried and tested way to get
 Django into production.
@@ -25,9 +25,12 @@ Basic configuration
 ===================
 
 Once you've got mod_wsgi installed and activated, edit your Apache server's
-``httpd.conf`` file and add the following. If you are using a version of Apache
-older than 2.4, replace ``Require all granted`` with ``Allow from all`` and
-also add the line ``Order deny,allow`` above it.
+`httpd.conf`_ file (or a `virtual host`_ file) and add the following. If you
+are using a version of Apache older than 2.4, replace ``Require all granted``
+with ``Allow from all`` and also add the line ``Order deny,allow`` above it.
+
+.. _httpd.conf: https://wiki.apache.org/httpd/DistrosDefaultLayout
+.. _virtual host: https://httpd.apache.org/docs/current/en/vhosts/
 
 .. code-block:: apache
 
@@ -88,8 +91,8 @@ should put in this file, and what else you can add to it.
     See the :ref:`unicode-files` section of the Unicode reference guide for
     details.
 
-Using a virtualenv
-==================
+Using a ``virtualenv``
+======================
 
 If you install your project's Python dependencies inside a `virtualenv`_,
 you'll need to add the path to this virtualenv's ``site-packages`` directory to
@@ -110,8 +113,8 @@ Make sure you give the correct path to your virtualenv, and replace
 
 .. _daemon-mode:
 
-Using mod_wsgi daemon mode
-==========================
+Using ``mod_wsgi`` daemon mode
+==============================
 
 "Daemon mode" is the recommended mode for running mod_wsgi (on non-Windows
 platforms). To create the required daemon process group and delegate the
@@ -157,10 +160,9 @@ If, however, you have no option but to serve media files on the same Apache
 ``VirtualHost`` as Django, you can set up Apache to serve some URLs as
 static media, and others using the mod_wsgi interface to Django.
 
-This example sets up Django at the site root, but explicitly serves
-``robots.txt``, ``favicon.ico``, any CSS file, and anything in the
-``/static/`` and ``/media/`` URL space as a static file. All other URLs
-will be served using mod_wsgi:
+This example sets up Django at the site root, but serves ``robots.txt``,
+``favicon.ico``, and anything in the ``/static/`` and ``/media/`` URL space as
+a static file. All other URLs will be served using mod_wsgi:
 
 .. code-block:: apache
 

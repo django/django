@@ -1,8 +1,8 @@
 from datetime import time
 
 from django.template.defaultfilters import time as time_filter
-from django.test import SimpleTestCase
-from django.utils import timezone
+from django.test import SimpleTestCase, override_settings
+from django.utils import timezone, translation
 
 from ..utils import setup
 from .timezone_utils import TimezoneTestCase
@@ -12,6 +12,18 @@ class TimeTests(TimezoneTestCase):
     """
     #20693: Timezone support for the time template filter
     """
+
+    @setup({'time00': '{{ dt|time }}'})
+    def test_time00(self):
+        output = self.engine.render_to_string('time00', {'dt': time(16, 25)})
+        self.assertEqual(output, '4:25 p.m.')
+
+    @override_settings(USE_L10N=True)
+    @setup({'time00_l10n': '{{ dt|time }}'})
+    def test_time00_l10n(self):
+        with translation.override('fr'):
+            output = self.engine.render_to_string('time00_l10n', {'dt': time(16, 25)})
+        self.assertEqual(output, '16:25')
 
     @setup({'time01': '{{ dt|time:"e:O:T:Z" }}'})
     def test_time01(self):

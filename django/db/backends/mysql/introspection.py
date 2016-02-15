@@ -38,8 +38,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_field_type(self, data_type, description):
         field_type = super(DatabaseIntrospection, self).get_field_type(data_type, description)
-        if field_type == 'IntegerField' and 'auto_increment' in description.extra:
-            return 'AutoField'
+        if 'auto_increment' in description.extra:
+            if field_type == 'IntegerField':
+                return 'AutoField'
+            elif field_type == 'BigIntegerField':
+                return 'BigAutoField'
+
         return field_type
 
     def get_table_list(self, cursor):
@@ -67,7 +71,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         field_info = {line[0]: InfoLine(*line) for line in cursor.fetchall()}
 
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        to_int = lambda i: int(i) if i is not None else i
+
+        def to_int(i):
+            return int(i) if i is not None else i
+
         fields = []
         for line in cursor.description:
             col_name = force_text(line[0])

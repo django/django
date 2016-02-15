@@ -45,12 +45,9 @@ class TestFieldWithValidators(TestCase):
             'string': '2 is not correct',
             'ignore_case_string': "IgnORE Case strIng",
         })
-        self.assertRaises(ValidationError, form.fields['full_name'].clean, 'not int nor mail')
-
-        try:
+        with self.assertRaises(ValidationError) as e:
             form.fields['full_name'].clean('not int nor mail')
-        except ValidationError as e:
-            self.assertEqual(2, len(e.messages))
+        self.assertEqual(2, len(e.exception.messages))
 
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['string'], ["Letters only."])

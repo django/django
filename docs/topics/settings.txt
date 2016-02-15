@@ -48,8 +48,8 @@ Python `import search path`_.
 
 .. _import search path: http://www.diveintopython.net/getting_to_know_python/everything_is_an_object.html
 
-The django-admin utility
----------------------------
+The ``django-admin`` utility
+----------------------------
 
 When using :doc:`django-admin </ref/django-admin>`, you can either set the
 environment variable once, or explicitly pass in the settings module each time
@@ -71,8 +71,8 @@ Use the ``--settings`` command-line argument to specify the settings manually::
 
 .. _django-admin: ../django-admin/
 
-On the server (mod_wsgi)
---------------------------
+On the server (``mod_wsgi``)
+----------------------------
 
 In your live server environment, you'll need to tell your WSGI
 application what settings file to use. Do that with ``os.environ``::
@@ -171,8 +171,8 @@ a convention.
 
 .. _settings-without-django-settings-module:
 
-Using settings without setting DJANGO_SETTINGS_MODULE
-=====================================================
+Using settings without setting ``DJANGO_SETTINGS_MODULE``
+=========================================================
 
 In some cases, you might want to bypass the ``DJANGO_SETTINGS_MODULE``
 environment variable. For example, if you're using the template system by
@@ -235,8 +235,8 @@ defaults, so you must specify a value for every possible setting that might be
 used in that code you are importing. Check in
 ``django.conf.settings.global_settings`` for the full list.
 
-Either configure() or DJANGO_SETTINGS_MODULE is required
---------------------------------------------------------
+Either ``configure()`` or ``DJANGO_SETTINGS_MODULE`` is required
+----------------------------------------------------------------
 
 If you're not setting the ``DJANGO_SETTINGS_MODULE`` environment variable, you
 *must* call ``configure()`` at some point before using any code that reads
@@ -290,6 +290,17 @@ settings and populate Django's application registry. For example::
 Note that calling ``django.setup()`` is only necessary if your code is truly
 standalone. When invoked by your Web server, or through :doc:`django-admin
 </ref/django-admin>`, Django will handle this for you.
+
+.. admonition:: ``django.setup()`` may only be called once.
+
+    Therefore, avoid putting reusable application logic in standalone scripts
+    so that you have to import from the script elsewhere in your application.
+    If you can't avoid that, put the call to ``django.setup()`` inside an
+    ``if`` block::
+
+        if __name__ == '__main__':
+            import django
+            django.setup()
 
 .. seealso::
 

@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
+import sys
 from datetime import date, datetime
+from unittest import skipIf
 
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import TZ_SUPPORT, requires_tz_support
@@ -34,6 +36,7 @@ class DateFormatTests(SimpleTestCase):
         dt = datetime(2009, 5, 16, 5, 30, 30)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt)
 
+    @skipIf(sys.platform.startswith('win') and not pytz, "Test requires pytz on Windows")
     def test_naive_ambiguous_datetime(self):
         # dt is ambiguous in Europe/Copenhagen. LocalTimezone guesses the
         # offset (and gets it wrong 50% of the time) while pytz refuses the

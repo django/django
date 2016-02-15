@@ -7,7 +7,7 @@
   Example:
 
    * In the view:
-      return render_to_response('template.html', {'google' : GoogleMap(key="abcdefg")})
+      return render(request, 'template.html', {'google': GoogleMap(key="abcdefg")})
 
    * In the template:
 

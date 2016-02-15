@@ -421,8 +421,8 @@ variables or use a custom template tag or filter to workaround the limitation.
 
 .. _playing-with-context:
 
-Playing with Context objects
-============================
+Playing with ``Context`` objects
+================================
 
 Most of the time, you'll instantiate :class:`Context` objects by passing in a
 fully-populated dictionary to ``Context()``. But you can add and delete items
@@ -579,8 +579,8 @@ against ``dict``::
 
 .. _subclassing-context-requestcontext:
 
-Subclassing Context: RequestContext
------------------------------------
+Subclassing ``Context``: ``RequestContext``
+-------------------------------------------
 
 .. class:: RequestContext(request, dict_=None, processors=None)
 
@@ -658,20 +658,17 @@ example, the :class:`RequestContext` instance gets a ``ip_address`` variable::
         }, [ip_address_processor])
         return HttpResponse(t.render(c))
 
-Built-in template context processors
-------------------------------------
-
 .. _context-processors:
 
-Context processors
-------------------
+Built-in template context processors
+------------------------------------
 
 Here's what each of the built-in processors does:
 
 .. currentmodule:: django.contrib.auth.context_processors
 
-django.contrib.auth.context_processors.auth
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.contrib.auth.context_processors.auth``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: auth
 
@@ -688,8 +685,8 @@ variables:
 
 .. currentmodule:: django.template.context_processors
 
-django.template.context_processors.debug
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.debug``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: debug
 
@@ -705,8 +702,8 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
   and how long it took. The list is in order by query and lazily generated
   on access.
 
-django.template.context_processors.i18n
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.i18n``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables:
@@ -717,35 +714,35 @@ variables:
 
 See :doc:`/topics/i18n/index` for more.
 
-django.template.context_processors.media
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.media``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``MEDIA_URL``, providing the value of the :setting:`MEDIA_URL` setting.
 
-django.template.context_processors.static
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.static``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: static
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``STATIC_URL``, providing the value of the :setting:`STATIC_URL` setting.
 
-django.template.context_processors.csrf
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.csrf``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/csrf>`.
 
-django.template.context_processors.request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.request``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``request``, which is the current :class:`~django.http.HttpRequest`.
 
-django.contrib.messages.context_processors.messages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.contrib.messages.context_processors.messages``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables:

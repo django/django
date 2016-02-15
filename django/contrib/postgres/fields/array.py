@@ -5,10 +5,11 @@ from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, IntegerField, Transform
-from django.db.models.lookups import Exact
+from django.db.models.lookups import Exact, In
 from django.utils import six
-from django.utils.translation import string_concat, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
+from ..utils import prefix_validation_error
 from .utils import AttributeSetter
 
 __all__ = ['ArrayField']
@@ -47,7 +48,6 @@ class ArrayField(Field):
             errors.append(
                 checks.Error(
                     'Base field for array cannot be a related field.',
-                    hint=None,
                     obj=self,
                     id='postgres.E002'
                 )
@@ -60,7 +60,6 @@ class ArrayField(Field):
                 errors.append(
                     checks.Error(
                         'Base field for array has errors:\n    %s' % messages,
-                        hint=None,
                         obj=self,
                         id='postgres.E001'
                     )
@@ -133,14 +132,15 @@ class ArrayField(Field):
 
     def validate(self, value, model_instance):
         super(ArrayField, self).validate(value, model_instance)
-        for i, part in enumerate(value):
+        for index, part in enumerate(value):
             try:
                 self.base_field.validate(part, model_instance)
-            except exceptions.ValidationError as e:
-                raise exceptions.ValidationError(
-                    string_concat(self.error_messages['item_invalid'], e.message),
+            except exceptions.ValidationError as error:
+                raise prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': i},
+                    params={'nth': index},
                 )
         if isinstance(self.base_field, ArrayField):
             if len({len(i) for i in value}) > 1:
@@ -151,14 +151,15 @@ class ArrayField(Field):
 
     def run_validators(self, value):
         super(ArrayField, self).run_validators(value)
-        for i, part in enumerate(value):
+        for index, part in enumerate(value):
             try:
                 self.base_field.run_validators(part)
-            except exceptions.ValidationError as e:
-                raise exceptions.ValidationError(
-                    string_concat(self.error_messages['item_invalid'], ' '.join(e.messages)),
+            except exceptions.ValidationError as error:
+                raise prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': i},
+                    params={'nth': index},
                 )
 
     def formfield(self, **kwargs):
@@ -215,6 +216,15 @@ class ArrayLenTransform(Transform):
             'CASE WHEN %(lhs)s IS NULL THEN NULL ELSE '
             'coalesce(array_length(%(lhs)s, 1), 0) END'
         ) % {'lhs': lhs}, params
+
+
+@ArrayField.register_lookup
+class ArrayInLookup(In):
+    def get_prep_lookup(self):
+        values = super(ArrayInLookup, self).get_prep_lookup()
+        # In.process_rhs() expects values to be hashable, so convert lists
+        # to tuples.
+        return [tuple(value) for value in values]
 
 
 class IndexTransform(Transform):
