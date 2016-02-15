@@ -107,11 +107,17 @@ class LocaleRegexProvider(object):
 
 
 class RegexURLPattern(LocaleRegexProvider):
-    def __init__(self, regex, callback, default_args=None, name=None):
+    def __init__(self, regex, callback, default_args=None, name=None, wrap=None):
         LocaleRegexProvider.__init__(self, regex)
         self.callback = callback  # the view
         self.default_args = default_args or {}
         self.name = name
+        if isinstance(wrap, (tuple, list)):
+            self.wrap = wrap
+        elif wrap:
+            self.wrap = [wrap]
+        else:
+            self.wrap = []
 
     def __repr__(self):
         return force_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
@@ -126,7 +132,7 @@ class RegexURLPattern(LocaleRegexProvider):
             args = () if kwargs else match.groups()
             # In both cases, pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)
-            return ResolverMatch(self.callback, args, kwargs, self.name)
+            return ResolverMatch(self._decorate(self.callback), args, kwargs, self.name)
 
     @cached_property
     def lookup_str(self):
@@ -143,10 +149,15 @@ class RegexURLPattern(LocaleRegexProvider):
             return callback.__module__ + "." + callback.__class__.__name__
         else:
             return callback.__module__ + "." + callback.__name__
+            
+    def _decorate(self, callback):
+        for decorator in reversed(self.wrap):
+            callback = decorator(callback)
+        return callback
 
 
 class RegexURLResolver(LocaleRegexProvider):
-    def __init__(self, regex, urlconf_name, default_kwargs=None, app_name=None, namespace=None):
+    def __init__(self, regex, urlconf_name, default_kwargs=None, app_name=None, namespace=None, wrap=None):
         LocaleRegexProvider.__init__(self, regex)
         # urlconf_name is the dotted Python path to the module defining
         # urlpatterns. It may also be an object with an urlpatterns attribute
@@ -163,7 +174,13 @@ class RegexURLResolver(LocaleRegexProvider):
         # urlpatterns
         self._callback_strs = set()
         self._populated = False
-
+        if isinstance(wrap, (tuple, list)):
+            self.wrap = wrap
+        elif wrap:
+            self.wrap = [wrap]
+        else:
+            self.wrap = []
+            
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
             # Don't bother to output the whole list, it can be huge
@@ -273,7 +290,7 @@ class RegexURLResolver(LocaleRegexProvider):
                             sub_match_args = match.groups() + sub_match.args
 
                         return ResolverMatch(
-                            sub_match.func,
+                            self._decorate(sub_match.func),
                             sub_match_args,
                             sub_match_dict,
                             sub_match.url_name,
@@ -372,6 +389,11 @@ class RegexURLResolver(LocaleRegexProvider):
             "arguments '%s' not found. %d pattern(s) tried: %s" %
             (lookup_view_s, args, kwargs, len(patterns), patterns)
         )
+        
+    def _decorate(self, callback):
+        for decorator in reversed(self.wrap):
+            callback = decorator(callback)
+        return callback        
 
 
 class LocaleRegexURLResolver(RegexURLResolver):
