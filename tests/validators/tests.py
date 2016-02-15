@@ -172,6 +172,11 @@ TEST_DATA = [
     (validate_comma_separated_integer_list, '1,,2', ValidationError),
 
     (int_list_validator(sep='.'), '1.2.3', None),
+    (int_list_validator(sep='.', allow_negative=True), '1.2.3', None),
+    (int_list_validator(allow_negative=True), '-1,-2,3', None),
+    (int_list_validator(allow_negative=True), '1,-2,-12', None),
+
+    (int_list_validator(), '-1,2,3', ValidationError),
     (int_list_validator(sep='.'), '1,2,3', ValidationError),
     (int_list_validator(sep='.'), '1.2.3\n', ValidationError),
 
