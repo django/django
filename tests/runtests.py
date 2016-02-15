@@ -260,6 +260,19 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     return failures
 
 
+def get_subprocess_args(options):
+    subprocess_args = [
+        sys.executable, upath(__file__), '--settings=%s' % options.settings
+    ]
+    if options.failfast:
+        subprocess_args.append('--failfast')
+    if options.verbosity:
+        subprocess_args.append('--verbosity=%s' % options.verbosity)
+    if not options.interactive:
+        subprocess_args.append('--noinput')
+    return subprocess_args
+
+
 def bisect_tests(bisection_label, options, test_labels, parallel):
     state = setup(options.verbosity, test_labels, parallel)
 
@@ -275,14 +288,7 @@ def bisect_tests(bisection_label, options, test_labels, parallel):
         except ValueError:
             pass
 
-    subprocess_args = [
-        sys.executable, upath(__file__), '--settings=%s' % options.settings]
-    if options.failfast:
-        subprocess_args.append('--failfast')
-    if options.verbosity:
-        subprocess_args.append('--verbosity=%s' % options.verbosity)
-    if not options.interactive:
-        subprocess_args.append('--noinput')
+    subprocess_args = get_subprocess_args(options)
 
     iteration = 1
     while len(test_labels) > 1:
@@ -333,14 +339,7 @@ def paired_tests(paired_test, options, test_labels, parallel):
         except ValueError:
             pass
 
-    subprocess_args = [
-        sys.executable, upath(__file__), '--settings=%s' % options.settings]
-    if options.failfast:
-        subprocess_args.append('--failfast')
-    if options.verbosity:
-        subprocess_args.append('--verbosity=%s' % options.verbosity)
-    if not options.interactive:
-        subprocess_args.append('--noinput')
+    subprocess_args = get_subprocess_args(options)
 
     for i, label in enumerate(test_labels):
         print('***** %d of %d: Check test pairing with %s' % (
