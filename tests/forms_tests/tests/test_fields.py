@@ -788,6 +788,9 @@ class FieldsTests(SimpleTestCase):
         # with here)
         self.assertTrue(f.has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
 
+    def test_file_picklable(self):
+        self.assertIsInstance(pickle.loads(pickle.dumps(FileField())), FileField)
+
     # ImageField ##################################################################
 
     @skipIf(Image is None, "Pillow is required to test ImageField")
