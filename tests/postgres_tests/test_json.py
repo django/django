@@ -213,16 +213,16 @@ class TestQuerying(TestCase):
 
 @skipUnlessPG94
 class TestSerialization(TestCase):
-    test_data = '[{"fields": {"field": {"a": "b"}}, "model": "postgres_tests.jsonmodel", "pk": null}]'
+    test_data = '[{"fields": {"field": {"a": "b", "c": null}}, "model": "postgres_tests.jsonmodel", "pk": null}]'
 
     def test_dumping(self):
-        instance = JSONModel(field={'a': 'b'})
+        instance = JSONModel(field={'a': 'b', 'c': None})
         data = serializers.serialize('json', [instance])
         self.assertJSONEqual(data, self.test_data)
 
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
-        self.assertEqual(instance.field, {'a': 'b'})
+        self.assertEqual(instance.field, {'a': 'b', 'c': None})
 
 
 class TestValidation(PostgreSQLTestCase):
