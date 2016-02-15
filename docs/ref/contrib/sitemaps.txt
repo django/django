@@ -190,7 +190,7 @@ Sitemap class reference
 
         .. versionchanged:: 1.10
 
-            The value of :attr:~Sitemap.lastmod was added to the default 
+            The value of :attr:`~Sitemap.lastmod` was added to the default 
             sitemap template.
 
     .. attribute:: Sitemap.changefreq

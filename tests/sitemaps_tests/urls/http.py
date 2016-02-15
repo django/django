@@ -67,12 +67,11 @@ class GetLatestLastmodNoneSiteMap(Sitemap):
     changefreq = "never"
     priority = 0.5
     location = '/location/'
-    
+
     def items(self):
         return [object()]
 
     def lastmod(self, obj):
-        print 'lastmod'
         return datetime(2013, 3, 13, 10, 0, 0)
 
 

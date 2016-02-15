@@ -4,7 +4,7 @@ from django.apps import apps as django_apps
 from django.conf import settings
 from django.core import paginator, urlresolvers
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import translation, timezone
+from django.utils import timezone, translation
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import urlopen
 
@@ -48,7 +48,7 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
 def sitemap_time(t):
     if t is None:
         return None
-    if isinstance(t, datetime.datetime) and (t.tzinfo == None or t.tzinfo.utcoffset(t) == None):
+    if isinstance(t, datetime.datetime) and (t.tzinfo is None or t.tzinfo.utcoffset(t) is None):
         t = t.replace(tzinfo=timezone.get_default_timezone())
     return t.isoformat()
 

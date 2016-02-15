@@ -2,13 +2,13 @@ import datetime
 from calendar import timegm
 from functools import wraps
 
+from django.contrib.sitemaps import sitemap_time
 from django.contrib.sites.shortcuts import get_current_site
 from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils.http import http_date
-from django.contrib.sitemaps import sitemap_time
 
 
 def x_robots_tag(func):
