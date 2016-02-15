@@ -588,22 +588,40 @@ expressions::
 
 Next, we write the method responsible for generating the SQL::
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         sql_expressions, sql_params = [], []
         for expression in self.expressions:
             sql, params = compiler.compile(expression)
             sql_expressions.append(sql)
             sql_params.extend(params)
-        self.extra['expressions'] = ','.join(sql_expressions)
-        return self.template % self.extra, sql_params
+        data = self.extra.copy()
+        data.update(**kwargs)
+        template = data.get('template', self.template)
+        data['expressions'] = ','.join(sql_expressions)
+        return template % data, params
 
-    def as_oracle(self, compiler, connection):
+    def as_oracle(self, compiler, connection, **kwargs):
         """
         Example of vendor specific handling (Oracle in this case).
         Let's make the function name lowercase.
         """
-        self.template = 'coalesce( %(expressions)s )'
-        return self.as_sql(compiler, connection)
+        return self.as_sql(compiler, connection, template='coalesce( %(expressions)s )')
+
+``as_sql``-methods support ``**kwargs`` to override the default ``template``
+and to provide extra context to be used when interpolating into the template.
+This is useful for 3rd-party database-backends that may have different SQL-
+syntax. Simply override ``as_sql`` with your backend-specific ``as_vendorname``
+-method and call the existing ``as_sql``-method with the modified ``template``
+or context parameters.
+
+Since expressions can be shared between queries it's important to never mutate
+state like ``self.template`` or ``self.extra``. The use of ``**kwargs`` is
+intended to override behavior of ``as_sql`` for that particular call, without
+affecting future calls to ``as_sql``.
+
+.. versionchanged:: 1.10
+
+    Added support for ``**kwargs`` in ``as_sql``-methods.
 
 We generate the SQL for each of the ``expressions`` by using the
 ``compiler.compile()`` method, and join the result together with commas.

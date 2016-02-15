@@ -206,6 +206,9 @@ Database backends
 ~~~~~~~~~~~~~~~~~
 
 * Temporal data subtraction was unified on all backends.
+* Added ``**kwargs`` to ``as_sql``-method of Expressions to override behavior
+  through arguments rather than mutating ``self``, which is not safe when using
+  multiple databases with different backends.
 
 * If the database supports it, backends can set
   ``DatabaseFeatures.can_return_ids_from_bulk_insert=True`` and implement

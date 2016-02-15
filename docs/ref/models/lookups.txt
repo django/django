@@ -83,7 +83,7 @@ field references, aggregates, and ``Transform`` are examples that follow this
 API. A class is said to follow the query expression API when it implements the
 following methods:
 
-.. method:: as_sql(self, compiler, connection)
+.. method:: as_sql(self, compiler, connection, **kwargs)
 
     Responsible for producing the query string and parameters for the expression.
     The ``compiler`` is an ``SQLCompiler`` object, which has a ``compile()``
@@ -93,6 +93,39 @@ following methods:
     Calling ``expression.as_sql()`` is usually incorrect - instead
     ``compiler.compile(expression)`` should be used. The ``compiler.compile()``
     method will take care of calling vendor-specific methods of the expression.
+
+    ``**kwargs`` may be used to supply extra context to the ``as_sql``-method
+    for that particular call. This can be useful for Expressions in
+    particular, where ``template`` can be overridden and variables intended
+    for interpolating the ``template``-string can be passed. 3rd-party
+    backends may have different SQL-syntax so they can pass these differences
+    through via ``**kwargs``.
+
+    The following example is taken from the Django ConcatPair-expression. It
+    shows the use of ``**kwargs`` for overriding ``as_sql``-methods. Note that
+    the class does not need an ``as_sql``-method. By providing the class-
+    variable ``function``, the behavior of the super-method is changed. The
+    result of ``self.coalesce``-function in ``as_sqlite``-method is mainly a
+    clone of ``self`` with some manipulations that are not relevant for this
+    example.
+
+    .. snippet::
+        :filename: django/db/models/functions.py
+
+        class ConcatPair(Func):
+            ...
+            function = 'CONCAT'
+            ...
+            def as_sqlite(self, compiler, connection):
+                coalesced = self.coalesce()
+                return super(ConcatPair, coalesced).as_sql(
+                    compiler, connection, template='%(expressions)s', arg_joiner=' || '
+                )
+
+            def as_mysql(self, compiler, connection):
+                return super(ConcatPair, self).as_sql(
+                    compiler, connection, function='CONCAT_WS', template="%(function)s('', %(expressions)s)"
+                )
 
 .. method:: as_vendorname(self, compiler, connection)
 
