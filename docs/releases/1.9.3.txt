@@ -31,3 +31,5 @@ Bugfixes
 * Fixed :class:`~django.contrib.postgres.fields.RangeField` and
   :class:`~django.contrib.postgres.fields.ArrayField` serialization with
   ``None`` values (:ticket:`26215`).
+* Fixed a regression where filtering by ``Decimal`` parameter in ``RawQuery`` was
+  raising ``TypeError`` (:ticket:`26219`).
