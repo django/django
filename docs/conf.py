@@ -16,6 +16,15 @@ from __future__ import unicode_literals
 import sys
 from os.path import abspath, dirname, join
 
+# Workaround for sphinx-build recursion limit overflow:
+# pickle.dump(doctree, f, pickle.HIGHEST_PROTOCOL)
+#  RuntimeError: maximum recursion depth exceeded while pickling an object
+#
+# Python's default allowed recursion depth is 1000 but this isn't enough for
+# building docs/ref/settings.txt sometimes.
+# https://groups.google.com/d/topic/sphinx-dev/MtRf64eGtv4/discussion
+sys.setrecursionlimit(2000)
+
 # Make sure we get the version of this copy of Django
 sys.path.insert(1, dirname(dirname(abspath(__file__))))
 
