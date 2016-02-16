@@ -435,7 +435,7 @@ with the following code::
 
     import os
     from django.contrib.gis.utils import LayerMapping
-    from models import WorldBorder
+    from .models import WorldBorder
 
     world_mapping = {
         'fips' : 'FIPS',
