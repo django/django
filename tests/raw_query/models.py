@@ -29,6 +29,7 @@ class BookFkAsPk(models.Model):
 
 class Coffee(models.Model):
     brand = models.CharField(max_length=255, db_column="name")
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 
 class Reviewer(models.Model):

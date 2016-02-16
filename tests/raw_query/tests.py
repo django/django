@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from datetime import date
+from decimal import Decimal
 
 from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase, skipUnlessDBFeature
@@ -306,3 +307,8 @@ class RawQueryTests(TestCase):
         """
         b = BookFkAsPk.objects.create(book=self.b1)
         self.assertEqual(list(BookFkAsPk.objects.raw('SELECT not_the_default FROM raw_query_bookfkaspk')), [b])
+
+    def test_decimal_parameter(self):
+        c = Coffee.objects.create(brand='starbucks', price=20.5)
+        qs = Coffee.objects.raw("SELECT * FROM raw_query_coffee WHERE price >= %s", params=[Decimal(20)])
+        self.assertEqual(list(qs), [c])
