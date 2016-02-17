@@ -153,7 +153,8 @@ ones:
     <Field.blank>`, the field will be required.
 
 :attr:`~Field.choices`
-    Use choices in columns to present a set of predetermined values in a form.  These will be displayed as check boxes,        instead of as the default text field.  Choices can be created using a tuple of tuples, and then passing them into your     model as shown in the examples below.
+    
+     Use choices in columns to present a set of predetermined values in a form.  These will be rendered as check boxes, instead of as the default text field.  Choices can be created using a tuple of tuples as an iterable.  They are then passed the model as shown in the examples below.
 
     A choices list looks like this::
 
