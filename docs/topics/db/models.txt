@@ -8,6 +8,8 @@ A model is the single, definitive source of information about your data. It
 contains the essential fields and behaviors of the data you're storing.
 Generally, each model maps to a single database table.
 
+If you're new to the data model concepts discussed in this section, you might want to do some additional reading at some point.  You can find these concepts discussed more in depth at many sites, including this writeup on Dream in Code, 'here<www.dreamincode.net/forums/topic/179103-relational-database-design-normalization/>`_. 
+
 The basics:
 
 * Each model is a Python class that subclasses
