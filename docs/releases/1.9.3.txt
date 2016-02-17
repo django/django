@@ -42,3 +42,7 @@ Bugfixes
   regressed in Django 1.9 (:ticket:`26253`).
 
 * Fixed ``BoundField`` to reallow slices of subwidgets (:ticket:`26267`).
+
+* Changed the admin's "permission denied" message in the login template to use
+  ``get_username`` instead of ``username`` to support custom user models
+  (:ticket:`26231`).
