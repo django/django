@@ -470,6 +470,7 @@ instances::
 
     from django.core.exceptions import ValidationError
     from django.db import models
+    from django.utils.translation import ugettext_lazy as _
 
     def parse_hand(hand_string):
         """Takes a string of cards and splits into a full hand."""
@@ -477,7 +478,7 @@ instances::
         p2 = re.compile('..')
         args = [p2.findall(x) for x in p1.findall(hand_string)]
         if len(args) != 4:
-            raise ValidationError("Invalid input for a Hand instance")
+            raise ValidationError(_("Invalid input for a Hand instance"))
         return Hand(*args)
 
     class HandField(models.Field):
