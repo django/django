@@ -486,7 +486,7 @@ class BaseDatabaseOperations(object):
             raise ValueError("Django does not support timezone-aware times.")
         return six.text_type(value)
 
-    def adapt_decimalfield_value(self, value, max_digits, decimal_places):
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
         """
         Transforms a decimal.Decimal value to an object compatible with what is
         expected by the backend driver for decimal (numeric) columns.
