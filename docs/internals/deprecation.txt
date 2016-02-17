@@ -133,6 +133,9 @@ details on these changes.
 * The model ``CommaSeparatedIntegerField`` will be removed. A stub field will
   remain for compatibility with historical migrations.
 
+* The legacy ``%(<foo>)s`` placeholder syntax will be removed from
+  ``ValidationError``.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

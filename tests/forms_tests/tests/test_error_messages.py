@@ -27,8 +27,8 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
     def test_charfield(self):
         e = {
             'required': 'REQUIRED',
-            'min_length': 'LENGTH %(show_value)s, MIN LENGTH %(limit_value)s',
-            'max_length': 'LENGTH %(show_value)s, MAX LENGTH %(limit_value)s',
+            'min_length': 'LENGTH {show_value}, MIN LENGTH {limit_value}',
+            'max_length': 'LENGTH {show_value}, MAX LENGTH {limit_value}',
         }
         f = CharField(min_length=5, max_length=10, error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
@@ -39,8 +39,8 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         e = {
             'required': 'REQUIRED',
             'invalid': 'INVALID',
-            'min_value': 'MIN VALUE IS %(limit_value)s',
-            'max_value': 'MAX VALUE IS %(limit_value)s',
+            'min_value': 'MIN VALUE IS {limit_value}',
+            'max_value': 'MAX VALUE IS {limit_value}',
         }
         f = IntegerField(min_value=5, max_value=10, error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
@@ -52,8 +52,8 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         e = {
             'required': 'REQUIRED',
             'invalid': 'INVALID',
-            'min_value': 'MIN VALUE IS %(limit_value)s',
-            'max_value': 'MAX VALUE IS %(limit_value)s',
+            'min_value': 'MIN VALUE IS {limit_value}',
+            'max_value': 'MAX VALUE IS {limit_value}',
         }
         f = FloatField(min_value=5, max_value=10, error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
@@ -65,11 +65,11 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         e = {
             'required': 'REQUIRED',
             'invalid': 'INVALID',
-            'min_value': 'MIN VALUE IS %(limit_value)s',
-            'max_value': 'MAX VALUE IS %(limit_value)s',
-            'max_digits': 'MAX DIGITS IS %(max)s',
-            'max_decimal_places': 'MAX DP IS %(max)s',
-            'max_whole_digits': 'MAX DIGITS BEFORE DP IS %(max)s',
+            'min_value': 'MIN VALUE IS {limit_value}',
+            'max_value': 'MAX VALUE IS {limit_value}',
+            'max_digits': 'MAX DIGITS IS {max}',
+            'max_decimal_places': 'MAX DP IS {max}',
+            'max_whole_digits': 'MAX DIGITS BEFORE DP IS {max}',
         }
         f = DecimalField(min_value=5, max_value=10, error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
@@ -113,8 +113,8 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         e = {
             'required': 'REQUIRED',
             'invalid': 'INVALID',
-            'min_length': 'LENGTH %(show_value)s, MIN LENGTH %(limit_value)s',
-            'max_length': 'LENGTH %(show_value)s, MAX LENGTH %(limit_value)s',
+            'min_length': 'LENGTH {show_value}, MIN LENGTH {limit_value}',
+            'max_length': 'LENGTH {show_value}, MAX LENGTH {limit_value}',
         }
         f = RegexField(r'^[0-9]+$', min_length=5, max_length=10, error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
@@ -126,8 +126,8 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         e = {
             'required': 'REQUIRED',
             'invalid': 'INVALID',
-            'min_length': 'LENGTH %(show_value)s, MIN LENGTH %(limit_value)s',
-            'max_length': 'LENGTH %(show_value)s, MAX LENGTH %(limit_value)s',
+            'min_length': 'LENGTH {show_value}, MIN LENGTH {limit_value}',
+            'max_length': 'LENGTH {show_value}, MAX LENGTH {limit_value}',
         }
         f = EmailField(min_length=8, max_length=10, error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
@@ -152,7 +152,7 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         e = {
             'required': 'REQUIRED',
             'invalid': 'INVALID',
-            'max_length': '"%(value)s" has more than %(limit_value)d characters.',
+            'max_length': '"{value}" has more than {limit_value:d} characters.',
         }
         f = URLField(error_messages=e, max_length=17)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
@@ -173,7 +173,7 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
     def test_choicefield(self):
         e = {
             'required': 'REQUIRED',
-            'invalid_choice': '%(value)s IS INVALID CHOICE',
+            'invalid_choice': '{value} IS INVALID CHOICE',
         }
         f = ChoiceField(choices=[('a', 'aye')], error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
@@ -182,7 +182,7 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
     def test_multiplechoicefield(self):
         e = {
             'required': 'REQUIRED',
-            'invalid_choice': '%(value)s IS INVALID CHOICE',
+            'invalid_choice': '{value} IS INVALID CHOICE',
             'invalid_list': 'NOT A LIST',
         }
         f = MultipleChoiceField(choices=[('a', 'aye')], error_messages=e)
@@ -265,7 +265,7 @@ class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
         # ModelMultipleChoiceField
         e = {
             'required': 'REQUIRED',
-            'invalid_choice': '%(value)s IS INVALID CHOICE',
+            'invalid_choice': '{value} IS INVALID CHOICE',
             'list': 'NOT A LIST OF VALUES',
         }
         f = ModelMultipleChoiceField(queryset=ChoiceModel.objects.all(), error_messages=e)

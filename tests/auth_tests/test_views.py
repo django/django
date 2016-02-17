@@ -387,9 +387,12 @@ class ChangePasswordTest(AuthViewsTestCase):
             'username': 'testclient',
             'password': password,
         })
-        self.assertFormError(response, AuthenticationForm.error_messages['invalid_login'] % {
-            'username': User._meta.get_field('username').verbose_name
-        })
+        self.assertFormError(
+            response,
+            AuthenticationForm.error_messages['invalid_login'].format(
+                username=User._meta.get_field('username').verbose_name,
+            )
+        )
 
     def logout(self):
         self.client.get('/logout/')

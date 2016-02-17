@@ -906,7 +906,7 @@ class UniqueTest(TestCase):
             class Meta(ProductForm.Meta):
                 error_messages = {
                     'slug': {
-                        'unique': "%(model_name)s's %(field_label)s not unique.",
+                        'unique': "{model_name}'s {field_label} not unique.",
                     }
                 }
 
@@ -920,7 +920,7 @@ class UniqueTest(TestCase):
             class Meta(PriceForm.Meta):
                 error_messages = {
                     NON_FIELD_ERRORS: {
-                        'unique_together': "%(model_name)s's %(field_labels)s not unique.",
+                        'unique_together': "{model_name}'s {field_labels} not unique.",
                     }
                 }
 
@@ -935,8 +935,8 @@ class UniqueTest(TestCase):
                 error_messages = {
                     'title': {
                         'unique_for_date': (
-                            "%(model_name)s's %(field_label)s not unique "
-                            "for %(date_field_label)s date."
+                            "{model_name}'s {field_label} not unique "
+                            "for {date_field_label} date."
                         ),
                     }
                 }

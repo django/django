@@ -169,8 +169,8 @@ def from_current_timezone(value):
             return timezone.make_aware(value, current_timezone)
         except Exception:
             message = _(
-                '%(datetime)s couldn\'t be interpreted '
-                'in time zone %(current_timezone)s; it '
+                '{datetime} couldn\'t be interpreted '
+                'in time zone {current_timezone}; it '
                 'may be ambiguous or it may not exist.'
             )
             params = {'datetime': value, 'current_timezone': current_timezone}

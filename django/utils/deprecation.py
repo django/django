@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import inspect
+import re
 import warnings
 
 
@@ -79,3 +80,16 @@ class DeprecationInstanceCheck(type):
             self.deprecation_warning, 2
         )
         return super(DeprecationInstanceCheck, self).__instancecheck__(instance)
+
+
+# RemovedInDjango20Warning
+# https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
+PERCENT_PLACEHOLDER_RE = re.compile(
+    r'%'                     # Start of conversion specifier
+    r'(?:\(.*?\))?'          # Optional mapping key
+    r'[#0 +-]*'              # Optional conversion flags
+    r'(?:[0-9]+|\*)?'        # Optional minimum field width
+    r'(?:\.(?:[0-9]+|\*))?'  # Optional precision
+    r'[hlL]?'                # Optional length modifier
+    r'[diouxXeEfFgGcrsa%]'   # Conversion type
+)

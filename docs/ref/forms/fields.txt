@@ -395,7 +395,7 @@ For each field, we describe the default widget used if you don't specify
     * Validates that the given value exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
 
-    The ``invalid_choice`` error message may contain ``%(value)s``, which will be
+    The ``invalid_choice`` error message may contain ``{value}``, which will be
     replaced with the selected choice.
 
     Takes one extra required argument:
@@ -408,6 +408,12 @@ For each field, we describe the default widget used if you don't specify
         model field. See the :ref:`model field reference documentation on
         choices <field-choices>` for more details. If the argument is a
         callable, it is evaluated each time the field's form is initialized.
+
+    .. versionchanged:: 1.10
+
+       Support for Python :py:meth:`str.format()` placeholder syntax in
+       ``invalid_choice`` has been added. The legacy ``%(value)s`` placeholder
+       syntax has been deprecated and will be removed in Django 2.0.
 
 ``TypedChoiceField``
 --------------------
@@ -529,9 +535,9 @@ For each field, we describe the default widget used if you don't specify
       ``max_whole_digits``
 
     The ``max_value`` and ``min_value`` error messages may contain
-    ``%(limit_value)s``, which will be substituted by the appropriate limit.
+    ``{limit_value}``, which will be substituted by the appropriate limit.
     Similarly, the ``max_digits``, ``max_decimal_places`` and
-    ``max_whole_digits`` error messages may contain ``%(max)s``.
+    ``max_whole_digits`` error messages may contain ``{max}``.
 
     Takes four optional arguments:
 
@@ -550,6 +556,13 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: decimal_places
 
         The maximum number of decimal places permitted.
+
+    .. versionchanged:: 1.10
+
+       Support for Python :py:meth:`str.format()` placeholder syntax in
+       ``max_value`` and ``min_value`` has been added. The legacy
+       ``%(limit_value)s`` and ``%(max)s`` placeholder syntax has been
+       deprecated and will be removed in Django 2.0.
 
 ``DurationField``
 -----------------
@@ -607,8 +620,16 @@ For each field, we describe the default widget used if you don't specify
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
     The ``max_length`` error refers to the length of the filename. In the error
-    message for that key, ``%(max)d`` will be replaced with the maximum filename
-    length and ``%(length)d`` will be replaced with the current filename length.
+    message for that key, ``{max:d}`` will be replaced with the maximum
+    filename length and ``{length:d}`` will be replaced with the current
+    filename length.
+
+    .. versionchanged:: 1.10
+
+       Support for Python :py:meth:`str.format()` placeholder syntax in
+       ``max_length`` has been added. The legacy ``%(max)d`` and ``%(length)d``
+       placeholder syntax has been deprecated and will be removed in Django
+       2.0.
 
 ``FilePathField``
 -----------------
@@ -717,7 +738,7 @@ For each field, we describe the default widget used if you don't specify
       ``min_value``
 
     The ``max_value`` and ``min_value`` error messages may contain
-    ``%(limit_value)s``, which will be substituted by the appropriate limit.
+    ``{limit_value}``, which will be substituted by the appropriate limit.
 
     Takes two optional arguments for validation:
 
@@ -725,6 +746,12 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: min_value
 
     These control the range of values permitted in the field.
+
+    .. versionchanged:: 1.10
+
+       Support for Python :py:meth:`str.format()` placeholder syntax in
+       ``max_value`` has been added. The legacy ``%(limit_value)s`` placeholder
+       syntax has been deprecated and will be removed in Django 2.0.
 
 ``GenericIPAddressField``
 -------------------------
@@ -773,10 +800,16 @@ For each field, we describe the default widget used if you don't specify
       of choices.
     * Error message keys: ``required``, ``invalid_choice``, ``invalid_list``
 
-    The ``invalid_choice`` error message may contain ``%(value)s``, which will be
+    The ``invalid_choice`` error message may contain ``{value}``, which will be
     replaced with the selected choice.
 
     Takes one extra required argument, ``choices``, as for :class:`ChoiceField`.
+
+    .. versionchanged:: 1.10
+
+       Support for Python :py:meth:`str.format()` placeholder syntax in
+       ``invalid_choice`` has been added. The legacy ``%(value)s`` placeholder
+       syntax has been deprecated and will be removed in Django 2.0.
 
 ``TypedMultipleChoiceField``
 ----------------------------
@@ -794,11 +827,17 @@ For each field, we describe the default widget used if you don't specify
       coerced.
     * Error message keys: ``required``, ``invalid_choice``
 
-    The ``invalid_choice`` error message may contain ``%(value)s``, which will be
+    The ``invalid_choice`` error message may contain ``{value}``, which will be
     replaced with the selected choice.
 
     Takes two extra arguments, ``coerce`` and ``empty_value``, as for
     :class:`TypedChoiceField`.
+
+    .. versionchanged:: 1.10
+
+       Support for Python :py:meth:`str.format()` placeholder syntax in
+       ``invalid_choice`` has been added. The legacy ``%(value)s`` placeholder
+       syntax has been deprecated and will be removed in Django 2.0.
 
 ``NullBooleanField``
 --------------------
@@ -1192,8 +1231,8 @@ method::
     * Error message keys: ``required``, ``list``, ``invalid_choice``,
       ``invalid_pk_value``
 
-    The ``invalid_choice`` message may contain ``%(value)s`` and the
-    ``invalid_pk_value`` message may contain ``%(pk)s``, which will be
+    The ``invalid_choice`` message may contain ``{value}`` and the
+    ``invalid_pk_value`` message may contain ``{pk}``, which will be
     substituted by the appropriate values.
 
     Allows the selection of one or more model objects, suitable for
@@ -1206,6 +1245,13 @@ method::
         A ``QuerySet`` of model objects from which the choices for the
         field will be derived, and which will be used to validate the
         user's selection.
+
+    .. versionchanged:: 1.10
+
+       Support for Python :py:meth:`str.format()` placeholder syntax in
+       ``invalid_choice`` and ``invalid_pk_value`` has been added. The legacy
+       ``%(value)s`` and ``%(pk)s`` placeholder syntax has been deprecated and
+       will be removed in Django 2.0.
 
 Creating custom fields
 ======================

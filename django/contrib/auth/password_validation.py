@@ -98,8 +98,8 @@ class MinimumLengthValidator(object):
         if len(password) < self.min_length:
             raise ValidationError(
                 ungettext(
-                    "This password is too short. It must contain at least %(min_length)d character.",
-                    "This password is too short. It must contain at least %(min_length)d characters.",
+                    "This password is too short. It must contain at least {min_length:d} character.",
+                    "This password is too short. It must contain at least {min_length:d} characters.",
                     self.min_length
                 ),
                 code='password_too_short',
@@ -144,7 +144,7 @@ class UserAttributeSimilarityValidator(object):
                 if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() > self.max_similarity:
                     verbose_name = force_text(user._meta.get_field(attribute_name).verbose_name)
                     raise ValidationError(
-                        _("The password is too similar to the %(verbose_name)s."),
+                        _("The password is too similar to the {verbose_name}."),
                         code='password_too_similar',
                         params={'verbose_name': verbose_name},
                     )

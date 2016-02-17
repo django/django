@@ -216,6 +216,10 @@ Forms
 * Form and widget ``Media`` is now served using
   :mod:`django.contrib.staticfiles` if installed.
 
+* Placeholders in :class:`~django.core.exceptions.ValidationError` now support
+  the Python :py:meth:`str.format()` syntax. The legacy ``%(<foo>)s`` syntax is
+  still supported but will be removed in Django 2.0.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -630,6 +634,10 @@ Miscellaneous
 
 * Importing from the ``django.core.urlresolvers`` module is deprecated in
   favor of its new location, :mod:`django.urls`.
+
+* In :class:`~django.core.exceptions.ValidationError`, The legacy ``%(<foo>)s``
+  placeholder syntax is deprecated in favor of Python :py:meth:`str.format()`
+  syntax.
 
 .. _removed-features-1.10:
 

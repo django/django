@@ -129,12 +129,12 @@ following guidelines:
 
       # Good
       ValidationError(
-          _('Invalid value: %(value)s'),
+          _('Invalid value: {value}'),
           params={'value': '42'},
       )
 
       # Bad
-      ValidationError(_('Invalid value: %s') % value)
+      ValidationError(_('Invalid value: {}').format(value))
 
 * Use mapping keys instead of positional formatting. This enables putting
   the variables in any order or omitting them altogether when rewriting the
@@ -142,7 +142,7 @@ following guidelines:
 
       # Good
       ValidationError(
-          _('Invalid value: %(value)s'),
+          _('Invalid value: {value}'),
           params={'value': '42'},
       )
 
@@ -150,6 +150,21 @@ following guidelines:
       ValidationError(
           _('Invalid value: %s'),
           params=('42',),
+      )
+
+* Use Python :py:meth:`str.format()` placeholder syntax instead of the legacy
+  ``%(<foo>)s`` syntax::
+
+      # Good
+      ValidationError(
+          _('Invalid value: {value}'),
+          params={'value': '42'},
+      )
+
+      # Bad
+      ValidationError(
+          _('Invalid value: %(value)s'),
+          params={'value': '42'},
       )
 
 * Wrap the message with ``gettext`` to enable translation::
@@ -163,7 +178,7 @@ following guidelines:
 Putting it all together::
 
     raise ValidationError(
-        _('Invalid value: %(value)s'),
+        _('Invalid value: {value}'),
         code='invalid',
         params={'value': '42'},
     )
@@ -175,12 +190,18 @@ While not recommended, if you are at the end of the validation chain
 (i.e. your form ``clean()`` method) and you know you will *never* need
 to override your error message you can still opt for the less verbose::
 
-    ValidationError(_('Invalid value: %s') % value)
+    ValidationError(_('Invalid value: {}').format(value))
 
 The :meth:`Form.errors.as_data() <django.forms.Form.errors.as_data()>` and
 :meth:`Form.errors.as_json() <django.forms.Form.errors.as_json()>` methods
 greatly benefit from fully featured ``ValidationError``\s (with a ``code`` name
 and a ``params`` dictionary).
+
+.. versionchanged:: 1.10
+
+   Support for Python :py:meth:`str.format()` placeholder syntax has been
+   added. The legacy ``%(value)s`` placeholder syntax has been deprecated and
+   will be removed in Django 2.0.
 
 Raising multiple errors
 -----------------------

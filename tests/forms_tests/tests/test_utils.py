@@ -138,11 +138,11 @@ class FormsUtilsTestCase(SimpleTestCase):
         e = ErrorDict()
         e['__all__'] = ErrorList([
             ValidationError(
-                message='message %(i)s',
+                message='message {i}',
                 params={'i': 1},
             ),
             ValidationError(
-                message='message %(i)s',
+                message='message {i}',
                 params={'i': 2},
             ),
         ])

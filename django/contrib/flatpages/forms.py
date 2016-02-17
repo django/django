@@ -50,7 +50,7 @@ class FlatpageForm(forms.ModelForm):
             for site in sites:
                 if same_url.filter(sites=site).exists():
                     raise forms.ValidationError(
-                        _('Flatpage with url %(url)s already exists for site %(site)s'),
+                        _('Flatpage with url {url} already exists for site {site}'),
                         code='duplicate_url',
                         params={'url': url, 'site': site},
                     )

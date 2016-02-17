@@ -298,6 +298,9 @@ Miscellaneous
   change to the ``AUTHORS`` file in your patch if you make more than a
   single trivial change.
 
+* For user facing APIs, use Python :py:meth:`str.format()` placeholder syntax
+  in favor of the legacy ``%(<foo>)s`` syntax.
+
 JavaScript style
 ================
 

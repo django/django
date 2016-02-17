@@ -11,15 +11,15 @@ from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 class ArrayMaxLengthValidator(MaxLengthValidator):
     message = ungettext_lazy(
-        'List contains %(show_value)d item, it should contain no more than %(limit_value)d.',
-        'List contains %(show_value)d items, it should contain no more than %(limit_value)d.',
+        'List contains {show_value:d} item, it should contain no more than {limit_value:d}.',
+        'List contains {show_value:d} items, it should contain no more than {limit_value:d}.',
         'limit_value')
 
 
 class ArrayMinLengthValidator(MinLengthValidator):
     message = ungettext_lazy(
-        'List contains %(show_value)d item, it should contain no fewer than %(limit_value)d.',
-        'List contains %(show_value)d items, it should contain no fewer than %(limit_value)d.',
+        'List contains {show_value:d} item, it should contain no fewer than {limit_value:d}.',
+        'List contains {show_value:d} items, it should contain no fewer than {limit_value:d}.',
         'limit_value')
 
 
@@ -28,8 +28,8 @@ class KeysValidator(object):
     """A validator designed for HStore to require/restrict keys."""
 
     messages = {
-        'missing_keys': _('Some keys were missing: %(keys)s'),
-        'extra_keys': _('Some unknown keys were provided: %(keys)s'),
+        'missing_keys': _('Some keys were missing: {keys}'),
+        'extra_keys': _('Some unknown keys were provided: {keys}'),
     }
     strict = False
 
@@ -71,10 +71,10 @@ class KeysValidator(object):
 class RangeMaxValueValidator(MaxValueValidator):
     def compare(self, a, b):
         return a.upper > b
-    message = _('Ensure that this range is completely less than or equal to %(limit_value)s.')
+    message = _('Ensure that this range is completely less than or equal to {limit_value}.')
 
 
 class RangeMinValueValidator(MinValueValidator):
     def compare(self, a, b):
         return a.lower < b
-    message = _('Ensure that this range is completely greater than or equal to %(limit_value)s.')
+    message = _('Ensure that this range is completely greater than or equal to {limit_value}.')

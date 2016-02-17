@@ -8,7 +8,7 @@ __all__ = ['JSONField']
 
 class JSONField(forms.CharField):
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be valid JSON."),
+        'invalid': _("'{value}' value must be valid JSON."),
     }
 
     def __init__(self, **kwargs):

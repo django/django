@@ -21,7 +21,7 @@ For example, here's a validator that only allows even numbers::
     def validate_even(value):
         if value % 2 != 0:
             raise ValidationError(
-                _('%(value)s is not an even number'),
+                _('{value} is not an even number'),
                 params={'value': value},
             )
 

@@ -1094,7 +1094,7 @@ class Model(six.with_metaclass(ModelBase)):
             field_labels = [capfirst(opts.get_field(f).verbose_name) for f in unique_check]
             params['field_labels'] = six.text_type(get_text_list(field_labels, _('and')))
             return ValidationError(
-                message=_("%(model_name)s with this %(field_labels)s already exists."),
+                message=_("{model_name} with this {field_labels} already exists."),
                 code='unique_together',
                 params=params,
             )

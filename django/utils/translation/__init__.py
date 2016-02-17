@@ -135,6 +135,27 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                     pass
                 return translated
 
+            def format(self, *fmt_args, **fmt_kwargs):
+                try:
+                    number_value = fmt_kwargs[number]
+                except KeyError:
+                    msg = (
+                        'Missing keyword argument "{}". '
+                        'Please provide it, because it is required to '
+                        'determine whether string is singular or plural.'
+                    )
+                    raise KeyError(msg.format(number))
+                kwargs['number'] = number_value
+                translated = func(**kwargs)
+                return translated.format(*fmt_args, **fmt_kwargs)
+
+            # RemovedInDjango20Warning
+            #
+            # __str__() can be removed with the deprecation warning in
+            # ValidationError.__iter__().
+            def __str__(self):
+                return kwargs['singular']
+
         proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
         proxy.__reduce__ = lambda: (_lazy_number_unpickle, (func, resultclass, number, original_kwargs))
     return proxy

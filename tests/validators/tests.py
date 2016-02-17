@@ -316,7 +316,7 @@ class TestSimpleValidators(SimpleTestCase):
             self.fail("TypeError not raised when flags and pre-compiled regex in RegexValidator")
 
     def test_max_length_validator_message(self):
-        v = MaxLengthValidator(16, message='"%(value)s" has more than %(limit_value)d characters.')
+        v = MaxLengthValidator(16, message='"{value}" has more than {limit_value:d} characters.')
         with self.assertRaisesMessage(ValidationError, '"djangoproject.com" has more than 16 characters.'):
             v('djangoproject.com')
 

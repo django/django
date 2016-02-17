@@ -10,7 +10,7 @@ class AdminAuthenticationForm(AuthenticationForm):
     A custom authentication form used in the admin app.
     """
     error_messages = {
-        'invalid_login': _("Please enter the correct %(username)s and password "
+        'invalid_login': _("Please enter the correct {username} and password "
                            "for a staff account. Note that both fields may be "
                            "case-sensitive."),
     }
