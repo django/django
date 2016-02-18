@@ -42,7 +42,7 @@ class QueryWrapper(object):
 class Q(tree.Node):
     """
     Encapsulates filters as objects that can then be combined logically (using
-    & and |).
+    `&` and `|`).
     """
     # Connection types
     AND = 'AND'
