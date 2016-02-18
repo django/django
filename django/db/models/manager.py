@@ -8,43 +8,40 @@ from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 
-def ensure_default_manager(cls):
+def can_use_for_related_field(manager_class):
+    return manager_class is Manager or getattr(manager_class, 'use_for_related_fields', False)
+
+
+def ensure_default_manager(model):
     """
-    Ensures that a Model subclass contains a default manager  and sets the
-    _default_manager attribute on the class. Also sets up the _base_manager
-    points to a plain Manager instance (which could be the same as
-    _default_manager if it's not a subclass of Manager).
+    Ensures that a Model subclass contains a default manager and sets the
+    _default_manager and _base_manager attributes on the class.
     """
-    if cls._meta.swapped:
-        setattr(cls, 'objects', SwappedManagerDescriptor(cls))
-        return
-    if not getattr(cls, '_default_manager', None):
-        if any(f.name == 'objects' for f in cls._meta.fields):
+
+    if not model._meta.managers:
+        if any(f.name == 'objects' for f in model._meta.fields):
             raise ValueError(
                 "Model %s must specify a custom Manager, because it has a "
-                "field named 'objects'" % cls.__name__
+                "field named 'objects'" % model.__name__
             )
-        # Create the default manager, if needed.
-        cls.add_to_class('objects', Manager())
-        cls._base_manager = cls.objects
-    elif not getattr(cls, '_base_manager', None):
-        default_mgr = cls._default_manager.__class__
-        if (default_mgr is Manager or
-                getattr(default_mgr, "use_for_related_fields", False)):
-            cls._base_manager = cls._default_manager
+        model.add_to_class('objects', Manager())
+
+    model._default_manager = model._meta.managers[0]
+
+    # Just alias _base_manager if default manager is suitable.
+    if can_use_for_related_field(model._default_manager.__class__):
+        model._base_manager = model._default_manager
+
+    # Otherwise search for a suitable manager type in the default manager MRO.
+    else:
+        for base_manager_class in model._default_manager.__class__.mro()[1:]:
+            if can_use_for_related_field(base_manager_class):
+                model._base_manager = base_manager_class()
+                model._base_manager.name = '_base_manager'
+                model._base_manager.model = model
+                break
         else:
-            # Default manager isn't a plain Manager class, or a suitable
-            # replacement, so we walk up the base class hierarchy until we hit
-            # something appropriate.
-            for base_class in default_mgr.mro()[1:]:
-                if (base_class is Manager or
-                        getattr(base_class, "use_for_related_fields", False)):
-                    cls.add_to_class('_base_manager', base_class())
-                    return
-            raise AssertionError(
-                "Should never get here. Please report a bug, including your "
-                "model and model manager setup."
-            )
+            raise ValueError("Could not find a suitable base manager.")
 
 
 @python_2_unicode_compatible
@@ -67,7 +64,6 @@ class BaseManager(object):
         self._set_creation_counter()
         self.model = None
         self.name = None
-        self._inherited = False
         self._db = None
         self._hints = {}
 
@@ -150,26 +146,13 @@ class BaseManager(object):
         return type(class_name, (cls,), class_dict)
 
     def contribute_to_class(self, model, name):
-        # TODO: Use weakref because of possible memory leak / circular reference.
-        self.model = model
         if not self.name:
             self.name = name
-        # Only contribute the manager if the model is concrete
-        if model._meta.abstract:
-            setattr(model, name, AbstractManagerDescriptor(model))
-        elif model._meta.swapped:
-            setattr(model, name, SwappedManagerDescriptor(model))
-        else:
-            # if not model._meta.abstract and not model._meta.swapped:
-            setattr(model, name, ManagerDescriptor(self))
-        if (not getattr(model, '_default_manager', None) or
-                self.creation_counter < model._default_manager.creation_counter):
-            model._default_manager = self
+        self.model = model
 
-        abstract = False
-        if model._meta.abstract or (self._inherited and not self.model._meta.proxy):
-            abstract = True
-        model._meta.managers.append((self.creation_counter, self, abstract))
+        setattr(model, name, ManagerDescriptor(self))
+
+        model._meta.local_managers.append(self)
 
     def _set_creation_counter(self):
         """
@@ -178,19 +161,6 @@ class BaseManager(object):
         """
         self.creation_counter = BaseManager.creation_counter
         BaseManager.creation_counter += 1
-
-    def _copy_to_model(self, model):
-        """
-        Makes a copy of the manager and assigns it to 'model', which should be
-        a child of the existing model (used when inheriting a manager from an
-        abstract base class).
-        """
-        assert issubclass(model, self.model)
-        mgr = copy.copy(self)
-        mgr._set_creation_counter()
-        mgr.model = model
-        mgr._inherited = True
-        return mgr
 
     def db_manager(self, using=None, hints=None):
         obj = copy.copy(self)
@@ -240,43 +210,32 @@ class Manager(BaseManager.from_queryset(QuerySet)):
 
 
 class ManagerDescriptor(object):
-    # This class ensures managers aren't accessible via model instances.
-    # For example, Poll.objects works, but poll_obj.objects raises AttributeError.
+
     def __init__(self, manager):
         self.manager = manager
 
     def __get__(self, instance, cls=None):
         if instance is not None:
             raise AttributeError("Manager isn't accessible via %s instances" % cls.__name__)
-        return self.manager
 
+        if cls._meta.abstract:
+            raise AttributeError("Manager isn't available; %s is abstract" % (
+                cls._meta.object_name,
+            ))
 
-class AbstractManagerDescriptor(object):
-    # This class provides a better error message when you try to access a
-    # manager on an abstract model.
-    def __init__(self, model):
-        self.model = model
-
-    def __get__(self, instance, cls=None):
-        raise AttributeError("Manager isn't available; %s is abstract" % (
-            self.model._meta.object_name,
-        ))
-
-
-class SwappedManagerDescriptor(object):
-    # This class provides a better error message when you try to access a
-    # manager on a swapped model.
-    def __init__(self, model):
-        self.model = model
-
-    def __get__(self, instance, cls=None):
-        raise AttributeError(
-            "Manager isn't available; '%s.%s' has been swapped for '%s'" % (
-                self.model._meta.app_label,
-                self.model._meta.object_name,
-                self.model._meta.swapped,
+        if cls._meta.swapped:
+            raise AttributeError(
+                "Manager isn't available; '%s.%s' has been swapped for '%s'" % (
+                    cls._meta.app_label,
+                    cls._meta.object_name,
+                    cls._meta.swapped,
+                )
             )
-        )
+
+        manager = copy.copy(self.manager)
+        manager.model = cls
+
+        return manager
 
 
 class EmptyManager(Manager):

@@ -47,21 +47,20 @@ class ManagersRegressionTests(TestCase):
             "<Child4: d2>",
             "<Child4: f1>",
             "<Child4: f2>"
-        ]
-        )
+        ])
         self.assertQuerysetEqual(Child4.manager1.all(), [
             "<Child4: d1>",
             "<Child4: f1>"
-        ],
-            ordered=False
-        )
+        ], ordered=False)
         self.assertQuerysetEqual(Child5._default_manager.all(), ["<Child5: fred>"])
-        self.assertQuerysetEqual(Child6._default_manager.all(), ["<Child6: f1>"])
+        self.assertQuerysetEqual(Child6._default_manager.all(), [
+            "<Child6: f1>",
+            '<Child6: f2>'
+        ], ordered=False)
         self.assertQuerysetEqual(Child7._default_manager.order_by('name'), [
             "<Child7: barney>",
             "<Child7: fred>"
-        ]
-        )
+        ])
 
     def test_abstract_manager(self):
         # Accessing the manager on an abstract model should

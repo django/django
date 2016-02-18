@@ -141,18 +141,6 @@ class ModelBase(type):
         if is_proxy and base_meta and base_meta.swapped:
             raise TypeError("%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped))
 
-        if getattr(new_class, '_default_manager', None):
-            if not is_proxy:
-                # Multi-table inheritance doesn't inherit default manager from
-                # parents.
-                new_class._default_manager = None
-                new_class._base_manager = None
-            else:
-                # Proxy classes do inherit parent's default manager, if none is
-                # set explicitly.
-                new_class._default_manager = new_class._default_manager._copy_to_model(new_class)
-                new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
-
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
@@ -202,9 +190,9 @@ class ModelBase(type):
                 if isinstance(field, OneToOneField):
                     related = resolve_relation(new_class, field.remote_field.model)
                     parent_links[make_model_tuple(related)] = field
+
         # Do the appropriate setup for any model parents.
         for base in parents:
-            original_base = base
             if not hasattr(base, '_meta'):
                 # Things without _meta aren't functional models, so they're
                 # uninteresting parents.
@@ -252,16 +240,8 @@ class ModelBase(type):
                 # Pass any non-abstract parent classes onto child.
                 new_class._meta.parents.update(base._meta.parents)
 
-            # Inherit managers from the abstract base classes.
-            new_class.copy_managers(base._meta.abstract_managers)
-
-            # Proxy models inherit the non-abstract managers from their base,
-            # unless they have redefined any of them.
-            if is_proxy:
-                new_class.copy_managers(original_base._meta.concrete_managers)
-
             # Inherit virtual fields (like GenericForeignKey) from the parent
-            # class
+            # class.
             for field in base._meta.virtual_fields:
                 if base._meta.abstract and field.name in field_names:
                     raise FieldError(
@@ -282,15 +262,6 @@ class ModelBase(type):
         new_class._prepare()
         new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
         return new_class
-
-    def copy_managers(cls, base_managers):
-        # This is in-place sorting of an Options attribute, but that's fine.
-        base_managers.sort()
-        for _, mgr_name, manager in base_managers:  # NOQA (redefinition of _)
-            val = getattr(cls, mgr_name, None)
-            if not val or val is manager:
-                new_manager = manager._copy_to_model(cls)
-                cls.add_to_class(mgr_name, new_manager)
 
     def add_to_class(cls, name, value):
         # We should call the contribute_to_class method only if it's bound
@@ -329,6 +300,7 @@ class ModelBase(type):
             setattr(cls, 'get_absolute_url', get_absolute_url_override)
 
         ensure_default_manager(cls)
+
         signals.class_prepared.send(sender=cls)
 
 
@@ -1234,7 +1206,7 @@ class Model(six.with_metaclass(ModelBase)):
         """ Perform all manager checks. """
 
         errors = []
-        for __, manager, __ in cls._meta.managers:
+        for manager in cls._meta.managers:
             errors.extend(manager.check(**kwargs))
         return errors
 

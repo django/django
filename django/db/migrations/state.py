@@ -497,8 +497,7 @@ class ModelState(object):
             else:
                 # Force this manager to be the first and thus default
                 managers_mapping[default_manager_name] = (0, models.Manager())
-            # Sort all managers by their creation counter
-            for _, manager, _ in sorted(model._meta.managers):
+            for manager in model._meta.managers:
                 if manager.name == "_base_manager" or not manager.use_in_migrations:
                     continue
                 reconstruct_manager(manager)

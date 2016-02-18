@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import copy
 from bisect import bisect
 from collections import OrderedDict, defaultdict
 from itertools import chain
@@ -76,6 +77,7 @@ class Options(object):
         self.local_fields = []
         self.local_many_to_many = []
         self.virtual_fields = []
+        self.local_managers = []
         self.model_name = None
         self.verbose_name = None
         self.verbose_name_plural = None
@@ -115,12 +117,6 @@ class Options(object):
         self.parents = OrderedDict()
         self.auto_created = False
 
-        # To handle various inheritance situations, we need to track where
-        # managers came from (concrete or abstract base classes). `managers`
-        # keeps a list of 3-tuples of the form:
-        # (creation_counter, instance, abstract(=True))
-        self.managers = []
-
         # List of all lookups defined in ForeignKey 'limit_choices_to' options
         # from *other* models. Needed for some admin checks. Internal use only.
         self.related_fkey_lookups = []
@@ -146,20 +142,6 @@ class Options(object):
     @property
     def installed(self):
         return self.app_config is not None
-
-    @property
-    def abstract_managers(self):
-        return [
-            (counter, instance.name, instance) for counter, instance, abstract
-            in self.managers if abstract
-        ]
-
-    @property
-    def concrete_managers(self):
-        return [
-            (counter, instance.name, instance) for counter, instance, abstract
-            in self.managers if not abstract
-        ]
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
@@ -353,6 +335,21 @@ class Options(object):
                 if '%s.%s' % (swapped_label, swapped_object.lower()) != self.label_lower:
                     return swapped_for
         return None
+
+    @property
+    def managers(self):
+        managers = []
+        bases = (b for b in self.model.mro() if hasattr(b, '_meta'))
+        for depth, base in enumerate(bases):
+            for manager in base._meta.local_managers:
+                manager = copy.copy(manager)
+                manager.model = self.model
+                managers.append((depth, manager.creation_counter, manager))
+
+        return make_immutable_fields_list(
+            "managers",
+            (m[2] for m in sorted(managers)),
+        )
 
     @cached_property
     def fields(self):
