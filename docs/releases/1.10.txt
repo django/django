@@ -355,6 +355,10 @@ Validators
   domain name labels to 63 characters and the total length of domain
   names to 253 characters per :rfc:`1034`.
 
+* :func:`~django.core.validators.int_list_validator` now accepts an optional
+  boolean parameter ``allow_negative``, defaulting to False, to allow negative
+  integers.
+
 Backwards incompatible changes in 1.10
 ======================================
 

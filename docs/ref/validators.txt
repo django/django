@@ -226,12 +226,17 @@ to, or in lieu of custom ``field.clean()`` methods.
 ``int_list_validator``
 ----------------------
 
-.. function:: int_list_validator(sep=',', message=None, code='invalid')
+.. function:: int_list_validator(sep=',', message=None, code='invalid', allow_negative=False)
 
     .. versionadded:: 1.9
 
     Returns a :class:`RegexValidator` instance that ensures a string
-    consists of integers separated by ``sep``.
+    consists of integers separated by ``sep``. It allows negative integers when
+    ``allow_negative`` is ``True``.
+
+    .. versionchanged:: 1.10
+
+    The ``allow_negative`` parameter was added.
 
 ``MaxValueValidator``
 ---------------------
