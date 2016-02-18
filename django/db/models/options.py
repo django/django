@@ -67,7 +67,8 @@ def make_immutable_fields_list(name, data):
 @python_2_unicode_compatible
 class Options(object):
     FORWARD_PROPERTIES = {'fields', 'many_to_many', 'concrete_fields',
-                          'local_concrete_fields', '_forward_fields_map'}
+                          'local_concrete_fields', '_forward_fields_map',
+                          'managers', 'managers_map'}
     REVERSE_PROPERTIES = {'related_objects', 'fields_map', '_relation_tree'}
 
     default_apps = apps
@@ -235,6 +236,10 @@ class Options(object):
                         auto_created=True)
                 model.add_to_class('id', auto)
 
+    def add_manager(self, manager):
+        self.local_managers.append(manager)
+        self._expire_cache()
+
     def add_field(self, field, virtual=False):
         # Insert the given field in the order in which it was created, using
         # the "creation_counter" attribute of the field.
@@ -336,7 +341,7 @@ class Options(object):
                     return swapped_for
         return None
 
-    @property
+    @cached_property
     def managers(self):
         managers = []
         bases = (b for b in self.model.mro() if hasattr(b, '_meta'))
@@ -350,6 +355,10 @@ class Options(object):
             "managers",
             (m[2] for m in sorted(managers)),
         )
+
+    @cached_property
+    def managers_map(self):
+        return {manager.name: manager for manager in reversed(self.managers)}
 
     @cached_property
     def fields(self):

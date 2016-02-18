@@ -152,7 +152,7 @@ class BaseManager(object):
 
         setattr(model, name, ManagerDescriptor(self))
 
-        model._meta.local_managers.append(self)
+        model._meta.add_manager(self)
 
     def _set_creation_counter(self):
         """
@@ -232,10 +232,7 @@ class ManagerDescriptor(object):
                 )
             )
 
-        manager = copy.copy(self.manager)
-        manager.model = cls
-
-        return manager
+        return cls._meta.managers_map[self.manager.name]
 
 
 class EmptyManager(Manager):
