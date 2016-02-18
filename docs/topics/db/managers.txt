@@ -321,33 +321,26 @@ You may also store the generated class into a variable::
 Custom managers and model inheritance
 -------------------------------------
 
-Class inheritance and model managers aren't quite a perfect match for each
-other. Managers are often specific to the classes they are defined on and
-inheriting them in subclasses isn't necessarily a good idea. Also, because the
-first manager declared is the *default manager*, it is important to allow that
-to be controlled. So here's how Django handles custom managers and
+Here's how Django handles custom managers and
 :ref:`model inheritance <model-inheritance>`:
 
-1. Managers defined on non-abstract base classes are *not* inherited by
-   child classes. If you want to reuse a manager from a non-abstract base,
-   redeclare it explicitly on the child class. These sorts of managers are
-   likely to be fairly specific to the class they are defined on, so
-   inheriting them can often lead to unexpected results (particularly as
-   far as the default manager goes). Therefore, they aren't passed onto
-   child classes.
-
-2. Managers from abstract base classes are always inherited by the child
-   class, using Python's normal name resolution order (names on the child
+1. Managers from base classes are always inherited by the child class,
+   using Python's normal name resolution order (names on the child
    class override all others; then come names on the first parent class,
-   and so on). Abstract base classes are designed to capture information
-   and behavior that is common to their child classes. Defining common
-   managers is an appropriate part of this common information.
+   and so on).
 
-3. The default manager on a class is either the first manager declared on
-   the class, if that exists, or the default manager of the first abstract
-   base class in the parent hierarchy, if that exists. If no default
-   manager is explicitly declared, Django's normal default manager is
-   used.
+2. The default manager on a class is either the first manager declared on the
+   class, if that exists, or the default manager of the first parent class in
+   the parent hierarchy, if that exists. If no manager is explicitly declared,
+   Django automatically creates the `objects` manager and it becomes the default
+   manager.
+
+.. versionchanged:: 1.10
+
+    In older versions, manager inheritance varied depending on the type of
+    model inheritance (i.e. :ref:`abstract-base-classes`,
+    :ref:`multi-table-inheritance`, or :ref:`proxy-models`), especially
+    with regards to electing the default manager.
 
 These rules provide the necessary flexibility if you want to install a
 collection of custom managers on a group of models, via an abstract base
