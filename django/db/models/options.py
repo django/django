@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import copy
 import warnings
 from bisect import bisect
 from collections import OrderedDict, defaultdict
@@ -73,7 +74,8 @@ def make_immutable_fields_list(name, data):
 @python_2_unicode_compatible
 class Options(object):
     FORWARD_PROPERTIES = {'fields', 'many_to_many', 'concrete_fields',
-                          'local_concrete_fields', '_forward_fields_map'}
+                          'local_concrete_fields', '_forward_fields_map',
+                          'managers', 'managers_map'}
     REVERSE_PROPERTIES = {'related_objects', 'fields_map', '_relation_tree'}
 
     default_apps = apps
@@ -83,6 +85,7 @@ class Options(object):
         self.local_fields = []
         self.local_many_to_many = []
         self.private_fields = []
+        self.local_managers = []
         self.model_name = None
         self.verbose_name = None
         self.verbose_name_plural = None
@@ -122,12 +125,6 @@ class Options(object):
         self.parents = OrderedDict()
         self.auto_created = False
 
-        # To handle various inheritance situations, we need to track where
-        # managers came from (concrete or abstract base classes). `managers`
-        # keeps a list of 3-tuples of the form:
-        # (creation_counter, instance, abstract(=True))
-        self.managers = []
-
         # List of all lookups defined in ForeignKey 'limit_choices_to' options
         # from *other* models. Needed for some admin checks. Internal use only.
         self.related_fkey_lookups = []
@@ -153,20 +150,6 @@ class Options(object):
     @property
     def installed(self):
         return self.app_config is not None
-
-    @property
-    def abstract_managers(self):
-        return [
-            (counter, instance.name, instance) for counter, instance, abstract
-            in self.managers if abstract
-        ]
-
-    @property
-    def concrete_managers(self):
-        return [
-            (counter, instance.name, instance) for counter, instance, abstract
-            in self.managers if not abstract
-        ]
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
@@ -263,6 +246,10 @@ class Options(object):
             else:
                 auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
                 model.add_to_class('id', auto)
+
+    def add_manager(self, manager):
+        self.local_managers.append(manager)
+        self._expire_cache()
 
     def add_field(self, field, private=False, virtual=NOT_PROVIDED):
         if virtual is not NOT_PROVIDED:
@@ -370,6 +357,25 @@ class Options(object):
                 if '%s.%s' % (swapped_label, swapped_object.lower()) != self.label_lower:
                     return swapped_for
         return None
+
+    @cached_property
+    def managers(self):
+        managers = []
+        bases = (b for b in self.model.mro() if hasattr(b, '_meta'))
+        for depth, base in enumerate(bases):
+            for manager in base._meta.local_managers:
+                manager = copy.copy(manager)
+                manager.model = self.model
+                managers.append((depth, manager.creation_counter, manager))
+
+        return make_immutable_fields_list(
+            "managers",
+            (m[2] for m in sorted(managers)),
+        )
+
+    @cached_property
+    def managers_map(self):
+        return {manager.name: manager for manager in reversed(self.managers)}
 
     @cached_property
     def fields(self):
