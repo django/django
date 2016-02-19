@@ -439,6 +439,10 @@ if __name__ == "__main__":
 
     if options.selenium:
         os.environ['DJANGO_SELENIUM_TESTS'] = '1'
+        if not options.tags:
+            options.tags = ['selenium']
+        elif 'selenium' not in options.tags:
+            options.tags.append('selenium')
 
     if options.bisect:
         bisect_tests(options.bisect, options, options.modules, options.parallel)
