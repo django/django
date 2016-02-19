@@ -3,7 +3,7 @@ GEOS API
 ========
 
 .. module:: django.contrib.gis.geos
-   :synopsis: GeoDjango's high-level interface to the GEOS library.
+    :synopsis: GeoDjango's high-level interface to the GEOS library.
 
 Background
 ==========
@@ -162,13 +162,13 @@ Geometries support set-like operators::
     it requires the compared geometries to have the same coordinates in the
     same positions::
 
-      >>> from django.contrib.gis.geos import LineString
-      >>> ls1 = LineString((0, 0), (1, 1))
-      >>> ls2 = LineString((1, 1), (0, 0))
-      >>> ls1.equals(ls2)
-      True
-      >>> ls1 == ls2
-      False
+        >>> from django.contrib.gis.geos import LineString
+        >>> ls1 = LineString((0, 0), (1, 1))
+        >>> ls2 = LineString((1, 1), (0, 0))
+        >>> ls1.equals(ls2)
+        True
+        >>> ls1 == ls2
+        False
 
 Geometry Objects
 ================
@@ -308,8 +308,8 @@ Essentially the SRID is prepended to the WKT representation, for example
 
 .. note::
 
-   The output from this property does not include the 3dm, 3dz, and 4d
-   information that PostGIS supports in its EWKT representations.
+    The output from this property does not include the 3dm, 3dz, and 4d
+    information that PostGIS supports in its EWKT representations.
 
 .. attribute:: GEOSGeometry.hex
 
@@ -645,99 +645,99 @@ is returned instead.
 
 .. class:: Point(x=None, y=None, z=None, srid=None)
 
-   ``Point`` objects are instantiated using arguments that represent
-   the component coordinates of the point or with a single sequence
-   coordinates.  For example, the following are equivalent::
+    ``Point`` objects are instantiated using arguments that represent
+    the component coordinates of the point or with a single sequence
+    coordinates.  For example, the following are equivalent::
 
-       >>> pnt = Point(5, 23)
-       >>> pnt = Point([5, 23])
+        >>> pnt = Point(5, 23)
+        >>> pnt = Point([5, 23])
 
-   Empty ``Point`` objects may be instantiated by passing no arguments or an
-   empty sequence. The following are equivalent::
+    Empty ``Point`` objects may be instantiated by passing no arguments or an
+    empty sequence. The following are equivalent::
 
-       >>> pnt = Point()
-       >>> pnt = Point([])
+        >>> pnt = Point()
+        >>> pnt = Point([])
 
-   .. versionchanged:: 1.10
+    .. versionchanged:: 1.10
 
-       In previous versions, an empty ``Point`` couldn't be instantiated.
+        In previous versions, an empty ``Point`` couldn't be instantiated.
 
 ``LineString``
 --------------
 
 .. class:: LineString(*args, **kwargs)
 
-   ``LineString`` objects are instantiated using arguments that are
-   either a sequence of coordinates or :class:`Point` objects.
-   For example, the following are equivalent::
+    ``LineString`` objects are instantiated using arguments that are
+    either a sequence of coordinates or :class:`Point` objects.
+    For example, the following are equivalent::
 
-       >>> ls = LineString((0, 0), (1, 1))
-       >>> ls = LineString(Point(0, 0), Point(1, 1))
+        >>> ls = LineString((0, 0), (1, 1))
+        >>> ls = LineString(Point(0, 0), Point(1, 1))
 
-   In addition, ``LineString`` objects may also be created by passing
-   in a single sequence of coordinate or :class:`Point` objects::
+    In addition, ``LineString`` objects may also be created by passing
+    in a single sequence of coordinate or :class:`Point` objects::
 
-       >>> ls = LineString( ((0, 0), (1, 1)) )
-       >>> ls = LineString( [Point(0, 0), Point(1, 1)] )
+        >>> ls = LineString( ((0, 0), (1, 1)) )
+        >>> ls = LineString( [Point(0, 0), Point(1, 1)] )
 
-   Empty ``LineString`` objects may be instantiated by passing no arguments
-   or an empty sequence. The following are equivalent::
+    Empty ``LineString`` objects may be instantiated by passing no arguments
+    or an empty sequence. The following are equivalent::
 
-       >>> ls = LineString()
-       >>> ls = LineString([])
+        >>> ls = LineString()
+        >>> ls = LineString([])
 
-   .. versionchanged:: 1.10
+    .. versionchanged:: 1.10
 
-       In previous versions, an empty ``LineString`` couldn't be instantiated.
+        In previous versions, an empty ``LineString`` couldn't be instantiated.
 
-   .. attribute:: closed
+    .. attribute:: closed
 
-   .. versionadded:: 1.10
+    .. versionadded:: 1.10
 
-   Returns whether or not this ``LineString`` is closed.
+    Returns whether or not this ``LineString`` is closed.
 
 ``LinearRing``
 --------------
 
 .. class:: LinearRing(*args, **kwargs)
 
-   ``LinearRing`` objects are constructed in the exact same way as
-   :class:`LineString` objects, however the coordinates must be
-   *closed*, in other words, the first coordinates must be the
-   same as the last coordinates.  For example::
+    ``LinearRing`` objects are constructed in the exact same way as
+    :class:`LineString` objects, however the coordinates must be
+    *closed*, in other words, the first coordinates must be the
+    same as the last coordinates.  For example::
 
-       >>> ls = LinearRing((0, 0), (0, 1), (1, 1), (0, 0))
+        >>> ls = LinearRing((0, 0), (0, 1), (1, 1), (0, 0))
 
-   Notice that ``(0, 0)`` is the first and last coordinate -- if
-   they were not equal, an error would be raised.
+    Notice that ``(0, 0)`` is the first and last coordinate -- if
+    they were not equal, an error would be raised.
 
 ``Polygon``
 -----------
 
 .. class:: Polygon(*args, **kwargs)
 
-   ``Polygon`` objects may be instantiated by passing in parameters that
-   represent the rings of the polygon.  The parameters must either be
-   :class:`LinearRing` instances, or a sequence that may be used to construct a
-   :class:`LinearRing`::
+    ``Polygon`` objects may be instantiated by passing in parameters that
+    represent the rings of the polygon.  The parameters must either be
+    :class:`LinearRing` instances, or a sequence that may be used to construct a
+    :class:`LinearRing`::
 
-       >>> ext_coords = ((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))
-       >>> int_coords = ((0.4, 0.4), (0.4, 0.6), (0.6, 0.6), (0.6, 0.4), (0.4, 0.4))
-       >>> poly = Polygon(ext_coords, int_coords)
-       >>> poly = Polygon(LinearRing(ext_coords), LinearRing(int_coords))
+        >>> ext_coords = ((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))
+        >>> int_coords = ((0.4, 0.4), (0.4, 0.6), (0.6, 0.6), (0.6, 0.4), (0.4, 0.4))
+        >>> poly = Polygon(ext_coords, int_coords)
+        >>> poly = Polygon(LinearRing(ext_coords), LinearRing(int_coords))
 
-   .. versionchanged:: 1.10
+    .. versionchanged:: 1.10
 
-       In previous versions, an empty ``Polygon`` couldn't be instantiated.
+        In previous versions, an empty ``Polygon`` couldn't be instantiated.
 
-   .. classmethod:: from_bbox(bbox)
+    .. classmethod:: from_bbox(bbox)
 
-   Returns a polygon object from the given bounding-box, a 4-tuple
-   comprising ``(xmin, ymin, xmax, ymax)``.
+    Returns a polygon object from the given bounding-box, a 4-tuple
+    comprising ``(xmin, ymin, xmax, ymax)``.
 
-   .. attribute:: num_interior_rings
+    .. attribute:: num_interior_rings
 
-   Returns the number of interior rings in this geometry.
+    Returns the number of interior rings in this geometry.
 
 .. admonition:: Comparing Polygons
 
@@ -758,92 +758,92 @@ Geometry Collections
 
 .. class:: MultiPoint(*args, **kwargs)
 
-   ``MultiPoint`` objects may be instantiated by passing in :class:`Point`
-   objects as arguments, or a single sequence of :class:`Point` objects::
+    ``MultiPoint`` objects may be instantiated by passing in :class:`Point`
+    objects as arguments, or a single sequence of :class:`Point` objects::
 
-       >>> mp = MultiPoint(Point(0, 0), Point(1, 1))
-       >>> mp = MultiPoint( (Point(0, 0), Point(1, 1)) )
+        >>> mp = MultiPoint(Point(0, 0), Point(1, 1))
+        >>> mp = MultiPoint( (Point(0, 0), Point(1, 1)) )
 
-   .. versionchanged:: 1.10
+    .. versionchanged:: 1.10
 
-       In previous versions, an empty ``MultiPoint`` couldn't be instantiated.
+        In previous versions, an empty ``MultiPoint`` couldn't be instantiated.
 
 ``MultiLineString``
 -------------------
 
 .. class:: MultiLineString(*args, **kwargs)
 
-   ``MultiLineString`` objects may be instantiated by passing in
-   :class:`LineString` objects as arguments, or a single sequence of
-   :class:`LineString` objects::
+    ``MultiLineString`` objects may be instantiated by passing in
+    :class:`LineString` objects as arguments, or a single sequence of
+    :class:`LineString` objects::
 
-       >>> ls1 = LineString((0, 0), (1, 1))
-       >>> ls2 = LineString((2, 2), (3, 3))
-       >>> mls = MultiLineString(ls1, ls2)
-       >>> mls = MultiLineString([ls1, ls2])
+        >>> ls1 = LineString((0, 0), (1, 1))
+        >>> ls2 = LineString((2, 2), (3, 3))
+        >>> mls = MultiLineString(ls1, ls2)
+        >>> mls = MultiLineString([ls1, ls2])
 
-   .. versionchanged:: 1.10
+    .. versionchanged:: 1.10
 
-       In previous versions, an empty ``MultiLineString`` couldn't be
-       instantiated.
+        In previous versions, an empty ``MultiLineString`` couldn't be
+        instantiated.
 
-   .. attribute:: merged
+    .. attribute:: merged
 
-   Returns a :class:`LineString` representing the line merge of
-   all the components in this ``MultiLineString``.
+    Returns a :class:`LineString` representing the line merge of
+    all the components in this ``MultiLineString``.
 
-   .. attribute:: closed
+    .. attribute:: closed
 
-   .. versionadded:: 1.10
+    .. versionadded:: 1.10
 
-   Returns ``True`` if and only if all elements are closed. Requires GEOS 3.5.
+    Returns ``True`` if and only if all elements are closed. Requires GEOS 3.5.
 
 ``MultiPolygon``
 ----------------
 
 .. class:: MultiPolygon(*args, **kwargs)
 
-   ``MultiPolygon`` objects may be instantiated by passing :class:`Polygon`
-   objects as arguments, or a single sequence of :class:`Polygon` objects::
+    ``MultiPolygon`` objects may be instantiated by passing :class:`Polygon`
+    objects as arguments, or a single sequence of :class:`Polygon` objects::
 
-       >>> p1 = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
-       >>> p2 = Polygon( ((1, 1), (1, 2), (2, 2), (1, 1)) )
-       >>> mp = MultiPolygon(p1, p2)
-       >>> mp = MultiPolygon([p1, p2])
+        >>> p1 = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
+        >>> p2 = Polygon( ((1, 1), (1, 2), (2, 2), (1, 1)) )
+        >>> mp = MultiPolygon(p1, p2)
+        >>> mp = MultiPolygon([p1, p2])
 
-   .. versionchanged:: 1.10
+    .. versionchanged:: 1.10
 
-       In previous versions, an empty ``MultiPolygon`` couldn't be
-       instantiated.
+        In previous versions, an empty ``MultiPolygon`` couldn't be
+        instantiated.
 
-   .. attribute:: cascaded_union
+    .. attribute:: cascaded_union
 
-   .. deprecated:: 1.10
+    .. deprecated:: 1.10
 
-      Use the :attr:`GEOSGeometry.unary_union` property instead.
+        Use the :attr:`GEOSGeometry.unary_union` property instead.
 
-   Returns a :class:`Polygon` that is the union of all of the component
-   polygons in this collection.  The algorithm employed is significantly
-   more efficient (faster) than trying to union the geometries together
-   individually. [#fncascadedunion]_
+    Returns a :class:`Polygon` that is the union of all of the component
+    polygons in this collection.  The algorithm employed is significantly
+    more efficient (faster) than trying to union the geometries together
+    individually. [#fncascadedunion]_
 
 ``GeometryCollection``
 ----------------------
 
 .. class:: GeometryCollection(*args, **kwargs)
 
-   ``GeometryCollection`` objects may be instantiated by passing in other
-   :class:`GEOSGeometry` as arguments, or a single sequence of
-   :class:`GEOSGeometry` objects::
+    ``GeometryCollection`` objects may be instantiated by passing in other
+    :class:`GEOSGeometry` as arguments, or a single sequence of
+    :class:`GEOSGeometry` objects::
 
-       >>> poly = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
-       >>> gc = GeometryCollection(Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly)
-       >>> gc = GeometryCollection((Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly))
+        >>> poly = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
+        >>> gc = GeometryCollection(Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly)
+        >>> gc = GeometryCollection((Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly))
 
-   .. versionchanged:: 1.10
+    .. versionchanged:: 1.10
 
-       In previous versions, an empty ``GeometryCollection`` couldn't be
-       instantiated.
+        In previous versions, an empty ``GeometryCollection`` couldn't be
+        instantiated.
 
 .. _prepared-geometries:
 
@@ -897,9 +897,9 @@ Geometry Factories
 
 .. function:: fromfile(file_h)
 
-   :param file_h: input file that contains spatial data
-   :type file_h: a Python ``file`` object or a string path to the file
-   :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the file
+    :param file_h: input file that contains spatial data
+    :type file_h: a Python ``file`` object or a string path to the file
+    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the file
 
 Example::
 
@@ -908,11 +908,11 @@ Example::
 
 .. function:: fromstr(string, srid=None)
 
-   :param string: string that contains spatial data
-   :type string: string
-   :param srid: spatial reference identifier
-   :type srid: int
-   :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the string
+    :param string: string that contains spatial data
+    :type string: string
+    :param srid: spatial reference identifier
+    :type srid: int
+    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the string
 
 ``fromstr(string, srid)`` is equivalent to :class:`GEOSGeometry(string, srid)
 <GEOSGeometry>`.

@@ -8,7 +8,7 @@ Spatial Backends
 ================
 
 .. module:: django.contrib.gis.db.backends
-   :synopsis: GeoDjango's spatial database backends.
+    :synopsis: GeoDjango's spatial database backends.
 
 GeoDjango currently provides the following spatial database backends:
 
@@ -18,7 +18,7 @@ GeoDjango currently provides the following spatial database backends:
 * ``django.contrib.gis.db.backends.spatialite``
 
 .. module:: django.contrib.gis.db.models
-   :synopsis: GeoDjango's database API.
+    :synopsis: GeoDjango's database API.
 
 .. _mysql-spatial-limitations:
 
@@ -297,7 +297,7 @@ Database functions
 ------------------
 
 .. module:: django.contrib.gis.db.models.functions
-   :synopsis: GeoDjango's database functions.
+    :synopsis: GeoDjango's database functions.
 
 The following table provides a summary of what geography-specific database
 functions are available on each spatial backend.
@@ -360,9 +360,9 @@ Aggregate                PostGIS  Oracle  SpatiaLite
 .. [#fnmysqlidx] *See* `Creating Spatial Indexes <https://dev.mysql.com/doc/refman/5.6/en/creating-spatial-indexes.html>`_
    in the MySQL Reference Manual:
 
-       For MyISAM tables, ``SPATIAL INDEX`` creates an R-tree index. For storage
-       engines that support nonspatial indexing of spatial columns, the engine
-       creates a B-tree index. A B-tree index on spatial values will be useful
-       for exact-value lookups, but not for range scans.
+        For MyISAM tables, ``SPATIAL INDEX`` creates an R-tree index. For storage
+        engines that support nonspatial indexing of spatial columns, the engine
+        creates a B-tree index. A B-tree index on spatial values will be useful
+        for exact-value lookups, but not for range scans.
 
 .. [#] Refer :ref:`mysql-spatial-limitations` section for more details.
