@@ -521,12 +521,19 @@ def create_generic_related_manager(superclass, rel):
         def __str__(self):
             return repr(self)
 
+        def _apply_rel_filters(self, queryset):
+            """
+            Filter the queryset for the instance this manager is bound to.
+            """
+            db = self._db or router.db_for_read(self.model, instance=self.instance)
+            return queryset.using(db).filter(**self.core_filters)
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
-                db = self._db or router.db_for_read(self.model, instance=self.instance)
-                return super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**self.core_filters)
+                queryset = super(GenericRelatedObjectManager, self).get_queryset()
+                return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:

@@ -144,6 +144,9 @@ details on these changes.
 * The ``__search`` query lookup and the
   ``DatabaseOperations.fulltext_search_sql()`` method will be removed.
 
+* The shim for supporting custom related manager classes without a
+  ``_apply_rel_filters()`` method will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
@@ -693,6 +695,16 @@ class CustomPrefetchTests(TestCase):
         ).first()
         self.assertIsNone(room.main_room_of_attr)
 
+        # The custom queryset filters should be applied to the queryset
+        # instance returned by the manager.
+        person = Person.objects.prefetch_related(
+            Prefetch('houses', queryset=House.objects.filter(name='House 1')),
+        ).get(pk=self.person1.pk)
+        self.assertEqual(
+            list(person.houses.all()),
+            list(person.houses.all().all()),
+        )
+
     def test_nested_prefetch_related_are_not_overwritten(self):
         # Regression test for #24873
         houses_2 = House.objects.prefetch_related(Prefetch('rooms'))
@@ -703,6 +715,30 @@ class CustomPrefetchTests(TestCase):
             houses.all()[0].occupants.all()[0].houses.all()[1].rooms.all()[0],
             self.room2_1
         )
+
+    def test_apply_rel_filters_deprecation_shim(self):
+        # Simulate a missing `_apply_rel_filters` method.
+        del Person.houses.related_manager_cls._apply_rel_filters
+        # Also remove `get_queryset` as it rely on `_apply_rel_filters`.
+        del Person.houses.related_manager_cls.get_queryset
+        try:
+            with warnings.catch_warnings(record=True) as warns:
+                warnings.simplefilter('always')
+                list(Person.objects.prefetch_related(
+                    Prefetch('houses', queryset=House.objects.filter(name='House 1'))
+                ))
+        finally:
+            # Deleting `related_manager_cls` will force the creation of a new
+            # class since it's a `cached_property`.
+            del Person.houses.related_manager_cls
+        msg = (
+            'The `django.db.models.fields.related_descriptors.ManyRelatedManager` class '
+            'must implement a `_apply_rel_filters()` method that accepts a `QuerySet` as '
+            'its single argument and returns an appropriately filtered version of it.'
+        )
+        self.assertEqual(len(warns), 2)  # Once person.
+        self.assertEqual(str(warns[0].message), msg)
+        self.assertEqual(str(warns[0].message), msg)
 
 
 class DefaultManagerTests(TestCase):
@@ -848,6 +884,10 @@ class GenericRelationTests(TestCase):
 
         with self.assertNumQueries(0):
             self.assertEqual(list(bookmark.tags.all()), [django_tag])
+
+        # The custom queryset filters should be applied to the queryset
+        # instance returned by the manager.
+        self.assertEqual(list(bookmark.tags.all()), list(bookmark.tags.all().all()))
 
 
 class MultiTableInheritanceTest(TestCase):
@@ -1295,6 +1335,25 @@ class Ticket25546Tests(TestCase):
             self.assertListEqual(list(book1.first_time_authors.all()[0].addresses.all()), [self.author1_address1])
             self.assertListEqual(list(book1.first_time_authors.all()[1].addresses.all()), [])
             self.assertListEqual(list(book2.first_time_authors.all()[0].addresses.all()), [self.author2_address1])
+
+        self.assertEqual(
+            list(book1.first_time_authors.all()), list(book1.first_time_authors.all().all())
+        )
+        self.assertEqual(
+            list(book2.first_time_authors.all()), list(book2.first_time_authors.all().all())
+        )
+        self.assertEqual(
+            list(book1.first_time_authors.all()[0].addresses.all()),
+            list(book1.first_time_authors.all()[0].addresses.all().all())
+        )
+        self.assertEqual(
+            list(book1.first_time_authors.all()[1].addresses.all()),
+            list(book1.first_time_authors.all()[1].addresses.all().all())
+        )
+        self.assertEqual(
+            list(book2.first_time_authors.all()[0].addresses.all()),
+            list(book2.first_time_authors.all()[0].addresses.all().all())
+        )
 
     def test_prefetch_with_to_attr(self):
         with self.assertNumQueries(3):

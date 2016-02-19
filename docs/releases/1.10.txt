@@ -762,6 +762,17 @@ features, is deprecated. Replace it with a custom lookup::
     models.CharField.register_lookup(Search)
     models.TextField.register_lookup(Search)
 
+Custom manager classes available through ``prefetch_related`` must define a ``_apply_rel_filters()`` method
+-----------------------------------------------------------------------------------------------------------
+
+If you defined a custom manager class available through
+:meth:`~django.db.models.query.QuerySet.prefetch_related` you must make sure
+it defines a ``_apply_rel_filters()`` method.
+
+This method must accept a :class:`~django.db.models.query.QuerySet` instance
+as its single argument and return a filtered version of the queryset for the
+model instance the manager is bound to.
+
 Miscellaneous
 -------------
 

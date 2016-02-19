@@ -23,6 +23,7 @@ from django.db.models.query_utils import (
 )
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import partition
 from django.utils.version import get_version
 
@@ -1608,6 +1609,9 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
             msg = 'to_attr={} conflicts with a field on the {} model.'
             raise ValueError(msg.format(to_attr, model.__name__))
 
+    # Whether or not we're prefetching the last part of the lookup.
+    leaf = len(lookup.prefetch_through.split(LOOKUP_SEP)) - 1 == level
+
     for obj in instances:
         instance_attr_val = instance_attr(obj)
         vals = rel_obj_cache.get(instance_attr_val, [])
@@ -1621,8 +1625,23 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
                 setattr(obj, to_attr, vals)
                 obj._prefetched_objects_cache[cache_name] = vals
             else:
-                # Cache in the QuerySet.all().
-                qs = getattr(obj, to_attr).all()
+                manager = getattr(obj, to_attr)
+                if leaf and lookup.queryset is not None:
+                    try:
+                        apply_rel_filter = manager._apply_rel_filters
+                    except AttributeError:
+                        warnings.warn(
+                            "The `%s.%s` class must implement a `_apply_rel_filters()` "
+                            "method that accepts a `QuerySet` as its single "
+                            "argument and returns an appropriately filtered version "
+                            "of it." % (manager.__class__.__module__, manager.__class__.__name__),
+                            RemovedInDjango20Warning,
+                        )
+                        qs = manager.get_queryset()
+                    else:
+                        qs = apply_rel_filter(lookup.queryset)
+                else:
+                    qs = manager.get_queryset()
                 qs._result_cache = vals
                 # We don't want the individual qs doing prefetch_related now,
                 # since we have merged this into the current work.

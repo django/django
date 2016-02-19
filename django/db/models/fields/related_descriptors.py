@@ -502,23 +502,29 @@ def create_reverse_many_to_one_manager(superclass, rel):
             return manager_class(self.instance)
         do_not_call_in_templates = True
 
+        def _apply_rel_filters(self, queryset):
+            """
+            Filter the queryset for the instance this manager is bound to.
+            """
+            db = self._db or router.db_for_read(self.model, instance=self.instance)
+            empty_strings_as_null = connections[db].features.interprets_empty_strings_as_nulls
+            queryset._add_hints(instance=self.instance)
+            if self._db:
+                queryset = queryset.using(self._db)
+            queryset = queryset.filter(**self.core_filters)
+            for field in self.field.foreign_related_fields:
+                val = getattr(self.instance, field.attname)
+                if val is None or (val == '' and empty_strings_as_null):
+                    return queryset.none()
+            queryset._known_related_objects = {self.field: {self.instance.pk: self.instance}}
+            return queryset
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.field.related_query_name()]
             except (AttributeError, KeyError):
-                db = self._db or router.db_for_read(self.model, instance=self.instance)
-                empty_strings_as_null = connections[db].features.interprets_empty_strings_as_nulls
-                qs = super(RelatedManager, self).get_queryset()
-                qs._add_hints(instance=self.instance)
-                if self._db:
-                    qs = qs.using(self._db)
-                qs = qs.filter(**self.core_filters)
-                for field in self.field.foreign_related_fields:
-                    val = getattr(self.instance, field.attname)
-                    if val is None or (val == '' and empty_strings_as_null):
-                        return qs.none()
-                qs._known_related_objects = {self.field: {self.instance.pk: self.instance}}
-                return qs
+                queryset = super(RelatedManager, self).get_queryset()
+                return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
@@ -776,15 +782,21 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 filters |= symmetrical_filters
             return filters
 
+        def _apply_rel_filters(self, queryset):
+            """
+            Filter the queryset for the instance this manager is bound to.
+            """
+            queryset._add_hints(instance=self.instance)
+            if self._db:
+                queryset = queryset.using(self._db)
+            return queryset._next_is_sticky().filter(**self.core_filters)
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
-                qs = super(ManyRelatedManager, self).get_queryset()
-                qs._add_hints(instance=self.instance)
-                if self._db:
-                    qs = qs.using(self._db)
-                return qs._next_is_sticky().filter(**self.core_filters)
+                queryset = super(ManyRelatedManager, self).get_queryset()
+                return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
