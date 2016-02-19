@@ -82,11 +82,11 @@ is required.
 
 .. note::
 
-   On Linux platforms, it may be necessary to run the ``ldconfig``
-   command after installing each library.  For example::
+    On Linux platforms, it may be necessary to run the ``ldconfig`` command
+    after installing each library. For example::
 
-       $ sudo make install
-       $ sudo ldconfig
+        $ sudo make install
+        $ sudo ldconfig
 
 .. note::
 
@@ -210,10 +210,10 @@ Configure, make and install::
 
 .. note::
 
-   Because GeoDjango has its own Python interface, the preceding instructions
-   do not build GDAL's own Python bindings.  The bindings may be built by
-   adding the ``--with-python`` flag when running ``configure``.  See
-   `GDAL/OGR In Python`__ for more information on GDAL's bindings.
+    Because GeoDjango has its own Python interface, the preceding instructions
+    do not build GDAL's own Python bindings. The bindings may be built by
+    adding the ``--with-python`` flag when running ``configure``. See
+    `GDAL/OGR In Python`__ for more information on GDAL's bindings.
 
 If you have any problems, please see the troubleshooting section below for
 suggestions and solutions.
@@ -252,7 +252,6 @@ setting may be added to your Django settings file with the full path to
 the GDAL library.  For example::
 
     GDAL_LIBRARY_PATH = '/home/sue/local/lib/libgdal.so'
-
 
 .. rubric:: Footnotes
 .. [#] The datum shifting files are needed for converting data to and from
