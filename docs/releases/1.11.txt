@@ -117,6 +117,9 @@ Minor features
   which in turn passes it to the authentication backend if it accepts a
   ``request`` argument.
 
+* The :func:`~django.contrib.auth.signals.user_login_failed` signal now
+  receives a ``request`` argument.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

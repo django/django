@@ -479,6 +479,14 @@ can be used for notification when a user logs in or out.
         authentication backend. Credentials matching a set of 'sensitive' patterns,
         (including password) will not be sent in the clear as part of the signal.
 
+    ``request``
+        The :class:`~django.http.HttpRequest` object, if one was provided to
+        :func:`~django.contrib.auth.authenticate`.
+
+    .. versionchanged:: 1.11
+
+        The ``request`` argument was added.
+
 .. _authentication-backends-reference:
 
 Authentication backends
