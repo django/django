@@ -2,9 +2,9 @@
 Django 1.8.10 release notes
 ===========================
 
-*Under development*
+*March 1, 2015*
 
-Django 1.8.10 fixes several bugs in 1.8.9.
+Django 1.8.10 fixes two security issues and several bugs in 1.8.9.
 
 Bugfixes
 ========
