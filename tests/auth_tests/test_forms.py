@@ -10,6 +10,7 @@ from django.contrib.auth.forms import (
     SetPasswordForm, UserChangeForm, UserCreationForm,
 )
 from django.contrib.auth.models import User
+from django.contrib.auth.signals import user_login_failed
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
@@ -166,6 +167,24 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
                          [force_text(form.error_messages['inactive'])])
+
+    def test_login_failed(self):
+        data = {
+            'username': 'testclient',
+            'password': 'incorrect',
+        }
+
+        signal_calls = []
+        def signal_handler(**kwargs):
+            signal_calls.append(kwargs)
+        user_login_failed.connect(signal_handler)
+        fake_request = object()
+
+        form = AuthenticationForm(fake_request, data)
+        self.assertFalse(form.is_valid())
+        self.assertIs(signal_calls[0]['request'], fake_request)
+
+        user_login_failed.disconnect(signal_handler)
 
     def test_inactive_user_i18n(self):
         with self.settings(USE_I18N=True), translation.override('pt-br', deactivate=True):
