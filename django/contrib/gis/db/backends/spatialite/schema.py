@@ -122,7 +122,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
     def alter_db_table(self, model, old_table_cls, new_table_cls):
         from django.contrib.gis.db.models.fields import GeometryField
         # Remove geometry-ness from temp table
-        old_db_table, new_db_table = self.compile_table(old_table_cls), self.compile_table(new_table_cls)
+        old_db_table, new_db_table = old_table_cls.table, new_table_cls.table
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):
                 self.execute(
