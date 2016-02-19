@@ -3,7 +3,7 @@ Geolocation with GeoIP2
 =======================
 
 .. module:: django.contrib.gis.geoip2
-   :synopsis: Python interface for MaxMind's GeoIP2 databases.
+    :synopsis: Python interface for MaxMind's GeoIP2 databases.
 
 .. versionadded:: 1.9
 
@@ -29,25 +29,25 @@ Example
 
 Here is an example of its usage::
 
-     >>> from django.contrib.gis.geoip2 import GeoIP2
-     >>> g = GeoIP2()
-     >>> g.country('google.com')
-     {'country_code': 'US', 'country_name': 'United States'}
-     >>> g.city('72.14.207.99')
-     {'city': 'Mountain View',
-     'country_code': 'US',
-     'country_name': 'United States',
-     'dma_code': 807,
-     'latitude': 37.419200897216797,
-     'longitude': -122.05740356445312,
-     'postal_code': '94043',
-     'region': 'CA'}
-     >>> g.lat_lon('salon.com')
-     (39.0437, -77.4875)
-     >>> g.lon_lat('uh.edu')
-     (-95.4342, 29.834)
-     >>> g.geos('24.124.1.80').wkt
-     'POINT (-97.0000000000000000 38.0000000000000000)'
+    >>> from django.contrib.gis.geoip2 import GeoIP2
+    >>> g = GeoIP2()
+    >>> g.country('google.com')
+    {'country_code': 'US', 'country_name': 'United States'}
+    >>> g.city('72.14.207.99')
+    {'city': 'Mountain View',
+    'country_code': 'US',
+    'country_name': 'United States',
+    'dma_code': 807,
+    'latitude': 37.419200897216797,
+    'longitude': -122.05740356445312,
+    'postal_code': '94043',
+    'region': 'CA'}
+    >>> g.lat_lon('salon.com')
+    (39.0437, -77.4875)
+    >>> g.lon_lat('uh.edu')
+    (-95.4342, 29.834)
+    >>> g.geos('24.124.1.80').wkt
+    'POINT (-97.0000000000000000 38.0000000000000000)'
 
 ``GeoIP`` Settings
 ==================

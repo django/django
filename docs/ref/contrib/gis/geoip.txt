@@ -3,7 +3,7 @@ Geolocation with GeoIP
 ======================
 
 .. module:: django.contrib.gis.geoip
-   :synopsis: High-level Python interface for MaxMind's GeoIP C library.
+    :synopsis: High-level Python interface for MaxMind's GeoIP C library.
 
 .. deprecated:: 1.9
 
@@ -33,27 +33,27 @@ Example
 Assuming you have the GeoIP C library installed, here is an example of its
 usage::
 
-     >>> from django.contrib.gis.geoip import GeoIP
-     >>> g = GeoIP()
-     >>> g.country('google.com')
-     {'country_code': 'US', 'country_name': 'United States'}
-     >>> g.city('72.14.207.99')
-     {'area_code': 650,
-     'city': 'Mountain View',
-     'country_code': 'US',
-     'country_code3': 'USA',
-     'country_name': 'United States',
-     'dma_code': 807,
-     'latitude': 37.419200897216797,
-     'longitude': -122.05740356445312,
-     'postal_code': '94043',
-     'region': 'CA'}
-     >>> g.lat_lon('salon.com')
-     (37.789798736572266, -122.39420318603516)
-     >>> g.lon_lat('uh.edu')
-     (-95.415199279785156, 29.77549934387207)
-     >>> g.geos('24.124.1.80').wkt
-     'POINT (-95.2087020874023438 39.0392990112304688)'
+    >>> from django.contrib.gis.geoip import GeoIP
+    >>> g = GeoIP()
+    >>> g.country('google.com')
+    {'country_code': 'US', 'country_name': 'United States'}
+    >>> g.city('72.14.207.99')
+    {'area_code': 650,
+    'city': 'Mountain View',
+    'country_code': 'US',
+    'country_code3': 'USA',
+    'country_name': 'United States',
+    'dma_code': 807,
+    'latitude': 37.419200897216797,
+    'longitude': -122.05740356445312,
+    'postal_code': '94043',
+    'region': 'CA'}
+    >>> g.lat_lon('salon.com')
+    (37.789798736572266, -122.39420318603516)
+    >>> g.lon_lat('uh.edu')
+    (-95.415199279785156, 29.77549934387207)
+    >>> g.geos('24.124.1.80').wkt
+    'POINT (-95.2087020874023438 39.0392990112304688)'
 
 ``GeoIP`` Settings
 ==================

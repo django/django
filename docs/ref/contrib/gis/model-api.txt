@@ -3,7 +3,7 @@ GeoDjango Model API
 ===================
 
 .. module:: django.contrib.gis.db.models
-   :synopsis: GeoDjango model and field API.
+    :synopsis: GeoDjango model and field API.
 
 This document explores the details of the GeoDjango Model API.  Throughout this
 section, we'll be using the following geographic model of a `ZIP code`__ and
