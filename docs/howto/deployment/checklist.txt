@@ -254,8 +254,9 @@ Python Options
 ==============
 
 It's strongly recommended that you invoke the Python process running your
-Django application using the `-R`_ option or with the
-:envvar:`PYTHONHASHSEED` environment variable set to ``random``.
+Django application using the `-R`_ option or with the :envvar:`PYTHONHASHSEED`
+environment variable set to ``random``. This option is enabled by default
+starting with Python 3.3.
 
 These options help protect your site from denial-of-service (DoS)
 attacks triggered by carefully crafted inputs. Such an attack can
