@@ -749,7 +749,7 @@ class SchemaQualified(models.Model):
 
 class DynamicQuery(models.ModelTable):
     def as_sql(self, compiler, connection):
-        db_time = compiler.query.context.get('db_time')
+        db_time = compiler.query.context.get('db_time') if hasattr(compiler, 'query') else None
         if db_time:
             return (
                 '(select * from shadow_queries_table '

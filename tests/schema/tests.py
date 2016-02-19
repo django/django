@@ -6,7 +6,7 @@ from copy import copy
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
 )
-from django.db.models import Model
+from django.db.models import Model, ModelTable
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
@@ -1410,15 +1410,17 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
         # Alter the table
+        old_table = ModelTable(None, "schema_author")
+        new_table = ModelTable(None, "schema_otherauthor")
         with connection.schema_editor() as editor:
-            editor.alter_db_table(Author, "schema_author", "schema_otherauthor")
+            editor.alter_db_table(Author, old_table, new_table)
         # Ensure the table is there afterwards
         Author._meta.db_table = "schema_otherauthor"
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
         # Alter the table again
         with connection.schema_editor() as editor:
-            editor.alter_db_table(Author, "schema_otherauthor", "schema_author")
+            editor.alter_db_table(Author, new_table, old_table)
         # Ensure the table is still there
         Author._meta.db_table = "schema_author"
         columns = self.column_classes(Author)

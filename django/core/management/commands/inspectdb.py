@@ -70,7 +70,7 @@ class Command(BaseCommand):
                 except NotImplementedError:
                     indexes = {}
                 try:
-                    constraints = connection.introspection.get_constraints(cursor, table_name)
+                    constraints = connection.introspection.get_constraints(cursor, None, table_name)
                 except NotImplementedError:
                     constraints = {}
                 used_column_names = []  # Holds column names used in the table so far
