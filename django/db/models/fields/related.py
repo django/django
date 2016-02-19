@@ -1056,7 +1056,7 @@ def create_many_to_many_intermediary_model(field, klass):
         from_ = 'from_%s' % from_
 
     meta = type(str('Meta'), (object,), {
-        'db_table': field._get_m2m_db_table(klass._meta),
+        'table_cls': field._get_m2m_table_cls(klass._meta),
         'auto_created': klass,
         'app_label': klass._meta.app_label,
         'db_tablespace': klass._meta.db_tablespace,
@@ -1454,6 +1454,14 @@ class ManyToManyField(RelatedField):
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)
+
+    def _get_m2m_table_cls(self, opts):
+        # TODO: m2m table cls
+        if self.remote_field.through is not None:
+            return self.remote_field.through._meta.table_cls
+        else:
+            from django.db.models import ModelTable
+            return ModelTable(opts.table_cls.schema, self._get_m2m_db_table(opts))
 
     def _get_m2m_db_table(self, opts):
         """
