@@ -81,7 +81,7 @@ file. Edit the database connection settings to match your setup::
              'ENGINE': 'django.contrib.gis.db.backends.postgis',
              'NAME': 'geodjango',
              'USER': 'geo',
-         }
+        },
     }
 
 In addition, modify the :setting:`INSTALLED_APPS` setting to include
@@ -96,7 +96,7 @@ and ``world`` (your newly created application)::
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'django.contrib.gis',
-        'world'
+        'world',
     ]
 
 Geographic Data
