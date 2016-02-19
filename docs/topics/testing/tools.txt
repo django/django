@@ -1632,7 +1632,7 @@ Tagging tests
 You can tag your tests so you can easily run a particular subset. For example,
 you might label fast or slow tests::
 
-    from django.test.utils import tag
+    from django.test import tag
 
     class SampleTestCase(TestCase):
 
