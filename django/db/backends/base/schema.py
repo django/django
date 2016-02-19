@@ -18,6 +18,22 @@ def _related_non_m2m_objects(old_field, new_field):
     )
 
 
+class MigrationCompiler(object):
+    """
+    A compiler mock fulfilling the compiler.compile() API.
+    """
+    def __init__(self, connection):
+        self.connection = connection
+
+    def compile(self, node):
+        vendor_impl = getattr(node, 'as_' + self.connection.vendor, None)
+        if vendor_impl:
+            sql, params = vendor_impl(self, self.connection)
+        else:
+            sql, params = node.as_sql(self, self.connection)
+        return sql, params
+
+
 class BaseDatabaseSchemaEditor(object):
     """
     This class (and its subclasses) are responsible for emitting schema-changing
@@ -112,6 +128,12 @@ class BaseDatabaseSchemaEditor(object):
 
     def quote_name(self, name):
         return self.connection.ops.quote_name(name)
+
+    def compile_table(self, table_cls):
+        sql, params = table_cls.as_sql(MigrationCompiler(self.connection), self.connection)
+        if params:
+            raise ValueError("Table used in migrations must not produce parameters!")
+        return sql
 
     @classmethod
     def _digest(cls, *args):
@@ -247,13 +269,13 @@ class BaseDatabaseSchemaEditor(object):
             params.extend(extra_params)
             # FK
             if field.remote_field and field.db_constraint:
-                to_table = field.remote_field.model._meta.db_table
+                to_table = field.remote_field.model._meta.table_cls
                 to_column = field.remote_field.model._meta.get_field(field.remote_field.field_name).column
                 if self.connection.features.supports_foreign_keys:
                     self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
                 elif self.sql_create_inline_fk:
                     definition += " " + self.sql_create_inline_fk % {
-                        "to_table": self.quote_name(to_table),
+                        "to_table": self.compile_table(to_table),
                         "to_column": self.quote_name(to_column),
                     }
             # Add the SQL to our big list
@@ -263,7 +285,8 @@ class BaseDatabaseSchemaEditor(object):
             ))
             # Autoincrement SQL (for backends with post table definition variant)
             if field.get_internal_type() in ("AutoField", "BigAutoField"):
-                autoinc_sql = self.connection.ops.autoinc_sql(model._meta.db_table, field.column)
+                autoinc_sql = self.connection.ops.autoinc_sql(model._meta.table_cls.schema,
+                                                              model._meta.table_cls.table, field.column)
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)
 
@@ -272,9 +295,12 @@ class BaseDatabaseSchemaEditor(object):
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field(field).column for field in fields]
             self.deferred_sql.append(self._create_unique_sql(model, columns))
+        # Ensure schema exists.
+        if model._meta.table_cls.schema:
+            self.execute("create schema if not exists %s" % self.quote_name(model._meta.table_cls.schema))
         # Make the table
         sql = self.sql_create_table % {
-            "table": self.quote_name(model._meta.db_table),
+            "table": self.compile_table(model._meta.table_cls),
             "definition": ", ".join(column_sqls)
         }
         if model._meta.db_tablespace:
@@ -303,7 +329,7 @@ class BaseDatabaseSchemaEditor(object):
 
         # Delete the table
         self.execute(self.sql_delete_table % {
-            "table": self.quote_name(model._meta.db_table),
+            "table": self.compile_table(model._meta.table_cls),
         })
 
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
@@ -344,20 +370,26 @@ class BaseDatabaseSchemaEditor(object):
         if len(constraint_names) != 1:
             raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
                 len(constraint_names),
-                model._meta.db_table,
+                self.compile_table(model._meta.table_cls),
                 ", ".join(columns),
             ))
         self.execute(self._delete_constraint_sql(sql, model, constraint_names[0]))
 
-    def alter_db_table(self, model, old_db_table, new_db_table):
+    def alter_db_table(self, model, old_table_cls, new_table_cls):
         """
         Renames the table a model points to.
         """
-        if old_db_table == new_db_table:
+        if old_table_cls == new_table_cls:
             return
+        if old_table_cls.schema != new_table_cls.schema:
+            self.execute("create schema if not exists %s" % self.quote_name(new_table_cls.schema))
+            self.execute("alter table %s set schema %s" %
+                         (self.compile_table(old_table_cls), self.quote_name(new_table_cls.schema)))
+            old_table_cls = old_table_cls.__class__(schema=new_table_cls.schema,
+                                                    table=old_table_cls.table)
         self.execute(self.sql_rename_table % {
-            "old_table": self.quote_name(old_db_table),
-            "new_table": self.quote_name(new_db_table),
+            "old_table": self.compile_table(old_table_cls),
+            "new_table": self.quote_name(new_table_cls.table)
         })
 
     def alter_db_tablespace(self, model, old_db_tablespace, new_db_tablespace):
@@ -365,7 +397,7 @@ class BaseDatabaseSchemaEditor(object):
         Moves a model's table between tablespaces
         """
         self.execute(self.sql_retablespace_table % {
-            "table": self.quote_name(model._meta.db_table),
+            "table": self.compile_table(model._meta.table_cls),
             "old_tablespace": self.quote_name(old_db_tablespace),
             "new_tablespace": self.quote_name(new_db_tablespace),
         })
@@ -390,7 +422,7 @@ class BaseDatabaseSchemaEditor(object):
             definition += " CHECK (%s)" % db_params['check']
         # Build the SQL and run it
         sql = self.sql_create_column % {
-            "table": self.quote_name(model._meta.db_table),
+            "table": self.compile_table(model._meta.table_cls),
             "column": self.quote_name(field.column),
             "definition": definition,
         }
@@ -399,7 +431,7 @@ class BaseDatabaseSchemaEditor(object):
         # (Django usually does not use in-database defaults)
         if not self.skip_default(field) and field.default is not None:
             sql = self.sql_alter_column % {
-                "table": self.quote_name(model._meta.db_table),
+                "table": self.compile_table(model._meta.table_cls),
                 "changes": self.sql_alter_column_no_default % {
                     "column": self.quote_name(field.column),
                 }
@@ -433,7 +465,7 @@ class BaseDatabaseSchemaEditor(object):
                 self.execute(self._delete_constraint_sql(self.sql_delete_fk, model, fk_name))
         # Delete the column
         sql = self.sql_delete_column % {
-            "table": self.quote_name(model._meta.db_table),
+            "table": self.compile_table(model._meta.table_cls),
             "column": self.quote_name(field.column),
         }
         self.execute(sql)
@@ -493,7 +525,7 @@ class BaseDatabaseSchemaEditor(object):
             if strict and len(fk_names) != 1:
                 raise ValueError("Found wrong number (%s) of foreign key constraints for %s.%s" % (
                     len(fk_names),
-                    model._meta.db_table,
+                    self.compile_table(model._meta.table_cls),
                     old_field.column,
                 ))
             for fk_name in fk_names:
@@ -506,7 +538,7 @@ class BaseDatabaseSchemaEditor(object):
             if strict and len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of unique constraints for %s.%s" % (
                     len(constraint_names),
-                    model._meta.db_table,
+                    self.compile_table(model._meta.table_cls),
                     old_field.column,
                 ))
             for constraint_name in constraint_names:
@@ -536,14 +568,15 @@ class BaseDatabaseSchemaEditor(object):
             if strict and len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of check constraints for %s.%s" % (
                     len(constraint_names),
-                    model._meta.db_table,
+                    self.compile_table(model._meta.table_cls),
                     old_field.column,
                 ))
             for constraint_name in constraint_names:
                 self.execute(self._delete_constraint_sql(self.sql_delete_check, model, constraint_name))
         # Have they renamed the column?
         if old_field.column != new_field.column:
-            self.execute(self._rename_field_sql(model._meta.db_table, old_field, new_field, new_type))
+            self.execute(self._rename_field_sql(self.compile_table(model._meta.table_cls),
+                                                old_field, new_field, new_type))
         # Next, start accumulating actions to do
         actions = []
         null_actions = []
@@ -551,7 +584,7 @@ class BaseDatabaseSchemaEditor(object):
         # Type change?
         if old_type != new_type:
             fragment, other_actions = self._alter_column_type_sql(
-                model._meta.db_table, old_field, new_field, new_type
+                model._meta.table_cls.schema, model._meta.table_cls.table, old_field, new_field, new_type
             )
             actions.append(fragment)
             post_actions.extend(other_actions)
@@ -629,7 +662,7 @@ class BaseDatabaseSchemaEditor(object):
             for sql, params in actions:
                 self.execute(
                     self.sql_alter_column % {
-                        "table": self.quote_name(model._meta.db_table),
+                        "table": self.compile_table(model._meta.table_cls),
                         "changes": sql,
                     },
                     params,
@@ -638,7 +671,7 @@ class BaseDatabaseSchemaEditor(object):
                 # Update existing rows with default value
                 self.execute(
                     self.sql_update_with_default % {
-                        "table": self.quote_name(model._meta.db_table),
+                        "table": self.compile_table(model._meta.table_cls),
                         "column": self.quote_name(new_field.column),
                         "default": "%s",
                     },
@@ -649,7 +682,7 @@ class BaseDatabaseSchemaEditor(object):
                 for sql, params in null_actions:
                     self.execute(
                         self.sql_alter_column % {
-                            "table": self.quote_name(model._meta.db_table),
+                            "table": self.compile_table(model._meta.table_cls),
                             "changes": sql,
                         },
                         params,
@@ -681,14 +714,14 @@ class BaseDatabaseSchemaEditor(object):
             if strict and len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of PK constraints for %s" % (
                     len(constraint_names),
-                    model._meta.db_table,
+                    self.compile_table(model._meta.table_cls),
                 ))
             for constraint_name in constraint_names:
                 self.execute(self._delete_constraint_sql(self.sql_delete_pk, model, constraint_name))
             # Make the new one
             self.execute(
                 self.sql_create_pk % {
-                    "table": self.quote_name(model._meta.db_table),
+                    "table": self.compile_table(model._meta.table_cls),
                     "name": self.quote_name(self._create_index_name(model, [new_field.column], suffix="_pk")),
                     "columns": self.quote_name(new_field.column),
                 }
@@ -699,12 +732,13 @@ class BaseDatabaseSchemaEditor(object):
         for old_rel, new_rel in rels_to_update:
             rel_db_params = new_rel.field.db_parameters(connection=self.connection)
             rel_type = rel_db_params['type']
+            new_table_cls = new_rel.related_model._meta.table_cls
             fragment, other_actions = self._alter_column_type_sql(
-                new_rel.related_model._meta.db_table, old_rel.field, new_rel.field, rel_type
+                new_table_cls.schema, new_table_cls.table, old_rel.field, new_rel.field, rel_type
             )
             self.execute(
                 self.sql_alter_column % {
-                    "table": self.quote_name(new_rel.related_model._meta.db_table),
+                    "table": self.compile_table(new_rel.related_model._meta.table_cls),
                     "changes": fragment[0],
                 },
                 fragment[1],
@@ -725,7 +759,7 @@ class BaseDatabaseSchemaEditor(object):
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
             self.execute(
                 self.sql_create_check % {
-                    "table": self.quote_name(model._meta.db_table),
+                    "table": self.compile_table(model._meta.table_cls),
                     "name": self.quote_name(self._create_index_name(model, [new_field.column], suffix="_check")),
                     "column": self.quote_name(new_field.column),
                     "check": new_db_params['check'],
@@ -735,7 +769,7 @@ class BaseDatabaseSchemaEditor(object):
         # (Django usually does not use in-database defaults)
         if needs_database_default:
             sql = self.sql_alter_column % {
-                "table": self.quote_name(model._meta.db_table),
+                "table": self.compile_table(model._meta.table_cls),
                 "changes": self.sql_alter_column_no_default % {
                     "column": self.quote_name(new_field.column),
                 }
@@ -745,7 +779,7 @@ class BaseDatabaseSchemaEditor(object):
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
 
-    def _alter_column_type_sql(self, table, old_field, new_field, new_type):
+    def _alter_column_type_sql(self, schema, table, old_field, new_field, new_type):
         """
         Hook to specialize column type alteration for different backends,
         for cases when a creation type is different to an alteration type
@@ -771,9 +805,9 @@ class BaseDatabaseSchemaEditor(object):
         Alters M2Ms to repoint their to= endpoints.
         """
         # Rename the through table
-        if old_field.remote_field.through._meta.db_table != new_field.remote_field.through._meta.db_table:
-            self.alter_db_table(old_field.remote_field.through, old_field.remote_field.through._meta.db_table,
-                                new_field.remote_field.through._meta.db_table)
+        if old_field.remote_field.through._meta.table_cls != new_field.remote_field.through._meta.table_cls:
+            self.alter_db_table(old_field.remote_field.through, old_field.remote_field.through._meta,
+                                new_field.remote_field.through._meta)
         # Repoint the FK to the other side
         self.alter_field(
             new_field.remote_field.through,
@@ -839,7 +873,7 @@ class BaseDatabaseSchemaEditor(object):
         columns = [field.column for field in fields]
         sql_create_index = sql or self.sql_create_index
         return sql_create_index % {
-            "table": self.quote_name(model._meta.db_table),
+            "table": self.compile_table(model._meta.table_cls),
             "name": self.quote_name(self._create_index_name(model, columns, suffix=suffix)),
             "columns": ", ".join(self.quote_name(column) for column in columns),
             "extra": tablespace_sql,
@@ -871,33 +905,32 @@ class BaseDatabaseSchemaEditor(object):
         }
 
     def _create_fk_sql(self, model, field, suffix):
-        from_table = model._meta.db_table
         from_column = field.column
-        to_table = field.target_field.model._meta.db_table
+        to_table_cls = field.target_field.model._meta.table_cls
         to_column = field.target_field.column
         suffix = suffix % {
-            "to_table": to_table,
+            "to_table": to_table_cls.table,
             "to_column": to_column,
         }
 
         return self.sql_create_fk % {
-            "table": self.quote_name(from_table),
+            "table": self.compile_table(model._meta.table_cls),
             "name": self.quote_name(self._create_index_name(model, [from_column], suffix=suffix)),
             "column": self.quote_name(from_column),
-            "to_table": self.quote_name(to_table),
+            "to_table": self.compile_table(to_table_cls),
             "to_column": self.quote_name(to_column),
         }
 
     def _create_unique_sql(self, model, columns):
         return self.sql_create_unique % {
-            "table": self.quote_name(model._meta.db_table),
+            "table": self.compile_table(model._meta.table_cls),
             "name": self.quote_name(self._create_index_name(model, columns, suffix="_uniq")),
             "columns": ", ".join(self.quote_name(column) for column in columns),
         }
 
     def _delete_constraint_sql(self, template, model, name):
         return template % {
-            "table": self.quote_name(model._meta.db_table),
+            "table": self.compile_table(model._meta.table_cls),
             "name": self.quote_name(name),
         }
 
@@ -909,7 +942,8 @@ class BaseDatabaseSchemaEditor(object):
         """
         column_names = list(column_names) if column_names else None
         with self.connection.cursor() as cursor:
-            constraints = self.connection.introspection.get_constraints(cursor, model._meta.db_table)
+            constraints = self.connection.introspection.get_constraints(cursor, model._meta.table_cls.schema,
+                                                                        model._meta.table_cls.table)
         result = []
         for name, infodict in constraints.items():
             if column_names is None or column_names == infodict['columns']:

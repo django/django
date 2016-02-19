@@ -231,10 +231,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             'pk': field[5],  # undocumented
         } for field in cursor.fetchall()]
 
-    def get_constraints(self, cursor, table_name):
+    def get_constraints(self, cursor, schema, table_name):
         """
         Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
         """
+        assert schema is None, "No schema support on sqlite3"
         constraints = {}
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))

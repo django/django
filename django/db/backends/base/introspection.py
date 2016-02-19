@@ -157,7 +157,7 @@ class BaseDatabaseIntrospection(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_indexes() method')
 
-    def get_constraints(self, cursor, table_name):
+    def get_constraints(self, cursor, schema, table_name):
         """
         Retrieves any constraints or keys (unique, pk, fk, check, index)
         across one or more columns.

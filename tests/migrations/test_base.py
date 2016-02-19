@@ -54,7 +54,7 @@ class MigrationTestBase(TransactionTestCase):
                 value,
                 any(
                     c["index"]
-                    for c in connection.introspection.get_constraints(cursor, table).values()
+                    for c in connection.introspection.get_constraints(cursor, None, table).values()
                     if c['columns'] == list(columns)
                 ),
             )
@@ -68,7 +68,7 @@ class MigrationTestBase(TransactionTestCase):
                 value,
                 any(
                     c["foreign_key"] == to
-                    for c in connection.introspection.get_constraints(cursor, table).values()
+                    for c in connection.introspection.get_constraints(cursor, None, table).values()
                     if c['columns'] == list(columns)
                 ),
             )

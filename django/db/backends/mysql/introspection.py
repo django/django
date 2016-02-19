@@ -154,10 +154,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             return self.connection.features._mysql_storage_engine
         return result[0]
 
-    def get_constraints(self, cursor, table_name):
+    def get_constraints(self, cursor, schema, table_name):
         """
         Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
         """
+        assert schema is None, "Schema-qualified tables not supported on MySQL"
         constraints = {}
         # Get the actual constraint names and columns
         name_query = """

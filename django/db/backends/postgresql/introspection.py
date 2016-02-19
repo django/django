@@ -139,10 +139,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 indexes[row[0]]['unique'] = True
         return indexes
 
-    def get_constraints(self, cursor, table_name):
+    def get_constraints(self, cursor, schema, table_name):
         """
         Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
         """
+        assert schema is None, "Not implemented yet!"
         constraints = {}
         # Loop over the key table, collecting things as constraints
         # This will get PKs, FKs, and uniques, but not CHECK

@@ -114,7 +114,7 @@ class SchemaTests(TransactionTestCase):
         Get the constraints on a table using a new cursor.
         """
         with connection.cursor() as cursor:
-            return connection.introspection.get_constraints(cursor, table)
+            return connection.introspection.get_constraints(cursor, None, table)
 
     def get_constraints_for_column(self, model, column_name):
         constraints = self.get_constraints(model._meta.db_table)
