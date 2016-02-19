@@ -26,7 +26,7 @@ class MigrationTestBase(TransactionTestCase):
 
     def get_table_description(self, table):
         with connection.cursor() as cursor:
-            return connection.introspection.get_table_description(cursor, table)
+            return connection.introspection.get_table_description(cursor, None, table)
 
     def assertTableExists(self, table):
         with connection.cursor() as cursor:

@@ -313,7 +313,7 @@ class ExecutorTests(MigrationTestBase):
         # it wouldn't be there in a normal run, and ensure migrations.Author
         # exists in the global app registry temporarily.
         old_table_names = connection.introspection.table_names
-        connection.introspection.table_names = lambda c: [x for x in old_table_names(c) if x != "auth_user"]
+        connection.introspection.table_names = lambda c, include_schema: [(None, x) for x in old_table_names(c) if x != "auth_user"]
         migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).apps
         global_apps.get_app_config("migrations").models["author"] = migrations_apps.get_model("migrations", "author")
         try:

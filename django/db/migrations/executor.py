@@ -250,7 +250,6 @@ class MigrationExecutor(object):
         tables or columns it would create exist. This is intended only for use
         on initial migrations (as it only looks for CreateModel and AddField).
         """
-        # TODO: we need schema-aware introspection for this case.
         if migration.initial is None:
             # Bail if the migration isn't the first one in its app
             if any(app == migration.app_label for app, name in migration.dependencies):
@@ -266,7 +265,7 @@ class MigrationExecutor(object):
         apps = after_state.apps
         found_create_model_migration = False
         found_add_field_migration = False
-        existing_table_names = self.connection.introspection.table_names(self.connection.cursor())
+        existing_table_names = self.connection.introspection.table_names(self.connection.cursor(), include_schema=True)
         # Make sure all create model and add field operations are done
         for operation in migration.operations:
             if isinstance(operation, migrations.CreateModel):
@@ -277,7 +276,7 @@ class MigrationExecutor(object):
                     model = global_apps.get_model(model._meta.swapped)
                 if model._meta.proxy or not model._meta.managed:
                     continue
-                if model._meta.db_table not in existing_table_names:
+                if (model._meta.table_cls.schema, model._meta.table_cls.table) not in existing_table_names:
                     return False, project_state
                 found_create_model_migration = True
             elif isinstance(operation, migrations.AddField):
@@ -289,12 +288,14 @@ class MigrationExecutor(object):
                 if model._meta.proxy or not model._meta.managed:
                     continue
 
-                table = model._meta.db_table
+                table = model._meta.table_cls.table
+                schema = model._meta.table_cls.schema
                 field = model._meta.get_field(operation.name)
 
                 # Handle implicit many-to-many tables created by AddField.
                 if field.many_to_many:
-                    if field.remote_field.through._meta.db_table not in existing_table_names:
+                    table_cls = field.remote_field.through._meta.table_cls
+                    if (table_cls.schema, table_cls.table) not in existing_table_names:
                         return False, project_state
                     else:
                         found_add_field_migration = True
@@ -302,7 +303,7 @@ class MigrationExecutor(object):
 
                 column_names = [
                     column.name for column in
-                    self.connection.introspection.get_table_description(self.connection.cursor(), table)
+                    self.connection.introspection.get_table_description(self.connection.cursor(), schema, table)
                 ]
                 if field.column not in column_names:
                     return False, project_state

@@ -56,7 +56,7 @@ class FlexibleFieldLookupDict(object):
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = FlexibleFieldLookupDict()
 
-    def get_table_list(self, cursor):
+    def get_table_list(self, cursor, include_schema=False):
         """
         Returns a list of table and view names in the current database.
         """
@@ -66,10 +66,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT name, type FROM sqlite_master
             WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
             ORDER BY name""")
-        return [TableInfo(row[0], row[1][0]) for row in cursor.fetchall()]
+        return [TableInfo(row[0], row[1][0], None) for row in cursor.fetchall()]
 
-    def get_table_description(self, cursor, table_name):
+    def get_table_description(self, cursor, schema, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
+        assert schema is None, "No schema support for SQLite"
         return [
             FieldInfo(
                 info['name'],

@@ -53,10 +53,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         cursor.execute("SELECT TABLE_NAME, 't' FROM USER_TABLES UNION ALL "
                        "SELECT VIEW_NAME, 'v' FROM USER_VIEWS")
-        return [TableInfo(row[0].lower(), row[1]) for row in cursor.fetchall()]
+        return [TableInfo(row[0].lower(), row[1], None) for row in cursor.fetchall()]
 
-    def get_table_description(self, cursor, table_name):
+    def get_table_description(self, cursor, schema, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
+        if schema:
+            raise NotImplementedError("TODO")
         self.cache_bust_counter += 1
         cursor.execute("SELECT * FROM {} WHERE ROWNUM < 2 AND {} > 0".format(
             self.connection.ops.quote_name(table_name),

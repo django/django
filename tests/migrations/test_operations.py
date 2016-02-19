@@ -1138,12 +1138,12 @@ class OperationTests(OperationTestBase):
             with connection.cursor() as cursor:
                 id_type, id_null = [
                     (c.type_code, c.null_ok)
-                    for c in connection.introspection.get_table_description(cursor, "test_alflpkfk_pony")
+                    for c in connection.introspection.get_table_description(cursor, None, "test_alflpkfk_pony")
                     if c.name == "id"
                 ][0]
                 fk_type, fk_null = [
                     (c.type_code, c.null_ok)
-                    for c in connection.introspection.get_table_description(cursor, "test_alflpkfk_rider")
+                    for c in connection.introspection.get_table_description(cursor, None, "test_alflpkfk_rider")
                     if c.name == "pony_id"
                 ][0]
             self.assertEqual(id_type, fk_type)

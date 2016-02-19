@@ -90,6 +90,7 @@ class SchemaTests(TransactionTestCase):
                 d[0]: (connection.introspection.get_field_type(d[1], d), d)
                 for d in connection.introspection.get_table_description(
                     cursor,
+                    None,
                     model._meta.db_table,
                 )
             }
@@ -1679,7 +1680,7 @@ class SchemaTests(TransactionTestCase):
             self.assertEqual(item[0], 'surname default')
             # And that the default is no longer set in the database.
             field = next(
-                f for f in connection.introspection.get_table_description(cursor, "schema_author")
+                f for f in connection.introspection.get_table_description(cursor, None, "schema_author")
                 if f.name == "surname"
             )
             if connection.features.can_introspect_default:
@@ -1702,7 +1703,7 @@ class SchemaTests(TransactionTestCase):
         # The database default should be removed.
         with connection.cursor() as cursor:
             field = next(
-                f for f in connection.introspection.get_table_description(cursor, "schema_author")
+                f for f in connection.introspection.get_table_description(cursor, None, "schema_author")
                 if f.name == "height"
             )
             if connection.features.can_introspect_default:
