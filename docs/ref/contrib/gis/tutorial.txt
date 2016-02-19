@@ -81,7 +81,7 @@ file. Edit the database connection settings to match your setup::
              'ENGINE': 'django.contrib.gis.db.backends.postgis',
              'NAME': 'geodjango',
              'USER': 'geo',
-         }
+        }
     }
 
 In addition, modify the :setting:`INSTALLED_APPS` setting to include
