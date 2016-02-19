@@ -132,11 +132,11 @@ in :mod:`django.contrib.gis`::
             'NAME': 'geodjango',
             'USER': 'geodjango',
         },
-       'other': {
+        'other': {
             'ENGINE': 'django.contrib.gis.db.backends.postgis',
             'NAME': 'other',
             'USER': 'geodjango',
-       }
+        },
     }
 
     SECRET_KEY = 'django_tests_secret_key'

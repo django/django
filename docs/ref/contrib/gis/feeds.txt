@@ -31,9 +31,9 @@ API Reference
    base class, GeoDjango's ``Feed`` class provides
    the following overrides.  Note that these overrides may be done in multiple ways::
 
-       from django.contrib.gis.feeds import Feed
+        from django.contrib.gis.feeds import Feed
 
-       class MyFeed(Feed):
+        class MyFeed(Feed):
 
             # First, as a class attribute.
             geometry = ...
