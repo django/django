@@ -96,12 +96,25 @@ class TestHashedFiles(object):
 
     def test_template_tag_absolute(self):
         relpath = self.hashed_file_path("cached/absolute.css")
-        self.assertEqual(relpath, "cached/absolute.ae9ef2716fe3.css")
+        self.assertEqual(relpath, "cached/absolute.df312c6326e1.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"/static/cached/styles.css", content)
             self.assertIn(b"/static/cached/styles.bb84a0240107.css", content)
+            self.assertNotIn(b"/static/styles_root.css", content)
+            self.assertIn(b"/static/styles_root.401f2509a628.css", content)
             self.assertIn(b'/static/cached/img/relative.acae32e4532b.png', content)
+
+    def test_template_tag_absolute_root(self):
+        """
+        Like test_template_tag_absolute, but for a file in STATIC_ROOT (#26249).
+        """
+        relpath = self.hashed_file_path("absolute_root.css")
+        self.assertEqual(relpath, "absolute_root.f864a4d7f083.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertNotIn(b"/static/styles_root.css", content)
+            self.assertIn(b"/static/styles_root.401f2509a628.css", content)
 
     def test_template_tag_denorm(self):
         relpath = self.hashed_file_path("cached/denorm.css")
