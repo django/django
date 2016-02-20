@@ -19,8 +19,6 @@ class ConsumerRegistry(object):
 
     def __init__(self, routing=None):
         self.consumers = {}
-        # Add basic internal consumers
-        self.add_consumer(self.echo_consumer, ["__channels__.echo"])
         # Initialise with any routing that was passed in
         if routing:
             # If the routing was a string, import it
@@ -69,18 +67,10 @@ class ConsumerRegistry(object):
         except KeyError:
             return None
 
-    def echo_consumer(self, message):
-        """
-        Implements the echo message standard.
-        """
-        message.reply_channel.send({
-            "content": message.content.get("content", None),
-        })
-
-    def check_default(self):
+    def check_default(self, http_consumer=None):
         """
         Checks to see if default handlers need to be registered
         for channels, and adds them if they need to be.
         """
         if not self.consumer_for_channel("http.request"):
-            self.add_consumer(ViewConsumer(), ["http.request"])
+            self.add_consumer(http_consumer or ViewConsumer(), ["http.request"])
