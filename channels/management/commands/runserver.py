@@ -19,6 +19,8 @@ class Command(RunserverCommand):
         super(Command, self).add_arguments(parser)
         parser.add_argument('--noworker', action='store_false', dest='run_worker', default=True,
             help='Tells Django not to run a worker thread; you\'ll need to run one separately.')
+        parser.add_argument('--noasgi', action='store_false', dest='use_asgi', default=True,
+            help='Run the old WSGI-based runserver rather than the ASGI-based one')
 
     def handle(self, *args, **options):
         self.verbosity = options.get("verbosity", 1)
@@ -26,6 +28,9 @@ class Command(RunserverCommand):
         super(Command, self).handle(*args, **options)
 
     def inner_run(self, *args, **options):
+        # Maybe they want the wsgi one?
+        if not options.get("use_asgi", True):
+            return RunserverCommand.inner_run(self, *args, **options)
         # Check a handler is registered for http reqs; if not, add default one
         self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
         self.channel_layer.registry.check_default()
