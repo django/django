@@ -2282,6 +2282,21 @@ class ModelOtherFieldTests(SimpleTestCase):
         self.assertTrue(HomepageForm({'url': 'http://www.example.com:8000/test'}).is_valid())
         self.assertTrue(HomepageForm({'url': 'http://example.com/foo/bar'}).is_valid())
 
+    def test_modelform_non_editable_field(self):
+        """
+        When explicitely including a non-editable field in a ModelForm, the
+        error message should be explicit.
+        """
+        # 'created', non-editable, is excluded by default
+        self.assertNotIn('created', ArticleForm().fields)
+
+        msg = "'created' cannot be specified for Article model form as it is a non-editable field"
+        with self.assertRaisesMessage(FieldError, msg):
+            class InvalidArticleForm(forms.ModelForm):
+                class Meta:
+                    model = Article
+                    fields = ('headline', 'created')
+
     def test_http_prefixing(self):
         """
         If the http:// prefix is omitted on form input, the field adds it again. (Refs #13613)

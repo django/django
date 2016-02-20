@@ -148,6 +148,12 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
                                if isinstance(f, ModelField)]
     for f in sorted(chain(opts.concrete_fields, sortable_virtual_fields, opts.many_to_many)):
         if not getattr(f, 'editable', False):
+            if (fields is not None and f.name in fields and
+                    (exclude is None or f.name not in exclude)):
+                raise FieldError(
+                    "'%s' cannot be specified for %s model form as it is a non-editable field" % (
+                        f.name, model.__name__)
+                )
             continue
         if fields is not None and f.name not in fields:
             continue
