@@ -165,26 +165,27 @@ class CompilationErrorHandling(MessageCompilationTests):
         with self.assertRaises(CommandError):
             call_command('compilemessages', locale=['ja'], verbosity=0)
 
-    # We will check the output of msgfmt, so we need to make sure its output
-    # is unaffected by the current locale.
-    @mock.patch('django.core.management.utils.Popen',
-        lambda *args, **kwargs: Popen(*args, env={'LANG': 'C'}, **kwargs))
     def test_msgfmt_error_including_non_ascii(self):
         # po file contains invalid msgstr content (triggers non-ascii error content).
         mo_file = 'locale/ko/LC_MESSAGES/django.mo'
         self.addCleanup(self.rmfile, os.path.join(self.test_dir, mo_file))
-        if six.PY2:
-            # Various assertRaises on PY2 don't support unicode error messages.
-            try:
-                call_command('compilemessages', locale=['ko'], verbosity=0)
-            except CommandError as err:
-                self.assertIn("'�' cannot start a field name", six.text_type(err))
-        else:
-            cmd = MakeMessagesCommand()
-            if cmd.gettext_version < (0, 18, 3):
-                raise unittest.SkipTest("python-brace-format is a recent gettext addition.")
-            with self.assertRaisesMessage(CommandError, "'�' cannot start a field name"):
-                call_command('compilemessages', locale=['ko'], verbosity=0)
+        # Make sure the output of msgfmt is unaffected by the current locale.
+        env = os.environ.copy()
+        env.update({'LANG': 'C'})
+        with mock.patch('django.core.management.utils.Popen',
+                lambda *args, **kwargs: Popen(*args, env=env, **kwargs)):
+            if six.PY2:
+                # Various assertRaises on PY2 don't support unicode error messages.
+                try:
+                    call_command('compilemessages', locale=['ko'], verbosity=0)
+                except CommandError as err:
+                    self.assertIn("'�' cannot start a field name", six.text_type(err))
+            else:
+                cmd = MakeMessagesCommand()
+                if cmd.gettext_version < (0, 18, 3):
+                    raise unittest.SkipTest("python-brace-format is a recent gettext addition.")
+                with self.assertRaisesMessage(CommandError, "'�' cannot start a field name"):
+                    call_command('compilemessages', locale=['ko'], verbosity=0)
 
 
 class ProjectAndAppTests(MessageCompilationTests):
