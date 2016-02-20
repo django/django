@@ -50,6 +50,7 @@ class AsgiRequest(http.HttpRequest):
         self.META = {
             "REQUEST_METHOD": self.method,
             "QUERY_STRING": self.message.get('query_string', b'').decode("ascii"),
+            "SCRIPT_NAME": self.script_name.decode("ascii"),
             # Old code will need these for a while
             "wsgi.multithread": True,
             "wsgi.multiprocess": True,
