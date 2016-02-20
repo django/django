@@ -26,12 +26,12 @@ class Worker(object):
         channels = self.channel_layer.registry.all_channel_names()
         while True:
             channel, content = self.channel_layer.receive_many(channels, block=True)
-            logger.debug("Worker got message on %s: repl %s", channel, content.get("reply_channel", "none"))
             # If no message, stall a little to avoid busy-looping then continue
             if channel is None:
                 time.sleep(0.01)
                 continue
             # Create message wrapper
+            logger.debug("Worker got message on %s: repl %s", channel, content.get("reply_channel", "none"))
             message = Message(
                 content=content,
                 channel_name=channel,
