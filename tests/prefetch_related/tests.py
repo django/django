@@ -695,6 +695,16 @@ class CustomPrefetchTests(TestCase):
         ).first()
         self.assertIsNone(room.main_room_of_attr)
 
+        # The custom queryset filters should be applied to the queryset
+        # instance returned by the manager.
+        person = Person.objects.prefetch_related(
+            Prefetch('houses', queryset=House.objects.filter(name='House 1')),
+        ).get(pk=self.person1.pk)
+        self.assertEqual(
+            list(person.houses.all()),
+            list(person.houses.all().all()),
+        )
+
     def test_nested_prefetch_related_are_not_overwritten(self):
         # Regression test for #24873
         houses_2 = House.objects.prefetch_related(Prefetch('rooms'))
@@ -836,6 +846,23 @@ class GenericRelationTests(TestCase):
             bookmark = Bookmark.objects.filter(pk=b.pk).prefetch_related('tags', 'favorite_tags')[0]
             self.assertEqual(sorted([i.tag for i in bookmark.tags.all()]), ["django", "python"])
             self.assertEqual([i.tag for i in bookmark.favorite_tags.all()], ["python"])
+
+    def test_custom_queryset(self):
+        bookmark = Bookmark.objects.create(url='http://www.djangoproject.com/')
+        django_tag = TaggedItem.objects.create(content_object=bookmark, tag='django')
+        TaggedItem.objects.create(content_object=bookmark, tag='python')
+
+        with self.assertNumQueries(2):
+            bookmark = Bookmark.objects.prefetch_related(
+                Prefetch('tags', TaggedItem.objects.filter(tag='django')),
+            ).get()
+
+        with self.assertNumQueries(0):
+            self.assertEqual(list(bookmark.tags.all()), [django_tag])
+
+        # The custom queryset filters should be applied to the queryset
+        # instance returned by the manager.
+        self.assertEqual(list(bookmark.tags.all()), list(bookmark.tags.all().all()))
 
 
 class MultiTableInheritanceTest(TestCase):
