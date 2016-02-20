@@ -242,8 +242,10 @@ class AsgiHandler(base.BaseHandler):
         # Streaming responses need to be pinned to their iterator
         if response.streaming:
             for part in response.streaming_content:
-                for chunk in cls.chunk_bytes(part):
+                for chunk, more in cls.chunk_bytes(part):
                     message['content'] = chunk
+                    # We ignore "more" as there may be more parts; instead,
+                    # we use an empty final closing message with False.
                     message['more_content'] = True
                     yield message
                     message = {}
