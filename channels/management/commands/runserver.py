@@ -9,7 +9,9 @@ from django.utils import six
 from django.utils.encoding import get_system_encoding
 
 from channels import DEFAULT_CHANNEL_LAYER, channel_layers
+from channels.handler import ViewConsumer
 from channels.log import setup_logger
+from channels.staticfiles import StaticFilesConsumer
 from channels.worker import Worker
 
 
@@ -33,7 +35,9 @@ class Command(RunserverCommand):
             return RunserverCommand.inner_run(self, *args, **options)
         # Check a handler is registered for http reqs; if not, add default one
         self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
-        self.channel_layer.registry.check_default()
+        self.channel_layer.registry.check_default(
+            http_consumer=self.get_consumer(),
+        )
         # Run checks
         self.stdout.write("Performing system checks...\n\n")
         self.check(display_num_errors=True)
@@ -58,11 +62,12 @@ class Command(RunserverCommand):
             "layer": self.channel_layer,
         })
 
-        # Launch worker as subthread
+        # Launch workers as subthreads
         if options.get("run_worker", True):
-            worker = WorkerThread(self.channel_layer, self.logger)
-            worker.daemon = True
-            worker.start()
+            for _ in range(4):
+                worker = WorkerThread(self.channel_layer, self.logger)
+                worker.daemon = True
+                worker.start()
         # Launch server in 'main' thread. Signals are disabled as it's still
         # actually a subthread under the autoreloader.
         self.logger.debug("Daphne running, listening on %s:%s", self.addr, self.port)
@@ -115,6 +120,19 @@ class Command(RunserverCommand):
             msg += "WebSocket DISCONNECT %(path)s [%(client)s]\n" % details
 
         sys.stderr.write(msg)
+
+    def get_consumer(self, *args, **options):
+        """
+        Returns the static files serving handler wrapping the default handler,
+        if static files should be served. Otherwise just returns the default
+        handler.
+        """
+        use_static_handler = options.get('use_static_handler', True)
+        insecure_serving = options.get('insecure_serving', False)
+        if use_static_handler and (settings.DEBUG or insecure_serving):
+            return StaticFilesConsumer()
+        else:
+            return ViewConsumer()
 
 
 class WorkerThread(threading.Thread):
