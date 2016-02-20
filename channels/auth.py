@@ -10,9 +10,10 @@ def transfer_user(from_session, to_session):
     """
     Transfers user from HTTP session to channel session.
     """
-    to_session[auth.BACKEND_SESSION_KEY] = from_session[auth.BACKEND_SESSION_KEY]
-    to_session[auth.SESSION_KEY] = from_session[auth.SESSION_KEY]
-    to_session[auth.HASH_SESSION_KEY] = from_session[auth.HASH_SESSION_KEY]
+    if auth.BACKEND_SESSION_KEY in from_session and auth.SESSION_KEY in from_session and auth.HASH_SESSION_KEY in from_session:
+        to_session[auth.BACKEND_SESSION_KEY] = from_session[auth.BACKEND_SESSION_KEY]
+        to_session[auth.SESSION_KEY] = from_session[auth.SESSION_KEY]
+        to_session[auth.HASH_SESSION_KEY] = from_session[auth.HASH_SESSION_KEY]
 
 
 def channel_session_user(func):
