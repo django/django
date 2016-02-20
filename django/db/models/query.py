@@ -1606,12 +1606,13 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
                 setattr(obj, to_attr, vals)
                 obj._prefetched_objects_cache[cache_name] = vals
             else:
-                # Cache in the QuerySet.all().
-                qs = getattr(obj, to_attr).all()
+                qs = rel_qs._clone()
                 qs._result_cache = vals
+
                 # We don't want the individual qs doing prefetch_related now,
                 # since we have merged this into the current work.
                 qs._prefetch_done = True
+
                 obj._prefetched_objects_cache[cache_name] = qs
     return all_related_objects, additional_lookups
 
