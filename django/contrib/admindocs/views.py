@@ -1,6 +1,7 @@
 import inspect
 import os
 import re
+import warnings
 from importlib import import_module
 
 from django.apps import apps
@@ -14,6 +15,10 @@ from django.http import Http404
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
 from django.utils.decorators import method_decorator
+from django.utils.deprecation import (
+    PERCENT_PLACEHOLDER_RE, RemovedInDjango20Warning,
+)
+from django.utils.encoding import force_text
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
     get_func_full_args,
@@ -356,8 +361,17 @@ def get_readable_field_data_type(field):
     """Returns the description for a given field type, if it exists,
     Fields' descriptions can contain format strings, which will be interpolated
     against the values of field.__dict__ before being output."""
-
-    return field.description % field.__dict__
+    if PERCENT_PLACEHOLDER_RE.search(force_text(field.description)):
+        warnings.warn(
+            'Legacy % placeholder syntax in description is deprecated. '
+            'Use the Python str.format() syntax instead.',
+            RemovedInDjango20Warning,
+            stacklevel=2,
+        )
+        description = field.description % field.__dict__
+    else:
+        description = field.description.format(**field.__dict__)
+    return description
 
 
 def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):

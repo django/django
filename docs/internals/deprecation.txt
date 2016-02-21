@@ -145,6 +145,9 @@ details on these changes.
 * The legacy ``%(field_name)s`` placeholder syntax will be removed from
   ``SuccessMessageMixin.success_message``.
 
+* The legacy ``%(field_name)s`` placeholder syntax will be removed from
+  ``Field.description``.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

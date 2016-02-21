@@ -1080,7 +1080,7 @@ class BooleanField(Field):
 
 
 class CharField(Field):
-    description = _("String (up to %(max_length)s)")
+    description = _("String (up to {max_length})")
 
     def __init__(self, *args, **kwargs):
         super(CharField, self).__init__(*args, **kwargs)
@@ -2130,7 +2130,7 @@ class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
 
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
-    description = _("Slug (up to %(max_length)s)")
+    description = _("Slug (up to {max_length})")
 
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 50)

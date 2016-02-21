@@ -1711,7 +1711,7 @@ Field API reference
 
         The description can be of the form::
 
-            description = _("String (up to %(max_length)s)")
+            description = _("String (up to {max_length})")
 
         where the arguments are interpolated from the field's ``__dict__``.
 
