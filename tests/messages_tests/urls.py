@@ -67,12 +67,19 @@ class ContactForm(forms.Form):
 class ContactFormViewWithMsg(SuccessMessageMixin, FormView):
     form_class = ContactForm
     success_url = show
+    success_message = "{name} was created successfully"
+
+
+class ContactFormViewWithLegacyMsg(SuccessMessageMixin, FormView):
+    form_class = ContactForm
+    success_url = show
     success_message = "%(name)s was created successfully"
 
 
 urlpatterns = [
     url('^add/(debug|info|success|warning|error)/$', add, name='add_message'),
     url('^add/msg/$', ContactFormViewWithMsg.as_view(), name='add_success_msg'),
+    url('^add/legacymsg/$', ContactFormViewWithLegacyMsg.as_view(), name='add_success_legacy_msg'),
     url('^show/$', show, name='show_message'),
     url('^template_response/add/(debug|info|success|warning|error)/$',
         add_template_response, name='add_template_response'),
