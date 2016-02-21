@@ -95,7 +95,7 @@ class Command(RunserverCommand):
         msg = "[%s] " % datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         # HTTP requests
         if protocol == "http" and action == "complete":
-            msg += "HTTP %(method)s %(path)s %(status)s [%(client)s]\n" % details
+            msg += "HTTP %(method)s %(path)s %(status)s [%(time_taken).2f, %(client)s]\n" % details
             # Utilize terminal colors, if available
             if 200 <= details['status'] < 300:
                 # Put 2XX first, since it should be the common case
