@@ -1,8 +1,9 @@
 from setuptools import find_packages, setup
+from channels import __version__
 
 setup(
     name='channels',
-    version="0.8",
+    version=__version__,
     url='http://github.com/andrewgodwin/django-channels',
     author='Andrew Godwin',
     author_email='andrew@aeracode.org',
@@ -11,7 +12,8 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'Django',
-        'asgiref',
+        'Django>=1.7',
+        'asgiref>=0.9',
+        'daphne>=0.9',
     ]
 )

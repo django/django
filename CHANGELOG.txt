@@ -1,0 +1,26 @@
+0.9 (2016-02-21)
+----------------
+
+* Staticfiles support in runserver
+
+* Runserver logs requests and WebSocket connections to console
+
+* Runserver autoreloads correctly
+
+* --noasgi option on runserver to use the old WSGI-based server
+
+* --noworker option on runserver to make it not launch worker threads
+
+* Streaming responses work correctly
+
+* Authentication decorators work again with new ASGI spec
+
+* channel_session_user_from_http decorator introduced
+
+* HTTP Long Poll support (raise ResponseLater)
+
+* Handle non-latin1 request body encoding
+
+* ASGI conformance tests for built-in database backend
+
+* Moved some imports around for more sensible layout
