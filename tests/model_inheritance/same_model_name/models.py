@@ -1,7 +1,7 @@
 """
 
 Model inheritance across apps can result in models with the same name,
-requiring an %(app_label)s format string. This app tests this feature by
+requiring an {app_label} format string. This app tests this feature by
 redefining the Copy model from model_inheritance/models.py.
 """
 

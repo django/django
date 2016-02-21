@@ -979,12 +979,12 @@ classes, with exactly the same values for the attributes (including
 To work around this problem, when you are using
 :attr:`~django.db.models.ForeignKey.related_name` or
 :attr:`~django.db.models.ForeignKey.related_query_name` in an abstract base
-class (only), part of the value should contain ``'%(app_label)s'`` and
-``'%(class)s'``.
+class (only), part of the value should contain ``'{app_label}'`` and
+``'{class}'``.
 
-- ``'%(class)s'`` is replaced by the lower-cased name of the child class
+- ``'{class}'`` is replaced by the lower-cased name of the child class
   that the field is used in.
-- ``'%(app_label)s'`` is replaced by the lower-cased name of the app the child
+- ``'{app_label}'`` is replaced by the lower-cased name of the app the child
   class is contained within. Each installed application name must be unique
   and the model class names within each app must also be unique, therefore the
   resulting name will end up being different.
@@ -996,8 +996,8 @@ For example, given an app ``common/models.py``::
     class Base(models.Model):
         m2m = models.ManyToManyField(
             OtherModel,
-            related_name="%(app_label)s_%(class)s_related",
-            related_query_name="%(app_label)s_%(class)ss",
+            related_name="{app_label}_{class}_related",
+            related_query_name="{app_label}_{class}s",
         )
 
         class Meta:
@@ -1022,8 +1022,8 @@ The reverse name of the ``common.ChildB.m2m`` field will be
 ``common_childb_related`` and the reverse query name will be
 ``common_childbs``. Finally, the reverse name of the ``rare.ChildB.m2m`` field
 will be ``rare_childb_related`` and the reverse query name will be
-``rare_childbs``. It's up to you how you use the `'%(class)s'`` and
-``'%(app_label)s`` portion to construct your related name or related query name
+``rare_childbs``. It's up to you how you use the `'{class}'`` and
+``'{app_label}`` portion to construct your related name or related query name
 but if you forget to use it, Django will raise errors when you perform system
 checks (or run :djadmin:`migrate`).
 
@@ -1038,8 +1038,15 @@ field.
 
 .. versionchanged:: 1.10
 
-   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` for
+   Interpolation of  ``'{app_label}'`` and ``'{class}'`` for
    ``related_query_name`` was added.
+
+.. versionchanged:: 1.10
+
+   Support for Python :py:meth:`str.format()` placeholder syntax has
+   been added for the interpolation of ``related_name``. The legacy
+   ``%(app_label)s`` and ``%(class)s`` placeholder syntax has been
+   deprecated and will be removed in Django 2.0.
 
 .. _multi-table-inheritance:
 

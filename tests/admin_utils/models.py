@@ -72,7 +72,7 @@ class VehicleMixin(Vehicle):
         Vehicle,
         models.CASCADE,
         parent_link=True,
-        related_name='vehicle_%(app_label)s_%(class)s',
+        related_name='vehicle_{app_label}_{class}',
     )
 
     class Meta:

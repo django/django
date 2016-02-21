@@ -296,8 +296,13 @@ Models
   may be called without any arguments to return all objects in the queryset.
 
 * :attr:`~django.db.models.ForeignKey.related_query_name` now supports
-  app label and class interpolation using the ``'%(app_label)s'`` and
-  ``'%(class)s'`` strings.
+  app label and class interpolation using the ``'{app_label}'`` and
+  ``'{class}'`` strings.
+
+* The app label and class interpolation in
+  :attr:`~django.db.models.ForeignKey.related_name` now supports the Python
+  :py:meth:`str.format()` syntax. The legacy ``'%(app_label)s'`` and
+  ``'%(class)s'`` syntax is still supported but will be removed in Django 2.0.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -638,6 +643,10 @@ Miscellaneous
 * In :class:`~django.core.exceptions.ValidationError`, The legacy ``%(<foo>)s``
   placeholder syntax is deprecated in favor of Python :py:meth:`str.format()`
   syntax.
+
+* For :attr:`~django.db.models.ForeignKey.related_name`, the legacy
+  ``%(app_label)s`` and ``%(class)s`` interpolation syntax is deprecated in
+  favor of Python :py:meth:`str.format()` syntax.
 
 .. _removed-features-1.10:
 

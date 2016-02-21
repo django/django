@@ -13,7 +13,9 @@ from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    PERCENT_PLACEHOLDER_RE, RemovedInDjango20Warning,
+)
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property, curry
 from django.utils.translation import ugettext_lazy as _
@@ -289,18 +291,27 @@ class RelatedField(Field):
         self.opts = cls._meta
 
         if not cls._meta.abstract:
+            fmt_kwargs = {
+                'class': cls.__name__.lower(),
+                'app_label': cls._meta.app_label.lower(),
+            }
+
             if self.remote_field.related_name:
-                related_name = force_text(self.remote_field.related_name) % {
-                    'class': cls.__name__.lower(),
-                    'app_label': cls._meta.app_label.lower()
-                }
+                related_name = force_text(self.remote_field.related_name)
+                if PERCENT_PLACEHOLDER_RE.search(related_name):
+                    warnings.warn(
+                        'Legacy % placeholder syntax in related_name is deprecated. '
+                        'Use the Python str.format() syntax instead.',
+                        RemovedInDjango20Warning,
+                        stacklevel=2,
+                    )
+                    related_name %= fmt_kwargs
+                else:
+                    related_name = related_name.format(**fmt_kwargs)
                 self.remote_field.related_name = related_name
 
             if self.remote_field.related_query_name:
-                related_query_name = force_text(self.remote_field.related_query_name) % {
-                    'class': cls.__name__.lower(),
-                    'app_label': cls._meta.app_label.lower(),
-                }
+                related_query_name = force_text(self.remote_field.related_query_name).format(**fmt_kwargs)
                 self.remote_field.related_query_name = related_query_name
 
             def resolve_related_class(model, related, field):

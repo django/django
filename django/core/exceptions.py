@@ -4,7 +4,9 @@ Global Django exception and warning classes.
 import warnings
 
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning, PERCENT_PLACEHOLDER_RE
+from django.utils.deprecation import (
+    PERCENT_PLACEHOLDER_RE, RemovedInDjango20Warning,
+)
 from django.utils.encoding import force_text
 
 

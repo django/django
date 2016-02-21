@@ -11,8 +11,8 @@ from django.utils import six
 
 from .models import (
     Base, Chef, CommonInfo, Copy, GrandChild, GrandParent, ItalianRestaurant,
-    MixinModel, ParkingLot, Place, Post, Restaurant, Student, SubBase,
-    Supplier, Title, Worker,
+    LegacyPost, MixinModel, ParkingLot, Place, Post, Restaurant, Student,
+    SubBase, Supplier, Title, Worker,
 )
 
 
@@ -69,9 +69,22 @@ class ModelInheritanceTests(TestCase):
         )
 
         # The Post model doesn't have an attribute called
-        # 'attached_%(class)s_set'.
+        # 'attached_{class}_set'.
         with self.assertRaises(AttributeError):
-            getattr(post, "attached_%(class)s_set")
+            getattr(post, "attached_{class}_set")
+
+    def test_related_name_with_percent_placeholder(self):
+        # The Post model has distinct accessors for the Comment and Link models.
+        post = LegacyPost.objects.create(title="Lorem Ipsum")
+        post.attached_legacycomment_set.create(content="Save $ on V1agr@", is_spam=True)
+        post.attached_legacylink_set.create(
+            content="The Web framework for perfections with deadlines.",
+            url="http://www.djangoproject.com/",
+        )
+
+        # The Post model doesn't have an attribute called
+        # 'attached_%(class)s_set'.
+        self.assertFalse(hasattr(post, "attached_%(class)_set"))
 
     def test_model_with_distinct_related_query_name(self):
         self.assertQuerysetEqual(Post.objects.filter(attached_model_inheritance_comments__is_spam=True), [])
@@ -425,8 +438,8 @@ class InheritanceSameModelNameTests(TransactionTestCase):
             copy.delete()
 
     def test_related_name_attribute_exists(self):
-        # The Post model doesn't have an attribute called 'attached_%(app_label)s_%(class)s_set'.
-        self.assertFalse(hasattr(self.title, 'attached_%(app_label)s_%(class)s_set'))
+        # The Post model doesn't have an attribute called 'attached_{app_label}_{class}_set'.
+        self.assertFalse(hasattr(self.title, 'attached_{app_label}_{class}_set'))
 
 
 class InheritanceUniqueTests(TestCase):

@@ -85,7 +85,7 @@ class NestedObjectsTests(TestCase):
         """
         #21846 -- Check that `NestedObjects.collect()` doesn't trip
         (AttributeError) on the special notation for relations on abstract
-        models (related_name that contains %(app_label)s and/or %(class)s).
+        models (related_name that contains {app_label} and/or {class}).
         """
         n = NestedObjects(using=DEFAULT_DB_ALIAS)
         Car.objects.create()

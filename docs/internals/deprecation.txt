@@ -136,6 +136,9 @@ details on these changes.
 * The legacy ``%(<foo>)s`` placeholder syntax will be removed from
   ``ValidationError``.
 
+* The legacy ``%(app_label)s`` and ``%(class)s`` placeholder syntax will be
+  removed from ``related_name``.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
