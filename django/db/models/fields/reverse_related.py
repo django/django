@@ -14,7 +14,9 @@ from __future__ import unicode_literals
 import warnings
 
 from django.core import exceptions
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    PERCENT_PLACEHOLDER_RE, RemovedInDjango20Warning,
+)
 from django.utils.encoding import smart_text
 from django.utils.functional import cached_property
 
@@ -188,10 +190,21 @@ class ForeignObjectRel(object):
         if self.related_name:
             return self.related_name
         if opts.default_related_name:
-            return opts.default_related_name % {
+            fmt_kwargs = {
                 'model_name': opts.model_name.lower(),
                 'app_label': opts.app_label.lower(),
             }
+            if PERCENT_PLACEHOLDER_RE.search(opts.default_related_name):
+                warnings.warn(
+                    'Legacy % placeholder syntax in default_related_name is deprecated. '
+                    'Use the Python str.format() syntax instead.',
+                    RemovedInDjango20Warning,
+                    stacklevel=2,
+                )
+                related_name = opts.default_related_name % fmt_kwargs
+            else:
+                related_name = opts.default_related_name.format(**fmt_kwargs)
+            return related_name
         return opts.model_name + ('_set' if self.multiple else '')
 
     def get_cache_name(self):

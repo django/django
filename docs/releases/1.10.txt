@@ -304,6 +304,12 @@ Models
   :py:meth:`str.format()` syntax. The legacy ``'%(app_label)s'`` and
   ``'%(class)s'`` syntax is still supported but will be removed in Django 2.0.
 
+* The app label and model name placeholders in
+  :attr:`~django.db.models.Options.default_related_name` now supports the Python
+  :py:meth:`str.format()` syntax. The legacy ``'%(app_label)s'`` and
+  ``'%(model_name)s'`` syntax is still supported but will be removed in Django
+  2.0.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -646,6 +652,10 @@ Miscellaneous
 
 * For :attr:`~django.db.models.ForeignKey.related_name`, the legacy
   ``%(app_label)s`` and ``%(class)s`` interpolation syntax is deprecated in
+  favor of Python :py:meth:`str.format()` syntax.
+
+* For :attr:`~django.db.models.Options.default_related_name` the legacy
+  ``%(app_label)s`` and ``%(model_name)s`` placeholder syntax is deprecated in
   favor of Python :py:meth:`str.format()` syntax.
 
 .. _removed-features-1.10:
