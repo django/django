@@ -332,7 +332,8 @@ store it in the session; thankfully, Channels ships with both a ``channel_sessio
 decorator that works like the ``http_session_user`` decorator we mentioned above but
 loads the user from the *channel* session rather than the *HTTP* session,
 and a function called ``transfer_user`` which replicates a user from one session
-to another.
+to another. Even better, it combines all of these into a ``channel_session_user_from_http``
+decorator.
 
 Bringing that all together, let's make a chat server where users can only
 chat to people with the same first letter of their username::
@@ -343,8 +344,7 @@ chat to people with the same first letter of their username::
     from channels.auth import http_session_user, channel_session_user, transfer_user
 
     # Connected to websocket.connect
-    @channel_session
-    @http_session_user
+    @channel_session_user_from_http
     def ws_add(message):
         # Copy user from HTTP to channel session
         transfer_user(message.http_session, message.channel_session)

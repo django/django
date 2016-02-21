@@ -34,19 +34,22 @@ serve as the communication layer - for example, the Redis backend connects
 to a Redis server. All this goes into the ``CHANNEL_BACKENDS`` setting;
 here's an example for a remote Redis server::
 
-    CHANNEL_BACKENDS = {
+    CHANNEL_LAYERS = {
         "default": {
-            "BACKEND": "channels.backends.redis_py.RedisChannelBackend",
-            "HOSTS": [("redis-channel", 6379)],
+            "BACKEND": "asgi_redis.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("redis-server-name", 6379)],
+            },
+            "ROUTING": "my_project.routing.channel_routing",
         },
     }
 
-To use the Redis backend you have to install the redis package::
+To use the Redis backend you have to install it::
 
-    pip install -U redis
+    pip install -U asgi_redis
 
 
-Make sure the same setting file is used across all your workers, interfaces
+Make sure the same settings file is used across all your workers, interfaces
 and WSGI apps; without it, they won't be able to talk to each other and things
 will just fail to work.
 
@@ -88,44 +91,44 @@ do the work of taking incoming requests and loading them into the channels
 system.
 
 You can just keep running your Django code as a WSGI app if you like, behind
-something like uwsgi or gunicorn, and just use the WSGI interface as the app
-you load into the server - just set it to use
-``channels.interfaces.wsgi:WSGIHandler``.
+something like uwsgi or gunicorn; this won't let you support WebSockets, though.
+Still, if you want to use a WSGI server and have it talk to a worker server
+cluster on the backend, see :ref:`wsgi-to-asgi`.
 
-If you want to support WebSockets, however, you'll need to run another
-interface server, as the WSGI protocol has no support for WebSockets.
-Channels ships with an Autobahn-based WebSocket interface server
-that should suit your needs; however, you could also use a third-party
-interface server or write one yourself, as long as it follows the
-:doc:`message-standards`.
+If you want to support WebSockets, long-poll HTTP requests and other Channels
+features, you'll need to run a native ASGI interface server, as the WSGI
+specification has no support for running these kinds of requests concurrenctly.
+Channels ships with an interface server that we recommend you use called
+*Daphne*; it supports WebSockets, long-poll HTTP requests, HTTP/2 *(soon)*
+and performs quite well. Of course, any ASGI-compliant server will work!
 
-Notably, it's possible to combine more than one protocol into the same
-interface server, and the one Channels ships with does just this; it can
-optionally serve HTTP requests as well as WebSockets, though by default
-it will just serve WebSockets and assume you're routing requests to the right
-kind of server using your load balancer or reverse proxy.
+Notably, Daphne has a nice feature where it supports all of these protocols on
+the same port and on all paths; it auto-negotiates between HTTP and WebSocket,
+so there's no need to have your WebSockets on a separate port or path (and
+they'll be able to share cookies with your normal view code).
 
-To run a normal WebSocket server, just run::
+To run Daphne, it just needs to be supplied with a channel backend;
+first, make sure your project has an ``asgi.py`` file that looks like this
+(it should live next to ``wsgi.py``)::
 
-    python manage.py runwsserver
+    import os
+    from channels.asgi import get_channel_layer
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "my_project.settings")
+
+    channel_layer = get_channel_layer()
+
+Then, you can run Daphne and supply the channel layer as the argument:
+
+    daphne my_project.asgi:channel_layer
 
 Like ``runworker``, you should place this inside an init system or something
 like supervisord to ensure it is re-run if it exits unexpectedly.
 
-If you want to enable serving of normal HTTP requests as well, just run::
-
-    python manage.py runwsserver --accept-all
-
-This interface server is built on in-process asynchronous solutions
-(Twisted for Python 2, and asyncio for Python 3) and so should be able to
-handle a lot of simultaneous connections. That said, you should still plan to
-run a cluster of them and load-balance between them; the per-connection memory
-overhead is moderately high.
-
-Finally, note that it's entirely possible for interface servers to be written
-in a language other than Python, though this would mean they could not take
-advantage of the channel backend abstraction code and so they'd likely be
-custom-written for a single channel backend.
+If you only run Daphne and no workers, all of your page requests will seem to
+hang forever; that's because Daphne doesn't have any worker servers to handle
+the request and it's waiting for one to appear (while ``runserver`` also uses
+Daphne, it launches a worker thread along with it in the same process).
 
 
 Deploying new versions of code
@@ -145,3 +148,7 @@ There's no need to restart the WSGI or WebSocket interface servers unless
 you've upgraded your version of Channels or changed any settings;
 none of your code is used by them, and all middleware and code that can
 customise requests is run on the consumers.
+
+You can even use different Python versions for the interface servers and the
+workers; the ASGI protocol that channel layers communicate over
+is designed to be very portable and network-transparent.
