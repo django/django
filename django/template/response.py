@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango110Warning
 
-from .backends.django import Template as BackendTemplate
+from .backends.django import DjangoTemplates, Template as BackendTemplate
 from .base import Template
 from .context import Context, RequestContext, _current_app_undefined
 from .loader import get_template, select_template
@@ -25,7 +25,7 @@ class SimpleTemplateResponse(HttpResponse):
                 "anymore. It may be a backend-specific template like those "
                 "created by get_template().".format(self.__class__.__name__),
                 RemovedInDjango110Warning, stacklevel=2)
-            template = BackendTemplate(template)
+            template = BackendTemplate(template, DjangoTemplates)
 
         # It would seem obvious to call these next two members 'template' and
         # 'context', but those names are reserved as part of the test Client
@@ -95,7 +95,7 @@ class SimpleTemplateResponse(HttpResponse):
                 "{}.".format(
                     self.__class__.__name__, new_template.__class__.__name__),
                 RemovedInDjango110Warning, stacklevel=2)
-            new_template = BackendTemplate(new_template)
+            new_template = BackendTemplate(new_template, DjangoTemplates)
         return new_template
 
     def resolve_context(self, context):
