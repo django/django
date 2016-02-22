@@ -118,7 +118,7 @@ first, make sure your project has an ``asgi.py`` file that looks like this
 
     channel_layer = get_channel_layer()
 
-Then, you can run Daphne and supply the channel layer as the argument:
+Then, you can run Daphne and supply the channel layer as the argument::
 
     daphne my_project.asgi:channel_layer
 
@@ -152,3 +152,26 @@ customise requests is run on the consumers.
 You can even use different Python versions for the interface servers and the
 workers; the ASGI protocol that channel layers communicate over
 is designed to be very portable and network-transparent.
+
+
+.. _wsgi-to-asgi:
+
+Running ASGI under WSGI
+-----------------------
+
+ASGI is a relatively new specification, and so it's backwards compatible with
+WSGI servers with an adapter layer. You won't get WebSocket support this way -
+WSGI doesn't support WebSockets - but you can run a separate ASGI server to
+handle WebSockets if you want.
+
+The ``wsgiref`` package contains the adapter; all you need to do is put this
+in your Django project's ``wsgi.py`` to declare a new WSGI application object
+that backs onto ASGI underneath::
+
+    import os
+    from asgiref.wsgi import WsgiToAsgiAdapter
+    from channels.asgi import get_channel_layer
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_test.settings")
+    channel_layer = get_channel_layer()
+    application = WsgiToAsgiAdapter(channel_layer)

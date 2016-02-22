@@ -127,6 +127,8 @@ Now, that's taken care of adding and removing WebSocket send channels for the
 we're not going to store a history of messages or anything and just replay
 any message sent in to all connected clients. Here's all the code::
 
+.. _websocket-example:
+
     # In consumers.py
     from channels import Group
 

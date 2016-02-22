@@ -21,6 +21,8 @@ view is called.
 
 Let's look at what *channels* are first.
 
+.. _what-are-channels:
+
 What is a channel?
 ------------------
 
