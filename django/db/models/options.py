@@ -33,8 +33,9 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
-                 'select_on_save', 'default_related_name',
-                 'required_db_features', 'required_db_vendor')
+                 'inherit_permissions', 'select_on_save',
+                 'default_related_name', 'required_db_features',
+                 'required_db_vendor')
 
 
 def normalize_together(option_together):
@@ -195,6 +196,18 @@ class Options(object):
 
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
+
+            # check for the %(class)s escape used for inherited permissions.
+            # If present, replace it with the appropriate text based off of
+            # the class name for both the name and codename of the permission.
+            perms = meta_attrs.pop('permissions', self.permissions)
+            translated_perms = []
+            if perms:
+                for codename, name in perms:
+                    codename = codename % {'class': cls.__name__.lower()}
+                    name = name % {'class': self.verbose_name}
+                    translated_perms.append((codename, name),)
+            self.permissions = translated_perms
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.

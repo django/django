@@ -295,6 +295,9 @@ Models
   app label and class interpolation using the ``'%(app_label)s'`` and
   ``'%(class)s'`` strings.
 
+* :attr:`~django.db.models.Options.permissions` now supports class interpolation
+  using the ``'%(class)s'`` string.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
