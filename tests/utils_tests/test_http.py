@@ -92,6 +92,11 @@ class TestUtilsHttp(unittest.TestCase):
                         'javascript:alert("XSS")',
                         '\njavascript:alert(x)',
                         '\x08//example.com',
+                        r'http://otherserver\@example.com',
+                        r'http:\\testserver\@example.com',
+                        r'http://testserver\me:pass@example.com',
+                        r'http://testserver\@example.com',
+                        r'http:\\testserver\confirm\me@example.com',
                         '\n'):
             self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
         for good_url in ('/view/?param=http://example.com',
@@ -101,8 +106,15 @@ class TestUtilsHttp(unittest.TestCase):
                      'https://testserver/',
                      'HTTPS://testserver/',
                      '//testserver/',
+                     'http://testserver/confirm?email=me@example.com',
                      '/url%20with%20spaces/'):
             self.assertTrue(http.is_safe_url(good_url, host='testserver'), "%s should be allowed" % good_url)
+        # Valid basic auth credentials are allowed.
+        self.assertTrue(http.is_safe_url(r'http://user:pass@testserver/', host='user:pass@testserver'))
+        # A path without host is allowed.
+        self.assertTrue(http.is_safe_url('/confirm/me@example.com'))
+        # Basic auth without host is not allowed.
+        self.assertFalse(http.is_safe_url(r'http://testserver\@example.com'))
 
     def test_urlsafe_base64_roundtrip(self):
         bytestring = b'foo'
