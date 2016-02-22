@@ -37,3 +37,6 @@ Bugfixes
 
 * Reallowed dashes in top-level domain names of URLs checked by
   ``URLValidator`` to fix a regression in Django 1.8 (:ticket:`26204`).
+
+* Fixed some crashing deprecation shims in ``SimpleTemplateResponse`` that
+  regressed in Django 1.9 (:ticket:`26253`).
