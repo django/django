@@ -122,12 +122,12 @@ handler::
     def ws_disconnect(message):
         Group("chat").discard(message.reply_channel)
 
+.. _websocket-example:
+
 Now, that's taken care of adding and removing WebSocket send channels for the
 ``chat`` group; all we need to do now is take care of message sending. For now,
 we're not going to store a history of messages or anything and just replay
 any message sent in to all connected clients. Here's all the code::
-
-.. _websocket-example:
 
     # In consumers.py
     from channels import Group

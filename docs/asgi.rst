@@ -286,7 +286,7 @@ A *channel layer* should provide an object with these attributes
 
 * ``extensions``, a list of unicode string names indicating which
   extensions this layer provides, or empty if it supports none.
-  The only valid extension names are ``groups``, ``flush`` and ``statistics`.
+  The only valid extension names are ``groups``, ``flush`` and ``statistics``.
 
 A channel layer implementing the ``groups`` extension must also provide:
 
