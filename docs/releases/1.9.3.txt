@@ -52,3 +52,7 @@ Bugfixes
 
 * Prevented ``ContentTypeManager`` instances from sharing their cache
   (:ticket:`26286`).
+
+* Reverted a change in Django 1.9.2 (:ticket:`25858`) that prevented relative
+  lazy relationships defined on abstract models to be resolved according to
+  their concrete model's ``app_label`` (:ticket:`26186`).
