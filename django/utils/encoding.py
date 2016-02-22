@@ -11,9 +11,6 @@ from django.utils import six
 from django.utils.functional import Promise
 from django.utils.six.moves.urllib.parse import quote, unquote
 
-if six.PY3:
-    from urllib.parse import unquote_to_bytes
-
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
@@ -28,6 +25,16 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
 
 # For backwards compatibility. (originally in Django, then added to six 1.9)
 python_2_unicode_compatible = six.python_2_unicode_compatible
+
+# the corresponding maps between uri to iri percent encodings
+_hexdig = '0123456789ABCDEFabcdef'
+if not six.PY3:
+    _hextochr = dict((a + b, unichr(int(a + b, 16)))
+            for a in _hexdig for b in _hexdig)
+    _asciire = re.compile('([\x00-\x7f]+)')
+elif six.PY3:
+    _hextobyte = {(a + b).encode(): bytes([int(a + b, 16)])
+                  for a in _hexdig for b in _hexdig}
 
 
 def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
@@ -110,43 +117,6 @@ def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     return force_bytes(s, encoding, strings_only, errors)
 
 
-def convert_encodings(uri):
-    """Convert the %encodings back to their octet except the encoding for the '%' sign"""
-    _hexdig = '0123456789ABCDEFabcdef'
-    _hextochr = dict((a + b, chr(int(a + b, 16)))
-                 for a in _hexdig for b in _hexdig)
-    _asciire = re.compile('([\x00-\x7f]+)')
-
-    if isinstance(uri, (str, unicode)):
-        if '%' not in uri:
-            return uri
-        parts = _asciire.split(uri)
-        ans = [parts[0]]
-        for i in range(1, len(parts), 2):
-            if str(parts[i][1:3]) != "25":
-                ans.append(unquote(str(parts[i])).decode('latin1'))
-                ans.append(parts[i + 1])
-            else:
-                ans.append("%")
-                ans.append(parts[i][1:3])
-        return ''.join(ans)
-    else:
-        parts = uri.split('%')
-        ans = [parts[0]]
-        for i in parts[1:]:
-            try:
-                if i[:2] != "25":
-                    ans.append(_hextochr[i[:2]])
-                    ans.append(i[2:])
-                else:
-                    ans.append('%')
-                    ans.append(i)
-            except KeyError:
-                ans.append('%')
-                ans.append(i)
-        return ''.join(ans)
-
-
 def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     Similar to smart_bytes, except that lazy instances are resolved to
@@ -204,6 +174,70 @@ Apply force_text in Python 3 and force_bytes in Python 2.
 """
 
 
+def convert_encodings(uri):
+    """
+    Used to map the uri percent encodings to the corresponding octets
+    except the percent encoding for the character '%'
+    """
+    if isinstance(uri, six.text_type):
+        if '%' not in uri:
+            return uri
+        parts = _asciire.split(uri)
+        ans = [parts[0]]
+        for i in range(1, len(parts), 2):
+            if (parts[i][1:3]) != "25":
+                ans.append(unquote(parts[i]).decode('latin1'))
+                ans.append(parts[i + 1])
+            else:
+                ans.append(parts[i][0:3])
+        return ''.join(ans)
+    else:
+        parts = uri.decode('latin1').split('%')
+        ans = [parts[0]]
+        for i in parts[1:]:
+            try:
+                if i[:2] != "25":
+                    ans.append(_hextochr[i[:2]])
+                    ans.append(i[2:])
+                else:
+                    ans.append('%')
+                    ans.append(i)
+            except KeyError:
+                ans.append('%')
+                ans.append(i)
+        return ''.join(ans)
+
+
+def convert_encodings_to_bytes(uri):
+    """
+    Similar to convert_encodings, but for python versions 3.x .
+    """
+    if isinstance(uri, str):
+        uri = uri.encode('utf-8')
+    parts = uri.split(b'%')
+    if len(parts) == 1:
+        return uri
+    ans = [parts[0]]
+    # Delay the initialization of the table to not waste memory
+    # if the function is never called
+    global _hextobyte
+    if _hextobyte is None:
+        _hextobyte = {(a + b).encode(): bytes([int(a + b, 16)])
+                      for a in _hexdig for b in _hexdig}
+    for item in parts[1:]:
+        try:
+            if item[:2] != b"25":
+                ans.append(_hextobyte[item[:2]])
+                ans.append(item[2:])
+            else:
+                ans.append(b'%')
+                ans.append(item)
+        except KeyError:
+            ans.append(b'%')
+            ans.append(item)
+    return b''.join(ans)
+
+
 def iri_to_uri(iri):
     """
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
@@ -247,7 +281,7 @@ def uri_to_iri(uri):
     if uri is None:
         return uri
     uri = force_bytes(uri)
-    iri = convert_encodings(uri)
+    iri = convert_encodings_to_bytes(uri) if six.PY3 else convert_encodings(uri).encode('latin-1')
     return repercent_broken_unicode(iri).decode('utf-8')
 
 
