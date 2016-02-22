@@ -35,7 +35,8 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save', 'default_related_name',
-                 'required_db_features', 'required_db_vendor')
+                 'required_db_features', 'required_db_vendor',
+                 'manager_inheritance_from_future')
 
 
 def normalize_together(option_together):
@@ -78,6 +79,7 @@ class Options(object):
         self.local_fields = []
         self.local_many_to_many = []
         self.virtual_fields = []
+        self.manager_inheritance_from_future = False
         self.local_managers = []
         self.model_name = None
         self.verbose_name = None
@@ -349,6 +351,11 @@ class Options(object):
             for manager in base._meta.local_managers:
                 manager = copy.copy(manager)
                 manager.model = self.model
+
+                # Used for deprecation of old-style manager inheritance
+                # remove afterwards. (RemovedInDjango20Warning)
+                manager._originating_model = base
+
                 managers.append((depth, manager.creation_counter, manager))
 
         return make_immutable_fields_list(

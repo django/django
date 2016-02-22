@@ -1,10 +1,12 @@
 import copy
 import inspect
+import warnings
 from importlib import import_module
 
 from django.db import router
 from django.db.models.query import QuerySet
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -18,7 +20,38 @@ def ensure_default_manager(model):
     _default_manager and _base_manager attributes on the class.
     """
 
-    if not model._meta.managers:
+    # <RemovedInDjango20Warning>
+    legacy_default_manager = None
+    create_legacy_objects_manager = False
+    if not model._meta.manager_inheritance_from_future and model._meta.managers:
+        for manager in model._meta.managers:
+            originating_model = manager._originating_model
+            if (model is originating_model or
+                    originating_model._meta.abstract or
+                    originating_model._meta.proxy):
+                legacy_default_manager = manager
+                break
+        else:
+            warnings.warn(
+                "Managers from concrete parents will soon qualify as default "
+                "managers. As a result '{model}.objects' won't be created "
+                "automatically anymore and '{future_default_manager}' "
+                "declared on {future_default_manager_model} will be "
+                "promoted to default manager. "
+                "Explicitly declare `objects = models.Manager()` on '{model}' "
+                "to keep things the way they are. You can set "
+                "`Meta.manager_inheritance_from_future` to `True` to switch to "
+                "the new behavior right away.".format(
+                    model=model.__name__,
+                    future_default_manager=model._meta.managers[0].name,
+                    future_default_manager_model=model._meta.managers[0]._originating_model.__name__,
+                ),
+                RemovedInDjango20Warning, 2
+            )
+            create_legacy_objects_manager = True
+    # </RemovedInDjango20Warning>
+
+    if not model._meta.managers or create_legacy_objects_manager:
         if any(f.name == 'objects' for f in model._meta.fields):
             raise ValueError(
                 "Model %s must specify a custom Manager, because it has a "
@@ -27,6 +60,30 @@ def ensure_default_manager(model):
         model.add_to_class('objects', Manager())
 
     model._default_manager = model._meta.managers[0]
+
+    # <RemovedInDjango20Warning>
+    if legacy_default_manager and legacy_default_manager is not model._default_manager:
+        warnings.warn(
+            "Managers from concrete parents will soon qualify as default "
+            "managers if they appear before any other managers in the MRO. "
+            "As a result '{legacy_default_manager}' declared on "
+            "'{legacy_default_manager_model}' will no longer be the default "
+            "manager for '{model}' in favor of '{future_default_manager}' "
+            "declared on '{future_default_manager_model}'. "
+            "Explicitly redeclare '{legacy_default_manager}' on '{model}' "
+            "to keep things the way they are. You can set "
+            "`Meta.manager_inheritance_from_future` to `True` to switch to "
+            "the new behavior right away.".format(
+                model=model.__name__,
+                legacy_default_manager=legacy_default_manager.name,
+                legacy_default_manager_model=legacy_default_manager._originating_model.__name__,
+                future_default_manager=model._meta.managers[0].name,
+                future_default_manager_model=model._meta.managers[0]._originating_model.__name__,
+            ),
+            RemovedInDjango20Warning, 2
+        )
+        model._default_manager = legacy_default_manager
+    # </RemovedInDjango20Warning>
 
     # Just alias _base_manager if default manager is suitable.
     if can_use_for_related_field(model._default_manager.__class__):

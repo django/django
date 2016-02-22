@@ -55,7 +55,7 @@ class ManagersRegressionTests(TestCase):
         self.assertQuerysetEqual(Child5._default_manager.all(), ["<Child5: fred>"])
         self.assertQuerysetEqual(Child6._default_manager.all(), [
             "<Child6: f1>",
-            '<Child6: f2>'
+            "<Child6: f2>"
         ], ordered=False)
         self.assertQuerysetEqual(Child7._default_manager.order_by('name'), [
             "<Child7: barney>",
