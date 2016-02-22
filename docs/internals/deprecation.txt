@@ -133,6 +133,8 @@ details on these changes.
 * The model ``CommaSeparatedIntegerField`` will be removed. A stub field will
   remain for compatibility with historical migrations.
 
+* Support for the template ``Context.has_key()`` method will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
