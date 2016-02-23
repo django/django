@@ -1,3 +1,4 @@
+from django import forms
 from django.template.defaultfilters import slice_filter
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
@@ -37,3 +38,20 @@ class FunctionTests(SimpleTestCase):
 
     def test_range_step(self):
         self.assertEqual(slice_filter('abcdefg', '0::2'), 'aceg')
+
+    def test_radio_select(self):
+        choices = [
+            ('0', '0'),
+            ('1', '1'),
+            ('2', '2'),
+        ]
+
+        class TestForm(forms.Form):
+            number = forms.ChoiceField(choices=choices, widget=forms.RadioSelect)
+
+        form = TestForm()
+        field = form['number']
+        self.assertEqual(
+            [str(item) for item in slice_filter(field, '1:')],
+            [str(field[1]), str(field[2])],
+        )
