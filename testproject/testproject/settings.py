@@ -18,6 +18,8 @@ ROOT_URLCONF = 'testproject.urls'
 
 WSGI_APPLICATION = 'testproject.wsgi.application'
 
+STATIC_URL = "/static/"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -25,9 +27,9 @@ DATABASES = {
     }
 }
 
-CHANNEL_BACKENDS = {
+CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.database_layer.DatabaseChannelLayer",
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
         "ROUTING": "testproject.urls.channel_routing",
     },
 }

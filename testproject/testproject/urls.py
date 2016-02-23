@@ -3,5 +3,5 @@ from chtest import consumers
 urlpatterns = []
 
 channel_routing = {
-    "websocket.message": consumers.ws_message,
+    "websocket.receive": consumers.ws_message,
 }
