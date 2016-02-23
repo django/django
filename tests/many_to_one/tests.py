@@ -599,13 +599,9 @@ class ManyToOneTests(TestCase):
         # If the manager is marked "use_for_related_fields", it'll get used instead
         # of the "bare" queryset. Usually you'd define this as a property on the class,
         # but this approximates that in a way that's easier in tests.
-        School.objects.use_for_related_fields = True
-        try:
-            private_student = Student.objects.get(pk=private_student.pk)
-            with self.assertRaises(School.DoesNotExist):
-                private_student.school
-        finally:
-            School.objects.use_for_related_fields = False
+        private_student = Student.objects.get(pk=private_student.pk)
+        with self.assertRaises(School.DoesNotExist):
+            private_student.school
 
     def test_hasattr_related_object(self):
         # The exception raised on attribute access when a related object
