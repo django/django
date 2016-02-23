@@ -85,12 +85,12 @@ class TestHashedFiles(object):
 
     def test_path_with_querystring_and_fragment(self):
         relpath = self.hashed_file_path("cached/css/fragments.css")
-        self.assertEqual(relpath, "cached/css/fragments.ef92012a8c16.css")
+        self.assertEqual(relpath, "cached/css/fragments.59dc2b188043.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b'fonts/font.a4b0478549d0.eot?#iefix', content)
             self.assertIn(b'fonts/font.b8d603e42714.svg#webfontIyfZbseF', content)
-            self.assertIn(b'fonts/font.b8d603e42714.svg#../path/to/fonts/font.svg', content)
+            self.assertIn(b'fonts/font.b8d603e42714.svg#path/to/../../fonts/font.svg', content)
             self.assertIn(b'data:font/woff;charset=utf-8;base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA', content)
             self.assertIn(b'#default#VML', content)
 
@@ -115,16 +115,6 @@ class TestHashedFiles(object):
             content = relfile.read()
             self.assertNotIn(b"/static/styles_root.css", content)
             self.assertIn(b"/static/styles_root.401f2509a628.css", content)
-
-    def test_template_tag_denorm(self):
-        relpath = self.hashed_file_path("cached/denorm.css")
-        self.assertEqual(relpath, "cached/denorm.c5bd139ad821.css")
-        with storage.staticfiles_storage.open(relpath) as relfile:
-            content = relfile.read()
-            self.assertNotIn(b"..//cached///styles.css", content)
-            self.assertIn(b"../cached/styles.bb84a0240107.css", content)
-            self.assertNotIn(b"url(img/relative.png )", content)
-            self.assertIn(b'url("img/relative.acae32e4532b.png', content)
 
     def test_template_tag_relative(self):
         relpath = self.hashed_file_path("cached/relative.css")

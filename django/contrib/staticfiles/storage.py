@@ -170,14 +170,6 @@ class HashedFilesMixin(object):
             if url.startswith('/') and not url.startswith(settings.STATIC_URL):
                 return matched
 
-            # This is technically not useful and could be considered a bug:
-            # we're making changes to our user's code for no good reason.
-            # Removing it makes test_template_tag_denorm fail, though, and I'm
-            # working on another bug, so I'm going to leave it there for now.
-            # When someone complains that /foo/bar#a/../b gets changed to
-            # /foo/bar#b, just remove it, as well as test_template_tag_denorm.
-            url = posixpath.normpath(url)
-
             # Strip off the fragment so a path-like fragment won't interfere.
             url_path, fragment = urldefrag(url)
 
