@@ -131,6 +131,10 @@ Minor features
   :attr:`MultiLineString.closed
   <django.contrib.gis.geos.MultiLineString.closed>` properties.
 
+* The :doc:`GeoJSON serializer </ref/contrib/gis/serializers>` now outputs the
+  primary key of objects in the ``properties`` dictionary if specific fields
+  aren't specified.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

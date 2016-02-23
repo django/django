@@ -33,6 +33,8 @@ class GeoJSONSerializerTests(TestCase):
         self.assertEqual(len(geodata['features']), len(City.objects.all()))
         self.assertEqual(geodata['features'][0]['geometry']['type'], 'Point')
         self.assertEqual(geodata['features'][0]['properties']['name'], 'Chicago')
+        first_city = City.objects.all().order_by('name').first()
+        self.assertEqual(geodata['features'][0]['properties']['pk'], str(first_city.pk))
 
     def test_geometry_field_option(self):
         """
@@ -76,6 +78,7 @@ class GeoJSONSerializerTests(TestCase):
         geodata = json.loads(geojson)
         self.assertIn('county', geodata['features'][0]['properties'])
         self.assertNotIn('founded', geodata['features'][0]['properties'])
+        self.assertNotIn('pk', geodata['features'][0]['properties'])
 
     def test_srid_option(self):
         geojson = serializers.serialize('geojson', City.objects.all().order_by('name'), srid=2847)
