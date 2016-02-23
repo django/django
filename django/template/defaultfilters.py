@@ -5,6 +5,7 @@ import random as random_module
 import re
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
+from operator import itemgetter
 from pprint import pformat
 
 from django.utils import formats, six
@@ -510,6 +511,32 @@ def striptags(value):
 # LISTS           #
 ###################
 
+def _property_resolver(arg):
+    """
+    When arg is convertible to float, behaves like operator.itemgetter(arg)
+    Otherwise, behaves like Variable(arg).resolve
+
+    >>> _property_resolver(1)('abc')
+    'b'
+    >>> _property_resolver('1')('abc')
+    Traceback (most recent call last):
+    ...
+    TypeError: string indices must be integers
+    >>> class Foo:
+    ...     a = 42
+    ...     b = 3.14
+    ...     c = 'Hey!'
+    >>> _property_resolver('b')(Foo())
+    3.14
+    """
+    try:
+        float(arg)
+    except ValueError:
+        return Variable(arg).resolve
+    else:
+        return itemgetter(arg)
+
+
 @register.filter(is_safe=False)
 def dictsort(value, arg):
     """
@@ -517,7 +544,7 @@ def dictsort(value, arg):
     the argument.
     """
     try:
-        return sorted(value, key=Variable(arg).resolve)
+        return sorted(value, key=_property_resolver(arg))
     except (TypeError, VariableDoesNotExist):
         return ''
 
@@ -529,7 +556,7 @@ def dictsortreversed(value, arg):
     property given in the argument.
     """
     try:
-        return sorted(value, key=Variable(arg).resolve, reverse=True)
+        return sorted(value, key=_property_resolver(arg), reverse=True)
     except (TypeError, VariableDoesNotExist):
         return ''
 

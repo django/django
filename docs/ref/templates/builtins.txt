@@ -1443,6 +1443,40 @@ then the output would be::
     * 1984 (George)
     * Timequake (Kurt)
 
+.. versionchanged:: 1.10
+
+``dictsort`` can also order a list of lists (or any other object, implementing
+``__getitem__``) by elements at specified index.
+For example, the following call to ``dictsort``::
+
+    {% vars|dictsort:0 %}
+
+Where ``vars`` is defined as:
+
+.. code-block:: python
+
+    [
+        ('a', '42'),
+        ('c', 'string'),
+        ('b', 'foo')
+    ]
+
+produces the following output:
+
+.. code-block:: python
+
+    [
+        ('a', '42'),
+        ('b', 'foo'),
+        ('c', 'string')
+    ]
+
+Note, that you should pass index as an integer, rather than a string. The following block::
+
+    {% vars|dictsort:"0" %}
+
+produces empty output.
+
 .. templatefilter:: dictsortreversed
 
 ``dictsortreversed``
