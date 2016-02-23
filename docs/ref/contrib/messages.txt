@@ -368,11 +368,11 @@ Adding messages in class-based views
     class AuthorCreate(SuccessMessageMixin, CreateView):
         model = Author
         success_url = '/success/'
-        success_message = "%(name)s was created successfully"
+        success_message = "{name} was created successfully"
 
 The cleaned data from the ``form`` is available for string interpolation using
-the ``%(field_name)s`` syntax. For ModelForms, if you need access to fields
-from the saved ``object`` override the
+the :py:meth:`str.format()` syntax. For ModelForms, if you need access to
+fields from the saved ``object`` override the
 :meth:`~django.contrib.messages.views.SuccessMessageMixin.get_success_message`
 method.
 
@@ -385,13 +385,19 @@ method.
     class ComplicatedCreate(SuccessMessageMixin, CreateView):
         model = ComplicatedModel
         success_url = '/success/'
-        success_message = "%(calculated_field)s was created successfully"
+        success_message = "{calculated_field} was created successfully"
 
         def get_success_message(self, cleaned_data):
-            return self.success_message % dict(
-                cleaned_data,
+            return self.success_message.format(
                 calculated_field=self.object.calculated_field,
+                **cleaned_data,
             )
+
+.. versionchanged:: 1.10
+
+   Support for Python :py:meth:`str.format()` placeholder syntax has been
+   added. The legacy ``%(field_name)s`` placeholder syntax has been deprecated
+   and will be removed in Django 2.0.
 
 Expiration of messages
 ======================

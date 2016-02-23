@@ -188,7 +188,7 @@ class Person(models.Model):
 @python_2_unicode_compatible
 class AbstractEvent(models.Model):
     name = models.CharField(max_length=100)
-    attendees = models.ManyToManyField(Person, related_name="%(class)s_set")
+    attendees = models.ManyToManyField(Person, related_name="{class}_set")
 
     class Meta:
         abstract = True

@@ -14,6 +14,8 @@ Both styles are demonstrated here.
 from __future__ import unicode_literals
 
 from django.db import models
+from django.test import ignore_warnings
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -59,8 +61,8 @@ class Attachment(models.Model):
     post = models.ForeignKey(
         Post,
         models.CASCADE,
-        related_name='attached_%(class)s_set',
-        related_query_name='attached_%(app_label)s_%(class)ss',
+        related_name='attached_{class}_set',
+        related_query_name='attached_{app_label}_{class}s',
     )
     content = models.TextField()
 
@@ -77,6 +79,28 @@ class Comment(Attachment):
 
 class Link(Attachment):
     url = models.URLField()
+
+
+with ignore_warnings(category=RemovedInDjango20Warning):
+    class LegacyPost(models.Model):
+        title = models.CharField(max_length=50)
+
+    class LegacyAttachment(models.Model):
+        post = models.ForeignKey(
+            LegacyPost,
+            models.CASCADE,
+            related_name='attached_%(class)s_set',
+        )
+        content = models.TextField()
+
+        class Meta:
+            abstract = True
+
+    class LegacyComment(LegacyAttachment):
+        is_spam = models.BooleanField(default=False)
+
+    class LegacyLink(LegacyAttachment):
+        url = models.URLField()
 
 
 #
@@ -161,7 +185,7 @@ class Title(models.Model):
 
 
 class NamedURL(models.Model):
-    title = models.ForeignKey(Title, models.CASCADE, related_name='attached_%(app_label)s_%(class)s_set')
+    title = models.ForeignKey(Title, models.CASCADE, related_name='attached_{app_label}_{class}_set')
     url = models.URLField()
 
     class Meta:

@@ -1909,9 +1909,9 @@ class InlineModelAdmin(BaseModelAdmin):
                         params = {'class_name': self._meta.model._meta.verbose_name,
                                   'instance': self.instance,
                                   'related_objects': get_text_list(objs, _('and'))}
-                        msg = _("Deleting %(class_name)s %(instance)s would require "
+                        msg = _("Deleting {class_name} {instance} would require "
                                 "deleting the following protected related objects: "
-                                "%(related_objects)s")
+                                "{related_objects}")
                         raise ValidationError(msg, code='deleting_protected', params=params)
 
             def is_valid(self):

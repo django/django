@@ -173,19 +173,19 @@ class DecimalFieldTests(test.TestCase):
 
     def test_max_digits_validation(self):
         field = models.DecimalField(max_digits=2)
-        expected_message = validators.DecimalValidator.messages['max_digits'] % {'max': 2}
+        expected_message = validators.DecimalValidator.messages['max_digits'].format(max=2)
         with self.assertRaisesMessage(ValidationError, expected_message):
             field.clean(100, None)
 
     def test_max_decimal_places_validation(self):
         field = models.DecimalField(decimal_places=1)
-        expected_message = validators.DecimalValidator.messages['max_decimal_places'] % {'max': 1}
+        expected_message = validators.DecimalValidator.messages['max_decimal_places'].format(max=1)
         with self.assertRaisesMessage(ValidationError, expected_message):
             field.clean(Decimal('0.99'), None)
 
     def test_max_whole_digits_validation(self):
         field = models.DecimalField(max_digits=3, decimal_places=1)
-        expected_message = validators.DecimalValidator.messages['max_whole_digits'] % {'max': 2}
+        expected_message = validators.DecimalValidator.messages['max_whole_digits'].format(max=2)
         with self.assertRaisesMessage(ValidationError, expected_message):
             field.clean(Decimal('999'), None)
 
@@ -739,9 +739,9 @@ class IntegerFieldTests(test.TestCase):
 
         if min_value is not None:
             instance = self.model(value=min_value - 1)
-            expected_message = validators.MinValueValidator.message % {
-                'limit_value': min_value
-            }
+            expected_message = validators.MinValueValidator.message.format(
+                limit_value=min_value,
+            )
             with self.assertRaisesMessage(ValidationError, expected_message):
                 instance.full_clean()
             instance.value = min_value
@@ -749,9 +749,9 @@ class IntegerFieldTests(test.TestCase):
 
         if max_value is not None:
             instance = self.model(value=max_value + 1)
-            expected_message = validators.MaxValueValidator.message % {
-                'limit_value': max_value
-            }
+            expected_message = validators.MaxValueValidator.message.format(
+                limit_value=max_value,
+            )
             with self.assertRaisesMessage(ValidationError, expected_message):
                 instance.full_clean()
             instance.value = max_value

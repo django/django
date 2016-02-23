@@ -1,7 +1,12 @@
 """
 Global Django exception and warning classes.
 """
+import warnings
+
 from django.utils import six
+from django.utils.deprecation import (
+    PERCENT_PLACEHOLDER_RE, RemovedInDjango20Warning,
+)
 from django.utils.encoding import force_text
 
 
@@ -161,7 +166,16 @@ class ValidationError(Exception):
             for error in self.error_list:
                 message = error.message
                 if error.params:
-                    message %= error.params
+                    if PERCENT_PLACEHOLDER_RE.search(force_text(message)):
+                        warnings.warn(
+                            'Legacy % placeholder syntax in ValidationError is deprecated. '
+                            'Use the Python str.format() syntax instead.',
+                            RemovedInDjango20Warning,
+                            stacklevel=2,
+                        )
+                        message %= error.params
+                    else:
+                        message = message.format(**error.params)
                 yield force_text(message)
 
     def __str__(self):

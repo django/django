@@ -328,7 +328,13 @@ interpolated with ``field.__dict__`` which allows the description to
 incorporate arguments of the field. For example, the description for
 :class:`~django.db.models.CharField` is::
 
-    description = _("String (up to %(max_length)s)")
+    description = _("String (up to {max_length})")
+
+.. versionchanged:: 1.10
+
+   Support for Python :py:meth:`str.format()` placeholder syntax has been
+   added. The legacy ``%(max_length)s`` placeholder syntax has been deprecated
+   and will be removed in Django 2.0.
 
 Useful methods
 --------------

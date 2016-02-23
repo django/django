@@ -469,7 +469,7 @@ class TestValidation(PostgreSQLTestCase):
             field.clean([1, None], None)
         self.assertEqual(cm.exception.code, 'item_invalid')
         self.assertEqual(
-            cm.exception.message % cm.exception.params,
+            cm.exception.message.format(**cm.exception.params),
             'Item 1 in the array did not validate: This field cannot be null.'
         )
 
@@ -500,7 +500,7 @@ class TestValidation(PostgreSQLTestCase):
         self.assertEqual(len(cm.exception.error_list), 1)
         exception = cm.exception.error_list[0]
         self.assertEqual(
-            exception.message,
+            exception.message.format(**exception.params),
             'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).'
         )
         self.assertEqual(exception.code, 'item_invalid')
@@ -514,7 +514,7 @@ class TestValidation(PostgreSQLTestCase):
         self.assertEqual(len(cm.exception.error_list), 1)
         exception = cm.exception.error_list[0]
         self.assertEqual(
-            exception.message,
+            exception.message.format(**exception.params),
             'Item 0 in the array did not validate: Ensure this value is greater than or equal to 1.'
         )
         self.assertEqual(exception.code, 'item_invalid')
@@ -548,14 +548,14 @@ class TestSimpleFormField(PostgreSQLTestCase):
         self.assertEqual(len(errors), 2)
         first_error = errors[0]
         self.assertEqual(
-            first_error.message,
+            first_error.message.format(**first_error.params),
             'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).'
         )
         self.assertEqual(first_error.code, 'item_invalid')
         self.assertEqual(first_error.params, {'nth': 0, 'value': 'abc', 'limit_value': 2, 'show_value': 3})
         second_error = errors[1]
         self.assertEqual(
-            second_error.message,
+            second_error.message.format(**second_error.params),
             'Item 2 in the array did not validate: Ensure this value has at most 2 characters (it has 4).'
         )
         self.assertEqual(second_error.code, 'item_invalid')

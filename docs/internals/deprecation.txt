@@ -133,6 +133,21 @@ details on these changes.
 * The model ``CommaSeparatedIntegerField`` will be removed. A stub field will
   remain for compatibility with historical migrations.
 
+* The legacy ``%(<foo>)s`` placeholder syntax will be removed from
+  ``ValidationError``.
+
+* The legacy ``%(app_label)s`` and ``%(class)s`` placeholder syntax will be
+  removed from ``related_name``.
+
+* The legacy ``%(app_label)s`` and ``%(model_name)s`` placeholder syntax will
+  be removed from ``default_related_name``.
+
+* The legacy ``%(field_name)s`` placeholder syntax will be removed from
+  ``SuccessMessageMixin.success_message``.
+
+* The legacy ``%(field_name)s`` placeholder syntax will be removed from
+  ``Field.description``.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

@@ -5,6 +5,8 @@ import unittest
 from django.contrib.admindocs import views
 from django.db import models
 from django.db.models import fields
+from django.test import ignore_warnings
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext as _
 
 
@@ -14,6 +16,11 @@ class CustomField(models.Field):
 
 class DescriptionLackingField(models.Field):
     pass
+
+
+# Removedindjango20warning
+class PercentDescriptionField(models.CharField):
+    description = _('String (up to %(max_length)s)')
 
 
 class TestFieldType(unittest.TestCase):
@@ -42,4 +49,17 @@ class TestFieldType(unittest.TestCase):
             _('Field of type: %(field_type)s') % {
                 'field_type': 'DescriptionLackingField'
             }
+        )
+
+    def test_format_description(self):
+        self.assertEqual(
+            views.get_readable_field_data_type(models.CharField(max_length=100)),
+            'String (up to 100)',
+        )
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_format_description_percent_placeholder(self):
+        self.assertEqual(
+            views.get_readable_field_data_type(PercentDescriptionField(max_length=100)),
+            'String (up to 100)',
         )

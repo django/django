@@ -538,8 +538,8 @@ class FileField(Field):
         'missing': _("No file was submitted."),
         'empty': _("The submitted file is empty."),
         'max_length': ungettext_lazy(
-            'Ensure this filename has at most %(max)d character (it has %(length)d).',
-            'Ensure this filename has at most %(max)d characters (it has %(length)d).',
+            'Ensure this filename has at most {max:d} character (it has {length:d}).',
+            'Ensure this filename has at most {max:d} characters (it has {length:d}).',
             'max'),
         'contradiction': _('Please either submit a file or check the clear checkbox, not both.')
     }
@@ -770,7 +770,7 @@ class CallableChoiceIterator(object):
 class ChoiceField(Field):
     widget = Select
     default_error_messages = {
-        'invalid_choice': _('Select a valid choice. %(value)s is not one of the available choices.'),
+        'invalid_choice': _('Select a valid choice. {value} is not one of the available choices.'),
     }
 
     def __init__(self, choices=(), required=True, widget=None, label=None,
@@ -864,7 +864,7 @@ class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
     widget = SelectMultiple
     default_error_messages = {
-        'invalid_choice': _('Select a valid choice. %(value)s is not one of the available choices.'),
+        'invalid_choice': _('Select a valid choice. {value} is not one of the available choices.'),
         'invalid_list': _('Enter a list of values.'),
     }
 

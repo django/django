@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import warnings
 from collections import defaultdict
 
 from django.contrib.auth import get_permission_codename
@@ -13,6 +14,9 @@ from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats, six, timezone
+from django.utils.deprecation import (
+    PERCENT_PLACEHOLDER_RE, RemovedInDjango20Warning,
+)
 from django.utils.encoding import force_str, force_text, smart_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
@@ -181,10 +185,20 @@ class NestedObjects(Collector):
     def collect(self, objs, source=None, source_attr=None, **kwargs):
         for obj in objs:
             if source_attr and not source_attr.endswith('+'):
-                related_name = source_attr % {
+                fmt_kwargs = {
                     'class': source._meta.model_name,
                     'app_label': source._meta.app_label,
                 }
+                if PERCENT_PLACEHOLDER_RE.search(source_attr):
+                    warnings.warn(
+                        'Legacy % placeholder syntax in related_name is deprecated. '
+                        'Use the Python str.format() syntax instead.',
+                        RemovedInDjango20Warning,
+                        stacklevel=2,
+                    )
+                    related_name = source_attr % fmt_kwargs
+                else:
+                    related_name = source_attr.format(**fmt_kwargs)
                 self.add_edge(getattr(obj, related_name), obj)
             else:
                 self.add_edge(None, obj)

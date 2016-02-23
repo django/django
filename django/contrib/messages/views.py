@@ -1,4 +1,9 @@
+import warnings
+
 from django.contrib import messages
+from django.utils.deprecation import (
+    PERCENT_PLACEHOLDER_RE, RemovedInDjango20Warning,
+)
 
 
 class SuccessMessageMixin(object):
@@ -15,4 +20,14 @@ class SuccessMessageMixin(object):
         return response
 
     def get_success_message(self, cleaned_data):
-        return self.success_message % cleaned_data
+        if PERCENT_PLACEHOLDER_RE.search(self.success_message):
+            warnings.warn(
+                'Legacy % placeholder syntax in success_message is deprecated. '
+                'Use the Python str.format() syntax instead.',
+                RemovedInDjango20Warning,
+                stacklevel=2,
+            )
+            message = self.success_message % cleaned_data
+        else:
+            message = self.success_message.format(**cleaned_data)
+        return message

@@ -44,3 +44,11 @@ class DefaultRelatedNameTests(TestCase):
             self.book.editor_stores
         except AttributeError:
             self.fail("Book should have a editor_stores relation.")
+
+    def test_inheritance_percent_placeholder(self):
+        # Here model_options corresponds to the name of the
+        # application used in this test
+        self.assertTrue(hasattr(self.book, 'model_options_legacybookstores'))
+
+    def test_inheritance_with_overridden_default_related_name_percent_placeholder(self):
+        self.assertTrue(hasattr(self.book, 'legacy_editor_stores'))

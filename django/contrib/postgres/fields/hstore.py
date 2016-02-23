@@ -15,7 +15,7 @@ class HStoreField(Field):
     empty_strings_allowed = False
     description = _('Map of strings to strings')
     default_error_messages = {
-        'not_a_string': _('The value of "%(key)s" is not a string.'),
+        'not_a_string': _('The value of "{key}" is not a string.'),
     }
 
     def db_type(self, connection):

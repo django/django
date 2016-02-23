@@ -191,7 +191,7 @@ class TestValidation(PostgreSQLTestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean({'a': 1}, None)
         self.assertEqual(cm.exception.code, 'not_a_string')
-        self.assertEqual(cm.exception.message % cm.exception.params, 'The value of "a" is not a string.')
+        self.assertEqual(cm.exception.message.format(**cm.exception.params), 'The value of "a" is not a string.')
 
 
 class TestFormField(PostgreSQLTestCase):

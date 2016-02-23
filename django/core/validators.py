@@ -305,7 +305,7 @@ validate_comma_separated_integer_list = int_list_validator(
 
 @deconstructible
 class BaseValidator(object):
-    message = _('Ensure this value is %(limit_value)s (it is %(show_value)s).')
+    message = _('Ensure this value is {limit_value} (it is {show_value}).')
     code = 'limit_value'
 
     def __init__(self, limit_value, message=None):
@@ -336,7 +336,7 @@ class BaseValidator(object):
 
 @deconstructible
 class MaxValueValidator(BaseValidator):
-    message = _('Ensure this value is less than or equal to %(limit_value)s.')
+    message = _('Ensure this value is less than or equal to {limit_value}.')
     code = 'max_value'
 
     def compare(self, a, b):
@@ -345,7 +345,7 @@ class MaxValueValidator(BaseValidator):
 
 @deconstructible
 class MinValueValidator(BaseValidator):
-    message = _('Ensure this value is greater than or equal to %(limit_value)s.')
+    message = _('Ensure this value is greater than or equal to {limit_value}.')
     code = 'min_value'
 
     def compare(self, a, b):
@@ -355,8 +355,8 @@ class MinValueValidator(BaseValidator):
 @deconstructible
 class MinLengthValidator(BaseValidator):
     message = ungettext_lazy(
-        'Ensure this value has at least %(limit_value)d character (it has %(show_value)d).',
-        'Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).',
+        'Ensure this value has at least {limit_value:d} character (it has {show_value:d}).',
+        'Ensure this value has at least {limit_value:d} characters (it has {show_value:d}).',
         'limit_value')
     code = 'min_length'
 
@@ -370,8 +370,8 @@ class MinLengthValidator(BaseValidator):
 @deconstructible
 class MaxLengthValidator(BaseValidator):
     message = ungettext_lazy(
-        'Ensure this value has at most %(limit_value)d character (it has %(show_value)d).',
-        'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',
+        'Ensure this value has at most {limit_value:d} character (it has {show_value:d}).',
+        'Ensure this value has at most {limit_value:d} characters (it has {show_value:d}).',
         'limit_value')
     code = 'max_length'
 
@@ -390,18 +390,18 @@ class DecimalValidator(object):
     """
     messages = {
         'max_digits': ungettext_lazy(
-            'Ensure that there are no more than %(max)s digit in total.',
-            'Ensure that there are no more than %(max)s digits in total.',
+            'Ensure that there are no more than {max} digit in total.',
+            'Ensure that there are no more than {max} digits in total.',
             'max'
         ),
         'max_decimal_places': ungettext_lazy(
-            'Ensure that there are no more than %(max)s decimal place.',
-            'Ensure that there are no more than %(max)s decimal places.',
+            'Ensure that there are no more than {max} decimal place.',
+            'Ensure that there are no more than {max} decimal places.',
             'max'
         ),
         'max_whole_digits': ungettext_lazy(
-            'Ensure that there are no more than %(max)s digit before the decimal point.',
-            'Ensure that there are no more than %(max)s digits before the decimal point.',
+            'Ensure that there are no more than {max} digit before the decimal point.',
+            'Ensure that there are no more than {max} digits before the decimal point.',
             'max'
         ),
     }
