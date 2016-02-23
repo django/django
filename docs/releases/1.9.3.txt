@@ -40,3 +40,5 @@ Bugfixes
 
 * Fixed some crashing deprecation shims in ``SimpleTemplateResponse`` that
   regressed in Django 1.9 (:ticket:`26253`).
+
+* Fixed ``BoundField`` to reallow slices of subwidgets (:ticket:`26267`).
