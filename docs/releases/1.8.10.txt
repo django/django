@@ -24,3 +24,5 @@ Bugfixes
 
 * Reallowed dashes in top-level domain names of URLs checked by
   ``URLValidator`` to fix a regression in Django 1.8 (:ticket:`26204`).
+
+* Fixed ``BoundField`` to reallow slices of subwidgets (:ticket:`26267`).
