@@ -2,12 +2,12 @@ from datetime import datetime
 
 from django.contrib.staticfiles.storage import CachedStaticFilesStorage
 from django.core.files import storage
+from django.utils import timezone
 
 
 class DummyStorage(storage.Storage):
     """
-    A storage class that does implement modified_time() but raises
-    NotImplementedError when calling
+    A storage class that implements get_modified_time().
     """
     def _save(self, name, content):
         return 'dummy'
@@ -18,8 +18,8 @@ class DummyStorage(storage.Storage):
     def exists(self, name):
         pass
 
-    def modified_time(self, name):
-        return datetime.date(1970, 1, 1)
+    def get_modified_time(self, name):
+        return datetime.datetime(1970, 1, 1, tzinfo=timezone.utc)
 
 
 class SimpleCachedStaticFilesStorage(CachedStaticFilesStorage):

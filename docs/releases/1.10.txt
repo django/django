@@ -203,7 +203,11 @@ Email
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* Storage backends now present a timezone-aware API with new methods
+  ``get_accessed_time()``, ``get_created_time()``, and ``get_modified_time()``.
+  They return a timezone-aware ``datetime`` if :setting:`USE_TZ` is ``True`` and
+  a naive ``datetime`` in the local timezone otherwise.
+
 
 File Uploads
 ~~~~~~~~~~~~
@@ -508,6 +512,30 @@ In older versions, assigning ``None`` to a non-nullable ``ForeignKey`` or
 not allow null values.')``. For consistency with other model fields which don't
 have a similar check, this check is removed.
 
+Timezone-aware :class:`~django.core.files.storage.Storage` API
+--------------------------------------------------------------
+
+Storage backends now present a timezone-aware API with new methods
+``get_accessed_time()``, ``get_created_time()``, and ``get_modified_time()``.
+They return a timezone-aware ``datetime`` if :setting:`USE_TZ` is ``True`` and
+a naive ``datetime`` in the local timezone otherwise.
+
+Code that uses storage backends should update to use the new methods.
+Deprecation warnings are emitted by the old methods by Django's own storage
+backends (:class:`~django.core.files.storage.Storage`,
+:class:`~django.core.files.storage.FileSystemStorage`,
+:class:`~django.contrib.staticfiles.storage.StaticFilesStorage`,
+:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`, and
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`).
+
+Third-party storage backends should implement the new methods and mark the old
+ones as deprecated. The new ``get_*_time()`` methods on the base
+:class:`~django.core.files.storage.Storage` class convert ``datetime``\s from
+the old methods as required and emit a deprecation warning as they do so.
+
+Third-party storage backends should retain the old methods as long as they
+wish to support earlier versions of Django.
+
 Removed weak password hashers from the default ``PASSWORD_HASHERS`` setting
 ---------------------------------------------------------------------------
 
@@ -623,6 +651,27 @@ added in Django 1.9::
 
 This prevents confusion about an assignment resulting in an implicit save.
 
+Non-timezone-aware :class:`~django.core.files.storage.Storage` API
+------------------------------------------------------------------
+
+Instead of the old, non-timezone-aware, methods ``accessed_time()``, ``created_time()``,
+and ``modified_time()``, use the new ``get_*_time()`` methods.
+
+Deprecation warnings are emitted by the old methods by Django's own storage
+backends (:class:`~django.core.files.storage.Storage`,
+:class:`~django.core.files.storage.FileSystemStorage`,
+:class:`~django.contrib.staticfiles.storage.StaticFilesStorage`,
+:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`, and
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`).
+
+Third-party storage backends should implement the new methods and mark the old
+ones as deprecated. Until then, the new ``get_*_time()`` methods on the base
+:class:`~django.core.files.storage.Storage` class convert ``datetime``\s from
+the old methods as required and emit a deprecation warning as they do so.
+
+Third-party storage backends may retain the old methods as long as they
+wish to support earlier versions of Django.
+
 :mod:`django.contrib.gis`
 -------------------------
 
@@ -682,6 +731,11 @@ Miscellaneous
   favor of its new location, :mod:`django.urls`.
 
 * The template ``Context.has_key()`` method is deprecated in favor of ``in``.
+* As part of the transition to a timezone-aware
+  :class:`~django.core.files.storage.Storage` API, the ``accessed_time()``,
+  ``created_time()``, and ``modified_time()`` methods are deprecated in favor
+  of ``get_accessed_time()``, ``get_modified_time()``, and
+  ``get_modified_time()``.
 
 .. _removed-features-1.10:
 
