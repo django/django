@@ -1015,7 +1015,7 @@ class BooleanField(Field):
     description = _("Boolean (Either True or False)")
 
     def __init__(self, *args, **kwargs):
-        #kwargs['blank'] = True
+        # kwargs['blank'] = True
         super(BooleanField, self).__init__(*args, **kwargs)
 
     def check(self, **kwargs):
