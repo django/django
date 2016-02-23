@@ -411,19 +411,19 @@ class CustomManagerTests(TestCase):
         self.b1.fun_authors.remove(droopy)
         self.assertQuerysetEqual(
             self.b1.fun_authors.through._default_manager.all(), [
-                "Bugs",
-                "Droopy",
+                bugs.pk,
+                droopy.pk,
             ],
-            lambda c: c.funperson.first_name,
+            lambda c: c.funperson_id,
             ordered=False,
         )
 
         self.b1.fun_authors.remove(bugs)
         self.assertQuerysetEqual(
             self.b1.fun_authors.through._default_manager.all(), [
-                "Droopy",
+                droopy.pk,
             ],
-            lambda c: c.funperson.first_name,
+            lambda c: c.funperson_id,
             ordered=False,
         )
         self.b1.fun_authors.add(bugs)
@@ -431,9 +431,9 @@ class CustomManagerTests(TestCase):
         self.b1.fun_authors.clear()
         self.assertQuerysetEqual(
             self.b1.fun_authors.through._default_manager.all(), [
-                "Droopy",
+                droopy.pk,
             ],
-            lambda c: c.funperson.first_name,
+            lambda c: c.funperson_id,
             ordered=False,
         )
 

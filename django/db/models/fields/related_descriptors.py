@@ -104,7 +104,7 @@ class ForwardManyToOneDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        manager = self.field.remote_field.model._base_manager
+        manager = self.field.remote_field.model._default_manager
         return manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
@@ -283,7 +283,7 @@ class ReverseOneToOneDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        manager = self.related.related_model._base_manager
+        manager = self.related.related_model._default_manager
         return manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
