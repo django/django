@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import time
 import random
+import statistics
 from autobahn.twisted.websocket import WebSocketClientProtocol, \
     WebSocketClientFactory
 
@@ -57,6 +58,7 @@ class MyClientProtocol(WebSocketClientProtocol):
                 "received": self.received,
                 "corrupted": self.corrupted,
                 "out_of_order": self.out_of_order,
+                "latencies": self.latencies,
                 "connect": True,
             }
         else:
@@ -105,17 +107,56 @@ class Benchmarker(object):
             len(stats),
         ))
         if open_protocols == 0 and len(stats) >= self.num:
-            print("Reached %s open connections, quitting" % self.num)
             reactor.stop()
             self.print_stats()
 
+    def percentile(self, values, fraction):
+        """
+        Returns a percentile value (e.g. fraction = 0.95 -> 95th percentile)
+        """
+        values = sorted(values)
+        stopat = int(len(values) * fraction)
+        if stopat == len(values):
+            stopat -= 1
+        return values[stopat]
+
     def print_stats(self):
-        num_incomplete = len([x for x in stats.values() if x['sent'] != x['received']])
-        num_corruption = len([x for x in stats.values() if x['corrupted']])
-        num_out_of_order = len([x for x in stats.values() if x['out_of_order']])
-        num_failed = len([x for x in stats.values() if not x['connect']])
+        # Collect stats together
+        latencies = []
+        num_good = 0
+        num_incomplete = 0
+        num_failed = 0
+        num_corruption = 0
+        num_out_of_order = 0
+        for entry in stats.values():
+            latencies.extend(entry.get("latencies", []))
+            if not entry['connect']:
+                num_failed += 1
+            elif entry['sent'] != entry['received']:
+                num_incomplete += 1
+            elif entry['corrupted']:
+                num_corruption += 1
+            elif entry['out_of_order']:
+                num_out_of_order += 1
+            else:
+                num_good += 1
+        # Some analysis on latencies
+        latency_mean = statistics.mean(latencies)
+        latency_median = statistics.median(latencies)
+        latency_stdev = statistics.stdev(latencies)
+        latency_5 = self.percentile(latencies, 0.05)
+        latency_95 = self.percentile(latencies, 0.95)
+        # Print results
         print("-------")
         print("Sockets opened: %s" % len(stats))
+        print("Latency stats: Mean %.2fs  Median %.2fs  Stdev %.2f  5%% %.2fs  95%% %.2fs" % (
+            latency_mean,
+            latency_median,
+            latency_stdev,
+            latency_5,
+            latency_95,
+        ))
+        print("Good sockets: %s (%.2f%%)" % (num_good, (float(num_good) / len(stats))*100))
         print("Incomplete sockets: %s (%.2f%%)" % (num_incomplete, (float(num_incomplete) / len(stats))*100))
         print("Corrupt sockets: %s (%.2f%%)" % (num_corruption, (float(num_corruption) / len(stats))*100))
         print("Out of order sockets: %s (%.2f%%)" % (num_out_of_order, (float(num_out_of_order) / len(stats))*100))
