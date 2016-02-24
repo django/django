@@ -625,7 +625,6 @@ Normal Python unit test classes extend a base class of
 A thin subclass of :class:`unittest.TestCase`, it extends it with some basic
 functionality like:
 
-* Saving and restoring the Python warning machinery state.
 * Some useful assertions like:
 
   * Checking that a callable :meth:`raises a certain exception
