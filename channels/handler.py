@@ -14,6 +14,8 @@ from django.core.urlresolvers import set_script_prefix
 from django.utils import six
 from django.utils.functional import cached_property
 
+from .exceptions import ResponseLater as ResponseLaterOuter
+
 logger = logging.getLogger('django.request')
 
 
@@ -23,13 +25,7 @@ class AsgiRequest(http.HttpRequest):
     dict, and wraps request body handling.
     """
 
-    class ResponseLater(Exception):
-        """
-        Exception that will cause any handler to skip around response
-        transmission and presume something else will do it later.
-        """
-        def __init__(self):
-            Exception.__init__(self, "Response later")
+    ResponseLater = ResponseLaterOuter
 
     def __init__(self, message):
         self.message = message
