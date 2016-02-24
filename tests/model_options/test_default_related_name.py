@@ -1,3 +1,4 @@
+from django.core.exceptions import FieldError
 from django.test import TestCase
 
 from .models.default_related_name import Author, Book, Editor
@@ -17,6 +18,12 @@ class DefaultRelatedNameTests(TestCase):
 
     def test_default_related_name(self):
         self.assertEqual(list(self.author.books.all()), [self.book])
+
+    def test_default_related_name_in_queryset_lookup(self):
+        try:
+            Author.objects.get(books=self.book)
+        except FieldError:
+            self.fail("Book should have 'books' related name in query function")
 
     def test_related_name_overrides_default_related_name(self):
         self.assertEqual(list(self.editor.edited_books.all()), [self.book])

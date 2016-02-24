@@ -187,11 +187,6 @@ class ForeignObjectRel(object):
                 return None
         if self.related_name:
             return self.related_name
-        if opts.default_related_name:
-            return opts.default_related_name % {
-                'model_name': opts.model_name.lower(),
-                'app_label': opts.app_label.lower(),
-            }
         return opts.model_name + ('_set' if self.multiple else '')
 
     def get_cache_name(self):
