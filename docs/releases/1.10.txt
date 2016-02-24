@@ -704,6 +704,34 @@ longer than the 4000 byte limit of ``NVARCHAR2``, you should use ``TextField``
 field (e.g. annotating the model with an aggregation or using ``distinct()``)
 you'll need to change them (to defer the field).
 
+Using a model name as a query lookup when ``default_related_name`` is set
+-------------------------------------------------------------------------
+
+Assume the following models::
+
+    from django.db import models
+
+    class Foo(models.Model):
+        pass
+
+    class Bar(models.Model):
+        foo = models.ForeignKey(Foo)
+
+        class Meta:
+            default_related_name = 'bars'
+
+In older versions, :attr:`~django.db.models.Options.default_related_name`
+couldn't be used as a query lookup. This is fixed and support for the old
+lookup name is deprecated. For example, since ``default_related_name`` is set
+in model ``Bar``, instead of using the model name ``bar`` as the lookup::
+
+    >>> bar = Bar.objects.get(pk=1)
+    >>> Foo.object.get(bar=bar)
+
+use the default_related_name ``bars``::
+
+    >>> Foo.object.get(bars=bar)
+
 Miscellaneous
 -------------
 

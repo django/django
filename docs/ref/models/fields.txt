@@ -1333,8 +1333,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 .. attribute:: ForeignKey.related_query_name
 
-    The name to use for the reverse filter name from the target model.
-    Defaults to the value of :attr:`related_name` if it is set, otherwise it
+    The name to use for the reverse filter name from the target model. It
+    defaults to the value of :attr:`related_name` or
+    :attr:`~django.db.models.Options.default_related_name` if set, otherwise it
     defaults to the name of the model::
 
         # Declare the ForeignKey with related_query_name
