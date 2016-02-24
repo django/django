@@ -13,3 +13,4 @@ Django FAQ
    admin
    contributing
    troubleshooting
+   csrf

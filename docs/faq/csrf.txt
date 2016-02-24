@@ -1,0 +1,51 @@
+FAQ: CSRF Protection
+=====================
+
+Is Django's CSRF protection vulnerable?
+---------------------------------------
+
+No, it is not. Django CSRF security system provides an implementation that
+allows you to have CSRF protection without linking it to a session. The way
+the CSRF token works is simple. Every form will have a CSRF token which
+matches the CSRF cookies. While processing the submitted form, the server will
+make sure that the submitted CSRF token matches the cookie value. This is a
+server side check but it is not against any stored server-side value. Since
+the remote attacker would not be able to read or set arbitrary cookies on your
+domain, it protects the user.
+
+Why can't we keep a new token for each request?
+------------------------------------------------
+
+Generating a new token for each request is problematic from a UI perspective
+because it invalidates all previous forms. Most users would be very unhappy to
+find that opening a new tab on your site has invalidated the form they had
+just spent time filling out in the other tab or that a form they accessed via
+the back button could not be filled out.
+
+How can I make Django's CSRF protection work to its full extent?
+------------------------------------------------------------------
+
+Make sure of the following:
+
+* Use HTTPS. Redirect to the encrypted version for all unencrypted requests.
+  If you don't do this, CSRF protection won't be able to protect you from a man-in-the-middle
+  attack.
+
+* Use HSTS. Set it for several months. Use ``includeSubDomains``. This means
+  that no matter what your users type, and no matter what the man-in-the-middle
+  does, your users will always access your site securely if they've been there
+  at least once before.
+
+* Validate the HOST header on your server. Don't allow arbitrary requests to
+  fall through to Django. Serve your site only for the appropriate domain. See
+  the :doc:`September 9 2011 CVE-2011-4140 security advisory </releases/security>`
+  for more information about this.
+
+* Ensure there are no cross-site scripting vulnerabilities on your website.
+
+If the above mentioned points are enforced then the developer will be able to
+take advantage of the other feature that makes the CSRF protection stronger:
+Strict referer checking (only enforced over HTTPS). This means that even if a
+subdomain can set or modify cookies on your domain, they can't force a visitor
+to post to your application, since that request won't come from your own exact
+domain.

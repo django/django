@@ -265,6 +265,8 @@ dangerous side effects , and so a CSRF attack with a GET request ought to be
 harmless. :rfc:`2616` defines POST, PUT and DELETE as 'unsafe', and all other
 methods are assumed to be unsafe, for maximum protection.
 
+Know more about :doc:`why Django's CSRF protection is not vulnerable </faq/csrf>`
+
 .. versionchanged:: 1.9
 
     Checking against the :setting:`CSRF_COOKIE_DOMAIN` setting was added.
