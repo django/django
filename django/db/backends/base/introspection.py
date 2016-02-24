@@ -3,7 +3,7 @@ from collections import namedtuple
 from django.utils import six
 
 # Structure returned by DatabaseIntrospection.get_table_list()
-TableInfo = namedtuple('TableInfo', ['name', 'type'])
+TableInfo = namedtuple('TableInfo', ['name', 'type', 'schema'])
 
 # Structure returned by the DB-API cursor.description interface (PEP 249)
 FieldInfo = namedtuple('FieldInfo',
@@ -42,22 +42,32 @@ class BaseDatabaseIntrospection(object):
         """
         return self.table_name_converter(name)
 
-    def table_names(self, cursor=None, include_views=False):
+    def table_names(self, cursor=None, include_views=False, include_schema=False):
         """
         Returns a list of names of all tables that exist in the database.
         The returned table list is sorted by Python's default sorting. We
         do NOT use database's ORDER BY here to avoid subtle differences
         in sorting order between databases.
+
+        If include_schema is True, then all tables in the DB must be returned in
+        format (schema, db_table). In addition all visible tables must be returned
+        in format (None, db_table).
         """
         def get_names(cursor):
-            return sorted(ti.name for ti in self.get_table_list(cursor)
-                          if include_views or ti.type == 't')
+            if include_schema:
+                return sorted((ti.schema, ti.name)
+                              for ti in self.get_table_list(cursor, include_schema=include_schema)
+                              if include_views or ti.type == 't')
+            else:
+                return sorted(ti.name for ti in self.get_table_list(cursor)
+                              if include_views or ti.type == 't')
+
         if cursor is None:
             with self.connection.cursor() as cursor:
                 return get_names(cursor)
         return get_names(cursor)
 
-    def get_table_list(self, cursor):
+    def get_table_list(self, cursor, include_schema=False):
         """
         Returns an unsorted list of TableInfo named tuples of all tables and
         views that exist in the database.
@@ -157,7 +167,7 @@ class BaseDatabaseIntrospection(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_indexes() method')
 
-    def get_constraints(self, cursor, table_name):
+    def get_constraints(self, cursor, schema, table_name):
         """
         Retrieves any constraints or keys (unique, pk, fk, check, index)
         across one or more columns.

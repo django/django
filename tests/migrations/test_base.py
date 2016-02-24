@@ -26,7 +26,7 @@ class MigrationTestBase(TransactionTestCase):
 
     def get_table_description(self, table):
         with connection.cursor() as cursor:
-            return connection.introspection.get_table_description(cursor, table)
+            return connection.introspection.get_table_description(cursor, None, table)
 
     def assertTableExists(self, table):
         with connection.cursor() as cursor:
@@ -54,7 +54,7 @@ class MigrationTestBase(TransactionTestCase):
                 value,
                 any(
                     c["index"]
-                    for c in connection.introspection.get_constraints(cursor, table).values()
+                    for c in connection.introspection.get_constraints(cursor, None, table).values()
                     if c['columns'] == list(columns)
                 ),
             )
@@ -68,7 +68,7 @@ class MigrationTestBase(TransactionTestCase):
                 value,
                 any(
                     c["foreign_key"] == to
-                    for c in connection.introspection.get_constraints(cursor, table).values()
+                    for c in connection.introspection.get_constraints(cursor, None, table).values()
                     if c['columns'] == list(columns)
                 ),
             )

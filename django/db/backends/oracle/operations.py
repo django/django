@@ -41,9 +41,10 @@ BEGIN
 END;
 /"""
 
-    def autoinc_sql(self, table, column):
+    def autoinc_sql(self, schema, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
         # create a sequence and a trigger.
+        assert schema is None
         args = {
             'sq_name': self._get_sequence_name(table),
             'tr_name': self._get_trigger_name(table),

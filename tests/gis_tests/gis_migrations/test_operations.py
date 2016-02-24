@@ -31,7 +31,7 @@ class OperationTests(TransactionTestCase):
 
     def get_table_description(self, table):
         with connection.cursor() as cursor:
-            return connection.introspection.get_table_description(cursor, table)
+            return connection.introspection.get_table_description(cursor, None, table)
 
     def assertColumnExists(self, table, column):
         self.assertIn(column, [c.name for c in self.get_table_description(table)])

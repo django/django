@@ -46,15 +46,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         return field_type
 
-    def get_table_list(self, cursor):
+    def get_table_list(self, cursor, include_schemas=False):
         """
         Returns a list of table and view names in the current database.
         """
         cursor.execute("SHOW FULL TABLES")
-        return [TableInfo(row[0], {'BASE TABLE': 't', 'VIEW': 'v'}.get(row[1]))
+        return [TableInfo(row[0], {'BASE TABLE': 't', 'VIEW': 'v'}.get(row[1]), None)
                 for row in cursor.fetchall()]
 
-    def get_table_description(self, cursor, table_name):
+    def get_table_description(self, cursor, schema, table_name):
         """
         Returns a description of the table, with the DB-API cursor.description interface."
         """
@@ -63,6 +63,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         #   not visible length (#5725)
         # - precision and scale (for decimal fields) (#5014)
         # - auto_increment is not available in cursor.description
+        assert schema is None, "No schema support for MySQL"
         cursor.execute("""
             SELECT column_name, data_type, character_maximum_length, numeric_precision,
                    numeric_scale, extra, column_default
@@ -154,10 +155,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             return self.connection.features._mysql_storage_engine
         return result[0]
 
-    def get_constraints(self, cursor, table_name):
+    def get_constraints(self, cursor, schema, table_name):
         """
         Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
         """
+        assert schema is None, "Schema-qualified tables not supported on MySQL"
         constraints = {}
         # Get the actual constraint names and columns
         name_query = """

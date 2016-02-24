@@ -28,9 +28,10 @@ from .models import (
     Order, OrderItem, Page, Paragraph, Person, Plaything, PointerA, Program,
     ProxyCategory, ProxyObjectA, ProxyObjectB, Ranking, Related,
     RelatedIndividual, RelatedObject, Report, ReservedName, Responsibility,
-    School, SharedConnection, SimpleCategory, SingleObject, SpecialCategory,
-    Staff, StaffUser, Student, Tag, Task, Ticket21203Child, Ticket21203Parent,
-    Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid,
+    SchemaQualified, School, ShadowTable, SharedConnection, SimpleCategory,
+    SingleObject, SpecialCategory, Staff, StaffUser, Student, Table, Tag, Task,
+    Ticket21203Child, Ticket21203Parent, Ticket23605A, Ticket23605B,
+    Ticket23605C, TvChef, Valid,
 )
 
 
@@ -3814,3 +3815,36 @@ class Ticket23622Tests(TestCase):
             Ticket23605A.objects.filter(qx),
             [a2], lambda x: x
         )
+
+
+class TestMetaTableClass(TestCase):
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific DDL used')
+    def test_schema_qualified(self):
+        cursor = connection.cursor()
+        cursor.execute('create schema other_schema')
+        cursor.execute('create table other_schema.schema_qualified(id serial primary key, val text)')
+        SchemaQualified.objects.create(val='Foo')
+        list(SchemaQualified.objects.all())
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific DDL used')
+    def test_shadow_table(self):
+        # The idea is that we store current data in Table, and historical row
+        # versions in ShadowTable. We can query a point in time from the
+        # ShadowTable with a bit of meta table class magic.
+        # Lets create the shadow table situation manually, in reality
+        # the modifications to ShadowTable would be done manually.
+        t = Table.objects.create(val='foo')
+        valid1 = datetime.datetime.now()
+        st = ShadowTable.objects.create(id=t.id, val='foo', valid_from=valid1)
+        t.val = 'bar'
+        t.save()
+        valid2 = datetime.datetime.now()
+        st.valid_until = valid2
+        st.save()
+        ShadowTable.objects.create(id=t.id, val='bar', valid_from=valid2)
+        # Now, when we query Table normally, we get the latest value.
+        self.assertEqual(Table.objects.get(pk=t.pk).val, 'bar')
+        # But, if we alter the query time, then we get a different result.
+        qs = Table.objects.all()
+        qs.query.add_context('db_time', valid1)
+        self.assertEqual(qs.get(pk=t.pk).val, 'foo')

@@ -173,7 +173,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
         with altered_table_name(model, model._meta.db_table + "__old"):
             # Rename the old table to make way for the new
-            self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
+            self.alter_db_table(model, temp_model._meta.table_cls, model._meta.table_cls)
 
             # Create a new table with the updated schema. We remove things
             # from the deferred SQL that match our table name, too

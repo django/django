@@ -1221,6 +1221,16 @@ class Model(six.with_metaclass(ModelBase)):
                         id='models.E017',
                     )
                 )
+        if 'table_cls' in cls._meta.original_attrs and 'db_table' in cls._meta.original_attrs:
+            errors.append(
+                checks.Error(
+                    "Both table_cls and db_table set for model '%s'" % cls.__name__,
+                    hint=None,
+                    obj=None,
+                    id="models.EXXX"
+                )
+            )
+
         return errors
 
     @classmethod

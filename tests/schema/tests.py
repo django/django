@@ -6,7 +6,7 @@ from copy import copy
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
 )
-from django.db.models import Model
+from django.db.models import Model, ModelTable
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
@@ -90,6 +90,7 @@ class SchemaTests(TransactionTestCase):
                 d[0]: (connection.introspection.get_field_type(d[1], d), d)
                 for d in connection.introspection.get_table_description(
                     cursor,
+                    None,
                     model._meta.db_table,
                 )
             }
@@ -114,7 +115,7 @@ class SchemaTests(TransactionTestCase):
         Get the constraints on a table using a new cursor.
         """
         with connection.cursor() as cursor:
-            return connection.introspection.get_constraints(cursor, table)
+            return connection.introspection.get_constraints(cursor, None, table)
 
     def get_constraints_for_column(self, model, column_name):
         constraints = self.get_constraints(model._meta.db_table)
@@ -1410,15 +1411,17 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
         # Alter the table
+        old_table = ModelTable(None, "schema_author")
+        new_table = ModelTable(None, "schema_otherauthor")
         with connection.schema_editor() as editor:
-            editor.alter_db_table(Author, "schema_author", "schema_otherauthor")
+            editor.alter_db_table(Author, old_table, new_table)
         # Ensure the table is there afterwards
         Author._meta.db_table = "schema_otherauthor"
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
         # Alter the table again
         with connection.schema_editor() as editor:
-            editor.alter_db_table(Author, "schema_otherauthor", "schema_author")
+            editor.alter_db_table(Author, new_table, old_table)
         # Ensure the table is still there
         Author._meta.db_table = "schema_author"
         columns = self.column_classes(Author)
@@ -1677,7 +1680,7 @@ class SchemaTests(TransactionTestCase):
             self.assertEqual(item[0], 'surname default')
             # And that the default is no longer set in the database.
             field = next(
-                f for f in connection.introspection.get_table_description(cursor, "schema_author")
+                f for f in connection.introspection.get_table_description(cursor, None, "schema_author")
                 if f.name == "surname"
             )
             if connection.features.can_introspect_default:
@@ -1700,7 +1703,7 @@ class SchemaTests(TransactionTestCase):
         # The database default should be removed.
         with connection.cursor() as cursor:
             field = next(
-                f for f in connection.introspection.get_table_description(cursor, "schema_author")
+                f for f in connection.introspection.get_table_description(cursor, None, "schema_author")
                 if f.name == "height"
             )
             if connection.features.can_introspect_default:

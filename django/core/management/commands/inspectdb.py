@@ -70,12 +70,12 @@ class Command(BaseCommand):
                 except NotImplementedError:
                     indexes = {}
                 try:
-                    constraints = connection.introspection.get_constraints(cursor, table_name)
+                    constraints = connection.introspection.get_constraints(cursor, None, table_name)
                 except NotImplementedError:
                     constraints = {}
                 used_column_names = []  # Holds column names used in the table so far
                 column_to_field_name = {}  # Maps column names to names of model fields
-                for row in connection.introspection.get_table_description(cursor, table_name):
+                for row in connection.introspection.get_table_description(cursor, None, table_name):
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
                     extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
                     column_name = row[0]

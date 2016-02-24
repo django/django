@@ -53,10 +53,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         cursor.execute("SELECT TABLE_NAME, 't' FROM USER_TABLES UNION ALL "
                        "SELECT VIEW_NAME, 'v' FROM USER_VIEWS")
-        return [TableInfo(row[0].lower(), row[1]) for row in cursor.fetchall()]
+        return [TableInfo(row[0].lower(), row[1], None) for row in cursor.fetchall()]
 
-    def get_table_description(self, cursor, table_name):
+    def get_table_description(self, cursor, schema, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
+        if schema:
+            raise NotImplementedError("TODO")
         self.cache_bust_counter += 1
         cursor.execute("SELECT * FROM {} WHERE ROWNUM < 2 AND {} > 0".format(
             self.connection.ops.quote_name(table_name),
@@ -146,10 +148,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                                'unique': bool(row[2])}
         return indexes
 
-    def get_constraints(self, cursor, table_name):
+    def get_constraints(self, cursor, schema, table_name):
         """
         Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
         """
+        assert schema is None, "Not implemented yet!"
         constraints = {}
         # Loop over the constraints, getting PKs and uniques
         cursor.execute("""

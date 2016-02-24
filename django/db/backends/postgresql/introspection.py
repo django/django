@@ -53,7 +53,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return 'BigAutoField'
         return field_type
 
-    def get_table_list(self, cursor):
+    def get_table_list(self, cursor, include_schema=False):
         """
         Returns a list of table and view names in the current database.
         """
@@ -64,20 +64,39 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE c.relkind IN ('r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)""")
-        return [TableInfo(row[0], {'r': 't', 'v': 'v'}.get(row[1]))
+        tables = [TableInfo(row[0], {'r': 't', 'v': 'v'}.get(row[1]), None)
                 for row in cursor.fetchall()
                 if row[0] not in self.ignored_tables]
+        if include_schema:
+            cursor.execute("""
+                SELECT c.relname, c.relkind, n.nspname
+                FROM pg_catalog.pg_class c
+                LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+                WHERE c.relkind IN ('r', 'v')
+                    AND n.nspname NOT IN ('pg_catalog', 'pg_toast')""")
+            tables.extend([TableInfo(row[0], {'r': 't', 'v': 'v'}.get(row[1]), row[2])
+                    for row in cursor.fetchall()
+                    if row[0] not in self.ignored_tables])
+        return tables
 
-    def get_table_description(self, cursor, table_name):
+    def get_table_description(self, cursor, schema, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
         # As cursor.description does not return reliably the nullable property,
         # we have to query the information_schema (#7783)
-        cursor.execute("""
-            SELECT column_name, is_nullable, column_default
-            FROM information_schema.columns
-            WHERE table_name = %s""", [table_name])
+        if schema is None:
+            cursor.execute("""
+                SELECT column_name, is_nullable, column_default
+                FROM information_schema.columns
+                WHERE table_name = %s""", [table_name])
+        else:
+            cursor.execute("""
+                SELECT column_name, is_nullable, column_default
+                FROM information_schema.columns
+                WHERE table_name = %s and table_schema = %s""", [table_name, schema])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
-        cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
+        cursor.execute("SELECT * FROM %s%s LIMIT 1" % (
+            (self.connection.ops.quote_name(schema) + '.') if schema else '',
+            self.connection.ops.quote_name(table_name)))
         return [FieldInfo(*((force_text(line[0]),) + line[1:6]
                             + (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])))
                 for line in cursor.description]
@@ -139,10 +158,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 indexes[row[0]]['unique'] = True
         return indexes
 
-    def get_constraints(self, cursor, table_name):
+    def get_constraints(self, cursor, schema, table_name):
         """
         Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
         """
+        assert schema is None, "Not implemented yet!"
         constraints = {}
         # Loop over the key table, collecting things as constraints
         # This will get PKs, FKs, and uniques, but not CHECK
