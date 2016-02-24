@@ -1,7 +1,18 @@
+0.9.2 (2016-02-24)
+------------------
+
+* ASGI spec updated to include `order` field for WebSocket messages
+
+* `enforce_ordering` decorator introduced
+
+* DatabaseChannelLayer now uses transactions to stop duplicated messages
+
+
 0.9.1 (2016-02-21)
 ------------------
 
 * Fix packaging issues with previous release
+
 
 0.9 (2016-02-21)
 ----------------

@@ -446,6 +446,8 @@ listening logic inside the ``chat-messages`` consumer, as every message would
 pass through it.
 
 
+.. _enforcing-ordering:
+
 Enforcing Ordering
 ------------------
 

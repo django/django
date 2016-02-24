@@ -66,6 +66,17 @@ it's designed to allow both easy sharding as well as the ability to run
 separate clusters with their own protocol and worker servers.
 
 
+Why doesn't it use my favourite message queue?
+----------------------------------------------
+
+Channels is deliberately designed to prefer low latency (goal is a few milliseconds)
+and high throughput over guaranteed delivery, which doesn't match some
+message queue designs.
+
+Some features, like :ref:`guaranteed ordering of messages <enforcing-ordering>`,
+are opt-in as they incur a performance hit.
+
+
 Do I need to worry about making all my code async-friendly?
 -----------------------------------------------------------
 
