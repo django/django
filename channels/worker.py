@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import logging
 import time
 
+from .exceptions import ConsumeLater
 from .message import Message
 from .utils import name_that_thing
 
@@ -43,5 +44,7 @@ class Worker(object):
                 self.callback(channel, message)
             try:
                 consumer(message)
+            except ConsumeLater:
+                self.channel_layer.send(channel, content)
             except:
                 logger.exception("Error processing message with consumer %s:", name_that_thing(consumer))

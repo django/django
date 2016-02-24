@@ -381,7 +381,12 @@ use if the key is missing). Keys are unicode strings.
 
 The one common key across all protocols is ``reply_channel``, a way to indicate
 the client-specific channel to send responses to. Protocols are generally
-encouraged to have one message type and one reply channel to ensure ordering.
+encouraged to have one message type and one reply channel type to ensure ordering.
+
+A ``reply_channel`` should be unique per connection. If the protocol in question
+can have any server service a response - e.g. a theoretical SMS protocol - it
+should not have ``reply_channel`` attributes on messages, but instead a separate
+top-level outgoing channel.
 
 Messages are specified here along with the channel names they are expected
 on; if a channel name can vary, such as with reply channels, the varying
@@ -390,7 +395,7 @@ the format the ``new_channel`` callable takes.
 
 There is no label on message types to say what they are; their type is implicit
 in the channel name they are received on. Two types that are sent on the same
-channel, such as HTTP responses and server pushes, are distinguished apart
+channel, such as HTTP responses and response chunks, are distinguished apart
 by their required fields.
 
 
@@ -630,6 +635,8 @@ Keys:
   for this server as a unicode string, and ``port`` is the integer listening port.
   Optional, defaults to ``None``.
 
+* ``order``: The integer value ``0``.
+
 
 Receive
 '''''''
@@ -646,6 +653,9 @@ Keys:
 * ``bytes``: Byte string of frame content, if it was bytes mode, or ``None``.
 
 * ``text``: Unicode string of frame content, if it was text mode, or ``None``.
+
+* ``order``: Order of this frame in the WebSocket stream, starting
+  at 1 (``connect`` is 0).
 
 One of ``bytes`` or ``text`` must be non-``None``.
 
@@ -664,6 +674,9 @@ Keys:
 * ``reply_channel``: Channel name that was used for sending data, in
   format ``websocket.send.?``. Cannot be used to send at this point; provided
   as a way to identify the connection only.
+
+* ``order``: Order of the disconnection relative to the incoming frames'
+  ``order`` values in ``websocket.receive``.
 
 
 Send/Close
@@ -734,6 +747,33 @@ Channel: ``udp.send.?``
 Keys:
 
 * ``data``: Byte string of UDP datagram payload.
+
+
+Protocol Format Guidelines
+--------------------------
+
+Message formats for protocols should follow these rules, unless
+a very good performance or implementation reason is present:
+
+* ``reply_channel`` should be unique per logical connection, and not per
+  logical client.
+
+* If the protocol has server-side state, entirely encapsulate that state in
+  the protocol server; do not require the message consumers to use an external
+  state store.
+
+* If the protocol has low-level negotiation, keepalive or other features,
+  handle these within the protocol server and don't expose them in ASGI
+  messages.
+
+* If the protocol has guaranteed ordering, ASGI messages should include an
+  ``order`` field (0-indexed) that preserves the ordering as received by the
+  protocol server (or as sent by the client, if available). This ordering should
+  span all message types emitted by the client - for example, a connect message
+  might have order ``0``, and the first two frames order ``1`` and ``2``.
+
+* If the protocol is datagram-based, one datagram should equal one ASGI message
+  (unless size is an issue)
 
 
 Approximate Global Ordering

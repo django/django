@@ -3,8 +3,24 @@ import hashlib
 from importlib import import_module
 
 from django.conf import settings
+from django.contrib.sessions.backends.base import CreateError
 
+from .exceptions import ConsumeLater
 from .handler import AsgiRequest
+
+
+def session_for_reply_channel(reply_channel):
+    """
+    Returns a session object tied to the reply_channel unicode string
+    passed in as an argument.
+    """
+    # We hash the whole reply channel name and add a prefix, to fit inside 32B
+    reply_name = reply_channel
+    hashed = hashlib.md5(reply_name.encode("utf8")).hexdigest()
+    session_key = "chn" + hashed[:29]
+    # Make a session storage
+    session_engine = import_module(settings.SESSION_ENGINE)
+    return session_engine.SessionStore(session_key=session_key)
 
 
 def channel_session(func):
@@ -17,30 +33,24 @@ def channel_session(func):
     """
     @functools.wraps(func)
     def inner(message, *args, **kwargs):
+        # Make sure there's NOT a channel_session already
+        if hasattr(message, "channel_session"):
+            return func(message, *args, **kwargs)
         # Make sure there's a reply_channel
         if not message.reply_channel:
             raise ValueError(
                 "No reply_channel sent to consumer; @channel_session " +
                 "can only be used on messages containing it."
             )
-
-        # Make sure there's NOT a channel_session already
-        if hasattr(message, "channel_session"):
-            raise ValueError("channel_session decorator wrapped inside another channel_session decorator")
-
-        # Turn the reply_channel into a valid session key length thing.
-        # We take the last 24 bytes verbatim, as these are the random section,
-        # and then hash the remaining ones onto the start, and add a prefix
-        reply_name = message.reply_channel.name
-        hashed = hashlib.md5(reply_name[:-24].encode()).hexdigest()[:8]
-        session_key = "skt" + hashed + reply_name[-24:]
-        # Make a session storage
-        session_engine = import_module(settings.SESSION_ENGINE)
-        session = session_engine.SessionStore(session_key=session_key)
         # If the session does not already exist, save to force our
         # session key to be valid.
+        session = session_for_reply_channel(message.reply_channel.name)
         if not session.exists(session.session_key):
-            session.save(must_create=True)
+            try:
+                session.save(must_create=True)
+            except CreateError:
+                # Session wasn't unique, so another consumer is doing the same thing
+                raise ConsumeLater()
         message.channel_session = session
         # Run the consumer
         try:
@@ -50,6 +60,47 @@ def channel_session(func):
             if session.modified:
                 session.save()
     return inner
+
+
+def enforce_ordering(func=None, slight=False):
+    """
+    Enforces either slight (order=0 comes first, everything else isn't ordered)
+    or strict (all messages exactly ordered) ordering against a reply_channel.
+
+    Uses sessions to track ordering.
+
+    You cannot mix slight ordering and strict ordering on a channel; slight
+    ordering does not write to the session after the first message to improve
+    performance.
+    """ 
+    def decorator(func):
+        @channel_session
+        @functools.wraps(func)
+        def inner(message, *args, **kwargs):
+            # Make sure there's an order
+            if "order" not in message.content:
+                raise ValueError(
+                    "No `order` value in message; @enforce_ordering " +
+                    "can only be used on messages containing it."
+                )
+            order = int(message.content['order'])
+            # See what the current next order should be
+            next_order = message.channel_session.get("__channels_next_order", 0)
+            if order == next_order or (slight and next_order > 0):
+                # Message is in right order. Maybe persist next one?
+                if order == 0 or not slight:
+                    message.channel_session["__channels_next_order"] = order + 1
+                # Run consumer
+                return func(message, *args, **kwargs)
+            else:
+                # Bad ordering
+                print("Bad ordering detected: next %s, us %s, %s" % (next_order, order, message.reply_channel))
+                raise ConsumeLater()
+        return inner
+    if func is not None:
+        return decorator(func)
+    else:
+        return decorator
 
 
 def http_session(func):
@@ -69,6 +120,9 @@ def http_session(func):
     """
     @functools.wraps(func)
     def inner(message, *args, **kwargs):
+        # Make sure there's NOT a http_session already
+        if hasattr(message, "http_session"):
+            return func(message, *args, **kwargs)
         try:
             # We want to parse the WebSocket (or similar HTTP-lite) message
             # to get cookies and GET, but we need to add in a few things that
@@ -78,9 +132,6 @@ def http_session(func):
             request = AsgiRequest(message)
         except Exception as e:
             raise ValueError("Cannot parse HTTP message - are you sure this is a HTTP consumer? %s" % e)
-        # Make sure there's NOT a http_session already
-        if hasattr(message, "http_session"):
-            raise ValueError("http_session decorator wrapped inside another http_session decorator")
         # Make sure there's a session key
         session_key = request.GET.get("session_key", None)
         if session_key is None:

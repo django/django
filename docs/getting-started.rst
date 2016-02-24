@@ -259,7 +259,7 @@ name in the path of your WebSocket request (we'll ignore auth for now - that's n
 
     # In consumers.py
     from channels import Group
-    from channels.decorators import channel_session
+    from channels.sessions import channel_session
 
     # Connected to websocket.connect
     @channel_session
@@ -342,7 +342,7 @@ chat to people with the same first letter of their username::
 
     # In consumers.py
     from channels import Channel, Group
-    from channels.decorators import channel_session
+    from channels.sessions import channel_session
     from channels.auth import http_session_user, channel_session_user, transfer_user
 
     # Connected to websocket.connect
@@ -401,7 +401,7 @@ have a ChatMessage model with ``message`` and ``room`` fields::
 
     # In consumers.py
     from channels import Channel
-    from channels.decorators import channel_session
+    from channels.sessions import channel_session
     from .models import ChatMessage
 
     # Connected to chat-messages
@@ -445,14 +445,16 @@ command run via ``cron``. If we wanted to write a bot, too, we could put its
 listening logic inside the ``chat-messages`` consumer, as every message would
 pass through it.
 
-Linearization
--------------
+
+Enforcing Ordering
+------------------
 
 There's one final concept we want to introduce you to before you go on to build
-sites with Channels - linearizing consumers.
+sites with Channels - consmer ordering
 
 Because Channels is a distributed system that can have many workers, by default
-it's entirely feasible for a WebSocket interface server to send out a ``connect``
+it just processes messages in the order the workers get them off the queue.
+It's entirely feasible for a WebSocket interface server to send out a ``connect``
 and a ``receive`` message close enough together that a second worker will pick
 up and start processing the ``receive`` message before the first worker has
 finished processing the ``connect`` worker.
@@ -464,52 +466,64 @@ same effect if someone tried to request a view before the login view had finishe
 processing, but there you're not expecting that page to run after the login,
 whereas you'd naturally expect ``receive`` to run after ``connect``.
 
-But, of course, Channels has a solution - the ``linearize`` decorator. Any
-handler decorated with this will use locking to ensure it does not run at the
-same time as any other view with ``linearize`` **on messages with the same reply channel**.
-That means your site will happily multitask with lots of different people's messages,
-but if two happen to try to run at the same time for the same client, they'll
-be deconflicted.
+Channels has a solution - the ``enforce_ordering`` decorator. All WebSocket 
+messages contain an ``order`` key, and this decorator uses that to make sure that
+messages are consumed in the right order, in one of two modes:
 
-There's a small cost to using ``linearize``, which is why it's an optional
-decorator, but generally you'll want to use it for most session-based WebSocket
+* Slight ordering: Message 0 (``websocket.connect``) is done first, all others
+  are unordered
+
+* Strict ordering: All messages are consumed strictly in sequence
+
+The decorator uses ``channel_session`` to keep track of what numbered messages
+have been processed, and if a worker tries to run a consumer on an out-of-order
+message, it raises the ``ConsumeLater`` exception, which puts the message
+back on the channel it came from and tells the worker to work on another message.
+
+There's a cost to using ``enforce_ordering``, which is why it's an optional
+decorator, and the cost is much greater in *strict* mode than it is in
+*slight* mode. Generally you'll want to use *slight* mode for most session-based WebSocket
 and other "continuous protocol" things. Here's an example, improving our
 first-letter-of-username chat from earlier::
 
     # In consumers.py
     from channels import Channel, Group
-    from channels.decorators import channel_session, linearize
-    from channels.auth import http_session_user, channel_session_user, transfer_user
+    from channels.sessions import channel_session, enforce_ordering
+    from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http
 
     # Connected to websocket.connect
-    @linearize
-    @channel_session
-    @http_session_user
+    @enforce_ordering(slight=True)
+    @channel_session_user_from_http
     def ws_add(message):
-        # Copy user from HTTP to channel session
-        transfer_user(message.http_session, message.channel_session)
         # Add them to the right group
         Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
 
-    # Connected to websocket.keepalive
-    # We don't linearize as we know this will happen a decent time after add
-    @channel_session_user
-    def ws_keepalive(message):
-        # Keep them in the right group
-        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
-
     # Connected to websocket.receive
-    @linearize
+    @enforce_ordering(slight=True)
     @channel_session_user
     def ws_message(message):
         Group("chat-%s" % message.user.username[0]).send(message.content)
 
     # Connected to websocket.disconnect
-    # We don't linearize as even if this gets an empty session, the group
-    # will auto-discard after the expiry anyway.
+    @enforce_ordering(slight=True)
     @channel_session_user
     def ws_disconnect(message):
         Group("chat-%s" % message.user.username[0]).discard(message.reply_channel)
+
+Slight ordering does mean that it's possible for a ``disconnect`` message to
+get processed before a ``receive`` message, but that's fine in this case;
+the client is disconnecting anyway, they don't care about those pending messages.
+
+Strict ordering is the default as it's the most safe; to use it, just call
+the decorator without arguments::
+
+    @enforce_ordering
+    def ws_message(message):
+        ...
+
+Generally, the performance (and safety) of your ordering is tied to your
+session backend's performance. Make sure you choose session backend wisely
+if you're going to rely heavily on ``enforce_ordering``.
 
 
 Next Steps
