@@ -72,7 +72,7 @@ def enforce_ordering(func=None, slight=False):
     You cannot mix slight ordering and strict ordering on a channel; slight
     ordering does not write to the session after the first message to improve
     performance.
-    """ 
+    """
     def decorator(func):
         @channel_session
         @functools.wraps(func)
