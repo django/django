@@ -1508,5 +1508,3 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 * Private API ``django.test.utils.TestTemplateLoader`` is removed.
 
 * The ``django.contrib.contenttypes.generic`` module is removed.
-
-* QuerySet.bulk_create sets pk on objects when using the Postgresql backend.

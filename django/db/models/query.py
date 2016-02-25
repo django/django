@@ -411,8 +411,8 @@ class QuerySet(object):
         Inserts each of the instances into the database. This does *not* call
         save() on each of the instances, does not send any pre/post save
         signals, and does not set the primary key attribute if it is an
-        autoincrement field (except on Postgres). Multi-table models are
-        not supported.
+        autoincrement field (except if features.can_return_ids_from_bulk_insert=True).
+        Multi-table models are not supported.
         """
         # So this case is fun. When you bulk insert you don't get the primary
         # keys back (if it's an autoincrement, except on Postgres), so you can't
@@ -1058,20 +1058,18 @@ class QuerySet(object):
             return
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
-        ret = []
-        for batch in [objs[i:i + batch_size]
-                      for i in range(0, len(objs), batch_size)]:
+        batch = []
+        for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
             if connections[self.db].features.can_return_ids_from_bulk_insert:
+                inserted_item = self.model._base_manager._insert(
+                    item, fields=fields, using=self.db, return_id=True)
                 if len(objs) > 1:
-                    ret.extend(self.model._base_manager._insert(batch, fields=fields,
-                                                                using=self.db, return_id=True))
+                    batch.extend(inserted_item)
                 if len(objs) == 1:
-                    ret.append(self.model._base_manager._insert(batch, fields=fields,
-                                                                using=self.db, return_id=True))
+                    batch.append(inserted_item)
             else:
-                self.model._base_manager._insert(batch, fields=fields,
-                                                 using=self.db)
-        return ret
+                self.model._base_manager._insert(item, fields=fields, using=self.db)
+        return batch
 
     def _clone(self, **kwargs):
         query = self.query.clone()
