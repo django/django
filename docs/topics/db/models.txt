@@ -170,10 +170,10 @@ ones:
         )
 
     The first element in each tuple is the value that will be stored in the
-    database, the second element will be displayed by the default form widget
-    or in a ModelChoiceField. Given an instance of a model object, the
-    display value for a choices field can be accessed using the
-    ``get_FOO_display`` method. For example::
+    database. The second element will be displayed by the default form widget
+    or in a :class:`~django.forms.ModelChoiceField`. Given a model instance,
+    the display value for a choices field can be accessed using the
+    ``get_FOO_display()`` method. For example::
 
         from django.db import models
 
