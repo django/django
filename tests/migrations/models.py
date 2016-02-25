@@ -72,3 +72,11 @@ class FoodManager(BaseFoodManager.from_queryset(FoodQuerySet)):
 
 class NoMigrationFoodManager(BaseFoodManager.from_queryset(FoodQuerySet)):
     pass
+
+
+class ExoPlanet(models.Model):
+    name = models.CharField(max_length=255)
+    inhabitable = models.BooleanField(default=False)
+
+    class Meta:
+        app_label = 'exoplanets'

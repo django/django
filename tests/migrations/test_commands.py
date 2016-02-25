@@ -7,7 +7,7 @@ import os
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
-from django.db import DatabaseError, connection, models
+from django.db import DatabaseError, connection, connections, models
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
@@ -22,6 +22,7 @@ class MigrateTests(MigrationTestBase):
     """
     Tests running the migrate command.
     """
+    multi_db = True
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate(self):
@@ -75,20 +76,31 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"},
+                       DATABASE_ROUTERS=['migrations.routers.TestRouter'])
     def test_migrate_fake_initial(self):
         """
         #24184 - Tests that --fake-initial only works if all tables created in
         the initial migration of an app exists
+        #26117 - and that database routers are obeyed when doing that check
         """
         # Make sure no tables are created
-        self.assertTableNotExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
+        for db in connections:
+            self.assertTableNotExists("migrations_author", using=db)
+            self.assertTableNotExists("migrations_tribble", using=db)
+            self.assertTableNotExists("migrations_exoplanet", using=db)
         # Run the migrations to 0001 only
         call_command("migrate", "migrations", "0001", verbosity=0)
+        call_command("migrate", "migrations", "0001", verbosity=0, database="other")
         # Make sure the right tables exist
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_tribble")
+        self.assertTableNotExists("migrations_exoplanet")
+        # Also check the "other" database
+        self.assertTableNotExists("migrations_author", using='other')
+        self.assertTableNotExists("migrations_tribble", using='other')
+        self.assertTableExists("migrations_exoplanet", using='other')
+
         # Fake a roll-back
         call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
         # Make sure the tables still exist
@@ -107,16 +119,24 @@ class MigrateTests(MigrationTestBase):
         )
         # Run migrations all the way
         call_command("migrate", verbosity=0)
+        call_command("migrate", verbosity=0, database="other")
         # Make sure the right tables exist
         self.assertTableExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         self.assertTableExists("migrations_book")
+        self.assertTableNotExists("migrations_exoplanet")
+        self.assertTableNotExists("migrations_author", using="other")
+        self.assertTableNotExists("migrations_tribble", using="other")
+        self.assertTableNotExists("migrations_book", using="other")
+        self.assertTableExists("migrations_exoplanet", using="other")
         # Fake a roll-back
         call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
+        call_command("migrate", "migrations", "zero", fake=True, verbosity=0, database="other")
         # Make sure the tables still exist
         self.assertTableExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         self.assertTableExists("migrations_book")
+        self.assertTableExists("migrations_exoplanet", using="other")
         # Try to run initial migration
         with self.assertRaises(DatabaseError):
             call_command("migrate", "migrations", verbosity=0)
@@ -127,12 +147,16 @@ class MigrateTests(MigrationTestBase):
             call_command("migrate", "migrations", fake_initial=True, verbosity=0)
         # Fake a apply
         call_command("migrate", "migrations", fake=True, verbosity=0)
+        call_command("migrate", "migrations", fake=True, verbosity=0, database="other")
         # Unmigrate everything
         call_command("migrate", "migrations", "zero", verbosity=0)
+        call_command("migrate", "migrations", "zero", verbosity=0, database="other")
         # Make sure it's all gone
-        self.assertTableNotExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
-        self.assertTableNotExists("migrations_book")
+        for db in connections:
+            self.assertTableNotExists("migrations_author", using=db)
+            self.assertTableNotExists("migrations_tribble", using=db)
+            self.assertTableNotExists("migrations_book", using=db)
+            self.assertTableNotExists("migrations_exoplanet", using=db)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_fake_split_initial"})
     def test_migrate_fake_split_initial(self):
@@ -1066,7 +1090,7 @@ class SquashMigrationsTests(MigrationTestBase):
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=1, stdout=out)
-        self.assertIn("Optimized from 7 operations to 3 operations.", force_text(out.getvalue()))
+        self.assertIn("Optimized from 9 operations to 4 operations.", force_text(out.getvalue()))
 
     def test_ticket_23799_squashmigrations_no_optimize(self):
         """

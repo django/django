@@ -66,7 +66,7 @@ class LoaderTests(TestCase):
         )
         # Now render it out!
         project_state = migration_loader.project_state(("migrations", "0002_second"))
-        self.assertEqual(len(project_state.models), 2)
+        self.assertEqual(len(project_state.models), 3)
 
         author_state = project_state.models["migrations", "author"]
         self.assertEqual(
