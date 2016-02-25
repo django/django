@@ -86,6 +86,9 @@ Minor features
   :func:`~django.contrib.auth.views.logout` view, if the view doesn't get a
   ``next_page`` argument.
 
+* The :func:`~django.contrib.auth.signals.user_login_failed` signal now gets a
+  ``request`` argument.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -612,6 +615,11 @@ Miscellaneous
 
 * Tests that violate deferrable database constraints will now error when run on
   a database that supports deferrable constraints.
+
+* :func:`~django.contrib.auth.authenticate` takes a new ``_request`` keyword
+  argument that will not be passed to auth backends as part of the
+  credentials. This will break if you have an auth backend that takes an
+  argument called ``_request``.
 
 .. _deprecated-features-1.10:
 

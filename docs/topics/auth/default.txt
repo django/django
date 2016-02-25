@@ -137,6 +137,12 @@ Authenticating users
             # the authentication system was unable to verify the username and password
             print("The username and password were incorrect.")
 
+    .. versionchanged:: 1.10
+
+        A ``_request`` keyword argument may be provided; it will be passed
+        to the :func:`~django.contrib.auth.signals.user_login_failed`
+        signal if provided.
+
     .. note::
 
         This is a low level way to authenticate a set of credentials; for

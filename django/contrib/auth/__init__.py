@@ -63,6 +63,7 @@ def authenticate(**credentials):
     """
     If the given credentials are valid, return a User object.
     """
+    request = credentials.pop('_request', None)
     for backend, backend_path in _get_backends(return_tuples=True):
         try:
             inspect.getcallargs(backend.authenticate, **credentials)
@@ -83,8 +84,7 @@ def authenticate(**credentials):
 
     # The credentials supplied are invalid to all backends, fire signal
     user_login_failed.send(sender=__name__,
-            credentials=_clean_credentials(credentials))
-
+            credentials=_clean_credentials(credentials), request=request)
 
 def login(request, user, backend=None):
     """
