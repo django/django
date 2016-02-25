@@ -304,8 +304,8 @@ Application registry
 
 .. attribute:: apps.ready
 
-    Boolean attribute that is set to ``True`` when the registry is fully
-    populated.
+    Boolean attribute that is set to ``True`` after the registry is fully
+    populated and all :meth:`AppConfig.ready` methods are called.
 
 .. method:: apps.get_app_configs()
 
