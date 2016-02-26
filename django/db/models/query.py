@@ -1421,11 +1421,12 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 if not hasattr(obj, '_prefetched_objects_cache'):
                     try:
                         obj._prefetched_objects_cache = {}
-                    except AttributeError:
-                        # Must be in a QuerySet subclass that is not returning
-                        # Model instances, either in Django or 3rd
-                        # party. prefetch_related() doesn't make sense, so quit
-                        # now.
+                    except (AttributeError, TypeError):
+                        # Must be an immutable object from
+                        # values_list(flat=True), for example (TypeError) or
+                        # a QuerySet subclass that isn't returning Model
+                        # instances (AttributeError), either in Django or a 3rd
+                        # party. prefetch_related() doesn't make sense, so quit.
                         good_objects = False
                         break
             if not good_objects:
