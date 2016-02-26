@@ -1424,7 +1424,7 @@ def prefetch_related_objects(result_cache, related_lookups):
                 if not hasattr(obj, '_prefetched_objects_cache'):
                     try:
                         obj._prefetched_objects_cache = {}
-                    except AttributeError:
+                    except (AttributeError, TypeError):
                         # Must be in a QuerySet subclass that is not returning
                         # Model instances, either in Django or 3rd
                         # party. prefetch_related() doesn't make sense, so quit
