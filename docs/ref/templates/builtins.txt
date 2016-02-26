@@ -1294,8 +1294,9 @@ n                 Month without leading zeros.              ``'1'`` to ``'12'``
 N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
                   style. Proprietary extension.
 o                 ISO-8601 week-numbering year,             ``'1999'``
-                  corresponding to
-                  the ISO-8601 week number (W)
+                  corresponding to the ISO-8601 week
+                  number (W) which uses leap weeks. See Y
+                  for the more common year format.
 O                 Difference to Greenwich time in hours.    ``'+0200'``
 P                 Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
                   'a.m.'/'p.m.', with minutes left off
