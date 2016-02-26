@@ -149,9 +149,6 @@ class SessionTestsMixin(object):
         self.assertTrue(self.session.modified)
 
     def test_save(self):
-        if (hasattr(self.session, '_cache') and 'DummyCache' in
-                settings.CACHES[settings.SESSION_CACHE_ALIAS]['BACKEND']):
-            raise unittest.SkipTest("Session saving tests require a real cache backend")
         self.session.save()
         self.assertTrue(self.session.exists(self.session.session_key))
 
@@ -345,8 +342,6 @@ class SessionTestsMixin(object):
 
         Creating session records on load is a DOS vulnerability.
         """
-        if self.backend is CookieSession:
-            raise unittest.SkipTest("Cookie backend doesn't have an external store to create records in.")
         session = self.backend('someunknownkey')
         session.load()
 
@@ -458,9 +453,6 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
 
     backend = CacheDBSession
 
-    @unittest.skipIf('DummyCache' in
-        settings.CACHES[settings.SESSION_CACHE_ALIAS]['BACKEND'],
-        "Session saving tests require a real cache backend")
     def test_exists_searches_cache_first(self):
         self.session.save()
         with self.assertNumQueries(0):
@@ -812,3 +804,7 @@ class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
 
         self.session.serializer = PickleSerializer
         self.session.load()
+
+    @unittest.skip("Cookie backend doesn't have an external store to create records in.")
+    def test_session_load_does_not_create_record(self):
+        pass
