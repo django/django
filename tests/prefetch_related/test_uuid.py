@@ -49,7 +49,10 @@ class UUIDPrefetchRelated(TestCase):
             Person.objects.create(name='Ellen'),
             Person.objects.create(name='George'),
         )
-        list(Pet.objects.prefetch_related('fleas_hosted').values_list('id', flat=True))
+        self.assertSequenceEqual(
+            Pet.objects.prefetch_related('fleas_hosted').values_list('id', flat=True),
+            [Pet.objects.get(name='Fifi').id]
+        )
 
 
 class UUIDPrefetchRelatedLookups(TestCase):

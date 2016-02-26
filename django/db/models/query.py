@@ -1425,10 +1425,10 @@ def prefetch_related_objects(result_cache, related_lookups):
                     try:
                         obj._prefetched_objects_cache = {}
                     except (AttributeError, TypeError):
-                        # Must be in a QuerySet subclass that is not returning
-                        # Model instances, either in Django or 3rd
-                        # party. prefetch_related() doesn't make sense, so quit
-                        # now.
+                        # Must be an immutable object or in a QuerySet subclass
+                        # that is not returning Model instances, either in
+                        # Django or 3rd party. prefetch_related() doesn't make
+                        # sense, so quit now.
                         good_objects = False
                         break
             if not good_objects:
