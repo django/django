@@ -622,6 +622,36 @@ Miscellaneous
 Features deprecated in 1.10
 ===========================
 
+Use model name as query lookup in related field when ``default_related_name`` is set
+------------------------------------------------------------------------------------
+
+Assume we have following models::
+
+    from django.db import models
+
+    class Foo(models.Model):
+        a = models.IntegerField(default=0)
+    
+    class Bar(models.Model):
+        foo = models.ForeignKey(Foo)
+        
+        class Meta:
+            default_related_name = 'bars'
+
+With created instance::
+
+    >>> foo = models.Foo.object.create()
+    >>> bar = models.Bar.object.create(foo=foo)
+
+Since we have set ``default_related_name`` in model ``Bar``,
+instead of using model name ``bar`` as related name in lookup string::
+
+    >>> models.Foo.object.get(bar=bar)
+
+use the default_related_name ``bars``::
+
+    >>> models.Foo.object.get(bars=bar)
+
 Direct assignment to a reverse foreign key or many-to-many relation
 -------------------------------------------------------------------
 

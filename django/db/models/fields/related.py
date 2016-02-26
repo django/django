@@ -289,7 +289,6 @@ class RelatedField(Field):
         self.opts = cls._meta
 
         if not cls._meta.abstract:
-
             if self.remote_field.related_name:
                 related_name = self.remote_field.related_name
             else:
