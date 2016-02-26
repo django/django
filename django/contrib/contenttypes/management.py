@@ -1,5 +1,5 @@
 from django.apps import apps
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.utils import six
 from django.utils.six.moves import input
 
@@ -18,6 +18,15 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
         return
 
     if not router.allow_migrate_model(using, ContentType):
+        return
+
+    # Make sure either the `contenttypes` app is either not managed by the
+    # migrations framework or that the required migrations have been applied.
+    from django.db.migrations.loader import MigrationLoader
+    from django.db.migrations.recorder import MigrationRecorder
+    migrations_import_path = MigrationLoader.migrations_module('contenttypes')
+    recorder = MigrationRecorder(connections[using])
+    if migrations_import_path and not recorder.migration_is_applied('contenttypes', '0002_remove_content_type_name'):
         return
 
     ContentType.objects.clear_cache()

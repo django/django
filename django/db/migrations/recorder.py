@@ -65,6 +65,10 @@ class MigrationRecorder(object):
         self.ensure_schema()
         return set(tuple(x) for x in self.migration_qs.values_list("app", "name"))
 
+    def migration_is_applied(self, app, name):
+        self.ensure_schema()
+        return self.migration_qs.filter(app=app, name=name).exists()
+
     def record_applied(self, app, name):
         """
         Records that a migration was applied.
