@@ -424,10 +424,10 @@ class OneToOneTests(TestCase):
 
     def test_related_object(self):
         public_school = School.objects.create(is_public=True)
-        public_director = Director.objects.create(school=public_school, is_temp=False)
+        public_director = Director.objects.create(school=public_school, is_temp=True)
 
         private_school = School.objects.create(is_public=False)
-        private_director = Director.objects.create(school=private_school, is_temp=True)
+        private_director = Director.objects.create(school=private_school, is_temp=False)
 
         # Only one school is available via all() due to the custom default manager.
         self.assertQuerysetEqual(
@@ -457,21 +457,13 @@ class OneToOneTests(TestCase):
         # If the manager is marked "use_for_related_fields", it'll get used instead
         # of the "bare" queryset. Usually you'd define this as a property on the class,
         # but this approximates that in a way that's easier in tests.
-        School.objects.use_for_related_fields = True
-        try:
-            private_director = Director._base_manager.get(pk=private_director.pk)
-            with self.assertRaises(School.DoesNotExist):
-                private_director.school
-        finally:
-            School.objects.use_for_related_fields = False
+        private_director = Director._base_manager.get(pk=private_director.pk)
+        with self.assertRaises(School.DoesNotExist):
+            private_director.school
 
-        Director.objects.use_for_related_fields = True
-        try:
-            private_school = School._base_manager.get(pk=private_school.pk)
-            with self.assertRaises(Director.DoesNotExist):
-                private_school.director
-        finally:
-            Director.objects.use_for_related_fields = False
+        public_school = School._base_manager.get(pk=public_school.pk)
+        with self.assertRaises(Director.DoesNotExist):
+            public_school.director
 
     def test_hasattr_related_object(self):
         # The exception raised on attribute access when a related object
