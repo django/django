@@ -46,3 +46,6 @@ Bugfixes
 * Changed the admin's "permission denied" message in the login template to use
   ``get_username`` instead of ``username`` to support custom user models
   (:ticket:`26231`).
+
+* Fixed a crash when passing a nonexistent template name to the cached template
+  loader's ``load_template()`` method (:ticket:`26280`).

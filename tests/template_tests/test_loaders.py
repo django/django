@@ -87,6 +87,18 @@ class CachedLoaderTests(SimpleTestCase):
             "Cached loader failed to cache the TemplateDoesNotExist exception",
         )
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_load_nonexistent_cached_template(self):
+        loader = self.engine.template_loaders[0]
+        template_name = 'nonexistent.html'
+
+        # fill the template cache
+        with self.assertRaises(TemplateDoesNotExist):
+            loader.find_template(template_name)
+
+        with self.assertRaisesMessage(TemplateDoesNotExist, template_name):
+            loader.get_template(template_name)
+
     def test_templatedir_caching(self):
         """
         #13573 -- Template directories should be part of the cache key.
