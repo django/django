@@ -203,6 +203,13 @@ class In(BuiltinLookup):
     lookup_name = 'in'
 
     def process_rhs(self, compiler, connection):
+        db_rhs = getattr(self.rhs, '_db', None)
+        if db_rhs is not None and db_rhs != connection.alias:
+            raise ValueError(
+                "Subqueries aren't allowed across different databases. Instead, "
+                "force the inner query to be evaluated using `list(inner_query)`."
+            )
+
         if self.rhs_is_direct_value():
             try:
                 rhs = set(self.rhs)
