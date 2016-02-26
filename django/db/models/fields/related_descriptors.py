@@ -105,10 +105,6 @@ class ForwardManyToOneDescriptor(object):
 
     def get_queryset(self, **hints):
         manager = self.field.remote_field.model._default_manager
-        # If the related manager indicates that it should be used for
-        # related fields, respect that.
-        if not getattr(manager, 'use_for_related_fields', False):
-            manager = self.field.remote_field.model._base_manager
         return manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
@@ -282,10 +278,6 @@ class ReverseOneToOneDescriptor(object):
 
     def get_queryset(self, **hints):
         manager = self.related.related_model._default_manager
-        # If the related manager indicates that it should be used for
-        # related fields, respect that.
-        if not getattr(manager, 'use_for_related_fields', False):
-            manager = self.related.related_model._base_manager
         return manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):

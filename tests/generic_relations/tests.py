@@ -10,7 +10,7 @@ from django.test import SimpleTestCase, TestCase
 
 from .models import (
     AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
-    ForConcreteModelModel, ForProxyModelModel, Gecko, ManualPK, Mineral,
+    ForConcreteModelModel, ForProxyModelModel, ManualPK, Mineral,
     ProxyRelatedModel, Rock, TaggedItem, ValuableRock, ValuableTaggedItem,
     Vegetable,
 )
@@ -480,12 +480,6 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
 <p><label for="id_x-0-DELETE">Delete:</label> <input type="checkbox" name="x-0-DELETE" id="id_x-0-DELETE" />
 <input type="hidden" name="x-0-id" id="id_x-0-id" /></p>"""
         )
-
-    def test_gfk_manager(self):
-        # GenericForeignKey should not use the default manager (which may filter objects) #16048
-        tailless = Gecko.objects.create(has_tail=False)
-        tag = TaggedItem.objects.create(content_object=tailless, tag="lizard")
-        self.assertEqual(tag.content_object, tailless)
 
     def test_subclasses_with_gen_rel(self):
         """

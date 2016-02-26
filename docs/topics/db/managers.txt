@@ -186,22 +186,6 @@ work with.
 
 .. _managers-for-related-objects:
 
-Using managers for related object access
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-By default, Django uses an instance of a "plain" manager class when accessing
-related objects (i.e. ``choice.poll``), not the default manager on the related
-object. This is because Django needs to be able to retrieve the related
-object, even if it would otherwise be filtered out (and hence be inaccessible)
-by the default manager.
-
-If the normal plain manager class (:class:`django.db.models.Manager`) is not
-appropriate for your circumstances, you can force Django to use the same class
-as the default manager for your model by setting the ``use_for_related_fields``
-attribute on the manager class. This is documented fully below_.
-
-.. _below: manager-types_
-
 .. _calling-custom-queryset-methods-from-manager:
 
 Calling custom ``QuerySet`` methods from the manager

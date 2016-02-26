@@ -100,6 +100,8 @@ class HiddenPointer(models.Model):
 
 # Test related objects visibility.
 class SchoolManager(models.Manager):
+    use_for_related_fields = True
+
     def get_queryset(self):
         return super(SchoolManager, self).get_queryset().filter(is_public=True)
 
@@ -110,6 +112,8 @@ class School(models.Model):
 
 
 class DirectorManager(models.Manager):
+    use_for_related_fields = True
+
     def get_queryset(self):
         return super(DirectorManager, self).get_queryset().filter(is_temp=False)
 

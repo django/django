@@ -103,16 +103,6 @@ class Mineral(models.Model):
         return self.name
 
 
-class GeckoManager(models.Manager):
-    def get_queryset(self):
-        return super(GeckoManager, self).get_queryset().filter(has_tail=True)
-
-
-class Gecko(models.Model):
-    has_tail = models.BooleanField(default=False)
-    objects = GeckoManager()
-
-
 # To test fix for #11263
 class Rock(Mineral):
     tags = GenericRelation(TaggedItem)
