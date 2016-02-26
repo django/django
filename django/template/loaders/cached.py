@@ -131,7 +131,7 @@ class Loader(BaseLoader):
         template_tuple = self.template_cache.get(key)
         # A cached previous failure:
         if template_tuple is TemplateDoesNotExist:
-            raise TemplateDoesNotExist
+            raise TemplateDoesNotExist(template_name)
         elif template_tuple is None:
             template, origin = self.find_template(template_name, template_dirs)
             if not hasattr(template, 'render'):
