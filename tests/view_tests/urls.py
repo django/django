@@ -54,6 +54,11 @@ js_info_dict_app5 = {
     'packages': ('view_tests.app5',),
 }
 
+js_info_dict_app6 = {
+    'domain': 'djangojs',
+    'packages': ('view_tests.app6',),
+}
+
 urlpatterns = [
     url(r'^$', views.index_page),
 
@@ -78,6 +83,7 @@ urlpatterns = [
     url(r'^jsi18n/app1/$', i18n.javascript_catalog, js_info_dict_app1),
     url(r'^jsi18n/app2/$', i18n.javascript_catalog, js_info_dict_app2),
     url(r'^jsi18n/app5/$', i18n.javascript_catalog, js_info_dict_app5),
+    url(r'^jsi18n/app6/$', i18n.javascript_catalog, js_info_dict_app6),
     url(r'^jsi18n_english_translation/$', i18n.javascript_catalog, js_info_dict_english_translation),
     url(r'^jsi18n_multi_packages1/$', i18n.javascript_catalog, js_info_dict_multi_packages1),
     url(r'^jsi18n_multi_packages2/$', i18n.javascript_catalog, js_info_dict_multi_packages2),
