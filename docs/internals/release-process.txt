@@ -161,8 +161,9 @@ Django 5.1 and 5.2. At this point in time:
   released as 5.1.1, 5.1.2, etc.
 
 * Security fixes and bug fixes for data loss issues will be applied to
-  ``master`` and to the ``stable/5.1.x``, and ``stable/4.2.x`` (LTS) branches.
-  They will trigger the release of ``5.1.1``, ``4.2.1``, etc.
+  ``master`` and to the ``stable/5.1.x``, ``stable/5.0.x``, and
+  ``stable/4.2.x`` (LTS) branches. They will trigger the release of ``5.1.1``,
+  ``5.0.5``, ``4.2.8``, etc.
 
 * Documentation fixes will be applied to master, and, if easily backported, to
   the latest stable branch, ``5.1.x``.
