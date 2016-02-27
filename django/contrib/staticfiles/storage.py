@@ -17,6 +17,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
+from django.utils.six import iteritems
 from django.utils.six.moves.urllib.parse import (
     unquote, urldefrag, urlsplit, urlunsplit,
 )
@@ -248,13 +249,14 @@ class HashedFilesMixin(object):
                 # ..to apply each replacement pattern to the content
                 if name in adjustable_paths:
                     content = original_file.read().decode(settings.FILE_CHARSET)
-                    for patterns in self._patterns.values():
-                        for pattern, template in patterns:
-                            converter = self.url_converter(name, template)
-                            try:
-                                content = pattern.sub(converter, content)
-                            except ValueError as exc:
-                                yield name, None, exc
+                    for extension, patterns in iteritems(self._patterns):
+                        if matches_patterns(path, (extension,)):
+                            for pattern, template in patterns:
+                                converter = self.url_converter(name, template)
+                                try:
+                                    content = pattern.sub(converter, content)
+                                except ValueError as exc:
+                                    yield name, None, exc
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result

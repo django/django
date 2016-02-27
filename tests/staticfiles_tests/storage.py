@@ -63,3 +63,17 @@ class SimpleCachedStaticFilesStorage(CachedStaticFilesStorage):
 
     def file_hash(self, name, content=None):
         return 'deploy12345'
+
+
+class ExtraPatternsCachedStaticFilesStorage(CachedStaticFilesStorage):
+    """
+    A storage class to test pattern substitutions with more than one pattern
+    entry. The added pattern rewrites strings like "url(...)" to JS_URL("...").
+    """
+    patterns = tuple(CachedStaticFilesStorage.patterns) + (
+        (
+            "*.js", (
+                (r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""", 'JS_URL("%s")'),
+            ),
+        ),
+    )
