@@ -285,6 +285,9 @@ Management Commands
 * To assist with testing, :func:`~django.core.management.call_command` now
   accepts a command object as the first argument.
 
+* The :djadmin:`shell` command supports tab completion on systems using
+  ``libedit``, e.g. Mac OSX.
+
 Migrations
 ~~~~~~~~~~
 
