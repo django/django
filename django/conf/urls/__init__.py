@@ -1,3 +1,4 @@
+import inspect
 import warnings
 from importlib import import_module
 
@@ -47,7 +48,11 @@ def include(arg, namespace=None, app_name=None):
         urlconf_module = arg
 
     if isinstance(urlconf_module, six.string_types):
-        urlconf_module = import_module(urlconf_module)
+        # Calculate for relative import, if any.
+        package = None
+        if urlconf_module.startswith('.'):
+            package = inspect.getmodule(inspect.stack()[1][0]).__package__
+        urlconf_module = import_module(urlconf_module, package=package)
     patterns = getattr(urlconf_module, 'urlpatterns', urlconf_module)
     app_name = getattr(urlconf_module, 'app_name', app_name)
     if namespace and not app_name:
