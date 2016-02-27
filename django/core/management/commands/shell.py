@@ -69,7 +69,11 @@ class Command(BaseCommand):
             # we already know 'readline' was imported successfully.
             import rlcompleter
             readline.set_completer(rlcompleter.Completer(imported_objects).complete)
-            readline.parse_and_bind("tab:complete")
+            readline_doc = getattr(readline, '__doc__', '')
+            if readline_doc is not None and 'libedit' in readline_doc:
+                readline.parse_and_bind("bind ^I rl_complete")
+            else:
+                readline.parse_and_bind("tab:complete")
 
         # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
         # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
