@@ -110,6 +110,33 @@ Django quotes column and table names behind the scenes.
     and the name of the model, both lowercased. See the paragraph on
     :ref:`related names for abstract models <abstract-related-name>`.
 
+.. deprecated:: 1.10
+
+    When this attribute is set, you should use the name in lookup string when
+    querying related model.
+
+    Example::
+
+        # Given following models:
+        
+        from django.db import models
+        
+        class Foo(models.Model):
+            a = models.IntegerField(default=0)
+        
+        class Bar(models.Model):
+            foo = models.ForeignKey(Foo)
+        
+            class Meta:
+                default_related_name = 'bars'
+
+        >>> foo = models.Foo.object.create()
+        >>> bar = models.Bar.object.create(foo=foo)
+        # Using model name "bar" as lookup string is deprecated.
+        >>> models.Foo.object.get(bar=bar)
+        # You should use default_related_name "bars".
+        >>> models.Foo.object.get(bars=bar)
+
 ``get_latest_by``
 -----------------
 
