@@ -341,11 +341,6 @@ class IEndsWith(PatternLookup):
 Field.register_lookup(IEndsWith)
 
 
-class Between(BuiltinLookup):
-    def get_rhs_op(self, connection, rhs):
-        return "BETWEEN %s AND %s" % (rhs, rhs)
-
-
 class Range(BuiltinLookup):
     lookup_name = 'range'
 
