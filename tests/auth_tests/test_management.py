@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import locale
 import sys
 from datetime import date
 
@@ -202,39 +201,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
-
-    @mock_inputs({'password': "nopasswd"})
-    def test_nolocale(self):
-        """
-        Check that createsuperuser does not break when no locale is set. See
-        ticket #16017.
-        """
-
-        old_getdefaultlocale = locale.getdefaultlocale
-        try:
-            # Temporarily remove locale information
-            locale.getdefaultlocale = lambda: (None, None)
-
-            # Call the command in this new environment
-            call_command(
-                "createsuperuser",
-                interactive=True,
-                username="nolocale@somewhere.org",
-                email="nolocale@somewhere.org",
-                verbosity=0,
-                stdin=MockTTY(),
-            )
-
-        except TypeError:
-            self.fail("createsuperuser fails if the OS provides no information about the current locale")
-
-        finally:
-            # Re-apply locale information
-            locale.getdefaultlocale = old_getdefaultlocale
-
-        # If we were successful, a user should have been created
-        u = User.objects.get(username="nolocale@somewhere.org")
-        self.assertEqual(u.email, 'nolocale@somewhere.org')
 
     @mock_inputs({
         'password': "nopasswd",
