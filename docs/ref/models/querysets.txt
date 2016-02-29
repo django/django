@@ -558,11 +558,10 @@ A few subtleties that are worth mentioning:
   ordering can affect the results. See the note in :meth:`distinct` for
   details.
 
-* If you use a ``values()`` clause after an :meth:`extra()` call,
-  any fields defined by a ``select`` argument in the :meth:`extra()` must
-  be explicitly included in the ``values()`` call. Any :meth:`extra()` call
-  made after a ``values()`` call will have its extra selected fields
-  ignored.
+* If you use ``values()`` together with :meth:`extra()`, you should form all
+  your extra fields before a ``values()`` call and explicitly include them
+  in the ``values()`` clause. Any :meth:`extra()` call made after will have
+  its extra selected fields ignored.
 
 * Calling :meth:`only()` and :meth:`defer()` after ``values()`` doesn't make
   sense, so doing so will raise a ``NotImplementedError``.
