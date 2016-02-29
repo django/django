@@ -1,3 +1,11 @@
+0.9.3 (2016-02-28)
+------------------
+
+* Static file serving is significantly faster thanks to larger chunk size
+
+* `runworker` now refuses to start if an in memory layer is configured
+
+
 0.9.2 (2016-02-28)
 ------------------
 

@@ -35,4 +35,3 @@ Contents:
    integration-plan
    faqs
    asgi
-   releases/index
