@@ -94,7 +94,7 @@ Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
 
 Like other Django contrib applications, you will *only* need to add
 :mod:`django.contrib.gis` to :setting:`INSTALLED_APPS` in your settings.
-This is the so that ``gis`` templates can be located -- if not done, then
+This is so that the ``gis`` templates can be located -- if not done, then
 features such as the geographic admin or KML sitemaps will not function properly.
 
 Troubleshooting

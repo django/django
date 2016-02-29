@@ -11,10 +11,7 @@ GeoQuerySet API Reference
 Spatial Lookups
 ===============
 
-Just like when using the :ref:`queryset-api`, interaction
-with ``GeoQuerySet`` by :ref:`chaining filters <chaining-filters>`.
-Instead of the regular Django :ref:`field-lookups`, the
-spatial lookups in this section are available for :class:`GeometryField`.
+The spatial lookups in this section are available for :class:`GeometryField`.
 
 For an introduction, see the :ref:`spatial lookups introduction
 <spatial-lookups-intro>`.  For an overview of what lookups are
@@ -294,7 +291,7 @@ SpatiaLite SQL equivalent::
 Oracle
 ~~~~~~
 
-Here the relation pattern is comprised at least one of the nine relation
+Here the relation pattern is comprised of at least one of the nine relation
 strings: ``TOUCH``, ``OVERLAPBDYDISJOINT``, ``OVERLAPBDYINTERSECT``,
 ``EQUAL``, ``INSIDE``, ``COVEREDBY``, ``CONTAINS``, ``COVERS``, ``ON``, and
 ``ANYINTERACT``.   Multiple strings may be combined with the logical Boolean
