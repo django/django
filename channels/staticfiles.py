@@ -49,7 +49,10 @@ class StaticFilesHandler(AsgiHandler):
 
         if self._should_handle(request.path):
             try:
-                return self.serve(request)
+                response = self.serve(request)
+                # Increase FileResponse block sizes so they're not super slow
+                response.block_size = 1024 * 256
+                return response
             except Http404 as e:
                 if settings.DEBUG:
                     from django.views import debug
