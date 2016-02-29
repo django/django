@@ -11,6 +11,8 @@ that allows two important features:
 * WebSocket handling, in a way very :ref:`similar to normal views <websocket-example>`
 * Background tasks, running in the same servers as the rest of Django
 
+It allows other things too, but these are the ones you'll use to start with.
+
 
 How?
 ----
@@ -36,7 +38,7 @@ change from running Django under a WSGI server, to running:
 
 * An ASGI server, probably `Daphne <http://github.com/andrewgodwin/daphne/>`_
 * Django worker servers, using ``manage.py runworker``
-* Something to route ASGI requests over, like Redis or a database.
+* Something to route ASGI requests over, like Redis.
 
 
 What else does Channels give me?
@@ -74,7 +76,7 @@ and high throughput over guaranteed delivery, which doesn't match some
 message queue designs.
 
 Some features, like :ref:`guaranteed ordering of messages <enforcing-ordering>`,
-are opt-in as they incur a performance hit.
+are opt-in as they incur a performance hit, but make it more message queue like.
 
 
 Do I need to worry about making all my code async-friendly?
