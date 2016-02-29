@@ -1326,11 +1326,17 @@ Django provides two mechanisms to internationalize URL patterns:
 Language prefix in URL patterns
 -------------------------------
 
-.. function:: i18n_patterns(*pattern_list)
+.. function:: i18n_patterns(*urls, prefix_default_language=True)
 
 This function can be used in a root URLconf and Django will automatically
 prepend the current active language code to all url patterns defined within
-:func:`~django.conf.urls.i18n.i18n_patterns`. Example URL patterns::
+:func:`~django.conf.urls.i18n.i18n_patterns`.
+
+Setting ``prefix_default_language`` to ``False`` removes the prefix from the
+default language (:setting:`LANGUAGE_CODE`). This can be useful when adding
+translations to existing site so that the current URLs won't change.
+
+Example URL patterns::
 
     from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
@@ -1370,6 +1376,21 @@ function. Example::
     >>> activate('nl')
     >>> reverse('news:detail', kwargs={'slug': 'news-slug'})
     '/nl/news/news-slug/'
+
+With ``prefix_default_language=False`` and  ``LANGUAGE_CODE='en'``, the URLs
+will be::
+
+    >>> activate('en')
+    >>> reverse('news:index')
+    '/news/'
+
+    >>> activate('nl')
+    >>> reverse('news:index')
+    '/nl/news/'
+
+.. versionadded:: 1.10
+
+    The ``prefix_default_language`` parameter was added.
 
 .. warning::
 

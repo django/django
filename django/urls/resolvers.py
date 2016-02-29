@@ -11,6 +11,7 @@ import functools
 import re
 from importlib import import_module
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
@@ -381,15 +382,22 @@ class LocaleRegexURLResolver(RegexURLResolver):
     Rather than taking a regex argument, we just override the ``regex``
     function to always return the active language-code as regex.
     """
-    def __init__(self, urlconf_name, default_kwargs=None, app_name=None, namespace=None):
+    def __init__(
+        self, urlconf_name, default_kwargs=None, app_name=None, namespace=None,
+        prefix_default_language=True,
+    ):
         super(LocaleRegexURLResolver, self).__init__(
             None, urlconf_name, default_kwargs, app_name, namespace,
         )
+        self.prefix_default_language = prefix_default_language
 
     @property
     def regex(self):
         language_code = get_language()
         if language_code not in self._regex_dict:
-            regex_compiled = re.compile('^%s/' % language_code, re.UNICODE)
-            self._regex_dict[language_code] = regex_compiled
+            if language_code == settings.LANGUAGE_CODE and not self.prefix_default_language:
+                regex_string = ''
+            else:
+                regex_string = '^%s/' % language_code
+            self._regex_dict[language_code] = re.compile(regex_string, re.UNICODE)
         return self._regex_dict[language_code]

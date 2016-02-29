@@ -248,6 +248,10 @@ Internationalization
   used in a root URLConf specified using :attr:`request.urlconf
   <django.http.HttpRequest.urlconf>`.
 
+* By setting the new ``prefix_default_language`` parameter for
+  :func:`~django.conf.urls.i18n.i18n_patterns` to ``False``, you can allow
+  accessing the default language without a URL prefix.
+
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
