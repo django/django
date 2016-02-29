@@ -806,10 +806,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         id='admin.E123',
                     )
                 ]
-            # Check that list_display_links is set, and that the first values of list_editable and list_display are
-            # not the same. See ticket #22792 for the use case relating to this.
-            elif (obj.list_display[0] in obj.list_editable and obj.list_display[0] != obj.list_editable[0] and
-                  obj.list_display_links is not None):
+            # If list_display[0] is in list_editable, check that
+            # list_display_links is set. See #22792 and #26229 for use cases.
+            elif (obj.list_display[0] == field_name and not obj.list_display_links
+                    and obj.list_display_links is not None):
                 return [
                     checks.Error(
                         "The value of '%s' refers to the first field in 'list_display' ('%s'), "
