@@ -75,6 +75,10 @@ class ChannelLayerWrapper(object):
     def __str__(self):
         return "%s (%s)" % (self.alias, name_that_thing(self.channel_layer))
 
+    def local_only(self):
+        # TODO: Can probably come up with a nicer check?
+        return "inmemory" in self.channel_layer.__class__.__module__
+
 
 def get_channel_layer(alias="default"):
     """
