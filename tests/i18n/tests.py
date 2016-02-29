@@ -13,6 +13,7 @@ from unittest import skipUnless
 
 from django import forms
 from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import (
     RequestFactory, SimpleTestCase, TestCase, override_settings,
@@ -1779,6 +1780,37 @@ class LocaleMiddlewareTests(TestCase):
         # Regression test for #21473
         self.client.get('/fr/simple/')
         self.assertNotIn(LANGUAGE_SESSION_KEY, self.client.session)
+
+
+@override_settings(
+    USE_I18N=True,
+    LANGUAGES=[
+        ('en', 'English'),
+        ('fr', 'French'),
+    ],
+    MIDDLEWARE_CLASSES=[
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    ],
+    ROOT_URLCONF='i18n.urls_default_unprefixed',
+    LANGUAGE_CODE='en',
+)
+class UnprefixedDefaultLanguageTests(SimpleTestCase):
+    def test_default_lang_without_prefix(self):
+        """
+        With i18n_patterns(..., prefix_default_language=False), the default
+        language (settings.LANGUAGE_CODE) should be accessible without a prefix.
+        """
+        response = self.client.get('/simple/')
+        self.assertEqual(response.content, b'Yes')
+
+    def test_other_lang_with_prefix(self):
+        response = self.client.get('/fr/simple/')
+        self.assertEqual(response.content, b'Oui')
+
+    def test_unexpected_kwarg_to_i18n_patterns(self):
+        with self.assertRaisesMessage(AssertionError, "Unexpected kwargs for i18n_patterns(): {'foo':"):
+            i18n_patterns(object(), foo='bar')
 
 
 @override_settings(

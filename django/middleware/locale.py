@@ -1,11 +1,10 @@
 "This is the locale selecting middleware that will look at accept headers"
 
 from django.conf import settings
+from django.conf.urls.i18n import is_language_prefix_patterns_used
 from django.http import HttpResponseRedirect
-from django.urls import (
-    LocaleRegexURLResolver, get_resolver, get_script_prefix, is_valid_path,
-)
-from django.utils import lru_cache, translation
+from django.urls import get_script_prefix, is_valid_path
+from django.utils import translation
 from django.utils.cache import patch_vary_headers
 
 
@@ -21,9 +20,10 @@ class LocaleMiddleware(object):
 
     def process_request(self, request):
         urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
-        language = translation.get_language_from_request(
-            request, check_path=self.is_language_prefix_patterns_used(urlconf)
-        )
+        i18n_patterns_used, prefixed_default_language = is_language_prefix_patterns_used(urlconf)
+        language = translation.get_language_from_request(request, check_path=i18n_patterns_used)
+        if not language and i18n_patterns_used and not prefixed_default_language:
+            language = settings.LANGUAGE_CODE
         translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
 
@@ -31,8 +31,12 @@ class LocaleMiddleware(object):
         language = translation.get_language()
         language_from_path = translation.get_language_from_path(request.path_info)
         urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
-        if (response.status_code == 404 and not language_from_path
-                and self.is_language_prefix_patterns_used(urlconf)):
+        i18n_patterns_used, prefixed_default_language = is_language_prefix_patterns_used(urlconf)
+
+        if not language_from_path and i18n_patterns_used and not prefixed_default_language:
+            language_from_path = settings.LANGUAGE_CODE
+
+        if response.status_code == 404 and not language_from_path and i18n_patterns_used:
             language_path = '/%s%s' % (language, request.path_info)
             path_valid = is_valid_path(language_path, urlconf)
             path_needs_slash = (
@@ -53,20 +57,8 @@ class LocaleMiddleware(object):
                 )
                 return self.response_redirect_class(language_url)
 
-        if not (self.is_language_prefix_patterns_used(urlconf)
-                and language_from_path):
+        if not (i18n_patterns_used and language_from_path):
             patch_vary_headers(response, ('Accept-Language',))
         if 'Content-Language' not in response:
             response['Content-Language'] = language
         return response
-
-    @lru_cache.lru_cache(maxsize=None)
-    def is_language_prefix_patterns_used(self, urlconf):
-        """
-        Returns `True` if the `LocaleRegexURLResolver` is used
-        at root level of the urlpatterns, else it returns `False`.
-        """
-        for url_pattern in get_resolver(urlconf).url_patterns:
-            if isinstance(url_pattern, LocaleRegexURLResolver):
-                return True
-        return False
