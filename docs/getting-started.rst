@@ -11,15 +11,17 @@ patterns and caveats.
 First Consumers
 ---------------
 
-Now, by default, Django will run things through Channels but it will also
-tie in the URL router and view subsystem to the default ``http.request``
-channel if you don't provide another consumer that listens to it - remember,
-only one consumer can listen to any given channel.
+When you run Django out of the box, it will be set up in the default layout -
+where all HTTP requests (on the ``http.request`` channel) are routed to the
+Django view layer - nothing will be different to how things worked in the past
+with a WSGI-based Django, and your views and static file serving (from
+``runserver`` will work as normal)
 
-As a very basic example, let's write a consumer that overrides the built-in
+As a very basic introduction, let's write a consumer that overrides the built-in
 handling and handles every HTTP request directly. This isn't something you'd
 usually do in a project, but it's a good illustration of how Channels
-actually underlies even core Django.
+underlies even core Django - it's less of an addition and more adding a whole
+new layer under the existing view layer.
 
 Make a new project, a new app, and put this in a ``consumers.py`` file in the app::
 
@@ -42,18 +44,19 @@ Django request objects, and the ``AsgiHandler`` class handles translation of
 ``HttpResponse`` into ASGI messages, which you see used above. Usually,
 Django's built-in code will do all this for you when you're using normal views.
 
-Now, go into your ``settings.py`` file, and set up a channel layer; by default,
-Django will just use an in-memory layer and route HTTP requests to the normal
-URL resolver (we'll come back to channel layers in a minute).
+Now we need to do one more thing, and that's tell Django that this consumer
+should be tied to the ``http.request`` channel rather than the default Django
+view system. This is done in the settings file - in particular, we need to
+define our ``default`` channel layer and what its routing is set to.
 
-For now, we want to override the *channel routing* so that, rather than going
-to the URL resolver and our normal view stack, all HTTP requests go to our
-custom consumer we wrote above. Here's what that looks like::
+Channel routing is a bit like URL routing, and so it's structured similarly -
+you point the setting at a dict mapping channels to consumer callables.
+Here's what that looks like::
 
     # In settings.py
     CHANNEL_LAYERS = {
         "default": {
-            "BACKEND": "channels.database_layer.DatabaseChannelLayer",
+            "BACKEND": "asgiref.inmemory.ChannelLayer",
             "ROUTING": "myproject.routing.channel_routing",
         },
     }
@@ -63,9 +66,16 @@ custom consumer we wrote above. Here's what that looks like::
         "http.request": "myproject.myapp.consumers.http_consumer",
     }
 
+.. warning::
+   This example, and most of the examples here, use the "in memory" channel
+   layer. This is the easiest to get started with but provides absolutely no
+   cross-process channel transportation, and so can only be used with
+   ``runserver``. You'll want to choose another backend (discussed later)
+   to run things in production.
+
 As you can see, this is a little like Django's ``DATABASES`` setting; there are
 named channel layers, with a default one called ``default``. Each layer
-needs a class specified which powers it - we'll come to the options there later -
+needs a channel layer class, some options (if the channel layer needs them),
 and a routing scheme, which points to a dict containing the routing settings.
 It's recommended you call this ``routing.py`` and put it alongside ``urls.py``
 in your project, but you can put it wherever you like, as long as the path is
@@ -159,8 +169,30 @@ And what our routing should look like in ``routing.py``::
     }
 
 With all that code, you now have a working set of a logic for a chat server.
-All you need to do now is get it deployed, and as we'll see, that's not too
-hard.
+Let's test it! Run ``runserver``, open a browser and put the following into the
+JavaScript console to open a WebSocket and send some data down it::
+
+    // Note that the path doesn't matter right now; any WebSocket
+    // connection gets bumped over to WebSocket consumers
+    socket = new WebSocket("ws://127.0.0.1:8000/chat/");
+    socket.onmessage = function(e) {
+        alert(e.data);
+    }
+    socket.onopen = function() {
+        socket.send("hello world");
+    }
+
+You should see an alert come back immediately saying "hello world" - your
+message has round-tripped through the server and come back to trigger the alert.
+You can open another tab and do the same there if you like, and both tabs will
+receive the message and show an alert, as any incoming message is sent to the
+``chat`` group by the ``ws_message`` consumer, and both your tabs will have
+been put into the ``chat`` group when they connected.
+
+Feel free to put some calls to ``print`` in your handler functions too, if you
+like, so you can understand when they're called. You can also use ``pdb`` and
+other methods you'd use to debug normal Django projects.
+
 
 Running with Channels
 ---------------------
@@ -185,13 +217,13 @@ By default, Django doesn't have a channel layer configured - it doesn't need one
 normal WSGI requests, after all. As soon as you try to add some consumers,
 though, you'll need to configure one.
 
-In the example above we used the database channel layer implementation
-as our default channel layer. This uses two tables
-in the ``default`` database to do message handling, and isn't particularly fast but
-requires no extra dependencies, so it's handy for development.
-When you deploy to production, though, you'll want to
-use a backend like the Redis backend that has much better throughput and
-lower latency.
+In the example above we used the in-memory channel layer implementation
+as our default channel layer. This just stores all the channel data in a dict
+in memory, and so isn't actually cross-process; it only works inside
+``runserver``, as that runs the interface and worker servers in different threads
+inside the same process. When you deploy to production, you'll need to
+use a channel layer like the Redis backend ``asgi_redis`` that works cross-process;
+see :doc:`backends` for more.
 
 The second thing, once we have a networked channel backend set up, is to make
 sure we're running an interface server that's capable of serving WebSockets.
@@ -205,31 +237,32 @@ different.
 with autoreload in another - it's basically a miniature version of a deployment,
 but all in one process)*
 
-Now, let's test our code. Open a browser and put the following into the
-JavaScript console to open a WebSocket and send some data down it::
+Let's try out the Redis backend - Redis runs on pretty much every machine, and
+has a very small overhead, which makes it perfect for this kind of thing. Install
+the ``asgi_redis`` package using ``pip``, and set up your channel layer like this::
 
-    // Note that the path doesn't matter right now; any WebSocket
-    // connection gets bumped over to WebSocket consumers
-    socket = new WebSocket("ws://127.0.0.1:8000/chat/");
-    socket.onmessage = function(e) {
-        alert(e.data);
+    # In settings.py
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "asgi_redis.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("localhost", 6379)],
+            },
+            "ROUTING": "myproject.routing.channel_routing",
+        },
     }
-    socket.onopen = function() {
-        socket.send("hello world");
-    }
 
-You should see an alert come back immediately saying "hello world" - your
-message has round-tripped through the server and come back to trigger the alert.
-You can open another tab and do the same there if you like, and both tabs will
-receive the message and show an alert, as any incoming message is sent to the
-``chat`` group by the ``ws_message`` consumer, and both your tabs will have
-been put into the ``chat`` group when they connected.
+Fire up ``runserver``, and it'll work as before - unexciting, like good
+infrastructure should be. You can also try out the cross-process nature; run
+these two commands in two terminals:
 
-Feel free to put some calls to ``print`` in your handler functions too, if you
-like, so you can understand when they're called. You can also run separate
-worker processes with ``manage.py runworker`` as well - if you do this, you
-should see some of the consumers being handled in the ``runserver`` thread and
-some in the separate worker process.
+* ``manage.py runserver --noworker``
+* ``manage.py runworker``
+
+As you can probably guess, this disables the worker threads in ``runserver``
+and handles them in a separate process. You can pass ``-v 2`` to ``runworker``
+if you want to see logging as it runs the consumers.
+
 
 Persisting Data
 ---------------

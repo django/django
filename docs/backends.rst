@@ -64,21 +64,28 @@ that will work cross-process. It has poor performance, and is only
 recommended for development or extremely small deployments.
 
 This layer is included with Channels; just set your ``BACKEND`` to
-``channels.backends.database.DatabaseChannelLayer``, and it will use the
+``channels.datagbase_layer.DatabaseChannelLayer``, and it will use the
 default Django database alias to store messages. You can change the alias
 by setting ``CONFIG`` to ``{'alias': 'aliasname'}``.
+
+.. warning::
+    The database channel layer is NOT fast, and performs especially poorly at
+    latency and throughput. We recommend its use only as a last resort, and only
+    on a database with good transaction support (e.g. Postgres), or you may
+    get errors with multiple message delivery.
 
 
 In-memory
 ---------
 
-The in-memory layer is purely an implementation detail used when running
-the entire Django stack in a single process; the most common case of this
-is ``runserver``, where a server thread, channel layer, and worker thread all
+The in-memory layer is only useful when running the protocol server and the
+worker server in a single process; the most common case of this
+is ``runserver``, where a server thread, this channel layer, and worker thread all
 co-exist inside the same python process.
 
-You should not need to use this process manually, but if you want to,
-it's available from ``asgiref.inmemory.ChannelLayer``.
+Its path is ``asgiref.inmemory.ChannelLayer``. If you try and use this channel
+layer with ``runworker``, it will exit, as it does not support cross-process
+communication.
 
 
 Writing Custom Channel Layers
