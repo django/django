@@ -485,7 +485,7 @@ Enforcing Ordering
 ------------------
 
 There's one final concept we want to introduce you to before you go on to build
-sites with Channels - consmer ordering
+sites with Channels - consumer ordering.
 
 Because Channels is a distributed system that can have many workers, by default
 it just processes messages in the order the workers get them off the queue.
