@@ -4,10 +4,6 @@ Django Channels
 .. image:: https://api.travis-ci.org/andrewgodwin/channels.svg
     :target: https://travis-ci.org/andrewgodwin/channels
 
-**NOTE: The current master branch is in flux as it changes to match the final
-structure and the new ASGI spec. If you wish to use this in the meantime,
-please use a tagged release.**
-
 This is a work-in-progress code branch of Django implemented as a third-party
 app, which aims to bring some asynchrony to Django and expand the options
 for code beyond the request-response model, in particular enabling WebSocket,
