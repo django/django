@@ -40,6 +40,9 @@ change from running Django under a WSGI server, to running:
 * Django worker servers, using ``manage.py runworker``
 * Something to route ASGI requests over, like Redis.
 
+Even when you're running on Channels, it routes all HTTP requests to the Django
+view system by default, so it works like before.
+
 
 What else does Channels give me?
 --------------------------------
