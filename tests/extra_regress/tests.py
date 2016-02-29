@@ -4,6 +4,7 @@ import datetime
 from collections import OrderedDict
 
 from django.contrib.auth.models import User
+from django.core.exceptions import FieldError
 from django.test import TestCase
 
 from .models import Order, RevisionableModel, TestObject
@@ -355,6 +356,11 @@ class ExtraRegressTests(TestCase):
             ),
             [('third', 'first', 'second', obj.pk)]
         )
+
+    def test_values_extra_error(self):
+        msg = "Cannot resolve keyword %r into field. Choices are: first, id, second, third" % 'extra_field'
+        with self.assertRaisesMessage(FieldError, msg):
+            TestObject.objects.values('first').extra(select={'extra_field': 1}).values('extra_field')
 
     def test_regression_10847(self):
         """
