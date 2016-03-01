@@ -693,8 +693,8 @@ Versions affected
 * Django 1.8 `(patch) <https://github.com/django/django/commit/9f83fc2f66f5a0bac7c291aec55df66050bb6991>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/8a01c6b53169ee079cb21ac5919fdafcc8c5e172>`__
 
-February 1, 2016 -- CVE-2016-2048
----------------------------------
+February 1, 2016 - CVE-2016-2048
+--------------------------------
 
 `CVE-2016-2048 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-2048&cid=2>`_:
 User with "change" but not "add" permission can create objects for ``ModelAdmin``’s with ``save_as=True``.
@@ -704,3 +704,29 @@ Versions affected
 ~~~~~~~~~~~~~~~~~
 
 * Django 1.9 `(patch) <https://github.com/django/django/commit/adbca5e4db42542575734b8e5d26961c8ada7265>`__
+
+March 1, 2016 - CVE-2016-2512
+-----------------------------
+
+`CVE-2016-2512 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-2512&cid=2>`_:
+Malicious redirect and possible XSS attack via user-supplied redirect URLs containing basic auth.
+`Full description <https://www.djangoproject.com/weblog/2016/mar/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.9 `(patch) <https://github.com/django/django/commit/fc6d147a63f89795dbcdecb0559256470fff4380>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/382ab137312961ad62feb8109d70a5a581fe8350>`__
+
+March 1, 2016 - CVE-2016-2513
+-----------------------------
+
+`CVE-2016-2513 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-2513&cid=2>`_:
+User enumeration through timing difference on password hasher work factor upgrade.
+`Full description <https://www.djangoproject.com/weblog/2016/mar/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.9 `(patch) <https://github.com/django/django/commit/af7d09b0c5c6ab68e629fd9baf736f9dd203b18e>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/f4e6e02f7713a6924d16540be279909ff4091eb6>`__
