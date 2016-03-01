@@ -163,7 +163,8 @@ class MemcachedCache(BaseMemcachedCache):
     @property
     def _cache(self):
         if getattr(self, '_client', None) is None:
-            self._client = self._lib.Client(self._servers, pickleProtocol=pickle.HIGHEST_PROTOCOL)
+            self._client = self._lib.Client(self._servers, pickleProtocol=pickle.HIGHEST_PROTOCOL,
+                    socket_timeout=self._options.get('socket_timeout', self._lib._SOCKET_TIMEOUT))
         return self._client
 
 
