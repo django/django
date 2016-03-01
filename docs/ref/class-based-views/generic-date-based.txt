@@ -333,6 +333,17 @@ views for displaying drilldown pages for date-based data.
 
     * Uses a default ``template_name_suffix`` of ``_archive_week``.
 
+    * The ``week_format`` attribute contains a :func:`~time.strptime`
+      format string that is used to parse the week number. The following
+      values are supported:
+
+      * ``'%U'``: Based on the United States week system where the week
+        begins on Sunday. This value is the default.
+
+      * ``'%V'``: Similar to ``'%U'``, except it assumes that the week
+        begins on Monday. Note that this is not the same as the ISO 8601
+        week number.
+
     **Example myapp/views.py**::
 
         from django.views.generic.dates import WeekArchiveView
@@ -372,24 +383,24 @@ views for displaying drilldown pages for date-based data.
 
         <p>
             {% if previous_week %}
-                Previous Week: {{ previous_week|date:"F Y" }}
+                Previous Week: {{ previous_week|date:"W" }} of year {{ previous_week|date:"Y" }}
             {% endif %}
             {% if previous_week and next_week %}--{% endif %}
             {% if next_week %}
-                Next week: {{ next_week|date:"F Y" }}
+                Next week: {{ next_week|date:"W" }} of year {{ next_week|date:"Y" }}
             {% endif %}
         </p>
 
-    In this example, you are outputting the week number. The default
-    ``week_format`` in the ``WeekArchiveView`` uses  week format ``'%U'``
-    which is based on the United States week system where the week begins on a
-    Sunday. The ``'%W'`` format uses the ISO week format and its week
-    begins on a Monday.  The ``'%W'`` format is the same in both the
-    :func:`~time.strftime` and the :tfilter:`date`.
-
-    However, the :tfilter:`date` template filter does not have an equivalent
-    output format that supports the US based week system. The :tfilter:`date`
-    filter ``'%U'`` outputs the number of seconds since the Unix epoch.
+    In this example, you are outputting the week number. However, please
+    keep in mind that week numbers computed by the :tfilter:`date`
+    template filter with the ``'W'`` format character are not always the
+    same as those computed by :func:`~time.strftime` and
+    :func:`~time.strptime` with the ``'%W'`` format string. For example,
+    for year 2015, week numbers output by :tfilter:`date` are higher by 1
+    compared to those output by :func:`~time.strftime`. Also note that
+    there is no equivalent for the ``'%U'`` :func:`~time.strftime` format
+    string in :tfilter:`date` either. Therefore, you should avoid using
+    :tfilter:`date` to generate URLs for ``WeekArchiveView``.
 
 ``DayArchiveView``
 ==================
