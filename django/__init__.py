@@ -1,6 +1,6 @@
 from django.utils.version import get_version
 
-VERSION = (1, 8, 10, 'final', 0)
+VERSION = (1, 8, 11, 'alpha', 0)
 
 __version__ = get_version(VERSION)
 
