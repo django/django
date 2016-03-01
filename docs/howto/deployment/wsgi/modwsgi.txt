@@ -140,7 +140,7 @@ to the configuration above:
 See the official mod_wsgi documentation for `details on setting up daemon
 mode`_.
 
-.. _details on setting up daemon mode: https://code.google.com/p/modwsgi/wiki/QuickConfigurationGuide#Delegation_To_Daemon_Process
+.. _details on setting up daemon mode: https://modwsgi.readthedocs.org/en/develop/user-guides/quick-configuration-guide.html#delegation-to-daemon-process
 
 .. _serving-files:
 
@@ -198,7 +198,7 @@ If you are using a version of Apache older than 2.4, replace
 .. More details on configuring a mod_wsgi site to serve static files can be found
 .. in the mod_wsgi documentation on `hosting static files`_.
 
-.. _hosting static files: https://code.google.com/p/modwsgi/wiki/ConfigurationGuidelines#Hosting_Of_Static_Files
+.. _hosting static files: https://modwsgi.readthedocs.org/en/develop/user-guides/configuration-guidelines.html#hosting-of-static-files
 
 .. _serving-the-admin-files:
 
