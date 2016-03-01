@@ -667,3 +667,47 @@ class SelectingBackendTests(TestCase):
         user = User.objects.create_user(self.username, 'email', self.password)
         self.client._login(user, self.other_backend)
         self.assertBackendInSession(self.other_backend)
+
+
+@override_settings(
+    AUTHENTICATION_BACKENDS=[
+        'django.contrib.auth.backends.AllowInactiveUsersModelBackend'
+    ],
+)
+class AllowInactiveUsersModelBackendTest(TestCase):
+    """
+    To verify that the login form rejects inactive users, use an
+    authentication backend that allows them.
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username='test',
+            email='test@example.com',
+            password='test',
+            is_active=False
+        )
+
+    def test_authenticate(self):
+        self.assertEqual(
+            authenticate(
+                username='test',
+                email='test@example.com',
+                password='test'
+            ),
+            self.user
+        )
+
+    def test_get_user(self):
+        self.client.login(
+            username='test',
+            email='test@example.com',
+            password='test'
+        )
+
+        # Prepare a request object
+        request = HttpRequest()
+        request.session = self.client.session
+
+        user = get_user(request)
+        self.assertEqual(user, self.user)
