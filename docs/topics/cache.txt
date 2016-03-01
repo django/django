@@ -123,6 +123,27 @@ When using the ``pylibmc`` binding, do not include the ``unix:/`` prefix::
         }
     }
 
+You can set CLIENT_OPTIONS in OPTIONS setting to pass additional parameter
+to memcached client. For example::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+            'OPTIONS': {
+                'CLIENT_OPTIONS': {
+                    'socket_timeout': 1
+                }
+            }
+        }
+    }
+
+will pass socket_timeout option to memcached client instance, limiting time
+spent waiting for connection with potentially unavailable memcached server
+to 1 second instead of default 3.
+Consult client ``__init__`` method to get list of available options
+that can be passed this way.
+
 One excellent feature of Memcached is its ability to share a cache over
 multiple servers. This means you can run Memcached daemons on multiple
 machines, and the program will treat the group of machines as a *single*
