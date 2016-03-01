@@ -179,11 +179,11 @@ can be made to convert your code to the new API:
   then check if:
 
   - ``f.auto_created == False``, because the new ``get_field()``
-    API will find "reverse" relations), and:
+    API will find "reverse" relations, and:
 
   - ``f.is_relation and f.related_model is None``, because the new
     ``get_field()`` API will find
-    :class:`~django.contrib.contenttypes.fields.GenericForeignKey` relations;
+    :class:`~django.contrib.contenttypes.fields.GenericForeignKey` relations.
 
 * ``MyModel._meta.get_field_by_name(name)`` returns a tuple of these four
   values with the following replacements:
