@@ -1553,16 +1553,59 @@ class ListDisplayEditableTests(CheckTestCase):
             list_display_links = None
         self.assertIsValid(ProductAdmin, ValidationTestModel)
 
-    def test_list_display_same_as_list_editable(self):
+    def test_list_display_first_item_same_as_list_editable_first_item(self):
         """
-        The first item in list_display can be the same as the first
-        in list_editable
+        The first item in list_display can be the same as the first in
+        list_editable
         """
         class ProductAdmin(ModelAdmin):
             list_display = ['name', 'slug', 'pub_date']
             list_editable = ['name', 'slug']
             list_display_links = ['pub_date']
         self.assertIsValid(ProductAdmin, ValidationTestModel)
+
+    def test_list_display_first_item_in_list_editable(self):
+        """
+        The first item in list_display can be in list_editable as long as
+        list_display_links is defined.
+        """
+        class ProductAdmin(ModelAdmin):
+            list_display = ['name', 'slug', 'pub_date']
+            list_editable = ['slug', 'name']
+            list_display_links = ['pub_date']
+        self.assertIsValid(ProductAdmin, ValidationTestModel)
+
+    def test_regression_ticket_26229(self):
+        """
+        The first item in list_display cannot be the same as the first
+        item in list_editable if list_display_links is not defined.
+        """
+        class ProductAdmin(ModelAdmin):
+            list_display = ['name']
+            list_editable = ['name']
+        self.assertIsInvalid(
+            ProductAdmin, ValidationTestModel,
+            "The value of 'list_editable[0]' refers to the first field "
+            "in 'list_display' ('name'), which cannot be used unless "
+            "'list_display_links' is set.",
+            id='admin.E124',
+        )
+
+    def test_list_display_first_item_in_list_editable_no_list_display_links(self):
+        """
+        The first item in list_display cannot be in list_editable if
+        list_display_links is not defined.
+        """
+        class ProductAdmin(ModelAdmin):
+            list_display = ['name', 'slug', 'pub_date']
+            list_editable = ['slug', 'name']
+        self.assertIsInvalid(
+            ProductAdmin, ValidationTestModel,
+            "The value of 'list_editable[1]' refers to the first field "
+            "in 'list_display' ('name'), which cannot be used unless "
+            "'list_display_links' is set.",
+            id='admin.E124',
+        )
 
 
 class ModelAdminPermissionTests(SimpleTestCase):
