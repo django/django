@@ -53,7 +53,6 @@ class Command(BaseCommand):
         self.ignore = options.get('ignore')
         self.using = options.get('database')
         self.app_label = options.get('app_label')
-        self.hide_empty = options.get('hide_empty', False)
         self.verbosity = options.get('verbosity')
 
         with transaction.atomic(using=self.using):
@@ -120,9 +119,7 @@ class Command(BaseCommand):
                         cursor.execute(line)
 
         if self.verbosity >= 1:
-            if self.fixture_count == 0 and self.hide_empty:
-                pass
-            elif self.fixture_object_count == self.loaded_object_count:
+            if self.fixture_object_count == self.loaded_object_count:
                 self.stdout.write("Installed %d object(s) from %d fixture(s)" %
                     (self.loaded_object_count, self.fixture_count))
             else:
