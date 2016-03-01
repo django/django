@@ -156,7 +156,7 @@ can be made to convert your code to the new API:
   then check if:
 
   - ``f.auto_created == False``, because the new ``get_field()``
-    API will find "reverse" relations), and:
+    API will find "reverse" relations, and;
 
   - ``f.is_relation and f.related_model is None``, because the new
     ``get_field()`` API will find
