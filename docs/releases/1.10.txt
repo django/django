@@ -190,6 +190,8 @@ Cache
 ~~~~~
 
 * The file-based cache backend now uses the highest pickling protocol.
+* ``CLIENT_OPTIONS`` can be used to pass settings to memcached client instance.
+  See :ref:`memcached <memcached>` for example.
 
 CSRF
 ~~~~

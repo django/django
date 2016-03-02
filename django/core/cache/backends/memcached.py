@@ -24,7 +24,8 @@ class BaseMemcachedCache(BaseCache):
         self.LibraryValueNotFoundException = value_not_found_exception
 
         self._lib = library
-        self._options = params.get('OPTIONS')
+        self._options = params.get('OPTIONS') or {}
+        self._options.setdefault('CLIENT_OPTIONS', {})
 
     @property
     def _cache(self):
@@ -32,12 +33,9 @@ class BaseMemcachedCache(BaseCache):
         Implements transparent thread-safe access to a memcached client.
         """
         if getattr(self, '_client', None) is None:
-            if self._options and 'CLIENT_OPTIONS' in self._options:
-                client_options = dict(servers=self._servers)
-                client_options.update(self._options['CLIENT_OPTIONS'])
-                self._client = self._lib.Client(**client_options)
-            else:
-                self._client = self._lib.Client(self._servers)
+            client_options = dict(servers=self._servers)
+            client_options.update(self._options['CLIENT_OPTIONS'])
+            self._client = self._lib.Client(**client_options)
 
         return self._client
 
@@ -168,12 +166,9 @@ class MemcachedCache(BaseMemcachedCache):
     @property
     def _cache(self):
         if getattr(self, '_client', None) is None:
-            if self._options and 'CLIENT_OPTIONS' in self._options:
-                client_options = dict(servers=self._servers, pickleProtocol=pickle.HIGHEST_PROTOCOL)
-                client_options.update(self._options['CLIENT_OPTIONS'])
-                self._client = self._lib.Client(**client_options)
-            else:
-                self._client = self._lib.Client(self._servers, pickleProtocol=pickle.HIGHEST_PROTOCOL)
+            client_options = dict(servers=self._servers, pickleProtocol=pickle.HIGHEST_PROTOCOL)
+            client_options.update(self._options['CLIENT_OPTIONS'])
+            self._client = self._lib.Client(**client_options)
         return self._client
 
 
@@ -187,12 +182,9 @@ class PyLibMCCache(BaseMemcachedCache):
 
     @cached_property
     def _cache(self):
-        if self._options and 'CLIENT_OPTIONS' in self._options:
-            client_options = dict(servers=self._servers)
-            client_options.update(self._options['CLIENT_OPTIONS'])
-            client = self._lib.Client(**client_options)
-        else:
-            client = self._lib.Client(self._servers)
+        client_options = dict(servers=self._servers)
+        client_options.update(self._options['CLIENT_OPTIONS'])
+        client = self._lib.Client(**client_options)
         if self._options:
             client.behaviors = self._options
 
