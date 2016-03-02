@@ -159,6 +159,17 @@ class BaseDatabaseOperations(object):
         """
         return cursor.fetchone()[0]
 
+    def fetch_returned_fields(self, cursor, fields, multiple=False):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table, returns the fields mentioned in the RETURNING
+        clause.
+        """
+        if multiple:
+            return cursor.fetchall()
+        else:
+            return cursor.fetchone()
+
     def field_cast_sql(self, db_type, internal_type):
         """
         Given a column type (e.g. 'BLOB', 'VARCHAR'), and an internal type

@@ -573,6 +573,7 @@ class ManagerTest(SimpleTestCase):
         'annotate',
         'complex_filter',
         'exclude',
+        'ignore_delegated',
         'in_bulk',
         'iterator',
         'earliest',
@@ -647,7 +648,7 @@ class SelectOnSaveTests(TestCase):
             def _update(self, *args, **kwargs):
                 FakeQuerySet.called = True
                 super(FakeQuerySet, self)._update(*args, **kwargs)
-                return 0
+                return 0, []
 
         class FakeManager(orig_class):
             def get_queryset(self):

@@ -200,6 +200,8 @@ class Query(object):
         # load.
         self.deferred_loading = (set(), True)
 
+        self._ignored_delegated = []
+
         self.context = {}
 
     @property
@@ -326,6 +328,7 @@ class Query(object):
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
         obj.context = self.context.copy()
+        obj._ignored_delegated = self._ignored_delegated[:]
         return obj
 
     def add_context(self, key, value):
@@ -1260,6 +1263,12 @@ class Query(object):
                 target_clause.add(child_clause, connector)
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
+
+    def add_ignored_delegated(self, ignored):
+        self._ignored_delegated.extend(ignored)
+
+    def get_ignored_delegated(self):
+        return self._ignored_delegated
 
     def names_to_path(self, names, opts, allow_many=True, fail_on_missing=False):
         """

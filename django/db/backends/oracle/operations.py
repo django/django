@@ -11,7 +11,9 @@ from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text
 
 from .base import Database
-from .utils import InsertIdVar, Oracle_datetime, convert_unicode
+from .utils import (
+    InsertIdVar, InsertReturningVar, Oracle_datetime, convert_unicode,
+)
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -237,6 +239,12 @@ WHEN (new.%(col_name)s IS NULL)
     def fetch_returned_insert_id(self, cursor):
         return int(cursor._insert_id_var.getvalue())
 
+    def fetch_returned_fields(self, cursor, return_fields):
+        values = []
+        for field, val in zip(return_fields, getattr(cursor, '_insert_returning_vars', [])):
+            values.append(field.to_python(val.getvalue()))
+        return values
+
     def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB'):
             return "DBMS_LOB.SUBSTR(%s)"
@@ -305,6 +313,10 @@ WHEN (new.%(col_name)s IS NULL)
 
     def return_insert_id(self):
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
+
+    def return_values(self, fields):
+        clause = "RETURNING %%s INTO %s" % ",".join(['%%s' for f in fields])
+        return clause, [InsertReturningVar(field[1]) for field in fields]
 
     def savepoint_create_sql(self, sid):
         return convert_unicode("SAVEPOINT " + self.quote_name(sid))

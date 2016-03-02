@@ -30,8 +30,13 @@ class GenericForeignKey(object):
     # Field flags
     auto_created = False
     concrete = False
+    delegate = False
+    delegate_on_insert = False
+    delegate_on_update = False
     editable = False
     hidden = False
+    return_on_insert = False
+    return_on_update = False
 
     is_relation = True
     many_to_many = False
