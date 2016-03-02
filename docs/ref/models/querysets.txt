@@ -1802,7 +1802,7 @@ This has a number of caveats though:
 
     Support for using ``bulk_create()`` with proxy models was added.
 
-.. versionchanged:: 1.0
+.. versionchanged:: 1.10
 
     Support for setting primary keys on objects created using ``bulk_create()``
     when using PostgreSQL was added.
