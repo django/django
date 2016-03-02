@@ -1,5 +1,6 @@
 import functools
 import hashlib
+import warnings
 from importlib import import_module
 
 from django.conf import settings
@@ -93,8 +94,9 @@ def enforce_ordering(func=None, slight=False):
                 # Run consumer
                 return func(message, *args, **kwargs)
             else:
-                # Bad ordering
-                print("Bad ordering detected: next %s, us %s, %s" % (next_order, order, message.reply_channel))
+                # Bad ordering - warn if we're getting close to the limit
+                if getattr(message, "__doomed__", False):
+                    warnings.warn("Enforce ordering consumer reached retry limit, message being dropped. Did you decorate all protocol consumers correctly?")
                 raise ConsumeLater()
         return inner
     if func is not None:

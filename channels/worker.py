@@ -16,9 +16,10 @@ class Worker(object):
     and runs their consumers.
     """
 
-    def __init__(self, channel_layer, callback=None):
+    def __init__(self, channel_layer, callback=None, message_retries=10):
         self.channel_layer = channel_layer
         self.callback = callback
+        self.message_retries = message_retries
 
     def run(self):
         """
@@ -38,6 +39,11 @@ class Worker(object):
                 channel_name=channel,
                 channel_layer=self.channel_layer,
             )
+            # Add attribute to message if it's been retried almost too many times,
+            # and would be thrown away this time if it's requeued. Used for helpful
+            # warnings in decorators and such - don't rely on this as public API.
+            if content.get("__retries__", 0) == self.message_retries:
+                message.__doomed__ = True
             # Handle the message
             consumer = self.channel_layer.registry.consumer_for_channel(channel)
             if self.callback:
@@ -45,6 +51,17 @@ class Worker(object):
             try:
                 consumer(message)
             except ConsumeLater:
+                # They want to not handle it yet. Re-inject it with a number-of-tries marker.
+                content['__retries__'] = content.get("__retries__", 0) + 1
+                # If we retried too many times, quit and error rather than
+                # spinning forever
+                if content['__retries__'] > self.message_retries:
+                    logger.warning(
+                        "Exceeded number of retries for message on channel %s: %s",
+                        channel,
+                        repr(content)[:100],
+                    )
+                    continue
                 self.channel_layer.send(channel, content)
             except:
                 logger.exception("Error processing message with consumer %s:", name_that_thing(consumer))
