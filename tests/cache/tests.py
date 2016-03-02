@@ -1138,6 +1138,7 @@ memcached_far_future_params['TIMEOUT'] = 31536000  # 60*60*24*365, 1 year
 memcached_client_options_params = memcached_params.copy()
 memcached_client_options_params['OPTIONS'] = {'CLIENT_OPTIONS': {'socket_timeout': 0.5}}
 
+
 @unittest.skipUnless(memcached_params, "memcached not available")
 @override_settings(CACHES=caches_setting_for_tests(base=memcached_params))
 class MemcachedCacheTests(BaseCacheTests, TestCase):
@@ -1185,7 +1186,6 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
     def test_passing_client_options(self):
         cache.set('foo', 'bar')
         self.assertEqual(cache._client.socket_timeout, 0.5)
-   
 
     def test_cull(self):
         # culling isn't implemented, memcached deals with it.
