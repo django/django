@@ -45,6 +45,7 @@ class Article(models.Model):
     body = models.TextField(default='')
     reporter = models.ForeignKey(Reporter, models.CASCADE)
     response_to = models.ForeignKey('self', models.SET_NULL, null=True)
+    unmanaged_reporters = models.ManyToManyField(Reporter, through='ArticleReporter')
 
     def __str__(self):
         return self.headline
@@ -54,3 +55,11 @@ class Article(models.Model):
         index_together = [
             ["headline", "pub_date"],
         ]
+
+
+class ArticleReporter(models.Model):
+    article = models.ForeignKey(Article, models.CASCADE)
+    reporter = models.ForeignKey(Reporter, models.CASCADE)
+
+    class Meta:
+        managed = False
