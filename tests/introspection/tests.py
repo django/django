@@ -6,7 +6,7 @@ from django.db import connection
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, mock, skipUnlessDBFeature
 
-from .models import Article, City, Reporter
+from .models import Article, ArticleReporter, City, Reporter
 
 
 class IntrospectionTests(TransactionTestCase):
@@ -52,6 +52,10 @@ class IntrospectionTests(TransactionTestCase):
                       connection.introspection.table_names(include_views=True))
         self.assertNotIn('introspection_article_view',
                          connection.introspection.table_names())
+
+    def test_unmanaged_through_model(self):
+        tables = connection.introspection.django_table_names()
+        self.assertNotIn(ArticleReporter._meta.db_table, tables)
 
     def test_installed_models(self):
         tables = [Article._meta.db_table, Reporter._meta.db_table]
