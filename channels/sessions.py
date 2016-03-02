@@ -96,7 +96,10 @@ def enforce_ordering(func=None, slight=False):
             else:
                 # Bad ordering - warn if we're getting close to the limit
                 if getattr(message, "__doomed__", False):
-                    warnings.warn("Enforce ordering consumer reached retry limit, message being dropped. Did you decorate all protocol consumers correctly?")
+                    warnings.warn(
+                        "Enforce ordering consumer reached retry limit, message "
+                        "being dropped. Did you decorate all protocol consumers correctly?"
+                    )
                 raise ConsumeLater()
         return inner
     if func is not None:
