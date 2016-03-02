@@ -1357,6 +1357,9 @@ to ensure compatibility when reversing by Python path is removed in Django 1.10.
 Similarly for GIS sitemaps, add ``name='django.contrib.gis.sitemaps.views.kml'``
 or ``name='django.contrib.gis.sitemaps.views.kmz'``.
 
+If you are using a Python path for the :setting:`LOGIN_URL` or
+:setting:`LOGIN_REDIRECT_URL` setting, use the name of the ``url()`` instead.
+
 .. _security issue: https://www.djangoproject.com/weblog/2014/apr/21/security/#s-issue-unexpected-code-execution-using-reverse
 
 Aggregate methods and modules

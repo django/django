@@ -34,6 +34,9 @@ details on these changes.
 * The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
   Python path will be removed.
 
+* The ability to use a dotted Python path for the ``LOGIN_URL`` and
+  ``LOGIN_REDIRECT_URL`` settings will be removed.
+
 * Support for :py:mod:`optparse` will be dropped for custom management commands
   (replaced by :py:mod:`argparse`).
 
