@@ -819,6 +819,9 @@ removed in Django 1.10 (please see the :ref:`deprecation timeline
 * The ability to :func:`~django.urls.reverse` URLs using a dotted Python path
   is removed.
 
+* The ability to use a dotted Python path for the ``LOGIN_URL`` and
+  ``LOGIN_REDIRECT_URL`` settings is removed.
+
 * Support for ``optparse`` is dropped for custom management commands.
 
 * The class ``django.core.management.NoArgsCommand`` is removed.
