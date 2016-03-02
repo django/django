@@ -2624,9 +2624,9 @@ The URL where requests are redirected after login when the
 This is used by the :func:`~django.contrib.auth.decorators.login_required`
 decorator, for example.
 
-This setting also accepts view function names and :ref:`named URL patterns
-<naming-url-patterns>` which can be used to reduce configuration duplication
-since you don't have to define the URL in two places (``settings`` and URLconf).
+This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
+can be used to reduce configuration duplication since you don't have to define
+the URL in two places (``settings`` and URLconf).
 
 .. setting:: LOGIN_URL
 
@@ -2638,9 +2638,9 @@ Default: ``'/accounts/login/'``
 The URL where requests are redirected for login, especially when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator.
 
-This setting also accepts view function names and :ref:`named URL patterns
-<naming-url-patterns>` which can be used to reduce configuration duplication
-since you don't have to define the URL in two places (``settings`` and URLconf).
+This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
+can be used to reduce configuration duplication since you don't have to define
+the URL in two places (``settings`` and URLconf).
 
 .. setting:: LOGOUT_REDIRECT_URL
 
@@ -2658,9 +2658,9 @@ The URL where requests are redirected after a user logs out using the
 If ``None``, no redirect will be performed and the logout view will be
 rendered.
 
-This setting also accepts view function names and :ref:`named URL patterns
-<naming-url-patterns>` which can be used to reduce configuration duplication
-since you don't have to define the URL in two places (``settings`` and URLconf).
+This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
+can be used to reduce configuration duplication since you don't have to define
+the URL in two places (``settings`` and URLconf).
 
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
