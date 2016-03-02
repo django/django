@@ -311,6 +311,8 @@ Models
 * :attr:`~django.db.models.ForeignKey.related_query_name` now supports
   app label and class interpolation using the ``'%(app_label)s'`` and
   ``'%(class)s'`` strings.
+* :meth:`QuerySet.bulk_create() <django.db.models.query.QuerySet.bulk_create>`
+  sets pk on objects when using the PostgreSQL backend.
 
 * The :func:`~django.db.models.prefetch_related_objects` function is now a
   public API.
