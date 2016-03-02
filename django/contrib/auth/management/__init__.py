@@ -10,7 +10,7 @@ from django.apps import apps
 from django.contrib.auth import get_permission_codename
 from django.core import exceptions
 from django.core.management.base import CommandError
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.utils import six
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 
@@ -67,6 +67,15 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
         return
 
     if not router.allow_migrate_model(using, Permission):
+        return
+
+    # Make sure either the `auth` app is either not managed by the migrations
+    # framework or that the required migrations have been applied.
+    from django.db.migrations.loader import MigrationLoader
+    from django.db.migrations.recorder import MigrationRecorder
+    migrations_import_path = MigrationLoader.migrations_module('auth')
+    recorder = MigrationRecorder(connections[using])
+    if migrations_import_path and not recorder.migration_is_applied('auth', '0006_require_contenttypes_0002'):
         return
 
     from django.contrib.contenttypes.models import ContentType

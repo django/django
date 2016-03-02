@@ -3,9 +3,8 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.models import ContentType, ContentTypeManager
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.shortcuts import get_current_site
-from django.db.utils import IntegrityError, OperationalError, ProgrammingError
 from django.http import Http404, HttpRequest
-from django.test import TestCase, mock, override_settings
+from django.test import TestCase, override_settings
 from django.utils import six
 
 from .models import (
@@ -258,26 +257,3 @@ class ContentTypesTests(TestCase):
         # Instead, just return the ContentType object and let the app detect stale states.
         ct_fetched = ContentType.objects.get_for_id(ct.pk)
         self.assertIsNone(ct_fetched.model_class())
-
-    @mock.patch('django.contrib.contenttypes.models.ContentTypeManager.get_or_create')
-    @mock.patch('django.contrib.contenttypes.models.ContentTypeManager.get')
-    def test_message_if_get_for_model_fails(self, mocked_get, mocked_get_or_create):
-        """
-        Check that `RuntimeError` with nice error message is raised if
-        `get_for_model` fails because of database errors.
-        """
-
-        def _test_message(mocked_method):
-            for ExceptionClass in (IntegrityError, OperationalError, ProgrammingError):
-                mocked_method.side_effect = ExceptionClass
-                with self.assertRaisesMessage(
-                    RuntimeError,
-                    "Error creating new content types. Please make sure contenttypes "
-                    "is migrated before trying to migrate apps individually."
-                ):
-                    ContentType.objects.get_for_model(ContentType)
-
-        _test_message(mocked_get)
-
-        mocked_get.side_effect = ContentType.DoesNotExist
-        _test_message(mocked_get_or_create)

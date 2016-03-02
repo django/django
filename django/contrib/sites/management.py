@@ -17,6 +17,15 @@ def create_default_site(app_config, verbosity=2, interactive=True, using=DEFAULT
     if not router.allow_migrate_model(using, Site):
         return
 
+    # Make sure either the `sites` app is either not managed by the
+    # migrations framework or has its initial migration applied.
+    from django.db.migrations.loader import MigrationLoader
+    from django.db.migrations.recorder import MigrationRecorder
+    migrations_import_path = MigrationLoader.migrations_module('sites')
+    recorder = MigrationRecorder(connections[using])
+    if migrations_import_path and not recorder.migration_is_applied('sites', '0001_initial'):
+        return
+
     if not Site.objects.using(using).exists():
         # The default settings set SITE_ID = 1, and some tests in Django's test
         # suite rely on this value. However, if database sequences are reused

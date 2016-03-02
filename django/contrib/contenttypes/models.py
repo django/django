@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django.apps import apps
 from django.db import models
-from django.db.utils import IntegrityError, OperationalError, ProgrammingError
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -50,24 +49,15 @@ class ContentTypeManager(models.Manager):
         # The ContentType entry was not found in the cache, therefore we
         # proceed to load or create it.
         try:
-            try:
-                # We start with get() and not get_or_create() in order to use
-                # the db_for_read (see #20401).
-                ct = self.get(app_label=opts.app_label, model=opts.model_name)
-            except self.model.DoesNotExist:
-                # Not found in the database; we proceed to create it.  This time we
-                # use get_or_create to take care of any race conditions.
-                ct, created = self.get_or_create(
-                    app_label=opts.app_label,
-                    model=opts.model_name,
-                )
-        except (OperationalError, ProgrammingError, IntegrityError):
-            # It's possible to migrate a single app before contenttypes,
-            # as it's not a required initial dependency (it's contrib!)
-            # Have a nice error for this.
-            raise RuntimeError(
-                "Error creating new content types. Please make sure contenttypes "
-                "is migrated before trying to migrate apps individually."
+            # We start with get() and not get_or_create() in order to use
+            # the db_for_read (see #20401).
+            ct = self.get(app_label=opts.app_label, model=opts.model_name)
+        except self.model.DoesNotExist:
+            # Not found in the database; we proceed to create it.  This time we
+            # use get_or_create to take care of any race conditions.
+            ct, created = self.get_or_create(
+                app_label=opts.app_label,
+                model=opts.model_name,
             )
         self._add_to_cache(self.db, ct)
         return ct
