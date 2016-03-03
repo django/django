@@ -26,6 +26,12 @@ class FieldOperation(Operation):
     def is_same_field_operation(self, operation):
         return self.is_same_model_operation(operation) and self.name_lower == operation.name_lower
 
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.model_name_lower
+
+    def references_field(self, model_name, name, app_label=None):
+        return self.references_model(model_name) and name.lower() == self.name_lower
+
     def reduce(self, operation, in_between, app_label=None):
         return (
             super(FieldOperation, self).reduce(operation, in_between, app_label=app_label) or
@@ -89,12 +95,6 @@ class AddField(FieldOperation):
     def describe(self):
         return "Add field %s to %s" % (self.name, self.model_name)
 
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name_lower
-
-    def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name_lower
-
     def reduce(self, operation, in_between, app_label=None):
         if isinstance(operation, FieldOperation) and self.is_same_field_operation(operation):
             if isinstance(operation, AlterField):
@@ -155,12 +155,6 @@ class RemoveField(FieldOperation):
 
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)
-
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name_lower
-
-    def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name_lower
 
 
 class AlterField(FieldOperation):
@@ -225,12 +219,6 @@ class AlterField(FieldOperation):
 
     def describe(self):
         return "Alter field %s on %s" % (self.name, self.model_name)
-
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name_lower
-
-    def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name_lower
 
     def reduce(self, operation, in_between, app_label=None):
         if isinstance(operation, RemoveField) and self.is_same_field_operation(operation):
@@ -315,9 +303,6 @@ class RenameField(FieldOperation):
 
     def describe(self):
         return "Rename field %s on %s to %s" % (self.old_name, self.model_name, self.new_name)
-
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name_lower
 
     def references_field(self, model_name, name, app_label=None):
         return self.references_model(model_name) and (
