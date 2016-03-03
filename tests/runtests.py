@@ -397,7 +397,7 @@ if __name__ == "__main__":
              'is localhost:8081-8179.')
     parser.add_argument(
         '--selenium', action='store_true', dest='selenium', default=False,
-        help='Run the Selenium tests as well (if Selenium is installed).')
+        help='Run only the Selenium tests (equivalent to "--tag selenium").')
     parser.add_argument(
         '--debug-sql', action='store_true', dest='debug_sql', default=False,
         help='Turn on the SQL query logger within tests.')
