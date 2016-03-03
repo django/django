@@ -387,6 +387,12 @@ query will be ordered by ``pub_date`` and not ``headline``::
     incurs a cost to your database. Each foreign key you add will
     implicitly include all of its default orderings as well.
 
+    If a query doesn't have an ordering specified, results are returned from
+    the database in an unspecified order. A particular ordering is guaranteed
+    only when ordering by a set of fields that uniquely identify each object in
+    the results. For example, if a ``name`` field isn't unique, ordering by it
+    won't guarantee objects with the same name always appear in the same order.
+
 ``reverse()``
 ~~~~~~~~~~~~~
 
