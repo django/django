@@ -14,7 +14,7 @@ class Command(BaseCommand):
             'open a shell. Defaults to the "default" database.')
 
     def handle(self, **options):
-        connection = connections[options.get('database')]
+        connection = connections[options['database']]
         try:
             connection.client.runshell()
         except OSError:

@@ -212,13 +212,13 @@ class Command(BaseCommand):
             default=False, help="Keep .pot file after making messages. Useful when debugging.")
 
     def handle(self, *args, **options):
-        locale = options.get('locale')
-        exclude = options.get('exclude')
-        self.domain = options.get('domain')
-        self.verbosity = options.get('verbosity')
-        process_all = options.get('all')
-        extensions = options.get('extensions')
-        self.symlinks = options.get('symlinks')
+        locale = options['locale']
+        exclude = options['exclude']
+        self.domain = options['domain']
+        self.verbosity = options['verbosity']
+        process_all = options['all']
+        extensions = options['extensions']
+        self.symlinks = options['symlinks']
 
         # Need to ensure that the i18n framework is enabled
         if settings.configured:
@@ -226,25 +226,25 @@ class Command(BaseCommand):
         else:
             settings.configure(USE_I18N=True)
 
-        ignore_patterns = options.get('ignore_patterns')
-        if options.get('use_default_ignore_patterns'):
+        ignore_patterns = options['ignore_patterns']
+        if options['use_default_ignore_patterns']:
             ignore_patterns += ['CVS', '.*', '*~', '*.pyc']
         self.ignore_patterns = list(set(ignore_patterns))
 
         # Avoid messing with mutable class variables
-        if options.get('no_wrap'):
+        if options['no_wrap']:
             self.msgmerge_options = self.msgmerge_options[:] + ['--no-wrap']
             self.msguniq_options = self.msguniq_options[:] + ['--no-wrap']
             self.msgattrib_options = self.msgattrib_options[:] + ['--no-wrap']
             self.xgettext_options = self.xgettext_options[:] + ['--no-wrap']
-        if options.get('no_location'):
+        if options['no_location']:
             self.msgmerge_options = self.msgmerge_options[:] + ['--no-location']
             self.msguniq_options = self.msguniq_options[:] + ['--no-location']
             self.msgattrib_options = self.msgattrib_options[:] + ['--no-location']
             self.xgettext_options = self.xgettext_options[:] + ['--no-location']
 
-        self.no_obsolete = options.get('no_obsolete')
-        self.keep_pot = options.get('keep_pot')
+        self.no_obsolete = options['no_obsolete']
+        self.keep_pot = options['keep_pot']
 
         if self.domain not in ('django', 'djangojs'):
             raise CommandError("currently makemessages only supports domains "

@@ -20,8 +20,8 @@ class Command(BaseCommand):
             help='Tells Django to use an IPv6 address.')
 
     def handle(self, *fixture_labels, **options):
-        verbosity = options.get('verbosity')
-        interactive = options.get('interactive')
+        verbosity = options['verbosity']
+        interactive = options['interactive']
 
         # Create a test database.
         db_name = connection.creation.create_test_db(verbosity=verbosity, autoclobber=not interactive, serialize=False)

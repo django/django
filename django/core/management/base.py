@@ -314,13 +314,13 @@ class BaseCommand(object):
         controlled by the ``requires_system_checks`` attribute, except if
         force-skipped).
         """
-        if options.get('no_color'):
+        if options['no_color']:
             self.style = no_style()
             self.stderr.style_func = None
         if options.get('stdout'):
             self.stdout = OutputWrapper(options['stdout'])
         if options.get('stderr'):
-            self.stderr = OutputWrapper(options.get('stderr'), self.stderr.style_func)
+            self.stderr = OutputWrapper(options['stderr'], self.stderr.style_func)
 
         saved_locale = None
         if not self.leave_locale_alone:
