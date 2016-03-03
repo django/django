@@ -244,7 +244,7 @@ class BaseCommand(object):
         parser = CommandParser(self, prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None)
         parser.add_argument('--version', action='version', version=self.get_version())
-        parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default='1',
+        parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default=1,
             type=int, choices=[0, 1, 2, 3],
             help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
         parser.add_argument('--settings',
