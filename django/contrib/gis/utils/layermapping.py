@@ -228,7 +228,7 @@ class LayerMapping(object):
                 self.geom_field = field_name
                 self.coord_dim = coord_dim
                 fields_val = model_field
-            elif isinstance(model_field, models.ForeignKey):
+            elif model_field.many_to_one and model_field.remote_field is not None:
                 if isinstance(ogr_name, dict):
                     # Is every given related model mapping field in the Layer?
                     rel_model = model_field.remote_field.model
@@ -237,11 +237,11 @@ class LayerMapping(object):
                         try:
                             rel_model._meta.get_field(rel_name)
                         except FieldDoesNotExist:
-                            raise LayerMapError('ForeignKey mapping field "%s" not in %s fields.' %
+                            raise LayerMapError('Foreign key mapping field "%s" not in %s fields.' %
                                                 (rel_name, rel_model.__class__.__name__))
                     fields_val = rel_model
                 else:
-                    raise TypeError('ForeignKey mapping must be of dictionary type.')
+                    raise TypeError('Foreign key mapping must be of dictionary type.')
             else:
                 # Is the model field type supported by LayerMapping?
                 if model_field.__class__ not in self.FIELD_TYPES:

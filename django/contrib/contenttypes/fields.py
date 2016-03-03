@@ -131,14 +131,14 @@ class GenericForeignKey(object):
                 )
             ]
         else:
-            if not isinstance(field, models.ForeignKey):
+            if not field.many_to_one:
                 return [
                     checks.Error(
-                        "'%s.%s' is not a ForeignKey." % (
+                        "'%s.%s' is not a foreign key." % (
                             self.model._meta.object_name, self.ct_field
                         ),
                         hint=(
-                            "GenericForeignKeys must use a ForeignKey to "
+                            "GenericForeignKeys must use a foreign key to "
                             "'contenttypes.ContentType' as the 'content_type' field."
                         ),
                         obj=self,

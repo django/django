@@ -123,7 +123,7 @@ class InlineFormsetFactoryTest(TestCase):
         Child has two ForeignKeys to Parent, so if we don't specify which one
         to use for the inline formset, we should get an exception.
         """
-        msg = "'inline_formsets.Child' has more than one ForeignKey to 'inline_formsets.Parent'."
+        msg = "'inline_formsets.Child' has more than one foreign key to 'inline_formsets.Parent'."
         with self.assertRaisesMessage(ValueError, msg):
             inlineformset_factory(Parent, Child)
 
@@ -132,7 +132,7 @@ class InlineFormsetFactoryTest(TestCase):
         If we specify fk_name, but it isn't a ForeignKey from the child model
         to the parent model, we should get an exception.
         """
-        msg = "fk_name 'school' is not a ForeignKey to 'inline_formsets.Parent'."
+        msg = "fk_name 'school' is not a foreign key to 'inline_formsets.Parent'."
         with self.assertRaisesMessage(ValueError, msg):
             inlineformset_factory(Parent, Child, fk_name='school')
 

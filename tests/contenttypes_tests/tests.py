@@ -151,9 +151,9 @@ class GenericForeignKeyTests(SimpleTestCase):
         errors = Model.content_object.check()
         expected = [
             checks.Error(
-                "'Model.content_type' is not a ForeignKey.",
+                "'Model.content_type' is not a foreign key.",
                 hint=(
-                    "GenericForeignKeys must use a ForeignKey to "
+                    "GenericForeignKeys must use a foreign key to "
                     "'contenttypes.ContentType' as the 'content_type' field."
                 ),
                 obj=Model.content_object,

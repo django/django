@@ -901,8 +901,8 @@ class RadioFieldsCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            ("The value of 'radio_fields' refers to 'name', which is not an instance "
-             "of ForeignKey, and does not have a 'choices' definition."),
+            ("The value of 'radio_fields' refers to 'name', which is not a "
+             "foreign key and does not have a 'choices' definition."),
             'admin.E023')
 
     def test_invalid_value(self):

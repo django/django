@@ -9,7 +9,6 @@ from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
@@ -204,9 +203,9 @@ class ModelDetailView(BaseAdminDocsView):
         # Gather fields/field descriptions.
         fields = []
         for field in opts.fields:
-            # ForeignKey is a special case since the field will actually be a
+            # Foreign keys are special cases since the field will actually be a
             # descriptor that returns the other object
-            if isinstance(field, models.ForeignKey):
+            if field.many_to_one and field.remote_field is not None:
                 data_type = field.remote_field.model.__name__
                 app_label = field.remote_field.model._meta.app_label
                 verbose = utils.parse_rst(

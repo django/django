@@ -457,7 +457,7 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = MyAdmin(Album, AdminSite()).check()
         expected = [
             checks.Error(
-                "'admin_checks.TwoAlbumFKAndAnE' has more than one ForeignKey to 'admin_checks.Album'.",
+                "'admin_checks.TwoAlbumFKAndAnE' has more than one foreign key to 'admin_checks.Album'.",
                 obj=TwoAlbumFKAndAnEInline,
                 id='admin.E202',
             )
