@@ -8,7 +8,6 @@ import unittest
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
-from django.contrib.staticfiles.management.commands import collectstatic
 from django.contrib.staticfiles.management.commands.collectstatic import \
     Command as CollectstaticCommand
 from django.core.cache.backends.base import BaseCache
@@ -369,13 +368,8 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
 
     command_params = {
         'interactive': False,
-        'post_process': True,
         'verbosity': 0,
         'ignore_patterns': ['*.ignoreme'],
-        'use_default_ignore_patterns': True,
-        'clear': False,
-        'link': False,
-        'dry_run': False,
     }
 
     def setUp(self):
@@ -396,7 +390,7 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
         FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765,
     )
     def test_collect_static_files_permissions(self):
-        collectstatic.Command().execute(**self.command_params)
+        call_command('collectstatic', **self.command_params)
         test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
         test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
         file_mode = os.stat(test_file)[0] & 0o777
@@ -409,7 +403,7 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
         FILE_UPLOAD_DIRECTORY_PERMISSIONS=None,
     )
     def test_collect_static_files_default_permissions(self):
-        collectstatic.Command().execute(**self.command_params)
+        call_command('collectstatic', **self.command_params)
         test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
         test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
         file_mode = os.stat(test_file)[0] & 0o777
@@ -423,7 +417,7 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
         STATICFILES_STORAGE='staticfiles_tests.test_storage.CustomStaticFilesStorage',
     )
     def test_collect_static_files_subclass_of_static_storage(self):
-        collectstatic.Command().execute(**self.command_params)
+        call_command('collectstatic', **self.command_params)
         test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
         test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
         file_mode = os.stat(test_file)[0] & 0o777
