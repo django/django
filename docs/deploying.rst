@@ -169,7 +169,7 @@ WSGI servers with an adapter layer. You won't get WebSocket support this way -
 WSGI doesn't support WebSockets - but you can run a separate ASGI server to
 handle WebSockets if you want.
 
-The ``wsgiref`` package contains the adapter; all you need to do is put this
+The ``asgiref`` package contains the adapter; all you need to do is put this
 in your Django project's ``wsgi.py`` to declare a new WSGI application object
 that backs onto ASGI underneath::
 
