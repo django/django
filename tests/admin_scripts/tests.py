@@ -1309,52 +1309,52 @@ class ManageRunserver(AdminScriptTestCase):
         self.cmd = Command(stdout=self.output)
         self.cmd.run = monkey_run
 
-    def assertServerSettings(self, addr, port, ipv6=None, raw_ipv6=False):
+    def assertServerSettings(self, addr, port, ipv6=False, raw_ipv6=False):
         self.assertEqual(self.cmd.addr, addr)
         self.assertEqual(self.cmd.port, port)
         self.assertEqual(self.cmd.use_ipv6, ipv6)
         self.assertEqual(self.cmd._raw_ipv6, raw_ipv6)
 
     def test_runserver_addrport(self):
-        self.cmd.handle()
+        call_command(self.cmd)
         self.assertServerSettings('127.0.0.1', '8000')
 
-        self.cmd.handle(addrport="1.2.3.4:8000")
+        call_command(self.cmd, addrport="1.2.3.4:8000")
         self.assertServerSettings('1.2.3.4', '8000')
 
-        self.cmd.handle(addrport="7000")
+        call_command(self.cmd, addrport="7000")
         self.assertServerSettings('127.0.0.1', '7000')
 
     @unittest.skipUnless(socket.has_ipv6, "platform doesn't support IPv6")
     def test_runner_addrport_ipv6(self):
-        self.cmd.handle(addrport="", use_ipv6=True)
+        call_command(self.cmd, addrport="", use_ipv6=True)
         self.assertServerSettings('::1', '8000', ipv6=True, raw_ipv6=True)
 
-        self.cmd.handle(addrport="7000", use_ipv6=True)
+        call_command(self.cmd, addrport="7000", use_ipv6=True)
         self.assertServerSettings('::1', '7000', ipv6=True, raw_ipv6=True)
 
-        self.cmd.handle(addrport="[2001:0db8:1234:5678::9]:7000")
+        call_command(self.cmd, addrport="[2001:0db8:1234:5678::9]:7000")
         self.assertServerSettings('2001:0db8:1234:5678::9', '7000', ipv6=True, raw_ipv6=True)
 
     def test_runner_hostname(self):
-        self.cmd.handle(addrport="localhost:8000")
+        call_command(self.cmd, addrport="localhost:8000")
         self.assertServerSettings('localhost', '8000')
 
-        self.cmd.handle(addrport="test.domain.local:7000")
+        call_command(self.cmd, addrport="test.domain.local:7000")
         self.assertServerSettings('test.domain.local', '7000')
 
     @unittest.skipUnless(socket.has_ipv6, "platform doesn't support IPv6")
     def test_runner_hostname_ipv6(self):
-        self.cmd.handle(addrport="test.domain.local:7000", use_ipv6=True)
+        call_command(self.cmd, addrport="test.domain.local:7000", use_ipv6=True)
         self.assertServerSettings('test.domain.local', '7000', ipv6=True)
 
     def test_runner_ambiguous(self):
         # Only 4 characters, all of which could be in an ipv6 address
-        self.cmd.handle(addrport="beef:7654")
+        call_command(self.cmd, addrport="beef:7654")
         self.assertServerSettings('beef', '7654')
 
         # Uses only characters that could be in an ipv6 address
-        self.cmd.handle(addrport="deadbeef:7654")
+        call_command(self.cmd, addrport="deadbeef:7654")
         self.assertServerSettings('deadbeef', '7654')
 
     def test_no_database(self):
@@ -1530,7 +1530,7 @@ class CommandTypes(AdminScriptTestCase):
         out = StringIO()
         err = StringIO()
         command = Command(stdout=out, stderr=err)
-        command.execute()
+        call_command(command)
         if color.supports_color():
             self.assertIn('Hello, world!\n', out.getvalue())
             self.assertIn('Hello, world!\n', err.getvalue())
@@ -1552,14 +1552,14 @@ class CommandTypes(AdminScriptTestCase):
         out = StringIO()
         err = StringIO()
         command = Command(stdout=out, stderr=err, no_color=True)
-        command.execute()
+        call_command(command)
         self.assertEqual(out.getvalue(), 'Hello, world!\n')
         self.assertEqual(err.getvalue(), 'Hello, world!\n')
 
         out = StringIO()
         err = StringIO()
         command = Command(stdout=out, stderr=err)
-        command.execute(no_color=True)
+        call_command(command, no_color=True)
         self.assertEqual(out.getvalue(), 'Hello, world!\n')
         self.assertEqual(err.getvalue(), 'Hello, world!\n')
 
@@ -1572,11 +1572,11 @@ class CommandTypes(AdminScriptTestCase):
 
         out = StringIO()
         command = Command(stdout=out)
-        command.execute()
+        call_command(command)
         self.assertEqual(out.getvalue(), "Hello, World!\n")
         out.truncate(0)
         new_out = StringIO()
-        command.execute(stdout=new_out)
+        call_command(command, stdout=new_out)
         self.assertEqual(out.getvalue(), "")
         self.assertEqual(new_out.getvalue(), "Hello, World!\n")
 
@@ -1589,11 +1589,11 @@ class CommandTypes(AdminScriptTestCase):
 
         err = StringIO()
         command = Command(stderr=err)
-        command.execute()
+        call_command(command)
         self.assertEqual(err.getvalue(), "Hello, World!\n")
         err.truncate(0)
         new_err = StringIO()
-        command.execute(stderr=new_err)
+        call_command(command, stderr=new_err)
         self.assertEqual(err.getvalue(), "")
         self.assertEqual(new_err.getvalue(), "Hello, World!\n")
 

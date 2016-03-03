@@ -1760,7 +1760,8 @@ Running management commands from your code
 To call a management command from code use ``call_command``.
 
 ``name``
-  the name of the command to call.
+  the name of the command to call or a command object. Passing the name is
+  preferred unless the object is required for testing.
 
 ``*args``
   a list of arguments accepted by the command.
@@ -1771,8 +1772,11 @@ To call a management command from code use ``call_command``.
 Examples::
 
       from django.core import management
+      from django.core.management.commands import loaddata
+
       management.call_command('flush', verbosity=0, interactive=False)
       management.call_command('loaddata', 'test_data', verbosity=0)
+      management.call_command(loaddata.Command(), 'test_data', verbosity=0)
 
 Note that command options that take no arguments are passed as keywords
 with ``True`` or ``False``, as you can see with the ``interactive`` option above.
@@ -1799,7 +1803,8 @@ value of the ``handle()`` method of the command.
 .. versionchanged:: 1.10
 
     ``call_command()`` now returns the value received from the
-    ``command.handle()`` method.
+    ``command.handle()`` method. It now also accepts a command object as the
+    first argument.
 
 Output redirection
 ==================
