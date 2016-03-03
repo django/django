@@ -1269,10 +1269,6 @@ class CustomTestRunner(DiscoverRunner):
 
 
 class ManageTestCommand(AdminScriptTestCase):
-    def setUp(self):
-        from django.core.management.commands.test import Command as TestCommand
-        self.cmd = TestCommand()
-
     def test_liveserver(self):
         """
         Ensure that the --liveserver option sets the environment variable
@@ -1284,14 +1280,13 @@ class ManageTestCommand(AdminScriptTestCase):
         address_predefined = 'DJANGO_LIVE_TEST_SERVER_ADDRESS' in os.environ
         old_address = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS')
 
-        self.cmd.handle(verbosity=0, testrunner='admin_scripts.tests.CustomTestRunner')
+        call_command('test', verbosity=0, testrunner='admin_scripts.tests.CustomTestRunner')
 
         # Original state hasn't changed
         self.assertEqual('DJANGO_LIVE_TEST_SERVER_ADDRESS' in os.environ, address_predefined)
         self.assertEqual(os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS'), old_address)
 
-        self.cmd.handle(verbosity=0, testrunner='admin_scripts.tests.CustomTestRunner',
-                        liveserver='blah')
+        call_command('test', verbosity=0, testrunner='admin_scripts.tests.CustomTestRunner', liveserver='blah')
 
         # Variable was correctly set
         self.assertEqual(os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'], 'blah')
