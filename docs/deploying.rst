@@ -97,18 +97,20 @@ cluster on the backend, see :ref:`wsgi-to-asgi`.
 
 If you want to support WebSockets, long-poll HTTP requests and other Channels
 features, you'll need to run a native ASGI interface server, as the WSGI
-specification has no support for running these kinds of requests concurrenctly.
+specification has no support for running these kinds of requests concurrently.
 Channels ships with an interface server that we recommend you use called
-*Daphne*; it supports WebSockets, long-poll HTTP requests, HTTP/2 *(soon)*
-and performs quite well. Of course, any ASGI-compliant server will work!
+`Daphne <http://github.com/andrewgodwin/daphne/>`_; it supports WebSockets,
+long-poll HTTP requests, HTTP/2 *(soon)* and performs quite well.
+Of course, any ASGI-compliant server will work!
 
 Notably, Daphne has a nice feature where it supports all of these protocols on
 the same port and on all paths; it auto-negotiates between HTTP and WebSocket,
 so there's no need to have your WebSockets on a separate port or path (and
 they'll be able to share cookies with your normal view code).
 
-To run Daphne, it just needs to be supplied with a channel backend;
-first, make sure your project has an ``asgi.py`` file that looks like this
+To run Daphne, it just needs to be supplied with a channel backend, in much
+the same way a WSGI server needs to be given an application.
+First, make sure your project has an ``asgi.py`` file that looks like this
 (it should live next to ``wsgi.py``)::
 
     import os
@@ -128,7 +130,10 @@ like supervisord to ensure it is re-run if it exits unexpectedly.
 If you only run Daphne and no workers, all of your page requests will seem to
 hang forever; that's because Daphne doesn't have any worker servers to handle
 the request and it's waiting for one to appear (while ``runserver`` also uses
-Daphne, it launches a worker thread along with it in the same process).
+Daphne, it launches a worker thread along with it in the same process). In this
+scenario, it will eventually time out and give you a 503 error after 2 minutes;
+you can configure how long it waits with the ``--http-timeout`` command line
+argument.
 
 
 Deploying new versions of code
