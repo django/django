@@ -53,8 +53,8 @@ class Command(BaseCommand):
         return super(Command, self).execute(*args, **options)
 
     def handle(self, *args, **options):
-        username = options.get(self.UserModel.USERNAME_FIELD)
-        database = options.get('database')
+        username = options[self.UserModel.USERNAME_FIELD]
+        database = options['database']
 
         # If not provided, create the user with an unusable password
         password = None
@@ -72,7 +72,7 @@ class Command(BaseCommand):
                 username = self.username_field.clean(username, None)
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
-                    if options.get(field_name):
+                    if options[field_name]:
                         field = self.UserModel._meta.get_field(field_name)
                         user_data[field_name] = field.clean(options[field_name], None)
                     else:
@@ -118,7 +118,7 @@ class Command(BaseCommand):
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)
-                    user_data[field_name] = options.get(field_name)
+                    user_data[field_name] = options[field_name]
                     while user_data[field_name] is None:
                         message = force_str('%s%s: ' % (
                             capfirst(field.verbose_name),

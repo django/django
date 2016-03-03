@@ -50,10 +50,10 @@ class Command(BaseCommand):
 
     def handle(self, *fixture_labels, **options):
 
-        self.ignore = options.get('ignore')
-        self.using = options.get('database')
-        self.app_label = options.get('app_label')
-        self.verbosity = options.get('verbosity')
+        self.ignore = options['ignore']
+        self.using = options['database']
+        self.app_label = options['app_label']
+        self.verbosity = options['verbosity']
 
         with transaction.atomic(using=self.using):
             self.loaddata(fixture_labels)

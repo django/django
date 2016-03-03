@@ -33,7 +33,7 @@ class Command(BaseCommand):
 
     def handle(self, *app_labels, **options):
         include_deployment_checks = options['deploy']
-        if options.get('list_tags'):
+        if options['list_tags']:
             self.stdout.write('\n'.join(sorted(registry.tags_available(include_deployment_checks))))
             return
 
@@ -42,7 +42,7 @@ class Command(BaseCommand):
         else:
             app_configs = None
 
-        tags = options.get('tags')
+        tags = options['tags']
         if tags:
             try:
                 invalid_tag = next(

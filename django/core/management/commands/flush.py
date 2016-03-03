@@ -25,10 +25,10 @@ class Command(BaseCommand):
             help='Nominates a database to flush. Defaults to the "default" database.')
 
     def handle(self, **options):
-        database = options.get('database')
+        database = options['database']
         connection = connections[database]
-        verbosity = options.get('verbosity')
-        interactive = options.get('interactive')
+        verbosity = options['verbosity']
+        interactive = options['interactive']
         # The following are stealth options used by Django's internals.
         reset_sequences = options.get('reset_sequences', True)
         allow_cascade = options.get('allow_cascade', False)

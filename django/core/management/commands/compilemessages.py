@@ -45,10 +45,10 @@ class Command(BaseCommand):
             help='Use fuzzy translations.')
 
     def handle(self, **options):
-        locale = options.get('locale')
-        exclude = options.get('exclude')
-        self.verbosity = int(options.get('verbosity'))
-        if options.get('fuzzy'):
+        locale = options['locale']
+        exclude = options['exclude']
+        self.verbosity = options['verbosity']
+        if options['fuzzy']:
             self.program_options = self.program_options + ['-f']
 
         if find_command(self.program) is None:

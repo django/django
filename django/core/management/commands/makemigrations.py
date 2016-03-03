@@ -43,13 +43,13 @@ class Command(BaseCommand):
             help='Exit with a non-zero status if model changes are missing migrations.')
 
     def handle(self, *app_labels, **options):
-        self.verbosity = options.get('verbosity')
-        self.interactive = options.get('interactive')
-        self.dry_run = options.get('dry_run', False)
-        self.merge = options.get('merge', False)
-        self.empty = options.get('empty', False)
-        self.migration_name = options.get('name')
-        self.exit_code = options.get('exit_code', False)
+        self.verbosity = options['verbosity']
+        self.interactive = options['interactive']
+        self.dry_run = options['dry_run']
+        self.merge = options['merge']
+        self.empty = options['empty']
+        self.migration_name = options['name']
+        self.exit_code = options['exit_code']
         check_changes = options['check_changes']
 
         if self.exit_code:

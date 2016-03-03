@@ -29,7 +29,7 @@ class Command(BaseCommand):
             help='Specifies the database to use. Default is "default".')
 
     def handle(self, *args, **options):
-        if options.get('username'):
+        if options['username']:
             username = options['username']
         else:
             username = getpass.getuser()
@@ -37,7 +37,7 @@ class Command(BaseCommand):
         UserModel = get_user_model()
 
         try:
-            u = UserModel._default_manager.using(options.get('database')).get(**{
+            u = UserModel._default_manager.using(options['database']).get(**{
                 UserModel.USERNAME_FIELD: username
             })
         except UserModel.DoesNotExist:

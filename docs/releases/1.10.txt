@@ -640,6 +640,14 @@ Miscellaneous
 * Tests that violate deferrable database constraints will now error when run on
   a database that supports deferrable constraints.
 
+* Built-in management commands now use indexing of keys in ``options``, e.g.
+  ``options['verbosity']``, instead of ``options.get()`` and no longer perform
+  any type coercion. This could be a problem if you're calling commands using
+  ``Command.execute()`` (which bypasses the argument parser that sets a default
+  value) instead of :func:`~django.core.management.call_command`. Instead of
+  calling ``Command.execute()``, pass the command object as the first argument
+  to ``call_command()``.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
