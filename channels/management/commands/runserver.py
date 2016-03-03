@@ -79,6 +79,7 @@ class Command(RunserverCommand):
                 port=int(self.port),
                 signal_handlers=not options['use_reloader'],
                 action_logger=self.log_action,
+                http_timeout=60,  # Shorter timeout than normal as it's dev
             ).run()
             self.logger.debug("Daphne exited")
         except KeyboardInterrupt:
