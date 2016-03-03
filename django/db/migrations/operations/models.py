@@ -20,6 +20,9 @@ class ModelOperation(Operation):
     def name_lower(self):
         return self.name.lower()
 
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name_lower
+
     def reduce(self, operation, in_between, app_label=None):
         return (
             super(ModelOperation, self).reduce(operation, in_between, app_label=app_label) or
@@ -216,9 +219,6 @@ class DeleteModel(ModelOperation):
         model = to_state.apps.get_model(app_label, self.name)
         if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
-
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.name_lower
 
     def describe(self):
         return "Delete model %s" % (self.name, )
@@ -421,9 +421,6 @@ class AlterModelTable(ModelOperation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.name_lower
-
     def describe(self):
         return "Rename table for %s to %s" % (self.name, self.table)
 
@@ -490,9 +487,6 @@ class AlterUniqueTogether(FieldRelatedOptionOperation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.name_lower
-
     def references_field(self, model_name, name, app_label=None):
         return (
             self.references_model(model_name, app_label) and
@@ -546,9 +540,6 @@ class AlterIndexTogether(FieldRelatedOptionOperation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
-
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.name_lower
 
     def references_field(self, model_name, name, app_label=None):
         return (
@@ -608,9 +599,6 @@ class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self.database_forwards(app_label, schema_editor, from_state, to_state)
-
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.name_lower
 
     def references_field(self, model_name, name, app_label=None):
         return (
@@ -674,9 +662,6 @@ class AlterModelOptions(ModelOptionOperation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         pass
 
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.name_lower
-
     def describe(self):
         return "Change Meta options on %s" % (self.name, )
 
@@ -709,9 +694,6 @@ class AlterModelManagers(ModelOptionOperation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         pass
-
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.name_lower
 
     def describe(self):
         return "Change managers on %s" % (self.name, )
