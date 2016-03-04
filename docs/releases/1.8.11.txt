@@ -2,11 +2,7 @@
 Django 1.8.11 release notes
 ===========================
 
-*Under development*
+*March 4, 2016*
 
-Django 1.8.11 fixes several bugs in 1.8.10.
-
-Bugfixes
-========
-
-* ...
+Django 1.8.11 fixes a regression on Python 2 in the 1.8.10 security release
+where ``utils.http.is_safe_url()`` crashes on bytestring URLs (:ticket:`26308`).

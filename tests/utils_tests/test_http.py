@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
 import sys
@@ -109,6 +110,17 @@ class TestUtilsHttp(unittest.TestCase):
                      'http://testserver/confirm?email=me@example.com',
                      '/url%20with%20spaces/'):
             self.assertTrue(http.is_safe_url(good_url, host='testserver'), "%s should be allowed" % good_url)
+
+        if six.PY2:
+            # Check binary URLs, regression tests for #26308
+            self.assertTrue(
+                http.is_safe_url(b'https://testserver/', host='testserver'),
+                "binary URLs should be allowed on Python 2"
+            )
+            self.assertFalse(http.is_safe_url(b'\x08//example.com', host='testserver'))
+            self.assertTrue(http.is_safe_url('àview/'.encode('utf-8'), host='testserver'))
+            self.assertTrue(http.is_safe_url('àview'.encode('latin-1'), host='testserver'))
+
         # Valid basic auth credentials are allowed.
         self.assertTrue(http.is_safe_url(r'http://user:pass@testserver/', host='user:pass@testserver'))
         # A path without host is allowed.
