@@ -45,7 +45,13 @@ For more details, see the reference documentation for :setting:`DATABASES`.
 
     If you're using PostgreSQL or MySQL, make sure you've created a database by
     this point. Do that with "``CREATE DATABASE database_name;``" within your
-    database's interactive prompt.
+    database's interactive prompt.  Create another database for use in testing.
+    If your first database was named ``my_database``, name this one
+    ``test_my_database``.
+
+    In the case of MySQL, make sure that whatever database user you have
+    provided in :file:`mysite/settings.py` has been granted all privileges for
+    **both** of these databases. (e.g. "``GRANT ALL my_database.* TO 'user'@'localhost';``")
 
     If you're using SQLite, you don't need to create anything beforehand - the
     database file will be created automatically when it is needed.
