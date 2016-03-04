@@ -290,6 +290,8 @@ def is_safe_url(url, host=None):
         url = url.strip()
     if not url:
         return False
+    if six.PY2:
+        url = force_text(url, errors='replace')
     # Chrome treats \ completely as / in paths but it could be part of some
     # basic auth credentials so we need to check both URLs.
     return _is_safe_url(url, host) and _is_safe_url(url.replace('\\', '/'), host)
