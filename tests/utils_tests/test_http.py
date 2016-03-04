@@ -124,7 +124,7 @@ class TestUtilsHttp(unittest.TestCase):
             )
             self.assertFalse(http.is_safe_url(b'\x08//example.com', host='testserver'))
             self.assertTrue(http.is_safe_url('àview/'.encode('utf-8'), host='testserver'))
-            self.assertTrue(http.is_safe_url('àview'.encode('latin-1'), host='testserver'))
+            self.assertFalse(http.is_safe_url('àview'.encode('latin-1'), host='testserver'))
 
         # Valid basic auth credentials are allowed.
         self.assertTrue(http.is_safe_url(r'http://user:pass@testserver/', host='user:pass@testserver'))

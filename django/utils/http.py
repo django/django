@@ -291,7 +291,10 @@ def is_safe_url(url, host=None):
     if not url:
         return False
     if six.PY2:
-        url = force_text(url, errors='replace')
+        try:
+            url = force_text(url)
+        except UnicodeDecodeError:
+            return False
     # Chrome treats \ completely as / in paths but it could be part of some
     # basic auth credentials so we need to check both URLs.
     return _is_safe_url(url, host) and _is_safe_url(url.replace('\\', '/'), host)
