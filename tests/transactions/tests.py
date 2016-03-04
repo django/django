@@ -338,6 +338,20 @@ class AtomicErrorsTests(TransactionTestCase):
             r2.save(force_update=True)
         self.assertEqual(Reporter.objects.get(pk=r1.pk).last_name, "Calculus")
 
+    @skipIf(connection.features.autocommits_when_autocommit_is_off,
+            "This test requires a non-autocommit mode that doesn't autocommit.")
+    def test_atomic_allows_queries_after_exception_when_autocommit_is_false(self):
+        transaction.set_autocommit(False)
+        try:
+            r1 = Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+            r2 = Reporter(first_name="Cuthbert", last_name="Calculus", id=r1.id)
+            with self.assertRaises(IntegrityError):
+                r2.save(force_insert=True)
+            Reporter(first_name="Tintin")
+        finally:
+            transaction.rollback()
+            transaction.set_autocommit(True)
+
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
     def test_atomic_prevents_queries_in_broken_transaction_after_client_close(self):
         with transaction.atomic():
