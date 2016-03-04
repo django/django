@@ -36,7 +36,7 @@ Bugfixes
   to work on both Python 2 and Python 3.
 
 * Prevented ``QuerySet.delete()`` from crashing on MySQL when querying across
-  relations (:ticket`25882`).
+  relations (:ticket:`25882`).
 
 * Fixed evaluation of zero-length slices of ``QuerySet.values()``
   (:ticket:`25894`).
