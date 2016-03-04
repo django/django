@@ -460,7 +460,7 @@ calling the appropriate methods on the wrapped expression.
         Tells Django that this expression contains an aggregate and that a
         ``GROUP BY`` clause needs to be added to the query.
 
-    .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False)
+    .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 
         Provides the chance to do any pre-processing or validation of
         the expression before it's added to the query. ``resolve_expression()``
@@ -591,11 +591,11 @@ Now we implement the pre-processing and validation. Since we do not have
 any of our own validation at this point, we just delegate to the nested
 expressions::
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         c = self.copy()
         c.is_summary = summarize
         for pos, expression in enumerate(self.expressions):
-            c.expressions[pos] = expression.resolve_expression(query, allow_joins, reuse, summarize)
+            c.expressions[pos] = expression.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         return c
 
 Next, we write the method responsible for generating the SQL::
