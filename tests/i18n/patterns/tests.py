@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
@@ -75,6 +76,8 @@ class URLPrefixTests(URLTestCaseBase):
             self.assertEqual(reverse('prefixed'), '/en/prefixed/')
         with translation.override('nl'):
             self.assertEqual(reverse('prefixed'), '/nl/prefixed/')
+        with translation.override(None):
+            self.assertEqual(reverse('prefixed'), '/%s/prefixed/' % settings.LANGUAGE_CODE)
 
     @override_settings(ROOT_URLCONF='i18n.patterns.urls.wrong')
     def test_invalid_prefix_use(self):
