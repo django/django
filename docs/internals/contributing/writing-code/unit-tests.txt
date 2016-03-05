@@ -64,11 +64,9 @@ two databases:
 * A ``default`` database. This database should use the backend that
   you want to use for primary testing.
 
-* A database with the alias ``other``. The ``other`` database is used to
-  establish that queries can be directed to different databases. As a result,
-  this database can use any backend you want. It doesn't need to use the same
-  backend as the ``default`` database (although it can use the same backend if
-  you want to). It cannot be the same database as the ``default``.
+* A database with the alias ``other``. The ``other`` database is used to test
+  that queries can be directed to different databases. This database should use
+  the same backend as the ``default``, and it must have a different name.
 
 If you're using a backend that isn't SQLite, you will need to provide other
 details for each database:
