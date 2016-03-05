@@ -339,7 +339,7 @@ views for displaying drilldown pages for date-based data.
       * ``'%U'``: Based on the United States week system where the week
         begins on Sunday. This is the default value.
 
-      * ``'%V'``: Similar to ``'%U'``, except it assumes that the week
+      * ``'%W'``: Similar to ``'%U'``, except it assumes that the week
         begins on Monday. This is not the same as the ISO 8601 week number.
 
     **Example myapp/views.py**::
