@@ -1,5 +1,4 @@
-from django.db.models import DateTimeField
-from django.db.models.functions import Func
+from django.db.models import DateTimeField, Func
 
 
 class TransactionNow(Func):

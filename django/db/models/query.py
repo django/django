@@ -13,11 +13,12 @@ from django.db import (
     DJANGO_VERSION_PICKLE_KEY, IntegrityError, connections, router,
     transaction,
 )
-from django.db.models import sql
+from django.db.models import DateField, DateTimeField, sql
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Date, DateTime, F
+from django.db.models.expressions import F
 from django.db.models.fields import AutoField
+from django.db.models.functions import Trunc
 from django.db.models.query_utils import (
     InvalidQuery, Q, check_rel_lookup_compatibility,
 )
@@ -739,7 +740,7 @@ class QuerySet(object):
         assert order in ('ASC', 'DESC'), \
             "'order' must be either 'ASC' or 'DESC'."
         return self.annotate(
-            datefield=Date(field_name, kind),
+            datefield=Trunc(field_name, kind, output_field=DateField()),
             plain_field=F(field_name)
         ).values_list(
             'datefield', flat=True
@@ -760,7 +761,7 @@ class QuerySet(object):
         else:
             tzinfo = None
         return self.annotate(
-            datetimefield=DateTime(field_name, kind, tzinfo),
+            datetimefield=Trunc(field_name, kind, output_field=DateTimeField(), tzinfo=tzinfo),
             plain_field=F(field_name)
         ).values_list(
             'datetimefield', flat=True
