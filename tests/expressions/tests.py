@@ -11,8 +11,8 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    Case, Col, Date, DateTime, ExpressionWrapper, F, Func, OrderBy, Random,
-    RawSQL, Ref, Value, When,
+    Case, Col, ExpressionWrapper, F, Func, OrderBy, Random, RawSQL, Ref, Value,
+    When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -20,7 +20,6 @@ from django.db.models.functions import (
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
-from django.utils.timezone import utc
 
 from .models import UUID, Company, Employee, Experiment, Number, Time
 
@@ -930,8 +929,6 @@ class ReprTests(TestCase):
             "<Case: CASE WHEN <Q: (AND: ('a', 1))> THEN Value(None), ELSE Value(None)>"
         )
         self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
-        self.assertEqual(repr(Date('published', 'exact')), "Date(published, exact)")
-        self.assertEqual(repr(DateTime('published', 'exact', utc)), "DateTime(published, exact, %s)" % utc)
         self.assertEqual(repr(F('published')), "F(published)")
         self.assertEqual(repr(F('cost') + F('tax')), "<CombinedExpression: F(cost) + F(tax)>")
         self.assertEqual(

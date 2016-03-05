@@ -2,13 +2,9 @@ import math
 import warnings
 from copy import copy
 
-from django.conf import settings
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import (
-    DateField, DateTimeField, Field, IntegerField, TimeField,
-)
+from django.db.models.fields import DateTimeField, Field, IntegerField
 from django.db.models.query_utils import RegisterLookupMixin
-from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.six.moves import range
@@ -480,46 +476,6 @@ class IRegex(Regex):
 Field.register_lookup(IRegex)
 
 
-class DateTimeDateTransform(Transform):
-    lookup_name = 'date'
-
-    @cached_property
-    def output_field(self):
-        return DateField()
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = compiler.compile(self.lhs)
-        tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
-        sql, tz_params = connection.ops.datetime_cast_date_sql(lhs, tzname)
-        lhs_params.extend(tz_params)
-        return sql, lhs_params
-
-
-class DateTransform(Transform):
-    def as_sql(self, compiler, connection):
-        sql, params = compiler.compile(self.lhs)
-        lhs_output_field = self.lhs.output_field
-        if isinstance(lhs_output_field, DateTimeField):
-            tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
-            sql, tz_params = connection.ops.datetime_extract_sql(self.lookup_name, sql, tzname)
-            params.extend(tz_params)
-        elif isinstance(lhs_output_field, DateField):
-            sql = connection.ops.date_extract_sql(self.lookup_name, sql)
-        elif isinstance(lhs_output_field, TimeField):
-            sql = connection.ops.time_extract_sql(self.lookup_name, sql)
-        else:
-            raise ValueError('DateTransform only valid on Date/Time/DateTimeFields')
-        return sql, params
-
-    @cached_property
-    def output_field(self):
-        return IntegerField()
-
-
-class YearTransform(DateTransform):
-    lookup_name = 'year'
-
-
 class YearLookup(Lookup):
     def year_lookup_bounds(self, connection, year):
         output_field = self.lhs.lhs.output_field
@@ -528,20 +484,6 @@ class YearLookup(Lookup):
         else:
             bounds = connection.ops.year_lookup_bounds_for_date_field(year)
         return bounds
-
-
-@YearTransform.register_lookup
-class YearExact(YearLookup):
-    lookup_name = 'exact'
-
-    def as_sql(self, compiler, connection):
-        # We will need to skip the extract part and instead go
-        # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        bounds = self.year_lookup_bounds(connection, rhs_params[0])
-        params.extend(bounds)
-        return '%s BETWEEN %%s AND %%s' % lhs_sql, params
 
 
 class YearComparisonLookup(YearLookup):
@@ -564,7 +506,27 @@ class YearComparisonLookup(YearLookup):
         )
 
 
-@YearTransform.register_lookup
+class YearExact(YearLookup, Exact):
+    lookup_name = 'exact'
+
+    def as_sql(self, compiler, connection):
+        # We will need to skip the extract part and instead go
+        # directly with the originating field, that is self.lhs.lhs.
+        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
+        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
+        try:
+            # Check that rhs_params[0] exists (IndexError),
+            # it isn't None (TypeError), and is a number (ValueError)
+            int(rhs_params[0])
+        except (IndexError, TypeError, ValueError):
+            # Can't determine the bounds before executing the query, so skip
+            # optimizations by falling back to a standard exact comparison.
+            return super(Exact, self).as_sql(compiler, connection)
+        bounds = self.year_lookup_bounds(connection, rhs_params[0])
+        params.extend(bounds)
+        return '%s BETWEEN %%s AND %%s' % lhs_sql, params
+
+
 class YearGt(YearComparisonLookup):
     lookup_name = 'gt'
 
@@ -572,7 +534,6 @@ class YearGt(YearComparisonLookup):
         return finish
 
 
-@YearTransform.register_lookup
 class YearGte(YearComparisonLookup):
     lookup_name = 'gte'
 
@@ -580,7 +541,6 @@ class YearGte(YearComparisonLookup):
         return start
 
 
-@YearTransform.register_lookup
 class YearLt(YearComparisonLookup):
     lookup_name = 'lt'
 
@@ -588,52 +548,8 @@ class YearLt(YearComparisonLookup):
         return start
 
 
-@YearTransform.register_lookup
 class YearLte(YearComparisonLookup):
     lookup_name = 'lte'
 
     def get_bound(self, start, finish):
         return finish
-
-
-class MonthTransform(DateTransform):
-    lookup_name = 'month'
-
-
-class DayTransform(DateTransform):
-    lookup_name = 'day'
-
-
-class WeekDayTransform(DateTransform):
-    lookup_name = 'week_day'
-
-
-class HourTransform(DateTransform):
-    lookup_name = 'hour'
-
-
-class MinuteTransform(DateTransform):
-    lookup_name = 'minute'
-
-
-class SecondTransform(DateTransform):
-    lookup_name = 'second'
-
-
-DateField.register_lookup(YearTransform)
-DateField.register_lookup(MonthTransform)
-DateField.register_lookup(DayTransform)
-DateField.register_lookup(WeekDayTransform)
-
-TimeField.register_lookup(HourTransform)
-TimeField.register_lookup(MinuteTransform)
-TimeField.register_lookup(SecondTransform)
-
-DateTimeField.register_lookup(DateTimeDateTransform)
-DateTimeField.register_lookup(YearTransform)
-DateTimeField.register_lookup(MonthTransform)
-DateTimeField.register_lookup(DayTransform)
-DateTimeField.register_lookup(WeekDayTransform)
-DateTimeField.register_lookup(HourTransform)
-DateTimeField.register_lookup(MinuteTransform)
-DateTimeField.register_lookup(SecondTransform)
