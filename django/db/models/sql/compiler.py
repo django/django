@@ -1024,14 +1024,14 @@ class SQLInsertCompiler(SQLCompiler):
                 params = param_rows
             else:
                 result.append("VALUES (%s)" % ", ".join(placeholder_rows[0]))
-                params = param_rows[0]
+                params = [param_rows[0]]
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             r_fmt, r_params = self.connection.ops.return_insert_id()
             # Skip empty r_fmt to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
             if r_fmt:
                 result.append(r_fmt % col)
-                params += r_params
+                params += [r_params]
             return [(" ".join(result), tuple(chain.from_iterable(params)))]
 
         if can_bulk:
