@@ -278,6 +278,9 @@ Management Commands
   :djadmin:`runserver` does, if the set of migrations on disk don't match the
   migrations in the database.
 
+* To assist with testing, :func:`~django.core.management.call_command` now also
+  accepts a command object as the first argument.
+
 Migrations
 ~~~~~~~~~~
 

@@ -24,10 +24,10 @@ class Command(BaseCommand):
         parser.set_defaults(format='list')
 
     def handle(self, *args, **options):
-        self.verbosity = options.get('verbosity')
+        self.verbosity = options['verbosity']
 
         # Get the database we're operating from
-        db = options.get('database')
+        db = options['database']
         connection = connections[db]
 
         if options['format'] == "plan":

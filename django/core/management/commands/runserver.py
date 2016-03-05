@@ -42,7 +42,7 @@ class Command(BaseCommand):
             help='Tells Django to NOT use the auto-reloader.')
 
     def execute(self, *args, **options):
-        if options.get('no_color'):
+        if options['no_color']:
             # We rely on the environment because it's currently the only
             # way to reach WSGIRequestHandler. This seems an acceptable
             # compromise considering `runserver` runs indefinitely.
@@ -61,11 +61,11 @@ class Command(BaseCommand):
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
             raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
 
-        self.use_ipv6 = options.get('use_ipv6')
+        self.use_ipv6 = options['use_ipv6']
         if self.use_ipv6 and not socket.has_ipv6:
             raise CommandError('Your Python does not support IPv6.')
         self._raw_ipv6 = False
-        if not options.get('addrport'):
+        if not options['addrport']:
             self.addr = ''
             self.port = self.default_port
         else:
@@ -85,14 +85,14 @@ class Command(BaseCommand):
                     raise CommandError('"%s" is not a valid IPv6 address.' % self.addr)
         if not self.addr:
             self.addr = '::1' if self.use_ipv6 else '127.0.0.1'
-            self._raw_ipv6 = bool(self.use_ipv6)
+            self._raw_ipv6 = self.use_ipv6
         self.run(**options)
 
     def run(self, **options):
         """
         Runs the server, using the autoreloader if needed
         """
-        use_reloader = options.get('use_reloader')
+        use_reloader = options['use_reloader']
 
         if use_reloader:
             autoreload.main(self.inner_run, None, options)
@@ -104,7 +104,8 @@ class Command(BaseCommand):
         # to be raised in the child process, raise it now.
         autoreload.raise_last_exception()
 
-        threading = options.get('use_threading')
+        threading = options['use_threading']
+        # 'shutdown_message' is a stealth option.
         shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
