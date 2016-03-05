@@ -1312,7 +1312,7 @@ class Queries3Tests(BaseQuerysetTest):
     def test_ticket8683(self):
         # An error should be raised when QuerySet.datetimes() is passed the
         # wrong type of field.
-        with self.assertRaisesMessage(AssertionError, "'name' isn't a DateTimeField."):
+        with self.assertRaisesMessage(AssertionError, "'name' isn't a DateField or DateTimeField."):
             Item.objects.datetimes('name', 'month')
 
     def test_ticket22023(self):

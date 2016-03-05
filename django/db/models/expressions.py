@@ -1,12 +1,11 @@
 import copy
 import datetime
 
-from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.query_utils import Q
-from django.utils import six, timezone
+from django.utils import six
 from django.utils.functional import cached_property
 
 
@@ -858,111 +857,6 @@ class Case(Expression):
         if self._output_field_or_none is not None:
             sql = connection.ops.unification_cast_sql(self.output_field) % sql
         return sql, sql_params
-
-
-class Date(Expression):
-    """
-    Add a date selection column.
-    """
-    def __init__(self, lookup, lookup_type):
-        super(Date, self).__init__(output_field=fields.DateField())
-        self.lookup = lookup
-        self.col = None
-        self.lookup_type = lookup_type
-
-    def __repr__(self):
-        return "{}({}, {})".format(self.__class__.__name__, self.lookup, self.lookup_type)
-
-    def get_source_expressions(self):
-        return [self.col]
-
-    def set_source_expressions(self, exprs):
-        self.col, = exprs
-
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        copy = self.copy()
-        copy.col = query.resolve_ref(self.lookup, allow_joins, reuse, summarize)
-        field = copy.col.output_field
-        assert isinstance(field, fields.DateField), "%r isn't a DateField." % field.name
-        if settings.USE_TZ:
-            assert not isinstance(field, fields.DateTimeField), (
-                "%r is a DateTimeField, not a DateField." % field.name
-            )
-        return copy
-
-    def as_sql(self, compiler, connection):
-        sql, params = self.col.as_sql(compiler, connection)
-        assert not(params)
-        return connection.ops.date_trunc_sql(self.lookup_type, sql), []
-
-    def copy(self):
-        copy = super(Date, self).copy()
-        copy.lookup = self.lookup
-        copy.lookup_type = self.lookup_type
-        return copy
-
-    def convert_value(self, value, expression, connection, context):
-        if isinstance(value, datetime.datetime):
-            value = value.date()
-        return value
-
-
-class DateTime(Expression):
-    """
-    Add a datetime selection column.
-    """
-    def __init__(self, lookup, lookup_type, tzinfo):
-        super(DateTime, self).__init__(output_field=fields.DateTimeField())
-        self.lookup = lookup
-        self.col = None
-        self.lookup_type = lookup_type
-        if tzinfo is None:
-            self.tzname = None
-        else:
-            self.tzname = timezone._get_timezone_name(tzinfo)
-        self.tzinfo = tzinfo
-
-    def __repr__(self):
-        return "{}({}, {}, {})".format(
-            self.__class__.__name__, self.lookup, self.lookup_type, self.tzinfo)
-
-    def get_source_expressions(self):
-        return [self.col]
-
-    def set_source_expressions(self, exprs):
-        self.col, = exprs
-
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        copy = self.copy()
-        copy.col = query.resolve_ref(self.lookup, allow_joins, reuse, summarize)
-        field = copy.col.output_field
-        assert isinstance(field, fields.DateTimeField), (
-            "%r isn't a DateTimeField." % field.name
-        )
-        return copy
-
-    def as_sql(self, compiler, connection):
-        sql, params = self.col.as_sql(compiler, connection)
-        assert not(params)
-        return connection.ops.datetime_trunc_sql(self.lookup_type, sql, self.tzname)
-
-    def copy(self):
-        copy = super(DateTime, self).copy()
-        copy.lookup = self.lookup
-        copy.lookup_type = self.lookup_type
-        copy.tzname = self.tzname
-        return copy
-
-    def convert_value(self, value, expression, connection, context):
-        if settings.USE_TZ:
-            if value is None:
-                raise ValueError(
-                    "Database returned an invalid value in QuerySet.datetimes(). "
-                    "Are time zone definitions for your database and pytz installed?"
-                )
-            value = value.replace(tzinfo=None)
-            value = timezone.make_aware(value, self.tzinfo)
-        return value
 
 
 class OrderBy(BaseExpression):
