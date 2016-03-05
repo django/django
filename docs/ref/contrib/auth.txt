@@ -446,6 +446,13 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     implement them other than returning an empty set of permissions if
     ``obj is not None``.
 
+    .. attribute:: ModelBackend.allow_inactive_users
+
+        .. versionadded:: 1.10
+        
+        Boolean that determines whether or not the backend will reject
+        inactive users. Defaults to ``False``.
+
     .. method:: authenticate(username=None, password=None, **kwargs)
 
         Tries to authenticate ``username`` with ``password`` by calling
@@ -529,3 +536,10 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
    new user is created, and can be used to perform custom setup actions, such
    as setting the user's groups based on attributes in an LDAP directory.
    Returns the user object.
+
+.. class:: AllowInactiveUsersModelBackend
+
+   .. versionadded:: 1.10
+
+   Same as :class:`~ModelBackend`, but doesn't reject inactive users because
+   :attr:`~ModelBackend.allow_inactive_users` = ``True``.

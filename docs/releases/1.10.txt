@@ -637,6 +637,10 @@ Miscellaneous
 * Tests that violate deferrable database constraints will now error when run on
   a database that supports deferrable constraints.
 
+* ``django.contrib.auth.backends.ModelBackend`` now rejects inactive users by
+  default. If you need previous behavior, use
+  ``django.contrib.auth.backends.AllowInactiveUsersModelBackend`` instead.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10

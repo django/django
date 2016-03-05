@@ -4,6 +4,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 
 # The custom User uses email as the unique identifier, and requires
@@ -95,6 +96,19 @@ class RemoveGroupsAndPermissions(object):
     def __exit__(self, exc_type, exc_value, traceback):
         AbstractUser._meta.local_many_to_many = self._old_au_local_m2m
         PermissionsMixin._meta.local_many_to_many = self._old_pm_local_m2m
+
+
+class CustomUserWithoutIsActiveField(AbstractBaseUser):
+    username = models.CharField(
+        _('username'),
+        max_length=150,
+        unique=True,
+    )
+    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
 
 
 # The extension user is a simple extension of the built-in user class,

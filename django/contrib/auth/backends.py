@@ -9,6 +9,9 @@ class ModelBackend(object):
     Authenticates against settings.AUTH_USER_MODEL.
     """
 
+    # Reject user when `is_active` is False.
+    allow_inactive_users = False
+
     def authenticate(self, username=None, password=None, **kwargs):
         UserModel = get_user_model()
         if username is None:
@@ -16,7 +19,9 @@ class ModelBackend(object):
         try:
             user = UserModel._default_manager.get_by_natural_key(username)
             if user.check_password(password):
-                return user
+                is_active = getattr(user, 'is_active', None)
+                if is_active or self.allow_inactive_users or is_active is None:
+                    return user
         except UserModel.DoesNotExist:
             # Run the default password hasher once to reduce the timing
             # difference between an existing and a non-existing user (#20760).
@@ -90,9 +95,14 @@ class ModelBackend(object):
     def get_user(self, user_id):
         UserModel = get_user_model()
         try:
-            return UserModel._default_manager.get(pk=user_id)
+            user = UserModel._default_manager.get(pk=user_id)
         except UserModel.DoesNotExist:
             return None
+        if user:
+            is_active = getattr(user, 'is_active', None)
+            if is_active or self.allow_inactive_users or is_active is None:
+                return user
+        return None
 
 
 class RemoteUserBackend(ModelBackend):
@@ -158,3 +168,7 @@ class RemoteUserBackend(ModelBackend):
         By default, returns the user unmodified.
         """
         return user
+
+
+class AllowInactiveUsersModelBackend(ModelBackend):
+    allow_inactive_users = True
