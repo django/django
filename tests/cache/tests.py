@@ -1326,7 +1326,7 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
         self.assertIsNotNone(cache._expire_info[cache_key])
 
     @override_settings(CACHES=NEVER_EXPIRING_CACHES_SETTINGS)
-    def text_caches_set_with_timeout_as_none_set_non_expiring_key(self):
+    def test_caches_set_with_timeout_as_none_set_non_expiring_key(self):
         """Memory caches that have the TIMEOUT parameter set to `None` will set
         a non expiring key by default.
         """
