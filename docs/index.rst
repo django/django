@@ -32,6 +32,7 @@ Contents:
    integration-changes
    scaling
    backends
+   reference
    integration-plan
    faqs
    asgi
