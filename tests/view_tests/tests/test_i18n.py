@@ -164,6 +164,7 @@ class JsI18NTests(SimpleTestCase):
         with self.settings(LANGUAGE_CODE='fr'), override('fi'):
             response = self.client.get('/jsi18n/')
             self.assertContains(response, 'il faut le traduire')
+            self.assertNotContains(response, "Untranslated string")
 
     def test_i18n_language_non_english_default(self):
         """

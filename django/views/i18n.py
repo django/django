@@ -1,5 +1,5 @@
-import gettext as gettext_module
 import importlib
+import itertools
 import json
 import os
 
@@ -16,6 +16,7 @@ from django.utils.http import is_safe_url
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, check_for_language, get_language, to_locale,
 )
+from django.utils.translation.trans_real import DjangoTranslation
 
 DEFAULT_PACKAGES = ['django.conf']
 LANGUAGE_QUERY_PARAMETER = 'language'
@@ -202,67 +203,25 @@ def render_javascript_catalog(catalog=None, plural=None):
 
 
 def get_javascript_catalog(locale, domain, packages):
-    default_locale = to_locale(settings.LANGUAGE_CODE)
     app_configs = apps.get_app_configs()
     allowable_packages = set(app_config.name for app_config in app_configs)
     allowable_packages.update(DEFAULT_PACKAGES)
     packages = [p for p in packages if p in allowable_packages]
-    t = {}
     paths = []
-    en_selected = locale.startswith('en')
-    en_catalog_missing = True
     # paths of requested packages
     for package in packages:
         p = importlib.import_module(package)
         path = os.path.join(os.path.dirname(upath(p.__file__)), 'locale')
         paths.append(path)
-    # add the filesystem paths listed in the LOCALE_PATHS setting
-    paths.extend(reversed(settings.LOCALE_PATHS))
-    # first load all english languages files for defaults
-    for path in paths:
-        try:
-            catalog = gettext_module.translation(domain, path, ['en'])
-            t.update(catalog._catalog)
-        except IOError:
-            pass
-        else:
-            # 'en' is the selected language and at least one of the packages
-            # listed in `packages` has an 'en' catalog
-            if en_selected:
-                en_catalog_missing = False
-    # next load the settings.LANGUAGE_CODE translations if it isn't english
-    if default_locale != 'en':
-        for path in paths:
-            try:
-                catalog = gettext_module.translation(domain, path, [default_locale])
-            except IOError:
-                catalog = None
-            if catalog is not None:
-                t.update(catalog._catalog)
-    # last load the currently selected language, if it isn't identical to the default.
-    if locale != default_locale:
-        # If the currently selected language is English but it doesn't have a
-        # translation catalog (presumably due to being the language translated
-        # from) then a wrong language catalog might have been loaded in the
-        # previous step. It needs to be discarded.
-        if en_selected and en_catalog_missing:
-            t = {}
-        else:
-            locale_t = {}
-            for path in paths:
-                try:
-                    catalog = gettext_module.translation(domain, path, [locale])
-                except IOError:
-                    catalog = None
-                if catalog is not None:
-                    locale_t.update(catalog._catalog)
-            if locale_t:
-                t = locale_t
+
+    trans = DjangoTranslation(locale, domain=domain, localedirs=paths)
+    trans_cat = trans._catalog
+
     plural = None
-    if '' in t:
-        for l in t[''].split('\n'):
-            if l.startswith('Plural-Forms:'):
-                plural = l.split(':', 1)[1].strip()
+    if '' in trans_cat:
+        for line in trans_cat[''].split('\n'):
+            if line.startswith('Plural-Forms:'):
+                plural = line.split(':', 1)[1].strip()
     if plural is not None:
         # this should actually be a compiled function of a typical plural-form:
         # Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 :
@@ -272,18 +231,19 @@ def get_javascript_catalog(locale, domain, packages):
     pdict = {}
     maxcnts = {}
     catalog = {}
-    for k, v in t.items():
-        if k == '':
+    trans_fallback_cat = trans._fallback._catalog if trans._fallback else {}
+    for key, value in itertools.chain(six.iteritems(trans_cat), six.iteritems(trans_fallback_cat)):
+        if key == '' or key in catalog:
             continue
-        if isinstance(k, six.string_types):
-            catalog[k] = v
-        elif isinstance(k, tuple):
-            msgid = k[0]
-            cnt = k[1]
+        if isinstance(key, six.string_types):
+            catalog[key] = value
+        elif isinstance(key, tuple):
+            msgid = key[0]
+            cnt = key[1]
             maxcnts[msgid] = max(cnt, maxcnts.get(msgid, 0))
-            pdict.setdefault(msgid, {})[cnt] = v
+            pdict.setdefault(msgid, {})[cnt] = value
         else:
-            raise TypeError(k)
+            raise TypeError(key)
     for k, v in pdict.items():
         catalog[k] = [v.get(i, '') for i in range(maxcnts[msgid] + 1)]
 
