@@ -148,6 +148,6 @@ class WorkerThread(threading.Thread):
 
     def run(self):
         self.logger.debug("Worker thread running")
-        worker = Worker(channel_layer=self.channel_layer)
+        worker = Worker(channel_layer=self.channel_layer, signal_handlers=False)
         worker.run()
         self.logger.debug("Worker thread exited")
