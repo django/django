@@ -170,7 +170,7 @@ a message expiry time, usually between 30 seconds and a few minutes, and it's
 often configurable) - but the ``disconnect`` handler will get called nearly all
 of the time anyway.
 
-.. _note:
+.. note::
     Channels' design is predicated on expecting and working around failure;
     it assumes that some small percentage of messages will never get delivered,
     and so all the core functionality is designed to *expect failure* so that
