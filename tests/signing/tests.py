@@ -58,7 +58,7 @@ class TestSigner(SimpleTestCase):
             self.assertNotEqual(force_str(example), signed)
             self.assertEqual(example, signer.unsign(signed))
 
-    def unsign_detects_tampering(self):
+    def test_unsign_detects_tampering(self):
         "unsign should raise an exception if the value has been tampered with"
         signer = signing.Signer('predictable-secret')
         value = 'Another string'
