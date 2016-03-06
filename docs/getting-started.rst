@@ -90,54 +90,106 @@ Now, that's not very exciting - raw HTTP responses are something Django has
 been able to do for a long time. Let's try some WebSockets, and make a basic
 chat server!
 
-Delete that consumer and its routing - we'll want the normal Django view layer to
+We'll start with a simple server that just echoes every message it gets sent
+back to the same client - no cross-client communication. It's not terribly
+useful, but it's a good way to start out writing Channels consumers.
+
+Delete that previous consumer and its routing - we'll want the normal Django view layer to
 serve HTTP requests from now on, which happens if you don't specify a consumer
 for ``http.request`` - and make this WebSocket consumer instead::
 
     # In consumers.py
     from channels import Group
 
-    def ws_add(message):
-        Group("chat").add(message.reply_channel)
+    def ws_message(message):
+        # ASGI WebSocket packet-received and send-packet message types
+        # both have a "text" key for their textual data. 
+        message.reply_channel.send({
+            "text": message.content['text'],
+        })
 
-Hook it up to the ``websocket.connect`` channel like this::
+Hook it up to the ``websocket.receive`` channel like this::
 
     # In routing.py
-    from myproject.myapp.consumers import ws_add
+    from myproject.myapp.consumers import ws_message
 
     channel_routing = {
-        "websocket.connect": ws_add,
+        "websocket.receive": ws_message,
     }
 
 Now, let's look at what this is doing. It's tied to the
-``websocket.connect`` channel, which means that it'll get a message
-whenever a new WebSocket connection is opened by a client.
+``websocket.receive`` channel, which means that it'll get a message
+whenever a WebSocket packet is sent to us by a client.
 
 When it gets that message, it takes the ``reply_channel`` attribute from it, which
-is the unique response channel for that client, and adds it to the ``chat``
-group, which means we can send messages to all connected chat clients.
+is the unique response channel for that client, and sends the same content
+back to the client using its ``send()`` method.
 
-Of course, if you've read through :doc:`concepts`, you'll know that channels
-added to groups expire out if their messages expire (every channel layer has
-a message expiry time, usually between 30 seconds and a few minutes, and it's
-often configurable).
+Let's test it! Run ``runserver``, open a browser and put the following into the
+JavaScript console to open a WebSocket and send some data down it (you might
+need to change the socket address if you're using a development VM or similar)::
 
-However, we'll still get disconnection messages most of the time when a
-WebSocket disconnects; the expiry/garbage collection of group membership is
-mostly there for when a disconnect message gets lost (channels are not
-guaranteed delivery, just mostly reliable). Let's add an explicit disconnect
-handler::
+    // Note that the path doesn't matter for routing; any WebSocket
+    // connection gets bumped over to WebSocket consumers
+    socket = new WebSocket("ws://127.0.0.1:8000/chat/");
+    socket.onmessage = function(e) {
+        alert(e.data);
+    }
+    socket.onopen = function() {
+        socket.send("hello world");
+    }
+
+You should see an alert come back immediately saying "hello world" - your
+message has round-tripped through the server and come back to trigger the alert.
+
+Groups
+------
+
+Now, let's make our echo server into an actual chat server, so people can talk
+to each other. To do this, we'll use Groups, one of the :doc:`core concepts <concepts>`
+of Channels, and our fundamental way of doing multi-cast messaging.
+
+To do this, we'll hook up the ``websocket.connect`` and ``websocket.disconnect``
+channels to add and remove our clients from the Group as they connect and
+disconnect, like this::
+
+    # In consumers.py
+    from channels import Group
+
+    # Connected to websocket.connect
+    def ws_add(message):
+        Group("chat").add(message.reply_channel)
 
     # Connected to websocket.disconnect
     def ws_disconnect(message):
         Group("chat").discard(message.reply_channel)
 
+Of course, if you've read through :doc:`concepts`, you'll know that channels
+added to groups expire out if their messages expire (every channel layer has
+a message expiry time, usually between 30 seconds and a few minutes, and it's
+often configurable) - but the ``disconnect`` handler will get called nearly all
+of the time anyway.
+
+.. _note:
+    Channels' design is predicated on expecting and working around failure;
+    it assumes that some small percentage of messages will never get delivered,
+    and so all the core functionality is designed to *expect failure* so that
+    when a message doesn't get delivered, it doesn't ruin the whole system.
+
+    We suggest you design your applications the same way - rather than relying
+    on 100% guaranteed delivery, which Channels won't give you, look at each
+    failure case and program something to expect and handle it - be that retry
+    logic, partial content handling, or just having something not work that one
+    time. HTTP requests are just as fallible, and most people's reponse to that
+    is a generic error page!
+
 .. _websocket-example:
 
 Now, that's taken care of adding and removing WebSocket send channels for the
-``chat`` group; all we need to do now is take care of message sending. For now,
-we're not going to store a history of messages or anything and just replay
-any message sent in to all connected clients. Here's all the code::
+``chat`` group; all we need to do now is take care of message sending. Instead
+of echoing the message back to the client like we did above, we'll instead send
+it to the whole ``Group``, which means any client who's been added to it will
+get the message. Here's all the code::
 
     # In consumers.py
     from channels import Group
@@ -148,8 +200,6 @@ any message sent in to all connected clients. Here's all the code::
 
     # Connected to websocket.receive
     def ws_message(message):
-        # ASGI WebSocket packet-received and send-packet message types
-        # both have a "text" key for their textual data. 
         Group("chat").send({
             "text": "[user] %s" % message.content['text'],
         })
@@ -169,8 +219,8 @@ And what our routing should look like in ``routing.py``::
     }
 
 With all that code, you now have a working set of a logic for a chat server.
-Let's test it! Run ``runserver``, open a browser and put the following into the
-JavaScript console to open a WebSocket and send some data down it::
+Test time! Run ``runserver``, open a browser and use that same JavaScript
+code in the developer console as before::
 
     // Note that the path doesn't matter right now; any WebSocket
     // connection gets bumped over to WebSocket consumers
@@ -182,16 +232,15 @@ JavaScript console to open a WebSocket and send some data down it::
         socket.send("hello world");
     }
 
-You should see an alert come back immediately saying "hello world" - your
-message has round-tripped through the server and come back to trigger the alert.
-You can open another tab and do the same there if you like, and both tabs will
-receive the message and show an alert, as any incoming message is sent to the
+You should see an alert come back immediately saying "hello world" - but this
+time, you can open another tab and do the same there, and both tabs will
+receive the message and show an alert. Any incoming message is sent to the
 ``chat`` group by the ``ws_message`` consumer, and both your tabs will have
 been put into the ``chat`` group when they connected.
 
 Feel free to put some calls to ``print`` in your handler functions too, if you
 like, so you can understand when they're called. You can also use ``pdb`` and
-other methods you'd use to debug normal Django projects.
+other similar methods you'd use to debug normal Django projects.
 
 
 Running with Channels
