@@ -30,7 +30,7 @@ from django.template import engines
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, TransactionTestCase,
+    RequestFactory, SimpleTestCase, TestCase, TransactionTestCase, mock,
     override_settings,
 )
 from django.test.signals import setting_changed
@@ -930,6 +930,13 @@ class BaseCacheTests(object):
         self.assertEqual(cache.get_or_set('brian', 42, version=1), 42)
         self.assertEqual(cache.get_or_set('brian', 1979, version=2), 1979)
         self.assertIsNone(cache.get('brian', version=3))
+
+    def test_get_or_set_racing(self):
+        with mock.patch('%s.%s' % (settings.CACHES['default']['BACKEND'], 'add')) as cache_add:
+            # Simulate cache.add() failing to add a value. In that case, the
+            # default value should be returned.
+            cache_add.return_value = False
+            self.assertEqual(cache.get_or_set('key', 'default'), 'default')
 
 
 @override_settings(CACHES=caches_setting_for_tests(
