@@ -36,15 +36,6 @@ class Channel(object):
             raise ValueError("You can only send dicts as content on channels.")
         self.channel_layer.send(self.name, content)
 
-    def as_view(self):
-        """
-        Returns a view version of this channel - one that takes
-        the request passed in and dispatches it to our channel,
-        serialized.
-        """
-        from channels.adapters import view_producer
-        return view_producer(self.name)
-
     def __str__(self):
         return self.name
 
@@ -73,9 +64,6 @@ class Group(object):
         if isinstance(channel, Channel):
             channel = channel.name
         self.channel_layer.group_discard(self.name, channel)
-
-    def channels(self):
-        return self.channel_layer.group_channels(self.name)
 
     def send(self, content):
         if not isinstance(content, dict):
