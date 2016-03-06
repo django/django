@@ -100,9 +100,13 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     requested language and add a fallback to the default language, if it's
     different from the requested language.
     """
-    def __init__(self, language):
+    domain = 'django'
+
+    def __init__(self, language, domain=None, localedirs=None):
         """Create a GNUTranslations() using many locale directories"""
         gettext_module.GNUTranslations.__init__(self)
+        if domain is not None:
+            self.domain = domain
         self.set_output_charset('utf-8')  # For Python 2 gettext() (#25720)
 
         self.__language = language
@@ -110,13 +114,26 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.__locale = to_locale(language)
         self._catalog = None
 
-        self._init_translation_catalog()
-        self._add_installed_apps_translations()
+        if self.domain == 'django':
+            if localedirs is not None:
+                # A module-level cache is used for caching 'django' translations
+                warnings.warn("localedirs is ignored when domain is 'django'.", RuntimeWarning)
+                localedirs = None
+            self._init_translation_catalog()
+
+        if localedirs:
+            for localedir in localedirs:
+                translation = self._new_gnu_trans(localedir)
+                self.merge(translation)
+        else:
+            self._add_installed_apps_translations()
+
         self._add_local_translations()
-        if self.__language == settings.LANGUAGE_CODE and self._catalog is None:
+        if (self.__language == settings.LANGUAGE_CODE and self.domain == 'django'
+                and self._catalog is None):
             # default lang should have at least one translation file available.
             raise IOError("No translation files found for default language %s." % settings.LANGUAGE_CODE)
-        self._add_fallback()
+        self._add_fallback(localedirs)
         if self._catalog is None:
             # No catalogs found for this language, set an empty catalog.
             self._catalog = {}
@@ -133,7 +150,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         references to 'fallback'.
         """
         return gettext_module.translation(
-            domain='django',
+            domain=self.domain,
             localedir=localedir,
             languages=[self.__locale],
             codeset='utf-8',
@@ -166,13 +183,19 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             translation = self._new_gnu_trans(localedir)
             self.merge(translation)
 
-    def _add_fallback(self):
+    def _add_fallback(self, localedirs=None):
         """Sets the GNUTranslations() fallback with the default language."""
         # Don't set a fallback for the default language or any English variant
         # (as it's empty, so it'll ALWAYS fall back to the default language)
         if self.__language == settings.LANGUAGE_CODE or self.__language.startswith('en'):
             return
-        default_translation = translation(settings.LANGUAGE_CODE)
+        if self.domain == 'django':
+            # Get from cache
+            default_translation = translation(settings.LANGUAGE_CODE)
+        else:
+            default_translation = DjangoTranslation(
+                settings.LANGUAGE_CODE, domain=self.domain, localedirs=localedirs
+            )
         self.add_fallback(default_translation)
 
     def merge(self, other):
@@ -198,7 +221,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
 def translation(language):
     """
-    Returns a translation object.
+    Returns a translation object in the default 'django' domain.
     """
     global _translations
     if language not in _translations:
