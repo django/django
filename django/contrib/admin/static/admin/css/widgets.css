@@ -384,7 +384,7 @@ span.clearable-file-input label {
     width: 100%;
 }
 
-.calendar caption, .calendarbox h2 {
+.calendar caption, .calendarbox h2, .calendar caption select {
     margin: 0;
     text-align: center;
     border-top: none;
