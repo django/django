@@ -179,6 +179,41 @@ class FileUploadTests(TestCase):
         response = self.client.request(**r)
         self.assertEqual(response.status_code, 200)
 
+    def test_blank_filenames(self):
+        """
+        Test receiving file upload when filename is blank (before or after sanitisation) (#26325)
+        """
+        filenames = [
+            "",
+            "C:\\Windows\\",
+        ]
+
+        payload = client.FakePayload()
+        for i, name in enumerate(filenames):
+            payload.write('\r\n'.join([
+                '--' + client.BOUNDARY,
+                'Content-Disposition: form-data; name="file%s"; filename="%s"' % (i, name),
+                'Content-Type: application/octet-stream',
+                '',
+                'You got pwnd.\r\n'
+            ]))
+        payload.write('\r\n--' + client.BOUNDARY + '--\r\n')
+
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': "/echo/",
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+
+        # Empty filenames should be ignored
+        received = json.loads(response.content.decode('utf-8'))
+        for i, name in enumerate(filenames):
+            self.assertEqual(received.get('file%s' % i, None), None)
+
     def test_dangerous_file_names(self):
         """Uploaded file names should be sanitized before ever reaching the view."""
         # This test simulates possible directory traversal attacks by a
