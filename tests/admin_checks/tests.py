@@ -116,7 +116,6 @@ class SystemChecksTestCase(SimpleTestCase):
             checks.Error(
                 "The value of 'list_editable[0]' refers to 'original_release', "
                 "which is not contained in 'list_display'.",
-                hint=None,
                 obj=SongAdmin,
                 id='admin.E122',
             )
@@ -136,9 +135,8 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = SongAdmin(Song, AdminSite()).check()
         expected = [
             checks.Error(
-                ("The value of 'list_editable[0]' refers to 'original_release', "
-                 "which is not editable through the admin."),
-                hint=None,
+                "The value of 'list_editable[0]' refers to 'original_release', "
+                "which is not editable through the admin.",
                 obj=SongAdmin,
                 id='admin.E125',
             )
@@ -191,7 +189,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'fieldsets[0][1]['fields']' must be a list or tuple.",
-                hint=None,
                 obj=NotATupleAdmin,
                 id='admin.E008',
             )
@@ -216,7 +213,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'fieldsets[1][1]['fields']' must be a list or tuple.",
-                hint=None,
                 obj=NotATupleAdmin,
                 id='admin.E008',
             )
@@ -234,7 +230,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'exclude' must be a list or tuple.",
-                hint=None,
                 obj=ExcludedFields1,
                 id='admin.E014',
             )
@@ -249,7 +244,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'exclude' contains duplicate field(s).",
-                hint=None,
                 obj=ExcludedFields2,
                 id='admin.E015',
             )
@@ -269,7 +263,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'exclude' must be a list or tuple.",
-                hint=None,
                 obj=ExcludedFieldsInline,
                 id='admin.E014',
             )
@@ -292,9 +285,8 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = AlbumAdmin(Album, AdminSite()).check()
         expected = [
             checks.Error(
-                ("Cannot exclude the field 'album', because it is the foreign key "
-                 "to the parent model 'admin_checks.Album'."),
-                hint=None,
+                "Cannot exclude the field 'album', because it is the foreign key "
+                "to the parent model 'admin_checks.Album'.",
                 obj=SongInline,
                 id='admin.E201',
             )
@@ -330,7 +322,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "'admin_checks.Book' has no GenericForeignKey.",
-                hint=None,
                 obj=BookInline,
                 id='admin.E301',
             )
@@ -350,7 +341,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "'ct_field' references 'nonexistent', which is not a field on 'admin_checks.Influence'.",
-                hint=None,
                 obj=InfluenceInline,
                 id='admin.E302',
             )
@@ -370,7 +360,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "'ct_fk_field' references 'nonexistent', which is not a field on 'admin_checks.Influence'.",
-                hint=None,
                 obj=InfluenceInline,
                 id='admin.E303',
             )
@@ -394,7 +383,6 @@ class SystemChecksTestCase(SimpleTestCase):
             checks.Error(
                 "'admin_checks.Influence' has no GenericForeignKey using "
                 "content type field 'name' and object ID field 'object_id'.",
-                hint=None,
                 obj=InfluenceInline,
                 id='admin.E304',
             )
@@ -418,7 +406,6 @@ class SystemChecksTestCase(SimpleTestCase):
             checks.Error(
                 "'admin_checks.Influence' has no GenericForeignKey using "
                 "content type field 'content_type' and object ID field 'name'.",
-                hint=None,
                 obj=InfluenceInline,
                 id='admin.E304',
             )
@@ -437,7 +424,6 @@ class SystemChecksTestCase(SimpleTestCase):
             checks.Error(
                 "The value of 'raw_id_fields[0]' refers to 'nonexisting', "
                 "which is not an attribute of 'admin_checks.Album'.",
-                hint=None,
                 obj=RawIdNonexistingAdmin,
                 id='admin.E002',
             )
@@ -472,7 +458,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "'admin_checks.TwoAlbumFKAndAnE' has more than one ForeignKey to 'admin_checks.Album'.",
-                hint=None,
                 obj=TwoAlbumFKAndAnEInline,
                 id='admin.E202',
             )
@@ -545,9 +530,8 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = SongAdmin(Song, AdminSite()).check()
         expected = [
             checks.Error(
-                ("The value of 'readonly_fields[1]' is not a callable, an attribute "
-                 "of 'SongAdmin', or an attribute of 'admin_checks.Song'."),
-                hint=None,
+                "The value of 'readonly_fields[1]' is not a callable, an attribute "
+                "of 'SongAdmin', or an attribute of 'admin_checks.Song'.",
                 obj=SongAdmin,
                 id='admin.E035',
             )
@@ -562,9 +546,8 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = CityInline(State, AdminSite()).check()
         expected = [
             checks.Error(
-                ("The value of 'readonly_fields[0]' is not a callable, an attribute "
-                 "of 'CityInline', or an attribute of 'admin_checks.City'."),
-                hint=None,
+                "The value of 'readonly_fields[0]' is not a callable, an attribute "
+                "of 'CityInline', or an attribute of 'admin_checks.City'.",
                 obj=CityInline,
                 id='admin.E035',
             )
@@ -600,9 +583,8 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = BookAdmin(Book, AdminSite()).check()
         expected = [
             checks.Error(
-                ("The value of 'fields' cannot include the ManyToManyField 'authors', "
-                 "because that field manually specifies a relationship model."),
-                hint=None,
+                "The value of 'fields' cannot include the ManyToManyField 'authors', "
+                "because that field manually specifies a relationship model.",
                 obj=BookAdmin,
                 id='admin.E013',
             )
@@ -619,9 +601,8 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = FieldsetBookAdmin(Book, AdminSite()).check()
         expected = [
             checks.Error(
-                ("The value of 'fieldsets[1][1][\"fields\"]' cannot include the ManyToManyField "
-                 "'authors', because that field manually specifies a relationship model."),
-                hint=None,
+                "The value of 'fieldsets[1][1][\"fields\"]' cannot include the ManyToManyField "
+                "'authors', because that field manually specifies a relationship model.",
                 obj=FieldsetBookAdmin,
                 id='admin.E013',
             )
@@ -701,7 +682,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'fields' contains duplicate field(s).",
-                hint=None,
                 obj=MyModelAdmin,
                 id='admin.E006'
             )
@@ -720,7 +700,6 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "There are duplicate field(s) in 'fieldsets[0][1]'.",
-                hint=None,
                 obj=MyModelAdmin,
                 id='admin.E012'
             )

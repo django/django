@@ -707,3 +707,13 @@ class isolate_apps(TestContextDecorator):
 
     def disable(self):
         setattr(Options, 'default_apps', self.old_apps)
+
+
+def tag(*tags):
+    """
+    Decorator to add tags to a test class or method.
+    """
+    def decorator(obj):
+        setattr(obj, 'tags', set(tags))
+        return obj
+    return decorator

@@ -308,7 +308,7 @@ send queries for the ``auth`` app to ``auth_db``::
                return True
             return None
 
-        def allow_migrate(self, db, app_label, model=None, **hints):
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
             """
             Make sure the auth app only appears in the 'auth_db'
             database.
@@ -346,7 +346,7 @@ from::
                 return True
             return None
 
-        def allow_migrate(self, db, app_label, model=None, **hints):
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
             """
             All non-auth models end up in this pool.
             """

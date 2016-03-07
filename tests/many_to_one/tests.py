@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
+from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -486,19 +487,19 @@ class ManyToOneTests(TestCase):
         p = Parent.objects.get(name="Parent")
         self.assertIsNone(p.bestchild)
 
-        # Assigning None fails: Child.parent is null=False.
-        with self.assertRaises(ValueError):
-            setattr(c, "parent", None)
+        # Assigning None will not fail: Child.parent is null=False.
+        setattr(c, "parent", None)
 
         # You also can't assign an object of the wrong type here
         with self.assertRaises(ValueError):
             setattr(c, "parent", First(id=1, second=1))
 
-        # Nor can you explicitly assign None to Child.parent during object
-        # creation (regression for #9649).
-        with self.assertRaises(ValueError):
-            Child(name='xyzzy', parent=None)
-        with self.assertRaises(ValueError):
+        # You can assign None to Child.parent during object creation.
+        Child(name='xyzzy', parent=None)
+
+        # But when trying to save a Child with parent=None, the database will
+        # raise IntegrityError.
+        with self.assertRaises(IntegrityError), transaction.atomic():
             Child.objects.create(name='xyzzy', parent=None)
 
         # Creation using keyword argument should cache the related object.

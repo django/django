@@ -103,12 +103,38 @@ Django quotes column and table names behind the scenes.
     The name that will be used by default for the relation from a related object
     back to this one. The default is ``<model_name>_set``.
 
+    This option also sets :attr:`~ForeignKey.related_query_name`.
+
     As the reverse name for a field should be unique, be careful if you intend
     to subclass your model. To work around name collisions, part of the name
     should contain ``'%(app_label)s'`` and ``'%(model_name)s'``, which are
     replaced respectively by the name of the application the model is in,
     and the name of the model, both lowercased. See the paragraph on
     :ref:`related names for abstract models <abstract-related-name>`.
+
+    .. deprecated:: 1.10
+
+        This attribute now affects ``related_query_name``. The old query lookup
+        name is deprecated::
+
+            from django.db import models
+
+            class Foo(models.Model):
+                pass
+
+            class Bar(models.Model):
+                foo = models.ForeignKey(Foo)
+
+                class Meta:
+                    default_related_name = 'bars'
+
+        ::
+
+            >>> bar = Bar.objects.get(pk=1)
+            >>> # Using model name "bar" as lookup string is deprecated.
+            >>> Foo.object.get(bar=bar)
+            >>> # You should use default_related_name "bars".
+            >>> Foo.object.get(bars=bar)
 
 ``get_latest_by``
 -----------------
@@ -261,6 +287,12 @@ Django quotes column and table names behind the scenes.
     Ordering is not a free operation. Each field you add to the ordering
     incurs a cost to your database. Each foreign key you add will
     implicitly include all of its default orderings as well.
+
+    If a query doesn't have an ordering specified, results are returned from
+    the database in an unspecified order. A particular ordering is guaranteed
+    only when ordering by a set of fields that uniquely identify each object in
+    the results. For example, if a ``name`` field isn't unique, ordering by it
+    won't guarantee objects with the same name always appear in the same order.
 
 ``permissions``
 ---------------

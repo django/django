@@ -57,11 +57,11 @@ class Command(BaseCommand):
         from django.conf import settings
         from django.test.utils import get_runner
 
-        TestRunner = get_runner(settings, options.get('testrunner'))
+        TestRunner = get_runner(settings, options['testrunner'])
 
-        if options.get('liveserver') is not None:
+        if options['liveserver'] is not None:
             os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options['liveserver']
-            del options['liveserver']
+        del options['liveserver']
 
         test_runner = TestRunner(**options)
         failures = test_runner.run_tests(test_labels)

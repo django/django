@@ -149,8 +149,6 @@ class ProxyModelTests(TestCase):
         expected = [
             checks.Error(
                 "Proxy model 'NoNewFields' contains model fields.",
-                hint=None,
-                obj=None,
                 id='models.E017',
             )
         ]

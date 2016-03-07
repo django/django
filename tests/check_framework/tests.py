@@ -79,12 +79,12 @@ class MessageTests(SimpleTestCase):
         self.assertEqual(force_text(e), expected)
 
     def test_printing_no_hint(self):
-        e = Error("Message", hint=None, obj=DummyObj())
+        e = Error("Message", obj=DummyObj())
         expected = "obj: Message"
         self.assertEqual(force_text(e), expected)
 
     def test_printing_no_object(self):
-        e = Error("Message", hint="Hint", obj=None)
+        e = Error("Message", hint="Hint")
         expected = "?: Message\n\tHINT: Hint"
         self.assertEqual(force_text(e), expected)
 
@@ -95,18 +95,18 @@ class MessageTests(SimpleTestCase):
 
     def test_printing_field_error(self):
         field = SimpleModel._meta.get_field('field')
-        e = Error("Error", hint=None, obj=field)
+        e = Error("Error", obj=field)
         expected = "check_framework.SimpleModel.field: Error"
         self.assertEqual(force_text(e), expected)
 
     def test_printing_model_error(self):
-        e = Error("Error", hint=None, obj=SimpleModel)
+        e = Error("Error", obj=SimpleModel)
         expected = "check_framework.SimpleModel: Error"
         self.assertEqual(force_text(e), expected)
 
     def test_printing_manager_error(self):
         manager = SimpleModel.manager
-        e = Error("Error", hint=None, obj=manager)
+        e = Error("Error", obj=manager)
         expected = "check_framework.SimpleModel.manager: Error"
         self.assertEqual(force_text(e), expected)
 
@@ -202,23 +202,11 @@ class CheckCommandTests(SimpleTestCase):
 
 
 def custom_error_system_check(app_configs, **kwargs):
-    return [
-        Error(
-            'Error',
-            hint=None,
-            id='myerrorcheck.E001',
-        )
-    ]
+    return [Error('Error', id='myerrorcheck.E001')]
 
 
 def custom_warning_system_check(app_configs, **kwargs):
-    return [
-        Warning(
-            'Warning',
-            hint=None,
-            id='mywarningcheck.E001',
-        )
-    ]
+    return [Warning('Warning', id='mywarningcheck.E001')]
 
 
 class SilencingCheckTests(SimpleTestCase):
@@ -283,21 +271,18 @@ class CheckFrameworkReservedNamesTests(SimpleTestCase):
             Error(
                 "The 'ModelWithAttributeCalledCheck.check()' class method is "
                 "currently overridden by 42.",
-                hint=None,
                 obj=ModelWithAttributeCalledCheck,
                 id='models.E020'
             ),
             Error(
                 "The 'ModelWithRelatedManagerCalledCheck.check()' class method is "
                 "currently overridden by %r." % ModelWithRelatedManagerCalledCheck.check,
-                hint=None,
                 obj=ModelWithRelatedManagerCalledCheck,
                 id='models.E020'
             ),
             Error(
                 "The 'ModelWithDescriptorCalledCheck.check()' class method is "
                 "currently overridden by %r." % ModelWithDescriptorCalledCheck.check,
-                hint=None,
                 obj=ModelWithDescriptorCalledCheck,
                 id='models.E020'
             ),

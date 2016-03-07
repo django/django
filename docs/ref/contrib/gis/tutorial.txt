@@ -81,7 +81,7 @@ file. Edit the database connection settings to match your setup::
              'ENGINE': 'django.contrib.gis.db.backends.postgis',
              'NAME': 'geodjango',
              'USER': 'geo',
-         }
+        },
     }
 
 In addition, modify the :setting:`INSTALLED_APPS` setting to include
@@ -96,7 +96,7 @@ and ``world`` (your newly created application)::
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'django.contrib.gis',
-        'world'
+        'world',
     ]
 
 Geographic Data
@@ -435,7 +435,7 @@ with the following code::
 
     import os
     from django.contrib.gis.utils import LayerMapping
-    from models import WorldBorder
+    from .models import WorldBorder
 
     world_mapping = {
         'fips' : 'FIPS',
@@ -704,7 +704,7 @@ Let's dive right in.  Create a file called ``admin.py`` inside the
 ``world`` application with the following code::
 
     from django.contrib.gis import admin
-    from models import WorldBorder
+    from .models import WorldBorder
 
     admin.site.register(WorldBorder, admin.GeoModelAdmin)
 

@@ -243,6 +243,14 @@ class TranslationTests(SimpleTestCase):
         self.assertTrue(ungettext_lazy('%d good result', '%d good results'))
         self.assertFalse(ungettext_lazy('', ''))
 
+    def test_ungettext_lazy_pickle(self):
+        s1 = ungettext_lazy('%d good result', '%d good results')
+        self.assertEqual(s1 % 1, '1 good result')
+        self.assertEqual(s1 % 8, '8 good results')
+        s2 = pickle.loads(pickle.dumps(s1))
+        self.assertEqual(s2 % 1, '1 good result')
+        self.assertEqual(s2 % 8, '8 good results')
+
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
         trans_real._active = local()
@@ -1116,6 +1124,10 @@ class FormattingTests(SimpleTestCase):
                     '<input type="text" name="products_delivered" value="12.000" id="id_products_delivered" />',
                     form6.as_ul()
                 )
+
+    def test_localized_input_func(self):
+        with self.settings(USE_THOUSAND_SEPARATOR=True):
+            self.assertEqual(localize_input(True), 'True')
 
     def test_sanitize_separators(self):
         """

@@ -79,6 +79,7 @@ class Player(models.Model):
 # is only available when using MySQL 5.6, or when using MyISAM
 # tables. As 5.6 isn't common yet, lets use MyISAM table for
 # testing. The table is manually created by the test method.
+# RemovedInDjango20Warning
 class MyISAMArticle(models.Model):
     headline = models.CharField(max_length=100)
 

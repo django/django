@@ -231,6 +231,14 @@ All attributes can be set in your derived class and can be used in
     ``True``, the output will automatically be wrapped with ``BEGIN;`` and
     ``COMMIT;``. Default value is ``False``.
 
+.. attribute:: BaseCommand.requires_migrations_checks
+
+    .. versionadded:: 1.10
+
+    A boolean; if ``True``, the command prints a warning if the set of
+    migrations on disk don't match the migrations in the database. A warning
+    doesn't prevent the command from executing. Default value is ``False``.
+
 .. attribute:: BaseCommand.requires_system_checks
 
     A boolean; if ``True``, the entire Django project will be checked for

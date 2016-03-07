@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import locale
 import sys
 from datetime import date
 
@@ -20,7 +19,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import models
 from django.test import (
-    SimpleTestCase, TestCase, override_settings, override_system_checks,
+    SimpleTestCase, TestCase, mock, override_settings, override_system_checks,
 )
 from django.test.utils import isolate_apps
 from django.utils import six
@@ -125,13 +124,12 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         self.stdout.close()
         self.stderr.close()
 
-    def test_that_changepassword_command_changes_joes_password(self):
+    @mock.patch.object(changepassword.Command, '_get_pass', return_value='not qwerty')
+    def test_that_changepassword_command_changes_joes_password(self, mock_get_pass):
         "Executing the changepassword management command should change joe's password"
         self.assertTrue(self.user.check_password('qwerty'))
-        command = changepassword.Command()
-        command._get_pass = lambda *args: 'not qwerty'
 
-        command.execute(username="joe", stdout=self.stdout)
+        call_command('changepassword', username='joe', stdout=self.stdout)
         command_output = self.stdout.getvalue().strip()
 
         self.assertEqual(
@@ -140,42 +138,35 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         )
         self.assertTrue(User.objects.get(username="joe").check_password("not qwerty"))
 
-    def test_that_max_tries_exits_1(self):
+    @mock.patch.object(changepassword.Command, '_get_pass', side_effect=lambda *args: str(args))
+    def test_that_max_tries_exits_1(self, mock_get_pass):
         """
         A CommandError should be thrown by handle() if the user enters in
         mismatched passwords three times.
         """
-        command = changepassword.Command()
-        command._get_pass = lambda *args: str(args) or 'foo'
-
         with self.assertRaises(CommandError):
-            command.execute(username="joe", stdout=self.stdout, stderr=self.stderr)
+            call_command('changepassword', username='joe', stdout=self.stdout, stderr=self.stderr)
 
-    def test_password_validation(self):
+    @mock.patch.object(changepassword.Command, '_get_pass', return_value='1234567890')
+    def test_password_validation(self, mock_get_pass):
         """
         A CommandError should be raised if the user enters in passwords which
         fail validation three times.
         """
-        command = changepassword.Command()
-        command._get_pass = lambda *args: '1234567890'
-
         abort_msg = "Aborting password change for user 'joe' after 3 attempts"
         with self.assertRaisesMessage(CommandError, abort_msg):
-            command.execute(username="joe", stdout=self.stdout, stderr=self.stderr)
+            call_command('changepassword', username='joe', stdout=self.stdout, stderr=self.stderr)
         self.assertIn('This password is entirely numeric.', self.stderr.getvalue())
 
-    def test_that_changepassword_command_works_with_nonascii_output(self):
+    @mock.patch.object(changepassword.Command, '_get_pass', return_value='not qwerty')
+    def test_that_changepassword_command_works_with_nonascii_output(self, mock_get_pass):
         """
         #21627 -- Executing the changepassword management command should allow
         non-ASCII characters from the User object representation.
         """
         # 'Julia' with accented 'u':
         User.objects.create_user(username='J\xfalia', password='qwerty')
-
-        command = changepassword.Command()
-        command._get_pass = lambda *args: 'not qwerty'
-
-        command.execute(username="J\xfalia", stdout=self.stdout)
+        call_command('changepassword', username='J\xfalia', stdout=self.stdout)
 
 
 @override_settings(
@@ -202,39 +193,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
-
-    @mock_inputs({'password': "nopasswd"})
-    def test_nolocale(self):
-        """
-        Check that createsuperuser does not break when no locale is set. See
-        ticket #16017.
-        """
-
-        old_getdefaultlocale = locale.getdefaultlocale
-        try:
-            # Temporarily remove locale information
-            locale.getdefaultlocale = lambda: (None, None)
-
-            # Call the command in this new environment
-            call_command(
-                "createsuperuser",
-                interactive=True,
-                username="nolocale@somewhere.org",
-                email="nolocale@somewhere.org",
-                verbosity=0,
-                stdin=MockTTY(),
-            )
-
-        except TypeError:
-            self.fail("createsuperuser fails if the OS provides no information about the current locale")
-
-        finally:
-            # Re-apply locale information
-            locale.getdefaultlocale = old_getdefaultlocale
-
-        # If we were successful, a user should have been created
-        u = User.objects.get(username="nolocale@somewhere.org")
-        self.assertEqual(u.email, 'nolocale@somewhere.org')
 
     @mock_inputs({
         'password': "nopasswd",
@@ -384,8 +342,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         """
         sentinel = object()
         command = createsuperuser.Command()
-        command.check = lambda: []
-        command.execute(
+        call_command(
+            command,
             stdin=sentinel,
             stdout=six.StringIO(),
             stderr=six.StringIO(),
@@ -397,8 +355,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertIs(command.stdin, sentinel)
 
         command = createsuperuser.Command()
-        command.check = lambda: []
-        command.execute(
+        call_command(
+            command,
             stdout=six.StringIO(),
             stderr=six.StringIO(),
             interactive=False,
@@ -584,7 +542,6 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "'REQUIRED_FIELDS' must be a list or tuple.",
-                hint=None,
                 obj=CustomUserNonListRequiredFields,
                 id='auth.E001',
             ),
@@ -606,9 +563,8 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
         errors = checks.run_checks(apps.get_app_configs())
         expected = [
             checks.Error(
-                ("The field named as the 'USERNAME_FIELD' for a custom user model "
-                 "must not be included in 'REQUIRED_FIELDS'."),
-                hint=None,
+                "The field named as the 'USERNAME_FIELD' for a custom user model "
+                "must not be included in 'REQUIRED_FIELDS'.",
                 obj=CustomUserBadRequiredFields,
                 id='auth.E002',
             ),
@@ -625,9 +581,8 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
         errors = checks.run_checks()
         expected = [
             checks.Error(
-                ("'CustomUserNonUniqueUsername.username' must be "
-                 "unique because it is named as the 'USERNAME_FIELD'."),
-                hint=None,
+                "'CustomUserNonUniqueUsername.username' must be "
+                "unique because it is named as the 'USERNAME_FIELD'.",
                 obj=CustomUserNonUniqueUsername,
                 id='auth.E003',
             ),
@@ -637,10 +592,9 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
             errors = checks.run_checks()
             expected = [
                 checks.Warning(
-                    ("'CustomUserNonUniqueUsername.username' is named as "
-                     "the 'USERNAME_FIELD', but it is not unique."),
-                    hint=('Ensure that your authentication backend(s) can handle '
-                          'non-unique usernames.'),
+                    "'CustomUserNonUniqueUsername.username' is named as "
+                    "the 'USERNAME_FIELD', but it is not unique.",
+                    hint='Ensure that your authentication backend(s) can handle non-unique usernames.',
                     obj=CustomUserNonUniqueUsername,
                     id='auth.W004',
                 )

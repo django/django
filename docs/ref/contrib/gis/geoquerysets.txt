@@ -1308,9 +1308,9 @@ Returns a ``LineString`` constructed from the point field geometries in the
 
 Example::
 
-     >>> print(City.objects.filter(name__in=('Houston', 'Dallas')
-     ...      ).aggregate(MakeLine('poly'))['poly__makeline']
-     LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
+    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(MakeLine('poly'))
+    >>> print(qs['poly__makeline'])
+    LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
 
 ``Union``
 ~~~~~~~~~

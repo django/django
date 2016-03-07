@@ -148,6 +148,12 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
                                if isinstance(f, ModelField)]
     for f in sorted(chain(opts.concrete_fields, sortable_virtual_fields, opts.many_to_many)):
         if not getattr(f, 'editable', False):
+            if (fields is not None and f.name in fields and
+                    (exclude is None or f.name not in exclude)):
+                raise FieldError(
+                    "'%s' cannot be specified for %s model form as it is a non-editable field" % (
+                        f.name, model.__name__)
+                )
             continue
         if fields is not None and f.name not in fields:
             continue
@@ -203,7 +209,13 @@ class ModelFormOptions(object):
 
 class ModelFormMetaclass(DeclarativeFieldsMetaclass):
     def __new__(mcs, name, bases, attrs):
-        formfield_callback = attrs.pop('formfield_callback', None)
+        base_formfield_callback = None
+        for b in bases:
+            if hasattr(b, 'Meta') and hasattr(b.Meta, 'formfield_callback'):
+                base_formfield_callback = b.Meta.formfield_callback
+                break
+
+        formfield_callback = attrs.pop('formfield_callback', base_formfield_callback)
 
         new_class = super(ModelFormMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
@@ -376,11 +388,6 @@ class BaseModelForm(BaseForm):
 
         exclude = self._get_validation_exclusions()
 
-        try:
-            self.instance = construct_instance(self, self.instance, opts.fields, exclude)
-        except ValidationError as e:
-            self._update_errors(e)
-
         # Foreign Keys being used to represent inline relationships
         # are excluded from basic field value validation. This is for two
         # reasons: firstly, the value may not be supplied (#12507; the
@@ -391,6 +398,11 @@ class BaseModelForm(BaseForm):
         for name, field in self.fields.items():
             if isinstance(field, InlineForeignKeyField):
                 exclude.append(name)
+
+        try:
+            self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
+        except ValidationError as e:
+            self._update_errors(e)
 
         try:
             self.instance.full_clean(exclude=exclude, validate_unique=False)
@@ -524,7 +536,8 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
     if hasattr(form, 'Meta'):
         parent = (form.Meta, object)
     Meta = type(str('Meta'), parent, attrs)
-
+    if formfield_callback:
+        Meta.formfield_callback = staticmethod(formfield_callback)
     # Give this new form class a reasonable name.
     class_name = model.__name__ + str('Form')
 

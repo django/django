@@ -48,7 +48,6 @@ class ArrayField(Field):
             errors.append(
                 checks.Error(
                     'Base field for array cannot be a related field.',
-                    hint=None,
                     obj=self,
                     id='postgres.E002'
                 )
@@ -61,7 +60,6 @@ class ArrayField(Field):
                 errors.append(
                     checks.Error(
                         'Base field for array has errors:\n    %s' % messages,
-                        hint=None,
                         obj=self,
                         id='postgres.E001'
                     )
@@ -108,8 +106,11 @@ class ArrayField(Field):
         base_field = self.base_field
 
         for val in vals:
-            obj = AttributeSetter(base_field.attname, val)
-            values.append(base_field.value_to_string(obj))
+            if val is None:
+                values.append(None)
+            else:
+                obj = AttributeSetter(base_field.attname, val)
+                values.append(base_field.value_to_string(obj))
         return json.dumps(values)
 
     def get_transform(self, name):

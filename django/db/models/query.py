@@ -23,6 +23,7 @@ from django.db.models.query_utils import (
 )
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import partition
 from django.utils.version import get_version
 
@@ -411,17 +412,21 @@ class QuerySet(object):
         Inserts each of the instances into the database. This does *not* call
         save() on each of the instances, does not send any pre/post save
         signals, and does not set the primary key attribute if it is an
-        autoincrement field. Multi-table models are not supported.
+        autoincrement field (except if features.can_return_ids_from_bulk_insert=True).
+        Multi-table models are not supported.
         """
-        # So this case is fun. When you bulk insert you don't get the primary
-        # keys back (if it's an autoincrement), so you can't insert into the
-        # child tables which references this. There are two workarounds, 1)
-        # this could be implemented if you didn't have an autoincrement pk,
-        # and 2) you could do it by doing O(n) normal inserts into the parent
-        # tables to get the primary keys back, and then doing a single bulk
-        # insert into the childmost table. Some databases might allow doing
-        # this by using RETURNING clause for the insert query. We're punting
-        # on these for now because they are relatively rare cases.
+        # When you bulk insert you don't get the primary keys back (if it's an
+        # autoincrement, except if can_return_ids_from_bulk_insert=True), so
+        # you can't insert into the child tables which references this. There
+        # are two workarounds:
+        # 1) This could be implemented if you didn't have an autoincrement pk
+        # 2) You could do it by doing O(n) normal inserts into the parent
+        #    tables to get the primary keys back and then doing a single bulk
+        #    insert into the childmost table.
+        # We currently set the primary keys on the objects when using
+        # PostgreSQL via the RETURNING ID clause. It should be possible for
+        # Oracle as well, but the semantics for  extracting the primary keys is
+        # trickier so it's not done yet.
         assert batch_size is None or batch_size > 0
         # Check that the parents share the same concrete model with the our
         # model to detect the inheritance pattern ConcreteGrandParent ->
@@ -447,7 +452,11 @@ class QuerySet(object):
                     self._batched_insert(objs_with_pk, fields, batch_size)
                 if objs_without_pk:
                     fields = [f for f in fields if not isinstance(f, AutoField)]
-                    self._batched_insert(objs_without_pk, fields, batch_size)
+                    ids = self._batched_insert(objs_without_pk, fields, batch_size)
+                    if connection.features.can_return_ids_from_bulk_insert:
+                        assert len(ids) == len(objs_without_pk)
+                    for i in range(len(ids)):
+                        objs_without_pk[i].pk = ids[i]
 
         return objs
 
@@ -654,7 +663,7 @@ class QuerySet(object):
 
     def _prefetch_related_objects(self):
         # This method can only be called once the result cache has been filled.
-        prefetch_related_objects(self._result_cache, self._prefetch_related_lookups)
+        prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
         self._prefetch_done = True
 
     ##################################################
@@ -1051,10 +1060,19 @@ class QuerySet(object):
             return
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
-        for batch in [objs[i:i + batch_size]
-                      for i in range(0, len(objs), batch_size)]:
-            self.model._base_manager._insert(batch, fields=fields,
-                                             using=self.db)
+        inserted_ids = []
+        for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
+            if connections[self.db].features.can_return_ids_from_bulk_insert:
+                inserted_id = self.model._base_manager._insert(
+                    item, fields=fields, using=self.db, return_id=True
+                )
+                if len(objs) > 1:
+                    inserted_ids.extend(inserted_id)
+                if len(objs) == 1:
+                    inserted_ids.append(inserted_id)
+            else:
+                self.model._base_manager._insert(item, fields=fields, using=self.db)
+        return inserted_ids
 
     def _clone(self, **kwargs):
         query = self.query.clone()
@@ -1108,12 +1126,18 @@ class QuerySet(object):
         for field, objects in other._known_related_objects.items():
             self._known_related_objects.setdefault(field, {}).update(objects)
 
-    def _prepare(self):
+    def _prepare(self, field):
         if self._fields is not None:
             # values() queryset can only be used as nested queries
             # if they are set up to select only a single field.
             if len(self._fields or self.model._meta.concrete_fields) > 1:
                 raise TypeError('Cannot use multi-field values as a filter value.')
+        else:
+            # If the query is used as a subquery for a ForeignKey with non-pk
+            # target field, make sure to select the target field in the subquery.
+            foreign_fields = getattr(field, 'foreign_related_fields', ())
+            if len(foreign_fields) == 1 and not foreign_fields[0].primary_key:
+                return self.values(foreign_fields[0].name)
         return self
 
     def _as_sql(self, connection):
@@ -1362,15 +1386,12 @@ def normalize_prefetch_lookups(lookups, prefix=None):
     return ret
 
 
-def prefetch_related_objects(result_cache, related_lookups):
+def prefetch_related_objects(model_instances, *related_lookups):
     """
-    Helper function for prefetch_related functionality
-
-    Populates prefetched objects caches for a list of results
-    from a QuerySet
+    Populate prefetched object caches for a list of model instances based on
+    the lookups/Prefetch instances given.
     """
-
-    if len(result_cache) == 0:
+    if len(model_instances) == 0:
         return  # nothing to do
 
     related_lookups = normalize_prefetch_lookups(related_lookups)
@@ -1395,7 +1416,7 @@ def prefetch_related_objects(result_cache, related_lookups):
 
         # Top level, the list of objects to decorate is the result cache
         # from the primary QuerySet. It won't be for deeper levels.
-        obj_list = result_cache
+        obj_list = model_instances
 
         through_attrs = lookup.prefetch_through.split(LOOKUP_SEP)
         for level, through_attr in enumerate(through_attrs):
@@ -1418,11 +1439,12 @@ def prefetch_related_objects(result_cache, related_lookups):
                 if not hasattr(obj, '_prefetched_objects_cache'):
                     try:
                         obj._prefetched_objects_cache = {}
-                    except AttributeError:
-                        # Must be in a QuerySet subclass that is not returning
-                        # Model instances, either in Django or 3rd
-                        # party. prefetch_related() doesn't make sense, so quit
-                        # now.
+                    except (AttributeError, TypeError):
+                        # Must be an immutable object from
+                        # values_list(flat=True), for example (TypeError) or
+                        # a QuerySet subclass that isn't returning Model
+                        # instances (AttributeError), either in Django or a 3rd
+                        # party. prefetch_related() doesn't make sense, so quit.
                         good_objects = False
                         break
             if not good_objects:
@@ -1587,6 +1609,9 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
             msg = 'to_attr={} conflicts with a field on the {} model.'
             raise ValueError(msg.format(to_attr, model.__name__))
 
+    # Whether or not we're prefetching the last part of the lookup.
+    leaf = len(lookup.prefetch_through.split(LOOKUP_SEP)) - 1 == level
+
     for obj in instances:
         instance_attr_val = instance_attr(obj)
         vals = rel_obj_cache.get(instance_attr_val, [])
@@ -1600,8 +1625,23 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
                 setattr(obj, to_attr, vals)
                 obj._prefetched_objects_cache[cache_name] = vals
             else:
-                # Cache in the QuerySet.all().
-                qs = getattr(obj, to_attr).all()
+                manager = getattr(obj, to_attr)
+                if leaf and lookup.queryset is not None:
+                    try:
+                        apply_rel_filter = manager._apply_rel_filters
+                    except AttributeError:
+                        warnings.warn(
+                            "The `%s.%s` class must implement a `_apply_rel_filters()` "
+                            "method that accepts a `QuerySet` as its single "
+                            "argument and returns an appropriately filtered version "
+                            "of it." % (manager.__class__.__module__, manager.__class__.__name__),
+                            RemovedInDjango20Warning,
+                        )
+                        qs = manager.get_queryset()
+                    else:
+                        qs = apply_rel_filter(lookup.queryset)
+                else:
+                    qs = manager.get_queryset()
                 qs._result_cache = vals
                 # We don't want the individual qs doing prefetch_related now,
                 # since we have merged this into the current work.

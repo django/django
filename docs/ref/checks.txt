@@ -17,7 +17,7 @@ API Reference
 ``CheckMessage``
 -----------------
 
-.. class:: CheckMessage(level, msg, hint, obj=None, id=None)
+.. class:: CheckMessage(level, msg, hint=None, obj=None, id=None)
 
 The warnings and errors raised by system checks must be instances of
 ``CheckMessage``. An instance encapsulates a single reportable error or
@@ -60,11 +60,11 @@ There are subclasses to make creating messages with common levels easier. When
 using them you can omit the ``level`` argument because it is implied by the
 class name.
 
-.. class:: Debug(msg, hint, obj=None, id=None)
-.. class:: Info(msg, hint, obj=None, id=None)
-.. class:: Warning(msg, hint, obj=None, id=None)
-.. class:: Error(msg, hint, obj=None, id=None)
-.. class:: Critical(msg, hint, obj=None, id=None)
+.. class:: Debug(msg, hint=None, obj=None, id=None)
+.. class:: Info(msg, hint=None, obj=None, id=None)
+.. class:: Warning(msg, hint=None obj=None, id=None)
+.. class:: Error(msg, hint=None, obj=None, id=None)
+.. class:: Critical(msg, hint=None, obj=None, id=None)
 
 Builtin checks
 ==============
@@ -165,6 +165,8 @@ Fields
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
   (except in historical migrations) will be removed in Django 1.9. *This check
   appeared in Django 1.7 and 1.8*.
+* **fields.W901**: ``CommaSeparatedIntegerField`` has been deprecated. Support
+  for it (except in historical migrations) will be removed in Django 2.0.
 
 File Fields
 ~~~~~~~~~~~

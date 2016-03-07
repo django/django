@@ -47,6 +47,9 @@ class Serializer(JSONSerializer):
             "type": "Feature",
             "properties": self._current,
         }
+        if ((self.selected_fields is None or 'pk' in self.selected_fields) and
+                'pk' not in data["properties"]):
+            data["properties"]["pk"] = obj._meta.pk.value_to_string(obj)
         if self._geometry:
             if self._geometry.srid != self.srid:
                 # If needed, transform the geometry in the srid of the global geojson srid

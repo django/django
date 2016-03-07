@@ -8,7 +8,6 @@ import unittest
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
-from django.contrib.staticfiles.management.commands import collectstatic
 from django.contrib.staticfiles.management.commands.collectstatic import \
     Command as CollectstaticCommand
 from django.core.cache.backends.base import BaseCache
@@ -85,33 +84,36 @@ class TestHashedFiles(object):
 
     def test_path_with_querystring_and_fragment(self):
         relpath = self.hashed_file_path("cached/css/fragments.css")
-        self.assertEqual(relpath, "cached/css/fragments.ef92012a8c16.css")
+        self.assertEqual(relpath, "cached/css/fragments.59dc2b188043.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b'fonts/font.a4b0478549d0.eot?#iefix', content)
             self.assertIn(b'fonts/font.b8d603e42714.svg#webfontIyfZbseF', content)
-            self.assertIn(b'fonts/font.b8d603e42714.svg#../path/to/fonts/font.svg', content)
+            self.assertIn(b'fonts/font.b8d603e42714.svg#path/to/../../fonts/font.svg', content)
             self.assertIn(b'data:font/woff;charset=utf-8;base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA', content)
             self.assertIn(b'#default#VML', content)
 
     def test_template_tag_absolute(self):
         relpath = self.hashed_file_path("cached/absolute.css")
-        self.assertEqual(relpath, "cached/absolute.ae9ef2716fe3.css")
+        self.assertEqual(relpath, "cached/absolute.df312c6326e1.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"/static/cached/styles.css", content)
             self.assertIn(b"/static/cached/styles.bb84a0240107.css", content)
+            self.assertNotIn(b"/static/styles_root.css", content)
+            self.assertIn(b"/static/styles_root.401f2509a628.css", content)
             self.assertIn(b'/static/cached/img/relative.acae32e4532b.png', content)
 
-    def test_template_tag_denorm(self):
-        relpath = self.hashed_file_path("cached/denorm.css")
-        self.assertEqual(relpath, "cached/denorm.c5bd139ad821.css")
+    def test_template_tag_absolute_root(self):
+        """
+        Like test_template_tag_absolute, but for a file in STATIC_ROOT (#26249).
+        """
+        relpath = self.hashed_file_path("absolute_root.css")
+        self.assertEqual(relpath, "absolute_root.f864a4d7f083.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
-            self.assertNotIn(b"..//cached///styles.css", content)
-            self.assertIn(b"../cached/styles.bb84a0240107.css", content)
-            self.assertNotIn(b"url(img/relative.png )", content)
-            self.assertIn(b'url("img/relative.acae32e4532b.png', content)
+            self.assertNotIn(b"/static/styles_root.css", content)
+            self.assertIn(b"/static/styles_root.401f2509a628.css", content)
 
     def test_template_tag_relative(self):
         relpath = self.hashed_file_path("cached/relative.css")
@@ -366,13 +368,8 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
 
     command_params = {
         'interactive': False,
-        'post_process': True,
         'verbosity': 0,
         'ignore_patterns': ['*.ignoreme'],
-        'use_default_ignore_patterns': True,
-        'clear': False,
-        'link': False,
-        'dry_run': False,
     }
 
     def setUp(self):
@@ -393,7 +390,7 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
         FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765,
     )
     def test_collect_static_files_permissions(self):
-        collectstatic.Command().execute(**self.command_params)
+        call_command('collectstatic', **self.command_params)
         test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
         test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
         file_mode = os.stat(test_file)[0] & 0o777
@@ -406,7 +403,7 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
         FILE_UPLOAD_DIRECTORY_PERMISSIONS=None,
     )
     def test_collect_static_files_default_permissions(self):
-        collectstatic.Command().execute(**self.command_params)
+        call_command('collectstatic', **self.command_params)
         test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
         test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
         file_mode = os.stat(test_file)[0] & 0o777
@@ -420,7 +417,7 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
         STATICFILES_STORAGE='staticfiles_tests.test_storage.CustomStaticFilesStorage',
     )
     def test_collect_static_files_subclass_of_static_storage(self):
-        collectstatic.Command().execute(**self.command_params)
+        call_command('collectstatic', **self.command_params)
         test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
         test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
         file_mode = os.stat(test_file)[0] & 0o777

@@ -59,6 +59,14 @@ class DatabaseOperations(BaseDatabaseOperations):
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
+    def fetch_returned_insert_ids(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table that has an auto-incrementing ID, return the
+        list of newly created IDs.
+        """
+        return [item[0] for item in cursor.fetchall()]
+
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = '%s'
 
@@ -239,3 +247,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         if value:
             return Inet(value)
         return None
+
+    def subtract_temporals(self, internal_type, lhs, rhs):
+        if internal_type == 'DateField':
+            lhs_sql, lhs_params = lhs
+            rhs_sql, rhs_params = rhs
+            return "age(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+        return super(DatabaseOperations, self).subtract_temporals(internal_type, lhs, rhs)

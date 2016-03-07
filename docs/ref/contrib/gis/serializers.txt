@@ -3,7 +3,7 @@
 ======================
 
 .. module:: django.contrib.gis.serializers.geojson
-   :synopsis: Serialization of GeoDjango models in the GeoJSON format.
+    :synopsis: Serialization of GeoDjango models in the GeoJSON format.
 
 GeoDjango provides a specific serializer for the `GeoJSON`__ format. See
 :doc:`/topics/serialization` for more information on serialization.
@@ -71,3 +71,11 @@ Would output::
         }
       ]
     }
+
+When the ``fields`` parameter is not specified, the ``geojson`` serializer adds
+a ``pk`` key to the ``properties`` dictionary with the primary key of the
+object as the value.
+
+.. versionchanged:: 1.10
+
+    The ``pk`` key was added to the ``properties`` dictionary.

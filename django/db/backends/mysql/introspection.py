@@ -165,10 +165,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 kc.`referenced_table_name`, kc.`referenced_column_name`
             FROM information_schema.key_column_usage AS kc
             WHERE
-                kc.table_schema = %s AND
+                kc.table_schema = DATABASE() AND
                 kc.table_name = %s
         """
-        cursor.execute(name_query, [self.connection.settings_dict['NAME'], table_name])
+        cursor.execute(name_query, [table_name])
         for constraint, column, ref_table, ref_column in cursor.fetchall():
             if constraint not in constraints:
                 constraints[constraint] = {
@@ -185,10 +185,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT c.constraint_name, c.constraint_type
             FROM information_schema.table_constraints AS c
             WHERE
-                c.table_schema = %s AND
+                c.table_schema = DATABASE() AND
                 c.table_name = %s
         """
-        cursor.execute(type_query, [self.connection.settings_dict['NAME'], table_name])
+        cursor.execute(type_query, [table_name])
         for constraint, kind in cursor.fetchall():
             if kind.lower() == "primary key":
                 constraints[constraint]['primary_key'] = True

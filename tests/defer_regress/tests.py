@@ -131,7 +131,7 @@ class DeferRegressionTest(TestCase):
         s = SessionStore(SESSION_KEY)
         s.clear()
         s["item"] = item
-        s.save()
+        s.save(must_create=True)
 
         s = SessionStore(SESSION_KEY)
         s.modified = True

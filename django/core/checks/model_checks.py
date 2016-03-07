@@ -20,10 +20,8 @@ def check_all_models(app_configs=None, **kwargs):
         if not inspect.ismethod(model.check):
             errors.append(
                 Error(
-                    "The '%s.check()' class method is "
-                    "currently overridden by %r." % (
-                        model.__name__, model.check),
-                    hint=None,
+                    "The '%s.check()' class method is currently overridden by %r."
+                    % (model.__name__, model.check),
                     obj=model,
                     id='models.E020'
                 )
@@ -61,7 +59,6 @@ def check_model_signals(app_configs=None, **kwargs):
                                 description, name, '.'.join(reference)
                             ),
                             obj=receiver.__module__,
-                            hint=None,
                             id='signals.E001'
                         )
                     )

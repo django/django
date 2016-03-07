@@ -2,7 +2,7 @@ import os
 from unittest import SkipTest
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import modify_settings
+from django.test import modify_settings, tag
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
@@ -14,6 +14,7 @@ class CSPMiddleware(object):
         return response
 
 
+@tag('selenium')
 @modify_settings(
     MIDDLEWARE_CLASSES={'append': 'django.contrib.admin.tests.CSPMiddleware'},
 )

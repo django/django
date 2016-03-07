@@ -415,7 +415,8 @@ guaranteed to fit numbers from ``-9223372036854775808`` to
 
 A field to store raw binary data. It only supports ``bytes`` assignment. Be
 aware that this field has limited functionality. For example, it is not possible
-to filter a queryset on a ``BinaryField`` value.
+to filter a queryset on a ``BinaryField`` value. It is also not possible to
+include a ``BinaryField`` in a :class:`~django.forms.ModelForm`.
 
 .. admonition:: Abusing ``BinaryField``
 
@@ -471,11 +472,16 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
     of. Refer to the :ref:`MySQL database notes <mysql-collation>` for
     details.
 
-
 ``CommaSeparatedIntegerField``
 ------------------------------
 
 .. class:: CommaSeparatedIntegerField(max_length=None, **options)
+
+.. deprecated:: 1.9
+
+    This field is deprecated in favor of :class:`~django.db.models.CharField`
+    with ``validators=[``\ :func:`validate_comma_separated_integer_list
+    <django.core.validators.validate_comma_separated_integer_list>`\ ``]``.
 
 A field of integers separated by commas. As in :class:`CharField`, the
 :attr:`~CharField.max_length` argument is required and the note about database
@@ -1151,6 +1157,35 @@ you can use the name of the model, rather than the model object itself::
         # ...
         pass
 
+Relationships defined this way on :ref:`abstract models
+<abstract-base-classes>` are resolved when the model is subclassed as a
+concrete model and are not relative to the abstract model's ``app_label``:
+
+.. snippet::
+    :filename: products/models.py
+
+    from django.db import models
+
+    class AbstractCar(models.Model):
+        manufacturer = models.ForeignKey('Manufacturer', on_delete=models.CASCADE)
+
+        class Meta:
+            abstract = True
+
+.. snippet::
+    :filename: production/models.py
+
+    from django.db import models
+    from products.models import AbstractCar
+
+    class Manufacturer(models.Model):
+        pass
+
+    class Car(AbstractCar):
+        pass
+
+    # Car.manufacturer will point to `production.Manufacturer` here.
+
 To refer to models defined in another application, you can explicitly specify
 a model with the full application label. For example, if the ``Manufacturer``
 model above is defined in another application called ``production``, you'd
@@ -1327,8 +1362,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 .. attribute:: ForeignKey.related_query_name
 
-    The name to use for the reverse filter name from the target model.
-    Defaults to the value of :attr:`related_name` if it is set, otherwise it
+    The name to use for the reverse filter name from the target model. It
+    defaults to the value of :attr:`related_name` or
+    :attr:`~django.db.models.Options.default_related_name` if set, otherwise it
     defaults to the name of the model::
 
         # Declare the ForeignKey with related_query_name
@@ -1811,15 +1847,8 @@ Field API reference
     .. method:: get_prep_lookup(lookup_type, value)
 
         Prepares ``value`` to the database prior to be used in a lookup.
-        The ``lookup_type`` will be one of the valid Django filter lookups:
-        ``"exact"``, ``"iexact"``, ``"contains"``, ``"icontains"``,
-        ``"gt"``, ``"gte"``, ``"lt"``, ``"lte"``, ``"in"``, ``"startswith"``,
-        ``"istartswith"``, ``"endswith"``, ``"iendswith"``, ``"range"``,
-        ``"year"``, ``"month"``, ``"day"``, ``"isnull"``, ``"search"``,
-        ``"regex"``, and ``"iregex"``.
-
-        If you are using :doc:`Custom lookups </ref/models/lookups>` the
-        ``lookup_type`` can be any ``lookup_name`` registered in the field.
+        The ``lookup_type`` will be the registered name of the lookup. For
+        example: ``"exact"``, ``"iexact"``, or ``"contains"``.
 
         See :ref:`preparing-values-for-use-in-database-lookups` for usage.
 

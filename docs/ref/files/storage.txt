@@ -73,10 +73,9 @@ The ``Storage`` class
     as necessary.
 
     .. note::
-        For methods returning naive ``datetime`` objects, the
-        effective timezone used will be the current value of
-        ``os.environ['TZ']``; note that this is usually set from
-        Django's :setting:`TIME_ZONE`.
+        When methods return naive ``datetime`` objects, the effective timezone
+        used will be the current value of ``os.environ['TZ']``; note that this
+        is usually set from Django's :setting:`TIME_ZONE`.
 
     .. method:: accessed_time(name)
 
@@ -85,12 +84,20 @@ The ``Storage`` class
         able to return the last accessed time this will raise
         ``NotImplementedError`` instead.
 
+        .. deprecated:: 1.10
+
+            Use :meth:`get_accessed_time` instead.
+
     .. method:: created_time(name)
 
         Returns a naive ``datetime`` object containing the creation
         time of the file.  For storage systems that aren't able to
         return the creation time this will raise
         ``NotImplementedError`` instead.
+
+        .. deprecated:: 1.10
+
+            Use :meth:`get_created_time` instead.
 
     .. method:: delete(name)
 
@@ -103,6 +110,17 @@ The ``Storage`` class
         Returns ``True`` if a file referenced by the given name already exists
         in the storage system, or ``False`` if the name is available for a new
         file.
+
+    .. method:: get_accessed_time(name)
+
+        .. versionadded:: 1.10
+
+        Returns a :class:`~datetime.datetime` of the last accessed time of the
+        file. For storage systems unable to return the last accessed time this
+        will raise :exc:`NotImplementedError`.
+
+        If :setting:`USE_TZ` is ``True``, returns an aware ``datetime``,
+        otherwise returns a naive ``datetime`` in the local timezone.
 
     .. method:: get_available_name(name, max_length=None)
 
@@ -118,6 +136,28 @@ The ``Storage`` class
         If a file with ``name`` already exists, an underscore plus a random
         7 character alphanumeric string is appended to the filename before
         the extension.
+
+    .. method:: get_created_time(name)
+
+        .. versionadded:: 1.10
+
+        Returns a :class:`~datetime.datetime` of the creation time of the file.
+        For storage systems unable to return the creation time this will raise
+        :exc:`NotImplementedError`.
+
+        If :setting:`USE_TZ` is ``True``, returns an aware ``datetime``,
+        otherwise returns a naive ``datetime`` in the local timezone.
+
+    .. method:: get_modified_time(name)
+
+        .. versionadded:: 1.10
+
+        Returns a :class:`~datetime.datetime` of the last modified time of the
+        file. For storage systems unable to return the last modified time this
+        will raise :exc:`NotImplementedError`.
+
+        If :setting:`USE_TZ` is ``True``, returns an aware ``datetime``,
+        otherwise returns a naive ``datetime`` in the local timezone.
 
     .. method:: get_valid_name(name)
 
@@ -137,6 +177,10 @@ The ``Storage`` class
         modified time. For storage systems that aren't able to return
         the last modified time, this will raise
         ``NotImplementedError`` instead.
+
+        .. deprecated:: 1.10
+
+            Use :meth:`get_modified_time` instead.
 
     .. method:: open(name, mode='rb')
 

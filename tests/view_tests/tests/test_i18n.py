@@ -10,7 +10,7 @@ from os import path
 from django.conf import settings
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, modify_settings,
-    override_settings,
+    override_settings, tag,
 )
 from django.urls import reverse
 from django.utils import six
@@ -260,6 +260,7 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 
 
 @unittest.skipIf(skip_selenium, 'Selenium tests not requested')
+@tag('selenium')
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class JavascriptI18nTests(LiveServerTestCase):
 

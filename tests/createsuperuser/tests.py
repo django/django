@@ -1,7 +1,7 @@
 from django.contrib.auth import models
 from django.contrib.auth.management.commands import changepassword
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, mock
 from django.utils.six import StringIO
 
 
@@ -11,17 +11,16 @@ class MultiDBChangepasswordManagementCommandTestCase(TestCase):
     def setUp(self):
         self.user = models.User.objects.db_manager('other').create_user(username='joe', password='qwerty')
 
-    def test_that_changepassword_command_with_database_option_uses_given_db(self):
+    @mock.patch.object(changepassword.Command, '_get_pass', return_value='not qwerty')
+    def test_that_changepassword_command_with_database_option_uses_given_db(self, mock_get_pass):
         """
         Executing the changepassword management command with a database option
         should operate on the specified DB
         """
         self.assertTrue(self.user.check_password('qwerty'))
-        command = changepassword.Command()
-        command._get_pass = lambda *args: 'not qwerty'
 
         out = StringIO()
-        command.execute(username="joe", database='other', stdout=out)
+        call_command('changepassword', username='joe', database='other', stdout=out)
         command_output = out.getvalue().strip()
 
         self.assertEqual(

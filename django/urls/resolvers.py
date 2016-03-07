@@ -11,6 +11,7 @@ import functools
 import re
 from importlib import import_module
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
@@ -388,7 +389,7 @@ class LocaleRegexURLResolver(RegexURLResolver):
 
     @property
     def regex(self):
-        language_code = get_language()
+        language_code = get_language() or settings.LANGUAGE_CODE
         if language_code not in self._regex_dict:
             regex_compiled = re.compile('^%s/' % language_code, re.UNICODE)
             self._regex_dict[language_code] = regex_compiled

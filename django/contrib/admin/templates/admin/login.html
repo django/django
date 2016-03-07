@@ -34,7 +34,7 @@
 
 {% if user.is_authenticated %}
 <p class="errornote">
-{% blocktrans with username=request.user.username trimmed %}
+{% blocktrans with username=request.user.get_username trimmed %}
     You are authenticated as {{ username }}, but are not authorized to
     access this page. Would you like to login to a different account?
 {% endblocktrans %}

@@ -1244,7 +1244,6 @@ The view is hooked up to your application and configured in the same fashion as
 The response format is as follows:
 
 .. code-block:: text
-..   JSON doesn't allow comments so highlighting as JSON won't work here.
 
     {
         "catalog": {
@@ -1255,6 +1254,8 @@ The response format is as follows:
         },
         "plural": "..."  # Expression for plural forms, or null.
     }
+
+.. JSON doesn't allow comments so highlighting as JSON won't work here.
 
 Note on performance
 -------------------
@@ -1327,7 +1328,7 @@ Language prefix in URL patterns
 
 .. function:: i18n_patterns(*pattern_list)
 
-This function can be used in your root URLconf and Django will automatically
+This function can be used in a root URLconf and Django will automatically
 prepend the current active language code to all url patterns defined within
 :func:`~django.conf.urls.i18n.i18n_patterns`. Example URL patterns::
 
@@ -1372,9 +1373,15 @@ function. Example::
 
 .. warning::
 
-    :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in your root
+    :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in a root
     URLconf. Using it within an included URLconf will throw an
     :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
+
+.. versionchanged:: 1.10
+
+    In older version, using ``i18n_patterns`` in a root URLconf different from
+    :setting:`ROOT_URLCONF` by setting :attr:`request.urlconf
+    <django.http.HttpRequest.urlconf>` wasn't supported.
 
 .. warning::
 
@@ -1682,25 +1689,8 @@ updating message files, just run :djadmin:`django-admin compilemessages
 This is only needed for people who either want to extract message IDs or compile
 message files (``.po``). Translation work itself just involves editing existing
 files of this type, but if you want to create your own message files, or want to
-test or compile a changed message file, you will need the ``gettext`` utilities:
-
-* Download the following zip files from the GNOME servers
-  https://download.gnome.org/binaries/win32/dependencies/
-
-  * ``gettext-runtime-X.zip``
-  * ``gettext-tools-X.zip``
-
-  ``X`` is the version number, we are requiring ``0.15`` or higher.
-
-* Extract the contents of the ``bin\`` directories in both files to the
-  same folder on your system (i.e. ``C:\Program Files\gettext-utils``)
-
-* Update the system PATH:
-
-  * ``Control Panel > System > Advanced > Environment Variables``.
-  * In the ``System variables`` list, click ``Path``, click ``Edit``.
-  * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
-    ``Variable value`` field.
+test or compile a changed message file, download `a precompiled binary
+installer <http://mlocati.github.io/gettext-iconv-windows/>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django

@@ -41,11 +41,16 @@ If you are not using SQLite as your database, additional settings such as
 :setting:`USER`, :setting:`PASSWORD`, and :setting:`HOST` must be added.
 For more details, see the reference documentation for :setting:`DATABASES`.
 
-.. note::
+.. admonition:: For databases other than SQLite
 
-    If you're using PostgreSQL or MySQL, make sure you've created a database by
-    this point. Do that with "``CREATE DATABASE database_name;``" within your
-    database's interactive prompt.
+    If you're using a database besides SQLite, make sure you've created a
+    database by this point. Do that with "``CREATE DATABASE database_name;``"
+    within your database's interactive prompt.
+
+    Also make sure that the database user provided in :file:`mysite/settings.py`
+    has "create database" privileges. This allows automatic creation of a
+    :ref:`test database <the-test-database>` which will be needed in a later
+    tutorial.
 
     If you're using SQLite, you don't need to create anything beforehand - the
     database file will be created automatically when it is needed.

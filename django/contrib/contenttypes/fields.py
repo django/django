@@ -92,7 +92,6 @@ class GenericForeignKey(object):
             return [
                 checks.Error(
                     'Field names must not end with an underscore.',
-                    hint=None,
                     obj=self,
                     id='fields.E001',
                 )
@@ -107,7 +106,6 @@ class GenericForeignKey(object):
             return [
                 checks.Error(
                     "The GenericForeignKey object ID references the non-existent field '%s'." % self.fk_field,
-                    hint=None,
                     obj=self,
                     id='contenttypes.E001',
                 )
@@ -128,7 +126,6 @@ class GenericForeignKey(object):
                     "The GenericForeignKey content type references the non-existent field '%s.%s'." % (
                         self.model._meta.object_name, self.ct_field
                     ),
-                    hint=None,
                     obj=self,
                     id='contenttypes.E002',
                 )
@@ -343,11 +340,10 @@ class GenericRelation(ForeignObject):
             else:
                 return [
                     checks.Error(
-                        ("The GenericRelation defines a relation with the model "
-                         "'%s.%s', but that model does not have a GenericForeignKey.") % (
+                        "The GenericRelation defines a relation with the model "
+                        "'%s.%s', but that model does not have a GenericForeignKey." % (
                             target._meta.app_label, target._meta.object_name
                         ),
-                        hint=None,
                         obj=self,
                         id='contenttypes.E004',
                     )
@@ -525,12 +521,19 @@ def create_generic_related_manager(superclass, rel):
         def __str__(self):
             return repr(self)
 
+        def _apply_rel_filters(self, queryset):
+            """
+            Filter the queryset for the instance this manager is bound to.
+            """
+            db = self._db or router.db_for_read(self.model, instance=self.instance)
+            return queryset.using(db).filter(**self.core_filters)
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
-                db = self._db or router.db_for_read(self.model, instance=self.instance)
-                return super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**self.core_filters)
+                queryset = super(GenericRelatedObjectManager, self).get_queryset()
+                return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:

@@ -18,7 +18,7 @@ class Command(AppCommand):
     def handle_app_config(self, app_config, **options):
         if app_config.models_module is None:
             return
-        connection = connections[options.get('database')]
+        connection = connections[options['database']]
         models = app_config.get_models(include_auto_created=True)
         statements = connection.ops.sequence_reset_sql(self.style, models)
         return '\n'.join(statements)

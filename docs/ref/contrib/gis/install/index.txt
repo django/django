@@ -76,18 +76,18 @@ Geospatial libraries
 --------------------
 
 .. toctree::
-   :maxdepth: 1
+    :maxdepth: 1
 
-   geolibs
+    geolibs
 
 Database installation
 ---------------------
 
 .. toctree::
-   :maxdepth: 1
+    :maxdepth: 1
 
-   postgis
-   spatialite
+    postgis
+    spatialite
 
 Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
 -------------------------------------------------------
@@ -480,14 +480,14 @@ executable with ``cmd.exe``, will set this up:
 
 .. code-block:: bat
 
-     set OSGEO4W_ROOT=C:\OSGeo4W
-     set PYTHON_ROOT=C:\Python27
-     set GDAL_DATA=%OSGEO4W_ROOT%\share\gdal
-     set PROJ_LIB=%OSGEO4W_ROOT%\share\proj
-     set PATH=%PATH%;%PYTHON_ROOT%;%OSGEO4W_ROOT%\bin
-     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_EXPAND_SZ /f /d "%PATH%"
-     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v GDAL_DATA /t REG_EXPAND_SZ /f /d "%GDAL_DATA%"
-     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PROJ_LIB /t REG_EXPAND_SZ /f /d "%PROJ_LIB%"
+    set OSGEO4W_ROOT=C:\OSGeo4W
+    set PYTHON_ROOT=C:\Python27
+    set GDAL_DATA=%OSGEO4W_ROOT%\share\gdal
+    set PROJ_LIB=%OSGEO4W_ROOT%\share\proj
+    set PATH=%PATH%;%PYTHON_ROOT%;%OSGEO4W_ROOT%\bin
+    reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_EXPAND_SZ /f /d "%PATH%"
+    reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v GDAL_DATA /t REG_EXPAND_SZ /f /d "%GDAL_DATA%"
+    reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PROJ_LIB /t REG_EXPAND_SZ /f /d "%PROJ_LIB%"
 
 For your convenience, these commands are available in the executable batch
 script, :download:`geodjango_setup.bat`.

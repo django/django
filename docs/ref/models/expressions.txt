@@ -448,7 +448,7 @@ calling the appropriate methods on the wrapped expression.
         Tells Django that this expression contains an aggregate and that a
         ``GROUP BY`` clause needs to be added to the query.
 
-    .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False)
+    .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 
         Provides the chance to do any pre-processing or validation of
         the expression before it's added to the query. ``resolve_expression()``
@@ -579,11 +579,11 @@ Now we implement the pre-processing and validation. Since we do not have
 any of our own validation at this point, we just delegate to the nested
 expressions::
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         c = self.copy()
         c.is_summary = summarize
         for pos, expression in enumerate(self.expressions):
-            c.expressions[pos] = expression.resolve_expression(query, allow_joins, reuse, summarize)
+            c.expressions[pos] = expression.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         return c
 
 Next, we write the method responsible for generating the SQL::
@@ -640,3 +640,34 @@ Let's see how it works::
     Apple: AAPL
     Yahoo: Internet Company
     Django Software Foundation: No Tagline
+
+Adding support in third-party database backends
+-----------------------------------------------
+
+If you're using a database backend that uses a different SQL syntax for a
+certain function, you can add support for it by monkey patching a new method
+onto the function's class.
+
+Let's say we're writing a backend for Microsoft's SQL Server which uses the SQL
+``LEN`` instead of ``LENGTH`` for the :class:`~functions.Length` function.
+We'll monkey patch a new method called ``as_sqlserver()`` onto the ``Length``
+class::
+
+    from django.db.models.functions import Length
+
+    def sqlserver_length(self, compiler, connection):
+        return self.as_sql(compiler, connection, function='LEN')
+
+    Length.as_sqlserver = sqlserver_length
+
+You can also customize the SQL using the ``template`` parameter of ``as_sql()``.
+
+We use ``as_sqlserver()`` because ``django.db.connection.vendor`` returns
+``sqlserver`` for the backend.
+
+Third-party backends can register their functions in the top level
+``__init__.py`` file of the backend package or in a top level ``expressions.py``
+file (or package) that is imported from the top level ``__init__.py``.
+
+For user projects wishing to patch the backend that they're using, this code
+should live in an :meth:`AppConfig.ready()<django.apps.AppConfig.ready>` method.

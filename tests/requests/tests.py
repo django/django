@@ -14,7 +14,7 @@ from django.http import (
 )
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
-from django.test.utils import str_prefix
+from django.test.utils import freeze_time, str_prefix
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.http import cookie_date, urlencode
@@ -37,6 +37,9 @@ class RequestsTests(SimpleTestCase):
 
         # and FILES should be MultiValueDict
         self.assertEqual(request.FILES.getlist('foo'), [])
+
+        self.assertIsNone(request.content_type)
+        self.assertIsNone(request.content_params)
 
     def test_httprequest_full_path(self):
         request = HttpRequest()
@@ -72,14 +75,24 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
 
     def test_wsgirequest(self):
-        request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus', 'wsgi.input': BytesIO(b'')})
+        request = WSGIRequest({
+            'PATH_INFO': 'bogus',
+            'REQUEST_METHOD': 'bogus',
+            'CONTENT_TYPE': 'text/html; charset=utf8',
+            'wsgi.input': BytesIO(b''),
+        })
         self.assertEqual(list(request.GET.keys()), [])
         self.assertEqual(list(request.POST.keys()), [])
         self.assertEqual(list(request.COOKIES.keys()), [])
-        self.assertEqual(set(request.META.keys()), {'PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME', 'wsgi.input'})
+        self.assertEqual(
+            set(request.META.keys()),
+            {'PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME', 'CONTENT_TYPE', 'wsgi.input'}
+        )
         self.assertEqual(request.META['PATH_INFO'], 'bogus')
         self.assertEqual(request.META['REQUEST_METHOD'], 'bogus')
         self.assertEqual(request.META['SCRIPT_NAME'], '')
+        self.assertEqual(request.content_type, 'text/html')
+        self.assertEqual(request.content_params, {'charset': 'utf8'})
 
     def test_wsgirequest_with_script_name(self):
         """
@@ -234,10 +247,12 @@ class RequestsTests(SimpleTestCase):
     def test_max_age_expiration(self):
         "Cookie will expire if max_age is provided"
         response = HttpResponse()
-        response.set_cookie('max_age', max_age=10)
+        set_cookie_time = time.time()
+        with freeze_time(set_cookie_time):
+            response.set_cookie('max_age', max_age=10)
         max_age_cookie = response.cookies['max_age']
         self.assertEqual(max_age_cookie['max-age'], 10)
-        self.assertEqual(max_age_cookie['expires'], cookie_date(time.time() + 10))
+        self.assertEqual(max_age_cookie['expires'], cookie_date(set_cookie_time + 10))
 
     def test_httponly_cookie(self):
         response = HttpResponse()

@@ -8,6 +8,7 @@ import unittest
 from datetime import timedelta
 
 from django.conf import settings
+from django.contrib.sessions.backends.base import UpdateError
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 from django.contrib.sessions.backends.cached_db import \
     SessionStore as CacheDBSession
@@ -149,9 +150,6 @@ class SessionTestsMixin(object):
         self.assertTrue(self.session.modified)
 
     def test_save(self):
-        if (hasattr(self.session, '_cache') and 'DummyCache' in
-                settings.CACHES[settings.SESSION_CACHE_ALIAS]['BACKEND']):
-            raise unittest.SkipTest("Session saving tests require a real cache backend")
         self.session.save()
         self.assertTrue(self.session.exists(self.session.session_key))
 
@@ -177,6 +175,7 @@ class SessionTestsMixin(object):
         prev_key = self.session.session_key
         prev_data = list(self.session.items())
         self.session.cycle_key()
+        self.assertFalse(self.session.exists(prev_key))
         self.assertNotEqual(self.session.session_key, prev_key)
         self.assertEqual(list(self.session.items()), prev_data)
 
@@ -345,14 +344,34 @@ class SessionTestsMixin(object):
 
         Creating session records on load is a DOS vulnerability.
         """
-        if self.backend is CookieSession:
-            raise unittest.SkipTest("Cookie backend doesn't have an external store to create records in.")
         session = self.backend('someunknownkey')
         session.load()
 
         self.assertFalse(session.exists(session.session_key))
         # provided unknown key was cycled, not reused
         self.assertNotEqual(session.session_key, 'someunknownkey')
+
+    def test_session_save_does_not_resurrect_session_logged_out_in_other_context(self):
+        """
+        Sessions shouldn't be resurrected by a concurrent request.
+        """
+        # Create new session.
+        s1 = self.backend()
+        s1['test_data'] = 'value1'
+        s1.save(must_create=True)
+
+        # Logout in another context.
+        s2 = self.backend(s1.session_key)
+        s2.delete()
+
+        # Modify session in first context.
+        s1['test_data'] = 'value2'
+        with self.assertRaises(UpdateError):
+            # This should throw an exception as the session is deleted, not
+            # resurrect the session.
+            s1.save()
+
+        self.assertEqual(s1.load(), {})
 
 
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
@@ -458,9 +477,6 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
 
     backend = CacheDBSession
 
-    @unittest.skipIf('DummyCache' in
-        settings.CACHES[settings.SESSION_CACHE_ALIAS]['BACKEND'],
-        "Session saving tests require a real cache backend")
     def test_exists_searches_cache_first(self):
         self.session.save()
         with self.assertNumQueries(0):
@@ -665,6 +681,25 @@ class SessionMiddlewareTests(TestCase):
         # Check that the value wasn't saved above.
         self.assertNotIn('hello', request.session.load())
 
+    def test_session_update_error_redirect(self):
+        path = '/foo/'
+        request = RequestFactory().get(path)
+        response = HttpResponse()
+        middleware = SessionMiddleware()
+
+        request.session = DatabaseSession()
+        request.session.save(must_create=True)
+        request.session.delete()
+
+        # Handle the response through the middleware. It will try to save the
+        # deleted session which will cause an UpdateError that's caught and
+        # results in a redirect to the original page.
+        response = middleware.process_response(request, response)
+
+        # Check that the response is a redirect.
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], path)
+
     def test_session_delete_on_end(self):
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
@@ -812,3 +847,11 @@ class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
 
         self.session.serializer = PickleSerializer
         self.session.load()
+
+    @unittest.skip("Cookie backend doesn't have an external store to create records in.")
+    def test_session_load_does_not_create_record(self):
+        pass
+
+    @unittest.skip("CookieSession is stored in the client and there is no way to query it.")
+    def test_session_save_does_not_resurrect_session_logged_out_in_other_context(self):
+        pass

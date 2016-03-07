@@ -166,7 +166,7 @@ class ForwardManyToOneDescriptor(object):
                 rel_obj = None
             else:
                 qs = self.get_queryset(instance=instance)
-                qs = qs.filter(**self.field.get_reverse_related_filter(instance))
+                qs = qs.filter(self.field.get_reverse_related_filter(instance))
                 # Assuming the database enforces foreign keys, this won't fail.
                 rel_obj = qs.get()
                 # If this is a one-to-one relation, set the reverse accessor
@@ -193,14 +193,8 @@ class ForwardManyToOneDescriptor(object):
         - ``instance`` is the ``child`` instance
         - ``value`` in the ``parent`` instance on the right of the equal sign
         """
-        # If null=True, we can assign null here, but otherwise the value needs
-        # to be an instance of the related class.
-        if value is None and self.field.null is False:
-            raise ValueError(
-                'Cannot assign None: "%s.%s" does not allow null values.' %
-                (instance._meta.object_name, self.field.name)
-            )
-        elif value is not None and not isinstance(value, self.field.remote_field.model._meta.concrete_model):
+        # An object must be an instance of the related class.
+        if value is not None and not isinstance(value, self.field.remote_field.model._meta.concrete_model):
             raise ValueError(
                 'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
                     value,
@@ -379,26 +373,17 @@ class ReverseOneToOneDescriptor(object):
         # ForwardManyToOneDescriptor is annoying, but there's a bunch
         # of small differences that would make a common base class convoluted.
 
-        # If null=True, we can assign null here, but otherwise the value needs
-        # to be an instance of the related class.
         if value is None:
-            if self.related.field.null:
-                # Update the cached related instance (if any) & clear the cache.
-                try:
-                    rel_obj = getattr(instance, self.cache_name)
-                except AttributeError:
-                    pass
-                else:
-                    delattr(instance, self.cache_name)
-                    setattr(rel_obj, self.related.field.name, None)
+            # Update the cached related instance (if any) & clear the cache.
+            try:
+                rel_obj = getattr(instance, self.cache_name)
+            except AttributeError:
+                pass
             else:
-                raise ValueError(
-                    'Cannot assign None: "%s.%s" does not allow null values.' % (
-                        instance._meta.object_name,
-                        self.related.get_accessor_name(),
-                    )
-                )
+                delattr(instance, self.cache_name)
+                setattr(rel_obj, self.related.field.name, None)
         elif not isinstance(value, self.related.related_model):
+            # An object must be an instance of the related class.
             raise ValueError(
                 'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
                     value,
@@ -517,23 +502,29 @@ def create_reverse_many_to_one_manager(superclass, rel):
             return manager_class(self.instance)
         do_not_call_in_templates = True
 
+        def _apply_rel_filters(self, queryset):
+            """
+            Filter the queryset for the instance this manager is bound to.
+            """
+            db = self._db or router.db_for_read(self.model, instance=self.instance)
+            empty_strings_as_null = connections[db].features.interprets_empty_strings_as_nulls
+            queryset._add_hints(instance=self.instance)
+            if self._db:
+                queryset = queryset.using(self._db)
+            queryset = queryset.filter(**self.core_filters)
+            for field in self.field.foreign_related_fields:
+                val = getattr(self.instance, field.attname)
+                if val is None or (val == '' and empty_strings_as_null):
+                    return queryset.none()
+            queryset._known_related_objects = {self.field: {self.instance.pk: self.instance}}
+            return queryset
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.field.related_query_name()]
             except (AttributeError, KeyError):
-                db = self._db or router.db_for_read(self.model, instance=self.instance)
-                empty_strings_as_null = connections[db].features.interprets_empty_strings_as_nulls
-                qs = super(RelatedManager, self).get_queryset()
-                qs._add_hints(instance=self.instance)
-                if self._db:
-                    qs = qs.using(self._db)
-                qs = qs.filter(**self.core_filters)
-                for field in self.field.foreign_related_fields:
-                    val = getattr(self.instance, field.attname)
-                    if val is None or (val == '' and empty_strings_as_null):
-                        return qs.none()
-                qs._known_related_objects = {self.field: {self.instance.pk: self.instance}}
-                return qs
+                queryset = super(RelatedManager, self).get_queryset()
+                return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
@@ -791,15 +782,21 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 filters |= symmetrical_filters
             return filters
 
+        def _apply_rel_filters(self, queryset):
+            """
+            Filter the queryset for the instance this manager is bound to.
+            """
+            queryset._add_hints(instance=self.instance)
+            if self._db:
+                queryset = queryset.using(self._db)
+            return queryset._next_is_sticky().filter(**self.core_filters)
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
-                qs = super(ManyRelatedManager, self).get_queryset()
-                qs._add_hints(instance=self.instance)
-                if self._db:
-                    qs = qs.using(self._db)
-                return qs._next_is_sticky().filter(**self.core_filters)
+                queryset = super(ManyRelatedManager, self).get_queryset()
+                return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:

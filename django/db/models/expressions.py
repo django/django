@@ -210,7 +210,7 @@ class BaseExpression(object):
         ])
         return c
 
-    def _prepare(self):
+    def _prepare(self, field):
         """
         Hook used by Field.get_prep_lookup() to do custom preparation.
         """
@@ -398,6 +398,10 @@ class CombinedExpression(Expression):
                 ((lhs_output and lhs_output.get_internal_type() == 'DurationField')
                 or (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
             return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
+        if (lhs_output and rhs_output and self.connector == self.SUB and
+            lhs_output.get_internal_type() in {'DateField', 'DateTimeField', 'TimeField'} and
+                lhs_output.get_internal_type() == lhs_output.get_internal_type()):
+            return TemporalSubtraction(self.lhs, self.rhs).as_sql(compiler, connection)
         expressions = []
         expression_params = []
         sql, params = compiler.compile(self.lhs)
@@ -446,6 +450,17 @@ class DurationExpression(CombinedExpression):
         expression_wrapper = '(%s)'
         sql = connection.ops.combine_duration_expression(self.connector, expressions)
         return expression_wrapper % sql, expression_params
+
+
+class TemporalSubtraction(CombinedExpression):
+    def __init__(self, lhs, rhs):
+        super(TemporalSubtraction, self).__init__(lhs, self.SUB, rhs, output_field=fields.DurationField())
+
+    def as_sql(self, compiler, connection):
+        connection.ops.check_expression_support(self)
+        lhs = compiler.compile(self.lhs, connection)
+        rhs = compiler.compile(self.rhs, connection)
+        return connection.ops.subtract_temporals(self.lhs.output_field.get_internal_type(), lhs, rhs)
 
 
 class F(Combinable):

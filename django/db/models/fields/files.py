@@ -245,7 +245,6 @@ class FileField(Field):
             return [
                 checks.Error(
                     "'unique' is not a valid argument for a %s." % self.__class__.__name__,
-                    hint=None,
                     obj=self,
                     id='fields.E200',
                 )
@@ -258,7 +257,6 @@ class FileField(Field):
             return [
                 checks.Error(
                     "'primary_key' is not a valid argument for a %s." % self.__class__.__name__,
-                    hint=None,
                     obj=self,
                     id='fields.E201',
                 )

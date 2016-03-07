@@ -47,8 +47,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        self.verbosity = options.get('verbosity')
-        self.interactive = options.get('interactive')
+        self.verbosity = options['verbosity']
+        self.interactive = options['interactive']
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 import_module('.management', app_config.name)
 
         # Get the database we're operating from
-        db = options.get('database')
+        db = options['database']
         connection = connections[db]
 
         # Hook for backends needing any database preparation
@@ -114,7 +114,7 @@ class Command(BaseCommand):
             targets = executor.loader.graph.leaf_nodes()
 
         plan = executor.migration_plan(targets)
-        run_syncdb = options.get('run_syncdb') and executor.loader.unmigrated_apps
+        run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps
 
         # Print some useful info
         if self.verbosity >= 1:
@@ -172,8 +172,8 @@ class Command(BaseCommand):
                         "apply them."
                     ))
         else:
-            fake = options.get("fake")
-            fake_initial = options.get("fake_initial")
+            fake = options['fake']
+            fake_initial = options['fake_initial']
             executor.migrate(targets, plan, fake=fake, fake_initial=fake_initial)
 
         # Send the post_migrate signal, so individual apps can do whatever they need

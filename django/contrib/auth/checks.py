@@ -28,7 +28,6 @@ def check_user_model(app_configs=None, **kwargs):
         errors.append(
             checks.Error(
                 "'REQUIRED_FIELDS' must be a list or tuple.",
-                hint=None,
                 obj=cls,
                 id='auth.E001',
             )
@@ -38,9 +37,8 @@ def check_user_model(app_configs=None, **kwargs):
     if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
         errors.append(
             checks.Error(
-                ("The field named as the 'USERNAME_FIELD' "
-                 "for a custom user model must not be included in 'REQUIRED_FIELDS'."),
-                hint=None,
+                "The field named as the 'USERNAME_FIELD' "
+                "for a custom user model must not be included in 'REQUIRED_FIELDS'.",
                 obj=cls,
                 id='auth.E002',
             )
@@ -55,7 +53,6 @@ def check_user_model(app_configs=None, **kwargs):
                     "'%s.%s' must be unique because it is named as the 'USERNAME_FIELD'." % (
                         cls._meta.object_name, cls.USERNAME_FIELD
                     ),
-                    hint=None,
                     obj=cls,
                     id='auth.E003',
                 )
@@ -66,8 +63,7 @@ def check_user_model(app_configs=None, **kwargs):
                     "'%s.%s' is named as the 'USERNAME_FIELD', but it is not unique." % (
                         cls._meta.object_name, cls.USERNAME_FIELD
                     ),
-                    hint=('Ensure that your authentication backend(s) can handle '
-                          'non-unique usernames.'),
+                    hint='Ensure that your authentication backend(s) can handle non-unique usernames.',
                     obj=cls,
                     id='auth.W004',
                 )

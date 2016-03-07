@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.utils.encoding import force_text
 
 
 class Command(BaseCommand):
@@ -57,25 +58,32 @@ class Command(BaseCommand):
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue
+                try:
+                    try:
+                        relations = connection.introspection.get_relations(cursor, table_name)
+                    except NotImplementedError:
+                        relations = {}
+                    try:
+                        indexes = connection.introspection.get_indexes(cursor, table_name)
+                    except NotImplementedError:
+                        indexes = {}
+                    try:
+                        constraints = connection.introspection.get_constraints(cursor, table_name)
+                    except NotImplementedError:
+                        constraints = {}
+                    table_description = connection.introspection.get_table_description(cursor, table_name)
+                except Exception as e:
+                    yield "# Unable to inspect table '%s'" % table_name
+                    yield "# The error was: %s" % force_text(e)
+                    continue
+
                 yield ''
                 yield ''
                 yield 'class %s(models.Model):' % table2model(table_name)
                 known_models.append(table2model(table_name))
-                try:
-                    relations = connection.introspection.get_relations(cursor, table_name)
-                except NotImplementedError:
-                    relations = {}
-                try:
-                    indexes = connection.introspection.get_indexes(cursor, table_name)
-                except NotImplementedError:
-                    indexes = {}
-                try:
-                    constraints = connection.introspection.get_constraints(cursor, table_name)
-                except NotImplementedError:
-                    constraints = {}
                 used_column_names = []  # Holds column names used in the table so far
                 column_to_field_name = {}  # Maps column names to names of model fields
-                for row in connection.introspection.get_table_description(cursor, table_name):
+                for row in table_description:
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
                     extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
                     column_name = row[0]

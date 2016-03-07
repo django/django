@@ -49,7 +49,6 @@ SUBDIRS_TO_SKIP = [
     'import_error_package',
     'test_discovery_sample',
     'test_discovery_sample2',
-    'test_runner_deprecation_app',
 ]
 
 ALWAYS_INSTALLED_APPS = [
@@ -235,7 +234,7 @@ def actual_test_processes(parallel):
 
 
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
-                 test_labels, debug_sql, parallel):
+                 test_labels, debug_sql, parallel, tags, exclude_tags):
     state = setup(verbosity, test_labels, parallel)
     extra_tests = []
 
@@ -252,6 +251,8 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         reverse=reverse,
         debug_sql=debug_sql,
         parallel=actual_test_processes(parallel),
+        tags=tags,
+        exclude_tags=exclude_tags,
     )
     failures = test_runner.run_tests(
         test_labels or get_installed(),
@@ -259,6 +260,23 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     )
     teardown(state)
     return failures
+
+
+def get_subprocess_args(options):
+    subprocess_args = [
+        sys.executable, upath(__file__), '--settings=%s' % options.settings
+    ]
+    if options.failfast:
+        subprocess_args.append('--failfast')
+    if options.verbosity:
+        subprocess_args.append('--verbosity=%s' % options.verbosity)
+    if not options.interactive:
+        subprocess_args.append('--noinput')
+    if options.tags:
+        subprocess_args.append('--tag=%s' % options.tags)
+    if options.exclude_tags:
+        subprocess_args.append('--exclude_tag=%s' % options.exclude_tags)
+    return subprocess_args
 
 
 def bisect_tests(bisection_label, options, test_labels, parallel):
@@ -276,14 +294,7 @@ def bisect_tests(bisection_label, options, test_labels, parallel):
         except ValueError:
             pass
 
-    subprocess_args = [
-        sys.executable, upath(__file__), '--settings=%s' % options.settings]
-    if options.failfast:
-        subprocess_args.append('--failfast')
-    if options.verbosity:
-        subprocess_args.append('--verbosity=%s' % options.verbosity)
-    if not options.interactive:
-        subprocess_args.append('--noinput')
+    subprocess_args = get_subprocess_args(options)
 
     iteration = 1
     while len(test_labels) > 1:
@@ -334,14 +345,7 @@ def paired_tests(paired_test, options, test_labels, parallel):
         except ValueError:
             pass
 
-    subprocess_args = [
-        sys.executable, upath(__file__), '--settings=%s' % options.settings]
-    if options.failfast:
-        subprocess_args.append('--failfast')
-    if options.verbosity:
-        subprocess_args.append('--verbosity=%s' % options.verbosity)
-    if not options.interactive:
-        subprocess_args.append('--noinput')
+    subprocess_args = get_subprocess_args(options)
 
     for i, label in enumerate(test_labels):
         print('***** %d of %d: Check test pairing with %s' % (
@@ -393,7 +397,7 @@ if __name__ == "__main__":
              'is localhost:8081-8179.')
     parser.add_argument(
         '--selenium', action='store_true', dest='selenium', default=False,
-        help='Run the Selenium tests as well (if Selenium is installed).')
+        help='Run only the Selenium tests (equivalent to "--tag selenium").')
     parser.add_argument(
         '--debug-sql', action='store_true', dest='debug_sql', default=False,
         help='Turn on the SQL query logger within tests.')
@@ -401,6 +405,12 @@ if __name__ == "__main__":
         '--parallel', dest='parallel', nargs='?', default=0, type=int,
         const=default_test_processes(), metavar='N',
         help='Run tests using up to N parallel processes.')
+    parser.add_argument(
+        '--tag', dest='tags', action='append',
+        help='Run only tests with the specified tags. Can be used multiple times.')
+    parser.add_argument(
+        '--exclude-tag', dest='exclude_tags', action='append',
+        help='Do not run tests with the specified tag. Can be used multiple times.')
 
     options = parser.parse_args()
 
@@ -429,15 +439,21 @@ if __name__ == "__main__":
 
     if options.selenium:
         os.environ['DJANGO_SELENIUM_TESTS'] = '1'
+        if not options.tags:
+            options.tags = ['selenium']
+        elif 'selenium' not in options.tags:
+            options.tags.append('selenium')
 
     if options.bisect:
         bisect_tests(options.bisect, options, options.modules, options.parallel)
     elif options.pair:
         paired_tests(options.pair, options, options.modules, options.parallel)
     else:
-        failures = django_tests(options.verbosity, options.interactive,
-                                options.failfast, options.keepdb,
-                                options.reverse, options.modules,
-                                options.debug_sql, options.parallel)
+        failures = django_tests(
+            options.verbosity, options.interactive, options.failfast,
+            options.keepdb, options.reverse, options.modules,
+            options.debug_sql, options.parallel, options.tags,
+            options.exclude_tags,
+        )
         if failures:
             sys.exit(bool(failures))

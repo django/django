@@ -1,3 +1,4 @@
+import warnings
 from copy import copy
 
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.db.models.fields import (
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.six.moves import range
 
@@ -203,6 +205,13 @@ class In(BuiltinLookup):
     lookup_name = 'in'
 
     def process_rhs(self, compiler, connection):
+        db_rhs = getattr(self.rhs, '_db', None)
+        if db_rhs is not None and db_rhs != connection.alias:
+            raise ValueError(
+                "Subqueries aren't allowed across different databases. Force "
+                "the inner query to be evaluated using `list(inner_query)`."
+            )
+
         if self.rhs_is_direct_value():
             try:
                 rhs = set(self.rhs)
@@ -334,11 +343,6 @@ class IEndsWith(PatternLookup):
 Field.register_lookup(IEndsWith)
 
 
-class Between(BuiltinLookup):
-    def get_rhs_op(self, connection, rhs):
-        return "BETWEEN %s AND %s" % (rhs, rhs)
-
-
 class Range(BuiltinLookup):
     lookup_name = 'range'
 
@@ -371,6 +375,10 @@ class Search(BuiltinLookup):
     lookup_name = 'search'
 
     def as_sql(self, compiler, connection):
+        warnings.warn(
+            'The `__search` lookup is deprecated. See the 1.10 release notes '
+            'for how to replace it.', RemovedInDjango20Warning, stacklevel=2
+        )
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         sql_template = connection.ops.fulltext_search_sql(field_name=lhs)

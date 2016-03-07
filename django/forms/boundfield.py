@@ -60,7 +60,7 @@ class BoundField(object):
     def __getitem__(self, idx):
         # Prevent unnecessary reevaluation when accessing BoundField's attrs
         # from templates.
-        if not isinstance(idx, six.integer_types):
+        if not isinstance(idx, six.integer_types + (slice,)):
             raise TypeError
         return list(self.__iter__())[idx]
 

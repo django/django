@@ -144,8 +144,8 @@ If you're using AngularJS 1.1.3 and newer, it's sufficient to configure the
 
 .. code-block:: javascript
 
-    $http.defaults.xsrfCookieName = 'csrftoken';
-    $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 Other template engines
 ----------------------
@@ -240,12 +240,16 @@ The CSRF protection is based on the following things:
    This check is done by ``CsrfViewMiddleware``.
 
 4. In addition, for HTTPS requests, strict referer checking is done by
-   ``CsrfViewMiddleware``.  This is necessary to address a Man-In-The-Middle
-   attack that is possible under HTTPS when using a session independent nonce,
-   due to the fact that HTTP 'Set-Cookie' headers are (unfortunately) accepted
-   by clients that are talking to a site under HTTPS.  (Referer checking is not
-   done for HTTP requests because the presence of the Referer header is not
-   reliable enough under HTTP.)
+   ``CsrfViewMiddleware``. This means that even if a subdomain can set or
+   modify cookies on your domain, it can't force a user to post to your
+   application since that request won't come from your own exact domain.
+
+   This also addresses a man-in-the-middle attack that's possible under HTTPS
+   when using a session independent nonce, due to the fact that HTTP
+   ``Set-Cookie`` headers are (unfortunately) accepted by clients even when
+   they are talking to a site under HTTPS. (Referer checking is not done for
+   HTTP requests because the presence of the ``Referer`` header isn't reliable
+   enough under HTTP.)
 
    If the :setting:`CSRF_COOKIE_DOMAIN` setting is set, the referer is compared
    against it. This setting supports subdomains. For example,
@@ -263,7 +267,15 @@ It deliberately ignores GET requests (and other requests that are defined as
 'safe' by :rfc:`2616`). These requests ought never to have any potentially
 dangerous side effects , and so a CSRF attack with a GET request ought to be
 harmless. :rfc:`2616` defines POST, PUT and DELETE as 'unsafe', and all other
-methods are assumed to be unsafe, for maximum protection.
+methods are also assumed to be unsafe, for maximum protection.
+
+The CSRF protection cannot protect against man-in-the-middle attacks, so use
+:ref:`HTTPS <security-recommendation-ssl>` with
+:ref:`http-strict-transport-security`. It also assumes :ref:`validation of
+the HOST header <host-headers-virtual-hosting>` and that there aren't any
+:ref:`cross-site scripting vulnerabilities <cross-site-scripting>` on your site
+(because XSS vulnerabilities already let an attacker do anything a CSRF
+vulnerability allows and much worse).
 
 .. versionchanged:: 1.9
 
@@ -462,3 +474,34 @@ A number of settings can be used to control Django's CSRF behavior:
 * :setting:`CSRF_FAILURE_VIEW`
 * :setting:`CSRF_HEADER_NAME`
 * :setting:`CSRF_TRUSTED_ORIGINS`
+
+Frequently Asked Questions
+==========================
+
+Is posting an arbitrary CSRF token pair (cookie and POST data) a vulnerability?
+-------------------------------------------------------------------------------
+
+No, this is by design. Without a man-in-the-middle attack, there is no way for
+an attacker to send a CSRF token cookie to a victim's browser, so a successful
+attack would need to obtain the victim's browser's cookie via XSS or similar,
+in which case an attacker usually doesn't need CSRF attacks.
+
+Some security audit tools flag this as a problem but as mentioned before, an
+attacker cannot steal a user's browser's CSRF cookie. "Stealing" or modifying
+*your own* token using Firebug, Chrome dev tools, etc. isn't a vulnerability.
+
+Is the fact that Django's CSRF protection isn't linked to a session a problem?
+------------------------------------------------------------------------------
+
+No, this is by design. Not linking CSRF protection to a session allows using
+the protection on sites such as a `pastebin` that allow submissions from
+anonymous users which don't have a session.
+
+Why not use a new token for each request?
+-----------------------------------------
+
+Generating a new token for each request is problematic from a UI perspective
+because it invalidates all previous forms. Most users would be very unhappy to
+find that opening a new tab on your site has invalidated the form they had
+just spent time filling out in another tab or that a form they accessed via
+the back button could not be filled out.

@@ -1,6 +1,8 @@
 # This code was mostly based on ipaddr-py
 # Copyright 2007 Google Inc. https://github.com/google/ipaddr-py
 # Licensed under the Apache License, Version 2.0 (the "License").
+import re
+
 from django.core.exceptions import ValidationError
 from django.utils.six.moves import range
 from django.utils.translation import ugettext_lazy as _
@@ -154,6 +156,10 @@ def is_valid_ipv6_address(ip_str):
         A boolean, True if this is a valid IPv6 address.
     """
     from django.core.validators import validate_ipv4_address
+
+    symbols_re = re.compile(r'^[0-9a-fA-F:.]+$')
+    if not symbols_re.match(ip_str):
+        return False
 
     # We need to have at least one ':'.
     if ':' not in ip_str:

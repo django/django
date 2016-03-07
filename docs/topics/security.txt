@@ -30,9 +30,10 @@ malicious input, it is not entirely foolproof. For example, it will not
 protect the following:
 
 .. code-block:: text
-..   highlighting as html+django fails due to intentionally missing quotes.
 
     <style class={{ var }}>...</style>
+
+.. highlighting as html+django fails due to intentionally missing quotes.
 
 If ``var`` is set to ``'class1 onmouseover=javascript:func()'``, this can result
 in unauthorized JavaScript execution, depending on how the browser renders

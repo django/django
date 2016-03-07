@@ -387,6 +387,12 @@ query will be ordered by ``pub_date`` and not ``headline``::
     incurs a cost to your database. Each foreign key you add will
     implicitly include all of its default orderings as well.
 
+    If a query doesn't have an ordering specified, results are returned from
+    the database in an unspecified order. A particular ordering is guaranteed
+    only when ordering by a set of fields that uniquely identify each object in
+    the results. For example, if a ``name`` field isn't unique, ordering by it
+    won't guarantee objects with the same name always appear in the same order.
+
 ``reverse()``
 ~~~~~~~~~~~~~
 
@@ -919,6 +925,10 @@ results; these ``QuerySets`` are then used in the ``self.toppings.all()`` calls.
 
 The additional queries in ``prefetch_related()`` are executed after the
 ``QuerySet`` has begun to be evaluated and the primary query has been executed.
+
+If you have an iterable of model instances, you can prefetch related attributes
+on those instances using the :func:`~django.db.models.prefetch_related_objects`
+function.
 
 Note that the result cache of the primary ``QuerySet`` and all specified related
 objects will then be fully loaded into memory. This changes the typical
@@ -1790,12 +1800,18 @@ This has a number of caveats though:
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField` it
-  does not retrieve and set the primary key attribute, as ``save()`` does.
+  does not retrieve and set the primary key attribute, as ``save()`` does,
+  unless the database backend supports it (currently PostgreSQL).
 * It does not work with many-to-many relationships.
 
 .. versionchanged:: 1.9
 
     Support for using ``bulk_create()`` with proxy models was added.
+
+.. versionchanged:: 1.10
+
+    Support for setting primary keys on objects created using ``bulk_create()``
+    when using PostgreSQL was added.
 
 The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite
@@ -2761,6 +2777,11 @@ SQL equivalent::
 ``search``
 ~~~~~~~~~~
 
+.. deprecated:: 1.10
+
+    See :ref:`the 1.10 release notes <search-lookup-replacement>` for how to
+    replace it.
+
 A boolean full-text search, taking advantage of full-text indexing. This is
 like :lookup:`contains` but is significantly faster due to full-text indexing.
 
@@ -2998,8 +3019,8 @@ by the aggregate.
 
 .. _SQLite documentation: https://www.sqlite.org/contrib
 
-Query-related classes
-=====================
+Query-related tools
+===================
 
 This section provides reference material for query-related tools not documented
 elsewhere.
@@ -3064,3 +3085,21 @@ attribute:
     provide a significant speed improvement over traditional
     ``prefetch_related`` calls which store the cached result within a
     ``QuerySet`` instance.
+
+``prefetch_related_objects()``
+------------------------------
+
+.. function:: prefetch_related_objects(model_instances, *related_lookups)
+
+.. versionadded:: 1.10
+
+Prefetches the given lookups on an iterable of model instances. This is useful
+in code that receives a list of model instances as opposed to a ``QuerySet``;
+for example, when fetching models from a cache or instantiating them manually.
+
+Pass an iterable of model instances (must all be of the same class) and the
+lookups or :class:`Prefetch` objects you want to prefetch for. For example::
+
+    >>> from django.db.models import prefetch_related_objects
+    >>> restaurants = fetch_top_restaurants_from_cache()  # A list of Restaurants
+    >>> prefetch_related_objects(restaurants, 'pizzas__toppings')

@@ -240,7 +240,9 @@ class GISFunctionsTests(TestCase):
             CountryWebMercator.objects.create(name=c.name, mpoly=c.mpoly)
         # Test in projected coordinate system
         qs = CountryWebMercator.objects.annotate(area_sum=Sum(functions.Area('mpoly')))
-        for c in qs:
+        # Some backends (e.g. Oracle) cannot group by multipolygon values, so
+        # defer such fields in the aggregation query.
+        for c in qs.defer('mpoly'):
             result = c.area_sum
             # If the result is a measure object, get value.
             if isinstance(result, Area):

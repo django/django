@@ -75,7 +75,7 @@ class HashedFilesMixin(object):
 
     def file_hash(self, name, content=None):
         """
-        Returns a hash of the file with the given name and optional content.
+        Return a hash of the file with the given name and optional content.
         """
         if content is None:
             return None
@@ -119,7 +119,7 @@ class HashedFilesMixin(object):
 
     def url(self, name, force=False):
         """
-        Returns the real URL in DEBUG mode.
+        Return the real URL in DEBUG mode.
         """
         if settings.DEBUG and not force:
             hashed_name, fragment = name, ''
@@ -147,51 +147,52 @@ class HashedFilesMixin(object):
 
     def url_converter(self, name, template=None):
         """
-        Returns the custom URL converter for the given file name.
+        Return the custom URL converter for the given file name.
         """
         if template is None:
             template = self.default_template
 
         def converter(matchobj):
             """
-            Converts the matched URL depending on the parent level (`..`)
-            and returns the normalized and hashed URL using the url method
-            of the storage.
+            Convert the matched URL to a normalized and hashed URL.
+
+            This requires figuring out which files the matched URL resolves
+            to and calling the url() method of the storage.
             """
             matched, url = matchobj.groups()
-            # Completely ignore http(s) prefixed URLs,
-            # fragments and data-uri URLs
-            if url.startswith(('#', 'http:', 'https:', 'data:', '//')):
+
+            # Ignore absolute/protocol-relative, fragments and data-uri URLs.
+            if url.startswith(('http:', 'https:', '//', '#', 'data:')):
                 return matched
-            name_parts = name.split(os.sep)
-            # Using posix normpath here to remove duplicates
-            url = posixpath.normpath(url)
-            # Strip off the fragment so that a path-like fragment won't confuse
-            # the lookup.
+
+            # Ignore absolute URLs that don't point to a static file (dynamic
+            # CSS / JS?). Note that STATIC_URL cannot be empty.
+            if url.startswith('/') and not url.startswith(settings.STATIC_URL):
+                return matched
+
+            # Strip off the fragment so a path-like fragment won't interfere.
             url_path, fragment = urldefrag(url)
-            url_parts = url_path.split('/')
-            parent_level, sub_level = url_path.count('..'), url_path.count('/')
+
             if url_path.startswith('/'):
-                sub_level -= 1
-                url_parts = url_parts[1:]
-            if parent_level or not url_path.startswith('/'):
-                start, end = parent_level + 1, parent_level
+                # Otherwise the condition above would have returned prematurely.
+                assert url_path.startswith(settings.STATIC_URL)
+                target_name = url_path[len(settings.STATIC_URL):]
             else:
-                if sub_level:
-                    if sub_level == 1:
-                        parent_level -= 1
-                    start, end = parent_level, 1
-                else:
-                    start, end = 1, sub_level - 1
-            joined_result = '/'.join(name_parts[:-start] + url_parts[end:])
-            hashed_url = self.url(unquote(joined_result), force=True)
-            file_name = hashed_url.split('/')[-1:]
-            relative_url = '/'.join(url_path.split('/')[:-1] + file_name)
+                # We're using the posixpath module to mix paths and URLs conveniently.
+                source_name = name if os.sep == '/' else name.replace(os.sep, '/')
+                target_name = posixpath.join(posixpath.dirname(source_name), url_path)
+
+            # Determine the hashed name of the target file with the storage backend.
+            hashed_url = self.url(unquote(target_name), force=True)
+
+            transformed_url = '/'.join(url_path.split('/')[:-1] + hashed_url.split('/')[-1:])
+
+            # Restore the fragment that was stripped off earlier.
             if fragment:
-                relative_url += '?#%s' % fragment if '?#' in url else '#%s' % fragment
+                transformed_url += ('?#' if '?#' in url else '#') + fragment
 
             # Return the hashed version to the file
-            return template % unquote(relative_url)
+            return template % unquote(transformed_url)
 
         return converter
 

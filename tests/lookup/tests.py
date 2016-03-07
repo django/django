@@ -7,7 +7,10 @@ from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import (
+    TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
+)
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import Article, Author, Game, MyISAMArticle, Player, Season, Tag
 
@@ -498,6 +501,14 @@ class LookupTests(TestCase):
             ]
         )
 
+    def test_in_different_database(self):
+        with self.assertRaisesMessage(
+            ValueError,
+            "Subqueries aren't allowed across different databases. Force the "
+            "inner query to be evaluated using `list(inner_query)`."
+        ):
+            list(Article.objects.filter(id__in=Article.objects.using('other').all()))
+
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
         with self.assertRaisesMessage(
@@ -784,6 +795,7 @@ class LookupTests(TestCase):
 class LookupTransactionTests(TransactionTestCase):
     available_apps = ['lookup']
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @skipUnless(connection.vendor == 'mysql', 'requires MySQL')
     def test_mysql_lookup_search(self):
         # To use fulltext indexes on MySQL either version 5.6 is needed, or one must use

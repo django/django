@@ -86,7 +86,14 @@ class URLValidator(RegexValidator):
     hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]{0,61}[a-z' + ul + r'0-9])?'
     # Max length for domain name labels is 63 characters per RFC 1034 sec. 3.1
     domain_re = r'(?:\.(?!-)[a-z' + ul + r'0-9-]{1,63}(?<!-))*'
-    tld_re = r'\.(?:[a-z' + ul + r']{2,63}|xn--[a-z0-9]{1,59})\.?'
+    tld_re = (
+        '\.'                                # dot
+        '(?!-)'                             # can't start with a dash
+        '(?:[a-z' + ul + '-]{2,63}'         # domain label
+        '|xn--[a-z0-9]{1,59})'              # or punycode label
+        '(?<!-)'                            # can't end with a dash
+        '\.?'                               # may have a trailing dot
+    )
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
     regex = _lazy_re_compile(
@@ -283,8 +290,11 @@ def ip_address_validators(protocol, unpack_ipv4):
                          % (protocol, list(ip_address_validator_map)))
 
 
-def int_list_validator(sep=',', message=None, code='invalid'):
-    regexp = _lazy_re_compile('^\d+(?:%s\d+)*\Z' % re.escape(sep))
+def int_list_validator(sep=',', message=None, code='invalid', allow_negative=False):
+    regexp = _lazy_re_compile('^%(neg)s\d+(?:%(sep)s%(neg)s\d+)*\Z' % {
+        'neg': '(-)?' if allow_negative else '',
+        'sep': re.escape(sep),
+    })
     return RegexValidator(regexp, message=message, code=code)
 
 

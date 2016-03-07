@@ -44,9 +44,8 @@ class CurrentSiteManagerChecksTests(SimpleTestCase):
         errors = InvalidArticle.check()
         expected = [
             checks.Error(
-                ("CurrentSiteManager could not find a field named "
-                 "'places_this_article_should_appear'."),
-                hint=None,
+                "CurrentSiteManager could not find a field named "
+                "'places_this_article_should_appear'.",
                 obj=InvalidArticle.on_site,
                 id='sites.E001',
             )
@@ -62,8 +61,8 @@ class CurrentSiteManagerChecksTests(SimpleTestCase):
         errors = ConfusedArticle.check()
         expected = [
             checks.Error(
-                "CurrentSiteManager cannot use 'ConfusedArticle.site' as it is not a ForeignKey or ManyToManyField.",
-                hint=None,
+                "CurrentSiteManager cannot use 'ConfusedArticle.site' as it is "
+                "not a ForeignKey or ManyToManyField.",
                 obj=ConfusedArticle.on_site,
                 id='sites.E002',
             )

@@ -673,9 +673,10 @@ class ExpressionOperatorTests(TestCase):
 
 class FTimeDeltaTests(TestCase):
 
-    def setUp(self):
-        self.sday = sday = datetime.date(2010, 6, 25)
-        self.stime = stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
+    @classmethod
+    def setUpTestData(cls):
+        cls.sday = sday = datetime.date(2010, 6, 25)
+        cls.stime = stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
         midnight = datetime.time(0)
 
         delta0 = datetime.timedelta(0)
@@ -686,18 +687,18 @@ class FTimeDeltaTests(TestCase):
 
         # Test data is set so that deltas and delays will be
         # strictly increasing.
-        self.deltas = []
-        self.delays = []
-        self.days_long = []
+        cls.deltas = []
+        cls.delays = []
+        cls.days_long = []
 
         # e0: started same day as assigned, zero duration
         end = stime + delta0
         e0 = Experiment.objects.create(name='e0', assigned=sday, start=stime,
             end=end, completed=end.date(), estimated_time=delta0)
-        self.deltas.append(delta0)
-        self.delays.append(e0.start -
+        cls.deltas.append(delta0)
+        cls.delays.append(e0.start -
             datetime.datetime.combine(e0.assigned, midnight))
-        self.days_long.append(e0.completed - e0.assigned)
+        cls.days_long.append(e0.completed - e0.assigned)
 
         # e1: started one day after assigned, tiny duration, data
         # set so that end time has no fractional seconds, which
@@ -709,41 +710,41 @@ class FTimeDeltaTests(TestCase):
             end = stime + delay + delta1
             e1 = Experiment.objects.create(name='e1', assigned=sday,
                 start=stime + delay, end=end, completed=end.date(), estimated_time=delta1)
-            self.deltas.append(delta1)
-            self.delays.append(e1.start -
+            cls.deltas.append(delta1)
+            cls.delays.append(e1.start -
                 datetime.datetime.combine(e1.assigned, midnight))
-            self.days_long.append(e1.completed - e1.assigned)
+            cls.days_long.append(e1.completed - e1.assigned)
 
         # e2: started three days after assigned, small duration
         end = stime + delta2
         e2 = Experiment.objects.create(name='e2',
             assigned=sday - datetime.timedelta(3), start=stime, end=end,
             completed=end.date(), estimated_time=datetime.timedelta(hours=1))
-        self.deltas.append(delta2)
-        self.delays.append(e2.start -
+        cls.deltas.append(delta2)
+        cls.delays.append(e2.start -
             datetime.datetime.combine(e2.assigned, midnight))
-        self.days_long.append(e2.completed - e2.assigned)
+        cls.days_long.append(e2.completed - e2.assigned)
 
         # e3: started four days after assigned, medium duration
         delay = datetime.timedelta(4)
         end = stime + delay + delta3
         e3 = Experiment.objects.create(name='e3',
             assigned=sday, start=stime + delay, end=end, completed=end.date(), estimated_time=delta3)
-        self.deltas.append(delta3)
-        self.delays.append(e3.start -
+        cls.deltas.append(delta3)
+        cls.delays.append(e3.start -
             datetime.datetime.combine(e3.assigned, midnight))
-        self.days_long.append(e3.completed - e3.assigned)
+        cls.days_long.append(e3.completed - e3.assigned)
 
         # e4: started 10 days after assignment, long duration
         end = stime + delta4
         e4 = Experiment.objects.create(name='e4',
             assigned=sday - datetime.timedelta(10), start=stime, end=end,
             completed=end.date(), estimated_time=delta4 - datetime.timedelta(1))
-        self.deltas.append(delta4)
-        self.delays.append(e4.start -
+        cls.deltas.append(delta4)
+        cls.delays.append(e4.start -
             datetime.datetime.combine(e4.assigned, midnight))
-        self.days_long.append(e4.completed - e4.assigned)
-        self.expnames = [e.name for e in Experiment.objects.all()]
+        cls.days_long.append(e4.completed - e4.assigned)
+        cls.expnames = [e.name for e in Experiment.objects.all()]
 
     def test_multiple_query_compilation(self):
         # Ticket #21643
@@ -869,8 +870,42 @@ class FTimeDeltaTests(TestCase):
             Experiment.objects.filter(end__gte=F('start') + F('estimated_time') + datetime.timedelta(hours=1))]
         self.assertEqual(delta_math, ['e4'])
 
-    @skipUnlessDBFeature("has_native_duration_field")
+    @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_date_subtraction(self):
+        queryset = Experiment.objects.annotate(
+            completion_duration=ExpressionWrapper(
+                F('completed') - F('assigned'), output_field=models.DurationField()
+            )
+        )
+
+        at_least_5_days = {e.name for e in queryset.filter(completion_duration__gte=datetime.timedelta(days=5))}
+        self.assertEqual(at_least_5_days, {'e3', 'e4'})
+
+        less_than_5_days = {e.name for e in queryset.filter(completion_duration__lt=datetime.timedelta(days=5))}
+        expected = {'e0', 'e2'}
+        if connection.features.supports_microsecond_precision:
+            expected.add('e1')
+        self.assertEqual(less_than_5_days, expected)
+
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_time_subtraction(self):
+        if connection.features.supports_microsecond_precision:
+            time = datetime.time(12, 30, 15, 2345)
+            timedelta = datetime.timedelta(hours=1, minutes=15, seconds=15, microseconds=2345)
+        else:
+            time = datetime.time(12, 30, 15)
+            timedelta = datetime.timedelta(hours=1, minutes=15, seconds=15)
+        Time.objects.create(time=time)
+        queryset = Time.objects.annotate(
+            difference=ExpressionWrapper(
+                F('time') - Value(datetime.time(11, 15, 0), output_field=models.TimeField()),
+                output_field=models.DurationField(),
+            )
+        )
+        self.assertEqual(queryset.get().difference, timedelta)
+
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_datetime_subtraction(self):
         under_estimate = [e.name for e in
             Experiment.objects.filter(estimated_time__gt=F('end') - F('start'))]
         self.assertEqual(under_estimate, ['e2'])

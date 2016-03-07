@@ -82,22 +82,35 @@ def call_command(name, *args, **options):
 
     This is the primary API you should use for calling specific commands.
 
+    `name` may be a string or a command object. Using a string is preferred
+    unless the command object is required for further processing or testing.
+
     Some examples:
         call_command('migrate')
         call_command('shell', plain=True)
         call_command('sqlmigrate', 'myapp')
-    """
-    # Load the command object.
-    try:
-        app_name = get_commands()[name]
-    except KeyError:
-        raise CommandError("Unknown command: %r" % name)
 
-    if isinstance(app_name, BaseCommand):
-        # If the command is already loaded, use it directly.
-        command = app_name
+        from django.core.management.commands import flush
+        cmd = flush.Command()
+        call_command(cmd, verbosity=0, interactive=False)
+        # Do something with cmd ...
+    """
+    if isinstance(name, BaseCommand):
+        # Command object passed in.
+        command = name
+        name = command.__class__.__module__.split('.')[-1]
     else:
-        command = load_command_class(app_name, name)
+        # Load the command object by name.
+        try:
+            app_name = get_commands()[name]
+        except KeyError:
+            raise CommandError("Unknown command: %r" % name)
+
+        if isinstance(app_name, BaseCommand):
+            # If the command is already loaded, use it directly.
+            command = app_name
+        else:
+            command = load_command_class(app_name, name)
 
     # Simulate argument parsing to get the option defaults (see #10080 for details).
     parser = command.create_parser('', name)

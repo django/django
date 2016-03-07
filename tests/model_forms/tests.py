@@ -23,7 +23,7 @@ from django.utils import six
 from django.utils._os import upath
 
 from .models import (
-    Article, ArticleStatus, Author, Author1, BetterWriter, BigInt, Book,
+    Article, ArticleStatus, Author, Author1, Award, BetterWriter, BigInt, Book,
     Category, Character, Colour, ColourfulItem, CommaSeparatedInteger,
     CustomErrorMessage, CustomFF, CustomFieldForExclusionModel, DateTimePost,
     DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel,
@@ -235,6 +235,40 @@ class ModelFormBaseTest(TestCase):
         self.assertTrue(f2.is_valid())
         obj = f2.save()
         self.assertEqual(obj.character, char)
+
+    def test_blank_false_with_null_true_foreign_key_field(self):
+        """
+        A ModelForm with a model having ForeignKey(blank=False, null=True)
+        and the form field set to required=False should allow the field to be
+        unset.
+        """
+        class AwardForm(forms.ModelForm):
+            class Meta:
+                model = Award
+                fields = '__all__'
+
+            def __init__(self, *args, **kwargs):
+                super(AwardForm, self).__init__(*args, **kwargs)
+                self.fields['character'].required = False
+
+        character = Character.objects.create(username='user', last_action=datetime.datetime.today())
+        award = Award.objects.create(name='Best sprinter', character=character)
+        data = {'name': 'Best tester', 'character': ''}  # remove character
+        form = AwardForm(data=data, instance=award)
+        self.assertTrue(form.is_valid())
+        award = form.save()
+        self.assertIsNone(award.character)
+
+    def test_save_blank_false_with_required_false(self):
+        """
+        A ModelForm with a model with a field set to blank=False and the form
+        field set to required=False should allow the field to be unset.
+        """
+        obj = Writer.objects.create(name='test')
+        form = CustomWriterForm(data={'name': ''}, instance=obj)
+        self.assertTrue(form.is_valid())
+        obj = form.save()
+        self.assertEqual(obj.name, '')
 
     def test_missing_fields_attribute(self):
         message = (
@@ -2248,6 +2282,21 @@ class ModelOtherFieldTests(SimpleTestCase):
         self.assertTrue(HomepageForm({'url': 'http://www.example.com:8000/test'}).is_valid())
         self.assertTrue(HomepageForm({'url': 'http://example.com/foo/bar'}).is_valid())
 
+    def test_modelform_non_editable_field(self):
+        """
+        When explicitely including a non-editable field in a ModelForm, the
+        error message should be explicit.
+        """
+        # 'created', non-editable, is excluded by default
+        self.assertNotIn('created', ArticleForm().fields)
+
+        msg = "'created' cannot be specified for Article model form as it is a non-editable field"
+        with self.assertRaisesMessage(FieldError, msg):
+            class InvalidArticleForm(forms.ModelForm):
+                class Meta:
+                    model = Article
+                    fields = ('headline', 'created')
+
     def test_http_prefixing(self):
         """
         If the http:// prefix is omitted on form input, the field adds it again. (Refs #13613)
@@ -2686,6 +2735,28 @@ class FormFieldCallbackTests(SimpleTestCase):
         # A bad callback provided by user still gives an error
         with self.assertRaises(TypeError):
             modelform_factory(Person, fields="__all__", formfield_callback='not a function or callable')
+
+    def test_inherit_after_custom_callback(self):
+        def callback(db_field, **kwargs):
+            if isinstance(db_field, models.CharField):
+                return forms.CharField(widget=forms.Textarea)
+            return db_field.formfield(**kwargs)
+
+        class BaseForm(forms.ModelForm):
+            class Meta:
+                model = Person
+                fields = '__all__'
+
+        NewForm = modelform_factory(Person, form=BaseForm, formfield_callback=callback)
+
+        class InheritedForm(NewForm):
+            pass
+
+        for name in NewForm.base_fields.keys():
+            self.assertEqual(
+                type(InheritedForm.base_fields[name].widget),
+                type(NewForm.base_fields[name].widget)
+            )
 
 
 class LocalizedModelFormTest(TestCase):

@@ -45,16 +45,16 @@ class Command(BaseCommand):
             help='Specifies file to which the output is written.')
 
     def handle(self, *app_labels, **options):
-        format = options.get('format')
-        indent = options.get('indent')
-        using = options.get('database')
-        excludes = options.get('exclude')
-        output = options.get('output')
-        show_traceback = options.get('traceback')
-        use_natural_foreign_keys = options.get('use_natural_foreign_keys')
-        use_natural_primary_keys = options.get('use_natural_primary_keys')
-        use_base_manager = options.get('use_base_manager')
-        pks = options.get('primary_keys')
+        format = options['format']
+        indent = options['indent']
+        using = options['database']
+        excludes = options['exclude']
+        output = options['output']
+        show_traceback = options['traceback']
+        use_natural_foreign_keys = options['use_natural_foreign_keys']
+        use_natural_primary_keys = options['use_natural_primary_keys']
+        use_base_manager = options['use_base_manager']
+        pks = options['primary_keys']
 
         if pks:
             primary_keys = pks.split(',')
