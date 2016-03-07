@@ -82,17 +82,18 @@ depends on core.js for utility functions like removeChildren or quickElement
             var calHeader = quickElement('caption', calTable, CalendarNamespace.monthsOfYear[month - 1] + ' ');
             // Draw year select element
             var selectYear = quickElement('select', calHeader);
-            for (i = 1900; i < todayYear + 20; i++) {
+            for (var i = 1900; i < todayYear + 20; i++) {
                 var option = new Option(i);
                 selectYear.appendChild(option);
-                if (i === year)
+                if (i === year) {
                     option.selected = true;
+                }
             }
             var tableBody = quickElement('tbody', calTable);
 
             // Draw days-of-week header
             var tableRow = quickElement('tr', tableBody);
-            for (var i = 0; i < 7; i++) {
+            for (i = 0; i < 7; i++) {
                 quickElement('th', tableRow, CalendarNamespace.daysOfWeek[(i + CalendarNamespace.firstDayOfWeek) % 7]);
             }
 
@@ -175,7 +176,7 @@ depends on core.js for utility functions like removeChildren or quickElement
             year_select.onchange = (function(calendar) {
                 return function() {
                     calendar.drawDate(calendar.currentMonth, parseInt(this.options[this.selectedIndex].value), calendar.selected);
-                }
+                };
             })(this);
         },
         drawDate: function(month, year, selected) {
