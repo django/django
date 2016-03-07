@@ -744,7 +744,7 @@ class ForeignKey(ForeignObject):
 
     def __init__(self, to, on_delete=None, related_name=None, related_query_name=None,
             limit_choices_to=None, parent_link=False, to_field=None,
-            db_constraint=True, **kwargs):
+            db_constraint=True, formfield_defaults=None, **kwargs):
         try:
             to._meta.model_name
         except AttributeError:
@@ -798,6 +798,7 @@ class ForeignKey(ForeignObject):
         super(ForeignKey, self).__init__(
             to, on_delete, from_fields=['self'], to_fields=[to_field], **kwargs)
 
+        self.formfield_defaults = formfield_defaults or {}
         self.db_constraint = db_constraint
 
     def check(self, **kwargs):
@@ -946,6 +947,7 @@ class ForeignKey(ForeignObject):
             'queryset': self.remote_field.model._default_manager.using(db),
             'to_field_name': self.remote_field.field_name,
         }
+        defaults.update(self.formfield_defaults)
         defaults.update(kwargs)
         return super(ForeignKey, self).formfield(**defaults)
 
