@@ -156,6 +156,8 @@ details on these changes.
   ``Field.contribute_to_class()`` and ``virtual`` in
   ``Model._meta.add_field()`` will be removed.
 
+* The ``javascript_catalog()`` and ``json_catalog()`` views will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

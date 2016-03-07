@@ -277,6 +277,14 @@ Internationalization
   Content) for AJAX requests when there is no ``next`` parameter in ``POST`` or
   ``GET``.
 
+* The :class:`~django.views.i18n.JavaScriptCatalog` and
+  :class:`~django.views.i18n.JSONCatalog` class-based views supersede the
+  deprecated ``javascript_catalog()`` and ``json_catalog()`` function-based
+  views. The new views are almost equivalent to the old ones except that by
+  default the new views collect all JavaScript strings in the ``djangojs``
+  translation domain from all installed apps rather than only the JavaScript
+  strings from :setting:`LOCALE_PATHS`.
+
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
@@ -928,6 +936,10 @@ Miscellaneous
   ``Field.contribute_to_class()`` and ``virtual`` in
   ``Model._meta.add_field()`` are deprecated in favor of ``private_only``
   and ``private``, respectively.
+
+* The ``javascript_catalog()`` and ``json_catalog()`` views are deprecated in
+  favor of class-based views :class:`~django.views.i18n.JavaScriptCatalog`
+  and :class:`~django.views.i18n.JSONCatalog`.
 
 .. _removed-features-1.10:
 
