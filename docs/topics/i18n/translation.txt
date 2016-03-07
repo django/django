@@ -959,14 +959,75 @@ Django provides an integrated solution for these problems: It passes the
 translations into JavaScript, so you can call ``gettext``, etc., from within
 JavaScript.
 
+The main solution to these problems is the following ``JavaScriptCatalog`` view,
+which generates a JavaScript code library with functions that mimic the
+``gettext`` interface, plus an array of translation strings.
+
 .. _javascript_catalog-view:
+
+The ``JavaScriptCatalog`` view
+------------------------------
+
+.. module:: django.views.i18n
+
+.. versionadded:: 1.10
+
+.. class:: JavaScriptCatalog
+
+    A view that produces a JavaScript code library with functions that mimic
+    the ``gettext`` interface, plus an array of translation strings.
+
+    **Attributes**
+
+    .. attribute:: domain
+
+        Translation domain containing strings to add in the view output.
+        Defaults to ``'djangojs'``.
+
+    .. attribute:: packages
+
+        A list of :attr:`application names <django.apps.AppConfig.name>` among
+        installed applications. Those apps should contain a ``locale``
+        directory. All those catalogs plus all catalogs found in
+        :setting:`LOCALE_PATHS` (which are always included) are merged into one
+        catalog. Defaults to ``None``, which means that all available
+        translations from all :setting:`INSTALLED_APPS` are provided in the
+        JavaScript output.
+
+    **Example with default values**::
+
+        from django.views.i18n import JavaScriptCatalog
+
+        urlpatterns = [
+            url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+        ]
+
+    **Example with custom packages**::
+
+        urlpatterns = [
+            url(r'^jsi18n/myapp/$',
+                JavaScriptCatalog.as_view(packages=['your.app.label']),
+                name='javascript-catalog'),
+        ]
+
+The precedence of translations is such that the packages appearing later in the
+``packages`` argument have higher precedence than the ones appearing at the
+beginning. This is important in the case of clashing translations for the same
+literal.
+
+If you use more than one ``JavaScriptCatalog`` view on a site and some of them
+define the same strings, the strings in the catalog that was loaded last take
+precedence.
 
 The ``javascript_catalog`` view
 -------------------------------
 
-.. module:: django.views.i18n
-
 .. function:: javascript_catalog(request, domain='djangojs', packages=None)
+
+.. deprecated:: 1.10
+
+    ``javascript_catalog()`` is deprecated in favor of
+    :class:`JavaScriptCatalog` and will be removed in Django 2.0.
 
 The main solution to these problems is the
 :meth:`django.views.i18n.javascript_catalog` view, which sends out a JavaScript
@@ -1209,12 +1270,48 @@ will render a conditional expression. This will evaluate to either a ``true``
 
 .. highlight:: python
 
+The ``JSONCatalog`` view
+------------------------
+
+.. versionadded:: 1.10
+
+.. class:: JSONCatalog
+
+    In order to use another client-side library to handle translations, you may
+    want to take advantage of the ``JSONCatalog`` view. It's similar to
+    :class:`~django.views.i18n.JavaScriptCatalog` but returns a JSON response.
+
+    See the documentation for :class:`~django.views.i18n.JavaScriptCatalog`
+    to learn about possible values and use of the ``domain`` and ``packages``
+    attributes.
+
+    The response format is as follows:
+
+    .. code-block:: text
+
+        {
+            "catalog": {
+                # Translations catalog
+            },
+            "formats": {
+                # Language formats for date, time, etc.
+            },
+            "plural": "..."  # Expression for plural forms, or null.
+        }
+
+    .. JSON doesn't allow comments so highlighting as JSON won't work here.
+
 The ``json_catalog`` view
 -------------------------
 
 .. versionadded:: 1.9
 
 .. function:: json_catalog(request, domain='djangojs', packages=None)
+
+.. deprecated:: 1.10
+
+    ``json_catalog()`` is deprecated in favor of :class:`JSONCatalog` and will
+    be removed in Django 2.0.
 
 In order to use another client-side library to handle translations, you may
 want to take advantage of the ``json_catalog()`` view. It's similar to
@@ -1260,9 +1357,9 @@ The response format is as follows:
 Note on performance
 -------------------
 
-The :func:`~django.views.i18n.javascript_catalog` view generates the catalog
-from ``.mo`` files on every request. Since its output is constant — at least
-for a given version of a site — it's a good candidate for caching.
+The various JavaScript/JSON i18n views generate the catalog from ``.mo`` files
+on every request. Since its output is constant, at least for a given version
+of a site, it's a good candidate for caching.
 
 Server-side caching will reduce CPU load. It's easily implemented with the
 :func:`~django.views.decorators.cache.cache_page` decorator. To trigger cache
@@ -1271,12 +1368,14 @@ prefix, as shown in the example below, or map the view at a version-dependent
 URL::
 
     from django.views.decorators.cache import cache_page
-    from django.views.i18n import javascript_catalog
+    from django.views.i18n import JavaScriptCatalog
 
     # The value returned by get_version() must change when translations change.
-    @cache_page(86400, key_prefix='js18n-%s' % get_version())
-    def cached_javascript_catalog(request, domain='djangojs', packages=None):
-        return javascript_catalog(request, domain, packages)
+    urlpatterns = [
+        url(r'^jsi18n/$',
+            cache_page(86400, key_prefix='js18n-%s' % get_version())(JavaScriptCatalog.as_view()),
+            name='javascript-catalog'),
+    ]
 
 Client-side caching will save bandwidth and make your site load faster. If
 you're using ETags (:setting:`USE_ETAGS = True <USE_ETAGS>`), you're already
@@ -1286,13 +1385,15 @@ whenever you restart your application server::
 
     from django.utils import timezone
     from django.views.decorators.http import last_modified
-    from django.views.i18n import javascript_catalog
+    from django.views.i18n import JavaScriptCatalog
 
     last_modified_date = timezone.now()
 
-    @last_modified(lambda req, **kw: last_modified_date)
-    def cached_javascript_catalog(request, domain='djangojs', packages=None):
-        return javascript_catalog(request, domain, packages)
+    urlpatterns = [
+        url(r'^jsi18n/$',
+            last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()),
+            name='javascript-catalog'),
+    ]
 
 You can even pre-generate the JavaScript catalog as part of your deployment
 procedure and serve it as a static file. This radical technique is implemented

@@ -14,6 +14,7 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
+from django.views.i18n import JavaScriptCatalog
 
 system_check_errors = []
 
@@ -316,15 +317,8 @@ class AdminSite(object):
     def i18n_javascript(self, request):
         """
         Displays the i18n JavaScript that the Django admin requires.
-
-        This takes into account the USE_I18N setting. If it's set to False, the
-        generated JavaScript will be leaner and faster.
         """
-        if settings.USE_I18N:
-            from django.views.i18n import javascript_catalog
-        else:
-            from django.views.i18n import null_javascript_catalog as javascript_catalog
-        return javascript_catalog(request, packages=['django.conf', 'django.contrib.admin'])
+        return JavaScriptCatalog.as_view(packages=['django.contrib.admin'])(request)
 
     @never_cache
     def logout(self, request, extra_context=None):
