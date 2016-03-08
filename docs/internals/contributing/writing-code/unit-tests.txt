@@ -137,6 +137,7 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
+*  argon2-cffi_ 16.0.0+
 *  bcrypt_
 *  docutils_
 *  enum34_ (Python 2 only)
@@ -171,6 +172,7 @@ and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
+.. _argon2-cffi: https://pypi.python.org/pypi/argon2_cffi
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
 .. _enum34: https://pypi.python.org/pypi/enum34

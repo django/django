@@ -1,3 +1,4 @@
+argon2-cffi >= 16.0.0
 bcrypt
 docutils
 geoip2
