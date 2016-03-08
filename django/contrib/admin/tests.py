@@ -1,6 +1,6 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import modify_settings
-from django.test.selenium import SeleniumTestCaseMixin
+from django.test.selenium import SeleniumTestCase
 from django.utils.translation import ugettext as _
 
 
@@ -14,7 +14,7 @@ class CSPMiddleware(object):
 @modify_settings(
     MIDDLEWARE_CLASSES={'append': 'django.contrib.admin.tests.CSPMiddleware'},
 )
-class AdminSeleniumTestCase(SeleniumTestCaseMixin, StaticLiveServerTestCase):
+class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     available_apps = [
         'django.contrib.admin',

@@ -1,60 +1,59 @@
-import os
-import types
-from unittest import skipIf
+from __future__ import unicode_literals
 
-from six import add_metaclass
+from functools import wraps
 
-from django.test import tag
+from django.test import tag, LiveServerTestCase
 from django.utils.module_loading import import_string
-from django.utils.six import (
-    get_function_closure, get_function_code, get_function_defaults,
-    get_function_globals,
-)
+from django.utils.six import with_metaclass
 
 
-class SeleniumMetaClass(type):
+def create_browser_test(browser, test):
+    @wraps(test)
+    def browser_test(self, *args, **kwargs):
+        return test(self, *args, **kwargs)
+    browser_test.browser = browser
+    return browser_test
+
+
+class SeleniumTestCaseBase(type(LiveServerTestCase)):
+    browsers = []
 
     def __new__(cls, name, bases, attrs):
-        """
-        Dynamically inject new methods for running tests in different browsers
-        when multiple browser specs are provided (e.g. --selenium=firefox,chrome).
-        """
-        browsers = os.environ.get('DJANGO_SELENIUM_SPECS', '').split(',')
-        if browsers[0]:
-            for key in list(attrs.keys()):
-                if isinstance(attrs[key], types.FunctionType) and key.startswith('test'):
-                    method = attrs[key]
-                    for index, spec in enumerate(browsers):
-                        # Create new methods for browsers other than first one.
-                        if index > 0:
-                            method_name = '%s__%s' % (key, spec)
-                            method = types.FunctionType(
-                                get_function_code(method),
-                                get_function_globals(method),
-                                str(method_name),
-                                get_function_defaults(method),
-                                get_function_closure(method),
-                            )
-                            setattr(method, 'browser_spec', spec)
-                            attrs[method_name] = method
-                        else:
-                            setattr(method, 'browser_spec', spec)
-        return type.__new__(cls, name, bases, attrs)
+        for attr, value in list(attrs.items()):
+            if attr.startswith('test') and callable(value):
+                test = attrs.pop(attr)
+                for browser in cls.browsers:
+                    attrs[str("test_%s%s" % (browser, attr[4:]))] = create_browser_test(browser, test)
+        super_new = super(SeleniumTestCaseBase, cls).__new__
+        test_class = super_new(cls, name, bases, attrs)
+        test_class.browser_test_classes = {
+            browser: super_new(cls, name, (test_class,), {'browser': browser, '__module__': test_class.__module__})
+            for browser in cls.browsers
+        }
+        return test_class
 
+    def __call__(self, method_name):
+        method = getattr(self, method_name)
+        browser_cls = self.browser_test_classes[method.browser]
+        return super(SeleniumTestCaseBase, browser_cls).__call__(method_name)
 
-skip_selenium = not os.environ.get('DJANGO_SELENIUM_SPECS', '').split(',')[0]
+    def create_webdriver(self):
+        return import_string('selenium.webdriver.%s.webdriver.WebDriver' % self.browser)()
 
 
 @tag('selenium')
-@add_metaclass(SeleniumMetaClass)
-@skipIf(skip_selenium, 'Selenium tests not requested.')
-class SeleniumTestCaseMixin(object):
+class SeleniumTestCase(with_metaclass(SeleniumTestCaseBase, LiveServerTestCase)):
 
-    def setUp(self):
-        test_method = getattr(self, self._testMethodName)
-        browser_spec = test_method.browser_spec
-        self.selenium = import_string('selenium.webdriver.%s.webdriver.WebDriver' % browser_spec)()
-        self.selenium.implicitly_wait(10)
+    @classmethod
+    def setUpClass(cls):
+        super(SeleniumTestCase, cls).setUpClass()
+        cls.selenium = cls.create_webdriver()
+        cls.selenium.implicitly_wait(10)
 
-    def tearDown(self):
-        self.selenium.quit()
+    @classmethod
+    def tearDownClass(cls):
+        super(SeleniumTestCase, cls).tearDownClass()
+        cls.selenium.quit()
+
+    def __reduce__(self, *args, **kwargs):
+        return self.__class__.__bases__[0], (self._testMethodName,)
