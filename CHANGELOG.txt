@@ -1,3 +1,13 @@
+0.9.4 (2016-03-08)
+------------------
+
+* Worker processes now exit gracefully (finish their current processing) when
+  sent SIGTERM or SIGINT.
+
+* `runserver` now has a shorter than standard HTTP timeout configured
+  of 60 seconds.
+
+
 0.9.3 (2016-02-28)
 ------------------
 
