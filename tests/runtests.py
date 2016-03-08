@@ -237,14 +237,14 @@ def actual_test_processes(parallel):
 
 class ActionSelenium(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
-        try:
-            # Attempt to create class instance to see if everything is fine.
-            import_string('selenium.webdriver.%s.webdriver.WebDriver' % values)
-        except Exception:
-            msg = "Selenium specifications not valid or corresponding WebDriver not installed: %s" % values
-            raise argparse.ArgumentError(self, msg)
-        items = getattr(namespace, self.dest, []) or []
-        items.append(values)
+        items = values.split(',')
+        for browser in items:
+            try:
+                # Attempt to create class instance to see if everything is fine.
+                import_string('selenium.webdriver.%s.webdriver.WebDriver' % browser)
+            except Exception:
+                msg = "Selenium specifications not valid or corresponding WebDriver not installed: %s" % browser
+                raise argparse.ArgumentError(self, msg)
         setattr(namespace, self.dest, items)
 
 
