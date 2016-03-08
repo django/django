@@ -59,7 +59,8 @@ specify a ``fields`` argument to the serializer::
     data = serializers.serialize('xml', SomeModel.objects.all(), fields=('name','size'))
 
 In this example, only the ``name`` and ``size`` attributes of each model will
-be serialized.
+be serialized. The primary key is always serialized as the ``pk`` element in the
+resulting output; it never appears in the ``fields`` part.
 
 .. note::
 
