@@ -154,8 +154,7 @@ class BaseCache(object):
         also be any callable. If timeout is given, that timeout will be used
         for the key; otherwise the default cache timeout will be used.
 
-        Returns the value of the key stored or retrieved on success,
-        False on error.
+        Returns the value of the key stored or retrieved.
         """
         if default is None:
             raise ValueError('You need to specify a value.')
@@ -163,9 +162,12 @@ class BaseCache(object):
         if val is None:
             if callable(default):
                 default = default()
-            val = self.add(key, default, timeout=timeout, version=version)
-            if val:
-                return self.get(key, default, version)
+            # Ignore the result of `.add()`. If another execution unit managed
+            # to add the value for this key between our `.get()` and this
+            # `.add()`. We still want to return to the caller with the
+            # already added or the `default` value.
+            self.add(key, default, timeout=timeout, version=version)
+            return self.get(key, default, version=version)
         return val
 
     def has_key(self, key, version=None):
