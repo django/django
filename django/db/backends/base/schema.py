@@ -99,7 +99,7 @@ class BaseDatabaseSchemaEditor(object):
         Executes the given SQL statement, with optional parameters.
         """
         # Log the command we're running, then run it
-        logger.debug("%s; (params %r)", sql, params)
+        logger.debug("%s; (params %r)", sql, params, extra={'sql': sql, 'params': params})
         if self.collect_sql:
             ending = "" if sql.endswith(";") else ";"
             if params is not None:
