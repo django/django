@@ -169,6 +169,28 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         call_command('changepassword', username='J\xfalia', stdout=self.stdout)
 
 
+class MultiDBChangepasswordManagementCommandTestCase(TestCase):
+    multi_db = True
+
+    @mock.patch.object(changepassword.Command, '_get_pass', return_value='not qwerty')
+    def test_that_changepassword_command_with_database_option_uses_given_db(self, mock_get_pass):
+        """
+        changepassword --database should operate on the specified DB.
+        """
+        user = User.objects.db_manager('other').create_user(username='joe', password='qwerty')
+        self.assertTrue(user.check_password('qwerty'))
+
+        out = six.StringIO()
+        call_command('changepassword', username='joe', database='other', stdout=out)
+        command_output = out.getvalue().strip()
+
+        self.assertEqual(
+            command_output,
+            "Changing password for user 'joe'\nPassword changed successfully for user 'joe'"
+        )
+        self.assertTrue(User.objects.using('other').get(username="joe").check_password('not qwerty'))
+
+
 @override_settings(
     SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
     AUTH_PASSWORD_VALIDATORS=[{'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}],
@@ -523,6 +545,28 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             )
 
         test(self)
+
+
+class MultiDBCreatesuperuserTestCase(TestCase):
+    multi_db = True
+
+    def test_createsuperuser_command_with_database_option(self):
+        """
+        changepassword --database should operate on the specified DB.
+        """
+        new_io = six.StringIO()
+        call_command(
+            'createsuperuser',
+            interactive=False,
+            username='joe',
+            email='joe@somewhere.org',
+            database='other',
+            stdout=new_io,
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+        user = User.objects.using('other').get(username='joe')
+        self.assertEqual(user.email, 'joe@somewhere.org')
 
 
 class CustomUserModelValidationTestCase(SimpleTestCase):
