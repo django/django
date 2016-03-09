@@ -25,3 +25,5 @@ Bugfixes
   their password to something with such whitespace after a site updated to
   Django 1.9 to reset their password. It provides backwards-compatibility for
   earlier versions of Django.
+
+* Fixed a memory leak in the cached template loader (:ticket:`26306`).
