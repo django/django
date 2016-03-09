@@ -19,3 +19,6 @@ Bugfixes
 
 * Fixed data loss on SQLite where ``DurationField`` values with fractional
   seconds could be saved as ``None`` (:ticket:`26324`).
+
+* Fixed a memory use regression in the cached template loader
+  (:ticket:`26306`).
