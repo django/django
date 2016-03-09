@@ -123,7 +123,7 @@ Note:
   corresponding to a sitemap property (:attr:`~Sitemap.location`,
   :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq`, and
   :attr:`~Sitemap.priority`).
-* :attr:`~Sitemap.lastmod` should return a Python ``datetime`` object.
+* :attr:`~Sitemap.lastmod` should return a :class:`~datetime.datetime`.
 * There is no :attr:`~Sitemap.location` method in this example, but you
   can provide it in order to specify the URL for your object. By default,
   :attr:`~Sitemap.location()` calls ``get_absolute_url()`` on each object
@@ -173,11 +173,11 @@ Note:
 
         **Optional.** Either a method or attribute.
 
-        If it's a method, it should take one argument -- an object as returned by
-        :attr:`~Sitemap.items()` -- and return that object's last-modified date/time, as a Python
-        ``datetime.datetime`` object.
+        If it's a method, it should take one argument -- an object as returned
+        by :attr:`~Sitemap.items()` -- and return that object's last-modified
+        date/time as a :class:`~datetime.datetime`.
 
-        If it's an attribute, its value should be a Python ``datetime.datetime`` object
+        If it's an attribute, its value should be a :class:`~datetime.datetime`
         representing the last-modified date/time for *every* object returned by
         :attr:`~Sitemap.items()`.
 
@@ -192,13 +192,15 @@ Note:
 
         **Optional.** Either a method or attribute.
 
-        If it's a method, it should take one argument -- an object as returned by
-        :attr:`~Sitemap.items()` -- and return that object's change frequency, as a Python string.
+        If it's a method, it should take one argument -- an object as returned
+        by :attr:`~Sitemap.items()` -- and return that object's change
+        frequency as a string.
 
-        If it's an attribute, its value should be a string representing the change
-        frequency of *every* object returned by :attr:`~Sitemap.items()`.
+        If it's an attribute, its value should be a string representing the
+        change frequency of *every* object returned by :attr:`~Sitemap.items()`.
 
-        Possible values for :attr:`~Sitemap.changefreq`, whether you use a method or attribute, are:
+        Possible values for :attr:`~Sitemap.changefreq`, whether you use a
+        method or attribute, are:
 
         * ``'always'``
         * ``'hourly'``
@@ -212,14 +214,17 @@ Note:
 
         **Optional.** Either a method or attribute.
 
-        If it's a method, it should take one argument -- an object as returned by
-        :attr:`~Sitemap.items()` -- and return that object's priority, as either a string or float.
+        If it's a method, it should take one argument -- an object as returned
+        by :attr:`~Sitemap.items()` -- and return that object's priority as
+        either a string or float.
 
-        If it's an attribute, its value should be either a string or float representing
-        the priority of *every* object returned by :attr:`~Sitemap.items()`.
+        If it's an attribute, its value should be either a string or float
+        representing the priority of *every* object returned by
+        :attr:`~Sitemap.items()`.
 
-        Example values for :attr:`~Sitemap.priority`: ``0.4``, ``1.0``. The default priority of a
-        page is ``0.5``. See the `sitemaps.org documentation`_ for more.
+        Example values for :attr:`~Sitemap.priority`: ``0.4``, ``1.0``. The
+        default priority of a page is ``0.5``. See the `sitemaps.org
+        documentation`_ for more.
 
         .. _sitemaps.org documentation: http://www.sitemaps.org/protocol.html#prioritydef
 
