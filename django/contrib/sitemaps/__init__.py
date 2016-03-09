@@ -1,9 +1,11 @@
+import datetime
+
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch, reverse
-from django.utils import translation
+from django.utils import timezone, translation
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import urlopen
 
@@ -44,6 +46,14 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     urlopen("%s?%s" % (ping_url, params))
 
 
+def sitemap_time(t):
+    if t is None:
+        return None
+    if isinstance(t, datetime.datetime) and (t.tzinfo is None or t.tzinfo.utcoffset(t) is None):
+        t = t.replace(tzinfo=timezone.get_default_timezone())
+    return t.isoformat()
+
+
 class Sitemap(object):
     # This limit is defined by Google. See the index documentation at
     # http://www.sitemaps.org/protocol.html#index.
@@ -67,6 +77,10 @@ class Sitemap(object):
 
     def location(self, obj):
         return obj.get_absolute_url()
+
+    def get_latest_lastmod(self):
+        if hasattr(self, 'lastmod') and not callable(self.lastmod):
+            return self.lastmod
 
     def _get_paginator(self):
         return paginator.Paginator(self.items(), self.limit)
@@ -122,7 +136,7 @@ class Sitemap(object):
             url_info = {
                 'item': item,
                 'location': loc,
-                'lastmod': lastmod,
+                'lastmod': sitemap_time(lastmod),
                 'changefreq': self.__get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
             }
@@ -149,6 +163,11 @@ class GenericSitemap(Sitemap):
     def lastmod(self, item):
         if self.date_field is not None:
             return getattr(item, self.date_field)
+        return None
+
+    def get_latest_lastmod(self):
+        if self.date_field is not None:
+            return self.queryset.order_by('-' + self.date_field).values_list(self.date_field, flat=True).first()
         return None
 
 

@@ -15,7 +15,7 @@ class SimpleSitemap(Sitemap):
     changefreq = "never"
     priority = 0.5
     location = '/location/'
-    lastmod = datetime.now()
+    lastmod = date.today()
 
     def items(self):
         return [object()]
@@ -68,6 +68,23 @@ class TimezoneSiteMap(SimpleSitemap):
     lastmod = datetime(2013, 3, 13, 10, 0, 0, tzinfo=timezone.get_fixed_timezone(-300))
 
 
+class GetLatestLastmodNoneSiteMap(Sitemap):
+    changefreq = "never"
+    priority = 0.5
+    location = '/location/'
+
+    def items(self):
+        return [object()]
+
+    def lastmod(self, obj):
+        return datetime(2013, 3, 13, 10, 0, 0)
+
+
+class GetLatestLastmodSiteMap(SimpleSitemap):
+    def get_latest_lastmod(self):
+        return datetime(2013, 3, 13, 10, 0, 0)
+
+
 def testmodelview(request, id):
     return HttpResponse()
 
@@ -114,8 +131,20 @@ sitemaps_lastmod_descending = OrderedDict([
     ('date', DateSiteMap),
 ])
 
+get_latest_lastmod_none_sitemaps = {
+    'get-latest-lastmod-none': GetLatestLastmodNoneSiteMap,
+}
+
+get_latest_lastmod_sitemaps = {
+    'get-latest-lastmod': GetLatestLastmodSiteMap,
+}
+
 generic_sitemaps = {
     'generic': GenericSitemap({'queryset': TestModel.objects.all()}),
+}
+
+generic_sitemaps_index = {
+    'generic': GenericSitemap({'queryset': TestModel.objects.all(), 'date_field': 'date_modified'}),
 }
 
 
@@ -144,10 +173,10 @@ urlpatterns = [
     url(r'^lastmod-mixed/sitemap\.xml$', views.sitemap,
         {'sitemaps': fixed_lastmod__mixed_sitemaps},
         name='django.contrib.sitemaps.views.sitemap'),
-    url(r'^lastmod/date-sitemap.xml$', views.sitemap,
+    url(r'^lastmod/date-sitemap\.xml$', views.sitemap,
         {'sitemaps': {'date-sitemap': DateSiteMap}},
         name='django.contrib.sitemaps.views.sitemap'),
-    url(r'^lastmod/tz-sitemap.xml$', views.sitemap,
+    url(r'^lastmod/tz-sitemap\.xml$', views.sitemap,
         {'sitemaps': {'tz-sitemap': TimezoneSiteMap}},
         name='django.contrib.sitemaps.views.sitemap'),
     url(r'^lastmod-sitemaps/mixed-ascending.xml$', views.sitemap,
@@ -162,6 +191,15 @@ urlpatterns = [
     url(r'^lastmod-sitemaps/descending.xml$', views.sitemap,
         {'sitemaps': sitemaps_lastmod_descending},
         name='django.contrib.sitemaps.views.sitemap'),
+    url(r'^lastmod/get-latest-lastmod-none-sitemap\.xml$', views.index,
+        {'sitemaps': get_latest_lastmod_none_sitemaps},
+        name='django.contrib.sitemaps.views.index'),
+    url(r'^lastmod/get-latest-lastmod-sitemap\.xml$', views.index,
+        {'sitemaps': get_latest_lastmod_sitemaps},
+        name='django.contrib.sitemaps.views.index'),
+    url(r'^generic/index\.xml$', views.index,
+        {'sitemaps': generic_sitemaps_index},
+        name='django.contrib.sitemaps.views.index'),
     url(r'^generic/sitemap\.xml$', views.sitemap,
         {'sitemaps': generic_sitemaps},
         name='django.contrib.sitemaps.views.sitemap'),

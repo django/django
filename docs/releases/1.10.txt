@@ -168,7 +168,12 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added support for the default sitemap index template ``<sitemapindex>`` to 
+  include ``<lastmod>`` through 
+  :meth:`~django.contrib.sitemaps.Sitemap.get_latest_lastmod()`.
+
+* Updated the default sitemap template ``<sitemap>`` to include the time value 
+  of ``<lastmod>``.
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

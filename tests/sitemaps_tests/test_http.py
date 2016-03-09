@@ -25,9 +25,9 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/simple/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/simple/sitemap-simple.xml</loc><lastmod>%s</lastmod></sitemap>
 </sitemapindex>
-""" % self.base_url
+""" % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     @override_settings(TEMPLATES=[{
@@ -40,9 +40,9 @@ class HTTPSitemapTests(SitemapTestsBase):
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/simple/sitemap-simple.xml</loc><lastmod>%s</lastmod></sitemap>
 </sitemapindex>
-""" % self.base_url
+""" % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     def test_simple_sitemap_section(self):
@@ -84,6 +84,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         "Tests that Last-Modified header is set correctly"
         response = self.client.get('/lastmod/sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
+        self.assertContains(response, '<lastmod>2013-03-13T10:00:00-05:51</lastmod>')
 
     def test_sitemap_last_modified_date(self):
         """
@@ -91,6 +92,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         """
         response = self.client.get('/lastmod/date-sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 00:00:00 GMT')
+        self.assertContains(response, '<lastmod>2013-03-13</lastmod>')
 
     def test_sitemap_last_modified_tz(self):
         """
@@ -99,16 +101,35 @@ class HTTPSitemapTests(SitemapTestsBase):
         """
         response = self.client.get('/lastmod/tz-sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 15:00:00 GMT')
+        self.assertContains(response, '<lastmod>2013-03-13T10:00:00-05:00</lastmod>')
 
     def test_sitemap_last_modified_missing(self):
         "Tests that Last-Modified header is missing when sitemap has no lastmod"
-        response = self.client.get('/generic/sitemap.xml')
+        response = self.client.get('/simple/i18n.xml')
         self.assertFalse(response.has_header('Last-Modified'))
+        self.assertNotContains(response, '<lastmod>')
 
     def test_sitemap_last_modified_mixed(self):
         "Tests that Last-Modified header is omitted when lastmod not on all items"
         response = self.client.get('/lastmod-mixed/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
+        self.assertNotContains(response, '<lastmod>')
+
+    def test_sitemap_get_latest_lastmod_none(self):
+        """
+        Tests that sitemapindex.lastmod is ommitted when Sitemap.lastmod is
+        callable and Sitemap.get_latest_lastmod is not implemented
+        """
+        response = self.client.get('/lastmod/get-latest-lastmod-none-sitemap.xml')
+        self.assertNotContains(response, '<lastmod>')
+
+    def test_sitemap_get_latest_lastmod(self):
+        """
+        Tests that sitemapindex.lastmod is ommitted when Sitemap.lastmod is
+        callable and Sitemap.get_latest_lastmod is not implemented
+        """
+        response = self.client.get('/lastmod/get-latest-lastmod-sitemap.xml')
+        self.assertContains(response, '<lastmod>2013-03-13T10:00:00-05:51</lastmod>')
 
     def test_sitemaps_lastmod_mixed_ascending_last_modified_missing(self):
         """
@@ -208,9 +229,9 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/cached/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>%s/cached/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/cached/sitemap-simple.xml</loc><lastmod>%s</lastmod></sitemap>
 </sitemapindex>
-""" % self.base_url
+""" % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     def test_x_robots_sitemap(self):

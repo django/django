@@ -1,9 +1,12 @@
+from datetime import datetime
+
 from django.db import models
 from django.urls import reverse
 
 
 class TestModel(models.Model):
     name = models.CharField(max_length=100)
+    date_modified = models.DateTimeField(default=datetime(1799, 1, 31, 23, 59, 59, 0))
 
     def get_absolute_url(self):
         return '/testmodel/%s/' % self.id

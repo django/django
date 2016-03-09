@@ -9,6 +9,16 @@ from .models import TestModel
 @override_settings(ABSOLUTE_URL_OVERRIDES={})
 class GenericViewsSitemapTests(SitemapTestsBase):
 
+    def test_generic_sitemap_index(self):
+        "A minimal generic sitemap index can be rendered"
+        response = self.client.get('/generic/index.xml')
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<sitemap><loc>http://example.com/simple/sitemap-generic.xml</loc><lastmod>1799-01-31T23:59:59-05:51</lastmod></sitemap>
+</sitemapindex>
+"""
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+
     def test_generic_sitemap(self):
         "A minimal generic sitemap can be rendered"
         response = self.client.get('/generic/sitemap.xml')

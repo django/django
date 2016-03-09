@@ -2,6 +2,7 @@ import datetime
 from calendar import timegm
 from functools import wraps
 
+from django.contrib.sitemaps import sitemap_time
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
@@ -34,9 +35,10 @@ def index(request, sitemaps,
         protocol = req_protocol if site.protocol is None else site.protocol
         sitemap_url = reverse(sitemap_url_name, kwargs={'section': section})
         absolute_url = '%s://%s%s' % (protocol, req_site.domain, sitemap_url)
-        sites.append(absolute_url)
+        lastmod = sitemap_time(site.get_latest_lastmod())
+        sites.append({'location': absolute_url, 'lastmod': lastmod})
         for page in range(2, site.paginator.num_pages + 1):
-            sites.append('%s?p=%s' % (absolute_url, page))
+            sites.append({'location': '%s?p=%s' % (absolute_url, page), 'lastmod': lastmod})
 
     return TemplateResponse(request, template_name, {'sitemaps': sites},
                             content_type=content_type)
