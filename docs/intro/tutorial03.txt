@@ -106,29 +106,11 @@ placeholder results and voting pages.
 When somebody requests a page from your website -- say, "/polls/34/", Django
 will load the ``mysite.urls`` Python module because it's pointed to by the
 :setting:`ROOT_URLCONF` setting. It finds the variable named ``urlpatterns``
-and traverses the regular expressions in order. The
-:func:`~django.conf.urls.include` functions we are using simply reference
-other URLconfs. Note that the regular expressions for the
-:func:`~django.conf.urls.include` functions don't have a ``$`` (end-of-string
-match character) but rather a trailing slash. Whenever Django encounters
-:func:`~django.conf.urls.include`, it chops off whatever part of the URL
-matched up to that point and sends the remaining string to the included
-URLconf for further processing.
-
-The idea behind :func:`~django.conf.urls.include` is to make it easy to
-plug-and-play URLs. Since polls are in their own URLconf
-(``polls/urls.py``), they can be placed under "/polls/", or under
-"/fun_polls/", or under "/content/polls/", or any other path root, and the
-app will still work.
-
-Here's what happens if a user goes to "/polls/34/" in this system:
-
-* Django will find the match at ``'^polls/'``
-
-* Then, Django will strip off the matching text (``"polls/"``) and send the
-  remaining text -- ``"34/"`` -- to the 'polls.urls' URLconf for
-  further processing which matches ``r'^(?P<question_id>[0-9]+)/$'`` resulting in a
-  call to the ``detail()`` view like so::
+and traverses the regular expressions in order. After finding the match at
+``'^polls/'``, it strips off the matching text (``"polls/"``) and sends the
+remaining text -- ``"34/"`` -- to the 'polls.urls' URLconf for further
+processing. There it matches ``r'^(?P<question_id>[0-9]+)/$'``, resulting in a
+call to the ``detail()`` view like so::
 
     detail(request=<HttpRequest object>, question_id='34')
 
