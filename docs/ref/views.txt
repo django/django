@@ -35,7 +35,7 @@ built-in handling for user-uploaded files, but you can have Django serve your
             url(r'^media/(?P<path>.*)$', serve, {
                 'document_root': settings.MEDIA_ROOT,
             }),
-       ]
+        ]
 
 Note, the snippet assumes your :setting:`MEDIA_URL` has a value of
 ``'/media/'``. This will call the :func:`~django.views.static.serve` view,
