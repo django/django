@@ -228,7 +228,7 @@ class OrderingTests(TestCase):
     def test_order_by_fk_attname(self):
         """
         Ensure that ordering by a foreign key by its attribute name prevents
-        the query from inheriting it's related model ordering option.
+        the query from inheriting its related model ordering option.
         Refs #19195.
         """
         for i in range(1, 5):
