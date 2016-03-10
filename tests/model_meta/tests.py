@@ -33,8 +33,7 @@ class OptionsBaseTests(SimpleTestCase):
             model = None
 
         field = relation if direct else relation.field
-        m2m = isinstance(field, related.ManyToManyField)
-        return relation, model, direct, m2m
+        return relation, model, direct, bool(field.many_to_many)  # many_to_many can be None
 
 
 class GetFieldsTests(OptionsBaseTests):
@@ -69,7 +68,7 @@ class DataTests(OptionsBaseTests):
 
     def test_local_fields(self):
         def is_data_field(f):
-            return isinstance(f, Field) and not isinstance(f, related.ManyToManyField)
+            return isinstance(f, Field) and not f.many_to_many
 
         for model, expected_result in TEST_RESULTS['local_fields'].items():
             fields = model._meta.local_fields

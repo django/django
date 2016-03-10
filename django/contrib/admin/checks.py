@@ -104,8 +104,8 @@ class BaseModelAdminChecks(object):
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=obj, id='admin.E002')
         else:
-            if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
-                return must_be('a ForeignKey or ManyToManyField',
+            if not field.many_to_many and not isinstance(field, models.ForeignKey):
+                return must_be('a foreign key or a many-to-many field',
                                option=label, obj=obj, id='admin.E003')
             else:
                 return []
@@ -218,11 +218,10 @@ class BaseModelAdminChecks(object):
                 # be an extra field on the form.
                 return []
             else:
-                if (isinstance(field, models.ManyToManyField) and
-                        not field.remote_field.through._meta.auto_created):
+                if field.many_to_many and not field.remote_field.through._meta.auto_created:
                     return [
                         checks.Error(
-                            "The value of '%s' cannot include the ManyToManyField '%s', "
+                            "The value of '%s' cannot include the many-to-many field '%s' "
                             "because that field manually specifies a relationship model."
                             % (label, field_name),
                             obj=obj.__class__,
@@ -295,8 +294,8 @@ class BaseModelAdminChecks(object):
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=obj, id='admin.E019')
         else:
-            if not isinstance(field, models.ManyToManyField):
-                return must_be('a ManyToManyField', option=label, obj=obj, id='admin.E020')
+            if not field.many_to_many:
+                return must_be('a many-to-many field', option=label, obj=obj, id='admin.E020')
             else:
                 return []
 
@@ -389,23 +388,17 @@ class BaseModelAdminChecks(object):
         is a name of existing field and the field is one of the allowed types.
         """
 
-        forbidden_field_types = (
-            models.DateTimeField,
-            models.ForeignKey,
-            models.ManyToManyField
-        )
-
         try:
             field = model._meta.get_field(field_name)
         except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=obj, id='admin.E027')
         else:
-            if isinstance(field, forbidden_field_types):
+            if field.many_to_many or isinstance(field, (models.DateTimeField, models.ForeignKey)):
                 return [
                     checks.Error(
                         "The value of '%s' refers to '%s', which must not be a DateTimeField, "
-                        "ForeignKey or ManyToManyField." % (label, field_name),
+                        "a foreign key, or a many-to-many field." % (label, field_name),
                         obj=obj.__class__,
                         id='admin.E028',
                     )
@@ -629,10 +622,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         id='admin.E108',
                     )
                 ]
-            elif isinstance(field, models.ManyToManyField):
+            elif getattr(field, 'many_to_many', False):
                 return [
                     checks.Error(
-                        "The value of '%s' must not be a ManyToManyField." % label,
+                        "The value of '%s' must not be a many-to-many field." % label,
                         obj=obj.__class__,
                         id='admin.E109',
                     )

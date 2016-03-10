@@ -633,7 +633,7 @@ class RawIdCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'raw_id_fields[0]' must be a ForeignKey or ManyToManyField.",
+            "The value of 'raw_id_fields[0]' must be a foreign key or a many-to-many field.",
             'admin.E003')
 
     def test_valid_case(self):
@@ -826,7 +826,7 @@ class FilterVerticalCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'filter_vertical[0]' must be a ManyToManyField.",
+            "The value of 'filter_vertical[0]' must be a many-to-many field.",
             'admin.E020')
 
     def test_valid_case(self):
@@ -863,7 +863,7 @@ class FilterHorizontalCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'filter_horizontal[0]' must be a ManyToManyField.",
+            "The value of 'filter_horizontal[0]' must be a many-to-many field.",
             'admin.E020')
 
     def test_valid_case(self):
@@ -960,7 +960,7 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             ("The value of 'prepopulated_fields' refers to 'users', which must not be "
-             "a DateTimeField, ForeignKey or ManyToManyField."),
+             "a DateTimeField, a foreign key, or a many-to-many field."),
             'admin.E028')
 
     def test_valid_case(self):
@@ -998,7 +998,7 @@ class ListDisplayTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'list_display[0]' must not be a ManyToManyField.",
+            "The value of 'list_display[0]' must not be a many-to-many field.",
             'admin.E109')
 
     def test_valid_case(self):

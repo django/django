@@ -799,8 +799,7 @@ class MigrationAutodetector(object):
         # You can't just add NOT NULL fields with no default or fields
         # which don't allow empty strings as default.
         preserve_default = True
-        if (not field.null and not field.has_default() and
-                not isinstance(field, models.ManyToManyField) and
+        if (not field.null and not field.has_default() and not field.many_to_many and
                 not (field.blank and field.empty_strings_allowed)):
             field = field.clone()
             field.default = self.questioner.ask_not_null_addition(field_name, model_name)
@@ -861,19 +860,13 @@ class MigrationAutodetector(object):
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:
-                both_m2m = (
-                    isinstance(old_field, models.ManyToManyField) and
-                    isinstance(new_field, models.ManyToManyField)
-                )
-                neither_m2m = (
-                    not isinstance(old_field, models.ManyToManyField) and
-                    not isinstance(new_field, models.ManyToManyField)
-                )
+                both_m2m = old_field.many_to_many and new_field.many_to_many
+                neither_m2m = not old_field.many_to_many and not new_field.many_to_many
                 if both_m2m or neither_m2m:
                     # Either both fields are m2m or neither is
                     preserve_default = True
                     if (old_field.null and not new_field.null and not new_field.has_default() and
-                            not isinstance(new_field, models.ManyToManyField)):
+                            not new_field.many_to_many):
                         field = new_field.clone()
                         new_default = self.questioner.ask_not_null_alteration(field_name, model_name)
                         if new_default is not models.NOT_PROVIDED:

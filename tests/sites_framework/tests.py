@@ -62,7 +62,7 @@ class CurrentSiteManagerChecksTests(SimpleTestCase):
         expected = [
             checks.Error(
                 "CurrentSiteManager cannot use 'ConfusedArticle.site' as it is "
-                "not a ForeignKey or ManyToManyField.",
+                "not a foreign key or a many-to-many field.",
                 obj=ConfusedArticle.on_site,
                 id='sites.E002',
             )

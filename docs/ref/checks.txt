@@ -271,8 +271,8 @@ with the admin site:
 * **admin.E001**: The value of ``raw_id_fields`` must be a list or tuple.
 * **admin.E002**: The value of ``raw_id_fields[n]`` refers to ``<field name>``,
   which is not an attribute of ``<model>``.
-* **admin.E003**: The value of ``raw_id_fields[n]`` must be a ``ForeignKey`` or
-  ``ManyToManyField``.
+* **admin.E003**: The value of ``raw_id_fields[n]`` must be a foreign key or
+  a many-to-many field.
 * **admin.E004**: The value of ``fields`` must be a list or tuple.
 * **admin.E005**: Both ``fieldsets`` and ``fields`` are specified.
 * **admin.E006**: The value of ``fields`` contains duplicate field(s).
@@ -284,7 +284,7 @@ with the admin site:
   ``fields``.
 * **admin.E012**: There are duplicate field(s) in ``fieldsets[n][1]``.
 * **admin.E013**: ``fields[n]/fieldsets[n][m]`` cannot include the
-  ``ManyToManyField`` ``<field name>``, because that field manually specifies a
+  many-to-many field ``<field name>``, because that field manually specifies a
   relationship model.
 * **admin.E014**: The value of ``exclude`` must be a list or tuple.
 * **admin.E015**: The value of ``exclude`` contains duplicate field(s).
@@ -294,7 +294,7 @@ with the admin site:
 * **admin.E019**: The value of ``filter_vertical[n]/filter_vertical[n]`` refers
   to ``<field name>``, which is not an attribute of ``<model>``.
 * **admin.E020**: The value of ``filter_vertical[n]/filter_vertical[n]`` must
-  be a ``ManyToManyField``.
+  be a many-to-many field.
 * **admin.E021**: The value of ``radio_fields`` must be a dictionary.
 * **admin.E022**: The value of ``radio_fields`` refers to ``<field name>``,
   which is not an attribute of ``<model>``.
@@ -308,8 +308,8 @@ with the admin site:
 * **admin.E027**: The value of ``prepopulated_fields`` refers to
   ``<field name>``, which is not an attribute of ``<model>``.
 * **admin.E028**: The value of ``prepopulated_fields`` refers to
-  ``<field name>``, which must not be a ``DateTimeField``, ``ForeignKey`` or
-  ``ManyToManyField``.
+  ``<field name>``, which must not be a ``DateTimeField``, a foreign key or a
+  many-to-many field.
 * **admin.E029**: The value of ``prepopulated_fields[<field name>]`` must be a
   list or tuple.
 * **admin.E030**: The value of ``prepopulated_fields`` refers to
@@ -343,7 +343,7 @@ with the admin site:
   which is not a callable, an attribute of ``<ModelAdmin class>``, or an
   attribute or method on ``<model>``.
 * **admin.E109**: The value of ``list_display[n]`` must not be a
-  ``ManyToManyField``.
+  many-to-many field.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
   or ``None``.
 * **admin.E111**: The value of ``list_display_links[n]`` refers to ``<label>``,
@@ -562,7 +562,7 @@ The following checks are performed on any model using a
 * **sites.E001**: ``CurrentSiteManager`` could not find a field named
   ``<field name>``.
 * **sites.E002**: ``CurrentSiteManager`` cannot use ``<field>`` as it is not a
-  ``ForeignKey`` or ``ManyToManyField``.
+  foreign key or a many-to-many field.
 
 Database
 --------

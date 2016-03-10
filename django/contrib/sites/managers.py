@@ -34,10 +34,10 @@ class CurrentSiteManager(models.Manager):
                 )
             ]
 
-        if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
+        if not field.many_to_many and not isinstance(field, (models.ForeignKey)):
             return [
                 checks.Error(
-                    "CurrentSiteManager cannot use '%s.%s' as it is not a ForeignKey or ManyToManyField." % (
+                    "CurrentSiteManager cannot use '%s.%s' as it is not a foreign key or a many-to-many field." % (
                         self.model._meta.object_name, field_name
                     ),
                     obj=self,
