@@ -22,7 +22,8 @@ class LocaleMiddleware(object):
         urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
         i18n_patterns_used, prefixed_default_language = is_language_prefix_patterns_used(urlconf)
         language = translation.get_language_from_request(request, check_path=i18n_patterns_used)
-        if not language and i18n_patterns_used and not prefixed_default_language:
+        language_from_path = translation.get_language_from_path(request.path_info)
+        if not language_from_path and i18n_patterns_used and not prefixed_default_language:
             language = settings.LANGUAGE_CODE
         translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
@@ -32,9 +33,6 @@ class LocaleMiddleware(object):
         language_from_path = translation.get_language_from_path(request.path_info)
         urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
         i18n_patterns_used, prefixed_default_language = is_language_prefix_patterns_used(urlconf)
-
-        if not language_from_path and i18n_patterns_used and not prefixed_default_language:
-            language_from_path = settings.LANGUAGE_CODE
 
         if response.status_code == 404 and not language_from_path and i18n_patterns_used:
             language_path = '/%s%s' % (language, request.path_info)
