@@ -99,8 +99,8 @@ contain only the following types to ensure serializability:
 * None
 
 Channels are identified by a unicode string name consisting only of ASCII
-letters, numbers, numerical digits, periods (``.``), dashes (``-``)
-and underscores (``_``), plus an optional prefix character (see below).
+letters, ASCII numerical digits, periods (``.``), dashes (``-``) and
+underscores (``_``), plus an optional prefix character (see below).
 
 Channels are a first-in, first out queue with at-most-once delivery
 semantics. They can have multiple writers and multiple readers; only a single
@@ -116,7 +116,7 @@ application worker process) and *single-reader channels*
 
 *Single-reader channel* names are prefixed with an exclamation mark
 (``!``) character in order to indicate to the channel layer that it may
-have to route these channels' data differently to ensure it reaches the
+have to route the data for these channels differently to ensure it reaches the
 single process that needs it; these channels are nearly always tied to
 incoming connections from the outside world. Some channel layers may not
 need this, and can simply treat the prefix as part of the name.
@@ -125,7 +125,7 @@ Messages should expire after a set time sitting unread in a channel;
 the recommendation is one minute, though the best value depends on the
 channel layer and the way it is deployed.
 
-Message size is finite, though the maximum varies based on the channel layer
+The maximum message size is finite, though it varies based on the channel layer
 and the encoding it's using. Channel layers may reject messages at ``send()``
 time with a ``MessageTooLarge`` exception; the calling code should take
 appropriate action (e.g. HTTP responses can be chunked, while HTTP
@@ -143,10 +143,10 @@ uploaded videos), and protocol events to/from connected clients.
 
 As such, this specification outlines encodings to and from ASGI messages
 for three common protocols (HTTP, WebSocket and raw UDP); this allows any ASGI
-web server to talk to any ASGI web application, and the same for any other
-protocol with a common specification. It is recommended that if other
-protocols become commonplace they should gain standardized formats in a
-supplementary specification of their own.
+web server to talk to any ASGI web application, as well as servers and
+applications for any other protocol with a common specification. It is
+recommended that if other protocols become commonplace they should gain
+standardized formats in a supplementary specification of their own.
 
 The message formats are a key part of the specification; without them,
 the protocol server and web application might be able to talk to each other,
@@ -262,7 +262,7 @@ Specification Details
 A *channel layer* should provide an object with these attributes
 (all function arguments are positional):
 
-* ``send(channel, message)``, a callable that takes two arguments; the
+* ``send(channel, message)``, a callable that takes two arguments: the
   channel to send on, as a unicode string, and the message
   to send, as a serializable ``dict``.
 
@@ -317,10 +317,10 @@ A channel layer implementing the ``statistics`` extension must also provide:
 
 A channel layer implementing the ``flush`` extension must also provide:
 
-* ``flush()``, a callable that resets the channel layer to no messages and
-  no groups (if groups is implemented). This call must block until the system
-  is cleared and will consistently look empty to any client, if the channel
-  layer is distributed.
+* ``flush()``, a callable that resets the channel layer to a blank state,
+  containing no messages and no groups (if the groups extension is
+  implemented). This call must block until the system is cleared and will
+  consistently look empty to any client, if the channel layer is distributed.
 
 
 
