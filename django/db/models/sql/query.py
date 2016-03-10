@@ -366,6 +366,17 @@ class Query(object):
                 self.annotations[col_alias] = expr
                 self.append_annotation_mask([col_alias])
                 new_exprs.append(Ref(col_alias, expr))
+            elif isinstance(expr, WhereNode):
+                # WhereNode indicates a conditional aggregation. Add each child
+                # lookup as an annotation to the inner query.
+                new_aliases = []
+                for child in expr.children:
+                    col_cnt += 1
+                    col_alias = '__col%d' % col_cnt
+                    self.annotations[col_alias] = child
+                    new_aliases.append(col_alias)
+                    new_exprs.append(Ref(col_alias, child))
+                self.append_annotation_mask(new_aliases)
             else:
                 # Some other expression not referencing database values
                 # directly. Its subexpression might contain Cols.
