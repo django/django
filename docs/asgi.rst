@@ -104,9 +104,9 @@ underscores (``_``), plus an optional prefix character (see below).
 
 Channels are a first-in, first out queue with at-most-once delivery
 semantics. They can have multiple writers and multiple readers; only a single
-reader should get each written message. Implementations should never
-deliver a message more than once or to more than one reader, and should
-drop messages if this is necessary to achieve this restriction.
+reader should get each written message. Implementations must never deliver
+a message more than once or to more than one reader, and must drop messages if
+this is necessary to achieve this restriction.
 
 In order to aid with scaling and network architecture, a distinction
 is made between channels that have multiple readers (such as the
@@ -259,7 +259,7 @@ receive messages in channel order.
 Specification Details
 =====================
 
-A *channel layer* should provide an object with these attributes
+A *channel layer* must provide an object with these attributes
 (all function arguments are positional):
 
 * ``send(channel, message)``, a callable that takes two arguments: the
@@ -409,10 +409,10 @@ different requests on the same connection different reply channels, and
 correctly multiplex the responses back into the same stream as they come in.
 The HTTP version is available as a string in the request message.
 
-HTTP/2 Server Push responses are included, but should be sent prior to the
-main response, and you should check for ``http_version = 2`` before sending
-them; if a protocol server or connection incapable of Server Push receives
-these, it should simply drop them.
+HTTP/2 Server Push responses are included, but must be sent prior to the
+main response, and applications must check for ``http_version = 2`` before
+sending them; if a protocol server or connection incapable of Server Push
+receives these, it must drop them.
 
 Multiple header fields with the same name are complex in HTTP. RFC 7230
 states that for any header field that can appear multiple times, it is exactly
