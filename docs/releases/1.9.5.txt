@@ -16,3 +16,6 @@ Bugfixes
 * Fixed a race condition in ``BaseCache.get_or_set()`` (:ticket:`26332`). It
   now returns the ``default`` value instead of ``False`` if there's an error
   when trying to add the value to the cache.
+
+* Fixed data loss on SQLite where ``DurationField`` values with fractional
+  seconds could be saved as ``None`` (:ticket:`26324`).

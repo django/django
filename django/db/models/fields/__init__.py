@@ -1665,7 +1665,8 @@ class DurationField(Field):
             return value
         if value is None:
             return None
-        return value.total_seconds() * 1000000
+        # Discard any fractional microseconds due to floating point arithmetic.
+        return int(round(value.total_seconds() * 1000000))
 
     def get_db_converters(self, connection):
         converters = []
