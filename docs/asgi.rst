@@ -773,11 +773,13 @@ a very good performance or implementation reason is present:
   handle these within the protocol server and don't expose them in ASGI
   messages.
 
-* If the protocol has guaranteed ordering, ASGI messages should include an
-  ``order`` field (0-indexed) that preserves the ordering as received by the
-  protocol server (or as sent by the client, if available). This ordering should
-  span all message types emitted by the client - for example, a connect message
-  might have order ``0``, and the first two frames order ``1`` and ``2``.
+* If the protocol has guaranteed ordering and does not use a specific channel
+  for a given connection (as HTTP does for body data), ASGI messages should
+  include an ``order`` field (0-indexed) that preserves the ordering as
+  received by the protocol server (or as sent by the client, if available).
+  This ordering should span all message types emitted by the client - for
+  example, a connect message might have order ``0``, and the first two frames
+  order ``1`` and ``2``.
 
 * If the protocol is datagram-based, one datagram should equal one ASGI message
   (unless size is an issue)
