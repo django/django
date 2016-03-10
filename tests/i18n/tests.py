@@ -1808,6 +1808,10 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         response = self.client.get('/fr/simple/')
         self.assertEqual(response.content, b'Oui')
 
+    def test_unprefixed_language_other_than_accept_language(self):
+        response = self.client.get('/simple/', HTTP_ACCEPT_LANGUAGE='fr')
+        self.assertEqual(response.content, b'Yes')
+
     def test_unexpected_kwarg_to_i18n_patterns(self):
         with self.assertRaisesMessage(AssertionError, "Unexpected kwargs for i18n_patterns(): {'foo':"):
             i18n_patterns(object(), foo='bar')
