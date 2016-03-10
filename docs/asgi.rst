@@ -456,7 +456,7 @@ Keys:
 * ``headers``: Dict of ``{name: value}``, where ``name`` is the lowercased
   HTTP header name as unicode string and ``value`` is the header value as a byte
   string. If multiple headers with the same name are received, they should
-  be concatenated into a single header as per RFC 2616. Header names containing
+  be concatenated into a single header as per RFC 7230. Header names containing
   underscores should be discarded by the server. Optional, defaults to ``{}``.
 
 * ``body``: Body of the request, as a byte string. Optional, defaults to ``""``.
