@@ -413,11 +413,17 @@ main response, and you should check for ``http_version = 2`` before sending
 them; if a protocol server or connection incapable of Server Push receives
 these, it should simply drop them.
 
-The HTTP specs are somewhat vague on the subject of multiple headers;
-RFC7230 explicitly says they must be merge-able with commas, while RFC6265
-says that ``Set-Cookie`` headers cannot be combined this way. This is why
-request ``headers`` is a ``dict``, and response ``headers`` is a list of
-tuples, which matches WSGI.
+Multiple header fields with the same name are complex in HTTP. RFC 7230
+states that for any header field that can appear multiple times, it is exactly
+equivalent to sending that header field only once with all the values joined by
+commas.
+
+However, RFC 7230 and RFC 6265 make it clear that this rule does not apply to
+the various headers used by HTTP cookies (``Cookie`` and ``Set-Cookie``). The
+``Cookie`` header must only be sent once by a user-agent, but the
+``Set-Cookie`` header may appear repeatedly and cannot be joined by commas.
+For this reason, we can safely make the request ``headers`` a ``dict``, but
+the response ``headers`` must be sent as a list of tuples, which matches WSGI.
 
 Request
 '''''''
@@ -450,7 +456,7 @@ Keys:
 * ``headers``: Dict of ``{name: value}``, where ``name`` is the lowercased
   HTTP header name as unicode string and ``value`` is the header value as a byte
   string. If multiple headers with the same name are received, they should
-  be concatenated into a single header as per RFC 2616. Header names containing
+  be concatenated into a single header as per RFC 7230. Header names containing
   underscores should be discarded by the server. Optional, defaults to ``{}``.
 
 * ``body``: Body of the request, as a byte string. Optional, defaults to ``""``.
