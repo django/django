@@ -10,14 +10,14 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
-        parser.add_argument('--alias', action='store', dest='alias', default=DEFAULT_CHANNEL_LAYER,
+        parser.add_argument('--layer', action='store', dest='layer', default=DEFAULT_CHANNEL_LAYER,
             help='Channel layer alias to use, if not the default.')
 
     def handle(self, *args, **options):
         # Get the backend to use
         self.verbosity = options.get("verbosity", 1)
         self.logger = setup_logger('django.channels', self.verbosity)
-        self.channel_layer = channel_layers[options.get("alias", DEFAULT_CHANNEL_LAYER)]
+        self.channel_layer = channel_layers[options.get("layer", DEFAULT_CHANNEL_LAYER)]
         # Check that handler isn't inmemory
         if self.channel_layer.local_only():
             raise CommandError(
@@ -27,7 +27,7 @@ class Command(BaseCommand):
         # Check a handler is registered for http reqs
         self.channel_layer.registry.check_default()
         # Launch a worker
-        self.logger.info("Running worker against backend %s", self.channel_layer)
+        self.logger.info("Running worker against channel layer %s", self.channel_layer)
         # Optionally provide an output callback
         callback = None
         if self.verbosity > 1:
