@@ -1,3 +1,11 @@
+0.9.5 (2016-03-10)
+------------------
+
+* `runworker` now has an --alias option to specify a different channel layer
+
+* `runserver` correctly falls back to WSGI mode if no channel layers configured
+
+
 0.9.4 (2016-03-08)
 ------------------
 
