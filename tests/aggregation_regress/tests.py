@@ -9,7 +9,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    F, Q, Avg, Count, Max, StdDev, Sum, Value, Variance,
+    F, Q, Avg, Case, Count, DecimalField, IntegerField, Max, StdDev, Sum,
+    Value, Variance, When,
 )
 from django.test import TestCase, skipUnlessAnyDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
@@ -337,7 +338,7 @@ class AggregationTests(TestCase):
             lambda b: b,
         )
 
-    def test_aggrate_annotation(self):
+    def test_aggregate_annotation(self):
         # Aggregates can be composed over annotations.
         # The return type is derived from the composed aggregate
         vals = (
@@ -358,6 +359,61 @@ class AggregationTests(TestCase):
         self.assertEqual(
             Book.objects.annotate(c=Count('authors')).values('c').aggregate(Max('c')),
             {'c__max': 3}
+        )
+
+        # Regression for #25307:  AttributeError: 'WhereNode' object has no
+        # attribute 'get_source_expressions'. Conditional aggregation of a
+        # grouped queryset.
+        self.assertEqual(
+            Book.objects.annotate(c=Count('authors')).values('c').aggregate(test=Sum(
+                Case(When(c__gt=1, then=1), output_field=IntegerField())
+            ))['test'],
+            3
+        )
+
+    def test_sliced_conditional_aggregate(self):
+        """
+        Regression test for #25307: AttributeError: 'WhereNode' object has no
+        attribute 'get_source_expressions'.
+
+        Conditional aggregation of a sliced queryset.
+        """
+        self.assertEqual(
+            Author.objects.all()[:5].aggregate(test=Sum(Case(
+                When(age__lte=35, then=1), output_field=IntegerField()
+            )))['test'],
+            3
+        )
+
+    def test_annotated_conditional_aggregate(self):
+        """
+        Regression test for #25307: AttributeError: 'WhereNode' object has no
+        attribute 'get_source_expressions'.
+
+        Conditional aggregation of an annotated queryset.
+        """
+        annotated_qs = Book.objects.annotate(discount_price=F('price') * 0.75)
+        self.assertAlmostEqual(
+            annotated_qs.aggregate(test=Avg(Case(
+                When(pages__lt=400, then='discount_price'),
+                output_field=DecimalField()
+            )))['test'],
+            22.27, places=2
+        )
+
+    def test_distinct_conditional_aggregate(self):
+        """
+        Regression test for #25307: AttributeError: 'WhereNode' object has no
+        attribute 'get_source_expressions'.
+
+        Conditional aggregation of a distinct queryset.
+        """
+        self.assertEqual(
+            Book.objects.distinct().aggregate(test=Avg(Case(
+                When(price=Decimal('29.69'), then='pages'),
+                output_field=IntegerField()
+            )))['test'],
+            325
         )
 
     def test_decimal_aggregate_annotation_filter(self):
