@@ -242,7 +242,6 @@ class AsgiHandler(base.BaseHandler):
         # Make initial response message
         message = {
             "status": response.status_code,
-            "status_text": response.reason_phrase.encode("ascii"),
             "headers": response_headers,
         }
         # Streaming responses need to be pinned to their iterator

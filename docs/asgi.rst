@@ -509,10 +509,6 @@ Keys:
 
 * ``status``: Integer HTTP status code.
 
-* ``status_text``: Byte string HTTP reason-phrase, e.g. ``OK`` from ``200 OK``.
-  Ignored for HTTP/2 clients. Optional, default should be based on ``status``
-  or left as empty string if no default found.
-
 * ``headers``: A list of ``[name, value]`` pairs, where ``name`` is the
   byte string header name, and ``value`` is the byte string
   header value. Order should be preserved in the HTTP response. Header names
@@ -881,7 +877,7 @@ WSGI's ``environ`` variable to the Request message:
 
 The ``start_response`` callable maps similarly to Response:
 
-* The ``status`` argument becomes ``status`` and ``status_text``
+* The ``status`` argument becomes ``status``, with the reason phrase dropped.
 * ``response_headers`` maps to ``headers``
 
 It may even be possible to map Request Body Chunks in a way that allows
