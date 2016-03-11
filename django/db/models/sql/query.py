@@ -1641,7 +1641,7 @@ class Query(object):
                 # from the model on which the lookup failed.
                 raise
             else:
-                names = sorted(list(get_field_names_from_opts(opts)) + list(self.extra)
+                names = sorted(list(get_field_names_from_opts(opts)) + list(self.extra_select)
                                + list(self.annotation_select))
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (name, ", ".join(names)))
