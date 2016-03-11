@@ -11,6 +11,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.core.management import call_command
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
@@ -752,6 +753,9 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
     if debug_sql:
         for alias in connections:
             connections[alias].force_debug_cursor = True
+
+    # Now run the system checks. They aren't run until now since some checks require database access.
+    call_command('check')
 
     return old_names
 
