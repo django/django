@@ -250,7 +250,7 @@ class RelatedGeoModelTest(TestCase):
     #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
     @no_oracle
     def test12a_count(self):
-        "Testing `Count` aggregate use with the `GeoManager` on geo-fields."
+        "Testing `Count` aggregate on geo-fields."
         # The City, 'Fort Worth' uses the same location as Dallas.
         dallas = City.objects.get(name='Dallas')
 
@@ -259,7 +259,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(2, loc.num_cities)
 
     def test12b_count(self):
-        "Testing `Count` aggregate use with the `GeoManager` on non geo-fields. See #11087."
+        "Testing `Count` aggregate on non geo-fields."
         # Should only be one author (Trevor Paglen) returned by this query, and
         # the annotation should have 3 for the number of books, see #11087.
         # Also testing with a values(), see #11489.
@@ -284,7 +284,7 @@ class RelatedGeoModelTest(TestCase):
     # TODO: The phantom model does appear on Oracle.
     @no_oracle
     def test13_select_related_null_fk(self):
-        "Testing `select_related` on a nullable ForeignKey via `GeoManager`. See #11381."
+        "Testing `select_related` on a nullable ForeignKey."
         Book.objects.create(title='Without Author')
         b = Book.objects.select_related('author').get(title='Without Author')
         # Should be `None`, and not a 'dummy' model.
