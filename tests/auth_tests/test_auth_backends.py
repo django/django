@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from datetime import date
 
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, SESSION_KEY, authenticate, get_user,
+    BACKEND_SESSION_KEY, SESSION_KEY, authenticate, get_user, signals,
 )
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
@@ -475,12 +475,21 @@ class PermissionDeniedBackendTest(TestCase):
 
     def setUp(self):
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
-        self.user1.save()
+        self.user_login_failed = []
+        signals.user_login_failed.connect(self.user_login_failed_listener)
+
+    def tearDown(self):
+        signals.user_login_failed.disconnect(self.user_login_failed_listener)
+
+    def user_login_failed_listener(self, sender, credentials, **kwargs):
+        self.user_login_failed.append(credentials)
 
     @modify_settings(AUTHENTICATION_BACKENDS={'prepend': backend})
     def test_permission_denied(self):
         "user is not authenticated after a backend raises permission denied #2550"
         self.assertEqual(authenticate(username='test', password='test'), None)
+        # user_login_failed signal is sent.
+        self.assertEqual(self.user_login_failed, [{'password': '********************', 'username': 'test'}])
 
     @modify_settings(AUTHENTICATION_BACKENDS={'append': backend})
     def test_authenticates(self):
