@@ -33,8 +33,6 @@ class City(SimpleModel):
 class AugmentedLocation(Location):
     extra_text = models.TextField(blank=True)
 
-    objects = models.GeoManager()
-
 
 class DirectoryEntry(SimpleModel):
     listing_text = models.CharField(max_length=50)
@@ -55,7 +53,6 @@ class Parcel(SimpleModel):
         return self.name
 
 
-# These use the GeoManager but do not have any geographic fields.
 class Author(SimpleModel):
     name = models.CharField(max_length=100)
     dob = models.DateField()

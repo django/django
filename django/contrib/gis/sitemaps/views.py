@@ -13,8 +13,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
     """
     This view generates KML for the given app label, model, and field name.
 
-    The model's default manager must be GeoManager, and the field name
-    must be that of a geographic field.
+    The field name must be that of a geographic field.
     """
     placemarks = []
     try:

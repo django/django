@@ -10,8 +10,6 @@ class City(models.Model):
     name = models.CharField(max_length=30)
     point = models.PointField()
 
-    objects = models.GeoManager()
-
     class Meta:
         app_label = 'geoadmin'
         required_db_features = ['gis_enabled']
