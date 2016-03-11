@@ -62,7 +62,7 @@ class HandlerTests(SimpleTestCase):
         self.assertEqual(reply_message.get("more_content", False), False)
         self.assertEqual(
             reply_message["headers"],
-            [("Content-Type", b"text/plain")],
+            [(b"Content-Type", b"text/plain")],
         )
 
     def test_large(self):
