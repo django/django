@@ -58,16 +58,26 @@ class AsgiRequest(http.HttpRequest):
         if self.message.get('server', None):
             self.META['SERVER_NAME'] = self.message['server'][0]
             self.META['SERVER_PORT'] = self.message['server'][1]
+        # Handle old style-headers for a transition period
+        if "headers" in self.message and isinstance(self.message['headers'], dict):
+            self.message['headers'] = [
+                (x.encode("latin1"), y) for x, y in
+                self.message['headers'].items()
+            ]
         # Headers go into META
-        for name, value in self.message.get('headers', {}).items():
+        for name, value in self.message.get('headers', []):
+            name = name.decode("latin1")
             if name == "content-length":
                 corrected_name = "CONTENT_LENGTH"
             elif name == "content-type":
                 corrected_name = "CONTENT_TYPE"
             else:
                 corrected_name = 'HTTP_%s' % name.upper().replace("-", "_")
-            # HTTPbis say only ASCII chars are allowed in headers
-            self.META[corrected_name] = value.decode("ascii")
+            # HTTPbis say only ASCII chars are allowed in headers, but we latin1 just in case
+            value = value.decode("latin1")
+            if corrected_name in self.META:
+                value = self.META[corrected_name] + "," + value.decode("latin1")
+            self.META[corrected_name] = value
         # Pull out request encoding if we find it
         if "CONTENT_TYPE" in self.META:
             _, content_params = cgi.parse_header(self.META["CONTENT_TYPE"])
@@ -212,13 +222,13 @@ class AsgiHandler(base.BaseHandler):
         # compliant clients that want things like Content-Type correct. Ugh.
         response_headers = []
         for header, value in response.items():
-            if isinstance(header, six.binary_type):
-                header = header.decode("latin1")
+            if isinstance(header, six.text_type):
+                header = header.encode("ascii")
             if isinstance(value, six.text_type):
                 value = value.encode("latin1")
             response_headers.append(
                 (
-                    six.text_type(header),
+                    six.binary_type(header),
                     six.binary_type(value),
                 )
             )

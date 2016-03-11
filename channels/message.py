@@ -30,5 +30,11 @@ class Message(object):
     def __getitem__(self, key):
         return self.content[key]
 
+    def __setitem__(self, key, value):
+        self.content[key] = value
+
+    def __contains__(self, key):
+        return key in self.content
+
     def get(self, key, default=None):
         return self.content.get(key, default)

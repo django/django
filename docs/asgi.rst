@@ -454,11 +454,11 @@ Keys:
   is mounted at; same as ``SCRIPT_NAME`` in WSGI. Optional, defaults
   to ``""``.
 
-* ``headers``: Dict of ``{name: value}``, where ``name`` is the lowercased
-  HTTP header name as unicode string and ``value`` is the header value as a byte
-  string. If multiple headers with the same name are received, they should
-  be concatenated into a single header as per RFC 7230. Header names containing
-  underscores should be discarded by the server. Optional, defaults to ``{}``.
+* ``headers``: A list of ``[name, value]`` pairs, where ``name`` is the
+  byte string header name, and ``value`` is the byte string
+  header value. Order should be preserved from the original HTTP request;
+  duplicates are possible and must be preserved in the message as received.
+  Header names must be lowercased.
 
 * ``body``: Body of the request, as a byte string. Optional, defaults to ``""``.
   If ``body_channel`` is set, treat as start of body and concatenate
@@ -514,8 +514,9 @@ Keys:
   or left as empty string if no default found.
 
 * ``headers``: A list of ``[name, value]`` pairs, where ``name`` is the
-  unicode string header name, and ``value`` is the byte string
-  header value. Order should be preserved in the HTTP response.
+  byte string header name, and ``value`` is the byte string
+  header value. Order should be preserved in the HTTP response. Header names
+  must be lowercased.
 
 * ``content``: Byte string of HTTP body content.
   Optional, defaults to empty string.
