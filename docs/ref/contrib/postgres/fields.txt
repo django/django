@@ -586,7 +586,7 @@ suitable for.
 All of the range fields translate to :ref:`psycopg2 Range objects
 <psycopg2:adapt-range>` in python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
-excluded.
+excluded; that is, ``[)``.
 
 ``IntegerRangeField``
 ---------------------
@@ -598,6 +598,10 @@ excluded.
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
+    Regardless of the bounds specified when saving the data, PostgreSQL always
+    returns a range in a canonical form that includes the lower bound and
+    excludes the upper bound; that is ``[)``.
+
 ``BigIntegerRangeField``
 ------------------------
 
@@ -607,6 +611,10 @@ excluded.
     :class:`~django.db.models.BigIntegerField`. Represented by an ``int8range``
     in the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
+
+    Regardless of the bounds specified when saving the data, PostgreSQL always
+    returns a range in a canonical form that includes the lower bound and
+    excludes the upper bound; that is ``[)``.
 
 ``FloatRangeField``
 -------------------
@@ -635,6 +643,10 @@ excluded.
     Stores a range of dates. Based on a
     :class:`~django.db.models.DateField`. Represented by a ``daterange`` in the
     database and a :class:`~psycopg2:psycopg2.extras.DateRange` in Python.
+
+    Regardless of the bounds specified when saving the data, PostgreSQL always
+    returns a range in a canonical form that includes the lower bound and
+    excludes the upper bound; that is ``[)``.
 
 Querying Range Fields
 ---------------------
