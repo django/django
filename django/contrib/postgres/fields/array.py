@@ -28,6 +28,8 @@ class ArrayField(Field):
         if self.size:
             self.default_validators = self.default_validators[:]
             self.default_validators.append(ArrayMaxLengthValidator(self.size))
+        if hasattr(self.base_field, 'from_db_value'):
+            self.from_db_value = self._from_db_value
         super(ArrayField, self).__init__(**kwargs)
 
     @property
@@ -99,6 +101,14 @@ class ArrayField(Field):
             vals = json.loads(value)
             value = [self.base_field.to_python(val) for val in vals]
         return value
+
+    def _from_db_value(self, value, expression, connection, context):
+        if value is None:
+            return value
+        return [
+            self.base_field.from_db_value(item, expression, connection, context)
+            for item in value
+        ]
 
     def value_to_string(self, obj):
         values = []
