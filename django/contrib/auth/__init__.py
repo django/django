@@ -74,7 +74,7 @@ def authenticate(**credentials):
             user = backend.authenticate(**credentials)
         except PermissionDenied:
             # This backend says to stop in our tracks - this user should not be allowed in at all.
-            return None
+            break
         if user is None:
             continue
         # Annotate the user object with the path of the backend.
