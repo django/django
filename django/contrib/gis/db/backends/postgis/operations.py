@@ -199,7 +199,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def convert_geom(self, hex, geo_field):
         """
-        Converts the geometry returned from PostGIS aggretates.
+        Converts the geometry returned from PostGIS aggregates.
         """
         if hex:
             return Geometry(hex, srid=geo_field.srid)

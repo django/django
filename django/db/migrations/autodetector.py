@@ -38,7 +38,7 @@ class MigrationAutodetector(object):
 
     def changes(self, graph, trim_to_apps=None, convert_apps=None, migration_name=None):
         """
-        Main entry point to produce a list of appliable changes.
+        Main entry point to produce a list of applicable changes.
         Takes a graph to base names on and an optional set of apps
         to try and restrict to (restriction is not guaranteed)
         """

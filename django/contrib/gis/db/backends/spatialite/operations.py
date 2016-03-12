@@ -176,7 +176,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def geo_db_type(self, f):
         """
-        Returns None because geometry columnas are added via the
+        Returns None because geometry columns are added via the
         `AddGeometryColumn` stored procedure on SpatiaLite.
         """
         return None
