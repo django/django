@@ -502,8 +502,9 @@ optional arguments:
     used; it's not just a default value that you can override.
 
 .. note::
-    Setting ``auto_now`` to ``True`` does not cause the field will be automatically
-    updated when using ``QuerySet.update()`` to update other fields.
+    Setting ``auto_now`` to ``True`` does not cause the field to be automatically
+    updated when using :ref:`QuerySet.update() <topics-db-queries-update>` to
+    update other fields.
 
 .. attribute:: DateField.auto_now_add
 
