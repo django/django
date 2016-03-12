@@ -89,18 +89,21 @@ else:
 
 
 def parse_cookie(cookie):
-    if cookie == '':
-        return {}
-    if not isinstance(cookie, http_cookies.BaseCookie):
-        try:
-            c = SimpleCookie()
-            c.load(cookie)
-        except http_cookies.CookieError:
-            # Invalid cookie
-            return {}
-    else:
-        c = cookie
+    """
+    Return a dictionary parsed from a `Cookie:` header string.
+    """
     cookiedict = {}
-    for key in c.keys():
-        cookiedict[key] = c.get(key).value
+    if six.PY2:
+        cookie = force_str(cookie)
+    for chunk in cookie.split(str(';')):
+        if str('=') in chunk:
+            key, val = chunk.split(str('='), 1)
+        else:
+            # Assume an empty name per
+            # https://bugzilla.mozilla.org/show_bug.cgi?id=169091
+            key, val = str(''), chunk
+        key, val = key.strip(), val.strip()
+        if key or val:
+            # unquote using Python's algorithm.
+            cookiedict[key] = http_cookies._unquote(val)
     return cookiedict
