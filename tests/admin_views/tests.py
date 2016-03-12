@@ -13,7 +13,7 @@ from django.contrib.admin.models import ADDITION, DELETION, LogEntry
 from django.contrib.admin.options import TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
@@ -4117,14 +4117,14 @@ class PrePopulatedTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
-class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
+class SeleniumTests(AdminSeleniumTestCase):
 
-    available_apps = ['admin_views'] + AdminSeleniumWebDriverTestCase.available_apps
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+    available_apps = ['admin_views'] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):
         self.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
         self.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
+        super(SeleniumTests, self).setUp()
 
     def test_prepopulated_fields(self):
         """
@@ -4441,14 +4441,6 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(ParentWithUUIDPK.objects.count(), 0)
         self.assertEqual(select.first_selected_option.text, '---------')
         self.assertEqual(select.first_selected_option.get_attribute('value'), '')
-
-
-class SeleniumAdminViewsChromeTests(SeleniumAdminViewsFirefoxTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class SeleniumAdminViewsIETests(SeleniumAdminViewsFirefoxTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')

@@ -119,15 +119,19 @@ Going beyond that, you can specify an individual test method like this::
 Running the Selenium tests
 --------------------------
 
-Some tests require Selenium and a Web browser (Firefox, Google Chrome, or
-Internet Explorer). To allow those tests to be run rather than skipped, you must
-install the selenium_ package into your Python path and run the tests with the
-``--selenium`` option::
+Some tests require Selenium and a Web browser. To run these tests, you must
+install the selenium_ package and run the tests with the
+``--selenium=<BROWSERS>`` option. For example, if you have Firefox and Google
+Chrome installed::
 
-   $ ./runtests.py --settings=test_sqlite --selenium admin_inlines
+   $ ./runtests.py --selenium=firefox,chrome
+
+See the `selenium.webdriver`_ package for the list of available browsers.
 
 Specifying ``--selenium`` automatically sets ``--tags=selenium`` to run only
 the tests that require selenium.
+
+.. _selenium.webdriver: https://github.com/SeleniumHQ/selenium/tree/master/py/selenium/webdriver
 
 .. _running-unit-tests-dependencies:
 

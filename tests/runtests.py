@@ -20,6 +20,8 @@ from django.utils import six
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.log import DEFAULT_LOGGING
+from django.utils.module_loading import import_string
+import argparse
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango20Warning)
@@ -233,6 +235,33 @@ def actual_test_processes(parallel):
         return parallel
 
 
+class ActionSelenium(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        items = values.split(',')
+        for browser in items:
+            try:
+                # Attempt to create class instance to see if everything is fine.
+                import_string('selenium.webdriver.%s.webdriver.WebDriver' % browser)
+            except Exception:
+                msg = "Selenium specifications not valid or corresponding WebDriver not installed: %s" % browser
+                raise argparse.ArgumentError(self, msg)
+        setattr(namespace, self.dest, items)
+
+
+def validate_selenium(browsers):
+    """
+    Validate the browsers requested and raise appropriate exception.
+    """
+    for browser in browsers:
+        try:
+            # Create a class instance to see if everything is fine.
+            import_string('selenium.webdriver.%s.webdriver.WebDriver' % browser)().quit()
+        except Exception:
+            raise RuntimeError(
+                'Selenium specifications not valid or corresponding WebDriver not installed: %s' % browser
+            )
+
+
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags):
     state = setup(verbosity, test_labels, parallel)
@@ -396,8 +425,9 @@ if __name__ == "__main__":
              'LiveServerTestCase) is expected to run from. The default value '
              'is localhost:8081-8179.')
     parser.add_argument(
-        '--selenium', action='store_true', dest='selenium', default=False,
-        help='Run only the Selenium tests (equivalent to "--tag selenium").')
+        '--selenium', dest='selenium', action=ActionSelenium,
+        help='A browser to run the Selenium test against. Can be used multiple times.'
+             'Runs only the Selenium tests by adding "--tag selenium".')
     parser.add_argument(
         '--debug-sql', action='store_true', dest='debug_sql', default=False,
         help='Turn on the SQL query logger within tests.')
@@ -438,11 +468,12 @@ if __name__ == "__main__":
         os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options.liveserver
 
     if options.selenium:
-        os.environ['DJANGO_SELENIUM_TESTS'] = '1'
         if not options.tags:
             options.tags = ['selenium']
         elif 'selenium' not in options.tags:
             options.tags.append('selenium')
+        from django.test.selenium import SeleniumTestCaseBase
+        SeleniumTestCaseBase.browsers = options.selenium
 
     if options.bisect:
         bisect_tests(options.bisect, options, options.modules, options.parallel)

@@ -11,7 +11,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import widgets
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -37,11 +37,6 @@ class TestDataMixin(object):
         cls.u2 = User.objects.create_user(username='testser', password='secret')
         models.Car.objects.create(owner=cls.superuser, make='Volkswagen', model='Passat')
         models.Car.objects.create(owner=cls.u2, make='BMW', model='M3')
-
-
-class SeleniumDataMixin(object):
-    def setUp(self):
-        self.u1 = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
 
 
 class AdminFormfieldForDBFieldTests(SimpleTestCase):
@@ -619,10 +614,16 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')
-class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
+class AdminWidgetSeleniumTestCase(AdminSeleniumTestCase):
 
-    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+    available_apps = ['admin_widgets'] + AdminSeleniumTestCase.available_apps
+
+    def setUp(self):
+        super(AdminWidgetSeleniumTestCase, self).setUp()
+        self.u1 = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
+
+
+class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_show_hide_date_time_picker_widgets(self):
         """
@@ -786,19 +787,9 @@ class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriv
                 self.wait_for_text('#calendarin0 caption', expected_caption)
 
 
-class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
-
-
 @skipIf(pytz is None, "this test requires pytz")
-@override_settings(ROOT_URLCONF='admin_widgets.urls', TIME_ZONE='Asia/Singapore')
-class DateTimePickerShortcutsSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
-    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+@override_settings(TIME_ZONE='Asia/Singapore')
+class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_date_time_picker_shortcuts(self):
         """
@@ -853,37 +844,17 @@ class DateTimePickerShortcutsSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleni
         self.assertLess(member.birthdate, now + error_margin)
 
 
-class DateTimePickerShortcutsSeleniumChromeTests(DateTimePickerShortcutsSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
-
-
 # The above tests run with Asia/Singapore which are on the positive side of
 # UTC. Here we test with a timezone on the negative side.
 @override_settings(TIME_ZONE='US/Eastern')
-class DateTimePickerAltTimezoneSeleniumFirefoxTests(DateTimePickerShortcutsSeleniumFirefoxTests):
+class DateTimePickerAltTimezoneSeleniumTests(DateTimePickerShortcutsSeleniumTests):
     pass
 
 
-class DateTimePickerAltTimezoneSeleniumChromeTests(DateTimePickerAltTimezoneSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class DateTimePickerAltTimezoneSeleniumIETests(DateTimePickerAltTimezoneSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
-
-
-@override_settings(ROOT_URLCONF='admin_widgets.urls')
-class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
-
-    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def setUp(self):
-        super(HorizontalVerticalFilterSeleniumFirefoxTests, self).setUp()
+        super(HorizontalVerticalFilterSeleniumTests, self).setUp()
         self.lisa = models.Student.objects.create(name='Lisa')
         self.john = models.Student.objects.create(name='John')
         self.bob = models.Student.objects.create(name='Bob')
@@ -1168,21 +1139,10 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         self.assertEqual(options_len, 2)
 
 
-class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
-
-
-@override_settings(ROOT_URLCONF='admin_widgets.urls')
-class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
-    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def setUp(self):
-        super(AdminRawIdWidgetSeleniumFirefoxTests, self).setUp()
+        super(AdminRawIdWidgetSeleniumTests, self).setUp()
         models.Band.objects.create(id=42, name='Bogey Blues')
         models.Band.objects.create(id=98, name='Green Potatoes')
 
@@ -1263,18 +1223,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDr
         self.wait_for_value('#id_supporting_bands', '42,98')
 
 
-class AdminRawIdWidgetSeleniumChromeTests(AdminRawIdWidgetSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class AdminRawIdWidgetSeleniumIETests(AdminRawIdWidgetSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
-
-
-@override_settings(ROOT_URLCONF='admin_widgets.urls')
-class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):
-    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_ForeignKey_using_to_field(self):
         self.admin_login(username='super', password='secret', login_url='/')
@@ -1321,11 +1270,3 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         profiles = models.Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)
-
-
-class RelatedFieldWidgetSeleniumChromeTests(RelatedFieldWidgetSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class RelatedFieldWidgetSeleniumIETests(RelatedFieldWidgetSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
