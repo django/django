@@ -8,6 +8,8 @@ from channels.worker import Worker
 
 class Command(BaseCommand):
 
+    leave_locale_alone = True
+
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
         parser.add_argument('--layer', action='store', dest='layer', default=DEFAULT_CHANNEL_LAYER,
