@@ -501,6 +501,10 @@ optional arguments:
     for "last-modified" timestamps. Note that the current date is *always*
     used; it's not just a default value that you can override.
 
+.. note::
+    Setting ``auto_now`` to ``True`` does not cause the field will be automatically
+    updated when using ``QuerySet.update()`` to update other fields.
+
 .. attribute:: DateField.auto_now_add
 
     Automatically set the field to now when the object is first created. Useful
