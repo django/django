@@ -354,6 +354,10 @@ Requests and Responses
   :attr:`~django.http.HttpRequest.content_params` attributes which are
   parsed from the ``CONTENT_TYPE`` header.
 
+* The parser for ``request.COOKIES`` is simplified to better match the behavior
+  of browsers. ``request.COOKIES`` may now contain cookies that are invalid
+  according to :rfc:`6265` but are possible to set via ``document.cookie``.
+
 Serialization
 ~~~~~~~~~~~~~
 
