@@ -501,6 +501,12 @@ optional arguments:
     for "last-modified" timestamps. Note that the current date is *always*
     used; it's not just a default value that you can override.
 
+    The field is only automatically updated when calling :meth:`Model.save()
+    <django.db.models.Model.save>`. The field isn't updated when making updates
+    to other fields in other ways such as :meth:`QuerySet.update()
+    <django.db.models.query.QuerySet.update>`, though you can specify a custom
+    value for the field in an update like that.
+
 .. attribute:: DateField.auto_now_add
 
     Automatically set the field to now when the object is first created. Useful
