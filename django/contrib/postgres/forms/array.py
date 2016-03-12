@@ -183,7 +183,7 @@ class SplitArrayField(forms.Field):
                     null_index = i
                 else:
                     break
-            if null_index:
+            if null_index is not None:
                 cleaned_data = cleaned_data[:null_index]
                 errors = errors[:null_index]
         errors = list(filter(None, errors))
