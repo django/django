@@ -401,8 +401,11 @@ adds defaults that differ from Jinja2's for a few options:
 * ``'auto_reload'``: ``settings.DEBUG``
 * ``'undefined'``: ``DebugUndefined if settings.DEBUG else Undefined``
 
-The default configuration is purposefully kept to a minimum. The ``Jinja2``
-backend doesn't create a Django-flavored environment. It doesn't know about
+The default configuration is purposefully kept to a minimum. The only thing the
+``Jinja2`` backend adds to the context are the globals ``request``,
+``csrf_input``, and ``csrf_token``, only when the template was rendered with a
+request (e.g. when using :py:func:`~django.shortcuts.render`). Apart from that
+this backend doesn't create a Django-flavored environment. It doesn't know about
 Django context processors, filters, and tags. In order to use Django-specific
 APIs, you must configure them into the environment.
 
