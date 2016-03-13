@@ -167,7 +167,7 @@ For example, consider the following exchange between the client and server:
    the version it is trying to update.
 4. Server checks to see if the resource has changed, by computing the ETag
    the same way it does for a ``GET`` request (using the same function).
-   If the resource *has* changed, it will return a 412 status code code,
+   If the resource *has* changed, it will return a 412 status code,
    meaning "precondition failed".
 5. Client sends a ``GET`` request to ``/foo/``, after receiving a 412
    response, to retrieve an updated version of the content before updating
