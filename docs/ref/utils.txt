@@ -157,7 +157,7 @@ The functions defined in this module share the following properties:
     decorate methods or classes; in the latter case, ``name`` is the name
     of the method to be decorated and is required.
 
-    ``decorator`` may also be a a list or tuple of functions. They are wrapped
+    ``decorator`` may also be a list or tuple of functions. They are wrapped
     in reverse order so that the call order is the order in which the functions
     appear in the list/tuple.
 

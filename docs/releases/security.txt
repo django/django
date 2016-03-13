@@ -202,7 +202,7 @@ Versions affected
 September 9, 2011 - CVE-2011-4137
 ---------------------------------
 
-`CVE-2011-4137 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-4137&cid=2>`_: Denial-of-service via via ``URLField.verify_exists``. `Full description <https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
+`CVE-2011-4137 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-4137&cid=2>`_: Denial-of-service via ``URLField.verify_exists``. `Full description <https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~

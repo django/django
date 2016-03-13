@@ -171,7 +171,7 @@ final steps towards producing well-performing code, not a shortcut.
 :class:`~django.utils.functional.cached_property`
 -------------------------------------------------
 
-It's common to have to call a class instances's method more than once. If
+It's common to have to call a class instance's method more than once. If
 that function is expensive, then doing so can be wasteful.
 
 Using the :class:`~django.utils.functional.cached_property` decorator saves the

@@ -368,7 +368,7 @@ You're almost done! All that's left to do now is:
 New stable branch tasks
 =======================
 
-There are several items to do in the time following a the creation of a new
+There are several items to do in the time following the creation of a new
 stable branch (often following an alpha release). Some of these tasks don't
 need to be done by the releaser.
 
