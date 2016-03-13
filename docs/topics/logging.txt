@@ -581,8 +581,10 @@ specific logger following this example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Logs the SQL queries that are executed during schema changes to the database by
-the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
-queries executed by :class:`~django.db.migrations.operations.RunPython`.
+the :doc:`migrations framework </topics/migrations>`. Messages to this logger
+have ``sql`` and ``params`` in their extra context which have the same meaning
+as explained in :ref:`django-db-logger`. Note that it won’t log the queries
+executed by :class:`~django.db.migrations.operations.RunPython`.
 
 Handlers
 --------
