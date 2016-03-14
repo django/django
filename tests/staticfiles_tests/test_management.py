@@ -166,6 +166,11 @@ class TestCollectionClear(CollectionTestCase):
         shutil.rmtree(six.text_type(settings.STATIC_ROOT))
         super(TestCollectionClear, self).run_collectstatic(clear=True)
 
+    @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.PathNotImplementedStorage')
+    def test_handle_path_notimplemented(self):
+        self.run_collectstatic()
+        self.assertFileNotFound('cleared.txt')
+
 
 class TestCollectionExcludeNoDefaultIgnore(CollectionTestCase, TestDefaults):
     """

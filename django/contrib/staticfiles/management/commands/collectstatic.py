@@ -218,12 +218,16 @@ class Command(BaseCommand):
                          smart_text(fpath), level=1)
             else:
                 self.log("Deleting '%s'" % smart_text(fpath), level=1)
-                full_path = self.storage.path(fpath)
-                if not os.path.exists(full_path) and os.path.lexists(full_path):
-                    # Delete broken symlinks
-                    os.unlink(full_path)
-                else:
+                try:
+                    full_path = self.storage.path(fpath)
+                except NotImplementedError:
                     self.storage.delete(fpath)
+                else:
+                    if not os.path.exists(full_path) and os.path.lexists(full_path):
+                        # Delete broken symlinks
+                        os.unlink(full_path)
+                    else:
+                        self.storage.delete(fpath)
         for d in dirs:
             self.clear_dir(os.path.join(path, d))
 
