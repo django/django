@@ -7,6 +7,7 @@ import hashlib
 import warnings
 
 from django.template import Origin, Template, TemplateDoesNotExist
+from django.template.backends.django import copy_exception
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 from django.utils.inspect import func_supports_parameter
@@ -26,12 +27,40 @@ class Loader(BaseLoader):
     def get_contents(self, origin):
         return origin.loader.get_contents(origin)
 
+    def _raise_from_cache(self, value, template_name):
+        """
+        Take a value pulled from the template cache and raise an exception if
+        the value represents an error. If template debugging is off, the error
+        value will be the raw TemplateDoesNotExist class, otherwise it will be
+        an instance of TemplateDoesNotExist. In the latter case, we raise a
+        new exception instead of raising the cached instance to prevent local
+        state, including the traceback, from ending up in the template cache.
+        """
+        if isinstance(value, type) and issubclass(value, TemplateDoesNotExist):
+            raise value(template_name)
+        elif isinstance(value, TemplateDoesNotExist):
+            raise copy_exception(value)
+
+    def _exception_for_cache(self, exception):
+        """
+        Return an error value suitable for caching given a previously raised
+        TemplateDoesNotExist exception. When template debugging is disabled,
+        we just cache the TemplateDoesNotExist class to save memory. With
+        template debugging enabled we want to keep the list of attempted
+        template paths stored on the exception, but an exception that has been
+        raised holds traceback and context data that we don't want to cache,
+        so we instantiate a new, un-raised exception to put in the cache.
+        """
+        if self.engine.debug:
+            return copy_exception(exception)
+        else:
+            return TemplateDoesNotExist
+
     def get_template(self, template_name, template_dirs=None, skip=None):
         key = self.cache_key(template_name, template_dirs, skip)
         cached = self.get_template_cache.get(key)
         if cached:
-            if isinstance(cached, TemplateDoesNotExist):
-                raise cached
+            self._raise_from_cache(cached, template_name)
             return cached
 
         try:
@@ -39,7 +68,7 @@ class Loader(BaseLoader):
                 template_name, template_dirs, skip,
             )
         except TemplateDoesNotExist as e:
-            self.get_template_cache[key] = e
+            self.get_template_cache[key] = self._exception_for_cache(e)
             raise
         else:
             self.get_template_cache[key] = template

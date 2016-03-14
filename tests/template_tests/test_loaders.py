@@ -49,11 +49,46 @@ class CachedLoaderTests(SimpleTestCase):
         self.assertEqual(template.origin.template_name, 'index.html')
         self.assertEqual(template.origin.loader, self.engine.template_loaders[0].loaders[0])
 
-    def test_get_template_missing(self):
+    def test_get_template_missing_debug_off(self):
+        """
+        With template debugging disabled, the raw TemplateDoesNotExist class
+        should be cached when a template is missing. See ticket #26306 and
+        docstrings in the cached loader for details.
+        """
+        self.engine.debug = False
         with self.assertRaises(TemplateDoesNotExist):
-            self.engine.get_template('doesnotexist.html')
-        e = self.engine.template_loaders[0].get_template_cache['doesnotexist.html']
-        self.assertEqual(e.args[0], 'doesnotexist.html')
+            self.engine.get_template('prod-template-missing.html')
+        e = self.engine.template_loaders[0].get_template_cache['prod-template-missing.html']
+        self.assertEqual(e, TemplateDoesNotExist)
+
+    def test_get_template_missing_debug_on(self):
+        """
+        With template debugging enabled, ensure that a TemplateDoesNotExist
+        instance is cached when a template is missing.
+        """
+        self.engine.debug = True
+        with self.assertRaises(TemplateDoesNotExist):
+            self.engine.get_template('debug-template-missing.html')
+        e = self.engine.template_loaders[0].get_template_cache['debug-template-missing.html']
+        self.assertIsInstance(e, TemplateDoesNotExist)
+        self.assertEqual(e.args[0], 'debug-template-missing.html')
+
+    @unittest.skipIf(six.PY2, "Python 2 doesn't set extra exception attributes")
+    def test_cached_exception_no_traceback(self):
+        """
+        Ensure the exception cached when template debugging is enabled doesn't
+        contain the traceback or context information that Python sets when an
+        exception is raised in Python 3.
+        """
+        self.engine.debug = True
+        with self.assertRaises(TemplateDoesNotExist):
+            self.engine.get_template('no-traceback-in-cache.html')
+        e = self.engine.template_loaders[0].get_template_cache['no-traceback-in-cache.html']
+
+        error_msg = "Cached TemplateDoesNotExist must not have been thrown."
+        self.assertIsNone(e.__traceback__, error_msg)
+        self.assertIsNone(e.__context__, error_msg)
+        self.assertIsNone(e.__cause__, error_msg)
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_load_template(self):
