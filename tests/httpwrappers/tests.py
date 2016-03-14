@@ -21,7 +21,7 @@ from django.http import (
 from django.test import SimpleTestCase
 from django.utils import six
 from django.utils._os import upath
-from django.utils.encoding import smart_str
+from django.utils.encoding import force_str
 from django.utils.functional import lazystr
 
 
@@ -291,10 +291,10 @@ class HttpResponseTests(unittest.TestCase):
 
         # Latin-1 unicode or bytes values are also converted to native strings.
         r['key'] = 'café'
-        self.assertEqual(r['key'], smart_str('café', 'latin-1'))
+        self.assertEqual(r['key'], force_str('café', 'latin-1'))
         self.assertIsInstance(r['key'], str)
         r['key'] = 'café'.encode('latin-1')
-        self.assertEqual(r['key'], smart_str('café', 'latin-1'))
+        self.assertEqual(r['key'], force_str('café', 'latin-1'))
         self.assertIsInstance(r['key'], str)
         self.assertIn('café'.encode('latin-1'), r.serialize_headers())
 
