@@ -475,6 +475,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             options['verbosity'] = 0
             new_io = six.StringIO()
             new_io.isatty = lambda: True
+            options.update({'stdout': new_io, 'stderr': new_io})
             management.call_command('dumpdata', 'fixtures', **options)
             self.assertEqual(new_io.getvalue(), '')
 
