@@ -226,10 +226,8 @@ class ModelInheritanceDataTests(TestCase):
 
     def test_inherited_multiple_objects_returned_exception(self):
         # MultipleObjectsReturned is also inherited.
-        self.assertRaises(
-            Place.MultipleObjectsReturned,
-            Restaurant.objects.get, id__lt=12321
-        )
+        with self.assertRaises(Place.MultipleObjectsReturned):
+            Restaurant.objects.get()
 
     def test_related_objects_for_inherited_models(self):
         # Related objects work just as they normally do.
