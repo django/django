@@ -6,13 +6,8 @@ from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.six.moves import http_cookies
 
-# See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
-_tc = http_cookies.SimpleCookie()
-try:
-    _tc.load(str('foo:bar=1'))
-    _cookie_allows_colon_in_names = True
-except http_cookies.CookieError:
-    _cookie_allows_colon_in_names = False
+# http://bugs.python.org/issue2193 is fixed in Python 3.3+.
+_cookie_allows_colon_in_names = six.PY3
 
 # Cookie pickling bug is fixed in Python 2.7.9 and Python 3.4.3+
 # http://bugs.python.org/issue22775
@@ -40,7 +35,7 @@ else:
         if not _cookie_allows_colon_in_names:
             def load(self, rawdata):
                 self.bad_cookies = set()
-                if six.PY2 and isinstance(rawdata, six.text_type):
+                if isinstance(rawdata, six.text_type):
                     rawdata = force_str(rawdata)
                 super(SimpleCookie, self).load(rawdata)
                 for key in self.bad_cookies:
