@@ -27,3 +27,6 @@ Bugfixes
   earlier versions of Django.
 
 * Fixed a memory leak in the cached template loader (:ticket:`26306`).
+
+* Made ``collectstatic --clear`` catch ``NotImplementedError``
+  (:ticket:`26297`). It now fallbacks to the backend's ``delete()`` method.
