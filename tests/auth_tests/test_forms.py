@@ -169,6 +169,16 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = CustomUserCreationForm(data)
         self.assertTrue(form.is_valid())
 
+    def test_password_whitespace_not_stripped(self):
+        data = {
+            'username': 'testuser',
+            'password1': '   testpassword   ',
+            'password2': '   testpassword   ',
+        }
+        form = UserCreationForm(data)
+        form.is_valid()
+        self.assertEqual(form.cleaned_data['password1'], data['password1'])
+
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class AuthenticationFormTest(TestDataMixin, TestCase):
@@ -279,6 +289,15 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         form = CustomAuthenticationForm()
         self.assertEqual(form.fields['username'].label, "")
 
+    def test_password_whitespace_not_stripped(self):
+        data = {
+            'username': 'testuser',
+            'password': ' pass ',
+        }
+        form = AuthenticationForm(None, data)
+        form.is_valid()
+        self.assertEqual(form.cleaned_data['password'], data['password'])
+
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class SetPasswordFormTest(TestDataMixin, TestCase):
@@ -330,6 +349,17 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
             form["new_password2"].errors
         )
 
+    def test_password_whitespace_not_stripped(self):
+        user = User.objects.get(username='testclient')
+        data = {
+            'new_password1': '   password   ',
+            'new_password2': '   password   ',
+        }
+        form = SetPasswordForm(user, data)
+        form.is_valid()
+        self.assertEqual(form.cleaned_data['new_password1'], data['new_password1'])
+        self.assertEqual(form.cleaned_data['new_password2'], data['new_password2'])
+
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class PasswordChangeFormTest(TestDataMixin, TestCase):
@@ -380,6 +410,18 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         user = User.objects.get(username='testclient')
         self.assertEqual(list(PasswordChangeForm(user, {}).fields),
                          ['old_password', 'new_password1', 'new_password2'])
+
+    def test_password_whitespace_not_stripped(self):
+        user = User.objects.get(username='testclient')
+        data = {
+            'old_password': 'password',
+            'new_password1': ' pass ',
+            'new_password2': ' pass ',
+        }
+        form = PasswordChangeForm(user, data)
+        form.is_valid()
+        self.assertEqual(form.cleaned_data['new_password1'], data['new_password1'])
+        self.assertEqual(form.cleaned_data['new_password2'], data['new_password2'])
 
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
@@ -673,3 +715,14 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(password_changed.call_count, 0)
         form.save()
         self.assertEqual(password_changed.call_count, 1)
+
+    def test_password_whitespace_not_stripped(self):
+        user = User.objects.get(username='testclient')
+        data = {
+            'password1': ' pass ',
+            'password2': ' pass ',
+        }
+        form = AdminPasswordChangeForm(user, data)
+        form.is_valid()
+        self.assertEqual(form.cleaned_data['password1'], data['password1'])
+        self.assertEqual(form.cleaned_data['password2'], data['password2'])
