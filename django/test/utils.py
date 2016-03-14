@@ -502,7 +502,7 @@ class ignore_warnings(TestContextDecorator):
 
 
 @contextmanager
-def patch_logger(logger_name, log_level):
+def patch_logger(logger_name, log_level, log_kwargs=False):
     """
     Context manager that takes a named logger and the logging level
     and provides a simple mock-like list of messages received
@@ -510,7 +510,8 @@ def patch_logger(logger_name, log_level):
     calls = []
 
     def replacement(msg, *args, **kwargs):
-        calls.append(msg % args)
+        call = msg % args
+        calls.append((call, kwargs) if log_kwargs else call)
     logger = logging.getLogger(logger_name)
     orig = getattr(logger, log_level)
     setattr(logger, log_level, replacement)
