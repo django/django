@@ -19,3 +19,9 @@ Bugfixes
 
 * Fixed data loss on SQLite where ``DurationField`` values with fractional
   seconds could be saved as ``None`` (:ticket:`26324`).
+
+* The forms in ``contrib.auth`` no longer strip trailing and leading whitespace
+  from the password fields (:ticket:`26334`). The change requires users who set
+  their password to something with such whitespace after a site updated to
+  Django 1.9 to reset their password. It provides backwards-compatibility for
+  earlier versions of Django.
