@@ -372,7 +372,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used to by ``run_tests()`` to set up,
 execute and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=True, keepdb=False, reverse=False, debug_sql=False, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_sql=False, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
