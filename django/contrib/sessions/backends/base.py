@@ -39,8 +39,6 @@ class SessionBase(object):
     """
     Base class for all Session classes.
     """
-    TEST_COOKIE_NAME = 'testcookie'
-    TEST_COOKIE_VALUE = 'worked'
 
     def __init__(self, session_key=None):
         self._session_key = session_key
@@ -78,13 +76,15 @@ class SessionBase(object):
             return value
 
     def set_test_cookie(self):
-        self[self.TEST_COOKIE_NAME] = self.TEST_COOKIE_VALUE
+        if not self.session_key:
+            self.session_key = ''
 
     def test_cookie_worked(self):
-        return self.get(self.TEST_COOKIE_NAME) == self.TEST_COOKIE_VALUE
+        return self.session_key is not None
 
     def delete_test_cookie(self):
-        del self[self.TEST_COOKIE_NAME]
+        if self.session_key == '':
+            self.session_key = None
 
     def _hash(self, value):
         key_salt = "django.contrib.sessions" + self.__class__.__name__
