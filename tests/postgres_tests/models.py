@@ -31,9 +31,6 @@ class TagField(models.SmallIntegerField):
     def get_prep_value(self, value):
         return value.tag_id
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        return self.get_prep_value(value)
-
 
 class PostgreSQLModel(models.Model):
     class Meta:
