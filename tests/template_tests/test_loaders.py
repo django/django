@@ -63,8 +63,8 @@ class CachedLoaderTests(SimpleTestCase):
 
     def test_get_template_missing_debug_on(self):
         """
-        With template debugging enabled, ensure that a TemplateDoesNotExist
-        instance is cached when a template is missing.
+        With template debugging enabled, a TemplateDoesNotExist instance
+        should be cached when a template is missing.
         """
         self.engine.debug = True
         with self.assertRaises(TemplateDoesNotExist):
@@ -76,9 +76,9 @@ class CachedLoaderTests(SimpleTestCase):
     @unittest.skipIf(six.PY2, "Python 2 doesn't set extra exception attributes")
     def test_cached_exception_no_traceback(self):
         """
-        Ensure the exception cached when template debugging is enabled doesn't
-        contain the traceback or context information that Python sets when an
-        exception is raised in Python 3.
+        When a TemplateDoesNotExist instance is cached, the cached instance
+        should not contain the __traceback__, __context__, or __cause__
+        attributes that Python sets when raising exceptions.
         """
         self.engine.debug = True
         with self.assertRaises(TemplateDoesNotExist):

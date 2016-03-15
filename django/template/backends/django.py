@@ -99,8 +99,8 @@ class Template(object):
 
 def copy_exception(exc, backend=None):
     """
-    Create a new TemplateDoesNotExist, preserving its declared attributes and
-    template debug data but discarding __traceback__, __context__ and __cause__
+    Create a new TemplateDoesNotExist. Preserve its declared attributes and
+    template debug data but discard __traceback__, __context__, and __cause__
     to make this object suitable for keeping around (in a cache, for example).
     """
     backend = backend or exc.backend
