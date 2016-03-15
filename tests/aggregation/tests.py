@@ -1083,7 +1083,7 @@ class AggregateTestCase(TestCase):
             Book.objects.annotate(Max('id')).annotate(Sum('id__max'))
 
         class MyMax(Max):
-            def as_sql(self, compiler, connection):
+            def as_sql(self, compiler, connection, **kwargs):
                 self.set_source_expressions(self.get_source_expressions()[0:1])
                 return super(MyMax, self).as_sql(compiler, connection)
 
@@ -1092,7 +1092,7 @@ class AggregateTestCase(TestCase):
 
     def test_multi_arg_aggregate(self):
         class MyMax(Max):
-            def as_sql(self, compiler, connection):
+            def as_sql(self, compiler, connection, **kwargs):
                 self.set_source_expressions(self.get_source_expressions()[0:1])
                 return super(MyMax, self).as_sql(compiler, connection)
 
@@ -1168,7 +1168,7 @@ class AggregateTestCase(TestCase):
         class Greatest(Func):
             function = 'GREATEST'
 
-            def as_sqlite(self, compiler, connection):
+            def as_sqlite(self, compiler, connection, **kwargs):
                 return super(Greatest, self).as_sql(compiler, connection, function='MAX')
 
         qs = Publisher.objects.annotate(

@@ -27,13 +27,13 @@ def register_lookup(field, *lookups):
 class Div3Lookup(models.Lookup):
     lookup_name = 'div3'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         lhs, params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params.extend(rhs_params)
         return '(%s) %%%% 3 = %s' % (lhs, rhs), params
 
-    def as_oracle(self, compiler, connection):
+    def as_oracle(self, compiler, connection, **kwargs):
         lhs, params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params.extend(rhs_params)
@@ -43,11 +43,11 @@ class Div3Lookup(models.Lookup):
 class Div3Transform(models.Transform):
     lookup_name = 'div3'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         lhs, lhs_params = compiler.compile(self.lhs)
         return '(%s) %%%% 3' % lhs, lhs_params
 
-    def as_oracle(self, compiler, connection):
+    def as_oracle(self, compiler, connection, **kwargs):
         lhs, lhs_params = compiler.compile(self.lhs)
         return 'mod(%s, 3)' % lhs, lhs_params
 
@@ -60,7 +60,7 @@ class Mult3BilateralTransform(models.Transform):
     bilateral = True
     lookup_name = 'mult3'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         lhs, lhs_params = compiler.compile(self.lhs)
         return '3 * (%s)' % lhs, lhs_params
 
@@ -69,7 +69,7 @@ class UpperBilateralTransform(models.Transform):
     bilateral = True
     lookup_name = 'upper'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         lhs, lhs_params = compiler.compile(self.lhs)
         return 'UPPER(%s)' % lhs, lhs_params
 
@@ -78,7 +78,7 @@ class YearTransform(models.Transform):
     # Use a name that avoids collision with the built-in year lookup.
     lookup_name = 'testyear'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         lhs_sql, params = compiler.compile(self.lhs)
         return connection.ops.date_extract_sql('year', lhs_sql), params
 
@@ -91,7 +91,7 @@ class YearTransform(models.Transform):
 class YearExact(models.lookups.Lookup):
     lookup_name = 'exact'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         # We will need to skip the extract part, and instead go
         # directly with the originating field, that is self.lhs.lhs
         lhs_sql, lhs_params = self.process_lhs(compiler, connection, self.lhs.lhs)
@@ -112,7 +112,7 @@ class YearLte(models.lookups.LessThanOrEqual):
     The purpose of this lookup is to efficiently compare the year of the field.
     """
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         # Skip the YearTransform above us (no possibility for efficient
         # lookup otherwise).
         real_lhs = self.lhs.lhs
@@ -197,7 +197,7 @@ class InMonth(models.lookups.Lookup):
     """
     lookup_name = 'inmonth'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         # We need to be careful so that we get the params in right
@@ -215,7 +215,7 @@ class DateTimeTransform(models.Transform):
     def output_field(self):
         return models.DateTimeField()
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         lhs, params = compiler.compile(self.lhs)
         return 'from_unixtime({})'.format(lhs), params
 
@@ -533,7 +533,7 @@ class TrackCallsYearTransform(YearTransform):
     lookup_name = 'testyear'
     call_order = []
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         lhs_sql, params = compiler.compile(self.lhs)
         return connection.ops.date_extract_sql('year', lhs_sql), params
 

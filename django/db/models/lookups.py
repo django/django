@@ -111,7 +111,7 @@ class Lookup(object):
             cols.extend(self.rhs.get_group_by_cols())
         return cols
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         raise NotImplementedError
 
     @cached_property
@@ -152,7 +152,7 @@ class BuiltinLookup(Lookup):
         lhs_sql = connection.ops.lookup_cast(self.lookup_name, field_internal_type) % lhs_sql
         return lhs_sql, list(params)
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         lhs_sql, params = self.process_lhs(compiler, connection)
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         params.extend(rhs_params)
@@ -233,11 +233,11 @@ class In(BuiltinLookup):
     def get_rhs_op(self, connection, rhs):
         return 'IN %s' % rhs
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         max_in_list_size = connection.ops.max_in_list_size()
         if self.rhs_is_direct_value() and max_in_list_size and len(self.rhs) > max_in_list_size:
             return self.split_parameter_list_as_sql(compiler, connection)
-        return super(In, self).as_sql(compiler, connection)
+        return super(In, self).as_sql(compiler, connection, **kwargs)
 
     def split_parameter_list_as_sql(self, compiler, connection):
         # This is a special case for databases which limit the number of
@@ -362,7 +362,7 @@ Field.register_lookup(Range)
 class IsNull(BuiltinLookup):
     lookup_name = 'isnull'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         sql, params = compiler.compile(self.lhs)
         if self.rhs:
             return "%s IS NULL" % sql, params
@@ -374,7 +374,7 @@ Field.register_lookup(IsNull)
 class Search(BuiltinLookup):
     lookup_name = 'search'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         warnings.warn(
             'The `__search` lookup is deprecated. See the 1.10 release notes '
             'for how to replace it.', RemovedInDjango20Warning, stacklevel=2
@@ -389,9 +389,9 @@ Field.register_lookup(Search)
 class Regex(BuiltinLookup):
     lookup_name = 'regex'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         if self.lookup_name in connection.operators:
-            return super(Regex, self).as_sql(compiler, connection)
+            return super(Regex, self).as_sql(compiler, connection, **kwargs)
         else:
             lhs, lhs_params = self.process_lhs(compiler, connection)
             rhs, rhs_params = self.process_rhs(compiler, connection)
@@ -412,7 +412,7 @@ class DateTimeDateTransform(Transform):
     def output_field(self):
         return DateField()
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         lhs, lhs_params = compiler.compile(self.lhs)
         tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
         sql, tz_params = connection.ops.datetime_cast_date_sql(lhs, tzname)
@@ -421,7 +421,7 @@ class DateTimeDateTransform(Transform):
 
 
 class DateTransform(Transform):
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         sql, params = compiler.compile(self.lhs)
         lhs_output_field = self.lhs.output_field
         if isinstance(lhs_output_field, DateTimeField):
@@ -459,7 +459,7 @@ class YearLookup(Lookup):
 class YearExact(YearLookup):
     lookup_name = 'exact'
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         # We will need to skip the extract part and instead go
         # directly with the originating field, that is self.lhs.lhs.
         lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
@@ -470,7 +470,7 @@ class YearExact(YearLookup):
 
 
 class YearComparisonLookup(YearLookup):
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **kwargs):
         # We will need to skip the extract part and instead go
         # directly with the originating field, that is self.lhs.lhs.
         lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
