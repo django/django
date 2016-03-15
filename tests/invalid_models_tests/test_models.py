@@ -736,10 +736,29 @@ class OtherModelTests(SimpleTestCase):
         errors = Group.check()
         expected = [
             Error(
-                "The model has two many-to-many relations through "
+                "The model has two identical many-to-many relations through "
                 "the intermediate model 'invalid_models_tests.Membership'.",
                 obj=Group,
                 id='models.E003',
             )
         ]
+        self.assertEqual(errors, expected)
+
+    def test_two_m2m_through_same_relationship_with_different_through(self):
+        class User(models.Model):
+            friends = models.ManyToManyField(
+                'self', through='Followship', symmetrical=False,
+                through_fields=('user', 'target'), related_name='+'
+            )
+            followers = models.ManyToManyField(
+                'self', through='Followship', symmetrical=False,
+                through_fields=('target', 'user'), related_name='+'
+            )
+
+        class Followship(models.Model):
+            user = models.ForeignKey(User, models.CASCADE, related_name='+')
+            target = models.ForeignKey(User, models.CASCADE, related_name='+')
+
+        errors = User.check()
+        expected = []
         self.assertEqual(errors, expected)
