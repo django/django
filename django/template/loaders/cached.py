@@ -27,40 +27,32 @@ class Loader(BaseLoader):
     def get_contents(self, origin):
         return origin.loader.get_contents(origin)
 
-    def _raise_from_cache(self, value, template_name):
-        """
-        Take a value pulled from the template cache and raise an exception if
-        the value represents an error. If template debugging is off, the error
-        value will be the raw TemplateDoesNotExist class, otherwise it will be
-        an instance of TemplateDoesNotExist. In the latter case, we raise a
-        new exception instead of raising the cached instance to prevent local
-        state, including the traceback, from ending up in the template cache.
-        """
-        if isinstance(value, type) and issubclass(value, TemplateDoesNotExist):
-            raise value(template_name)
-        elif isinstance(value, TemplateDoesNotExist):
-            raise copy_exception(value)
-
-    def _exception_for_cache(self, exception):
-        """
-        Return an error value suitable for caching given a previously raised
-        TemplateDoesNotExist exception. When template debugging is disabled,
-        we just cache the TemplateDoesNotExist class to save memory. With
-        template debugging enabled we want to keep the list of attempted
-        template paths stored on the exception, but an exception that has been
-        raised holds traceback and context data that we don't want to cache,
-        so we instantiate a new, un-raised exception to put in the cache.
-        """
-        if self.engine.debug:
-            return copy_exception(exception)
-        else:
-            return TemplateDoesNotExist
-
     def get_template(self, template_name, template_dirs=None, skip=None):
+        """
+        Perform the caching that gives this loader its name. Often many of the
+        templates attempted will be missing, so memory use is of concern here.
+        To keep it in check, caching behaviour is a little complicated when a
+        template is not found. See ticket #26306 for details.
+
+        With template debugging disabled, we cache the TemplateDoesNotExist
+        class for every missing template, and raise a new instance of it after
+        fetching it from cache.
+
+        With template debugging enabled, a unique TemplateDoesNotExist object
+        is cached for each missing template to preserve debug data. When
+        raising an exception, Python sets __traceback__, __context__, and
+        __cause__ attributes on it. Those attributes can contain references to
+        all sorts of objects up the call chain, and caching them creates a
+        memory leak. So we cache un-raised copies of the exceptions we catch,
+        and raise copies of those copies after we fetch them from cache.
+        """
         key = self.cache_key(template_name, template_dirs, skip)
         cached = self.get_template_cache.get(key)
         if cached:
-            self._raise_from_cache(cached, template_name)
+            if isinstance(cached, type) and issubclass(cached, TemplateDoesNotExist):
+                raise cached(template_name)
+            elif isinstance(cached, TemplateDoesNotExist):
+                raise copy_exception(cached)
             return cached
 
         try:
@@ -68,7 +60,7 @@ class Loader(BaseLoader):
                 template_name, template_dirs, skip,
             )
         except TemplateDoesNotExist as e:
-            self.get_template_cache[key] = self._exception_for_cache(e)
+            self.get_template_cache[key] = copy_exception(e) if self.engine.debug else TemplateDoesNotExist
             raise
         else:
             self.get_template_cache[key] = template
