@@ -20,6 +20,12 @@ Code style
   Different JavaScript files sometimes use a different code style. Please try to
   conform to the code style of each file.
 
+* Where possible write code that will work even if the page structure is later
+  changed via JavaScript. For instance when binding a handler to a click,
+  consider using ``$('body').on('click', selector, func)`` instead of
+  ``$(selector).click(func)``. This makes it easier for projects to extend
+  Django's default behavior with JavaScript.
+
 * Use the `JSHint`_ code linter to check your code for bugs and style errors.
   JSHint will be run when you run the JavaScript tests. We also recommended
   installing a JSHint plugin in your text editor.
