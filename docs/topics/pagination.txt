@@ -141,7 +141,11 @@ Required arguments
 
 ``object_list``
     A list, tuple, Django ``QuerySet``, or other sliceable object with a
-    ``count()`` or ``__len__()`` method.
+    ``count()`` or ``__len__()`` method. Note that if you use a ``QuerySet``, it
+    should be ordered — i.e. has an :meth:`order_by()
+    <django.db.models.query.QuerySet.order_by>` clause or a default ordering on the
+    model. Using a ``QuerySet`` that is unordered can cause inconsistent
+    pagination.
 
 ``per_page``
     The maximum number of items to include on a page, not including orphans
