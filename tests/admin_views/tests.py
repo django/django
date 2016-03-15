@@ -1500,8 +1500,6 @@ class AdminViewPermissionsTest(TestCase):
 
         # Change User should not have access to add articles
         self.client.force_login(self.changeuser)
-        # make sure the view removes test cookie
-        self.assertEqual(self.client.session.test_cookie_worked(), False)
         response = self.client.get(reverse('admin:admin_views_article_add'))
         self.assertEqual(response.status_code, 403)
         # Try POST just to make sure
