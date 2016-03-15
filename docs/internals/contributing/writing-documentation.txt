@@ -193,11 +193,20 @@ documentation:
       Add :mod:`django.contrib.auth` to your :setting:`INSTALLED_APPS`...
 
   This is because Sphinx will generate proper links for the latter, which
-  greatly helps readers. There's basically no limit to the amount of
-  useful markup you can add.
+  greatly helps readers.
+
+  You can prefix the target with a ``~`` (that's a tilde) to get just the
+  "last bit" of that path. So ``:mod:`~django.contrib.auth``` will just
+  display a link with the title "auth".
 
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
+
+* Add ``.. code-block:: <lang>`` to literal blocks so that they get
+  highlighted. Prefer relying on automatic highlighting simply using ``::``
+  (two colons). This has the benefit that if the code contains some invalid
+  syntax, it won't be highlighted. Adding ``.. code-block:: python``, for
+  example, will force highlighting despite invalid syntax.
 
 * Use these heading styles::
 
@@ -414,57 +423,6 @@ example:
   I can reference it using ``:setting:`ADMINS```.
 
 That's basically how everything fits together.
-
-.. _improving-the-documentation:
-
-Improving the documentation
-===========================
-
-A few small improvements can be made to make the documentation read and
-look better:
-
-* Most of the various ``index.txt`` documents have *very* short or even
-  non-existent intro text. Each of those documents needs a good short
-  intro the content below that point.
-
-* The glossary is very perfunctory. It needs to be filled out.
-
-* Add more metadata targets. Lots of places look like::
-
-        ``File.close()``
-        ~~~~~~~~~~~~~~~~
-
-  \... these should be::
-
-        .. method:: File.close()
-
-  That is, use metadata instead of titles.
-
-* Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
-  of ````ADMINS````.
-
-* Use directives where appropriate. Some directives
-  (e.g. ``.. setting::``) are prefix-style directives; they go *before*
-  the unit they're describing. These are known as "crossref" directives.
-  Others (e.g. ``.. class::``) generate their own markup; these should go
-  inside the section they're describing. These are called
-  "description units".
-
-  You can tell which are which by looking at in
-  :file:`_ext/djangodocs.py`; it registers roles as one of the other.
-
-* Add ``.. code-block:: <lang>`` to literal blocks so that they get
-  highlighted.
-
-* When referring to classes/functions/modules, etc., you'll want to use
-  the fully-qualified name of the target
-  (``:class:`django.contrib.contenttypes.models.ContentType```).
-
-  Since this doesn't look all that awesome in the output -- it shows the
-  entire path to the object -- you can prefix the target with a ``~``
-  (that's a tilde) to get just the "last bit" of that path. So
-  ``:class:`~django.contrib.contenttypes.models.ContentType``` will just
-  display a link with the title "ContentType".
 
 .. _documentation-spelling-check:
 
