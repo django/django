@@ -94,6 +94,11 @@ following methods:
     ``compiler.compile(expression)`` should be used. The ``compiler.compile()``
     method will take care of calling vendor-specific methods of the expression.
 
+    Custom keyword arguments may be defined on this method if it's likely that
+    ``as_vendorname()`` methods or subclasses will need to supply data to
+    override the generation of the SQL string. See :meth:`Func.as_sql` for
+    example usage.
+
 .. method:: as_vendorname(self, compiler, connection)
 
     Works like ``as_sql()`` method. When an expression is compiled by
