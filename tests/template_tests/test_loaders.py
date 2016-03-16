@@ -14,12 +14,14 @@ from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from .utils import TEMPLATE_DIR
+from .utils import ROOT, TEMPLATE_DIR
 
 try:
     import pkg_resources
 except ImportError:
     pkg_resources = None
+
+OTHER_DIR = os.path.join(ROOT, 'other_templates')
 
 
 class CachedLoaderTests(SimpleTestCase):
@@ -110,6 +112,76 @@ class CachedLoaderTests(SimpleTestCase):
 
         # The two templates should not have the same content
         self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
+
+    def test_auto_reload_disabled(self):
+        loader = self.engine.template_loaders[0]
+        self.assertFalse(loader.auto_reload)
+
+
+class CachedAutoReloaderTests(SimpleTestCase):
+
+    def setUp(self):
+        self.engine = Engine(
+            dirs=[OTHER_DIR, TEMPLATE_DIR],
+            auto_reload=True,
+            loaders=[
+                ('django.template.loaders.cached.Loader', [
+                    'django.template.loaders.filesystem.Loader',
+                ]),
+            ],
+        )
+
+    def test_auto_reload_enabled(self):
+        loader = self.engine.template_loaders[0]
+        self.assertTrue(loader.auto_reload)
+
+    def test_auto_reload_caches(self):
+        template1 = self.engine.get_template('autoreload.html')
+        template2 = self.engine.get_template('autoreload.html')
+        self.assertIs(template1, template2)
+
+    def test_auto_reload_reloads(self):
+        template1 = self.engine.get_template('autoreload.html')
+        try:
+            self.assertEqual(template1.render(Context()), 'initial\n')
+            with open(template1.origin.name, 'w') as f:
+                f.write('changed\n')
+            template2 = self.engine.get_template('autoreload.html')
+            self.assertFalse(template1 is template2)
+            self.assertEqual(template2.render(Context()), 'changed\n')
+        finally:
+            with open(template1.origin.name, 'w') as f:
+                f.write('initial\n')
+
+    def test_auto_reload_priority(self):
+        priority_path = os.path.join(OTHER_DIR, 'priority', 'autoreload.html')
+        try:
+            template1 = self.engine.get_template('priority/autoreload.html')
+            self.assertEqual(template1.render(Context()), 'no priority\n')
+            with open(priority_path, 'w') as f:
+                f.write('priority\n')
+            template2 = self.engine.get_template('priority/autoreload.html')
+            self.assertFalse(template1 is template2)
+            self.assertEqual(template2.render(Context()), 'priority\n')
+        finally:
+            if os.path.exists(priority_path):
+                os.remove(priority_path)
+
+    def test_auto_reload_template_does_not_exist(self):
+        missing_path = os.path.join(TEMPLATE_DIR, 'does_not_exist.html')
+        try:
+            self.assertRaises(TemplateDoesNotExist, self.engine.get_template, 'does_not_exist.html')
+            open(missing_path, 'w').close()
+            try:
+                self.engine.get_template('does_not_exist.html')
+            except TemplateDoesNotExist:
+                self.fail('Expected template to be found')
+        finally:
+            if os.path.exists(missing_path):
+                os.remove(missing_path)
+
+
+
 
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
@@ -332,6 +404,16 @@ class FileSystemLoaderTests(SimpleTestCase):
         with self.assertRaises(IOError):
             self.engine.get_template('first')
 
+    def test_origin_uptodate(self):
+        template = self.engine.get_template('index.html')
+        self.assertTrue(template.origin.uptodate)
+        os.utime(template.origin.name, None)
+        self.assertFalse(template.origin.uptodate)
+
+    def test_get_template_does_not_cache(self):
+        template1 = self.engine.get_template('index.html')
+        template2 = self.engine.get_template('index.html')
+        self.assertFalse(template1 is template2)
 
 class AppDirectoriesLoaderTests(SimpleTestCase):
 

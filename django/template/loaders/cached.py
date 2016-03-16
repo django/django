@@ -21,6 +21,7 @@ class Loader(BaseLoader):
         self.find_template_cache = {}  # RemovedInDjango20Warning
         self.get_template_cache = {}
         self.loaders = engine.get_template_loaders(loaders)
+        self.auto_reload = engine.auto_reload
         super(Loader, self).__init__(engine)
 
     def get_contents(self, origin):
@@ -30,16 +31,37 @@ class Loader(BaseLoader):
         key = self.cache_key(template_name, template_dirs, skip)
         cached = self.get_template_cache.get(key)
         if cached:
-            if isinstance(cached, TemplateDoesNotExist):
-                raise cached
-            return cached
+            if self.auto_reload:
+                # Check if the cached template has not been superseded.
+                sources = self.get_template_sources(template_name, template_dirs=template_dirs)
+                for origin in sources:
+                    if origin == cached.origin:
+                        # The cached template is still the one with the
+                        # highest priority
+                        if cached.origin.uptodate:
+                            return cached
+                        else:
+                            break  # The cached template is outdated.
+                    else:
+                        try:
+                            # TODO: Make it cheaper to see if an origin exists
+                            self.get_contents(origin)
+                        except TemplateDoesNotExist:
+                            continue
+                        else:
+                            break  # Found a template with a higher priority.
+            else:
+                if isinstance(cached, TemplateDoesNotExist):
+                    raise cached
+                return cached
 
         try:
             template = super(Loader, self).get_template(
                 template_name, template_dirs, skip,
             )
         except TemplateDoesNotExist as e:
-            self.get_template_cache[key] = e
+            if not self.auto_reload:
+                self.get_template_cache[key] = e
             raise
         else:
             self.get_template_cache[key] = template

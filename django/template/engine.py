@@ -18,7 +18,8 @@ class Engine(object):
 
     def __init__(self, dirs=None, app_dirs=False, context_processors=None,
                  debug=False, loaders=None, string_if_invalid='',
-                 file_charset='utf-8', libraries=None, builtins=None, autoescape=True):
+                 file_charset='utf-8', libraries=None, builtins=None, autoescape=True,
+                 cache_templates=False, auto_reload=False):
         if dirs is None:
             dirs = []
         if context_processors is None:
@@ -31,6 +32,8 @@ class Engine(object):
             if app_dirs:
                 raise ImproperlyConfigured(
                     "app_dirs must not be set when loaders is defined.")
+        if cache_templates:
+            loaders = [('django.template.loaders.cached.Loader', loaders)]
         if libraries is None:
             libraries = {}
         if builtins is None:
@@ -39,6 +42,7 @@ class Engine(object):
         self.dirs = dirs
         self.app_dirs = app_dirs
         self.autoescape = autoescape
+        self.auto_reload = auto_reload
         self.context_processors = context_processors
         self.debug = debug
         self.loaders = loaders

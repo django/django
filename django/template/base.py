@@ -161,6 +161,18 @@ class Origin(object):
                 self.loader.__module__, self.loader.__class__.__name__,
             )
 
+    @property
+    def uptodate(self):
+        """
+        Used by the cached template loader. If this returns `False`
+        the associated template is outdated and should be reloaded.
+
+        Template loaders may override this method. E.g. by an
+        implementation that stores the source modification time
+        and compares it to the current modification time.
+        """
+        return False
+
 
 class StringOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
     alternative = 'django.template.Origin'

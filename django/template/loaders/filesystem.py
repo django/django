@@ -4,6 +4,7 @@ Wrapper for loading templates from the filesystem.
 
 import errno
 import io
+import os.path
 import warnings
 
 from django.core.exceptions import SuspiciousFileOperation
@@ -14,6 +15,20 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from .base import Loader as BaseLoader
 
 
+class FileSystemOrigin(Origin):
+    def __init__(self, mtime, *args, **kwargs):
+        super(FileSystemOrigin, self).__init__(*args, **kwargs)
+        self.mtime = mtime
+
+    @property
+    def uptodate(self):
+        # Check if the template has been modified (or removed)
+        try:
+            return self.mtime == os.path.getmtime(self.name)
+        except OSError:
+            return False
+
+
 class Loader(BaseLoader):
 
     def get_dirs(self):
@@ -21,9 +36,10 @@ class Loader(BaseLoader):
 
     def get_contents(self, origin):
         try:
+            origin.mtime = os.path.getmtime(origin.name)
             with io.open(origin.name, encoding=self.engine.file_charset) as fp:
                 return fp.read()
-        except IOError as e:
+        except (OSError, IOError) as e:
             if e.errno == errno.ENOENT:
                 raise TemplateDoesNotExist(origin)
             raise
@@ -44,7 +60,8 @@ class Loader(BaseLoader):
                 # (it might be inside another one, so this isn't fatal).
                 continue
 
-            yield Origin(
+            yield FileSystemOrigin(
+                mtime=None,  # Defer setting this to get_contents
                 name=name,
                 template_name=template_name,
                 loader=self,
