@@ -235,7 +235,7 @@ class AsgiHandler(base.BaseHandler):
         for c in response.cookies.values():
             response_headers.append(
                 (
-                    'Set-Cookie',
+                    b'Set-Cookie',
                     c.output(header='').encode("ascii"),
                 )
             )
