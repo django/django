@@ -91,7 +91,7 @@ single process tied to a WSGI server, Django runs in three separate layers:
   cover this later.
 
 * The channel backend, which is a combination of pluggable Python code and
-  a datastore (a database, or Redis) and responsible for transporting messages.
+  a datastore (a database, or Redis) responsible for transporting messages.
 
 * The workers, that listen on all relevant channels and run consumer code
   when a message is ready.
