@@ -721,6 +721,8 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
         first_alias = None
         for alias in aliases:
             connection = connections[alias]
+            # make it possible to skip migrations during tests
+            connection.settings_dict['MIGRATE'] = connection.settings_dict['TEST'].get('MIGRATE', True)
             old_names.append((connection, db_name, first_alias is None))
 
             # Actually create the database for the first connection
