@@ -835,6 +835,11 @@ The field-specific output honors the form object's ``auto_id`` setting::
 Attributes of ``BoundField``
 ----------------------------
 
+.. attribute:: BoundField.auto_id
+
+    The HTML ID attribute for this ``BoundField``. Returns an empty string
+    if :attr:`Form.auto_id` is ``False``.
+
 .. attribute:: BoundField.data
 
     This property returns the data for this :class:`~django.forms.BoundField`

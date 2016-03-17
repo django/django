@@ -682,8 +682,8 @@ Selector and checkbox widgets
     simply includes ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>``
     with ``<li>`` tags, as above.
 
-    The outer ``<ul>`` container will receive the ``id`` attribute defined on
-    the widget.
+    The outer ``<ul>`` container receives the ``id`` attribute of the widget,
+    if defined, or :attr:`BoundField.auto_id` otherwise.
 
     When looping over the radio buttons, the ``label`` and ``input`` tags include
     ``for`` and ``id`` attributes, respectively. Each radio button has an
@@ -704,8 +704,8 @@ Selector and checkbox widgets
           ...
         </ul>
 
-    The outer ``<ul>`` container will receive the ``id`` attribute defined on
-    the widget.
+    The outer ``<ul>`` container receives the ``id`` attribute of the widget,
+    if defined, or :attr:`BoundField.auto_id` otherwise.
 
 Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
 up the lists. See the documentation of :class:`RadioSelect` for more details.
