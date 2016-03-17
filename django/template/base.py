@@ -68,9 +68,7 @@ from django.utils.encoding import (
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.inspect import getargspec
-from django.utils.safestring import (
-    EscapeData, SafeData, mark_for_escaping, mark_safe,
-)
+from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
 )
@@ -737,8 +735,6 @@ class FilterExpression(object):
                 new_obj = func(obj, *arg_vals)
             if getattr(func, 'is_safe', False) and isinstance(obj, SafeData):
                 obj = mark_safe(new_obj)
-            elif isinstance(obj, EscapeData):
-                obj = mark_for_escaping(new_obj)
             else:
                 obj = new_obj
         return obj
@@ -1012,8 +1008,7 @@ def render_value_in_context(value, context):
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
     value = force_text(value)
-    if ((context.autoescape and not isinstance(value, SafeData)) or
-            isinstance(value, EscapeData)):
+    if context.autoescape:
         return conditional_escape(value)
     else:
         return value

@@ -840,14 +840,6 @@ appropriate entities.
         >>> type(mystr)
         <type 'str'>
 
-.. function:: mark_for_escaping(s)
-
-    Explicitly mark a string as requiring HTML escaping upon output. Has no
-    effect on ``SafeData`` subclasses.
-
-    Can be called multiple times on a single string (the resulting escaping is
-    only applied once).
-
 ``django.utils.text``
 =====================
 
