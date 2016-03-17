@@ -259,6 +259,13 @@ To prevent serialized data from being loaded twice, setting
 :data:`~django.db.models.signals.post_migrate` signal when flushing the test
 database.
 
+.. versionchanged:: 1.10
+
+Data are now loaded at the end of a ``TransactionTestCase``, after
+the database flush (it was previously loaded at the beginning of the test).
+This change makes ``--keepdb`` option work properly if your test suite
+contains ``TransactionTestCase`` tests.
+
 Other test conditions
 ---------------------
 
