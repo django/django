@@ -30,3 +30,7 @@ Bugfixes
 
 * Fixed a regression that caused ``collectstatic --clear`` to fail if the
   storage doesn't implement ``path()`` (:ticket:`26297`).
+
+* Fixed a crash when using a reverse lookup with a subquery when a
+  ``ForeignKey`` has a ``to_field`` set to something other than the primary key
+  (:ticket:`26373`).

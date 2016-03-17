@@ -2474,6 +2474,10 @@ class ToFieldTests(TestCase):
             set(Eaten.objects.filter(food__in=Food.objects.filter(name='apple').values('eaten__meal'))),
             set()
         )
+        self.assertEqual(
+            set(Food.objects.filter(eaten__in=Eaten.objects.filter(meal='lunch'))),
+            {apple}
+        )
 
     def test_reverse_in(self):
         apple = Food.objects.create(name="apple")
