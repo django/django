@@ -27,3 +27,6 @@ Bugfixes
   earlier versions of Django.
 
 * Fixed a memory leak in the cached template loader (:ticket:`26306`).
+
+* Fixed a crash when using a reverse lookup with a subquery when the ``ForeignKey``
+  has a ``to_field`` set to something other than the primary key. (:ticket:`26373`)
