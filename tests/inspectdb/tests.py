@@ -28,6 +28,20 @@ class InspectDBTestCase(TestCase):
         # inspected
         self.assertNotIn("class DjangoContentType(models.Model):", out.getvalue(), msg=error_message)
 
+    def test_table_and_view_name_filter_option(self):
+        out = StringIO()
+
+        # Tell inspectdb to just inspect the inspectdb_people table
+        call_command('inspectdb', 'inspectdb_people', stdout=out)
+
+        # Check that the chosen table has been inspected
+        self.assertIn('class InspectdbPeople(models.Model):', out.getvalue(),
+            msg="inspectdb hasn't examined a table that's been chosen to be inspected")
+
+        # Check that no other tables have been inspected
+        self.assertNotIn("class InspectdbPeopledata(models.Model):", out.getvalue(),
+            msg="inspectdb has examined a table that hasn't been chosen to be inspected")
+
     def make_field_type_asserter(self):
         """Call inspectdb and return a function to validate a field type in its output"""
         out = StringIO()

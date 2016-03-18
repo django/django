@@ -362,7 +362,8 @@ file) to standard output.
 
 Use this if you have a legacy database with which you'd like to use Django.
 The script will inspect the database and create a model for each table within
-it.
+it. It is possible to choose what tables should be inspected by appending their
+names to the command.
 
 As you might expect, the created models will have an attribute for every field
 in the table. Note that ``inspectdb`` has a few special cases in its field-name

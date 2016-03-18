@@ -20,6 +20,8 @@ class Command(BaseCommand):
         parser.add_argument('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a database to '
             'introspect. Defaults to using the "default" database.')
+        parser.add_argument('table', action='store', nargs='*', type=str,
+            help='Selects what tables or views should be introspected')
 
     def handle(self, **options):
         try:
@@ -54,7 +56,13 @@ class Command(BaseCommand):
             yield ''
             yield 'from %s import models' % self.db_module
             known_models = []
-            for table_name in connection.introspection.table_names(cursor):
+
+            if options['table']:
+                tables_to_introspect = options['table']
+            else:
+                tables_to_introspect = connection.introspection.table_names(cursor)
+
+            for table_name in tables_to_introspect:
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue

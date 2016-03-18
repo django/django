@@ -292,6 +292,9 @@ Management Commands
 * The :djadmin:`shell` command supports tab completion on systems using
   ``libedit``, e.g. Mac OSX.
 
+* The :djadmin:`inspectdb` command now lets you choose what table/views should
+  be inspected by specifying their names with the command.
+
 Migrations
 ~~~~~~~~~~
 
