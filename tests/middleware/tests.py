@@ -67,10 +67,8 @@ class CommonMiddlewareTest(SimpleTestCase):
         APPEND_SLASH should redirect slashless URLs to a valid pattern.
         """
         request = self.rf.get('/slash')
-        response = HttpResponseNotFound()
-        r = CommonMiddleware().process_response(request, response)
+        r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, '/slash/')
 
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_redirect_querystring(self):
@@ -301,9 +299,6 @@ class CommonMiddlewareTest(SimpleTestCase):
         request = self.rf.get('/slash')
         request.META['QUERY_STRING'] = force_str('drink=café')
         r = CommonMiddleware().process_request(request)
-        self.assertIsNone(r)
-        response = HttpResponseNotFound()
-        r = CommonMiddleware().process_response(request, response)
         self.assertEqual(r.status_code, 301)
 
     def test_response_redirect_class(self):
