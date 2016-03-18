@@ -168,6 +168,11 @@ def setup(verbosity, test_labels, parallel):
         'fields.W901',  # CommaSeparatedIntegerField deprecated
     ]
 
+    settings.SILENCED_SYSTEM_CHECKS = [
+        'fields.W342',  # ForeignKey(unique=True) -> OneToOneField
+        'fields.W901',  # CommaSeparatedIntegerField deprecated
+    ]
+
     warnings.filterwarnings(
         'ignore',
         'The GeoManager class is deprecated.',
