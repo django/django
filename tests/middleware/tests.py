@@ -62,15 +62,26 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertEqual(CommonMiddleware().process_response(request, response), response)
 
     @override_settings(APPEND_SLASH=True)
-    def test_append_slash_redirect(self):
+    def test_append_slash_redirect_request(self):
         """
-        APPEND_SLASH should redirect slashless URLs to a valid pattern.
+        Regression test for #26293
+        APPEND_SLASH should redirect slashless URLs in process request
+        to a valid pattern regardless of whether we are prepending www
+        """
+        request = self.rf.get('/slash')
+        r = CommonMiddleware().process_request(request)
+        self.assertEqual(r.status_code, 301)
+
+    @override_settings(APPEND_SLASH=True)
+    def test_append_slash_redirect_response(self):
+        """
+        APPEND_SLASH should redirect slashless URLs in process response
+        to a valid pattern.
         """
         request = self.rf.get('/slash')
         response = HttpResponseNotFound()
         r = CommonMiddleware().process_response(request, response)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, '/slash/')
 
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_redirect_querystring(self):
@@ -301,7 +312,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         request = self.rf.get('/slash')
         request.META['QUERY_STRING'] = force_str('drink=café')
         r = CommonMiddleware().process_request(request)
-        self.assertIsNone(r)
+        self.assertEqual(r.status_code, 301)
         response = HttpResponseNotFound()
         r = CommonMiddleware().process_response(request, response)
         self.assertEqual(r.status_code, 301)
