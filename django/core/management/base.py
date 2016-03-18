@@ -262,7 +262,7 @@ class BaseCommand(object):
             # Backwards compatibility: use deprecated optparse module
             warnings.warn("OptionParser usage for Django management commands "
                           "is deprecated, use ArgumentParser instead",
-                          RemovedInDjango110Warning)
+                          RemovedInDjango110Warning, stacklevel=3)
             parser = OptionParser(prog=prog_name,
                                 usage=self.usage(subcommand),
                                 version=self.get_version())
