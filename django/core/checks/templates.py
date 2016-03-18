@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.utils import six
 
 from . import Error, Tags, register
 
@@ -11,8 +12,8 @@ E001 = Error(
     id='templates.E001',
 )
 E002 = Error(
-    "'string_if_invalid' is not a string in your TEMPLATES. "
-    "Change it to a string value or remove it.",
+    "'string_if_invalid' in TEMPLATES OPTIONS "
+    "must be a string (got ({}) ({}))",
     id="templates.E002",
 )
 
@@ -31,13 +32,12 @@ def check_setting_app_dirs_loaders(app_configs, **kwargs):
 @register(Tags.templates)
 def check_string_if_invalid_is_string(app_configs, **kwargs):
     passed_check = True
-    try:
-        basestring
-    except NameError:
-        basestring = str
-
     for conf in settings.TEMPLATES:
         string_if_invalid = conf.get('OPTIONS', {}).get('string_if_invalid', "")
-        if not isinstance(string_if_invalid, basestring):
+        if not isinstance(string_if_invalid, six.string_types):
             passed_check = False
+            E002.msg = E002.msg.format(
+                string_if_invalid,
+                type(string_if_invalid).__name__
+            )
     return [] if passed_check else [E002]
