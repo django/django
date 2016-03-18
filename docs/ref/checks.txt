@@ -584,6 +584,8 @@ configured:
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
   remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+* **templates.E002**: ``string_if_invalid`` is not a string in your
+  :setting:`TEMPLATES`. Change it to a string value or remove it.
 
 Caches
 ------
