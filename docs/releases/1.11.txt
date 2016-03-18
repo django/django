@@ -434,6 +434,10 @@ Tests
 * Added support for :meth:`python:unittest.TestCase.subTest`’s when using the
   :option:`test --parallel` option.
 
+* ``DiscoverRunner`` now runs the system checks at the start of a test run.
+  Override the :meth:`.DiscoverRunner.run_checks` method if you want to disable
+  that.
+
 URLs
 ~~~~
 

@@ -197,6 +197,7 @@ In the terminal, we can run our test::
 and you'll see something like::
 
     Creating test database for alias 'default'...
+    System check identified no issues (0 silenced).
     F
     ======================================================================
     FAIL: test_was_published_recently_with_future_question (polls.tests.QuestionMethodTests)
@@ -250,6 +251,7 @@ past:
 and run the test again::
 
     Creating test database for alias 'default'...
+    System check identified no issues (0 silenced).
     .
     ----------------------------------------------------------------------
     Ran 1 test in 0.001s
