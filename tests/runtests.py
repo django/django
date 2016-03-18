@@ -163,6 +163,10 @@ def setup(verbosity, test_labels, parallel):
     # tests.
     log_config['loggers']['django']['level'] = 'ERROR'
     settings.LOGGING = log_config
+    settings.SILENCED_SYSTEM_CHECKS = [
+        'fields.W342',  # ForeignKey(unique=True) -> OneToOneField
+        'fields.W901',  # CommaSeparatedIntegerField deprecated
+    ]
 
     warnings.filterwarnings(
         'ignore',
