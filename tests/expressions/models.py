@@ -80,8 +80,8 @@ class Time(models.Model):
 
 @python_2_unicode_compatible
 class SimulationRun(models.Model):
-    start = models.ForeignKey(Time, models.CASCADE, null=True)
-    end = models.ForeignKey(Time, models.CASCADE, null=True)
+    start = models.ForeignKey(Time, models.CASCADE, null=True, related_name='+')
+    end = models.ForeignKey(Time, models.CASCADE, null=True, related_name='+')
     midpoint = models.TimeField()
 
     def __str__(self):

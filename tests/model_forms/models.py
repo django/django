@@ -131,7 +131,7 @@ class Author(models.Model):
 
 
 class Author1(models.Model):
-    publication = models.OneToOneField(Publication, models.SET_NULL, null=False)
+    publication = models.OneToOneField(Publication, models.CASCADE, null=False)
     full_name = models.CharField(max_length=255)
 
 
