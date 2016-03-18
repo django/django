@@ -577,6 +577,7 @@ class BaseDatabaseSchemaEditor(object):
                 actions.append((
                     self.sql_alter_column_default % {
                         "column": self.quote_name(new_field.column),
+                        "type": new_type,
                         "default": self.prepare_default(new_default),
                     },
                     [],
@@ -585,6 +586,7 @@ class BaseDatabaseSchemaEditor(object):
                 actions.append((
                     self.sql_alter_column_default % {
                         "column": self.quote_name(new_field.column),
+                        "type": new_type,
                         "default": "%s",
                     },
                     [new_default],
@@ -738,6 +740,7 @@ class BaseDatabaseSchemaEditor(object):
                 "table": self.quote_name(model._meta.db_table),
                 "changes": self.sql_alter_column_no_default % {
                     "column": self.quote_name(new_field.column),
+                    "type": new_type,
                 }
             }
             self.execute(sql)
