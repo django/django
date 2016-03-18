@@ -9,6 +9,7 @@ import unittest
 import warnings
 from importlib import import_module
 
+from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import (
@@ -555,6 +556,11 @@ class DiscoverRunner(object):
             verbosity=self.verbosity,
         )
 
+    def run_checks(self):
+        # Checks are run after database creation since some checks require
+        # database access.
+        call_command('check', verbosity=self.verbosity)
+
     def run_suite(self, suite, **kwargs):
         kwargs = self.get_test_runner_kwargs()
         runner = self.test_runner(**kwargs)
@@ -593,6 +599,7 @@ class DiscoverRunner(object):
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         old_config = self.setup_databases()
+        self.run_checks()
         result = self.run_suite(suite)
         self.teardown_databases(old_config)
         self.teardown_test_environment()
