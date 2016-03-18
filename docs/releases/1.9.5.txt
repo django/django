@@ -34,3 +34,6 @@ Bugfixes
 * Fixed a crash when using a reverse lookup with a subquery when a
   ``ForeignKey`` has a ``to_field`` set to something other than the primary key
   (:ticket:`26373`).
+
+* Fixed a regression in ``CommonMiddleware`` that caused spurious warnings in
+  logs on requests missing a trailing slash (:ticket:`26293`).
