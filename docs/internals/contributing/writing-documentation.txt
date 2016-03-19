@@ -232,7 +232,7 @@ Django-specific markup
 Besides the `Sphinx built-in markup`__, Django's docs defines some extra
 description units:
 
-__ http://sphinx-doc.org/markup/
+__ http://www.sphinx-doc.org/en/stable/markup/misc.html
 
 * Settings::
 
