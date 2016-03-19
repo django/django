@@ -73,6 +73,8 @@ they can work out which model class to use:
   returns an object, the class of that object will be used.
 * If a :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` is
   given, the model for that queryset will be used.
+* If a :attr:`~django.views.generic.edit.FormMixin.form_class` is given and is
+  a :class:`~django.forms.ModelForm`, its model will be used.
 
 Model form views provide a
 :meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` implementation
@@ -88,8 +90,9 @@ If you want to use a custom :class:`~django.forms.ModelForm` (for instance to
 add extra validation) simply set
 :attr:`~django.views.generic.edit.FormMixin.form_class` on your view.
 
-.. note::
-    When specifying a custom form class, you must still specify the model,
+.. versionchanged:: 1.10
+
+    In older versions, you need to specify the model,
     even though the :attr:`~django.views.generic.edit.FormMixin.form_class` may
     be a :class:`~django.forms.ModelForm`.
 

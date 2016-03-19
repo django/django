@@ -140,6 +140,12 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
             kwargs.update({'instance': self.object})
         return kwargs
 
+    def get_model(self):
+        """
+        Returns the model of the form_class.
+        """
+        return self.get_form_class().Meta.model
+
     def get_success_url(self):
         """
         Returns the supplied URL.

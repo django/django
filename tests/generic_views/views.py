@@ -123,9 +123,7 @@ class AuthorCreate(generic.CreateView):
 
 
 class SpecializedAuthorCreate(generic.CreateView):
-    model = Author
     form_class = AuthorForm
-    template_name = 'generic_views/form.html'
     context_object_name = 'thingy'
 
     def get_success_url(self):
@@ -166,9 +164,7 @@ class OneAuthorUpdate(generic.UpdateView):
 
 
 class SpecializedAuthorUpdate(generic.UpdateView):
-    model = Author
     form_class = AuthorForm
-    template_name = 'generic_views/form.html'
     context_object_name = 'thingy'
 
     def get_success_url(self):
