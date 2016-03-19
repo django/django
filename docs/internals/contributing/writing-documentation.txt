@@ -229,10 +229,8 @@ documentation:
 Django-specific markup
 ======================
 
-Besides the `Sphinx built-in markup`__, Django's docs defines some extra
-description units:
-
-__ http://sphinx-doc.org/markup/
+Besides the :ref:`Sphinx built-in markup <sphinx:sphinxmarkup>`, Django's
+docs defines some extra description units:
 
 * Settings::
 
