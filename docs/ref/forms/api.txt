@@ -901,6 +901,19 @@ Attributes of ``BoundField``
 
         <label for="myFIELD">...</label><input id="myFIELD" type="text" name="my_field" />
 
+.. attribute:: BoundField.id_for_wrapper
+
+    .. versionadded:: 1.10
+
+    Provides ``id`` for ``<ul>`` or other wrapper elements for fields
+    implemented with more complex widgets,
+    like a :class:`~django.forms.ChoiceField`
+    based on :class:`~django.forms.RadioSelect` widget.
+
+    This attribute, along with :attr:`~django.forms.BoundField.id_for_label`,
+    is useful if you want to manually implement ``{{ form }}`` output for
+    :class:`~django.forms.RadioSelect` using only template variables and loop.
+
 .. attribute:: BoundField.is_hidden
 
     Returns ``True`` if this :class:`~django.forms.BoundField`'s widget is

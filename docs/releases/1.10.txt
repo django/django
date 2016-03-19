@@ -239,6 +239,11 @@ Forms
 * Form and widget ``Media`` is now served using
   :mod:`django.contrib.staticfiles` if installed.
 
+* :class:`~django.forms.BoundField` has new
+  :attr:`~django.forms.BoundField.id_for_wrapper` attribute
+  for getting ``id`` in templates for wrapper elements
+  of complex widgets.
+
 Generic Views
 ~~~~~~~~~~~~~
 

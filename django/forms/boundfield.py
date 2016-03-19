@@ -225,3 +225,14 @@ class BoundField(object):
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         return widget.id_for_label(id_)
+
+    @property
+    def id_for_wrapper(self):
+        """
+        Gets ID for wrapping elements of complex widgets,
+        for example for <ul/> element
+        which wraps choice elements for RadioSelect.
+        """
+        widget = self.field.widget
+        id_ = widget.attrs.get('id') or self.auto_id
+        return id_
