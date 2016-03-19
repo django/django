@@ -84,6 +84,14 @@ Django's system checks are organized using the following tags:
 * ``templates``: Checks template related configuration.
 * ``caches``: Checks cache related configuration.
 * ``urls``: Checks URL configuration.
+* ``database``: Checks database-related configuration issues. Database checks
+  are not run by default because they do more than static code analysis as
+  regular checks do. They are only run by the :djadmin:`migrate` command or if
+  you specify the ``database`` tag when calling the :djadmin:`check` command.
+
+.. versionadded:: 1.10
+
+    The ``database`` tag was added.
 
 Some checks may be registered with multiple tags.
 

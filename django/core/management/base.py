@@ -368,6 +368,9 @@ class BaseCommand(object):
                 translation.activate(saved_locale)
         return output
 
+    def _run_checks(self, **kwargs):
+        return checks.run_checks(**kwargs)
+
     def check(self, app_configs=None, tags=None, display_num_errors=False,
               include_deployment_checks=False, fail_level=checks.ERROR):
         """
@@ -376,7 +379,7 @@ class BaseCommand(object):
         If there are only light messages (like warnings), they are printed to
         stderr and no exception is raised.
         """
-        all_issues = checks.run_checks(
+        all_issues = self._run_checks(
             app_configs=app_configs,
             tags=tags,
             include_deployment_checks=include_deployment_checks,
