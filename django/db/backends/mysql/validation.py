@@ -1,8 +1,31 @@
 from django.core import checks
 from django.db.backends.base.validation import BaseDatabaseValidation
+from django.utils.version import get_docs_version
 
 
 class DatabaseValidation(BaseDatabaseValidation):
+    def check(self, **kwargs):
+        issues = super(DatabaseValidation, self).check(**kwargs)
+        issues.extend(self._check_sql_mode(**kwargs))
+        return issues
+
+    def _check_sql_mode(self, **kwargs):
+        with self.connection.cursor() as cursor:
+            cursor.execute("SELECT @@sql_mode")
+            sql_mode = cursor.fetchone()
+        modes = set(sql_mode[0].split(','))
+        if not (modes & {'STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES'}):
+            return [checks.Warning(
+                "MySQL Strict Mode is not set for database connection '%s'" % self.connection.alias,
+                hint="MySQL's Strict Mode fixes many data integrity problems in MySQL, "
+                     "such as data truncation upon insertion, by escalating warnings into "
+                     "errors. It is strongly recommended you activate it. See: "
+                     "https://docs.djangoproject.com/en/%s/ref/databases/#mysql-sql-mode"
+                     % (get_docs_version(),),
+                id='mysql.W002',
+            )]
+        return []
+
     def check_field(self, field, **kwargs):
         """
         MySQL has the following field length restriction:

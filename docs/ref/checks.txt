@@ -592,6 +592,8 @@ If you're using MySQL, the following checks will be performed:
 
 * **mysql.E001**: MySQL does not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+* **mysql.W002**: MySQL Strict Mode is not set for database connection
+  '<alias>'. See also :ref:`mysql-sql-mode`.
 
 Templates
 ---------
