@@ -6,6 +6,7 @@ from collections import OrderedDict
 from importlib import import_module
 
 from django.apps import apps
+from django.core.checks import Tags, run_checks
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.sql import (
     emit_post_migrate_signal, emit_pre_migrate_signal,
@@ -55,6 +56,11 @@ class Command(BaseCommand):
             '--run-syncdb', action='store_true', dest='run_syncdb',
             help='Creates tables for apps without migrations.',
         )
+
+    def _run_checks(self, **kwargs):
+        issues = run_checks(tags=[Tags.database])
+        issues.extend(super(Command, self).check(**kwargs))
+        return issues
 
     def handle(self, *args, **options):
 
