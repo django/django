@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import warnings
 from bisect import bisect
 from collections import OrderedDict, defaultdict
 from itertools import chain
@@ -12,12 +13,17 @@ from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, warn_about_renamed_method,
+)
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
 from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import override, string_concat
+
+NOT_PROVIDED = object()
 
 PROXY_PARENTS = object()
 
@@ -76,7 +82,7 @@ class Options(object):
         self._get_fields_cache = {}
         self.local_fields = []
         self.local_many_to_many = []
-        self.virtual_fields = []
+        self.private_fields = []
         self.model_name = None
         self.verbose_name = None
         self.verbose_name_plural = None
@@ -253,13 +259,19 @@ class Options(object):
                 auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
                 model.add_to_class('id', auto)
 
-    def add_field(self, field, virtual=False):
+    def add_field(self, field, private=False, virtual=NOT_PROVIDED):
+        if virtual is not NOT_PROVIDED:
+            warnings.warn(
+                "The `virtual` argument of Options.add_field() has been renamed to `private`.",
+                RemovedInDjango20Warning, stacklevel=2
+            )
+            private = virtual
         # Insert the given field in the order in which it was created, using
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
-        if virtual:
-            self.virtual_fields.append(field)
+        if private:
+            self.private_fields.append(field)
         elif field.is_relation and field.many_to_many:
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
         else:
@@ -365,7 +377,7 @@ class Options(object):
         obtaining this field list.
         """
         # For legacy reasons, the fields property should only contain forward
-        # fields that are not virtual or with a m2m cardinality. Therefore we
+        # fields that are not private or with a m2m cardinality. Therefore we
         # pass these three filters as filters to the generator.
         # The third lambda is a longwinded way of checking f.related_model - we don't
         # use that property directly because related_model is a cached property,
@@ -400,6 +412,14 @@ class Options(object):
         return make_immutable_fields_list(
             "concrete_fields", (f for f in self.fields if f.concrete)
         )
+
+    @property
+    @warn_about_renamed_method(
+        'Options', 'virtual_fields', 'private_fields',
+        RemovedInDjango20Warning
+    )
+    def virtual_fields(self):
+        return self.private_fields
 
     @cached_property
     def local_concrete_fields(self):
@@ -686,14 +706,14 @@ class Options(object):
             fields.extend(
                 field for field in chain(self.local_fields, self.local_many_to_many)
             )
-            # Virtual fields are recopied to each child model, and they get a
+            # Private fields are recopied to each child model, and they get a
             # different model as field.model in each child. Hence we have to
-            # add the virtual fields separately from the topmost call. If we
+            # add the private fields separately from the topmost call. If we
             # did this recursively similar to local_fields, we would get field
             # instances with field.model != self.model.
             if topmost_call:
                 fields.extend(
-                    f for f in self.virtual_fields
+                    f for f in self.private_fields
                 )
 
         # In order to avoid list manipulation. Always
