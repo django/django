@@ -1,6 +1,11 @@
-from django.conf.urls import include, url
-from chtest import consumers
-urlpatterns = []
+from django.conf.urls import  url
+from chtest import consumers, views
+
+
+urlpatterns = [
+    url(r'^$', views.index),
+]
+
 
 channel_routing = {
     "websocket.receive": consumers.ws_message,
