@@ -219,7 +219,7 @@ And what our routing should look like in ``routing.py``::
         route("websocket.connect", ws_add),
         route("websocket.receive", ws_message),
         route("websocket.disconnect", ws_disconnect),
-    }
+    ]
 
 With all that code, you now have a working set of a logic for a chat server.
 Test time! Run ``runserver``, open a browser and use that same JavaScript
