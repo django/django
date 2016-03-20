@@ -117,19 +117,15 @@ They have the following attributes:
 
 * ``alias``: The alias of this layer.
 
-* ``registry``: An object which represents the layer's mapping of channels
+* ``router``: An object which represents the layer's mapping of channels
   to consumers. Has the following attributes:
 
-  * ``add_consumer(consumer, channels)``: Registers a :ref:`consumer <ref-consumers>`
-    to handle all channels passed in. ``channels`` should be an iterable of
-    unicode string names.
+  * ``channels``: The set of channels this router can handle, as unicode strings
 
-  * ``consumer_for_channel(channel)``: Takes a unicode channel name and returns
-    either a :ref:`consumer <ref-consumers>`, or None, if no consumer is registered.
-
-  * ``all_channel_names()``: Returns a list of all channel names this layer has
-    routed to a consumer. Used by the worker threads to work out what channels
-    to listen on.
+  * ``match(message)``: Takes a :ref:`Message <ref-message>` and returns either
+    a (consumer, kwargs) tuple specifying the consumer to run and the keyword
+    argument to pass that were extracted via routing patterns, or None,
+    meaning there's no route available.
 
 
 .. _ref-asgirequest:

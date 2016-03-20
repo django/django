@@ -62,9 +62,10 @@ Here's what that looks like::
     }
 
     # In routing.py
-    channel_routing = {
-        "http.request": "myproject.myapp.consumers.http_consumer",
-    }
+    from channels.routing import route
+    channel_routing = [
+        route("http.request", "myproject.myapp.consumers.http_consumer"),
+    ]
 
 .. warning::
    This example, and most of the examples here, use the "in memory" channel
@@ -76,7 +77,7 @@ Here's what that looks like::
 As you can see, this is a little like Django's ``DATABASES`` setting; there are
 named channel layers, with a default one called ``default``. Each layer
 needs a channel layer class, some options (if the channel layer needs them),
-and a routing scheme, which points to a dict containing the routing settings.
+and a routing scheme, which points to a list containing the routing settings.
 It's recommended you call this ``routing.py`` and put it alongside ``urls.py``
 in your project, but you can put it wherever you like, as long as the path is
 correct.
@@ -111,11 +112,12 @@ for ``http.request`` - and make this WebSocket consumer instead::
 Hook it up to the ``websocket.receive`` channel like this::
 
     # In routing.py
+    from channels.routing import route
     from myproject.myapp.consumers import ws_message
 
-    channel_routing = {
-        "websocket.receive": ws_message,
-    }
+    channel_routing = [
+        route("websocket.receive", ws_message),
+    ]
 
 Now, let's look at what this is doing. It's tied to the
 ``websocket.receive`` channel, which means that it'll get a message
@@ -210,12 +212,13 @@ get the message. Here's all the code::
 
 And what our routing should look like in ``routing.py``::
 
+    from channels.routing import route
     from myproject.myapp.consumers import ws_add, ws_message, ws_disconnect
 
-    channel_routing = {
-        "websocket.connect": ws_add,
-        "websocket.receive": ws_message,
-        "websocket.disconnect": ws_disconnect,
+    channel_routing = [
+        route("websocket.connect", ws_add),
+        route("websocket.receive", ws_message),
+        route("websocket.disconnect", ws_disconnect),
     }
 
 With all that code, you now have a working set of a logic for a chat server.
@@ -366,6 +369,7 @@ If you play around with it from the console (or start building a simple
 JavaScript chat client that appends received messages to a div), you'll see
 that you can set a chat room with the initial request.
 
+
 Authentication
 --------------
 
@@ -430,8 +434,6 @@ chat to people with the same first letter of their username::
     # Connected to websocket.connect
     @channel_session_user_from_http
     def ws_add(message):
-        # Copy user from HTTP to channel session
-        transfer_user(message.http_session, message.channel_session)
         # Add them to the right group
         Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
 
@@ -456,6 +458,58 @@ You can get the current session key in a template with ``{{ request.session.sess
 Note that Channels can't work with signed cookie sessions - since only HTTP
 responses can set cookies, it needs a backend it can write to to separately
 store state.
+
+
+Routing
+-------
+
+Channels' ``routing.py`` acts very much like Django's ``urls.py``, including the
+ability to route things to different consumers based on ``path``, or any other
+message attribute that's a string (for example, ``http.request`` messages have
+a ``method`` key you could route based on).
+
+Much like urls, you route using regular expressions; the main difference is that
+because the ``path`` is not special-cased - Channels doesn't know that it's a URL -
+you have to start patterns with the root ``/``, and end includes without a ``/``
+so that when the patterns combine, they work correctly.
+
+Finally, because you're matching against message contents using keyword arguments,
+you can only use named groups in your regular expressions! Here's an example of
+routing our chat from above::
+
+    http_routing = [
+        route("http.request", poll_consumer, path=r"^/poll/$", method=r"^POST$"),
+    ]
+
+    chat_routing = [
+        route("websocket.connect", chat_connect, path=r"^/(?P<room>[a-zA-Z0-9_]+)/$),
+        route("websocket.disconnect", chat_disconnect),
+    ]
+
+    routing = [
+        # You can use a string import path as the first argument as well.
+        include(chat_routing, path=r"^/chat"),
+        include(http_routing),
+    ]
+
+When Channels loads this routing, it appends any match keys together, so the
+``path`` match becomes ``^/chat/(?P<room>[a-zA-Z0-9_]+)/$``. If the include match
+or the route match doesn't have the ``^`` character, it will refuse to append them
+and error (you can still have matches without ``^`` in either, you just can't
+ask Channels to combine them).
+
+Because these matches come through as keyword arguments, we could modify our
+consumer above to use a room based on URL rather than username::
+
+    # Connected to websocket.connect
+    @channel_session_user_from_http
+    def ws_add(message, room):
+        # Add them to the right group
+        Group("chat-%s" % room).add(message.reply_channel)
+
+In the next section, we'll change to sending the ``room`` as a part of the
+WebSocket message - which you might do if you had a multiplexing client -
+but you could use routing there as well.
 
 
 Models

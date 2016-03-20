@@ -27,7 +27,7 @@ class Command(BaseCommand):
                 "Change your settings to use a cross-process channel layer."
             )
         # Check a handler is registered for http reqs
-        self.channel_layer.registry.check_default()
+        self.channel_layer.router.check_default()
         # Launch a worker
         self.logger.info("Running worker against channel layer %s", self.channel_layer)
         # Optionally provide an output callback

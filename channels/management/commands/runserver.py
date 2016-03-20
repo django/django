@@ -35,7 +35,7 @@ class Command(RunserverCommand):
             return RunserverCommand.inner_run(self, *args, **options)
         # Check a handler is registered for http reqs; if not, add default one
         self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
-        self.channel_layer.registry.check_default(
+        self.channel_layer.router.check_default(
             http_consumer=self.get_consumer(),
         )
         # Run checks

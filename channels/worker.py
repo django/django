@@ -44,7 +44,7 @@ class Worker(object):
         """
         if self.signal_handlers:
             self.install_signal_handler()
-        channels = self.channel_layer.registry.all_channel_names()
+        channels = self.channel_layer.router.channels
         while not self.termed:
             self.in_job = False
             channel, content = self.channel_layer.receive_many(channels, block=True)
@@ -66,11 +66,16 @@ class Worker(object):
             if content.get("__retries__", 0) == self.message_retries:
                 message.__doomed__ = True
             # Handle the message
-            consumer = self.channel_layer.registry.consumer_for_channel(channel)
+            match = self.channel_layer.router.match(message)
+            if match is None:
+                logger.exception("Could not find match for message on %s! Check your routing.", channel)
+                continue
+            else:
+                consumer, kwargs = match
             if self.callback:
                 self.callback(channel, message)
             try:
-                consumer(message)
+                consumer(message, **kwargs)
             except ConsumeLater:
                 # They want to not handle it yet. Re-inject it with a number-of-tries marker.
                 content['__retries__'] = content.get("__retries__", 0) + 1
