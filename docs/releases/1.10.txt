@@ -921,6 +921,14 @@ Miscellaneous
 
 * The template ``Context.has_key()`` method is deprecated in favor of ``in``.
 
+* The private attribute ``virtual_fields`` of ``Model._meta`` is
+  deprecated in favor of ``private_fields``.
+
+* The private keyword arguments ``virtual_only`` in
+  ``Field.contribute_to_class()``, and ``virtual`` in
+  ``Model._meta.add_field()`` are deprecated in favor of ``private_only``,
+  and ``private``, respectively.
+
 .. _removed-features-1.10:
 
 Features removed in 1.10
