@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 from django.test import SimpleTestCase
-from django.utils import six
 
 from channels.routing import Router, route, include
 from channels.message import Message
@@ -10,14 +9,18 @@ from channels.utils import name_that_thing
 # Fake consumers and routing sets that can be imported by string
 def consumer_1():
     pass
+
 def consumer_2():
     pass
+
 def consumer_3():
     pass
+
 chatroom_routing = [
     route("websocket.connect", consumer_2, path=r"^/chat/(?P<room>[^/]+)/$"),
     route("websocket.connect", consumer_3, path=r"^/mentions/$"),
 ]
+
 chatroom_routing_noprefix = [
     route("websocket.connect", consumer_2, path=r"/chat/(?P<room>[^/]+)/$"),
     route("websocket.connect", consumer_3, path=r"/mentions/$"),
