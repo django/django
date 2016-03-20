@@ -20,7 +20,7 @@ from django.utils.encoding import force_text
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
-from .models.custom_user import ExtensionUser
+from .models.custom_user import CustomUser, ExtensionUser
 from .settings import AUTH_TEMPLATES
 
 
@@ -132,6 +132,21 @@ class UserCreationFormTest(TestDataMixin, TestCase):
 
         data = {
             'username': 'testclient',
+            'password1': 'testclient',
+            'password2': 'testclient',
+            'date_of_birth': '1988-02-24',
+        }
+        form = CustomUserCreationForm(data)
+        self.assertTrue(form.is_valid())
+
+    def test_custom_form_with_different_username_field(self):
+        class CustomUserCreationForm(UserCreationForm):
+            class Meta(UserCreationForm.Meta):
+                model = CustomUser
+                fields = ('email', 'date_of_birth')
+
+        data = {
+            'email': 'test@client222.com',
             'password1': 'testclient',
             'password2': 'testclient',
             'date_of_birth': '1988-02-24',
