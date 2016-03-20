@@ -492,8 +492,9 @@ routing our chat from above::
         include(http_routing),
     ]
 
-When Channels loads this routing, it appends any match keys together, so the
-``path`` match becomes ``^/chat/(?P<room>[a-zA-Z0-9_]+)/$``. If the include match
+When Channels loads this routing, it appends any match keys together and
+flattens out the routing, so the ``path`` match for ``chat_connect`` becomes
+``^/chat/(?P<room>[a-zA-Z0-9_]+)/$``. If the include match
 or the route match doesn't have the ``^`` character, it will refuse to append them
 and error (you can still have matches without ``^`` in either, you just can't
 ask Channels to combine them).
