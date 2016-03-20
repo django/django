@@ -282,9 +282,9 @@ class RelatedField(Field):
         # columns from another table.
         return None
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
+    def contribute_to_class(self, cls, name, private_only=False, **kwargs):
 
-        super(RelatedField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+        super(RelatedField, self).contribute_to_class(cls, name, private_only=private_only, **kwargs)
 
         self.opts = cls._meta
 
@@ -703,8 +703,8 @@ class ForeignObject(RelatedField):
     def get_defaults(self):
         return tuple(field.get_default() for field in self.local_related_fields)
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
-        super(ForeignObject, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+    def contribute_to_class(self, cls, name, private_only=False, **kwargs):
+        super(ForeignObject, self).contribute_to_class(cls, name, private_only=private_only, **kwargs)
         setattr(cls, self.name, ForwardManyToOneDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):

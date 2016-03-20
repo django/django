@@ -672,11 +672,25 @@ class Field(RegisterLookupMixin):
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
+    def contribute_to_class(self, cls, name, private_only=False, virtual_only=NOT_PROVIDED):
+        """
+        Register the field with the model class it belongs to.
+
+        If private_only is True, a separate instance of this field will be
+        created for every subclass of cls, even if cls is not an abstract
+        model.
+        """
+        if virtual_only is not NOT_PROVIDED:
+            warnings.warn(
+                "The `virtual_only` argument of Field.contribute_to_class() "
+                "has been renamed to `private_only`.",
+                RemovedInDjango20Warning, stacklevel=2
+            )
+            private_only = virtual_only
         self.set_attributes_from_name(name)
         self.model = cls
-        if virtual_only:
-            cls._meta.add_field(self, virtual=True)
+        if private_only:
+            cls._meta.add_field(self, private=True)
         else:
             cls._meta.add_field(self)
         if self.choices:
