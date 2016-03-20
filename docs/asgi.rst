@@ -654,6 +654,8 @@ Keys:
 * ``reply_channel``: Channel name for sending data, in
   format ``websocket.send.?``
 
+* ``path``: Path sent during ``connect``, sent to make routing easier for apps.
+
 * ``bytes``: Byte string of frame content, if it was bytes mode, or ``None``.
 
 * ``text``: Unicode string of frame content, if it was text mode, or ``None``.
@@ -678,6 +680,8 @@ Keys:
 * ``reply_channel``: Channel name that was used for sending data, in
   format ``websocket.send.?``. Cannot be used to send at this point; provided
   as a way to identify the connection only.
+
+* ``path``: Path sent during ``connect``, sent to make routing easier for apps.
 
 * ``order``: Order of the disconnection relative to the incoming frames'
   ``order`` values in ``websocket.receive``.
