@@ -10,11 +10,14 @@ from channels.utils import name_that_thing
 def consumer_1():
     pass
 
+
 def consumer_2():
     pass
 
+
 def consumer_3():
     pass
+
 
 chatroom_routing = [
     route("websocket.connect", consumer_2, path=r"^/chat/(?P<room>[^/]+)/$"),
@@ -31,14 +34,6 @@ class RoutingTests(SimpleTestCase):
     """
     Tests that the router's routing code works correctly.
     """
-
-    # Fake consumers we can test for with the == operator
-    def consumer_1(self):
-        pass
-    def consumer_2(self):
-        pass
-    def consumer_3(self):
-        pass
 
     def assertRoute(self, router, channel, content, consumer, kwargs=None):
         """
