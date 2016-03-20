@@ -215,7 +215,7 @@ class RoutingTests(SimpleTestCase):
         Tests that regexes with positional groups are rejected.
         """
         with self.assertRaises(ValueError):
-            Consumerrouter([
+            Router([
                 route("http.request", consumer_1, path=r"^/chat/([^/]+)/$"),
             ])
 
@@ -225,10 +225,10 @@ class RoutingTests(SimpleTestCase):
         starting with ^, and the included filter not starting with ^.
         """
         with self.assertRaises(ValueError):
-            Consumerrouter([
+            Router([
                 include("channels.tests.test_routing.chatroom_routing", path="foobar"),
             ])
         with self.assertRaises(ValueError):
-            Consumerrouter([
+            Router([
                 include("channels.tests.test_routing.chatroom_routing_noprefix", path="^/foobar/"),
             ])

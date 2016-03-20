@@ -194,7 +194,7 @@ class Include(object):
     """
 
     def __init__(self, routing, **kwargs):
-        self.routing = Routing.resolve_routing(routing)
+        self.routing = Router.resolve_routing(routing)
         self.prefixes = kwargs
         # Sanity check prefix regexes
         for name, value in self.prefixes.items():
