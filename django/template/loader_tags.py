@@ -272,10 +272,12 @@ def construct_relative_path(name, relative_name):
 
     folders = name.split('/')[:-1]
     if levels > len(folders):
-        raise TemplateSyntaxError("Relative name '%s' have more parent folders, then given name '%s'" % (relative_name, name))
+        raise TemplateSyntaxError("Relative name '%s' have more parent folders, then given name '%s'" 
+            % (relative_name, name)
+        )
 
     result = folders[:len(folders) - levels]
-    result.append(relative_name[levels+2:-1])
+    result.append(relative_name[levels + 2:-1])
     return '"%s"' % '/'.join(result)
 
 

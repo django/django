@@ -1,9 +1,9 @@
 import os
 
-from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
-from django.template.loader_tags import ExtendsError
-from django.template.loaders.base import Loader
-from django.test import SimpleTestCase, ignore_warnings
+from django.template import (
+    Context, Engine, TemplateSyntaxError
+)
+from django.test import SimpleTestCase
 
 from .utils import ROOT
 
@@ -36,6 +36,7 @@ class ExtendsRelativeBehaviorTests(SimpleTestCase):
 
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.render_to_string('error_extends.html')
+
 
 class IncludeRelativeBehaviorTests(SimpleTestCase):
 
