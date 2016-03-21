@@ -13,7 +13,7 @@ from django.utils._os import abspathu, safe_join
 from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import filepath_to_uri, force_text
+from django.utils.encoding import filepath_to_uri, force_str, force_text
 from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
@@ -51,10 +51,7 @@ class Storage(object):
             content = File(content)
 
         name = self.get_available_name(name, max_length=max_length)
-        name = self._save(name, content)
-
-        # Store filenames with forward slashes, even on Windows
-        return force_text(name.replace('\\', '/'))
+        return self._save(name, content)
 
     # These methods are part of the public API, with default implementations.
 
@@ -95,6 +92,24 @@ class Storage(object):
                     )
                 name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
         return name
+
+    def generate_filename(self, filename, instance, upload_to):
+        """
+        Return a filename to be passed to the save() method. Apply `upload_to`,
+        if defined on the model field, and perform filename validation by
+        calling get_valid_name().
+
+        Uses os.path operations and may be overridden to fulfill other file
+        path manipulation requirements.
+        """
+        if callable(upload_to):
+            directory_name, filename = os.path.split(upload_to(instance, filename))
+            filename = self.get_valid_name(filename)
+            return os.path.normpath(os.path.join(directory_name, filename))
+        else:
+            dirname = os.path.normpath(force_text(datetime.now().strftime(force_str(upload_to))))
+            filename = os.path.normpath(self.get_valid_name(os.path.basename(filename)))
+            return os.path.join(dirname, filename)
 
     def path(self, name):
         """
@@ -367,7 +382,8 @@ class FileSystemStorage(Storage):
         if self.file_permissions_mode is not None:
             os.chmod(full_path, self.file_permissions_mode)
 
-        return name
+        # Store filenames with forward slashes, even on Windows
+        return force_text(name.replace('\\', '/'))
 
     def delete(self, name):
         assert name, "The name argument is not allowed to be empty."

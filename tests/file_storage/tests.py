@@ -9,16 +9,19 @@ import tempfile
 import threading
 import time
 import unittest
+import warnings
 from datetime import datetime, timedelta
 
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation, SuspiciousOperation
 from django.core.files.base import ContentFile, File
-from django.core.files.storage import FileSystemStorage, get_storage_class
+from django.core.files.storage import (
+    FileSystemStorage, Storage as BaseStorage, get_storage_class,
+)
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
 )
-from django.db.models.fields.files import FileDescriptor
+from django.db.models.fields.files import FileDescriptor, FileField
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, ignore_warnings,
     override_settings,
@@ -27,6 +30,7 @@ from django.test.utils import requires_tz_support
 from django.utils import six, timezone
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_str, force_text
 from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Storage, temp_storage, temp_storage_location
@@ -847,6 +851,132 @@ class FileFieldStorageTests(TestCase):
         self.assertTrue(temp_storage.exists('tests/stringio'))
         with temp_storage.open('tests/stringio') as f:
             self.assertEqual(f.read(), b'content')
+
+
+class AWSS3Storage(BaseStorage):
+    """
+    Simulate an AWS S3 storage which uses unix like paths
+    and allows any character on file names and where
+    actually there are no folders but just keys.
+    """
+    prefix = 'mys3folder/'
+
+    # This one is important to test so that Storage.save no longer replaces \ with /
+    def _save(self, name, content):
+        return name
+
+    def get_valid_name(self, name):
+        return name
+
+    def get_available_name(self, name, max_length=None):
+        return name
+
+    def generate_filename(self, filename, instance, upload_to):
+        """
+        This is the method that's important to override when
+        Using S3 so no os.path calls are done that would break our S3 keys
+        Also having this new method allows us to fully customize file name generation
+        without the need to override FileField or ImageField
+        """
+        if callable(upload_to):
+            return self.prefix + self.get_valid_name(upload_to(instance, filename))
+        else:
+            return (
+                self.prefix +
+                force_text(datetime.now().strftime(force_str(upload_to))) +
+                self.get_valid_name(filename)
+            )
+
+
+class AgnosticCustomStorageTests(SimpleTestCase):
+    """
+    Tests related to removing hard coded os calls on FileField and storage delegation
+
+    #26058
+    """
+    def test_filefield_get_directory_deprecation(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            f = FileField(upload_to='some/folder/')
+            self.assertEqual(f.get_directory_name(), os.path.normpath('some/folder/'))
+
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            warns[0].message.args[0],
+            'FileField now delegates file name and folder processing to the '
+            'storage. get_directory_name() will be removed in Django 2.0.'
+        )
+
+    def test_filefield_get_filename_deprecation(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            f = FileField(upload_to='some/folder/')
+            self.assertEqual(f.get_filename('some/folder/test.txt'), 'test.txt')
+
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            warns[0].message.args[0],
+            'FileField now delegates file name and folder processing to the '
+            'storage. get_filename() will be removed in Django 2.0.'
+        )
+
+    def test_filefield_generate_filename1(self):
+        """
+        Test that file with default storage still works after
+        generate_filename delegation to storage
+        """
+        f = FileField(upload_to='some/folder/')
+        self.assertEqual(
+            f.generate_filename(None, 'test with space.txt'),
+            os.path.normpath('some/folder/test_with_space.txt')
+        )
+
+    def test_filefield_generate_filename2(self):
+        """
+        Test that file with default storage still works after
+        generate_filename delegation to storage, now with a callable
+        """
+        def upload_to(instance, filename):
+            return "some/folder/" + filename
+
+        f = FileField(upload_to=upload_to)
+        self.assertEqual(
+            f.generate_filename(None, 'test with space.txt'),
+            os.path.normpath('some/folder/test_with_space.txt')
+        )
+
+    def test_filefield_awss3_storage(self):
+        """
+        Simulate a FileField with an S3 storage which uses keys rather than folders and names
+        and confirm that the actual key is not broken due to os.path calls inside FileField or Storage
+        """
+        storageInstance = AWSS3Storage()
+        folder = 'not/a/folder/'
+
+        f = FileField(upload_to=folder, storage=storageInstance)
+        key = 'my-file-key\\with odd characters'    # But still valid although allowing it makes no sense.
+        data = ContentFile('test')
+
+        # Simulate actual call to f.save
+        resultKey = f.generate_filename(None, key)
+        self.assertEqual(resultKey, AWSS3Storage.prefix + folder + key)
+
+        resultKey = storageInstance.save(resultKey, data)
+        self.assertEqual(resultKey, AWSS3Storage.prefix + folder + key)
+
+        # Repeat test with callable
+        def upload_to(instance, filename):
+            # Return a non normalized path on purpose.
+            return folder + filename
+
+        f = FileField(upload_to=upload_to, storage=storageInstance)
+
+        # Simulate actual call to f.save
+        resultKey = f.generate_filename(None, key)
+        self.assertEqual(resultKey, AWSS3Storage.prefix + folder + key)
+
+        resultKey = storageInstance.save(resultKey, data)
+        self.assertEqual(resultKey, AWSS3Storage.prefix + folder + key)
 
 
 # Tests for a race condition on file saving (#4948).

@@ -156,6 +156,9 @@ details on these changes.
   ``Field.contribute_to_class()`` and ``virtual`` in
   ``Model._meta.add_field()`` will be removed.
 
+* ``FileField`` methods ``get_directory_name()`` and ``get_filename()`` will be
+  removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
