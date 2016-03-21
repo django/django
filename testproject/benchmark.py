@@ -96,6 +96,7 @@ class Benchmarker(object):
         if len(stats) >= self.num:
             return
         host, port = self.url.split("://")[1].split(":")
+        port = int(port)
         for i in range(self.rate):
             # TODO: Look at URL
             reactor.connectTCP(host, port, self.factory)
