@@ -29,10 +29,10 @@ DATABASES = {
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "BACKEND": "asgi_redis.RedisChannelLayer",
         "ROUTING": "testproject.urls.channel_routing",
+        "CONFIG": {
+            "hosts": [os.environ.get('REDIS_URL', 'redis://redis:6379')],
+        }
     },
 }
-
-if os.environ.get("USEREDIS", None):
-    CHANNEL_BACKENDS['default']['BACKEND'] = "asgi_redis.RedisChannelLayer"

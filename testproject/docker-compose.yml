@@ -1,0 +1,18 @@
+version: '2'
+services:
+    redis:
+        image: redis
+    daphne:
+        image: channels-test
+        build: .
+        command: daphne -b 0.0.0.0 -p 80 testproject.asgi:channel_layer
+        ports:
+            - "80:80"
+        depends_on:
+          - redis
+    worker:
+        image: channels-test
+        build: .
+        command: python manage.py runworker
+        depends_on:
+          - redis
