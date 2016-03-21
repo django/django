@@ -4,6 +4,9 @@ Django Channels
 .. image:: https://api.travis-ci.org/andrewgodwin/channels.svg
     :target: https://travis-ci.org/andrewgodwin/channels
 
+*(Note: Recent versions of Channels also need recent versions of Daphne,
+asgi_redis and asgiref, so make sure you update all at once)*
+
 This is a work-in-progress code branch of Django implemented as a third-party
 app, which aims to bring some asynchrony to Django and expand the options
 for code beyond the request-response model, in particular enabling WebSocket,
