@@ -147,14 +147,11 @@ details on these changes.
 * The shim for supporting custom related manager classes without a
   ``_apply_rel_filters()`` method will be removed.
 
-* Using ``User.is_authenticated()`` and ``User.is_anonymous()`` as methods
-  will no longer be supported.
-
-* The private attribute ``virtual_fields`` of ``Model._meta`` will be removed.
-
-* The private keyword arguments ``virtual_only`` in
-  ``Field.contribute_to_class()`` and ``virtual`` in
-  ``Model._meta.add_field()`` will be removed.
+* Private methods from :class:`~django.db.models.FileField` get_directory_name and
+  get_filename will be removed in favor to delegate this work to the underlying
+  storage class. In addition these methods will no longer be called by
+  :class:`~django.db.models.FileField` which is a backwards incompatible change
+  for users overriding those methods on custom fields.
 
 .. _deprecation-removed-in-1.10:
 

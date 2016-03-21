@@ -9,16 +9,19 @@ import tempfile
 import threading
 import time
 import unittest
+import warnings
 from datetime import datetime, timedelta
 
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation, SuspiciousOperation
 from django.core.files.base import ContentFile, File
-from django.core.files.storage import FileSystemStorage, get_storage_class
+from django.core.files.storage import (
+    FileSystemStorage, Storage as BaseStorage, get_storage_class,
+)
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
 )
-from django.db.models.fields.files import FileDescriptor
+from django.db.models.fields.files import FileDescriptor, FileField
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, ignore_warnings,
     override_settings,
@@ -27,6 +30,7 @@ from django.test.utils import requires_tz_support
 from django.utils import six, timezone
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_str, force_text
 from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Storage, temp_storage, temp_storage_location
@@ -69,8 +73,10 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class raises an error if the requested module don't exist.
         """
         # Error message may or may not be the fully qualified path.
-        with six.assertRaisesRegex(self, ImportError, "No module named '?(django.core.files.)?non_existing_storage'?"):
-            get_storage_class('django.core.files.non_existing_storage.NonExistingStorage')
+        with six.assertRaisesRegex(self, ImportError,
+                "No module named '?(django.core.files.)?non_existing_storage'?"):
+            get_storage_class(
+                'django.core.files.non_existing_storage.NonExistingStorage')
 
 
 class FileStorageDeconstructionTests(unittest.TestCase):
@@ -101,7 +107,8 @@ class FileStorageTests(TestCase):
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
-        self.storage = self.storage_class(location=self.temp_dir, base_url='/test_media_url/')
+        self.storage = self.storage_class(location=self.temp_dir,
+            base_url='/test_media_url/')
         # Set up a second temporary directory which is ensured to have a mixed
         # case name.
         self.temp_dir2 = tempfile.mkdtemp(suffix='aBc')
@@ -342,7 +349,8 @@ class FileStorageTests(TestCase):
         Saving a pathname should create intermediate directories as necessary.
         """
         self.assertFalse(self.storage.exists('path/to'))
-        self.storage.save('path/to/test.file', ContentFile('file saved with path'))
+        self.storage.save('path/to/test.file',
+            ContentFile('file saved with path'))
 
         self.assertTrue(self.storage.exists('path/to'))
         with self.storage.open('path/to/test.file') as f:
@@ -362,7 +370,8 @@ class FileStorageTests(TestCase):
             self.assertFalse(file.closed)
             self.assertFalse(file.file.closed)
 
-        file = InMemoryUploadedFile(six.StringIO('1'), '', 'test', 'text/plain', 1, 'utf8')
+        file = InMemoryUploadedFile(six.StringIO('1'), '', 'test',
+                                    'text/plain', 1, 'utf8')
         with file:
             self.assertFalse(file.closed)
             self.storage.save('path/to/test.file', file)
@@ -378,7 +387,8 @@ class FileStorageTests(TestCase):
         f = ContentFile('custom contents')
         f_name = self.storage.save('test.file', f)
 
-        self.assertEqual(self.storage.path(f_name), os.path.join(self.temp_dir, f_name))
+        self.assertEqual(self.storage.path(f_name),
+            os.path.join(self.temp_dir, f_name))
 
         self.storage.delete(f_name)
 
@@ -386,37 +396,25 @@ class FileStorageTests(TestCase):
         """
         File storage returns a url to access a given file from the Web.
         """
-        self.assertEqual(self.storage.url('test.file'), self.storage.base_url + 'test.file')
+        self.assertEqual(self.storage.url('test.file'),
+            '%s%s' % (self.storage.base_url, 'test.file'))
 
         # should encode special chars except ~!*()'
         # like encodeURIComponent() JavaScript function do
-        self.assertEqual(
-            self.storage.url(r"~!*()'@#$%^&*abc`+ =.file"),
-            "/test_media_url/~!*()'%40%23%24%25%5E%26*abc%60%2B%20%3D.file"
-        )
-        self.assertEqual(self.storage.url("ab\0c"), "/test_media_url/ab%00c")
+        self.assertEqual(self.storage.url(r"""~!*()'@#$%^&*abc`+ =.file"""),
+            """/test_media_url/~!*()'%40%23%24%25%5E%26*abc%60%2B%20%3D.file""")
 
         # should translate os path separator(s) to the url path separator
-        self.assertEqual(self.storage.url("""a/b\\c.file"""), "/test_media_url/a/b/c.file")
+        self.assertEqual(self.storage.url("""a/b\\c.file"""),
+            """/test_media_url/a/b/c.file""")
 
-        # #25905: remove leading slashes from file names to prevent unsafe url output
-        self.assertEqual(self.storage.url("/evil.com"), "/test_media_url/evil.com")
-        self.assertEqual(self.storage.url(r"\evil.com"), "/test_media_url/evil.com")
-        self.assertEqual(self.storage.url("///evil.com"), "/test_media_url/evil.com")
-        self.assertEqual(self.storage.url(r"\\\evil.com"), "/test_media_url/evil.com")
-
-        self.assertEqual(self.storage.url(None), "/test_media_url/")
-
-    def test_base_url(self):
-        """
-        File storage returns a url even when its base_url is unset or modified.
-        """
         self.storage.base_url = None
         with self.assertRaises(ValueError):
             self.storage.url('test.file')
 
         # #22717: missing ending slash in base_url should be auto-corrected
-        storage = self.storage_class(location=self.temp_dir, base_url='/no_ending_slash')
+        storage = self.storage_class(location=self.temp_dir,
+            base_url='/no_ending_slash')
         self.assertEqual(
             storage.url('test.file'),
             '%s%s' % (storage.base_url, 'test.file')
@@ -436,7 +434,8 @@ class FileStorageTests(TestCase):
 
         dirs, files = self.storage.listdir('')
         self.assertEqual(set(dirs), {'storage_dir_1'})
-        self.assertEqual(set(files), {'storage_test_1', 'storage_test_2'})
+        self.assertEqual(set(files),
+                         {'storage_test_1', 'storage_test_2'})
 
         self.storage.delete('storage_test_1')
         self.storage.delete('storage_test_2')
@@ -462,7 +461,8 @@ class FileStorageTests(TestCase):
         file = other_temp_storage.open(mixed_case, 'w')
         file.write('storage contents')
         file.close()
-        self.assertEqual(os.path.join(self.temp_dir2, mixed_case), other_temp_storage.path(mixed_case))
+        self.assertEqual(os.path.join(self.temp_dir2, mixed_case),
+                         other_temp_storage.path(mixed_case))
         other_temp_storage.delete(mixed_case)
 
     def test_makedirs_race_handling(self):
@@ -487,11 +487,13 @@ class FileStorageTests(TestCase):
         try:
             os.makedirs = fake_makedirs
 
-            self.storage.save('normal/test.file', ContentFile('saved normally'))
+            self.storage.save('normal/test.file',
+                ContentFile('saved normally'))
             with self.storage.open('normal/test.file') as f:
                 self.assertEqual(f.read(), b'saved normally')
 
-            self.storage.save('raced/test.file', ContentFile('saved with race'))
+            self.storage.save('raced/test.file',
+                ContentFile('saved with race'))
             with self.storage.open('raced/test.file') as f:
                 self.assertEqual(f.read(), b'saved with race')
 
@@ -847,6 +849,122 @@ class FileFieldStorageTests(TestCase):
         self.assertTrue(temp_storage.exists('tests/stringio'))
         with temp_storage.open('tests/stringio') as f:
             self.assertEqual(f.read(), b'content')
+
+
+class AWSS3Storage(BaseStorage):
+    """
+    Simulate an AWS S3 storage which uses unix like paths
+    and allows any character on file names and where
+    actually there are no folders but just keys.
+    """
+    prefix = 'mys3folder/'
+
+    # This one is important to test so that Storage.save no longer replaces \ with /
+    def _save(self, name, content):
+        return name
+
+    def get_valid_name(self, name):
+        return name
+
+    def get_available_name(self, name, max_length=None):
+        return name
+
+    def generate_filename(self, filename, instance, upload_to):
+        """
+        This is the method that's important to override when
+        Using S3 so no os.path calls are done that would break our S3 keys
+        Also having this new method allows us to fully customize file name generation
+        without the need to override FileField or ImageField
+        """
+        if callable(upload_to):
+            return self.prefix + self.get_valid_name(upload_to(instance, filename))
+        else:
+            return (
+                self.prefix +
+                force_text(datetime.now().strftime(force_str(upload_to))) +
+                self.get_valid_name(filename)
+            )
+
+
+class AgnosticCustomStorageTests(unittest.TestCase):
+    """
+    Tests related to removing hard coded os calls on FileField and storage delegation
+
+    #26058
+    """
+    def test_filefield_get_directory_deprecation(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            f = FileField(upload_to='some/folder/')
+            self.assertEqual(f.get_directory_name(), os.path.normpath('some/folder/'))
+
+        self.assertEqual(len(warns), 1)
+
+    def test_filefield_get_filename_deprecation(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            f = FileField(upload_to='some/folder/')
+            self.assertEqual(f.get_filename('some/folder/test.txt'), 'test.txt')
+
+        self.assertEqual(len(warns), 1)
+
+    def test_filefield_generate_filename1(self):
+        """
+        Test that file with default storage still works after
+        generate_filename delegation to storage
+        """
+        f = FileField(upload_to='some/folder/')
+        self.assertEqual(
+            f.generate_filename(None, 'test with space.txt'),
+            os.path.normpath('some/folder/test_with_space.txt')
+        )
+
+    def test_filefield_generate_filename2(self):
+        """
+        Test that file with default storage still works after
+        generate_filename delegation to storage, now with a callable
+        """
+        def upload_to(instance, filename):
+            return "some/folder/" + filename
+
+        f = FileField(upload_to=upload_to)
+        self.assertEqual(
+            f.generate_filename(None, 'test with space.txt'),
+            os.path.normpath('some/folder/test_with_space.txt')
+        )
+
+    def test_filefield_awss3_storage(self):
+        """
+        Simulate a FileField with an S3 storage which uses keys rather than folders and names
+        and confirm that the actual key is not broken due to os.path calls inside FileField or Storage
+        """
+        storageInstance = AWSS3Storage()
+        folder = 'not/a/folder/'
+
+        f = FileField(upload_to=folder, storage=storageInstance)
+        key = 'my-file-key\\with odd characters'    # But still valid although allowing it makes no sense.
+        data = ContentFile('test')
+
+        # Simulate actual call to f.save
+        resultKey = f.generate_filename(None, key)
+        self.assertEqual(resultKey, AWSS3Storage.prefix + folder + key)
+
+        resultKey = storageInstance.save(resultKey, data)
+        self.assertEqual(resultKey, AWSS3Storage.prefix + folder + key)
+
+        # Repeat test with callable
+        def upload_to(instance, filename):
+            # Return a non normalized path on purpose.
+            return folder + filename
+
+        f = FileField(upload_to=upload_to, storage=storageInstance)
+
+        # Simulate actual call to f.save
+        resultKey = f.generate_filename(None, key)
+        self.assertEqual(resultKey, AWSS3Storage.prefix + folder + key)
+
+        resultKey = storageInstance.save(resultKey, data)
+        self.assertEqual(resultKey, AWSS3Storage.prefix + folder + key)
 
 
 # Tests for a race condition on file saving (#4948).
