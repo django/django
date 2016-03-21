@@ -102,7 +102,7 @@ class Benchmarker(object):
 
     def spawn_loop(self):
         self.spawn_connections()
-        reactor.callLater(0.01, self.spawn_loop)
+        reactor.callLater(0.1, self.spawn_loop)
 
     def progress_loop(self):
         self.print_progress()
