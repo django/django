@@ -155,9 +155,9 @@ the message - but response channels would have to have their messages sent
 to the channel server they're listening on.
 
 For this reason, Channels treats these as two different *channel types*, and
-denotes a *response channel* by having the first character of the channel name
-be the character ``!`` - e.g. ``!http.response.f5G3fE21f``. *Normal
-channels* have no special prefix, but along with the rest of the response
+denotes a *response channel* by having the channel name contain
+the character ``!`` - e.g. ``http.response!f5G3fE21f``. *Normal
+channels* have do not contain it, but along with the rest of the response
 channel name, they must contain only the characters ``a-z A-Z 0-9 - _``,
 and be less than 200 characters long.
 
@@ -244,7 +244,7 @@ Of course, you should still remove things from the group on disconnect if you
 can; the expiry code is there to catch cases where the disconnect message
 doesn't make it for some reason.
 
-Groups are generally only useful for response channels (ones starting with
+Groups are generally only useful for response channels (ones containing
 the character ``!``), as these are unique-per-client, but can be used for
 normal channels as well if you wish.
 

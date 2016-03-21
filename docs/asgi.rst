@@ -112,14 +112,17 @@ In order to aid with scaling and network architecture, a distinction
 is made between channels that have multiple readers (such as the
 ``http.request`` channel that web applications would listen on from every
 application worker process) and *single-reader channels*
-(such as a ``http.response.ABCDEF`` channel tied to a client socket).
+(such as a ``http.response!ABCDEF`` channel tied to a client socket).
 
-*Single-reader channel* names are prefixed with an exclamation mark
+*Single-reader channel* names contain an exclamation mark
 (``!``) character in order to indicate to the channel layer that it may
 have to route the data for these channels differently to ensure it reaches the
 single process that needs it; these channels are nearly always tied to
-incoming connections from the outside world. Some channel layers may not
-need this, and can simply treat the prefix as part of the name.
+incoming connections from the outside world. The ``!`` is always preceded by
+the main channel name (e.g. ``http.response``) and followed by the
+per-client/random portion - channel layers can split on the ``!`` and use just
+the right hand part to route if they desire, or can ignore it if they don't
+need to use different routing rules.
 
 Messages should expire after a set time sitting unread in a channel;
 the recommendation is one minute, though the best value depends on the
@@ -156,7 +159,7 @@ standard keys in the ``environ`` dict for WSGI.
 The design pattern is that most protocols will share a few channels for
 incoming data (for example, ``http.request``, ``websocket.connect`` and
 ``websocket.receive``), but will have individual channels for sending to
-each client (such as ``!http.response.kj2daj23``). This allows incoming
+each client (such as ``http.response!kj2daj23``). This allows incoming
 data to be dispatched into a cluster of application servers that can all
 handle it, while responses are routed to the individual protocol server
 that has the other end of the client's socket.
@@ -275,11 +278,13 @@ A *channel layer* must provide an object with these attributes
 
 * ``new_channel(pattern)``, a callable that takes a unicode string pattern,
   and returns a new valid channel name that does not already exist, by
-  substituting any occurrences of the question mark character ``?`` in
-  ``pattern`` with a single random unicode string and checking for
-  existence of that name in the channel layer. This is NOT called prior to
+  adding a single random unicode string after the ``!`` character in ``pattern``,
+  and checking for existence of that name in the channel layer. The ``pattern``
+  MUST end with ``!`` or this function must error. This is NOT called prior to
   a message being sent on a channel, and should not be used for channel
-  initialization.
+  initialization, and is also not guaranteed to be called by the same channel
+  client that then reads the messages, so you cannot put process identifiers in
+  it for routing.
 
 * ``MessageTooLarge``, the exception raised when a send operation fails
   because the encoded message is over the layer's size limit.
@@ -391,7 +396,7 @@ top-level outgoing channel.
 
 Messages are specified here along with the channel names they are expected
 on; if a channel name can vary, such as with reply channels, the varying
-portion will be replaced by ``?``, such as ``http.response.?``, which matches
+portion will be represented by ``!``, such as ``http.response!``, which matches
 the format the ``new_channel`` callable takes.
 
 There is no label on message types to say what they are; their type is implicit
@@ -435,8 +440,8 @@ Channel: ``http.request``
 
 Keys:
 
-* ``reply_channel``: Channel name for responses and server pushes, in
-  format ``http.response.?``
+* ``reply_channel``: Channel name for responses and server pushes, starting with
+  ``http.response!``
 
 * ``http_version``: Unicode string, one of ``1.0``, ``1.1`` or ``2``.
 
@@ -485,7 +490,7 @@ Request Body Chunk
 
 Must be sent after an initial Response.
 
-Channel: ``http.request.body.?``
+Channel: ``http.request.body!``
 
 Keys:
 
@@ -503,7 +508,7 @@ Response
 
 Send after any server pushes, and before any response chunks.
 
-Channel: ``http.response.?``
+Channel: ``http.response!``
 
 Keys:
 
@@ -528,7 +533,7 @@ Response Chunk
 
 Must be sent after an initial Response.
 
-Channel: ``http.response.?``
+Channel: ``http.response!``
 
 Keys:
 
@@ -551,7 +556,7 @@ When a server receives this message, it must treat the Request message in the
 received from the network. A server may, if it chooses, apply all of its
 internal logic to handling this request (e.g. the server may want to try to
 satisfy the request from a cache). Regardless, if the server is unable to
-satisfy the request itself it must create a new ``http.response.?`` channel for
+satisfy the request itself it must create a new ``http.response!`` channel for
 the application to send the Response message on, fill that channel in on the
 ``reply_channel`` field of the message, and then send the Request back to the
 application on the ``http.request`` channel.
@@ -565,7 +570,7 @@ If the remote peer does not support server push, either because it's not a
 HTTP/2 peer or because SETTINGS_ENABLE_PUSH is set to 0, the server must do
 nothing in response to this message.
 
-Channel: ``http.response.?``
+Channel: ``http.response!``
 
 Keys:
 
@@ -611,8 +616,7 @@ Channel: ``websocket.connect``
 
 Keys:
 
-* ``reply_channel``: Channel name for sending data, in
-  format ``websocket.send.?``
+* ``reply_channel``: Channel name for sending data, start with ``websocket.send!``
 
 * ``scheme``: Unicode string URL scheme portion (likely ``ws`` or ``wss``).
   Optional (but must not be empty), default is ``ws``.
@@ -651,8 +655,7 @@ Channel: ``websocket.receive``
 
 Keys:
 
-* ``reply_channel``: Channel name for sending data, in
-  format ``websocket.send.?``
+* ``reply_channel``: Channel name for sending data, starting with ``websocket.send!``
 
 * ``path``: Path sent during ``connect``, sent to make routing easier for apps.
 
@@ -677,8 +680,8 @@ Channel: ``websocket.disconnect``
 
 Keys:
 
-* ``reply_channel``: Channel name that was used for sending data, in
-  format ``websocket.send.?``. Cannot be used to send at this point; provided
+* ``reply_channel``: Channel name that was used for sending data, starting
+  with ``websocket.send!``. Cannot be used to send at this point; provided
   as a way to identify the connection only.
 
 * ``path``: Path sent during ``connect``, sent to make routing easier for apps.
@@ -693,7 +696,7 @@ Send/Close
 Sends a data frame to the client and/or closes the connection from the
 server end.
 
-Channel: ``websocket.send.?``
+Channel: ``websocket.send!``
 
 Keys:
 
@@ -732,7 +735,7 @@ Channel: ``udp.receive``
 
 Keys:
 
-* ``reply_channel``: Channel name for sending data, in format ``udp.send.?``
+* ``reply_channel``: Channel name for sending data, starts with ``udp.send!``
 
 * ``data``: Byte string of UDP datagram payload.
 
@@ -750,7 +753,7 @@ Send
 
 Sent to send out a UDP datagram to a client.
 
-Channel: ``udp.send.?``
+Channel: ``udp.send!``
 
 Keys:
 
@@ -834,7 +837,8 @@ limitation that they only use the following characters:
 * Hyphen ``-``
 * Underscore ``_``
 * Period ``.``
-* Exclamation mark ``!`` (only at the start of a channel name)
+* Exclamation mark ``!`` (only to deliniate single-reader channel names,
+  and only one per name)
 
 
 WSGI Compatibility
