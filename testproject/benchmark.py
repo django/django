@@ -86,11 +86,12 @@ class Benchmarker(object):
     Performs benchmarks against WebSockets.
     """
 
-    def __init__(self, url, num, concurrency, rate, messages):
+    def __init__(self, url, num, concurrency, rate, messages, spawn):
         self.url = url
         self.num = num
         self.concurrency = concurrency
         self.rate = rate
+        self.spawn = spawn
         self.messages = messages
         self.factory = WebSocketClientFactory(
             args.url,
@@ -117,7 +118,7 @@ class Benchmarker(object):
         if max_to_spawn <= 0:
             return
         # Don't spawn too many at once
-        max_to_spawn = min(max_to_spawn, 10)
+        max_to_spawn = min(max_to_spawn, int(self.spawn / 10.0))
         # Decode connection args
         host, port = self.url.split("://")[1].split(":")
         port = int(port)
@@ -206,6 +207,7 @@ if __name__ == '__main__':
     parser.add_argument("-c", "--concurrency", type=int, default=10, help="Number of sockets to open at once")
     parser.add_argument("-r", "--rate", type=float, default=1, help="Number of messages to send per socket per second")
     parser.add_argument("-m", "--messages", type=int, default=5, help="Number of messages to send per socket before close")
+    parser.add_argument("-s", "--spawn", type=int, default=30, help="Number of sockets to spawn per second, max")
     args = parser.parse_args()
 
     benchmarker = Benchmarker(
@@ -214,6 +216,7 @@ if __name__ == '__main__':
         concurrency=args.concurrency,
         rate=args.rate,
         messages=args.messages,
+        spawn=args.spawn,
     )
     benchmarker.loop()
     reactor.run()
