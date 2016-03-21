@@ -32,7 +32,7 @@ CHANNEL_LAYERS = {
         "BACKEND": "asgi_redis.RedisChannelLayer",
         "ROUTING": "testproject.urls.channel_routing",
         "CONFIG": {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://redis:6379')],
+            "hosts": [os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379')],
         }
     },
 }

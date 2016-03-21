@@ -22,5 +22,6 @@ RUN git clone https://github.com/andrewgodwin/channels.git /srv/channels/ && \
     python setup.py install
 
 WORKDIR /srv/channels/testproject/
+ENV REDIS_URL=redis://redis:6379
 
 EXPOSE 80
