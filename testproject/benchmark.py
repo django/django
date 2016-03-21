@@ -84,7 +84,6 @@ class Benchmarker(object):
         self.rate = rate
         self.factory = WebSocketClientFactory(
             args.url,
-            debug=False,
         )
         self.factory.protocol = MyClientProtocol
 
