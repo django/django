@@ -32,7 +32,7 @@ class ExtendsRelativeBehaviorTests(SimpleTestCase):
 
     def test_extend_error(self):
         engine = Engine(dirs=[RELATIVE])
-        msg = "Relative name '..two.html' have more parent folders, then given name 'error_extends.html'"
+        msg = "Relative name '\"..two.html\"' have more parent folders, then given name 'error_extends.html'"
 
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.render_to_string('error_extends.html')
@@ -53,7 +53,7 @@ class IncludeRelativeBehaviorTests(SimpleTestCase):
 
     def test_include_error(self):
         engine = Engine(dirs=[RELATIVE])
-        msg = "Relative name '..three.html' have more parent folders, then given name 'error_include.html'"
+        msg = "Relative name '\"..three.html\"' have more parent folders, then given name 'error_include.html'"
 
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.render_to_string('error_include.html')
