@@ -96,9 +96,10 @@ class Benchmarker(object):
     def spawn_connections(self):
         if len(stats) >= self.num:
             return
+        host, port = self.url.split("://")[1].split(":")
         for i in range(self.rate):
             # TODO: Look at URL
-            reactor.connectTCP("127.0.0.1", 8000, self.factory)
+            reactor.connectTCP(host, port, self.factory)
 
     def print_progress(self):
         open_protocols = len([x for x in stats.values() if not x])
