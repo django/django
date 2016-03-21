@@ -116,6 +116,8 @@ class Benchmarker(object):
         max_to_spawn = self.num - len(stats)
         if max_to_spawn <= 0:
             return
+        # Don't spawn too many at once
+        max_to_spawn = min(max_to_spawn, 10)
         # Decode connection args
         host, port = self.url.split("://")[1].split(":")
         port = int(port)
