@@ -166,17 +166,17 @@ class Benchmarker(object):
         latency_mean = statistics.mean(latencies)
         latency_median = statistics.median(latencies)
         latency_stdev = statistics.stdev(latencies)
-        latency_5 = self.percentile(latencies, 0.05)
         latency_95 = self.percentile(latencies, 0.95)
+        latency_99 = self.percentile(latencies, 0.99)
         # Print results
         print("-------")
         print("Sockets opened: %s" % len(stats))
-        print("Latency stats: Mean %.2fs  Median %.2fs  Stdev %.2f  5%% %.2fs  95%% %.2fs" % (
+        print("Latency stats: Mean %.3fs  Median %.3fs  Stdev %.3f  95%% %.3fs  95%% %.3fs" % (
             latency_mean,
             latency_median,
             latency_stdev,
-            latency_5,
             latency_95,
+            latency_99,
         ))
         print("Good sockets: %s (%.2f%%)" % (num_good, (float(num_good) / len(stats))*100))
         print("Incomplete sockets: %s (%.2f%%)" % (num_incomplete, (float(num_incomplete) / len(stats))*100))
