@@ -248,11 +248,17 @@ def do_block(parser, token):
 
     return BlockNode(block_name, nodelist)
 
+
 def construct_relative_path(name, relative_name):
+    """
+    Counts levels of parent folders in 'relative_name', and construct absolute template name relative given 'name'.
+    """
     if not relative_name.startswith('"'):
         # argument is variable
         return relative_name
 
+    # counts leading dots. this work like python import paths
+    # if ../ ./ style is prefered, just replace code, which counts 'levels' value
     levels = -1
     for ch in relative_name[1:]:
         if ch == '.':
