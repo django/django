@@ -11,6 +11,7 @@ __all__ = ['JSONField']
 
 
 class JSONField(Field):
+    empty_values = [None]
     empty_strings_allowed = False
     description = _('A JSON object')
     default_error_messages = {
