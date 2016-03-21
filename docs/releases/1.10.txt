@@ -251,6 +251,10 @@ File Storage
   timezone-aware ``datetime`` if :setting:`USE_TZ` is ``True`` and a naive
   ``datetime`` in the local timezone otherwise.
 
+* The new :meth:`Storage.generate_filename()
+  <django.core.files.storage.Storage.generate_filename>` method makes it easier
+  to implement custom storages that don't use the ``os.path`` calls previously
+  in :class:`~django.db.models.FileField`.
 
 File Uploads
 ~~~~~~~~~~~~
@@ -791,6 +795,21 @@ Miscellaneous
 * The ``Model._deferred`` attribute is removed as dynamic model classes when
   using ``QuerySet.defer()`` and ``only()`` is removed.
 
+* :meth:`Storage.save() <django.core.files.storage.Storage.save>` no longer
+  replaces ``'\'`` with ``'/'``. This behavior is moved to
+  :class:`~django.core.files.storage.FileSystemStorage` since this is a storage
+  specific implementation detail. Any Windows user with a custom storage
+  implementation that relies on this behavior will need to implement it in the
+  custom storage's ``save()`` method.
+
+* Private :class:`~django.db.models.FileField` methods ``get_directory_name()``
+  and ``get_filename()`` are no longer called (and are now deprecated) which is
+  a backwards incompatible change for users overriding those methods on custom
+  fields. To adapt such code, override ``FileField.generate_filename()`` or
+  :meth:`Storage.generate_filename()
+  <django.core.files.storage.Storage.generate_filename>` instead. It
+  might be possible to use :attr:`~django.db.models.FileField.upload_to` also.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
@@ -999,6 +1018,11 @@ Miscellaneous
 * The private API ``Widget._format_value()`` is made public and renamed to
   :meth:`~django.forms.Widget.format_value`. The old name will work
   through a deprecation period.
+
+* Private ``FileField`` methods ``get_directory_name()`` and ``get_filename()``
+  are deprecated in favor of performing this work in
+  :meth:`Storage.generate_filename()
+  <django.core.files.storage.Storage.generate_filename>`).
 
 .. _removed-features-1.10:
 
