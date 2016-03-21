@@ -1,6 +1,6 @@
 import os
 
-from django.template import Context, Engine, TemplateDoesNotExist
+from django.template import Context, Engine, TemplateSyntaxError
 from django.test import SimpleTestCase
 
 from .utils import ROOT
