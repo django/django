@@ -105,7 +105,7 @@ Simple mixins
     .. method:: get_template_names()
 
         Returns a list of template names to search for when rendering the
-        template.
+        template. The first template that is found will be used.
 
         If :attr:`template_name` is specified, the default implementation will
         return a list containing :attr:`template_name` (if it is specified).
