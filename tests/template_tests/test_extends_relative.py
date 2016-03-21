@@ -1,6 +1,6 @@
 import os
 
-from django.template import Context, Engine, TemplateDoesNotExist
+from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
 from django.template.loader_tags import ExtendsError
 from django.template.loaders.base import Loader
 from django.test import SimpleTestCase, ignore_warnings
@@ -32,9 +32,9 @@ class ExtendsRelativeBehaviorTests(SimpleTestCase):
 
     def test_extend_error(self):
         engine = Engine(dirs=[RELATIVE])
-        msg = 'Error'
+        msg = "Relative name '..two.html' have more parent folders, then given name 'error_extends.html'"
 
-        with self.assertRaisesMessage(ExtendsError, msg):
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.render_to_string('error_extends.html')
 
 class IncludeRelativeBehaviorTests(SimpleTestCase):
@@ -53,7 +53,7 @@ class IncludeRelativeBehaviorTests(SimpleTestCase):
 
     def test_include_error(self):
         engine = Engine(dirs=[RELATIVE])
-        msg = 'Error'
+        msg = "Relative name '..three.html' have more parent folders, then given name 'error_include.html'"
 
-        with self.assertRaisesMessage(ExtendsError, msg):
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.render_to_string('error_include.html')
