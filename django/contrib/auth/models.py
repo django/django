@@ -438,9 +438,11 @@ class AnonymousUser(object):
     def has_module_perms(self, module):
         return _user_has_module_perms(self, module)
 
+    @property
     def is_anonymous(self):
         return True
 
+    @property
     def is_authenticated(self):
         return False
 
