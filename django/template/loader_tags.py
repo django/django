@@ -288,8 +288,8 @@ def do_extends(parser, token):
     if len(bits) != 2:
         raise TemplateSyntaxError("'%s' takes one argument" % bits[0])
 
-    name = construct_relative_path(parser.template_name, bits[1])
-    parent_name = parser.compile_filter(name)
+    bits[1] = construct_relative_path(parser.template_name, bits[1])
+    parent_name = parser.compile_filter(bits[1])
     nodelist = parser.parse()
     if nodelist.get_nodes_by_type(ExtendsNode):
         raise TemplateSyntaxError("'%s' cannot appear more than once in the same template" % bits[0])
@@ -339,7 +339,7 @@ def do_include(parser, token):
         options[option] = value
     isolated_context = options.get('only', False)
     namemap = options.get('with', {})
-    name = construct_relative_path(parser.template_name, bits[1])
+    bits[1] = construct_relative_path(parser.template_name, bits[1])
 
-    return IncludeNode(parser.compile_filter(name), extra_context=namemap,
+    return IncludeNode(parser.compile_filter(bits[1]), extra_context=namemap,
                        isolated_context=isolated_context)
