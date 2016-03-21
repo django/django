@@ -12,6 +12,11 @@ stats = {}
 
 class MyClientProtocol(WebSocketClientProtocol):
 
+    def __init__(self, *args, **kwargs):
+        WebSocketClientProtocol.__init__(self, *args, **kwargs)
+        self.fingerprint = "".join(random.choice("abcdefghijklmnopqrstuvwxyz") for i in range(16))
+        stats[self.fingerprint] = {}
+
     def onConnect(self, response):
         self.opened = time.time()
         self.sent = 0
@@ -20,8 +25,6 @@ class MyClientProtocol(WebSocketClientProtocol):
         self.corrupted = 0
         self.out_of_order = 0
         self.latencies = []
-        self.fingerprint = "".join(random.choice("abcdefghijklmnopqrstuvwxyz") for i in range(16))
-        stats[self.fingerprint] = {}
 
     def onOpen(self):
         def hello():
