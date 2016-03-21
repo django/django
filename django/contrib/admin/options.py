@@ -1684,7 +1684,7 @@ class ModelAdmin(BaseModelAdmin):
         (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
             [obj], opts, request.user, self.admin_site, using)
 
-        if request.POST:  # The user has already confirmed the deletion.
+        if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
             obj_display = force_text(obj)
@@ -1692,7 +1692,6 @@ class ModelAdmin(BaseModelAdmin):
             obj_id = obj.serializable_value(attr)
             self.log_deletion(request, obj, obj_display)
             self.delete_model(request, obj)
-
             return self.response_delete(request, obj_display, obj_id)
 
         object_name = force_text(opts.verbose_name)
