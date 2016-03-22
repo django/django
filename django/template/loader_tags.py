@@ -267,7 +267,7 @@ def construct_relative_path(name, relative_name):
 
         if folder == "..":
             if folders_template:
-                folders_template = folders_template[:-1]  
+                folders_template = folders_template[:-1]
             else:
                 raise TemplateSyntaxError(
                     "Relative name '%s' have more parent folders, then given template name '%s'"
