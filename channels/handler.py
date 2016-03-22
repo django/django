@@ -11,6 +11,7 @@ from django import http
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
+from django.http import FileResponse
 from django.utils import six
 from django.utils.functional import cached_property
 
@@ -184,6 +185,9 @@ class AsgiHandler(base.BaseHandler):
         else:
             try:
                 response = self.get_response(request)
+                # Fix chunk size on file responses
+                if isinstance(response, FileResponse):
+                    response.block_size = 1024 * 512
             except AsgiRequest.ResponseLater:
                 # The view has promised something else
                 # will send a response at a later time
