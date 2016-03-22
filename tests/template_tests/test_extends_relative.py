@@ -58,3 +58,26 @@ class IncludeRelativeBehaviorTests(SimpleTestCase):
 
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.render_to_string('error_include.html')
+
+
+class ExtendsMixedBehaviorTests(SimpleTestCase):
+
+    def test_mixing1(self):
+        engine = Engine(dirs=[RELATIVE])
+        template = engine.get_template('dir1/two.html')
+        output = template.render(Context({}))
+        self.assertEqual(output.strip(), 'three two one dir2 one dir1 two')
+
+    def test_mixing2(self):
+        engine = Engine(dirs=[RELATIVE])
+        template = engine.get_template('dir1/three.html')
+        output = template.render(Context({}))
+        self.assertEqual(output.strip(), 'three dir1 three')
+
+    def test_mixing_loop(self):
+        engine = Engine(dirs=[RELATIVE])
+        msg = "Circular dependencies into relative path " \
+              "'\"./dir2/../looped.html\"'"
+
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            engine.render_to_string('dir1/looped.html')
