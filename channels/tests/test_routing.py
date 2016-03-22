@@ -230,3 +230,57 @@ class RoutingTests(SimpleTestCase):
             Router([
                 include("channels.tests.test_routing.chatroom_routing_noprefix", path="^/foobar/"),
             ])
+
+    def test_mixed_unicode_bytes(self):
+        """
+        Tests that having the message key be bytes and pattern unicode (or vice-versa)
+        still works.
+        """
+        # Unicode patterns, byte message
+        router = Router([
+            route("websocket.connect", consumer_1, path="^/foo/"),
+            include("channels.tests.test_routing.chatroom_routing", path="^/ws/v(?P<version>[0-9]+)"),
+        ])
+        self.assertRoute(
+            router,
+            channel="websocket.connect",
+            content={"path": b"/boom/"},
+            consumer=None,
+        )
+        self.assertRoute(
+            router,
+            channel="websocket.connect",
+            content={"path": b"/foo/"},
+            consumer=consumer_1,
+        )
+        self.assertRoute(
+            router,
+            channel="websocket.connect",
+            content={"path": b"/ws/v2/chat/django/"},
+            consumer=consumer_2,
+            kwargs={"version": "2", "room": "django"},
+        )
+        # Byte patterns, unicode message
+        router = Router([
+            route("websocket.connect", consumer_1, path=b"^/foo/"),
+            include("channels.tests.test_routing.chatroom_routing", path=b"^/ws/v(?P<version>[0-9]+)"),
+        ])
+        self.assertRoute(
+            router,
+            channel="websocket.connect",
+            content={"path": "/boom/"},
+            consumer=None,
+        )
+        self.assertRoute(
+            router,
+            channel="websocket.connect",
+            content={"path": "/foo/"},
+            consumer=consumer_1,
+        )
+        self.assertRoute(
+            router,
+            channel="websocket.connect",
+            content={"path": "/ws/v2/chat/django/"},
+            consumer=consumer_2,
+            kwargs={"version": "2", "room": "django"},
+        )

@@ -205,7 +205,10 @@ class Include(object):
 
     def __init__(self, routing, **kwargs):
         self.routing = Router.resolve_routing(routing)
-        self.prefixes = kwargs
+        self.prefixes = {
+            name: Router.normalise_re_arg(value)
+            for name, value in kwargs.items()
+        }
         # Sanity check prefix regexes
         for name, value in self.prefixes.items():
             if not value.startswith("^"):
