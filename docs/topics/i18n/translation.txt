@@ -730,6 +730,30 @@ will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
 compared to ``"\n  First sentence.\n  Second sentence.\n"``, if the ``trimmed``
 option had not been specified.
 
+The `force_escape` ``{% blocktrans %}`` option forces HTML escaping for
+translated content. The option should be used only when it is absolutely
+necessary, for instance in HTML tag attributes, so unescaped characters
+won't break your HTML layout. It behaves the same as if you applied
+:tfilter:`force_escape` filter, e.g.::
+
+    <a class="related-widget-wrapper-link change-related" id="change_id_{{ name }}"
+        data-href-template="{{ change_related_template_url }}?{{ url_params }}"
+        title="{% blocktrans force_escape %}Change selected {{ model }}{% endblocktrans %}">
+        <img src="{% static 'admin/img/icon-changelink.svg' %}" alt="{% trans 'Change' %}"/>
+    </a>
+
+for model with verbose name "B&B Hotel" will produce::
+
+    <a class="related-widget-wrapper-link change-related" id="change_id_bbhotel"
+        data-href-template="/admin/accomodation/bbhotel/__fk__/change/?_to_field=id&amp;_popup=1"
+        title="Change selected B&amp;B Hotel">
+        <img src="/static/admin/img/icon-changelink.svg" alt="Change"/>
+    </a>
+
+.. versionchanged:: 1.10
+
+    The ``force_escape`` option was added.
+
 String literals passed to tags and filters
 ------------------------------------------
 

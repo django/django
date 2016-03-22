@@ -7,6 +7,7 @@ from django.template import Library, Node, TemplateSyntaxError, Variable
 from django.template.base import TOKEN_TEXT, TOKEN_VAR, render_value_in_context
 from django.template.defaulttags import token_kwargs
 from django.utils import six, translation
+from django.utils.html import escape
 from django.utils.safestring import SafeData, mark_safe
 
 register = Library()
@@ -102,7 +103,8 @@ class TranslateNode(Node):
 class BlockTranslateNode(Node):
 
     def __init__(self, extra_context, singular, plural=None, countervar=None,
-            counter=None, message_context=None, trimmed=False, asvar=None):
+            counter=None, message_context=None, trimmed=False, asvar=None,
+            force_escape=None):
         self.extra_context = extra_context
         self.singular = singular
         self.plural = plural
@@ -111,6 +113,7 @@ class BlockTranslateNode(Node):
         self.message_context = message_context
         self.trimmed = trimmed
         self.asvar = asvar
+        self.force_escape = force_escape
 
     def render_token_list(self, tokens):
         result = []
@@ -164,6 +167,10 @@ class BlockTranslateNode(Node):
 
         data = {v: render_value(v) for v in vars}
         context.pop()
+        # Escape HTML characters only in translatable string, context
+        # already escaped in `render_value_in_context`.
+        if self.force_escape:
+            result = escape(result)
         try:
             result = result % data
         except (KeyError, ValueError):
@@ -173,6 +180,7 @@ class BlockTranslateNode(Node):
                     "string returned by gettext: %r using %r" % (result, data))
             with translation.override(None):
                 result = self.render(context, nested=True)
+
         if self.asvar:
             context[self.asvar] = result
             return ''
@@ -485,7 +493,7 @@ def do_block_translate(parser, token):
                     '"context" in %r tag expected '
                     'exactly one argument.') % bits[0]
                 six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
-        elif option == "trimmed":
+        elif option in ("trimmed", "force_escape"):
             value = True
         elif option == "asvar":
             try:
@@ -510,6 +518,7 @@ def do_block_translate(parser, token):
     extra_context = options.get('with', {})
 
     trimmed = options.get("trimmed", False)
+    force_escape = options.get("force_escape", False)
 
     singular = []
     plural = []
@@ -533,7 +542,7 @@ def do_block_translate(parser, token):
 
     return BlockTranslateNode(extra_context, singular, plural, countervar,
                               counter, message_context, trimmed=trimmed,
-                              asvar=asvar)
+                              asvar=asvar, force_escape=force_escape)
 
 
 @register.tag
