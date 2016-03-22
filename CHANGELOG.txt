@@ -1,3 +1,23 @@
+0.10.1 (2016-03-22)
+-------------------
+
+* Regular expressions for HTTP paths can now be Unicode under Python 3
+
+* route() and include() now importable directly from `channels`
+
+* FileResponse send speed improved for all code (previously just for staticfiles)
+
+
+0.10.0 (2016-03-21)
+-------------------
+
+* New routing system
+
+* Updated to match new ASGI single-reader-channel name spec
+
+* Updated to match new ASGI HTTP header encoding spec
+
+
 0.9.5 (2016-03-10)
 ------------------
 
