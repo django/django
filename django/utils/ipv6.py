@@ -54,7 +54,8 @@ def clean_ipv6_address(ip_str, unpack_ipv4=False,
 
     for index in range(len(hextets)):
         # Remove leading zeroes
-        hextets[index] = hextets[index].lstrip('0')
+        if '.' not in hextets[index]:
+            hextets[index] = hextets[index].lstrip('0')
         if not hextets[index]:
             hextets[index] = '0'
 
