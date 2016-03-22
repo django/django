@@ -251,23 +251,45 @@ def do_block(parser, token):
 
 def construct_relative_path(name, relative_name):
     """
-    Counts levels of parent folders in 'relative_name', and construct absolute template name relative given 'name'.
+    Construct absolute template name based on two chains of folders:
+    into 'relative_name' and 'name'
     """
     if not relative_name.startswith('"./'):
         # argument is variable or literal, that not contain relative path
         return relative_name
 
-    levels = len(relative_name.split('/')) - 2
-    folders = name.split('/')[:-1]
-    if levels > len(folders):
+    chain = relative_name.split('/')
+    result_template_name = chain[-1].rstrip('"')
+    folders_relative = chain[1:-1]
+    folders_template = name.split('/')[:-1]
+
+    for folder in folders_relative:
+
+        if folder == "..":
+            if folders_template:
+                folders_template = folders_template[:-1]  
+            else:
+                raise TemplateSyntaxError(
+                    "Relative name '%s' have more parent folders, then given template name '%s'"
+                    % (relative_name, name)
+                )
+
+        elif folder == ".":
+            pass
+
+        else:
+            folders_template.append(folder)
+
+    folders_template.append(result_template_name)
+    result_template_name = '/'.join(folders_template)
+
+    if name == result_template_name:
         raise TemplateSyntaxError(
-            "Relative name '%s' have more parent folders, then given template name '%s'"
+            "Circular dependencies: relative path '%s' was translated to template name '%s'"
             % (relative_name, name)
         )
 
-    result = folders[:len(folders) - levels]
-    result.append(relative_name.split('/')[-1].rstrip('"'))
-    return '"%s"' % '/'.join(result)
+    return '"%s"' % result_template_name
 
 
 @register.tag('extends')
