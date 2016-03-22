@@ -249,40 +249,24 @@ def do_block(parser, token):
     return BlockNode(block_name, nodelist)
 
 
-def count_parent_folders(relative_name):
-    # counts leading dots. this work like python import paths
-    # if ../ ./ style is prefered, just replace code, which counts 'levels' value
-    count = -1
-    for ch in relative_name[1:]:
-        if ch == '.':
-            count += 1
-        else:
-            break
-
-    return count
-
-
 def construct_relative_path(name, relative_name):
     """
     Counts levels of parent folders in 'relative_name', and construct absolute template name relative given 'name'.
     """
-    if not relative_name.startswith('"'):
-        # argument is variable
+    if not relative_name.startswith('"./'):
+        # argument is variable or literal, that not contain relative path
         return relative_name
 
-    levels = count_parent_folders(relative_name)
-    if levels < 0:
-        # relative_name not contain relative path
-        return relative_name
-
+    levels = len(relative_name.split('/')) - 2
     folders = name.split('/')[:-1]
     if levels > len(folders):
-        raise TemplateSyntaxError("Relative name '%s' have more parent folders, then given name '%s'"
+        raise TemplateSyntaxError(
+            "Relative name '%s' have more parent folders, then given template name '%s'"
             % (relative_name, name)
         )
 
     result = folders[:len(folders) - levels]
-    result.append(relative_name[levels + 2:-1])
+    result.append(relative_name.split('/')[-1].rstrip('"'))
     return '"%s"' % '/'.join(result)
 
 
