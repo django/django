@@ -81,6 +81,16 @@ class Router(object):
             ]
         return routing
 
+    @classmethod
+    def normalise_re_arg(cls, value):
+        """
+        Normalises regular expression patterns and string inputs to Unicode.
+        """
+        if isinstance(value, six.binary_type):
+            return value.decode("ascii")
+        else:
+            return value
+
 
 class Route(object):
     """
@@ -103,7 +113,7 @@ class Route(object):
         self.consumer = consumer
         # Compile filter regexes up front
         self.filters = {
-            name: re.compile(value)
+            name: re.compile(Router.normalise_re_arg(value))
             for name, value in kwargs.items()
         }
         # Check filters don't use positional groups
@@ -130,7 +140,7 @@ class Route(object):
         for name, value in self.filters.items():
             if name not in message:
                 return None
-            match = re.match(value, message[name])
+            match = value.match(Router.normalise_re_arg(message[name]))
             # Any match failure means we pass
             if match:
                 call_args.update(match.groupdict())
