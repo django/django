@@ -48,8 +48,10 @@ class MigrationLoader(object):
         if load:
             self.build_graph()
 
-    @classmethod
-    def migrations_module(cls, app_label):
+    def migrations_module(self, app_label):
+        if (self.connection is not None and
+                not self.connection.settings_dict.get('TEST', {}).get('MIGRATE', True)):
+            return None
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label]
         else:
