@@ -602,6 +602,7 @@ class CryptPasswordHasher(BasePasswordHasher):
         crypt = self._load_library()
         assert len(salt) == 2
         data = crypt.crypt(force_str(password), salt)
+        assert data is not None  # A platform like OpenBSD with a dummy crypt module.
         # we don't need to store the salt, but Django used to do this
         return "%s$%s$%s" % (self.algorithm, '', data)
 
