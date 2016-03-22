@@ -394,6 +394,9 @@ Tests
   and run selectively with the new :option:`test --tag` and :option:`test
   --exclude-tag` options.
 
+* Added the :setting:`DATABASES['TEST']['MIGRATE'] <TEST_MIGRATE>` option to
+  allow disabling of migrations during test database creation.
+
 URLs
 ~~~~
 

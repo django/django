@@ -710,6 +710,17 @@ The creation-order dependencies of the database. See the documentation
 on :ref:`controlling the creation order of test databases
 <topics-testing-creation-dependencies>` for details.
 
+.. setting:: TEST_MIGRATE
+
+``MIGRATE``
+^^^^^^^^^^^
+
+.. versionadded:: 1.10
+
+Default: ``True``
+
+If set to ``False``, Django won't use migrations to create the test database.
+
 .. setting:: TEST_MIRROR
 
 ``MIRROR``
