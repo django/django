@@ -76,8 +76,10 @@ class ExtendsMixedBehaviorTests(SimpleTestCase):
 
     def test_mixing_loop(self):
         engine = Engine(dirs=[RELATIVE])
-        msg = "Circular dependencies into relative path " \
-              "'\"./dir2/../looped.html\"'"
+        msg = "Circular dependencies: relative path " \
+              "'\"./dir2/../looped.html\"'" \
+              " was translated to template name " \
+              "'dir1/looped.html'" \
 
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.render_to_string('dir1/looped.html')
