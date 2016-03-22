@@ -496,6 +496,11 @@ Keys:
 
 * ``content``: Byte string of HTTP body content, will be concatenated onto
   previously received ``content`` values and ``body`` key in Request.
+  Not required if ``closed`` is True, required otherwise.
+
+* ``closed``: True if the client closed the connection prematurely and the
+  rest of the body. If you receive this, abandon processing of the HTTP request.
+  Optional, defaults to ``False``.
 
 * ``more_content``: Boolean value signifying if there is additional content
   to come (as part of a Request Body Chunk message). If ``False``, request will
