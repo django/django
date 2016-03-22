@@ -105,6 +105,8 @@ Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
 * Added support and translations for the Armenian language.
+* ``{% blocktrans %}`` template tag now has `force_escape` option to force HTML
+  escaping for translated content.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~

@@ -370,6 +370,22 @@ class TranslationBlockTransTagTests(SimpleTestCase):
             rendered = t.render(Context())
             self.assertEqual(rendered, '2 andere Super-Ergebnisse')
 
+            # Using 'force_escape'
+            t = Template(
+                '{% load i18n %}{% blocktrans force_escape %}'
+                '<b>"Escaped content" - {{ context }}, to try \'force_escape\' argument & check '
+                'for errors.</b>{% endblocktrans %}'
+            )
+            context = Context(
+                {'context': 'context is <i>already</i> "escaped"'}
+            )
+            rendered = t.render(context)
+            self.assertEqual(
+                rendered,
+                '&lt;b&gt;&quot;Escaped content&quot; - context is &lt;i&gt;already&lt;/i&gt; &quot;escaped&quot;, '
+                'to try &#39;force_escape&#39; argument &amp; check for errors.&lt;/b&gt;'
+            )
+
             # Misuses
             msg = "Unknown argument for 'blocktrans' tag: %r."
             with self.assertRaisesMessage(TemplateSyntaxError, msg % 'month="May"'):
