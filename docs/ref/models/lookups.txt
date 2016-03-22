@@ -94,6 +94,29 @@ following methods:
     ``compiler.compile(expression)`` should be used. The ``compiler.compile()``
     method will take care of calling vendor-specific methods of the expression.
 
+    Custom key-word arguments may be defined if it's likely that
+    ``as_vendorname`` methods or subclasses will need to supply data to override
+    the generation of the SQL string.
+
+    The following example is taken from the Django ConcatPair-expression that
+    shows the use of key-word arguments, defined by ``Func``, for overriding
+    ``as_sql``-methods.  By providing key-word arguments the ``as_mysql``
+    method is able to change the name of the function being called, as well as
+    the template used to generate the SQL string.
+
+    .. snippet::
+        :filename: django/db/models/functions.py
+
+        class ConcatPair(Func):
+            ...
+            function = 'CONCAT'
+            ...
+
+            def as_mysql(self, compiler, connection):
+                return super(ConcatPair, self).as_sql(
+                    compiler, connection, function='CONCAT_WS', template="%(function)s('', %(expressions)s)"
+                )
+
 .. method:: as_vendorname(self, compiler, connection)
 
     Works like ``as_sql()`` method. When an expression is compiled by

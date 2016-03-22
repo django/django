@@ -261,6 +261,18 @@ The ``Func`` API is as follows:
         different number of expressions, ``TypeError`` will be raised. Defaults
         to ``None``.
 
+    .. method:: as_sql(compiler, connection, function=None, template=None, arg_joiner=None, **extra_context)
+
+        .. versionchanged:: 1.10
+
+            Added support for key-word arguments.
+
+        Provides additional key-word arguments that allow users or subclasses
+        to override data used to construct the generated SQL string for this
+        particular invocation. Providing data at this time helps to prevent
+        mutating attributes on ``self`` in ``as_vendorname`` methods which can
+        affect future invocations on different backends.
+
 The ``*expressions`` argument is a list of positional expressions that the
 function will be applied to. The expressions will be converted to strings,
 joined together with ``arg_joiner``, and then interpolated into the ``template``
@@ -271,10 +283,11 @@ assumed to be column references and will be wrapped in ``F()`` expressions
 while other values will be wrapped in ``Value()`` expressions.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
-into the ``template`` attribute. Note that the keywords ``function`` and
-``template`` can be used to replace the ``function`` and ``template``
-attributes respectively, without having to define your own class.
-``output_field`` can be used to define the expected return type.
+into the ``template`` attribute. Note that the keywords ``function``,
+``template`` and ``arg_joiner`` can be used to replace the ``function``,
+``template`` and ``arg_joiner`` attributes respectively, without having to
+define your own class. ``output_field`` can be used to define the expected
+return type.
 
 ``Aggregate()`` expressions
 ---------------------------
@@ -560,7 +573,7 @@ an ``__init__()`` method to set some attributes::
   class Coalesce(Expression):
       template = 'COALESCE( %(expressions)s )'
 
-      def __init__(self, expressions, output_field, **extra):
+      def __init__(self, expressions, output_field):
         super(Coalesce, self).__init__(output_field=output_field)
         if len(expressions) < 2:
             raise ValueError('expressions must have at least 2 elements')
@@ -568,7 +581,6 @@ an ``__init__()`` method to set some attributes::
             if not hasattr(expression, 'resolve_expression'):
                 raise TypeError('%r is not an Expression' % expression)
         self.expressions = expressions
-        self.extra = extra
 
 We do some basic validation on the parameters, including requiring at least
 2 columns or values, and ensuring they are expressions. We are requiring
@@ -588,22 +600,30 @@ expressions::
 
 Next, we write the method responsible for generating the SQL::
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, template=None):
         sql_expressions, sql_params = [], []
         for expression in self.expressions:
             sql, params = compiler.compile(expression)
             sql_expressions.append(sql)
             sql_params.extend(params)
-        self.extra['expressions'] = ','.join(sql_expressions)
-        return self.template % self.extra, sql_params
+        template = template or self.template
+        data = {'expressions': ','.join(sql_expressions)}
+        return template % data, params
 
     def as_oracle(self, compiler, connection):
         """
         Example of vendor specific handling (Oracle in this case).
         Let's make the function name lowercase.
         """
-        self.template = 'coalesce( %(expressions)s )'
-        return self.as_sql(compiler, connection)
+        return self.as_sql(compiler, connection, template='coalesce( %(expressions)s )')
+
+``as_sql`` methods can support custom key-word arguments, allowing
+``as_vendorname`` methods to override data used to generate the SQL string.
+Allowing changes at run time via ``as_sql`` key-word arguments is preferable to
+mutating ``self`` within ``as_vendorname`` methods, because mutating ``self``
+can lead to errors when running on multiple database backends. If your class
+relies on class attributes to define data, consider allowing overrides in your
+``as_sql`` method.
 
 We generate the SQL for each of the ``expressions`` by using the
 ``compiler.compile()`` method, and join the result together with commas.

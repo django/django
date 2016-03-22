@@ -207,6 +207,10 @@ Database backends
 
 * Temporal data subtraction was unified on all backends.
 
+* Added key-word arguments to ``as_sql`` methods of various Expressions to
+  prevent mutating ``self``, which is not safe when using multiple database
+  backends.
+
 * If the database supports it, backends can set
   ``DatabaseFeatures.can_return_ids_from_bulk_insert=True`` and implement
   ``DatabaseOperations.fetch_returned_insert_ids()`` to set primary keys

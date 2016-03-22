@@ -26,8 +26,10 @@ class Coalesce(Func):
 
             expressions = [
                 ToNCLOB(expression) for expression in self.get_source_expressions()]
-            self.set_source_expressions(expressions)
-        return super(Coalesce, self).as_sql(compiler, connection)
+            clone = self.copy()
+            clone.set_source_expressions(expressions)
+            return super(Coalesce, clone).as_sql(compiler, connection)
+        return self.as_sql(compiler, connection)
 
 
 class ConcatPair(Func):
@@ -43,15 +45,15 @@ class ConcatPair(Func):
 
     def as_sqlite(self, compiler, connection):
         coalesced = self.coalesce()
-        coalesced.arg_joiner = ' || '
-        coalesced.template = '%(expressions)s'
-        return super(ConcatPair, coalesced).as_sql(compiler, connection)
+        return super(ConcatPair, coalesced).as_sql(
+            compiler, connection, template='%(expressions)s', arg_joiner=' || '
+        )
 
     def as_mysql(self, compiler, connection):
         # Use CONCAT_WS with an empty separator so that NULLs are ignored.
-        self.function = 'CONCAT_WS'
-        self.template = "%(function)s('', %(expressions)s)"
-        return super(ConcatPair, self).as_sql(compiler, connection)
+        return super(ConcatPair, self).as_sql(
+            compiler, connection, function='CONCAT_WS', template="%(function)s('', %(expressions)s)"
+        )
 
     def coalesce(self):
         # null on either side results in null for expression, wrap with coalesce
@@ -137,8 +139,7 @@ class Length(Transform):
         super(Length, self).__init__(expression, output_field=output_field, **extra)
 
     def as_mysql(self, compiler, connection):
-        self.function = 'CHAR_LENGTH'
-        return super(Length, self).as_sql(compiler, connection)
+        return super(Length, self).as_sql(compiler, connection, function='CHAR_LENGTH')
 
 
 class Lower(Transform):
@@ -158,8 +159,7 @@ class Now(Func):
         # Postgres' CURRENT_TIMESTAMP means "the time at the start of the
         # transaction". We use STATEMENT_TIMESTAMP to be cross-compatible with
         # other databases.
-        self.template = 'STATEMENT_TIMESTAMP()'
-        return self.as_sql(compiler, connection)
+        return self.as_sql(compiler, connection, template='STATEMENT_TIMESTAMP()')
 
 
 class Substr(Func):
@@ -183,12 +183,10 @@ class Substr(Func):
         super(Substr, self).__init__(*expressions, **extra)
 
     def as_sqlite(self, compiler, connection):
-        self.function = 'SUBSTR'
-        return super(Substr, self).as_sql(compiler, connection)
+        return super(Substr, self).as_sql(compiler, connection, function='SUBSTR')
 
     def as_oracle(self, compiler, connection):
-        self.function = 'SUBSTR'
-        return super(Substr, self).as_sql(compiler, connection)
+        return super(Substr, self).as_sql(compiler, connection, function='SUBSTR')
 
 
 class Upper(Transform):
