@@ -4,6 +4,7 @@ import cgi
 import codecs
 import logging
 import sys
+import traceback
 from io import BytesIO
 from threading import Lock
 
@@ -11,7 +12,7 @@ from django import http
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponseServerError
 from django.utils import six
 from django.utils.functional import cached_property
 
@@ -212,9 +213,18 @@ class AsgiHandler(base.BaseHandler):
         Propagates ResponseLater up into the higher handler method,
         processes everything else
         """
+        # ResponseLater needs to be bubbled up the stack
         if issubclass(exc_info[0], AsgiRequest.ResponseLater):
             raise
-        return super(AsgiHandler, self).handle_uncaught_exception(request, resolver, exc_info)
+        # There's no WSGI server to catch the exception further up if this fails,
+        # so translate it into a plain text response.
+        try:
+            return super(AsgiHandler, self).handle_uncaught_exception(request, resolver, exc_info)
+        except:
+            return HttpResponseServerError(
+                traceback.format_exc(),
+                content_type="text/plain",
+            )
 
     @classmethod
     def encode_response(cls, response):
