@@ -41,12 +41,12 @@ class TestUtilsIPv6(unittest.TestCase):
         self.assertFalse(is_valid_ipv6_address('::999.42.16.14'))
         self.assertFalse(is_valid_ipv6_address('::zzzz:0a0a'))
 
-    def test_cleanes_plain_address(self):
+    def test_cleans_plain_address(self):
         self.assertEqual(clean_ipv6_address('DEAD::0:BEEF'), 'dead::beef')
         self.assertEqual(clean_ipv6_address('2001:000:a:0000:0:fe:fe:beef'), '2001:0:a::fe:fe:beef')
         self.assertEqual(clean_ipv6_address('2001::a:0000:0:fe:fe:beef'), '2001:0:a::fe:fe:beef')
 
-    def test_cleanes_with_v4_mapping(self):
+    def test_cleans_with_v4_mapping(self):
         self.assertEqual(clean_ipv6_address('::ffff:0a0a:0a0a'), '::ffff:10.10.10.10')
         self.assertEqual(clean_ipv6_address('::ffff:1234:1234'), '::ffff:18.52.18.52')
         self.assertEqual(clean_ipv6_address('::ffff:18.52.18.52'), '::ffff:18.52.18.52')
