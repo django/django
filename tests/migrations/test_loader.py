@@ -208,7 +208,7 @@ class LoaderTests(TestCase):
     def test_disable_migrations(self):
         connections = ConnectionHandler({
             'default': {
-                'NAME': 'dummy',
+                'NAME': ':memory:',
                 'ENGINE': 'django.db.backends.sqlite3',
                 'TEST': {
                     'MIGRATE': False,
