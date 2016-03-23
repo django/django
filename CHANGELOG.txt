@@ -1,3 +1,13 @@
+0.10.2 (2016-03-23)
+-------------------
+
+* Regular expressions for routing include() can now be Unicode under Python 3
+
+* Last-resort error handling for HTTP request exceptions inside Django's core
+  code. If DEBUG is on, shows plain text tracebacks; if it is off, shows
+  "Internal Server Error".
+
+
 0.10.1 (2016-03-22)
 -------------------
 
