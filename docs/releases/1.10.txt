@@ -1008,3 +1008,5 @@ removed in Django 1.10 (please see the :ref:`deprecation timeline
 
 * The warning that :class:`~django.core.signing.Signer` issued when given an
   invalid separator is now a ``ValueError``.
+
+* The undocumented `xmlhttp` from `core.js` was removed.
