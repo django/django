@@ -249,6 +249,49 @@ def do_block(parser, token):
     return BlockNode(block_name, nodelist)
 
 
+def construct_relative_path(name, relative_name):
+    """
+    Construct absolute template name based on two chains of folders:
+    into 'relative_name' and 'name'
+    """
+    if not relative_name.startswith('"./'):
+        # argument is variable or literal, that not contain relative path
+        return relative_name
+
+    chain = relative_name.split('/')
+    result_template_name = chain[-1].rstrip('"')
+    folders_relative = chain[1:-1]
+    folders_template = name.split('/')[:-1]
+
+    for folder in folders_relative:
+
+        if folder == "..":
+            if folders_template:
+                folders_template = folders_template[:-1]
+            else:
+                raise TemplateSyntaxError(
+                    "Relative name '%s' have more parent folders, then given template name '%s'"
+                    % (relative_name, name)
+                )
+
+        elif folder == ".":
+            pass
+
+        else:
+            folders_template.append(folder)
+
+    folders_template.append(result_template_name)
+    result_template_name = '/'.join(folders_template)
+
+    if name == result_template_name:
+        raise TemplateSyntaxError(
+            "Circular dependencies: relative path '%s' was translated to template name '%s'"
+            % (relative_name, name)
+        )
+
+    return '"%s"' % result_template_name
+
+
 @register.tag('extends')
 def do_extends(parser, token):
     """
@@ -263,6 +306,8 @@ def do_extends(parser, token):
     bits = token.split_contents()
     if len(bits) != 2:
         raise TemplateSyntaxError("'%s' takes one argument" % bits[0])
+
+    bits[1] = construct_relative_path(parser.template_name, bits[1])
     parent_name = parser.compile_filter(bits[1])
     nodelist = parser.parse()
     if nodelist.get_nodes_by_type(ExtendsNode):
@@ -313,5 +358,7 @@ def do_include(parser, token):
         options[option] = value
     isolated_context = options.get('only', False)
     namemap = options.get('with', {})
+    bits[1] = construct_relative_path(parser.template_name, bits[1])
+
     return IncludeNode(parser.compile_filter(bits[1]), extra_context=namemap,
                        isolated_context=isolated_context)
