@@ -9,6 +9,7 @@ from io import BytesIO
 from threading import Lock
 
 from django import http
+from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
@@ -222,7 +223,7 @@ class AsgiHandler(base.BaseHandler):
             return super(AsgiHandler, self).handle_uncaught_exception(request, resolver, exc_info)
         except:
             return HttpResponseServerError(
-                traceback.format_exc(),
+                traceback.format_exc() if settings.DEBUG else "Internal Server Error",
                 content_type="text/plain",
             )
 
