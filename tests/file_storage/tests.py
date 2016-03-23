@@ -710,6 +710,16 @@ class FileFieldStorageTests(TestCase):
         self.assertEqual(list(obj.normal.chunks(chunk_size=2)), [b"co", b"nt", b"en", b"t"])
         obj.normal.close()
 
+    def test_filefield_write(self):
+        # Files can be written to
+        obj = Storage.objects.create(
+            normal=SimpleUploadedFile("rewritten.txt", b"content"))
+        with obj.normal as normal:
+            normal.open('wb')
+            normal.write(b"updated")
+        obj = Storage.objects.get()
+        self.assertEqual(obj.normal.read(), b"updated")
+
     def test_duplicate_filename(self):
         # Multiple files with the same name get _(7 random chars) appended to them.
         objs = [Storage() for i in range(2)]
