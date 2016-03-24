@@ -212,6 +212,26 @@ This tag can be used in two ways:
 
 See :ref:`template-inheritance` for more information.
 
+A string argument may be a relative path starting with ``./`` or ``../``. For
+example, assume the following directory structure::
+
+    dir1/
+        template.html
+        base2.html
+        my/
+            base3.html
+    base1.html
+
+In ``template.html``, the following paths would be valid::
+
+    {% extends "./base2.html" %}
+    {% extends "../base1.html" %}
+    {% extends "./my/base3.html" %}
+
+.. versionadded:: 1.10
+
+   The ability to use relative paths was added.
+
 .. templatetag:: filter
 
 ``filter``
@@ -662,6 +682,13 @@ in either single or double quotes.
 This example includes the contents of the template ``"foo/bar.html"``::
 
     {% include "foo/bar.html" %}
+
+A string argument may be a relative path starting with ``./`` or ``../`` as
+described in the :ttag:`extends` tag.
+
+.. versionadded:: 1.10
+
+   The ability to use a relative path was added.
 
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``::

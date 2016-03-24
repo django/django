@@ -451,6 +451,9 @@ Templates
 * The :func:`~django.template.context_processors.debug` context processor
   contains queries for all database aliases instead of only the default alias.
 
+* Added relative path support for string arguments of the :ttag:`extends` and
+  :ttag:`include` template tags.
+
 Tests
 ~~~~~
 
