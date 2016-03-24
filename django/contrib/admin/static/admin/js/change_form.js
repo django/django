@@ -12,14 +12,6 @@
                 showAddAnotherPopup(this);
             }
         });
-        $('.related-lookup').click(function(e) {
-            e.preventDefault();
-            var event = $.Event('django:lookup-related');
-            $(this).trigger(event);
-            if (!event.isDefaultPrevented()) {
-                showRelatedObjectLookupPopup(this);
-            }
-        });
 
         if (modelName) {
             $('form#' + modelName + '_form :input:visible:enabled:first').focus();

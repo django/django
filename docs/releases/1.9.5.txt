@@ -37,3 +37,6 @@ Bugfixes
 
 * Fixed a regression in ``CommonMiddleware`` that caused spurious warnings in
   logs on requests missing a trailing slash (:ticket:`26293`).
+
+* Restored the functionality of the admin's ``raw_id_fields`` in
+  ``list_editable`` (:ticket:`26387`).
