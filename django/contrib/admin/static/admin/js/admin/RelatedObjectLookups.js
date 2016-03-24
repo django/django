@@ -128,3 +128,12 @@ function dismissDeleteRelatedObjectPopup(win, objId) {
 // Kept for backward compatibility
 showAddAnotherPopup = showRelatedObjectPopup;
 dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
+
+django.jQuery(function($){
+    $(document).ready(function() {
+        $('.related-lookup').click(function(e) {
+            e.preventDefault();
+            showRelatedObjectLookupPopup(this);
+        });
+    });
+});

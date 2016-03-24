@@ -638,9 +638,9 @@ class ModelAdmin(BaseModelAdmin):
         extra = '' if settings.DEBUG else '.min'
         js = [
             'core.js',
-            'admin/RelatedObjectLookups.js',
             'jquery%s.js' % extra,
-            'jquery.init.js'
+            'jquery.init.js',
+            'admin/RelatedObjectLookups.js',
         ]
         if self.actions is not None:
             js.append('actions%s.js' % extra)
