@@ -4,6 +4,18 @@ Django Channels
 .. image:: https://api.travis-ci.org/andrewgodwin/channels.svg
     :target: https://travis-ci.org/andrewgodwin/channels
 
+.. image:: https://img.shields.io/pypi/dm/channels.svg
+    :target: https://pypi.python.org/pypi/channels
+    
+.. image:: https://readthedocs.org/projects/channels/badge/?version=latest
+    :target: http://channels.readthedocs.org/en/latest/?badge=latest
+    
+.. image:: https://img.shields.io/pypi/v/channels.svg
+    :target: https://pypi.python.org/pypi/channels
+
+.. image:: https://img.shields.io/pypi/l/channels.svg
+    :target: https://pypi.python.org/pypi/channels
+
 *(Note: Recent versions of Channels also need recent versions of Daphne,
 asgi_redis and asgiref, so make sure you update all at once)*
 
