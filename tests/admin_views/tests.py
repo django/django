@@ -4453,6 +4453,23 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(select.first_selected_option.text, '---------')
         self.assertEqual(select.first_selected_option.get_attribute('value'), '')
 
+    def test_list_editable_raw_id_fields(self):
+        parent = ParentWithUUIDPK.objects.create(title='test')
+        parent2 = ParentWithUUIDPK.objects.create(title='test2')
+        RelatedWithUUIDPKModel.objects.create(parent=parent)
+        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        change_url = reverse('admin:admin_views_relatedwithuuidpkmodel_changelist', current_app=site2.name)
+        self.selenium.get(self.live_server_url + change_url)
+        self.selenium.find_element_by_id('lookup_id_form-0-parent').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        # Select "parent2" in the popup.
+        self.selenium.find_element_by_link_text(str(parent2.pk)).click()
+        self.selenium.switch_to.window(self.selenium.window_handles[0])
+        # The newly selected pk should appear in the raw id input.
+        value = self.selenium.find_element_by_id('id_form-0-parent').get_attribute('value')
+        self.assertEqual(value, str(parent2.pk))
+
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
