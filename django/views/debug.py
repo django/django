@@ -71,6 +71,14 @@ def get_safe_settings():
     return settings_dict
 
 
+def get_safe_request_meta(meta):
+    "Returns a dictionary of the request.META, with sensitive request.META blurred out."
+    new_meta = {}
+    for k,v in meta.items():
+        new_meta[k] = cleanse_setting(k, v)
+    return new_meta
+
+
 def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
     """
     Create a technical server error response. The last three arguments are
@@ -290,6 +298,7 @@ class ExceptionReporter(object):
             'unicode_hint': unicode_hint,
             'frames': frames,
             'request': self.request,
+            'META': get_safe_request_meta(self.request.META),
             'filtered_POST': self.filter.get_post_parameters(self.request),
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
@@ -495,6 +504,7 @@ def technical_404_response(request, exception):
         'urlpatterns': tried,
         'reason': force_bytes(exception, errors='replace'),
         'request': request,
+        'META': get_safe_request_meta(request.META),
         'settings': get_safe_settings(),
         'raising_view_name': caller,
     })
@@ -995,7 +1005,7 @@ Exception Value: {{ exception_value|force_escape }}
       </tr>
     </thead>
     <tbody>
-      {% for var in request.META.items|dictsort:0 %}
+      {% for var in META.items|dictsort:0 %}
         <tr>
           <td>{{ var.0 }}</td>
           <td class="code"><pre>{{ var.1|pprint }}</pre></td>
@@ -1107,7 +1117,7 @@ FILES:{% for k, v in request.FILES.items %}
 COOKIES:{% for k, v in request.COOKIES.items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No cookie data{% endfor %}
 
-META:{% for k, v in request.META.items|dictsort:0 %}
+META:{% for k, v in META.items|dictsort:0 %}
 {{ k }} = {{ v|stringformat:"r" }}{% endfor %}
 {% else %}Request data not supplied
 {% endif %}
