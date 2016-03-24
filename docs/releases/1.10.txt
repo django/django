@@ -239,6 +239,10 @@ Forms
 * Form and widget ``Media`` is now served using
   :mod:`django.contrib.staticfiles` if installed.
 
+* Form now has the attribute :attr:`~django.forms.Form.use_required_attribute`.
+  When set to ``True``, required form fields will have the HTML attribute
+  ``required``.
+
 Generic Views
 ~~~~~~~~~~~~~
 

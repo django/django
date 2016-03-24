@@ -6,6 +6,7 @@ from .models import Author
 
 
 class AuthorForm(forms.ModelForm):
+    use_required_attribute = True  # RemovedInDjango20Warning
     name = forms.CharField()
     slug = forms.SlugField()
 
@@ -15,5 +16,6 @@ class AuthorForm(forms.ModelForm):
 
 
 class ContactForm(forms.Form):
+    use_required_attribute = True  # RemovedInDjango20Warning
     name = forms.CharField()
     message = forms.CharField(widget=forms.Textarea)

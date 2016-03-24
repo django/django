@@ -126,6 +126,7 @@ TestChoices = (
 
 
 class TestForm(Form):
+    use_required_attribute = True  # RemovedInDjango20Warning
     text = fields.CharField()
     email = fields.EmailField()
     value = fields.IntegerField()

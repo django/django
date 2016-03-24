@@ -24,6 +24,7 @@ ACTION_CHECKBOX_NAME = '_selected_action'
 
 
 class ActionForm(forms.Form):
+    use_required_attribute = True  # RemovedInDjango20Warning
     action = forms.ChoiceField(label=_('Action:'))
     select_across = forms.BooleanField(label='', required=False, initial=0,
         widget=forms.HiddenInput({'class': 'select-across'}))

@@ -63,6 +63,7 @@ class TemplateStringsTests(SimpleTestCase):
             self.skipTest("test doesn't apply to dummy backend")
 
         class TestForm(Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             test_field = CharField()
 
         media = Media(js=['my-script.js'])

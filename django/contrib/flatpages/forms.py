@@ -5,6 +5,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 
 class FlatpageForm(forms.ModelForm):
+    use_required_attribute = True  # RemovedInDjango20Warning
     url = forms.RegexField(
         label=_("URL"),
         max_length=100,

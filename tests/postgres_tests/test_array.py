@@ -693,15 +693,16 @@ class TestSplitFormField(PostgreSQLTestCase):
 
     def test_rendering(self):
         class SplitForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             array = SplitArrayField(forms.CharField(), size=3)
 
         self.assertHTMLEqual(str(SplitForm()), '''
             <tr>
                 <th><label for="id_array_0">Array:</label></th>
                 <td>
-                    <input id="id_array_0" name="array_0" type="text" />
-                    <input id="id_array_1" name="array_1" type="text" />
-                    <input id="id_array_2" name="array_2" type="text" />
+                    <input id="id_array_0" name="array_0" type="text" required />
+                    <input id="id_array_1" name="array_1" type="text" required />
+                    <input id="id_array_2" name="array_2" type="text" required />
                 </td>
             </tr>
         ''')

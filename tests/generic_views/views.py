@@ -121,6 +121,12 @@ class AuthorCreate(generic.CreateView):
     success_url = '/list/authors/'
     fields = '__all__'
 
+    # RemovedInDjango20Warning
+    def get_form_class(self):
+        form_class = super(AuthorCreate, self).get_form_class()
+        form_class.use_required_attribute = True
+        return form_class
+
 
 class SpecializedAuthorCreate(generic.CreateView):
     model = Author
@@ -152,6 +158,12 @@ class AuthorUpdate(generic.UpdateView):
     success_url = '/list/authors/'
     fields = '__all__'
 
+    # RemovedInDjango20Warning
+    def get_form_class(self):
+        form_class = super(AuthorUpdate, self).get_form_class()
+        form_class.use_required_attribute = True
+        return form_class
+
     def get_form(self, *args, **kwargs):
         self.get_form_called_count += 1
         return super(AuthorUpdate, self).get_form(*args, **kwargs)
@@ -160,6 +172,12 @@ class AuthorUpdate(generic.UpdateView):
 class OneAuthorUpdate(generic.UpdateView):
     success_url = '/list/authors/'
     fields = '__all__'
+
+    # RemovedInDjango20Warning
+    def get_form_class(self):
+        form_class = super(OneAuthorUpdate, self).get_form_class()
+        form_class.use_required_attribute = True
+        return form_class
 
     def get_object(self):
         return Author.objects.get(pk=1)

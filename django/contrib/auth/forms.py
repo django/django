@@ -65,6 +65,7 @@ class UserCreationForm(forms.ModelForm):
     A form that creates a user, with no privileges, from the given username and
     password.
     """
+    use_required_attribute = True  # RemovedInDjango20Warning
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
@@ -105,6 +106,7 @@ class UserCreationForm(forms.ModelForm):
 
 
 class UserChangeForm(forms.ModelForm):
+    use_required_attribute = True  # RemovedInDjango20Warning
     password = ReadOnlyPasswordHashField(label=_("Password"),
         help_text=_("Raw passwords are not stored, so there is no way to see "
                     "this user's password, but you can change the password "
@@ -132,6 +134,7 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
+    use_required_attribute = True  # RemovedInDjango20Warning
     username = forms.CharField(
         max_length=254,
         widget=forms.TextInput(attrs={'autofocus': ''}),
@@ -204,6 +207,7 @@ class AuthenticationForm(forms.Form):
 
 
 class PasswordResetForm(forms.Form):
+    use_required_attribute = True  # RemovedInDjango20Warning
     email = forms.EmailField(label=_("Email"), max_length=254)
 
     def send_mail(self, subject_template_name, email_template_name,
@@ -273,6 +277,7 @@ class SetPasswordForm(forms.Form):
     A form that lets a user change set their password without entering the old
     password
     """
+    use_required_attribute = True  # RemovedInDjango20Warning
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
@@ -342,6 +347,7 @@ class AdminPasswordChangeForm(forms.Form):
     """
     A form used to change the password of a user in the admin interface.
     """
+    use_required_attribute = True  # RemovedInDjango20Warning
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }

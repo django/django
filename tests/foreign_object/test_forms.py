@@ -10,6 +10,8 @@ class FormsTests(TestCase):
     # ForeignObjects should not have any form fields, currently the user needs
     # to manually deal with the foreignobject relation.
     class ArticleForm(forms.ModelForm):
+        use_required_attribute = True  # RemovedInDjango20Warning
+
         class Meta:
             model = Article
             fields = '__all__'
