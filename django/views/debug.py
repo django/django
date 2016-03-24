@@ -74,7 +74,7 @@ def get_safe_settings():
 def get_safe_request_meta(meta):
     "Returns a dictionary of the request.META, with sensitive request.META blurred out."
     new_meta = {}
-    for k,v in meta.items():
+    for k, v in meta.items():
         new_meta[k] = cleanse_setting(k, v)
     return new_meta
 
