@@ -212,6 +212,22 @@ This tag can be used in two ways:
 
 See :ref:`template-inheritance` for more information.
 
+Literal form (with quotes) can use relative path (started from ``./`` or ``../``).
+
+Extend "base.html":
+
+* ``{% extends "./base.html" %}`` located in the same folder,
+  where your template placed
+
+* ``{% extends "../../base.html" %}`` located at two levels higher
+
+* ``{% extends "./my/base.html" %}`` located in the 'my' directory,
+  relatively current template
+
+.. versionadded:: 1.10
+
+   The ability to use relative path in ``extends`` tag was added.
+
 .. templatetag:: filter
 
 ``filter``
@@ -640,6 +656,17 @@ in either single or double quotes.
 This example includes the contents of the template ``"foo/bar.html"``::
 
     {% include "foo/bar.html" %}
+
+You can use relative path (started from ``./``)
+
+This example includes the contents of the template, located at 
+two levels higher, relatively current template.  ``"bar.html"``::
+
+    {% include "./../../bar.html" %}
+
+.. versionadded:: 1.10
+
+   The ability to use relative path in ``include`` tag was added.
 
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``::

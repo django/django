@@ -227,6 +227,7 @@ class Template(object):
             tokens, self.engine.template_libraries, self.engine.template_builtins,
             self.origin,
         )
+        parser.template_name = self.origin.template_name
 
         try:
             return parser.parse()

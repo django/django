@@ -1,4 +1,5 @@
 import logging
+import posixpath
 from collections import defaultdict
 
 from django.utils import six
@@ -249,6 +250,39 @@ def do_block(parser, token):
     return BlockNode(block_name, nodelist)
 
 
+def construct_relative_path(name, relative_name):
+
+    if not any(map(lambda x: relative_name.startswith(x), [
+        "'./",
+        "'../",
+        '"./',
+        '"../',
+    ])):
+        # argument is variable or literal, that not contain relative path
+        return relative_name
+
+    new_name = posixpath.normpath(
+        posixpath.join(
+            posixpath.dirname(name.lstrip('/')),
+            relative_name.strip('\'"')
+        )
+    )
+
+    if new_name.startswith('../'):
+        raise TemplateSyntaxError(
+            "Relative name '%s' has more parent folders, then the template name %s in which the tag appears"
+            % (relative_name, name)
+        )
+
+    if name.lstrip('/') == new_name:
+        raise TemplateSyntaxError(
+            "Circular dependencies: relative path '%s' was translated to template name '%s'"
+            % (relative_name, name)
+        )
+
+    return '"%s"' % new_name
+
+
 @register.tag('extends')
 def do_extends(parser, token):
     """
@@ -263,6 +297,8 @@ def do_extends(parser, token):
     bits = token.split_contents()
     if len(bits) != 2:
         raise TemplateSyntaxError("'%s' takes one argument" % bits[0])
+
+    bits[1] = construct_relative_path(parser.template_name, bits[1])
     parent_name = parser.compile_filter(bits[1])
     nodelist = parser.parse()
     if nodelist.get_nodes_by_type(ExtendsNode):
@@ -313,5 +349,7 @@ def do_include(parser, token):
         options[option] = value
     isolated_context = options.get('only', False)
     namemap = options.get('with', {})
+    bits[1] = construct_relative_path(parser.template_name, bits[1])
+
     return IncludeNode(parser.compile_filter(bits[1]), extra_context=namemap,
                        isolated_context=isolated_context)
