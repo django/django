@@ -24,15 +24,11 @@ class TestRegistration(SimpleTestCase):
 
     def test_bare_registration(self):
         self.site.register(Person)
-        self.assertTrue(
-            isinstance(self.site._registry[Person], admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.site._registry[Person], admin.ModelAdmin)
 
     def test_registration_with_model_admin(self):
         self.site.register(Person, NameAdmin)
-        self.assertTrue(
-            isinstance(self.site._registry[Person], NameAdmin)
-        )
+        self.assertIsInstance(self.site._registry[Person], NameAdmin)
 
     def test_prevent_double_registration(self):
         self.site.register(Person)
@@ -44,22 +40,16 @@ class TestRegistration(SimpleTestCase):
         self.assertEqual(self.site._registry[Person].search_fields, ['name'])
 
     def test_star_star_overrides(self):
-        self.site.register(Person, NameAdmin,
-                           search_fields=["name"], list_display=['__str__'])
+        self.site.register(Person, NameAdmin, search_fields=["name"], list_display=['__str__'])
         self.assertEqual(self.site._registry[Person].search_fields, ['name'])
-        self.assertEqual(self.site._registry[Person].list_display,
-                         ['__str__'])
+        self.assertEqual(self.site._registry[Person].list_display, ['__str__'])
         self.assertTrue(self.site._registry[Person].save_on_top)
 
     def test_iterable_registration(self):
         self.site.register([Person, Place], search_fields=['name'])
-        self.assertTrue(
-            isinstance(self.site._registry[Person], admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.site._registry[Person], admin.ModelAdmin)
         self.assertEqual(self.site._registry[Person].search_fields, ['name'])
-        self.assertTrue(
-            isinstance(self.site._registry[Place], admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.site._registry[Place], admin.ModelAdmin)
         self.assertEqual(self.site._registry[Place].search_fields, ['name'])
 
     def test_abstract_model(self):
@@ -100,30 +90,18 @@ class TestRegistrationDecorator(SimpleTestCase):
 
     def test_basic_registration(self):
         register(Person)(NameAdmin)
-        self.assertTrue(
-            isinstance(self.default_site._registry[Person],
-                       admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.default_site._registry[Person], admin.ModelAdmin)
         self.default_site.unregister(Person)
 
     def test_custom_site_registration(self):
         register(Person, site=self.custom_site)(NameAdmin)
-        self.assertTrue(
-            isinstance(self.custom_site._registry[Person],
-                       admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.custom_site._registry[Person], admin.ModelAdmin)
 
     def test_multiple_registration(self):
         register(Traveler, Place)(NameAdmin)
-        self.assertTrue(
-            isinstance(self.default_site._registry[Traveler],
-                       admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.default_site._registry[Traveler], admin.ModelAdmin)
         self.default_site.unregister(Traveler)
-        self.assertTrue(
-            isinstance(self.default_site._registry[Place],
-                       admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.default_site._registry[Place], admin.ModelAdmin)
         self.default_site.unregister(Place)
 
     def test_wrapped_class_not_a_model_admin(self):
