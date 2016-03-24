@@ -384,6 +384,9 @@ Templates
 * Allowed :tfilter:`dictsort` to order a list of lists by an element at a
   specified index.
 
+* Added relative path support in :ttag:`extends` and :ttag:`include` template 
+  tags.
+
 Tests
 ~~~~~
 
