@@ -1,9 +1,7 @@
 """
 Classes that represent database functions.
 """
-from django.db.models import (
-    DateTimeField, Func, IntegerField, Transform, Value,
-)
+from django.db.models import Func, Transform, Value, fields
 
 
 class Coalesce(Func):
@@ -136,7 +134,7 @@ class Length(Transform):
     lookup_name = 'length'
 
     def __init__(self, expression, **extra):
-        output_field = extra.pop('output_field', IntegerField())
+        output_field = extra.pop('output_field', fields.IntegerField())
         super(Length, self).__init__(expression, output_field=output_field, **extra)
 
     def as_mysql(self, compiler, connection):
@@ -153,7 +151,7 @@ class Now(Func):
 
     def __init__(self, output_field=None, **extra):
         if output_field is None:
-            output_field = DateTimeField()
+            output_field = fields.DateTimeField()
         super(Now, self).__init__(output_field=output_field, **extra)
 
     def as_postgresql(self, compiler, connection):
