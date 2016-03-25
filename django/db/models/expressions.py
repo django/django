@@ -550,8 +550,8 @@ class Func(Expression):
         template = template or self.extra.get('template', self.template)
         return template % self.extra, params
 
-    def as_sqlite(self, *args, **kwargs):
-        sql, params = self.as_sql(*args, **kwargs)
+    def as_sqlite(self, compiler, connection):
+        sql, params = self.as_sql(compiler, connection)
         try:
             if self.output_field.get_internal_type() == 'DecimalField':
                 sql = 'CAST(%s AS NUMERIC)' % sql
