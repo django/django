@@ -31,5 +31,8 @@ class Poem(models.Model):
     poet = models.ForeignKey(Poet, models.CASCADE)
     name = models.CharField(max_length=100)
 
+    class Meta:
+        unique_together = ('poet', 'name')
+
     def __str__(self):
         return self.name
