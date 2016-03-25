@@ -15,7 +15,7 @@ from django.db.models.expressions import (
     RawSQL, Ref, Value, When,
 )
 from django.db.models.functions import (
-    Coalesce, Concat, Length, Lower, Substr, Upper,
+    Cast, Coalesce, Concat, Length, Lower, Substr, Upper,
 )
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
@@ -976,3 +976,27 @@ class ReprTests(TestCase):
         self.assertEqual(repr(StdDev('a')), "StdDev(F(a), sample=False)")
         self.assertEqual(repr(Sum('a')), "Sum(F(a))")
         self.assertEqual(repr(Variance('a', sample=True)), "Variance(F(a), sample=True)")
+
+
+class CastTests(TestCase):
+    @classmethod
+    def setUpTestData(self):
+        Number.objects.create(integer=1, float=1.0)
+
+    def test_cast_from_value(self):
+        numbers = Number.objects.annotate(
+            cast_integer=Cast(Value('0'), models.IntegerField()),
+        )
+        self.assertEqual(numbers.get().cast_integer, 0)
+
+    def test_cast_from_field(self):
+        numbers = Number.objects.annotate(
+            cast_string=Cast('integer', models.CharField(max_length=255)),
+        )
+        self.assertEqual(numbers.get().cast_string, '1')
+
+    def test_cast_from_python(self):
+        numbers = Number.objects.annotate(
+            cast_float=Cast(0, models.FloatField()),
+        )
+        self.assertEqual(numbers.get().cast_float, 0.0)
