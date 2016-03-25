@@ -294,7 +294,7 @@ file::
 
     >>> Author.objects.aggregate(average_rating=Avg('book__rating'))
 
-(The resulting dictionary will have a key called ``'average__rating'``. If no
+(The resulting dictionary will have a key called ``'average_rating'``. If no
 such alias were specified, it would be the rather long ``'book__rating__avg'``.)
 
 Aggregations and other ``QuerySet`` clauses
