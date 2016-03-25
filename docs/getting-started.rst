@@ -64,7 +64,7 @@ Here's what that looks like::
     # In routing.py
     from channels.routing import route
     channel_routing = [
-        route("http.request", "myproject.myapp.consumers.http_consumer"),
+        route("http.request", "myapp.consumers.http_consumer"),
     ]
 
 .. warning::
@@ -113,7 +113,7 @@ Hook it up to the ``websocket.receive`` channel like this::
 
     # In routing.py
     from channels.routing import route
-    from myproject.myapp.consumers import ws_message
+    from myapp.consumers import ws_message
 
     channel_routing = [
         route("websocket.receive", ws_message),
@@ -213,7 +213,7 @@ get the message. Here's all the code::
 And what our routing should look like in ``routing.py``::
 
     from channels.routing import route
-    from myproject.myapp.consumers import ws_add, ws_message, ws_disconnect
+    from myapp.consumers import ws_add, ws_message, ws_disconnect
 
     channel_routing = [
         route("websocket.connect", ws_add),
