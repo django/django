@@ -1232,13 +1232,6 @@ data = {
 }
 
 
-class Choice(Form):
-    choice = CharField()
-    votes = IntegerField()
-
-ChoiceFormSet = formset_factory(Choice)
-
-
 class FormsetAsFooTests(SimpleTestCase):
     def test_as_table(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
