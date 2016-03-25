@@ -842,8 +842,6 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
     Returns a FormSet class for the given Django model class.
     """
     meta = getattr(form, 'Meta', None)
-    if meta is None:
-        meta = type(str('Meta'), (object,), {})
     if (getattr(meta, 'fields', fields) is None and
             getattr(meta, 'exclude', exclude) is None):
         raise ImproperlyConfigured(
