@@ -9,11 +9,13 @@ from datetime import datetime, timedelta
 from unittest import TestCase
 
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.validators import (
-    BaseValidator, DecimalValidator, EmailValidator, MaxLengthValidator,
-    MaxValueValidator, MinLengthValidator, MinValueValidator, RegexValidator,
-    URLValidator, int_list_validator, validate_comma_separated_integer_list,
-    validate_email, validate_integer, validate_ipv4_address,
+    BaseValidator, DecimalValidator, EmailValidator, FileExtensionValidator,
+    MaxLengthValidator, MaxValueValidator, MinLengthValidator,
+    MinValueValidator, RegexValidator, URLValidator, int_list_validator,
+    validate_comma_separated_integer_list, validate_email,
+    validate_image_file_extension, validate_integer, validate_ipv4_address,
     validate_ipv6_address, validate_ipv46_address, validate_slug,
     validate_unicode_slug,
 )
@@ -242,6 +244,17 @@ TEST_DATA = [
     (RegexValidator('x', flags=re.IGNORECASE), 'y', ValidationError),
     (RegexValidator('a'), 'A', ValidationError),
     (RegexValidator('a', flags=re.IGNORECASE), 'A', None),
+
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithUnsupportedExt.jpg'), ValidationError),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithNoExtenstion'), ValidationError),
+    (FileExtensionValidator([]), ContentFile('contents', name='file.txt'), ValidationError),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='file.txt'), None),
+    (FileExtensionValidator(), ContentFile('contents', name='file.jpg'), None),
+
+    (validate_image_file_extension, ContentFile('contents', name='file.jpg'), None),
+    (validate_image_file_extension, ContentFile('contents', name='file.png'), None),
+    (validate_image_file_extension, ContentFile('contents', name='file.txt'), ValidationError),
+    (validate_image_file_extension, ContentFile('contents', name='file'), ValidationError),
 ]
 
 
@@ -421,4 +434,34 @@ class TestValidatorEquality(TestCase):
         self.assertNotEqual(
             DecimalValidator(1, 2),
             MinValueValidator(11),
+        )
+
+    def test_file_extension_equality(self):
+        self.assertEqual(
+            FileExtensionValidator(),
+            FileExtensionValidator()
+        )
+        self.assertEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['txt'])
+        )
+        self.assertEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['txt'], code='invalid_extension')
+        )
+        self.assertNotEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['png'])
+        )
+        self.assertNotEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['png', 'jpg'])
+        )
+        self.assertNotEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['txt'], code='custom_code')
+        )
+        self.assertNotEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['txt'], message='custom error message')
         )
