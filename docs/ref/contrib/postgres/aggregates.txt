@@ -118,7 +118,7 @@ field or an expression returning a numeric data. Both are required.
 
 .. class:: RegrAvgY(y, x)
 
-    Returns the average of the independent variable (``sum(y)/N``) as a
+    Returns the average of the dependent variable (``sum(y)/N``) as a
     ``float``, or ``None`` if there aren't any matching rows.
 
 ``RegrCount``
