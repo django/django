@@ -34,7 +34,7 @@ class TestNoFilesCreated(object):
         self.assertEqual(os.listdir(settings.STATIC_ROOT), [])
 
 
-class TestFindStatic(CollectionTestCase, TestDefaults):
+class TestFindStatic(TestDefaults, CollectionTestCase):
     """
     Test ``findstatic`` management command.
     """
@@ -134,7 +134,7 @@ class TestCollectionHelpSubcommand(AdminScriptTestCase):
         self.assertNoOutput(err)
 
 
-class TestCollection(CollectionTestCase, TestDefaults):
+class TestCollection(TestDefaults, CollectionTestCase):
     """
     Test ``collectstatic`` management command.
     """
@@ -176,7 +176,7 @@ class TestCollectionClear(CollectionTestCase):
         self.assertFileNotFound('cleared.txt')
 
 
-class TestCollectionExcludeNoDefaultIgnore(CollectionTestCase, TestDefaults):
+class TestCollectionExcludeNoDefaultIgnore(TestDefaults, CollectionTestCase):
     """
     Test ``--exclude-dirs`` and ``--no-default-ignore`` options of the
     ``collectstatic`` management command.
@@ -195,7 +195,7 @@ class TestCollectionExcludeNoDefaultIgnore(CollectionTestCase, TestDefaults):
         self.assertFileContains('test/CVS', 'should be ignored')
 
 
-class TestCollectionDryRun(CollectionTestCase, TestNoFilesCreated):
+class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
     """
     Test ``--dry-run`` option for ``collectstatic`` management command.
     """
@@ -316,7 +316,7 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage')
-class TestCollectionNonLocalStorage(CollectionTestCase, TestNoFilesCreated):
+class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
     """
     Tests for #15035
     """
@@ -324,7 +324,7 @@ class TestCollectionNonLocalStorage(CollectionTestCase, TestNoFilesCreated):
 
 
 @unittest.skipUnless(symlinks_supported(), "Must be able to symlink to run this test.")
-class TestCollectionLinks(CollectionTestCase, TestDefaults):
+class TestCollectionLinks(TestDefaults, CollectionTestCase):
     """
     Test ``--link`` option for ``collectstatic`` management command.
 

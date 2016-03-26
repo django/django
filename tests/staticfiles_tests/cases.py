@@ -16,7 +16,7 @@ from django.utils.encoding import force_text
 from .settings import TEST_SETTINGS
 
 
-class BaseStaticFilesTestCase(object):
+class BaseStaticFilesMixin(object):
     """
     Test case with a couple utility assertions.
     """
@@ -52,11 +52,12 @@ class BaseStaticFilesTestCase(object):
 
 
 @override_settings(**TEST_SETTINGS)
-class StaticFilesTestCase(BaseStaticFilesTestCase, SimpleTestCase):
+class StaticFilesTestCase(BaseStaticFilesMixin, SimpleTestCase):
     pass
 
 
-class BaseCollectionTestCase(BaseStaticFilesTestCase):
+@override_settings(**TEST_SETTINGS)
+class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
     """
     Tests shared by all file finding features (collectstatic,
     findstatic, and static serve view).
@@ -66,7 +67,7 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
     all these tests.
     """
     def setUp(self):
-        super(BaseCollectionTestCase, self).setUp()
+        super(CollectionTestCase, self).setUp()
         temp_dir = tempfile.mkdtemp()
         # Override the STATIC_ROOT for all tests from setUp to tearDown
         # rather than as a context manager
@@ -78,7 +79,7 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
 
     def tearDown(self):
         self.patched_settings.disable()
-        super(BaseCollectionTestCase, self).tearDown()
+        super(CollectionTestCase, self).tearDown()
 
     def run_collectstatic(self, **kwargs):
         call_command('collectstatic', interactive=False, verbosity=0,
@@ -89,10 +90,6 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
         filepath = os.path.join(settings.STATIC_ROOT, filepath)
         with codecs.open(filepath, "r", "utf-8") as f:
             return f.read()
-
-
-class CollectionTestCase(BaseCollectionTestCase, StaticFilesTestCase):
-    pass
 
 
 class TestDefaults(object):

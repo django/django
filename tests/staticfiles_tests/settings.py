@@ -7,7 +7,6 @@ from django.utils._os import upath
 TEST_ROOT = os.path.dirname(upath(__file__))
 
 TEST_SETTINGS = {
-    'DEBUG': True,
     'MEDIA_URL': '/media/',
     'STATIC_URL': '/static/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),

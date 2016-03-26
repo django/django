@@ -11,7 +11,7 @@ from .cases import StaticFilesTestCase
 from .settings import TEST_ROOT
 
 
-class FinderTestCase(object):
+class TestFinders(object):
     """
     Base finder test mixin.
 
@@ -32,7 +32,7 @@ class FinderTestCase(object):
         self.assertEqual(found, dst)
 
 
-class TestFileSystemFinder(StaticFilesTestCase, FinderTestCase):
+class TestFileSystemFinder(TestFinders, StaticFilesTestCase):
     """
     Test FileSystemFinder.
     """
@@ -44,7 +44,7 @@ class TestFileSystemFinder(StaticFilesTestCase, FinderTestCase):
         self.find_all = (os.path.join('test', 'file.txt'), [test_file_path])
 
 
-class TestAppDirectoriesFinder(StaticFilesTestCase, FinderTestCase):
+class TestAppDirectoriesFinder(TestFinders, StaticFilesTestCase):
     """
     Test AppDirectoriesFinder.
     """
@@ -56,7 +56,7 @@ class TestAppDirectoriesFinder(StaticFilesTestCase, FinderTestCase):
         self.find_all = (os.path.join('test', 'file1.txt'), [test_file_path])
 
 
-class TestDefaultStorageFinder(StaticFilesTestCase, FinderTestCase):
+class TestDefaultStorageFinder(TestFinders, StaticFilesTestCase):
     """
     Test DefaultStorageFinder.
     """
