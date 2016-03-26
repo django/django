@@ -33,14 +33,15 @@ class TestServeDisabled(TestServeStatic):
         self.assertFileNotFound('test.txt')
 
 
-class TestServeStaticWithDefaultURL(TestServeStatic, TestDefaults):
+@override_settings(DEBUG=True)
+class TestServeStaticWithDefaultURL(TestDefaults, TestServeStatic):
     """
     Test static asset serving view with manually configured URLconf.
     """
 
 
-@override_settings(ROOT_URLCONF='staticfiles_tests.urls.helper')
-class TestServeStaticWithURLHelper(TestServeStatic, TestDefaults):
+@override_settings(DEBUG=True, ROOT_URLCONF='staticfiles_tests.urls.helper')
+class TestServeStaticWithURLHelper(TestDefaults, TestServeStatic):
     """
     Test static asset serving view with staticfiles_urlpatterns helper.
     """
