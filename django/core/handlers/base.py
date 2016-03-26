@@ -169,7 +169,7 @@ class BaseHandler(object):
         self._response_middleware = []
         self._exception_middleware = []
 
-        #settings.MIDDLEWARE = settings.MIDDLEWARE_CLASSES
+        # settings.MIDDLEWARE = settings.MIDDLEWARE_CLASSES
         if settings.MIDDLEWARE is None:
             handler = self._legacy_get_response
             self._legacy_load_middleware()
