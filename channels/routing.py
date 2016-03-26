@@ -24,7 +24,11 @@ class Router(object):
         # Expand those entries recursively into a flat list of Routes
         self.routing = []
         for entry in routing:
-            self.routing.extend(entry.expand_routes())
+            try:
+                self.routing.extend(entry.expand_routes())
+            except AttributeError:
+                # It's not a valid route
+                raise ValueError("Encountered %r in routing config, which is not a valid route() or include()" % entry)
         # Now go through that list and collect channel names into a set
         self.channels = {
             route.channel
