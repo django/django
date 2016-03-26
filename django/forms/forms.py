@@ -365,13 +365,14 @@ class BaseForm(object):
 
     def _clean_fields(self):
         for name, field in self.fields.items():
+            if field.disabled:
+                # Initial values are supposed to be clean
+                self.cleaned_data[name] = self.initial.get(name, field.initial)
+                continue
             # value_from_datadict() gets the data from the data dictionaries.
             # Each widget type knows how to retrieve its own data, because some
             # widgets split data over several HTML fields.
-            if field.disabled:
-                value = self.initial.get(name, field.initial)
-            else:
-                value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
+            value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
             try:
                 if isinstance(field, FileField):
                     initial = self.initial.get(name, field.initial)
