@@ -110,7 +110,17 @@ class UserProxy(User):
         proxy = True
 
 
+class AnotherUserProxy(User):
+    class Meta:
+        proxy = True
+
+
 class UserProxyProxy(UserProxy):
+    class Meta:
+        proxy = True
+
+
+class MultiUserProxy(UserProxy, AnotherUserProxy):
     class Meta:
         proxy = True
 
