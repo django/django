@@ -359,6 +359,9 @@ Models
 
 * Added the :class:`~django.db.models.functions.Cast` database function.
 
+* A proxy model can now inherit multiple proxy model classes, if they all
+  share a common non-abstract parent class.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
