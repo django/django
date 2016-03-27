@@ -5,10 +5,11 @@ objects corresponding to geographic model fields.
 
 Thanks to Robert Coup for providing this functionality (see #4322).
 """
+from django.db.models.query_utils import DeferredAttribute
 from django.utils import six
 
 
-class SpatialProxy(object):
+class SpatialProxy(DeferredAttribute):
     def __init__(self, klass, field):
         """
         Proxy initializes on the given Geometry or Raster class (not an instance)
@@ -16,6 +17,7 @@ class SpatialProxy(object):
         """
         self._field = field
         self._klass = klass
+        super(SpatialProxy, self).__init__(field.attname, klass)
 
     def __get__(self, instance, cls=None):
         """
@@ -29,7 +31,10 @@ class SpatialProxy(object):
             return self
 
         # Getting the value of the field.
-        geo_value = instance.__dict__[self._field.attname]
+        try:
+            geo_value = instance.__dict__[self._field.attname]
+        except KeyError:
+            geo_value = super(SpatialProxy, self).__get__(instance, cls)
 
         if isinstance(geo_value, self._klass):
             geo_obj = geo_value

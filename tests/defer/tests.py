@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.db.models.query_utils import DeferredAttribute, InvalidQuery
+from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase
 
 from .models import (
@@ -15,10 +15,7 @@ class AssertionMixin(object):
         we examine attribute values. Therefore, this method returns the number
         of deferred fields on returned instances.
         """
-        count = 0
-        for field in obj._meta.fields:
-            if isinstance(obj.__class__.__dict__.get(field.attname), DeferredAttribute):
-                count += 1
+        count = len(obj.get_deferred_fields())
         self.assertEqual(count, num)
 
 
@@ -45,7 +42,9 @@ class DeferTests(AssertionMixin, TestCase):
         # of them except the model's primary key see #15494
         self.assert_delayed(qs.only("pk")[0], 3)
         # You can use 'pk' with reverse foreign key lookups.
-        self.assert_delayed(self.s1.primary_set.all().only('pk')[0], 3)
+        # We automatically set the related_id (even if we didn't fetch it from DB!),
+        # so pk and related_id are not deferred.
+        self.assert_delayed(self.s1.primary_set.all().only('pk')[0], 2)
 
     def test_defer_only_chaining(self):
         qs = Primary.objects.all()

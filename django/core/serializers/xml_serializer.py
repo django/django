@@ -52,7 +52,7 @@ class Serializer(base.Serializer):
             raise base.SerializationError("Non-model object (%s) encountered during serialization" % type(obj))
 
         self.indent(1)
-        model = obj._meta.proxy_for_model if obj._deferred else obj.__class__
+        model = obj.__class__
         attrs = OrderedDict([("model", smart_text(model._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
             obj_pk = obj._get_pk_val()

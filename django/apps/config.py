@@ -165,8 +165,7 @@ class AppConfig(object):
             raise LookupError(
                 "App '%s' doesn't have a '%s' model." % (self.label, model_name))
 
-    def get_models(self, include_auto_created=False,
-                   include_deferred=False, include_swapped=False):
+    def get_models(self, include_auto_created=False, include_swapped=False):
         """
         Returns an iterable of models.
 
@@ -182,8 +181,6 @@ class AppConfig(object):
         """
         self.check_models_ready()
         for model in self.models.values():
-            if model._deferred and not include_deferred:
-                continue
             if model._meta.auto_created and not include_auto_created:
                 continue
             if model._meta.swapped and not include_swapped:

@@ -11,7 +11,6 @@ import inspect
 from collections import namedtuple
 
 from django.core.exceptions import FieldDoesNotExist
-from django.db.backends import utils
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 
@@ -126,8 +125,9 @@ class DeferredAttribute(object):
         Retrieves and caches the value from the datastore on the first lookup.
         Returns the cached value.
         """
-        non_deferred_model = instance._meta.proxy_for_model
-        opts = non_deferred_model._meta
+        if instance is None:
+            return
+        opts = instance._meta
 
         assert instance is not None
         data = instance.__dict__
@@ -147,13 +147,6 @@ class DeferredAttribute(object):
                 val = getattr(instance, self.field_name)
             data[self.field_name] = val
         return data[self.field_name]
-
-    def __set__(self, instance, value):
-        """
-        Deferred loading attributes can be set normally (which means there will
-        never be a database lookup involved.
-        """
-        instance.__dict__[self.field_name] = value
 
     def _check_parent_chain(self, instance, name):
         """
@@ -258,48 +251,6 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
                                    (field.model._meta.object_name, field.name))
             return False
     return True
-
-
-# This function is needed because data descriptors must be defined on a class
-# object, not an instance, to have any effect.
-
-def deferred_class_factory(model, attrs):
-    """
-    Returns a class object that is a copy of "model" with the specified "attrs"
-    being replaced with DeferredAttribute objects. The "pk_value" ties the
-    deferred attributes to a particular instance of the model.
-    """
-    if not attrs:
-        return model
-    opts = model._meta
-    # Never create deferred models based on deferred model
-    if model._deferred:
-        # Deferred models are proxies for the non-deferred model. We never
-        # create chains of defers => proxy_for_model is the non-deferred
-        # model.
-        model = opts.proxy_for_model
-    # The app registry wants a unique name for each model, otherwise the new
-    # class won't be created (we get an exception). Therefore, we generate
-    # the name using the passed in attrs. It's OK to reuse an existing class
-    # object if the attrs are identical.
-    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(attrs)))
-    name = utils.truncate_name(name, 80, 32)
-
-    try:
-        return opts.apps.get_model(model._meta.app_label, name)
-
-    except LookupError:
-
-        class Meta:
-            proxy = True
-            apps = opts.apps
-            app_label = opts.app_label
-
-        overrides = {attr: DeferredAttribute(attr, model) for attr in attrs}
-        overrides["Meta"] = Meta
-        overrides["__module__"] = model.__module__
-        overrides["_deferred"] = True
-        return type(str(name), (model,), overrides)
 
 
 def refs_aggregate(lookup_parts, aggregates):

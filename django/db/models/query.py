@@ -19,7 +19,7 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import F, Date, DateTime
 from django.db.models.fields import AutoField
 from django.db.models.query_utils import (
-    Q, InvalidQuery, check_rel_lookup_compatibility, deferred_class_factory,
+    Q, InvalidQuery, check_rel_lookup_compatibility
 )
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
@@ -60,11 +60,6 @@ class ModelIterable(BaseIterable):
         model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
         init_list = [f[0].target.attname
                      for f in select[model_fields_start:model_fields_end]]
-        if len(init_list) != len(model_cls._meta.concrete_fields):
-            init_set = set(init_list)
-            skip = [f.attname for f in model_cls._meta.concrete_fields
-                    if f.attname not in init_set]
-            model_cls = deferred_class_factory(model_cls, skip)
         related_populators = get_related_populators(klass_info, select, db)
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
@@ -1254,9 +1249,7 @@ class RawQuerySet(object):
             if skip:
                 if self.model._meta.pk.attname in skip:
                     raise InvalidQuery('Raw query must include the primary key')
-                model_cls = deferred_class_factory(self.model, skip)
-            else:
-                model_cls = self.model
+            model_cls = self.model
             fields = [self.model_fields.get(c) for c in self.columns]
             converters = compiler.get_converters([
                 f.get_col(f.model._meta.db_table) if f else None for f in fields
@@ -1732,13 +1725,6 @@ class RelatedPopulator(object):
 
     def get_deferred_cls(self, klass_info, init_list):
         model_cls = klass_info['model']
-        if len(init_list) != len(model_cls._meta.concrete_fields):
-            init_set = set(init_list)
-            skip = [
-                f.attname for f in model_cls._meta.concrete_fields
-                if f.attname not in init_set
-            ]
-            model_cls = deferred_class_factory(model_cls, skip)
         return model_cls
 
     def populate(self, row, from_obj):

@@ -156,8 +156,7 @@ class Apps(object):
 
     # This method is performance-critical at least for Django's test suite.
     @lru_cache.lru_cache(maxsize=None)
-    def get_models(self, include_auto_created=False,
-                   include_deferred=False, include_swapped=False):
+    def get_models(self, include_auto_created=False, include_swapped=False):
         """
         Returns a list of all installed models.
 
@@ -175,7 +174,7 @@ class Apps(object):
         result = []
         for app_config in self.app_configs.values():
             result.extend(list(app_config.get_models(
-                include_auto_created, include_deferred, include_swapped)))
+                include_auto_created, include_swapped)))
         return result
 
     def get_model(self, app_label, model_name=None):

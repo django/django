@@ -27,9 +27,6 @@ from django.db.models.fields.related import (
 from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
 from django.db.models.query import Q
-from django.db.models.query_utils import (
-    DeferredAttribute, deferred_class_factory,
-)
 from django.db.models.utils import make_model_tuple
 from django.utils import six
 from django.utils.encoding import force_str, force_text
@@ -38,6 +35,12 @@ from django.utils.six.moves import zip
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_version
+
+DEFERRED = object()
+
+
+class Empty(object):
+    pass
 
 
 def subclass_exception(name, parents, module, attached_to=None):
@@ -369,11 +372,15 @@ class Model(six.with_metaclass(ModelBase)):
             # is *not* consumed. We rely on this, so don't change the order
             # without changing the logic.
             for val, field in zip(args, fields_iter):
+                if val is DEFERRED:
+                    continue
                 setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
             fields_iter = iter(self._meta.fields)
             for val, field in zip(args, fields_iter):
+                if val is DEFERRED:
+                    continue
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
                 # Maintain compatibility with existing calls.
@@ -385,13 +392,8 @@ class Model(six.with_metaclass(ModelBase)):
 
         for field in fields_iter:
             is_related_object = False
-            # This slightly odd construct is so that we can access any
-            # data-descriptor object (DeferredAttribute) without triggering its
-            # __get__ method.
-            if (field.attname not in kwargs and
-                    (isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)
-                     or field.column is None)):
-                # This field will be populated on request.
+            # Virtual field
+            if field.attname not in kwargs and field.column is None:
                 continue
             if kwargs:
                 if isinstance(field.remote_field, ForeignObjectRel):
@@ -427,15 +429,18 @@ class Model(six.with_metaclass(ModelBase)):
                 # field.name instead of field.attname (e.g. "user" instead of
                 # "user_id") so that the object gets properly cached (and type
                 # checked) by the RelatedObjectDescriptor.
-                setattr(self, field.name, rel_obj)
+                if rel_obj is not DEFERRED:
+                    setattr(self, field.name, rel_obj)
             else:
-                setattr(self, field.attname, val)
+                if val is not DEFERRED:
+                    setattr(self, field.attname, val)
 
         if kwargs:
             for prop in list(kwargs):
                 try:
                     if isinstance(getattr(self.__class__, prop), property):
-                        setattr(self, prop, kwargs[prop])
+                        if kwargs[prop] is not DEFERRED:
+                            setattr(self, prop, kwargs[prop])
                         del kwargs[prop]
                 except AttributeError:
                     pass
@@ -446,10 +451,12 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def from_db(cls, db, field_names, values):
-        if cls._deferred:
-            new = cls(**dict(zip(field_names, values)))
-        else:
-            new = cls(*values)
+        # TODO - make QuerySet iterator fill the missing fields.
+        if len(values) != len(cls._meta.concrete_fields):
+            values = list(values)
+            values.reverse()
+            values = [values.pop() if f.attname in field_names else DEFERRED for f in cls._meta.concrete_fields]
+        new = cls(*values)
         new._state.adding = False
         new._state.db = db
         return new
@@ -493,17 +500,8 @@ class Model(six.with_metaclass(ModelBase)):
         """
         data = self.__dict__
         data[DJANGO_VERSION_PICKLE_KEY] = get_version()
-        if not self._deferred:
-            class_id = self._meta.app_label, self._meta.object_name
-            return model_unpickle, (class_id, [], simple_class_factory), data
-        defers = []
-        for field in self._meta.fields:
-            if isinstance(self.__class__.__dict__.get(field.attname),
-                          DeferredAttribute):
-                defers.append(field.attname)
-        model = self._meta.proxy_for_model
-        class_id = model._meta.app_label, model._meta.object_name
-        return (model_unpickle, (class_id, defers, deferred_class_factory), data)
+        class_id = self._meta.app_label, self._meta.object_name
+        return model_unpickle, (class_id,), data
 
     def __setstate__(self, state):
         msg = None
@@ -538,7 +536,7 @@ class Model(six.with_metaclass(ModelBase)):
         """
         return {
             f.attname for f in self._meta.concrete_fields
-            if isinstance(self.__class__.__dict__.get(f.attname), DeferredAttribute)
+            if f.attname not in self.__dict__
         }
 
     def refresh_from_db(self, using=None, fields=None, **kwargs):
@@ -565,18 +563,15 @@ class Model(six.with_metaclass(ModelBase)):
                     'are not allowed in fields.' % LOOKUP_SEP)
 
         db = using if using is not None else self._state.db
-        if self._deferred:
-            non_deferred_model = self._meta.proxy_for_model
-        else:
-            non_deferred_model = self.__class__
-        db_instance_qs = non_deferred_model._default_manager.using(db).filter(pk=self.pk)
+        model = self.__class__
+        db_instance_qs = model._default_manager.using(db).filter(pk=self.pk)
 
         # Use provided fields, if not set then reload all non-deferred fields.
+        deferred_fields = self.get_deferred_fields()
         if fields is not None:
             fields = list(fields)
             db_instance_qs = db_instance_qs.only(*fields)
-        elif self._deferred:
-            deferred_fields = self.get_deferred_fields()
+        elif deferred_fields:
             fields = [f.attname for f in self._meta.concrete_fields
                       if f.attname not in deferred_fields]
             db_instance_qs = db_instance_qs.only(*fields)
@@ -655,6 +650,7 @@ class Model(six.with_metaclass(ModelBase)):
         if force_insert and (force_update or update_fields):
             raise ValueError("Cannot force both insert and updating in model saving.")
 
+        deferred_fields = self.get_deferred_fields()
         if update_fields is not None:
             # If update_fields is empty, skip the save. We do also check for
             # no-op saves later on for inheritance cases. This bailout is
@@ -681,17 +677,11 @@ class Model(six.with_metaclass(ModelBase)):
 
         # If saving to the same database, and this model is deferred, then
         # automatically do a "update_fields" save on the loaded fields.
-        elif not force_insert and self._deferred and using == self._state.db:
+        elif not force_insert and deferred_fields and using == self._state.db:
             field_names = set()
             for field in self._meta.concrete_fields:
                 if not field.primary_key and not hasattr(field, 'through'):
                     field_names.add(field.attname)
-            deferred_fields = [
-                f.attname for f in self._meta.fields
-                if (f.attname not in self.__dict__ and
-                    isinstance(self.__class__.__dict__[f.attname], DeferredAttribute))
-            ]
-
             loaded_fields = field_names.difference(deferred_fields)
             if loaded_fields:
                 update_fields = frozenset(loaded_fields)
@@ -1660,14 +1650,7 @@ def make_foreign_order_accessors(model, related_model):
 ########
 
 
-def simple_class_factory(model, attrs):
-    """
-    Needed for dynamic classes.
-    """
-    return model
-
-
-def model_unpickle(model_id, attrs, factory):
+def model_unpickle(model_id):
     """
     Used to unpickle Model subclasses with deferred fields.
     """
@@ -1676,8 +1659,7 @@ def model_unpickle(model_id, attrs, factory):
     else:
         # Backwards compat - the model was cached directly in earlier versions.
         model = model_id
-    cls = factory(model, attrs)
-    return cls.__new__(cls)
+    return model.__new__(model)
 model_unpickle.__safe_for_unpickle__ = True
 
 
