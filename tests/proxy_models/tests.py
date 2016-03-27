@@ -13,9 +13,9 @@ from django.urls import reverse
 from .admin import admin as force_admin_model_registration  # NOQA
 from .models import (
     Abstract, BaseUser, Bug, Country, Improvement, Issue, LowerStatusPerson,
-    MyPerson, MyPersonProxy, OtherPerson, Person, ProxyBug, ProxyImprovement,
-    ProxyProxyBug, ProxyTrackerUser, State, StateProxy, StatusPerson,
-    TrackerUser, User, UserProxy, UserProxyProxy,
+    MultiUserProxy, MyPerson, MyPersonProxy, OtherPerson, Person, ProxyBug,
+    ProxyImprovement, ProxyProxyBug, ProxyTrackerUser, State, StateProxy,
+    StatusPerson, TrackerUser, User, UserProxy, UserProxyProxy,
 )
 
 
@@ -246,7 +246,7 @@ class ProxyModelTests(TestCase):
         ctype = ContentType.objects.get_for_model
         self.assertIs(ctype(Person), ctype(OtherPerson))
 
-    def test_user_userproxy_userproxyproxy(self):
+    def test_user_proxy_models(self):
         User.objects.create(name='Bruce')
 
         resp = [u.name for u in User.objects.all()]
@@ -257,6 +257,8 @@ class ProxyModelTests(TestCase):
 
         resp = [u.name for u in UserProxyProxy.objects.all()]
         self.assertEqual(resp, ['Bruce'])
+
+        self.assertEqual([u.name for u in MultiUserProxy.objects.all()], ['Bruce'])
 
     def test_proxy_for_model(self):
         self.assertEqual(UserProxy, UserProxyProxy._meta.proxy_for_model)
