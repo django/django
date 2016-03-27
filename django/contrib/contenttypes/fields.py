@@ -34,6 +34,7 @@ class GenericForeignKey(object):
     hidden = False
 
     is_relation = True
+    is_reverse_relation = False
     many_to_many = False
     many_to_one = True
     one_to_many = False
@@ -48,6 +49,8 @@ class GenericForeignKey(object):
         self.editable = False
         self.rel = None
         self.column = None
+        self.remote_field = None
+        self.to = None
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
@@ -283,6 +286,46 @@ class GenericRel(ForeignObjectRel):
         )
 
 
+class ReverseGenericRelation(ForeignObject):
+    one_to_many = True
+    many_to_one = False
+    auto_created = True
+    generate_reverse = False
+    unique = False
+
+    def __init__(self, to, object_id_field, content_type_field,
+                 for_concrete_model, related_query_name, **kwargs):
+        super(ReverseGenericRelation, self).__init__(
+            to, [], [], related_query_name=related_query_name, **kwargs)
+        self.related_name = self.related_query_name = related_query_name
+
+    def post_relation_ready(self):
+        pass
+
+    def resolve_related_fields(self):
+        fields = self.remote_field.resolve_related_fields()
+        return zip((f[1] for f in fields), (f[0] for f in fields))
+
+    def get_extra_restriction(self, where_class, alias, remote_alias):
+        field = self.model._meta.get_field(self.remote_field.content_type_field_name)
+        contenttype_pk = self.remote_field.get_content_type().pk
+        cond = where_class()
+        lookup = field.get_lookup('exact')(field.get_col(remote_alias), contenttype_pk)
+        cond.add(lookup, 'AND')
+        return cond
+
+    def get_path_info(self):
+        opts = self.to._meta
+        from_opts = self.model._meta
+        return [PathInfo(from_opts, opts, (opts.pk,), self, self.many_to_many or self.one_to_many, False)]
+
+    def get_query_name(self):
+        return self.related_name or (self.to._meta.model_name + '+')
+
+    def get_accessor_name(self):
+        return self.get_query_name()
+
+
 class GenericRelation(ForeignObject):
     """
     Provide a reverse to a relation created by a GenericForeignKey.
@@ -290,6 +333,7 @@ class GenericRelation(ForeignObject):
 
     # Field flags
     auto_created = False
+    generate_reverse = True
 
     many_to_many = False
     many_to_one = False
@@ -297,6 +341,7 @@ class GenericRelation(ForeignObject):
     one_to_one = False
 
     rel_class = GenericRel
+    remote_field_class = ReverseGenericRelation
 
     def __init__(self, to, object_id_field='object_id', content_type_field='content_type',
             for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
@@ -305,6 +350,13 @@ class GenericRelation(ForeignObject):
             related_query_name=related_query_name,
             limit_choices_to=limit_choices_to,
         )
+
+        self.remote_field_kwargs = {
+            'object_id_field': object_id_field,
+            'content_type_field': content_type_field,
+            'for_concrete_model': for_concrete_model,
+            'related_query_name': related_query_name
+        }
 
         kwargs['blank'] = True
         kwargs['on_delete'] = models.CASCADE
@@ -322,6 +374,23 @@ class GenericRelation(ForeignObject):
         self.object_id_field_name = object_id_field
         self.content_type_field_name = content_type_field
         self.for_concrete_model = for_concrete_model
+
+    def post_relation_ready(self):
+        setattr(self.model, self.name,
+                ReverseGenericRelation(self, self.for_concrete_model))
+
+    def resolve_remote_field(self):
+        return ReverseGenericRelation(
+            self.model, remote_field=self,
+            **self.remote_field_kwargs)
+
+    def get_extra_restriction(self, where_class, alias, remote_alias):
+        field = self.rel.to._meta.get_field(self.content_type_field_name)
+        contenttype_pk = self.get_content_type().pk
+        cond = where_class()
+        lookup = field.get_lookup('exact')(field.get_col(alias), contenttype_pk)
+        cond.add(lookup, 'AND')
+        return cond
 
     def check(self, **kwargs):
         errors = super(GenericRelation, self).check(**kwargs)
@@ -441,14 +510,6 @@ class GenericRelation(ForeignObject):
         """
         return ContentType.objects.get_for_model(self.model,
                                                  for_concrete_model=self.for_concrete_model)
-
-    def get_extra_restriction(self, where_class, alias, remote_alias):
-        field = self.remote_field.model._meta.get_field(self.content_type_field_name)
-        contenttype_pk = self.get_content_type().pk
-        cond = where_class()
-        lookup = field.get_lookup('exact')(field.get_col(remote_alias), contenttype_pk)
-        cond.add(lookup, 'AND')
-        return cond
 
     def bulk_related_objects(self, objs, using=DEFAULT_DB_ALIAS):
         """
