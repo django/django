@@ -99,8 +99,7 @@ WHEN (new.%(col_name)s IS NULL)
         days = str(timedelta.days)
         day_precision = len(days)
         fmt = "INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6)"
-        return fmt % (days, hours, minutes, seconds, timedelta.microseconds,
-                day_precision), []
+        return fmt % (days, hours, minutes, seconds, timedelta.microseconds, day_precision), []
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084

@@ -75,8 +75,9 @@ class Serializer(base.Serializer):
             else:
                 def m2m_value(value):
                     return force_text(value._get_pk_val(), strings_only=True)
-            self._current[field.name] = [m2m_value(related)
-                               for related in getattr(obj, field.name).iterator()]
+            self._current[field.name] = [
+                m2m_value(related) for related in getattr(obj, field.name).iterator()
+            ]
 
     def getvalue(self):
         return self.objects

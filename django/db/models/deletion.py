@@ -20,8 +20,9 @@ def CASCADE(collector, field, sub_objs, using):
 
 
 def PROTECT(collector, field, sub_objs, using):
-    raise ProtectedError("Cannot delete some instances of model '%s' because "
-        "they are referenced through a protected foreign key: '%s.%s'" % (
+    raise ProtectedError(
+        "Cannot delete some instances of model '%s' because they are "
+        "referenced through a protected foreign key: '%s.%s'" % (
             field.remote_field.model.__name__, sub_objs[0].__class__.__name__, field.name
         ),
         sub_objs
@@ -165,7 +166,7 @@ class Collector(object):
             return [objs]
 
     def collect(self, objs, source=None, nullable=False, collect_related=True,
-            source_attr=None, reverse_dependency=False, keep_parents=False):
+                source_attr=None, reverse_dependency=False, keep_parents=False):
         """
         Adds 'objs' to the collection of objects to be deleted as well as all
         parent instances.  'objs' must be a homogeneous iterable collection of

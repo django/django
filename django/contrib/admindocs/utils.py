@@ -82,9 +82,11 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
 
 .. default-role::
 """
-    parts = docutils.core.publish_parts(source % text,
-                source_path=thing_being_parsed, destination_path=None,
-                writer_name='html', settings_overrides=overrides)
+    parts = docutils.core.publish_parts(
+        source % text,
+        source_path=thing_being_parsed, destination_path=None,
+        writer_name='html', settings_overrides=overrides,
+    )
     return mark_safe(parts['fragment'])
 
 #

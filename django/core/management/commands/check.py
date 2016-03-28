@@ -14,12 +14,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('args', metavar='app_label', nargs='*')
-        parser.add_argument('--tag', '-t', action='append', dest='tags',
-            help='Run only checks labeled with given tag.')
-        parser.add_argument('--list-tags', action='store_true', dest='list_tags',
-            help='List available tags.')
-        parser.add_argument('--deploy', action='store_true', dest='deploy',
-            help='Check deployment settings.')
+        parser.add_argument(
+            '--tag', '-t', action='append', dest='tags',
+            help='Run only checks labeled with given tag.',
+        )
+        parser.add_argument(
+            '--list-tags', action='store_true', dest='list_tags',
+            help='List available tags.',
+        )
+        parser.add_argument(
+            '--deploy', action='store_true', dest='deploy',
+            help='Check deployment settings.',
+        )
         parser.add_argument(
             '--fail-level',
             default='ERROR',

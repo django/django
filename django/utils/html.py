@@ -38,8 +38,8 @@ html_gunk_re = re.compile(
     r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|'
     '<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
 hard_coded_bullets_re = re.compile(
-    r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x)
-    for x in DOTS), re.DOTALL)
+    r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x) for x in DOTS), re.DOTALL
+)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 
 
@@ -53,8 +53,10 @@ def escape(text):
     marked as such. This may result in double-escaping. If this is a concern,
     use conditional_escape() instead.
     """
-    return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;')
-        .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
+    return mark_safe(
+        force_text(text).replace('&', '&amp;').replace('<', '&lt;')
+        .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+    )
 
 _js_escapes = {
     ord('\\'): '\\u005C',

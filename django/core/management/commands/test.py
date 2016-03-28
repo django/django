@@ -29,24 +29,29 @@ class Command(BaseCommand):
         super(Command, self).run_from_argv(argv)
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='test_label', nargs='*',
-            help='Module paths to test; can be modulename, modulename.TestCase or modulename.TestCase.test_method')
-        parser.add_argument('--noinput', '--no-input',
-            action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.')
-        parser.add_argument('--failfast',
-            action='store_true', dest='failfast', default=False,
-            help='Tells Django to stop running the test suite after first '
-                 'failed test.')
-        parser.add_argument('--testrunner',
-            action='store', dest='testrunner',
+        parser.add_argument(
+            'args', metavar='test_label', nargs='*',
+            help='Module paths to test; can be modulename, modulename.TestCase or modulename.TestCase.test_method'
+        )
+        parser.add_argument(
+            '--noinput', '--no-input', action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.',
+        )
+        parser.add_argument(
+            '--failfast', action='store_true', dest='failfast', default=False,
+            help='Tells Django to stop running the test suite after first failed test.',
+        )
+        parser.add_argument(
+            '--testrunner', action='store', dest='testrunner',
             help='Tells Django to use specified test runner class instead of '
-                 'the one specified by the TEST_RUNNER setting.')
-        parser.add_argument('--liveserver',
-            action='store', dest='liveserver', default=None,
+                 'the one specified by the TEST_RUNNER setting.',
+        )
+        parser.add_argument(
+            '--liveserver', action='store', dest='liveserver', default=None,
             help='Overrides the default address where the live server (used '
                  'with LiveServerTestCase) is expected to run from. The '
-                 'default value is localhost:8081-8179.')
+                 'default value is localhost:8081-8179.',
+        )
 
         test_runner_class = get_runner(settings, self.test_runner)
 

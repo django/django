@@ -10,16 +10,24 @@ class Command(BaseCommand):
     help = "Shows all available migrations for the current project"
 
     def add_arguments(self, parser):
-        parser.add_argument('app_label', nargs='*',
-            help='App labels of applications to limit the output to.')
-        parser.add_argument('--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
-            help='Nominates a database to synchronize. Defaults to the "default" database.')
+        parser.add_argument(
+            'app_label', nargs='*',
+            help='App labels of applications to limit the output to.',
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to synchronize. Defaults to the "default" database.',
+        )
 
         formats = parser.add_mutually_exclusive_group()
-        formats.add_argument('--list', '-l', action='store_const', dest='format', const='list',
-            help='Shows a list of all migrations and which are applied.')
-        formats.add_argument('--plan', '-p', action='store_const', dest='format', const='plan',
-            help='Shows all migrations in the order they will be applied.')
+        formats.add_argument(
+            '--list', '-l', action='store_const', dest='format', const='list',
+            help='Shows a list of all migrations and which are applied.',
+        )
+        formats.add_argument(
+            '--plan', '-p', action='store_const', dest='format', const='plan',
+            help='Shows all migrations in the order they will be applied.',
+        )
 
         parser.set_defaults(format='list')
 

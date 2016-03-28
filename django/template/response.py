@@ -119,15 +119,17 @@ class SimpleTemplateResponse(HttpResponse):
 
     def __iter__(self):
         if not self._is_rendered:
-            raise ContentNotRenderedError('The response content must be '
-                                          'rendered before it can be iterated over.')
+            raise ContentNotRenderedError(
+                'The response content must be rendered before it can be iterated over.'
+            )
         return super(SimpleTemplateResponse, self).__iter__()
 
     @property
     def content(self):
         if not self._is_rendered:
-            raise ContentNotRenderedError('The response content must be '
-                                          'rendered before it can be accessed.')
+            raise ContentNotRenderedError(
+                'The response content must be rendered before it can be accessed.'
+            )
         return super(SimpleTemplateResponse, self).content
 
     @content.setter
@@ -142,7 +144,7 @@ class TemplateResponse(SimpleTemplateResponse):
     rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request']
 
     def __init__(self, request, template, context=None, content_type=None,
-            status=None, charset=None, using=None):
+                 status=None, charset=None, using=None):
         super(TemplateResponse, self).__init__(
             template, context, content_type, status, charset, using)
         self._request = request

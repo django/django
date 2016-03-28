@@ -299,7 +299,7 @@ class GenericRelation(ForeignObject):
     rel_class = GenericRel
 
     def __init__(self, to, object_id_field='object_id', content_type_field='content_type',
-            for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
+                 for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
         kwargs['rel'] = self.rel_class(
             self, to,
             related_query_name=related_query_name,

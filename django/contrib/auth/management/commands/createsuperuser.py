@@ -31,22 +31,32 @@ class Command(BaseCommand):
         self.username_field = self.UserModel._meta.get_field(self.UserModel.USERNAME_FIELD)
 
     def add_arguments(self, parser):
-        parser.add_argument('--%s' % self.UserModel.USERNAME_FIELD,
+        parser.add_argument(
+            '--%s' % self.UserModel.USERNAME_FIELD,
             dest=self.UserModel.USERNAME_FIELD, default=None,
-            help='Specifies the login for the superuser.')
-        parser.add_argument('--noinput', '--no-input',
+            help='Specifies the login for the superuser.',
+        )
+        parser.add_argument(
+            '--noinput', '--no-input',
             action='store_false', dest='interactive', default=True,
-            help=('Tells Django to NOT prompt the user for input of any kind. '
-                  'You must use --%s with --noinput, along with an option for '
-                  'any other required field. Superusers created with --noinput will '
-                  ' not be able to log in until they\'re given a valid password.' %
-                  self.UserModel.USERNAME_FIELD))
-        parser.add_argument('--database', action='store', dest='database',
-                default=DEFAULT_DB_ALIAS,
-                help='Specifies the database to use. Default is "default".')
+            help=(
+                'Tells Django to NOT prompt the user for input of any kind. '
+                'You must use --%s with --noinput, along with an option for '
+                'any other required field. Superusers created with --noinput will '
+                'not be able to log in until they\'re given a valid password.' %
+                self.UserModel.USERNAME_FIELD
+            ),
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS,
+            help='Specifies the database to use. Default is "default".',
+        )
         for field in self.UserModel.REQUIRED_FIELDS:
-            parser.add_argument('--%s' % field, dest=field, default=None,
-                help='Specifies the %s for the superuser.' % field)
+            parser.add_argument(
+                '--%s' % field, dest=field, default=None,
+                help='Specifies the %s for the superuser.' % field,
+            )
 
     def execute(self, *args, **options):
         self.stdin = options.get('stdin', sys.stdin)  # Used for testing
@@ -67,8 +77,7 @@ class Command(BaseCommand):
         if not options['interactive']:
             try:
                 if not username:
-                    raise CommandError("You must use --%s with --noinput." %
-                            self.UserModel.USERNAME_FIELD)
+                    raise CommandError("You must use --%s with --noinput." % self.UserModel.USERNAME_FIELD)
                 username = self.username_field.clean(username, None)
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:

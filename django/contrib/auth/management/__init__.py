@@ -30,8 +30,10 @@ def _get_builtin_permissions(opts):
     """
     perms = []
     for action in opts.default_permissions:
-        perms.append((get_permission_codename(action, opts),
-            'Can %s %s' % (action, opts.verbose_name_raw)))
+        perms.append((
+            get_permission_codename(action, opts),
+            'Can %s %s' % (action, opts.verbose_name_raw)
+        ))
     return perms
 
 
@@ -125,9 +127,11 @@ def get_default_username(check_db=True):
 
     default_username = get_system_username()
     try:
-        default_username = (unicodedata.normalize('NFKD', default_username)
-                .encode('ascii', 'ignore').decode('ascii')
-                .replace(' ', '').lower())
+        default_username = (
+            unicodedata.normalize('NFKD', default_username)
+            .encode('ascii', 'ignore').decode('ascii')
+            .replace(' ', '').lower()
+        )
     except UnicodeDecodeError:
         return ''
 

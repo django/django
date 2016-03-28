@@ -1059,8 +1059,9 @@ class SQLInsertCompiler(SQLCompiler):
             if self.connection.features.can_return_id_from_insert:
                 assert len(self.query.objs) == 1
                 return self.connection.ops.fetch_returned_insert_id(cursor)
-            return self.connection.ops.last_insert_id(cursor,
-                    self.query.get_meta().db_table, self.query.get_meta().pk.column)
+            return self.connection.ops.last_insert_id(
+                cursor, self.query.get_meta().db_table, self.query.get_meta().pk.column
+            )
 
 
 class SQLDeleteCompiler(SQLCompiler):

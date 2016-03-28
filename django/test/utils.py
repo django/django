@@ -521,9 +521,11 @@ def patch_logger(logger_name, log_level, log_kwargs=False):
 # don't enforce a specific timezone (with timezone.override or equivalent),
 # or attempt to interpret naive datetimes in the default timezone.
 
-requires_tz_support = skipUnless(TZ_SUPPORT,
-        "This test relies on the ability to run a program in an arbitrary "
-        "time zone, but your operating system isn't able to do that.")
+requires_tz_support = skipUnless(
+    TZ_SUPPORT,
+    "This test relies on the ability to run a program in an arbitrary "
+    "time zone, but your operating system isn't able to do that."
+)
 
 
 @contextmanager

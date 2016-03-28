@@ -160,8 +160,7 @@ class Signer(object):
                 'Unsafe Signer separator: %r (cannot be empty or consist of '
                 'only A-z0-9-_=)' % sep,
             )
-        self.salt = force_str(salt or
-            '%s.%s' % (self.__class__.__module__, self.__class__.__name__))
+        self.salt = force_str(salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__))
 
     def signature(self, value):
         signature = base64_hmac(self.salt + 'signer', value, self.key)
