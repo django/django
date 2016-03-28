@@ -307,6 +307,10 @@ A channel layer implementing the ``groups`` extension must also provide:
   arguments; the group to send to, as a unicode string, and the message
   to send, as a serializable ``dict``.
 
+* ``group_expiry``, an integer number of seconds that specifies how long group
+  membership is valid for after the most recent ``group_add`` call (see
+  *Persistence* below)
+
 A channel layer implementing the ``statistics`` extension must also provide:
 
 * ``global_statistics()``, a callable that returns a dict with zero
@@ -373,8 +377,27 @@ clients reconnect will immediately resolve the problem.
 
 If a channel layer implements the ``groups`` extension, it must persist group
 membership until at least the time when the member channel has a message
-expire due to non-consumption. It should drop membership after a while to
-prevent collision of old messages with new clients with the same random ID.
+expire due to non-consumption, after which it may drop membership at any time.
+If a channel subsequently has a successful delivery, the channel layer must
+then not drop group membership until another message expires on that channel.
+
+Channel layers must also drop group membership after a configurable long timeout
+after the most recent ``group_add`` call for that membership, the default being
+86,400 seconds (one day). The value of this timeout is exposed as the
+``group_expiry`` property on the channel layer.
+
+Protocol servers must have a configurable timeout value for every connection-based
+prtocol they serve that closes the connection after the timeout, and should
+default this value to the value of ``group_expiry``, if the channel
+layer provides it. This allows old group memberships to be cleaned up safely,
+knowing that after the group expiry the original connection must have closed,
+or is about to be in the next few seconds.
+
+It's recommended that end developers put the timeout setting much lower - on
+the order of hours or minutes - to enable better protocol design and testing.
+Even with ASGI's separation of protocol server restart from business logic
+restart, you will likely need to move and reprovision protocol servers, and
+making sure your code can cope with this is important.
 
 
 Message Formats
