@@ -4,9 +4,9 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError, ValidationError
 from django.core.management import call_command
-from django.db import connection
+from django.db import connection, models
 from django.test import TestCase, TransactionTestCase
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils import six
 
 from .models import (
@@ -139,6 +139,22 @@ class ModelInheritanceTests(TestCase):
     def test_mixin_init(self):
         m = MixinModel()
         self.assertEqual(m.other_attr, 1)
+
+    @isolate_apps('model_inheritance')
+    def test_abstract_parent_link(self):
+        class A(models.Model):
+            pass
+
+        class B(A):
+            a = models.OneToOneField('A', parent_link=True, on_delete=models.CASCADE)
+
+            class Meta:
+                abstract = True
+
+        class C(B):
+            pass
+
+        self.assertIs(C._meta.parents[A], C._meta.get_field('a'))
 
 
 class ModelInheritanceDataTests(TestCase):
