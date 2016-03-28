@@ -4,6 +4,7 @@ import warnings
 from importlib import import_module
 
 from django.conf import settings
+from django.contrib.sessions.backends import signed_cookies
 from django.contrib.sessions.backends.base import CreateError
 
 from .exceptions import ConsumeLater
@@ -20,7 +21,9 @@ def session_for_reply_channel(reply_channel):
     hashed = hashlib.md5(reply_name.encode("utf8")).hexdigest()
     session_key = "chn" + hashed[:29]
     # Make a session storage
-    session_engine = import_module(settings.SESSION_ENGINE)
+    session_engine = import_module(getattr(settings, "CHANNEL_SESSION_ENGINE", settings.SESSION_ENGINE))
+    if session_engine is signed_cookies:
+        raise ValueError("You cannot use channels session functionality with signed cookie sessions!")
     return session_engine.SessionStore(session_key=session_key)
 
 
@@ -122,6 +125,9 @@ def http_session(func):
 
     If a message does not have a session we can inflate, the "session" attribute
     will be None, rather than an empty session you can write to.
+
+    Does not allow a new session to be set; that must be done via a view. This
+    is only an accessor for any existing session.
     """
     @functools.wraps(func)
     def inner(message, *args, **kwargs):
