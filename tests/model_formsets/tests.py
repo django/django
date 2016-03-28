@@ -1641,7 +1641,7 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         form = PoetFormSet.form()
         self.assertHTMLEqual(
             "%s" % form['name'],
-            '<input id="id_name" maxlength="100" type="text" class="poet" name="name" />'
+            '<input id="id_name" maxlength="100" type="text" class="poet" name="name" required />'
         )
 
     def test_inlineformset_factory_widgets(self):
@@ -1652,7 +1652,7 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         form = BookFormSet.form()
         self.assertHTMLEqual(
             "%s" % form['title'],
-            '<input class="book" id="id_title" maxlength="100" name="title" type="text" />'
+            '<input class="book" id="id_title" maxlength="100" name="title" type="text" required />'
         )
 
     def test_modelformset_factory_labels_overrides(self):

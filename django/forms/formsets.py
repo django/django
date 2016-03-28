@@ -161,6 +161,10 @@ class BaseFormSet(object):
             'auto_id': self.auto_id,
             'prefix': self.add_prefix(i),
             'error_class': self.error_class,
+            # Don't render the HTML 'required' attribute as it may cause
+            # incorrect validation for extra, optional, and deleted
+            # forms in the formset.
+            'use_required_attribute': False,
         }
         if self.is_bound:
             defaults['data'] = self.data
@@ -195,6 +199,7 @@ class BaseFormSet(object):
             auto_id=self.auto_id,
             prefix=self.add_prefix('__prefix__'),
             empty_permitted=True,
+            use_required_attribute=False,
             **self.get_form_kwargs(None)
         )
         self.add_fields(form, None)

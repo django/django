@@ -259,6 +259,12 @@ Forms
 * The ``<input>`` tag rendered by :class:`~django.forms.CharField` now includes
   a ``minlength`` attribute if the field has a ``min_length``.
 
+* Required form fields now have the ``required`` HTML attribute. Set the new
+  :attr:`Form.use_required_attribute <django.forms.Form.use_required_attribute>`
+  attribute to ``False`` to disable it. The ``required`` attribute isn't
+  included on forms of formsets because the browser validation may not be
+  correct when adding and deleting formsets.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -759,6 +765,11 @@ Miscellaneous
   changelist. If you need the previous behavior, set the new
   :attr:`ModelAdmin.save_as_continue
   <django.contrib.admin.ModelAdmin.save_as_continue>` attribute to ``False``.
+
+* Required form fields now have the ``required`` HTML attribute. Set the
+  :attr:`Form.use_required_attribute <django.forms.Form.use_required_attribute>`
+  attribute to ``False`` to disable it. You could also add the ``novalidate``
+  attribute to ``<form>`` if you don't want browser validation.
 
 .. _deprecated-features-1.10:
 
