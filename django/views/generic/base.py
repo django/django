@@ -88,11 +88,9 @@ class View(object):
         return handler(request, *args, **kwargs)
 
     def http_method_not_allowed(self, request, *args, **kwargs):
-        logger.warning('Method Not Allowed (%s): %s', request.method, request.path,
-            extra={
-                'status_code': 405,
-                'request': request
-            }
+        logger.warning(
+            'Method Not Allowed (%s): %s', request.method, request.path,
+            extra={'status_code': 405, 'request': request}
         )
         return http.HttpResponseNotAllowed(self._allowed_methods())
 
@@ -196,11 +194,10 @@ class RedirectView(View):
             else:
                 return http.HttpResponseRedirect(url)
         else:
-            logger.warning('Gone: %s', request.path,
-                        extra={
-                            'status_code': 410,
-                            'request': request
-                        })
+            logger.warning(
+                'Gone: %s', request.path,
+                extra={'status_code': 410, 'request': request}
+            )
             return http.HttpResponseGone()
 
     def head(self, request, *args, **kwargs):

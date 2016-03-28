@@ -35,8 +35,7 @@ if os.name == 'nt':
         Python 2.6+, or the 'delete', 'buffering', 'encoding', or 'newline'
         keyword arguments in Python 3.0+.
         """
-        def __init__(self, mode='w+b', bufsize=-1, suffix='', prefix='',
-                dir=None):
+        def __init__(self, mode='w+b', bufsize=-1, suffix='', prefix='', dir=None):
             fd, name = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=dir)
             self.name = name
             self.file = os.fdopen(fd, mode, bufsize)

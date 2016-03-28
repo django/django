@@ -36,13 +36,19 @@ class Command(BaseCommand):
     program_options = ['--check-format']
 
     def add_arguments(self, parser):
-        parser.add_argument('--locale', '-l', dest='locale', action='append', default=[],
+        parser.add_argument(
+            '--locale', '-l', dest='locale', action='append', default=[],
             help='Locale(s) to process (e.g. de_AT). Default is to process all. '
-            'Can be used multiple times.')
-        parser.add_argument('--exclude', '-x', dest='exclude', action='append', default=[],
-            help='Locales to exclude. Default is none. Can be used multiple times.')
-        parser.add_argument('--use-fuzzy', '-f', dest='fuzzy', action='store_true', default=False,
-            help='Use fuzzy translations.')
+                 'Can be used multiple times.',
+        )
+        parser.add_argument(
+            '--exclude', '-x', dest='exclude', action='append', default=[],
+            help='Locales to exclude. Default is none. Can be used multiple times.',
+        )
+        parser.add_argument(
+            '--use-fuzzy', '-f', dest='fuzzy', action='store_true', default=False,
+            help='Use fuzzy translations.',
+        )
 
     def handle(self, **options):
         locale = options['locale']
@@ -116,8 +122,9 @@ class Command(BaseCommand):
                                   "mo files will not be updated/created." % dirpath)
                 return
 
-            args = [self.program] + self.program_options + ['-o',
-                    npath(base_path + '.mo'), npath(base_path + '.po')]
+            args = [self.program] + self.program_options + [
+                '-o', npath(base_path + '.mo'), npath(base_path + '.po')
+            ]
             output, errors, status = popen_wrapper(args)
             if status:
                 if errors:

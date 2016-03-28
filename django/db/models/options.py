@@ -28,13 +28,14 @@ IMMUTABLE_WARNING = (
     "for your own use, make a copy first."
 )
 
-DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
-                 'unique_together', 'permissions', 'get_latest_by',
-                 'order_with_respect_to', 'app_label', 'db_tablespace',
-                 'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
-                 'index_together', 'apps', 'default_permissions',
-                 'select_on_save', 'default_related_name',
-                 'required_db_features', 'required_db_vendor')
+DEFAULT_NAMES = (
+    'verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
+    'unique_together', 'permissions', 'get_latest_by', 'order_with_respect_to',
+    'app_label', 'db_tablespace', 'abstract', 'managed', 'proxy', 'swappable',
+    'auto_created', 'index_together', 'apps', 'default_permissions',
+    'select_on_save', 'default_related_name', 'required_db_features',
+    'required_db_vendor',
+)
 
 
 def normalize_together(option_together):
@@ -249,8 +250,7 @@ class Options(object):
                 field.primary_key = True
                 self.setup_pk(field)
             else:
-                auto = AutoField(verbose_name='ID', primary_key=True,
-                        auto_created=True)
+                auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
                 model.add_to_class('id', auto)
 
     def add_field(self, field, virtual=False):
@@ -385,8 +385,7 @@ class Options(object):
         return make_immutable_fields_list(
             "fields",
             (f for f in self._get_fields(reverse=False)
-            if is_not_an_m2m_field(f) and is_not_a_generic_relation(f) and
-            is_not_a_generic_foreign_key(f))
+             if is_not_an_m2m_field(f) and is_not_a_generic_relation(f) and is_not_a_generic_foreign_key(f))
         )
 
     @cached_property
@@ -426,8 +425,7 @@ class Options(object):
         """
         return make_immutable_fields_list(
             "many_to_many",
-            (f for f in self._get_fields(reverse=False)
-            if f.is_relation and f.many_to_many)
+            (f for f in self._get_fields(reverse=False) if f.is_relation and f.many_to_many)
         )
 
     @cached_property
@@ -444,8 +442,7 @@ class Options(object):
         all_related_fields = self._get_fields(forward=False, reverse=True, include_hidden=True)
         return make_immutable_fields_list(
             "related_objects",
-            (obj for obj in all_related_fields
-            if not obj.hidden or obj.field.many_to_many)
+            (obj for obj in all_related_fields if not obj.hidden or obj.field.many_to_many)
         )
 
     @cached_property

@@ -183,10 +183,12 @@ class UserAdmin(admin.ModelAdmin):
 
         request.current_app = self.admin_site.name
 
-        return TemplateResponse(request,
+        return TemplateResponse(
+            request,
             self.change_user_password_template or
             'admin/auth/user/change_password.html',
-            context)
+            context,
+        )
 
     def response_add(self, request, obj, post_url_continue=None):
         """

@@ -105,8 +105,7 @@ class UpdateQuery(Query):
             self.related_updates = {}
 
     def clone(self, klass=None, **kwargs):
-        return super(UpdateQuery, self).clone(klass,
-                related_updates=self.related_updates.copy(), **kwargs)
+        return super(UpdateQuery, self).clone(klass, related_updates=self.related_updates.copy(), **kwargs)
 
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)

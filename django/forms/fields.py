@@ -775,8 +775,10 @@ class ChoiceField(Field):
 
     def __init__(self, choices=(), required=True, widget=None, label=None,
                  initial=None, help_text='', *args, **kwargs):
-        super(ChoiceField, self).__init__(required=required, widget=widget, label=label,
-                                        initial=initial, help_text=help_text, *args, **kwargs)
+        super(ChoiceField, self).__init__(
+            required=required, widget=widget, label=label, initial=initial,
+            help_text=help_text, *args, **kwargs
+        )
         self.choices = choices
 
     def __deepcopy__(self, memo):
@@ -1090,9 +1092,10 @@ class FilePathField(ChoiceField):
                  initial=None, help_text='', *args, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
         self.allow_files, self.allow_folders = allow_files, allow_folders
-        super(FilePathField, self).__init__(choices=(), required=required,
-            widget=widget, label=label, initial=initial, help_text=help_text,
-            *args, **kwargs)
+        super(FilePathField, self).__init__(
+            choices=(), required=required, widget=widget, label=label,
+            initial=initial, help_text=help_text, *args, **kwargs
+        )
 
         if self.required:
             self.choices = []

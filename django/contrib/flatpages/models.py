@@ -22,9 +22,11 @@ class FlatPage(models.Model):
             "the system will use 'flatpages/default.html'."
         ),
     )
-    registration_required = models.BooleanField(_('registration required'),
+    registration_required = models.BooleanField(
+        _('registration required'),
         help_text=_("If this is checked, only logged-in users will be able to view the page."),
-        default=False)
+        default=False,
+    )
     sites = models.ManyToManyField(Site, verbose_name=_('sites'))
 
     class Meta:

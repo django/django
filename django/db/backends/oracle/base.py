@@ -367,8 +367,7 @@ class OracleParam(object):
         else:
             # To transmit to the database, we need Unicode if supported
             # To get size right, we must consider bytes.
-            self.force_bytes = convert_unicode(param, cursor.charset,
-                                             strings_only)
+            self.force_bytes = convert_unicode(param, cursor.charset, strings_only)
             if isinstance(self.force_bytes, six.string_types):
                 # We could optimize by only converting up to 4000 bytes here
                 string_size = len(force_bytes(param, cursor.charset, strings_only))
@@ -498,8 +497,7 @@ class FormatStylePlaceholderCursor(object):
         formatted = [firstparams] + [self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)
         try:
-            return self.cursor.executemany(query,
-                                [self._param_generator(p) for p in formatted])
+            return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
         except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):

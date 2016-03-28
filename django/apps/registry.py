@@ -297,8 +297,10 @@ class Apps(object):
         available = set(available)
         installed = set(app_config.name for app_config in self.get_app_configs())
         if not available.issubset(installed):
-            raise ValueError("Available apps isn't a subset of installed "
-                "apps, extra apps: %s" % ", ".join(available - installed))
+            raise ValueError(
+                "Available apps isn't a subset of installed apps, extra apps: %s"
+                % ", ".join(available - installed)
+            )
 
         self.stored_app_configs.append(self.app_configs)
         self.app_configs = OrderedDict(

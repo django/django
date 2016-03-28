@@ -366,8 +366,10 @@ class StreamingHttpResponse(HttpResponseBase):
 
     @property
     def content(self):
-        raise AttributeError("This %s instance has no `content` attribute. "
-            "Use `streaming_content` instead." % self.__class__.__name__)
+        raise AttributeError(
+            "This %s instance has no `content` attribute. Use "
+            "`streaming_content` instead." % self.__class__.__name__
+        )
 
     @property
     def streaming_content(self):
@@ -508,8 +510,10 @@ class JsonResponse(HttpResponse):
     def __init__(self, data, encoder=DjangoJSONEncoder, safe=True,
                  json_dumps_params=None, **kwargs):
         if safe and not isinstance(data, dict):
-            raise TypeError('In order to allow non-dict objects to be '
-                'serialized set the safe parameter to False')
+            raise TypeError(
+                'In order to allow non-dict objects to be serialized set the '
+                'safe parameter to False.'
+            )
         if json_dumps_params is None:
             json_dumps_params = {}
         kwargs.setdefault('content_type', 'application/json')
