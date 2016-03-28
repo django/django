@@ -135,9 +135,9 @@ provided for each widget will be rendered exactly the same::
 
     >>> f = CommentForm(auto_id=False)
     >>> f.as_table()
-    <tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
-    <tr><th>Url:</th><td><input type="url" name="url"/></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+    <tr><th>Name:</th><td><input type="text" name="name" required /></td></tr>
+    <tr><th>Url:</th><td><input type="url" name="url" required /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" required /></td></tr>
 
 On a real Web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the
@@ -154,9 +154,9 @@ Django will then include the extra attributes in the rendered output:
 
     >>> f = CommentForm(auto_id=False)
     >>> f.as_table()
-    <tr><th>Name:</th><td><input type="text" name="name" class="special"/></td></tr>
-    <tr><th>Url:</th><td><input type="url" name="url"/></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
+    <tr><th>Name:</th><td><input type="text" name="name" class="special" required /></td></tr>
+    <tr><th>Url:</th><td><input type="url" name="url" required /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" size="40" required /></td></tr>
 
 You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
 :attr:`BoundField.id_for_label` for an example.
@@ -204,7 +204,7 @@ foundation for custom widgets.
             >>> from django import forms
             >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
             >>> name.render('name', 'A name')
-            '<input title="Your name" type="text" name="name" value="A name" size="10" />'
+            '<input title="Your name" type="text" name="name" value="A name" size="10" required />'
 
         If you assign a value of ``True`` or ``False`` to an attribute,
         it will be rendered as an HTML5 boolean attribute::
@@ -627,16 +627,16 @@ Selector and checkbox widgets
     .. code-block:: html
 
         <div class="myradio">
-            <label for="id_beatles_0"><input id="id_beatles_0" name="beatles" type="radio" value="john" /> John</label>
+            <label for="id_beatles_0"><input id="id_beatles_0" name="beatles" type="radio" value="john" required /> John</label>
         </div>
         <div class="myradio">
-            <label for="id_beatles_1"><input id="id_beatles_1" name="beatles" type="radio" value="paul" /> Paul</label>
+            <label for="id_beatles_1"><input id="id_beatles_1" name="beatles" type="radio" value="paul" required /> Paul</label>
         </div>
         <div class="myradio">
-            <label for="id_beatles_2"><input id="id_beatles_2" name="beatles" type="radio" value="george" /> George</label>
+            <label for="id_beatles_2"><input id="id_beatles_2" name="beatles" type="radio" value="george" required /> George</label>
         </div>
         <div class="myradio">
-            <label for="id_beatles_3"><input id="id_beatles_3" name="beatles" type="radio" value="ringo" /> Ringo</label>
+            <label for="id_beatles_3"><input id="id_beatles_3" name="beatles" type="radio" value="ringo" required /> Ringo</label>
         </div>
 
     That included the ``<label>`` tags. To get more granular, you can use each
@@ -658,22 +658,22 @@ Selector and checkbox widgets
 
         <label for="id_beatles_0">
             John
-            <span class="radio"><input id="id_beatles_0" name="beatles" type="radio" value="john" /></span>
+            <span class="radio"><input id="id_beatles_0" name="beatles" type="radio" value="john" required /></span>
         </label>
 
         <label for="id_beatles_1">
             Paul
-            <span class="radio"><input id="id_beatles_1" name="beatles" type="radio" value="paul" /></span>
+            <span class="radio"><input id="id_beatles_1" name="beatles" type="radio" value="paul" required /></span>
         </label>
 
         <label for="id_beatles_2">
             George
-            <span class="radio"><input id="id_beatles_2" name="beatles" type="radio" value="george" /></span>
+            <span class="radio"><input id="id_beatles_2" name="beatles" type="radio" value="george" required /></span>
         </label>
 
         <label for="id_beatles_3">
             Ringo
-            <span class="radio"><input id="id_beatles_3" name="beatles" type="radio" value="ringo" /></span>
+            <span class="radio"><input id="id_beatles_3" name="beatles" type="radio" value="ringo" required /></span>
         </label>
 
     If you decide not to loop over the radio buttons -- e.g., if your template

@@ -259,7 +259,7 @@ The whole form, when rendered for the first time, will look like:
 .. code-block:: html+django
 
     <label for="your_name">Your name: </label>
-    <input id="your_name" type="text" name="your_name" maxlength="100">
+    <input id="your_name" type="text" name="your_name" maxlength="100" required />
 
 Note that it **does not** include the ``<form>`` tags, or a submit button.
 We'll have to provide those ourselves in the template.
@@ -512,11 +512,11 @@ Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance:
 .. code-block:: html+django
 
     <p><label for="id_subject">Subject:</label>
-        <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
+        <input id="id_subject" type="text" name="subject" maxlength="100" required /></p>
     <p><label for="id_message">Message:</label>
-        <textarea name="message" id="id_message"></textarea></p>
+        <textarea name="message" id="id_message" required></textarea></p>
     <p><label for="id_sender">Sender:</label>
-        <input type="email" name="sender" id="id_sender" /></p>
+        <input type="email" name="sender" id="id_sender" required /></p>
     <p><label for="id_cc_myself">Cc myself:</label>
         <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
 
