@@ -18,7 +18,7 @@ from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
 from django.db.models.query_utils import (
-    Q, PathInfo, refs_aggregate, refs_expression,
+    PathInfo, Q, refs_aggregate, refs_expression,
 )
 from django.db.models.sql.constants import (
     INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, QUERY_TERMS, SINGLE,

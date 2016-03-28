@@ -5,7 +5,7 @@ from django.forms.models import modelform_factory
 from django.test import TestCase, skipIfDBFeature
 
 from .models import (
-    A, B, C, D, Address, Board, CharLink, Company, Contact, Content, Developer,
+    A, Address, B, Board, C, CharLink, Company, Contact, Content, D, Developer,
     Guild, HasLinkThing, Link, Node, Note, OddRelation1, OddRelation2,
     Organization, Person, Place, Related, Restaurant, Tag, Team, TextLink,
 )

@@ -8,7 +8,7 @@ from operator import attrgetter
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.db.models import (
-    F, Q, Avg, Count, Max, StdDev, Sum, Value, Variance,
+    Avg, Count, F, Max, Q, StdDev, Sum, Value, Variance,
 )
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate

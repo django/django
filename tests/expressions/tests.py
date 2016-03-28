@@ -11,7 +11,7 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    F, Case, Col, Date, DateTime, ExpressionWrapper, Func, OrderBy, Random,
+    Case, Col, Date, DateTime, ExpressionWrapper, F, Func, OrderBy, Random,
     RawSQL, Ref, Value, When,
 )
 from django.db.models.functions import (

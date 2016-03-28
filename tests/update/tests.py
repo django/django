@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import A, B, D, Bar, DataPoint, Foo, RelatedPoint
+from .models import A, B, Bar, D, DataPoint, Foo, RelatedPoint
 
 
 class SimpleTest(TestCase):
