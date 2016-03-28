@@ -34,17 +34,18 @@ def set_language(request):
     any state.
     """
     next = request.POST.get('next', request.GET.get('next'))
-    if not is_safe_url(url=next, host=request.get_host()):
+    if (next or not request.is_ajax()) and not is_safe_url(url=next, host=request.get_host()):
         next = request.META.get('HTTP_REFERER')
         if not is_safe_url(url=next, host=request.get_host()):
             next = '/'
-    response = http.HttpResponseRedirect(next)
+    response = http.HttpResponseRedirect(next) if next else http.HttpResponse(status=204)
     if request.method == 'POST':
         lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
         if lang_code and check_for_language(lang_code):
-            next_trans = translate_url(next, lang_code)
-            if next_trans != next:
-                response = http.HttpResponseRedirect(next_trans)
+            if next:
+                next_trans = translate_url(next, lang_code)
+                if next_trans != next:
+                    response = http.HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
             else:

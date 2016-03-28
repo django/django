@@ -1788,14 +1788,21 @@ saves the language choice in the user's session. Otherwise, it saves the
 language choice in a cookie that is by default named ``django_language``.
 (The name can be changed through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
 
-After setting the language choice, Django redirects the user, following this
-algorithm:
+After setting the language choice, Django looks for a ``next`` parameter in the
+``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
+URL (i.e. it doesn't point to a different host and uses a safe scheme), a
+redirect to that URL will be performed. Otherwise, Django may fall back to
+redirecting the user to the URL from the ``Referer`` header or, if it is not
+set, to ``/``, depending on the nature of the request:
 
-* Django looks for a ``next`` parameter in the ``POST`` data.
-* If that doesn't exist, or is empty, Django tries the URL in the
-  ``Referrer`` header.
-* If that's empty -- say, if a user's browser suppresses that header --
-  then the user will be redirected to ``/`` (the site root) as a fallback.
+* For AJAX requests, the fallback will be performed only if the ``next``
+  parameter was set. Otherwise a 204 status code (No Content) will be returned.
+* For non-AJAX requests, the fallback will always be performed.
+
+.. versionchanged:: 1.10
+
+    Returning a 204 status code for AJAX requests when no redirect is specified
+    is new.
 
 Here's example HTML template code:
 
