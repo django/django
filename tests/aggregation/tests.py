@@ -7,7 +7,7 @@ from decimal import Decimal
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    F, Avg, Count, DecimalField, DurationField, FloatField, Func, IntegerField,
+    Avg, Count, DecimalField, DurationField, F, FloatField, Func, IntegerField,
     Max, Min, Sum, Value,
 )
 from django.test import TestCase

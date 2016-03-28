@@ -8,8 +8,8 @@ from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils.six.moves import range
 
 from .models import (
-    A, M, MR, R, S, T, Avatar, Base, Child, HiddenUser, HiddenUserProfile,
-    M2MFrom, M2MTo, MRNull, Parent, RChild, User, create_a, get_default_r,
+    MR, A, Avatar, Base, Child, HiddenUser, HiddenUserProfile, M, M2MFrom,
+    M2MTo, MRNull, Parent, R, RChild, S, T, User, create_a, get_default_r,
 )
 
 

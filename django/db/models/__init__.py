@@ -7,7 +7,7 @@ from django.db.models.deletion import (  # NOQA
     CASCADE, DO_NOTHING, PROTECT, SET, SET_DEFAULT, SET_NULL, ProtectedError,
 )
 from django.db.models.expressions import (  # NOQA
-    F, Case, Expression, ExpressionWrapper, Func, Value, When,
+    Case, Expression, ExpressionWrapper, F, Func, Value, When,
 )
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields.files import FileField, ImageField  # NOQA
@@ -15,7 +15,7 @@ from django.db.models.fields.proxy import OrderWrt  # NOQA
 from django.db.models.lookups import Lookup, Transform  # NOQA
 from django.db.models.manager import Manager  # NOQA
 from django.db.models.query import (  # NOQA
-    Q, Prefetch, QuerySet, prefetch_related_objects,
+    Prefetch, Q, QuerySet, prefetch_related_objects,
 )
 
 # Imports that would create circular imports if sorted
