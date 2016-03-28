@@ -102,7 +102,7 @@ class TranslateNode(Node):
 class BlockTranslateNode(Node):
 
     def __init__(self, extra_context, singular, plural=None, countervar=None,
-            counter=None, message_context=None, trimmed=False, asvar=None):
+                 counter=None, message_context=None, trimmed=False, asvar=None):
         self.extra_context = extra_context
         self.singular = singular
         self.plural = plural
@@ -169,8 +169,10 @@ class BlockTranslateNode(Node):
         except (KeyError, ValueError):
             if nested:
                 # Either string is malformed, or it's a bug
-                raise TemplateSyntaxError("'blocktrans' is unable to format "
-                    "string returned by gettext: %r using %r" % (result, data))
+                raise TemplateSyntaxError(
+                    "'blocktrans' is unable to format string returned by gettext: %r using %r"
+                    % (result, data)
+                )
             with translation.override(None):
                 result = self.render(context, nested=True)
         if self.asvar:

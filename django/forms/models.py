@@ -738,14 +738,15 @@ class BaseModelFormSet(BaseFormSet):
                 "field": unique_check[0],
             }
         else:
-            return ugettext("Please correct the duplicate data for %(field)s, "
-                "which must be unique.") % {
+            return ugettext("Please correct the duplicate data for %(field)s, which must be unique.") % {
                 "field": get_text_list(unique_check, six.text_type(_("and"))),
             }
 
     def get_date_error_message(self, date_check):
-        return ugettext("Please correct the duplicate data for %(field_name)s "
-            "which must be unique for the %(lookup)s in %(date_field)s.") % {
+        return ugettext(
+            "Please correct the duplicate data for %(field_name)s "
+            "which must be unique for the %(lookup)s in %(date_field)s."
+        ) % {
             'field_name': date_check[2],
             'date_field': date_check[3],
             'lookup': six.text_type(date_check[1]),
@@ -1126,8 +1127,7 @@ class ModelChoiceIterator(object):
             yield self.choice(obj)
 
     def __len__(self):
-        return (len(self.queryset) +
-            (1 if self.field.empty_label is not None else 0))
+        return (len(self.queryset) + (1 if self.field.empty_label is not None else 0))
 
     def choice(self, obj):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
@@ -1252,8 +1252,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def __init__(self, queryset, required=True, widget=None, label=None,
                  initial=None, help_text='', *args, **kwargs):
-        super(ModelMultipleChoiceField, self).__init__(queryset, None,
-            required, widget, label, initial, help_text, *args, **kwargs)
+        super(ModelMultipleChoiceField, self).__init__(
+            queryset, None, required, widget, label, initial, help_text,
+            *args, **kwargs
+        )
 
     def to_python(self, value):
         if not value:

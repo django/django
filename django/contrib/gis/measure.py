@@ -78,8 +78,7 @@ class MeasureBase(object):
             raise AttributeError('Unknown unit type: %s' % name)
 
     def __repr__(self):
-        return '%s(%s=%s)' % (pretty_name(self), self._default_unit,
-            getattr(self, self._default_unit))
+        return '%s(%s=%s)' % (pretty_name(self), self._default_unit, getattr(self, self._default_unit))
 
     def __str__(self):
         return '%s %s' % (getattr(self, self._default_unit), self._default_unit)
@@ -102,8 +101,10 @@ class MeasureBase(object):
 
     def __add__(self, other):
         if isinstance(other, self.__class__):
-            return self.__class__(default_unit=self._default_unit,
-                **{self.STANDARD_UNIT: (self.standard + other.standard)})
+            return self.__class__(
+                default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard + other.standard)}
+            )
         else:
             raise TypeError('%(class)s must be added with %(class)s' % {"class": pretty_name(self)})
 
@@ -116,8 +117,10 @@ class MeasureBase(object):
 
     def __sub__(self, other):
         if isinstance(other, self.__class__):
-            return self.__class__(default_unit=self._default_unit,
-                **{self.STANDARD_UNIT: (self.standard - other.standard)})
+            return self.__class__(
+                default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard - other.standard)}
+            )
         else:
             raise TypeError('%(class)s must be subtracted from %(class)s' % {"class": pretty_name(self)})
 
@@ -130,8 +133,10 @@ class MeasureBase(object):
 
     def __mul__(self, other):
         if isinstance(other, NUMERIC_TYPES):
-            return self.__class__(default_unit=self._default_unit,
-                **{self.STANDARD_UNIT: (self.standard * other)})
+            return self.__class__(
+                default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard * other)}
+            )
         else:
             raise TypeError('%(class)s must be multiplied with number' % {"class": pretty_name(self)})
 
@@ -149,8 +154,10 @@ class MeasureBase(object):
         if isinstance(other, self.__class__):
             return self.standard / other.standard
         if isinstance(other, NUMERIC_TYPES):
-            return self.__class__(default_unit=self._default_unit,
-                **{self.STANDARD_UNIT: (self.standard / other)})
+            return self.__class__(
+                default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard / other)}
+            )
         else:
             raise TypeError('%(class)s must be divided with number or %(class)s' % {"class": pretty_name(self)})
 
@@ -300,11 +307,15 @@ class Distance(MeasureBase):
 
     def __mul__(self, other):
         if isinstance(other, self.__class__):
-            return Area(default_unit=AREA_PREFIX + self._default_unit,
-                **{AREA_PREFIX + self.STANDARD_UNIT: (self.standard * other.standard)})
+            return Area(
+                default_unit=AREA_PREFIX + self._default_unit,
+                **{AREA_PREFIX + self.STANDARD_UNIT: (self.standard * other.standard)}
+            )
         elif isinstance(other, NUMERIC_TYPES):
-            return self.__class__(default_unit=self._default_unit,
-                **{self.STANDARD_UNIT: (self.standard * other)})
+            return self.__class__(
+                default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard * other)}
+            )
         else:
             raise TypeError('%(distance)s must be multiplied with number or %(distance)s' % {
                 "distance": pretty_name(self.__class__),
@@ -320,8 +331,10 @@ class Area(MeasureBase):
 
     def __truediv__(self, other):
         if isinstance(other, NUMERIC_TYPES):
-            return self.__class__(default_unit=self._default_unit,
-                **{self.STANDARD_UNIT: (self.standard / other)})
+            return self.__class__(
+                default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard / other)}
+            )
         else:
             raise TypeError('%(class)s must be divided by a number' % {"class": pretty_name(self)})
 

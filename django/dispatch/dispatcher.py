@@ -144,8 +144,7 @@ class Signal(object):
                 the unique identifier of the receiver to disconnect
         """
         if weak is not None:
-            warnings.warn("Passing `weak` to disconnect has no effect.",
-                RemovedInDjango20Warning, stacklevel=2)
+            warnings.warn("Passing `weak` to disconnect has no effect.", RemovedInDjango20Warning, stacklevel=2)
         if dispatch_uid:
             lookup_key = (dispatch_uid, _make_id(sender))
         else:

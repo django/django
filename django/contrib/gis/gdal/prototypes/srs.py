@@ -56,7 +56,8 @@ angular_units = units_func(lgdal.OSRGetAngularUnits)
 # For exporting to WKT, PROJ.4, "Pretty" WKT, and XML.
 to_wkt = string_output(std_call('OSRExportToWkt'), [c_void_p, POINTER(c_char_p)], decoding='ascii')
 to_proj = string_output(std_call('OSRExportToProj4'), [c_void_p, POINTER(c_char_p)], decoding='ascii')
-to_pretty_wkt = string_output(std_call('OSRExportToPrettyWkt'),
+to_pretty_wkt = string_output(
+    std_call('OSRExportToPrettyWkt'),
     [c_void_p, POINTER(c_char_p), c_int], offset=-2, decoding='ascii'
 )
 

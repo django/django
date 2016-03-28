@@ -90,8 +90,7 @@ def forbid_multi_line_headers(name, val, encoding):
         val.encode('ascii')
     except UnicodeEncodeError:
         if name.lower() in ADDRESS_HEADERS:
-            val = ', '.join(sanitize_address(addr, encoding)
-                for addr in getaddresses((val,)))
+            val = ', '.join(sanitize_address(addr, encoding) for addr in getaddresses((val,)))
         else:
             val = Header(val, encoding).encode()
     else:
@@ -418,8 +417,8 @@ class EmailMultiAlternatives(EmailMessage):
     alternative_subtype = 'alternative'
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
-            connection=None, attachments=None, headers=None, alternatives=None,
-            cc=None, reply_to=None):
+                 connection=None, attachments=None, headers=None, alternatives=None,
+                 cc=None, reply_to=None):
         """
         Initialize a single email message (which can be sent to multiple
         recipients).

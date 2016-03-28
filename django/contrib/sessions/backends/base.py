@@ -110,8 +110,7 @@ class SessionBase(object):
             # ValueError, SuspiciousOperation, unpickling exceptions. If any of
             # these happen, just return an empty dictionary (an empty session).
             if isinstance(e, SuspiciousOperation):
-                logger = logging.getLogger('django.security.%s' %
-                        e.__class__.__name__)
+                logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
                 logger.warning(force_text(e))
             return {}
 

@@ -519,9 +519,10 @@ class Model(six.with_metaclass(ModelBase)):
         if pickled_version:
             current_version = get_version()
             if current_version != pickled_version:
-                msg = ("Pickled model instance's Django version %s does"
-                    " not match the current version %s."
-                    % (pickled_version, current_version))
+                msg = (
+                    "Pickled model instance's Django version %s does not match "
+                    "the current version %s." % (pickled_version, current_version)
+                )
         else:
             msg = "Pickled model instance's Django version is not specified."
 
@@ -1285,9 +1286,7 @@ class Model(six.with_metaclass(ModelBase)):
     @classmethod
     def _check_id_field(cls):
         """ Check if `id` field is a primary key. """
-
-        fields = list(f for f in cls._meta.local_fields
-            if f.name == 'id' and f != cls._meta.pk)
+        fields = list(f for f in cls._meta.local_fields if f.name == 'id' and f != cls._meta.pk)
         # fields is empty or consists of the invalid "id" field
         if fields and not fields[0].primary_key and cls._meta.pk.name == 'id':
             return [
@@ -1342,8 +1341,7 @@ class Model(six.with_metaclass(ModelBase)):
             # field "id" and automatically added unique field "id", both
             # defined at the same model. This special case is considered in
             # _check_id_field and here we ignore it.
-            id_conflict = (f.name == "id" and
-                clash and clash.name == "id" and clash.model == cls)
+            id_conflict = f.name == "id" and clash and clash.name == "id" and clash.model == cls
             if clash and not id_conflict:
                 errors.append(
                     checks.Error(
@@ -1397,8 +1395,7 @@ class Model(six.with_metaclass(ModelBase)):
                 )
             ]
 
-        elif any(not isinstance(fields, (tuple, list))
-                for fields in cls._meta.index_together):
+        elif any(not isinstance(fields, (tuple, list)) for fields in cls._meta.index_together):
             return [
                 checks.Error(
                     "All 'index_together' elements must be lists or tuples.",
@@ -1425,8 +1422,7 @@ class Model(six.with_metaclass(ModelBase)):
                 )
             ]
 
-        elif any(not isinstance(fields, (tuple, list))
-                for fields in cls._meta.unique_together):
+        elif any(not isinstance(fields, (tuple, list)) for fields in cls._meta.unique_together):
             return [
                 checks.Error(
                     "All 'unique_together' elements must be lists or tuples.",

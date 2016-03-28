@@ -199,8 +199,10 @@ class SimpleTestCase(unittest.TestCase):
         include a call to super().setUp().
         """
         testMethod = getattr(self, self._testMethodName)
-        skipped = (getattr(self.__class__, "__unittest_skip__", False) or
-            getattr(testMethod, "__unittest_skip__", False))
+        skipped = (
+            getattr(self.__class__, "__unittest_skip__", False) or
+            getattr(testMethod, "__unittest_skip__", False)
+        )
 
         if not skipped:
             try:
@@ -263,30 +265,34 @@ class SimpleTestCase(unittest.TestCase):
 
         if hasattr(response, 'redirect_chain'):
             # The request was a followed redirect
-            self.assertTrue(len(response.redirect_chain) > 0,
-                msg_prefix + "Response didn't redirect as expected: Response"
-                " code was %d (expected %d)" %
-                    (response.status_code, status_code))
+            self.assertTrue(
+                len(response.redirect_chain) > 0,
+                msg_prefix + "Response didn't redirect as expected: Response code was %d (expected %d)"
+                % (response.status_code, status_code)
+            )
 
-            self.assertEqual(response.redirect_chain[0][1], status_code,
-                msg_prefix + "Initial response didn't redirect as expected:"
-                " Response code was %d (expected %d)" %
-                    (response.redirect_chain[0][1], status_code))
+            self.assertEqual(
+                response.redirect_chain[0][1], status_code,
+                msg_prefix + "Initial response didn't redirect as expected: Response code was %d (expected %d)"
+                % (response.redirect_chain[0][1], status_code)
+            )
 
             url, status_code = response.redirect_chain[-1]
             scheme, netloc, path, query, fragment = urlsplit(url)
 
-            self.assertEqual(response.status_code, target_status_code,
-                msg_prefix + "Response didn't redirect as expected: Final"
-                " Response code was %d (expected %d)" %
-                    (response.status_code, target_status_code))
+            self.assertEqual(
+                response.status_code, target_status_code,
+                msg_prefix + "Response didn't redirect as expected: Final Response code was %d (expected %d)"
+                % (response.status_code, target_status_code)
+            )
 
         else:
             # Not a followed redirect
-            self.assertEqual(response.status_code, status_code,
-                msg_prefix + "Response didn't redirect as expected: Response"
-                " code was %d (expected %d)" %
-                    (response.status_code, status_code))
+            self.assertEqual(
+                response.status_code, status_code,
+                msg_prefix + "Response didn't redirect as expected: Response code was %d (expected %d)"
+                % (response.status_code, status_code)
+            )
 
             url = response.url
             scheme, netloc, path, query, fragment = urlsplit(url)
@@ -297,15 +303,15 @@ class SimpleTestCase(unittest.TestCase):
                 path = urljoin(response.request['PATH_INFO'], path)
 
             if fetch_redirect_response:
-                redirect_response = response.client.get(path, QueryDict(query),
-                                                        secure=(scheme == 'https'))
+                redirect_response = response.client.get(path, QueryDict(query), secure=(scheme == 'https'))
 
                 # Get the redirection page, using the same client that was used
                 # to obtain the original response.
-                self.assertEqual(redirect_response.status_code, target_status_code,
-                    msg_prefix + "Couldn't retrieve redirection page '%s':"
-                    " response code was %d (expected %d)" %
-                        (path, redirect_response.status_code, target_status_code))
+                self.assertEqual(
+                    redirect_response.status_code, target_status_code,
+                    msg_prefix + "Couldn't retrieve redirection page '%s': response code was %d (expected %d)"
+                    % (path, redirect_response.status_code, target_status_code)
+                )
 
         if url != expected_url:
             # For temporary backwards compatibility, try to compare with a relative url
@@ -320,9 +326,10 @@ class SimpleTestCase(unittest.TestCase):
                     RemovedInDjango20Warning, stacklevel=2)
                 expected_url = relative_url
 
-        self.assertEqual(url, expected_url,
-            msg_prefix + "Response redirected to '%s', expected '%s'" %
-                (url, expected_url))
+        self.assertEqual(
+            url, expected_url,
+            msg_prefix + "Response redirected to '%s', expected '%s'" % (url, expected_url)
+        )
 
     def _assert_contains(self, response, text, status_code, msg_prefix, html):
         # If the response supports deferred rendering and hasn't been rendered
@@ -333,9 +340,11 @@ class SimpleTestCase(unittest.TestCase):
         if msg_prefix:
             msg_prefix += ": "
 
-        self.assertEqual(response.status_code, status_code,
+        self.assertEqual(
+            response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
-            " (expected %d)" % (response.status_code, status_code))
+            " (expected %d)" % (response.status_code, status_code)
+        )
 
         if response.streaming:
             content = b''.join(response.streaming_content)
@@ -348,15 +357,12 @@ class SimpleTestCase(unittest.TestCase):
         else:
             text_repr = repr(text)
         if html:
-            content = assert_and_parse_html(self, content, None,
-                "Response's content is not valid HTML:")
-            text = assert_and_parse_html(self, text, None,
-                "Second argument is not valid HTML:")
+            content = assert_and_parse_html(self, content, None, "Response's content is not valid HTML:")
+            text = assert_and_parse_html(self, text, None, "Second argument is not valid HTML:")
         real_count = content.count(text)
         return (text_repr, real_count, msg_prefix)
 
-    def assertContains(self, response, text, count=None, status_code=200,
-                       msg_prefix='', html=False):
+    def assertContains(self, response, text, count=None, status_code=200, msg_prefix='', html=False):
         """
         Asserts that a response indicates that some content was retrieved
         successfully, (i.e., the HTTP status code was as expected), and that
@@ -368,15 +374,14 @@ class SimpleTestCase(unittest.TestCase):
             response, text, status_code, msg_prefix, html)
 
         if count is not None:
-            self.assertEqual(real_count, count,
-                msg_prefix + "Found %d instances of %s in response"
-                " (expected %d)" % (real_count, text_repr, count))
+            self.assertEqual(
+                real_count, count,
+                msg_prefix + "Found %d instances of %s in response (expected %d)" % (real_count, text_repr, count)
+            )
         else:
-            self.assertTrue(real_count != 0,
-                msg_prefix + "Couldn't find %s in response" % text_repr)
+            self.assertTrue(real_count != 0, msg_prefix + "Couldn't find %s in response" % text_repr)
 
-    def assertNotContains(self, response, text, status_code=200,
-                          msg_prefix='', html=False):
+    def assertNotContains(self, response, text, status_code=200, msg_prefix='', html=False):
         """
         Asserts that a response indicates that some content was retrieved
         successfully, (i.e., the HTTP status code was as expected), and that
@@ -385,8 +390,7 @@ class SimpleTestCase(unittest.TestCase):
         text_repr, real_count, msg_prefix = self._assert_contains(
             response, text, status_code, msg_prefix, html)
 
-        self.assertEqual(real_count, 0,
-                msg_prefix + "Response should not contain %s" % text_repr)
+        self.assertEqual(real_count, 0, msg_prefix + "Response should not contain %s" % text_repr)
 
     def assertFormError(self, response, form, field, errors, msg_prefix=''):
         """
@@ -399,8 +403,7 @@ class SimpleTestCase(unittest.TestCase):
         # Put context(s) into a list to simplify processing.
         contexts = to_list(response.context)
         if not contexts:
-            self.fail(msg_prefix + "Response did not use any contexts to "
-                      "render the response")
+            self.fail(msg_prefix + "Response did not use any contexts to render the response")
 
         # Put error(s) into a list to simplify processing.
         errors = to_list(errors)
@@ -415,29 +418,34 @@ class SimpleTestCase(unittest.TestCase):
                 if field:
                     if field in context[form].errors:
                         field_errors = context[form].errors[field]
-                        self.assertTrue(err in field_errors,
+                        self.assertTrue(
+                            err in field_errors,
                             msg_prefix + "The field '%s' on form '%s' in"
                             " context %d does not contain the error '%s'"
                             " (actual errors: %s)" %
-                            (field, form, i, err, repr(field_errors)))
+                            (field, form, i, err, repr(field_errors))
+                        )
                     elif field in context[form].fields:
-                        self.fail(msg_prefix + "The field '%s' on form '%s'"
-                                  " in context %d contains no errors" %
-                                  (field, form, i))
+                        self.fail(
+                            msg_prefix + "The field '%s' on form '%s' in context %d contains no errors" %
+                            (field, form, i)
+                        )
                     else:
-                        self.fail(msg_prefix + "The form '%s' in context %d"
-                                  " does not contain the field '%s'" %
-                                  (form, i, field))
+                        self.fail(
+                            msg_prefix + "The form '%s' in context %d does not contain the field '%s'" %
+                            (form, i, field)
+                        )
                 else:
                     non_field_errors = context[form].non_field_errors()
-                    self.assertTrue(err in non_field_errors,
+                    self.assertTrue(
+                        err in non_field_errors,
                         msg_prefix + "The form '%s' in context %d does not"
                         " contain the non-field error '%s'"
                         " (actual errors: %s)" %
-                            (form, i, err, non_field_errors))
+                        (form, i, err, non_field_errors)
+                    )
         if not found_form:
-            self.fail(msg_prefix + "The form '%s' was not used to render the"
-                      " response" % form)
+            self.fail(msg_prefix + "The form '%s' was not used to render the response" % form)
 
     def assertFormsetError(self, response, formset, form_index, field, errors,
                            msg_prefix=''):
@@ -473,48 +481,51 @@ class SimpleTestCase(unittest.TestCase):
                 if field is not None:
                     if field in context[formset].forms[form_index].errors:
                         field_errors = context[formset].forms[form_index].errors[field]
-                        self.assertTrue(err in field_errors,
-                                msg_prefix + "The field '%s' on formset '%s', "
-                                "form %d in context %d does not contain the "
-                                "error '%s' (actual errors: %s)" %
-                                (field, formset, form_index, i, err,
-                                 repr(field_errors)))
+                        self.assertTrue(
+                            err in field_errors,
+                            msg_prefix + "The field '%s' on formset '%s', "
+                            "form %d in context %d does not contain the "
+                            "error '%s' (actual errors: %s)" %
+                            (field, formset, form_index, i, err, repr(field_errors))
+                        )
                     elif field in context[formset].forms[form_index].fields:
-                        self.fail(msg_prefix + "The field '%s' "
-                                  "on formset '%s', form %d in "
-                                  "context %d contains no errors" %
-                                  (field, formset, form_index, i))
+                        self.fail(
+                            msg_prefix + "The field '%s' on formset '%s', form %d in context %d contains no errors"
+                            % (field, formset, form_index, i)
+                        )
                     else:
-                        self.fail(msg_prefix + "The formset '%s', form %d in "
-                                  "context %d does not contain the field '%s'" %
-                                  (formset, form_index, i, field))
+                        self.fail(
+                            msg_prefix + "The formset '%s', form %d in context %d does not contain the field '%s'"
+                            % (formset, form_index, i, field)
+                        )
                 elif form_index is not None:
                     non_field_errors = context[formset].forms[form_index].non_field_errors()
-                    self.assertFalse(len(non_field_errors) == 0,
-                                     msg_prefix + "The formset '%s', form %d in "
-                                     "context %d does not contain any non-field "
-                                     "errors." % (formset, form_index, i))
-                    self.assertTrue(err in non_field_errors,
-                                    msg_prefix + "The formset '%s', form %d "
-                                    "in context %d does not contain the "
-                                    "non-field error '%s' "
-                                    "(actual errors: %s)" %
-                                    (formset, form_index, i, err,
-                                     repr(non_field_errors)))
+                    self.assertFalse(
+                        len(non_field_errors) == 0,
+                        msg_prefix + "The formset '%s', form %d in context %d "
+                        "does not contain any non-field errors." % (formset, form_index, i)
+                    )
+                    self.assertTrue(
+                        err in non_field_errors,
+                        msg_prefix + "The formset '%s', form %d in context %d "
+                        "does not contain the non-field error '%s' (actual errors: %s)"
+                        % (formset, form_index, i, err, repr(non_field_errors))
+                    )
                 else:
                     non_form_errors = context[formset].non_form_errors()
-                    self.assertFalse(len(non_form_errors) == 0,
-                                     msg_prefix + "The formset '%s' in "
-                                     "context %d does not contain any "
-                                     "non-form errors." % (formset, i))
-                    self.assertTrue(err in non_form_errors,
-                                    msg_prefix + "The formset '%s' in context "
-                                    "%d does not contain the "
-                                    "non-form error '%s' (actual errors: %s)" %
-                                    (formset, i, err, repr(non_form_errors)))
+                    self.assertFalse(
+                        len(non_form_errors) == 0,
+                        msg_prefix + "The formset '%s' in context %d does not "
+                        "contain any non-form errors." % (formset, i)
+                    )
+                    self.assertTrue(
+                        err in non_form_errors,
+                        msg_prefix + "The formset '%s' in context %d does not "
+                        "contain the non-form error '%s' (actual errors: %s)"
+                        % (formset, i, err, repr(non_form_errors))
+                    )
         if not found_formset:
-            self.fail(msg_prefix + "The formset '%s' was not used to render "
-                      "the response" % formset)
+            self.fail(msg_prefix + "The formset '%s' was not used to render the response" % formset)
 
     def _assert_template_used(self, response, template_name, msg_prefix):
 
@@ -537,8 +548,7 @@ class SimpleTestCase(unittest.TestCase):
             # use this template with context manager
             return template_name, None, msg_prefix
 
-        template_names = [t.name for t in response.templates if t.name is not
-                          None]
+        template_names = [t.name for t in response.templates if t.name is not None]
         return None, template_names, msg_prefix
 
     def assertTemplateUsed(self, response=None, template_name=None, msg_prefix='', count=None):
@@ -555,33 +565,37 @@ class SimpleTestCase(unittest.TestCase):
 
         if not template_names:
             self.fail(msg_prefix + "No templates used to render the response")
-        self.assertTrue(template_name in template_names,
+        self.assertTrue(
+            template_name in template_names,
             msg_prefix + "Template '%s' was not a template used to render"
-            " the response. Actual template(s) used: %s" %
-                (template_name, ', '.join(template_names)))
+            " the response. Actual template(s) used: %s"
+            % (template_name, ', '.join(template_names))
+        )
 
         if count is not None:
-            self.assertEqual(template_names.count(template_name), count,
+            self.assertEqual(
+                template_names.count(template_name), count,
                 msg_prefix + "Template '%s' was expected to be rendered %d "
-                "time(s) but was actually rendered %d time(s)." %
-                    (template_name, count, template_names.count(template_name)))
+                "time(s) but was actually rendered %d time(s)."
+                % (template_name, count, template_names.count(template_name))
+            )
 
     def assertTemplateNotUsed(self, response=None, template_name=None, msg_prefix=''):
         """
         Asserts that the template with the provided name was NOT used in
         rendering the response. Also usable as context manager.
         """
-
         context_mgr_template, template_names, msg_prefix = self._assert_template_used(
-            response, template_name, msg_prefix)
-
+            response, template_name, msg_prefix
+        )
         if context_mgr_template:
             # Use assertTemplateNotUsed as context manager.
             return _AssertTemplateNotUsedContext(self, context_mgr_template)
 
-        self.assertFalse(template_name in template_names,
-            msg_prefix + "Template '%s' was used unexpectedly in rendering"
-            " the response" % template_name)
+        self.assertFalse(
+            template_name in template_names,
+            msg_prefix + "Template '%s' was used unexpectedly in rendering the response" % template_name
+        )
 
     @contextmanager
     def _assert_raises_message_cm(self, expected_exception, expected_message):
@@ -620,7 +634,7 @@ class SimpleTestCase(unittest.TestCase):
             callable_obj(*args, **kwargs)
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
-            field_kwargs=None, empty_value=''):
+                          field_kwargs=None, empty_value=''):
         """
         Asserts that a form field behaves correctly with various inputs.
 
@@ -639,8 +653,7 @@ class SimpleTestCase(unittest.TestCase):
         if field_kwargs is None:
             field_kwargs = {}
         required = fieldclass(*field_args, **field_kwargs)
-        optional = fieldclass(*field_args,
-                              **dict(field_kwargs, required=False))
+        optional = fieldclass(*field_args, **dict(field_kwargs, required=False))
         # test valid inputs
         for input, output in valid.items():
             self.assertEqual(required.clean(input), output)
@@ -659,14 +672,12 @@ class SimpleTestCase(unittest.TestCase):
         for e in required.empty_values:
             with self.assertRaises(ValidationError) as context_manager:
                 required.clean(e)
-            self.assertEqual(context_manager.exception.messages,
-                             error_required)
+            self.assertEqual(context_manager.exception.messages, error_required)
             self.assertEqual(optional.clean(e), empty_value)
         # test that max_length and min_length are always accepted
         if issubclass(fieldclass, CharField):
             field_kwargs.update({'min_length': 2, 'max_length': 20})
-            self.assertIsInstance(fieldclass(*field_args, **field_kwargs),
-                                  fieldclass)
+            self.assertIsInstance(fieldclass(*field_args, **field_kwargs), fieldclass)
 
     def assertHTMLEqual(self, html1, html2, msg=None):
         """
@@ -674,26 +685,23 @@ class SimpleTestCase(unittest.TestCase):
         Whitespace in most cases is ignored, and attribute ordering is not
         significant. The passed-in arguments must be valid HTML.
         """
-        dom1 = assert_and_parse_html(self, html1, msg,
-            'First argument is not valid HTML:')
-        dom2 = assert_and_parse_html(self, html2, msg,
-            'Second argument is not valid HTML:')
+        dom1 = assert_and_parse_html(self, html1, msg, 'First argument is not valid HTML:')
+        dom2 = assert_and_parse_html(self, html2, msg, 'Second argument is not valid HTML:')
 
         if dom1 != dom2:
             standardMsg = '%s != %s' % (
                 safe_repr(dom1, True), safe_repr(dom2, True))
             diff = ('\n' + '\n'.join(difflib.ndiff(
-                           six.text_type(dom1).splitlines(),
-                           six.text_type(dom2).splitlines())))
+                six.text_type(dom1).splitlines(),
+                six.text_type(dom2).splitlines(),
+            )))
             standardMsg = self._truncateMessage(standardMsg, diff)
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertHTMLNotEqual(self, html1, html2, msg=None):
         """Asserts that two HTML snippets are not semantically equivalent."""
-        dom1 = assert_and_parse_html(self, html1, msg,
-            'First argument is not valid HTML:')
-        dom2 = assert_and_parse_html(self, html2, msg,
-            'Second argument is not valid HTML:')
+        dom1 = assert_and_parse_html(self, html1, msg, 'First argument is not valid HTML:')
+        dom2 = assert_and_parse_html(self, html2, msg, 'Second argument is not valid HTML:')
 
         if dom1 == dom2:
             standardMsg = '%s == %s' % (
@@ -701,18 +709,16 @@ class SimpleTestCase(unittest.TestCase):
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertInHTML(self, needle, haystack, count=None, msg_prefix=''):
-        needle = assert_and_parse_html(self, needle, None,
-            'First argument is not valid HTML:')
-        haystack = assert_and_parse_html(self, haystack, None,
-            'Second argument is not valid HTML:')
+        needle = assert_and_parse_html(self, needle, None, 'First argument is not valid HTML:')
+        haystack = assert_and_parse_html(self, haystack, None, 'Second argument is not valid HTML:')
         real_count = haystack.count(needle)
         if count is not None:
-            self.assertEqual(real_count, count,
-                msg_prefix + "Found %d instances of '%s' in response"
-                " (expected %d)" % (real_count, needle, count))
+            self.assertEqual(
+                real_count, count,
+                msg_prefix + "Found %d instances of '%s' in response (expected %d)" % (real_count, needle, count)
+            )
         else:
-            self.assertTrue(real_count != 0,
-                msg_prefix + "Couldn't find '%s' in response" % needle)
+            self.assertTrue(real_count != 0, msg_prefix + "Couldn't find '%s' in response" % needle)
 
     def assertJSONEqual(self, raw, expected_data, msg=None):
         """
@@ -821,10 +827,12 @@ class TransactionTestCase(SimpleTestCase):
         super(TransactionTestCase, self)._pre_setup()
         if self.available_apps is not None:
             apps.set_available_apps(self.available_apps)
-            setting_changed.send(sender=settings._wrapped.__class__,
-                                 setting='INSTALLED_APPS',
-                                 value=self.available_apps,
-                                 enter=True)
+            setting_changed.send(
+                sender=settings._wrapped.__class__,
+                setting='INSTALLED_APPS',
+                value=self.available_apps,
+                enter=True,
+            )
             for db_name in self._databases_names(include_mirrors=False):
                 emit_post_migrate_signal(verbosity=0, interactive=False, db=db_name)
         try:
@@ -832,11 +840,12 @@ class TransactionTestCase(SimpleTestCase):
         except Exception:
             if self.available_apps is not None:
                 apps.unset_available_apps()
-                setting_changed.send(sender=settings._wrapped.__class__,
-                                     setting='INSTALLED_APPS',
-                                     value=settings.INSTALLED_APPS,
-                                     enter=False)
-
+                setting_changed.send(
+                    sender=settings._wrapped.__class__,
+                    setting='INSTALLED_APPS',
+                    value=settings.INSTALLED_APPS,
+                    enter=False,
+                )
             raise
 
     @classmethod
@@ -844,8 +853,10 @@ class TransactionTestCase(SimpleTestCase):
         # If the test case has a multi_db=True flag, act on all databases,
         # including mirrors or not. Otherwise, just on the default DB.
         if getattr(cls, 'multi_db', False):
-            return [alias for alias in connections
-                    if include_mirrors or not connections[alias].settings_dict['TEST']['MIRROR']]
+            return [
+                alias for alias in connections
+                if include_mirrors or not connections[alias].settings_dict['TEST']['MIRROR']
+            ]
         else:
             return [DEFAULT_DB_ALIAS]
 

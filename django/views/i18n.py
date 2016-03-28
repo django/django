@@ -49,10 +49,12 @@ def set_language(request):
             if hasattr(request, 'session'):
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
             else:
-                response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code,
-                                    max_age=settings.LANGUAGE_COOKIE_AGE,
-                                    path=settings.LANGUAGE_COOKIE_PATH,
-                                    domain=settings.LANGUAGE_COOKIE_DOMAIN)
+                response.set_cookie(
+                    settings.LANGUAGE_COOKIE_NAME, lang_code,
+                    max_age=settings.LANGUAGE_COOKIE_AGE,
+                    path=settings.LANGUAGE_COOKIE_PATH,
+                    domain=settings.LANGUAGE_COOKIE_DOMAIN,
+                )
     return response
 
 

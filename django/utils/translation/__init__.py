@@ -120,10 +120,11 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                     try:
                         number_value = rhs[number]
                     except KeyError:
-                        raise KeyError('Your dictionary lacks key \'%s\'. '
-                            'Please provide it, because it is required to '
-                            'determine whether string is singular or plural.'
-                            % number)
+                        raise KeyError(
+                            "Your dictionary lacks key '%s\'. Please provide "
+                            "it, because it is required to determine whether "
+                            "string is singular or plural." % number
+                        )
                 else:
                     number_value = rhs
                 kwargs['number'] = number_value

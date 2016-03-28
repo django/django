@@ -376,29 +376,39 @@ class DiscoverRunner(object):
 
     @classmethod
     def add_arguments(cls, parser):
-        parser.add_argument('-t', '--top-level-directory',
-            action='store', dest='top_level', default=None,
-            help='Top level of project for unittest discovery.')
-        parser.add_argument('-p', '--pattern', action='store', dest='pattern',
-            default="test*.py",
-            help='The test matching pattern. Defaults to test*.py.')
-        parser.add_argument('-k', '--keepdb', action='store_true', dest='keepdb',
-            default=False,
-            help='Preserves the test DB between runs.')
-        parser.add_argument('-r', '--reverse', action='store_true', dest='reverse',
-            default=False,
-            help='Reverses test cases order.')
-        parser.add_argument('-d', '--debug-sql', action='store_true', dest='debug_sql',
-            default=False,
-            help='Prints logged SQL queries on failure.')
+        parser.add_argument(
+            '-t', '--top-level-directory', action='store', dest='top_level', default=None,
+            help='Top level of project for unittest discovery.',
+        )
+        parser.add_argument(
+            '-p', '--pattern', action='store', dest='pattern', default="test*.py",
+            help='The test matching pattern. Defaults to test*.py.',
+        )
+        parser.add_argument(
+            '-k', '--keepdb', action='store_true', dest='keepdb', default=False,
+            help='Preserves the test DB between runs.'
+        )
+        parser.add_argument(
+            '-r', '--reverse', action='store_true', dest='reverse', default=False,
+            help='Reverses test cases order.',
+        )
+        parser.add_argument(
+            '-d', '--debug-sql', action='store_true', dest='debug_sql', default=False,
+            help='Prints logged SQL queries on failure.',
+        )
         parser.add_argument(
             '--parallel', dest='parallel', nargs='?', default=1, type=int,
             const=default_test_processes(), metavar='N',
-            help='Run tests using up to N parallel processes.')
-        parser.add_argument('--tag', action='append', dest='tags',
-            help='Run only tests with the specified tag. Can be used multiple times.')
-        parser.add_argument('--exclude-tag', action='append', dest='exclude_tags',
-            help='Do not run tests with the specified tag. Can be used multiple times.')
+            help='Run tests using up to N parallel processes.',
+        )
+        parser.add_argument(
+            '--tag', action='append', dest='tags',
+            help='Run only tests with the specified tag. Can be used multiple times.',
+        )
+        parser.add_argument(
+            '--exclude-tag', action='append', dest='exclude_tags',
+            help='Do not run tests with the specified tag. Can be used multiple times.',
+        )
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment()

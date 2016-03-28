@@ -21,8 +21,7 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
 
     def __str__(self):
         original = UnicodeDecodeError.__str__(self)
-        return '%s. You passed in %r (%s)' % (original, self.obj,
-                type(self.obj))
+        return '%s. You passed in %r (%s)' % (original, self.obj, type(self.obj))
 
 
 # For backwards compatibility. (originally in Django, then added to six 1.9)
@@ -42,8 +41,9 @@ def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     return force_text(s, encoding, strings_only, errors)
 
 
-_PROTECTED_TYPES = six.integer_types + (type(None), float, Decimal,
-    datetime.datetime, datetime.date, datetime.time)
+_PROTECTED_TYPES = six.integer_types + (
+    type(None), float, Decimal, datetime.datetime, datetime.date, datetime.time
+)
 
 
 def is_protected_type(obj):

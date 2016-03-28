@@ -24,24 +24,40 @@ class Command(BaseCommand):
     help = "Creates new migration(s) for apps."
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='app_label', nargs='*',
-            help='Specify the app label(s) to create migrations for.')
-        parser.add_argument('--dry-run', action='store_true', dest='dry_run', default=False,
-            help="Just show what migrations would be made; don't actually write them.")
-        parser.add_argument('--merge', action='store_true', dest='merge', default=False,
-            help="Enable fixing of migration conflicts.")
-        parser.add_argument('--empty', action='store_true', dest='empty', default=False,
-            help="Create an empty migration.")
-        parser.add_argument('--noinput', '--no-input',
+        parser.add_argument(
+            'args', metavar='app_label', nargs='*',
+            help='Specify the app label(s) to create migrations for.',
+        )
+        parser.add_argument(
+            '--dry-run', action='store_true', dest='dry_run', default=False,
+            help="Just show what migrations would be made; don't actually write them.",
+        )
+        parser.add_argument(
+            '--merge', action='store_true', dest='merge', default=False,
+            help="Enable fixing of migration conflicts.",
+        )
+        parser.add_argument(
+            '--empty', action='store_true', dest='empty', default=False,
+            help="Create an empty migration.",
+        )
+        parser.add_argument(
+            '--noinput', '--no-input',
             action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.')
-        parser.add_argument('-n', '--name', action='store', dest='name', default=None,
-            help="Use this name for migration file(s).")
-        parser.add_argument('-e', '--exit', action='store_true', dest='exit_code', default=False,
+            help='Tells Django to NOT prompt the user for input of any kind.',
+        )
+        parser.add_argument(
+            '-n', '--name', action='store', dest='name', default=None,
+            help="Use this name for migration file(s).",
+        )
+        parser.add_argument(
+            '-e', '--exit', action='store_true', dest='exit_code', default=False,
             help='Exit with error code 1 if no changes needing migrations are found. '
-            'Deprecated, use the --check option instead.')
-        parser.add_argument('--check', action='store_true', dest='check_changes',
-            help='Exit with a non-zero status if model changes are missing migrations.')
+                 'Deprecated, use the --check option instead.',
+        )
+        parser.add_argument(
+            '--check', action='store_true', dest='check_changes',
+            help='Exit with a non-zero status if model changes are missing migrations.',
+        )
 
     def handle(self, *app_labels, **options):
         self.verbosity = options['verbosity']

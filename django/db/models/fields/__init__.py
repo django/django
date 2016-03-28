@@ -137,12 +137,12 @@ class Field(RegisterLookupMixin):
     description = property(_description)
 
     def __init__(self, verbose_name=None, name=None, primary_key=False,
-            max_length=None, unique=False, blank=False, null=False,
-            db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
-            serialize=True, unique_for_date=None, unique_for_month=None,
-            unique_for_year=None, choices=None, help_text='', db_column=None,
-            db_tablespace=None, auto_created=False, validators=[],
-            error_messages=None):
+                 max_length=None, unique=False, blank=False, null=False,
+                 db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
+                 serialize=True, unique_for_date=None, unique_for_month=None,
+                 unique_for_year=None, choices=None, help_text='', db_column=None,
+                 db_tablespace=None, auto_created=False, validators=[],
+                 error_messages=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -806,8 +806,7 @@ class Field(RegisterLookupMixin):
             if callable(self.default):
                 return self.default()
             return self.default
-        if (not self.empty_strings_allowed or (self.null and
-                   not connection.features.interprets_empty_strings_as_nulls)):
+        if not self.empty_strings_allowed or self.null and not connection.features.interprets_empty_strings_as_nulls:
             return None
         return ""
 
@@ -1177,10 +1176,8 @@ class DateTimeCheckMixin(object):
         # auto_now, auto_now_add, and default are mutually exclusive
         # options. The use of more than one of these options together
         # will trigger an Error
-        mutually_exclusive_options = [self.auto_now_add, self.auto_now,
-                                      self.has_default()]
-        enabled_options = [option not in (None, False)
-                          for option in mutually_exclusive_options].count(True)
+        mutually_exclusive_options = [self.auto_now_add, self.auto_now, self.has_default()]
+        enabled_options = [option not in (None, False) for option in mutually_exclusive_options].count(True)
         if enabled_options > 1:
             return [
                 checks.Error(
@@ -1314,12 +1311,14 @@ class DateField(DateTimeCheckMixin, Field):
     def contribute_to_class(self, cls, name, **kwargs):
         super(DateField, self).contribute_to_class(cls, name, **kwargs)
         if not self.null:
-            setattr(cls, 'get_next_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self,
-                      is_next=True))
-            setattr(cls, 'get_previous_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self,
-                      is_next=False))
+            setattr(
+                cls, 'get_next_by_%s' % self.name,
+                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=True)
+            )
+            setattr(
+                cls, 'get_previous_by_%s' % self.name,
+                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)
+            )
 
     def get_prep_value(self, value):
         value = super(DateField, self).get_prep_value(value)
@@ -1633,8 +1632,7 @@ class DecimalField(Field):
         return utils.format_number(value, self.max_digits, self.decimal_places)
 
     def get_db_prep_save(self, value, connection):
-        return connection.ops.adapt_decimalfield_value(self.to_python(value),
-                self.max_digits, self.decimal_places)
+        return connection.ops.adapt_decimalfield_value(self.to_python(value), self.max_digits, self.decimal_places)
 
     def get_prep_value(self, value):
         value = super(DecimalField, self).get_prep_value(value)
@@ -2002,8 +2000,7 @@ class GenericIPAddressField(Field):
             value = force_text(value)
         value = value.strip()
         if ':' in value:
-            return clean_ipv6_address(value,
-                self.unpack_ipv4, self.error_messages['invalid'])
+            return clean_ipv6_address(value, self.unpack_ipv4, self.error_messages['invalid'])
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):

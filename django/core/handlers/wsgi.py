@@ -158,7 +158,8 @@ class WSGIHandler(base.BaseHandler):
         try:
             request = self.request_class(environ)
         except UnicodeDecodeError:
-            logger.warning('Bad Request (UnicodeDecodeError)',
+            logger.warning(
+                'Bad Request (UnicodeDecodeError)',
                 exc_info=sys.exc_info(),
                 extra={
                     'status_code': 400,

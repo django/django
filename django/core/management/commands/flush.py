@@ -13,16 +13,21 @@ from django.utils.six.moves import input
 
 
 class Command(BaseCommand):
-    help = ('Removes ALL DATA from the database, including data added during '
-           'migrations. Does not achieve a "fresh install" state.')
+    help = (
+        'Removes ALL DATA from the database, including data added during '
+        'migrations. Does not achieve a "fresh install" state.'
+    )
 
     def add_arguments(self, parser):
-        parser.add_argument('--noinput', '--no-input',
+        parser.add_argument(
+            '--noinput', '--no-input',
             action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.')
-        parser.add_argument('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS,
-            help='Nominates a database to flush. Defaults to the "default" database.')
+            help='Tells Django to NOT prompt the user for input of any kind.',
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to flush. Defaults to the "default" database.',
+        )
 
     def handle(self, **options):
         database = options['database']

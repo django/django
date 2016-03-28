@@ -221,8 +221,7 @@ class RelatedField(Field):
         # model_set and it clashes with Target.model_set.
         potential_clashes = rel_opts.fields + rel_opts.many_to_many
         for clash_field in potential_clashes:
-            clash_name = "%s.%s" % (rel_opts.object_name,
-                clash_field.name)  # i. e. "Target.model_set"
+            clash_name = "%s.%s" % (rel_opts.object_name, clash_field.name)  # i.e. "Target.model_set"
             if not rel_is_hidden and clash_field.name == rel_name:
                 errors.append(
                     checks.Error(
@@ -441,8 +440,8 @@ class ForeignObject(RelatedField):
     rel_class = ForeignObjectRel
 
     def __init__(self, to, on_delete, from_fields, to_fields, rel=None, related_name=None,
-            related_query_name=None, limit_choices_to=None, parent_link=False,
-            swappable=True, **kwargs):
+                 related_query_name=None, limit_choices_to=None, parent_link=False,
+                 swappable=True, **kwargs):
 
         if rel is None:
             rel = self.rel_class(
@@ -491,8 +490,9 @@ class ForeignObject(RelatedField):
         has_unique_constraint = any(u <= foreign_fields for u in unique_foreign_fields)
 
         if not has_unique_constraint and len(self.foreign_related_fields) > 1:
-            field_combination = ', '.join("'%s'" % rel_field.name
-                for rel_field in self.foreign_related_fields)
+            field_combination = ', '.join(
+                "'%s'" % rel_field.name for rel_field in self.foreign_related_fields
+            )
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
@@ -743,8 +743,8 @@ class ForeignKey(ForeignObject):
     description = _("Foreign Key (type determined by related field)")
 
     def __init__(self, to, on_delete=None, related_name=None, related_query_name=None,
-            limit_choices_to=None, parent_link=False, to_field=None,
-            db_constraint=True, **kwargs):
+                 limit_choices_to=None, parent_link=False, to_field=None,
+                 db_constraint=True, **kwargs):
         try:
             to._meta.model_name
         except AttributeError:
@@ -1111,9 +1111,9 @@ class ManyToManyField(RelatedField):
     description = _("Many-to-many relationship")
 
     def __init__(self, to, related_name=None, related_query_name=None,
-            limit_choices_to=None, symmetrical=None, through=None,
-            through_fields=None, db_constraint=True, db_table=None,
-            swappable=True, **kwargs):
+                 limit_choices_to=None, symmetrical=None, through=None,
+                 through_fields=None, db_constraint=True, db_table=None,
+                 swappable=True, **kwargs):
         try:
             to._meta
         except AttributeError:
@@ -1241,8 +1241,10 @@ class ManyToManyField(RelatedField):
 
             # Count foreign keys in intermediate model
             if self_referential:
-                seen_self = sum(from_model == getattr(field.remote_field, 'model', None)
-                    for field in self.remote_field.through._meta.fields)
+                seen_self = sum(
+                    from_model == getattr(field.remote_field, 'model', None)
+                    for field in self.remote_field.through._meta.fields
+                )
 
                 if seen_self > 2 and not self.remote_field.through_fields:
                     errors.append(
@@ -1260,10 +1262,14 @@ class ManyToManyField(RelatedField):
 
             else:
                 # Count foreign keys in relationship model
-                seen_from = sum(from_model == getattr(field.remote_field, 'model', None)
-                    for field in self.remote_field.through._meta.fields)
-                seen_to = sum(to_model == getattr(field.remote_field, 'model', None)
-                    for field in self.remote_field.through._meta.fields)
+                seen_from = sum(
+                    from_model == getattr(field.remote_field, 'model', None)
+                    for field in self.remote_field.through._meta.fields
+                )
+                seen_to = sum(
+                    to_model == getattr(field.remote_field, 'model', None)
+                    for field in self.remote_field.through._meta.fields
+                )
 
                 if seen_from > 1 and not self.remote_field.through_fields:
                     errors.append(
@@ -1469,8 +1475,7 @@ class ManyToManyField(RelatedField):
         elif self.db_table:
             return self.db_table
         else:
-            return utils.truncate_name('%s_%s' % (opts.db_table, self.name),
-                                      connection.ops.max_name_length())
+            return utils.truncate_name('%s_%s' % (opts.db_table, self.name), connection.ops.max_name_length())
 
     def _get_m2m_attr(self, related, attr):
         """

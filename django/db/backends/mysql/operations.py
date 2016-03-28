@@ -12,7 +12,8 @@ class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
 
     # MySQL stores positive fields as UNSIGNED ints.
-    integer_field_ranges = dict(BaseDatabaseOperations.integer_field_ranges,
+    integer_field_ranges = dict(
+        BaseDatabaseOperations.integer_field_ranges,
         PositiveSmallIntegerField=(0, 65535),
         PositiveIntegerField=(0, 4294967295),
     )

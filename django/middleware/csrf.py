@@ -97,7 +97,8 @@ class CsrfViewMiddleware(object):
         return None
 
     def _reject(self, request, reason):
-        logger.warning('Forbidden (%s): %s', reason, request.path,
+        logger.warning(
+            'Forbidden (%s): %s', reason, request.path,
             extra={
                 'status_code': 403,
                 'request': request,
@@ -106,7 +107,6 @@ class CsrfViewMiddleware(object):
         return _get_failure_view()(request, reason=reason)
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
-
         if getattr(request, 'csrf_processing_done', False):
             return None
 
