@@ -164,6 +164,11 @@ As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
 
+As with a regular ``Form``, HTML attributes (such as ``maxlength``) will be
+added to rendered tags for browser validation. However, formsets will not add
+the attribute ``required`` as the validation may be incorrect when adding and
+deleting forms.
+
 .. method:: BaseFormSet.total_error_count()
 
 To check how many errors there are in the formset, we can use the

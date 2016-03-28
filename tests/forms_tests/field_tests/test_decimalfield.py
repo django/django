@@ -14,7 +14,7 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_decimalfield_1(self):
         f = DecimalField(max_digits=4, decimal_places=2)
-        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" required />')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -80,7 +80,10 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             max_value=decimal.Decimal('1.5'),
             min_value=decimal.Decimal('0.5')
         )
-        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.5" max="1.5" type="number" id="id_f" />')
+        self.assertWidgetRendersTo(
+            f,
+            '<input step="0.01" name="f" min="0.5" max="1.5" type="number" id="id_f" required />',
+        )
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'"):
             f.clean('1.6')
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 0.5.'"):
@@ -136,7 +139,7 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = DecimalField(max_digits=20)
         self.assertEqual(f.widget_attrs(NumberInput()), {'step': 'any'})
         f = DecimalField(max_digits=6, widget=NumberInput(attrs={'step': '0.01'}))
-        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" type="number" id="id_f" />')
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" type="number" id="id_f" required />')
 
     def test_decimalfield_localized(self):
         """
@@ -144,7 +147,7 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         number input specific attributes.
         """
         f = DecimalField(localize=True)
-        self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" required />')
 
     def test_decimalfield_changed(self):
         f = DecimalField(max_digits=2, decimal_places=2)

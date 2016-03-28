@@ -699,9 +699,9 @@ class TestSplitFormField(PostgreSQLTestCase):
             <tr>
                 <th><label for="id_array_0">Array:</label></th>
                 <td>
-                    <input id="id_array_0" name="array_0" type="text" />
-                    <input id="id_array_1" name="array_1" type="text" />
-                    <input id="id_array_2" name="array_2" type="text" />
+                    <input id="id_array_0" name="array_0" type="text" required />
+                    <input id="id_array_1" name="array_1" type="text" required />
+                    <input id="id_array_2" name="array_2" type="text" required />
                 </td>
             </tr>
         ''')
