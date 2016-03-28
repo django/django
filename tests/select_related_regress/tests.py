@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import six
 
 from .models import (
-    A, B, C, Building, Chick, Child, Class, Client, ClientStatus, Connection,
+    A, B, Building, C, Chick, Child, Class, Client, ClientStatus, Connection,
     Country, Device, Enrollment, Hen, Item, Organizer, Person, Port,
     SpecialClient, State, Student, TUser,
 )

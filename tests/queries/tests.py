@@ -8,7 +8,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.models import F, Q, Count
+from django.db.models import Count, F, Q
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.where import NothingNode, WhereNode
@@ -18,7 +18,7 @@ from django.utils import six
 from django.utils.six.moves import range
 
 from .models import (
-    FK1, X, Annotation, Article, Author, BaseA, Book, CategoryItem,
+    FK1, Annotation, Article, Author, BaseA, Book, CategoryItem,
     CategoryRelationship, Celebrity, Channel, Chapter, Child, ChildObjectA,
     Classroom, Company, Cover, CustomPk, CustomPkTag, Detail, DumbCategory,
     Eaten, Employment, ExtraInfo, Fan, Food, Identifier, Individual, Item, Job,
@@ -30,7 +30,7 @@ from .models import (
     RelatedIndividual, RelatedObject, Report, ReservedName, Responsibility,
     School, SharedConnection, SimpleCategory, SingleObject, SpecialCategory,
     Staff, StaffUser, Student, Tag, Task, Ticket21203Child, Ticket21203Parent,
-    Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid,
+    Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid, X,
 )
 
 

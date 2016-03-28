@@ -16,10 +16,10 @@ from django.db import (
 from django.db.models import sql
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.expressions import F, Date, DateTime
+from django.db.models.expressions import Date, DateTime, F
 from django.db.models.fields import AutoField
 from django.db.models.query_utils import (
-    Q, InvalidQuery, check_rel_lookup_compatibility, deferred_class_factory,
+    InvalidQuery, Q, check_rel_lookup_compatibility, deferred_class_factory,
 )
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone

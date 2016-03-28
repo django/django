@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
-    F, BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, Func,
+    BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, F, Func,
     IntegerField, Sum, Value,
 )
 from django.db.models.functions import Lower

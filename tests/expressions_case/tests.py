@@ -8,7 +8,7 @@ from uuid import UUID
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.db.models import F, Q, Max, Min, Sum, Value
+from django.db.models import F, Max, Min, Q, Sum, Value
 from django.db.models.expressions import Case, When
 from django.test import TestCase
 from django.utils import six
