@@ -151,9 +151,14 @@ class GDALBand(GDALBase):
         """
         Sets the nodata value for this band.
         """
-        if not isinstance(value, (int, float)):
-            raise ValueError('Nodata value must be numeric.')
-        capi.set_band_nodata_value(self._ptr, value)
+        if value is None:
+            if not capi.delete_band_nodata_value:
+                raise ValueError('GDAL >= 2.1 required to delete nodata values.')
+            capi.delete_band_nodata_value(self._ptr)
+        elif not isinstance(value, (int, float)):
+            raise ValueError('Nodata value must be numeric or None.')
+        else:
+            capi.set_band_nodata_value(self._ptr, value)
         self._flush()
 
     def datatype(self, as_string=False):
