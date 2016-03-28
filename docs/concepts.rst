@@ -128,7 +128,7 @@ However, the crucial part is that you can run code (and so send on channels) in
 response to any event - and that includes ones you create. You can trigger
 on model saves, on other incoming messages, or from code paths inside views
 and forms. That approach comes in handy for push-style
-code - where you WebSockets or HTTP long-polling to notify
+code - where you use WebSockets or HTTP long-polling to notify
 clients of changes in real time (messages in a chat, perhaps, or live updates
 in an admin as another user edits something).
 
