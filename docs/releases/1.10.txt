@@ -267,6 +267,10 @@ Internationalization
   :func:`~django.conf.urls.i18n.i18n_patterns` to ``False``, you can allow
   accessing the default language without a URL prefix.
 
+* :func:`~django.views.i18n.set_language` now returns a 204 status code (No
+  Content) for AJAX requests when there is no ``next`` parameter in ``POST`` or
+  ``GET``.
+
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
@@ -694,6 +698,9 @@ Miscellaneous
 * In light of the previous change, the test client's
   :meth:`~django.test.Client.login()` method no longer always rejects inactive
   users but instead delegates this decision to the authentication backend.
+
+* :func:`django.views.i18n.set_language` may now return a 204 status code for
+  AJAX requests.
 
 .. _deprecated-features-1.10:
 
