@@ -278,7 +278,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
 class BaseModelForm(BaseForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
-                 empty_permitted=False, instance=None):
+                 empty_permitted=False, instance=None, use_required_attribute=None):
         opts = self._meta
         if opts.model is None:
             raise ValueError('ModelForm has no model class specified.')
@@ -296,8 +296,10 @@ class BaseModelForm(BaseForm):
         # It is False by default so overriding self.clean() and failing to call
         # super will stop validate_unique from being called.
         self._validate_unique = False
-        super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
-                                            error_class, label_suffix, empty_permitted)
+        super(BaseModelForm, self).__init__(
+            data, files, auto_id, prefix, object_data, error_class,
+            label_suffix, empty_permitted, use_required_attribute=use_required_attribute,
+        )
         # Apply ``limit_choices_to`` to each field.
         for field_name in self.fields:
             formfield = self.fields[field_name]
