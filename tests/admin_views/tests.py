@@ -3123,6 +3123,11 @@ class AdminActionsTest(TestCase):
             'action': 'delete_selected',
             'index': 0,
         }
+        delete_confirmation_data = {
+            ACTION_CHECKBOX_NAME: [q1.pk],
+            'action': 'delete_selected',
+            'post': 'yes',
+        }
 
         response = self.client.post(reverse('admin:admin_views_question_changelist'), action_data)
 
@@ -3137,6 +3142,12 @@ class AdminActionsTest(TestCase):
             '<li>Answer: <a href="%s">Yes.</a></li>' % reverse('admin:admin_views_answer_change', args=(a2.pk,)),
             html=True
         )
+
+        # A POST request to delete protected objects should display the page
+        # which says the deletion is prohibited.
+        response = self.client.post(reverse('admin:admin_views_question_changelist'), delete_confirmation_data)
+        self.assertEqual(Question.objects.count(), 2)
+        self.assertContains(response, "would require deleting the following protected related objects")
 
     def test_model_admin_default_delete_action_no_change_url(self):
         """
