@@ -1,5 +1,6 @@
 *.egg-info
 dist/
+build/
 docs/_build
 __pycache__/
 *.sqlite3
