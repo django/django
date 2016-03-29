@@ -1,3 +1,13 @@
+0.10.3 (2016-03-29)
+-------------------
+
+* Better error messages for wrongly-constructed routing lists
+
+* Error when trying to use signed cookie backend with channel_session
+
+* ASGI group_expiry implemented on database channel backend
+
+
 0.10.2 (2016-03-23)
 -------------------
 
