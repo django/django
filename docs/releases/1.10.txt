@@ -267,6 +267,9 @@ Internationalization
   :func:`~django.conf.urls.i18n.i18n_patterns` to ``False``, you can allow
   accessing the default language without a URL prefix.
 
+* ``{% blocktrans %}`` template tag now has `force_escape` option to force HTML
+  escaping for translated content.
+
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
