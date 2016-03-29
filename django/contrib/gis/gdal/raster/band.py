@@ -170,7 +170,7 @@ class GDALBand(GDALBase):
             dtype = GDAL_PIXEL_TYPES[dtype]
         return dtype
 
-    def data(self, data=None, offset=None, size=None, as_memoryview=False):
+    def data(self, data=None, offset=None, size=None, shape=None, as_memoryview=False):
         """
         Reads or writes pixel values for this band. Blocks of data can
         be accessed by specifying the width, height and offset of the
@@ -185,6 +185,9 @@ class GDALBand(GDALBase):
         if not size:
             size = (self.width - offset[0], self.height - offset[1])
 
+        if not shape:
+            shape = size
+
         if any(x <= 0 for x in size):
             raise ValueError('Offset too big for this raster.')
 
@@ -192,7 +195,7 @@ class GDALBand(GDALBase):
             raise ValueError('Size is larger than raster.')
 
         # Create ctypes type array generator
-        ctypes_array = GDAL_TO_CTYPES[self.datatype()] * (size[0] * size[1])
+        ctypes_array = GDAL_TO_CTYPES[self.datatype()] * (shape[0] * shape[1])
 
         if data is None:
             # Set read mode
@@ -211,8 +214,8 @@ class GDALBand(GDALBase):
 
         # Access band
         capi.band_io(self._ptr, access_flag, offset[0], offset[1],
-                     size[0], size[1], byref(data_array), size[0],
-                     size[1], self.datatype(), 0, 0)
+                     size[0], size[1], byref(data_array), shape[0],
+                     shape[1], self.datatype(), 0, 0)
 
         # Return data as numpy array if possible, otherwise as list
         if data is None:

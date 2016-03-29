@@ -143,6 +143,10 @@ Minor features
   primary key of objects in the ``properties`` dictionary if specific fields
   aren't specified.
 
+* The ability to replicate input data on the :meth:`GDALBand.data()
+  <django.contrib.gis.gdal.GDALBand.data>` method was added. Band data can
+  now be updated with repeated values efficiently.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
