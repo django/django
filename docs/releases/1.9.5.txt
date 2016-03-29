@@ -43,3 +43,6 @@ Bugfixes
 
 * Fixed a regression with abstract model inheritance and explicit parent links
   (:ticket:`26413`).
+
+* Fixed a regression that caused migrations to fail when renaming the primary
+  key of a model containing a ``ForeignKey`` to ```'self'`` (:ticket:`26384`).
