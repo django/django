@@ -105,37 +105,26 @@ class ProxyModelTests(TestCase):
         with self.assertRaises(Person.MultipleObjectsReturned):
             StatusPerson.objects.get(id__lt=max_id + 1)
 
-    def test_abc(self):
-        """
-        All base classes must be non-abstract
-        """
-        def build_abc():
+    def test_abstract_base_with_model_fields(self):
+        msg = "Abstract base class containing model fields not permitted for proxy model 'NoAbstract'."
+        with self.assertRaisesMessage(TypeError, msg):
             class NoAbstract(Abstract):
                 class Meta:
                     proxy = True
-        with self.assertRaises(TypeError):
-            build_abc()
 
-    @isolate_apps('proxy_models')
-    def test_no_cbc(self):
-        """
-        The proxy must actually have one concrete base class
-        """
-        def build_no_cbc():
-            class TooManyBases(Person, Abstract):
+    def test_too_many_concrete_classes(self):
+        msg = "Proxy model 'TooManyBases' has more than one non-abstract model base class."
+        with self.assertRaisesMessage(TypeError, msg):
+            class TooManyBases(User, Person):
                 class Meta:
                     proxy = True
-        with self.assertRaises(TypeError):
-            build_no_cbc()
 
-    @isolate_apps('proxy_models')
     def test_no_base_classes(self):
-        def build_no_base_classes():
+        msg = "Proxy model 'NoBaseClasses' has no non-abstract model base class."
+        with self.assertRaisesMessage(TypeError, msg):
             class NoBaseClasses(models.Model):
                 class Meta:
                     proxy = True
-        with self.assertRaises(TypeError):
-            build_no_base_classes()
 
     @isolate_apps('proxy_models')
     def test_new_fields(self):
