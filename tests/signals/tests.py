@@ -267,7 +267,7 @@ class LazyModelRefTest(BaseSignalTest):
         self.received.append(kwargs)
 
     def test_invalid_sender_model_name(self):
-        msg = "Specified sender must either be a model or a model name of the 'app_label.ModelName' form."
+        msg = "Invalid model reference 'invalid'. String model references must be of the form 'app_label.ModelName'."
         with self.assertRaisesMessage(ValueError, msg):
             signals.post_init.connect(self.receiver, sender='invalid')
 
@@ -285,10 +285,10 @@ class LazyModelRefTest(BaseSignalTest):
         finally:
             signals.post_init.disconnect(self.receiver, sender=Book)
 
-    @isolate_apps('signals')
-    def test_not_loaded_model(self):
+    @isolate_apps('signals', kwarg_name='apps')
+    def test_not_loaded_model(self, apps):
         signals.post_init.connect(
-            self.receiver, sender='signals.Created', weak=False
+            self.receiver, sender='signals.Created', weak=False, apps=apps
         )
 
         try:
