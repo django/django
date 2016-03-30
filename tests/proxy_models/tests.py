@@ -13,9 +13,9 @@ from django.urls import reverse
 from .admin import admin as force_admin_model_registration  # NOQA
 from .models import (
     Abstract, BaseUser, Bug, Country, Improvement, Issue, LowerStatusPerson,
-    MyPerson, MyPersonProxy, OtherPerson, Person, ProxyBug, ProxyImprovement,
-    ProxyProxyBug, ProxyTrackerUser, State, StateProxy, StatusPerson,
-    TrackerUser, User, UserProxy, UserProxyProxy,
+    MultiUserProxy, MyPerson, MyPersonProxy, OtherPerson, Person, ProxyBug,
+    ProxyImprovement, ProxyProxyBug, ProxyTrackerUser, State, StateProxy,
+    StatusPerson, TrackerUser, User, UserProxy, UserProxyProxy,
 )
 
 
@@ -104,6 +104,17 @@ class ProxyModelTests(TestCase):
 
         with self.assertRaises(Person.MultipleObjectsReturned):
             StatusPerson.objects.get(id__lt=max_id + 1)
+
+    def test_multiple_abc(self):
+        """
+        Proxy cannot have multiple abstract base classes
+        """
+        def build_multiple_abc():
+            class MultipleAbstract(User, Person):
+                class Meta:
+                    proxy = True
+        with self.assertRaises(TypeError):
+            build_multiple_abc()
 
     def test_abc(self):
         """
@@ -257,7 +268,12 @@ class ProxyModelTests(TestCase):
         ctype = ContentType.objects.get_for_model
         self.assertIs(ctype(Person), ctype(OtherPerson))
 
-    def test_user_userproxy_userproxyproxy(self):
+    def test_user_proxy_models(self):
+        """
+        Test various ways in which a model (User) can directly or indirectly
+        be proxied.
+        """
+
         User.objects.create(name='Bruce')
 
         resp = [u.name for u in User.objects.all()]
@@ -267,6 +283,9 @@ class ProxyModelTests(TestCase):
         self.assertEqual(resp, ['Bruce'])
 
         resp = [u.name for u in UserProxyProxy.objects.all()]
+        self.assertEqual(resp, ['Bruce'])
+
+        resp = [u.name for u in MultiUserProxy.objects.all()]
         self.assertEqual(resp, ['Bruce'])
 
     def test_proxy_for_model(self):

@@ -177,10 +177,10 @@ class ModelBase(type):
                         )
                     else:
                         continue
-                if base is not None:
-                    raise TypeError("Proxy model '%s' has more than one non-abstract model base class." % name)
-                else:
+                if base is None:
                     base = parent
+                elif parent._meta.concrete_model is not base._meta.concrete_model:
+                    raise TypeError("Proxy model '%s' has more than one non-abstract model base class." % name)
             if base is None:
                 raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
             new_class._meta.setup_proxy(base)
