@@ -270,7 +270,7 @@ def construct_relative_path(name, relative_name):
 
     if new_name.startswith('../'):
         raise TemplateSyntaxError(
-            "Relative name '%s' has more parent folders, then the template name %s in which the tag appears"
+            "Relative name '%s' points outside the file hierarchy that template %s is in"
             % (relative_name, name)
         )
 

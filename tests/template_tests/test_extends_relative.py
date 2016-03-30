@@ -48,8 +48,8 @@ class ExtendsRelativeBehaviorTests(SimpleTestCase):
 
     def test_extend_error(self):
         engine = Engine(dirs=[RELATIVE])
-        msg = "Relative name '\"./../two.html\"' has more parent folders, " \
-              "then the template name error_extends.html in which the tag appears"
+        msg = "Relative name '\"./../two.html\"' points outside the file hierarchy " \
+              "that template error_extends.html is in"
 
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.render_to_string('error_extends.html')
@@ -71,8 +71,8 @@ class IncludeRelativeBehaviorTests(SimpleTestCase):
 
     def test_include_error(self):
         engine = Engine(dirs=[RELATIVE])
-        msg = "Relative name '\"./../three.html\"' has more parent folders, " \
-              "then the template name error_include.html in which the tag appears"
+        msg = "Relative name '\"./../three.html\"' points outside the file hierarchy " \
+              "that template error_include.html is in"
 
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.render_to_string('error_include.html')
