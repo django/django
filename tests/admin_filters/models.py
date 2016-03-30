@@ -77,3 +77,14 @@ class Bookmark(models.Model):
 
     def __str__(self):
         return self.url
+
+
+class Direction(models.Model):
+    DIRECTIONS = [
+        ('trip_from', 'From'),
+        ('trip_to', 'To'),
+        (None, 'None'),
+        ('', '-'),
+    ]
+
+    direction = models.CharField(max_length=20, choices=DIRECTIONS, blank=True, null=True)
