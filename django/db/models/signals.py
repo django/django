@@ -1,6 +1,7 @@
-from django.apps import apps
+from functools import partial
+
+from django.db.models.utils import make_model_tuple
 from django.dispatch import Signal
-from django.utils import six
 
 
 class_prepared = Signal(providing_args=["class"])
@@ -11,44 +12,15 @@ class ModelSignal(Signal):
     Signal subclass that allows the sender to be lazily specified as a string
     of the `app_label.ModelName` form.
     """
+    def connect(self, receiver, sender=None, weak=True, dispatch_uid=None, apps=None):
+        # Takes a single optional argument named "sender"
+        connect = partial(super(ModelSignal, self).connect, receiver, weak=weak, dispatch_uid=dispatch_uid)
+        models = [make_model_tuple(sender)] if sender else []
+        if not apps:
+            from django.db.models.base import Options
+            apps = sender._meta.apps if hasattr(sender, '_meta') else Options.default_apps
+        apps.lazy_model_operation(connect, *models)
 
-    def __init__(self, *args, **kwargs):
-        super(ModelSignal, self).__init__(*args, **kwargs)
-        self.unresolved_references = {}
-        class_prepared.connect(self._resolve_references)
-
-    def _resolve_references(self, sender, **kwargs):
-        opts = sender._meta
-        reference = (opts.app_label, opts.object_name)
-        try:
-            receivers = self.unresolved_references.pop(reference)
-        except KeyError:
-            pass
-        else:
-            for receiver, weak, dispatch_uid in receivers:
-                super(ModelSignal, self).connect(
-                    receiver, sender=sender, weak=weak, dispatch_uid=dispatch_uid
-                )
-
-    def connect(self, receiver, sender=None, weak=True, dispatch_uid=None):
-        if isinstance(sender, six.string_types):
-            try:
-                app_label, model_name = sender.split('.')
-            except ValueError:
-                raise ValueError(
-                    "Specified sender must either be a model or a "
-                    "model name of the 'app_label.ModelName' form."
-                )
-            try:
-                sender = apps.get_registered_model(app_label, model_name)
-            except LookupError:
-                ref = (app_label, model_name)
-                refs = self.unresolved_references.setdefault(ref, [])
-                refs.append((receiver, weak, dispatch_uid))
-                return
-        super(ModelSignal, self).connect(
-            receiver, sender=sender, weak=weak, dispatch_uid=dispatch_uid
-        )
 
 pre_init = ModelSignal(providing_args=["instance", "args", "kwargs"], use_caching=True)
 post_init = ModelSignal(providing_args=["instance"], use_caching=True)

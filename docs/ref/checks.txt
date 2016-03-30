@@ -248,7 +248,8 @@ Signals
 ~~~~~~~
 
 * **signals.E001**: ``<handler>`` was connected to the ``<signal>`` signal with
-  a lazy reference to the ``<model>`` sender, which has not been installed.
+  a lazy reference to the sender ``<app label>.<model>``, but app ``<app label>``
+  isn't installed or doesn't provide model ``<model>``.
 
 Backwards Compatibility
 ~~~~~~~~~~~~~~~~~~~~~~~
