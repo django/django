@@ -187,6 +187,10 @@ class BaseExpression(object):
                 return True
         return False
 
+    @cached_property
+    def contributes_to_group_by(self):
+        return self.contains_column_references
+
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         """
         Provides the chance to do any preprocessing or validation before being
@@ -620,6 +624,8 @@ class DurationValue(Value):
 
 
 class RawSQL(Expression):
+    contributes_to_group_by = True
+
     def __init__(self, sql, params, output_field=None):
         if output_field is None:
             output_field = fields.Field()
