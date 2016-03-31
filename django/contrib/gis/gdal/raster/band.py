@@ -222,8 +222,10 @@ class GDALBand(GDALBase):
             if as_memoryview:
                 return memoryview(data_array)
             elif numpy:
+                # reshape function need the size tuple with the height first
+                reshape_size = (size[1], size[0])
                 return numpy.frombuffer(
-                    data_array, dtype=numpy.dtype(data_array)).reshape(size)
+                    data_array, dtype=numpy.dtype(data_array)).reshape(reshape_size)
             else:
                 return list(data_array)
         else:
