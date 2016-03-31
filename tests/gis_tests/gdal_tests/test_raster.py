@@ -320,8 +320,8 @@ class GDALBandTests(SimpleTestCase):
         self.assertEqual(self.band.nodata_value, 15)
         if numpy:
             data = self.band.data()
-            # Check that 42 first values of the column 42 match what's inside
-            # the file raster.tif
+            # Check that the 42 first values of the column 42 match what's
+            # inside the file raster.tif
             correct_list = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
                             4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 9, 9,
                             9, 4, 4, 4, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4]
