@@ -1819,6 +1819,10 @@ class SchemaTests(TransactionTestCase):
             ['schema_tag_slug_2c418ba3_like', 'schema_tag_slug_key']
         )
 
+    @unittest.skipIf(
+        connection.vendor == 'mysql' and connection.mysql_version < (5, 6, 6),
+        'Skip known bug renaming primary keys on older MySQL versions (#24995).'
+    )
     def test_alter_pk_with_self_referential_field(self):
         """
         Changing the primary key field name of a model with a self-referential
