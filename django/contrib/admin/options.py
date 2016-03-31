@@ -133,8 +133,8 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         if db_field.choices:
             return self.formfield_for_choice_field(db_field, request, **kwargs)
 
-        # Foreign key or many-to-many fields
-        if db_field.many_to_many or isinstance(db_field, models.ForeignKey):
+        # ForeignKey or ManyToManyFields
+        if isinstance(db_field, models.ManyToManyField) or isinstance(db_field, models.ForeignKey):
             # Combine the field kwargs with any options for formfield_overrides.
             # Make sure the passed in **kwargs override anything in
             # formfield_overrides because **kwargs is more specific, and should
@@ -145,7 +145,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             # Get the correct formfield.
             if isinstance(db_field, models.ForeignKey):
                 formfield = self.formfield_for_foreignkey(db_field, request, **kwargs)
-            elif db_field.many_to_many:
+            elif isinstance(db_field, models.ManyToManyField):
                 formfield = self.formfield_for_manytomany(db_field, request, **kwargs)
 
             # For non-raw_id fields, wrap the widget with a wrapper that adds
@@ -1385,7 +1385,7 @@ class ModelAdmin(BaseModelAdmin):
             except FieldDoesNotExist:
                 continue
             # We have to special-case M2Ms as a list of comma-separated PKs.
-            if f.many_to_many:
+            if isinstance(f, models.ManyToManyField):
                 initial[k] = initial[k].split(",")
         return initial
 
