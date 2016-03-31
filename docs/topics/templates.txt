@@ -256,6 +256,11 @@ templates, Django provides a shortcut function which automates the process.
         An optional :class:`~django.http.HttpRequest` that will be available
         during the template's rendering process.
 
+    Usage example::
+
+        from django.template.loader import render_to_string
+        rendered = render_to_string('my_template.html', {'foo': 'bar'})
+
 See also the :func:`~django.shortcuts.render()` shortcut which calls
 :func:`render_to_string()` and feeds the result into an
 :class:`~django.http.HttpResponse` suitable for returning from a view.
