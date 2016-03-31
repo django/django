@@ -804,11 +804,11 @@ lookup name is deprecated. For example, since ``default_related_name`` is set
 in model ``Bar``, instead of using the model name ``bar`` as the lookup::
 
     >>> bar = Bar.objects.get(pk=1)
-    >>> Foo.object.get(bar=bar)
+    >>> Foo.objects.get(bar=bar)
 
 use the default_related_name ``bars``::
 
-    >>> Foo.object.get(bars=bar)
+    >>> Foo.objects.get(bars=bar)
 
 .. _search-lookup-replacement:
 
