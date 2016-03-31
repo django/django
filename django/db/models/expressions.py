@@ -357,6 +357,9 @@ class BaseExpression(object):
                 for inner_expr in expr.flatten():
                     yield inner_expr
 
+    def get_empty_result(self):
+        return None
+
 
 class Expression(BaseExpression, Combinable):
     """
@@ -614,6 +617,9 @@ class Value(Expression):
 
     def get_group_by_cols(self):
         return []
+
+    def get_empty_result(self):
+        return self.value
 
 
 class DurationValue(Value):

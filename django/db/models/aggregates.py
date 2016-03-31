@@ -78,6 +78,9 @@ class Count(Aggregate):
             return 0
         return int(value)
 
+    def get_empty_result(self):
+        return 0
+
 
 class Max(Aggregate):
     function = 'MAX'

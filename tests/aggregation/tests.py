@@ -10,6 +10,7 @@ from django.db.models import (
     Avg, Count, DecimalField, DurationField, F, FloatField, Func, IntegerField,
     Max, Min, Sum, Value,
 )
+from django.db.models.functions import Coalesce
 from django.test import TestCase
 from django.test.utils import Approximate, CaptureQueriesContext
 from django.utils import timezone
@@ -1183,3 +1184,22 @@ class AggregateTestCase(TestCase):
         ).filter(rating_or_num_awards__gt=F('num_awards')).order_by('num_awards')
         self.assertQuerysetEqual(
             qs2, [1, 3], lambda v: v.num_awards)
+
+    def test_coalesced_empty_result_set(self):
+        self.assertEqual(
+            Publisher.objects.none().aggregate(
+                sum_awards=Coalesce(Sum('num_awards'), Value(0)),
+            )['sum_awards'], 0
+        )
+        # Multiple expressions.
+        self.assertEqual(
+            Publisher.objects.none().aggregate(
+                sum_awards=Coalesce(Sum('num_awards'), F('num_awards'), Value(0)),
+            )['sum_awards'], 0
+        )
+        # Nested coealesce.
+        self.assertEqual(
+            Publisher.objects.none().aggregate(
+                sum_awards=Coalesce(Coalesce(Sum('num_awards'), Value(0)), F('num_awards')),
+            )['sum_awards'], 0
+        )

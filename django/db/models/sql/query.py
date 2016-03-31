@@ -440,8 +440,8 @@ class Query(object):
                 outer_query.add_subquery(inner_query, using)
             except EmptyResultSet:
                 return {
-                    alias: None
-                    for alias in outer_query.annotation_select
+                    alias: expression.get_empty_result()
+                    for alias, expression in outer_query.annotation_select.items()
                 }
         else:
             outer_query = self
@@ -456,7 +456,7 @@ class Query(object):
         compiler = outer_query.get_compiler(using)
         result = compiler.execute_sql(SINGLE)
         if result is None:
-            result = [None for q in outer_query.annotation_select.items()]
+            result = [expression.get_empty_result() for expression in outer_query.annotation_select.values()]
 
         converters = compiler.get_converters(outer_query.annotation_select.values())
         result = compiler.apply_converters(result, converters)
