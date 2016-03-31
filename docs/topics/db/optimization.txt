@@ -161,7 +161,7 @@ So using the :ref:`example Weblog models <queryset-model-example>`::
 
 will be quicker than:
 
-  >>> entry = Entry.object.get(headline="News Item Title")
+  >>> entry = Entry.objects.get(headline="News Item Title")
 
 because ``id`` is indexed by the database and is guaranteed to be unique.
 
