@@ -1034,8 +1034,8 @@ environment, such as all the currently defined Django settings (from
 ``settings.py``).
 
 As a security measure, Django will *not* include settings that might be
-sensitive (or offensive), such as :setting:`SECRET_KEY`. Specifically, it will
-exclude any setting whose name includes any of the following:
+sensitive, such as :setting:`SECRET_KEY`. Specifically, it will exclude any
+setting whose name includes any of the following:
 
 * ``'API'``
 * ``'KEY'``
