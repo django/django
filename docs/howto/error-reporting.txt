@@ -143,10 +143,12 @@ exception raised, each `traceback frame`_’s local variables, and the
 
 However, sometimes certain types of information may be too sensitive and thus
 may not be appropriate to be kept track of, for example a user's password or
-credit card number. So Django offers a set of function decorators to help you
-control which information should be filtered out of error reports in a
-production environment (that is, where :setting:`DEBUG` is set to ``False``):
-:func:`sensitive_variables` and :func:`sensitive_post_parameters`.
+credit card number. So in addition to filtering out settings that appear to be
+sensitive as described in the :setting:`DEBUG` documentation, Django offers a
+set of function decorators to help you control which information should be
+filtered out of error reports in a production environment (that is, where
+:setting:`DEBUG` is set to ``False``): :func:`sensitive_variables` and
+:func:`sensitive_post_parameters`.
 
 .. _`full traceback`: https://en.wikipedia.org/wiki/Stack_trace
 .. _`traceback frame`: https://en.wikipedia.org/wiki/Stack_frame
