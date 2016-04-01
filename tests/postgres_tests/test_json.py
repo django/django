@@ -260,14 +260,6 @@ class TestFormField(PostgreSQLTestCase):
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, forms.JSONField)
 
-    def test_formfield_disabled(self):
-        class JsonForm(Form):
-            name = CharField()
-            jfield = forms.JSONField(disabled=True)
-
-        form = JsonForm({'name': 'xyz', 'jfield': '["bar"]'}, initial={'jfield': ['foo']})
-        self.assertIn('[&quot;foo&quot;]</textarea>', form.as_p())
-
     def test_prepare_value(self):
         field = forms.JSONField()
         self.assertEqual(field.prepare_value({'a': 'b'}), '{"a": "b"}')
