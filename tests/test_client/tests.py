@@ -632,6 +632,14 @@ class ClientTest(TestCase):
         # Check some response details
         self.assertContains(response, 'This is a test')
 
+    def test_relative_redirect(self):
+        response = self.client.get('/accounts/')
+        self.assertRedirects(response, '/accounts/login/')
+
+    def test_relative_redirect_no_trailing_slash(self):
+        response = self.client.get('/accounts/no_trailing_slash')
+        self.assertRedirects(response, '/accounts/login/')
+
     def test_mass_mail_sending(self):
         "Test that mass mail is redirected to a dummy outbox during test setup"
 

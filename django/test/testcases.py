@@ -44,7 +44,7 @@ from django.utils.deprecation import (
 )
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import (
-    unquote, urlparse, urlsplit, urlunsplit,
+    unquote, urljoin, urlparse, urlsplit, urlunsplit,
 )
 from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve
@@ -316,6 +316,11 @@ class SimpleTestCase(unittest.TestCase):
 
             url = response.url
             scheme, netloc, path, query, fragment = urlsplit(url)
+
+            # Prepend the request path to handle relative path redirects.
+            if not path.startswith('/'):
+                url = urljoin(response.request['PATH_INFO'], url)
+                path = urljoin(response.request['PATH_INFO'], path)
 
             if fetch_redirect_response:
                 redirect_response = response.client.get(path, QueryDict(query),
