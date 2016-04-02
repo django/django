@@ -16,7 +16,7 @@ from django.core.signals import request_started
 from django.db import reset_queries
 from django.db.models.options import Options
 from django.http import request
-from django.template import Template
+from django.template import Template, engines
 from django.test.signals import setting_changed, template_rendered
 from django.urls import get_script_prefix, set_script_prefix
 from django.utils import six
@@ -94,6 +94,13 @@ def instrumented_test_render(self, context):
     return self.nodelist.render(context)
 
 
+def get_test_template_render(original_render):
+    def render(self, context=None, request=None):
+        template_rendered.send(sender=self, template=self, context=context)
+        return original_render(self, context, request)
+    return render
+
+
 def setup_test_environment():
     """Perform any global pre-test setup. This involves:
 
@@ -103,6 +110,17 @@ def setup_test_environment():
     """
     Template._original_render = Template._render
     Template._render = instrumented_test_render
+
+    for engine in engines:
+        if engine == 'django':
+            # we know how to patch DTL's internals and did so,
+            # so don't patch it again
+            continue
+        engine_cls = engines[engine]
+        template = engine_cls.template_class
+        if template is not None:
+            template._original_render = template.render
+            template.render = get_test_template_render(template._original_render)
 
     # Storing previous values in the settings module itself is problematic.
     # Store them in arbitrary (but related) modules instead. See #20636.
@@ -126,6 +144,12 @@ def teardown_test_environment():
     """
     Template._render = Template._original_render
     del Template._original_render
+
+    for engine in engines:
+        engine_cls = engines[engine]
+        template = engine_cls.template_class
+        if template is not None and hasattr(template, '_original_render'):
+            template.render = template._original_render
 
     settings.EMAIL_BACKEND = mail._original_email_backend
     del mail._original_email_backend

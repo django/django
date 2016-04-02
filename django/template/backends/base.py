@@ -10,6 +10,7 @@ from django.utils.functional import cached_property
 
 
 class BaseEngine(object):
+    template_class = None
 
     # Core methods: engines have to provide their own implementation
     #               (except for from_string which is optional).

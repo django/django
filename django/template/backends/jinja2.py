@@ -14,9 +14,28 @@ from .base import BaseEngine
 from .utils import csrf_input_lazy, csrf_token_lazy
 
 
+class Template(object):
+
+    def __init__(self, template):
+        self.template = template
+        self.origin = Origin(
+            name=template.filename, template_name=template.name,
+        )
+
+    def render(self, context=None, request=None):
+        if context is None:
+            context = {}
+        if request is not None:
+            context['request'] = request
+            context['csrf_input'] = csrf_input_lazy(request)
+            context['csrf_token'] = csrf_token_lazy(request)
+        return self.template.render(context)
+
+
 class Jinja2(BaseEngine):
 
     app_dirname = 'jinja2'
+    template_class = Template
 
     def __init__(self, params):
         params = params.copy()
@@ -51,24 +70,6 @@ class Jinja2(BaseEngine):
             new = TemplateSyntaxError(exc.args)
             new.template_debug = get_exception_info(exc)
             six.reraise(TemplateSyntaxError, new, sys.exc_info()[2])
-
-
-class Template(object):
-
-    def __init__(self, template):
-        self.template = template
-        self.origin = Origin(
-            name=template.filename, template_name=template.name,
-        )
-
-    def render(self, context=None, request=None):
-        if context is None:
-            context = {}
-        if request is not None:
-            context['request'] = request
-            context['csrf_input'] = csrf_input_lazy(request)
-            context['csrf_token'] = csrf_token_lazy(request)
-        return self.template.render(context)
 
 
 class Origin(object):
