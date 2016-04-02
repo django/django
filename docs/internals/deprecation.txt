@@ -147,6 +147,9 @@ details on these changes.
 * The shim for supporting custom related manager classes without a
   ``_apply_rel_filters()`` method will be removed.
 
+* The attribute ``django.forms.Form.use_required_attribute`` will be changed to
+  ``True``.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

@@ -192,7 +192,7 @@ class TestInline(TestDataMixin, TestCase):
                 '<input type="hidden" name="-1-0-capo_famiglia" id="id_-1-0-capo_famiglia" />', html=True)
         self.assertContains(response,
                 '<input id="id_-1-0-name" type="text" class="vTextField" '
-                'name="-1-0-name" maxlength="100" />', html=True)
+                'name="-1-0-name" maxlength="100" required />', html=True)
 
         self.assertContains(response,
                 '<input type="hidden" name="-2-0-id" id="id_-2-0-id" />', html=True)
@@ -200,7 +200,7 @@ class TestInline(TestDataMixin, TestCase):
                 '<input type="hidden" name="-2-0-capo_famiglia" id="id_-2-0-capo_famiglia" />', html=True)
         self.assertContains(response,
                 '<input id="id_-2-0-name" type="text" class="vTextField" '
-                'name="-2-0-name" maxlength="100" />', html=True)
+                'name="-2-0-name" maxlength="100" required />', html=True)
 
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_localize_pk_shortcut(self):
@@ -350,13 +350,13 @@ class TestInline(TestDataMixin, TestCase):
         self.assertContains(
             response,
             '<input class="vIntegerField" id="id_editablepkbook_set-0-manual_pk" '
-            'name="editablepkbook_set-0-manual_pk" type="text" />',
+            'name="editablepkbook_set-0-manual_pk" type="text" required />',
             html=True, count=1
         )
         self.assertContains(
             response,
             '<input class="vIntegerField" id="id_editablepkbook_set-2-0-manual_pk" '
-            'name="editablepkbook_set-2-0-manual_pk" type="text" />',
+            'name="editablepkbook_set-2-0-manual_pk" type="text" required />',
             html=True, count=1
         )
 

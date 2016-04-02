@@ -637,10 +637,12 @@ class ModelAdmin(BaseModelAdmin):
             defaults['fields'] = forms.ALL_FIELDS
 
         try:
-            return modelform_factory(self.model, **defaults)
+            form = modelform_factory(self.model, **defaults)
         except FieldError as e:
             raise FieldError('%s. Check fields/fieldsets/exclude attributes of class %s.'
                              % (e, self.__class__.__name__))
+        form.use_required_attribute = True  # RemovedInDjango20Warning
+        return form
 
     def get_changelist(self, request, **kwargs):
         """
@@ -676,7 +678,9 @@ class ModelAdmin(BaseModelAdmin):
                 and not modelform_defines_fields(defaults.get('form'))):
             defaults['fields'] = forms.ALL_FIELDS
 
-        return modelform_factory(self.model, **defaults)
+        form = modelform_factory(self.model, **defaults)
+        form.use_required_attribute = True  # RemovedInDjango20Warning
+        return form
 
     def get_changelist_formset(self, request, **kwargs):
         """
@@ -687,9 +691,11 @@ class ModelAdmin(BaseModelAdmin):
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
         }
         defaults.update(kwargs)
-        return modelformset_factory(self.model,
+        formset = modelformset_factory(self.model,
             self.get_changelist_form(request), extra=0,
             fields=self.list_editable, **defaults)
+        formset.form.use_required_attribute = True  # RemovedInDjango20Warning
+        return formset
 
     def get_formsets_with_inlines(self, request, obj=None):
         """
@@ -1924,7 +1930,9 @@ class InlineModelAdmin(BaseModelAdmin):
         if defaults['fields'] is None and not modelform_defines_fields(defaults['form']):
             defaults['fields'] = forms.ALL_FIELDS
 
-        return inlineformset_factory(self.parent_model, self.model, **defaults)
+        formset = inlineformset_factory(self.parent_model, self.model, **defaults)
+        formset.form.use_required_attribute = True  # RemovedInDjango20Warning
+        return formset
 
     def get_fields(self, request, obj=None):
         if self.fields:

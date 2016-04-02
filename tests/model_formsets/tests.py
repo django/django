@@ -148,25 +148,26 @@ class ModelFormsetTest(TestCase):
     def test_simple_save(self):
         qs = Author.objects.all()
         AuthorFormSet = modelformset_factory(Author, fields="__all__", extra=3)
+        AuthorFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
 
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 3)
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_form-0-name">Name:</label>'
-            '<input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" />'
+            '<input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" required />'
             '<input type="hidden" name="form-0-id" id="id_form-0-id" /></p>'
         )
         self.assertHTMLEqual(
             formset.forms[1].as_p(),
             '<p><label for="id_form-1-name">Name:</label>'
-            '<input id="id_form-1-name" type="text" name="form-1-name" maxlength="100" />'
+            '<input id="id_form-1-name" type="text" name="form-1-name" maxlength="100" required />'
             '<input type="hidden" name="form-1-id" id="id_form-1-id" /></p>'
         )
         self.assertHTMLEqual(
             formset.forms[2].as_p(),
             '<p><label for="id_form-2-name">Name:</label>'
-            ' <input id="id_form-2-name" type="text" name="form-2-name" maxlength="100" />'
+            ' <input id="id_form-2-name" type="text" name="form-2-name" maxlength="100" required />'
             '<input type="hidden" name="form-2-id" id="id_form-2-id" /></p>'
         )
 
@@ -198,25 +199,28 @@ class ModelFormsetTest(TestCase):
 
         qs = Author.objects.order_by('name')
         AuthorFormSet = modelformset_factory(Author, fields="__all__", extra=1, can_delete=False)
+        AuthorFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
 
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 3)
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_form-0-name">Name:</label>'
-            '<input id="id_form-0-name" type="text" name="form-0-name" value="Arthur Rimbaud" maxlength="100" />'
+            '<input id="id_form-0-name" type="text" name="form-0-name" '
+            'value="Arthur Rimbaud" maxlength="100" required />'
             '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /></p>' % author2.id
         )
         self.assertHTMLEqual(
             formset.forms[1].as_p(),
             '<p><label for="id_form-1-name">Name:</label>'
-            '<input id="id_form-1-name" type="text" name="form-1-name" value="Charles Baudelaire" maxlength="100" />'
+            '<input id="id_form-1-name" type="text" name="form-1-name" '
+            'value="Charles Baudelaire" maxlength="100" required />'
             '<input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" /></p>' % author1.id
         )
         self.assertHTMLEqual(
             formset.forms[2].as_p(),
             '<p><label for="id_form-2-name">Name:</label>'
-            '<input id="id_form-2-name" type="text" name="form-2-name" maxlength="100" />'
+            '<input id="id_form-2-name" type="text" name="form-2-name" maxlength="100" required />'
             '<input type="hidden" name="form-2-id" id="id_form-2-id" /></p>'
         )
 
@@ -248,6 +252,7 @@ class ModelFormsetTest(TestCase):
 
         qs = Author.objects.order_by('name')
         AuthorFormSet = modelformset_factory(Author, fields="__all__", extra=1, can_delete=True)
+        AuthorFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
 
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 4)
@@ -255,7 +260,7 @@ class ModelFormsetTest(TestCase):
             formset.forms[0].as_p(),
             '<p><label for="id_form-0-name">Name:</label>'
             '<input id="id_form-0-name" type="text" name="form-0-name" '
-            'value="Arthur Rimbaud" maxlength="100" /></p>'
+            'value="Arthur Rimbaud" maxlength="100" required /></p>'
             '<p><label for="id_form-0-DELETE">Delete:</label>'
             '<input type="checkbox" name="form-0-DELETE" id="id_form-0-DELETE" />'
             '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /></p>' % author2.id
@@ -264,7 +269,7 @@ class ModelFormsetTest(TestCase):
             formset.forms[1].as_p(),
             '<p><label for="id_form-1-name">Name:</label>'
             '<input id="id_form-1-name" type="text" name="form-1-name" '
-            'value="Charles Baudelaire" maxlength="100" /></p>'
+            'value="Charles Baudelaire" maxlength="100" required /></p>'
             '<p><label for="id_form-1-DELETE">Delete:</label>'
             '<input type="checkbox" name="form-1-DELETE" id="id_form-1-DELETE" />'
             '<input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" /></p>' % author1.id
@@ -273,7 +278,7 @@ class ModelFormsetTest(TestCase):
             formset.forms[2].as_p(),
             '<p><label for="id_form-2-name">Name:</label>'
             '<input id="id_form-2-name" type="text" name="form-2-name" '
-            'value="Paul Verlaine" maxlength="100" /></p>'
+            'value="Paul Verlaine" maxlength="100" required /></p>'
             '<p><label for="id_form-2-DELETE">Delete:</label>'
             '<input type="checkbox" name="form-2-DELETE" id="id_form-2-DELETE" />'
             '<input type="hidden" name="form-2-id" value="%d" id="id_form-2-id" /></p>' % author3.id
@@ -281,7 +286,7 @@ class ModelFormsetTest(TestCase):
         self.assertHTMLEqual(
             formset.forms[3].as_p(),
             '<p><label for="id_form-3-name">Name:</label>'
-            '<input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /></p>'
+            '<input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" required /></p>'
             '<p><label for="id_form-3-DELETE">Delete:</label>'
             '<input type="checkbox" name="form-3-DELETE" id="id_form-3-DELETE" />'
             '<input type="hidden" name="form-3-id" id="id_form-3-id" /></p>'
@@ -525,14 +530,15 @@ class ModelFormsetTest(TestCase):
 
     def test_model_inheritance(self):
         BetterAuthorFormSet = modelformset_factory(BetterAuthor, fields="__all__")
+        BetterAuthorFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         formset = BetterAuthorFormSet()
         self.assertEqual(len(formset.forms), 1)
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_form-0-name">Name:</label>'
-            '<input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" /></p>'
+            '<input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" required /></p>'
             '<p><label for="id_form-0-write_speed">Write speed:</label>'
-            '<input type="number" name="form-0-write_speed" id="id_form-0-write_speed" />'
+            '<input type="number" name="form-0-write_speed" id="id_form-0-write_speed" required />'
             '<input type="hidden" name="form-0-author_ptr" id="id_form-0-author_ptr" /></p>'
         )
 
@@ -558,17 +564,18 @@ class ModelFormsetTest(TestCase):
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_form-0-name">Name:</label>'
-            '<input id="id_form-0-name" type="text" name="form-0-name" value="Ernest Hemingway" maxlength="100" /></p>'
+            '<input id="id_form-0-name" type="text" name="form-0-name" '
+            'value="Ernest Hemingway" maxlength="100" required /></p>'
             '<p><label for="id_form-0-write_speed">Write speed:</label>'
-            '<input type="number" name="form-0-write_speed" value="10" id="id_form-0-write_speed" />'
+            '<input type="number" name="form-0-write_speed" value="10" id="id_form-0-write_speed" required />'
             '<input type="hidden" name="form-0-author_ptr" value="%d" id="id_form-0-author_ptr" /></p>' % hemingway_id
         )
         self.assertHTMLEqual(
             formset.forms[1].as_p(),
             '<p><label for="id_form-1-name">Name:</label>'
-            '<input id="id_form-1-name" type="text" name="form-1-name" maxlength="100" /></p>'
+            '<input id="id_form-1-name" type="text" name="form-1-name" maxlength="100" required /></p>'
             '<p><label for="id_form-1-write_speed">Write speed:</label>'
-            '<input type="number" name="form-1-write_speed" id="id_form-1-write_speed" />'
+            '<input type="number" name="form-1-write_speed" id="id_form-1-write_speed" required />'
             '<input type="hidden" name="form-1-author_ptr" id="id_form-1-author_ptr" /></p>'
         )
 
@@ -593,28 +600,30 @@ class ModelFormsetTest(TestCase):
         # how the admin system's edit inline functionality works.
 
         AuthorBooksFormSet = inlineformset_factory(Author, Book, can_delete=False, extra=3, fields="__all__")
+        AuthorBooksFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         author = Author.objects.create(name='Charles Baudelaire')
 
         formset = AuthorBooksFormSet(instance=author)
         self.assertEqual(len(formset.forms), 3)
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
-            '<p><label for="id_book_set-0-title">Title:</label> <input id="id_book_set-0-title" type="text" '
-            'name="book_set-0-title" maxlength="100" /><input type="hidden" name="book_set-0-author" value="%d" '
-            'id="id_book_set-0-author" /><input type="hidden" name="book_set-0-id" id="id_book_set-0-id" />'
+            '<p><label for="id_book_set-0-title">Title:</label> '
+            '<input id="id_book_set-0-title" type="text" name="book_set-0-title" maxlength="100" required />'
+            '<input type="hidden" name="book_set-0-author" value="%d" id="id_book_set-0-author" />'
+            '<input type="hidden" name="book_set-0-id" id="id_book_set-0-id" />'
             '</p>' % author.id
         )
         self.assertHTMLEqual(
             formset.forms[1].as_p(),
             '<p><label for="id_book_set-1-title">Title:</label>'
-            '<input id="id_book_set-1-title" type="text" name="book_set-1-title" maxlength="100" />'
+            '<input id="id_book_set-1-title" type="text" name="book_set-1-title" maxlength="100" required />'
             '<input type="hidden" name="book_set-1-author" value="%d" id="id_book_set-1-author" />'
             '<input type="hidden" name="book_set-1-id" id="id_book_set-1-id" /></p>' % author.id
         )
         self.assertHTMLEqual(
             formset.forms[2].as_p(),
             '<p><label for="id_book_set-2-title">Title:</label>'
-            '<input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" />'
+            '<input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" required />'
             '<input type="hidden" name="book_set-2-author" value="%d" id="id_book_set-2-author" />'
             '<input type="hidden" name="book_set-2-id" id="id_book_set-2-id" /></p>' % author.id
         )
@@ -642,6 +651,7 @@ class ModelFormsetTest(TestCase):
         # every existing book.
 
         AuthorBooksFormSet = inlineformset_factory(Author, Book, can_delete=False, extra=2, fields="__all__")
+        AuthorBooksFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         author = Author.objects.get(name='Charles Baudelaire')
 
         formset = AuthorBooksFormSet(instance=author)
@@ -650,7 +660,7 @@ class ModelFormsetTest(TestCase):
             formset.forms[0].as_p(),
             '<p><label for="id_book_set-0-title">Title:</label>'
             '<input id="id_book_set-0-title" type="text" name="book_set-0-title" '
-            'value="Les Fleurs du Mal" maxlength="100" />'
+            'value="Les Fleurs du Mal" maxlength="100" required />'
             '<input type="hidden" name="book_set-0-author" value="%d" id="id_book_set-0-author" />'
             '<input type="hidden" name="book_set-0-id" value="%d" id="id_book_set-0-id" /></p>' % (
                 author.id, book1.id,
@@ -659,14 +669,14 @@ class ModelFormsetTest(TestCase):
         self.assertHTMLEqual(
             formset.forms[1].as_p(),
             '<p><label for="id_book_set-1-title">Title:</label>'
-            '<input id="id_book_set-1-title" type="text" name="book_set-1-title" maxlength="100" />'
+            '<input id="id_book_set-1-title" type="text" name="book_set-1-title" maxlength="100" required />'
             '<input type="hidden" name="book_set-1-author" value="%d" id="id_book_set-1-author" />'
             '<input type="hidden" name="book_set-1-id" id="id_book_set-1-id" /></p>' % author.id
         )
         self.assertHTMLEqual(
             formset.forms[2].as_p(),
             '<p><label for="id_book_set-2-title">Title:</label>'
-            '<input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" />'
+            '<input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" required />'
             '<input type="hidden" name="book_set-2-author" value="%d" id="id_book_set-2-author" />'
             '<input type="hidden" name="book_set-2-id" id="id_book_set-2-id" /></p>' % author.id
         )
@@ -700,6 +710,7 @@ class ModelFormsetTest(TestCase):
         # The save_as_new parameter lets you re-associate the data to a new
         # instance.  This is used in the admin for save_as functionality.
         AuthorBooksFormSet = inlineformset_factory(Author, Book, can_delete=False, extra=2, fields="__all__")
+        AuthorBooksFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         Author.objects.create(name='Charles Baudelaire')
 
         data = {
@@ -731,7 +742,7 @@ class ModelFormsetTest(TestCase):
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_test-0-title">Title:</label>'
-            '<input id="id_test-0-title" type="text" name="test-0-title" maxlength="100" />'
+            '<input id="id_test-0-title" type="text" name="test-0-title" maxlength="100" required />'
             '<input type="hidden" name="test-0-author" id="id_test-0-author" />'
             '<input type="hidden" name="test-0-id" id="id_test-0-id" /></p>'
         )
@@ -739,7 +750,7 @@ class ModelFormsetTest(TestCase):
         self.assertHTMLEqual(
             formset.forms[1].as_p(),
             '<p><label for="id_test-1-title">Title:</label>'
-            '<input id="id_test-1-title" type="text" name="test-1-title" maxlength="100" />'
+            '<input id="id_test-1-title" type="text" name="test-1-title" maxlength="100" required />'
             '<input type="hidden" name="test-1-author" id="id_test-1-author" />'
             '<input type="hidden" name="test-1-id" id="id_test-1-id" /></p>'
         )
@@ -752,6 +763,7 @@ class ModelFormsetTest(TestCase):
         AuthorBooksFormSet2 = inlineformset_factory(
             Author, BookWithCustomPK, can_delete=False, extra=1, fields="__all__"
         )
+        AuthorBooksFormSet2.form.use_required_attribute = True  # RemovedInDjango20Warning
         author = Author.objects.create(pk=1, name='Charles Baudelaire')
 
         formset = AuthorBooksFormSet2(instance=author)
@@ -760,10 +772,10 @@ class ModelFormsetTest(TestCase):
             formset.forms[0].as_p(),
             '<p><label for="id_bookwithcustompk_set-0-my_pk">My pk:</label>'
             '<input id="id_bookwithcustompk_set-0-my_pk" type="number" '
-            'name="bookwithcustompk_set-0-my_pk" step="1" /></p>'
+            'name="bookwithcustompk_set-0-my_pk" step="1" required /></p>'
             '<p><label for="id_bookwithcustompk_set-0-title">Title:</label>'
             '<input id="id_bookwithcustompk_set-0-title" type="text" '
-            'name="bookwithcustompk_set-0-title" maxlength="100" />'
+            'name="bookwithcustompk_set-0-title" maxlength="100" required />'
             '<input type="hidden" name="bookwithcustompk_set-0-author" '
             'value="1" id="id_bookwithcustompk_set-0-author" /></p>'
         )
@@ -792,6 +804,7 @@ class ModelFormsetTest(TestCase):
         # inheritance, thus has a non AutoField yet auto-created primary key.
 
         AuthorBooksFormSet3 = inlineformset_factory(Author, AlternateBook, can_delete=False, extra=1, fields="__all__")
+        AuthorBooksFormSet3.form.use_required_attribute = True  # RemovedInDjango20Warning
         author = Author.objects.create(pk=1, name='Charles Baudelaire')
 
         formset = AuthorBooksFormSet3(instance=author)
@@ -800,10 +813,10 @@ class ModelFormsetTest(TestCase):
             formset.forms[0].as_p(),
             '<p><label for="id_alternatebook_set-0-title">Title:</label>'
             '<input id="id_alternatebook_set-0-title" type="text" '
-            'name="alternatebook_set-0-title" maxlength="100" /></p>'
+            'name="alternatebook_set-0-title" maxlength="100" required /></p>'
             '<p><label for="id_alternatebook_set-0-notes">Notes:</label>'
             '<input id="id_alternatebook_set-0-notes" type="text" '
-            'name="alternatebook_set-0-notes" maxlength="100" />'
+            'name="alternatebook_set-0-notes" maxlength="100" required />'
             '<input type="hidden" name="alternatebook_set-0-author" value="1" '
             'id="id_alternatebook_set-0-author" />'
             '<input type="hidden" name="alternatebook_set-0-book_ptr" '
@@ -859,6 +872,7 @@ class ModelFormsetTest(TestCase):
 
     def test_inline_formsets_with_custom_save_method(self):
         AuthorBooksFormSet = inlineformset_factory(Author, Book, can_delete=False, extra=2, fields="__all__")
+        AuthorBooksFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         author = Author.objects.create(pk=1, name='Charles Baudelaire')
         book1 = Book.objects.create(pk=1, author=author, title='Les Paradis Artificiels')
         book2 = Book.objects.create(pk=2, author=author, title='Les Fleurs du Mal')
@@ -874,6 +888,7 @@ class ModelFormsetTest(TestCase):
                 return poem
 
         PoemFormSet = inlineformset_factory(Poet, Poem, form=PoemForm, fields="__all__")
+        PoemFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
 
         data = {
             'poem_set-TOTAL_FORMS': '3',  # the number of forms rendered
@@ -903,7 +918,7 @@ class ModelFormsetTest(TestCase):
             formset.forms[0].as_p(),
             '<p><label for="id_book_set-0-title">Title:</label>'
             '<input id="id_book_set-0-title" type="text" name="book_set-0-title" '
-            'value="Les Paradis Artificiels" maxlength="100" />'
+            'value="Les Paradis Artificiels" maxlength="100" required />'
             '<input type="hidden" name="book_set-0-author" value="1" id="id_book_set-0-author" />'
             '<input type="hidden" name="book_set-0-id" value="1" id="id_book_set-0-id" /></p>'
         )
@@ -911,7 +926,7 @@ class ModelFormsetTest(TestCase):
             formset.forms[1].as_p(),
             '<p><label for="id_book_set-1-title">Title:</label>'
             '<input id="id_book_set-1-title" type="text" name="book_set-1-title" '
-            'value="Les Fleurs du Mal" maxlength="100" />'
+            'value="Les Fleurs du Mal" maxlength="100" required />'
             '<input type="hidden" name="book_set-1-author" value="1" id="id_book_set-1-author" />'
             '<input type="hidden" name="book_set-1-id" value="2" id="id_book_set-1-id" /></p>'
         )
@@ -919,21 +934,21 @@ class ModelFormsetTest(TestCase):
             formset.forms[2].as_p(),
             '<p><label for="id_book_set-2-title">Title:</label>'
             '<input id="id_book_set-2-title" type="text" name="book_set-2-title" '
-            'value="Flowers of Evil" maxlength="100" />'
+            'value="Flowers of Evil" maxlength="100" required />'
             '<input type="hidden" name="book_set-2-author" value="1" id="id_book_set-2-author" />'
             '<input type="hidden" name="book_set-2-id" value="3" id="id_book_set-2-id" /></p>'
         )
         self.assertHTMLEqual(
             formset.forms[3].as_p(),
             '<p><label for="id_book_set-3-title">Title:</label>'
-            '<input id="id_book_set-3-title" type="text" name="book_set-3-title" maxlength="100" />'
+            '<input id="id_book_set-3-title" type="text" name="book_set-3-title" maxlength="100" required />'
             '<input type="hidden" name="book_set-3-author" value="1" id="id_book_set-3-author" />'
             '<input type="hidden" name="book_set-3-id" id="id_book_set-3-id" /></p>'
         )
         self.assertHTMLEqual(
             formset.forms[4].as_p(),
             '<p><label for="id_book_set-4-title">Title:</label>'
-            '<input id="id_book_set-4-title" type="text" name="book_set-4-title" maxlength="100" />'
+            '<input id="id_book_set-4-title" type="text" name="book_set-4-title" maxlength="100" required />'
             '<input type="hidden" name="book_set-4-author" value="1" id="id_book_set-4-author" />'
             '<input type="hidden" name="book_set-4-id" id="id_book_set-4-id" /></p>'
         )
@@ -960,21 +975,21 @@ class ModelFormsetTest(TestCase):
             formset.forms[0].as_p(),
             '<p><label for="id_book_set-0-title">Title:</label>'
             '<input id="id_book_set-0-title" type="text" name="book_set-0-title" '
-            'value="Flowers of Evil" maxlength="100" />'
+            'value="Flowers of Evil" maxlength="100" required />'
             '<input type="hidden" name="book_set-0-author" value="1" id="id_book_set-0-author" />'
             '<input type="hidden" name="book_set-0-id" value="3" id="id_book_set-0-id" /></p>'
         )
         self.assertHTMLEqual(
             formset.forms[1].as_p(),
             '<p><label for="id_book_set-1-title">Title:</label>'
-            '<input id="id_book_set-1-title" type="text" name="book_set-1-title" maxlength="100" />'
+            '<input id="id_book_set-1-title" type="text" name="book_set-1-title" maxlength="100" required />'
             '<input type="hidden" name="book_set-1-author" value="1" id="id_book_set-1-author" />'
             '<input type="hidden" name="book_set-1-id" id="id_book_set-1-id" /></p>'
         )
         self.assertHTMLEqual(
             formset.forms[2].as_p(),
             '<p><label for="id_book_set-2-title">Title:</label>'
-            '<input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" />'
+            '<input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" required />'
             '<input type="hidden" name="book_set-2-author" value="1" id="id_book_set-2-author" />'
             '<input type="hidden" name="book_set-2-id" id="id_book_set-2-id" /></p>'
         )
@@ -1033,14 +1048,15 @@ class ModelFormsetTest(TestCase):
         # We need to ensure that it is displayed
 
         CustomPrimaryKeyFormSet = modelformset_factory(CustomPrimaryKey, fields="__all__")
+        CustomPrimaryKeyFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         formset = CustomPrimaryKeyFormSet()
         self.assertEqual(len(formset.forms), 1)
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_form-0-my_pk">My pk:</label> <input id="id_form-0-my_pk" type="text" '
-            'name="form-0-my_pk" maxlength="10" /></p>'
+            'name="form-0-my_pk" maxlength="10" required /></p>'
             '<p><label for="id_form-0-some_field">Some field:</label>'
-            '<input id="id_form-0-some_field" type="text" name="form-0-some_field" maxlength="100" /></p>'
+            '<input id="id_form-0-some_field" type="text" name="form-0-some_field" maxlength="100" required /></p>'
         )
 
         # Custom primary keys with ForeignKey, OneToOneField and AutoField ############
@@ -1048,19 +1064,20 @@ class ModelFormsetTest(TestCase):
         place = Place.objects.create(pk=1, name='Giordanos', city='Chicago')
 
         FormSet = inlineformset_factory(Place, Owner, extra=2, can_delete=False, fields="__all__")
+        FormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         formset = FormSet(instance=place)
         self.assertEqual(len(formset.forms), 2)
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_owner_set-0-name">Name:</label>'
-            '<input id="id_owner_set-0-name" type="text" name="owner_set-0-name" maxlength="100" />'
+            '<input id="id_owner_set-0-name" type="text" name="owner_set-0-name" maxlength="100" required />'
             '<input type="hidden" name="owner_set-0-place" value="1" id="id_owner_set-0-place" />'
             '<input type="hidden" name="owner_set-0-auto_id" id="id_owner_set-0-auto_id" /></p>'
         )
         self.assertHTMLEqual(
             formset.forms[1].as_p(),
             '<p><label for="id_owner_set-1-name">Name:</label>'
-            '<input id="id_owner_set-1-name" type="text" name="owner_set-1-name" maxlength="100" />'
+            '<input id="id_owner_set-1-name" type="text" name="owner_set-1-name" maxlength="100" required />'
             '<input type="hidden" name="owner_set-1-place" value="1" id="id_owner_set-1-place" />'
             '<input type="hidden" name="owner_set-1-auto_id" id="id_owner_set-1-auto_id" /></p>'
         )
@@ -1087,7 +1104,8 @@ class ModelFormsetTest(TestCase):
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_owner_set-0-name">Name:</label>'
-            '<input id="id_owner_set-0-name" type="text" name="owner_set-0-name" value="Joe Perry" maxlength="100" />'
+            '<input id="id_owner_set-0-name" type="text" name="owner_set-0-name" '
+            'value="Joe Perry" maxlength="100" required />'
             '<input type="hidden" name="owner_set-0-place" value="1" id="id_owner_set-0-place" />'
             '<input type="hidden" name="owner_set-0-auto_id" value="%d" id="id_owner_set-0-auto_id" /></p>'
             % owner1.auto_id
@@ -1095,14 +1113,14 @@ class ModelFormsetTest(TestCase):
         self.assertHTMLEqual(
             formset.forms[1].as_p(),
             '<p><label for="id_owner_set-1-name">Name:</label>'
-            '<input id="id_owner_set-1-name" type="text" name="owner_set-1-name" maxlength="100" />'
+            '<input id="id_owner_set-1-name" type="text" name="owner_set-1-name" maxlength="100" required />'
             '<input type="hidden" name="owner_set-1-place" value="1" id="id_owner_set-1-place" />'
             '<input type="hidden" name="owner_set-1-auto_id" id="id_owner_set-1-auto_id" /></p>'
         )
         self.assertHTMLEqual(
             formset.forms[2].as_p(),
             '<p><label for="id_owner_set-2-name">Name:</label>'
-            '<input id="id_owner_set-2-name" type="text" name="owner_set-2-name" maxlength="100" />'
+            '<input id="id_owner_set-2-name" type="text" name="owner_set-2-name" maxlength="100" required />'
             '<input type="hidden" name="owner_set-2-place" value="1" id="id_owner_set-2-place" />'
             '<input type="hidden" name="owner_set-2-auto_id" id="id_owner_set-2-auto_id" /></p>'
         )
@@ -1129,22 +1147,24 @@ class ModelFormsetTest(TestCase):
         # Ensure a custom primary key that is a ForeignKey or OneToOneField get rendered for the user to choose.
 
         FormSet = modelformset_factory(OwnerProfile, fields="__all__")
+        FormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         formset = FormSet()
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_form-0-owner">Owner:</label>'
-            '<select name="form-0-owner" id="id_form-0-owner">'
+            '<select name="form-0-owner" id="id_form-0-owner" required>'
             '<option value="" selected="selected">---------</option>'
             '<option value="%d">Joe Perry at Giordanos</option>'
             '<option value="%d">Jack Berry at Giordanos</option>'
             '</select></p>'
             '<p><label for="id_form-0-age">Age:</label>'
-            '<input type="number" name="form-0-age" id="id_form-0-age" min="0" /></p>'
+            '<input type="number" name="form-0-age" id="id_form-0-age" min="0" required /></p>'
             % (owner1.auto_id, owner2.auto_id)
         )
 
         owner1 = Owner.objects.get(name='Joe Perry')
         FormSet = inlineformset_factory(Owner, OwnerProfile, max_num=1, can_delete=False, fields="__all__")
+        FormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         self.assertEqual(FormSet.max_num, 1)
 
         formset = FormSet(instance=owner1)
@@ -1152,7 +1172,7 @@ class ModelFormsetTest(TestCase):
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_ownerprofile-0-age">Age:</label>'
-            '<input type="number" name="ownerprofile-0-age" id="id_ownerprofile-0-age" min="0" />'
+            '<input type="number" name="ownerprofile-0-age" id="id_ownerprofile-0-age" min="0" required />'
             '<input type="hidden" name="ownerprofile-0-owner" value="%d" id="id_ownerprofile-0-owner" /></p>'
             % owner1.auto_id
         )
@@ -1177,7 +1197,7 @@ class ModelFormsetTest(TestCase):
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_ownerprofile-0-age">Age:</label>'
-            '<input type="number" name="ownerprofile-0-age" value="54" id="id_ownerprofile-0-age" min="0" />'
+            '<input type="number" name="ownerprofile-0-age" value="54" id="id_ownerprofile-0-age" min="0" required />'
             '<input type="hidden" name="ownerprofile-0-owner" value="%d" id="id_ownerprofile-0-owner" /></p>'
             % owner1.auto_id
         )
@@ -1203,6 +1223,7 @@ class ModelFormsetTest(TestCase):
         place = Place.objects.create(pk=1, name='Giordanos', city='Chicago')
 
         FormSet = inlineformset_factory(Place, Location, can_delete=False, fields="__all__")
+        FormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         self.assertEqual(FormSet.max_num, 1)
 
         formset = FormSet(instance=place)
@@ -1210,9 +1231,9 @@ class ModelFormsetTest(TestCase):
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<p><label for="id_location_set-0-lat">Lat:</label>'
-            '<input id="id_location_set-0-lat" type="text" name="location_set-0-lat" maxlength="100" /></p>'
+            '<input id="id_location_set-0-lat" type="text" name="location_set-0-lat" maxlength="100" required /></p>'
             '<p><label for="id_location_set-0-lon">Lon:</label> '
-            '<input id="id_location_set-0-lon" type="text" name="location_set-0-lon" maxlength="100" />'
+            '<input id="id_location_set-0-lon" type="text" name="location_set-0-lon" maxlength="100" required />'
             '<input type="hidden" name="location_set-0-place" value="1" id="id_location_set-0-place" />'
             '<input type="hidden" name="location_set-0-id" id="id_location_set-0-id" /></p>'
         )
@@ -1355,6 +1376,7 @@ class ModelFormsetTest(TestCase):
 
         person = Person.objects.create(name='Ringo')
         FormSet = inlineformset_factory(Person, Membership, can_delete=False, extra=1, fields="__all__")
+        FormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         formset = FormSet(instance=person)
 
         # Django will render a hidden field for model fields that have a callable
@@ -1370,11 +1392,11 @@ class ModelFormsetTest(TestCase):
             result,
             '<p><label for="id_membership_set-0-date_joined">Date joined:</label>'
             '<input type="text" name="membership_set-0-date_joined" '
-            'value="__DATETIME__" id="id_membership_set-0-date_joined" />'
+            'value="__DATETIME__" id="id_membership_set-0-date_joined" required />'
             '<input type="hidden" name="initial-membership_set-0-date_joined" value="__DATETIME__" '
             'id="initial-membership_set-0-id_membership_set-0-date_joined" /></p>'
             '<p><label for="id_membership_set-0-karma">Karma:</label>'
-            '<input type="number" name="membership_set-0-karma" id="id_membership_set-0-karma" />'
+            '<input type="number" name="membership_set-0-karma" id="id_membership_set-0-karma" required />'
             '<input type="hidden" name="membership_set-0-person" value="%d" id="id_membership_set-0-person" />'
             '<input type="hidden" name="membership_set-0-id" id="id_membership_set-0-id" /></p>'
             % person.id)
@@ -1631,10 +1653,11 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
             'name': forms.TextInput(attrs={'class': 'poet'})
         }
         PoetFormSet = modelformset_factory(Poet, fields="__all__", widgets=widgets)
+        PoetFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         form = PoetFormSet.form()
         self.assertHTMLEqual(
             "%s" % form['name'],
-            '<input id="id_name" maxlength="100" type="text" class="poet" name="name" />'
+            '<input id="id_name" maxlength="100" type="text" class="poet" name="name" required />'
         )
 
     def test_inlineformset_factory_widgets(self):
@@ -1642,10 +1665,11 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
             'title': forms.TextInput(attrs={'class': 'book'})
         }
         BookFormSet = inlineformset_factory(Author, Book, widgets=widgets, fields="__all__")
+        BookFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         form = BookFormSet.form()
         self.assertHTMLEqual(
             "%s" % form['title'],
-            '<input class="book" id="id_title" maxlength="100" name="title" type="text" />'
+            '<input class="book" id="id_title" maxlength="100" name="title" type="text" required />'
         )
 
     def test_modelformset_factory_labels_overrides(self):

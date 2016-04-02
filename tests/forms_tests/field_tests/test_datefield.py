@@ -6,6 +6,7 @@ from django.utils import translation
 
 
 class GetDate(Form):
+    use_required_attribute = True  # RemovedInDjango20Warning
     mydate = DateField(widget=SelectDateWidget)
 
 

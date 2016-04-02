@@ -248,6 +248,7 @@ class InlineFormsetTests(TestCase):
         user = User.objects.create(username="bibi", serial=1)
         UserSite.objects.create(user=user, data=7)
         FormSet = inlineformset_factory(User, UserSite, extra=2, fields="__all__")
+        FormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
 
         formset = FormSet(instance=user, initial=[{'data': 41}, {'data': 42}])
         self.assertEqual(formset.forms[0].initial['data'], 7)
@@ -284,6 +285,7 @@ class FormsetTests(TestCase):
     def test_initial_data(self):
         User.objects.create(username="bibi", serial=1)
         Formset = modelformset_factory(User, fields="__all__", extra=2)
+        Formset.form.use_required_attribute = True  # RemovedInDjango20Warning
         formset = Formset(initial=[{'username': 'apollo11'}, {'username': 'apollo12'}])
         self.assertEqual(formset.forms[0].initial['username'], "bibi")
         self.assertEqual(formset.extra_forms[0].initial['username'], "apollo11")

@@ -49,6 +49,7 @@ class ComplexField(MultiValueField):
 
 
 class ComplexFieldForm(Form):
+    use_required_attribute = True  # RemovedInDjango20Warning
     field1 = ComplexField(widget=ComplexMultiWidget())
 
 
@@ -114,15 +115,15 @@ class MultiValueFieldTest(SimpleTestCase):
             form.as_table(),
             """
             <tr><th><label for="id_field1_0">Field1:</label></th>
-            <td><input type="text" name="field1_0" id="id_field1_0" />
-            <select multiple="multiple" name="field1_1" id="id_field1_1">
+            <td><input type="text" name="field1_0" id="id_field1_0" required />
+            <select multiple="multiple" name="field1_1" id="id_field1_1" required>
             <option value="J">John</option>
             <option value="P">Paul</option>
             <option value="G">George</option>
             <option value="R">Ringo</option>
             </select>
-            <input type="text" name="field1_2_0" id="id_field1_2_0" />
-            <input type="text" name="field1_2_1" id="id_field1_2_1" /></td></tr>
+            <input type="text" name="field1_2_0" id="id_field1_2_0" required />
+            <input type="text" name="field1_2_1" id="id_field1_2_1" required /></td></tr>
             """,
         )
 
@@ -137,15 +138,15 @@ class MultiValueFieldTest(SimpleTestCase):
             form.as_table(),
             """
             <tr><th><label for="id_field1_0">Field1:</label></th>
-            <td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
-            <select multiple="multiple" name="field1_1" id="id_field1_1">
+            <td><input type="text" name="field1_0" value="some text" id="id_field1_0" required />
+            <select multiple="multiple" name="field1_1" id="id_field1_1" required>
             <option value="J" selected="selected">John</option>
             <option value="P" selected="selected">Paul</option>
             <option value="G">George</option>
             <option value="R">Ringo</option>
             </select>
-            <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" />
-            <input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" /></td></tr>
+            <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" required />
+            <input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" required /></td></tr>
             """,
         )
 

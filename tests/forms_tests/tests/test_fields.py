@@ -70,6 +70,7 @@ class FieldsTests(SimpleTestCase):
 
     def assertWidgetRendersTo(self, field, to):
         class _Form(Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             f = field
         self.assertHTMLEqual(str(_Form()['f']), to)
 
@@ -189,13 +190,13 @@ class FieldsTests(SimpleTestCase):
 
     def test_charfield_disabled(self):
         f = CharField(disabled=True)
-        self.assertWidgetRendersTo(f, '<input type="text" name="f" id="id_f" disabled />')
+        self.assertWidgetRendersTo(f, '<input type="text" name="f" id="id_f" disabled required />')
 
     # IntegerField ################################################################
 
     def test_integerfield_1(self):
         f = IntegerField()
-        self.assertWidgetRendersTo(f, '<input type="number" name="f" id="id_f" />')
+        self.assertWidgetRendersTo(f, '<input type="number" name="f" id="id_f" required />')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -237,7 +238,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_3(self):
         f = IntegerField(max_value=10)
-        self.assertWidgetRendersTo(f, '<input max="10" type="number" name="f" id="id_f" />')
+        self.assertWidgetRendersTo(f, '<input max="10" type="number" name="f" id="id_f" required />')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
         self.assertEqual(1, f.clean(1))
@@ -252,7 +253,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_4(self):
         f = IntegerField(min_value=10)
-        self.assertWidgetRendersTo(f, '<input id="id_f" type="number" name="f" min="10" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" type="number" name="f" min="10" required />')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 10.'"):
@@ -266,7 +267,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_5(self):
         f = IntegerField(min_value=10, max_value=20)
-        self.assertWidgetRendersTo(f, '<input id="id_f" max="20" type="number" name="f" min="10" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" max="20" type="number" name="f" min="10" required />')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 10.'"):
@@ -287,7 +288,7 @@ class FieldsTests(SimpleTestCase):
         no number input specific attributes.
         """
         f1 = IntegerField(localize=True)
-        self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" />')
+        self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" required />')
 
     def test_integerfield_float(self):
         f = IntegerField()
@@ -323,7 +324,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_floatfield_1(self):
         f = FloatField()
-        self.assertWidgetRendersTo(f, '<input step="any" type="number" name="f" id="id_f" />')
+        self.assertWidgetRendersTo(f, '<input step="any" type="number" name="f" id="id_f" required />')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -360,7 +361,10 @@ class FieldsTests(SimpleTestCase):
 
     def test_floatfield_3(self):
         f = FloatField(max_value=1.5, min_value=0.5)
-        self.assertWidgetRendersTo(f, '<input step="any" name="f" min="0.5" max="1.5" type="number" id="id_f" />')
+        self.assertWidgetRendersTo(
+            f,
+            '<input step="any" name="f" min="0.5" max="1.5" type="number" id="id_f" required />',
+        )
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'"):
             f.clean('1.6')
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 0.5.'"):
@@ -372,7 +376,10 @@ class FieldsTests(SimpleTestCase):
 
     def test_floatfield_widget_attrs(self):
         f = FloatField(widget=NumberInput(attrs={'step': 0.01, 'max': 1.0, 'min': 0.0}))
-        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.0" max="1.0" type="number" id="id_f" />')
+        self.assertWidgetRendersTo(
+            f,
+            '<input step="0.01" name="f" min="0.0" max="1.0" type="number" id="id_f" required />',
+        )
 
     def test_floatfield_localized(self):
         """
@@ -380,7 +387,7 @@ class FieldsTests(SimpleTestCase):
         no number input specific attributes.
         """
         f = FloatField(localize=True)
-        self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" required />')
 
     def test_floatfield_changed(self):
         f = FloatField()
@@ -396,7 +403,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_decimalfield_1(self):
         f = DecimalField(max_digits=4, decimal_places=2)
-        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" required />')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -458,7 +465,10 @@ class FieldsTests(SimpleTestCase):
 
     def test_decimalfield_3(self):
         f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
-        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.5" max="1.5" type="number" id="id_f" />')
+        self.assertWidgetRendersTo(
+            f,
+            '<input step="0.01" name="f" min="0.5" max="1.5" type="number" id="id_f" required />',
+        )
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'"):
             f.clean('1.6')
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 0.5.'"):
@@ -514,7 +524,7 @@ class FieldsTests(SimpleTestCase):
         f = DecimalField(max_digits=20)
         self.assertEqual(f.widget_attrs(NumberInput()), {'step': 'any'})
         f = DecimalField(max_digits=6, widget=NumberInput(attrs={'step': '0.01'}))
-        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" type="number" id="id_f" />')
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" type="number" id="id_f" required />')
 
     def test_decimalfield_localized(self):
         """
@@ -522,7 +532,7 @@ class FieldsTests(SimpleTestCase):
         no number input specific attributes.
         """
         f = DecimalField(localize=True)
-        self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" required />')
 
     def test_decimalfield_changed(self):
         f = DecimalField(max_digits=2, decimal_places=2)
@@ -753,10 +763,11 @@ class FieldsTests(SimpleTestCase):
 
     def test_durationfield_2(self):
         class DurationForm(Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             duration = DurationField(initial=datetime.timedelta(hours=1))
         f = DurationForm()
         self.assertHTMLEqual(
-            '<input id="id_duration" type="text" name="duration" value="01:00:00">',
+            '<input id="id_duration" type="text" name="duration" value="01:00:00" required>',
             str(f['duration'])
         )
 
@@ -842,7 +853,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_emailfield_1(self):
         f = EmailField()
-        self.assertWidgetRendersTo(f, '<input type="email" name="f" id="id_f" />')
+        self.assertWidgetRendersTo(f, '<input type="email" name="f" id="id_f" required />')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -871,7 +882,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_emailfield_min_max_length(self):
         f = EmailField(min_length=10, max_length=15)
-        self.assertWidgetRendersTo(f, '<input id="id_f" type="email" name="f" maxlength="15" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" type="email" name="f" maxlength="15" required />')
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (it has 9).'"):
             f.clean('a@foo.com')
         self.assertEqual('alf@foo.com', f.clean('alf@foo.com'))
@@ -998,7 +1009,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_urlfield_1(self):
         f = URLField()
-        self.assertWidgetRendersTo(f, '<input type="url" name="f" id="id_f" />')
+        self.assertWidgetRendersTo(f, '<input type="url" name="f" id="id_f" required />')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -1078,7 +1089,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
-        self.assertWidgetRendersTo(f, '<input id="id_f" type="url" name="f" maxlength="20" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" type="url" name="f" maxlength="20" required />')
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 15 characters (it has 12).'"):
             f.clean('http://f.com')
         self.assertEqual('http://example.com', f.clean('http://example.com'))
@@ -1260,7 +1271,7 @@ class FieldsTests(SimpleTestCase):
     def test_choicefield_disabled(self):
         f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')], disabled=True)
         self.assertWidgetRendersTo(f,
-            '<select id="id_f" name="f" disabled><option value="J">John</option>'
+            '<select id="id_f" name="f" disabled required><option value="J">John</option>'
             '<option value="P">Paul</option></select>')
 
     # TypedChoiceField ############################################################

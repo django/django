@@ -17,6 +17,7 @@ class SelectDateForm(forms.Form):
 
 
 class CompanyForm(forms.ModelForm):
+    use_required_attribute = True  # RemovedInDjango20Warning
     cents_paid = forms.DecimalField(max_digits=4, decimal_places=2, localize=True)
     products_delivered = forms.IntegerField(localize=True)
     date_added = forms.DateTimeField(localize=True)

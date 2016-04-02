@@ -12,6 +12,7 @@ class EventSplitForm(forms.Form):
 
 
 class EventLocalizedForm(forms.Form):
+    use_required_attribute = True  # RemovedInDjango20Warning
     dt = forms.DateTimeField(localize=True)
 
 
@@ -22,6 +23,8 @@ class EventModelForm(forms.ModelForm):
 
 
 class EventLocalizedModelForm(forms.ModelForm):
+    use_required_attribute = True  # RemovedInDjango20Warning
+
     class Meta:
         model = Event
         fields = '__all__'

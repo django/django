@@ -692,6 +692,12 @@ This will take precedence over :attr:`Form.label_suffix
 using the ``label_suffix`` parameter to
 :meth:`~django.forms.BoundField.label_tag`.
 
+.. attribute:: Form.use_required_attribute
+
+.. versionadded:: 1.10
+
+When ``True``, required form fields will have the HTML attribute ``required``.
+
 Notes on field ordering
 -----------------------
 

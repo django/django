@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
 
 import datetime
+import warnings
 
 from django.forms.utils import flatatt, pretty_name
 from django.forms.widgets import Textarea, TextInput
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
@@ -85,6 +87,18 @@ class BoundField(object):
             widget.is_localized = True
 
         attrs = attrs or {}
+        if not widget.is_hidden and self.field.required:
+            if self.form.use_required_attribute is None:
+                warnings.warn(
+                    "In Django 2.0, the HTML required attribute will be "
+                    "turned on by default unless you opt-out. Set the "
+                    "attribute use_require_attribute on form %s to True or "
+                    "False to suppress this message or preserve current "
+                    "behavior, respectively." % self.form.__class__.__name__,
+                    RemovedInDjango20Warning
+                )
+            elif self.form.use_required_attribute:
+                attrs['required'] = True
         if self.field.disabled:
             attrs['disabled'] = True
         auto_id = self.auto_id

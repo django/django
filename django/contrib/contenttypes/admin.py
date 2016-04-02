@@ -124,7 +124,9 @@ class GenericInlineModelAdmin(InlineModelAdmin):
         if defaults['fields'] is None and not modelform_defines_fields(defaults['form']):
             defaults['fields'] = ALL_FIELDS
 
-        return generic_inlineformset_factory(self.model, **defaults)
+        formset = generic_inlineformset_factory(self.model, **defaults)
+        formset.form.use_required_attribute = True  # RemovedInDjango20Warning
+        return formset
 
 
 class GenericStackedInline(GenericInlineModelAdmin):

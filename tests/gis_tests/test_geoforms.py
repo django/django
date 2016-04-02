@@ -167,6 +167,7 @@ class SpecializedFieldTest(SimpleTestCase):
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_pointfield(self):
         class PointForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             p = forms.PointField()
 
         geom = self.geometries['point']
@@ -183,6 +184,7 @@ class SpecializedFieldTest(SimpleTestCase):
 
     def test_multipointfield(self):
         class PointForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             p = forms.MultiPointField()
 
         geom = self.geometries['multipoint']
@@ -196,6 +198,7 @@ class SpecializedFieldTest(SimpleTestCase):
 
     def test_linestringfield(self):
         class LineStringForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             l = forms.LineStringField()
 
         geom = self.geometries['linestring']
@@ -209,6 +212,7 @@ class SpecializedFieldTest(SimpleTestCase):
 
     def test_multilinestringfield(self):
         class LineStringForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             l = forms.MultiLineStringField()
 
         geom = self.geometries['multilinestring']
@@ -222,6 +226,7 @@ class SpecializedFieldTest(SimpleTestCase):
 
     def test_polygonfield(self):
         class PolygonForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             p = forms.PolygonField()
 
         geom = self.geometries['polygon']
@@ -235,6 +240,7 @@ class SpecializedFieldTest(SimpleTestCase):
 
     def test_multipolygonfield(self):
         class PolygonForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             p = forms.MultiPolygonField()
 
         geom = self.geometries['multipolygon']
@@ -248,6 +254,7 @@ class SpecializedFieldTest(SimpleTestCase):
 
     def test_geometrycollectionfield(self):
         class GeometryForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             g = forms.GeometryCollectionField()
 
         geom = self.geometries['geometrycollection']
@@ -270,6 +277,7 @@ class OSMWidgetTest(SimpleTestCase):
 
     def test_osm_widget(self):
         class PointForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             p = forms.PointField(widget=forms.OSMWidget)
 
         geom = self.geometries['point']
@@ -281,6 +289,7 @@ class OSMWidgetTest(SimpleTestCase):
 
     def test_default_lat_lon(self):
         class PointForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             p = forms.PointField(
                 widget=forms.OSMWidget(attrs={
                     'default_lon': 20, 'default_lat': 30
@@ -319,6 +328,7 @@ class CustomGeometryWidgetTest(SimpleTestCase):
                 return GEOSGeometry(value)
 
         class PointForm(forms.Form):
+            use_required_attribute = True  # RemovedInDjango20Warning
             p = forms.PointField(widget=CustomGeometryWidget)
 
         point = GEOSGeometry("SRID=4326;POINT(9.052734375 42.451171875)")

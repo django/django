@@ -101,6 +101,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
             exclude=['description', 'keywords'],
             extra=3,
         )
+        EpisodeMediaFormSet.form.use_required_attribute = True  # RemovedInDjango20Warning
         e = Episode.objects.get(name='This Week in Django')
 
         # Works with no queryset
@@ -111,7 +112,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
             '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">'
             'Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" '
             'type="url" name="generic_inline_admin-media-content_type-object_id-0-url" '
-            'value="http://example.com/podcast.mp3" maxlength="200" />'
+            'value="http://example.com/podcast.mp3" maxlength="200" required />'
             '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" '
             'value="%s" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>'
             % self.mp3_media_pk
@@ -121,7 +122,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
             '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">'
             'Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" '
             'type="url" name="generic_inline_admin-media-content_type-object_id-1-url" '
-            'value="http://example.com/logo.png" maxlength="200" />'
+            'value="http://example.com/logo.png" maxlength="200" required />'
             '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" '
             'value="%s" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>'
             % self.png_media_pk
@@ -130,7 +131,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
             formset.forms[2].as_p(),
             '<p><label for="id_generic_inline_admin-media-content_type-object_id-2-url">Url:</label>'
             '<input id="id_generic_inline_admin-media-content_type-object_id-2-url" type="url" '
-            'name="generic_inline_admin-media-content_type-object_id-2-url" maxlength="200" />'
+            'name="generic_inline_admin-media-content_type-object_id-2-url" maxlength="200" required />'
             '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-2-id" '
             'id="id_generic_inline_admin-media-content_type-object_id-2-id" /></p>'
         )
@@ -143,7 +144,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
             '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label>'
             '<input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="url" '
             'name="generic_inline_admin-media-content_type-object_id-0-url"'
-            'value="http://example.com/logo.png" maxlength="200" />'
+            'value="http://example.com/logo.png" maxlength="200" required />'
             '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" '
             'value="%s" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>'
             % self.png_media_pk
@@ -153,7 +154,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
             '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label>'
             '<input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="url" '
             'name="generic_inline_admin-media-content_type-object_id-1-url" '
-            'value="http://example.com/podcast.mp3" maxlength="200" />'
+            'value="http://example.com/podcast.mp3" maxlength="200" required />'
             '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" '
             'value="%s" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>'
             % self.mp3_media_pk
@@ -162,7 +163,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
             formset.forms[2].as_p(),
             '<p><label for="id_generic_inline_admin-media-content_type-object_id-2-url">'
             'Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-2-url" '
-            'type="url" name="generic_inline_admin-media-content_type-object_id-2-url" maxlength="200" />'
+            'type="url" name="generic_inline_admin-media-content_type-object_id-2-url" maxlength="200" required />'
             '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-2-id" '
             'id="id_generic_inline_admin-media-content_type-object_id-2-id" /></p>'
         )
@@ -175,7 +176,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
             '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label>'
             ' <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="url" '
             'name="generic_inline_admin-media-content_type-object_id-0-url" '
-            'value="http://example.com/logo.png" maxlength="200" />'
+            'value="http://example.com/logo.png" maxlength="200" required />'
             '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" '
             'value="%s" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>'
             % self.png_media_pk
@@ -184,7 +185,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
             formset.forms[1].as_p(),
             '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">'
             'Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" '
-            'type="url" name="generic_inline_admin-media-content_type-object_id-1-url" maxlength="200" />'
+            'type="url" name="generic_inline_admin-media-content_type-object_id-1-url" maxlength="200" required />'
             '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" '
             'id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>'
         )
