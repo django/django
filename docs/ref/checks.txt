@@ -631,3 +631,5 @@ The following checks are performed on your URL configuration:
 * **urls.W003**: Your URL pattern ``<pattern>`` has a ``name``
   including a ``:``. Remove the colon, to avoid ambiguous namespace
   references.
+* **urls.E004**: Your URL pattern ``<pattern>`` is invalid. Ensure that
+  ``urlpatterns`` is a list of :func:`~django.conf.urls.url()` instances.
