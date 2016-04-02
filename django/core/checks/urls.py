@@ -72,15 +72,16 @@ def check_pattern_startswith_slash(pattern):
     if hasattr(pattern, 'regex') and not hasattr(pattern.regex, 'pattern'):
         errors.append(Warning(
             "url objects should have a property regex.pattern",
-            id="urls.W004"))
-    regex_pattern = pattern.regex.pattern
-    if regex_pattern.startswith('/') or regex_pattern.startswith('^/'):
-        warning = Warning(
-            "Your URL pattern {} has a regex beginning with a '/'. "
-            "Remove this slash as it is unnecessary.".format(describe_pattern(pattern)),
-            id="urls.W002",
-        )
-        errors.append(warning)
+            id="urls.W005"))
+    if not errors:
+        regex_pattern = pattern.regex.pattern
+        if regex_pattern.startswith('/') or regex_pattern.startswith('^/'):
+            warning = Warning(
+                "Your URL pattern {} has a regex beginning with a '/'. "
+                "Remove this slash as it is unnecessary.".format(describe_pattern(pattern)),
+                id="urls.W002",
+            )
+            errors.append(warning)
 
     return errors
 
