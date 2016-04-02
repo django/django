@@ -9,4 +9,6 @@ Django 1.9.6 fixes several bugs in 1.9.5.
 Bugfixes
 ========
 
-* ...
+* Added support for relative path redirects to
+  ``SimpleTestCase.assertRedirects()`` because Django 1.9 no longer converts
+  redirects to absolute URIs (:ticket:`26428`).
