@@ -9,6 +9,7 @@ import smtpd
 import sys
 import tempfile
 import threading
+from email.header import Header
 from email.mime.text import MIMEText
 from smtplib import SMTP, SMTPException
 from ssl import SSLError
@@ -19,7 +20,7 @@ from django.core.mail import (
     send_mail, send_mass_mail,
 )
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
-from django.core.mail.message import BadHeaderError
+from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
@@ -567,6 +568,44 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         # Verify that the child message header is not base64 encoded
         self.assertIn(str('Child Subject'), parent_s)
 
+    def test_sanitize_address(self):
+        """
+        Assert that e-mail addresses are properly sanitized.
+
+        Related to #25986, where unicode localparts are not possible on Python 3
+        """
+        # simple ASCII address - string form
+        self.assertEqual(sanitize_address('to@example.com', 'ascii'), 'to@example.com')
+        self.assertEqual(sanitize_address('to@example.com', 'utf-8'), 'to@example.com')
+        # asserts that force_text is called that transforms bytestrings into normal strings
+        self.assertEqual(sanitize_address(b'to@example.com', 'utf-8'), 'to@example.com')
+
+        # simple ASCII address - tuple form
+        self.assertEqual(
+            sanitize_address(('A name', 'to@example.com'), 'ascii'),
+            'A name <to@example.com>'
+        )
+        if PY3:
+            self.assertEqual(
+                sanitize_address(('A name', 'to@example.com'), 'utf-8'),
+                '=?utf-8?q?A_name?= <to@example.com>'
+            )
+        else:
+            self.assertEqual(
+                sanitize_address(('A name', 'to@example.com'), 'utf-8'),
+                'A name <to@example.com>'
+            )
+
+        # test with unicode characters (which are supported in RFC-6532)
+        self.assertEqual(
+            sanitize_address('tó@example.com', 'utf-8'),
+            '=?utf-8?b?dMOz?=@example.com'
+        )
+        self.assertEqual(
+            sanitize_address(('Tó Example', 'tó@example.com'), 'utf-8'),
+            '=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>'
+        )
+
 
 class PythonGlobalState(SimpleTestCase):
     """
@@ -1026,6 +1065,15 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
             data = data.encode('utf-8')
         m = message_from_bytes(data)
         maddr = parseaddr(m.get('from'))[1]
+
+        if mailfrom != maddr:
+            # according to the spec, mailfrom does not necessarily match the From
+            # header - on Python 3 this is the case where the local part is not
+            # encoded, so we try to correct that.
+            lp, domain = mailfrom.split('@', 1)
+            lp = Header(lp, 'utf-8').encode()
+            mailfrom = '@'.join([lp, domain])
+
         if mailfrom != maddr:
             return "553 '%s' != '%s'" % (mailfrom, maddr)
         with self.sink_lock:
