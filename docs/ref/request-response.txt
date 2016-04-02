@@ -233,9 +233,9 @@ middleware class is listed in :setting:`MIDDLEWARE_CLASSES`.
     logged-in user. If the user isn't currently logged in, ``user`` will be set
     to an instance of :class:`~django.contrib.auth.models.AnonymousUser`. You
     can tell them apart with
-    :meth:`~django.contrib.auth.models.User.is_authenticated`, like so::
+    :attr:`~django.contrib.auth.models.User.is_authenticated`, like so::
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             ... # Do something for logged-in users.
         else:
             ... # Do something for anonymous users.

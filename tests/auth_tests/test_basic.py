@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, User
@@ -44,7 +46,8 @@ class BasicTestCase(TestCase):
         self.assertEqual(u.get_username(), 'testuser')
 
         # Check authentication/permissions
-        self.assertTrue(u.is_authenticated())
+        self.assertFalse(u.is_anonymous)
+        self.assertTrue(u.is_authenticated)
         self.assertFalse(u.is_staff)
         self.assertTrue(u.is_active)
         self.assertFalse(u.is_superuser)
@@ -52,6 +55,26 @@ class BasicTestCase(TestCase):
         # Check API-based user creation with no password
         u2 = User.objects.create_user('testuser2', 'test2@example.com')
         self.assertFalse(u2.has_usable_password())
+
+    def test_is_anonymous_authenticated_method_deprecation(self):
+        deprecation_message = (
+            'Using user.is_authenticated() and user.is_anonymous() as a '
+            'method is deprecated. Remove the parentheses to use it as an '
+            'attribute.'
+        )
+        u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
+        # Backwards-compatibility callables
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            self.assertFalse(u.is_anonymous())
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(str(warns[0].message), deprecation_message)
+
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            self.assertTrue(u.is_authenticated())
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(str(warns[0].message), deprecation_message)
 
     def test_user_no_email(self):
         "Check that users can be created without an email"
@@ -70,12 +93,33 @@ class BasicTestCase(TestCase):
         self.assertEqual(a.pk, None)
         self.assertEqual(a.username, '')
         self.assertEqual(a.get_username(), '')
-        self.assertFalse(a.is_authenticated())
+        self.assertTrue(a.is_anonymous)
+        self.assertFalse(a.is_authenticated)
         self.assertFalse(a.is_staff)
         self.assertFalse(a.is_active)
         self.assertFalse(a.is_superuser)
         self.assertEqual(a.groups.all().count(), 0)
         self.assertEqual(a.user_permissions.all().count(), 0)
+
+    def test_anonymous_user_is_anonymous_authenticated_method_deprecation(self):
+        a = AnonymousUser()
+        deprecation_message = (
+            'Using user.is_authenticated() and user.is_anonymous() as a '
+            'method is deprecated. Remove the parentheses to use it as an '
+            'attribute.'
+        )
+        # Backwards-compatibility callables
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')  # prevent warnings from appearing as errors
+            self.assertTrue(a.is_anonymous())
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(str(warns[0].message), deprecation_message)
+
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')  # prevent warnings from appearing as errors
+            self.assertFalse(a.is_authenticated())
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(str(warns[0].message), deprecation_message)
 
     def test_superuser(self):
         "Check the creation and properties of a superuser"

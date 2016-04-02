@@ -1170,7 +1170,7 @@ decorator)::
 
     @vary_on_cookie
     def list_blog_entries_view(request):
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             response = render_only_public_entries()
             patch_cache_control(response, public=True)
         else:
