@@ -417,6 +417,9 @@ Tests
 * Added the :setting:`DATABASES['TEST']['MIGRATE'] <TEST_MIGRATE>` option to
   allow disabling of migrations during test database creation.
 
+* You can now login and use sessions with the test client even if
+  :mod:`django.contrib.sessions` is not in :setting:`INSTALLED_APPS`.
+
 URLs
 ~~~~
 

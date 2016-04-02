@@ -9,7 +9,6 @@ from copy import copy
 from importlib import import_module
 from io import BytesIO
 
-from django.apps import apps
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8, WSGIRequest
@@ -419,17 +418,15 @@ class Client(RequestFactory):
         """
         Obtains the current session variables.
         """
-        if apps.is_installed('django.contrib.sessions'):
-            engine = import_module(settings.SESSION_ENGINE)
-            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
-            if cookie:
-                return engine.SessionStore(cookie.value)
-            else:
-                s = engine.SessionStore()
-                s.save()
-                self.cookies[settings.SESSION_COOKIE_NAME] = s.session_key
-                return s
-        return {}
+        engine = import_module(settings.SESSION_ENGINE)
+        cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
+        if cookie:
+            return engine.SessionStore(cookie.value)
+
+        session = engine.SessionStore()
+        session.save()
+        self.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+        return session
     session = property(_session)
 
     def request(self, **request):
@@ -594,12 +591,11 @@ class Client(RequestFactory):
         Sets the Factory to appear as if it has successfully logged into a site.
 
         Returns True if login is possible; False if the provided credentials
-        are incorrect, or the user is inactive, or if the sessions framework is
-        not available.
+        are incorrect.
         """
         from django.contrib.auth import authenticate
         user = authenticate(**credentials)
-        if user and apps.is_installed('django.contrib.sessions'):
+        if user:
             self._login(user)
             return True
         else:
