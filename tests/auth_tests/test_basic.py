@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from django.test import TestCase, override_settings
 from django.test.signals import setting_changed
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import CustomUser
 
@@ -44,10 +45,17 @@ class BasicTestCase(TestCase):
         self.assertEqual(u.get_username(), 'testuser')
 
         # Check authentication/permissions
-        self.assertTrue(u.is_authenticated())
+        self.assertFalse(u.is_anonymous)
+        self.assertTrue(u.is_authenticated)
         self.assertFalse(u.is_staff)
         self.assertTrue(u.is_active)
         self.assertFalse(u.is_superuser)
+
+        # Backwards-compatibility callables
+        with self.assertRaises(RemovedInDjango20Warning):
+            self.assertFalse(u.is_anonymous())
+        with self.assertRaises(RemovedInDjango20Warning):
+            self.assertTrue(u.is_authenticated())
 
         # Check API-based user creation with no password
         u2 = User.objects.create_user('testuser2', 'test2@example.com')
@@ -70,12 +78,19 @@ class BasicTestCase(TestCase):
         self.assertEqual(a.pk, None)
         self.assertEqual(a.username, '')
         self.assertEqual(a.get_username(), '')
-        self.assertFalse(a.is_authenticated())
+        self.assertTrue(a.is_anonymous)
+        self.assertFalse(a.is_authenticated)
         self.assertFalse(a.is_staff)
         self.assertFalse(a.is_active)
         self.assertFalse(a.is_superuser)
         self.assertEqual(a.groups.all().count(), 0)
         self.assertEqual(a.user_permissions.all().count(), 0)
+
+        # Backwards-compatibility callables
+        with self.assertRaises(RemovedInDjango20Warning):
+            self.assertTrue(a.is_anonymous())
+        with self.assertRaises(RemovedInDjango20Warning):
+            self.assertFalse(a.is_authenticated())
 
     def test_superuser(self):
         "Check the creation and properties of a superuser"

@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import (
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, mock
 from django.views.generic import View
 
 
@@ -78,9 +78,9 @@ class AccessMixinTests(TestCase):
         with self.assertRaises(PermissionDenied):
             view(request)
 
+    @mock.patch.object(models.User, 'is_authenticated', False)
     def test_stacked_mixins_not_logged_in(self):
         user = models.User.objects.create(username='joe', password='qwerty')
-        user.is_authenticated = lambda: False
         perms = models.Permission.objects.filter(codename__in=('add_customuser', 'change_customuser'))
         user.user_permissions.add(*perms)
         request = self.factory.get('/rand')

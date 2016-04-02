@@ -66,6 +66,7 @@ from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
 from django.utils.formats import localize
+from django.utils.functional import CallableFalse, CallableTrue
 from django.utils.html import conditional_escape, escape
 from django.utils.inspect import getargspec
 from django.utils.safestring import (
@@ -891,7 +892,7 @@ class Variable(object):
                             raise VariableDoesNotExist("Failed lookup for key "
                                                        "[%s] in %r",
                                                        (bit, current))  # missing attribute
-                if callable(current):
+                if callable(current) and not (current is CallableFalse or current is CallableTrue):
                     if getattr(current, 'do_not_call_in_templates', False):
                         pass
                     elif getattr(current, 'alters_data', False):

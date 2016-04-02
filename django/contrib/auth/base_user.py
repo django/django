@@ -11,6 +11,7 @@ from django.contrib.auth.hashers import (
 from django.db import models
 from django.utils.crypto import get_random_string, salted_hmac
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import CallableFalse, CallableTrue
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -79,19 +80,21 @@ class AbstractBaseUser(models.Model):
     def natural_key(self):
         return (self.get_username(),)
 
+    @property
     def is_anonymous(self):
         """
         Always return False. This is a way of comparing User objects to
         anonymous users.
         """
-        return False
+        return CallableFalse
 
+    @property
     def is_authenticated(self):
         """
         Always return True. This is a way to tell if the user has been
         authenticated in templates.
         """
-        return True
+        return CallableTrue
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
