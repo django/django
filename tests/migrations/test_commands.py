@@ -8,6 +8,7 @@ import os
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import DatabaseError, connection, connections, models
+from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
@@ -461,6 +462,22 @@ class MigrateTests(MigrationTestBase):
             recorder.applied_migrations()
         )
         # No changes were actually applied so there is nothing to rollback
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations'})
+    def test_migrate_inconsistent_history(self):
+        """
+        Running migrate with some migrations applied before their dependencies
+        should not be allowed.
+        """
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied("migrations", "0002_second")
+        msg = ("Migration migrations.0002_second is applied before its "
+               "dependency migrations.0001_initial")
+
+        with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
+            call_command("migrate")
+        applied_migrations = recorder.applied_migrations()
+        self.assertNotIn(("migrations", "0001_initial"), applied_migrations)
 
 
 class MakeMigrationsTests(MigrationTestBase):
@@ -1054,6 +1071,20 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module() as migration_dir:
             call_command("makemigrations", "migrations", stdout=out)
             self.assertIn(os.path.join(migration_dir, '0001_initial.py'), out.getvalue())
+
+    def test_makemigrations_inconsistent_history(self):
+        """
+        makemigrations should raise InconsistentMigrationHistory exception if
+        there are some migrations applied before their dependencies.
+        """
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0002_second')
+        msg = ("Migration migrations.0002_second is applied before its "
+               "dependency migrations.0001_initial")
+
+        with self.temporary_migration_module(module="migrations.test_migrations"):
+            with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
+                call_command("makemigrations")
 
 
 class SquashMigrationsTests(MigrationTestBase):
