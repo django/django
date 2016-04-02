@@ -323,6 +323,10 @@ Migrations
 * Added support for :ref:`non-atomic migrations <non-atomic-migrations>` by
   setting the ``atomic`` attribute on a ``Migration``.
 
+* The ``migrate`` and ``makemigrations`` commands now check for a consistent
+  migration history. If they find some unapplied dependencies of an applied
+  migration, ``InconsistentMigrationHistory`` is raised.
+
 Models
 ~~~~~~
 
