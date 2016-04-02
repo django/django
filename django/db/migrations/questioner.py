@@ -76,6 +76,11 @@ class MigrationQuestioner(object):
         "Do you really want to merge these migrations?"
         return self.defaults.get("ask_merge", False)
 
+    def ask_auto_now_add_addition(self, field_name, model_name):
+        "Adding an auto_now_add field to a model"
+        # None means quit
+        return None
+
 
 class InteractiveMigrationQuestioner(MigrationQuestioner):
 
@@ -101,17 +106,36 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 pass
             result = input("Please select a valid option: ")
 
-    def _ask_default(self):
+    def _ask_default(self, default=''):
+        """
+        Prompt for a default value.
+
+        The ``default`` argument allows providing a custom default value (as a
+        string) which will be shown to the user and used as the return value
+        if the user doesn't provide any other input.
+        """
         print("Please enter the default value now, as valid Python")
+        if default:
+            print(
+                "You can accept the default '{}' by pressing 'Enter' or you "
+                "can provide another value.".format(default)
+            )
         print("The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now")
+        print("Type 'exit' to exit this prompt")
         while True:
+            if default:
+                prompt = "[default: {}] >>> ".format(default)
+            else:
+                prompt = ">>> "
             if six.PY3:
                 # Six does not correctly abstract over the fact that
                 # py3 input returns a unicode string, while py2 raw_input
                 # returns a bytestring.
-                code = input(">>> ")
+                code = input(prompt)
             else:
-                code = input(">>> ").decode(sys.stdin.encoding)
+                code = input(prompt).decode(sys.stdin.encoding)
+            if not code and default:
+                code = default
             if not code:
                 print("Please enter some code, or 'exit' (with no quotes) to exit.")
             elif code == "exit":
@@ -186,6 +210,25 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             False,
         )
 
+    def ask_auto_now_add_addition(self, field_name, model_name):
+        "Adding an auto_now_add field to a model"
+        if not self.dry_run:
+            choice = self._choice_input(
+                "You are trying to add the field '{}' with 'auto_now_add=True' "
+                "to {} without a default; the database needs something to "
+                "populate existing rows.\n".format(field_name, model_name),
+                [
+                    "Provide a one-off default now (will be set on all "
+                    "existing rows)",
+                    "Quit, and let me add a default in models.py",
+                ]
+            )
+            if choice == 2:
+                sys.exit(3)
+            else:
+                return self._ask_default(default='timezone.now')
+        return None
+
 
 class NonInteractiveMigrationQuestioner(MigrationQuestioner):
 
@@ -196,3 +239,7 @@ class NonInteractiveMigrationQuestioner(MigrationQuestioner):
     def ask_not_null_alteration(self, field_name, model_name):
         # We can't ask the user, so set as not provided.
         return NOT_PROVIDED
+
+    def ask_auto_now_add_addition(self, field_name, model_name):
+        # We can't ask the user, so act like the user aborted.
+        sys.exit(3)
