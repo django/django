@@ -3,7 +3,9 @@ from __future__ import unicode_literals
 from unittest import skipIf
 
 from django.db import ConnectionHandler, connection, connections
-from django.db.migrations.exceptions import AmbiguityError, NodeNotFoundError
+from django.db.migrations.exceptions import (
+    AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
+)
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, modify_settings, override_settings
@@ -382,3 +384,16 @@ class LoaderTests(TestCase):
         recorder.record_applied("migrations", "7_auto")
         loader.build_graph()
         self.assertEqual(num_nodes(), 0)
+
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations'},
+        INSTALLED_APPS=['migrations'],
+    )
+    def test_check_consistent_history(self):
+        loader = MigrationLoader(connection=None)
+        loader.check_consistent_history(connection)
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0002_second')
+        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
+            loader.check_consistent_history(connection)
