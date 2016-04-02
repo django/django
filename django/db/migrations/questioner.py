@@ -103,7 +103,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
 
     def _ask_default(self):
         print("Please enter the default value now, as valid Python")
-        print("The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now()")
+        print("The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now")
         while True:
             if six.PY3:
                 # Six does not correctly abstract over the fact that
