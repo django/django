@@ -10,7 +10,10 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
 
-from .exceptions import AmbiguityError, BadMigrationError, NodeNotFoundError
+from .exceptions import (
+    AmbiguityError, BadMigrationError, InconsistentMigrationHistory,
+    NodeNotFoundError,
+)
 
 MIGRATIONS_MODULE_NAME = 'migrations'
 
@@ -317,6 +320,25 @@ class MigrationLoader(object):
                         # Since we added "key" to the nodes before this implies
                         # "child" is not in there.
                         _reraise_missing_dependency(migration, child, e)
+
+    def check_consistent_history(self, connection):
+        """
+        Raise InconsistentMigrationHistory if any applied migrations have
+        unapplied dependencies.
+        """
+        recorder = MigrationRecorder(connection)
+        applied = recorder.applied_migrations()
+        for migration in applied:
+            # If the migration is unknown, skip it.
+            if migration not in self.graph.nodes:
+                continue
+            for parent in self.graph.node_map[migration].parents:
+                if parent not in applied:
+                    raise InconsistentMigrationHistory(
+                        "Migration {}.{} is applied before its dependency {}.{}".format(
+                            migration[0], migration[1], parent[0], parent[1],
+                        )
+                    )
 
     def detect_conflicts(self):
         """
