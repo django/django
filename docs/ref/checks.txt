@@ -611,9 +611,12 @@ The following checks are performed on your URL configuration:
 * **urls.W003**: Your URL pattern ``<pattern>`` has a ``name``
   including a ``:``. Remove the colon, to avoid ambiguous namespace
   references.
-* **urls.W004**: Your URL pattern is not an object returned from the `url()`
-  method. If you are using a custom object, it should provide a `pattern`
-  attribute that represents a regular expression object.
-* **urls.W005**: Your URL pattern is not an object returned from the `url()`
+* **urls.W004**: Your URL pattern ``<pattern>`` is not an object returned from the ``url()``
+  method. If you are using a custom object, it should provide a ``pattern``
+  attribute that represents a regular expression object. Hint: Did you forget
+  to add ``url`` to your pattern?
+* **urls.W005**: "Your URL pattern ``<pattern>`` is not an object returned from the ``url()``
   method. If you are using a custom object, it should provide a regular
-  expression object at `pattern.regex` that has a text property `pattern`.
+  expression object at ``pattern.regex.pattern`` where ``pattern`` is a text like object
+  representing the pattern. If you are not using a custom object, you may have
+  forgotten to add ``'url'`` to your pattern.
