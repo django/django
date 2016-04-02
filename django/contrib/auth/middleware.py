@@ -2,6 +2,7 @@ from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
+from django.core.handlers.middleware import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
 
@@ -11,7 +12,7 @@ def get_user(request):
     return request._cached_user
 
 
-class AuthenticationMiddleware(object):
+class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
         assert hasattr(request, 'session'), (
             "The Django authentication middleware requires session middleware "
@@ -22,7 +23,7 @@ class AuthenticationMiddleware(object):
         request.user = SimpleLazyObject(lambda: get_user(request))
 
 
-class SessionAuthenticationMiddleware(object):
+class SessionAuthenticationMiddleware(MiddlewareMixin):
     """
     Formerly, a middleware for invalidating a user's sessions that don't
     correspond to the user's current session authentication hash. However, it
@@ -35,7 +36,7 @@ class SessionAuthenticationMiddleware(object):
         pass
 
 
-class RemoteUserMiddleware(object):
+class RemoteUserMiddleware(MiddlewareMixin):
     """
     Middleware for utilizing Web-server-provided authentication.
 
