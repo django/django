@@ -55,7 +55,7 @@ class Paginator(object):
         if top + self.orphans >= self.count:
             top = self.count
         if isinstance(self.object_list, QuerySet) and not self.object_list.ordered:
-            warnings.warn("Warning", RuntimeWarning)
+            warnings.warn("Warning: Inconsistent pagination when no ordering is specified", RuntimeWarning)
         return self._get_page(self.object_list[bottom:top], number, self)
 
     def _get_page(self, *args, **kwargs):
