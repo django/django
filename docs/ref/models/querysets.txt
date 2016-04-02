@@ -637,6 +637,31 @@ achieve that, use ``values_list()`` followed by a ``get()`` call::
     >>> Entry.objects.values_list('headline', flat=True).get(pk=1)
     'First entry'
 
+When dealing with :class:`~django.db.models.ManyToManyField` attributes and
+multivalued relations (like '1:N' relations), please take in mind that
+``values()`` and ``values_list()`` are both intended as optimizations for
+a specific use case - retrieval of subsets of data without the overhead of
+creating a model instance. This metaphor completely falls apart when dealing
+with m2m relations, because the the "one row, one object" metaphor that
+underpins most of the ORM falls apart.
+For example, see how the following query produces 4 results::
+
+    >>> Author.objects.values_list('name', 'entry__headline')
+    [('Noam Chomsky', 'Impressions of Gaza'),
+     ('George Orwell', 'Why Socialists Do Not Believe in Fun'),
+     ('George Orwell', 'In Defence of English Cooking'),
+     ('Don Quixote', None)]
+
+In which the last row still returns the author name, but with a ``None``
+entry, as the author has no associated entry.
+
+Similarly the following example::
+
+    >>> Entry.objects.values_list('authors')
+    [('Noam Chomsky',), ('George Orwell',), (None,)]
+
+which returns ``None`` values for entries not having any author set.
+
 ``dates()``
 ~~~~~~~~~~~
 
