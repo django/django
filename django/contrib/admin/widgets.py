@@ -397,3 +397,15 @@ class AdminIntegerFieldWidget(forms.TextInput):
 
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
     class_name = 'vBigIntegerField'
+
+
+class AdminHstoreWidget(forms.Textarea):
+    @property
+    def media(self):
+        return forms.Media(js=['admin/js/hstore.js'])
+
+    def render(self, name, value, attrs=None):
+        if attrs is None:
+            attrs = {}
+        attrs['class'] = 'hstore'
+        return super(AdminHstoreWidget, self).render(name, value, attrs)
