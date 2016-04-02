@@ -466,14 +466,14 @@ class MakeMigrationsTests(MigrationTestBase):
     """
 
     def setUp(self):
-        super(MigrationTestBase, self).setUp()
+        super(MakeMigrationsTests, self).setUp()
         self._old_models = apps.app_configs['migrations'].models.copy()
 
     def tearDown(self):
         apps.app_configs['migrations'].models = self._old_models
         apps.all_models['migrations'] = self._old_models
         apps.clear_cache()
-        super(MigrationTestBase, self).tearDown()
+        super(MakeMigrationsTests, self).tearDown()
 
     def test_files_content(self):
         self.assertTableNotExists("migrations_unicodemodel")
