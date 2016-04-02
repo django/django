@@ -603,7 +603,7 @@ password resets. You must then provide some key implementation details:
         raised a deprecation warning in older versions and is no longer
         supported in Django 1.9).
 
-The following methods are available on any subclass of
+The following attributes and methods are available on any subclass of
 :class:`~django.contrib.auth.models.AbstractBaseUser`:
 
 .. class:: models.AbstractBaseUser
@@ -612,20 +612,34 @@ The following methods are available on any subclass of
 
         Returns the value of the field nominated by ``USERNAME_FIELD``.
 
-    .. method:: models.AbstractBaseUser.is_anonymous()
+    .. attribute:: models.AbstractBaseUser.is_authenticated
 
-        Always returns ``False``. This is a way of differentiating
-        from  :class:`~django.contrib.auth.models.AnonymousUser` objects.
-        Generally, you should prefer using
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_authenticated()` to this
-        method.
+        Read-only attribute which is always ``True`` (as opposed to
+        ``AnonymousUser.is_authenticated`` which is always ``False``).
+        This is a way to tell if the user has been authenticated. This does not
+        imply any permissions and doesn't check if the user is active or has
+        a valid session. Even though normally you will check this attribute on
+        ``request.user`` to find out whether it has been populated by the
+        :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+        (representing the currently logged-in user), you should know this
+        attribute is ``True`` for any :class:`~models.User` instance.
 
-    .. method:: models.AbstractBaseUser.is_authenticated()
+        .. versionchanged:: 1.10
 
-        Always returns ``True``. This is a way to tell if the user has been
-        authenticated. This does not imply any permissions, and doesn't check
-        if the user is active - it only indicates that the user has provided a
-        valid username and password.
+            In older versions, this was a method. Backwards-compatibility
+            support for using it as a method will be removed in Django 2.0.
+
+    .. attribute:: models.AbstractBaseUser.is_anonymous
+
+        Read-only attribute which is always ``False``. This is a way of
+        differentiating :class:`~models.User` and :class:`~models.AnonymousUser`
+        objects. Generally, you should prefer using
+        :attr:`~models.User.is_authenticated` to this attribute.
+
+        .. versionchanged:: 1.10
+
+            In older versions, this was a method. Backwards-compatibility
+            support for using it as a method will be removed in Django 2.0.
 
     .. method:: models.AbstractBaseUser.set_password(raw_password)
 
