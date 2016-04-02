@@ -45,7 +45,7 @@ class LazyRedirectView(RedirectView):
     url = reverse_lazy('named-lazy-url-redirected-to')
 
 
-@user_passes_test(lambda u: u.is_authenticated(), login_url=reverse_lazy('some-login-page'))
+@user_passes_test(lambda u: u.is_authenticated, login_url=reverse_lazy('some-login-page'))
 def login_required_view(request):
     return HttpResponse('Hello you')
 

@@ -256,7 +256,7 @@ given view by setting the ``HttpRequest``’s ``exception_reporter_filter``
 attribute::
 
     def my_view(request):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             request.exception_reporter_filter = CustomExceptionReporterFilter()
         ...
 

@@ -12,7 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
 from django.test import (
-    SimpleTestCase, TestCase, modify_settings, override_settings,
+    SimpleTestCase, TestCase, mock, modify_settings, override_settings,
 )
 
 from .models import (
@@ -142,11 +142,10 @@ class BaseModelBackendTest(object):
         self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
         self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
-        user.is_anonymous = lambda: True
-
-        self.assertEqual(backend.get_all_permissions(user), set())
-        self.assertEqual(backend.get_user_permissions(user), set())
-        self.assertEqual(backend.get_group_permissions(user), set())
+        with mock.patch.object(self.UserModel, 'is_anonymous', True):
+            self.assertEqual(backend.get_all_permissions(user), set())
+            self.assertEqual(backend.get_user_permissions(user), set())
+            self.assertEqual(backend.get_group_permissions(user), set())
 
     def test_inactive_has_no_permissions(self):
         """
@@ -334,14 +333,14 @@ class SimpleRowlevelBackend(object):
         if isinstance(obj, TestObj):
             if user.username == 'test2':
                 return True
-            elif user.is_anonymous() and perm == 'anon':
+            elif user.is_anonymous and perm == 'anon':
                 return True
             elif not user.is_active and perm == 'inactive':
                 return True
         return False
 
     def has_module_perms(self, user, app_label):
-        if not user.is_anonymous() and not user.is_active:
+        if not user.is_anonymous and not user.is_active:
             return False
         return app_label == "app1"
 
@@ -352,7 +351,7 @@ class SimpleRowlevelBackend(object):
         if not isinstance(obj, TestObj):
             return ['none']
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             return ['anon']
         if user.username == 'test2':
             return ['simple', 'advanced']
@@ -578,7 +577,7 @@ class ChangedBackendSettingsTest(TestCase):
             # Assert that the user retrieval is successful and the user is
             # anonymous as the backend is not longer available.
             self.assertIsNotNone(user)
-            self.assertTrue(user.is_anonymous())
+            self.assertTrue(user.is_anonymous)
 
 
 class TypeErrorBackend(object):

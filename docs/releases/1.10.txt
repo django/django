@@ -730,6 +730,10 @@ Miscellaneous
 * Middleware classes are now initialized when the server starts rather than
   during the first request.
 
+* If you override ``is_authenticated()`` or ``is_anonymous()`` in a custom user
+  model, you must convert them to attributes or properties as described in
+  :ref:`the deprecation note <user-is-auth-anon-deprecation>`.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
@@ -856,6 +860,37 @@ features, is deprecated. Replace it with a custom lookup::
 
     models.CharField.register_lookup(Search)
     models.TextField.register_lookup(Search)
+
+.. _user-is-auth-anon-deprecation:
+
+Using ``User.is_authenticated()`` and ``User.is_anonymous()`` as methods
+------------------------------------------------------------------------
+
+The ``is_authenticated()`` and ``is_anonymous()`` methods of
+:class:`~django.contrib.auth.models.AbstractBaseUser` and
+:class:`~django.contrib.auth.models.AnonymousUser` classes are now
+properties. They will still work as methods until Django 2.0, but all usage
+in Django now uses attribute access.
+
+For example, if you use
+:class:`~django.contrib.auth.middleware.AuthenticationMiddleware` and want
+to know whether the user is currently logged-in you would use::
+
+    if request.user.is_authenticated:
+        ... # Do something for logged-in users.
+    else:
+        ... # Do something for anonymous users.
+
+instead of ``request.user.is_authenticated()``.
+
+This change avoids accidental information leakage if you forget to call the
+method, e.g.::
+
+    if request.user.is_authenticated:
+        return sensitive_information
+
+If you override these methods in a custom user model, you must change them to
+properties or attributes.
 
 Custom manager classes available through ``prefetch_related`` must define a ``_apply_rel_filters()`` method
 -----------------------------------------------------------------------------------------------------------
