@@ -1820,15 +1820,13 @@ class SchemaTests(TransactionTestCase):
             ['schema_tag_slug_2c418ba3_like', 'schema_tag_slug_key']
         )
 
-    @unittest.skipIf(
-        connection.vendor == 'mysql' and connection.mysql_version < (5, 6, 6),
-        'Skip known bug renaming primary keys on older MySQL versions (#24995).'
-    )
     def test_alter_pk_with_self_referential_field(self):
         """
         Changing the primary key field name of a model with a self-referential
         foreign key (#26384).
         """
+        if connection.vendor == 'mysql' and connection.mysql_version < (5, 6, 6):
+            self.skipTest('Skip known bug renaming primary keys on older MySQL versions (#24995).')
         old_field = Node._meta.get_field('node_id')
         new_field = AutoField(primary_key=True)
         new_field.set_attributes_from_name('id')
