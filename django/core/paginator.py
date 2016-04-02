@@ -2,9 +2,12 @@ import collections
 import warnings
 from math import ceil
 
-from django.db.models import QuerySet
 from django.utils import six
 from django.utils.functional import cached_property
+
+
+class UnorderedQuerysetWarning(RuntimeWarning):
+    pass
 
 
 class InvalidPage(Exception):
@@ -20,10 +23,10 @@ class EmptyPage(InvalidPage):
 
 
 class Paginator(object):
-
     def __init__(self, object_list, per_page, orphans=0,
                  allow_empty_first_page=True):
         self.object_list = object_list
+        self._check_object_list_is_ordered()
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
@@ -54,14 +57,11 @@ class Paginator(object):
         top = bottom + self.per_page
         if top + self.orphans >= self.count:
             top = self.count
-        if isinstance(self.object_list, QuerySet) and not self.object_list.ordered:
-            warnings.warn("Warning", RuntimeWarning)
         return self._get_page(self.object_list[bottom:top], number, self)
 
     def _get_page(self, *args, **kwargs):
         """
         Returns an instance of a single page.
-
         This hook can be used by subclasses to use an alternative to the
         standard :cls:`Page` object.
         """
@@ -98,12 +98,22 @@ class Paginator(object):
         """
         return six.moves.range(1, self.num_pages + 1)
 
+    def _check_object_list_is_ordered(self):
+        """
+        Check if the object list is Queryset and if it's not ordered and display warning to user
+        """
+        if hasattr(self.object_list, 'ordered') and not self.object_list.ordered:
+            warnings.warn(
+                'Pagination may yield inconsistent results with object_list '
+                ':{} isn\'t ordered.'.format(self.object_list),
+                UnorderedQuerysetWarning
+            )
 
-QuerySetPaginator = Paginator   # For backwards-compatibility.
+
+QuerySetPaginator = Paginator  # For backwards-compatibility.
 
 
 class Page(collections.Sequence):
-
     def __init__(self, object_list, number, paginator):
         self.object_list = object_list
         self.number = number

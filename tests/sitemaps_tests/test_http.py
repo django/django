@@ -194,7 +194,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         Check to make sure that the raw item is included with each
         Sitemap.get_url() url result.
         """
-        test_sitemap = GenericSitemap({'queryset': TestModel.objects.all()})
+        test_sitemap = GenericSitemap({'queryset': TestModel.objects.order_by('pk').all()})
 
         def is_testmodel(url):
             return isinstance(url['item'], TestModel)
