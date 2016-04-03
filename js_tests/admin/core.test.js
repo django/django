@@ -54,6 +54,7 @@ test('Date.getHourMinuteSecond', function(assert) {
 test('Date.strftime', function(assert) {
     var date = new Date(2014, 6, 1, 11, 0, 5);
     assert.equal(date.strftime('%Y-%m-%d %H:%M:%S'), '2014-07-01 11:00:05');
+    assert.equal(date.strftime('%B %d, %Y'), 'July 01, 2014');
 });
 
 test('String.strptime', function(assert) {

@@ -153,6 +153,12 @@ function findPosY(obj) {
         return this.getTwoDigitHour() + ':' + this.getTwoDigitMinute() + ':' + this.getTwoDigitSecond();
     };
 
+    Date.prototype.getFullMonthName = function() {
+        return typeof window.CalendarNamespace === "undefined"
+            ? this.getTwoDigitMonth()
+            : window.CalendarNamespace.monthsOfYear[this.getMonth()];
+    };
+
     Date.prototype.strftime = function(format) {
         var fields = {
             c: this.toString(),
@@ -168,6 +174,7 @@ function findPosY(obj) {
             X: this.toLocaleTimeString(),
             y: ('' + this.getFullYear()).substr(2, 4),
             Y: '' + this.getFullYear(),
+            B: this.getFullMonthName(),
             '%': '%'
         };
         var result = '', i = 0;
