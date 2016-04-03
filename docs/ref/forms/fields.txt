@@ -621,7 +621,7 @@ For each field, we describe the default widget used if you don't specify
     * Validates that the selected choice exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
 
-    The field allows choosing from files inside a certain directory. It takes three
+    The field allows choosing from files inside a certain directory. It takes five
     extra arguments; only ``path`` is required:
 
     .. attribute:: path
