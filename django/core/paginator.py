@@ -1,8 +1,6 @@
 import collections
 import warnings
 from math import ceil
-
-from django.db.models import QuerySet
 from django.utils import six
 from django.utils.functional import cached_property
 
