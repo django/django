@@ -226,3 +226,54 @@ Prefer using ``dependencies`` over ``run_before`` when possible. You should
 only use ``run_before`` if it is undesirable or impractical to specify
 ``dependencies`` in the migration which you want to run after the one you are
 writing.
+
+Migrating data between third-party apps
+=======================================
+
+You can use a data migration to move data from one third-party application to
+another.
+
+If you plan to remove the old app later, you'll need to set the ``dependencies``
+property based on whether or not the old app is installed. Otherwise, you'll
+have missing dependencies once you uninstall the old app. Similarly, you'll
+need to catch :exc:`LookupError` in the ``apps.get_model()`` call that
+retrieves models from the old app. This approach allows you to deploy your
+project anywhere without first installing and then uninstalling the old app.
+
+Here's a sample migration:
+
+.. snippet::
+    :filename: myapp/migrations/0124_move_old_app_to_new_app.py
+
+    from django.apps import apps as global_apps
+    from django.db import migrations
+
+    def forwards(apps, schema_editor):
+        try:
+            OldModel = apps.get_model('old_app', 'OldModel')
+        except LookupError:
+            # The old app isn't installed.
+            return
+
+        NewModel = apps.get_model('new_app', 'NewModel')
+        NewModel.objects.bulk_create(
+            NewModel(new_attribute=old_object.old_attribute)
+            for old_object in OldModel.objects.all()
+        )
+
+    class Migration(migrations.Migration):
+        operations = [
+            migrations.RunPython(forwards, migrations.RunPython.noop),
+        ]
+        dependencies = [
+            ('myapp', '0123_the_previous_migration'),
+            ('new_app', '0001_initial'),
+        ]
+
+        if global_apps.is_installed('old_app'):
+            dependencies.append(('old_app', '0001_initial'))
+
+Also consider what you want to happen when the migration is unapplied. You
+could either do nothing (as in the example above) or remove some or all of the
+data from the new application. Adjust the second argument of the
+:mod:`~django.db.migrations.operations.RunPython` operation accordingly.
