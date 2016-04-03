@@ -1,5 +1,5 @@
-Concepts
-========
+Channels Concepts
+=================
 
 Django's traditional view of the world revolves around requests and responses;
 a request comes in, Django is fired up to serve it, generates a response to

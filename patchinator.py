@@ -101,6 +101,23 @@ class DestPatch(object):
         with open(dest, "w") as fh:
             fh.write(content)
 
+class NewFile(object):
+    """
+    Writes a file to the destination, either blank or with some content from
+    a string.
+    """
+
+    def __init__(self, dest_path, content=""):
+        self.dest_path = dest_path
+        self.content = content
+
+    def run(self, source_dir, dest_dir):
+        print("NEW: %s" % (self.dest_path, ))
+        # Save new file
+        dest = os.path.join(dest_dir, self.dest_path)
+        with open(dest, "w") as fh:
+            fh.write(self.content)
+
 
 ### Main class ###
 
@@ -112,12 +129,14 @@ global_transforms = [
     Replacement(r"from .handler import", r"from django.core.handlers.asgi import")
 ]
 
+docs_transforms = global_transforms + []
+
 
 class Patchinator(object):
 
     operations = [
         FileMap(
-            "channels/__init__.py", "django/channels/__init__.py", global_transforms,
+            "patchinator/channels-init.py", "django/channels/__init__.py", [],
         ),
         FileMap(
             "channels/asgi.py", "django/channels/asgi.py", global_transforms,
@@ -155,8 +174,12 @@ class Patchinator(object):
         FileMap(
             "channels/management/commands/runworker.py", "django/core/management/commands/runworker.py", global_transforms,
         ),
+        # Tests
         FileMap(
             "channels/tests/base.py", "django/test/channels.py", global_transforms,
+        ),
+        NewFile(
+            "tests/channels_tests/__init__.py",
         ),
         FileMap(
             "channels/tests/test_database_layer.py", "tests/channels_tests/test_database_layer.py", global_transforms,
@@ -175,7 +198,26 @@ class Patchinator(object):
                 Insert(r"from django.test.utils import", "from django.test.channels import ChannelTestCase\n"),
                 Insert(r"'LiveServerTestCase'", ", 'ChannelTestCase'", after=True),
             ]
-        )
+        ),
+        # Docs
+        FileMap(
+            "docs/backends.rst", "docs/ref/channels/backends.txt", docs_transforms,
+        ),
+        FileMap(
+            "docs/concepts.rst", "docs/topics/channels/concepts.txt", docs_transforms,
+        ),
+        FileMap(
+            "docs/deploying.rst", "docs/ref/channels/deploying.txt", docs_transforms,
+        ),
+        FileMap(
+            "docs/getting-started.rst", "docs/howto/channels-started.txt", docs_transforms,
+        ),
+        FileMap(
+            "docs/reference.rst", "docs/ref/channels/api.txt", docs_transforms,
+        ),
+        FileMap(
+            "docs/scaling.rst", "docs/ref/channels/scaling.txt", docs_transforms,
+        ),
     ]
 
     def __init__(self, source, destination):
