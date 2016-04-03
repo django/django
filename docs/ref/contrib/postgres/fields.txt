@@ -845,7 +845,7 @@ types.
 
     .. attribute:: base_field
 
-        The model field to use.
+        The model field class to use.
 
     .. attribute:: range_type
 
