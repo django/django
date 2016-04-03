@@ -4,7 +4,7 @@ from django.utils import six
 from channels import Channel
 from channels.tests import ChannelTestCase
 from channels.handler import AsgiRequest
-from channels.exceptions import RequestTimeout
+from channels.exceptions import RequestTimeout, RequestAborted
 
 
 class RequestTests(ChannelTestCase):
@@ -216,3 +216,26 @@ class RequestTests(ChannelTestCase):
             body_receive_timeout = 0
         with self.assertRaises(RequestTimeout):
             VeryImpatientRequest(self.get_next_message("test"))
+
+    def test_request_abort(self):
+        """
+        Tests that the code aborts when a request-body close is sent.
+        """
+        Channel("test").send({
+            "reply_channel": "test",
+            "http_version": "1.1",
+            "method": "POST",
+            "path": b"/test/",
+            "body": b"there_a",
+            "body_channel": "test-input",
+            "headers": {
+                "host": b"example.com",
+                "content-type": b"application/x-www-form-urlencoded",
+                "content-length": b"21",
+            },
+        })
+        Channel("test-input").send({
+            "closed": True,
+        })
+        with self.assertRaises(RequestAborted):
+            AsgiRequest(self.get_next_message("test"))

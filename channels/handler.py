@@ -18,7 +18,7 @@ from django.http import FileResponse, HttpResponse, HttpResponseServerError
 from django.utils import six
 from django.utils.functional import cached_property
 
-from .exceptions import ResponseLater as ResponseLaterOuter, RequestTimeout
+from .exceptions import ResponseLater as ResponseLaterOuter, RequestTimeout, RequestAborted
 
 logger = logging.getLogger('django.request')
 
@@ -118,6 +118,9 @@ class AsgiRequest(http.HttpRequest):
                         [message['body_channel']],
                         block=True,
                     )
+                # If chunk contains close, abort.
+                if chunk.get("closed", False):
+                    raise RequestAborted()
                 # Add content to body
                 self._body += chunk.get("content", "")
                 # Exit loop if this was the last
@@ -197,6 +200,9 @@ class AsgiHandler(base.BaseHandler):
         except RequestTimeout:
             # Parsing the rquest failed, so the response is a Request Timeout error
             response = HttpResponse("408 Request Timeout (upload too slow)", status_code=408)
+        except RequestAborted:
+            # Client closed connection on us mid request. Abort!
+            return
         else:
             try:
                 response = self.get_response(request)
