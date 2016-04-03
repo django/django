@@ -6,7 +6,6 @@ import logging
 import re
 import sys
 from io import BytesIO
-from threading import Lock
 
 from django import http
 from django.conf import settings
@@ -147,18 +146,17 @@ class WSGIRequest(http.HttpRequest):
 
 
 class WSGIHandler(base.BaseHandler):
-    initLock = Lock()
     request_class = WSGIRequest
 
-    def __call__(self, environ, start_response):
-        # Set up middleware if needed. We couldn't do this earlier, because
-        # settings weren't available.
-        if self._request_middleware is None:
-            with self.initLock:
-                # Check that middleware is still uninitialized.
-                if self._request_middleware is None:
-                    self.load_middleware()
+    def __init__(self, *args, **kwargs):
+        super(WSGIHandler, self).__init__(*args, **kwargs)
+        # Load middleware on initialization rather than on first request. In
+        # the WSGIHandler context (unlike e.g ClientHandler) the environment
+        # will already have been set, and we want to trigger any potential
+        # errors immediately rather that waiting for a request to be made.
+        self.load_middleware()
 
+    def __call__(self, environ, start_response):
         set_script_prefix(get_script_name(environ))
         signals.request_started.send(sender=self.__class__, environ=environ)
         try:

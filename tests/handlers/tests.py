@@ -20,19 +20,9 @@ class HandlerTests(SimpleTestCase):
     def tearDown(self):
         request_started.connect(close_old_connections)
 
-    # Mangle settings so the handler will fail
-    @override_settings(MIDDLEWARE_CLASSES=42)
-    def test_lock_safety(self):
-        """
-        Tests for bug #11193 (errors inside middleware shouldn't leave
-        the initLock locked).
-        """
-        # Try running the handler, it will fail in load_middleware
+    def test_middleware_initialized_eagerly(self):
         handler = WSGIHandler()
-        self.assertEqual(handler.initLock.locked(), False)
-        with self.assertRaises(Exception):
-            handler(None, None)
-        self.assertEqual(handler.initLock.locked(), False)
+        self.assertIsNotNone(handler._request_middleware)
 
     def test_bad_path_info(self):
         """Tests for bug #15672 ('request' referenced before assignment)"""
