@@ -707,6 +707,10 @@ class PluggableSearchPerson(models.Model):
     age = models.PositiveIntegerField()
 
 
+class PluggableSearchOperator(models.Model):
+    name = models.CharField(max_length=100)
+
+
 class PrePopulatedPostLargeSlug(models.Model):
     """
     Regression test for #15938: a large max_length for the slugfield must not

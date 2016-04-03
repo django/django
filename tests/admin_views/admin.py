@@ -36,15 +36,15 @@ from .models import (
     MainPrepopulated, ModelWithStringPrimaryKey, NotReferenced, OldSubscriber,
     OtherStory, Paper, Parent, ParentWithDependentChildren, ParentWithUUIDPK,
     Person, Persona, Picture, Pizza, Plot, PlotDetails, PlotProxy,
-    PluggableSearchPerson, Podcast, Post, PrePopulatedPost,
-    PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo, Question, Recipe,
-    Recommendation, Recommender, ReferencedByGenRel, ReferencedByInline,
-    ReferencedByParent, RelatedPrepopulated, RelatedWithUUIDPKModel, Report,
-    Reservation, Restaurant, RowLevelChangePermissionModel, Section,
-    ShortMessage, Simple, Sketch, State, Story, StumpJoke, Subscriber,
-    SuperVillain, Telegram, Thing, Topping, UnchangeableObject,
-    UndeletableObject, UnorderedObject, UserMessenger, Villain, Vodcast,
-    Whatsit, Widget, Worker, WorkHour,
+    PluggableSearchOperator, PluggableSearchPerson, Podcast, Post,
+    PrePopulatedPost, PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo,
+    Question, Recipe, Recommendation, Recommender, ReferencedByGenRel,
+    ReferencedByInline, ReferencedByParent, RelatedPrepopulated,
+    RelatedWithUUIDPKModel, Report, Reservation, Restaurant,
+    RowLevelChangePermissionModel, Section, ShortMessage, Simple, Sketch,
+    State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
+    Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
+    UserMessenger, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
 )
 
 
@@ -602,6 +602,35 @@ class PluggableSearchPersonAdmin(admin.ModelAdmin):
         return queryset, use_distinct
 
 
+class PluggableSearchOperatorAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+    def get_search_results(self, request, queryset, search_term):
+        include_search_terms = []
+        exclude_search_terms = []
+
+        for word in search_term.split():
+            word = word.strip()
+            if word.startswith('-'):
+                exclude_search_terms.append(word[1:])  # Remove minus from word.
+            else:
+                include_search_terms.append(word)
+
+        # Get search results we want.
+        queryset, use_distinct = super(PluggableSearchOperatorAdmin, self).get_search_results(
+            request, queryset, ' '.join(include_search_terms)
+        )
+
+        # Remove all search results we don't want.
+        if exclude_search_terms:
+            exclude_queryset, _ = super(PluggableSearchOperatorAdmin, self).get_search_results(
+                request, queryset, ' '.join(exclude_search_terms)
+            )
+            queryset = queryset.exclude(pk__in=exclude_queryset)
+
+        return queryset, use_distinct
+
+
 class AlbumAdmin(admin.ModelAdmin):
     list_filter = ['title']
 
@@ -978,6 +1007,7 @@ site.register(Answer)
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)
 site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)
 site.register(FilteredManager, CustomManagerAdmin)
+site.register(PluggableSearchOperator, PluggableSearchOperatorAdmin)
 site.register(PluggableSearchPerson, PluggableSearchPersonAdmin)
 site.register(PrePopulatedPostLargeSlug, PrePopulatedPostLargeSlugAdmin)
 site.register(AdminOrderedField, AdminOrderedFieldAdmin)

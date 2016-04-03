@@ -1381,25 +1381,41 @@ templates used by the :class:`ModelAdmin` views:
     The default implementation searches the fields named in :attr:`ModelAdmin.search_fields`.
 
     This method may be overridden with your own custom search method. For
-    example, you might wish to search by an integer field, or use an external
-    tool such as Solr or Haystack. You must establish if the queryset changes
-    implemented by your search method may introduce duplicates into the results,
-    and return ``True`` in the second element of the return value.
+    example, you might wish to optimize the database query, implement custom
+    operators on search terms (+, -, @), or use an external tool such as
+    Solr or Haystack. You must establish if the queryset changes implemented
+    by your search method may introduce duplicates into the results, and return
+    ``True`` in the second element of the return value.
 
-    For example, to enable search by integer field, you could use::
+    This example enables search with negative search terms. If some search word starts with minus(-),
+    rows with names containing the word(s) are excluded from results::
 
         class PersonAdmin(admin.ModelAdmin):
-            list_display = ('name', 'age')
             search_fields = ('name',)
 
             def get_search_results(self, request, queryset, search_term):
-                queryset, use_distinct = super(PersonAdmin, self).get_search_results(request, queryset, search_term)
-                try:
-                    search_term_as_int = int(search_term)
-                except ValueError:
-                    pass
-                else:
-                    queryset |= self.model.objects.filter(age=search_term_as_int)
+                include_search_terms = []
+                exclude_search_terms = []
+
+                for word in search_term.split():
+                    word = word.strip()
+                    if word.startswith('-'):
+                        exclude_search_terms.append(word[1:])  # Remove minus.
+                    else:
+                        include_search_terms.append(word)
+
+                # Get search results we want.
+                queryset, use_distinct = super(PersonAdmin, self).get_search_results(
+                    request, queryset, ' '.join(include_search_terms)
+                )
+
+                # Remove all search results we don't want.
+                if exclude_search_terms:
+                    exclude_queryset, _ = super(PersonAdmin, self).get_search_results(
+                        request, queryset, ' '.join(exclude_search_terms)
+                    )
+                    queryset = queryset.exclude(pk__in=exclude_queryset)
+
                 return queryset, use_distinct
 
 .. method:: ModelAdmin.save_related(request, form, formsets, change)

@@ -53,13 +53,14 @@ from .models import (
     FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language, Link,
     MainPrepopulated, ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
     ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona, Picture,
-    Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
-    PrePopulatedPost, Promo, Question, Recommendation, Recommender,
-    RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Restaurant,
-    RowLevelChangePermissionModel, SecretHideout, Section, ShortMessage,
-    Simple, State, Story, Subscriber, SuperSecretHideout, SuperVillain,
-    Telegram, TitleTranslation, Topping, UnchangeableObject, UndeletableObject,
-    UnorderedObject, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
+    Pizza, Plot, PlotDetails, PluggableSearchOperator, PluggableSearchPerson,
+    Podcast, Post, PrePopulatedPost, Promo, Question, Recommendation,
+    Recommender, RelatedPrepopulated, RelatedWithUUIDPKModel, Report,
+    Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
+    ShortMessage, Simple, State, Story, Subscriber, SuperSecretHideout,
+    SuperVillain, Telegram, TitleTranslation, Topping, UnchangeableObject,
+    UndeletableObject, UnorderedObject, Villain, Vodcast, Whatsit, Widget,
+    Worker, WorkHour,
 )
 
 
@@ -2929,6 +2930,25 @@ class AdminSearchTest(TestCase):
         # confirm the search returned one object
         self.assertContains(response, "\n1 pluggable search person\n")
         self.assertContains(response, "Amy")
+
+    def test_pluggable_search_operator(self):
+        PluggableSearchOperator.objects.create(name="Will")
+        PluggableSearchOperator.objects.create(name="William")
+
+        response = self.client.get(
+            reverse('admin:admin_views_pluggablesearchoperator_changelist') + '?q=Will')
+        # confirm the search returned two objects
+        self.assertContains(response, "\n2 pluggable search operators\n")
+
+        response = self.client.get(
+            reverse('admin:admin_views_pluggablesearchoperator_changelist') + '?q=Will -William')
+        # confirm the search returned one object
+        self.assertContains(response, "\n1 pluggable search operator\n")
+
+        response = self.client.get(
+            reverse('admin:admin_views_pluggablesearchoperator_changelist') + '?q=-Will')
+        # confirm the search returned 0 objects
+        self.assertContains(response, "\n0 pluggable search operators\n")
 
     def test_reset_link(self):
         """
