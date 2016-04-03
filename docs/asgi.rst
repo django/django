@@ -274,7 +274,9 @@ A *channel layer* must provide an object with these attributes
   or ``(channel, message)`` if a message is available. If ``block`` is True, then
   it will not return until after a built-in timeout or a message arrives; if
   ``block`` is false, it will always return immediately. It is perfectly
-  valid to ignore ``block`` and always return immediately.
+  valid to ignore ``block`` and always return immediately. If ``block`` is True,
+  there must be a finite timeout before this returns ``(None, None)`` and that
+  timeout must be less than sixty seconds (preferably around five).
 
 * ``new_channel(pattern)``, a callable that takes a unicode string pattern,
   and returns a new valid channel name that does not already exist, by
