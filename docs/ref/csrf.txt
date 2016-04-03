@@ -219,8 +219,7 @@ How it works
 
 The CSRF protection is based on the following things:
 
-1. A CSRF cookie that is set to a random value (a session independent nonce, as
-   it is called), which other sites will not have access to.
+1. A CSRF cookie that is set to a random value (a session independent nonce, as it is called, and it is rotated after login), which other sites will not have access to.
 
    This cookie is set by ``CsrfViewMiddleware``.  It is meant to be permanent,
    but since there is no way to set a cookie that never expires, it is sent with
@@ -505,3 +504,12 @@ because it invalidates all previous forms. Most users would be very unhappy to
 find that opening a new tab on your site has invalidated the form they had
 just spent time filling out in another tab or that a form they accessed via
 the back button could not be filled out.
+
+Why I've get CSRF validation failure?
+-------------------------------------
+
+New CSRF token is rotated with every login. All forms generated **before**  
+login will have invalid CSRF token and need to be reloaded (using GET request).
+
+This situation might happen when back button is pressed after login or when you
+log in in other browser's tab.
