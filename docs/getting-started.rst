@@ -1,5 +1,5 @@
-Getting Started
-===============
+Getting Started with Channels
+=============================
 
 (If you haven't yet, make sure you :doc:`install Channels <installation>`)
 

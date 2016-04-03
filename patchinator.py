@@ -79,27 +79,6 @@ class FileMap(object):
         with open(dest, "w") as fh:
             fh.write(content)
 
-class DestPatch(object):
-    """
-    Patches a destination file in place with transforms
-    """
-
-    def __init__(self, dest_path, transforms):
-        self.dest_path = dest_path
-        self.transforms = transforms
-
-    def run(self, source_dir, dest_dir):
-        print("PATCH: %s" % (self.dest_path, ))
-        # Open and read in the file
-        dest = os.path.join(dest_dir, self.dest_path)
-        with open(dest, "r") as fh:
-            content = fh.read()
-        # Run transforms
-        for transform in self.transforms:
-            content = transform(content)
-        # Save new file
-        with open(dest, "w") as fh:
-            fh.write(content)
 
 class NewFile(object):
     """
@@ -129,15 +108,18 @@ global_transforms = [
     Replacement(r"from .handler import", r"from django.core.handlers.asgi import")
 ]
 
-docs_transforms = global_transforms + []
+docs_transforms = global_transforms + [
+    Replacement(r":doc:`concepts`", r":doc:`topics/channels/concepts`"),
+    Replacement(r":doc:`deploying`", r":doc:`topics/channels/deploying`"),
+    Replacement(r":doc:`scaling`", r":doc:`topics/channels/scaling`"),
+    Replacement(r":doc:`getting-started`", r":doc:`intro/channels`"),
+    Replacement(r"\n\(.*installation>`\)\n", r""),
+]
 
 
 class Patchinator(object):
 
     operations = [
-        FileMap(
-            "patchinator/channels-init.py", "django/channels/__init__.py", [],
-        ),
         FileMap(
             "channels/asgi.py", "django/channels/asgi.py", global_transforms,
         ),
@@ -193,12 +175,6 @@ class Patchinator(object):
         FileMap(
             "channels/tests/test_request.py", "tests/channels_tests/test_request.py", global_transforms,
         ),
-        DestPatch(
-            "django/test/__init__.py", [
-                Insert(r"from django.test.utils import", "from django.test.channels import ChannelTestCase\n"),
-                Insert(r"'LiveServerTestCase'", ", 'ChannelTestCase'", after=True),
-            ]
-        ),
         # Docs
         FileMap(
             "docs/backends.rst", "docs/ref/channels/backends.txt", docs_transforms,
@@ -207,16 +183,16 @@ class Patchinator(object):
             "docs/concepts.rst", "docs/topics/channels/concepts.txt", docs_transforms,
         ),
         FileMap(
-            "docs/deploying.rst", "docs/ref/channels/deploying.txt", docs_transforms,
+            "docs/deploying.rst", "docs/topics/channels/deploying.txt", docs_transforms,
         ),
         FileMap(
-            "docs/getting-started.rst", "docs/howto/channels-started.txt", docs_transforms,
+            "docs/getting-started.rst", "docs/intro/channels.txt", docs_transforms,
         ),
         FileMap(
             "docs/reference.rst", "docs/ref/channels/api.txt", docs_transforms,
         ),
         FileMap(
-            "docs/scaling.rst", "docs/ref/channels/scaling.txt", docs_transforms,
+            "docs/scaling.rst", "docs/topics/channels/scaling.txt", docs_transforms,
         ),
     ]
 
