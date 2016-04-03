@@ -256,78 +256,75 @@ class ModelPaginationTests(TestCase):
             a.save()
 
     def test_first_page(self):
-        p = None
-        paginator = Paginator(Article.objects.all(), 5)
-        with self.assertRaises(RuntimeWarning):
-            p = paginator.page(1)
+        paginator = Paginator(Article.objects.order_by('id'), 5)
+        p = paginator.page(1)
 
-            self.assertEqual("<Page 1 of 2>", six.text_type(p))
-            self.assertQuerysetEqual(p.object_list, [
-                "<Article: Article 1>",
-                "<Article: Article 2>",
-                "<Article: Article 3>",
-                "<Article: Article 4>",
-                "<Article: Article 5>"
-            ],
-                ordered=False
-            )
-            self.assertTrue(p.has_next())
-            self.assertFalse(p.has_previous())
-            self.assertTrue(p.has_other_pages())
-            self.assertEqual(2, p.next_page_number())
-            with self.assertRaises(InvalidPage):
-                p.previous_page_number()
-            self.assertEqual(1, p.start_index())
-            self.assertEqual(5, p.end_index())
+        self.assertEqual("<Page 1 of 2>", six.text_type(p))
+        self.assertQuerysetEqual(p.object_list, [
+            "<Article: Article 1>",
+            "<Article: Article 2>",
+            "<Article: Article 3>",
+            "<Article: Article 4>",
+            "<Article: Article 5>"
+        ],
+            ordered=True
+        )
+        self.assertTrue(p.has_next())
+        self.assertFalse(p.has_previous())
+        self.assertTrue(p.has_other_pages())
+        self.assertEqual(2, p.next_page_number())
+        with self.assertRaises(InvalidPage):
+            p.previous_page_number()
+        self.assertEqual(1, p.start_index())
+        self.assertEqual(5, p.end_index())
 
     def test_last_page(self):
-        paginator = Paginator(Article.objects.all(), 5)
-        with self.assertRaises(RuntimeWarning):
-            p = paginator.page(2)
-            self.assertEqual("<Page 2 of 2>", six.text_type(p))
-            self.assertQuerysetEqual(p.object_list, [
-                "<Article: Article 6>",
-                "<Article: Article 7>",
-                "<Article: Article 8>",
-                "<Article: Article 9>"
-            ],
-                ordered=False
-            )
-            self.assertFalse(p.has_next())
-            self.assertTrue(p.has_previous())
-            self.assertTrue(p.has_other_pages())
-            with self.assertRaises(InvalidPage):
-                p.next_page_number()
-            self.assertEqual(1, p.previous_page_number())
-            self.assertEqual(6, p.start_index())
-            self.assertEqual(9, p.end_index())
+        paginator = Paginator(Article.objects.order_by('id'), 5)
+
+        p = paginator.page(2)
+        self.assertEqual("<Page 2 of 2>", six.text_type(p))
+        self.assertQuerysetEqual(p.object_list, [
+            "<Article: Article 6>",
+            "<Article: Article 7>",
+            "<Article: Article 8>",
+            "<Article: Article 9>"
+        ],
+            ordered=True
+        )
+        self.assertFalse(p.has_next())
+        self.assertTrue(p.has_previous())
+        self.assertTrue(p.has_other_pages())
+        with self.assertRaises(InvalidPage):
+            p.next_page_number()
+        self.assertEqual(1, p.previous_page_number())
+        self.assertEqual(6, p.start_index())
+        self.assertEqual(9, p.end_index())
 
     def test_page_getitem(self):
         """
         Tests proper behavior of a paginator page __getitem__ (queryset
         evaluation, slicing, exception raised).
         """
-        paginator = Paginator(Article.objects.all(), 5)
-        with self.assertRaises(RuntimeWarning):
-            p = paginator.page(1)
+        paginator = Paginator(Article.objects.order_by('id'), 5)
+        p = paginator.page(1)
 
-            # Make sure object_list queryset is not evaluated by an invalid __getitem__ call.
-            # (this happens from the template engine when using eg: {% page_obj.has_previous %})
-            self.assertIsNone(p.object_list._result_cache)
-            with self.assertRaises(TypeError):
-                p['has_previous']
-            self.assertIsNone(p.object_list._result_cache)
-            self.assertNotIsInstance(p.object_list, list)
+        # Make sure object_list queryset is not evaluated by an invalid __getitem__ call.
+        # (this happens from the template engine when using eg: {% page_obj.has_previous %})
+        self.assertIsNone(p.object_list._result_cache)
+        with self.assertRaises(TypeError):
+            p['has_previous']
+        self.assertIsNone(p.object_list._result_cache)
+        self.assertNotIsInstance(p.object_list, list)
 
-            # Make sure slicing the Page object with numbers and slice objects work.
-            self.assertEqual(p[0], Article.objects.get(headline='Article 1'))
-            self.assertQuerysetEqual(p[slice(2)], [
-                "<Article: Article 1>",
-                "<Article: Article 2>",
-            ]
-            )
-            # After __getitem__ is called, object_list is a list
-            self.assertIsInstance(p.object_list, list)
+        # Make sure slicing the Page object with numbers and slice objects work.
+        self.assertEqual(p[0], Article.objects.get(headline='Article 1'))
+        self.assertQuerysetEqual(p[slice(2)], [
+            "<Article: Article 1>",
+            "<Article: Article 2>",
+        ]
+        )
+        # After __getitem__ is called, object_list is a list
+        self.assertIsInstance(p.object_list, list)
 
     def test_paginating_not_order_QuerySet_should_raise_RuntimeWarning(self):
         with self.assertRaises(RuntimeWarning):
