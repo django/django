@@ -14,3 +14,10 @@ class ResponseLater(Exception):
     returning a response.
     """
     pass
+
+
+class RequestTimeout(Exception):
+    """
+    Raised when it takes too long to read a request body.
+    """
+    pass

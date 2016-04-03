@@ -4,6 +4,7 @@ from django.utils import six
 from channels import Channel
 from channels.tests import ChannelTestCase
 from channels.handler import AsgiRequest
+from channels.exceptions import RequestTimeout
 
 
 class RequestTests(ChannelTestCase):
@@ -188,3 +189,30 @@ class RequestTests(ChannelTestCase):
         self.assertEqual(request.method, "PUT")
         self.assertEqual(request.read(3), b"one")
         self.assertEqual(request.read(), b"twothree")
+
+    def test_request_timeout(self):
+        """
+        Tests that the code correctly gives up after the request body read timeout.
+        """
+        Channel("test").send({
+            "reply_channel": "test",
+            "http_version": "1.1",
+            "method": "POST",
+            "path": b"/test/",
+            "body": b"there_a",
+            "body_channel": "test-input",
+            "headers": {
+                "host": b"example.com",
+                "content-type": b"application/x-www-form-urlencoded",
+                "content-length": b"21",
+            },
+        })
+        # Say there's more content, but never provide it! Muahahaha!
+        Channel("test-input").send({
+            "content": b"re=fou",
+            "more_content": True,
+        })
+        class VeryImpatientRequest(AsgiRequest):
+            body_receive_timeout = 0
+        with self.assertRaises(RequestTimeout):
+            VeryImpatientRequest(self.get_next_message("test"))

@@ -4,6 +4,7 @@ import cgi
 import codecs
 import logging
 import sys
+import time
 import traceback
 from io import BytesIO
 from threading import Lock
@@ -13,11 +14,11 @@ from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
-from django.http import FileResponse, HttpResponseServerError
+from django.http import FileResponse, HttpResponse, HttpResponseServerError
 from django.utils import six
 from django.utils.functional import cached_property
 
-from .exceptions import ResponseLater as ResponseLaterOuter
+from .exceptions import ResponseLater as ResponseLaterOuter, RequestTimeout
 
 logger = logging.getLogger('django.request')
 
@@ -29,6 +30,10 @@ class AsgiRequest(http.HttpRequest):
     """
 
     ResponseLater = ResponseLaterOuter
+
+    # Number of seconds until a Request gives up on trying to read a request
+    # body and aborts.
+    body_receive_timeout = 60
 
     def __init__(self, message):
         self.message = message
@@ -100,10 +105,15 @@ class AsgiRequest(http.HttpRequest):
         # Body handling
         self._body = message.get("body", b"")
         if message.get("body_channel", None):
+            body_handle_start = time.time()
             while True:
                 # Get the next chunk from the request body channel
                 chunk = None
                 while chunk is None:
+                    # If they take too long, raise request timeout and the handler
+                    # will turn it into a response
+                    if time.time() - body_handle_start > self.body_receive_timeout:
+                        raise RequestTimeout()
                     _, chunk = message.channel_layer.receive_many(
                         [message['body_channel']],
                         block=True,
@@ -184,6 +194,9 @@ class AsgiHandler(base.BaseHandler):
                 }
             )
             response = http.HttpResponseBadRequest()
+        except RequestTimeout:
+            # Parsing the rquest failed, so the response is a Request Timeout error
+            response = HttpResponse("408 Request Timeout (upload too slow)", status_code=408)
         else:
             try:
                 response = self.get_response(request)
