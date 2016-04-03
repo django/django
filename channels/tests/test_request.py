@@ -1,36 +1,28 @@
 from __future__ import unicode_literals
-from django.test import SimpleTestCase
 from django.utils import six
 
-from asgiref.inmemory import ChannelLayer
+from channels import Channel
+from channels.tests import ChannelTestCase
 from channels.handler import AsgiRequest
-from channels.message import Message
 
 
-class RequestTests(SimpleTestCase):
+class RequestTests(ChannelTestCase):
     """
     Tests that ASGI request handling correctly decodes HTTP requests.
     """
-
-    def setUp(self):
-        """
-        Make an in memory channel layer for testing
-        """
-        self.channel_layer = ChannelLayer()
-        self.make_message = lambda m, c: Message(m, c, self.channel_layer)
 
     def test_basic(self):
         """
         Tests that the handler can decode the most basic request message,
         with all optional fields omitted.
         """
-        message = self.make_message({
+        Channel("test").send({
             "reply_channel": "test-reply",
             "http_version": "1.1",
             "method": "GET",
             "path": b"/test/",
-        }, "test")
-        request = AsgiRequest(message)
+        })
+        request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.path, "/test/")
         self.assertEqual(request.method, "GET")
         self.assertFalse(request.body)
@@ -48,7 +40,7 @@ class RequestTests(SimpleTestCase):
         """
         Tests a more fully-featured GET request
         """
-        message = self.make_message({
+        Channel("test").send({
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "GET",
@@ -60,8 +52,8 @@ class RequestTests(SimpleTestCase):
             },
             "client": ["10.0.0.1", 1234],
             "server": ["10.0.0.2", 80],
-        }, "test")
-        request = AsgiRequest(message)
+        })
+        request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.path, "/test2/")
         self.assertEqual(request.method, "GET")
         self.assertFalse(request.body)
@@ -81,7 +73,7 @@ class RequestTests(SimpleTestCase):
         """
         Tests a POST body contained within a single message.
         """
-        message = self.make_message({
+        Channel("test").send({
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
@@ -93,8 +85,8 @@ class RequestTests(SimpleTestCase):
                 "content-type": b"application/x-www-form-urlencoded",
                 "content-length": b"18",
             },
-        }, "test")
-        request = AsgiRequest(message)
+        })
+        request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.path, "/test2/")
         self.assertEqual(request.method, "POST")
         self.assertEqual(request.body, b"ponies=are+awesome")
@@ -111,7 +103,7 @@ class RequestTests(SimpleTestCase):
         """
         Tests a POST body across multiple messages (first part in 'body').
         """
-        message = self.make_message({
+        Channel("test").send({
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
@@ -123,15 +115,15 @@ class RequestTests(SimpleTestCase):
                 "content-type": b"application/x-www-form-urlencoded",
                 "content-length": b"21",
             },
-        }, "test")
-        self.channel_layer.send("test-input", {
+        })
+        Channel("test-input").send({
             "content": b"re=fou",
             "more_content": True,
         })
-        self.channel_layer.send("test-input", {
+        Channel("test-input").send({
             "content": b"r+lights",
         })
-        request = AsgiRequest(message)
+        request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.method, "POST")
         self.assertEqual(request.body, b"there_are=four+lights")
         self.assertEqual(request.META["CONTENT_TYPE"], "application/x-www-form-urlencoded")
@@ -151,7 +143,7 @@ class RequestTests(SimpleTestCase):
             b'FAKEPDFBYTESGOHERE' +
             b'--BOUNDARY--'
         )
-        message = self.make_message({
+        Channel("test").send({
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
@@ -161,15 +153,15 @@ class RequestTests(SimpleTestCase):
                 "content-type": b"multipart/form-data; boundary=BOUNDARY",
                 "content-length": six.text_type(len(body)).encode("ascii"),
             },
-        }, "test")
-        self.channel_layer.send("test-input", {
+        })
+        Channel("test-input").send({
             "content": body[:20],
             "more_content": True,
         })
-        self.channel_layer.send("test-input", {
+        Channel("test-input").send({
             "content": body[20:],
         })
-        request = AsgiRequest(message)
+        request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.method, "POST")
         self.assertEqual(len(request.body), len(body))
         self.assertTrue(request.META["CONTENT_TYPE"].startswith("multipart/form-data"))
@@ -181,7 +173,7 @@ class RequestTests(SimpleTestCase):
         """
         Tests the body stream is emulated correctly.
         """
-        message = self.make_message({
+        Channel("test").send({
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "PUT",
@@ -191,8 +183,8 @@ class RequestTests(SimpleTestCase):
                 "host": b"example.com",
                 "content-length": b"11",
             },
-        }, "test")
-        request = AsgiRequest(message)
+        })
+        request = AsgiRequest(self.get_next_message("test", require=True))
         self.assertEqual(request.method, "PUT")
         self.assertEqual(request.read(3), b"one")
         self.assertEqual(request.read(), b"twothree")

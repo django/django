@@ -56,6 +56,16 @@ class ChannelLayerManager(object):
     def __contains__(self, key):
         return key in self.configs
 
+    def set(self, key, layer):
+        """
+        Sets an alias to point to a new ChannelLayerWrapper instance, and
+        returns the old one that it replaced. Useful for swapping out the
+        backend during tests.
+        """
+        old = self.backends.get(key, None)
+        self.backends[key] = layer
+        return old
+
 
 class ChannelLayerWrapper(object):
     """

@@ -6,4 +6,11 @@ DATABASES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'asgiref.inmemory.ChannelLayer',
+        'ROUTING': [],
+    },
+}
+
 MIDDLEWARE_CLASSES = []

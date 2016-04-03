@@ -1,10 +1,9 @@
 from __future__ import unicode_literals
-from django.test import SimpleTestCase
 from django.http import HttpResponse
 
-from asgiref.inmemory import ChannelLayer
+from channels import Channel
 from channels.handler import AsgiHandler
-from channels.message import Message
+from channels.tests import ChannelTestCase
 
 
 class FakeAsgiHandler(AsgiHandler):
@@ -24,34 +23,27 @@ class FakeAsgiHandler(AsgiHandler):
         return self._response
 
 
-class HandlerTests(SimpleTestCase):
+class HandlerTests(ChannelTestCase):
     """
     Tests that the handler works correctly and round-trips things into a
     correct response.
     """
-
-    def setUp(self):
-        """
-        Make an in memory channel layer for testing
-        """
-        self.channel_layer = ChannelLayer()
-        self.make_message = lambda m, c: Message(m, c, self.channel_layer)
 
     def test_basic(self):
         """
         Tests a simple request
         """
         # Make stub request and desired response
-        message = self.make_message({
+        Channel("test").send({
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "GET",
             "path": b"/test/",
-        }, "test")
+        })
         response = HttpResponse(b"Hi there!", content_type="text/plain")
         # Run the handler
         handler = FakeAsgiHandler(response)
-        reply_messages = list(handler(message))
+        reply_messages = list(handler(self.get_next_message("test", require=True)))
         # Make sure we got the right number of messages
         self.assertEqual(len(reply_messages), 1)
         reply_message = reply_messages[0]
@@ -69,16 +61,16 @@ class HandlerTests(SimpleTestCase):
         Tests a large response (will need chunking)
         """
         # Make stub request and desired response
-        message = self.make_message({
+        Channel("test").send({
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "GET",
             "path": b"/test/",
-        }, "test")
+        })
         response = HttpResponse(b"Thefirstthirtybytesisrighthereandhereistherest")
         # Run the handler
         handler = FakeAsgiHandler(response)
-        reply_messages = list(handler(message))
+        reply_messages = list(handler(self.get_next_message("test", require=True)))
         # Make sure we got the right number of messages
         self.assertEqual(len(reply_messages), 2)
         # Make sure the messages look correct
