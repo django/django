@@ -153,8 +153,15 @@ function findPosY(obj) {
         return this.getTwoDigitHour() + ':' + this.getTwoDigitMinute() + ':' + this.getTwoDigitSecond();
     };
 
+    Date.prototype.getFullMonthName = function() {
+        return typeof window.CalendarNamespace === "undefined"
+            ? this.getTwoDigitMonth()
+            : window.CalendarNamespace.monthsOfYear[this.getMonth()];
+    };
+
     Date.prototype.strftime = function(format) {
         var fields = {
+            B: this.getFullMonthName(),
             c: this.toString(),
             d: this.getTwoDigitDate(),
             H: this.getTwoDigitHour(),
