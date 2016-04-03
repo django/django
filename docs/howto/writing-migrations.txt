@@ -271,3 +271,64 @@ Prefer using ``dependencies`` over ``run_before`` when possible. You should
 only use ``run_before`` if it is undesirable or impractical to specify
 ``dependencies`` in the migration which you want to run after the one you are
 writing.
+
+Migrating data when replacing an external app
+=============================================
+
+If you plan to move from one external application to another one with a similar
+data structure, you can use a data migration. If you plan to remove the old 
+application later, you will need to set the ``dependencies`` property
+dynamically. Otherwise you will have missing dependencies once you uninstall
+the old application.
+
+.. snippet::
+    :filename: myapp/migrations/0124_ensure_dependencies.py
+
+    from django.apps import apps as global_apps
+    from django.db import migrations
+
+    def forward(apps, schema_editor):
+        """
+        see below
+        """
+
+    class Migration(migrations.Migration):
+
+        operations = [
+            migrations.RunPython(forward, migrations.RunPython.noop),
+        ]
+        dependencies = [
+            ('myapp', '0123_the_previous_migration'),
+            ('new_external_app', '0001_initial'),
+        ]
+
+        if global_apps.is_installed('old_external_app'):
+            dependencies.append(('old_external_app', '0001_initial'))
+
+In your data migration method, you will need to test for the old application
+model:
+
+.. snippet::
+    :filename: myapp/migrations/0124_ensure_dependencies.py
+
+    def forward(apps, schema_editor):
+        try:
+            OldModel = apps.get_model('old_external', 'OldModel')
+        except LookupError:
+            return
+
+        NewModel = apps.get_model('new_external', 'NewModel')
+        NewModel.objects.bulk_create(
+            NewModel(new_attribute=old_object.old_attribute)
+            for old_object in OldModel.objects.all()
+        )
+
+This way you can deploy your application anywhere without first installing
+and then uninstalling your old external dependency. If the old external
+dependency is not installed when the migration runs it will just do nothing
+instead of migrating the data.
+
+Please take also into consideration what you want to happen when the migration
+is unapplied - you could either do nothing or remove some or all data from
+the new application model; adjust the second argument of the
+:mod:`~django.db.migrations.operations.RunPython` operation accordingly.
