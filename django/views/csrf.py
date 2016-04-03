@@ -78,6 +78,8 @@ CSRF_FAILURE_TEMPLATE = """
     <code>csrf_protect</code> on any views that use the <code>csrf_token</code>
     template tag, as well as those that accept the POST data.</li>
 
+    <li>Form has valid CSRF token (e.g. After login in other tab or hitting back
+    button you need to reload the page with the form)</li>
   </ul>
 
   <p>You're seeing the help section of this page because you have <code>DEBUG =
