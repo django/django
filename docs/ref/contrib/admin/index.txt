@@ -1143,8 +1143,8 @@ subclass::
     editing" and "Save and add another". If ``save_as`` is ``True``, "Save
     and add another" will be replaced by a "Save as new" button.
 
-    "Save as new" means the object will be saved as a new object (with a new ID),
-    rather than the old object.
+    "Save as new" means the object will be saved as a new object (with a new
+    ID), rather than the old object.
 
     By default, ``save_as`` is set to ``False``.
 
