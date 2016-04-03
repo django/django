@@ -487,6 +487,7 @@ class ModelAdmin(BaseModelAdmin):
     search_fields = ()
     date_hierarchy = None
     save_as = False
+    save_as_continue = True
     save_on_top = False
     paginator = Paginator
     preserve_filters = True
@@ -1102,7 +1103,11 @@ class ModelAdmin(BaseModelAdmin):
                 'popup_response_data': popup_response_data,
             })
 
-        elif "_continue" in request.POST:
+        elif "_continue" in request.POST or (
+                # Redirecting after "Save as new".
+                "_saveasnew" in request.POST and self.save_as_continue and
+                self.has_change_permission(request, obj)
+        ):
             msg = format_html(
                 _('The {name} "{obj}" was added successfully. You may edit it again below.'),
                 **msg_dict

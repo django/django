@@ -753,6 +753,13 @@ Miscellaneous
   model, you must convert them to attributes or properties as described in
   :ref:`the deprecation note <user-is-auth-anon-deprecation>`.
 
+* When using :attr:`ModelAdmin.save_as=True
+  <django.contrib.admin.ModelAdmin.save_as>`, the "Save as new" button now
+  redirects to the change view for the new object instead of to the model's
+  changelist. If you need the previous behavior, set the new
+  :attr:`ModelAdmin.save_as_continue
+  <django.contrib.admin.ModelAdmin.save_as_continue>` attribute to ``False``.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10

@@ -1119,9 +1119,23 @@ class SaveAsTests(TestCase):
     def test_save_as_duplication(self):
         """Ensure save as actually creates a new person"""
         post_data = {'_saveasnew': '', 'name': 'John M', 'gender': 1, 'age': 42}
-        self.client.post(reverse('admin:admin_views_person_change', args=(self.per1.pk,)), post_data)
+        response = self.client.post(reverse('admin:admin_views_person_change', args=(self.per1.pk,)), post_data)
         self.assertEqual(len(Person.objects.filter(name='John M')), 1)
         self.assertEqual(len(Person.objects.filter(id=self.per1.pk)), 1)
+        new_person = Person.objects.latest('id')
+        self.assertRedirects(response, reverse('admin:admin_views_person_change', args=(new_person.pk,)))
+
+    def test_save_as_continue_false(self):
+        """
+        Saving a new object using "Save as new" redirects to the changelist
+        instead of the change view when ModelAdmin.save_as_continue=False.
+        """
+        post_data = {'_saveasnew': '', 'name': 'John M', 'gender': 1, 'age': 42}
+        url = reverse('admin:admin_views_person_change', args=(self.per1.pk,), current_app=site2.name)
+        response = self.client.post(url, post_data)
+        self.assertEqual(len(Person.objects.filter(name='John M')), 1)
+        self.assertEqual(len(Person.objects.filter(id=self.per1.pk)), 1)
+        self.assertRedirects(response, reverse('admin:admin_views_person_changelist', current_app=site2.name))
 
     def test_save_as_new_with_validation_errors(self):
         """
@@ -1688,6 +1702,15 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post(article_change_url, change_dict_save_as_new)
         self.assertEqual(post.status_code, 403)
         self.assertEqual(Article.objects.count(), article_count)
+
+        # User with both add and change permissions should be redirected to the
+        # change page for the newly created object.
+        article_count = Article.objects.count()
+        self.client.force_login(self.superuser)
+        post = self.client.post(article_change_url, change_dict_save_as_new)
+        self.assertEqual(Article.objects.count(), article_count + 1)
+        new_article = Article.objects.latest('id')
+        self.assertRedirects(post, reverse('admin:admin_views_article_change', args=(new_article.pk,)))
 
     def test_delete_view(self):
         """Delete view should restrict access and actually delete items."""
