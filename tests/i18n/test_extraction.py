@@ -204,6 +204,21 @@ class BasicExtractorTests(ExtractorTests):
                 po_contents
             )
 
+    def test_location_comments_for_templatized_files(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
+            po_contents = fp.read()
+            self.assertIn('msgid "#: templates/test.html.py"', po_contents)
+            matches = re.findall('^#:.+\.html\.py.*$', po_contents, flags=re.MULTILINE)
+            self.assertFalse(matches, 'Found an unprocessed file name in comment line')
+
+            matches = re.search(
+                '^#: __init__.py:.* templates/test.html:.* templates/test.html:.*$',
+                po_contents, flags=re.MULTILINE)
+            self.assertTrue(matches, 'Expected line with commented file names is not found')
+
     def test_special_char_extracted(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
