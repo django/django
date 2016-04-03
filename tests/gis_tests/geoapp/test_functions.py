@@ -5,9 +5,9 @@ from decimal import Decimal
 
 from django.contrib.gis.db.models import functions
 from django.contrib.gis.geos import LineString, Point, Polygon, fromstr
-from django.contrib.gis.measure import Area
+from django.contrib.gis.measure import Area, Distance
 from django.db import connection
-from django.db.models import Sum
+from django.db.models import F, Sum
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
@@ -248,6 +248,18 @@ class GISFunctionsTests(TestCase):
             if isinstance(result, Area):
                 result = result.sq_m
             self.assertAlmostEqual((result - c.mpoly.area) / c.mpoly.area, 0)
+
+    @skipUnlessDBFeature("has_Distance_function")
+    def test_distance(self):
+        # Measure distances from the center of the world (online)
+        world_center = City.objects.get(name='Lawrence').point
+        for c in City.objects.all().annotate(dist=functions.Distance(F('point'), Point(world_center))):
+            result = c.distance
+            # If the result is a measure object, get value.
+            if isinstance(result, Distance):
+                result = result.m
+            expected = c.point.distance(world_center)
+            self.assertAlmostEqual((result - expected) / expected, 0)
 
     @skipUnlessDBFeature("has_MemSize_function")
     def test_memsize(self):

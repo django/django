@@ -254,6 +254,7 @@ class Distance(MeasureBase):
         'survey_ft': 0.304800609601,
         'um': 0.000001,
         'yd': 0.9144,
+        'furlong': 201.168,
     }
 
     # Unit aliases for `UNIT` terms encountered in Spatial Reference WKT.

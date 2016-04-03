@@ -48,6 +48,10 @@ class DistanceField(BaseField):
         self.distance_att = distance_att
 
     def from_db_value(self, value, expression, connection, context):
+        # If the database returns a Decimal, convert it to a float as expected
+        # by the Python geometric objects.
+        if isinstance(value, Decimal):
+            value = float(value)
         if value is not None:
             value = Distance(**{self.distance_att: value})
         return value
