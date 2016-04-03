@@ -153,3 +153,13 @@ class DateFormatTests(SimpleTestCase):
 
         # Ticket #16924 -- We don't need timezone support to test this
         self.assertEqual(dateformat.format(aware_dt, 'O'), '-0330')
+
+    def test_format_specifiers(self):
+        my_birthday = date(1984, 8, 7)
+
+        for specifier in ['a', 'A', 'f', 'g', 'G', 'h', 'H', 'i', 'P', 's', 'u']:
+            with self.assertRaises(TypeError):
+                dateformat.format(my_birthday, specifier)
+
+
+
