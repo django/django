@@ -705,6 +705,12 @@ Miscellaneous
 * :func:`django.views.i18n.set_language` may now return a 204 status code for
   AJAX requests.
 
+* The ``base_field`` attribute of
+  :class:`~django.contrib.postgres.fields.RangeField` is now a type of field,
+  not an instance of a field.  If you have created a custom subclass of
+  :class:`~django.contrib.postgres.fields.RangeField`, you should change the
+  ``base_field`` attribute.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
