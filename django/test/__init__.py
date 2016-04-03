@@ -7,6 +7,7 @@ from django.test.testcases import (
     LiveServerTestCase, SimpleTestCase, TestCase, TransactionTestCase,
     skipIfDBFeature, skipUnlessAnyDBFeature, skipUnlessDBFeature,
 )
+from django.test.channels import ChannelTestCase
 from django.test.utils import (
     ignore_warnings, modify_settings, override_settings,
     override_system_checks, tag,
@@ -14,7 +15,7 @@ from django.test.utils import (
 
 __all__ = [
     'Client', 'RequestFactory', 'TestCase', 'TransactionTestCase',
-    'SimpleTestCase', 'LiveServerTestCase', 'skipIfDBFeature',
+    'SimpleTestCase', 'LiveServerTestCase', 'ChannelTestCase', 'skipIfDBFeature',
     'skipUnlessAnyDBFeature', 'skipUnlessDBFeature', 'ignore_warnings',
     'modify_settings', 'override_settings', 'override_system_checks', 'tag',
 ]

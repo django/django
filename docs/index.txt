@@ -100,6 +100,15 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`SchemaEditor <ref/schema-editor>` |
   :doc:`Writing migrations <howto/writing-migrations>`
 
+* **Channels:**
+  :doc:`Introduction <topics/channels/introduction>` |
+  :doc:`Concepts <topics/channels/concepts>` |
+  :doc:`Tutorial <intro/channels>` |
+  :doc:`Deploying <topics/channels/deploying>` |
+  :doc:`Scaling <topics/channels/scaling>` |
+  :doc:`Channel Layers <ref/channels/backends>` |
+  :doc:`API <ref/channels/api>`
+
 * **Advanced:**
   :doc:`Managers <topics/db/managers>` |
   :doc:`Raw SQL <topics/db/sql>` |
