@@ -62,6 +62,13 @@ Minor features
 * Added "No date" and "Has date" choices for ``DateFieldListFilter`` if the
   field is nullable.
 
+* When using the :attr:`ModelAdmin.save_as
+  <django.contrib.admin.ModelAdmin.save_as>` attribute, the "Save as new"
+  button now redirects to the change view for the new object instead of the
+  changelist for the model. If you need the previous behavior, set the new
+  :attr:`ModelAdmin.save_as_continue
+  <django.contrib.admin.ModelAdmin.save_as_continue>` attribute to ``False``.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

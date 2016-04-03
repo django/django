@@ -487,6 +487,7 @@ class ModelAdmin(BaseModelAdmin):
     search_fields = ()
     date_hierarchy = None
     save_as = False
+    save_as_continue = True
     save_on_top = False
     paginator = Paginator
     preserve_filters = True
@@ -1087,6 +1088,9 @@ class ModelAdmin(BaseModelAdmin):
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
 
+        save_as_new = (
+            "_saveasnew" in request.POST and self.save_as_continue and self.has_change_permission(request, obj))
+
         if IS_POPUP_VAR in request.POST:
             to_field = request.POST.get(TO_FIELD_VAR)
             if to_field:
@@ -1102,7 +1106,7 @@ class ModelAdmin(BaseModelAdmin):
                 'popup_response_data': popup_response_data,
             })
 
-        elif "_continue" in request.POST:
+        elif "_continue" in request.POST or save_as_new:
             msg = format_html(
                 _('The {name} "{obj}" was added successfully. You may edit it again below.'),
                 **msg_dict

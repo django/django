@@ -1146,6 +1146,17 @@ subclass::
 
     By default, ``save_as`` is set to ``False``.
 
+.. attribute:: ModelAdmin.save_as_continue
+
+    .. versionadded:: 1.10
+
+    When the above ``save_as`` option is enabled, the default behavior after
+    saving the new object is to redirect to the change view for that object.
+    If you set ``save_as_continue`` to ``False`` you will be redirected to the
+    changelist view instead.
+
+    By default ``save_as_continue`` is set to ``True``.
+
 .. attribute:: ModelAdmin.save_on_top
 
     Set ``save_on_top`` to add save buttons across the top of your admin change
