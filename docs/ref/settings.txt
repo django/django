@@ -65,11 +65,10 @@ See :doc:`/howto/error-reporting` for more information.
 Default: ``[]`` (Empty list)
 
 A list of strings representing the host/domain names that this Django site can
-serve. This is a security measure to prevent HTTP Host header attacks, in which
-an attacker uses malicious HTTP Host header values to inject code, trigger
-password reset emails, etc. HTTP Host header attacks can exploit the behavior
-of web applications, web servers, and web caches, even under many
-seemingly-safe web server configurations.
+serve. This is a security measure to prevent
+:ref:`HTTP Host header attacks <host-headers-virtual-hosting>`. HTTP Host
+header attacks are possible even under many seemingly-safe web server
+configurations.
 
 Values in this list can be fully qualified names (e.g. ``'www.example.com'``),
 in which case they will be matched against the request's ``Host`` header
