@@ -1,4 +1,5 @@
 import re
+import warnings
 
 from django import http
 from django.conf import settings
@@ -8,7 +9,7 @@ from django.urls import is_valid_path
 from django.utils.cache import (
     cc_delim_re, get_conditional_response, set_response_etag,
 )
-from django.utils.deprecation import MiddlewareMixin
+from django.utils.deprecation import MiddlewareMixin, RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import urlparse
 
@@ -34,7 +35,8 @@ class CommonMiddleware(MiddlewareMixin):
 
         - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
           the entire page content and Not Modified responses will be returned
-          appropriately.
+          appropriately. USE_ETAGS is deprecated in favor of
+          ConditionalGetMiddleware.
     """
 
     response_redirect_class = http.HttpResponsePermanentRedirect
@@ -115,6 +117,13 @@ class CommonMiddleware(MiddlewareMixin):
                 return self.response_redirect_class(self.get_full_path_with_slash(request))
 
         if settings.USE_ETAGS and self.needs_etag(response):
+            warnings.warn(
+                "The USE_ETAGS setting is deprecated in favor of "
+                "ConditionalGetMiddleware which sets the ETag regardless of "
+                "the setting. CommonMiddleware won't do ETag processing in "
+                "Django 2.1.",
+                RemovedInDjango21Warning
+            )
             if not response.has_header('ETag'):
                 set_response_etag(response)
 

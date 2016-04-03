@@ -327,6 +327,9 @@ Requests and Responses
 * Added the :setting:`SECURE_HSTS_PRELOAD` setting to allow appending the
   ``preload`` directive to the ``Strict-Transport-Security`` header.
 
+* :class:`~django.middleware.http.ConditionalGetMiddleware` now adds the
+  ``ETag`` header to responses.
+
 Serialization
 ~~~~~~~~~~~~~
 
@@ -633,3 +636,9 @@ Miscellaneous
 * :func:`~django.contrib.auth.authenticate` now passes a ``request`` argument
   to the ``authenticate()`` method of authentication backends. Support for
   methods that don't accept ``request`` will be removed in Django 2.1.
+
+* The ``USE_ETAGS`` setting is deprecated in favor of
+  :class:`~django.middleware.http.ConditionalGetMiddleware` which now adds the
+  ``ETag`` header to responses regardless of the setting. ``CommonMiddleware``
+  and ``django.utils.cache.patch_response_headers()`` will no longer set ETags
+  when the deprecation ends.

@@ -65,6 +65,11 @@ need to distinguish caches by the ``Accept-language`` header.
 
         In older versions, the ``Last-Modified`` header was also set.
 
+    .. deprecated:: 1.11
+
+        Since the ``USE_ETAGS`` setting is deprecated, this function won't set
+        the ``ETag`` header when the deprecation ends in Django 2.1.
+
 .. function:: add_never_cache_headers(response)
 
     Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate``

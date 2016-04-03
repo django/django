@@ -33,8 +33,8 @@ from django.template import engines
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, TransactionTestCase, mock,
-    override_settings,
+    RequestFactory, SimpleTestCase, TestCase, TransactionTestCase,
+    ignore_warnings, mock, override_settings,
 )
 from django.test.signals import setting_changed
 from django.utils import six, timezone, translation
@@ -1856,6 +1856,7 @@ class CacheI18nTest(TestCase):
                 "Cache keys should include the time zone name when time zones are active"
             )
 
+    @ignore_warnings(category=RemovedInDjango21Warning)  # USE_ETAGS=True
     @override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX="test",
         CACHE_MIDDLEWARE_SECONDS=60,
@@ -2262,6 +2263,7 @@ class TestWithTemplateResponse(SimpleTestCase):
         response = response.render()
         self.assertFalse(response.has_header('ETag'))
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @override_settings(USE_ETAGS=True)
     def test_with_etag(self):
         template = engines['django'].from_string("This is a test")

@@ -2532,6 +2532,11 @@ bandwidth but slows down performance. This is used by the
 :class:`~django.middleware.common.CommonMiddleware` and in the :doc:`cache
 framework </topics/cache>`.
 
+.. deprecated:: 1.11
+
+    This setting is deprecated in favor of using ``ConditionalGetMiddleware``,
+    which sets an ETag regardless of this setting.
+
 .. setting:: USE_I18N
 
 ``USE_I18N``

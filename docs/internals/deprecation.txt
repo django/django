@@ -43,6 +43,9 @@ details on these changes.
 
 * The ``django.db.models.permalink()`` decorator will be removed.
 
+* The ``USE_ETAGS`` setting will be removed. ``CommonMiddleware`` and
+  ``django.utils.cache.patch_response_headers()`` will no longer set ETags.
+
 .. _deprecation-removed-in-2.0:
 
 2.0
