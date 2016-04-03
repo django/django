@@ -8,6 +8,7 @@ from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
 from django.urls import NoReverseMatch
+from django.utils import translation
 
 
 class TemplateTests(SimpleTestCase):
@@ -64,15 +65,17 @@ class TemplateTests(SimpleTestCase):
 
     def test_invalid_block_suggestion(self):
         """
-        #7876 -- Error messages should include the unexpected block name.
+        Error messages should include the unexpected block name and be in all
+        English.
         """
         engine = Engine()
         msg = (
             "Invalid block tag on line 1: 'endblock', expected 'elif', 'else' "
             "or 'endif'. Did you forget to register or load this tag?"
         )
-        with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            engine.from_string("{% if 1 %}lala{% endblock %}{% endif %}")
+        with self.settings(USE_I18N=True), translation.override('de'):
+            with self.assertRaisesMessage(TemplateSyntaxError, msg):
+                engine.from_string("{% if 1 %}lala{% endblock %}{% endif %}")
 
     def test_unknown_block_tag(self):
         engine = Engine()
