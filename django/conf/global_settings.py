@@ -23,6 +23,7 @@ DEBUG = False
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
 # Whether to use the "Etag" header. This saves bandwidth but slows down performance.
+# Deprecated in favor of ConditionalGetMiddleware.
 USE_ETAGS = False
 
 # People who get code error notifications.

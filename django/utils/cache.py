@@ -22,10 +22,12 @@ import hashlib
 import logging
 import re
 import time
+import warnings
 
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
@@ -214,6 +216,11 @@ def patch_response_headers(response, cache_timeout=None):
     if cache_timeout < 0:
         cache_timeout = 0  # Can't have max-age negative
     if settings.USE_ETAGS and not response.has_header('ETag'):
+        warnings.warn(
+            "The `USE_ETAGS` setting is deprecated. Instead use `ConditionalGetMiddleware`. ",
+            RemovedInDjango20Warning
+        )
+
         if hasattr(response, 'render') and callable(response.render):
             response.add_post_render_callback(set_response_etag)
         else:

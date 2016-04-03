@@ -128,7 +128,8 @@ Conditional GET middleware
 Handles conditional GET operations. If the response has a ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
-:class:`~django.http.HttpResponseNotModified`.
+:class:`~django.http.HttpResponseNotModified`. If there is no ``ETag``
+the middleware tries to calculate and set one.
 
 Also sets the ``Date`` and ``Content-Length`` response-headers.
 

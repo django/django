@@ -20,8 +20,11 @@ from django.middleware.common import (
 )
 from django.middleware.gzip import GZipMiddleware
 from django.middleware.http import ConditionalGetMiddleware
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import (
+    RequestFactory, SimpleTestCase, ignore_warnings, override_settings,
+)
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str
 from django.utils.six.moves import range
 from django.utils.six.moves.urllib.parse import quote
@@ -256,12 +259,14 @@ class CommonMiddlewareTest(SimpleTestCase):
 
     # ETag + If-Not-Modified support tests
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(USE_ETAGS=True)
     def test_etag(self):
         req = HttpRequest()
         res = HttpResponse('content')
         self.assertTrue(CommonMiddleware().process_response(req, res).has_header('ETag'))
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(USE_ETAGS=True)
     def test_etag_streaming_response(self):
         req = HttpRequest()
@@ -269,12 +274,14 @@ class CommonMiddlewareTest(SimpleTestCase):
         res['ETag'] = 'tomatoes'
         self.assertEqual(CommonMiddleware().process_response(req, res).get('ETag'), 'tomatoes')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(USE_ETAGS=True)
     def test_no_etag_streaming_response(self):
         req = HttpRequest()
         res = StreamingHttpResponse(['content'])
         self.assertFalse(CommonMiddleware().process_response(req, res).has_header('ETag'))
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(USE_ETAGS=True)
     def test_if_none_match(self):
         first_req = HttpRequest()
@@ -463,6 +470,25 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.assertEqual(int(self.resp['Content-Length']), bad_content_length)
 
     # Tests for the ETag header
+
+    def test_middleware_will_not_calculate_etag(self):
+        self.assertNotIn('ETag', self.resp)
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 200)
+        self.assertNotIn('ETag', self.resp)
+
+    @override_settings(USE_ETAGS=True)
+    def test_middleware_will_calculate_etag(self):
+        self.assertNotIn('ETag', self.resp)
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 200)
+        self.assertNotEqual('', self.resp['ETag'])
+
+    def test_middleware_will_not_overwrite_etag(self):
+        self.resp['ETag'] = 'eggs'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 200)
+        self.assertEqual('eggs', self.resp['ETag'])
 
     def test_if_none_match_and_no_etag(self):
         self.req.META['HTTP_IF_NONE_MATCH'] = 'spam'
@@ -763,6 +789,7 @@ class GZipMiddlewareTest(SimpleTestCase):
         self.assertIsNone(r.get('Content-Encoding'))
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 @override_settings(USE_ETAGS=True)
 class ETagGZipMiddlewareTest(SimpleTestCase):
     """

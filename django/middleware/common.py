@@ -1,5 +1,6 @@
 import logging
 import re
+import warnings
 
 from django import http
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
 from django.urls import is_valid_path
 from django.utils.cache import get_conditional_response, set_response_etag
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.http import unquote_etag
 from django.utils.six.moves.urllib.parse import urlparse
@@ -35,7 +37,8 @@ class CommonMiddleware(object):
 
         - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
           the entire page content and Not Modified responses will be returned
-          appropriately.
+          appropriately. USE_ETAGS is deprecated in favor of
+          ConditionalGetMiddleware. .
     """
 
     response_redirect_class = http.HttpResponsePermanentRedirect
@@ -116,6 +119,11 @@ class CommonMiddleware(object):
                 return self.response_redirect_class(self.get_full_path_with_slash(request))
 
         if settings.USE_ETAGS:
+            warnings.warn(
+                "The `USE_ETAGS` setting is deprecated. Instead use `ConditionalGetMiddleware`. ",
+                RemovedInDjango20Warning
+            )
+
             if not response.has_header('ETag'):
                 set_response_etag(response)
 

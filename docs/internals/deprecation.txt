@@ -147,6 +147,14 @@ details on these changes.
 * The shim for supporting custom related manager classes without a
   ``_apply_rel_filters()`` method will be removed.
 
+* ``CommonMiddleware`` will not handle conditional ``GET`` by ``ETag``
+  or ``Last-Modified`` any more. It's replaced by the
+  ``ConditionalGetMiddleware``.
+
+* The setting ``USE_ETAGS`` will be removed. It's replaced by using
+  ``ConditionalGetMiddleware``, which takes care of handling the conditional
+  ``GET`` and also generating the ``ETag`` if it's empty.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
