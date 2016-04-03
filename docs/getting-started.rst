@@ -504,12 +504,15 @@ routing our chat from above::
         include(http_routing),
     ]
 
-When Channels loads this routing, it appends any match keys together and
-flattens out the routing, so the ``path`` match for ``chat_connect`` becomes
-``^/chat/(?P<room>[a-zA-Z0-9_]+)/$``. If the include match
-or the route match doesn't have the ``^`` character, it will refuse to append them
-and error (you can still have matches without ``^`` in either, you just can't
-ask Channels to combine them).
+Channels will resolve the routing in order, short-circuiting around the
+includes if one or more of their matches fails. You don't have to start with
+the ``^`` symbol - we use Python's ``re.match`` function, which starts at the
+start of a line anyway - but it's considered good practice.
+
+When an include matches part of a message value, it chops off the bit of the
+value it matched before passing it down to its routes or sub-includes, so you
+can put the same routing under multiple includes with different prefixes if
+you like.
 
 Because these matches come through as keyword arguments, we could modify our
 consumer above to use a room based on URL rather than username::

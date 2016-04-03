@@ -24,7 +24,7 @@ chatroom_routing = [
     route("websocket.connect", consumer_3, path=r"^/mentions/$"),
 ]
 
-chatroom_routing_noprefix = [
+chatroom_routing_nolinestart = [
     route("websocket.connect", consumer_2, path=r"/chat/(?P<room>[^/]+)/$"),
     route("websocket.connect", consumer_3, path=r"/mentions/$"),
 ]
@@ -207,6 +207,17 @@ class RoutingTests(SimpleTestCase):
             consumer=consumer_3,
             kwargs={"version": "1"},
         )
+        # Check it works without the ^s too.
+        router = Router([
+            include("channels.tests.test_routing.chatroom_routing_nolinestart", path="/ws/v(?P<version>[0-9]+)"),
+        ])
+        self.assertRoute(
+            router,
+            channel="websocket.connect",
+            content={"path": "/ws/v2/chat/django/"},
+            consumer=consumer_2,
+            kwargs={"version": "2", "room": "django"},
+        )
 
     def test_positional_pattern(self):
         """
@@ -215,20 +226,6 @@ class RoutingTests(SimpleTestCase):
         with self.assertRaises(ValueError):
             Router([
                 route("http.request", consumer_1, path=r"^/chat/([^/]+)/$"),
-            ])
-
-    def test_bad_include_prefix(self):
-        """
-        Tests both failure cases of prefixes for includes - the include not
-        starting with ^, and the included filter not starting with ^.
-        """
-        with self.assertRaises(ValueError):
-            Router([
-                include("channels.tests.test_routing.chatroom_routing", path="foobar"),
-            ])
-        with self.assertRaises(ValueError):
-            Router([
-                include("channels.tests.test_routing.chatroom_routing_noprefix", path="^/foobar/"),
             ])
 
     def test_mixed_unicode_bytes(self):

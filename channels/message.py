@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import copy
 
 from .channel import Channel
 
@@ -38,3 +39,13 @@ class Message(object):
 
     def get(self, key, default=None):
         return self.content.get(key, default)
+
+    def copy(self):
+        """
+        Returns a safely content-mutable copy of this Message.
+        """
+        return self.__class__(
+            copy.deepcopy(self.content),
+            self.channel.name,
+            self.channel_layer,
+        )
