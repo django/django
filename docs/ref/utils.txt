@@ -826,6 +826,8 @@ appropriate entities.
 
     Can be called multiple times on a single string.
 
+    Can also be used as a decorator.
+
     For building up fragments of HTML, you should normally be using
     :func:`django.utils.html.format_html` instead.
 
@@ -847,6 +849,8 @@ appropriate entities.
 
     Can be called multiple times on a single string (the resulting escaping is
     only applied once).
+
+    Can also be used as a decorator.
 
 ``django.utils.text``
 =====================

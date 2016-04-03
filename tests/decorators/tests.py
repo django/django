@@ -7,12 +7,14 @@ from django.contrib.auth.decorators import (
 )
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
+from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.functional import allow_lazy, keep_lazy, keep_lazy_text, lazy
+from django.utils.safestring import mark_for_escaping, mark_safe
 from django.utils.translation import ugettext_lazy
 from django.views.decorators.cache import (
     cache_control, cache_page, never_cache,
@@ -79,6 +81,11 @@ full_decorator = compose(
 fully_decorated = full_decorator(fully_decorated)
 
 
+# django.utils.safestring
+fully_decorated = mark_safe(fully_decorated)
+fully_decorated = mark_for_escaping(fully_decorated)
+
+
 class DecoratorsTest(TestCase):
 
     def test_attributes(self):
@@ -89,6 +96,39 @@ class DecoratorsTest(TestCase):
         self.assertEqual(fully_decorated.__name__, 'fully_decorated')
         self.assertEqual(fully_decorated.__doc__, 'Expected __doc__')
         self.assertEqual(fully_decorated.__dict__['anything'], 'Expected __dict__')
+
+    def test_escaping(self):
+        """
+        Tests that safety markers from django.utils.safestring
+        return the proper str or unicode subclass for use in templates.
+
+        Tests are done by comparing directly a sample rendered Template instance
+        with the unicode content it should contain.
+        """
+        template = Template("{{ data }}")
+
+        rendered = {'safe': u'<html><body>dummy</body></html>',
+            'escaped': u'&lt;html&gt;&lt;body&gt;dummy&lt;/body&gt;&lt;/html&gt;'}
+
+        def clean_unicode_provider():
+            return u'<html><body>dummy</body></html>'
+
+        def clean_string_provider():
+            return '<html><body>dummy</body></html>'
+
+        escaped_unicode = mark_for_escaping(clean_unicode_provider)()
+        safe_unicode = mark_safe(clean_unicode_provider)()
+        escaped_str = mark_for_escaping(clean_string_provider)()
+        safe_str = mark_safe(clean_string_provider)()
+
+        self.assertEquals(template.render(Context({'data': escaped_unicode})),
+            rendered['escaped'])
+        self.assertEquals(template.render(Context({'data': safe_unicode})),
+            rendered['safe'])
+        self.assertEquals(template.render(Context({'data': escaped_str})),
+            rendered['escaped'])
+        self.assertEquals(template.render(Context({'data': safe_str})),
+            rendered['safe'])
 
     def test_user_passes_test_composition(self):
         """
