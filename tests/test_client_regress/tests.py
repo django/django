@@ -1220,9 +1220,7 @@ class RequestMethodTests(SimpleTestCase):
         "Request a view via request method HEAD"
         response = self.client.head('/request_methods/')
         self.assertEqual(response.status_code, 200)
-        # A HEAD request doesn't return any content.
-        self.assertNotEqual(response.content, b'request method: HEAD')
-        self.assertEqual(response.content, b'')
+        self.assertEqual(response.content, b'request method: HEAD')
 
     def test_options(self):
         "Request a view via request method OPTIONS"
