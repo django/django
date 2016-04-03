@@ -57,7 +57,7 @@ class SessionStore(SessionBase):
             return self.create()
         if must_create:
             func = self._cache.add
-        elif self._cache.get(self.session_key) is not None:
+        elif self._cache.get(self.cache_key) is not None:
             func = self._cache.set
         else:
             raise UpdateError
