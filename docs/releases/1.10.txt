@@ -714,6 +714,9 @@ Miscellaneous
   :class:`~django.contrib.postgres.fields.RangeField`, you should change the
   ``base_field`` attribute.
 
+* Middleware classes are now initialized when the server starts rather than
+  during the first request.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
