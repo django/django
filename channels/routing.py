@@ -141,7 +141,7 @@ class Route(object):
         """
         Returns the channel names this route listens on
         """
-        return self.channel
+        return {self.channel,}
 
     def __str__(self):
         return "%s %s -> %s" % (
@@ -204,7 +204,7 @@ class Include(object):
         """
         result = set()
         for entry in self.routing:
-            result.union(entry.channel_names())
+            result.update(entry.channel_names())
         return result
 
 

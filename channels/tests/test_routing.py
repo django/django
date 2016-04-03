@@ -281,3 +281,24 @@ class RoutingTests(SimpleTestCase):
             consumer=consumer_2,
             kwargs={"version": "2", "room": "django"},
         )
+
+    def test_channels(self):
+        """
+        Tests that the router reports channels to listen on correctly
+        """
+        router = Router([
+            route("http.request", consumer_1, path=r"^/chat/$"),
+            route("http.disconnect", consumer_2),
+            route("http.request", consumer_3),
+        ])
+        # Initial check
+        self.assertEqual(
+            router.channels,
+            {"http.request", "http.disconnect"},
+        )
+        # Dynamically add route, recheck
+        router.add_route(route("websocket.receive", consumer_1))
+        self.assertEqual(
+            router.channels,
+            {"http.request", "http.disconnect", "websocket.receive"},
+        )
