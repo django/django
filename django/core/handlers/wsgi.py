@@ -150,10 +150,6 @@ class WSGIHandler(base.BaseHandler):
 
     def __init__(self, *args, **kwargs):
         super(WSGIHandler, self).__init__(*args, **kwargs)
-        # Load middleware on initialization rather than on first request. In
-        # the WSGIHandler context (unlike e.g ClientHandler) the environment
-        # will already have been set, and we want to trigger any potential
-        # errors immediately rather that waiting for a request to be made.
         self.load_middleware()
 
     def __call__(self, environ, start_response):
