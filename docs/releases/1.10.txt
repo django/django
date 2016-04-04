@@ -62,6 +62,10 @@ Minor features
 * Added "No date" and "Has date" choices for ``DateFieldListFilter`` if the
   field is nullable.
 
+* When an applied migration has some of its dependencies not applied
+  ``InconsistentMigrationHistory`` exception will be raised if a user tries
+  to run ``migrate`` or ``makemigrations`` command.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

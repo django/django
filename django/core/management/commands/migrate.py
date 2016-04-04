@@ -65,6 +65,9 @@ class Command(BaseCommand):
         # Work out which apps have migrations and which do not
         executor = MigrationExecutor(connection, self.migration_progress_callback)
 
+        # Check if all migrations are applied after their dependencies
+        executor.loader.check_consistent_history(connection)
+
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any
         conflicts = executor.loader.detect_conflicts()

@@ -5,6 +5,7 @@ from itertools import takewhile
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
+from django.db import connections
 from django.db.migrations import Migration
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.loader import MigrationLoader
@@ -74,6 +75,11 @@ class Command(BaseCommand):
         # Load the current graph state. Pass in None for the connection so
         # the loader doesn't try to resolve replaced migrations from DB.
         loader = MigrationLoader(None, ignore_no_migrations=True)
+
+        # Check that there aren't any migrations applied before their
+        # dependencies.
+        for db in connections:
+            loader.check_consistent_history(connections[db])
 
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge
