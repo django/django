@@ -194,6 +194,7 @@ def format_number(value, max_digits, decimal_places):
         return None
     if isinstance(value, decimal.Decimal):
         context = decimal.getcontext().copy()
+        context.rounding = decimal.ROUND_HALF_UP
         if max_digits is not None:
             context.prec = max_digits
         if decimal_places is not None:

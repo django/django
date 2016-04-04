@@ -1604,7 +1604,10 @@ class DecimalField(Field):
         if value is None:
             return value
         try:
-            return decimal.Decimal(value)
+            if isinstance(value, six.text_type):
+                return decimal.Decimal(value)
+            else:
+                return decimal.Decimal(str(value))
         except decimal.InvalidOperation:
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
