@@ -12,7 +12,7 @@ import os.path
 import sys
 
 
-### Transforms: Turn one content string into another ###
+# Transforms: Turn one content string into another
 
 class Replacement(object):
     """
@@ -45,10 +45,10 @@ class Insert(object):
         if self.after:
             return value[:match.end()] + self.to_insert + value[match.end():]
         else:
-            return value[:match.start()] + self.to_insert + value[match.start():]            
+            return value[:match.start()] + self.to_insert + value[match.start():]
 
 
-### Operations: Copy or patch files ###
+# Operations: Copy or patch files
 
 class FileMap(object):
     """
@@ -98,7 +98,7 @@ class NewFile(object):
             fh.write(self.content)
 
 
-### Main class ###
+# Main class and config
 
 
 global_transforms = [
@@ -154,7 +154,9 @@ class Patchinator(object):
             "channels/worker.py", "django/channels/worker.py", global_transforms,
         ),
         FileMap(
-            "channels/management/commands/runworker.py", "django/core/management/commands/runworker.py", global_transforms,
+            "channels/management/commands/runworker.py",
+            "django/core/management/commands/runworker.py",
+            global_transforms,
         ),
         # Tests
         FileMap(

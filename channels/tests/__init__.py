@@ -1,1 +1,1 @@
-from .base import ChannelTestCase
+from .base import ChannelTestCase  # NOQA isort:skip

@@ -212,8 +212,10 @@ class RequestTests(ChannelTestCase):
             "content": b"re=fou",
             "more_content": True,
         })
+
         class VeryImpatientRequest(AsgiRequest):
             body_receive_timeout = 0
+
         with self.assertRaises(RequestTimeout):
             VeryImpatientRequest(self.get_next_message("test"))
 

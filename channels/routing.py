@@ -141,7 +141,7 @@ class Route(object):
         """
         Returns the channel names this route listens on
         """
-        return {self.channel,}
+        return {self.channel, }
 
     def __str__(self):
         return "%s %s -> %s" % (
