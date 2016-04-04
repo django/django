@@ -153,10 +153,10 @@ class WSGIHandler(base.BaseHandler):
     def __call__(self, environ, start_response):
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
-        if self._request_middleware is None:
+        if self._middleware_chain is None:
             with self.initLock:
                 # Check that middleware is still uninitialized.
-                if self._request_middleware is None:
+                if self._middleware_chain is None:
                     self.load_middleware()
 
         set_script_prefix(get_script_name(environ))

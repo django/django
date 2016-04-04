@@ -1,8 +1,9 @@
 from django import http
 from django.conf import settings
+from django.core.handlers.middleware import MiddlewareMixin
 
 
-class XViewMiddleware(object):
+class XViewMiddleware(MiddlewareMixin):
     """
     Adds an X-View header to internal HEAD requests -- used by the documentation system.
     """

@@ -1,10 +1,11 @@
 import re
 
 from django.conf import settings
+from django.core.handlers.middleware import MiddlewareMixin
 from django.http import HttpResponsePermanentRedirect
 
 
-class SecurityMiddleware(object):
+class SecurityMiddleware(MiddlewareMixin):
     def __init__(self):
         self.sts_seconds = settings.SECURE_HSTS_SECONDS
         self.sts_include_subdomains = settings.SECURE_HSTS_INCLUDE_SUBDOMAINS

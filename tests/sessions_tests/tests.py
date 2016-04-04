@@ -622,33 +622,32 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
 class SessionMiddlewareTests(TestCase):
 
+    def run_middleware(self, request=None, response=None, modifier=None):
+        request = request or RequestFactory().get('/')
+        response = response or HttpResponse('Session Test')
+
+        def response_factory(request):
+            if modifier:
+                modifier(request, response)
+            else:
+                request.session['hello'] = 'world'
+            return response
+
+        middleware = SessionMiddleware(response_factory)
+
+        return request, middleware(request)
+
     @override_settings(SESSION_COOKIE_SECURE=True)
     def test_secure_session_cookie(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
+        request, response = self.run_middleware()
 
-        # Simulate a request the modifies the session
-        middleware.process_request(request)
-        request.session['hello'] = 'world'
-
-        # Handle the response through the middleware
-        response = middleware.process_response(request, response)
         self.assertTrue(
             response.cookies[settings.SESSION_COOKIE_NAME]['secure'])
 
     @override_settings(SESSION_COOKIE_HTTPONLY=True)
     def test_httponly_session_cookie(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
+        request, response = self.run_middleware()
 
-        # Simulate a request the modifies the session
-        middleware.process_request(request)
-        request.session['hello'] = 'world'
-
-        # Handle the response through the middleware
-        response = middleware.process_response(request, response)
         self.assertTrue(
             response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
         self.assertIn(http_cookies.Morsel._reserved['httponly'],
@@ -656,33 +655,19 @@ class SessionMiddlewareTests(TestCase):
 
     @override_settings(SESSION_COOKIE_HTTPONLY=False)
     def test_no_httponly_session_cookie(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
+        request, response = self.run_middleware()
 
-        # Simulate a request the modifies the session
-        middleware.process_request(request)
-        request.session['hello'] = 'world'
-
-        # Handle the response through the middleware
-        response = middleware.process_response(request, response)
         self.assertFalse(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
 
         self.assertNotIn(http_cookies.Morsel._reserved['httponly'],
                          str(response.cookies[settings.SESSION_COOKIE_NAME]))
 
     def test_session_save_on_500(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Horrible error')
-        response.status_code = 500
-        middleware = SessionMiddleware()
+        def modifier(request, response):
+            request.session['hello'] = 'world'
+            response.status_code = 500
 
-        # Simulate a request the modifies the session
-        middleware.process_request(request)
-        request.session['hello'] = 'world'
-
-        # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        request, response = self.run_middleware(modifier=modifier)
 
         # Check that the value wasn't saved above.
         self.assertNotIn('hello', request.session.load())
@@ -708,18 +693,15 @@ class SessionMiddlewareTests(TestCase):
 
     def test_session_delete_on_end(self):
         request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
 
         # Before deleting, there has to be an existing cookie
         request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
 
-        # Simulate a request that ends the session
-        middleware.process_request(request)
-        request.session.flush()
+        def modifier(request, response):
+            request.session.flush()
 
-        # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        # Simulate a request that ends the session
+        request, response = self.run_middleware(request, modifier=modifier)
 
         # Check that the cookie was deleted, not recreated.
         # A deleted cookie header looks like:
@@ -736,18 +718,15 @@ class SessionMiddlewareTests(TestCase):
     @override_settings(SESSION_COOKIE_DOMAIN='.example.local')
     def test_session_delete_on_end_with_custom_domain(self):
         request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
 
         # Before deleting, there has to be an existing cookie
         request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
 
-        # Simulate a request that ends the session
-        middleware.process_request(request)
-        request.session.flush()
+        def modifier(request, response):
+            request.session.flush()
 
-        # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        # Simulate a request that ends the session
+        request, response = self.run_middleware(request, modifier=modifier)
 
         # Check that the cookie was deleted, not recreated.
         # A deleted cookie header with a custom domain looks like:
@@ -763,16 +742,11 @@ class SessionMiddlewareTests(TestCase):
         )
 
     def test_flush_empty_without_session_cookie_doesnt_set_cookie(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
+        def modifier(request, response):
+            request.session.flush()
 
         # Simulate a request that ends the session
-        middleware.process_request(request)
-        request.session.flush()
-
-        # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        request, response = self.run_middleware(modifier=modifier)
 
         # A cookie should not be set.
         self.assertEqual(response.cookies, {})
@@ -786,14 +760,10 @@ class SessionMiddlewareTests(TestCase):
         """
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
 
-        # Set a session key and some data.
-        middleware.process_request(request)
-        request.session['foo'] = 'bar'
-        # Handle the response through the middleware.
-        response = middleware.process_response(request, response)
-        self.assertEqual(tuple(request.session.items()), (('foo', 'bar'),))
+        request, response = self.run_middleware()
+
+        self.assertEqual(tuple(request.session.items()), (('hello', 'world'),))
         # A cookie should be set, along with Vary: Cookie.
         self.assertIn(
             'Set-Cookie: sessionid=%s' % request.session.session_key,
@@ -801,11 +771,15 @@ class SessionMiddlewareTests(TestCase):
         )
         self.assertEqual(response['Vary'], 'Cookie')
 
-        # Empty the session data.
-        del request.session['foo']
-        # Handle the response through the middleware.
+        request.COOKIES[settings.SESSION_COOKIE_NAME] = request.session._session_key
+
+        def modifier(request, response):
+            # Empty the session data.
+            del request.session['hello']
+
         response = HttpResponse('Session test')
-        response = middleware.process_response(request, response)
+        request, response = self.run_middleware(request, response, modifier)
+
         self.assertEqual(dict(request.session.values()), {})
         session = Session.objects.get(session_key=request.session.session_key)
         self.assertEqual(session.get_decoded(), {})
