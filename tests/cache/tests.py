@@ -586,7 +586,7 @@ class BaseCacheTests(object):
                 warnings.simplefilter("always")
                 # memcached does not allow whitespace or control characters in keys
                 cache.set('key with spaces', 'value')
-                self.assertEqual(len(w), 2)
+                self.assertEqual(len(w), 1)
                 self.assertIsInstance(w[0].message, CacheKeyWarning)
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")

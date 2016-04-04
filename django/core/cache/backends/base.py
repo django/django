@@ -242,6 +242,7 @@ class BaseCache(object):
                 warnings.warn('Cache key contains characters that will cause '
                         'errors if used with memcached: %r' % key,
                               CacheKeyWarning)
+                break
 
     def incr_version(self, key, delta=1, version=None):
         """Adds delta to the cache version for the supplied key. Returns the
