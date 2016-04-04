@@ -423,16 +423,11 @@ def strip_quotes(want, got):
     """
     def is_quoted_string(s):
         s = s.strip()
-        return (len(s) >= 2
-                and s[0] == s[-1]
-                and s[0] in ('"', "'"))
+        return len(s) >= 2 and s[0] == s[-1] and s[0] in ('"', "'")
 
     def is_quoted_unicode(s):
         s = s.strip()
-        return (len(s) >= 3
-                and s[0] == 'u'
-                and s[1] == s[-1]
-                and s[1] in ('"', "'"))
+        return len(s) >= 3 and s[0] == 'u' and s[1] == s[-1] and s[1] in ('"', "'")
 
     if is_quoted_string(want) and is_quoted_string(got):
         want = want.strip()[1:-1]

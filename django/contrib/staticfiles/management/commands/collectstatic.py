@@ -259,16 +259,12 @@ class Command(BaseCommand):
                         full_path = None
                     # Skip the file if the source file is younger
                     # Avoid sub-second precision (see #14665, #19540)
-                    if (target_last_modified.replace(microsecond=0)
-                            >= source_last_modified.replace(microsecond=0)):
-                        if not ((self.symlink and full_path
-                                 and not os.path.islink(full_path)) or
-                                (not self.symlink and full_path
-                                 and os.path.islink(full_path))):
-                            if prefixed_path not in self.unmodified_files:
-                                self.unmodified_files.append(prefixed_path)
-                            self.log("Skipping '%s' (not modified)" % path)
-                            return False
+                    if (target_last_modified.replace(microsecond=0) >= source_last_modified.replace(microsecond=0) and
+                            full_path and not (self.symlink ^ os.path.islink(full_path))):
+                        if prefixed_path not in self.unmodified_files:
+                            self.unmodified_files.append(prefixed_path)
+                        self.log("Skipping '%s' (not modified)" % path)
+                        return False
             # Then delete the existing file if really needed
             if self.dry_run:
                 self.log("Pretending to delete '%s'" % path)

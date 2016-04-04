@@ -163,8 +163,7 @@ class BaseListView(MultipleObjectMixin, View):
             # When pagination is enabled and object_list is a queryset,
             # it's better to do a cheap query than to load the unpaginated
             # queryset in memory.
-            if (self.get_paginate_by(self.object_list) is not None
-                    and hasattr(self.object_list, 'exists')):
+            if self.get_paginate_by(self.object_list) is not None and hasattr(self.object_list, 'exists'):
                 is_empty = not self.object_list.exists()
             else:
                 is_empty = len(self.object_list) == 0

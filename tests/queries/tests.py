@@ -1170,8 +1170,7 @@ class Queries1Tests(BaseQuerysetTest):
 
     def test_ticket19672(self):
         self.assertQuerysetEqual(
-            Report.objects.filter(Q(creator__isnull=False) &
-                                  ~Q(creator__extra__value=41)),
+            Report.objects.filter(Q(creator__isnull=False) & ~Q(creator__extra__value=41)),
             ['<Report: r1>']
         )
 
@@ -1390,8 +1389,8 @@ class Queries4Tests(BaseQuerysetTest):
 
         q1 = Item.objects.filter(Q(creator__report__name='e1') | Q(creator=self.a1)).order_by()
         q2 = (
-            Item.objects.filter(Q(creator__report__name='e1')).order_by()
-            | Item.objects.filter(Q(creator=self.a1)).order_by()
+            Item.objects.filter(Q(creator__report__name='e1')).order_by() |
+            Item.objects.filter(Q(creator=self.a1)).order_by()
         )
         self.assertQuerysetEqual(q1, ["<Item: i1>"])
         self.assertEqual(str(q1.query), str(q2.query))
@@ -3081,12 +3080,10 @@ class NullJoinPromotionOrTest(TestCase):
         # Test OR + doubleneg. The expected result is that channel is LOUTER
         # joined, program INNER joined
         qs1_filter = Identifier.objects.filter(
-            Q(program__id=p2.id, channel__id=c1.id)
-            | Q(program__id=p1.id)
+            Q(program__id=p2.id, channel__id=c1.id) | Q(program__id=p1.id)
         ).order_by('pk')
         qs1_doubleneg = Identifier.objects.exclude(
-            ~Q(Q(program__id=p2.id, channel__id=c1.id)
-            | Q(program__id=p1.id))
+            ~Q(Q(program__id=p2.id, channel__id=c1.id) | Q(program__id=p1.id))
         ).order_by('pk')
         self.assertQuerysetEqual(qs1_doubleneg, qs1_filter, lambda x: x)
         self.assertEqual(str(qs1_filter.query).count('JOIN'),
@@ -3106,11 +3103,11 @@ class NullJoinPromotionOrTest(TestCase):
         # NOT is pushed to lowest level in the boolean tree, and
         # another query where this isn't done.
         qs1 = Identifier.objects.filter(
-            ~Q(~Q(program__id=p2.id, channel__id=c1.id)
-            & Q(program__id=p1.id))).order_by('pk')
+            ~Q(~Q(program__id=p2.id, channel__id=c1.id) & Q(program__id=p1.id))
+        ).order_by('pk')
         qs2 = Identifier.objects.filter(
-            Q(Q(program__id=p2.id, channel__id=c1.id)
-            | ~Q(program__id=p1.id))).order_by('pk')
+            Q(Q(program__id=p2.id, channel__id=c1.id) | ~Q(program__id=p1.id))
+        ).order_by('pk')
         self.assertQuerysetEqual(qs1, qs2, lambda x: x)
         self.assertEqual(str(qs1.query).count('JOIN'),
                          str(qs2.query).count('JOIN'))
@@ -3697,8 +3694,7 @@ class Ticket23605Tests(TestCase):
                 F("ticket23605b__modelc_fk__field_c0")
             ) &
             # True for a1 (field_b1=True)
-            Q(ticket23605b__field_b1=True) &
-            ~Q(ticket23605b__pk__in=Ticket23605B.objects.filter(
+            Q(ticket23605b__field_b1=True) & ~Q(ticket23605b__pk__in=Ticket23605B.objects.filter(
                 ~(
                     # Same filters as above commented filters, but
                     # double-negated (one for Q() above, one for
@@ -3803,12 +3799,12 @@ class Ticket23622Tests(TestCase):
             modelc_fk=c1,
         )
         qx = (
-            Q(ticket23605b__pk__in=Ticket23605B.objects.order_by('modela_fk', '-field_b1').distinct('modela_fk'))
-            & Q(ticket23605b__field_b0__gte=300)
+            Q(ticket23605b__pk__in=Ticket23605B.objects.order_by('modela_fk', '-field_b1').distinct('modela_fk')) &
+            Q(ticket23605b__field_b0__gte=300)
         )
         qy = (
-            Q(ticket23605b__in=Ticket23605B.objects.order_by('modela_fk', '-field_b1').distinct('modela_fk'))
-            & Q(ticket23605b__field_b0__gte=300)
+            Q(ticket23605b__in=Ticket23605B.objects.order_by('modela_fk', '-field_b1').distinct('modela_fk')) &
+            Q(ticket23605b__field_b0__gte=300)
         )
         self.assertEqual(
             set(Ticket23605A.objects.filter(qx).values_list('pk', flat=True)),

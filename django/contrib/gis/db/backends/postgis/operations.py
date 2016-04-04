@@ -261,8 +261,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # also handles it (#25524).
         if handle_spheroid and len(dist_val) > 1:
             option = dist_val[1]
-            if (not geography and geodetic and lookup_type != 'dwithin'
-                    and option == 'spheroid'):
+            if not geography and geodetic and lookup_type != 'dwithin' and option == 'spheroid':
                 # using distance_spheroid requires the spheroid of the field as
                 # a parameter.
                 params.insert(0, f._spheroid)

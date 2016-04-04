@@ -102,8 +102,8 @@ class Node(object):
             return data
         if self.connector == conn_type:
             # We can reuse self.children to append or squash the node other.
-            if (isinstance(data, Node) and not data.negated
-                    and (data.connector == conn_type or len(data) == 1)):
+            if (isinstance(data, Node) and not data.negated and
+                    (data.connector == conn_type or len(data) == 1)):
                 # We can squash the other node's children directly into this
                 # node. We are just doing (AB)(CD) == (ABCD) here, with the
                 # addition that if the length of the other node is 1 the

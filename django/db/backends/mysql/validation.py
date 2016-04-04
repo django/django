@@ -21,9 +21,8 @@ class DatabaseValidation(BaseDatabaseValidation):
             if field_type is None:
                 return errors
 
-            if (field_type.startswith('varchar')  # Look for CharFields...
-                    and field.unique  # ... that are unique
-                    and (field.max_length is None or int(field.max_length) > 255)):
+            if (field_type.startswith('varchar') and field.unique and
+                    (field.max_length is None or int(field.max_length) > 255)):
                 errors.append(
                     checks.Error(
                         'MySQL does not allow unique CharFields to have a max_length > 255.',
