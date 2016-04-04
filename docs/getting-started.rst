@@ -365,6 +365,18 @@ name in the path of your WebSocket request (we'll ignore auth for now - that's n
     def ws_disconnect(message):
         Group("chat-%s" % message.channel_session['room']).discard(message.reply_channel)
 
+Update ``routing.py`` as well::
+
+    # in routing.py
+    from channels.routing import route
+    from myapp.consumers import ws_connect, ws_message, ws_disconnect
+
+    channel_routing = [
+        route("websocket.connect", ws_connect),
+        route("websocket.receive", ws_message),
+        route("websocket.disconnect", ws_disconnect),
+    ]
+
 If you play around with it from the console (or start building a simple
 JavaScript chat client that appends received messages to a div), you'll see
 that you can set a chat room with the initial request.
