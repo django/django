@@ -196,7 +196,7 @@ Related Fields
   model ``<model>`` is unique. Add ``unique=True`` on any of those fields or
   add at least a subset of them to a unique_together constraint.
 * **fields.E311**: ``<model>`` must set ``unique=True`` because it is
-  referenced by a ``ForeignKey``.
+  referenced by a foreign key.
 * **fields.E320**: Field specifies ``on_delete=SET_NULL``, but cannot be null.
 * **fields.E321**: The field specifies ``on_delete=SET_DEFAULT``, but has no
   default value.
@@ -299,7 +299,7 @@ with the admin site:
 * **admin.E022**: The value of ``radio_fields`` refers to ``<field name>``,
   which is not an attribute of ``<model>``.
 * **admin.E023**: The value of ``radio_fields`` refers to ``<field name>``,
-  which is not a ``ForeignKey``, and does not have a ``choices`` definition.
+  which is not a foreign key, and does not have a ``choices`` definition.
 * **admin.E024**: The value of ``radio_fields[<field name>]`` must be either
   ``admin.HORIZONTAL`` or ``admin.VERTICAL``.
 * **admin.E025**: The value of ``view_on_site`` must be either a callable or a
@@ -388,8 +388,8 @@ inline on a :class:`~django.contrib.admin.ModelAdmin`.
 
 * **admin.E201**: Cannot exclude the field ``<field name>``, because it is the
   foreign key to the parent model ``<app_label>.<model>``.
-* **admin.E202**: ``<model>`` has no ``ForeignKey`` to ``<parent model>``./
-  ``<model>`` has more than one ``ForeignKey`` to ``<parent model>``.
+* **admin.E202**: ``<model>`` has no foreign key to ``<parent model>``./
+  ``<model>`` has more than one foreign key to ``<parent model>``.
 * **admin.E203**: The value of ``extra`` must be an integer.
 * **admin.E204**: The value of ``max_num`` must be an integer.
 * **admin.E205**: The value of ``min_num`` must be an integer.
@@ -445,8 +445,8 @@ The following checks are performed when a model contains a
   non-existent field ``<field>``.
 * **contenttypes.E002**: The ``GenericForeignKey`` content type references the
   non-existent field ``<field>``.
-* **contenttypes.E003**: ``<field>`` is not a ``ForeignKey``.
-* **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
+* **contenttypes.E003**: ``<field>`` is not a foreign key.
+* **contenttypes.E004**: ``<field>`` is not a foreign key to
   ``contenttypes.ContentType``.
 
 Security

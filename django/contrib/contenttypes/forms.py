@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
 from django.forms import ModelForm, modelformset_factory
 from django.forms.models import BaseModelFormSet
 
@@ -68,8 +67,9 @@ def generic_inlineformset_factory(model, form=ModelForm,
     opts = model._meta
     # if there is no field called `ct_field` let the exception propagate
     ct_field = opts.get_field(ct_field)
-    if not isinstance(ct_field, models.ForeignKey) or ct_field.remote_field.model != ContentType:
-        raise Exception("fk_name '%s' is not a ForeignKey to ContentType" % ct_field)
+    if (not ct_field.many_to_one or ct_field.remote_field is None
+            or ct_field.remote_field.model != ContentType):
+        raise Exception("fk_name '%s' is not a foreign key to ContentType" % ct_field)
     fk_field = opts.get_field(fk_field)  # let the exception propagate
     if exclude is not None:
         exclude = list(exclude)

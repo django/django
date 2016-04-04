@@ -104,7 +104,7 @@ class BaseModelAdminChecks(object):
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=obj, id='admin.E002')
         else:
-            if not field.many_to_many and not isinstance(field, models.ForeignKey):
+            if not field.many_to_one and not field.many_to_many:
                 return must_be('a foreign key or a many-to-many field',
                                option=label, obj=obj, id='admin.E003')
             else:
@@ -323,11 +323,11 @@ class BaseModelAdminChecks(object):
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=obj, id='admin.E022')
         else:
-            if not (isinstance(field, models.ForeignKey) or field.choices):
+            if not (field.many_to_one or field.choices):
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which is not an "
-                        "instance of ForeignKey, and does not have a 'choices' definition." % (
+                        "The value of '%s' refers to '%s', which is not a "
+                        "foreign key and does not have a 'choices' definition." % (
                             label, field_name
                         ),
                         obj=obj.__class__,
@@ -394,7 +394,7 @@ class BaseModelAdminChecks(object):
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=obj, id='admin.E027')
         else:
-            if field.many_to_many or isinstance(field, (models.DateTimeField, models.ForeignKey)):
+            if field.many_to_one or field.many_to_many or isinstance(field, models.DateTimeField):
                 return [
                     checks.Error(
                         "The value of '%s' refers to '%s', which must not be a DateTimeField, "
