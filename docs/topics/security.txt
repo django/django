@@ -196,9 +196,9 @@ For more details see the full :setting:`ALLOWED_HOSTS` documentation.
    Django now requires that you set :setting:`ALLOWED_HOSTS` explicitly rather
    than relying on web server configuration.
 
-Additionally, as of 1.3.1, Django requires you to explicitly enable support for
-the ``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST`
-setting) if your configuration requires it.
+Additionally, Django requires you to explicitly enable support for the
+``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST` setting)
+if your configuration requires it.
 
 Session security
 ================
