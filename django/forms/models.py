@@ -707,8 +707,8 @@ class BaseModelFormSet(BaseFormSet):
             uclass, lookup, field, unique_for = date_check
             for form in valid_forms:
                 # see if we have data for both fields
-                if (form.cleaned_data and form.cleaned_data[field] is not None
-                        and form.cleaned_data[unique_for] is not None):
+                if (form.cleaned_data and form.cleaned_data[field] is not None and
+                        form.cleaned_data[unique_for] is not None):
                     # if it's a date lookup we need to get the data for all the fields
                     if lookup == 'date':
                         date = form.cleaned_data[unique_for]
@@ -806,8 +806,8 @@ class BaseModelFormSet(BaseFormSet):
         def pk_is_not_editable(pk):
             return (
                 (not pk.editable) or (pk.auto_created or isinstance(pk, AutoField)) or (
-                    pk.remote_field and pk.remote_field.parent_link
-                    and pk_is_not_editable(pk.remote_field.model._meta.pk)
+                    pk.remote_field and pk.remote_field.parent_link and
+                    pk_is_not_editable(pk.remote_field.model._meta.pk)
                 )
             )
         if pk_is_not_editable(pk) or pk.name not in form.fields:
@@ -999,9 +999,10 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         # Try to discover what the ForeignKey from model to parent_model is
         fks_to_parent = [
             f for f in opts.fields
-            if isinstance(f, ForeignKey)
-            and (f.remote_field.model == parent_model
-                or f.remote_field.model in parent_model._meta.get_parent_list())
+            if isinstance(f, ForeignKey) and (
+                f.remote_field.model == parent_model or
+                f.remote_field.model in parent_model._meta.get_parent_list()
+            )
         ]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]

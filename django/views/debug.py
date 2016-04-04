@@ -190,8 +190,8 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         current_frame = tb_frame.f_back
         sensitive_variables = None
         while current_frame is not None:
-            if (current_frame.f_code.co_name == 'sensitive_variables_wrapper'
-                    and 'sensitive_variables_wrapper' in current_frame.f_locals):
+            if (current_frame.f_code.co_name == 'sensitive_variables_wrapper' and
+                    'sensitive_variables_wrapper' in current_frame.f_locals):
                 # The sensitive_variables decorator was used, so we take note
                 # of the sensitive variables' names.
                 wrapper = current_frame.f_locals['sensitive_variables_wrapper']
@@ -219,8 +219,8 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
             for name, value in tb_frame.f_locals.items():
                 cleansed[name] = self.cleanse_special_types(request, value)
 
-        if (tb_frame.f_code.co_name == 'sensitive_variables_wrapper'
-                and 'sensitive_variables_wrapper' in tb_frame.f_locals):
+        if (tb_frame.f_code.co_name == 'sensitive_variables_wrapper' and
+                'sensitive_variables_wrapper' in tb_frame.f_locals):
             # For good measure, obfuscate the decorated function's arguments in
             # the sensitive_variables decorator's frame, in case the variables
             # associated with those arguments were meant to be obfuscated from
@@ -459,11 +459,12 @@ def technical_404_response(request, exception):
     except (IndexError, TypeError, KeyError):
         tried = []
     else:
-        if (not tried                           # empty URLconf
-            or (request.path == '/'
-                and len(tried) == 1             # default URLconf
-                and len(tried[0]) == 1
-                and getattr(tried[0][0], 'app_name', '') == getattr(tried[0][0], 'namespace', '') == 'admin')):
+        if (not tried or (                  # empty URLconf
+            request.path == '/' and
+            len(tried) == 1 and             # default URLconf
+            len(tried[0]) == 1 and
+            getattr(tried[0][0], 'app_name', '') == getattr(tried[0][0], 'namespace', '') == 'admin'
+        )):
             return default_urlconf(request)
 
     urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)

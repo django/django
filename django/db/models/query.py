@@ -443,8 +443,8 @@ class QuerySet(object):
         objs = list(objs)
         self._populate_pk_values(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
-                    and self.model._meta.has_auto_field):
+            if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk and
+                    self.model._meta.has_auto_field):
                 self._batched_insert(objs, fields, batch_size)
             else:
                 objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)

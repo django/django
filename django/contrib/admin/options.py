@@ -672,8 +672,7 @@ class ModelAdmin(BaseModelAdmin):
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
         }
         defaults.update(kwargs)
-        if (defaults.get('fields') is None
-                and not modelform_defines_fields(defaults.get('form'))):
+        if defaults.get('fields') is None and not modelform_defines_fields(defaults.get('form')):
             defaults['fields'] = forms.ALL_FIELDS
 
         return modelform_factory(self.model, **defaults)

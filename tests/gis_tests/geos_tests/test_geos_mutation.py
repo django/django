@@ -65,9 +65,10 @@ def api_get_area(x):
 def api_get_length(x):
     return x.length
 
-geos_function_tests = [val for name, val in vars().items()
-                       if hasattr(val, '__call__')
-                       and name.startswith('api_get_')]
+geos_function_tests = [
+    val for name, val in vars().items()
+    if hasattr(val, '__call__') and name.startswith('api_get_')
+]
 
 
 @skipUnless(HAS_GEOS, "Geos is required.")

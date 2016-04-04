@@ -275,8 +275,8 @@ class PatternLookup(BuiltinLookup):
         # So, for Python values we don't need any special pattern, but for
         # SQL reference values or SQL transformations we need the correct
         # pattern added.
-        if (hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql')
-                or hasattr(self.rhs, '_as_sql') or self.bilateral_transforms):
+        if (hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql') or
+                hasattr(self.rhs, '_as_sql') or self.bilateral_transforms):
             pattern = connection.pattern_ops[self.lookup_name].format(connection.pattern_esc)
             return pattern.format(rhs)
         else:

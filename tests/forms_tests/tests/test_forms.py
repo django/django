@@ -941,8 +941,8 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             password2 = CharField(widget=PasswordInput)
 
             def clean_password2(self):
-                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2')
-                        and self.cleaned_data['password1'] != self.cleaned_data['password2']):
+                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and
+                        self.cleaned_data['password1'] != self.cleaned_data['password2']):
                     raise ValidationError('Please make sure your passwords match.')
 
                 return self.cleaned_data['password2']
@@ -980,8 +980,8 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
 
             def clean(self):
                 # Test raising a ValidationError as NON_FIELD_ERRORS.
-                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2')
-                        and self.cleaned_data['password1'] != self.cleaned_data['password2']):
+                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and
+                        self.cleaned_data['password1'] != self.cleaned_data['password2']):
                     raise ValidationError('Please make sure your passwords match.')
 
                 # Test raising ValidationError that targets multiple fields.
@@ -1120,8 +1120,8 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             password2 = CharField(widget=PasswordInput)
 
             def clean(self):
-                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2')
-                        and self.cleaned_data['password1'] != self.cleaned_data['password2']):
+                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and
+                        self.cleaned_data['password1'] != self.cleaned_data['password2']):
                     raise ValidationError(
                         'Please make sure your passwords match.',
                         code='password_mismatch',
@@ -2309,8 +2309,8 @@ Password: <input type="password" name="password" /></li>
             password2 = CharField(widget=PasswordInput)
 
             def clean(self):
-                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2')
-                        and self.cleaned_data['password1'] != self.cleaned_data['password2']):
+                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and
+                        self.cleaned_data['password1'] != self.cleaned_data['password2']):
                     raise ValidationError('Please make sure your passwords match.')
 
                 return self.cleaned_data
@@ -2369,8 +2369,8 @@ Password: <input type="password" name="password" /></li>
             password2 = CharField(widget=PasswordInput)
 
             def clean(self):
-                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2')
-                        and self.cleaned_data['password1'] != self.cleaned_data['password2']):
+                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and
+                        self.cleaned_data['password1'] != self.cleaned_data['password2']):
                     raise ValidationError('Please make sure your passwords match.')
 
                 return self.cleaned_data

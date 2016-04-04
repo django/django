@@ -322,9 +322,9 @@ class BaseValidator(object):
     def __eq__(self, other):
         return (
             isinstance(other, self.__class__) and
-            (self.limit_value == other.limit_value)
-            and (self.message == other.message)
-            and (self.code == other.code)
+            self.limit_value == other.limit_value and
+            self.message == other.message and
+            self.code == other.code
         )
 
     def compare(self, a, b):
@@ -435,8 +435,8 @@ class DecimalValidator(object):
                 code='max_decimal_places',
                 params={'max': self.decimal_places},
             )
-        if (self.max_digits is not None and self.decimal_places is not None
-                and whole_digits > (self.max_digits - self.decimal_places)):
+        if (self.max_digits is not None and self.decimal_places is not None and
+                whole_digits > (self.max_digits - self.decimal_places)):
             raise ValidationError(
                 self.messages['max_whole_digits'],
                 code='max_whole_digits',

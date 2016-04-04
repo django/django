@@ -386,8 +386,7 @@ class AllValuesFieldListFilter(FieldListFilter):
 
     def choices(self, changelist):
         yield {
-            'selected': (self.lookup_val is None
-                and self.lookup_val_isnull is None),
+            'selected': self.lookup_val is None and self.lookup_val_isnull is None,
             'query_string': changelist.get_query_string({},
                 [self.lookup_kwarg, self.lookup_kwarg_isnull]),
             'display': _('All'),

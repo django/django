@@ -51,9 +51,8 @@ def check_dependencies(**kwargs):
         pass
     else:
         if ('django.contrib.auth.context_processors.auth'
-                not in default_template_engine.context_processors
-                and 'django.contrib.auth.backends.ModelBackend'
-                in settings.AUTHENTICATION_BACKENDS):
+                not in default_template_engine.context_processors and
+                'django.contrib.auth.backends.ModelBackend' in settings.AUTHENTICATION_BACKENDS):
             missing_template = checks.Error(
                 "'django.contrib.auth.context_processors.auth' must be in "
                 "TEMPLATES in order to use the admin application.",
@@ -801,8 +800,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 ]
             # If list_display[0] is in list_editable, check that
             # list_display_links is set. See #22792 and #26229 for use cases.
-            elif (obj.list_display[0] == field_name and not obj.list_display_links
-                    and obj.list_display_links is not None):
+            elif (obj.list_display[0] == field_name and not obj.list_display_links and
+                    obj.list_display_links is not None):
                 return [
                     checks.Error(
                         "The value of '%s' refers to the first field in 'list_display' ('%s'), "
