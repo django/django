@@ -395,8 +395,8 @@ class CombinedExpression(Expression):
         except FieldError:
             rhs_output = None
         if (not connection.features.has_native_duration_field and
-                ((lhs_output and lhs_output.get_internal_type() == 'DurationField')
-                or (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
+                ((lhs_output and lhs_output.get_internal_type() == 'DurationField') or
+                 (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
             return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
         if (lhs_output and rhs_output and self.connector == self.SUB and
             lhs_output.get_internal_type() in {'DateField', 'DateTimeField', 'TimeField'} and

@@ -228,8 +228,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # TO_CHAR().
         cursor.execute(
             "ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'"
-            " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'"
-            + (" TIME_ZONE = 'UTC'" if settings.USE_TZ else ''))
+            " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'" +
+            (" TIME_ZONE = 'UTC'" if settings.USE_TZ else '')
+        )
         cursor.close()
         if 'operators' not in self.__dict__:
             # Ticket #14149: Check whether our LIKE implementation will

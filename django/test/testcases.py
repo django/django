@@ -327,8 +327,7 @@ class SimpleTestCase(unittest.TestCase):
     def _assert_contains(self, response, text, status_code, msg_prefix, html):
         # If the response supports deferred rendering and hasn't been rendered
         # yet, then ensure that it does get rendered before proceeding further.
-        if (hasattr(response, 'render') and callable(response.render)
-                and not response.is_rendered):
+        if hasattr(response, 'render') and callable(response.render) and not response.is_rendered:
             response.render()
 
         if msg_prefix:
@@ -920,9 +919,8 @@ class TransactionTestCase(SimpleTestCase):
         for db_name in self._databases_names(include_mirrors=False):
             # Flush the database
             inhibit_post_migrate = (
-                self.available_apps is not None
-                or (
-                    # Inhibit the post_migrate signal when using serialized
+                self.available_apps is not None or
+                (   # Inhibit the post_migrate signal when using serialized
                     # rollback to avoid trying to recreate the serialized data.
                     self.serialized_rollback and
                     hasattr(connections[db_name], '_test_serialized_contents')

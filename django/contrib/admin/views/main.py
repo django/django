@@ -241,8 +241,7 @@ class ChangeList(object):
         ordering field.
         """
         params = self.params
-        ordering = list(self.model_admin.get_ordering(request)
-                        or self._get_default_ordering())
+        ordering = list(self.model_admin.get_ordering(request) or self._get_default_ordering())
         if ORDER_VAR in params:
             # Clear ordering and used params
             ordering = []

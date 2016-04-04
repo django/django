@@ -440,8 +440,8 @@ class ImageField(FileField):
             return
 
         dimension_fields_filled = not(
-            (self.width_field and not getattr(instance, self.width_field))
-            or (self.height_field and not getattr(instance, self.height_field))
+            (self.width_field and not getattr(instance, self.width_field)) or
+            (self.height_field and not getattr(instance, self.height_field))
         )
         # When both dimension fields have values, we are most likely loading
         # data from the database or updating an image field that already had

@@ -76,8 +76,8 @@ class CommonMiddleware(object):
         if settings.APPEND_SLASH and not request.get_full_path().endswith('/'):
             urlconf = getattr(request, 'urlconf', None)
             return (
-                not is_valid_path(request.path_info, urlconf)
-                and is_valid_path('%s/' % request.path_info, urlconf)
+                not is_valid_path(request.path_info, urlconf) and
+                is_valid_path('%s/' % request.path_info, urlconf)
             )
         return False
 

@@ -983,8 +983,8 @@ class AggregationTests(TestCase):
             Book.objects
             .annotate(n_authors=Count("authors"))
             .filter(
-                Q(name="The Definitive Guide to Django: Web Development Done Right")
-                | (Q(name="Artificial Intelligence: A Modern Approach") & Q(n_authors=3))
+                Q(name="The Definitive Guide to Django: Web Development Done Right") |
+                (Q(name="Artificial Intelligence: A Modern Approach") & Q(n_authors=3))
             )
         )
         self.assertQuerysetEqual(
