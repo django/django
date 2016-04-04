@@ -1,10 +1,37 @@
 from __future__ import unicode_literals
 
+import functools
 from importlib import import_module
 
 from django.core.exceptions import ViewDoesNotExist
+from django.http import QueryDict
 from django.utils import lru_cache, six
+from django.utils.encoding import iri_to_uri
+from django.utils.http import RFC3986_SUBDELIMS, urlquote
 from django.utils.module_loading import module_has_submodule
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
+
+
+def describe_constraints(constraints):
+    url = URL()
+    for constraint in constraints:
+        url = constraint.describe(url)
+    return url.describe()
+
+
+def get_lookup_string(view):
+    """
+    A string that identifies the view (e.g. 'path.to.view_function' or
+    'path.to.ClassBasedView').
+    """
+    # Python 3.5 collapses nested partials, so can change "while" to "if"
+    # when it's the minimum supported version.
+    while isinstance(view, functools.partial):
+        view = view.func
+    if not hasattr(view, '__name__'):
+        return view.__module__ + "." + view.__class__.__name__
+    else:
+        return view.__module__ + "." + view.__name__
 
 
 @lru_cache.lru_cache(maxsize=None)
@@ -62,3 +89,61 @@ def get_mod_func(callback):
     except ValueError:
         return callback, ''
     return callback[:dot], callback[dot + 1:]
+
+
+class URL(object):
+    __slots__ = ['scheme', 'host', 'path', 'query', 'fragment', 'params']
+
+    def __init__(self, scheme='', host='', path='', query=None, fragment='', params=None):
+        self.scheme = scheme
+        self.host = host
+        self.path = path
+        if isinstance(query, six.string_types):
+            self.query = QueryDict(iri_to_uri(query), mutable=True)
+        else:
+            self.query = query.copy() if query else QueryDict(mutable=True)
+        self.fragment = fragment
+        self.params = params or {}
+
+    @classmethod
+    def from_location(cls, location):
+        return cls(*urlsplit(location))
+
+    @classmethod
+    def from_request(cls, request):
+        return cls(
+            request.scheme,
+            request.get_host(),
+            request.path,
+            request.META.get('QUERY_STRING', ''),
+            ''
+        )
+
+    def __repr__(self):
+        return "<URL '%s'>" % str(self)
+
+    def __str__(self):
+        path = urlquote(self.path, safe=RFC3986_SUBDELIMS + str('/~:@'))
+        if path.startswith('//'):
+            path = '/%%2F%s' % path[2:]
+        return urlunsplit((
+            self.scheme,
+            self.host,
+            path,
+            self.query.urlencode(),
+            iri_to_uri(self.fragment) if self.fragment else ''
+        ))
+
+    def describe(self):
+        description = urlunsplit((self.scheme, self.host, self.path, self.query, self.fragment))
+        if self.params:
+            description += ' [%s]' % (
+                ', '.join('%s=%r' % (k, v) for k, v in self.params.items()),
+            )
+        return description
+
+    def copy(self):
+        return type(self)(
+            self.scheme, self.host, self.path,
+            self.query, self.fragment, self.params,
+        )

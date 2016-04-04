@@ -480,7 +480,9 @@ class Client(RequestFactory):
             response.json = curry(self._parse_json, response)
 
             # Attach the ResolverMatch instance to the response
-            response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
+            response.resolver_match = SimpleLazyObject(
+                lambda: resolve(request['PATH_INFO'], request=request)
+            )
 
             # Flatten a single context. Not really necessary anymore thanks to
             # the __getattr__ flattening in ContextList, but has some edge-case
