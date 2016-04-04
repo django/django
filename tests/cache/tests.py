@@ -585,15 +585,33 @@ class BaseCacheTests(object):
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
                 # memcached does not allow whitespace or control characters in keys
-                cache.set('key with spaces', 'value')
+                key = 'key with spaces and 清'
+                cache.set(key, 'value')
                 self.assertEqual(len(w), 1)
                 self.assertIsInstance(w[0].message, CacheKeyWarning)
+                self.assertEqual(
+                    # On Python 2 ``warnings.warn()`` expects a ``message`` that
+                    # can be coerced to a ``str``. If this fails -
+                    # ``warnings.warn()`` will also fail.
+                    str(w[0].message.args[0]),
+                    "Cache key contains characters that will cause errors if used "
+                    "with memcached: %r" % key,
+                )
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
                 # memcached limits key length to 250
-                cache.set('a' * 251, 'value')
+                key = ('a' * 250) + '清'
+                cache.set(key, 'value')
                 self.assertEqual(len(w), 1)
                 self.assertIsInstance(w[0].message, CacheKeyWarning)
+                self.assertEqual(
+                    # On Python 2 ``warnings.warn()`` expects a ``message`` that
+                    # can be coerced to a ``str``. If this fails -
+                    # ``warnings.warn()`` will also fail.
+                    str(w[0].message.args[0]),
+                    'Cache key will cause errors if used with memcached: '
+                    '%r (longer than %s)' % (key, 250),
+                )
         finally:
             cache.key_func = old_func
 
