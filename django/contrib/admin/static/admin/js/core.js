@@ -67,29 +67,6 @@ function removeChildren(a) {
 }
 
 // ----------------------------------------------------------------------------
-// Cross-browser xmlhttp object
-// from http://jibbering.com/2002/4/httprequest.html
-// ----------------------------------------------------------------------------
-var xmlhttp;
-/*@cc_on @*/
-/*@if (@_jscript_version >= 5)
-    try {
-        xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
-    } catch (e) {
-        try {
-            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        } catch (E) {
-            xmlhttp = false;
-        }
-    }
-@else
-    xmlhttp = false;
-@end @*/
-if (!xmlhttp && typeof XMLHttpRequest !== 'undefined') {
-    xmlhttp = new XMLHttpRequest();
-}
-
-// ----------------------------------------------------------------------------
 // Find-position functions by PPK
 // See http://www.quirksmode.org/js/findpos.html
 // ----------------------------------------------------------------------------

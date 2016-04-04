@@ -143,6 +143,10 @@ Minor features
   primary key of objects in the ``properties`` dictionary if specific fields
   aren't specified.
 
+* The ability to replicate input data on the :meth:`GDALBand.data()
+  <django.contrib.gis.gdal.GDALBand.data>` method was added. Band data can
+  now be updated with repeated values efficiently.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -212,6 +216,13 @@ Database backends
   ``DatabaseOperations.fetch_returned_insert_ids()`` to set primary keys
   on objects created using ``QuerySet.bulk_create()``.
 
+* Added keyword arguments to the ``as_sql()`` methods of various expressions
+  (``Func``, ``When``, ``Case``, and ``OrderBy``) to allow database backends to
+  customize them without mutating ``self``, which isn't safe when using
+  different database backends. See the ``arg_joiner`` and ``**extra_context``
+  parameters of :meth:`Func.as_sql() <django.db.models.Func.as_sql>` for an
+  example.
+
 Email
 ~~~~~
 
@@ -255,6 +266,10 @@ Internationalization
 * By setting the new ``prefix_default_language`` parameter for
   :func:`~django.conf.urls.i18n.i18n_patterns` to ``False``, you can allow
   accessing the default language without a URL prefix.
+
+* :func:`~django.views.i18n.set_language` now returns a 204 status code (No
+  Content) for AJAX requests when there is no ``next`` parameter in ``POST`` or
+  ``GET``.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -342,6 +357,11 @@ Models
 * :meth:`QuerySet.bulk_create() <django.db.models.query.QuerySet.bulk_create>`
   sets the primary key on objects when using PostgreSQL.
 
+* Added the :class:`~django.db.models.functions.Cast` database function.
+
+* A proxy model may now inherit multiple proxy models that share a common
+  non-abstract parent class.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -393,6 +413,12 @@ Tests
 * Tests and test cases can be :ref:`marked with tags <topics-tagging-tests>`
   and run selectively with the new :option:`test --tag` and :option:`test
   --exclude-tag` options.
+
+* Added the :setting:`DATABASES['TEST']['MIGRATE'] <TEST_MIGRATE>` option to
+  allow disabling of migrations during test database creation.
+
+* You can now login and use sessions with the test client even if
+  :mod:`django.contrib.sessions` is not in :setting:`INSTALLED_APPS`.
 
 URLs
 ~~~~
@@ -666,6 +692,31 @@ Miscellaneous
   calling ``Command.execute()``, pass the command object as the first argument
   to ``call_command()``.
 
+* :class:`~django.contrib.auth.backends.ModelBackend` and
+  :class:`~django.contrib.auth.backends.RemoteUserBackend` now reject inactive
+  users. This means that inactive users can't login and will be logged
+  out if they are switched from ``is_active=True`` to ``False``. If you need
+  the previous behavior, use the new
+  :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend` or
+  :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend`
+  in :setting:`AUTHENTICATION_BACKENDS` instead.
+
+* In light of the previous change, the test client's
+  :meth:`~django.test.Client.login()` method no longer always rejects inactive
+  users but instead delegates this decision to the authentication backend.
+
+* :func:`django.views.i18n.set_language` may now return a 204 status code for
+  AJAX requests.
+
+* The ``base_field`` attribute of
+  :class:`~django.contrib.postgres.fields.RangeField` is now a type of field,
+  not an instance of a field.  If you have created a custom subclass of
+  :class:`~django.contrib.postgres.fields.RangeField`, you should change the
+  ``base_field`` attribute.
+
+* Middleware classes are now initialized when the server starts rather than
+  during the first request.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
@@ -765,11 +816,11 @@ lookup name is deprecated. For example, since ``default_related_name`` is set
 in model ``Bar``, instead of using the model name ``bar`` as the lookup::
 
     >>> bar = Bar.objects.get(pk=1)
-    >>> Foo.object.get(bar=bar)
+    >>> Foo.objects.get(bar=bar)
 
 use the default_related_name ``bars``::
 
-    >>> Foo.object.get(bars=bar)
+    >>> Foo.objects.get(bars=bar)
 
 .. _search-lookup-replacement:
 

@@ -166,6 +166,9 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data['password2'], data['password2'])
 
 
+# To verify that the login form rejects inactive users, use an authentication
+# backend that allows them.
+@override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend'])
 class AuthenticationFormTest(TestDataMixin, TestCase):
 
     def test_invalid_username(self):

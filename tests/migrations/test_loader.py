@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from unittest import skipIf
 
-from django.db import connection, connections
+from django.db import ConnectionHandler, connection, connections
 from django.db.migrations.exceptions import AmbiguityError, NodeNotFoundError
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -199,6 +199,23 @@ class LoaderTests(TestCase):
         MIGRATION_MODULES allows disabling of migrations for a particular app.
         """
         migration_loader = MigrationLoader(connection)
+        self.assertEqual(migration_loader.migrated_apps, set())
+        self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
+
+    @override_settings(
+        INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+    )
+    def test_disable_migrations(self):
+        connections = ConnectionHandler({
+            'default': {
+                'NAME': ':memory:',
+                'ENGINE': 'django.db.backends.sqlite3',
+                'TEST': {
+                    'MIGRATE': False,
+                },
+            },
+        })
+        migration_loader = MigrationLoader(connections['default'])
         self.assertEqual(migration_loader.migrated_apps, set())
         self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
 

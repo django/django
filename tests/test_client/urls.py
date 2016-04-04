@@ -34,6 +34,8 @@ urlpatterns = [
     url(r'^nesting_exception_view/$', views.nesting_exception_view),
     url(r'^django_project_redirect/$', views.django_project_redirect),
 
+    url(r'^accounts/$', RedirectView.as_view(url='login/')),
+    url(r'^accounts/no_trailing_slash$', RedirectView.as_view(url='login/')),
     url(r'^accounts/login/$', auth_views.login, {'template_name': 'login.html'}),
     url(r'^accounts/logout/$', auth_views.logout),
 ]

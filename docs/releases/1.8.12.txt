@@ -2,7 +2,7 @@
 Django 1.8.12 release notes
 ===========================
 
-*Under development*
+*April 1, 2016*
 
 Django 1.8.12 fixes several bugs in 1.8.11.
 
@@ -15,3 +15,6 @@ Bugfixes
 
 * Fixed data loss on SQLite where ``DurationField`` values with fractional
   seconds could be saved as ``None`` (:ticket:`26324`).
+
+* Restored the functionality of the admin's ``raw_id_fields`` in
+  ``list_editable`` (:ticket:`26387`).

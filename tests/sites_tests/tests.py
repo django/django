@@ -190,6 +190,26 @@ class SitesFrameworkTests(TestCase):
         self.assertEqual(Site.objects.get_by_natural_key(self.site.domain), self.site)
         self.assertEqual(self.site.natural_key(), (self.site.domain,))
 
+    def test_requestsite_save_notimplemented_msg(self):
+        # Test response msg for RequestSite.save NotImplementedError
+        request = HttpRequest()
+        request.META = {
+            "HTTP_HOST": "example.com",
+        }
+        msg = 'RequestSite cannot be saved.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            RequestSite(request).save()
+
+    def test_requestsite_delete_notimplemented_msg(self):
+        # Test response msg for RequestSite.delete NotImplementedError
+        request = HttpRequest()
+        request.META = {
+            "HTTP_HOST": "example.com",
+        }
+        msg = 'RequestSite cannot be deleted.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            RequestSite(request).delete()
+
 
 class JustOtherRouter(object):
     def allow_migrate(self, db, app_label, **hints):

@@ -564,6 +564,9 @@ class BaseModelFormSet(BaseFormSet):
     """
     model = None
 
+    # Set of fields that must be unique among forms of this set.
+    unique_fields = set()
+
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  queryset=None, **kwargs):
         self.queryset = queryset
@@ -677,9 +680,11 @@ class BaseModelFormSet(BaseFormSet):
         for uclass, unique_check in all_unique_checks:
             seen_data = set()
             for form in valid_forms:
-                # get data for each field of each of unique_check
-                row_data = (form.cleaned_data[field]
-                            for field in unique_check if field in form.cleaned_data)
+                # Get the data for the set of fields that must be unique among the forms.
+                row_data = (
+                    field if field in self.unique_fields else form.cleaned_data[field]
+                    for field in unique_check if field in form.cleaned_data
+                )
                 # Reduce Model instances to their primary key values
                 row_data = tuple(d._get_pk_val() if hasattr(d, '_get_pk_val') else d
                                  for d in row_data)
@@ -842,8 +847,6 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
     Returns a FormSet class for the given Django model class.
     """
     meta = getattr(form, 'Meta', None)
-    if meta is None:
-        meta = type(str('Meta'), (object,), {})
     if (getattr(meta, 'fields', fields) is None and
             getattr(meta, 'exclude', exclude) is None):
         raise ImproperlyConfigured(
@@ -880,6 +883,7 @@ class BaseInlineFormSet(BaseModelFormSet):
             qs = queryset.filter(**{self.fk.name: self.instance})
         else:
             qs = queryset.none()
+        self.unique_fields = {self.fk.name}
         super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix,
                                                 queryset=qs, **kwargs)
 

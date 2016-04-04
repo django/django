@@ -177,10 +177,10 @@ class ModelBase(type):
                         )
                     else:
                         continue
-                if base is not None:
-                    raise TypeError("Proxy model '%s' has more than one non-abstract model base class." % name)
-                else:
+                if base is None:
                     base = parent
+                elif parent._meta.concrete_model is not base._meta.concrete_model:
+                    raise TypeError("Proxy model '%s' has more than one non-abstract model base class." % name)
             if base is None:
                 raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
             new_class._meta.setup_proxy(base)
@@ -244,13 +244,21 @@ class ModelBase(type):
                     field = None
                 new_class._meta.parents[base] = field
             else:
+                base_parents = base._meta.parents.copy()
+
                 # .. and abstract ones.
                 for field in parent_fields:
                     new_field = copy.deepcopy(field)
                     new_class.add_to_class(field.name, new_field)
+                    # Replace parent links defined on this base by the new
+                    # field as it will be appropriately resolved if required.
+                    if field.one_to_one:
+                        for parent, parent_link in base_parents.items():
+                            if field == parent_link:
+                                base_parents[parent] = new_field
 
                 # Pass any non-abstract parent classes onto child.
-                new_class._meta.parents.update(base._meta.parents)
+                new_class._meta.parents.update(base_parents)
 
             # Inherit managers from the abstract base classes.
             new_class.copy_managers(base._meta.abstract_managers)

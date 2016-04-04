@@ -48,6 +48,7 @@ import unittest
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.shortcuts import numpy
+from django.test import SimpleTestCase
 from django.utils import six
 from django.utils._os import upath
 
@@ -302,7 +303,7 @@ class GDALRasterTests(unittest.TestCase):
 
 
 @unittest.skipUnless(HAS_GDAL, "GDAL is required")
-class GDALBandTests(unittest.TestCase):
+class GDALBandTests(SimpleTestCase):
     def setUp(self):
         self.rs_path = os.path.join(os.path.dirname(upath(__file__)),
                                '../data/rasters/raster.tif')
@@ -467,3 +468,39 @@ class GDALBandTests(unittest.TestCase):
             'bands': [{'data': [0], 'nodata_value': 0}],
         })
         self.assertEqual(rsmem.bands[0].statistics(), (None, None, None, None))
+
+    def test_band_delete_nodata(self):
+        rsmem = GDALRaster({
+            'srid': 4326,
+            'width': 1,
+            'height': 1,
+            'bands': [{'data': [0], 'nodata_value': 1}],
+        })
+        if GDAL_VERSION < (2, 1):
+            msg = 'GDAL >= 2.1 required to delete nodata values.'
+            with self.assertRaisesMessage(ValueError, msg):
+                rsmem.bands[0].nodata_value = None
+        else:
+            rsmem.bands[0].nodata_value = None
+            self.assertIsNone(rsmem.bands[0].nodata_value)
+
+    def test_band_data_replication(self):
+        band = GDALRaster({
+            'srid': 4326,
+            'width': 3,
+            'height': 3,
+            'bands': [{'data': range(10, 19), 'nodata_value': 0}],
+        }).bands[0]
+
+        # Variations for input (data, shape, expected result).
+        combos = (
+            ([1], (1, 1), [1] * 9),
+            (range(3), (1, 3), [0, 0, 0, 1, 1, 1, 2, 2, 2]),
+            (range(3), (3, 1), [0, 1, 2, 0, 1, 2, 0, 1, 2]),
+        )
+        for combo in combos:
+            band.data(combo[0], shape=combo[1])
+            if numpy:
+                numpy.testing.assert_equal(band.data(), numpy.array(combo[2]).reshape(3, 3))
+            else:
+                self.assertEqual(band.data(), list(combo[2]))

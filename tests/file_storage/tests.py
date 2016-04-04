@@ -399,11 +399,24 @@ class FileStorageTests(TestCase):
         # like encodeURIComponent() JavaScript function do
         self.assertEqual(self.storage.url(r"""~!*()'@#$%^&*abc`+ =.file"""),
             """/test_media_url/~!*()'%40%23%24%25%5E%26*abc%60%2B%20%3D.file""")
+        self.assertEqual(self.storage.url("""ab\0c"""), """/test_media_url/ab%00c""")
 
         # should translate os path separator(s) to the url path separator
         self.assertEqual(self.storage.url("""a/b\\c.file"""),
             """/test_media_url/a/b/c.file""")
 
+        # #25905: remove leading slashes from file names to prevent unsafe url output
+        self.assertEqual(self.storage.url("/evil.com"), "/test_media_url/evil.com")
+        self.assertEqual(self.storage.url(r"\evil.com"), "/test_media_url/evil.com")
+        self.assertEqual(self.storage.url("///evil.com"), "/test_media_url/evil.com")
+        self.assertEqual(self.storage.url(r"\\\evil.com"), "/test_media_url/evil.com")
+
+        self.assertEqual(self.storage.url(None), "/test_media_url/")
+
+    def test_base_url(self):
+        """
+        File storage returns a url even when its base_url is unset or modified.
+        """
         self.storage.base_url = None
         with self.assertRaises(ValueError):
             self.storage.url('test.file')
@@ -708,6 +721,16 @@ class FileFieldStorageTests(TestCase):
         self.assertEqual(obj.normal.read(3), b"con")
         self.assertEqual(obj.normal.read(), b"tent")
         self.assertEqual(list(obj.normal.chunks(chunk_size=2)), [b"co", b"nt", b"en", b"t"])
+        obj.normal.close()
+
+    def test_filefield_write(self):
+        # Files can be written to.
+        obj = Storage.objects.create(normal=SimpleUploadedFile('rewritten.txt', b'content'))
+        with obj.normal as normal:
+            normal.open('wb')
+            normal.write(b'updated')
+        obj.refresh_from_db()
+        self.assertEqual(obj.normal.read(), b'updated')
         obj.normal.close()
 
     def test_duplicate_filename(self):

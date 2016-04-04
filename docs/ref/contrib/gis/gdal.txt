@@ -1456,9 +1456,17 @@ blue.
         to mark pixels that are not valid data. Such pixels should generally not
         be displayed, nor contribute to analysis operations.
 
+        To delete an existing "no data" value, set this property to ``None``
+        (requires GDAL ≥ 2.1).
+
         .. versionchanged:: 1.9
 
             This property can now be set as well.
+
+        .. versionchanged:: 1.10
+
+            The "no data" value can now be deleted by setting the
+            ``nodata_value`` attribute to ``None``.
 
     .. method:: datatype(as_string=False)
 
@@ -1469,7 +1477,7 @@ blue.
         ``GDT_UInt32``, ``GDT_Int32``, ``GDT_Float32``, ``GDT_Float64``,
         ``GDT_CInt16``, ``GDT_CInt32``, ``GDT_CFloat32``, and ``GDT_CFloat64``.
 
-    .. method:: data(data=None, offset=None, size=None)
+    .. method:: data(data=None, offset=None, size=None, shape=None)
 
         .. versionadded:: 1.9
 
@@ -1482,9 +1490,17 @@ blue.
 
         Data is written to the ``GDALBand`` if the ``data`` parameter is provided.
         The input can be of one of the following types - packed string, buffer, list,
-        array, and NumPy array. The number of items in the input must correspond to the
-        total number of pixels in the band, or to the number of pixels for a specific
-        block of pixel values if the ``offset`` and ``size`` parameters are provided.
+        array, and NumPy array. The number of items in the input should normally
+        correspond to the total number of pixels in the band, or to the number
+        of pixels for a specific block of pixel values if the ``offset`` and
+        ``size`` parameters are provided.
+
+        If the number of items in the input is different from the target pixel
+        block, the ``shape`` parameter must be specified. The shape is a tuple
+        that specifies the width and height of the input data in pixels. The
+        data is then replicated to update the pixel values of the selected
+        block. This is useful to fill an entire band with a single value, for
+        instance.
 
         For example:
 
@@ -1511,6 +1527,22 @@ blue.
                    [  4, -99, -88,   7],
                    [  8, -77, -66,  11],
                    [ 12,  13,  14,  15]], dtype=int8)
+            >>> bnd.data([1], shape=(1, 1))
+            >>> bnd.data()
+            array([[1, 1, 1, 1],
+                   [1, 1, 1, 1],
+                   [1, 1, 1, 1],
+                   [1, 1, 1, 1]], dtype=uint8)
+            >>> bnd.data(range(4), shape=(1, 4))
+            array([[0, 0, 0, 0],
+                   [1, 1, 1, 1],
+                   [2, 2, 2, 2],
+                   [3, 3, 3, 3]], dtype=uint8)
+
+    .. versionchanged:: 1.10
+
+        The ``shape`` parameter and the ability to replicate data input when
+        setting ``GDALBand`` data was added.
 
 Settings
 ========

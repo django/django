@@ -261,12 +261,13 @@ The ``Func`` API is as follows:
         different number of expressions, ``TypeError`` will be raised. Defaults
         to ``None``.
 
-    .. method:: as_sql(compiler, connection, function=None, template=None)
+    .. method:: as_sql(compiler, connection, function=None, template=None, arg_joiner=None, **extra_context)
 
         Generates the SQL for the database function.
 
-        The ``as_vendor()`` methods should use the ``function`` and
-        ``template`` parameters to customize the SQL as needed. For example:
+        The ``as_vendor()`` methods should use the ``function``, ``template``,
+        ``arg_joiner``, and any other ``**extra_context`` parameters to
+        customize the SQL as needed. For example:
 
         .. snippet::
             :filename: django/db/models/functions.py
@@ -283,6 +284,11 @@ The ``Func`` API is as follows:
                         template="%(function)s('', %(expressions)s)",
                     )
 
+        .. versionchanged:: 1.10
+
+            Support for the ``arg_joiner`` and ``**extra_context`` parameters
+            was added.
+
 The ``*expressions`` argument is a list of positional expressions that the
 function will be applied to. The expressions will be converted to strings,
 joined together with ``arg_joiner``, and then interpolated into the ``template``
@@ -293,10 +299,10 @@ assumed to be column references and will be wrapped in ``F()`` expressions
 while other values will be wrapped in ``Value()`` expressions.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
-into the ``template`` attribute. Note that the keywords ``function`` and
-``template`` can be used to replace the ``function`` and ``template``
-attributes respectively, without having to define your own class.
-``output_field`` can be used to define the expected return type.
+into the ``template`` attribute. The ``function``, ``template``, and
+``arg_joiner`` keywords can be used to replace the attributes of the same name
+without having to define your own class. ``output_field`` can be used to define
+the expected return type.
 
 ``Aggregate()`` expressions
 ---------------------------

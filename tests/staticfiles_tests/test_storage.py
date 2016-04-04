@@ -12,14 +12,12 @@ from django.contrib.staticfiles.management.commands.collectstatic import \
     Command as CollectstaticCommand
 from django.core.cache.backends.base import BaseCache
 from django.core.management import call_command
-from django.test import SimpleTestCase, override_settings
+from django.test import override_settings
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .cases import (
-    BaseCollectionTestCase, BaseStaticFilesTestCase, StaticFilesTestCase,
-)
-from .settings import TEST_ROOT, TEST_SETTINGS
+from .cases import CollectionTestCase
+from .settings import TEST_ROOT
 
 
 def hashed_file_path(test, path):
@@ -199,14 +197,10 @@ class TestHashedFiles(object):
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
 
 
-# we set DEBUG to False here since the template tag wouldn't work otherwise
-@override_settings(**dict(
-    TEST_SETTINGS,
+@override_settings(
     STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
-    DEBUG=False,
-))
-class TestCollectionCachedStorage(TestHashedFiles, BaseCollectionTestCase,
-        BaseStaticFilesTestCase, SimpleTestCase):
+)
+class TestCollectionCachedStorage(TestHashedFiles, CollectionTestCase):
     """
     Tests for the Cache busting storage
     """
@@ -243,14 +237,42 @@ class TestCollectionCachedStorage(TestHashedFiles, BaseCollectionTestCase,
         self.assertEqual(cache_key, 'staticfiles:821ea71ef36f95b3922a77f7364670e7')
 
 
-# we set DEBUG to False here since the template tag wouldn't work otherwise
-@override_settings(**dict(
-    TEST_SETTINGS,
+@override_settings(
+    STATICFILES_STORAGE='staticfiles_tests.storage.ExtraPatternsCachedStaticFilesStorage',
+)
+class TestExtraPatternsCachedStorage(CollectionTestCase):
+
+    def setUp(self):
+        storage.staticfiles_storage.hashed_files.clear()  # avoid cache interference
+        super(TestExtraPatternsCachedStorage, self).setUp()
+
+    def cached_file_path(self, path):
+        fullpath = self.render_template(self.static_template_snippet(path))
+        return fullpath.replace(settings.STATIC_URL, '')
+
+    def test_multi_extension_patterns(self):
+        """
+        With storage classes having several file extension patterns, only the
+        files matching a specific file pattern should be affected by the
+        substitution (#19670).
+        """
+        # CSS files shouldn't be touched by JS patterns.
+        relpath = self.cached_file_path("cached/import.css")
+        self.assertEqual(relpath, "cached/import.2b1d40b0bbd4.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            self.assertIn(b'import url("styles.bb84a0240107.css")', relfile.read())
+
+        # Confirm JS patterns have been applied to JS files.
+        relpath = self.cached_file_path("cached/test.js")
+        self.assertEqual(relpath, "cached/test.62789ffcd280.js")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            self.assertIn(b'JS_URL("import.2b1d40b0bbd4.css")', relfile.read())
+
+
+@override_settings(
     STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
-    DEBUG=False,
-))
-class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
-        BaseStaticFilesTestCase, SimpleTestCase):
+)
+class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
     """
     Tests for the Cache busting storage
     """
@@ -321,18 +343,18 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
         self.assertNotIn(cleared_file_name, manifest_content)
 
 
-# we set DEBUG to False here since the template tag wouldn't work otherwise
-@override_settings(**dict(
-    TEST_SETTINGS,
+@override_settings(
     STATICFILES_STORAGE='staticfiles_tests.storage.SimpleCachedStaticFilesStorage',
-    DEBUG=False,
-))
-class TestCollectionSimpleCachedStorage(BaseCollectionTestCase,
-        BaseStaticFilesTestCase, SimpleTestCase):
+)
+class TestCollectionSimpleCachedStorage(CollectionTestCase):
     """
     Tests for the Cache busting storage
     """
     hashed_file_path = hashed_file_path
+
+    def setUp(self):
+        storage.staticfiles_storage.hashed_files.clear()  # avoid cache interference
+        super(TestCollectionSimpleCachedStorage, self).setUp()
 
     def test_template_tag_return(self):
         """
@@ -364,7 +386,7 @@ class CustomStaticFilesStorage(storage.StaticFilesStorage):
 
 
 @unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports chmod.")
-class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
+class TestStaticFilePermissions(CollectionTestCase):
 
     command_params = {
         'interactive': False,

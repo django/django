@@ -37,7 +37,7 @@ class MigrationQuestioner(object):
             app_config = apps.get_app_config(app_label)
         except LookupError:         # It's a fake app.
             return self.defaults.get("ask_initial", False)
-        migrations_import_path = MigrationLoader.migrations_module(app_config.label)
+        migrations_import_path = MigrationLoader(None, load=False).migrations_module(app_config.label)
         if migrations_import_path is None:
             # It's an application with migrations disabled.
             return self.defaults.get("ask_initial", False)
@@ -103,7 +103,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
 
     def _ask_default(self):
         print("Please enter the default value now, as valid Python")
-        print("The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now()")
+        print("The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now")
         while True:
             if six.PY3:
                 # Six does not correctly abstract over the fact that
@@ -130,7 +130,8 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 "we can't do that (the database needs something to populate existing rows).\n"
                 "Please select a fix:" % (field_name, model_name),
                 [
-                    "Provide a one-off default now (will be set on all existing rows)",
+                    ("Provide a one-off default now (will be set on all existing "
+                     "rows with a null value for this column)"),
                     "Quit, and let me add a default in models.py",
                 ]
             )
@@ -149,7 +150,8 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 "populate existing rows).\n"
                 "Please select a fix:" % (field_name, model_name),
                 [
-                    "Provide a one-off default now (will be set on all existing rows)",
+                    ("Provide a one-off default now (will be set on all existing "
+                     "rows with a null value for this column)"),
                     ("Ignore for now, and let me handle existing rows with NULL myself "
                      "(e.g. because you added a RunPython or RunSQL operation to handle "
                      "NULL values in a previous data migration)"),

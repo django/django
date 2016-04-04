@@ -3,9 +3,6 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
-from django.db.models.base import ModelBase
-from django.db.models.manager import Manager
-from django.db.models.query import QuerySet
 from django.http import (
     Http404, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
@@ -61,25 +58,15 @@ def redirect(to, *args, **kwargs):
 
 def _get_queryset(klass):
     """
-    Returns a QuerySet from a Model, Manager, or QuerySet. Created to make
-    get_object_or_404 and get_list_or_404 more DRY.
-
-    Raises a ValueError if klass is not a Model, Manager, or QuerySet.
+    Return a QuerySet or a Manager.
+    Duck typing in action: any class with a `get()` method (for
+    get_object_or_404) or a `filter()` method (for get_list_or_404) might do
+    the job.
     """
-    if isinstance(klass, QuerySet):
-        return klass
-    elif isinstance(klass, Manager):
-        manager = klass
-    elif isinstance(klass, ModelBase):
-        manager = klass._default_manager
-    else:
-        if isinstance(klass, type):
-            klass__name = klass.__name__
-        else:
-            klass__name = klass.__class__.__name__
-        raise ValueError("Object is of type '%s', but must be a Django Model, "
-                         "Manager, or QuerySet" % klass__name)
-    return manager.all()
+    # If it is a model class or anything else with ._default_manager
+    if hasattr(klass, '_default_manager'):
+        return klass._default_manager.all()
+    return klass
 
 
 def get_object_or_404(klass, *args, **kwargs):
@@ -96,6 +83,12 @@ def get_object_or_404(klass, *args, **kwargs):
     queryset = _get_queryset(klass)
     try:
         return queryset.get(*args, **kwargs)
+    except AttributeError:
+        klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        raise ValueError(
+            "First argument to get_object_or_404() must be a Model, Manager, "
+            "or QuerySet, not '%s'." % klass__name
+        )
     except queryset.model.DoesNotExist:
         raise Http404('No %s matches the given query.' % queryset.model._meta.object_name)
 
@@ -109,7 +102,14 @@ def get_list_or_404(klass, *args, **kwargs):
     arguments and keyword arguments are used in the filter() query.
     """
     queryset = _get_queryset(klass)
-    obj_list = list(queryset.filter(*args, **kwargs))
+    try:
+        obj_list = list(queryset.filter(*args, **kwargs))
+    except AttributeError:
+        klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        raise ValueError(
+            "First argument to get_list_or_404() must be a Model, Manager, or "
+            "QuerySet, not '%s'." % klass__name
+        )
     if not obj_list:
         raise Http404('No %s matches the given query.' % queryset.model._meta.object_name)
     return obj_list

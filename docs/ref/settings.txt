@@ -65,9 +65,8 @@ See :doc:`/howto/error-reporting` for more information.
 Default: ``[]`` (Empty list)
 
 A list of strings representing the host/domain names that this Django site can
-serve. This is a security measure to prevent an attacker from poisoning caches
-and triggering password reset emails with links to malicious hosts by submitting
-requests with a fake HTTP ``Host`` header, which is possible even under many
+serve. This is a security measure to prevent :ref:`HTTP Host header attacks
+<host-headers-virtual-hosting>`, which are possible even under many
 seemingly-safe web server configurations.
 
 Values in this list can be fully qualified names (e.g. ``'www.example.com'``),
@@ -710,6 +709,17 @@ The creation-order dependencies of the database. See the documentation
 on :ref:`controlling the creation order of test databases
 <topics-testing-creation-dependencies>` for details.
 
+.. setting:: TEST_MIGRATE
+
+``MIGRATE``
+^^^^^^^^^^^
+
+.. versionadded:: 1.10
+
+Default: ``True``
+
+If set to ``False``, Django won't use migrations to create the test database.
+
 .. setting:: TEST_MIRROR
 
 ``MIRROR``
@@ -993,8 +1003,8 @@ environment, such as all the currently defined Django settings (from
 ``settings.py``).
 
 As a security measure, Django will *not* include settings that might be
-sensitive (or offensive), such as :setting:`SECRET_KEY`. Specifically, it will
-exclude any setting whose name includes any of the following:
+sensitive, such as :setting:`SECRET_KEY`. Specifically, it will exclude any
+setting whose name includes any of the following:
 
 * ``'API'``
 * ``'KEY'``

@@ -256,6 +256,11 @@ templates, Django provides a shortcut function which automates the process.
         An optional :class:`~django.http.HttpRequest` that will be available
         during the template's rendering process.
 
+    Usage example::
+
+        from django.template.loader import render_to_string
+        rendered = render_to_string('my_template.html', {'foo': 'bar'})
+
 See also the :func:`~django.shortcuts.render()` shortcut which calls
 :func:`render_to_string()` and feeds the result into an
 :class:`~django.http.HttpResponse` suitable for returning from a view.
@@ -792,5 +797,5 @@ Django provides many :ref:`built-in context processors <context-processors>`.
 Implementing a custom context processor is as simple as defining a function.
 
 .. _Jinja2: http://jinja.pocoo.org/
-.. _DEP 182: https://github.com/django/deps/blob/master/accepted/0182-multiple-template-engines.rst
+.. _DEP 182: https://github.com/django/deps/blob/master/final/0182-multiple-template-engines.rst
 .. _Django Debug Toolbar: https://github.com/django-debug-toolbar/django-debug-toolbar

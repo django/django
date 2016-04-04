@@ -64,9 +64,20 @@ remote users. These interfaces work with users stored in the database
 regardless of ``AUTHENTICATION_BACKENDS``.
 
 .. note::
-   Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
-   still have all of the same permissions checking that is implemented in
-   ``ModelBackend``.
+
+    Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
+    still have all of the same permissions checking that is implemented in
+    ``ModelBackend``.
+
+    Users with :attr:`is_active=False
+    <django.contrib.auth.models.User.is_active>` won't be allowed to
+    authenticate. Use
+    :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if
+    you want to allow them to.
+
+    .. versionchanged:: 1.10
+
+        In older versions, inactive users weren't rejected as described above.
 
 If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
