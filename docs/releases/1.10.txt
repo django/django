@@ -295,6 +295,12 @@ Management Commands
 * The :djadmin:`inspectdb` command lets you choose what tables should be
   inspected by specifying their names as arguments.
 
+Middleware
+~~~~~~~~~~
+
+* Middleware classes are now initialized when the server starts, rather than waiting
+  until the first request.
+
 Migrations
 ~~~~~~~~~~
 
