@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.staticfiles.handlers import StaticFilesHandler
+from django.contrib.staticfiles.consumers import StaticFilesConsumer
 from django.core.management.commands.runserver import \
     Command as RunserverCommand
 
@@ -30,3 +31,14 @@ class Command(RunserverCommand):
         if use_static_handler and (settings.DEBUG or insecure_serving):
             return StaticFilesHandler(handler)
         return handler
+
+    def get_consumer(self, *args, **options):
+        """
+        Returns the consumer to use for HTTP requests
+        """
+        consumer = super(Command, self).get_consumer(*args, **options)
+        use_static_handler = options.get('use_static_handler', True)
+        insecure_serving = options.get('insecure_serving', False)
+        if use_static_handler and (settings.DEBUG or insecure_serving):
+            return StaticFilesConsumer()
+        return consumer
