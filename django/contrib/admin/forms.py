@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.base_forms import (
+    AuthenticationForm, PasswordChangeForm,
+)
 from django.utils.translation import ugettext_lazy as _
 
 

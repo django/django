@@ -1,16 +1,16 @@
 from __future__ import unicode_literals
 
 from django.contrib import auth
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.base_user import (  # NOQA
+    AbstractBaseUser, AnonymousUser, BaseUserManager,
+    _user_get_all_permissions, _user_has_module_perms, _user_has_perm,
+)
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.core import validators
-from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.db import models
-from django.db.models.manager import EmptyManager
 from django.utils import six, timezone
-from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -164,45 +164,6 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self._create_user(username, email, password, **extra_fields)
-
-
-# A few helper functions for common logic between User and AnonymousUser.
-def _user_get_all_permissions(user, obj):
-    permissions = set()
-    for backend in auth.get_backends():
-        if hasattr(backend, "get_all_permissions"):
-            permissions.update(backend.get_all_permissions(user, obj))
-    return permissions
-
-
-def _user_has_perm(user, perm, obj):
-    """
-    A backend can raise `PermissionDenied` to short-circuit permission checking.
-    """
-    for backend in auth.get_backends():
-        if not hasattr(backend, 'has_perm'):
-            continue
-        try:
-            if backend.has_perm(user, perm, obj):
-                return True
-        except PermissionDenied:
-            return False
-    return False
-
-
-def _user_has_module_perms(user, app_label):
-    """
-    A backend can raise `PermissionDenied` to short-circuit permission checking.
-    """
-    for backend in auth.get_backends():
-        if not hasattr(backend, 'has_module_perms'):
-            continue
-        try:
-            if backend.has_module_perms(user, app_label):
-                return True
-        except PermissionDenied:
-            return False
-    return False
 
 
 class PermissionsMixin(models.Model):
@@ -373,79 +334,3 @@ class User(AbstractUser):
     """
     class Meta(AbstractUser.Meta):
         swappable = 'AUTH_USER_MODEL'
-
-
-@python_2_unicode_compatible
-class AnonymousUser(object):
-    id = None
-    pk = None
-    username = ''
-    is_staff = False
-    is_active = False
-    is_superuser = False
-    _groups = EmptyManager(Group)
-    _user_permissions = EmptyManager(Permission)
-
-    def __init__(self):
-        pass
-
-    def __str__(self):
-        return 'AnonymousUser'
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__)
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return 1  # instances always return the same hash value
-
-    def save(self):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def delete(self):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def set_password(self, raw_password):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def check_password(self, raw_password):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def _get_groups(self):
-        return self._groups
-    groups = property(_get_groups)
-
-    def _get_user_permissions(self):
-        return self._user_permissions
-    user_permissions = property(_get_user_permissions)
-
-    def get_group_permissions(self, obj=None):
-        return set()
-
-    def get_all_permissions(self, obj=None):
-        return _user_get_all_permissions(self, obj=obj)
-
-    def has_perm(self, perm, obj=None):
-        return _user_has_perm(self, perm, obj=obj)
-
-    def has_perms(self, perm_list, obj=None):
-        for perm in perm_list:
-            if not self.has_perm(perm, obj):
-                return False
-        return True
-
-    def has_module_perms(self, module):
-        return _user_has_module_perms(self, module)
-
-    @property
-    def is_anonymous(self):
-        return CallableTrue
-
-    @property
-    def is_authenticated(self):
-        return CallableFalse
-
-    def get_username(self):
-        return self.username
