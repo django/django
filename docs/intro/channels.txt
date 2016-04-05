@@ -24,7 +24,7 @@ new layer under the existing view layer.
 Make a new project, a new app, and put this in a ``consumers.py`` file in the app::
 
     from django.http import HttpResponse
-    from django.channels.handler import AsgiHandler
+    from django.core.handlers.asgi import AsgiHandler
 
     def http_consumer(message):
         # Make standard HTTP response - access ASGI path attribute directly

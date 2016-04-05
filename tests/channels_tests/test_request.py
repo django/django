@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 from django.utils import six
 
 from django.channels import Channel
-from django.channels.tests import ChannelTestCase
-from django.channels.handler import AsgiRequest
+from django.test.channels import ChannelTestCase
+from django.core.handlers.asgi import AsgiRequest
 from django.channels.exceptions import RequestTimeout, RequestAborted
 
 

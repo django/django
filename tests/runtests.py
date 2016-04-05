@@ -125,6 +125,7 @@ def setup(verbosity, test_labels, parallel):
         'STATIC_URL': settings.STATIC_URL,
         'STATIC_ROOT': settings.STATIC_ROOT,
         'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES,
+        'CHANNEL_LAYERS': settings.CHANNEL_LAYERS,
     }
 
     # Redirect some settings for the duration of these tests.
@@ -154,6 +155,12 @@ def setup(verbosity, test_labels, parallel):
         'auth': None,
         'contenttypes': None,
         'sessions': None,
+    }
+    settings.CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'asgiref.inmemory.ChannelLayer',
+            'ROUTING': [],
+        },
     }
     log_config = copy.deepcopy(DEFAULT_LOGGING)
     # Filter out non-error logging so we don't have to capture it in lots of

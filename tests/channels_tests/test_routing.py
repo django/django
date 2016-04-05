@@ -80,6 +80,7 @@ class RoutingTests(SimpleTestCase):
         Ensures the test consumers don't compare equal, as if this ever happens
         this test file will pass and miss most bugs.
         """
+        self.assertEqual(consumer_1, consumer_1)
         self.assertNotEqual(consumer_1, consumer_2)
         self.assertNotEqual(consumer_1, consumer_3)
 
@@ -151,7 +152,7 @@ class RoutingTests(SimpleTestCase):
         Tests inclusion without a prefix
         """
         router = Router([
-            include("channels.tests.test_routing.chatroom_routing"),
+            include("channels_tests.test_routing.chatroom_routing"),
         ])
         self.assertRoute(
             router,
@@ -179,7 +180,7 @@ class RoutingTests(SimpleTestCase):
         Tests inclusion with a prefix
         """
         router = Router([
-            include("channels.tests.test_routing.chatroom_routing", path="^/ws/v(?P<version>[0-9]+)"),
+            include("channels_tests.test_routing.chatroom_routing", path="^/ws/v(?P<version>[0-9]+)"),
         ])
         self.assertRoute(
             router,
@@ -209,7 +210,7 @@ class RoutingTests(SimpleTestCase):
         )
         # Check it works without the ^s too.
         router = Router([
-            include("channels.tests.test_routing.chatroom_routing_nolinestart", path="/ws/v(?P<version>[0-9]+)"),
+            include("channels_tests.test_routing.chatroom_routing_nolinestart", path="/ws/v(?P<version>[0-9]+)"),
         ])
         self.assertRoute(
             router,
@@ -236,7 +237,7 @@ class RoutingTests(SimpleTestCase):
         # Unicode patterns, byte message
         router = Router([
             route("websocket.connect", consumer_1, path="^/foo/"),
-            include("channels.tests.test_routing.chatroom_routing", path="^/ws/v(?P<version>[0-9]+)"),
+            include("channels_tests.test_routing.chatroom_routing", path="^/ws/v(?P<version>[0-9]+)"),
         ])
         self.assertRoute(
             router,
@@ -260,7 +261,7 @@ class RoutingTests(SimpleTestCase):
         # Byte patterns, unicode message
         router = Router([
             route("websocket.connect", consumer_1, path=b"^/foo/"),
-            include("channels.tests.test_routing.chatroom_routing", path=b"^/ws/v(?P<version>[0-9]+)"),
+            include("channels_tests.test_routing.chatroom_routing", path=b"^/ws/v(?P<version>[0-9]+)"),
         ])
         self.assertRoute(
             router,
