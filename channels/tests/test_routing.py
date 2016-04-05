@@ -80,6 +80,7 @@ class RoutingTests(SimpleTestCase):
         Ensures the test consumers don't compare equal, as if this ever happens
         this test file will pass and miss most bugs.
         """
+        self.assertEqual(consumer_1, consumer_1)
         self.assertNotEqual(consumer_1, consumer_2)
         self.assertNotEqual(consumer_1, consumer_3)
 

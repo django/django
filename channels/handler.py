@@ -17,7 +17,7 @@ from django.http import FileResponse, HttpResponse, HttpResponseServerError
 from django.utils import six
 from django.utils.functional import cached_property
 
-from .exceptions import ResponseLater as ResponseLaterOuter, RequestTimeout, RequestAborted
+from channels.exceptions import ResponseLater as ResponseLaterOuter, RequestTimeout, RequestAborted
 
 logger = logging.getLogger('django.request')
 

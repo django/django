@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from asgiref.conformance import ConformanceTestCase
-from ..database_layer import DatabaseChannelLayer
+from channels.database_layer import DatabaseChannelLayer
 
 
 class DatabaseLayerTests(ConformanceTestCase):

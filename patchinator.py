@@ -105,14 +105,17 @@ global_transforms = [
     Replacement(r"import channels.([a-zA-Z0-9_\.]+)$", r"import django.channels.\1 as channels"),
     Replacement(r"from channels import", r"from django.channels import"),
     Replacement(r"from channels.([a-zA-Z0-9_\.]+) import", r"from django.channels.\1 import"),
-    Replacement(r"from .handler import", r"from django.core.handlers.asgi import")
+    Replacement(r"from .handler import", r"from django.core.handlers.asgi import"),
+    Replacement(r"from django.channels.tests import", r"from django.test.channels import"),
+    Replacement(r"from django.channels.handler import", r"from django.core.handlers.asgi import"),
+    Replacement(r"channels.tests.test_routing", r"channels_tests.test_routing")
 ]
 
 docs_transforms = global_transforms + [
-    Replacement(r":doc:`concepts`", r":doc:`topics/channels/concepts`"),
-    Replacement(r":doc:`deploying`", r":doc:`topics/channels/deploying`"),
-    Replacement(r":doc:`scaling`", r":doc:`topics/channels/scaling`"),
-    Replacement(r":doc:`getting-started`", r":doc:`intro/channels`"),
+    Replacement(r":doc:`concepts`", r":doc:`/topics/channels/concepts`"),
+    Replacement(r":doc:`deploying`", r":doc:`/topics/channels/deploying`"),
+    Replacement(r":doc:`scaling`", r":doc:`/topics/channels/scaling`"),
+    Replacement(r":doc:`getting-started`", r":doc:`/intro/channels`"),
     Replacement(r"\n\(.*installation>`\)\n", r""),
 ]
 
@@ -140,6 +143,9 @@ class Patchinator(object):
         ),
         FileMap(
             "channels/routing.py", "django/channels/routing.py", global_transforms,
+        ),
+        FileMap(
+            "channels/message.py", "django/channels/message.py", global_transforms,
         ),
         FileMap(
             "channels/sessions.py", "django/channels/sessions.py", global_transforms,
