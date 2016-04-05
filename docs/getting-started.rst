@@ -358,7 +358,9 @@ name in the path of your WebSocket request (we'll ignore auth for now - that's n
     # Connected to websocket.receive
     @channel_session
     def ws_message(message):
-        Group("chat-%s" % message.channel_session['room']).send(message.content)
+        Group("chat-%s" % message.channel_session['room']).send({
+            "text": message['text'],
+        })
 
     # Connected to websocket.disconnect
     @channel_session
@@ -452,7 +454,9 @@ chat to people with the same first letter of their username::
     # Connected to websocket.receive
     @channel_session_user
     def ws_message(message):
-        Group("chat-%s" % message.user.username[0]).send(message.content)
+        Group("chat-%s" % message.user.username[0]).send({
+            "text": message['text'],
+        })
 
     # Connected to websocket.disconnect
     @channel_session_user
@@ -656,7 +660,9 @@ first-letter-of-username chat from earlier::
     @enforce_ordering(slight=True)
     @channel_session_user
     def ws_message(message):
-        Group("chat-%s" % message.user.username[0]).send(message.content)
+        Group("chat-%s" % message.user.username[0]).send({
+            "text": message['text'],
+        })
 
     # Connected to websocket.disconnect
     @enforce_ordering(slight=True)
