@@ -273,7 +273,10 @@ passing tests.
 Skipped tests are typically due to missing external libraries required to run
 the test; see :ref:`running-unit-tests-dependencies` for a list of dependencies
 and be sure to install any for tests related to the changes you are making (we
-won't need any for this tutorial).
+won't need any for this tutorial). Some tests are specific to a particular
+database backend and will be skipped if not testing with that backend. SQLite
+is the database backend for the default settings. To run the tests using a
+different backend, see :ref:`running-unit-tests-settings`.
 
 Once the tests complete, you should be greeted with a message informing you
 whether the test suite passed or failed. Since you haven't yet made any changes
