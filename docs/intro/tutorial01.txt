@@ -116,7 +116,7 @@ These files are:
 * :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
 
-.. _more about packages: https://docs.python.org/tutorial/modules.html#packages
+.. _more about packages: https://docs.python.org/3/tutorial/modules.html#packages
 
 The development server
 ======================
