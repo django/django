@@ -157,7 +157,7 @@ to the channel server they're listening on.
 For this reason, Channels treats these as two different *channel types*, and
 denotes a *response channel* by having the channel name contain
 the character ``!`` - e.g. ``http.response!f5G3fE21f``. *Normal
-channels* have do not contain it, but along with the rest of the response
+channels* do not contain it, but along with the rest of the response
 channel name, they must contain only the characters ``a-z A-Z 0-9 - _``,
 and be less than 200 characters long.
 

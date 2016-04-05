@@ -4,20 +4,20 @@ import cgi
 import codecs
 import logging
 import sys
+import time
 import traceback
 from io import BytesIO
-from threading import Lock
 
 from django import http
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
-from django.http import FileResponse, HttpResponseServerError
+from django.http import FileResponse, HttpResponse, HttpResponseServerError
 from django.utils import six
 from django.utils.functional import cached_property
 
-from .exceptions import ResponseLater as ResponseLaterOuter
+from .exceptions import ResponseLater as ResponseLaterOuter, RequestTimeout, RequestAborted
 
 logger = logging.getLogger('django.request')
 
@@ -29,6 +29,10 @@ class AsgiRequest(http.HttpRequest):
     """
 
     ResponseLater = ResponseLaterOuter
+
+    # Number of seconds until a Request gives up on trying to read a request
+    # body and aborts.
+    body_receive_timeout = 60
 
     def __init__(self, message):
         self.message = message
@@ -100,14 +104,22 @@ class AsgiRequest(http.HttpRequest):
         # Body handling
         self._body = message.get("body", b"")
         if message.get("body_channel", None):
+            body_handle_start = time.time()
             while True:
                 # Get the next chunk from the request body channel
                 chunk = None
                 while chunk is None:
+                    # If they take too long, raise request timeout and the handler
+                    # will turn it into a response
+                    if time.time() - body_handle_start > self.body_receive_timeout:
+                        raise RequestTimeout()
                     _, chunk = message.channel_layer.receive_many(
                         [message['body_channel']],
                         block=True,
                     )
+                # If chunk contains close, abort.
+                if chunk.get("closed", False):
+                    raise RequestAborted()
                 # Add content to body
                 self._body += chunk.get("content", "")
                 # Exit loop if this was the last
@@ -155,20 +167,16 @@ class AsgiHandler(base.BaseHandler):
     a HTTP request)
     """
 
-    initLock = Lock()
     request_class = AsgiRequest
 
     # Size to chunk response bodies into for multiple response messages
     chunk_size = 512 * 1024
 
+    def __init__(self, *args, **kwargs):
+        super(AsgiHandler, self).__init__(*args, **kwargs)
+        self.load_middleware()
+
     def __call__(self, message):
-        # Set up middleware if needed. We couldn't do this earlier, because
-        # settings weren't available.
-        if self._request_middleware is None:
-            with self.initLock:
-                # Check that middleware is still uninitialized.
-                if self._request_middleware is None:
-                    self.load_middleware()
         # Set script prefix from message root_path
         set_script_prefix(message.get('root_path', ''))
         signals.request_started.send(sender=self.__class__, message=message)
@@ -184,6 +192,12 @@ class AsgiHandler(base.BaseHandler):
                 }
             )
             response = http.HttpResponseBadRequest()
+        except RequestTimeout:
+            # Parsing the rquest failed, so the response is a Request Timeout error
+            response = HttpResponse("408 Request Timeout (upload too slow)", status_code=408)
+        except RequestAborted:
+            # Client closed connection on us mid request. Abort!
+            return
         else:
             try:
                 response = self.get_response(request)
