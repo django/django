@@ -2,7 +2,7 @@ Getting Started with Channels
 =============================
 
 Now, let's get to writing some consumers. If you've not read it already,
-you should read :doc:`topics/channels/concepts`, as it covers the basic description of what
+you should read :doc:`/topics/channels/concepts`, as it covers the basic description of what
 channels and groups are, and lays out some of the important implementation
 patterns and caveats.
 
@@ -164,7 +164,7 @@ disconnect, like this::
     def ws_disconnect(message):
         Group("chat").discard(message.reply_channel)
 
-Of course, if you've read through :doc:`topics/channels/concepts`, you'll know that channels
+Of course, if you've read through :doc:`/topics/channels/concepts`, you'll know that channels
 added to groups expire out if their messages expire (every channel layer has
 a message expiry time, usually between 30 seconds and a few minutes, and it's
 often configurable) - but the ``disconnect`` handler will get called nearly all
@@ -694,5 +694,5 @@ systems easily integrate with WebSockets.
 
 We recommend you read through the rest of the reference documentation to see
 all of what Channels has to offer; in particular, you may want to look at
-our :doc:`topics/channels/deploying` and :doc:`topics/channels/scaling` resources to get an idea of how to
+our :doc:`/topics/channels/deploying` and :doc:`/topics/channels/scaling` resources to get an idea of how to
 design and run apps in production environments.

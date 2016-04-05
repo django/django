@@ -19,7 +19,7 @@ Setting up a channel backend
 ----------------------------
 
 The first step is to set up a channel backend. If you followed the
-:doc:`intro/channels` guide, you will have ended up using the database
+:doc:`/intro/channels` guide, you will have ended up using the database
 backend, which is great for getting started quickly in development but totally
 unsuitable for production use; it will hammer your database with lots of
 queries as it polls for new messages.

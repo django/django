@@ -164,7 +164,7 @@ and be less than 200 characters long.
 It's optional for a backend implementation to understand this - after all,
 it's only important at scale, where you want to shard the two types differently
 — but it's present nonetheless. For more on scaling, and how to handle channel
-types if you're writing a backend or interface server, read :doc:`topics/channels/scaling`.
+types if you're writing a backend or interface server, read :doc:`/topics/channels/scaling`.
 
 Groups
 ------
@@ -263,5 +263,5 @@ command that checks for completion and re-submits a message to the channel
 if nothing is completed (rolling your own retry logic, essentially).
 
 We'll cover more about what kind of tasks fit well into Channels in the rest
-of the documentation, but for now, let's progress to :doc:`intro/channels`
+of the documentation, but for now, let's progress to :doc:`/intro/channels`
 and writing some code.
