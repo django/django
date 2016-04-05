@@ -53,7 +53,8 @@ Using another ``settings`` module
 The included settings module allows you to run the test suite using
 SQLite. If you want to test behavior using a different database (and
 if you're proposing patches for Django, it's a good idea to test
-across databases), you may need to define your own settings file.
+across databases), you may need to define your own settings file. The default
+settings module is located at ``django/tests/test_sqlite.py``.
 
 To run the tests with different settings, ensure that the module is on your
 ``PYTHONPATH`` and pass the module with ``--settings``.
