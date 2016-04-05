@@ -1,3 +1,13 @@
+0.11.0 (2016-04-05)
+-------------------
+
+* ChannelTestCase base testing class for easier testing of consumers
+
+* Routing rewrite to improve speed with nested includes and remove need for ^ operator
+
+* Timeouts reading very slow request bodies
+
+
 0.10.3 (2016-03-29)
 -------------------
 
