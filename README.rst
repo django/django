@@ -30,5 +30,8 @@ a bit as things develop.
 Documentation, installation and getting started instructions are at
 http://channels.readthedocs.org
 
+Support can be obtained either here via issues, or in the ``#django-channels``
+channel on Freenode.
+
 You can also install channels from PyPI as the ``channels`` package.
 You'll likely also want ``asgi_redis`` to provide the Redis channel layer.
