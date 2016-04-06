@@ -149,7 +149,7 @@ class DatabaseChannelLayer(object):
             class Meta:
                 apps = Apps()
                 app_label = "channels"
-                db_table = "django_channels"
+                db_table = "django_channels_channel"
         # Ensure its table exists
         if Message._meta.db_table not in self.connection.introspection.table_names(self.connection.cursor()):
             with self.connection.schema_editor() as editor:
@@ -171,7 +171,7 @@ class DatabaseChannelLayer(object):
             class Meta:
                 apps = Apps()
                 app_label = "channels"
-                db_table = "django_channel_groups"
+                db_table = "django_channels_group"
                 unique_together = [["group", "channel"]]
         # Ensure its table exists with the right schema
         if Group._meta.db_table not in self.connection.introspection.table_names(self.connection.cursor()):
