@@ -11,7 +11,6 @@ from django.contrib.auth.management.commands import (
 )
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.core import exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, mock, override_settings
@@ -567,47 +566,11 @@ class PermissionTestCase(TestCase):
     def setUp(self):
         self._original_permissions = Permission._meta.permissions[:]
         self._original_default_permissions = Permission._meta.default_permissions
-        self._original_verbose_name = Permission._meta.verbose_name
 
     def tearDown(self):
         Permission._meta.permissions = self._original_permissions
         Permission._meta.default_permissions = self._original_default_permissions
-        Permission._meta.verbose_name = self._original_verbose_name
         ContentType.objects.clear_cache()
-
-    def test_duplicated_permissions(self):
-        """
-        Test that we show proper error message if we are trying to create
-        duplicate permissions.
-        """
-        auth_app_config = apps.get_app_config('auth')
-
-        # check duplicated default permission
-        Permission._meta.permissions = [
-            ('change_permission', 'Can edit permission (duplicate)')]
-        msg = (
-            "The permission codename 'change_permission' clashes with a "
-            "builtin permission for model 'auth.Permission'."
-        )
-        with self.assertRaisesMessage(CommandError, msg):
-            create_permissions(auth_app_config, verbosity=0)
-
-        # check duplicated custom permissions
-        Permission._meta.permissions = [
-            ('my_custom_permission', 'Some permission'),
-            ('other_one', 'Some other permission'),
-            ('my_custom_permission', 'Some permission with duplicate permission code'),
-        ]
-        msg = "The permission codename 'my_custom_permission' is duplicated for model 'auth.Permission'."
-        with self.assertRaisesMessage(CommandError, msg):
-            create_permissions(auth_app_config, verbosity=0)
-
-        # should not raise anything
-        Permission._meta.permissions = [
-            ('my_custom_permission', 'Some permission'),
-            ('other_one', 'Some other permission'),
-        ]
-        create_permissions(auth_app_config, verbosity=0)
 
     def test_default_permissions(self):
         auth_app_config = apps.get_app_config('auth')
@@ -631,32 +594,3 @@ class PermissionTestCase(TestCase):
         self.assertEqual(Permission.objects.filter(
             content_type=permission_content_type,
         ).count(), 1)
-
-    def test_verbose_name_length(self):
-        auth_app_config = apps.get_app_config('auth')
-
-        permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
-        Permission.objects.filter(content_type=permission_content_type).delete()
-        Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control" * 5
-
-        msg = "The verbose_name of auth.permission is longer than 244 characters"
-        with self.assertRaisesMessage(exceptions.ValidationError, msg):
-            create_permissions(auth_app_config, verbosity=0)
-
-    def test_custom_permission_name_length(self):
-        auth_app_config = apps.get_app_config('auth')
-
-        ContentType.objects.get_by_natural_key('auth', 'permission')
-        custom_perm_name = 'a' * 256
-        Permission._meta.permissions = [
-            ('my_custom_permission', custom_perm_name),
-        ]
-        try:
-            msg = (
-                "The permission name %s of auth.permission is longer than "
-                "255 characters" % custom_perm_name
-            )
-            with self.assertRaisesMessage(exceptions.ValidationError, msg):
-                create_permissions(auth_app_config, verbosity=0)
-        finally:
-            Permission._meta.permissions = []
