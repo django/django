@@ -10,7 +10,7 @@ class ChannelsConfig(AppConfig):
     def ready(self):
         # Check you're not running 1.10 or above
         try:
-            from django import channels
+            from django import channels  # NOQA isort:skip
         except ImportError:
             pass
         else:
