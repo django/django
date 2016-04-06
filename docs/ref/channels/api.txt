@@ -23,11 +23,11 @@ Message
 -------
 
 Message objects are what consumers get passed as their only argument. They
-encapsulate the basic :doc:`ASGI <asgi>` message, which is a ``dict``, with
+encapsulate the basic `ASGI <http://channels.readthedocs.org/en/latest/asgi.html>`_ message, which is a ``dict``, with
 extra information. They have the following attributes:
 
 * ``content``: The actual message content, as a dict. See the
-  :doc:`ASGI spec <asgi>` or protocol message definition document for how this
+  `ASGI spec <http://channels.readthedocs.org/en/latest/asgi.html>`_ or protocol message definition document for how this
   is structured.
 
 * ``channel``: A :ref:`Channel <ref-channel>` object, representing the channel
@@ -72,7 +72,7 @@ onto that one instead. They have the following attributes:
 Group
 -----
 
-Groups represent the underlying :doc:`ASGI <asgi>` group concept in an
+Groups represent the underlying `ASGI <http://channels.readthedocs.org/en/latest/asgi.html>`_ group concept in an
 object-oriented way. The constructor looks like this::
 
     channels.Group(name, alias=DEFAULT_CHANNEL_LAYER, channel_layer=None)
@@ -103,7 +103,7 @@ They have the following attributes:
 Channel Layer
 -------------
 
-These are a wrapper around the underlying :doc:`ASGI <asgi>` channel layers
+These are a wrapper around the underlying `ASGI <http://channels.readthedocs.org/en/latest/asgi.html>`_ channel layers
 that supplies a routing system that maps channels to consumers, as well as
 aliases to help distinguish different layers in a project with multiple layers.
 
@@ -138,7 +138,7 @@ ASGI requests, and a few extra methods for ASGI-specific info. The constructor i
 
     channels.handler.AsgiRequest(message)
 
-``message`` must be an :doc:`ASGI <asgi>` ``http.request`` format message.
+``message`` must be an `ASGI <http://channels.readthedocs.org/en/latest/asgi.html>`_ ``http.request`` format message.
 
 Additional attributes are:
 

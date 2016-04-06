@@ -3,7 +3,7 @@ Channel Layer Types
 
 Multiple choices of backend are available, to fill different tradeoffs of
 complexity, throughput and scalability. You can also write your own backend if
-you wish; the spec they confirm to is called :doc:`ASGI <asgi>`. Any
+you wish; the spec they confirm to is called `ASGI <http://channels.readthedocs.org/en/latest/asgi.html>`_. Any
 ASGI-compliant channel layer can be used.
 
 Redis
@@ -92,8 +92,8 @@ Writing Custom Channel Layers
 -----------------------------
 
 The interface channel layers present to Django and other software that
-communicates over them is codified in a specification called :doc:`ASGI <asgi>`.
+communicates over them is codified in a specification called `ASGI <http://channels.readthedocs.org/en/latest/asgi.html>`_.
 
-Any channel layer that conforms to the :doc:`ASGI spec <asgi>` can be used
+Any channel layer that conforms to the `ASGI spec <http://channels.readthedocs.org/en/latest/asgi.html>`_ can be used
 by Django; just set ``BACKEND`` to the class to instantiate and ``CONFIG`` to
 a dict of keyword arguments to initialize the class with.

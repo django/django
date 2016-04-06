@@ -1,0 +1,18 @@
+========
+Channels
+========
+
+Django's channel layer provides the ability to write code against non-HTTP
+protocols and run code outside of a request-response contenxt.
+
+.. toctree::
+   :maxdepth: 2
+
+   introduction
+   concepts
+   deploying
+   scaling
+
+.. seealso::
+
+    Also see the :doc:`reference documentation `/ref/channels`.

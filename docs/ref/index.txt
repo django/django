@@ -6,6 +6,7 @@ API Reference
    :maxdepth: 1
 
    applications
+   channels/index
    checks
    class-based-views/index
    clickjacking

@@ -24,7 +24,7 @@ backend, which is great for getting started quickly in development but totally
 unsuitable for production use; it will hammer your database with lots of
 queries as it polls for new messages.
 
-Instead, take a look at the list of :doc:`backends`, and choose one that
+Instead, take a look at the list of :doc:`/ref/channels/backends`, and choose one that
 fits your requirements (additionally, you could use a third-party pluggable
 backend or write your own - that page also explains the interface and rules
 a backend has to follow).

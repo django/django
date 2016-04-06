@@ -34,4 +34,4 @@ are sent to random Redis servers, while response channels are sent to a
 predictable server that both the interface server and worker can derive.
 
 Currently, sharding is implemented as part of the Redis backend only;
-see the :doc:`backend documentation <backends>` for more information.
+see the :doc:`backend documentation </ref/channels/backends>` for more information.
