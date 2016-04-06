@@ -151,6 +151,11 @@ Required arguments
         If you are using a ``QuerySet`` with a very large number of items,
         requesting high page numbers might be slow on some database backends.
 
+        In Django's database layer, the ``QuerySet`` translates into a
+        ``LIMIT`` clause with an ``offset`` argument. While running on most
+        database  backends, this query needs to count off the first ``offset``
+        number of records, which takes longer as the page number gets higher.
+
 ``per_page``
     The maximum number of items to include on a page, not including orphans
     (see the ``orphans`` optional argument below).
