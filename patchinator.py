@@ -11,6 +11,8 @@ import re
 import os.path
 import sys
 
+from isort import SortImports
+
 
 # Transforms: Turn one content string into another
 
@@ -46,6 +48,15 @@ class Insert(object):
             return value[:match.end()] + self.to_insert + value[match.end():]
         else:
             return value[:match.start()] + self.to_insert + value[match.start():]
+
+
+class Isort(object):
+    """
+    Runs isort on the file
+    """
+
+    def __call__(self, value):
+        return SortImports(file_contents=value).output
 
 
 # Operations: Copy or patch files
@@ -108,7 +119,11 @@ global_transforms = [
     Replacement(r"from .handler import", r"from django.core.handlers.asgi import"),
     Replacement(r"from django.channels.tests import", r"from django.test.channels import"),
     Replacement(r"from django.channels.handler import", r"from django.core.handlers.asgi import"),
-    Replacement(r"channels.tests.test_routing", r"channels_tests.test_routing")
+    Replacement(r"channels.tests.test_routing", r"channels_tests.test_routing"),
+]
+
+python_transforms = global_transforms + [
+    Isort(),
 ]
 
 docs_transforms = global_transforms + [
@@ -129,64 +144,64 @@ class Patchinator(object):
 
     operations = [
         FileMap(
-            "channels/asgi.py", "django/channels/asgi.py", global_transforms,
+            "channels/asgi.py", "django/channels/asgi.py", python_transforms,
         ),
         FileMap(
-            "channels/auth.py", "django/channels/auth.py", global_transforms,
+            "channels/auth.py", "django/channels/auth.py", python_transforms,
         ),
         FileMap(
-            "channels/channel.py", "django/channels/channel.py", global_transforms,
+            "channels/channel.py", "django/channels/channel.py", python_transforms,
         ),
         FileMap(
-            "channels/database_layer.py", "django/channels/database_layer.py", global_transforms,
+            "channels/database_layer.py", "django/channels/database_layer.py", python_transforms,
         ),
         FileMap(
-            "channels/exceptions.py", "django/channels/exceptions.py", global_transforms,
+            "channels/exceptions.py", "django/channels/exceptions.py", python_transforms,
         ),
         FileMap(
-            "channels/handler.py", "django/core/handlers/asgi.py", global_transforms,
+            "channels/handler.py", "django/core/handlers/asgi.py", python_transforms,
         ),
         FileMap(
-            "channels/routing.py", "django/channels/routing.py", global_transforms,
+            "channels/routing.py", "django/channels/routing.py", python_transforms,
         ),
         FileMap(
-            "channels/message.py", "django/channels/message.py", global_transforms,
+            "channels/message.py", "django/channels/message.py", python_transforms,
         ),
         FileMap(
-            "channels/sessions.py", "django/channels/sessions.py", global_transforms,
+            "channels/sessions.py", "django/channels/sessions.py", python_transforms,
         ),
         FileMap(
-            "channels/staticfiles.py", "django/contrib/staticfiles/consumers.py", global_transforms,
+            "channels/staticfiles.py", "django/contrib/staticfiles/consumers.py", python_transforms,
         ),
         FileMap(
-            "channels/utils.py", "django/channels/utils.py", global_transforms,
+            "channels/utils.py", "django/channels/utils.py", python_transforms,
         ),
         FileMap(
-            "channels/worker.py", "django/channels/worker.py", global_transforms,
+            "channels/worker.py", "django/channels/worker.py", python_transforms,
         ),
         FileMap(
             "channels/management/commands/runworker.py",
             "django/core/management/commands/runworker.py",
-            global_transforms,
+            python_transforms,
         ),
         # Tests
         FileMap(
-            "channels/tests/base.py", "django/test/channels.py", global_transforms,
+            "channels/tests/base.py", "django/test/channels.py", python_transforms,
         ),
         NewFile(
             "tests/channels_tests/__init__.py",
         ),
         FileMap(
-            "channels/tests/test_database_layer.py", "tests/channels_tests/test_database_layer.py", global_transforms,
+            "channels/tests/test_database_layer.py", "tests/channels_tests/test_database_layer.py", python_transforms,
         ),
         FileMap(
-            "channels/tests/test_handler.py", "tests/channels_tests/test_handler.py", global_transforms,
+            "channels/tests/test_handler.py", "tests/channels_tests/test_handler.py", python_transforms,
         ),
         FileMap(
-            "channels/tests/test_routing.py", "tests/channels_tests/test_routing.py", global_transforms,
+            "channels/tests/test_routing.py", "tests/channels_tests/test_routing.py", python_transforms,
         ),
         FileMap(
-            "channels/tests/test_request.py", "tests/channels_tests/test_request.py", global_transforms,
+            "channels/tests/test_request.py", "tests/channels_tests/test_request.py", python_transforms,
         ),
         # Docs
         FileMap(

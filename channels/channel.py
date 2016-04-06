@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.utils import six
+
 from channels import DEFAULT_CHANNEL_LAYER, channel_layers
 
 

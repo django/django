@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 
 from django.core.management import BaseCommand, CommandError
-from channels import channel_layers, DEFAULT_CHANNEL_LAYER
+
+from channels import DEFAULT_CHANNEL_LAYER, channel_layers
 from channels.log import setup_logger
 from channels.worker import Worker
 
