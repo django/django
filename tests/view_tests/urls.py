@@ -103,4 +103,5 @@ urlpatterns += [
         name='raises_template_does_not_exist'
     ),
     url(r'^render_no_template/$', views.render_no_template, name='render_no_template'),
+    url(r'^test-setlang/(?P<parameter>[^/]+)/$', views.with_parameter, name='with_parameter'),
 ]
