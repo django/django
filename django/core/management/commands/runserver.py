@@ -236,29 +236,6 @@ class Command(BaseCommand):
                 self.stdout.write(self.shutdown_message)
             return
 
-    def check_migrations(self):
-        """
-        Checks to see if the set of migrations on disk matches the
-        migrations in the database. Prints a warning if they don't match.
-        """
-        try:
-            executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
-        except ImproperlyConfigured:
-            # No databases are configured (or the dummy one)
-            return
-        except MigrationSchemaMissing:
-            self.stdout.write(self.style.NOTICE(
-                "\nNot checking migrations as it is not possible to access/create the django_migrations table."
-            ))
-            return
-
-        plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
-        if plan:
-            self.stdout.write(self.style.NOTICE(
-                "\nYou have unapplied migrations; your app may not work properly until they are applied."
-            ))
-            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
-
     def log_action(self, protocol, action, details):
         """
         Logs various different kinds of requests to the console.
