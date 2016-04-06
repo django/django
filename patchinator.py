@@ -22,12 +22,16 @@ class Replacement(object):
     substitute strings in the file.
     """
 
-    def __init__(self, match, sub):
+    def __init__(self, match, sub, regex=True):
         self.match = match
         self.sub = sub
+        self.regex = regex
 
     def __call__(self, value):
-        return re.sub(self.match, self.sub, value)
+        if self.regex:
+            return re.sub(self.match, self.sub, value)
+        else:
+            return value.replace(self.match, self.sub)
 
 
 class Insert(object):
@@ -144,7 +148,9 @@ class Patchinator(object):
 
     operations = [
         FileMap(
-            "channels/asgi.py", "django/channels/asgi.py", python_transforms,
+            "channels/asgi.py", "django/channels/asgi.py", python_transforms + [
+                Replacement("if django.VERSION[1] > 9:\n        django.setup(set_prefix=False)\n    else:\n        django.setup()", "django.setup(set_prefix=False)", regex=False),  # NOQA
+            ],
         ),
         FileMap(
             "channels/auth.py", "django/channels/auth.py", python_transforms,
