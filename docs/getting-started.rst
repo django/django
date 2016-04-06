@@ -569,7 +569,7 @@ have a ChatMessage model with ``message`` and ``room`` fields::
         )
         # Broadcast to listening sockets
         Group("chat-%s" % room).send({
-            "content": message.content['message'],
+            "text": message.content['message'],
         })
 
     # Connected to websocket.connect
@@ -587,7 +587,7 @@ have a ChatMessage model with ``message`` and ``room`` fields::
         # Stick the message onto the processing queue
         Channel("chat-messages").send({
             "room": channel_session['room'],
-            "message": content,
+            "message": message['text'],
         })
 
     # Connected to websocket.disconnect
