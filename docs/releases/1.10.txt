@@ -147,6 +147,12 @@ Minor features
   <django.contrib.gis.gdal.GDALBand.data>` method was added. Band data can
   now be updated with repeated values efficiently.
 
+* Added database functions
+  :class:`~django.contrib.gis.db.models.functions.IsValid` and
+  :class:`~django.contrib.gis.db.models.functions.MakeValid`, as well as the
+  :lookup:`isvalid` lookup, all for PostGIS. This allows filtering and
+  repairing invalid geometries on the database side.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

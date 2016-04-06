@@ -127,7 +127,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     unsupported_functions = {
         'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
         'BoundingCircle', 'Envelope',
-        'ForceRHR', 'GeoHash', 'MemSize', 'Scale',
+        'ForceRHR', 'GeoHash', 'IsValid', 'MakeValid', 'MemSize', 'Scale',
         'SnapToGrid', 'Translate',
     }
 
