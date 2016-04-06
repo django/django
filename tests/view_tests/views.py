@@ -26,6 +26,10 @@ def index_page(request):
     return HttpResponse('<html><body>Dummy page</body></html>')
 
 
+def with_parameter(request, parameter):
+    return HttpResponse('ok')
+
+
 def raises(request):
     # Make sure that a callable that raises an exception in the stack frame's
     # local vars won't hijack the technical 500 response. See:
