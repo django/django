@@ -34,11 +34,6 @@ ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 RFC3986_GENDELIMS = str(":/?#[]@")
 RFC3986_SUBDELIMS = str("!$&'()*+,;=")
 
-PROTOCOL_TO_PORT = {
-    'http': 80,
-    'https': 443,
-}
-
 
 @keep_lazy_text
 def urlquote(url, safe='/'):
