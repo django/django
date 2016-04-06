@@ -1,9 +1,9 @@
 from django.apps import AppConfig
-from django.contrib.auth.checks import check_user_model
 from django.core import checks
 from django.db.models.signals import post_migrate
 from django.utils.translation import ugettext_lazy as _
 
+from .checks import check_models_permissions, check_user_model
 from .management import create_permissions
 
 
@@ -15,3 +15,4 @@ class AuthConfig(AppConfig):
         post_migrate.connect(create_permissions,
             dispatch_uid="django.contrib.auth.management.create_permissions")
         checks.register(check_user_model, checks.Tags.models)
+        checks.register(check_models_permissions, checks.Tags.models)
