@@ -12,7 +12,9 @@ import cgi
 import sys
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousMultipartForm
+from django.core.exceptions import (
+    RequestDataTooBig, SuspiciousMultipartForm, TooManyFieldsSent,
+)
 from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,
 )
@@ -103,6 +105,8 @@ class MultiPartParser(object):
         self._encoding = encoding or settings.DEFAULT_CHARSET
         self._content_length = content_length
         self._upload_handlers = upload_handlers
+        # Number of bytes that have been read.
+        self._data_size = 0
 
     def parse(self):
         """
@@ -145,6 +149,11 @@ class MultiPartParser(object):
         old_field_name = None
         counters = [0] * len(handlers)
 
+        # To count the number of keys in the request.
+        num_post_keys = 0
+        # To limit the amount of data read from the request.
+        read_size = None
+
         try:
             for item_type, meta_data, field_stream in Parser(stream, self._boundary):
                 if old_field_name:
@@ -166,15 +175,36 @@ class MultiPartParser(object):
                 field_name = force_text(field_name, encoding, errors='replace')
 
                 if item_type == FIELD:
+                    # Avoid storing more than DATA_UPLOAD_MAX_NUMBER_FIELDS
+                    num_post_keys += 1
+                    if (settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and
+                            settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_post_keys):
+                        raise TooManyFieldsSent('Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.')
+
+                    # Avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE
+                    if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None:
+                        read_size = settings.DATA_UPLOAD_MAX_MEMORY_SIZE - self._data_size
+
                     # This is a post field, we can just set it in the post
                     if transfer_encoding == 'base64':
-                        raw_data = field_stream.read()
+                        raw_data = field_stream.read(size=read_size)
+                        self._data_size += len(raw_data)
                         try:
                             data = base64.b64decode(raw_data)
                         except _BASE64_DECODE_ERROR:
                             data = raw_data
                     else:
-                        data = field_stream.read()
+                        data = field_stream.read(size=read_size)
+                        self._data_size += len(data)
+
+                    # We add 2 here to make the check consistent with the x-www-form-urlencoded
+                    # check that also includes '&='
+                    self._data_size += len(field_name) + 2
+                    if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
+                            (self._data_size > settings.DATA_UPLOAD_MAX_MEMORY_SIZE or field_stream.read(1))):
+                        raise RequestDataTooBig(
+                            'The amount of data in the request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'
+                        )
 
                     self._post.appendlist(field_name,
                                           force_text(data, encoding, errors='replace'))
