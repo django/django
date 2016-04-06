@@ -228,6 +228,9 @@ class Patchinator(object):
         FileMap(
             "docs/scaling.rst", "docs/topics/channels/scaling.txt", docs_transforms,
         ),
+        FileMap(
+            "docs/testing.rst", "docs/topics/channels/testing.txt", docs_transforms,
+        ),
     ]
 
     def __init__(self, source, destination):

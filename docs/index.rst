@@ -32,6 +32,7 @@ Contents:
    integration-changes
    scaling
    backends
+   testing
    reference
    integration-plan
    faqs
