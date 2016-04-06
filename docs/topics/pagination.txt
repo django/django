@@ -146,10 +146,12 @@ Required arguments
     clause or with a default :attr:`~django.db.models.Options.ordering` on the
     model.
 
-    .. note::
+    .. admonition:: Performance issues paginating large ``QuerySet``\s
 
-        If you are using a ``QuerySet`` with a very large number of items,
-        requesting high page numbers might be slow on some database backends.
+        If you're using a ``QuerySet`` with a very large number of items,
+        requesting high page numbers might be slow on some databases, because
+        the resulting ``LIMIT``/``OFFSET`` query needs to count the number of
+        ``OFFSET`` records which takes longer as the page number gets higher.
 
 ``per_page``
     The maximum number of items to include on a page, not including orphans
