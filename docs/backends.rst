@@ -64,7 +64,7 @@ that will work cross-process. It has poor performance, and is only
 recommended for development or extremely small deployments.
 
 This layer is included with Channels; just set your ``BACKEND`` to
-``channels.datagbase_layer.DatabaseChannelLayer``, and it will use the
+``channels.database_layer.DatabaseChannelLayer``, and it will use the
 default Django database alias to store messages. You can change the alias
 by setting ``CONFIG`` to ``{'alias': 'aliasname'}``.
 
