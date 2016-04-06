@@ -267,9 +267,7 @@ class ModelPaginationTests(TestCase):
             "<Article: Article 3>",
             "<Article: Article 4>",
             "<Article: Article 5>"
-        ],
-            ordered=True
-        )
+        ])
         self.assertTrue(p.has_next())
         self.assertFalse(p.has_previous())
         self.assertTrue(p.has_other_pages())
@@ -289,9 +287,7 @@ class ModelPaginationTests(TestCase):
             "<Article: Article 7>",
             "<Article: Article 8>",
             "<Article: Article 9>"
-        ],
-            ordered=True
-        )
+        ])
         self.assertFalse(p.has_next())
         self.assertTrue(p.has_previous())
         self.assertTrue(p.has_other_pages())
