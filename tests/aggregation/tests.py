@@ -841,7 +841,7 @@ class AggregateTestCase(TestCase):
 
     def test_ticket26390(self):
         """
-        Check that the random call does not break GROUP BY cluse when
+        Check that the random call does not break GROUP BY clause when
         used as ordering.
         """
         qs = Author.objects.annotate(contact_count=Count('book'))
