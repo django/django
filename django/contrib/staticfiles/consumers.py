@@ -3,10 +3,9 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
+from django.core.handlers.asgi import AsgiHandler, ViewConsumer
 from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.six.moves.urllib.request import url2pathname
-
-from django.core.handlers.asgi import AsgiHandler, ViewConsumer
 
 
 class StaticFilesHandler(AsgiHandler):

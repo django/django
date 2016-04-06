@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-import re
 import importlib
+import re
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six

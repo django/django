@@ -9,6 +9,9 @@ import traceback
 from io import BytesIO
 
 from django import http
+from django.channels.exceptions import (
+    RequestAborted, RequestTimeout, ResponseLater as ResponseLaterOuter,
+)
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
@@ -16,8 +19,6 @@ from django.core.urlresolvers import set_script_prefix
 from django.http import FileResponse, HttpResponse, HttpResponseServerError
 from django.utils import six
 from django.utils.functional import cached_property
-
-from django.channels.exceptions import ResponseLater as ResponseLaterOuter, RequestTimeout, RequestAborted
 
 logger = logging.getLogger('django.request')
 

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 import copy
 
 from .channel import Channel

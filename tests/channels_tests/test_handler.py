@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
-from django.http import HttpResponse
 
 from django.channels import Channel
 from django.core.handlers.asgi import AsgiHandler
+from django.http import HttpResponse
 from django.test.channels import ChannelTestCase
 
 

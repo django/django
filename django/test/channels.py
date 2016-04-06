@@ -1,8 +1,8 @@
-from django.test import TestCase
-from django.channels import DEFAULT_CHANNEL_LAYER
-from django.channels.asgi import channel_layers, ChannelLayerWrapper
-from django.channels.message import Message
 from asgiref.inmemory import ChannelLayer as InMemoryChannelLayer
+from django.channels import DEFAULT_CHANNEL_LAYER
+from django.channels.asgi import ChannelLayerWrapper, channel_layers
+from django.channels.message import Message
+from django.test import TestCase
 
 
 class ChannelTestCase(TestCase):

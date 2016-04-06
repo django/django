@@ -6,9 +6,9 @@ from importlib import import_module
 from django.conf import settings
 from django.contrib.sessions.backends import signed_cookies
 from django.contrib.sessions.backends.base import CreateError
+from django.core.handlers.asgi import AsgiRequest
 
 from .exceptions import ConsumeLater
-from django.core.handlers.asgi import AsgiRequest
 
 
 def session_for_reply_channel(reply_channel):
