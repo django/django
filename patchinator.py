@@ -112,11 +112,16 @@ global_transforms = [
 ]
 
 docs_transforms = global_transforms + [
+    Replacement(r"<concepts>`", r"</topics/channels/concepts>`"),
     Replacement(r":doc:`concepts`", r":doc:`/topics/channels/concepts`"),
     Replacement(r":doc:`deploying`", r":doc:`/topics/channels/deploying`"),
     Replacement(r":doc:`scaling`", r":doc:`/topics/channels/scaling`"),
     Replacement(r":doc:`getting-started`", r":doc:`/intro/channels`"),
+    Replacement(r"<backends>`", r"</ref/channels/backends>`"),
+    Replacement(r":doc:`backends`", r":doc:`/ref/channels/backends`"),
+    Replacement(r":doc:`([\w\d\s]+) <asgi>`", r"`\1 <http://channels.readthedocs.org/en/latest/asgi.html>`_"),
     Replacement(r"\n\(.*installation>`\)\n", r""),
+    Replacement(r":doc:`installed Channels correctly <installation>`", r"added the channel layer setting"),
 ]
 
 
@@ -151,7 +156,7 @@ class Patchinator(object):
             "channels/sessions.py", "django/channels/sessions.py", global_transforms,
         ),
         FileMap(
-            "channels/staticfiles.py", "django/channels/staticfiles.py", global_transforms,
+            "channels/staticfiles.py", "django/contrib/staticfiles/consumers.py", global_transforms,
         ),
         FileMap(
             "channels/utils.py", "django/channels/utils.py", global_transforms,
