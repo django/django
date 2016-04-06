@@ -94,10 +94,7 @@ def get_channel_layer(alias="default"):
     """
     Returns the raw ASGI channel layer for this project.
     """
-    if django.VERSION[1] > 9:
-        django.setup(set_prefix=False)
-    else:
-        django.setup()
+    django.setup(set_prefix=False)
     return channel_layers[alias].channel_layer
 
 
