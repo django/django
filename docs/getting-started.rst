@@ -443,7 +443,7 @@ chat to people with the same first letter of their username::
     # In consumers.py
     from channels import Channel, Group
     from channels.sessions import channel_session
-    from channels.auth import http_session_user, channel_session_user, transfer_user
+    from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http
 
     # Connected to websocket.connect
     @channel_session_user_from_http
