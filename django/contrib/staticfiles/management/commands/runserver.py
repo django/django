@@ -1,6 +1,6 @@
 from django.conf import settings
-from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.contrib.staticfiles.consumers import StaticFilesConsumer
+from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.core.management.commands.runserver import \
     Command as RunserverCommand
 
