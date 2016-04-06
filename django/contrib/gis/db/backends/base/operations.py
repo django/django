@@ -58,10 +58,10 @@ class BaseSpatialOperations(object):
     unsupported_functions = {
         'Area', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
         'BoundingCircle', 'Centroid', 'Difference', 'Distance', 'Envelope',
-        'ForceRHR', 'GeoHash', 'Intersection', 'Length', 'MemSize', 'NumGeometries',
-        'NumPoints', 'Perimeter', 'PointOnSurface', 'Reverse', 'Scale',
-        'SnapToGrid', 'SymDifference', 'Transform', 'Translate',
-        'Union',
+        'ForceRHR', 'GeoHash', 'Intersection', 'IsValid', 'Length', 'MakeValid',
+        'MemSize', 'NumGeometries', 'NumPoints', 'Perimeter', 'PointOnSurface',
+        'Reverse', 'Scale', 'SnapToGrid', 'SymDifference', 'Transform',
+        'Translate', 'Union',
     }
 
     # Serialization
