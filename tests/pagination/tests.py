@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.core.paginator import (
     EmptyPage, InvalidPage, PageNotAnInteger, Paginator,
+    UnorderedQuerysetWarning
 )
 from django.test import TestCase
 from django.utils import six
@@ -327,6 +328,5 @@ class ModelPaginationTests(TestCase):
         self.assertIsInstance(p.object_list, list)
 
     def test_paginating_not_order_QuerySet_should_raise_RuntimeWarning(self):
-        with self.assertRaises(RuntimeWarning):
-            paginator = Paginator(Article.objects.all(), 5)
-            paginator.page(1)
+        with self.assertRaises(UnorderedQuerysetWarning):
+            Paginator(Article.objects.all(), 5)
