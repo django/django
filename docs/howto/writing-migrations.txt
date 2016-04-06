@@ -318,8 +318,6 @@ Here's a sample migration:
         if global_apps.is_installed('old_app'):
             dependencies.append(('old_app', '0001_initial'))
 
-
-
 Also consider what you want to happen when the migration is unapplied. You
 could either do nothing (as in the example above) or remove some or all of the
 data from the new application. Adjust the second argument of the
