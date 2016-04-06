@@ -4,6 +4,12 @@ from math import ceil
 
 from django.utils import six
 from django.utils.functional import cached_property
+from django.core.exceptions import DjangoRuntimeWarning
+
+
+class UnorderedQuerysetWarning(DjangoRuntimeWarning):
+    pass
+
 
 
 class InvalidPage(Exception):
