@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
-from django.contrib.auth.checks import check_user_model
+from django.contrib.auth.checks import (
+    check_models_permissions, check_user_model,
+)
 from django.contrib.auth.models import AbstractBaseUser
 from django.core import checks
 from django.db import models
@@ -80,3 +82,83 @@ class UserModelChecksTests(SimpleTestCase):
                     id='auth.W004',
                 ),
             ])
+
+
+@isolate_apps('auth_tests', attr_name='apps')
+@override_system_checks([check_models_permissions])
+class ModelsPermissionsChecksTests(SimpleTestCase):
+    def test_clashing_default_permissions(self):
+        class Checked(models.Model):
+            class Meta:
+                permissions = [
+                    ('change_checked', 'Can edit permission (duplicate)')
+                ]
+        errors = checks.run_checks(self.apps.get_app_configs())
+        self.assertEqual(errors, [
+            checks.Error(
+                "The permission codenamed 'change_checked' clashes with a builtin "
+                "permission for model 'auth_tests.Checked'.",
+                obj=Checked,
+                id='auth.E005',
+            ),
+        ])
+
+    def test_non_clashing_custom_permissions(self):
+        class Checked(models.Model):
+            class Meta:
+                permissions = [
+                    ('my_custom_permission', 'Some permission'),
+                    ('other_one', 'Some other permission'),
+                ]
+        errors = checks.run_checks(self.apps.get_app_configs())
+        self.assertEqual(errors, [])
+
+    def test_clashing_custom_permissions(self):
+        class Checked(models.Model):
+            class Meta:
+                permissions = [
+                    ('my_custom_permission', 'Some permission'),
+                    ('other_one', 'Some other permission'),
+                    ('my_custom_permission', 'Some permission with duplicate permission code'),
+                ]
+        errors = checks.run_checks(self.apps.get_app_configs())
+        self.assertEqual(errors, [
+            checks.Error(
+                "The permission codenamed 'my_custom_permission' is duplicated for "
+                "model 'auth_tests.Checked'.",
+                obj=Checked,
+                id='auth.E006',
+            ),
+        ])
+
+    def test_verbose_name_max_length(self):
+        class Checked(models.Model):
+            class Meta:
+                verbose_name = 'some ridiculously long verbose name that is out of control' * 5
+        errors = checks.run_checks(self.apps.get_app_configs())
+        self.assertEqual(errors, [
+            checks.Error(
+                "The verbose_name of model 'auth_tests.Checked' must be at most 244 "
+                "characters for its builtin permission names to be at most 255 characters.",
+                obj=Checked,
+                id='auth.E007',
+            ),
+        ])
+
+    def test_custom_permission_name_max_length(self):
+        custom_permission_name = 'some ridiculously long verbose name that is out of control' * 5
+
+        class Checked(models.Model):
+            class Meta:
+                permissions = [
+                    ('my_custom_permission', custom_permission_name),
+                ]
+        errors = checks.run_checks(self.apps.get_app_configs())
+        self.assertEqual(errors, [
+            checks.Error(
+                "The permission named '%s' of model 'auth_tests.Checked' is longer "
+                "than 255 characters." % custom_permission_name,
+                obj=Checked,
+                id='auth.E008',
+            ),
+        ])
