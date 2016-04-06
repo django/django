@@ -6,7 +6,7 @@ from django.contrib.gis.measure import (
     Area as AreaMeasure, Distance as DistanceMeasure,
 )
 from django.core.exceptions import FieldError
-from django.db.models import FloatField, IntegerField, TextField
+from django.db.models import BooleanField, FloatField, IntegerField, TextField
 from django.db.models.expressions import Func, Value
 from django.utils import six
 
@@ -282,6 +282,10 @@ class Intersection(OracleToleranceMixin, GeoFuncWithGeoParam):
     arity = 2
 
 
+class IsValid(GeoFunc):
+    output_field_class = BooleanField
+
+
 class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     output_field_class = FloatField
 
@@ -317,6 +321,10 @@ class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
             else:
                 self.function = 'GreatCircleLength'
         return super(Length, self).as_sql(compiler, connection)
+
+
+class MakeValid(GeoFunc):
+    pass
 
 
 class MemSize(GeoFunc):

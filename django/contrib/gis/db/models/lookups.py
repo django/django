@@ -5,7 +5,7 @@ import re
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Expression
-from django.db.models.lookups import Lookup
+from django.db.models.lookups import BuiltinLookup, Lookup
 from django.utils import six
 
 gis_lookups = {}
@@ -268,6 +268,19 @@ gis_lookups['equals'] = EqualsLookup
 class IntersectsLookup(GISLookup):
     lookup_name = 'intersects'
 gis_lookups['intersects'] = IntersectsLookup
+
+
+class IsValidLookup(BuiltinLookup):
+    lookup_name = 'isvalid'
+
+    def as_sql(self, compiler, connection):
+        gis_op = connection.ops.gis_operators[self.lookup_name]
+        sql, params = self.process_lhs(compiler, connection)
+        sql = '%(func)s(%(lhs)s)' % {'func': gis_op.func, 'lhs': sql}
+        if not self.rhs:
+            sql = 'NOT ' + sql
+        return sql, params
+gis_lookups['isvalid'] = IsValidLookup
 
 
 class OverlapsLookup(GISLookup):
