@@ -29,6 +29,7 @@ class Paginator(object):
     def __init__(self, object_list, per_page, orphans=0,
                  allow_empty_first_page=True):
         self.object_list = object_list
+        self._is_ordered_queryset()
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
@@ -59,9 +60,6 @@ class Paginator(object):
         top = bottom + self.per_page
         if top + self.orphans >= self.count:
             top = self.count
-
-        if hasattr(self.object_list, 'ordered') and not self.object_list.ordered:
-            warnings.warn("Inconsistent pagination when no ordering is specified", RuntimeWarning)
         return self._get_page(self.object_list[bottom:top], number, self)
 
     def _get_page(self, *args, **kwargs):
@@ -103,6 +101,17 @@ class Paginator(object):
         a template for loop.
         """
         return six.moves.range(1, self.num_pages + 1)
+
+    def _is_ordered_queryset(self):
+        """
+        Check if the object list is Queryset and if it's not ordered
+        and wran user
+        """
+        if hasattr(self.object_list, 'ordered')\
+           and not self.object_list.ordered:
+            warnings.warn("Pagination may yield consistent results with"
+                          "object_list isn't ordered.",
+                          UnorderedQuerysetWarning)
 
 
 QuerySetPaginator = Paginator   # For backwards-compatibility.
