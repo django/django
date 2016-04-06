@@ -6,7 +6,6 @@ import importlib
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
 
-from .handler import ViewConsumer
 from .utils import name_that_thing
 
 
@@ -47,6 +46,9 @@ class Router(object):
         """
         # We just add the default Django route to the bottom; if the user
         # has defined another http.request handler, it'll get hit first and run.
+        # Inner import here to avoid circular import; this function only gets
+        # called once, thankfully.
+        from .handler import ViewConsumer
         self.add_route(Route("http.request", http_consumer or ViewConsumer()))
 
     @classmethod
