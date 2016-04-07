@@ -170,6 +170,16 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string('if-tag-not-in-02', {'x': [1]})
         self.assertEqual(output, 'yes')
 
+    @setup({'if-tag-is01': '{% if foo is True %}yes{% else %}no{% endif %}'})
+    def test_if_tag_is01(self):
+        output = self.engine.render_to_string('if-tag-is01', {'foo': True})
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-is02': '{% if foo is True %}yes{% else %}no{% endif %}'})
+    def test_if_tag_is02(self):
+        output = self.engine.render_to_string('if-tag-is02', {'foo': 1})
+        self.assertEqual(output, 'no')
+
     # AND
     @setup({'if-tag-and01': '{% if foo and bar %}yes{% else %}no{% endif %}'})
     def test_if_tag_and01(self):
@@ -482,6 +492,18 @@ class IfTagTests(SimpleTestCase):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('if-tag-error12')
 
+    @setup({'if-tag-error13': '{% if a not b %}yes'})
+    def test_if_tag_error13(self):
+        with self.assertRaises(TemplateSyntaxError):
+            self.engine.get_template('if-tag-error13')
+
+    @setup({'if-tag-error14': '{% if foo = bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_error14(self):
+        # A single equals sign is a syntax error.
+        with self.assertRaises(TemplateSyntaxError):
+            self.engine.render_to_string('if-tag-error14', {'foo': 1})
+
+
     @setup({'if-tag-shortcircuit01': '{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}'})
     def test_if_tag_shortcircuit01(self):
         """
@@ -520,20 +542,4 @@ class IfTagTests(SimpleTestCase):
     @setup({'if-tag-badarg04': '{% if x|default_if_none:y %}yes{% else %}no{% endif %}'})
     def test_if_tag_badarg04(self):
         output = self.engine.render_to_string('if-tag-badarg04')
-        self.assertEqual(output, 'no')
-
-    @setup({'if-tag-single-eq': '{% if foo = bar %}yes{% else %}no{% endif %}'})
-    def test_if_tag_single_eq(self):
-        # A single equals sign is a syntax error.
-        with self.assertRaises(TemplateSyntaxError):
-            self.engine.render_to_string('if-tag-single-eq', {'foo': 1})
-
-    @setup({'template': '{% if foo is True %}yes{% else %}no{% endif %}'})
-    def test_if_is_match(self):
-        output = self.engine.render_to_string('template', {'foo': True})
-        self.assertEqual(output, 'yes')
-
-    @setup({'template': '{% if foo is True %}yes{% else %}no{% endif %}'})
-    def test_if_is_no_match(self):
-        output = self.engine.render_to_string('template', {'foo': 1})
         self.assertEqual(output, 'no')
