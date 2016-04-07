@@ -417,7 +417,7 @@ Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 This enables filtering, ordering, and other query operations on ``Bookmark``
 from ``TaggedItem``::
 
-    >>> # Get all tags belonging to books containing `django` in the url
+    >>> # Get all tags belonging to bookmarks containing `django` in the url
     >>> TaggedItem.objects.filter(bookmarks__url__contains='django')
     [<TaggedItem: django>, <TaggedItem: python>]
 
