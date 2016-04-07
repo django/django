@@ -88,8 +88,6 @@ def prefix(bp, func):
 
 
 # Operator precedence follows Python.
-# NB - we can get slightly more accurate syntax error messages by not using the
-# same object for '==' and '='.
 # We defer variable evaluation to the lambda to ensure that terms are
 # lazily evaluated using Python's boolean parsing logic.
 OPERATORS = {
