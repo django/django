@@ -34,7 +34,7 @@ class Channel(object):
         Send a message over the channel - messages are always dicts.
         """
         if not isinstance(content, dict):
-            raise ValueError("You can only send dicts as content on channels.")
+            raise TypeError("You can only send dicts as content on channels.")
         self.channel_layer.send(self.name, content)
 
     def __str__(self):
