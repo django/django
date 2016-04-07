@@ -838,7 +838,7 @@ Using ``request.user.is_authenticated()`` and ``request.user.is_anonymous()`` as
 The following members of
 :class:`~django.contrib.auth.models.AbstractBaseUser` and
 :class:`~django.contrib.auth.models.AnonymousUser` classes are now
-properties, and should no longer be invoked as methods:
+properties, and should no longer be invoked as methods::
 
 * ``AbstractBaseUser.is_authenticated``
 * ``AbstractBaseUser.is_anonymous``
@@ -847,12 +847,19 @@ properties, and should no longer be invoked as methods:
 
 For instance, if you use
 :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` and want
-to know whether the user is currently logged-in you would use:
+to know whether the user is currently logged-in you would use::
 
     if request.user.is_authenticated:
         ... # Do something for logged-in users.
     else:
         ... # Do something for anonymous users.
+
+This change was made because ``is_staff`` and ``is_superuser`` were
+properties, whereas ``is_authenticated`` and ``is_anonymous`` were not. As a
+result, it was too easy to accidentally write code such as::
+
+    if request.user.is_authenticated:
+        return sensitive_information
 
 Custom manager classes available through ``prefetch_related`` must define a ``_apply_rel_filters()`` method
 -----------------------------------------------------------------------------------------------------------
