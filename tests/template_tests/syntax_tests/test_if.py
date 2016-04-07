@@ -497,6 +497,13 @@ class IfTagTests(SimpleTestCase):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('if-tag-error13')
 
+    @setup({'if-tag-error14': '{% if foo = bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_error14(self):
+        # A single equals sign is a syntax error.
+        with self.assertRaises(TemplateSyntaxError):
+            self.engine.render_to_string('if-tag-error14', {'foo': 1})
+
+
     @setup({'if-tag-shortcircuit01': '{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}'})
     def test_if_tag_shortcircuit01(self):
         """
@@ -536,9 +543,3 @@ class IfTagTests(SimpleTestCase):
     def test_if_tag_badarg04(self):
         output = self.engine.render_to_string('if-tag-badarg04')
         self.assertEqual(output, 'no')
-
-    @setup({'if-tag-single-eq': '{% if foo = bar %}yes{% else %}no{% endif %}'})
-    def test_if_tag_single_eq(self):
-        # A single equals sign is a syntax error.
-        with self.assertRaises(TemplateSyntaxError):
-            self.engine.render_to_string('if-tag-single-eq', {'foo': 1})
