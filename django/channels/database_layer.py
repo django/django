@@ -60,7 +60,9 @@ class DatabaseChannelLayer(object):
         while True:
             try:
                 with transaction.atomic():
-                    message = self.channel_model.objects.select_for_update().filter(channel__in=channels).order_by("id").first()
+                    message = self.channel_model.objects.select_for_update().filter(
+                        channel__in=channels
+                    ).order_by("id").first()
                     if message:
                         self.channel_model.objects.filter(pk=message.pk).delete()
                         return message.channel, self.deserialize(message.content)

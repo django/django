@@ -214,9 +214,11 @@ background tasks outside of the request-response cycle.
   :doc:`Tutorial <intro/channels>`
 
 * **Running:**
+  :doc:`Testing <topics/channels/testing>` |
   :doc:`Deploying <topics/channels/deploying>` |
   :doc:`Scaling <topics/channels/scaling>` |
-  :doc:`Channel Layers <ref/channels/backends>`
+  :doc:`Channel Layers <ref/channels/backends>` |
+  :doc:`Cross-compatibility <topics/channels/cross-compat>`
 
 * **Reference:**
   :doc:`API <ref/channels/api>`

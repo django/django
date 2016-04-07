@@ -12,6 +12,8 @@ protocols and run code outside of a request-response contenxt.
    concepts
    deploying
    scaling
+   testing
+   cross-compat
 
 .. seealso::
 
