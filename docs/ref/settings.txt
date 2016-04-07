@@ -2523,6 +2523,12 @@ A boolean that specifies whether to use the X-Forwarded-Host header in
 preference to the Host header. This should only be enabled if a proxy
 which sets this header is in use.
 
+.. note:: This takes priority over :setting:`USE_X_FORWARDED_PORT`.
+   Please note that the ``X-Forwarded-Host`` header can include port number, see `RFC_7239`_
+   in which case you should not use :setting:`USE_X_FORWARDED_PORT`
+
+.. _RFC_7239: http://tools.ietf.org/html/rfc7239#page-7
+
 .. setting:: USE_X_FORWARDED_PORT
 
 ``USE_X_FORWARDED_PORT``
@@ -2535,6 +2541,8 @@ Default: ``False``
 A boolean that specifies whether to use the X-Forwarded-Port header in
 preference to the ``SERVER_PORT`` ``META`` variable. This should only be
 enabled if a proxy which sets this header is in use.
+
+.. note:: :setting:`USE_X_FORWARDED_HOST` has precedence over this setting.
 
 .. setting:: WSGI_APPLICATION
 
