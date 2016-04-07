@@ -612,21 +612,6 @@ The following methods are available on any subclass of
 
         Returns the value of the field nominated by ``USERNAME_FIELD``.
 
-    .. attribute:: models.AbstractBaseUser.is_anonymous
-
-        Read-only attribute which is always ``False``. This is a way of
-        differentiating :class:`~django.contrib.auth.models.User` and
-        :class:`~django.contrib.auth.models.AnonymousUser` objects.
-        Generally, you should prefer using
-        :attr:`~django.contrib.auth.models.User.is_authenticated` to this
-        attribute.
-
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. For backwards-compatibility
-            it can still be used as a method, but this will be removed in
-            version 2.0.
-
     .. attribute:: models.AbstractBaseUser.is_authenticated()
 
         Read-only attribute which is always ``True`` (as opposed to
@@ -639,6 +624,21 @@ The following methods are available on any subclass of
         (representing the currently logged-in user), you should know this
         attribute is ``True`` for any :class:`~django.contrib.auth.models.User`
         instance.
+
+        .. versionchanged:: 1.10
+
+            In older versions, this was a method. For backwards-compatibility
+            it can still be used as a method, but this will be removed in
+            version 2.0.
+
+    .. attribute:: models.AbstractBaseUser.is_anonymous
+
+        Read-only attribute which is always ``False``. This is a way of
+        differentiating :class:`~django.contrib.auth.models.User` and
+        :class:`~django.contrib.auth.models.AnonymousUser` objects.
+        Generally, you should prefer using
+        :attr:`~django.contrib.auth.models.User.is_authenticated` to this
+        attribute.
 
         .. versionchanged:: 1.10
 

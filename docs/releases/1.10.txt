@@ -832,6 +832,27 @@ features, is deprecated. Replace it with a custom lookup::
     models.CharField.register_lookup(Search)
     models.TextField.register_lookup(Search)
 
+Using ``request.user.is_authenticated()`` and ``request.user.is_anonymous()`` as methods
+----------------------------------------------------------------------------------------
+
+The following members of :class:`~django.contrib.auth.models.User` and
+:class:`~~django.contrib.auth.models.AnonymousUser` classes are now
+properties, and should no longer be invoked as methods:
+
+* :attr:`~django.contrib.auth.models.User.is_authenticated`
+* :attr:`~django.contrib.auth.models.User.is_anonymous`
+* :attr:`~django.contrib.auth.models.AnonymousUser.is_authenticated`
+* :attr:`~django.contrib.auth.models.AnonymousUser.is_anonymous`
+
+For instance, if you use
+:class:`~django.contrib.auth.middleware.AuthenticationMiddleware` and want
+to know whether the user is currently logged-in you would use:
+
+    if request.user.is_authenticated:
+        ... # Do something for logged-in users.
+    else:
+        ... # Do something for anonymous users.
+
 Custom manager classes available through ``prefetch_related`` must define a ``_apply_rel_filters()`` method
 -----------------------------------------------------------------------------------------------------------
 
