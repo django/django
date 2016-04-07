@@ -8,10 +8,7 @@ from decimal import Decimal
 
 from django.utils import six
 from django.utils.functional import Promise
-from django.utils.six.moves.urllib.parse import quote, unquote
-
-if six.PY3:
-    from urllib.parse import unquote_to_bytes
+from django.utils.six.moves.urllib.parse import quote
 
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
@@ -210,12 +207,16 @@ def iri_to_uri(iri):
     return quote(force_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
 
+_hexdig = '0123456789ABCDEFabcdef'
+_hextobyte = None
+
+
 def uri_to_iri(uri):
     """
     Converts a Uniform Resource Identifier(URI) into an Internationalized
     Resource Identifier(IRI).
 
-    This is the algorithm from section 3.2 of RFC 3987.
+    This is the algorithm from section 3.2 of RFC 3987, excluding step 4.
 
     Takes an URI in ASCII bytes (e.g. '/I%20%E2%99%A5%20Django/') and returns
     unicode containing the encoded result (e.g. '/I \xe2\x99\xa5 Django/').
@@ -223,7 +224,29 @@ def uri_to_iri(uri):
     if uri is None:
         return uri
     uri = force_bytes(uri)
-    iri = unquote_to_bytes(uri) if six.PY3 else unquote(uri)
+
+    bits = uri.split(b'%')
+    if len(bits) == 1:
+        iri = uri
+    else:
+        parts = [bits[0]]
+        append = parts.append
+        global _hextobyte
+        if _hextobyte is None:
+            _allowed_ascii = [45, 46, 95, 126] + list(range(65, 91)) + list(range(97, 123))
+            _hextobyte = {('%02x' % char).encode(): bytes([char])
+                          for char in _allowed_ascii}
+            _hextobyte.update(((a + b).encode(), bytes([int(a + b, 16)]))
+                              for a in _hexdig[8:] for b in _hexdig)
+        for item in bits[1:]:
+            try:
+                append(_hextobyte[item[:2]])
+                append(item[2:])
+            except KeyError:
+                append(b'%')
+                append(item)
+        iri = b''.join(parts)
+
     return repercent_broken_unicode(iri).decode('utf-8')
 
 
