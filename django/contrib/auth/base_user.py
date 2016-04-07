@@ -10,8 +10,8 @@ from django.contrib.auth.hashers import (
 )
 from django.db import models
 from django.utils.crypto import get_random_string, salted_hmac
+from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.functional import CallableFalse, CallableTrue
 from django.utils.translation import ugettext_lazy as _
 
 

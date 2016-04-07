@@ -440,30 +440,3 @@ def partition(predicate, values):
     for item in values:
         results[predicate(item)].append(item)
     return results
-
-
-class CallableBool:
-    """
-    An boolean-like object that is also callable for backwards compatibility.
-    """
-    def __init__(self, value):
-        self.value = value
-
-    def __bool__(self):
-        return self.value
-
-    def __call__(self):
-        warnings.warn(
-            "Using user.is_authenticated() and user.is_anonymous() as a method is deprecated.",
-            RemovedInDjango20Warning, stacklevel=2)
-        return self.value
-
-    def __nonzero__(self):  # Python 2 compatibility
-        return self.value
-
-    def __repr__(self):
-        return 'CallableBool(%r)' % self.value
-
-CallableFalse = CallableBool(False)
-
-CallableTrue = CallableBool(True)

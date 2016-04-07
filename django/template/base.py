@@ -60,13 +60,13 @@ from django.template.context import (  # NOQA: imported for backwards compatibil
 )
 from django.utils import six
 from django.utils.deprecation import (
-    DeprecationInstanceCheck, RemovedInDjango20Warning,
+    CallableFalse, CallableTrue, DeprecationInstanceCheck,
+    RemovedInDjango20Warning,
 )
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
 from django.utils.formats import localize
-from django.utils.functional import CallableFalse, CallableTrue
 from django.utils.html import conditional_escape, escape
 from django.utils.inspect import getargspec
 from django.utils.safestring import (
