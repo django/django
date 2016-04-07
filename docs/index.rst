@@ -29,11 +29,10 @@ Contents:
    installation
    getting-started
    deploying
-   integration-changes
    scaling
    backends
    testing
+   cross-compat
    reference
-   integration-plan
    faqs
    asgi
