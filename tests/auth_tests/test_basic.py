@@ -10,7 +10,6 @@ from django.dispatch import receiver
 from django.test import TestCase, override_settings
 from django.test.signals import setting_changed
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import CustomUser
 
