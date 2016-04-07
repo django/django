@@ -4,6 +4,7 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.http import urlquote
@@ -115,3 +116,16 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+@python_2_unicode_compatible
+class ModelWithEmptyFKToSite(models.Model):
+    """A model with a nullable ForeignKey to Site"""
+    title = models.CharField(max_length=200)
+    site = models.ForeignKey(Site, null=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return "/title/%s/" % (self.title)

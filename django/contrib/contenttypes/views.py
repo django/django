@@ -66,6 +66,9 @@ def shortcut(request, content_type_id, object_id):
                         object_domain = getattr(obj, field.name).domain
                     except Site.DoesNotExist:
                         pass
+                    except AttributeError:
+                        raise http.Http404(_("%(ct_name)s foreign key to Site is equal to None for field %(field)s ") %
+                           {'ct_name': content_type.name, 'field': field})
                     if object_domain is not None:
                         break
 
