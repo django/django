@@ -492,6 +492,11 @@ class IfTagTests(SimpleTestCase):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('if-tag-error12')
 
+    @setup({'if-tag-error13': '{% if a not b %}yes'})
+    def test_if_tag_error13(self):
+        with self.assertRaises(TemplateSyntaxError):
+            self.engine.get_template('if-tag-error13')
+
     @setup({'if-tag-shortcircuit01': '{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}'})
     def test_if_tag_shortcircuit01(self):
         """
