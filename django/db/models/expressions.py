@@ -189,6 +189,9 @@ class BaseExpression(object):
 
     @cached_property
     def contributes_to_group_by(self):
+        for expr in self.get_source_expressions():
+            if expr and expr.contributes_to_group_by:
+                return True
         return self.contains_column_references
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
