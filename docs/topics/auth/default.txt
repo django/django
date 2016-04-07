@@ -306,7 +306,7 @@ of :class:`~django.contrib.auth.models.AnonymousUser`, otherwise it will be an
 instance of :class:`~django.contrib.auth.models.User`.
 
 You can tell them apart with
-:meth:`~django.contrib.auth.models.User.is_authenticated`, like so::
+:attr:`~django.contrib.auth.models.User.is_authenticated`, like so::
 
     if request.user.is_authenticated:
         # Do something for authenticated users.

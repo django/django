@@ -612,7 +612,7 @@ The following methods are available on any subclass of
 
         Returns the value of the field nominated by ``USERNAME_FIELD``.
 
-    .. attribute:: models.AbstractBaseUser.is_authenticated()
+    .. attribute:: models.AbstractBaseUser.is_authenticated
 
         Read-only attribute which is always ``True`` (as opposed to
         ``AnonymousUser.is_authenticated`` which is always ``False``).

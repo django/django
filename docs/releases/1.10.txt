@@ -835,14 +835,15 @@ features, is deprecated. Replace it with a custom lookup::
 Using ``request.user.is_authenticated()`` and ``request.user.is_anonymous()`` as methods
 ----------------------------------------------------------------------------------------
 
-The following members of :class:`~django.contrib.auth.models.User` and
-:class:`~~django.contrib.auth.models.AnonymousUser` classes are now
+The following members of
+:class:`~django.contrib.auth.models.AbstractBaseUser` and
+:class:`~django.contrib.auth.models.AnonymousUser` classes are now
 properties, and should no longer be invoked as methods:
 
-* :attr:`~django.contrib.auth.models.User.is_authenticated`
-* :attr:`~django.contrib.auth.models.User.is_anonymous`
-* :attr:`~django.contrib.auth.models.AnonymousUser.is_authenticated`
-* :attr:`~django.contrib.auth.models.AnonymousUser.is_anonymous`
+* ``AbstractBaseUser.is_authenticated``
+* ``AbstractBaseUser.is_anonymous``
+* ``AnonymousUser.is_authenticated``
+* ``AnonymousUser.is_anonymous``
 
 For instance, if you use
 :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` and want
