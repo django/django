@@ -8,9 +8,11 @@ from django.utils import six
 from django.utils._os import upath
 
 
-@unittest.skipIf(six.PY2,
+@unittest.skipIf(
+    six.PY2,
     'Python 2 cannot import the project template because '
-    'django/conf/project_template doesn\'t have an __init__.py file.')
+    'django/conf/project_template doesn\'t have an __init__.py file.'
+)
 class TestStartProjectSettings(TestCase):
     def setUp(self):
         # Ensure settings.py exists

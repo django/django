@@ -191,8 +191,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
 
     def test_generic_inline_formset_factory(self):
         # Regression test for #10522.
-        inline_formset = generic_inlineformset_factory(Media,
-            exclude=('url',))
+        inline_formset = generic_inlineformset_factory(Media, exclude=('url',))
 
         # Regression test for #12340.
         e = Episode.objects.get(name='This Week in Django')

@@ -267,9 +267,8 @@ class LazyModelRefTest(BaseSignalTest):
         self.received.append(kwargs)
 
     def test_invalid_sender_model_name(self):
-        with self.assertRaisesMessage(ValueError,
-                    "Specified sender must either be a model or a "
-                    "model name of the 'app_label.ModelName' form."):
+        msg = "Specified sender must either be a model or a model name of the 'app_label.ModelName' form."
+        with self.assertRaisesMessage(ValueError, msg):
             signals.post_init.connect(self.receiver, sender='invalid')
 
     def test_already_loaded_model(self):

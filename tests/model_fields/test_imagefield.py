@@ -17,8 +17,10 @@ except ImproperlyConfigured:
     Image = None
 
 if Image:
-    from .models import (Person, PersonWithHeight, PersonWithHeightAndWidth,
-        PersonDimensionsFirst, PersonTwoImages, TestImageFieldFile)
+    from .models import (
+        Person, PersonWithHeight, PersonWithHeightAndWidth,
+        PersonDimensionsFirst, PersonTwoImages, TestImageFieldFile,
+    )
     from .models import temp_storage_dir
 else:
     # Pillow not available, create dummy classes (tests will be skipped anyway)

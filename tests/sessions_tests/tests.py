@@ -552,8 +552,10 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         file_prefix = settings.SESSION_COOKIE_NAME
 
         def count_sessions():
-            return len([session_file for session_file in os.listdir(storage_path)
-                if session_file.startswith(file_prefix)])
+            return len([
+                session_file for session_file in os.listdir(storage_path)
+                if session_file.startswith(file_prefix)
+            ])
 
         self.assertEqual(0, count_sessions())
 
@@ -651,8 +653,10 @@ class SessionMiddlewareTests(TestCase):
         response = middleware.process_response(request, response)
         self.assertTrue(
             response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
-        self.assertIn(http_cookies.Morsel._reserved['httponly'],
-            str(response.cookies[settings.SESSION_COOKIE_NAME]))
+        self.assertIn(
+            http_cookies.Morsel._reserved['httponly'],
+            str(response.cookies[settings.SESSION_COOKIE_NAME])
+        )
 
     @override_settings(SESSION_COOKIE_HTTPONLY=False)
     def test_no_httponly_session_cookie(self):

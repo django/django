@@ -338,16 +338,26 @@ class MigrateTests(MigrationTestBase):
         index_tx_end = output.find(connection.ops.end_transaction_sql().lower())
 
         self.assertGreater(index_tx_start, -1, "Transaction start not found")
-        self.assertGreater(index_op_desc_author, index_tx_start,
-            "Operation description (author) not found or found before transaction start")
-        self.assertGreater(index_create_table, index_op_desc_author,
-            "CREATE TABLE not found or found before operation description (author)")
-        self.assertGreater(index_op_desc_tribble, index_create_table,
-            "Operation description (tribble) not found or found before CREATE TABLE (author)")
-        self.assertGreater(index_op_desc_unique_together, index_op_desc_tribble,
-            "Operation description (unique_together) not found or found before operation description (tribble)")
-        self.assertGreater(index_tx_end, index_op_desc_unique_together,
-            "Transaction end not found or found before operation description (unique_together)")
+        self.assertGreater(
+            index_op_desc_author, index_tx_start,
+            "Operation description (author) not found or found before transaction start"
+        )
+        self.assertGreater(
+            index_create_table, index_op_desc_author,
+            "CREATE TABLE not found or found before operation description (author)"
+        )
+        self.assertGreater(
+            index_op_desc_tribble, index_create_table,
+            "Operation description (tribble) not found or found before CREATE TABLE (author)"
+        )
+        self.assertGreater(
+            index_op_desc_unique_together, index_op_desc_tribble,
+            "Operation description (unique_together) not found or found before operation description (tribble)"
+        )
+        self.assertGreater(
+            index_tx_end, index_op_desc_unique_together,
+            "Transaction end not found or found before operation description (unique_together)"
+        )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate_backwards(self):
@@ -369,17 +379,27 @@ class MigrateTests(MigrationTestBase):
         index_tx_end = output.find(connection.ops.end_transaction_sql().lower())
 
         self.assertGreater(index_tx_start, -1, "Transaction start not found")
-        self.assertGreater(index_op_desc_unique_together, index_tx_start,
-            "Operation description (unique_together) not found or found before transaction start")
-        self.assertGreater(index_op_desc_tribble, index_op_desc_unique_together,
-            "Operation description (tribble) not found or found before operation description (unique_together)")
-        self.assertGreater(index_op_desc_author, index_op_desc_tribble,
-            "Operation description (author) not found or found before operation description (tribble)")
+        self.assertGreater(
+            index_op_desc_unique_together, index_tx_start,
+            "Operation description (unique_together) not found or found before transaction start"
+        )
+        self.assertGreater(
+            index_op_desc_tribble, index_op_desc_unique_together,
+            "Operation description (tribble) not found or found before operation description (unique_together)"
+        )
+        self.assertGreater(
+            index_op_desc_author, index_op_desc_tribble,
+            "Operation description (author) not found or found before operation description (tribble)"
+        )
 
-        self.assertGreater(index_drop_table, index_op_desc_author,
-            "DROP TABLE not found or found before operation description (author)")
-        self.assertGreater(index_tx_end, index_op_desc_unique_together,
-            "Transaction end not found or found before DROP TABLE")
+        self.assertGreater(
+            index_drop_table, index_op_desc_author,
+            "DROP TABLE not found or found before operation description (author)"
+        )
+        self.assertGreater(
+            index_tx_end, index_op_desc_unique_together,
+            "Transaction end not found or found before DROP TABLE"
+        )
 
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)

@@ -772,54 +772,42 @@ class BaseCacheTests(object):
     def test_cache_versioning_get_set_many(self):
         # set, using default version = 1
         cache.set_many({'ford1': 37, 'arthur1': 42})
-        self.assertDictEqual(cache.get_many(['ford1', 'arthur1']),
-                         {'ford1': 37, 'arthur1': 42})
-        self.assertDictEqual(cache.get_many(['ford1', 'arthur1'], version=1),
-                         {'ford1': 37, 'arthur1': 42})
+        self.assertDictEqual(cache.get_many(['ford1', 'arthur1']), {'ford1': 37, 'arthur1': 42})
+        self.assertDictEqual(cache.get_many(['ford1', 'arthur1'], version=1), {'ford1': 37, 'arthur1': 42})
         self.assertDictEqual(cache.get_many(['ford1', 'arthur1'], version=2), {})
 
         self.assertDictEqual(caches['v2'].get_many(['ford1', 'arthur1']), {})
-        self.assertDictEqual(caches['v2'].get_many(['ford1', 'arthur1'], version=1),
-                         {'ford1': 37, 'arthur1': 42})
+        self.assertDictEqual(caches['v2'].get_many(['ford1', 'arthur1'], version=1), {'ford1': 37, 'arthur1': 42})
         self.assertDictEqual(caches['v2'].get_many(['ford1', 'arthur1'], version=2), {})
 
         # set, default version = 1, but manually override version = 2
         cache.set_many({'ford2': 37, 'arthur2': 42}, version=2)
         self.assertDictEqual(cache.get_many(['ford2', 'arthur2']), {})
         self.assertDictEqual(cache.get_many(['ford2', 'arthur2'], version=1), {})
-        self.assertDictEqual(cache.get_many(['ford2', 'arthur2'], version=2),
-                         {'ford2': 37, 'arthur2': 42})
+        self.assertDictEqual(cache.get_many(['ford2', 'arthur2'], version=2), {'ford2': 37, 'arthur2': 42})
 
-        self.assertDictEqual(caches['v2'].get_many(['ford2', 'arthur2']),
-                         {'ford2': 37, 'arthur2': 42})
+        self.assertDictEqual(caches['v2'].get_many(['ford2', 'arthur2']), {'ford2': 37, 'arthur2': 42})
         self.assertDictEqual(caches['v2'].get_many(['ford2', 'arthur2'], version=1), {})
-        self.assertDictEqual(caches['v2'].get_many(['ford2', 'arthur2'], version=2),
-                         {'ford2': 37, 'arthur2': 42})
+        self.assertDictEqual(caches['v2'].get_many(['ford2', 'arthur2'], version=2), {'ford2': 37, 'arthur2': 42})
 
         # v2 set, using default version = 2
         caches['v2'].set_many({'ford3': 37, 'arthur3': 42})
         self.assertDictEqual(cache.get_many(['ford3', 'arthur3']), {})
         self.assertDictEqual(cache.get_many(['ford3', 'arthur3'], version=1), {})
-        self.assertDictEqual(cache.get_many(['ford3', 'arthur3'], version=2),
-                         {'ford3': 37, 'arthur3': 42})
+        self.assertDictEqual(cache.get_many(['ford3', 'arthur3'], version=2), {'ford3': 37, 'arthur3': 42})
 
-        self.assertDictEqual(caches['v2'].get_many(['ford3', 'arthur3']),
-                         {'ford3': 37, 'arthur3': 42})
+        self.assertDictEqual(caches['v2'].get_many(['ford3', 'arthur3']), {'ford3': 37, 'arthur3': 42})
         self.assertDictEqual(caches['v2'].get_many(['ford3', 'arthur3'], version=1), {})
-        self.assertDictEqual(caches['v2'].get_many(['ford3', 'arthur3'], version=2),
-                         {'ford3': 37, 'arthur3': 42})
+        self.assertDictEqual(caches['v2'].get_many(['ford3', 'arthur3'], version=2), {'ford3': 37, 'arthur3': 42})
 
         # v2 set, default version = 2, but manually override version = 1
         caches['v2'].set_many({'ford4': 37, 'arthur4': 42}, version=1)
-        self.assertDictEqual(cache.get_many(['ford4', 'arthur4']),
-                         {'ford4': 37, 'arthur4': 42})
-        self.assertDictEqual(cache.get_many(['ford4', 'arthur4'], version=1),
-                         {'ford4': 37, 'arthur4': 42})
+        self.assertDictEqual(cache.get_many(['ford4', 'arthur4']), {'ford4': 37, 'arthur4': 42})
+        self.assertDictEqual(cache.get_many(['ford4', 'arthur4'], version=1), {'ford4': 37, 'arthur4': 42})
         self.assertDictEqual(cache.get_many(['ford4', 'arthur4'], version=2), {})
 
         self.assertDictEqual(caches['v2'].get_many(['ford4', 'arthur4']), {})
-        self.assertDictEqual(caches['v2'].get_many(['ford4', 'arthur4'], version=1),
-                         {'ford4': 37, 'arthur4': 42})
+        self.assertDictEqual(caches['v2'].get_many(['ford4', 'arthur4'], version=1), {'ford4': 37, 'arthur4': 42})
         self.assertDictEqual(caches['v2'].get_many(['ford4', 'arthur4'], version=2), {})
 
     def test_incr_version(self):
@@ -988,8 +976,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
     def test_second_call_doesnt_crash(self):
         out = six.StringIO()
         management.call_command('createcachetable', stdout=out)
-        self.assertEqual(out.getvalue(),
-            "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
+        self.assertEqual(out.getvalue(), "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
     @override_settings(CACHES=caches_setting_for_tests(
         BACKEND='django.core.cache.backends.db.DatabaseCache',
@@ -1015,8 +1002,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
             verbosity=2,
             stdout=out,
         )
-        self.assertEqual(out.getvalue(),
-            "Cache table 'test cache table' created.\n")
+        self.assertEqual(out.getvalue(), "Cache table 'test cache table' created.\n")
 
 
 @override_settings(USE_TZ=True)
@@ -1732,13 +1718,17 @@ class CacheI18nTest(TestCase):
         with timezone.override(CustomTzName()):
             CustomTzName.name = 'Hora estándar de Argentina'.encode('UTF-8')  # UTF-8 string
             sanitized_name = 'Hora_estndar_de_Argentina'
-            self.assertIn(sanitized_name, learn_cache_key(request, response),
-                    "Cache keys should include the time zone name when time zones are active")
+            self.assertIn(
+                sanitized_name, learn_cache_key(request, response),
+                "Cache keys should include the time zone name when time zones are active"
+            )
 
             CustomTzName.name = 'Hora estándar de Argentina'    # unicode
             sanitized_name = 'Hora_estndar_de_Argentina'
-            self.assertIn(sanitized_name, learn_cache_key(request, response),
-                    "Cache keys should include the time zone name when time zones are active")
+            self.assertIn(
+                sanitized_name, learn_cache_key(request, response),
+                "Cache keys should include the time zone name when time zones are active"
+            )
 
     @override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX="test",
@@ -2151,18 +2141,15 @@ class TestMakeTemplateFragmentKey(SimpleTestCase):
 
     def test_with_one_vary_on(self):
         key = make_template_fragment_key('foo', ['abc'])
-        self.assertEqual(key,
-            'template.cache.foo.900150983cd24fb0d6963f7d28e17f72')
+        self.assertEqual(key, 'template.cache.foo.900150983cd24fb0d6963f7d28e17f72')
 
     def test_with_many_vary_on(self):
         key = make_template_fragment_key('bar', ['abc', 'def'])
-        self.assertEqual(key,
-            'template.cache.bar.4b35f12ab03cec09beec4c21b2d2fa88')
+        self.assertEqual(key, 'template.cache.bar.4b35f12ab03cec09beec4c21b2d2fa88')
 
     def test_proper_escaping(self):
         key = make_template_fragment_key('spam', ['abc:def%'])
-        self.assertEqual(key,
-            'template.cache.spam.f27688177baec990cdf3fbd9d9c3f469')
+        self.assertEqual(key, 'template.cache.spam.f27688177baec990cdf3fbd9d9c3f469')
 
 
 class CacheHandlerTest(SimpleTestCase):

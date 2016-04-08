@@ -812,8 +812,10 @@ class Simple(models.Model):
 
 
 class Choice(models.Model):
-    choice = models.IntegerField(blank=True, null=True,
-        choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))
+    choice = models.IntegerField(
+        blank=True, null=True,
+        choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')),
+    )
 
 
 class ParentWithDependentChildren(models.Model):

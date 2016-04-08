@@ -135,8 +135,7 @@ class PrefetchRelatedTests(TestCase):
             lists = [[[six.text_type(r) for r in b.read_by.all()]
                       for b in a.books.all()]
                      for a in qs]
-            self.assertEqual(lists,
-            [
+            self.assertEqual(lists, [
                 [["Amy"], ["Belinda"]],  # Charlotte - Poems, Jane Eyre
                 [["Amy"]],                # Anne - Poems
                 [["Amy"], []],            # Emily - Poems, Wuthering Heights
@@ -149,8 +148,7 @@ class PrefetchRelatedTests(TestCase):
             lists = [[[six.text_type(r) for r in b.read_by.all()]
                       for b in a.books.all()]
                      for a in qs]
-            self.assertEqual(lists,
-            [
+            self.assertEqual(lists, [
                 [["Amy"], ["Belinda"]],  # Charlotte - Poems, Jane Eyre
                 [["Amy"]],                # Anne - Poems
                 [["Amy"], []],            # Emily - Poems, Wuthering Heights
@@ -161,8 +159,7 @@ class PrefetchRelatedTests(TestCase):
             lists = [[[six.text_type(r) for r in b.read_by.all()]
                       for b in a.books.all()]
                      for a in qs]
-            self.assertEqual(lists,
-            [
+            self.assertEqual(lists, [
                 [["Amy"], ["Belinda"]],  # Charlotte - Poems, Jane Eyre
                 [["Amy"]],                # Anne - Poems
                 [["Amy"], []],            # Emily - Poems, Wuthering Heights
@@ -176,8 +173,7 @@ class PrefetchRelatedTests(TestCase):
         # Need a double
         with self.assertNumQueries(3):
             author = Author.objects.prefetch_related('books__read_by').get(name="Charlotte")
-            lists = [[six.text_type(r) for r in b.read_by.all()]
-                     for b in author.books.all()]
+            lists = [[six.text_type(r) for r in b.read_by.all()] for b in author.books.all()]
             self.assertEqual(lists, [["Amy"], ["Belinda"]])  # Poems, Jane Eyre
 
     def test_foreign_key_then_m2m(self):
@@ -189,10 +185,7 @@ class PrefetchRelatedTests(TestCase):
             qs = Author.objects.select_related('first_book').prefetch_related('first_book__read_by')
             lists = [[six.text_type(r) for r in a.first_book.read_by.all()]
                      for a in qs]
-            self.assertEqual(lists, [["Amy"],
-                                     ["Amy"],
-                                     ["Amy"],
-                                     ["Amy", "Belinda"]])
+            self.assertEqual(lists, [["Amy"], ["Amy"], ["Amy"], ["Amy", "Belinda"]])
 
     def test_reverse_one_to_one_then_m2m(self):
         """
@@ -907,8 +900,7 @@ class MultiTableInheritanceTest(TestCase):
     def test_foreignkey(self):
         with self.assertNumQueries(2):
             qs = AuthorWithAge.objects.prefetch_related('addresses')
-            addresses = [[six.text_type(address) for address in obj.addresses.all()]
-                         for obj in qs]
+            addresses = [[six.text_type(address) for address in obj.addresses.all()] for obj in qs]
         self.assertEqual(addresses, [[six.text_type(self.author_address)], [], []])
 
     def test_foreignkey_to_inherited(self):
@@ -920,20 +912,16 @@ class MultiTableInheritanceTest(TestCase):
     def test_m2m_to_inheriting_model(self):
         qs = AuthorWithAge.objects.prefetch_related('books_with_year')
         with self.assertNumQueries(2):
-            lst = [[six.text_type(book) for book in author.books_with_year.all()]
-                   for author in qs]
+            lst = [[six.text_type(book) for book in author.books_with_year.all()] for author in qs]
         qs = AuthorWithAge.objects.all()
-        lst2 = [[six.text_type(book) for book in author.books_with_year.all()]
-                for author in qs]
+        lst2 = [[six.text_type(book) for book in author.books_with_year.all()] for author in qs]
         self.assertEqual(lst, lst2)
 
         qs = BookWithYear.objects.prefetch_related('aged_authors')
         with self.assertNumQueries(2):
-            lst = [[six.text_type(author) for author in book.aged_authors.all()]
-                   for book in qs]
+            lst = [[six.text_type(author) for author in book.aged_authors.all()] for book in qs]
         qs = BookWithYear.objects.all()
-        lst2 = [[six.text_type(author) for author in book.aged_authors.all()]
-               for book in qs]
+        lst2 = [[six.text_type(author) for author in book.aged_authors.all()] for book in qs]
         self.assertEqual(lst, lst2)
 
     def test_parent_link_prefetch(self):
@@ -1248,14 +1236,10 @@ class Ticket21410Tests(TestCase):
         self.book3 = Book.objects.create(title="Wuthering Heights")
         self.book4 = Book.objects.create(title="Sense and Sensibility")
 
-        self.author1 = Author2.objects.create(name="Charlotte",
-                                             first_book=self.book1)
-        self.author2 = Author2.objects.create(name="Anne",
-                                             first_book=self.book1)
-        self.author3 = Author2.objects.create(name="Emily",
-                                             first_book=self.book1)
-        self.author4 = Author2.objects.create(name="Jane",
-                                             first_book=self.book4)
+        self.author1 = Author2.objects.create(name="Charlotte", first_book=self.book1)
+        self.author2 = Author2.objects.create(name="Anne", first_book=self.book1)
+        self.author3 = Author2.objects.create(name="Emily", first_book=self.book1)
+        self.author4 = Author2.objects.create(name="Jane", first_book=self.book4)
 
         self.author1.favorite_books.add(self.book1, self.book2, self.book3)
         self.author2.favorite_books.add(self.book1)

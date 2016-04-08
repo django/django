@@ -7,8 +7,9 @@ from ..utils import setup
 
 class UrlizetruncTests(SimpleTestCase):
 
-    @setup({'urlizetrunc01':
-        '{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}'})
+    @setup({
+        'urlizetrunc01': '{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}'
+    })
     def test_urlizetrunc01(self):
         output = self.engine.render_to_string(
             'urlizetrunc01',

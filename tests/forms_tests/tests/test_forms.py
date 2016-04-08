@@ -1493,11 +1493,13 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             address = CharField()                                 # no max_length defined here
 
         p = UserRegistration(auto_id=False)
-        self.assertHTMLEqual(p.as_ul(),
-        """<li>Username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(
+            p.as_ul(),
+            """<li>Username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" maxlength="10" /></li>
 <li>Realname: <input type="text" name="realname" maxlength="10" /></li>
-<li>Address: <input type="text" name="address" /></li>""")
+<li>Address: <input type="text" name="address" /></li>"""
+        )
 
         # If you specify a custom "attrs" that includes the "maxlength" attribute,
         # the Field's max_length attribute will override whatever "maxlength" you specify
@@ -1507,9 +1509,11 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             password = CharField(max_length=10, widget=PasswordInput)
 
         p = UserRegistration(auto_id=False)
-        self.assertHTMLEqual(p.as_ul(),
-        """<li>Username: <input type="text" name="username" maxlength="10" /></li>
-<li>Password: <input type="password" name="password" maxlength="10" /></li>""")
+        self.assertHTMLEqual(
+            p.as_ul(),
+            """<li>Username: <input type="text" name="username" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" maxlength="10" /></li>"""
+        )
 
     def test_specifying_labels(self):
         # You can specify the label for a field by using the 'label' argument to a Field
@@ -1521,10 +1525,12 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             password2 = CharField(widget=PasswordInput, label='Contraseña (de nuevo)')
 
         p = UserRegistration(auto_id=False)
-        self.assertHTMLEqual(p.as_ul(),
-        """<li>Your username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(
+            p.as_ul(),
+            """<li>Your username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password1: <input type="password" name="password1" /></li>
-<li>Contraseña (de nuevo): <input type="password" name="password2" /></li>""")
+<li>Contraseña (de nuevo): <input type="password" name="password2" /></li>"""
+        )
 
         # Labels for as_* methods will only end in a colon if they don't end in other
         # punctuation already.
@@ -1574,9 +1580,11 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             password = CharField(widget=PasswordInput)
 
         p = UserRegistration(auto_id=False)
-        self.assertHTMLEqual(p.as_ul(),
-        """<li>Username: <input type="text" name="username" maxlength="10" /></li>
-<li>Password: <input type="password" name="password" /></li>""")
+        self.assertHTMLEqual(
+            p.as_ul(),
+            """<li>Username: <input type="text" name="username" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>"""
+        )
         p = UserRegistration(auto_id='id_%s')
         self.assertHTMLEqual(
             p.as_ul(),
@@ -1861,8 +1869,7 @@ Password: <input type="password" name="password" /></li>
             last_name = CharField(initial='Greatel')
             birthday = DateField(initial=datetime.date(1974, 8, 16))
 
-        p = Person(data={'first_name': 'Hans', 'last_name': 'Scrmbl',
-                         'birthday': '1974-08-16'})
+        p = Person(data={'first_name': 'Hans', 'last_name': 'Scrmbl', 'birthday': '1974-08-16'})
         self.assertTrue(p.is_valid())
         self.assertNotIn('first_name', p.changed_data)
         self.assertIn('last_name', p.changed_data)
@@ -1876,8 +1883,10 @@ Password: <input type="password" name="password" /></li>
         class Person2(Person):
             pedantic = PedanticField(initial='whatever', show_hidden_initial=True)
 
-        p = Person2(data={'first_name': 'Hans', 'last_name': 'Scrmbl',
-                         'birthday': '1974-08-16', 'initial-pedantic': 'whatever'})
+        p = Person2(data={
+            'first_name': 'Hans', 'last_name': 'Scrmbl', 'birthday': '1974-08-16',
+            'initial-pedantic': 'whatever',
+        })
         self.assertFalse(p.is_valid())
         self.assertIn('pedantic', p.changed_data)
 
@@ -2700,9 +2709,10 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         """
         class ChoicesField(MultiValueField):
             def __init__(self, fields=(), *args, **kwargs):
-                fields = (ChoiceField(label='Rank',
-                           choices=((1, 1), (2, 2))),
-                          CharField(label='Name', max_length=10))
+                fields = (
+                    ChoiceField(label='Rank', choices=((1, 1), (2, 2))),
+                    CharField(label='Name', max_length=10),
+                )
                 super(ChoicesField, self).__init__(fields=fields, *args, **kwargs)
 
         field = ChoicesField()
@@ -2787,8 +2797,10 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
-        six.assertRaisesRegex(self, ValidationError,
-            "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home'])
+        six.assertRaisesRegex(
+            self, ValidationError,
+            "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
+        )
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
 
@@ -2801,8 +2813,10 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
-        six.assertRaisesRegex(self, ValidationError,
-            "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home'])
+        six.assertRaisesRegex(
+            self, ValidationError,
+            "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
+        )
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
 

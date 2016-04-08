@@ -44,8 +44,7 @@ class TemplateTests(SimpleTestCase):
             while tb.tb_next is not None:
                 tb = tb.tb_next
                 depth += 1
-            self.assertGreater(depth, 5,
-                "The traceback context was lost when reraising the traceback. See #19827")
+            self.assertGreater(depth, 5, "The traceback context was lost when reraising the traceback.")
 
     def test_no_wrapped_exception(self):
         """

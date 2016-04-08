@@ -244,8 +244,7 @@ class AppsTests(SimpleTestCase):
         body = {}
         body['Meta'] = type(str("Meta"), tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__ + '.whatever'
-        with six.assertRaisesRegex(self, RuntimeError,
-                "Conflicting 'southponies' models in application 'apps':.*"):
+        with self.assertRaisesMessage(RuntimeError, "Conflicting 'southponies' models in application 'apps':"):
             type(str("SouthPonies"), (models.Model,), body)
 
     def test_get_containing_app_config_apps_not_ready(self):

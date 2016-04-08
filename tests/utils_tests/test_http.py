@@ -78,42 +78,49 @@ class TestUtilsHttp(unittest.TestCase):
             self.assertEqual(http.base36_to_int(b36), n)
 
     def test_is_safe_url(self):
-        for bad_url in ('http://example.com',
-                        'http:///example.com',
-                        'https://example.com',
-                        'ftp://example.com',
-                        r'\\example.com',
-                        r'\\\example.com',
-                        r'/\\/example.com',
-                        r'\\\example.com',
-                        r'\\example.com',
-                        r'\\//example.com',
-                        r'/\/example.com',
-                        r'\/example.com',
-                        r'/\example.com',
-                        'http:///example.com',
-                        'http:/\//example.com',
-                        'http:\/example.com',
-                        'http:/\example.com',
-                        'javascript:alert("XSS")',
-                        '\njavascript:alert(x)',
-                        '\x08//example.com',
-                        r'http://otherserver\@example.com',
-                        r'http:\\testserver\@example.com',
-                        r'http://testserver\me:pass@example.com',
-                        r'http://testserver\@example.com',
-                        r'http:\\testserver\confirm\me@example.com',
-                        '\n'):
+        bad_urls = (
+            'http://example.com',
+            'http:///example.com',
+            'https://example.com',
+            'ftp://example.com',
+            r'\\example.com',
+            r'\\\example.com',
+            r'/\\/example.com',
+            r'\\\example.com',
+            r'\\example.com',
+            r'\\//example.com',
+            r'/\/example.com',
+            r'\/example.com',
+            r'/\example.com',
+            'http:///example.com',
+            'http:/\//example.com',
+            'http:\/example.com',
+            'http:/\example.com',
+            'javascript:alert("XSS")',
+            '\njavascript:alert(x)',
+            '\x08//example.com',
+            r'http://otherserver\@example.com',
+            r'http:\\testserver\@example.com',
+            r'http://testserver\me:pass@example.com',
+            r'http://testserver\@example.com',
+            r'http:\\testserver\confirm\me@example.com',
+            '\n',
+        )
+        for bad_url in bad_urls:
             self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
-        for good_url in ('/view/?param=http://example.com',
-                     '/view/?param=https://example.com',
-                     '/view?param=ftp://example.com',
-                     'view/?param=//example.com',
-                     'https://testserver/',
-                     'HTTPS://testserver/',
-                     '//testserver/',
-                     'http://testserver/confirm?email=me@example.com',
-                     '/url%20with%20spaces/'):
+
+        good_urls = (
+            '/view/?param=http://example.com',
+            '/view/?param=https://example.com',
+            '/view?param=ftp://example.com',
+            'view/?param=//example.com',
+            'https://testserver/',
+            'HTTPS://testserver/',
+            '//testserver/',
+            'http://testserver/confirm?email=me@example.com',
+            '/url%20with%20spaces/',
+        )
+        for good_url in good_urls:
             self.assertTrue(http.is_safe_url(good_url, host='testserver'), "%s should be allowed" % good_url)
 
         if six.PY2:
@@ -140,26 +147,14 @@ class TestUtilsHttp(unittest.TestCase):
         self.assertEqual(bytestring, decoded)
 
     def test_urlquote(self):
-        self.assertEqual(http.urlquote('Paris & Orl\xe9ans'),
-            'Paris%20%26%20Orl%C3%A9ans')
-        self.assertEqual(http.urlquote('Paris & Orl\xe9ans', safe="&"),
-            'Paris%20&%20Orl%C3%A9ans')
-        self.assertEqual(
-            http.urlunquote('Paris%20%26%20Orl%C3%A9ans'),
-            'Paris & Orl\xe9ans')
-        self.assertEqual(
-            http.urlunquote('Paris%20&%20Orl%C3%A9ans'),
-            'Paris & Orl\xe9ans')
-        self.assertEqual(http.urlquote_plus('Paris & Orl\xe9ans'),
-            'Paris+%26+Orl%C3%A9ans')
-        self.assertEqual(http.urlquote_plus('Paris & Orl\xe9ans', safe="&"),
-            'Paris+&+Orl%C3%A9ans')
-        self.assertEqual(
-            http.urlunquote_plus('Paris+%26+Orl%C3%A9ans'),
-            'Paris & Orl\xe9ans')
-        self.assertEqual(
-            http.urlunquote_plus('Paris+&+Orl%C3%A9ans'),
-            'Paris & Orl\xe9ans')
+        self.assertEqual(http.urlquote('Paris & Orl\xe9ans'), 'Paris%20%26%20Orl%C3%A9ans')
+        self.assertEqual(http.urlquote('Paris & Orl\xe9ans', safe="&"), 'Paris%20&%20Orl%C3%A9ans')
+        self.assertEqual(http.urlunquote('Paris%20%26%20Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
+        self.assertEqual(http.urlunquote('Paris%20&%20Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
+        self.assertEqual(http.urlquote_plus('Paris & Orl\xe9ans'), 'Paris+%26+Orl%C3%A9ans')
+        self.assertEqual(http.urlquote_plus('Paris & Orl\xe9ans', safe="&"), 'Paris+&+Orl%C3%A9ans')
+        self.assertEqual(http.urlunquote_plus('Paris+%26+Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
+        self.assertEqual(http.urlunquote_plus('Paris+&+Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
 
     def test_is_same_domain_good(self):
         for pair in (
@@ -204,15 +199,12 @@ class HttpDateProcessingTests(unittest.TestCase):
 
     def test_parsing_rfc1123(self):
         parsed = http.parse_http_date('Sun, 06 Nov 1994 08:49:37 GMT')
-        self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 6, 8, 49, 37))
+        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
 
     def test_parsing_rfc850(self):
         parsed = http.parse_http_date('Sunday, 06-Nov-94 08:49:37 GMT')
-        self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 6, 8, 49, 37))
+        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
 
     def test_parsing_asctime(self):
         parsed = http.parse_http_date('Sun Nov  6 08:49:37 1994')
-        self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 6, 8, 49, 37))
+        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))

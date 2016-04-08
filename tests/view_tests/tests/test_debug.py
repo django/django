@@ -140,8 +140,10 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             match = re.search(b'<div class="context" id="(?P<id>[^"]+)">', response.content)
             self.assertIsNotNone(match)
             id_repr = match.group('id')
-            self.assertFalse(re.search(b'[^c0-9]', id_repr),
-                             "Numeric IDs in debug response HTML page shouldn't be localized (value: %s)." % id_repr)
+            self.assertFalse(
+                re.search(b'[^c0-9]', id_repr),
+                "Numeric IDs in debug response HTML page shouldn't be localized (value: %s)." % id_repr
+            )
 
     def test_template_exceptions(self):
         for n in range(len(except_args)):
@@ -149,9 +151,11 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
                 self.client.get(reverse('template_exception', args=(n,)))
             except Exception:
                 raising_loc = inspect.trace()[-1][-2][0].strip()
-                self.assertNotEqual(raising_loc.find('raise BrokenException'), -1,
-                    "Failed to find 'raise BrokenException' in last frame of traceback, instead found: %s" %
-                        raising_loc)
+                self.assertNotEqual(
+                    raising_loc.find('raise BrokenException'), -1,
+                    "Failed to find 'raise BrokenException' in last frame of "
+                    "traceback, instead found: %s" % raising_loc
+                )
 
     def test_template_loader_postmortem(self):
         """Tests for not existing file"""
@@ -939,12 +943,10 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
         the request to bypass the one set in DEFAULT_EXCEPTION_REPORTER_FILTER.
         """
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(custom_exception_reporter_filter_view,
-                check_for_vars=False)
+            self.verify_unsafe_response(custom_exception_reporter_filter_view, check_for_vars=False)
 
         with self.settings(DEBUG=False):
-            self.verify_unsafe_response(custom_exception_reporter_filter_view,
-                check_for_vars=False)
+            self.verify_unsafe_response(custom_exception_reporter_filter_view, check_for_vars=False)
 
 
 class HelperFunctionTests(SimpleTestCase):

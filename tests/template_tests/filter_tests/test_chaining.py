@@ -14,8 +14,10 @@ class ChainingTests(SimpleTestCase):
         output = self.engine.render_to_string('chaining01', {'a': 'a < b', 'b': mark_safe('a < b')})
         self.assertEqual(output, ' A &lt; b . A < b ')
 
-    @setup({'chaining02':
-        '{% autoescape off %}{{ a|capfirst|center:"7" }}.{{ b|capfirst|center:"7" }}{% endautoescape %}'})
+    @setup({
+        'chaining02':
+        '{% autoescape off %}{{ a|capfirst|center:"7" }}.{{ b|capfirst|center:"7" }}{% endautoescape %}'
+    })
     def test_chaining02(self):
         output = self.engine.render_to_string('chaining02', {'a': 'a < b', 'b': mark_safe('a < b')})
         self.assertEqual(output, ' A < b . A < b ')
@@ -26,8 +28,9 @@ class ChainingTests(SimpleTestCase):
         output = self.engine.render_to_string('chaining03', {'a': 'a < b', 'b': mark_safe('a < b')})
         self.assertEqual(output, 'A &lt; .A < ')
 
-    @setup({'chaining04':
-        '{% autoescape off %}{{ a|cut:"b"|capfirst }}.{{ b|cut:"b"|capfirst }}{% endautoescape %}'})
+    @setup({
+        'chaining04': '{% autoescape off %}{{ a|cut:"b"|capfirst }}.{{ b|cut:"b"|capfirst }}{% endautoescape %}'
+    })
     def test_chaining04(self):
         output = self.engine.render_to_string('chaining04', {'a': 'a < b', 'b': mark_safe('a < b')})
         self.assertEqual(output, 'A < .A < ')

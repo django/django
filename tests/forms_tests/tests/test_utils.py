@@ -59,27 +59,30 @@ class FormsUtilsTestCase(SimpleTestCase):
         ###################
 
         # Can take a string.
-        self.assertHTMLEqual(str(ErrorList(ValidationError("There was an error.").messages)),
-                         '<ul class="errorlist"><li>There was an error.</li></ul>')
-
+        self.assertHTMLEqual(
+            str(ErrorList(ValidationError("There was an error.").messages)),
+            '<ul class="errorlist"><li>There was an error.</li></ul>'
+        )
         # Can take a unicode string.
-        self.assertHTMLEqual(six.text_type(ErrorList(ValidationError("Not \u03C0.").messages)),
-                         '<ul class="errorlist"><li>Not π.</li></ul>')
-
+        self.assertHTMLEqual(
+            six.text_type(ErrorList(ValidationError("Not \u03C0.").messages)),
+            '<ul class="errorlist"><li>Not π.</li></ul>'
+        )
         # Can take a lazy string.
-        self.assertHTMLEqual(str(ErrorList(ValidationError(ugettext_lazy("Error.")).messages)),
-                         '<ul class="errorlist"><li>Error.</li></ul>')
-
+        self.assertHTMLEqual(
+            str(ErrorList(ValidationError(ugettext_lazy("Error.")).messages)),
+            '<ul class="errorlist"><li>Error.</li></ul>'
+        )
         # Can take a list.
-        self.assertHTMLEqual(str(ErrorList(ValidationError(["Error one.", "Error two."]).messages)),
-                         '<ul class="errorlist"><li>Error one.</li><li>Error two.</li></ul>')
-
+        self.assertHTMLEqual(
+            str(ErrorList(ValidationError(["Error one.", "Error two."]).messages)),
+            '<ul class="errorlist"><li>Error one.</li><li>Error two.</li></ul>'
+        )
         # Can take a dict.
         self.assertHTMLEqual(
             str(ErrorList(sorted(ValidationError({'error_1': "1. Error one.", 'error_2': "2. Error two."}).messages))),
             '<ul class="errorlist"><li>1. Error one.</li><li>2. Error two.</li></ul>'
         )
-
         # Can take a mixture in a list.
         self.assertHTMLEqual(
             str(ErrorList(sorted(ValidationError([
