@@ -230,8 +230,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_add_with_GET_args(self):
         response = self.client.get(reverse('admin:admin_views_section_add'), {'name': 'My Section'})
-        self.assertContains(response, 'value="My Section"',
-            msg_prefix="Couldn't find an input with the right value in the response")
+        self.assertContains(
+            response, 'value="My Section"',
+            msg_prefix="Couldn't find an input with the right value in the response"
+        )
 
     def test_basic_edit_GET(self):
         """
@@ -352,10 +354,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         (column 2 is callable_year in ArticleAdmin)
         """
         response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': 2})
-        self.assertContentBefore(response, 'Oldest content', 'Middle content',
-            "Results of sorting on callable are out of order.")
-        self.assertContentBefore(response, 'Middle content', 'Newest content',
-            "Results of sorting on callable are out of order.")
+        self.assertContentBefore(
+            response, 'Oldest content', 'Middle content',
+            "Results of sorting on callable are out of order."
+        )
+        self.assertContentBefore(
+            response, 'Middle content', 'Newest content',
+            "Results of sorting on callable are out of order."
+        )
 
     def test_change_list_sorting_model(self):
         """
@@ -363,10 +369,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         (column 3 is 'model_year' in ArticleAdmin)
         """
         response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '-3'})
-        self.assertContentBefore(response, 'Newest content', 'Middle content',
-            "Results of sorting on Model method are out of order.")
-        self.assertContentBefore(response, 'Middle content', 'Oldest content',
-            "Results of sorting on Model method are out of order.")
+        self.assertContentBefore(
+            response, 'Newest content', 'Middle content',
+            "Results of sorting on Model method are out of order."
+        )
+        self.assertContentBefore(
+            response, 'Middle content', 'Oldest content',
+            "Results of sorting on Model method are out of order."
+        )
 
     def test_change_list_sorting_model_admin(self):
         """
@@ -374,10 +384,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         (column 4 is 'modeladmin_year' in ArticleAdmin)
         """
         response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '4'})
-        self.assertContentBefore(response, 'Oldest content', 'Middle content',
-            "Results of sorting on ModelAdmin method are out of order.")
-        self.assertContentBefore(response, 'Middle content', 'Newest content',
-            "Results of sorting on ModelAdmin method are out of order.")
+        self.assertContentBefore(
+            response, 'Oldest content', 'Middle content',
+            "Results of sorting on ModelAdmin method are out of order."
+        )
+        self.assertContentBefore(
+            response, 'Middle content', 'Newest content',
+            "Results of sorting on ModelAdmin method are out of order."
+        )
 
     def test_change_list_sorting_model_admin_reverse(self):
         """
@@ -386,17 +400,25 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         (column 6 is 'model_year_reverse' in ArticleAdmin)
         """
         response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '6'})
-        self.assertContentBefore(response, '2009', '2008',
-            "Results of sorting on ModelAdmin method are out of order.")
-        self.assertContentBefore(response, '2008', '2000',
-            "Results of sorting on ModelAdmin method are out of order.")
+        self.assertContentBefore(
+            response, '2009', '2008',
+            "Results of sorting on ModelAdmin method are out of order."
+        )
+        self.assertContentBefore(
+            response, '2008', '2000',
+            "Results of sorting on ModelAdmin method are out of order."
+        )
         # Let's make sure the ordering is right and that we don't get a
         # FieldError when we change to descending order
         response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '-6'})
-        self.assertContentBefore(response, '2000', '2008',
-            "Results of sorting on ModelAdmin method are out of order.")
-        self.assertContentBefore(response, '2008', '2009',
-            "Results of sorting on ModelAdmin method are out of order.")
+        self.assertContentBefore(
+            response, '2000', '2008',
+            "Results of sorting on ModelAdmin method are out of order."
+        )
+        self.assertContentBefore(
+            response, '2008', '2009',
+            "Results of sorting on ModelAdmin method are out of order."
+        )
 
     def test_change_list_sorting_multiple(self):
         p1 = Person.objects.create(name="Chris", gender=1, alive=True)
@@ -521,10 +543,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         This also tests relation-spanning filters (e.g. 'color__value').
         """
         response = self.client.get(reverse('admin:admin_views_thing_changelist'))
-        self.assertContains(response, '<div id="changelist-filter">',
-            msg_prefix="Expected filter not found in changelist view")
-        self.assertNotContains(response, '<a href="?color__id__exact=3">Blue</a>',
-            msg_prefix="Changelist filter not correctly limited by limit_choices_to")
+        self.assertContains(
+            response, '<div id="changelist-filter">',
+            msg_prefix="Expected filter not found in changelist view"
+        )
+        self.assertNotContains(
+            response, '<a href="?color__id__exact=3">Blue</a>',
+            msg_prefix="Changelist filter not correctly limited by limit_choices_to"
+        )
 
     def test_relation_spanning_filters(self):
         changelist_url = reverse('admin:admin_views_chapterxtra1_changelist')
@@ -626,10 +652,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "field 'choices' option named group."
         )
         self.assertContains(response, '<div id="changelist-filter">')
-        self.assertContains(response,
-            '<a href="?surface__exact=x">Horizontal</a>', msg_prefix=fail_msg, html=True)
-        self.assertContains(response,
-            '<a href="?surface__exact=y">Vertical</a>', msg_prefix=fail_msg, html=True)
+        self.assertContains(response, '<a href="?surface__exact=x">Horizontal</a>', msg_prefix=fail_msg, html=True)
+        self.assertContains(response, '<a href="?surface__exact=y">Vertical</a>', msg_prefix=fail_msg, html=True)
 
     def test_change_list_null_boolean_display(self):
         Post.objects.create(public=None)
@@ -789,8 +813,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         user.save()
         self.client.force_login(user)
         response = self.client.get(reverse('admin:index'))
-        self.assertNotContains(response, reverse('admin:password_change'),
-            msg_prefix='The "change password" link should not be displayed if a user does not have a usable password.')
+        self.assertNotContains(
+            response, reverse('admin:password_change'),
+            msg_prefix='The "change password" link should not be displayed if a user does not have a usable password.'
+        )
 
     def test_change_view_with_show_delete_extra_context(self):
         """
@@ -1514,8 +1540,10 @@ class AdminViewPermissionsTest(TestCase):
         self.client.force_login(self.adduser)
         addpage = self.client.get(reverse('admin:admin_views_article_add'))
         change_list_link = '&rsaquo; <a href="%s">Articles</a>' % reverse('admin:admin_views_article_changelist')
-        self.assertNotContains(addpage, change_list_link,
-            msg_prefix='User restricted to add permission is given link to change list view in breadcrumbs.')
+        self.assertNotContains(
+            addpage, change_list_link,
+            msg_prefix='User restricted to add permission is given link to change list view in breadcrumbs.'
+        )
         post = self.client.post(reverse('admin:admin_views_article_add'), add_dict)
         self.assertRedirects(post, self.index_url)
         self.assertEqual(Article.objects.count(), 4)
@@ -1537,8 +1565,10 @@ class AdminViewPermissionsTest(TestCase):
         # Super can add too, but is redirected to the change list view
         self.client.force_login(self.superuser)
         addpage = self.client.get(reverse('admin:admin_views_article_add'))
-        self.assertContains(addpage, change_list_link,
-            msg_prefix='Unrestricted user is not given link to change list view in breadcrumbs.')
+        self.assertContains(
+            addpage, change_list_link,
+            msg_prefix='Unrestricted user is not given link to change list view in breadcrumbs.'
+        )
         post = self.client.post(reverse('admin:admin_views_article_add'), add_dict)
         self.assertRedirects(post, reverse('admin:admin_views_article_changelist'))
         self.assertEqual(Article.objects.count(), 5)
@@ -1584,13 +1614,17 @@ class AdminViewPermissionsTest(TestCase):
         # one error in form should produce singular error message, multiple errors plural
         change_dict['title'] = ''
         post = self.client.post(article_change_url, change_dict)
-        self.assertContains(post, 'Please correct the error below.',
-            msg_prefix='Singular error message not found in response to post with one error')
+        self.assertContains(
+            post, 'Please correct the error below.',
+            msg_prefix='Singular error message not found in response to post with one error'
+        )
 
         change_dict['content'] = ''
         post = self.client.post(article_change_url, change_dict)
-        self.assertContains(post, 'Please correct the errors below.',
-            msg_prefix='Plural error message not found in response to post with multiple errors')
+        self.assertContains(
+            post, 'Please correct the errors below.',
+            msg_prefix='Plural error message not found in response to post with multiple errors'
+        )
         self.client.get(reverse('admin:logout'))
 
         # Test redirection when using row-level change permissions. Refs #11513.
@@ -2292,14 +2326,16 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
     def test_change_view_history_link(self):
         """Object history button link should work and contain the pk value quoted."""
-        url = reverse('admin:%s_modelwithstringprimarykey_change' %
-            ModelWithStringPrimaryKey._meta.app_label,
-            args=(quote(self.pk),))
+        url = reverse(
+            'admin:%s_modelwithstringprimarykey_change' % ModelWithStringPrimaryKey._meta.app_label,
+            args=(quote(self.pk),)
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        expected_link = reverse('admin:%s_modelwithstringprimarykey_history' %
-            ModelWithStringPrimaryKey._meta.app_label,
-            args=(quote(self.pk),))
+        expected_link = reverse(
+            'admin:%s_modelwithstringprimarykey_history' % ModelWithStringPrimaryKey._meta.app_label,
+            args=(quote(self.pk),)
+        )
         self.assertContains(response, '<a href="%s" class="historylink"' % escape(expected_link))
 
     def test_redirect_on_add_view_continue_button(self):
@@ -2443,8 +2479,7 @@ class AdminViewListEditable(TestCase):
         self.client.force_login(self.superuser)
 
     def test_inheritance(self):
-        Podcast.objects.create(name="This Week in Django",
-            release_date=datetime.date.today())
+        Podcast.objects.create(name="This Week in Django", release_date=datetime.date.today())
         response = self.client.get(reverse('admin:admin_views_podcast_changelist'))
         self.assertEqual(response.status_code, 200)
 
@@ -2939,9 +2974,11 @@ class AdminSearchTest(TestCase):
         # + 1 for total count
         with self.assertNumQueries(5):
             response = self.client.get(reverse('admin:admin_views_person_changelist') + '?q=Gui')
-        self.assertContains(response,
+        self.assertContains(
+            response,
             """<span class="small quiet">1 result (<a href="?">3 total</a>)</span>""",
-            html=True)
+            html=True
+        )
 
     def test_no_total_count(self):
         """
@@ -2952,9 +2989,11 @@ class AdminSearchTest(TestCase):
         # + 1 for filtered result + 1 for filtered count
         with self.assertNumQueries(4):
             response = self.client.get(reverse('admin:admin_views_recommendation_changelist') + '?q=bar')
-        self.assertContains(response,
+        self.assertContains(
+            response,
             """<span class="small quiet">1 result (<a href="?">Show all</a>)</span>""",
-            html=True)
+            html=True
+        )
         self.assertTrue(response.context['cl'].show_admin_actions)
 
 
@@ -3244,16 +3283,20 @@ action)</option>
         "Tests a ModelAdmin without any action"
         response = self.client.get(reverse('admin:admin_views_oldsubscriber_changelist'))
         self.assertEqual(response.context["action_form"], None)
-        self.assertNotContains(response, '<input type="checkbox" class="action-select"',
-            msg_prefix="Found an unexpected action toggle checkboxbox in response")
+        self.assertNotContains(
+            response, '<input type="checkbox" class="action-select"',
+            msg_prefix="Found an unexpected action toggle checkboxbox in response"
+        )
         self.assertNotContains(response, '<input type="checkbox" class="action-select"')
 
     def test_model_without_action_still_has_jquery(self):
         "Tests that a ModelAdmin without any actions still gets jQuery included in page"
         response = self.client.get(reverse('admin:admin_views_oldsubscriber_changelist'))
         self.assertEqual(response.context["action_form"], None)
-        self.assertContains(response, 'jquery.min.js',
-            msg_prefix="jQuery missing from admin pages for model with no admin actions")
+        self.assertContains(
+            response, 'jquery.min.js',
+            msg_prefix="jQuery missing from admin pages for model with no admin actions"
+        )
 
     def test_action_column_class(self):
         "Tests that the checkbox column class is present in the response"
@@ -3467,8 +3510,7 @@ class AdminCustomQuerysetTest(TestCase):
             "author": "Candidate, Best",
             "_save": "Save",
         }
-        response = self.client.post(reverse('admin:admin_views_coverletter_add'),
-                                    post_data, follow=True)
+        response = self.client.post(reverse('admin:admin_views_coverletter_add'), post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CoverLetter.objects.count(), 1)
         # Message should contain non-ugly model verbose name
@@ -3487,8 +3529,7 @@ class AdminCustomQuerysetTest(TestCase):
             "content": "What's this SMS thing?",
             "_save": "Save",
         }
-        response = self.client.post(reverse('admin:admin_views_shortmessage_add'),
-                post_data, follow=True)
+        response = self.client.post(reverse('admin:admin_views_shortmessage_add'), post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ShortMessage.objects.count(), 1)
         # Message should contain non-ugly model verbose name
@@ -3510,8 +3551,7 @@ class AdminCustomQuerysetTest(TestCase):
             "title": "Urgent telegram",
             "_save": "Save",
         }
-        response = self.client.post(reverse('admin:admin_views_telegram_add'),
-                post_data, follow=True)
+        response = self.client.post(reverse('admin:admin_views_telegram_add'), post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Telegram.objects.count(), 1)
         # Message should contain non-ugly model verbose name
@@ -3530,8 +3570,7 @@ class AdminCustomQuerysetTest(TestCase):
             "title": "My Modified Paper Title",
             "_save": "Save",
         }
-        response = self.client.post(reverse('admin:admin_views_paper_add'),
-                post_data, follow=True)
+        response = self.client.post(reverse('admin:admin_views_paper_add'), post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Paper.objects.count(), 1)
         # Message should contain non-ugly model verbose name
@@ -3556,8 +3595,8 @@ class AdminCustomQuerysetTest(TestCase):
             "author": "John Doe II",
             "_save": "Save",
         }
-        response = self.client.post(reverse('admin:admin_views_coverletter_change', args=(cl.pk,)),
-                post_data, follow=True)
+        url = reverse('admin:admin_views_coverletter_change', args=(cl.pk,))
+        response = self.client.post(url, post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CoverLetter.objects.count(), 1)
         # Message should contain non-ugly model verbose name. Instance
@@ -3579,8 +3618,8 @@ class AdminCustomQuerysetTest(TestCase):
             "content": "Too expensive",
             "_save": "Save",
         }
-        response = self.client.post(reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)),
-                post_data, follow=True)
+        url = reverse('admin:admin_views_shortmessage_change', args=(sm.pk,))
+        response = self.client.post(url, post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ShortMessage.objects.count(), 1)
         # Message should contain non-ugly model verbose name. The ugly(!)
@@ -3605,8 +3644,7 @@ class AdminCustomQuerysetTest(TestCase):
             "title": "Telegram without typo",
             "_save": "Save",
         }
-        response = self.client.post(reverse('admin:admin_views_telegram_change', args=(t.pk,)),
-                post_data, follow=True)
+        response = self.client.post(reverse('admin:admin_views_telegram_change', args=(t.pk,)), post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Telegram.objects.count(), 1)
         # Message should contain non-ugly model verbose name. The instance
@@ -3628,8 +3666,7 @@ class AdminCustomQuerysetTest(TestCase):
             "title": "My Modified Paper Title",
             "_save": "Save",
         }
-        response = self.client.post(reverse('admin:admin_views_paper_change', args=(p.pk,)),
-                post_data, follow=True)
+        response = self.client.post(reverse('admin:admin_views_paper_change', args=(p.pk,)), post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Paper.objects.count(), 1)
         # Message should contain non-ugly model verbose name. The ugly(!)
@@ -4152,8 +4189,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         Refs #13068, #9264, #9983, #9784.
         """
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
-        self.selenium.get('%s%s' % (self.live_server_url,
-            reverse('admin:admin_views_mainprepopulated_add')))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_views_mainprepopulated_add'))
 
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_id('id_pubdate').send_keys('2012-02-18')
@@ -4273,13 +4309,9 @@ class SeleniumTests(AdminSeleniumTestCase):
             slug1='',
             slug2='',
         )
-        self.admin_login(username='super',
-                         password='secret',
-                         login_url=reverse('admin:index'))
+        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
 
-        object_url = '%s%s' % (
-            self.live_server_url,
-            reverse('admin:admin_views_mainprepopulated_change', args=(item.id,)))
+        object_url = self.live_server_url + reverse('admin:admin_views_mainprepopulated_change', args=(item.id,))
 
         self.selenium.get(object_url)
         self.selenium.find_element_by_id('id_name').send_keys(' the best')
@@ -4309,30 +4341,24 @@ class SeleniumTests(AdminSeleniumTestCase):
         show/hide the appropriate field section.
         """
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
-        self.selenium.get('%s%s' % (self.live_server_url,
-            reverse('admin:admin_views_article_add')))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_views_article_add'))
         self.assertFalse(self.selenium.find_element_by_id('id_title').is_displayed())
         self.selenium.find_elements_by_link_text('Show')[0].click()
         self.assertTrue(self.selenium.find_element_by_id('id_title').is_displayed())
-        self.assertEqual(
-            self.selenium.find_element_by_id('fieldsetcollapser0').text,
-            "Hide"
-        )
+        self.assertEqual(self.selenium.find_element_by_id('fieldsetcollapser0').text, "Hide")
 
     def test_first_field_focus(self):
         """JavaScript-assisted auto-focus on first usable form field."""
         # First form field has a single widget
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
-        self.selenium.get('%s%s' % (self.live_server_url,
-            reverse('admin:admin_views_picture_add')))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_views_picture_add'))
         self.assertEqual(
             self.selenium.switch_to.active_element,
             self.selenium.find_element_by_id('id_name')
         )
 
         # First form field has a MultiWidget
-        self.selenium.get('%s%s' % (self.live_server_url,
-            reverse('admin:admin_views_reservation_add')))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_views_reservation_add'))
         self.assertEqual(
             self.selenium.switch_to.active_element,
             self.selenium.find_element_by_id('id_start_date_0')
@@ -4342,7 +4368,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         "Cancelling the deletion of an object takes the user back one page."
         pizza = Pizza.objects.create(name="Double Cheese")
         url = reverse('admin:admin_views_pizza_change', args=(pizza.id,))
-        full_url = '%s%s' % (self.live_server_url, url)
+        full_url = self.live_server_url + url
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(full_url)
         self.selenium.find_element_by_class_name('deletelink').click()
@@ -4363,7 +4389,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         topping2 = Topping.objects.create(name="Mozzarella")
         pizza.toppings.add(topping1, topping2)
         url = reverse('admin:admin_views_pizza_change', args=(pizza.id,))
-        full_url = '%s%s' % (self.live_server_url, url)
+        full_url = self.live_server_url + url
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(full_url)
         self.selenium.find_element_by_class_name('deletelink').click()
@@ -4498,8 +4524,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         # hidden fields for inlines + 1 field for the inline + 2 empty form
         self.assertContains(response, "<input", count=15)
         self.assertContains(response, formats.localize(datetime.date.today()))
-        self.assertContains(response,
-            "<label>Awesomeness level:</label>")
+        self.assertContains(response, "<label>Awesomeness level:</label>")
         self.assertContains(response, "Very awesome.")
         self.assertContains(response, "Unknown coolness.")
         self.assertContains(response, "foo")
@@ -4511,8 +4536,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         # Remove only this last line when the deprecation completes.
         self.assertContains(response, "<p>Multiline<br />html<br />content<br />with allow tags</p>", html=True)
 
-        self.assertContains(response,
-            formats.localize(datetime.date.today() - datetime.timedelta(days=7)))
+        self.assertContains(response, formats.localize(datetime.date.today() - datetime.timedelta(days=7)))
 
         self.assertContains(response, '<div class="form-row field-coolness">')
         self.assertContains(response, '<div class="form-row field-awesomeness_level">')
@@ -4828,8 +4852,7 @@ class UserAdminTest(TestCase):
         self.assertEqual(response.status_code, 200)
         adminform = response.context['adminform']
         self.assertNotIn('password', adminform.form.errors)
-        self.assertEqual(adminform.form.errors['password2'],
-            ["The two password fields didn't match."])
+        self.assertEqual(adminform.form.errors['password2'], ["The two password fields didn't match."])
 
     def test_user_fk_add_popup(self):
         """User addition through a FK popup should return the appropriate JavaScript response."""
@@ -5019,26 +5042,22 @@ class CSSTest(TestCase):
         Ensure app and model tag are correctly read by change_form template
         """
         response = self.client.get(reverse('admin:admin_views_section_add'))
-        self.assertContains(response,
-            '<body class=" app-admin_views model-section ')
+        self.assertContains(response, '<body class=" app-admin_views model-section ')
 
     def test_app_model_in_list_body_class(self):
         """
         Ensure app and model tag are correctly read by change_list template
         """
         response = self.client.get(reverse('admin:admin_views_section_changelist'))
-        self.assertContains(response,
-            '<body class=" app-admin_views model-section ')
+        self.assertContains(response, '<body class=" app-admin_views model-section ')
 
     def test_app_model_in_delete_confirmation_body_class(self):
         """
         Ensure app and model tag are correctly read by delete_confirmation
         template
         """
-        response = self.client.get(
-            reverse('admin:admin_views_section_delete', args=(self.s1.pk,)))
-        self.assertContains(response,
-            '<body class=" app-admin_views model-section ')
+        response = self.client.get(reverse('admin:admin_views_section_delete', args=(self.s1.pk,)))
+        self.assertContains(response, '<body class=" app-admin_views model-section ')
 
     def test_app_model_in_app_index_body_class(self):
         """
@@ -5057,25 +5076,19 @@ class CSSTest(TestCase):
             'action': 'delete_selected',
             'index': 0,
         }
-        response = self.client.post(reverse('admin:admin_views_section_changelist'),
-            action_data)
-        self.assertContains(response,
-            '<body class=" app-admin_views model-section ')
+        response = self.client.post(reverse('admin:admin_views_section_changelist'), action_data)
+        self.assertContains(response, '<body class=" app-admin_views model-section ')
 
     def test_changelist_field_classes(self):
         """
         Cells of the change list table should contain the field name in their class attribute
         Refs #11195.
         """
-        Podcast.objects.create(name="Django Dose",
-            release_date=datetime.date.today())
+        Podcast.objects.create(name="Django Dose", release_date=datetime.date.today())
         response = self.client.get(reverse('admin:admin_views_podcast_changelist'))
-        self.assertContains(
-            response, '<th class="field-name">')
-        self.assertContains(
-            response, '<td class="field-release_date nowrap">')
-        self.assertContains(
-            response, '<td class="action-checkbox">')
+        self.assertContains(response, '<th class="field-name">')
+        self.assertContains(response, '<td class="field-release_date nowrap">')
+        self.assertContains(response, '<td class="action-checkbox">')
 
 
 try:

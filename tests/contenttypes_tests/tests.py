@@ -252,9 +252,11 @@ class GenericRelationshipTests(SimpleTestCase):
                 'custom_content_type', 'custom_object_id')
 
         class Bookmark(models.Model):
-            tags = GenericRelation('TaggedItem',
+            tags = GenericRelation(
+                'TaggedItem',
                 content_type_field='custom_content_type',
-                object_id_field='custom_object_id')
+                object_id_field='custom_object_id',
+            )
 
         errors = Bookmark.tags.field.check()
         self.assertEqual(errors, [])

@@ -664,8 +664,8 @@ class NonExistentFixtureTests(TestCase):
 
     @mock.patch('django.db.connection.enable_constraint_checking')
     @mock.patch('django.db.connection.disable_constraint_checking')
-    def test_nonexistent_fixture_no_constraint_checking(self,
-            disable_constraint_checking, enable_constraint_checking):
+    def test_nonexistent_fixture_no_constraint_checking(
+            self, disable_constraint_checking, enable_constraint_checking):
         """
         If no fixtures match the loaddata command, constraints checks on the
         database shouldn't be disabled. This is performance critical on MSSQL.

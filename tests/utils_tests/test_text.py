@@ -58,12 +58,9 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator(
             'The quick brown fox jumped over the lazy dog.'
         )
-        self.assertEqual('The quick brown fox jumped over the lazy dog.',
-            truncator.chars(100)),
-        self.assertEqual('The quick brown fox ...',
-            truncator.chars(23)),
-        self.assertEqual('The quick brown fo.....',
-            truncator.chars(23, '.....')),
+        self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.chars(100)),
+        self.assertEqual('The quick brown fox ...', truncator.chars(23)),
+        self.assertEqual('The quick brown fo.....', truncator.chars(23, '.....')),
 
         # Ensure that we normalize our unicode data first
         nfc = text.Truncator('o\xfco\xfco\xfco\xfc')
@@ -94,53 +91,55 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(12), 'The quick...')
 
     def test_truncate_words(self):
-        truncator = text.Truncator('The quick brown fox jumped over the lazy '
-            'dog.')
-        self.assertEqual('The quick brown fox jumped over the lazy dog.',
-            truncator.words(10))
+        truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
+        self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.words(10))
         self.assertEqual('The quick brown fox...', truncator.words(4))
-        self.assertEqual('The quick brown fox[snip]',
-            truncator.words(4, '[snip]'))
+        self.assertEqual('The quick brown fox[snip]', truncator.words(4, '[snip]'))
         # Ensure that lazy strings are handled correctly
         truncator = text.Truncator(lazystr('The quick brown fox jumped over the lazy dog.'))
         self.assertEqual('The quick brown fox...', truncator.words(4))
 
     def test_truncate_html_words(self):
-        truncator = text.Truncator('<p id="par"><strong><em>The quick brown fox'
-            ' jumped over the lazy dog.</em></strong></p>')
-        self.assertEqual('<p id="par"><strong><em>The quick brown fox jumped over'
-            ' the lazy dog.</em></strong></p>', truncator.words(10, html=True))
-        self.assertEqual('<p id="par"><strong><em>The quick brown fox...</em>'
-            '</strong></p>', truncator.words(4, html=True))
-        self.assertEqual('<p id="par"><strong><em>The quick brown fox....</em>'
-            '</strong></p>', truncator.words(4, '....', html=True))
-        self.assertEqual('<p id="par"><strong><em>The quick brown fox</em>'
-            '</strong></p>', truncator.words(4, '', html=True))
+        truncator = text.Truncator(
+            '<p id="par"><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>'
+        )
+        self.assertEqual(
+            '<p id="par"><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>',
+            truncator.words(10, html=True)
+        )
+        self.assertEqual(
+            '<p id="par"><strong><em>The quick brown fox...</em></strong></p>',
+            truncator.words(4, html=True)
+        )
+        self.assertEqual(
+            '<p id="par"><strong><em>The quick brown fox....</em></strong></p>',
+            truncator.words(4, '....', html=True)
+        )
+        self.assertEqual(
+            '<p id="par"><strong><em>The quick brown fox</em></strong></p>',
+            truncator.words(4, '', html=True)
+        )
 
         # Test with new line inside tag
-        truncator = text.Truncator('<p>The quick <a href="xyz.html"\n'
-            'id="mylink">brown fox</a> jumped over the lazy dog.</p>')
-        self.assertEqual('<p>The quick <a href="xyz.html"\n'
-            'id="mylink">brown...</a></p>', truncator.words(3, '...', html=True))
+        truncator = text.Truncator(
+            '<p>The quick <a href="xyz.html"\n id="mylink">brown fox</a> jumped over the lazy dog.</p>'
+        )
+        self.assertEqual(
+            '<p>The quick <a href="xyz.html"\n id="mylink">brown...</a></p>',
+            truncator.words(3, '...', html=True)
+        )
 
         # Test self-closing tags
-        truncator = text.Truncator('<br/>The <hr />quick brown fox jumped over'
-            ' the lazy dog.')
-        self.assertEqual('<br/>The <hr />quick brown...',
-            truncator.words(3, '...', html=True))
-        truncator = text.Truncator('<br>The <hr/>quick <em>brown fox</em> '
-            'jumped over the lazy dog.')
-        self.assertEqual('<br>The <hr/>quick <em>brown...</em>',
-            truncator.words(3, '...', html=True))
+        truncator = text.Truncator('<br/>The <hr />quick brown fox jumped over the lazy dog.')
+        self.assertEqual('<br/>The <hr />quick brown...', truncator.words(3, '...', html=True))
+        truncator = text.Truncator('<br>The <hr/>quick <em>brown fox</em> jumped over the lazy dog.')
+        self.assertEqual('<br>The <hr/>quick <em>brown...</em>', truncator.words(3, '...', html=True))
 
         # Test html entities
-        truncator = text.Truncator('<i>Buenos d&iacute;as!'
-            ' &#x00bf;C&oacute;mo est&aacute;?</i>')
-        self.assertEqual('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo...</i>',
-            truncator.words(3, '...', html=True))
+        truncator = text.Truncator('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo est&aacute;?</i>')
+        self.assertEqual('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo...</i>', truncator.words(3, '...', html=True))
         truncator = text.Truncator('<p>I &lt;3 python, what about you?</p>')
-        self.assertEqual('<p>I &lt;3 python...</p>',
-            truncator.words(3, '...', html=True))
+        self.assertEqual('<p>I &lt;3 python...</p>', truncator.words(3, '...', html=True))
 
     def test_wrap(self):
         digits = '1234 67 9'
@@ -148,21 +147,16 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.wrap(digits, 9), '1234 67 9')
         self.assertEqual(text.wrap(digits, 8), '1234 67\n9')
 
-        self.assertEqual(text.wrap('short\na long line', 7),
-                         'short\na long\nline')
-
-        self.assertEqual(text.wrap('do-not-break-long-words please? ok', 8),
-                         'do-not-break-long-words\nplease?\nok')
+        self.assertEqual(text.wrap('short\na long line', 7), 'short\na long\nline')
+        self.assertEqual(text.wrap('do-not-break-long-words please? ok', 8), 'do-not-break-long-words\nplease?\nok')
 
         long_word = 'l%sng' % ('o' * 20)
         self.assertEqual(text.wrap(long_word, 20), long_word)
-        self.assertEqual(text.wrap('a %s word' % long_word, 10),
-                         'a\n%s\nword' % long_word)
+        self.assertEqual(text.wrap('a %s word' % long_word, 10), 'a\n%s\nword' % long_word)
         self.assertEqual(text.wrap(lazystr(digits), 100), '1234 67 9')
 
     def test_normalize_newlines(self):
-        self.assertEqual(text.normalize_newlines("abc\ndef\rghi\r\n"),
-                         "abc\ndef\nghi\n")
+        self.assertEqual(text.normalize_newlines("abc\ndef\rghi\r\n"), "abc\ndef\nghi\n")
         self.assertEqual(text.normalize_newlines("\n\r\r\n\r"), "\n\n\n\n")
         self.assertEqual(text.normalize_newlines("abcdefghi"), "abcdefghi")
         self.assertEqual(text.normalize_newlines(""), "")

@@ -692,8 +692,7 @@ class SerializationTests(SimpleTestCase):
 
     def assert_yaml_contains_datetime(self, yaml, dt):
         # Depending on the yaml dumper, '!timestamp' might be absent
-        six.assertRegex(self, yaml,
-            r"\n  fields: {dt: !(!timestamp)? '%s'}" % re.escape(dt))
+        six.assertRegex(self, yaml, r"\n  fields: {dt: !(!timestamp)? '%s'}" % re.escape(dt))
 
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
@@ -1162,18 +1161,24 @@ class NewFormsTests(TestCase):
         with timezone.override(pytz.timezone('Europe/Paris')):
             form = EventForm({'dt': '2011-03-27 02:30:00'})
             self.assertFalse(form.is_valid())
-            self.assertEqual(form.errors['dt'],
-                ["2011-03-27 02:30:00 couldn't be interpreted in time zone "
-                 "Europe/Paris; it may be ambiguous or it may not exist."])
+            self.assertEqual(
+                form.errors['dt'], [
+                    "2011-03-27 02:30:00 couldn't be interpreted in time zone "
+                    "Europe/Paris; it may be ambiguous or it may not exist."
+                ]
+            )
 
     @requires_pytz
     def test_form_with_ambiguous_time(self):
         with timezone.override(pytz.timezone('Europe/Paris')):
             form = EventForm({'dt': '2011-10-30 02:30:00'})
             self.assertFalse(form.is_valid())
-            self.assertEqual(form.errors['dt'],
-                ["2011-10-30 02:30:00 couldn't be interpreted in time zone "
-                 "Europe/Paris; it may be ambiguous or it may not exist."])
+            self.assertEqual(
+                form.errors['dt'], [
+                    "2011-10-30 02:30:00 couldn't be interpreted in time zone "
+                    "Europe/Paris; it may be ambiguous or it may not exist."
+                ]
+            )
 
     @requires_tz_support
     def test_split_form(self):

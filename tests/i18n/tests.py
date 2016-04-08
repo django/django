@@ -708,8 +708,7 @@ class FormattingTests(SimpleTestCase):
             # thousand separator and grouping when USE_L10N is False even
             # if the USE_THOUSAND_SEPARATOR, NUMBER_GROUPING and
             # THOUSAND_SEPARATOR settings are specified
-            with self.settings(USE_THOUSAND_SEPARATOR=True,
-                    NUMBER_GROUPING=1, THOUSAND_SEPARATOR='!'):
+            with self.settings(USE_THOUSAND_SEPARATOR=True, NUMBER_GROUPING=1, THOUSAND_SEPARATOR='!'):
                 self.assertEqual('66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
                 self.assertEqual('100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
 
@@ -1527,8 +1526,11 @@ class ResolutionOrderI18NTests(SimpleTestCase):
 
     def assertUgettext(self, msgid, msgstr):
         result = ugettext(msgid)
-        self.assertIn(msgstr, result, ("The string '%s' isn't in the "
-            "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
+        self.assertIn(
+            msgstr, result,
+            "The string '%s' isn't in the translation of '%s'; the actual result is '%s'."
+            % (msgstr, msgid, result)
+        )
 
 
 class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):

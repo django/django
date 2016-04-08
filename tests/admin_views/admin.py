@@ -208,8 +208,7 @@ class PersonAdmin(admin.ModelAdmin):
     save_as = True
 
     def get_changelist_formset(self, request, **kwargs):
-        return super(PersonAdmin, self).get_changelist_formset(request,
-            formset=BasePersonModelFormSet, **kwargs)
+        return super(PersonAdmin, self).get_changelist_formset(request, formset=BasePersonModelFormSet, **kwargs)
 
     def get_queryset(self, request):
         # Order by a field that isn't in list display, to be able to test

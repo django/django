@@ -329,8 +329,7 @@ class JsI18NTestsMultiPackage(SimpleTestCase):
         with self.settings(LANGUAGE_CODE='es-ar', LOCALE_PATHS=extended_locale_paths):
             with override('es-ar'):
                 response = self.client.get('/jsi18n/')
-                self.assertContains(response,
-                    'este texto de app3 debe ser traducido')
+                self.assertContains(response, 'este texto de app3 debe ser traducido')
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
@@ -344,7 +343,7 @@ class JavascriptI18nTests(SeleniumTestCase):
 
     @override_settings(LANGUAGE_CODE='de')
     def test_javascript_gettext(self):
-        self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_template/'))
+        self.selenium.get(self.live_server_url + '/jsi18n_template/')
 
         elem = self.selenium.find_element_by_id("gettext")
         self.assertEqual(elem.text, "Entfernen")
@@ -362,7 +361,7 @@ class JavascriptI18nTests(SeleniumTestCase):
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})
     @override_settings(LANGUAGE_CODE='fr')
     def test_multiple_catalogs(self):
-        self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_multi_catalogs/'))
+        self.selenium.get(self.live_server_url + '/jsi18n_multi_catalogs/')
 
         elem = self.selenium.find_element_by_id('app1string')
         self.assertEqual(elem.text, 'il faut traduire cette chaîne de caractères de app1')

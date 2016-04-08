@@ -328,8 +328,7 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = '__all__'
 
-        self.assertIsInstance(ReplaceField.base_fields['url'],
-            forms.fields.BooleanField)
+        self.assertIsInstance(ReplaceField.base_fields['url'], forms.fields.BooleanField)
 
     def test_replace_field_variant_2(self):
         # Should have the same result as before,
@@ -341,8 +340,7 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = ['url']
 
-        self.assertIsInstance(ReplaceField.base_fields['url'],
-            forms.fields.BooleanField)
+        self.assertIsInstance(ReplaceField.base_fields['url'], forms.fields.BooleanField)
 
     def test_replace_field_variant_3(self):
         # Should have the same result as before,
@@ -354,8 +352,7 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = []  # url will still appear, since it is explicit above
 
-        self.assertIsInstance(ReplaceField.base_fields['url'],
-            forms.fields.BooleanField)
+        self.assertIsInstance(ReplaceField.base_fields['url'], forms.fields.BooleanField)
 
     def test_override_field(self):
         class WriterForm(forms.ModelForm):
@@ -390,8 +387,7 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 exclude = ['url']
 
-        self.assertEqual(list(ExcludeFields.base_fields),
-                         ['name', 'slug'])
+        self.assertEqual(list(ExcludeFields.base_fields), ['name', 'slug'])
 
     def test_exclude_nonexistent_field(self):
         class ExcludeFields(forms.ModelForm):
@@ -399,8 +395,7 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 exclude = ['nonexistent']
 
-        self.assertEqual(list(ExcludeFields.base_fields),
-                         ['name', 'slug', 'url'])
+        self.assertEqual(list(ExcludeFields.base_fields), ['name', 'slug', 'url'])
 
     def test_exclude_fields_with_string(self):
         expected_msg = "CategoryForm.Meta.exclude cannot be a string. Did you mean to type: ('url',)?"
@@ -811,8 +806,10 @@ class UniqueTest(TestCase):
         self.assertEqual(form.errors['key'], ['Explicit pk with this Key already exists.'])
 
     def test_unique_for_date(self):
-        p = Post.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+        p = Post.objects.create(
+            title="Django 1.0 is released", slug="Django 1.0",
+            subtitle="Finally", posted=datetime.date(2008, 9, 3),
+        )
         form = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
@@ -828,8 +825,8 @@ class UniqueTest(TestCase):
         form = PostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['subtitle'], ['Subtitle must be unique for Posted month.'])
-        form = PostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
-            "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
+        data = {'subtitle': "Finally", "title": "Django 1.0 is released", "slug": "Django 1.0", 'posted': '2008-09-03'}
+        form = PostForm(data, instance=p)
         self.assertTrue(form.is_valid())
         form = PostForm({'title': "Django 1.0 is released"})
         self.assertFalse(form.is_valid())
@@ -847,9 +844,10 @@ class UniqueTest(TestCase):
                 model = DateTimePost
                 fields = '__all__'
 
-        DateTimePost.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally",
-            posted=datetime.datetime(2008, 9, 3, 10, 10, 1))
+        DateTimePost.objects.create(
+            title="Django 1.0 is released", slug="Django 1.0",
+            subtitle="Finally", posted=datetime.datetime(2008, 9, 3, 10, 10, 1),
+        )
         # 'title' has unique_for_date='posted'
         form = DateTimePostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
         self.assertTrue(form.is_valid())
@@ -861,8 +859,10 @@ class UniqueTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_inherited_unique_for_date(self):
-        p = Post.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+        p = Post.objects.create(
+            title="Django 1.0 is released", slug="Django 1.0",
+            subtitle="Finally", posted=datetime.date(2008, 9, 3),
+        )
         form = DerivedPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
@@ -878,8 +878,8 @@ class UniqueTest(TestCase):
         form = DerivedPostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['subtitle'], ['Subtitle must be unique for Posted month.'])
-        form = DerivedPostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
-            "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
+        data = {'subtitle': "Finally", "title": "Django 1.0 is released", "slug": "Django 1.0", 'posted': '2008-09-03'}
+        form = DerivedPostForm(data, instance=p)
         self.assertTrue(form.is_valid())
 
     def test_unique_for_date_with_nullable_date(self):
@@ -888,8 +888,10 @@ class UniqueTest(TestCase):
                 model = FlexibleDatePost
                 fields = '__all__'
 
-        p = FlexibleDatePost.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+        p = FlexibleDatePost.objects.create(
+            title="Django 1.0 is released", slug="Django 1.0",
+            subtitle="Finally", posted=datetime.date(2008, 9, 3),
+        )
 
         form = FlexDatePostForm({'title': "Django 1.0 is released"})
         self.assertTrue(form.is_valid())
@@ -897,8 +899,8 @@ class UniqueTest(TestCase):
         self.assertTrue(form.is_valid())
         form = FlexDatePostForm({'subtitle': "Finally"})
         self.assertTrue(form.is_valid())
-        form = FlexDatePostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
-            "slug": "Django 1.0"}, instance=p)
+        data = {'subtitle': "Finally", "title": "Django 1.0 is released", "slug": "Django 1.0"}
+        form = FlexDatePostForm(data, instance=p)
         self.assertTrue(form.is_valid())
 
     def test_override_unique_message(self):
@@ -941,8 +943,10 @@ class UniqueTest(TestCase):
                     }
                 }
 
-        Post.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+        Post.objects.create(
+            title="Django 1.0 is released", slug="Django 1.0",
+            subtitle="Finally", posted=datetime.date(2008, 9, 3),
+        )
         form = CustomPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['title'], ["Post's Title not unique for Posted date."])
@@ -1343,8 +1347,7 @@ class ModelFormBasicTests(TestCase):
         new_art = f.save()
         new_art = Article.objects.get(id=new_art.id)
         art_id_1 = new_art.id
-        self.assertQuerysetEqual(new_art.categories.order_by('name'),
-                         ["Entertainment", "It's a test"])
+        self.assertQuerysetEqual(new_art.categories.order_by('name'), ["Entertainment", "It's a test"])
 
         # Now, submit form data with no categories. This deletes the existing categories.
         form_data['categories'] = []
@@ -1379,8 +1382,7 @@ class ModelFormBasicTests(TestCase):
 
         # Save the m2m data on the form
         f.save_m2m()
-        self.assertQuerysetEqual(new_art.categories.order_by('name'),
-            ["Entertainment", "It's a test"])
+        self.assertQuerysetEqual(new_art.categories.order_by('name'), ["Entertainment", "It's a test"])
 
     def test_custom_form_fields(self):
         # Here, we define a custom ModelForm. Because it happens to have the same fields as
@@ -1594,12 +1596,18 @@ class ModelMultipleChoiceFieldTests(TestCase):
         self.assertQuerysetEqual(f.clean([self.c1.id]), ["Entertainment"])
         self.assertQuerysetEqual(f.clean([self.c2.id]), ["It's a test"])
         self.assertQuerysetEqual(f.clean([str(self.c1.id)]), ["Entertainment"])
-        self.assertQuerysetEqual(f.clean([str(self.c1.id), str(self.c2.id)]),
-            ["Entertainment", "It's a test"], ordered=False)
-        self.assertQuerysetEqual(f.clean([self.c1.id, str(self.c2.id)]),
-            ["Entertainment", "It's a test"], ordered=False)
-        self.assertQuerysetEqual(f.clean((self.c1.id, str(self.c2.id))),
-            ["Entertainment", "It's a test"], ordered=False)
+        self.assertQuerysetEqual(
+            f.clean([str(self.c1.id), str(self.c2.id)]),
+            ["Entertainment", "It's a test"], ordered=False
+        )
+        self.assertQuerysetEqual(
+            f.clean([self.c1.id, str(self.c2.id)]),
+            ["Entertainment", "It's a test"], ordered=False
+        )
+        self.assertQuerysetEqual(
+            f.clean((self.c1.id, str(self.c2.id))),
+            ["Entertainment", "It's a test"], ordered=False
+        )
         with self.assertRaises(ValidationError):
             f.clean(['100'])
         with self.assertRaises(ValidationError):
@@ -1827,8 +1835,7 @@ class ModelOneToOneFieldTests(TestCase):
                 model = Author
                 fields = ['publication', 'full_name']
 
-        publication = Publication.objects.create(title="Pravda",
-            date_published=datetime.date(1991, 8, 22))
+        publication = Publication.objects.create(title="Pravda", date_published=datetime.date(1991, 8, 22))
         author = Author.objects.create(publication=publication, full_name='John Doe')
         form = AuthorForm({'publication': '', 'full_name': 'John Doe'}, instance=author)
         self.assertTrue(form.is_valid())
@@ -1845,8 +1852,7 @@ class ModelOneToOneFieldTests(TestCase):
                 model = Author1
                 fields = ['publication', 'full_name']
 
-        publication = Publication.objects.create(title="Pravda",
-            date_published=datetime.date(1991, 8, 22))
+        publication = Publication.objects.create(title="Pravda", date_published=datetime.date(1991, 8, 22))
         author = Author1.objects.create(publication=publication, full_name='John Doe')
         form = AuthorForm({'publication': '', 'full_name': 'John Doe'}, instance=author)
         self.assertFalse(form.is_valid())

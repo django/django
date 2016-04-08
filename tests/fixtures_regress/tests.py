@@ -215,8 +215,7 @@ class TestFixtures(TestCase):
         """
         Test that failing serializer import raises the proper error
         """
-        with six.assertRaisesRegex(self, ImportError,
-                r"No module named.*unexistent"):
+        with six.assertRaisesRegex(self, ImportError, r"No module named.*unexistent"):
             management.call_command(
                 'loaddata',
                 'bad_fixture1.unkn',
@@ -277,8 +276,7 @@ class TestFixtures(TestCase):
             )
             warning = warning_list.pop()
             self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(str(warning.message),
-            "No fixture data found for 'empty'. (File format may be invalid.)")
+            self.assertEqual(str(warning.message), "No fixture data found for 'empty'. (File format may be invalid.)")
 
     def test_error_message(self):
         """

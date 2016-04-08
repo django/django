@@ -37,9 +37,11 @@ class PaginationTests(unittest.TestCase):
         got = getattr(paginator, name)
         if coerce is not None:
             got = coerce(got)
-        self.assertEqual(expected, got,
+        self.assertEqual(
+            expected, got,
             "For '%s', expected %s but got %s.  Paginator parameters were: %s"
-            % (name, expected, got, params))
+            % (name, expected, got, params)
+        )
 
     def test_paginator(self):
         """
@@ -156,12 +158,9 @@ class PaginationTests(unittest.TestCase):
             page_num = paginator.num_pages
         page = paginator.page(page_num)
         start, end = indexes
-        msg = ("For %s of page %s, expected %s but got %s."
-               " Paginator parameters were: %s")
-        self.assertEqual(start, page.start_index(),
-            msg % ('start index', page_num, start, page.start_index(), params))
-        self.assertEqual(end, page.end_index(),
-            msg % ('end index', page_num, end, page.end_index(), params))
+        msg = ("For %s of page %s, expected %s but got %s. Paginator parameters were: %s")
+        self.assertEqual(start, page.start_index(), msg % ('start index', page_num, start, page.start_index(), params))
+        self.assertEqual(end, page.end_index(), msg % ('end index', page_num, end, page.end_index(), params))
 
     def test_page_indexes(self):
         """

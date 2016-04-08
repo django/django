@@ -28,12 +28,15 @@ class BaseModelValidationTests(ValidationTestCase):
 
     def test_wrong_FK_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', parent_id=3)
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'parent',
-            ['model to validate instance with id %r does not exist.' % mtv.parent_id])
-
+        self.assertFieldFailsValidationWithMessage(
+            mtv.full_clean, 'parent',
+            ['model to validate instance with id %r does not exist.' % mtv.parent_id]
+        )
         mtv = ModelToValidate(number=10, name='Some Name', ufm_id='Some Name')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'ufm',
-            ["unique fields model instance with unique_charfield %r does not exist." % mtv.name])
+        self.assertFieldFailsValidationWithMessage(
+            mtv.full_clean, 'ufm',
+            ["unique fields model instance with unique_charfield %r does not exist." % mtv.name]
+        )
 
     def test_correct_FK_value_validates(self):
         parent = ModelToValidate.objects.create(number=10, name='Some Name')

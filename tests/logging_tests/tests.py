@@ -223,7 +223,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
             admin_email_handler.filters = []
             rf = RequestFactory()
             request = rf.get('/')
-            self.logger.error(message, token1, token2,
+            self.logger.error(
+                message, token1, token2,
                 extra={
                     'status_code': 403,
                     'request': request,

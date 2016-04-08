@@ -776,13 +776,17 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
         ETag is changed after gzip compression is performed.
         """
         request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
-        response = GZipMiddleware().process_response(request,
-            CommonMiddleware().process_response(request, HttpResponse(self.compressible_string)))
+        response = GZipMiddleware().process_response(
+            request,
+            CommonMiddleware().process_response(request, HttpResponse(self.compressible_string))
+        )
         gzip_etag = response.get('ETag')
 
         request = self.rf.get('/', HTTP_ACCEPT_ENCODING='')
-        response = GZipMiddleware().process_response(request,
-            CommonMiddleware().process_response(request, HttpResponse(self.compressible_string)))
+        response = GZipMiddleware().process_response(
+            request,
+            CommonMiddleware().process_response(request, HttpResponse(self.compressible_string))
+        )
         nogzip_etag = response.get('ETag')
 
         self.assertNotEqual(gzip_etag, nogzip_etag)

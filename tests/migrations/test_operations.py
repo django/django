@@ -46,7 +46,8 @@ class OperationTestBase(MigrationTestBase):
         operation.state_forwards(app_label, new_state)
         return project_state, new_state
 
-    def set_up_test_model(self, app_label, second_model=False, third_model=False,
+    def set_up_test_model(
+            self, app_label, second_model=False, third_model=False,
             related_model=False, mti_model=False, proxy_model=False, manager_model=False,
             unique_together=False, options=False, db_table=None, index_together=False):
         """

@@ -161,9 +161,11 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Move to the test directory and run
         os.chdir(self.test_dir)
-        out, err = subprocess.Popen([sys.executable, script] + args,
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                env=test_environ, universal_newlines=True).communicate()
+        out, err = subprocess.Popen(
+            [sys.executable, script] + args,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            env=test_environ, universal_newlines=True,
+        ).communicate()
         # Move back to the old working directory
         os.chdir(old_cwd)
 
@@ -204,8 +206,10 @@ class AdminScriptTestCase(unittest.TestCase):
         "Utility assertion: assert that the given message exists in the output"
         stream = force_text(stream)
         if regex:
-            self.assertIsNotNone(re.search(msg, stream),
-                "'%s' does not match actual output text '%s'" % (msg, stream))
+            self.assertIsNotNone(
+                re.search(msg, stream),
+                "'%s' does not match actual output text '%s'" % (msg, stream)
+            )
         else:
             self.assertIn(msg, stream, "'%s' does not match actual output text '%s'" % (msg, stream))
 
@@ -1146,9 +1150,11 @@ class ManageCheck(AdminScriptTestCase):
         """ manage.py check reports an error on a non-existent app in
         INSTALLED_APPS """
 
-        self.write_settings('settings.py',
+        self.write_settings(
+            'settings.py',
             apps=['admin_scriptz.broken_app'],
-            sdict={'USE_I18N': False})
+            sdict={'USE_I18N': False},
+        )
         args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
@@ -1192,12 +1198,16 @@ class ManageCheck(AdminScriptTestCase):
         """ manage.py check does not raise errors when an app imports a base
         class that itself has an abstract base. """
 
-        self.write_settings('settings.py',
-            apps=['admin_scripts.app_with_import',
-                  'django.contrib.auth',
-                  'django.contrib.contenttypes',
-                  'django.contrib.sites'],
-            sdict={'DEBUG': True})
+        self.write_settings(
+            'settings.py',
+            apps=[
+                'admin_scripts.app_with_import',
+                'django.contrib.auth',
+                'django.contrib.contenttypes',
+                'django.contrib.sites',
+            ],
+            sdict={'DEBUG': True},
+        )
         args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
@@ -1206,11 +1216,15 @@ class ManageCheck(AdminScriptTestCase):
     def test_output_format(self):
         """ All errors/warnings should be sorted by level and by message. """
 
-        self.write_settings('settings.py',
-            apps=['admin_scripts.app_raising_messages',
-                  'django.contrib.auth',
-                  'django.contrib.contenttypes'],
-            sdict={'DEBUG': True})
+        self.write_settings(
+            'settings.py',
+            apps=[
+                'admin_scripts.app_raising_messages',
+                'django.contrib.auth',
+                'django.contrib.contenttypes',
+            ],
+            sdict={'DEBUG': True},
+        )
         args = ['check']
         out, err = self.run_manage(args)
         expected_err = (
@@ -1239,11 +1253,15 @@ class ManageCheck(AdminScriptTestCase):
         In this test we also test output format.
         """
 
-        self.write_settings('settings.py',
-            apps=['admin_scripts.app_raising_warning',
-                  'django.contrib.auth',
-                  'django.contrib.contenttypes'],
-            sdict={'DEBUG': True})
+        self.write_settings(
+            'settings.py',
+            apps=[
+                'admin_scripts.app_raising_warning',
+                'django.contrib.auth',
+                'django.contrib.contenttypes',
+            ],
+            sdict={'DEBUG': True},
+        )
         args = ['check']
         out, err = self.run_manage(args)
         expected_err = (
@@ -2049,8 +2067,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         for f in ('Procfile', 'additional_file.py', 'requirements.txt'):
             self.assertTrue(os.path.exists(os.path.join(base_path, f)))
             with open(os.path.join(base_path, f)) as fh:
-                self.assertEqual(fh.read().strip(),
-                    '# some file for customtestproject test project')
+                self.assertEqual(fh.read().strip(), '# some file for customtestproject test project')
 
     def test_custom_project_template_context_variables(self):
         "Make sure template context variables are rendered with proper values"

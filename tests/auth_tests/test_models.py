@@ -154,8 +154,12 @@ class AbstractUserTestCase(TestCase):
             "html_message": None,
         }
         abstract_user = AbstractUser(email='foo@bar.com')
-        abstract_user.email_user(subject="Subject here",
-            message="This is a message", from_email="from@domain.com", **kwargs)
+        abstract_user.email_user(
+            subject="Subject here",
+            message="This is a message",
+            from_email="from@domain.com",
+            **kwargs
+        )
         # Test that one message has been sent.
         self.assertEqual(len(mail.outbox), 1)
         # Verify that test email contains the correct attributes:

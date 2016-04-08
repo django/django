@@ -99,16 +99,14 @@ class ModelInstanceCreationTests(TestCase):
             pub_date=datetime(2005, 7, 31, 12, 30),
         )
         a1.save()
-        self.assertEqual(Article.objects.get(id__exact=a1.id).pub_date,
-            datetime(2005, 7, 31, 12, 30))
+        self.assertEqual(Article.objects.get(id__exact=a1.id).pub_date, datetime(2005, 7, 31, 12, 30))
 
         a2 = Article(
             headline='Article 8',
             pub_date=datetime(2005, 7, 31, 12, 30, 45),
         )
         a2.save()
-        self.assertEqual(Article.objects.get(id__exact=a2.id).pub_date,
-            datetime(2005, 7, 31, 12, 30, 45))
+        self.assertEqual(Article.objects.get(id__exact=a2.id).pub_date, datetime(2005, 7, 31, 12, 30, 45))
 
     def test_saving_an_object_again_does_not_create_a_new_object(self):
         a = Article(headline='original', pub_date=datetime(2014, 5, 16))
@@ -150,14 +148,15 @@ class ModelTest(TestCase):
         some_pub_date = datetime(2014, 5, 16, 12, 1)
         for headline in headlines:
             Article(headline=headline, pub_date=some_pub_date).save()
-        self.assertQuerysetEqual(Article.objects.all().order_by('headline'),
+        self.assertQuerysetEqual(
+            Article.objects.all().order_by('headline'),
             ["<Article: Amazing article>",
              "<Article: An article>",
              "<Article: Article One>",
-             "<Article: Boring article>"])
+             "<Article: Boring article>"]
+        )
         Article.objects.filter(headline__startswith='A').delete()
-        self.assertQuerysetEqual(Article.objects.all().order_by('headline'),
-            ["<Article: Boring article>"])
+        self.assertQuerysetEqual(Article.objects.all().order_by('headline'), ["<Article: Boring article>"])
 
     def test_not_equal_and_equal_operators_behave_as_expected_on_instances(self):
         some_pub_date = datetime(2014, 5, 16, 12, 1)
@@ -176,8 +175,7 @@ class ModelTest(TestCase):
             pub_date=datetime(2005, 7, 31, 12, 30, 45, 180),
         )
         a9.save()
-        self.assertEqual(Article.objects.get(pk=a9.pk).pub_date,
-            datetime(2005, 7, 31, 12, 30, 45, 180))
+        self.assertEqual(Article.objects.get(pk=a9.pk).pub_date, datetime(2005, 7, 31, 12, 30, 45, 180))
 
     @skipIfDBFeature('supports_microsecond_precision')
     def test_microsecond_precision_not_supported(self):
@@ -236,8 +234,10 @@ class ModelTest(TestCase):
             headline='Article 12',
             pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
         )
-        self.assertQuerysetEqual(Article.objects.filter(pub_date__year=2008),
-            ["<Article: Article 11>", "<Article: Article 12>"])
+        self.assertQuerysetEqual(
+            Article.objects.filter(pub_date__year=2008),
+            ["<Article: Article 11>", "<Article: Article 12>"]
+        )
 
     def test_unicode_data(self):
         # Unicode data works, too.
@@ -246,8 +246,7 @@ class ModelTest(TestCase):
             pub_date=datetime(2005, 7, 28),
         )
         a.save()
-        self.assertEqual(Article.objects.get(pk=a.id).headline,
-            '\u6797\u539f \u3081\u3050\u307f')
+        self.assertEqual(Article.objects.get(pk=a.id).headline, '\u6797\u539f \u3081\u3050\u307f')
 
     def test_hash_function(self):
         # Model instances have a hash function, so they can be used in sets
@@ -304,8 +303,10 @@ class ModelTest(TestCase):
         dicts = Article.objects.filter(
             pub_date__year=2008).extra(
             select={'dashed-value': '1'}).values('headline', 'dashed-value')
-        self.assertEqual([sorted(d.items()) for d in dicts],
-            [[('dashed-value', 1), ('headline', 'Article 11')], [('dashed-value', 1), ('headline', 'Article 12')]])
+        self.assertEqual(
+            [sorted(d.items()) for d in dicts],
+            [[('dashed-value', 1), ('headline', 'Article 11')], [('dashed-value', 1), ('headline', 'Article 12')]]
+        )
 
     def test_extra_method_select_argument_with_dashes(self):
         # If you use 'select' with extra() and names containing dashes on a
@@ -438,8 +439,7 @@ class ModelLookupTest(TestCase):
         self.a.save()
 
         # Article.objects.all() returns all the articles in the database.
-        self.assertQuerysetEqual(Article.objects.all(),
-            ['<Article: Parrot programs in Python>'])
+        self.assertQuerysetEqual(Article.objects.all(), ['<Article: Parrot programs in Python>'])
 
     def test_rich_lookup(self):
         # Django provides a rich database lookup API.
@@ -496,8 +496,7 @@ class ModelLookupTest(TestCase):
         self.assertEqual(Article.objects.get(pk=self.a.id), self.a)
 
         # pk can be used as a shortcut for the primary key name in any query.
-        self.assertQuerysetEqual(Article.objects.filter(pk__in=[self.a.id]),
-            ["<Article: Swallow programs in Python>"])
+        self.assertQuerysetEqual(Article.objects.filter(pk__in=[self.a.id]), ["<Article: Swallow programs in Python>"])
 
         # Model instances of the same type and same ID are considered equal.
         a = Article.objects.get(pk=self.a.id)

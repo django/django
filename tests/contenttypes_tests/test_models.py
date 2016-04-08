@@ -40,8 +40,7 @@ class ContentTypesTests(TestCase):
         with self.assertNumQueries(0):
             ContentType.objects.get_for_id(ct.id)
         with self.assertNumQueries(0):
-            ContentType.objects.get_by_natural_key('contenttypes',
-                                                   'contenttype')
+            ContentType.objects.get_by_natural_key('contenttypes', 'contenttype')
 
         # Once we clear the cache, another lookup will again hit the DB
         ContentType.objects.clear_cache()
@@ -51,12 +50,10 @@ class ContentTypesTests(TestCase):
         # The same should happen with a lookup by natural key
         ContentType.objects.clear_cache()
         with self.assertNumQueries(1):
-            ContentType.objects.get_by_natural_key('contenttypes',
-                                                   'contenttype')
+            ContentType.objects.get_by_natural_key('contenttypes', 'contenttype')
         # And a second hit shouldn't hit the DB
         with self.assertNumQueries(0):
-            ContentType.objects.get_by_natural_key('contenttypes',
-                                                   'contenttype')
+            ContentType.objects.get_by_natural_key('contenttypes', 'contenttype')
 
     def test_get_for_models_empty_cache(self):
         # Empty cache.
@@ -94,17 +91,10 @@ class ContentTypesTests(TestCase):
         with concrete, proxy and deferred models
         """
         concrete_model_ct = ContentType.objects.get_for_model(ConcreteModel)
+        self.assertEqual(concrete_model_ct, ContentType.objects.get_for_model(ProxyModel))
+        self.assertEqual(concrete_model_ct, ContentType.objects.get_for_model(ConcreteModel, for_concrete_model=False))
 
-        self.assertEqual(concrete_model_ct,
-            ContentType.objects.get_for_model(ProxyModel))
-
-        self.assertEqual(concrete_model_ct,
-            ContentType.objects.get_for_model(ConcreteModel,
-                                              for_concrete_model=False))
-
-        proxy_model_ct = ContentType.objects.get_for_model(ProxyModel,
-                                                           for_concrete_model=False)
-
+        proxy_model_ct = ContentType.objects.get_for_model(ProxyModel, for_concrete_model=False)
         self.assertNotEqual(concrete_model_ct, proxy_model_ct)
 
         # Make sure deferred model are correctly handled
@@ -112,19 +102,16 @@ class ContentTypesTests(TestCase):
         DeferredConcreteModel = ConcreteModel.objects.only('pk').get().__class__
         DeferredProxyModel = ProxyModel.objects.only('pk').get().__class__
 
-        self.assertEqual(concrete_model_ct,
-            ContentType.objects.get_for_model(DeferredConcreteModel))
-
-        self.assertEqual(concrete_model_ct,
-            ContentType.objects.get_for_model(DeferredConcreteModel,
-                                              for_concrete_model=False))
-
-        self.assertEqual(concrete_model_ct,
-            ContentType.objects.get_for_model(DeferredProxyModel))
-
-        self.assertEqual(proxy_model_ct,
-            ContentType.objects.get_for_model(DeferredProxyModel,
-                                              for_concrete_model=False))
+        self.assertEqual(concrete_model_ct, ContentType.objects.get_for_model(DeferredConcreteModel))
+        self.assertEqual(
+            concrete_model_ct,
+            ContentType.objects.get_for_model(DeferredConcreteModel, for_concrete_model=False)
+        )
+        self.assertEqual(concrete_model_ct, ContentType.objects.get_for_model(DeferredProxyModel))
+        self.assertEqual(
+            proxy_model_ct,
+            ContentType.objects.get_for_model(DeferredProxyModel, for_concrete_model=False)
+        )
 
     def test_get_for_concrete_models(self):
         """
@@ -139,10 +126,8 @@ class ContentTypesTests(TestCase):
             ProxyModel: concrete_model_ct,
         })
 
-        proxy_model_ct = ContentType.objects.get_for_model(ProxyModel,
-                                                           for_concrete_model=False)
-        cts = ContentType.objects.get_for_models(ConcreteModel, ProxyModel,
-                                                 for_concrete_models=False)
+        proxy_model_ct = ContentType.objects.get_for_model(ProxyModel, for_concrete_model=False)
+        cts = ContentType.objects.get_for_models(ConcreteModel, ProxyModel, for_concrete_models=False)
         self.assertEqual(cts, {
             ConcreteModel: concrete_model_ct,
             ProxyModel: proxy_model_ct,
@@ -153,16 +138,15 @@ class ContentTypesTests(TestCase):
         DeferredConcreteModel = ConcreteModel.objects.only('pk').get().__class__
         DeferredProxyModel = ProxyModel.objects.only('pk').get().__class__
 
-        cts = ContentType.objects.get_for_models(DeferredConcreteModel,
-                                                 DeferredProxyModel)
+        cts = ContentType.objects.get_for_models(DeferredConcreteModel, DeferredProxyModel)
         self.assertEqual(cts, {
             DeferredConcreteModel: concrete_model_ct,
             DeferredProxyModel: concrete_model_ct,
         })
 
-        cts = ContentType.objects.get_for_models(DeferredConcreteModel,
-                                                 DeferredProxyModel,
-                                                 for_concrete_models=False)
+        cts = ContentType.objects.get_for_models(
+            DeferredConcreteModel, DeferredProxyModel, for_concrete_models=False
+        )
         self.assertEqual(cts, {
             DeferredConcreteModel: concrete_model_ct,
             DeferredProxyModel: proxy_model_ct,
@@ -198,13 +182,14 @@ class ContentTypesTests(TestCase):
 
         with self.modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'}):
             response = shortcut(request, user_ct.id, obj.id)
-            self.assertEqual("http://%s/users/john/" % get_current_site(request).domain,
-                             response._headers.get("location")[1])
+            self.assertEqual(
+                "http://%s/users/john/" % get_current_site(request).domain,
+                response._headers.get("location")[1]
+            )
 
         with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
             response = shortcut(request, user_ct.id, obj.id)
-            self.assertEqual("http://Example.com/users/john/",
-                             response._headers.get("location")[1])
+            self.assertEqual("http://Example.com/users/john/", response._headers.get("location")[1])
 
     def test_shortcut_view_without_get_absolute_url(self):
         """

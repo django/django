@@ -41,10 +41,8 @@ class GetUniqueCheckTests(unittest.TestCase):
         objects.
         """
         data = {
-            '2-tuple': (('foo', 'bar'),
-                        (('foo', 'bar'),)),
-            'list': (['foo', 'bar'],
-                     (('foo', 'bar'),)),
+            '2-tuple': (('foo', 'bar'), (('foo', 'bar'),)),
+            'list': (['foo', 'bar'], (('foo', 'bar'),)),
             'already normalized': ((('foo', 'bar'), ('bar', 'baz')),
                                    (('foo', 'bar'), ('bar', 'baz'))),
             'set': ({('foo', 'bar'), ('bar', 'baz')},  # Ref #21469
@@ -113,9 +111,10 @@ class PerformUniqueChecksTest(TestCase):
             mtv.full_clean()
 
     def test_unique_for_date(self):
-        Post.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
-
+        Post.objects.create(
+            title="Django 1.0 is released", slug="Django 1.0",
+            subtitle="Finally", posted=datetime.date(2008, 9, 3),
+        )
         p = Post(title="Django 1.0 is released", posted=datetime.date(2008, 9, 3))
         with self.assertRaises(ValidationError) as cm:
             p.full_clean()
@@ -145,9 +144,10 @@ class PerformUniqueChecksTest(TestCase):
         self.assertEqual(cm.exception.message_dict, {'posted': ['This field cannot be null.']})
 
     def test_unique_for_date_with_nullable_date(self):
-        FlexibleDatePost.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
-
+        FlexibleDatePost.objects.create(
+            title="Django 1.0 is released", slug="Django 1.0",
+            subtitle="Finally", posted=datetime.date(2008, 9, 3),
+        )
         p = FlexibleDatePost(title="Django 1.0 is released")
         try:
             p.full_clean()

@@ -850,8 +850,10 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual('person@example.com', f.clean('person@example.com'))
         with self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'"):
             f.clean('foo')
-        self.assertEqual('local@domain.with.idn.xyz\xe4\xf6\xfc\xdfabc.part.com',
-            f.clean('local@domain.with.idn.xyzäöüßabc.part.com'))
+        self.assertEqual(
+            'local@domain.with.idn.xyz\xe4\xf6\xfc\xdfabc.part.com',
+            f.clean('local@domain.with.idn.xyzäöüßabc.part.com')
+        )
 
     def test_email_regexp_for_performance(self):
         f = EmailField()
@@ -1259,9 +1261,11 @@ class FieldsTests(SimpleTestCase):
 
     def test_choicefield_disabled(self):
         f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')], disabled=True)
-        self.assertWidgetRendersTo(f,
+        self.assertWidgetRendersTo(
+            f,
             '<select id="id_f" name="f" disabled><option value="J">John</option>'
-            '<option value="P">Paul</option></select>')
+            '<option value="P">Paul</option></select>'
+        )
 
     # TypedChoiceField ############################################################
     # TypedChoiceField is just like ChoiceField, except that coerced types will
@@ -1434,8 +1438,8 @@ class FieldsTests(SimpleTestCase):
             f.clean('hello')
         self.assertEqual([], f.clean([]))
         self.assertEqual([], f.clean(()))
-        with self.assertRaisesMessage(ValidationError,
-                "'Select a valid choice. 3 is not one of the available choices.'"):
+        msg = "'Select a valid choice. 3 is not one of the available choices.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(['3'])
 
     def test_multiplechoicefield_3(self):

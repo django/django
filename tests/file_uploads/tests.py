@@ -585,8 +585,7 @@ class DirectoryCreationTests(SimpleTestCase):
                 self.obj.testfile.save('foo.txt', file, save=False)
         # The test needs to be done on a specific string as IOError
         # is raised even without the patch (just not early enough)
-        self.assertEqual(exc_info.exception.args[0],
-            "%s exists and is not a directory." % UPLOAD_TO)
+        self.assertEqual(exc_info.exception.args[0], "%s exists and is not a directory." % UPLOAD_TO)
 
 
 class MultiParserTests(unittest.TestCase):

@@ -1290,8 +1290,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
-        self.assertOperationAttributes(changes, 'testapp', 0, 0,
-            name="AuthorUnmanaged", options={"managed": False})
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged", options={"managed": False})
 
     def test_unmanaged_to_managed(self):
         # Now, we test turning an unmanaged model into a managed model
@@ -1302,8 +1301,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterModelOptions"])
-        self.assertOperationAttributes(changes, 'testapp', 0, 0,
-            name="authorunmanaged", options={})
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="authorunmanaged", options={})
 
     def test_managed_to_unmanaged(self):
         # Now, we turn managed to unmanaged.
@@ -1314,8 +1312,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, "testapp", 0, ["AlterModelOptions"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0,
-            name="authorunmanaged", options={"managed": False})
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="authorunmanaged", options={"managed": False})
 
     def test_unmanaged_custom_pk(self):
         """

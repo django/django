@@ -57,8 +57,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
     def test_pbkdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
-        self.assertEqual(encoded,
-            'pbkdf2_sha256$30000$seasalt$VrX+V8drCGo68wlvy6rfu8i1d1pfkdeXA4LJkRGJodY=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$30000$seasalt$VrX+V8drCGo68wlvy6rfu8i1d1pfkdeXA4LJkRGJodY=')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -73,8 +72,7 @@ class TestUtilsHashPass(SimpleTestCase):
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
     def test_sha1(self):
         encoded = make_password('lètmein', 'seasalt', 'sha1')
-        self.assertEqual(encoded,
-            'sha1$seasalt$cff36ea83f5706ce9aa7454e63e431fc726b2dc8')
+        self.assertEqual(encoded, 'sha1$seasalt$cff36ea83f5706ce9aa7454e63e431fc726b2dc8')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -89,8 +87,7 @@ class TestUtilsHashPass(SimpleTestCase):
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
     def test_md5(self):
         encoded = make_password('lètmein', 'seasalt', 'md5')
-        self.assertEqual(encoded,
-                         'md5$seasalt$3f86d0d3d465b7b458c231bf3555c0e3')
+        self.assertEqual(encoded, 'md5$seasalt$3f86d0d3d465b7b458c231bf3555c0e3')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -165,8 +162,10 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertEqual(identify_hasher(encoded).algorithm, "bcrypt_sha256")
 
         # Verify that password truncation no longer works
-        password = ('VSK0UYV6FFQVZ0KG88DYN9WADAADZO1CTSIVDJUNZSUML6IBX7LN7ZS3R5'
-                    'JGB3RGZ7VI7G7DJQ9NI8BQFSRPTG6UWTTVESA5ZPUN')
+        password = (
+            'VSK0UYV6FFQVZ0KG88DYN9WADAADZO1CTSIVDJUNZSUML6IBX7LN7ZS3R5'
+            'JGB3RGZ7VI7G7DJQ9NI8BQFSRPTG6UWTTVESA5ZPUN'
+        )
         encoded = make_password(password, hasher='bcrypt_sha256')
         self.assertTrue(check_password(password, encoded))
         self.assertFalse(check_password(password[:72], encoded))
@@ -282,15 +281,13 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_low_level_pbkdf2(self):
         hasher = PBKDF2PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded,
-            'pbkdf2_sha256$30000$seasalt2$a75qzbogeVhNFeMqhdgyyoqGKpIzYUo651sq57RERew=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$30000$seasalt2$a75qzbogeVhNFeMqhdgyyoqGKpIzYUo651sq57RERew=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     def test_low_level_pbkdf2_sha1(self):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded,
-            'pbkdf2_sha1$30000$seasalt2$pMzU1zNPcydf6wjnJFbiVKwgULc=')
+        self.assertEqual(encoded, 'pbkdf2_sha1$30000$seasalt2$pMzU1zNPcydf6wjnJFbiVKwgULc=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     @override_settings(
@@ -433,15 +430,13 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_load_library_no_algorithm(self):
         with self.assertRaises(ValueError) as e:
             BasePasswordHasher()._load_library()
-        self.assertEqual("Hasher 'BasePasswordHasher' doesn't specify a "
-                         "library attribute", str(e.exception))
+        self.assertEqual("Hasher 'BasePasswordHasher' doesn't specify a library attribute", str(e.exception))
 
     def test_load_library_importerror(self):
-        PlainHasher = type(str('PlainHasher'), (BasePasswordHasher,),
-                           {'algorithm': 'plain', 'library': 'plain'})
+        PlainHasher = type(str('PlainHasher'), (BasePasswordHasher,), {'algorithm': 'plain', 'library': 'plain'})
         # Python 3 adds quotes around module name
-        with six.assertRaisesRegex(self, ValueError,
-                "Couldn't load 'PlainHasher' algorithm library: No module named '?plain'?"):
+        msg = "Couldn't load 'PlainHasher' algorithm library: No module named '?plain'?"
+        with six.assertRaisesRegex(self, ValueError, msg):
             PlainHasher()._load_library()
 
 

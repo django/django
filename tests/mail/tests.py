@@ -31,8 +31,10 @@ if PY3:
     from email import message_from_bytes, message_from_binary_file
 else:
     from email.Utils import parseaddr
-    from email import (message_from_string as message_from_bytes,
-        message_from_file as message_from_binary_file)
+    from email import (
+        message_from_string as message_from_bytes,
+        message_from_file as message_from_binary_file,
+    )
 
 
 class HeadersCheckMixin(object):
@@ -613,9 +615,10 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
 
     def get_the_message(self):
         mailbox = self.get_mailbox_content()
-        self.assertEqual(len(mailbox), 1,
-            "Expected exactly one message, got %d.\n%r" % (len(mailbox), [
-                m.as_string() for m in mailbox]))
+        self.assertEqual(
+            len(mailbox), 1,
+            "Expected exactly one message, got %d.\n%r" % (len(mailbox), [m.as_string() for m in mailbox])
+        )
         return mailbox[0]
 
     def test_send(self):
@@ -769,8 +772,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         self.assertEqual(message.get('to'), 'to@xn--4ca9at.com')
 
         self.flush_mailbox()
-        m = EmailMessage('Subject', 'Content', 'from@öäü.com',
-                     ['to@öäü.com'], cc=['cc@öäü.com'])
+        m = EmailMessage('Subject', 'Content', 'from@öäü.com', ['to@öäü.com'], cc=['cc@öäü.com'])
         m.send()
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')

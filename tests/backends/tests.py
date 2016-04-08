@@ -40,8 +40,7 @@ class DummyBackendTest(SimpleTestCase):
         """
         DATABASES = {}
         conns = ConnectionHandler(DATABASES)
-        self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'],
-            'django.db.backends.dummy')
+        self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'], 'django.db.backends.dummy')
         with self.assertRaises(ImproperlyConfigured):
             conns[DEFAULT_DB_ALIAS].ensure_connection()
 
@@ -119,9 +118,11 @@ class SQLiteTests(TestCase):
             statements = editor.collected_sql
         match = re.search('"id" ([^,]+),', statements[0])
         self.assertIsNotNone(match)
-        self.assertEqual('integer NOT NULL PRIMARY KEY AUTOINCREMENT',
-            match.group(1), "Wrong SQL used to create an auto-increment "
-            "column on SQLite")
+        self.assertEqual(
+            'integer NOT NULL PRIMARY KEY AUTOINCREMENT',
+            match.group(1),
+            "Wrong SQL used to create an auto-increment column on SQLite"
+        )
 
     def test_aggregation(self):
         """
@@ -672,11 +673,15 @@ class BackendTestCase(TransactionTestCase):
         models.Person(first_name="Clark", last_name="Kent").save()
         opts2 = models.Person._meta
         f3, f4 = opts2.get_field('first_name'), opts2.get_field('last_name')
-        query2 = ('SELECT %s, %s FROM %s ORDER BY %s'
-          % (qn(f3.column), qn(f4.column), connection.introspection.table_name_converter(opts2.db_table),
-             qn(f3.column)))
         cursor = connection.cursor()
-        cursor.execute(query2)
+        cursor.execute(
+            'SELECT %s, %s FROM %s ORDER BY %s' % (
+                qn(f3.column),
+                qn(f4.column),
+                connection.introspection.table_name_converter(opts2.db_table),
+                qn(f3.column),
+            )
+        )
         self.assertEqual(cursor.fetchone(), ('Clark', 'Kent'))
         self.assertEqual(list(cursor.fetchmany(2)), [('Jane', 'Doe'), ('John', 'Doe')])
         self.assertEqual(list(cursor.fetchall()), [('Mary', 'Agnelline'), ('Peter', 'Parker')])
@@ -818,9 +823,10 @@ class BackendTestCase(TransactionTestCase):
             with warnings.catch_warnings(record=True) as w:
                 self.assertEqual(3, len(new_connection.queries))
                 self.assertEqual(1, len(w))
-                self.assertEqual(str(w[0].message), "Limit for query logging "
-                    "exceeded, only the last 3 queries will be returned.")
-
+                self.assertEqual(
+                    str(w[0].message),
+                    "Limit for query logging exceeded, only the last 3 queries will be returned."
+                )
         finally:
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
