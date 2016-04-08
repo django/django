@@ -651,7 +651,7 @@ achieve that, use ``values_list()`` followed by a ``get()`` call::
 specific use case: retrieving a subset of data without the overhead of creating
 a model instance. This metaphor falls apart when dealing with many-to-many and
 other multivalued relations (such as the one-to-many relation of a reverse
-foreign key) because the the "one row, one object" assumption doesn't hold.
+foreign key) because the "one row, one object" assumption doesn't hold.
 
 For example, notice the behavior when querying across a
 :class:`~django.db.models.ManyToManyField`::
