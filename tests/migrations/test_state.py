@@ -261,13 +261,11 @@ class StateTests(SimpleTestCase):
         self.assertEqual(len(new_apps.get_model("migrations", "SubTag")._meta.local_fields), 2)
 
         Food = new_apps.get_model("migrations", "Food")
-        managers = sorted(Food._meta.managers)
-        self.assertEqual([mgr.name for _, mgr, _ in managers],
+        self.assertEqual([mgr.name for mgr in Food._meta.managers],
                          ['default', 'food_mgr1', 'food_mgr2'])
-        self.assertTrue(all(isinstance(mgr.name, six.text_type) for _, mgr, _ in managers))
-        self.assertEqual([mgr.__class__ for _, mgr, _ in managers],
+        self.assertTrue(all(isinstance(mgr.name, six.text_type) for mgr in Food._meta.managers))
+        self.assertEqual([mgr.__class__ for mgr in Food._meta.managers],
                          [models.Manager, FoodManager, FoodManager])
-        self.assertIs(managers[0][1], Food._default_manager)
 
     def test_render_model_inheritance(self):
         class Book(models.Model):

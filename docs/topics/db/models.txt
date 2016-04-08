@@ -1282,38 +1282,24 @@ possible.
 
 .. _proxy-vs-unmanaged-models:
 
-Differences between proxy inheritance and  unmanaged models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Differences between proxy inheritance and unmanaged models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Proxy model inheritance might look fairly similar to creating an unmanaged
 model, using the :attr:`~django.db.models.Options.managed` attribute on a
-model's ``Meta`` class. The two alternatives are not quite the same and it's
-worth considering which one you should use.
+model's ``Meta`` class.
 
-One difference is that you can (and, in fact, must unless you want an empty
-model) specify model fields on models with ``Meta.managed=False``. You could,
-with careful setting of :attr:`Meta.db_table
-<django.db.models.Options.db_table>` create an unmanaged model that shadowed
-an existing model and add Python methods to it. However, that would be very
-repetitive and fragile as you need to keep both copies synchronized if you
-make any changes.
+With careful setting of :attr:`Meta.db_table
+<django.db.models.Options.db_table>` you could create an unmanaged model
+that shadowed an existing model and add Python methods to it. However,
+that would be very repetitive and fragile as you need to keep both copies
+synchronized if you make any changes.
 
-The other difference that is more important for proxy models, is how model
-managers are handled. Proxy models are intended to behave exactly like the
-model they are proxying for. So they inherit the parent model's managers,
-including the default manager. In the normal multi-table model inheritance
-case, children do not inherit managers from their parents as the custom
-managers aren't always appropriate when extra fields are involved. The
-:ref:`manager documentation <custom-managers-and-inheritance>` has more
-details about this latter case.
+On the other hand, proxy models are intended to behave exactly like the model
+they are proxying for. They are always in sync with the parent model since they
+directly inherit its fields and managers.
 
-When these two features were implemented, attempts were made to squash them
-into a single option. It turned out that interactions with inheritance, in
-general, and managers, in particular, made the API very complicated and
-potentially difficult to understand and use. It turned out that two options
-were needed in any case, so the current separation arose.
-
-So, the general rules are:
+The general rules are:
 
 1. If you are mirroring an existing model or database table and don't want
    all the original database table columns, use ``Meta.managed=False``.
