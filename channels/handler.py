@@ -149,6 +149,7 @@ class AsgiRequest(http.HttpRequest):
 
     def _get_files(self):
         if not hasattr(self, '_files'):
+            self._read_started = False
             self._load_post_and_files()
         return self._files
 
