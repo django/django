@@ -16,8 +16,7 @@ from django.test import (
 from .models import Reporter
 
 
-@skipUnless(connection.features.uses_savepoints,
-        "'atomic' requires transactions and savepoints.")
+@skipUnless(connection.features.uses_savepoints, "'atomic' requires transactions and savepoints.")
 class AtomicTests(TransactionTestCase):
     """
     Tests for the atomic decorator and context manager.
@@ -81,8 +80,10 @@ class AtomicTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with transaction.atomic():
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-        self.assertQuerysetEqual(Reporter.objects.all(),
-                ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
+        self.assertQuerysetEqual(
+            Reporter.objects.all(),
+            ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>']
+        )
 
     def test_nested_commit_rollback(self):
         with transaction.atomic():
@@ -118,8 +119,10 @@ class AtomicTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with transaction.atomic(savepoint=False):
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-        self.assertQuerysetEqual(Reporter.objects.all(),
-                ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
+        self.assertQuerysetEqual(
+            Reporter.objects.all(),
+            ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>']
+        )
 
     def test_merged_commit_rollback(self):
         with transaction.atomic():
@@ -157,8 +160,7 @@ class AtomicTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with atomic:
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-        self.assertQuerysetEqual(Reporter.objects.all(),
-                ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
+        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
 
     def test_reuse_commit_rollback(self):
         atomic = transaction.atomic()
@@ -228,8 +230,10 @@ class AtomicInsideTransactionTests(AtomicTests):
         self.atomic.__exit__(*sys.exc_info())
 
 
-@skipIf(connection.features.autocommits_when_autocommit_is_off,
-        "This test requires a non-autocommit mode that doesn't autocommit.")
+@skipIf(
+    connection.features.autocommits_when_autocommit_is_off,
+    "This test requires a non-autocommit mode that doesn't autocommit."
+)
 class AtomicWithoutAutocommitTests(AtomicTests):
     """All basic tests for atomic should also pass when autocommit is turned off."""
 
@@ -243,8 +247,7 @@ class AtomicWithoutAutocommitTests(AtomicTests):
         transaction.set_autocommit(True)
 
 
-@skipUnless(connection.features.uses_savepoints,
-        "'atomic' requires transactions and savepoints.")
+@skipUnless(connection.features.uses_savepoints, "'atomic' requires transactions and savepoints.")
 class AtomicMergeTests(TransactionTestCase):
     """Test merging transactions with savepoint=False."""
 
@@ -294,8 +297,7 @@ class AtomicMergeTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
 
 
-@skipUnless(connection.features.uses_savepoints,
-        "'atomic' requires transactions and savepoints.")
+@skipUnless(connection.features.uses_savepoints, "'atomic' requires transactions and savepoints.")
 class AtomicErrorsTests(TransactionTestCase):
 
     available_apps = ['transactions']

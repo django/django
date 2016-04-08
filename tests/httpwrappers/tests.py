@@ -461,9 +461,11 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         response = HttpResponseRedirect('/redirected/')
         self.assertEqual(response.status_code, 302)
         # Test that standard HttpResponse init args can be used
-        response = HttpResponseRedirect('/redirected/',
+        response = HttpResponseRedirect(
+            '/redirected/',
             content='The resource has temporarily moved',
-            content_type='text/html')
+            content_type='text/html',
+        )
         self.assertContains(response, 'The resource has temporarily moved', status_code=302)
         # Test that url attribute is right
         self.assertEqual(response.url, response['Location'])
@@ -490,9 +492,7 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         response = HttpResponseNotAllowed(['GET'])
         self.assertEqual(response.status_code, 405)
         # Test that standard HttpResponse init args can be used
-        response = HttpResponseNotAllowed(['GET'],
-            content='Only the GET method is allowed',
-            content_type='text/html')
+        response = HttpResponseNotAllowed(['GET'], content='Only the GET method is allowed', content_type='text/html')
         self.assertContains(response, 'Only the GET method is allowed', status_code=405)
 
     def test_not_allowed_repr(self):

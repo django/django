@@ -11,7 +11,6 @@ from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, modify_settings,
     override_settings, signals,
 )
-from django.utils import six
 
 
 @modify_settings(ITEMS={
@@ -19,8 +18,7 @@ from django.utils import six
     'append': ['d'],
     'remove': ['a', 'e']
 })
-@override_settings(ITEMS=['a', 'c', 'e'], ITEMS_OUTER=[1, 2, 3],
-                   TEST='override', TEST_OUTER='outer')
+@override_settings(ITEMS=['a', 'c', 'e'], ITEMS_OUTER=[1, 2, 3], TEST='override', TEST_OUTER='outer')
 class FullyDecoratedTranTestCase(TransactionTestCase):
 
     available_apps = []
@@ -215,8 +213,7 @@ class SettingsTests(SimpleTestCase):
         self.assertIsInstance(decorated, type)
         self.assertTrue(issubclass(decorated, SimpleTestCase))
 
-        with six.assertRaisesRegex(self, Exception,
-                "Only subclasses of Django SimpleTestCase*"):
+        with self.assertRaisesMessage(Exception, "Only subclasses of Django SimpleTestCase"):
             decorated = override_settings(TEST='override')(UnittestTestCaseSubclass)
 
     def test_signal_callback_context_manager(self):
@@ -310,10 +307,8 @@ class TestComplexSettingOverride(SimpleTestCase):
 
             self.assertEqual(len(w), 1)
             # File extension may by .py, .pyc, etc. Compare only basename.
-            self.assertEqual(os.path.splitext(w[0].filename)[0],
-                             os.path.splitext(__file__)[0])
-            self.assertEqual(str(w[0].message),
-                'Overriding setting TEST_WARN can lead to unexpected behavior.')
+            self.assertEqual(os.path.splitext(w[0].filename)[0], os.path.splitext(__file__)[0])
+            self.assertEqual(str(w[0].message), 'Overriding setting TEST_WARN can lead to unexpected behavior.')
 
 
 class TrailingSlashURLTests(SimpleTestCase):
@@ -351,15 +346,13 @@ class TrailingSlashURLTests(SimpleTestCase):
         self.assertEqual('/foo/', self.settings_module.MEDIA_URL)
 
         self.settings_module.MEDIA_URL = 'http://media.foo.com/'
-        self.assertEqual('http://media.foo.com/',
-                         self.settings_module.MEDIA_URL)
+        self.assertEqual('http://media.foo.com/', self.settings_module.MEDIA_URL)
 
         self.settings_module.STATIC_URL = '/foo/'
         self.assertEqual('/foo/', self.settings_module.STATIC_URL)
 
         self.settings_module.STATIC_URL = 'http://static.foo.com/'
-        self.assertEqual('http://static.foo.com/',
-                         self.settings_module.STATIC_URL)
+        self.assertEqual('http://static.foo.com/', self.settings_module.STATIC_URL)
 
     def test_no_end_slash(self):
         """
@@ -387,15 +380,13 @@ class TrailingSlashURLTests(SimpleTestCase):
         self.assertEqual('/wrong//', self.settings_module.MEDIA_URL)
 
         self.settings_module.MEDIA_URL = 'http://media.foo.com/wrong//'
-        self.assertEqual('http://media.foo.com/wrong//',
-                         self.settings_module.MEDIA_URL)
+        self.assertEqual('http://media.foo.com/wrong//', self.settings_module.MEDIA_URL)
 
         self.settings_module.STATIC_URL = '/wrong//'
         self.assertEqual('/wrong//', self.settings_module.STATIC_URL)
 
         self.settings_module.STATIC_URL = 'http://static.foo.com/wrong//'
-        self.assertEqual('http://static.foo.com/wrong//',
-                         self.settings_module.STATIC_URL)
+        self.assertEqual('http://static.foo.com/wrong//', self.settings_module.STATIC_URL)
 
 
 class SecureProxySslHeaderTest(SimpleTestCase):

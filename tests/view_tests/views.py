@@ -113,12 +113,10 @@ def send_log(request, exc_info):
     orig_filters = admin_email_handler.filters
     admin_email_handler.filters = []
     admin_email_handler.include_html = True
-    logger.error('Internal Server Error: %s', request.path,
+    logger.error(
+        'Internal Server Error: %s', request.path,
         exc_info=exc_info,
-        extra={
-            'status_code': 500,
-            'request': request
-        }
+        extra={'status_code': 500, 'request': request},
     )
     admin_email_handler.filters = orig_filters
 

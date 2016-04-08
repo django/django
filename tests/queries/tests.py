@@ -1474,10 +1474,8 @@ class Queries4Tests(BaseQuerysetTest):
 
     def test_ticket15316_filter_false(self):
         c1 = SimpleCategory.objects.create(name="category1")
-        c2 = SpecialCategory.objects.create(name="named category1",
-                special_name="special1")
-        c3 = SpecialCategory.objects.create(name="named category2",
-                special_name="special2")
+        c2 = SpecialCategory.objects.create(name="named category1", special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2", special_name="special2")
 
         CategoryItem.objects.create(category=c1)
         ci2 = CategoryItem.objects.create(category=c2)
@@ -1489,10 +1487,8 @@ class Queries4Tests(BaseQuerysetTest):
 
     def test_ticket15316_exclude_false(self):
         c1 = SimpleCategory.objects.create(name="category1")
-        c2 = SpecialCategory.objects.create(name="named category1",
-                special_name="special1")
-        c3 = SpecialCategory.objects.create(name="named category2",
-                special_name="special2")
+        c2 = SpecialCategory.objects.create(name="named category1", special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2", special_name="special2")
 
         ci1 = CategoryItem.objects.create(category=c1)
         CategoryItem.objects.create(category=c2)
@@ -1504,10 +1500,8 @@ class Queries4Tests(BaseQuerysetTest):
 
     def test_ticket15316_filter_true(self):
         c1 = SimpleCategory.objects.create(name="category1")
-        c2 = SpecialCategory.objects.create(name="named category1",
-                special_name="special1")
-        c3 = SpecialCategory.objects.create(name="named category2",
-                special_name="special2")
+        c2 = SpecialCategory.objects.create(name="named category1", special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2", special_name="special2")
 
         ci1 = CategoryItem.objects.create(category=c1)
         CategoryItem.objects.create(category=c2)
@@ -1519,10 +1513,8 @@ class Queries4Tests(BaseQuerysetTest):
 
     def test_ticket15316_exclude_true(self):
         c1 = SimpleCategory.objects.create(name="category1")
-        c2 = SpecialCategory.objects.create(name="named category1",
-                special_name="special1")
-        c3 = SpecialCategory.objects.create(name="named category2",
-                special_name="special2")
+        c2 = SpecialCategory.objects.create(name="named category1", special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2", special_name="special2")
 
         CategoryItem.objects.create(category=c1)
         ci2 = CategoryItem.objects.create(category=c2)
@@ -2260,15 +2252,20 @@ class QuerySetSupportsPythonIdioms(TestCase):
 
     def test_can_get_items_using_index_and_slice_notation(self):
         self.assertEqual(self.get_ordered_articles()[0].name, 'Article 1')
-        self.assertQuerysetEqual(self.get_ordered_articles()[1:3],
-            ["<Article: Article 2>", "<Article: Article 3>"])
+        self.assertQuerysetEqual(
+            self.get_ordered_articles()[1:3],
+            ["<Article: Article 2>", "<Article: Article 3>"]
+        )
 
     def test_slicing_with_steps_can_be_used(self):
-        self.assertQuerysetEqual(self.get_ordered_articles()[::2],
-            ["<Article: Article 1>",
-             "<Article: Article 3>",
-             "<Article: Article 5>",
-             "<Article: Article 7>"])
+        self.assertQuerysetEqual(
+            self.get_ordered_articles()[::2], [
+                "<Article: Article 1>",
+                "<Article: Article 3>",
+                "<Article: Article 5>",
+                "<Article: Article 7>"
+            ]
+        )
 
     @unittest.skipUnless(six.PY2, "Python 2 only -- Python 3 doesn't have longs.")
     def test_slicing_works_with_longs(self):
@@ -2276,11 +2273,14 @@ class QuerySetSupportsPythonIdioms(TestCase):
         self.assertEqual(self.get_ordered_articles()[long(0)].name, 'Article 1')  # NOQA
         self.assertQuerysetEqual(self.get_ordered_articles()[long(1):long(3)],  # NOQA
             ["<Article: Article 2>", "<Article: Article 3>"])
-        self.assertQuerysetEqual(self.get_ordered_articles()[::long(2)],  # NOQA
-            ["<Article: Article 1>",
-            "<Article: Article 3>",
-            "<Article: Article 5>",
-            "<Article: Article 7>"])
+        self.assertQuerysetEqual(
+            self.get_ordered_articles()[::long(2)], [  # NOQA
+                "<Article: Article 1>",
+                "<Article: Article 3>",
+                "<Article: Article 5>",
+                "<Article: Article 7>"
+            ]
+        )
 
         # And can be mixed with ints.
         self.assertQuerysetEqual(self.get_ordered_articles()[1:long(3)],  # NOQA
@@ -2295,25 +2295,29 @@ class QuerySetSupportsPythonIdioms(TestCase):
             self.get_ordered_articles()[0:5:3]
 
     def test_slicing_can_slice_again_after_slicing(self):
-        self.assertQuerysetEqual(self.get_ordered_articles()[0:5][0:2],
-            ["<Article: Article 1>",
-             "<Article: Article 2>"])
-        self.assertQuerysetEqual(self.get_ordered_articles()[0:5][4:],
-            ["<Article: Article 5>"])
+        self.assertQuerysetEqual(
+            self.get_ordered_articles()[0:5][0:2],
+            ["<Article: Article 1>", "<Article: Article 2>"]
+        )
+        self.assertQuerysetEqual(self.get_ordered_articles()[0:5][4:], ["<Article: Article 5>"])
         self.assertQuerysetEqual(self.get_ordered_articles()[0:5][5:], [])
 
         # Some more tests!
-        self.assertQuerysetEqual(self.get_ordered_articles()[2:][0:2],
-            ["<Article: Article 3>", "<Article: Article 4>"])
-        self.assertQuerysetEqual(self.get_ordered_articles()[2:][:2],
-            ["<Article: Article 3>", "<Article: Article 4>"])
-        self.assertQuerysetEqual(self.get_ordered_articles()[2:][2:3],
-            ["<Article: Article 5>"])
+        self.assertQuerysetEqual(
+            self.get_ordered_articles()[2:][0:2],
+            ["<Article: Article 3>", "<Article: Article 4>"]
+        )
+        self.assertQuerysetEqual(
+            self.get_ordered_articles()[2:][:2],
+            ["<Article: Article 3>", "<Article: Article 4>"]
+        )
+        self.assertQuerysetEqual(self.get_ordered_articles()[2:][2:3], ["<Article: Article 5>"])
 
         # Using an offset without a limit is also possible.
-        self.assertQuerysetEqual(self.get_ordered_articles()[5:],
-            ["<Article: Article 6>",
-             "<Article: Article 7>"])
+        self.assertQuerysetEqual(
+            self.get_ordered_articles()[5:],
+            ["<Article: Article 6>", "<Article: Article 7>"]
+        )
 
     def test_slicing_cannot_filter_queryset_once_sliced(self):
         with self.assertRaisesMessage(AssertionError, "Cannot filter a query once a slice has been taken."):
@@ -2343,9 +2347,10 @@ class QuerySetSupportsPythonIdioms(TestCase):
     def test_can_combine_queries_using_and_and_or_operators(self):
         s1 = Article.objects.filter(name__exact='Article 1')
         s2 = Article.objects.filter(name__exact='Article 2')
-        self.assertQuerysetEqual((s1 | s2).order_by('name'),
-            ["<Article: Article 1>",
-             "<Article: Article 2>"])
+        self.assertQuerysetEqual(
+            (s1 | s2).order_by('name'),
+            ["<Article: Article 1>", "<Article: Article 2>"]
+        )
         self.assertQuerysetEqual(s1 & s2, [])
 
 
@@ -3488,8 +3493,7 @@ class RelatedLookupTypeTests(TestCase):
         with self.assertRaisesMessage(ValueError, self.error % (self.ob, ObjectA._meta.object_name)):
             ObjectB.objects.filter(objecta__in=[self.poa, self.ob])
 
-        with self.assertRaisesMessage(ValueError,
-                self.error % (self.ob, ChildObjectA._meta.object_name)):
+        with self.assertRaisesMessage(ValueError, self.error % (self.ob, ChildObjectA._meta.object_name)):
             ObjectC.objects.exclude(childobjecta__in=[self.coa, self.ob])
 
     def test_wrong_backward_lookup(self):

@@ -17,18 +17,15 @@ class LinenumbersTests(SimpleTestCase):
             'linenumbers01',
             {'a': 'one\n<two>\nthree', 'b': mark_safe('one\n&lt;two&gt;\nthree')},
         )
-        self.assertEqual(output, '1. one\n2. &lt;two&gt;\n3. three '
-                                 '1. one\n2. &lt;two&gt;\n3. three')
+        self.assertEqual(output, '1. one\n2. &lt;two&gt;\n3. three 1. one\n2. &lt;two&gt;\n3. three')
 
-    @setup({'linenumbers02':
-        '{% autoescape off %}{{ a|linenumbers }} {{ b|linenumbers }}{% endautoescape %}'})
+    @setup({'linenumbers02': '{% autoescape off %}{{ a|linenumbers }} {{ b|linenumbers }}{% endautoescape %}'})
     def test_linenumbers02(self):
         output = self.engine.render_to_string(
             'linenumbers02',
             {'a': 'one\n<two>\nthree', 'b': mark_safe('one\n&lt;two&gt;\nthree')},
         )
-        self.assertEqual(output, '1. one\n2. <two>\n3. three '
-                                 '1. one\n2. &lt;two&gt;\n3. three')
+        self.assertEqual(output, '1. one\n2. <two>\n3. three 1. one\n2. &lt;two&gt;\n3. three')
 
 
 class FunctionTests(SimpleTestCase):

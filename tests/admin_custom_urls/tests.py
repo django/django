@@ -73,15 +73,16 @@ class AdminCustomUrlsTest(TestCase):
         """
         # Should get the change_view for model instance with PK 'add', not show
         # the add_view
-        url = reverse('admin_custom_urls:%s_action_change' % Action._meta.app_label,
-                args=(quote('add'),))
+        url = reverse('admin_custom_urls:%s_action_change' % Action._meta.app_label, args=(quote('add'),))
         response = self.client.get(url)
         self.assertContains(response, 'Change action')
 
         # Should correctly get the change_view for the model instance with the
         # funny-looking PK (the one with a 'path/to/html/document.html' value)
-        url = reverse('admin_custom_urls:%s_action_change' % Action._meta.app_label,
-                args=(quote("path/to/html/document.html"),))
+        url = reverse(
+            'admin_custom_urls:%s_action_change' % Action._meta.app_label,
+            args=(quote("path/to/html/document.html"),)
+        )
         response = self.client.get(url)
         self.assertContains(response, 'Change action')
         self.assertContains(response, 'value="path/to/html/document.html"')
@@ -95,12 +96,11 @@ class AdminCustomUrlsTest(TestCase):
         """
         post_data = {'name': 'John Doe'}
         self.assertEqual(Person.objects.count(), 0)
-        response = self.client.post(
-            reverse('admin_custom_urls:admin_custom_urls_person_add'), post_data)
+        response = self.client.post(reverse('admin_custom_urls:admin_custom_urls_person_add'), post_data)
         persons = Person.objects.all()
         self.assertEqual(len(persons), 1)
-        self.assertRedirects(
-            response, reverse('admin_custom_urls:admin_custom_urls_person_history', args=[persons[0].pk]))
+        redirect_url = reverse('admin_custom_urls:admin_custom_urls_person_history', args=[persons[0].pk])
+        self.assertRedirects(response, redirect_url)
 
     def test_post_save_change_redirect(self):
         """
@@ -112,11 +112,9 @@ class AdminCustomUrlsTest(TestCase):
         Person.objects.create(name='John Doe')
         self.assertEqual(Person.objects.count(), 1)
         person = Person.objects.all()[0]
-        post_data = {'name': 'Jack Doe'}
-        response = self.client.post(
-            reverse('admin_custom_urls:admin_custom_urls_person_change', args=[person.pk]), post_data)
-        self.assertRedirects(
-            response, reverse('admin_custom_urls:admin_custom_urls_person_delete', args=[person.pk]))
+        post_url = reverse('admin_custom_urls:admin_custom_urls_person_change', args=[person.pk])
+        response = self.client.post(post_url, {'name': 'Jack Doe'})
+        self.assertRedirects(response, reverse('admin_custom_urls:admin_custom_urls_person_delete', args=[person.pk]))
 
     def test_post_url_continue(self):
         """
@@ -125,9 +123,7 @@ class AdminCustomUrlsTest(TestCase):
         """
         post_data = {'name': 'SuperFast', '_continue': '1'}
         self.assertEqual(Car.objects.count(), 0)
-        response = self.client.post(
-            reverse('admin_custom_urls:admin_custom_urls_car_add'), post_data)
+        response = self.client.post(reverse('admin_custom_urls:admin_custom_urls_car_add'), post_data)
         cars = Car.objects.all()
         self.assertEqual(len(cars), 1)
-        self.assertRedirects(
-            response, reverse('admin_custom_urls:admin_custom_urls_car_history', args=[cars[0].pk]))
+        self.assertRedirects(response, reverse('admin_custom_urls:admin_custom_urls_car_history', args=[cars[0].pk]))

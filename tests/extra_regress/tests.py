@@ -46,15 +46,15 @@ class ExtraRegressTests(TestCase):
             }]
         )
 
-        self.assertQuerysetEqual(qs,
-            [('Second Revision', 'First Revision')],
+        self.assertQuerysetEqual(
+            qs, [('Second Revision', 'First Revision')],
             transform=lambda r: (r.title, r.base.title)
         )
 
         # Queryset to search for string in title:
         qs2 = RevisionableModel.objects.filter(title__contains="Revision")
-        self.assertQuerysetEqual(qs2,
-            [
+        self.assertQuerysetEqual(
+            qs2, [
                 ('First Revision', 'First Revision'),
                 ('Second Revision', 'First Revision'),
             ],
@@ -63,7 +63,8 @@ class ExtraRegressTests(TestCase):
         )
 
         # Following queryset should return the most recent revision:
-        self.assertQuerysetEqual(qs & qs2,
+        self.assertQuerysetEqual(
+            qs & qs2,
             [('Second Revision', 'First Revision')],
             transform=lambda r: (r.title, r.base.title),
             ordered=False
@@ -111,10 +112,8 @@ class ExtraRegressTests(TestCase):
         query as well.
         """
         self.assertEqual(
-            list(User.objects
-                .extra(select={"alpha": "%s"}, select_params=(-6,))
-                .filter(id=self.u.id)
-                .values_list('id', flat=True)),
+            list(User.objects.extra(select={"alpha": "%s"}, select_params=(-6,))
+                 .filter(id=self.u.id).values_list('id', flat=True)),
             [self.u.id]
         )
 

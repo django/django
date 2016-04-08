@@ -263,9 +263,7 @@ class UtilsTests(SimpleTestCase):
             "not Really the Model"
         )
         self.assertEqual(
-            label_for_field("test_from_model", Article,
-                model_admin=MockModelAdmin,
-                return_attr=True),
+            label_for_field("test_from_model", Article, model_admin=MockModelAdmin, return_attr=True),
             ("not Really the Model", MockModelAdmin.test_from_model)
         )
 

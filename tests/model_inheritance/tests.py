@@ -336,10 +336,8 @@ class ModelInheritanceDataTests(TestCase):
         #23370 - Should be able to defer child fields when using
         select_related() from parent to child.
         """
-        qs = (Restaurant.objects
-            .select_related("italianrestaurant")
-            .defer("italianrestaurant__serves_gnocchi")
-            .order_by("rating"))
+        qs = (Restaurant.objects.select_related("italianrestaurant")
+              .defer("italianrestaurant__serves_gnocchi").order_by("rating"))
 
         # Test that the field was actually deferred
         with self.assertNumQueries(2):

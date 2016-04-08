@@ -858,8 +858,7 @@ class AccessorClashTests(SimpleTestCase):
             pass
 
         class Model(models.Model):
-            children = models.ManyToManyField('Child',
-                related_name="m2m_clash", related_query_name="no_clash")
+            children = models.ManyToManyField('Child', related_name="m2m_clash", related_query_name="no_clash")
 
         class Parent(models.Model):
             m2m_clash = models.ManyToManyField('Target')
@@ -1013,10 +1012,13 @@ class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
     def test_fk_to_integer(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.IntegerField(),
-            relative=models.ForeignKey('Target',
+            relative=models.ForeignKey(
+                'Target',
                 models.CASCADE,
                 related_name=related_name,
-                related_query_name='clash'))
+                related_query_name='clash',
+            )
+        )
 
     def test_hidden_fk_to_integer(self, related_name=None):
         self.test_fk_to_integer(related_name='+')
@@ -1024,10 +1026,13 @@ class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
     def test_fk_to_fk(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ForeignKey('Another', models.CASCADE),
-            relative=models.ForeignKey('Target',
+            relative=models.ForeignKey(
+                'Target',
                 models.CASCADE,
                 related_name=related_name,
-                related_query_name='clash'))
+                related_query_name='clash',
+            )
+        )
 
     def test_hidden_fk_to_fk(self):
         self.test_fk_to_fk(related_name='+')
@@ -1035,10 +1040,13 @@ class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
     def test_fk_to_m2m(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ManyToManyField('Another'),
-            relative=models.ForeignKey('Target',
+            relative=models.ForeignKey(
+                'Target',
                 models.CASCADE,
                 related_name=related_name,
-                related_query_name='clash'))
+                related_query_name='clash',
+            )
+        )
 
     def test_hidden_fk_to_m2m(self):
         self.test_fk_to_m2m(related_name='+')
@@ -1046,9 +1054,7 @@ class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
     def test_m2m_to_integer(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.IntegerField(),
-            relative=models.ManyToManyField('Target',
-                related_name=related_name,
-                related_query_name='clash'))
+            relative=models.ManyToManyField('Target', related_name=related_name, related_query_name='clash'))
 
     def test_hidden_m2m_to_integer(self):
         self.test_m2m_to_integer(related_name='+')
@@ -1056,9 +1062,7 @@ class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
     def test_m2m_to_fk(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ForeignKey('Another', models.CASCADE),
-            relative=models.ManyToManyField('Target',
-                related_name=related_name,
-                related_query_name='clash'))
+            relative=models.ManyToManyField('Target', related_name=related_name, related_query_name='clash'))
 
     def test_hidden_m2m_to_fk(self):
         self.test_m2m_to_fk(related_name='+')
@@ -1066,9 +1070,12 @@ class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
     def test_m2m_to_m2m(self, related_name=None):
         self._test_explicit_related_query_name_clash(
             target=models.ManyToManyField('Another'),
-            relative=models.ManyToManyField('Target',
+            relative=models.ManyToManyField(
+                'Target',
                 related_name=related_name,
-                related_query_name='clash'))
+                related_query_name='clash',
+            )
+        )
 
     def test_hidden_m2m_to_m2m(self):
         self.test_m2m_to_m2m(related_name='+')

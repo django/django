@@ -81,8 +81,8 @@ class Company(models.Model):
     description = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
-        return ('Company(name=%s, motto=%s, ticker_name=%s, description=%s)'
-            % (self.name, self.motto, self.ticker_name, self.description)
+        return 'Company(name=%s, motto=%s, ticker_name=%s, description=%s)' % (
+            self.name, self.motto, self.ticker_name, self.description,
         )
 
 
