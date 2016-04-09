@@ -79,9 +79,7 @@ class MultiValueFieldTest(SimpleTestCase):
             self.field.clean(['some text', ['JP']])
 
     def test_has_changed_no_initial(self):
-        self.assertTrue(self.field.has_changed(
-            None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']],
-        ))
+        self.assertTrue(self.field.has_changed(None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
     def test_has_changed_same(self):
         self.assertFalse(self.field.has_changed(
@@ -157,6 +155,4 @@ class MultiValueFieldTest(SimpleTestCase):
             'field1_2_1': '06:24:00',
         })
         form.is_valid()
-        self.assertEqual(
-            form.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00',
-        )
+        self.assertEqual(form.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
