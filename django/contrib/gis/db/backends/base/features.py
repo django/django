@@ -64,6 +64,10 @@ class BaseSpatialFeatures(object):
     def supports_relate_lookup(self):
         return 'relate' in self.connection.ops.gis_operators
 
+    @property
+    def supports_isvalid_lookup(self):
+        return 'isvalid' in self.connection.ops.gis_operators
+
     # For each of those methods, the class will have a property named
     # `has_<name>_method` (defined in __init__) which accesses connection.ops
     # to determine GIS method availability.

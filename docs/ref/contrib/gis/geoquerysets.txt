@@ -247,6 +247,25 @@ MySQL       ``MBRIntersects(poly, geom)``
 SpatiaLite  ``Intersects(poly, geom)``
 ==========  =================================================
 
+.. fieldlookup:: isvalid
+
+``isvalid``
+--------------
+
+.. versionadded:: 1.10
+
+*Availability*: PostGIS
+
+Tests if the geometry is valid.
+
+Example::
+
+    Zipcode.objects.filter(poly__isvalid=True)
+
+PostGIS equivalent::
+
+    SELECT ... WHERE ST_IsValid(poly)
+
 .. fieldlookup:: overlaps
 
 ``overlaps``
