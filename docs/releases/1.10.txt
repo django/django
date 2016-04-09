@@ -414,6 +414,9 @@ Templates
 * Allowed :tfilter:`dictsort` to order a list of lists by an element at a
   specified index.
 
+* The :func:`~django.template.context_processors.debug` context processor
+  contains queries for all database aliases instead of only the default alias.
+
 Tests
 ~~~~~
 
