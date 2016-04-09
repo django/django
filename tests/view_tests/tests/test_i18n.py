@@ -138,6 +138,23 @@ class I18NTests(TestCase):
             self.assertEqual(language_cookie['path'], '/test/')
             self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
 
+    def test_setlang_decodes_http_referer_url(self):
+        """
+        The set_language view decodes the urlencoding from HTTP_REFERER, when
+        the "next" parameter is missing.
+        """
+        # first ensure the url & view exist; if they don't, the regression test
+        # would inadvertently pass, since call to reverse in translate_url (which
+        # is called in set_language) would result in the original url being returned
+        self.assertEqual(reverse('dummy_ok', kwargs={'test_parameter': 'x'}), '/test-setlang/x/')
+        lang_code = self._get_inactive_language_code()
+        post_data = dict(language=lang_code)
+        # for the reference: %C3%A4 decodes to ä
+        example_encoded_url = '/test-setlang/%C3%A4/'
+        response = self.client.post('/i18n/setlang/', post_data, HTTP_REFERER=example_encoded_url)
+        self.assertRedirects(response, example_encoded_url, fetch_redirect_response=False)
+        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+
     @modify_settings(MIDDLEWARE_CLASSES={
         'append': 'django.middleware.locale.LocaleMiddleware',
     })

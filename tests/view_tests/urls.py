@@ -104,3 +104,7 @@ urlpatterns += [
     ),
     url(r'^render_no_template/$', views.render_no_template, name='render_no_template'),
 ]
+
+urlpatterns += [
+    url(r'^test-setlang/(?P<test_parameter>[^/]+)/$', views.dummy_ok, name='dummy_ok'),
+]

@@ -12,7 +12,7 @@ from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format, get_format_modules
-from django.utils.http import is_safe_url
+from django.utils.http import is_safe_url, urlunquote
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, check_for_language, get_language, to_locale,
 )
@@ -38,6 +38,10 @@ def set_language(request):
         next = request.META.get('HTTP_REFERER')
         if not is_safe_url(url=next, host=request.get_host()):
             next = '/'
+        # Decode the most probably urlencoded URL if we got it from
+        # HTTP_REFERER. Leaving it encoded could cause a redirect to an
+        # inexistent view after translate_url.
+        next = urlunquote(next)
     response = http.HttpResponseRedirect(next) if next else http.HttpResponse(status=204)
     if request.method == 'POST':
         lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
