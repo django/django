@@ -431,8 +431,8 @@ will be interpreted like:
 Use of actual parentheses in the :ttag:`if` tag is invalid syntax. If you need
 them to indicate precedence, you should use nested :ttag:`if` tags.
 
-:ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
-``<=``, ``>=``, ``in``, and ``is`` which work as follows:
+:ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``, ``<=``,
+``>=``, ``in``, ``not in``, ``is``, and ``is not`` which work as follows:
 
 ``==`` operator
 ^^^^^^^^^^^^^^^
@@ -533,6 +533,18 @@ Object identity. Tests if two values are the same object. Example::
 
     {% if value is None %}
       This will output if and only if value is None.
+    {% endif %}
+
+``is not`` operator
+^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 1.10
+
+Tests if two values are not the same object. This is the negation of
+the ``is`` operator. Example::
+
+    {% if value is not None %}
+      This will output if and only if value is not None.
     {% endif %}
 
 Filters
