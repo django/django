@@ -29,7 +29,7 @@ class Paginator(object):
     def __init__(self, object_list, per_page, orphans=0,
                  allow_empty_first_page=True):
         self.object_list = object_list
-        self._is_ordered_queryset()
+        self._check_is_ordered_queryset()
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
@@ -102,7 +102,7 @@ class Paginator(object):
         """
         return six.moves.range(1, self.num_pages + 1)
 
-    def _is_ordered_queryset(self):
+    def _check_is_ordered_queryset(self):
         """
         Check if the object list is Queryset and if it's not ordered
         and wran user
@@ -110,7 +110,7 @@ class Paginator(object):
         if hasattr(self.object_list, 'ordered')\
            and not self.object_list.ordered:
             warnings.warn("Pagination may yield consistent results with"
-                          "object_list isn't ordered.",
+                          " object_list isn't ordered.",
                           UnorderedQuerysetWarning)
 
 
