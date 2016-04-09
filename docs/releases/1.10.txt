@@ -416,6 +416,8 @@ Templates
 
 * Added relative path support in :ttag:`extends` and :ttag:`include` template 
   tags.
+* The :func:`~django.template.context_processors.debug` context processor
+  contains queries for all database aliases instead of only the default alias.
 
 Tests
 ~~~~~
