@@ -537,3 +537,15 @@ class IfTagTests(SimpleTestCase):
     def test_if_is_no_match(self):
         output = self.engine.render_to_string('template', {'foo': 1})
         self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo is not None %}yes{% else %}no{% endif %}'})
+    def test_if_is_not_match(self):
+        # For this to act as a regression test, it's important not to use
+        # foo=True because True is (not None)
+        output = self.engine.render_to_string('template', {'foo': False})
+        self.assertEqual(output, 'yes')
+
+    @setup({'template': '{% if foo is not None %}yes{% else %}no{% endif %}'})
+    def test_if_is_not_no_match(self):
+        output = self.engine.render_to_string('template', {'foo': None})
+        self.assertEqual(output, 'no')
