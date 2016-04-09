@@ -102,14 +102,14 @@ class Paginator(object):
         """
         return six.moves.range(1, self.num_pages + 1)
 
-    def _check_is_ordered_queryset(self):
+    def _check_object_list_is_ordered(self):
         """
         Check if the object list is Queryset and if it's not ordered
         and wran user
         """
         if hasattr(self.object_list, 'ordered')\
            and not self.object_list.ordered:
-            warnings.warn("Pagination may yield consistent results with"
+            warnings.warn("Pagination may yield inconsistent results with"
                           " object_list isn't ordered.",
                           UnorderedQuerysetWarning)
 
