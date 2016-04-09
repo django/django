@@ -212,6 +212,34 @@ This tag can be used in two ways:
 
 See :ref:`template-inheritance` for more information.
 
+Literal form (with quotes) can use relative path (started from ``./`` or ``../``).
+
+Assume that we have the next directory structure for ``TEMPLATE_DIRS`` folder::
+
+    dir1/
+        template.html
+        base2.html
+        my/
+            base3.html
+    base1.html
+
+We can write in ``template.html``::
+
+    {% extends "./base2.html" %}
+    {% extends "../base1.html" %}
+    {% extends "./my/base3.html" %}
+
+:exc:`~django.template.TemplateSyntaxError` will be raised by the next statement::
+
+    {% extends "../../base.html" %}
+
+Because relative name "../../base.html" points outside the file hierarchy 
+that template ``template.html`` is in.
+
+.. versionadded:: 1.10
+
+   The ability to use relative path in ``extends`` tag was added.
+
 .. templatetag:: filter
 
 ``filter``
@@ -640,6 +668,13 @@ in either single or double quotes.
 This example includes the contents of the template ``"foo/bar.html"``::
 
     {% include "foo/bar.html" %}
+
+Literal form (with quotes) can use relative path (started from ``./`` or ``../``)
+by same rules, as :ttag:`extends` tag.
+
+.. versionadded:: 1.10
+
+   The ability to use relative path in ``include`` tag was added.
 
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``::
