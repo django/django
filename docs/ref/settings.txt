@@ -2439,6 +2439,10 @@ bandwidth but slows down performance. This is used by the ``CommonMiddleware``
 (see :doc:`/topics/http/middleware`) and in the``Cache Framework``
 (see :doc:`/topics/cache`).
 
+Using this setting is deprecated. If you want to use ETag-headers, you should use
+``ConditionalGetMiddleware``, which handles both the conditional-get handling and
+the ETag calculation if it is needed.
+
 .. setting:: USE_I18N
 
 ``USE_I18N``

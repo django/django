@@ -5971,7 +5971,7 @@ class TestEtagWithAdminView(SimpleTestCase):
             self.assertEqual(response.status_code, 302)
             self.assertFalse(response.has_header('ETag'))
 
-        with self.settings(USE_ETAGS=True):
+        with self.settings(USE_ETAGS=True), ignore_warnings(category=RemovedInDjango20Warning):
             response = self.client.get(reverse('admin:index'))
             self.assertEqual(response.status_code, 302)
             self.assertTrue(response.has_header('ETag'))
