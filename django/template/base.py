@@ -564,7 +564,7 @@ class Parser(object):
                 "forget to register or load this tag?" % (
                     token.lineno,
                     command,
-                    get_text_list(["'%s'" % p for p in parse_until]),
+                    get_text_list(["'%s'" % p for p in parse_until], "or"),
                 ),
             )
         raise self.error(
