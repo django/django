@@ -109,11 +109,9 @@ class Paginator(object):
         """
         if hasattr(self.object_list, 'ordered')\
            and not self.object_list.ordered:
-            warnings.warn(
-                           "Pagination may yield inconsistent results with "
-                           "object_list isn't ordered.",
-                           UnorderedQuerysetWarning
-                          )
+            warning_message = "Pagination may yield inconsistent results" +\
+             "with object_list :{0} isn't ordered.".format(self.object_list)
+            warnings.warn(warning_message, UnorderedQuerysetWarning)
 
 
 QuerySetPaginator = Paginator   # For backwards-compatibility.
