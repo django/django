@@ -60,7 +60,8 @@ from django.template.context import (  # NOQA: imported for backwards compatibil
 )
 from django.utils import six
 from django.utils.deprecation import (
-    DeprecationInstanceCheck, RemovedInDjango20Warning,
+    CallableFalse, CallableTrue, DeprecationInstanceCheck,
+    RemovedInDjango20Warning,
 )
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
@@ -891,7 +892,7 @@ class Variable(object):
                             raise VariableDoesNotExist("Failed lookup for key "
                                                        "[%s] in %r",
                                                        (bit, current))  # missing attribute
-                if callable(current):
+                if callable(current) and not (current is CallableFalse or current is CallableTrue):
                     if getattr(current, 'do_not_call_in_templates', False):
                         pass
                     elif getattr(current, 'alters_data', False):

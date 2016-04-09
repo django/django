@@ -111,6 +111,45 @@ Fields
         A datetime designating when the account was created. Is set to the
         current date/time by default when the account is created.
 
+Attributes
+----------
+
+.. class:: models.User
+
+    .. attribute:: is_authenticated
+
+        Read-only attribute which is always ``True`` (as opposed to
+        ``AnonymousUser.is_authenticated`` which is always ``False``).
+        This is a way to tell if the user has been authenticated. This does not
+        imply any permissions, and doesn't check if the user is active or has
+        a valid session. Even though normally you will check this attribute on
+        ``request.user`` to find out whether it has been populated by the
+        :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+        (representing the currently logged-in user), you should know this
+        attribute is ``True`` for any :class:`~django.contrib.auth.models.User`
+        instance.
+
+        .. versionchanged:: 1.10
+
+            In older versions, this was a method. For backwards-compatibility
+            it can still be used as a method, but this will be removed in
+            version 2.0.
+
+    .. attribute:: is_anonymous
+
+        Read-only attribute which is always ``False``. This is a way of
+        differentiating :class:`~django.contrib.auth.models.User` and
+        :class:`~django.contrib.auth.models.AnonymousUser` objects.
+        Generally, you should prefer using
+        :attr:`~django.contrib.auth.models.User.is_authenticated` to this
+        attribute.
+
+        .. versionchanged:: 1.10
+
+            In older versions, this was a method. For backwards-compatibility
+            it can still be used as a method, but this will be removed in
+            version 2.0.
+
 Methods
 -------
 
@@ -121,28 +160,6 @@ Methods
         Returns the username for the user. Since the User model can be swapped
         out, you should use  this method instead of referencing the username
         attribute directly.
-
-    .. method:: is_anonymous()
-
-        Always returns ``False``. This is a way of differentiating
-        :class:`~django.contrib.auth.models.User` and
-        :class:`~django.contrib.auth.models.AnonymousUser` objects.
-        Generally, you should prefer using
-        :meth:`~django.contrib.auth.models.User.is_authenticated()` to this
-        method.
-
-    .. method:: is_authenticated()
-
-        Always returns ``True`` (as opposed to
-        ``AnonymousUser.is_authenticated()`` which always returns ``False``).
-        This is a way to tell if the user has been authenticated. This does not
-        imply any permissions, and doesn't check if the user is active or has
-        a valid session. Even though normally you will call this method on
-        ``request.user`` to find out whether it has been populated by the
-        :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
-        (representing the currently logged-in user), you should know this method
-        returns ``True`` for any :class:`~django.contrib.auth.models.User`
-        instance.
 
     .. method:: get_full_name()
 
@@ -287,6 +304,10 @@ Manager methods
       string.
     * :meth:`~django.contrib.auth.models.User.get_username()` always returns
       the empty string.
+    * :attr:`~django.contrib.auth.models.User.is_anonymous` is ``True``
+      instead of ``False``.
+    * :attr:`~django.contrib.auth.models.User.is_authenticated` is
+      ``False`` instead of ``True``.
     * :attr:`~django.contrib.auth.models.User.is_staff` and
       :attr:`~django.contrib.auth.models.User.is_superuser` are always
       ``False``.
@@ -294,10 +315,6 @@ Manager methods
     * :attr:`~django.contrib.auth.models.User.groups` and
       :attr:`~django.contrib.auth.models.User.user_permissions` are always
       empty.
-    * :meth:`~django.contrib.auth.models.User.is_anonymous()` returns ``True``
-      instead of ``False``.
-    * :meth:`~django.contrib.auth.models.User.is_authenticated()` returns
-      ``False`` instead of ``True``.
     * :meth:`~django.contrib.auth.models.User.set_password()`,
       :meth:`~django.contrib.auth.models.User.check_password()`,
       :meth:`~django.db.models.Model.save` and
@@ -471,21 +488,21 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         Returns the set of permission strings the ``user_obj`` has from their
         own user permissions. Returns an empty set if
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
+        :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
 
     .. method:: get_group_permissions(user_obj, obj=None)
 
         Returns the set of permission strings the ``user_obj`` has from the
         permissions of the groups they belong. Returns an empty set if
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
+        :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active`  is ``False``.
 
     .. method:: get_all_permissions(user_obj, obj=None)
 
         Returns the set of permission strings the ``user_obj`` has, including both
         user permissions and group permissions. Returns an empty set if
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
+        :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
 
     .. method:: has_perm(user_obj, perm, obj=None)

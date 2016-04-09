@@ -147,6 +147,9 @@ details on these changes.
 * The shim for supporting custom related manager classes without a
   ``_apply_rel_filters()`` method will be removed.
 
+* Using ``request.user.is_authenticated()`` and
+  ``request.user.is_anonymous()`` as methods will no longer be supported.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

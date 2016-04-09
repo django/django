@@ -612,20 +612,39 @@ The following methods are available on any subclass of
 
         Returns the value of the field nominated by ``USERNAME_FIELD``.
 
-    .. method:: models.AbstractBaseUser.is_anonymous()
+    .. attribute:: models.AbstractBaseUser.is_authenticated
 
-        Always returns ``False``. This is a way of differentiating
-        from  :class:`~django.contrib.auth.models.AnonymousUser` objects.
+        Read-only attribute which is always ``True`` (as opposed to
+        ``AnonymousUser.is_authenticated`` which is always ``False``).
+        This is a way to tell if the user has been authenticated. This does not
+        imply any permissions, and doesn't check if the user is active or has
+        a valid session. Even though normally you will check this attribute on
+        ``request.user`` to find out whether it has been populated by the
+        :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+        (representing the currently logged-in user), you should know this
+        attribute is ``True`` for any :class:`~django.contrib.auth.models.User`
+        instance.
+
+        .. versionchanged:: 1.10
+
+            In older versions, this was a method. For backwards-compatibility
+            it can still be used as a method, but this will be removed in
+            version 2.0.
+
+    .. attribute:: models.AbstractBaseUser.is_anonymous
+
+        Read-only attribute which is always ``False``. This is a way of
+        differentiating :class:`~django.contrib.auth.models.User` and
+        :class:`~django.contrib.auth.models.AnonymousUser` objects.
         Generally, you should prefer using
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_authenticated()` to this
-        method.
+        :attr:`~django.contrib.auth.models.User.is_authenticated` to this
+        attribute.
 
-    .. method:: models.AbstractBaseUser.is_authenticated()
+        .. versionchanged:: 1.10
 
-        Always returns ``True``. This is a way to tell if the user has been
-        authenticated. This does not imply any permissions, and doesn't check
-        if the user is active - it only indicates that the user has provided a
-        valid username and password.
+            In older versions, this was a method. For backwards-compatibility
+            it can still be used as a method, but this will be removed in
+            version 2.0.
 
     .. method:: models.AbstractBaseUser.set_password(raw_password)
 
