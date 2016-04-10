@@ -128,9 +128,8 @@ class DeferTests(AssertionMixin, TestCase):
             Primary.objects.only("name").select_related("related")[0]
 
     def test_defer_foreign_keys_are_deferred_and_not_traversed(self):
-        # With a depth-based select_related, all deferred ForeignKeys are
-        # deferred instead of traversed.
-        with self.assertNumQueries(3):
+        # select_related() overrides defer().
+        with self.assertNumQueries(1):
             obj = Primary.objects.defer("related").select_related()[0]
             self.assert_delayed(obj, 1)
             self.assertEqual(obj.related.id, self.s1.pk)

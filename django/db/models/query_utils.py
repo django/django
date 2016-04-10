@@ -256,7 +256,6 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
                                    " and traversed using select_related"
                                    " at the same time." %
                                    (field.model._meta.object_name, field.name))
-            return False
     return True
 
 
