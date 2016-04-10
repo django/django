@@ -6,9 +6,12 @@ from __future__ import unicode_literals
 import os
 from unittest import skipUnless
 
+from django.contrib.gis.db import models
 from django.contrib.gis.db.models.functions import Area, Distance
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.measure import D
+from django.db import connection
+from django.db.models.functions import Cast
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -112,6 +115,21 @@ class GeographyTest(TestCase):
 @skipUnlessDBFeature("gis_enabled")
 class GeographyFunctionTests(TestCase):
     fixtures = ['initial']
+
+    @skipUnlessDBFeature("supports_extent_aggr")
+    def test_cast_aggregate(self):
+        """
+        Cast a geography to a geometry field for an aggregate function that
+        expects a geometry input.
+        """
+        if not connection.ops.geography:
+            self.skipTest("This test needs geography support")
+        expected = (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
+        res = City.objects.filter(
+            name__in=('Houston', 'Dallas')
+        ).aggregate(extent=models.Extent(Cast('point', models.PointField())))
+        for val, exp in zip(res['extent'], expected):
+            self.assertAlmostEqual(exp, val, 4)
 
     @skipUnlessDBFeature("has_Distance_function", "supports_distance_geodetic")
     def test_distance_function(self):

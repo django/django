@@ -235,6 +235,18 @@ available for geography columns:
 * :lookup:`covers`
 * :lookup:`intersects`
 
+If you need to use a spatial lookup or aggregate that doesn't support the
+geography type as input, you can use the
+:class:`~django.db.models.functions.Cast` database function to convert the
+geography column to a geometry type in the query::
+
+    from django.contrib.gis.db.models import PointField
+    from django.db.models.functions import Cast
+
+    Zipcode.objects.annotate(
+        geom=Cast('geography_field', PointField())
+    ).filter(geom__within=poly)
+
 For more information, the PostGIS documentation contains a helpful section on
 determining `when to use geography data type over geometry data type
 <http://postgis.net/docs/manual-2.1/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
