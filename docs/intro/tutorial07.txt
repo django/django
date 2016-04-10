@@ -33,7 +33,7 @@ the ``admin.site.register(Question)`` line with:
 
 You'll follow this pattern -- create a model admin class, then pass it as the
 second argument to ``admin.site.register()`` -- any time you need to change the
-admin options for an model.
+admin options for a model.
 
 This particular change above makes the "Publication date" come before the
 "Question" field:
