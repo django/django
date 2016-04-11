@@ -5,7 +5,7 @@ from datetime import datetime
 
 from django.core.paginator import (
     EmptyPage, InvalidPage, PageNotAnInteger, Paginator,
-    UnorderedQuerysetWarning
+    UnorderedQuerysetWarning,
 )
 from django.test import TestCase
 from django.utils import six
