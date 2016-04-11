@@ -142,9 +142,13 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
 
     def get_model(self):
         """
-        Returns the model of the form_class.
+        Return the model of the form_class.
         """
-        return self.get_form_class().Meta.model
+        try:
+            model = super(ModelFormMixin, self).get_model()
+        except ImproperlyConfigured:
+            model = self.get_form_class().Meta.model
+        return model
 
     def get_success_url(self):
         """

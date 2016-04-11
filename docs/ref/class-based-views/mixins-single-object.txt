@@ -70,6 +70,8 @@ Single object mixins
 
     .. method:: get_model()
 
+        .. versionadded:: 1.10
+
         Returns the model of the object that this view will display.
 
     .. method:: get_object(queryset=None)

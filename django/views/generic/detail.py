@@ -26,7 +26,12 @@ class SingleObjectMixin(ContextMixin):
         By default, this returns `self.model`, but subclasses can override
         this and return any model
         """
-        return self.model
+        if self.model is None:
+            raise ImproperlyConfigured(
+                "SingleObjectMixin requireds either a definition of "
+                "'model' or an implementation of 'get model()'")
+        else:
+            return self.model
 
     def get_object(self, queryset=None):
         """
@@ -78,8 +83,8 @@ class SingleObjectMixin(ContextMixin):
             else:
                 raise ImproperlyConfigured(
                     "%(cls)s is missing a QuerySet. Define "
-                    "%(cls)s.model, %(cls)s.queryset, a forms.ModelForm as %(cls)s.form_class, "
-                    "or override %(cls)s.get_queryset()." % {
+                    "%(cls)s.model, %(cls)s.queryset, or override "
+                    "%(cls)s.get_queryset() or %(cls)s.get_model()." % {
                         'cls': self.__class__.__name__
                     }
                 )
@@ -168,8 +173,11 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
                     object_meta.model_name,
                     self.template_name_suffix
                 ))
-            elif hasattr(self, 'get_model'):
-                model = self.get_model()
+            elif hasattr(self, 'get_model') or hasattr(self, 'model'):
+                if hasattr(self, 'get_model'):
+                    model = self.get_model()
+                else:
+                    model = self.model
                 if model is not None and issubclass(model, models.Model):
                     names.append("%s/%s%s.html" % (
                         model._meta.app_label,
