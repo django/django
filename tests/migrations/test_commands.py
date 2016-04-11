@@ -53,6 +53,16 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
+    @override_settings(INSTALLED_APPS=[
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'migrations.migrations_test_apps.migrated_app',
+    ])
+    def test_migrate_do_not_skip_system_checks(self):
+        out = six.StringIO()
+        call_command("migrate", skip_checks=False, no_color=True, stdout=out)
+        self.assertIn('Apply all migrations: migrated_app', out.getvalue())
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_initial_false"})
     def test_migrate_initial_false(self):
         """
