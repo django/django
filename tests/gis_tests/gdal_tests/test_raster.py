@@ -318,19 +318,11 @@ class GDALBandTests(SimpleTestCase):
         self.assertEqual(self.band.datatype(), 1)
         self.assertEqual(self.band.datatype(as_string=True), 'GDT_Byte')
         self.assertEqual(self.band.nodata_value, 15)
-        if numpy:
-            data = self.band.data()
-            # Check that the 42 first values of the column 42 match what's
-            # inside the file raster.tif
-            correct_list = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-                            4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 9, 9,
-                            9, 4, 4, 4, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4]
-            for x in range(0, 42):
-                self.assertEqual(data[x, 42], correct_list[x])
-            self.assertEqual(len(data), self.band.height)
-            for row in data:
-                # Each row in the numpy array should have band's width as len
-                self.assertEqual(len(row), self.band.width)
+        data = self.band.data()
+        assert_array = numpy.loadtxt(os.path.join(os.path.dirname(upath(__file__)),
+                                     '../data/rasters/raster.numpy.txt'))
+        numpy.testing.assert_equal(data, assert_array)
+        self.assertEqual(data.shape, (self.band.height, self.band.width))
         try:
             smin, smax, smean, sstd = self.band.statistics(approximate=True)
             self.assertEqual(smin, 0)
