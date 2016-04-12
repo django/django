@@ -1,3 +1,4 @@
+import math
 import warnings
 from copy import copy
 
@@ -199,6 +200,27 @@ Field.register_lookup(LessThan)
 class LessThanOrEqual(BuiltinLookup):
     lookup_name = 'lte'
 Field.register_lookup(LessThanOrEqual)
+
+
+class IntegerFieldFloatRounding(object):
+    """
+    Allow floats to work as query values for IntegerField. Without this, the
+    decimal portion of the float would always be discarded.
+    """
+    def get_prep_lookup(self):
+        if isinstance(self.rhs, float):
+            self.rhs = math.ceil(self.rhs)
+        return super(IntegerFieldFloatRounding, self).get_prep_lookup()
+
+
+class IntegerGreaterThanOrEqual(IntegerFieldFloatRounding, GreaterThanOrEqual):
+    pass
+IntegerField.register_lookup(IntegerGreaterThanOrEqual)
+
+
+class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
+    pass
+IntegerField.register_lookup(IntegerLessThan)
 
 
 class In(BuiltinLookup):
