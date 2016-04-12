@@ -5,7 +5,6 @@ import collections
 import copy
 import datetime
 import decimal
-import math
 import uuid
 import warnings
 from base64 import b64decode, b64encode
@@ -1874,11 +1873,6 @@ class IntegerField(Field):
         if value is None:
             return None
         return int(value)
-
-    def get_prep_lookup(self, lookup_type, value):
-        if lookup_type in ('gte', 'lt') and isinstance(value, float):
-            value = math.ceil(value)
-        return super(IntegerField, self).get_prep_lookup(lookup_type, value)
 
     def get_internal_type(self):
         return "IntegerField"
