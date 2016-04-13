@@ -235,9 +235,10 @@ There are two ways to send signals in Django.
 .. method:: Signal.send(sender, **kwargs)
 .. method:: Signal.send_robust(sender, **kwargs)
 
-To send a signal, call either :meth:`Signal.send` or :meth:`Signal.send_robust`.
-You must provide the ``sender`` argument (which is a class most of the time),
-and may provide as many other keyword arguments as you like.
+To send a signal, call either :meth:`Signal.send` (all built-in signals use
+this) or :meth:`Signal.send_robust`. You must provide the ``sender`` argument
+(which is a class most of the time) and may provide as many other keyword
+arguments as you like.
 
 For example, here's how sending our ``pizza_done`` signal might look::
 
