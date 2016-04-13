@@ -125,7 +125,7 @@ def typecast_time(s):  # does NOT store time zone information
         seconds, microseconds = seconds.split('.')
     else:
         microseconds = '0'
-    return datetime.time(int(hour), int(minutes), int(seconds), int(float('.' + microseconds) * 1000000))
+    return datetime.time(int(hour), int(minutes), int(seconds), int((microseconds + '000000')[:6]))
 
 
 def typecast_timestamp(s):  # does NOT store time zone information
