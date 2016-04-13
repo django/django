@@ -1,0 +1,12 @@
+===========================
+Django 1.8.13 release notes
+===========================
+
+*Under development*
+
+Django 1.8.13 fixes several bugs in 1.8.12.
+
+Bugfixes
+========
+
+* ...
