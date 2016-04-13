@@ -2,7 +2,8 @@
 Signals
 =======
 
-A list of all the signals that Django sends.
+A list of all the signals that Django sends. All built-in signals are sent
+using the :meth:`~django.dispatch.Signal.send` method.
 
 .. seealso::
 
