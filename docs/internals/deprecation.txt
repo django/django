@@ -150,6 +150,12 @@ details on these changes.
 * Using ``User.is_authenticated()`` and ``User.is_anonymous()`` as methods
   will no longer be supported.
 
+* The private attribute ``virtual_fields`` of ``Model._meta`` will be removed.
+
+* The private keyword arguments ``virtual_only`` in
+  ``Field.contribute_to_class()``, and ``virtual`` in
+  ``Model._meta.add_field()`` will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

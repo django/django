@@ -147,7 +147,7 @@ class Collector(object):
         for related in get_candidate_relations_to_delete(opts):
             if related.field.remote_field.on_delete is not DO_NOTHING:
                 return False
-        for field in model._meta.virtual_fields:
+        for field in model._meta.private_fields:
             if hasattr(field, 'bulk_related_objects'):
                 # It's something like generic foreign key.
                 return False
@@ -221,7 +221,7 @@ class Collector(object):
                         self.fast_deletes.append(sub_objs)
                     elif sub_objs:
                         field.remote_field.on_delete(self, field, sub_objs, self.using)
-            for field in model._meta.virtual_fields:
+            for field in model._meta.private_fields:
                 if hasattr(field, 'bulk_related_objects'):
                     # It's something like generic foreign key.
                     sub_objs = field.bulk_related_objects(new_objs, self.using)

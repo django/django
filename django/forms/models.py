@@ -81,7 +81,7 @@ def model_to_dict(instance, fields=None, exclude=None):
     """
     opts = instance._meta
     data = {}
-    for f in chain(opts.concrete_fields, opts.virtual_fields, opts.many_to_many):
+    for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
         if not getattr(f, 'editable', False):
             continue
         if fields and f.name not in fields:
@@ -142,9 +142,9 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     opts = model._meta
     # Avoid circular import
     from django.db.models.fields import Field as ModelField
-    sortable_virtual_fields = [f for f in opts.virtual_fields
+    sortable_private_fields = [f for f in opts.private_fields
                                if isinstance(f, ModelField)]
-    for f in sorted(chain(opts.concrete_fields, sortable_virtual_fields, opts.many_to_many)):
+    for f in sorted(chain(opts.concrete_fields, sortable_private_fields, opts.many_to_many)):
         if not getattr(f, 'editable', False):
             if (fields is not None and f.name in fields and
                     (exclude is None or f.name not in exclude)):
@@ -431,9 +431,9 @@ class BaseModelForm(BaseForm):
         fields = self._meta.fields
         opts = self.instance._meta
         # Note that for historical reasons we want to include also
-        # virtual_fields here. (GenericRelation was previously a fake
+        # private_fields here. (GenericRelation was previously a fake
         # m2m field).
-        for f in chain(opts.many_to_many, opts.virtual_fields):
+        for f in chain(opts.many_to_many, opts.private_fields):
             if not hasattr(f, 'save_form_data'):
                 continue
             if fields and f.name not in fields:

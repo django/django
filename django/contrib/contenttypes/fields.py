@@ -53,7 +53,7 @@ class GenericForeignKey(object):
         self.name = name
         self.model = cls
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_field(self, virtual=True)
+        cls._meta.add_field(self, private=True)
 
         # Only run pre-initialization field assignment on non-abstract models
         if not cls._meta.abstract:
@@ -331,7 +331,7 @@ class GenericRelation(ForeignObject):
     def _check_generic_foreign_key_existence(self):
         target = self.remote_field.model
         if isinstance(target, ModelBase):
-            fields = target._meta.virtual_fields
+            fields = target._meta.private_fields
             if any(isinstance(field, GenericForeignKey) and
                     field.ct_field == self.content_type_field_name and
                     field.fk_field == self.object_id_field_name
@@ -409,7 +409,7 @@ class GenericRelation(ForeignObject):
         return smart_text([instance._get_pk_val() for instance in qs])
 
     def contribute_to_class(self, cls, name, **kwargs):
-        kwargs['virtual_only'] = True
+        kwargs['private_only'] = True
         super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
         self.model = cls
         setattr(cls, self.name, ReverseGenericManyToOneDescriptor(self.remote_field))
