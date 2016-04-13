@@ -12,3 +12,6 @@ Bugfixes
 * Added support for relative path redirects to
   ``SimpleTestCase.assertRedirects()`` because Django 1.9 no longer converts
   redirects to absolute URIs (:ticket:`26428`).
+
+* Fixed ``TimeField`` microseconds round-tripping on MySQL and SQLite
+  (:ticket:`26498`).
