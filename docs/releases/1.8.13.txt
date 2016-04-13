@@ -9,4 +9,5 @@ Django 1.8.13 fixes several bugs in 1.8.12.
 Bugfixes
 ========
 
-* ...
+* Fixed microseconds not roundtripping correctly in TimeField
+  on MySQL and SQLite (:ticket:`26498`).
