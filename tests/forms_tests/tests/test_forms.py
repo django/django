@@ -71,10 +71,9 @@ class FormsTestCase(SimpleTestCase):
             '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" />'
         )
 
-        nonexistenterror = "Key u?'nonexistentfield' not found in 'Person'"
-        with six.assertRaisesRegex(self, KeyError, nonexistenterror):
+        msg = "Key 'nonexistentfield' not found in 'Person'. Choices are: birthday, first_name, last_name."
+        with self.assertRaisesMessage(KeyError, msg):
             p['nonexistentfield']
-            self.fail('Attempts to access non-existent fields should fail.')
 
         form_output = []
 
