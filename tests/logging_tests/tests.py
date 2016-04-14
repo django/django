@@ -141,6 +141,12 @@ class I18NLoggingTest(LoggingCaptureMixin, SimpleTestCase):
         super(I18NLoggingTest, cls).tearDownClass()
         logging.config.dictConfig(cls._logging)
 
+    def test_i18n_page_found_no_warning(self):
+        with self.settings(DEBUG=True):
+            self.client.get('/exists/')
+            self.client.get('/en/exists/')
+            self.assertEqual(self.logger_output.getvalue(), '')
+
     def test_i18n_page_not_found_warning(self):
         with self.settings(DEBUG=True):
             self.client.get('/this_does_not/')
