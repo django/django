@@ -106,6 +106,9 @@ Minor features
   :class:`~django.contrib.auth.views.LogoutView` allows specifying a set of
   hosts that are safe for redirecting after login and logout.
 
+* Added password validators ``help_text`` to
+  :class:`~django.contrib.auth.forms.UserCreationForm`.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

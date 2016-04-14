@@ -236,6 +236,16 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data['password1'], data['password1'])
         self.assertEqual(form.cleaned_data['password2'], data['password2'])
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    ])
+    def test_password_help_text(self):
+         form = UserCreationForm()
+         self.assertEqual(
+            form.fields['password1'].help_text,
+            '<ul><li>Your password can&#39;t be too similar to your other personal information.</li></ul>'
+        )
+
 
 # To verify that the login form rejects inactive users, use an authentication
 # backend that allows them.
