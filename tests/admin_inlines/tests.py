@@ -148,7 +148,7 @@ class TestInline(TestDataMixin, TestCase):
         Ref #8190.
         """
         response = self.client.get(reverse('admin:admin_inlines_holder4_add'))
-        self.assertContains(response, '<p class="help">Awesome stacked help text is awesome.</p>', 4)
+        self.assertContains(response, '<div class="help">Awesome stacked help text is awesome.</div>', 4)
         self.assertContains(
             response,
             '<img src="/static/admin/img/icon-unknown.svg" '

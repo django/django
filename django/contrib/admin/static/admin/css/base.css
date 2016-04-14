@@ -187,7 +187,7 @@ p.mini {
     margin-top: -3px;
 }
 
-.help, p.help, form p.help {
+.help, p.help, form p.help, div.help, form div.help {
     font-size: 11px;
     color: #999;
 }
@@ -409,6 +409,9 @@ input, textarea, select, .form-row p, form .button {
     font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
     font-weight: normal;
     font-size: 13px;
+}
+.form-row div.help {
+    padding: 2px 3px;
 }
 
 textarea {

@@ -4543,20 +4543,20 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, '<div class="form-row field-posted">')
         self.assertContains(response, '<div class="form-row field-value">')
         self.assertContains(response, '<div class="form-row">')
-        self.assertContains(response, '<p class="help">', 3)
+        self.assertContains(response, '<div class="help">', 3)
         self.assertContains(
             response,
-            '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>',
+            '<div class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<p class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</p>',
+            '<div class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<p class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</p>',
+            '<div class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
 
@@ -4659,7 +4659,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         """
         p = FieldOverridePost.objects.create(title="Test Post", content="Test Content")
         response = self.client.get(reverse('admin:admin_views_fieldoverridepost_change', args=(p.pk,)))
-        self.assertContains(response, '<p class="help">Overridden help text for the date</p>')
+        self.assertContains(response, '<div class="help">Overridden help text for the date</div>')
         self.assertContains(response, '<label for="id_public">Overridden public label:</label>', html=True)
         self.assertNotContains(response, "Some help text for the date (with unicode ŠĐĆŽćžšđ)")
 
