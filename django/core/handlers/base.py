@@ -179,10 +179,6 @@ class BaseHandler(object):
                 response_is_rendered = True
 
         except http.Http404 as exc:
-            logger.warning(
-                'Not Found: %s', request.path,
-                extra={'status_code': 404, 'request': request},
-            )
             if settings.DEBUG:
                 response = debug.technical_404_response(request, exc)
             else:
@@ -245,6 +241,12 @@ class BaseHandler(object):
         # been rendered, force it to be rendered.
         if not response_is_rendered and callable(getattr(response, 'render', None)):
             response = response.render()
+
+        if response.status_code == 404:
+            logger.warning(
+                'Not Found: %s', request.path,
+                extra={'status_code': 404, 'request': request},
+            )
 
         return response
 
