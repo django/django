@@ -1222,7 +1222,7 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Help text for the field is displayed
         self.assertEqual(
-            self.selenium.find_element_by_css_selector('.field-supporting_bands p.help').text,
+            self.selenium.find_element_by_css_selector('.field-supporting_bands div.help').text,
             'Supporting Bands.'
         )
 
