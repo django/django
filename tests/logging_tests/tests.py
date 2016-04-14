@@ -133,6 +133,11 @@ class HandlerLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleT
 )
 class I18nLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
 
+    def test_i18n_page_found_no_warning(self):
+        self.client.get('/exists/')
+        self.client.get('/en/exists/')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
     def test_i18n_page_not_found_warning(self):
         self.client.get('/this_does_not/')
         self.client.get('/en/nor_this/')
