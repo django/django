@@ -93,25 +93,6 @@ class Q(tree.Node):
         query.promote_joins(joins)
         return clause
 
-    @classmethod
-    def _refs_aggregate(cls, obj, existing_aggregates):
-        if not isinstance(obj, tree.Node):
-            aggregate, aggregate_lookups = refs_aggregate(obj[0].split(LOOKUP_SEP), existing_aggregates)
-            if not aggregate and hasattr(obj[1], 'refs_aggregate'):
-                return obj[1].refs_aggregate(existing_aggregates)
-            return aggregate, aggregate_lookups
-        for c in obj.children:
-            aggregate, aggregate_lookups = cls._refs_aggregate(c, existing_aggregates)
-            if aggregate:
-                return aggregate, aggregate_lookups
-        return False, ()
-
-    def refs_aggregate(self, existing_aggregates):
-        if not existing_aggregates:
-            return False
-
-        return self._refs_aggregate(self, existing_aggregates)
-
 
 class DeferredAttribute(object):
     """
@@ -299,20 +280,6 @@ def deferred_class_factory(model, attrs):
         overrides["__module__"] = model.__module__
         overrides["_deferred"] = True
         return type(str(name), (model,), overrides)
-
-
-def refs_aggregate(lookup_parts, aggregates):
-    """
-    A helper method to check if the lookup_parts contains references
-    to the given aggregates set. Because the LOOKUP_SEP is contained in the
-    default annotation names we must check each prefix of the lookup_parts
-    for a match.
-    """
-    for n in range(len(lookup_parts) + 1):
-        level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
-        if level_n_lookup in aggregates and aggregates[level_n_lookup].contains_aggregate:
-            return aggregates[level_n_lookup], lookup_parts[n:]
-    return False, ()
 
 
 def refs_expression(lookup_parts, annotations):
