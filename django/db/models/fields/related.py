@@ -696,13 +696,6 @@ class ForeignObject(RelatedField):
     def get_transform(self, *args, **kwargs):
         raise NotImplementedError('Relational fields do not support transforms.')
 
-    @property
-    def attnames(self):
-        return tuple(field.attname for field in self.local_related_fields)
-
-    def get_defaults(self):
-        return tuple(field.get_default() for field in self.local_related_fields)
-
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
         super(ForeignObject, self).contribute_to_class(cls, name, private_only=private_only, **kwargs)
         setattr(cls, self.name, ForwardManyToOneDescriptor(self))
