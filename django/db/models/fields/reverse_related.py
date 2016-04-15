@@ -130,8 +130,7 @@ class ForeignObjectRel(object):
             self.related_model._meta.model_name,
         )
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
-                    limit_to_currently_related=False):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
         """
         Return choices with a default blank choices included, for use as
         SelectField choices for this field.
@@ -139,14 +138,9 @@ class ForeignObjectRel(object):
         Analog of django.db.models.fields.Field.get_choices(), provided
         initially for utilization by RelatedFieldListFilter.
         """
-        first_choice = blank_choice if include_blank else []
-        queryset = self.related_model._default_manager.all()
-        if limit_to_currently_related:
-            queryset = queryset.complex_filter(
-                {'%s__isnull' % self.related_model._meta.model_name: False}
-            )
-        lst = [(x._get_pk_val(), smart_text(x)) for x in queryset]
-        return first_choice + lst
+        return (blank_choice if include_blank else []) + [
+            (x._get_pk_val(), smart_text(x)) for x in self.related_model._default_manager.all()
+        ]
 
     def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
         # Defer to the actual field definition for db prep
