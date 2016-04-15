@@ -10,8 +10,9 @@ from django.test import (
 )
 
 from .models import (
-    Country, NoFields, Pizzeria, ProxyCountry, ProxyMultiCountry,
-    ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant, State, TwoFields,
+    Country, NoFields, NullableFields, Pizzeria, ProxyCountry,
+    ProxyMultiCountry, ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant,
+    State, TwoFields,
 )
 
 
@@ -198,6 +199,13 @@ class BulkCreateTests(TestCase):
         ])
         bbb = Restaurant.objects.filter(name="betty's beetroot bar")
         self.assertEqual(bbb.count(), 1)
+
+    def test_nullable_fields(self):
+        # Inserting null mixed with values
+        NullableFields.objects.create(int_or_null=7)
+        NullableFields.objects.bulk_create([
+            NullableFields(int_or_null=i if i % 2 == 0 else None)
+            for i in range(3)])
 
     @skipUnlessDBFeature('can_return_ids_from_bulk_insert')
     def test_set_pk_and_insert_single_item(self):

@@ -42,7 +42,36 @@ class SQLCompiler(compiler.SQLCompiler):
 
 
 class SQLInsertCompiler(compiler.SQLInsertCompiler, SQLCompiler):
-    pass
+    def as_sql(self):
+        can_bulk = (not self.return_id and self.connection.features.has_bulk_insert)
+        if not can_bulk:
+            return super(SQLInsertCompiler, self).as_sql()
+
+        result = ["INSERT ALL"]
+
+        fields = self.query.fields
+        has_fields = bool(self.query.fields)
+
+        if has_fields:
+            value_rows = [
+                [self.prepare_value(field, self.pre_save_val(field, obj)) for field in fields]
+                for obj in self.query.objs
+            ]
+        else:
+            # An empty object.
+            value_rows = [[self.connection.ops.pk_default_value()] for _ in self.query.objs]
+            fields = [None]
+
+        placeholder_rows, param_rows = self.assemble_as_sql(fields, value_rows)
+
+        opts = self.query.get_meta()
+        qn = self.connection.ops.quote_name
+        fields = self.query.fields if has_fields else [opts.pk]
+        result.append(self.connection.ops.bulk_insert_sql(fields, placeholder_rows).format(table=qn(opts.db_table)))
+
+        result.append('SELECT * FROM DUAL')
+
+        return [(" ".join(result), tuple(p for ps in param_rows for p in ps))]
 
 
 class SQLDeleteCompiler(compiler.SQLDeleteCompiler, SQLCompiler):

@@ -444,8 +444,8 @@ WHEN (new.%(col_name)s IS NULL)
         return '%s_TR' % truncate_name(table, name_length).upper()
 
     def bulk_insert_sql(self, fields, placeholder_rows):
-        return " UNION ALL ".join(
-            "SELECT %s FROM DUAL" % ", ".join(row)
+        return " ".join(
+            "INTO {table} (%s) VALUES (%s)" % (', '.join(self.quote_name(f.column) for f in fields), ", ".join(row))
             for row in placeholder_rows
         )
 
