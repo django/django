@@ -7,7 +7,8 @@ from django.http.response import (
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseGone,
     HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseNotModified,
     HttpResponsePermanentRedirect, HttpResponseRedirect,
-    HttpResponseServerError, JsonResponse, StreamingHttpResponse,
+    HttpResponseServerError, JsonpResponse, JsonResponse,
+    StreamingHttpResponse,
 )
 from django.http.utils import conditional_content_removal
 

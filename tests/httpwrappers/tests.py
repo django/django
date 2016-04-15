@@ -15,7 +15,7 @@ from django.db import close_old_connections
 from django.http import (
     BadHeaderError, HttpResponse, HttpResponseNotAllowed,
     HttpResponseNotModified, HttpResponsePermanentRedirect,
-    HttpResponseRedirect, JsonResponse, QueryDict, SimpleCookie,
+    HttpResponseRedirect, JsonpResponse, JsonResponse, QueryDict, SimpleCookie,
     StreamingHttpResponse, parse_cookie,
 )
 from django.test import SimpleTestCase
@@ -539,6 +539,58 @@ class JsonResponseTests(SimpleTestCase):
     def test_json_response_passing_arguments_to_json_dumps(self):
         response = JsonResponse({'foo': 'bar'}, json_dumps_params={'indent': 2})
         self.assertEqual(response.content.decode(), '{\n  "foo": "bar"\n}')
+
+
+class JsonpResponseTests(SimpleTestCase):
+    def setUp(self):
+        self.callback = 'callback'
+        self.strip = lambda x: x.lstrip('callback(\\\'').rstrip('\\\')')
+
+    def test_jsonp_response_non_ascii(self):
+        data = {'key': 'łóżko'}
+        response = JsonpResponse(self.callback, data)
+        self.assertEqual(json.loads(self.strip(response.content.decode())), data)
+
+    def test_jsonp_response_raises_type_error_with_default_setting(self):
+        with self.assertRaisesMessage(
+            TypeError,
+            'In order to allow non-dict objects to be serialized set the '
+            'safe parameter to False'
+        ):
+            JsonpResponse(self.callback, [1, 2, 3])
+
+    def test_jsonp_response_text(self):
+        response = JsonpResponse(self.callback, 'foobar', safe=False)
+        self.assertEqual(json.loads(self.strip(response.content.decode())), 'foobar')
+
+    def test_jsonp_response_list(self):
+        response = JsonpResponse(self.callback, ['foo', 'bar'], safe=False)
+        self.assertEqual(json.loads(self.strip(response.content.decode())), ['foo', 'bar'])
+
+    def test_jsonp_response_uuid(self):
+        u = uuid.uuid4()
+        response = JsonpResponse(self.callback, u, safe=False)
+        self.assertEqual(json.loads(self.strip(response.content.decode())), str(u))
+
+    def test_jsonp_response_custom_encoder(self):
+        class CustomDjangoJSONEncoder(DjangoJSONEncoder):
+            def encode(self, o):
+                return json.dumps({'foo': 'bar'})
+
+        response = JsonpResponse(self.callback, {}, encoder=CustomDjangoJSONEncoder)
+        self.assertEqual(json.loads(self.strip(response.content.decode())), {'foo': 'bar'})
+
+    def test_jsonp_response_passing_arguments_to_json_dumps(self):
+        response = JsonpResponse(self.callback, {'foo': 'bar'}, json_dumps_params={'indent': 2})
+        self.assertEqual(self.strip(response.content.decode()), '{\n  "foo": "bar"\n}')
+
+    def test_jsonp_response_text_with_single_quotes(self):
+        response = JsonpResponse(self.callback, '\'foobar\'', safe=False)
+        self.assertEqual(json.loads(self.strip(response.content.decode())), '\'foobar\'')
+
+    def test_jsonp_response_text_with_double_quotes(self):
+        response = JsonpResponse(self.callback, '"foobar"', safe=False)
+        self.assertEqual(json.loads(self.strip(response.content.decode())), '"foobar"')
 
 
 class StreamingHttpResponseTests(SimpleTestCase):
