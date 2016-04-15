@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import os
 from collections import OrderedDict
 
+from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
@@ -74,7 +75,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--no-default-ignore', action='store_false',
             dest='use_default_ignore_patterns', default=True,
-            help="Don't ignore the common private glob-style patterns 'CVS', '.*' and '*~'.",
+            help="Don't ignore the common private glob-style patterns (defaults to 'CVS', '.*' and '*~').",
         )
 
     def set_options(self, **options):
@@ -88,7 +89,7 @@ class Command(BaseCommand):
         self.dry_run = options['dry_run']
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
-            ignore_patterns += ['CVS', '.*', '*~']
+            ignore_patterns += apps.get_app_config('staticfiles').ignore_patterns
         self.ignore_patterns = list(set(ignore_patterns))
         self.post_process = options['post_process']
 
