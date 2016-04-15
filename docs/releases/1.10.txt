@@ -244,6 +244,13 @@ File Storage
   timezone-aware ``datetime`` if :setting:`USE_TZ` is ``True`` and a naive
   ``datetime`` in the local timezone otherwise.
 
+* The new  :meth:`Storage.generate_filename()
+  <django.core.files.storage.Storage.generate_filename>` method makes it easier
+  to implement custom storages that don't rely on the OS path behavior
+* Storage backends now present a new method to further customize file name generation
+  :meth:`~django.core.files.storage.Storage.generate_filename` which will make it easier
+  to implement custom storages that do not rely on the OS path behavior and which was
+  previously handled by :class:`~django.db.models.FileField`.
 
 File Uploads
 ~~~~~~~~~~~~
@@ -728,6 +735,18 @@ Miscellaneous
 
 * :func:`django.views.i18n.set_language` may now return a 204 status code for
   AJAX requests.
+* :meth:`~django.core.files.storage.Storage.save` implementation no longer
+  replaces '\\' with '/' and this behavior is moved to
+  :class:`~django.core.files.storage.FileSystemStorage` since this was
+  a storage specific implementation detail. This means that any Windows user
+  with a custom storage implementation that previously relied on this behavior
+  will need to implement it on the custom storage save implementation.
+
+* Private methods from :class:`~django.db.models.FileField` get_directory_name and
+  get_filename will no longer be called (and are now deprecated) which is a backwards
+  incompatible change for users overriding those methods on custom fields. To keep the
+  same behavior override :meth:`~django.core.files.storage.Storage.generate_filename`
+  instead.
 
 * The ``base_field`` attribute of
   :class:`~django.contrib.postgres.fields.RangeField` is now a type of field,
@@ -741,6 +760,19 @@ Miscellaneous
 * If you override ``is_authenticated()`` or ``is_anonymous()`` in a custom user
   model, you must convert them to attributes or properties as described in
   :ref:`the deprecation note <user-is-auth-anon-deprecation>`.
+* :meth:`~django.core.files.storage.Storage.save` no longer replaces '\\' with
+  '/'. This behavior is moved to
+  :class:`~django.core.files.storage.FileSystemStorage` since this is a storage
+  specific implementation detail. Any Windows user with a custom storage
+  implementation that previously relied on this behavior will need to implement
+  it in the custom storage's ``save()`` method.
+
+* Private :class:`~django.db.models.FileField` methods ``get_directory_name()``
+  and ``get_filename()`` are no longer called (and are now deprecated) which is
+  a backwards incompatible change for users overriding those methods on custom
+  fields. To adopt same behavior, override ``FileField.generate_filename()`` or
+  :meth:`~django.core.files.storage.Storage.generate_filename` instead. It
+  might be enough to use :attr:`~django.db.models.FileField.upload_to` too.
 
 .. _deprecated-features-1.10:
 
@@ -936,6 +968,10 @@ Miscellaneous
   ``Field.contribute_to_class()`` and ``virtual`` in
   ``Model._meta.add_field()`` are deprecated in favor of ``private_only``
   and ``private``, respectively.
+* Private methods from :class:`~django.db.models.FileField` get_directory_name and
+  get_filename are now deprecated in favor to delegate this work to the underlying
+  storage class although they were never part of the public and
+  :meth:`~django.core.files.storage.Storage.generate_filename` is now recommended.
 
 * The ``javascript_catalog()`` and ``json_catalog()`` views are deprecated in
   favor of class-based views :class:`~django.views.i18n.JavaScriptCatalog`

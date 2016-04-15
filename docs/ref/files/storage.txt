@@ -164,6 +164,16 @@ The ``Storage`` class
         Returns a filename based on the ``name`` parameter that's suitable
         for use on the target storage system.
 
+    .. method:: generate_filename(filename, instance, upload_to)
+
+        .. versionadded:: 1.10
+
+        Creates the final file name or path to be passed to the save method,
+        applying any defined upload_to of the model field and performing file
+        name validation.
+        By default uses the underlying os path operations, but should be overridden
+        to match any other file path manipulation requirement or custom code.
+
     .. method:: listdir(path)
 
         Lists the contents of the specified path, returning a 2-tuple of lists;
