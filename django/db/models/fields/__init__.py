@@ -855,9 +855,6 @@ class Field(RegisterLookupMixin):
                        limit_choices_to)]
         return first_choice + lst
 
-    def get_choices_default(self):
-        return self.get_choices()
-
     @warn_about_renamed_method(
         'Field', '_get_val_from_obj', 'value_from_object',
         RemovedInDjango20Warning
