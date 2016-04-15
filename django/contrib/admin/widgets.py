@@ -398,11 +398,3 @@ class AdminIntegerFieldWidget(forms.TextInput):
 
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
     class_name = 'vBigIntegerField'
-
-
-class AdminCommaSeparatedIntegerFieldWidget(forms.TextInput):
-    def __init__(self, attrs=None):
-        final_attrs = {'class': 'vCommaSeparatedIntegerField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super(AdminCommaSeparatedIntegerFieldWidget, self).__init__(attrs=final_attrs)
