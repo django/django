@@ -401,9 +401,6 @@ class GenericRelation(ForeignObject):
         from_opts = self.remote_field.model._meta
         return [PathInfo(from_opts, opts, (opts.pk,), self, not self.unique, False)]
 
-    def get_choices_default(self):
-        return super(GenericRelation, self).get_choices(include_blank=False)
-
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
         return smart_text([instance._get_pk_val() for instance in qs])
