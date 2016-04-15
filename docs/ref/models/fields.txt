@@ -787,7 +787,7 @@ by ``mode``. Unlike the standard Python ``open()`` method, this method does
 .. note::
     The ``file`` attribute (as described in the :class:`django.core.files.File`
     documentation) is opened implicitly when accessed for the first time, so it
-    may be unecessary to call this method except to reset the pointer to the
+    may be unnecessary to call this method except to reset the pointer to the
     underlying file or change the ``mode``.
 
 .. method:: FieldFile.close()
