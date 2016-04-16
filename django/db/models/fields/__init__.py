@@ -1295,6 +1295,9 @@ class DateField(DateTimeCheckMixin, Field):
             return value.date()
         if isinstance(value, datetime.date):
             return value
+        # duck type check for objects that may be mocks
+        if hasattr(value, 'isoformat'):
+            value = value.isoformat()
 
         try:
             parsed = parse_date(value)
@@ -1423,7 +1426,19 @@ class DateTimeField(DateField):
         if isinstance(value, datetime.datetime):
             return value
         if isinstance(value, datetime.date):
-            value = datetime.datetime(value.year, value.month, value.day)
+            # edge case - if we are mocking out datetime.datetime, and manage
+            # to pass a 'real' datetime into this method, then it will return
+            # True to isinstance(value,  datetime.date), but should really be
+            # treated as a datetime.
+            try:
+                value = datetime.datetime(
+                    value.year, value.month, value.day,
+                    value.hour, value.minute, value.second, value.microsecond
+                )
+            except AttributeError:
+                # looks like it is a date and not a datetime.
+                value = datetime.datetime(value.year, value.month, value.day)
+
             if settings.USE_TZ:
                 # For backwards compatibility, interpret naive datetimes in
                 # local time. This won't work during DST change, but we can't
@@ -1436,6 +1451,9 @@ class DateTimeField(DateField):
                 default_timezone = timezone.get_default_timezone()
                 value = timezone.make_aware(value, default_timezone)
             return value
+        # duck type check for objects that may be mocks
+        if hasattr(value, 'isoformat'):
+            value = value.isoformat()
 
         try:
             parsed = parse_datetime(value)
@@ -2295,6 +2313,9 @@ class TimeField(DateTimeCheckMixin, Field):
             # information), but this can be a side-effect of interacting with a
             # database backend (e.g. Oracle), so we'll be accommodating.
             return value.time()
+        # duck type check for objects that may be mocks
+        if hasattr(value, 'isoformat'):
+            value = value.isoformat()
 
         try:
             parsed = parse_time(value)
