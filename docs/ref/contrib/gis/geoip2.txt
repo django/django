@@ -47,7 +47,7 @@ Here is an example of its usage::
     >>> g.lon_lat('uh.edu')
     (-95.4342, 29.834)
     >>> g.geos('24.124.1.80').wkt
-    'POINT (-97.0000000000000000 38.0000000000000000)'
+    'POINT (-97 38)'
 
 ``GeoIP`` Settings
 ==================
