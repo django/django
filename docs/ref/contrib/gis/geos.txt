@@ -69,11 +69,11 @@ All these constructors take the keyword argument ``srid``. For example::
 
     >>> from django.contrib.gis.geos import GEOSGeometry, LineString, Point
     >>> print(GEOSGeometry('POINT (0 0)', srid=4326))
-    SRID=4326;POINT (0.0000000000000000 0.0000000000000000)
+    SRID=4326;POINT (0 0)
     >>> print(LineString((0, 0), (1, 1), srid=4326))
-    SRID=4326;LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 1.0000000000000000)
+    SRID=4326;LINESTRING (0 0, 1 1)
     >>> print(Point(0, 0, srid=32140))
-    SRID=32140;POINT (0.0000000000000000 0.0000000000000000)
+    SRID=32140;POINT (0 0)
 
 Finally, there is the :func:`fromfile` factory method which returns a
 :class:`GEOSGeometry` object from a file::
@@ -368,6 +368,10 @@ another object.
 .. attribute:: GEOSGeometry.wkt
 
     Returns the Well-Known Text of the geometry (an OGC standard).
+
+    .. versionchanged:: 1.10
+
+        Non-significant zeros are stripped from the output.
 
 __ https://developers.google.com/kml/documentation/
 
