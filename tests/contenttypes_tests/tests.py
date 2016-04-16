@@ -12,11 +12,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db import connections, models
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, mock, override_settings
 from django.test.utils import captured_stdout, isolate_apps
 from django.utils.encoding import force_str, force_text
 
-from .models import Article, Author, SchemeIncludedURL
+from .models import (
+    Article, Author, ModelWithNullFKToSite, SchemeIncludedURL,
+    Site as MockSite,
+)
 
 
 @override_settings(ROOT_URLCONF='contenttypes_tests.urls')
@@ -112,6 +115,21 @@ class ContentTypesViewsTests(TestCase):
         self.assertEqual(ct.app_label, 'my_great_app')
         self.assertEqual(ct.model, 'modelcreatedonthefly')
         self.assertEqual(force_text(ct), 'modelcreatedonthefly')
+
+    @mock.patch('django.apps.apps.get_model')
+    def test_shortcut_view_with_null_site_fk(self, get_model):
+        """
+        The shortcut view works if a model's ForeignKey to site is None.
+        """
+        get_model.side_effect = lambda *args, **kwargs: MockSite if args[0] == 'sites.Site' else ModelWithNullFKToSite
+
+        obj = ModelWithNullFKToSite.objects.create(title="object title")
+        short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(ModelWithNullFKToSite).id, obj.pk)
+        response = self.client.get(short_url)
+        self.assertRedirects(
+            response, '%s' % obj.get_absolute_url(),
+            fetch_redirect_response=False,
+        )
 
 
 @override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
