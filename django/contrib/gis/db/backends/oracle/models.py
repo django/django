@@ -33,14 +33,6 @@ class OracleGeometryColumns(models.Model):
         """
         return 'table_name'
 
-    @classmethod
-    def geom_col_name(cls):
-        """
-        Returns the name of the metadata column used to store the feature
-        geometry column.
-        """
-        return 'column_name'
-
     def __str__(self):
         return '%s - %s (SRID: %s)' % (self.table_name, self.column_name, self.srid)
 

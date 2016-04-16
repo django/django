@@ -34,14 +34,6 @@ class PostGISGeometryColumns(models.Model):
         """
         return 'f_table_name'
 
-    @classmethod
-    def geom_col_name(cls):
-        """
-        Returns the name of the metadata column used to store the feature
-        geometry column.
-        """
-        return 'f_geometry_column'
-
     def __str__(self):
         return "%s.%s - %dD %s field (SRID: %d)" % \
                (self.f_table_name, self.f_geometry_column,
