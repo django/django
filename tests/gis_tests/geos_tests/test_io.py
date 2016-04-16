@@ -101,9 +101,8 @@ class GEOSIOTest(SimpleTestCase):
 
         # Ensuring bad output dimensions are not accepted
         for bad_outdim in (-1, 0, 1, 4, 423, 'foo', None):
-            # Equivalent of `wkb_w.outdim = bad_outdim`
             with self.assertRaises(ValueError):
-                wkb_w._set_outdim(bad_outdim)
+                wkb_w.outdim = bad_outdim
 
         # Now setting the output dimensions to be 3
         wkb_w.outdim = 3
