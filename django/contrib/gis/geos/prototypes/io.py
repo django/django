@@ -190,8 +190,9 @@ class WKTWriter(IOBase):
 
     @trim.setter
     def trim(self, flag):
-        self._trim = bool(flag)
-        wkt_writer_set_trim(self.ptr, b'\x01' if flag else b'\x00')
+        if bool(flag) != self._trim:
+            self._trim = bool(flag)
+            wkt_writer_set_trim(self.ptr, b'\x01' if flag else b'\x00')
 
     @property
     def precision(self):
@@ -199,11 +200,11 @@ class WKTWriter(IOBase):
 
     @precision.setter
     def precision(self, precision):
-        if isinstance(precision, int) and precision >= 0 or precision is None:
+        if (not isinstance(precision, int) or precision < 0) and precision is not None:
+            raise AttributeError('WKT output rounding precision must be non-negative integer or None.')
+        if precision != self._precision:
             self._precision = precision
             wkt_writer_set_precision(self.ptr, -1 if precision is None else precision)
-        else:
-            raise AttributeError('WKT output rounding precision must be non-negative integer or None.')
 
 
 class WKBWriter(IOBase):
