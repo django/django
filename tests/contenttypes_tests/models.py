@@ -4,9 +4,19 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import SiteManager
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.http import urlquote
+
+
+@python_2_unicode_compatible
+class Site(models.Model):
+    domain = models.CharField(max_length=100)
+    objects = SiteManager()
+
+    def __str__(self):
+        return self.domain
 
 
 @python_2_unicode_compatible
@@ -115,3 +125,15 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+@python_2_unicode_compatible
+class ModelWithNullFKToSite(models.Model):
+    title = models.CharField(max_length=200)
+    site = models.ForeignKey(Site, null=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return '/title/%s/' % urlquote(self.title)
