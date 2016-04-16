@@ -233,28 +233,28 @@ class WKBWriter(IOBase):
     byteorder = property(_get_byteorder, _set_byteorder)
 
     # Property for getting/setting the output dimension.
-    def _get_outdim(self):
+    @property
+    def outdim(self):
         return wkb_writer_get_outdim(self.ptr)
 
-    def _set_outdim(self, new_dim):
+    @outdim.setter
+    def outdim(self, new_dim):
         if new_dim not in (2, 3):
             raise ValueError('WKB output dimension must be 2 or 3')
         wkb_writer_set_outdim(self.ptr, new_dim)
 
-    outdim = property(_get_outdim, _set_outdim)
-
     # Property for getting/setting the include srid flag.
-    def _get_include_srid(self):
+    @property
+    def srid(self):
         return bool(ord(wkb_writer_get_include_srid(self.ptr)))
 
-    def _set_include_srid(self, include):
+    @srid.setter
+    def srid(self, include):
         if include:
             flag = b'\x01'
         else:
             flag = b'\x00'
         wkb_writer_set_include_srid(self.ptr, flag)
-
-    srid = property(_get_include_srid, _set_include_srid)
 
 
 # `ThreadLocalIO` object holds instances of the WKT and WKB reader/writer
