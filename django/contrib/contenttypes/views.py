@@ -62,10 +62,13 @@ def shortcut(request, content_type_id, object_id):
         if object_domain is None:
             for field in obj._meta.fields:
                 if field.remote_field and field.remote_field.model is Site:
+                    site = None
                     try:
-                        object_domain = getattr(obj, field.name).domain
+                        site = getattr(obj, field.name)
                     except Site.DoesNotExist:
                         pass
+                    if site is not None:
+                        object_domain = site.domain
                     if object_domain is not None:
                         break
 
