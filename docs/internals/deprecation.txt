@@ -158,6 +158,8 @@ details on these changes.
 
 * The ``javascript_catalog()`` and ``json_catalog()`` views will be removed.
 
+* The ``django.contrib.gis.utils.precision_wkt()`` function will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

@@ -1,8 +1,10 @@
 """
  Utilities for manipulating Geometry WKT.
 """
+import warnings
 
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 def precision_wkt(geom, prec):
@@ -21,6 +23,11 @@ def precision_wkt(geom, prec):
     If the precision is a string, it must be valid Python format string
     (e.g., '%20.7f') -- thus, you should know what you're doing.
     """
+    warnings.warn(
+        "precision_wkt() is deprecated in favor of the WKTWriter class.",
+        RemovedInDjango20Warning, stacklevel=2
+    )
+
     if isinstance(prec, int):
         num_fmt = '%%.%df' % prec
     elif isinstance(prec, six.string_types):
