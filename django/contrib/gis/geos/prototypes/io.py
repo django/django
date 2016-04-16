@@ -170,6 +170,14 @@ class WKTWriter(IOBase):
     _trim = False
     _precision = None
 
+    def __init__(self, dim=2, trim=False, precision=None):
+        super(WKTWriter, self).__init__()
+        if bool(trim) != self._trim:
+            self.trim = trim
+        if precision is not None:
+            self.precision = precision
+        self.outdim = dim
+
     def write(self, geom):
         "Returns the WKT representation of the given geometry."
         return wkt_writer_write(self.ptr, geom.ptr)
@@ -211,6 +219,10 @@ class WKBWriter(IOBase):
     _constructor = wkb_writer_create
     _destructor = wkb_writer_destroy
     ptr_type = WKB_WRITE_PTR
+
+    def __init__(self, dim=2):
+        super(WKBWriter, self).__init__()
+        self.outdim = dim
 
     def write(self, geom):
         "Returns the WKB representation of the given geometry."
@@ -280,10 +292,13 @@ def wkt_r():
     return thread_context.wkt_r
 
 
-def wkt_w(dim=2):
+def wkt_w(dim=2, trim=False, precision=None):
     if not thread_context.wkt_w:
-        thread_context.wkt_w = WKTWriter()
-    thread_context.wkt_w.outdim = dim
+        thread_context.wkt_w = WKTWriter(dim=dim, trim=trim, precision=precision)
+    else:
+        thread_context.wkt_w.outdim = dim
+        thread_context.wkt_w.trim = trim
+        thread_context.wkt_w.precision = precision
     return thread_context.wkt_w
 
 
@@ -295,14 +310,16 @@ def wkb_r():
 
 def wkb_w(dim=2):
     if not thread_context.wkb_w:
-        thread_context.wkb_w = WKBWriter()
-    thread_context.wkb_w.outdim = dim
+        thread_context.wkb_w = WKBWriter(dim=dim)
+    else:
+        thread_context.wkb_w.outdim = dim
     return thread_context.wkb_w
 
 
 def ewkb_w(dim=2):
     if not thread_context.ewkb_w:
-        thread_context.ewkb_w = WKBWriter()
+        thread_context.ewkb_w = WKBWriter(dim=dim)
         thread_context.ewkb_w.srid = True
-    thread_context.ewkb_w.outdim = dim
+    else:
+        thread_context.ewkb_w.outdim = dim
     return thread_context.ewkb_w

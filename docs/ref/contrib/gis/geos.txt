@@ -957,12 +957,18 @@ WKB or WKT of the given geometry.  In addition, :class:`WKBWriter` objects
 also have properties that may be used to change the byte order, and or
 include the SRID value (in other words, EWKB).
 
-.. class:: WKBWriter
+.. class:: WKBWriter(dim=2)
 
 ``WKBWriter`` provides the most control over its output.  By default it
 returns OGC-compliant WKB when its ``write`` method is called.  However,
 it has properties that allow for the creation of EWKB, a superset of the
-WKB standard that includes additional information.
+WKB standard that includes additional information. See the
+:attr:`WKBWriter.outdim` documentation for more details about the ``dim``
+argument.
+
+.. versionchanged:: 1.10
+
+    The ability to pass the ``dim`` argument to the constructor was added.
 
 .. method:: WKBWriter.write(geom)
 
@@ -1047,7 +1053,16 @@ geometry should be included with the WKB representation.  Example::
     >>> wkb_w.write_hex(pnt)
     '0101000020E6100000000000000000F03F000000000000F03F'
 
-.. class:: WKTWriter
+.. class:: WKTWriter(dim=2, trim=False, precision=None)
+
+This class allows outputting the WKT representation of a geometry. See the
+:attr:`WKBWriter.outdim`, :attr:`trim`, and :attr:`precision` attributes for
+details about the constructor arguments.
+
+.. versionchanged:: 1.10
+
+    The ability to pass the ``dim``, ``trim``, and ``precision`` arguments to
+    the constructor was added.
 
 .. method:: WKTWriter.write(geom)
 
@@ -1058,6 +1073,10 @@ Returns the WKT of the given geometry. Example::
     >>> wkt_w = WKTWriter()
     >>> wkt_w.write(pnt)
     'POINT (1.0000000000000000 1.0000000000000000)'
+
+.. attribute:: WKTWriter.outdim
+
+    See :attr:`WKBWriter.outdim`.
 
 .. attribute:: WKTWriter.trim
 
