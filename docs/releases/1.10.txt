@@ -796,6 +796,9 @@ wish to support earlier versions of Django.
   :class:`~django.contrib.gis.geos.MultiPolygon` is deprecated in favor of the
   :attr:`~django.contrib.gis.geos.GEOSGeometry.unary_union` property.
 
+* The ``django.contrib.gis.utils.precision_wkt()`` is deprecated in favor of
+  the :class:`~django.contrib.gis.geos.WKTWriter`
+
 ``CommaSeparatedIntegerField`` model field
 ------------------------------------------
 
