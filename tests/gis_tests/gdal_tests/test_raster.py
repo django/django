@@ -320,12 +320,13 @@ class GDALBandTests(SimpleTestCase):
         self.assertEqual(self.band.datatype(), 1)
         self.assertEqual(self.band.datatype(as_string=True), 'GDT_Byte')
         self.assertEqual(self.band.nodata_value, 15)
-        data = self.band.data()
-        assert_array = numpy.loadtxt(
-            os.path.join(os.path.dirname(upath(__file__)), '../data/rasters/raster.numpy.txt')
-        )
-        numpy.testing.assert_equal(data, assert_array)
-        self.assertEqual(data.shape, (self.band.height, self.band.width))
+        if numpy:
+            data = self.band.data()
+            assert_array = numpy.loadtxt(
+                os.path.join(os.path.dirname(upath(__file__)), '../data/rasters/raster.numpy.txt')
+            )
+            numpy.testing.assert_equal(data, assert_array)
+            self.assertEqual(data.shape, (self.band.height, self.band.width))
         try:
             smin, smax, smean, sstd = self.band.statistics(approximate=True)
             self.assertEqual(smin, 0)
