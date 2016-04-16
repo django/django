@@ -737,7 +737,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         """Test with a null srid and a srid unknown to GDAL."""
         for srid in [None, 999999]:
             pnt = Point(111200, 220900, srid=srid)
-            self.assertTrue(pnt.ewkt.startswith(("SRID=%s;" % srid if srid else '') + "POINT (111200.0"))
+            self.assertTrue(pnt.ewkt.startswith(("SRID=%s;" % srid if srid else '') + "POINT (111200"))
             self.assertIsInstance(pnt.ogr, gdal.OGRGeometry)
             self.assertIsNone(pnt.srs)
 
