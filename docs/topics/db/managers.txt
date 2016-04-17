@@ -172,35 +172,59 @@ and ``Person.people.all()``, yielding predictable results.
 .. _default-managers:
 
 Default managers
-~~~~~~~~~~~~~~~~
+----------------
+
+.. attribute:: Model._default_manager
 
 If you use custom ``Manager`` objects, take note that the first ``Manager``
 Django encounters (in the order in which they're defined in the model) has a
 special status. Django interprets the first ``Manager`` defined in a class as
-the "default" ``Manager``, and several parts of Django
-(including :djadmin:`dumpdata`) will use that ``Manager``
-exclusively for that model. As a result, it's a good idea to be careful in
-your choice of default manager in order to avoid a situation where overriding
-``get_queryset()`` results in an inability to retrieve objects you'd like to
-work with.
+the "default" ``Manager``, and several parts of Django (including
+:djadmin:`dumpdata`) will use that ``Manager`` exclusively for that model. As a
+result, it's a good idea to be careful in your choice of default manager in
+order to avoid a situation where overriding ``get_queryset()`` results in an
+inability to retrieve objects you'd like to work with.
+
+You can specify a custom default manager using :attr:`Meta.base_manager_name
+<django.db.models.Options.base_manager_name>`.
+
+If you're writing some code that must handle an unknown model, for example, in
+a third-party app that implements a generic view, use this manager (or
+:attr:`~Model._base_manager`) rather than assuming the model has an ``objects``
+manager.
+
+Base managers
+-------------
+
+.. attribute:: Model._base_manager
 
 .. _managers-for-related-objects:
 
 Using managers for related object access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, Django uses an instance of a "plain" manager class when accessing
-related objects (i.e. ``choice.poll``), not the default manager on the related
-object. This is because Django needs to be able to retrieve the related
-object, even if it would otherwise be filtered out (and hence be inaccessible)
-by the default manager.
+By default, Django uses an instance of the ``Model._base_manager`` manager
+class when accessing related objects (i.e. ``choice.poll``), not the
+``_default_manager`` on the related object. This is because Django needs to be
+able to retrieve the related object, even if it would otherwise be filtered out
+(and hence be inaccessible) by the default manager.
 
-If the normal plain manager class (:class:`django.db.models.Manager`) is not
-appropriate for your circumstances, you can force Django to use the same class
-as the default manager for your model by setting the ``use_for_related_fields``
-attribute on the manager class. This is documented fully below_.
+If the normal base manager class (:class:`django.db.models.Manager`) isn't
+appropriate for your circumstances, you can tell Django which class to use by
+setting :attr:`Meta.base_manager_name
+<django.db.models.Options.base_manager_name>`.
 
-.. _below: manager-types_
+Don't filter away any results in this type of manager subclass
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This manager is used to access objects that are related to from some other
+model. In those situations, Django has to be able to see all the objects for
+the model it is fetching, so that *anything* which is referred to can be
+retrieved.
+
+If you override the ``get_queryset()`` method and filter out any rows, Django
+will return incorrect results. Don't do that. A manager that filters results
+in ``get_queryset()`` is not appropriate for use as a default manager.
 
 .. _calling-custom-queryset-methods-from-manager:
 
@@ -321,19 +345,21 @@ You may also store the generated class into a variable::
 Custom managers and model inheritance
 -------------------------------------
 
-Here's how Django handles custom managers and
-:ref:`model inheritance <model-inheritance>`:
+Here's how Django handles custom managers and :ref:`model inheritance
+<model-inheritance>`:
 
-1. Managers from base classes are always inherited by the child class,
+#. Managers from base classes are always inherited by the child class,
    using Python's normal name resolution order (names on the child
    class override all others; then come names on the first parent class,
    and so on).
 
-2. The default manager on a class is either the first manager declared on the
-   class, if that exists, or the default manager of the first parent class in
-   the parent hierarchy, if that exists. If no manager is explicitly declared,
-   Django automatically creates the `objects` manager and it becomes the default
-   manager.
+#. If no managers are declared on a model and/or its parents, Django
+   automatically creates the ``objects`` manager.
+
+#. The default manager on a class is either the one chosen with
+   :attr:`Meta.default_manager_name
+   <django.db.models.Options.default_manager_name>`, or the first manager
+   declared on the model, or the default manager of the first parent model.
 
 .. versionchanged:: 1.10
 
@@ -428,99 +454,3 @@ However, if you're overriding ``__getattr__`` or some other private
 method of your ``Manager`` object that controls object state, you
 should ensure that you don't affect the ability of your ``Manager`` to
 be copied.
-
-.. _manager-types:
-
-Controlling automatic manager types
-===================================
-
-This document has already mentioned a couple of places where Django creates a
-manager class for you: `default managers`_ and the "plain" manager used to
-`access related objects`_. There are other places in the implementation of
-Django where temporary plain managers are needed. Those automatically created
-managers will normally be instances of the :class:`django.db.models.Manager`
-class.
-
-.. _default managers: manager-names_
-.. _access related objects: managers-for-related-objects_
-
-Throughout this section, we will use the term "automatic manager" to mean a
-manager that Django creates for you -- either as a default manager on a model
-with no managers, or to use temporarily when accessing related objects.
-
-Sometimes this default class won't be the right choice. The default manager
-may not have all the methods you need to work with your data. A custom manager
-class of your own will allow you to create custom ``QuerySet`` objects to give
-you the information you need.
-
-Django provides a way for custom manager developers to say that their manager
-class should be used for automatic managers whenever it is the default manager
-on a model. This is done by setting the ``use_for_related_fields`` attribute on
-the manager class::
-
-    class MyManager(models.Manager):
-        use_for_related_fields = True
-        # ...
-
-If this attribute is set on the *default* manager for a model (only the
-default manager is considered in these situations), Django will use that class
-whenever it needs to automatically create a manager for the class.  Otherwise,
-it will use :class:`django.db.models.Manager`.
-
-.. admonition:: Historical Note
-
-    Given the purpose for which it's used, the name of this attribute
-    (``use_for_related_fields``) might seem a little odd. Originally, the
-    attribute only controlled the type of manager used for related field
-    access, which is where the name came from. As it became clear the concept
-    was more broadly useful, the name hasn't been changed. This is primarily
-    so that existing code will :doc:`continue to work </misc/api-stability>` in
-    future Django versions.
-
-Writing correct managers for use in automatic manager instances
----------------------------------------------------------------
-
-The ``use_for_related_fields`` feature is primarily for managers that need to
-return a custom ``QuerySet`` subclass. In providing this functionality in your
-manager, there are a couple of things to remember.
-
-Do not filter away any results in this type of manager subclass
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-One reason an automatic manager is used is to access objects that are related
-to from some other model. In those situations, Django has to be able to see
-all the objects for the model it is fetching, so that *anything* which is
-referred to can be retrieved.
-
-If you override the ``get_queryset()`` method and filter out any rows, Django
-will return incorrect results. Don't do that. A manager that filters results
-in ``get_queryset()`` is not appropriate for use as an automatic manager.
-
-Set ``use_for_related_fields`` when you define the class
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``use_for_related_fields`` attribute must be set on the manager *class*, not
-on an *instance* of the class. The earlier example shows the correct way to set
-it, whereas the following will not work::
-
-    # BAD: Incorrect code
-    class MyManager(models.Manager):
-        # ...
-        pass
-
-    # Sets the attribute on an instance of MyManager. Django will
-    # ignore this setting.
-    mgr = MyManager()
-    mgr.use_for_related_fields = True
-
-    class MyModel(models.Model):
-        # ...
-        objects = mgr
-
-    # End of incorrect code.
-
-You also shouldn't change the attribute on the class object after it has been
-used in a model, since the attribute's value is processed when the model class
-is created and not subsequently reread. Set the attribute on the manager class
-when it is first defined, as in the initial example of this section and
-everything will work smoothly.
