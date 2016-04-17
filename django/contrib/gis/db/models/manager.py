@@ -13,6 +13,10 @@ class GeoManager(Manager.from_queryset(GeoQuerySet)):
     # properly.
     use_for_related_fields = True
 
+    # No need to bother users with the use_for_related_fields
+    # deprecation for this manager which is itself deprecated.
+    silence_use_for_related_fields_deprecation = True
+
     def __init__(self, *args, **kwargs):
         warnings.warn(
             "The GeoManager class is deprecated. Simply use a normal manager "

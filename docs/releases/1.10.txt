@@ -432,6 +432,13 @@ Models
 * ``Model.__init__()`` now sets values of virtual fields from its keyword
   arguments.
 
+* The new :attr:`Meta.base_manager_name
+  <django.db.models.Options.base_manager_name>` and
+  :attr:`Meta.default_manager_name
+  <django.db.models.Options.default_manager_name>` options allow controlling
+  the :attr:`~django.db.models.Model._base_manager` and
+  :attr:`~django.db.models.Model._default_manager`, respectively.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1062,6 +1069,22 @@ As a result, the "lazy" behavior of the ``escape`` filter (where it would
 always be applied as the last filter no matter where in the filter chain it
 appeared) is deprecated. The filter will change to immediately apply
 :func:`~django.utils.html.conditional_escape` in Django 2.0.
+
+``Manager.use_for_related_fields`` and inheritance changes
+----------------------------------------------------------
+
+``Manager.use_for_related_fields`` is deprecated in favor of setting
+:attr:`Meta.base_manager_name <django.db.models.Options.base_manager_name>` on
+the model.
+
+Model ``Manager`` inheritance will follow MRO inheritance rules in Django 2.0,
+changing the current behavior where managers defined on non-abstract base
+classes aren't inherited by child classes. A deprecating warning with
+instructions on how to adapt your code is raised if you have any affected
+managers. You'll either redeclare a manager from an abstract model on the child
+class to override the manager from the concrete model, or you'll set the
+model's ``Meta.manager_inheritance_from_future=True`` option to opt-in to the
+new inheritance behavior.
 
 Miscellaneous
 -------------

@@ -85,6 +85,8 @@ class StatusPerson(MyPerson):
     """
     status = models.CharField(max_length=80)
 
+    objects = models.Manager()
+
 # We can even have proxies of proxies (and subclass of those).
 
 
@@ -95,6 +97,8 @@ class MyPersonProxy(MyPerson):
 
 class LowerStatusPerson(MyPersonProxy):
     status = models.CharField(max_length=80)
+
+    objects = models.Manager()
 
 
 @python_2_unicode_compatible

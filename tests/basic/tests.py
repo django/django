@@ -637,7 +637,7 @@ class SelectOnSaveTests(TestCase):
         # test this properly otherwise. Article's manager, because
         # proxy models use their parent model's _base_manager.
 
-        orig_class = Article._base_manager.__class__
+        orig_class = Article._base_manager._queryset_class
 
         class FakeQuerySet(QuerySet):
             # Make sure the _update method below is in fact called.
@@ -648,11 +648,8 @@ class SelectOnSaveTests(TestCase):
                 super(FakeQuerySet, self)._update(*args, **kwargs)
                 return 0
 
-        class FakeManager(orig_class):
-            def get_queryset(self):
-                return FakeQuerySet(self.model)
         try:
-            Article._base_manager.__class__ = FakeManager
+            Article._base_manager._queryset_class = FakeQuerySet
             asos = ArticleSelectOnSave.objects.create(pub_date=datetime.now())
             with self.assertNumQueries(3):
                 asos.save()
@@ -665,7 +662,7 @@ class SelectOnSaveTests(TestCase):
             with self.assertRaises(DatabaseError):
                 asos.save(update_fields=['pub_date'])
         finally:
-            Article._base_manager.__class__ = orig_class
+            Article._base_manager._queryset_class = orig_class
 
 
 class ModelRefreshTests(TestCase):

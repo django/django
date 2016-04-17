@@ -8,46 +8,13 @@ from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 
-def can_use_for_related_field(manager_class):
-    return manager_class is Manager or getattr(manager_class, 'use_for_related_fields', False)
-
-
-def ensure_default_manager(model):
-    """
-    Ensures that a Model subclass contains a default manager and sets the
-    _default_manager and _base_manager attributes on the class.
-    """
-
-    if not model._meta.managers:
-        if any(f.name == 'objects' for f in model._meta.fields):
-            raise ValueError(
-                "Model %s must specify a custom Manager, because it has a "
-                "field named 'objects'" % model.__name__
-            )
-        model.add_to_class('objects', Manager())
-
-    model._default_manager = model._meta.managers[0]
-
-    # Just alias _base_manager if default manager is suitable.
-    if can_use_for_related_field(model._default_manager.__class__):
-        model._base_manager = model._default_manager
-
-    # Otherwise search for a suitable manager type in the default manager MRO.
-    else:
-        for base_manager_class in model._default_manager.__class__.mro()[1:]:
-            if can_use_for_related_field(base_manager_class):
-                model._base_manager = base_manager_class()
-                model._base_manager.name = '_base_manager'
-                model._base_manager.model = model
-                break
-        else:
-            raise ValueError("Could not find a suitable base manager.")
-
-
 @python_2_unicode_compatible
 class BaseManager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
+
+    # Set to True for the 'objects' managers that are automatically created.
+    auto_created = False
 
     #: If set to True the manager will be serialized into migrations and will
     #: thus be available in e.g. RunPython operations

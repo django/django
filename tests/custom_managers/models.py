@@ -172,6 +172,18 @@ class Car(models.Model):
         return self.name
 
 
+class FastCarAsBase(Car):
+    class Meta:
+        proxy = True
+        base_manager_name = 'fast_cars'
+
+
+class FastCarAsDefault(Car):
+    class Meta:
+        proxy = True
+        default_manager_name = 'fast_cars'
+
+
 class RestrictedManager(models.Manager):
     def get_queryset(self):
         return super(RestrictedManager, self).get_queryset().filter(is_public=True)

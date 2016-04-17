@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 
 from django.db import IntegrityError, connection, transaction
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import (
     Bar, Director, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
@@ -422,6 +423,7 @@ class OneToOneTests(TestCase):
             hasattr(Target, HiddenPointer._meta.get_field('target').remote_field.get_accessor_name())
         )
 
+    @ignore_warnings(category=RemovedInDjango20Warning)  # for use_for_related_fields deprecation
     def test_related_object(self):
         public_school = School.objects.create(is_public=True)
         public_director = Director.objects.create(school=public_school, is_temp=False)
@@ -472,6 +474,26 @@ class OneToOneTests(TestCase):
                 private_school.director
         finally:
             Director._default_manager.use_for_related_fields = False
+
+        School._meta.base_manager_name = 'objects'
+        School._meta._expire_cache()
+        try:
+            private_director = Director._base_manager.get(pk=private_director.pk)
+            with self.assertRaises(School.DoesNotExist):
+                private_director.school
+        finally:
+            School._meta.base_manager_name = None
+            School._meta._expire_cache()
+
+        Director._meta.base_manager_name = 'objects'
+        Director._meta._expire_cache()
+        try:
+            private_school = School._base_manager.get(pk=private_school.pk)
+            with self.assertRaises(Director.DoesNotExist):
+                private_school.director
+        finally:
+            Director._meta.base_manager_name = None
+            Director._meta._expire_cache()
 
     def test_hasattr_related_object(self):
         # The exception raised on attribute access when a related object
