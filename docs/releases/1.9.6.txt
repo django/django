@@ -15,3 +15,6 @@ Bugfixes
 
 * Fixed ``TimeField`` microseconds round-tripping on MySQL and SQLite
   (:ticket:`26498`).
+
+* Prevented ``makemigrations`` from generating infinite migrations for a model
+  field that references a ``functools.partial`` (:ticket:`26475`).
