@@ -1,0 +1,76 @@
+[
+  {
+    "model": "foreign_object.customer",
+    "pk": 1,
+    "fields": {
+      "company": "a",
+      "customer_id": 10,
+      "name": "plop SARL"
+    }
+  },
+  {
+    "model": "foreign_object.customer",
+    "pk": 2,
+    "fields": {
+      "company": "a",
+      "customer_id": 20,
+      "name": "moiraine & cie"
+    }
+  },
+  {
+    "model": "foreign_object.customer",
+    "pk": 3,
+    "fields": {
+      "company": "b",
+      "customer_id": 10,
+      "name": "moiraine & cie"
+    }
+  },
+  {
+    "model": "foreign_object.contact",
+    "pk": 1,
+    "fields": {
+      "company_code": "b",
+      "customer_code": 10,
+      "surname": "moiraine the witch"
+    }
+  },
+  {
+    "model": "foreign_object.contact",
+    "pk": 2,
+    "fields": {
+      "company_code": "a",
+      "customer_code": 10,
+      "surname": "M. plop"
+    }
+  },
+  {
+    "model": "foreign_object.Address",
+    "pk": 1,
+    "fields": {
+      "company": "a",
+      "tiers_id": 10,
+      "city": "tear",
+      "postcode": "00111"
+    }
+  },
+  {
+    "model": "foreign_object.Address",
+    "pk": 3,
+    "fields": {
+      "company": "b",
+      "tiers_id": 10,
+      "city": "tear",
+      "postcode": "00111"
+    }
+  },
+  {
+    "model": "foreign_object.PhoneNumber",
+    "pk": 1,
+    "fields": {
+      "num": "1234512345",
+      "type_number": 1,
+      "contact_id": 2
+    }
+  }
+]
