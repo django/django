@@ -284,6 +284,7 @@ the ``User`` from the database. For example::
         user.has_perm('myapp.change_bar')  # False
 
         # Request new instance of User
+        # Be aware that user.refresh_from_db() won't clear the cache.
         user = get_object_or_404(User, pk=user_id)
 
         # Permission cache is repopulated from the database
