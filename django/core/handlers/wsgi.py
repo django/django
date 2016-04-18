@@ -187,7 +187,7 @@ def get_path_info(environ):
     """
     path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
 
-    return path_info.decode(UTF_8)
+    return path_info.decode(UTF_8) if six.PY3 else path_info
 
 
 def get_script_name(environ):
@@ -220,7 +220,7 @@ def get_script_name(environ):
     else:
         script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
 
-    return script_name.decode(UTF_8)
+    return script_name.decode(UTF_8) if six.PY3 else script_name
 
 
 def get_bytes_from_wsgi(environ, key, default):
