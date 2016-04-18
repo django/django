@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import functools
 import re
 
 from django.apps import apps
@@ -32,6 +33,14 @@ class DeconstructibleObject(object):
             self.args,
             self.kwargs
         )
+
+
+def _content_file_name(instance, filename, key=None):
+    return '{}/{}'.format(instance, filename)
+
+
+def content_file_name(key):
+    return functools.partial(_content_file_name, key=key)
 
 
 class AutodetectorTests(TestCase):
@@ -268,6 +277,14 @@ class AutodetectorTests(TestCase):
     author_renamed_with_new_db_table_options = ModelState("testapp", "NewAuthor", [
         ("id", models.AutoField(primary_key=True)),
     ], {"db_table": "author_three"})
+    author_with_partial_upload_to = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
+    ])
+    author_with_partial_upload_to_again = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
+    ])
     contract = ModelState("testapp", "Contract", [
         ("id", models.AutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
@@ -656,6 +673,14 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
+
+    def test_partial_doesnt_detect_changes_when_unchanged(self):
+        """#26475 - Tests functools.partial serialisation always showing changes."""
+        before = self.make_project_state([self.author_with_partial_upload_to])
+        after = self.make_project_state([self.author_with_partial_upload_to_again])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 0)
 
     @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
