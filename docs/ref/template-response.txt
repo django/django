@@ -303,7 +303,7 @@ rendered response.
 
 If you're using middleware, the solution is easy. Middleware provides
 multiple opportunities to process a response on exit from a view. If
-you put behavior in the Response middleware is guaranteed to execute
+you put behavior in the response middleware, it's guaranteed to execute
 after template rendering has taken place.
 
 However, if you're using a decorator, the same opportunities do not
