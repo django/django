@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import functools
 import re
 from itertools import chain
 
@@ -63,6 +64,8 @@ class MigrationAutodetector(object):
                 key: self.deep_deconstruct(value)
                 for key, value in obj.items()
             }
+        elif isinstance(obj, functools.partial):
+            return (obj.func, self.deep_deconstruct(obj.args), self.deep_deconstruct(obj.keywords))
         elif isinstance(obj, COMPILED_REGEX_TYPE):
             return RegexObject(obj)
         elif isinstance(obj, type):
