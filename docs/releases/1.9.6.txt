@@ -12,3 +12,6 @@ Bugfixes
 * Added support for relative path redirects to
   ``SimpleTestCase.assertRedirects()`` because Django 1.9 no longer converts
   redirects to absolute URIs (:ticket:`26428`).
+
+* Prevented ``makemigrations`` from mistakenly thinking a model field that
+  uses a ``functools.partial`` has changed when it has not. (:ticket:`26475`).
