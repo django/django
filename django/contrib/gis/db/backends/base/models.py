@@ -164,15 +164,15 @@ class SpatialRefSysMixin(object):
     @classmethod
     def get_units(cls, wkt):
         """
-        Class method used by GeometryField on initialization to
-        retrieve the units on the given WKT, without having to use
-        any of the database fields.
+        Class method to retrieve the units on the given WKT, without having to use any of the database fields.
+
+        Returns a tuple such as (unit_value, unit_name).
         """
         if gdal.HAS_GDAL:
             return gdal.SpatialReference(wkt).units
         else:
             m = cls.units_regex.match(wkt)
-            return m.group('unit'), m.group('unit_name')
+            return float(m.group('unit')), m.group('unit_name')
 
     @classmethod
     def get_spheroid(cls, wkt, string=True):
