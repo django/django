@@ -48,6 +48,9 @@ class ContentTypesViewsTests(TestCase):
         cls.scheme2 = SchemeIncludedURL.objects.create(url='https://test_scheme_included_https/')
         cls.scheme3 = SchemeIncludedURL.objects.create(url='//test_default_scheme_kept/')
 
+    def setUp(self):
+        Site.objects.clear_cache()
+
     def test_shortcut_with_absolute_url(self):
         "Can view a shortcut for an Author object that has a get_absolute_url method"
         for obj in Author.objects.all():
