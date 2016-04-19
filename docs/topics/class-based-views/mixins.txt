@@ -400,7 +400,7 @@ To show what happens when you try to get more sophisticated, we show
 an example that sacrifices readability and maintainability when there
 is a simpler solution. First, let's look at a naive attempt to combine
 :class:`~django.views.generic.detail.DetailView` with
-:class:`~django.views.generic.edit.FormMixin` to enable use to
+:class:`~django.views.generic.edit.FormMixin` to enable us to
 ``POST`` a Django :class:`~django.forms.Form` to the same URL as we're
 displaying an object using :class:`DetailView`.
 
