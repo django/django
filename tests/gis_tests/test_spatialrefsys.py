@@ -1,9 +1,9 @@
-import unittest
 import re
+import unittest
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.db import connection
-from django.test import skipUnlessDBFeature, mock
+from django.test import mock, skipUnlessDBFeature
 from django.utils import six
 
 from .utils import SpatialRefSys, oracle, postgis, spatialite
