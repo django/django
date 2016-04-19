@@ -400,6 +400,9 @@ Models
 * A proxy model may now inherit multiple proxy models that share a common
   non-abstract parent class.
 
+* ``Model.__init__()`` now sets values of virtual fields from its keyword
+  arguments.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
