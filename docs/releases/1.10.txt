@@ -256,6 +256,9 @@ Forms
 * Form and widget ``Media`` is now served using
   :mod:`django.contrib.staticfiles` if installed.
 
+* The ``<input>`` tag rendered by :class:`~django.forms.CharField` now includes
+  a ``minlength`` attribute if the field has a ``min_length``.
+
 Generic Views
 ~~~~~~~~~~~~~
 

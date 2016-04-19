@@ -91,7 +91,7 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
-        self.assertWidgetRendersTo(f, '<input id="id_f" type="url" name="f" maxlength="20" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" type="url" name="f" maxlength="20" minlength="15" />')
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 15 characters (it has 12).'"):
             f.clean('http://f.com')
         self.assertEqual('http://example.com', f.clean('http://example.com'))
