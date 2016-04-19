@@ -1,8 +1,9 @@
 import unittest
+import re
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.db import connection
-from django.test import skipUnlessDBFeature
+from django.test import skipUnlessDBFeature, mock
 from django.utils import six
 
 from .utils import SpatialRefSys, oracle, postgis, spatialite
@@ -20,6 +21,18 @@ test_srs = ({
     # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
     'ellipsoid': (6378137.0, 6356752.3, 298.257223563),
     'eprec': (1, 1, 9),
+    'wkt': re.sub('[\s+]', '', """
+        GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.01745329251994328,
+        AUTHORITY["EPSG","9122"]],
+    AUTHORITY["EPSG","4326"]]
+    """)
 }, {
     'srid': 32140,
     'auth_name': ('EPSG', False),
@@ -42,6 +55,25 @@ test_srs = ({
 @unittest.skipUnless(HAS_GDAL, "SpatialRefSysTest needs gdal support")
 @skipUnlessDBFeature("has_spatialrefsys_table")
 class SpatialRefSysTest(unittest.TestCase):
+
+    def test_get_units(self):
+        """Ensure get_units() work as expected (when GDAL is available)."""
+        epsg_4326 = next(f for f in test_srs if f['srid'] == 4326)
+
+        unit, unit_name = SpatialRefSys().get_units(epsg_4326['wkt'])
+        self.assertEqual(unit_name, 'degree')
+        self.assertAlmostEqual(unit, 0.01745329251994328)
+
+    @mock.patch('django.contrib.gis.gdal.HAS_GDAL', False)
+    def test_get_units_wo_gdal(self):
+        """Ensure get_units() work as expected (when GDAL is not available)."""
+        epsg_4326 = next(f for f in test_srs if f['srid'] == 4326)
+
+        # It's tested here using GDAL
+        unit, unit_name = SpatialRefSys().get_units(epsg_4326['wkt'])
+        self.assertEqual(unit_name, 'degree')
+        self.assertIsInstance(unit, float)
+        self.assertAlmostEqual(unit, 0.01745329251994328)
 
     def test_retrieve(self):
         """
