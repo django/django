@@ -235,7 +235,10 @@ class CharField(Field):
         attrs = super(CharField, self).widget_attrs(widget)
         if self.max_length is not None:
             # The HTML attribute is maxlength, not max_length.
-            attrs.update({'maxlength': str(self.max_length)})
+            attrs['maxlength'] = str(self.max_length)
+        if self.min_length is not None:
+            # The HTML attribute is minlength, not min_length.
+            attrs['minlength'] = str(self.min_length)
         return attrs
 
 
