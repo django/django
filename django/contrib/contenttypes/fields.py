@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, models, router, transaction
-from django.db.models import DO_NOTHING, signals
+from django.db.models import DO_NOTHING
 from django.db.models.base import ModelBase, make_foreign_order_accessors
 from django.db.models.fields.related import (
     ForeignObject, ForeignObjectRel, ReverseManyToOneDescriptor,
@@ -54,10 +54,6 @@ class GenericForeignKey(object):
         self.model = cls
         self.cache_attr = "_%s_cache" % name
         cls._meta.add_field(self, private=True)
-
-        # Only run pre-initialization field assignment on non-abstract models
-        if not cls._meta.abstract:
-            signals.pre_init.connect(self.instance_pre_init, sender=cls)
 
         setattr(cls, name, self)
 
@@ -161,20 +157,6 @@ class GenericForeignKey(object):
                 ]
             else:
                 return []
-
-    def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
-        """
-        Handle initializing an object with the generic FK instead of
-        content_type and object_id fields.
-        """
-        if self.name in kwargs:
-            value = kwargs.pop(self.name)
-            if value is not None:
-                kwargs[self.ct_field] = self.get_content_type(obj=value)
-                kwargs[self.fk_field] = value._get_pk_val()
-            else:
-                kwargs[self.ct_field] = None
-                kwargs[self.fk_field] = None
 
     def get_content_type(self, obj=None, id=None, using=None):
         if obj is not None:
