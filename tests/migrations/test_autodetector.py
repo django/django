@@ -35,14 +35,6 @@ class DeconstructibleObject(object):
         )
 
 
-def _content_file_name(instance, filename, key=None):
-    return '{}/{}'.format(instance, filename)
-
-
-def content_file_name(key):
-    return functools.partial(_content_file_name, key=key)
-
-
 class AutodetectorTests(TestCase):
     """
     Tests the migration autodetector.
@@ -277,14 +269,6 @@ class AutodetectorTests(TestCase):
     author_renamed_with_new_db_table_options = ModelState("testapp", "NewAuthor", [
         ("id", models.AutoField(primary_key=True)),
     ], {"db_table": "author_three"})
-    author_with_partial_upload_to = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
-        ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
-    ])
-    author_with_partial_upload_to_again = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
-        ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
-    ])
     contract = ModelState("testapp", "Contract", [
         ("id", models.AutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
@@ -676,11 +660,56 @@ class AutodetectorTests(TestCase):
 
     def test_partial_doesnt_detect_changes_when_unchanged(self):
         """#26475 - Tests functools.partial serialisation always showing changes."""
-        before = self.make_project_state([self.author_with_partial_upload_to])
-        after = self.make_project_state([self.author_with_partial_upload_to_again])
+
+        def _content_file_name(instance, filename, key, **kwargs):
+            return '{}/{}'.format(instance, filename)
+
+        def content_file_name(key, **kwargs):
+            return functools.partial(_content_file_name, key, **kwargs)
+
+        before = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
+        ])])
+        after = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
+        ])])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertNumberMigrations(changes, 'testapp', 0)
+
+        args_changed = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('other-file'))),
+        ])])
+        autodetector = MigrationAutodetector(before, args_changed)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AlterField'])
+        # Can't use assertOperationFieldAttributes, because we need the deconstructed version,
+        # ie, the exploded func/args/keywords rather than the partial: we don't care if it's
+        # not the same _instance_ of the partial, only if it's the same source function, args
+        # and keywords.
+        value = changes['testapp'][0].operations[0].field.upload_to
+        self.assertEqual(
+            (_content_file_name, ('other-file',), {}),
+            (value.func, value.args, value.keywords)
+        )
+
+        kwargs_changed = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('file', spam='eggs'))),
+        ])])
+        autodetector = MigrationAutodetector(before, kwargs_changed)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AlterField'])
+        value = changes['testapp'][0].operations[0].field.upload_to
+        self.assertEqual(
+            (_content_file_name, ('file',), {'spam': 'eggs'}),
+            (value.func, value.args, value.keywords)
+        )
 
     @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
