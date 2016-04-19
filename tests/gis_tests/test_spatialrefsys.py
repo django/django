@@ -69,7 +69,6 @@ class SpatialRefSysTest(unittest.TestCase):
         """Ensure get_units() work as expected (when GDAL is not available)."""
         epsg_4326 = next(f for f in test_srs if f['srid'] == 4326)
 
-        # It's tested here using GDAL
         unit, unit_name = SpatialRefSys().get_units(epsg_4326['wkt'])
         self.assertEqual(unit_name, 'degree')
         self.assertIsInstance(unit, float)
