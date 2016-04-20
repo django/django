@@ -158,7 +158,14 @@ class AppConfig(object):
 
         Raises LookupError if no model exists with this name.
         """
-        self.check_models_ready()
+        if self.models is None:
+            # Models for this app are not ready yet, trying to force importing
+            # this AppConfig module
+            if module_has_submodule(self.module, MODELS_MODULE_NAME):
+                models_module_name = '%s.%s' % (self.name, MODELS_MODULE_NAME)
+                self.models_module = import_module(models_module_name)
+                from .registry import apps
+                self.models = apps.all_models[self.label]
         try:
             return self.models[model_name.lower()]
         except KeyError:

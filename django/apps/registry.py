@@ -191,7 +191,7 @@ class Apps(object):
         model exists with this name in the application. Raises ValueError if
         called with a single argument that doesn't contain exactly one dot.
         """
-        self.check_models_ready()
+        self.check_apps_ready()
         if model_name is None:
             app_label, model_name = app_label.split('.')
         return self.get_app_config(app_label).get_model(model_name.lower())
