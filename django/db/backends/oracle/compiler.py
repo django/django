@@ -31,10 +31,17 @@ class SQLCompiler(compiler.SQLCompiler):
             high_where = ''
             if self.query.high_mark is not None:
                 high_where = 'WHERE ROWNUM <= %d' % (self.query.high_mark,)
-            sql = (
-                'SELECT * FROM (SELECT "_SUB".*, ROWNUM AS "_RN" FROM (%s) '
-                '"_SUB" %s) WHERE "_RN" > %d' % (sql, high_where, self.query.low_mark)
-            )
+
+            if self.query.low_mark:
+                sql = (
+                    'SELECT * FROM (SELECT "_SUB".*, ROWNUM AS "_RN" FROM (%s) '
+                    '"_SUB" %s) WHERE "_RN" > %d' % (sql, high_where, self.query.low_mark)
+                )
+            else:
+                # Simplify the query to support subqueries if there's no offset.
+                sql = (
+                    'SELECT * FROM (SELECT "_SUB".* FROM (%s) "_SUB" %s)' % (sql, high_where)
+                )
 
         return sql, params
 

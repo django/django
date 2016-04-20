@@ -450,6 +450,178 @@ Conditional expressions allow you to use :keyword:`if` ... :keyword:`elif` ...
 :keyword:`else` logic in queries. Django natively supports SQL ``CASE``
 expressions. For more details see :doc:`conditional-expressions`.
 
+``Subquery()`` expressions
+--------------------------
+
+.. class:: Subquery(queryset, output_field=None)
+
+.. versionadded:: 1.11
+
+You can add an explicit subquery to a ``QuerySet`` using the ``Subquery``
+expression.
+
+For example, to annotate each post with the email address of the author of the
+newest comment on that post::
+
+    >>> from django.db.models import OuterRef, Subquery
+    >>> newest = Comment.objects.filter(post=OuterRef('pk')).order_by('-created_at')
+    >>> Post.objects.annotate(newest_commenter_email=Subquery(newest.values('email')[:1]))
+
+On PostgreSQL, the SQL looks like:
+
+.. code-block:: sql
+
+    SELECT "post"."id", (
+        SELECT U0."email"
+        FROM "comment" U0
+        WHERE U0."post_id" = ("post"."id")
+        ORDER BY U0."created_at" DESC LIMIT 1
+    ) AS "newest_commenter_email" FROM "post"
+
+.. note::
+
+    The examples in this section are designed to show how to force
+    Django to execute a subquery. In some cases it may be possible to
+    write an equivalent queryset that performs the same task more
+    clearly or efficiently.
+
+Referencing columns from the outer queryset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: OuterRef(field)
+
+.. versionadded:: 1.11
+
+Use ``OuterRef`` when a queryset in a ``Subquery`` needs to refer to a field
+from the outer query. It acts like an :class:`F` expression except that the
+check to see if it refers to a valid field isn't made until the outer queryset
+is resolved.
+
+Instances of ``OuterRef`` may be used in conjunction with nested instances
+of ``Subquery`` to refer to a containing queryset that isn't the immediate
+parent. For example, this queryset would need to be within a nested pair of
+``Subquery`` instances to resolve correctly::
+
+    >>> Book.objects.filter(author=OuterRef(OuterRef('pk')))
+
+Limiting a subquery to a single column
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There are times when a single column must be returned from a ``Subquery``, for
+instance, to use a ``Subquery`` as the target of an ``__in`` lookup. To return
+all comments for posts published within the last day::
+
+    >>> from datetime import timedelta
+    >>> from django.utils import timezone
+    >>> one_day_ago = timezone.now() - timedelta(days=1)
+    >>> posts = Post.objects.filter(published_at__gte=one_day_ago)
+    >>> Comment.objects.filter(post__in=Subquery(posts.values('pk')))
+
+In this case, the subquery must use :meth:`~.QuerySet.values`
+to return only a single column: the primary key of the post.
+
+Limiting the subquery to a single row
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To prevent a subquery from returning multiple rows, a slice (``[:1]``) of the
+queryset is used::
+
+    >>> subquery = Subquery(newest.values('email')[:1])
+    >>> Post.objects.annotate(newest_commenter_email=subquery)
+
+In this case, the subquery must only return a single column *and* a single
+row: the email address of the most recently created comment.
+
+(Using :meth:`~.QuerySet.get` instead of a slice would fail because the
+``OuterRef`` cannot be resolved until the queryset is used within a
+``Subquery``.)
+
+``Exists()`` subqueries
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: Exists(queryset)
+
+.. versionadded:: 1.11
+
+``Exists`` is a ``Subquery`` subclass that uses an SQL ``EXISTS`` statement. In
+many cases it will perform better than a subquery since the database is able to
+stop evaluation of the subquery when a first matching row is found.
+
+For example, to annotate each post with whether or not it has a comment from
+within the last day::
+
+    >>> from django.db.models import Exists, OuterRef
+    >>> from datetime import timedelta
+    >>> from django.utils import timezone
+    >>> one_day_ago = timezone.now() - timedelta(days=1)
+    >>> recent_comments = Comment.objects.filter(
+    ...     post=OuterRef('pk'),
+    ...     created_at__gte=one_day_ago,
+    ... )
+    >>> Post.objects.annotate(recent_comment=Exists(recent_comments)
+
+On PostgreSQL, the SQL looks like:
+
+.. code-block:: sql
+
+    SELECT "post"."id", "post"."published_at", EXISTS(
+        SELECT U0."id", U0."post_id", U0."email", U0."created_at"
+        FROM "comment" U0
+        WHERE (
+            U0."created_at" >= YYYY-MM-DD HH:MM:SS AND
+            U0."post_id" = ("post"."id")
+        )
+    ) AS "recent_comment" FROM "post"
+
+It's unnecessary to force ``Exists`` to refer to a single column, since the
+columns are discarded and a boolean result is returned. Similarly, since
+ordering is unimportant within an SQL ``EXISTS`` subquery and would only
+degrade performance, it's automatically removed.
+
+You can query using ``NOT EXISTS`` with ``~Exists()``.
+
+Filtering on a ``Subquery`` expression
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's not possible to filter directly using ``Subquery`` and ``Exists``, e.g.::
+
+    >>> Post.objects.filter(Exists(recent_comments))
+    ...
+    TypeError: 'Exists' object is not iterable
+
+
+You must filter on a subquery expression by first annotating the queryset
+and then filtering based on that annotation::
+
+    >>> Post.objects.annotate(
+    ...     recent_comment=Exists(recent_comments),
+    ... ).filter(recent_comment=True)
+
+Using aggregates within a ``Subquery`` expression
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Aggregates may be used within a ``Subquery``, but they require a specific
+combination of :meth:`~.QuerySet.filter`, :meth:`~.QuerySet.values`, and
+:meth:`~.QuerySet.annotate` to get the subquery grouping correct.
+
+Assuming both models have a ``length`` field, to find posts where the post
+length is greater than the total length of all combined comments::
+
+    >>> from django.db.models import OuterRef, Subquery, Sum
+    >>> comments = Comment.objects.filter(post=OuterRef('pk')).values('post')
+    >>> total_comments = comments.annotate(total=Sum('length')).values('total')
+    >>> Post.objects.filter(length__gt=Subquery(total_comments))
+
+The initial ``filter(...)`` limits the subquery to the relevant parameters.
+``values('post')`` aggregates comments by ``Post``. Finally, ``annotate(...)``
+performs the aggregation. The order in which these queryset methods are applied
+is important. In this case, since the subquery must be limited to a single
+column, ``values('total')`` is required.
+
+This is the only way to perform an aggregation within a ``Subquery``, as
+using :meth:`~.QuerySet.aggregate` attempts to evaluate the queryset (and if
+there is an ``OuterRef``, this will not be possible to resolve).
+
 Raw SQL expressions
 -------------------
 

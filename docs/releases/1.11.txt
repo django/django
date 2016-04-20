@@ -70,6 +70,14 @@ template system rather than in Python. See :doc:`/ref/forms/renderers`.
 You may need to adjust any custom widgets that you've written for a few
 :ref:`backwards incompatible changes <template-widget-incompatibilities-1-11>`.
 
+``Subquery`` expressions
+------------------------
+
+The new :class:`~django.db.models.Subquery` and
+:class:`~django.db.models.Exists` database expressions allow creating
+explicit subqueries. Subqueries may refer to fields from the outer queryset
+using the :class:`~django.db.models.OuterRef` class.
+
 Minor features
 --------------
 
