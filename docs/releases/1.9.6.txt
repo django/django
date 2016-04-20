@@ -18,3 +18,6 @@ Bugfixes
 
 * Prevented ``makemigrations`` from generating infinite migrations for a model
   field that references a ``functools.partial`` (:ticket:`26475`).
+
+* Fixed a regression where ``SessionBase.pop()`` returned ``None`` rather than
+  raising a ``KeyError`` for nonexistent values (:ticket:`26520`).
