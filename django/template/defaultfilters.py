@@ -767,10 +767,10 @@ def time(value, arg=None):
         return ''
     try:
         return formats.time_format(value, arg)
-    except AttributeError:
+    except (AttributeError, TypeError):
         try:
             return time_format(value, arg)
-        except AttributeError:
+        except (AttributeError, TypeError):
             return ''
 
 
