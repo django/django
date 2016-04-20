@@ -83,6 +83,11 @@ class SessionTestsMixin(object):
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
 
+    def test_pop_default_named_argument(self):
+        self.assertEqual(self.session.pop('some key', default='does not exist'), 'does not exist')
+        self.assertTrue(self.session.accessed)
+        self.assertFalse(self.session.modified)
+
     def test_setdefault(self):
         self.assertEqual(self.session.setdefault('foo', 'bar'), 'bar')
         self.assertEqual(self.session.setdefault('foo', 'baz'), 'bar')
