@@ -158,8 +158,7 @@ class DateFormatTests(SimpleTestCase):
         my_birthday = date(1984, 8, 7)
 
         for specifier in ['a', 'A', 'f', 'g', 'G', 'h', 'H', 'i', 'P', 's', 'u']:
-            with self.assertRaises(TypeError):
+            msg = "The format for date objects may not contain time-related format specifiers " \
+                  "(found '%s')." % specifier
+            with self.assertRaisesMessage(TypeError, msg):
                 dateformat.format(my_birthday, specifier)
-
-
-

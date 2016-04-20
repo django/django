@@ -31,16 +31,14 @@ re_escaped = re.compile(r'\\(.)')
 
 class Formatter(object):
 
-    def format_piece(self, piece):
-        if type(self.data) is datetime.date and hasattr(TimeFormat, piece):
-            raise TypeError('The format for date objects may not contain time-related format specifiers')
-        return piece
-
     def format(self, formatstr):
         pieces = []
         for i, piece in enumerate(re_formatchars.split(force_text(formatstr))):
             if i % 2:
-                pieces.append(force_text(getattr(self, self.format_piece(piece))()))
+                if type(self.data) is datetime.date and hasattr(TimeFormat, piece):
+                    raise TypeError("The format for date objects may not contain time-related format specifiers "
+                                    "(found '%s')." % piece)
+                pieces.append(force_text(getattr(self, piece)()))
             elif piece:
                 pieces.append(re_escaped.sub(r'\1', piece))
         return ''.join(pieces)
