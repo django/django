@@ -205,9 +205,9 @@ You can edit it multiple times.
 
       Example: ``fav_color = request.session.get('fav_color', 'red')``
 
-    .. method:: pop(key)
+    .. method:: pop(key[, default])
 
-      Example: ``fav_color = request.session.pop('fav_color')``
+      Example: ``fav_color = request.session.pop('fav_color', 'blue')``
 
     .. method:: keys()
 
