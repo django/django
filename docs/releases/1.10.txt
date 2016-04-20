@@ -753,6 +753,9 @@ Miscellaneous
   model, you must convert them to attributes or properties as described in
   :ref:`the deprecation note <user-is-auth-anon-deprecation>`.
 
+* In the admin templates, ``<p class="help">`` was replaced with a div tag to
+  allow including lists inside help messages
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
