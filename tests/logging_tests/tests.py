@@ -90,20 +90,20 @@ class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
             self.logger.error("Hey, this is an error.")
             self.assertEqual(self.logger_output.getvalue(), 'Hey, this is an error.\n')
 
+    @override_settings(DEBUG=True)
     def test_django_logger_warning(self):
-        with self.settings(DEBUG=True):
-            self.logger.warning('warning')
-            self.assertEqual(self.logger_output.getvalue(), 'warning\n')
+        self.logger.warning('warning')
+        self.assertEqual(self.logger_output.getvalue(), 'warning\n')
 
+    @override_settings(DEBUG=True)
     def test_django_logger_info(self):
-        with self.settings(DEBUG=True):
-            self.logger.info('info')
-            self.assertEqual(self.logger_output.getvalue(), 'info\n')
+        self.logger.info('info')
+        self.assertEqual(self.logger_output.getvalue(), 'info\n')
 
+    @override_settings(DEBUG=True)
     def test_django_logger_debug(self):
-        with self.settings(DEBUG=True):
-            self.logger.debug('debug')
-            self.assertEqual(self.logger_output.getvalue(), '')
+        self.logger.debug('debug')
+        self.assertEqual(self.logger_output.getvalue(), '')
 
 
 class WarningLoggerTests(SimpleTestCase):
