@@ -1,7 +1,10 @@
 from django.contrib.gis import forms
-from django.contrib.gis.db.models.lookups import gis_lookups
+from django.contrib.gis.db.models.lookups import (
+    RasterBandTransform, gis_lookups,
+)
 from django.contrib.gis.db.models.proxy import SpatialProxy
 from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.expressions import Expression
@@ -157,6 +160,81 @@ class BaseSpatialField(Field):
         """
         return connection.ops.get_geom_placeholder(self, value, compiler)
 
+    def get_srid(self, obj):
+        """
+        Returns the default SRID for the given geometry or raster, taking into account
+        the SRID set for the field.  For example, if the input geometry or raster
+        has no SRID, then that of the field will be returned.
+        """
+        srid = obj.srid  # SRID of given geometry.
+        if srid is None or self.srid == -1 or (srid == -1 and self.srid != -1):
+            return self.srid
+        else:
+            return srid
+
+    def get_db_prep_save(self, value, connection):
+        """
+        Prepares the value for saving in the database.
+        """
+        if not value:
+            return None
+        else:
+            return connection.ops.Adapter(self.get_prep_value(value))
+
+    def get_prep_value(self, value):
+        """
+        Spatial lookup values are either a parameter that is (or may be
+        converted to) a geometry or raster, or a sequence of lookup values
+        that begins with a geometry or raster.  This routine will setup the
+        geometry or raster value properly, and preserve any other lookup
+        parameters before returning to the caller.
+        """
+        from django.contrib.gis.gdal import GDALRaster
+
+        value = super(BaseSpatialField, self).get_prep_value(value)
+        # For IsValid lookups, boolean values are allowed
+        if isinstance(value, (Expression, bool)):
+            return value
+        elif isinstance(value, (tuple, list)):
+            obj = value[0]
+            seq_value = True
+        else:
+            obj = value
+            seq_value = False
+
+        # When the input is not a geometry or raster, attempt to construct one
+        # from the given string input.
+        if isinstance(obj, (Geometry, GDALRaster)):
+            pass
+        elif isinstance(obj, (bytes, six.string_types)) or hasattr(obj, '__geo_interface__'):
+            try:
+                obj = Geometry(obj)
+            except (GeometryException, GDALException):
+                try:
+                    obj = GDALRaster(obj)
+                except GDALException:
+                    raise ValueError('Could not create spatial object from lookup value.')
+        elif isinstance(obj, dict):
+            try:
+                obj = GDALRaster(obj)
+            except GDALException:
+                raise ValueError('Could not create spatial object from lookup value.')
+        else:
+            raise ValueError('Cannot use object with type %s for a spatial lookup parameter.' % type(obj).__name__)
+
+        # Assigning the SRID value.
+        obj.srid = self.get_srid(obj)
+
+        if seq_value:
+            lookup_val = [obj]
+            lookup_val.extend(value[1:])
+            return tuple(lookup_val)
+        else:
+            return obj
+
+for klass in gis_lookups.values():
+    BaseSpatialField.register_lookup(klass)
+
 
 class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
     """
@@ -224,6 +302,8 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
         value properly, and preserve any other lookup parameters before
         returning to the caller.
         """
+        from django.contrib.gis.gdal import GDALRaster
+
         value = super(GeometryField, self).get_prep_value(value)
         if isinstance(value, (Expression, bool)):
             return value
@@ -236,7 +316,7 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
 
         # When the input is not a GEOS geometry, attempt to construct one
         # from the given string input.
-        if isinstance(geom, Geometry):
+        if isinstance(geom, (Geometry, GDALRaster)):
             pass
         elif isinstance(geom, (bytes, six.string_types)) or hasattr(geom, '__geo_interface__'):
             try:
@@ -264,18 +344,6 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             if not srid and self.srid != -1:
                 value.srid = self.srid
         return value
-
-    def get_srid(self, geom):
-        """
-        Returns the default SRID for the given geometry, taking into account
-        the SRID set for the field.  For example, if the input geometry
-        has no SRID, then that of the field will be returned.
-        """
-        gsrid = geom.srid  # SRID of given geometry.
-        if gsrid is None or self.srid == -1 or (gsrid == -1 and self.srid != -1):
-            return self.srid
-        else:
-            return gsrid
 
     # ### Routines overloaded from Field ###
     def contribute_to_class(self, cls, name, **kwargs):
@@ -337,17 +405,6 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             return self.get_prep_value(value)
         return super(GeometryField, self).get_prep_lookup(lookup_type, value)
 
-    def get_db_prep_save(self, value, connection):
-        "Prepares the value for saving in the database."
-        if not value:
-            return None
-        else:
-            return connection.ops.Adapter(self.get_prep_value(value))
-
-
-for klass in gis_lookups.values():
-    GeometryField.register_lookup(klass)
-
 
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
@@ -408,6 +465,7 @@ class RasterField(BaseSpatialField):
 
     description = _("Raster Field")
     geom_type = 'RASTER'
+    geography = False
 
     def __init__(self, *args, **kwargs):
         if not HAS_GDAL:
@@ -442,3 +500,15 @@ class RasterField(BaseSpatialField):
         # delays the instantiation of the objects to the moment of evaluation
         # of the raster attribute.
         setattr(cls, self.attname, SpatialProxy(GDALRaster, self))
+
+    def get_transform(self, name):
+        try:
+            band_index = int(name)
+            return type(
+                'SpecificRasterBandTransform',
+                (RasterBandTransform, ),
+                {'band_index': band_index}
+            )
+        except ValueError:
+            pass
+        return super(RasterField, self).get_transform(name)

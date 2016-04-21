@@ -52,8 +52,14 @@ on a different spatial backend.
 Raster Support
 --------------
 
-``RasterField`` is currently only implemented for the PostGIS backend. Spatial
-queries (such as lookups and distance) are not yet available for raster fields.
+The ``RasterField`` is currently only implemented for the PostGIS backend.
+Spatial lookups are available for raster fields, but spatial database functions
+and aggregates are not implemented for raster fields.
+
+.. versionchanged:: 1.10
+
+    ``RasterField`` now supports spatial lookups.
+
 
 Creating and Saving Models with Geometry Fields
 ===============================================
@@ -136,11 +142,20 @@ Spatial Lookups
 
 GeoDjango's lookup types may be used with any manager method like
 ``filter()``, ``exclude()``, etc.  However, the lookup types unique to
-GeoDjango are only available on geometry fields.
+GeoDjango are only available on spatial fields.
 Filters on 'normal' fields (e.g. :class:`~django.db.models.CharField`)
-may be chained with those on geographic fields.  Thus, geographic queries
-take the following general form (assuming  the ``Zipcode`` model used in the
-:doc:`model-api`)::
+may be chained with those on geographic fields. Geographic lookups accept
+geometry and raster input on both sides and input types can be mixed freely.
+
+The general structure of geographic lookups is described below, a
+complete reference can be found in the :ref:`spatial lookup reference
+<spatial-lookups>`.
+
+Geometry Lookups
+----------------
+
+Geographic queries with geometries take the following general form (assuming
+the ``Zipcode`` model used in the :doc:`model-api`)::
 
     >>> qs = Zipcode.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Zipcode.objects.exclude(...)
@@ -148,14 +163,59 @@ take the following general form (assuming  the ``Zipcode`` model used in the
 For example::
 
     >>> qs = Zipcode.objects.filter(poly__contains=pnt)
+    >>> qs = Elevation.objects.filter(poly__contains=rst)
 
 In this case, ``poly`` is the geographic field, :lookup:`contains <gis-contains>`
-is the spatial lookup type, and ``pnt`` is the parameter (which may be a
+is the spatial lookup type, ``pnt`` is the parameter (which may be a
 :class:`~django.contrib.gis.geos.GEOSGeometry` object or a string of
-GeoJSON , WKT, or HEXEWKB).
+GeoJSON , WKT, or HEXEWKB), and ``rst`` is a
+:class:`~django.contrib.gis.gdal.GDALRaster` object.
 
-A complete reference can be found in the :ref:`spatial lookup reference
-<spatial-lookups>`.
+.. _spatial-lookup-raster:
+
+Raster Lookups
+--------------
+
+.. versionadded:: 1.10
+
+The raster lookup syntax similar to the syntax for geometries. The only difference is
+that a band index can specified as additional input. If no band index is
+specified, the first band is used by default (index ``0``). In that case the syntax is
+identical to the syntax for geometry lookups.
+
+To specify the band index explicitly, an additional parameter can be specified on both
+sides of the lookup. On the left hand side, the double underscore syntax is used to pass
+a band index. On the right hand side, a tuple of the raster and band index can be specified.
+
+This results in the following general form for lookups involving rasters (assuming
+the ``Elevation`` model used in the :doc:`model-api`)::
+
+    >>> qs = Elevation.objects.filter(<field>__<lookup_type>=<parameter>)
+    >>> qs = Elevation.objects.filter(<field>__<band_index>__<lookup_type>=<parameter>)
+    >>> qs = Elevation.objects.filter(<field>__<lookup_type>=(<raster_input, <band_index>)
+
+Fore example::
+
+    >>> qs = Elevation.objects.filter(rast__contains=geom)
+    >>> qs = Elevation.objects.filter(rast__contains=rst)
+    >>> qs = Elevation.objects.filter(rast__1__contains=geom)
+    >>> qs = Elevation.objects.filter(rast__contains=(rst, 1))
+    >>> qs = Elevation.objects.filter(rast__1__contains=(rst, 1))
+
+On the left hand side of the example, ``rast`` is the geographic raster field
+and :lookup:`contains <gis-contains>` is the spatial lookup type. On the right
+hand side, ``geom`` is a geometry input, and ``rst`` is a
+:class:`~django.contrib.gis.gdal.GDALRaster` object. The band index defaults to
+``0`` in the first two queries, and is set to ``1`` on the others.
+
+While all spatial lookups can be used with raster objects on both sides, not all
+underlying operators natively accept raster input. For cases where the operator
+expects geometry input, the raster is automatically converted to a geometry. It
+is important to keep this in mind when interpreting the lookup results.
+
+The type of raster support is listed for all lookups in the
+:ref:`compatibility table <spatial-lookup-compatibility>`. Lookups involving
+rasters are currently only available for the PostGIS backend.
 
 .. _distance-queries:
 
@@ -176,7 +236,7 @@ in the :doc:`model-api` documentation for more details.
 Distance Lookups
 ----------------
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+*Availability*: PostGIS, Oracle, SpatiaLite, PGRaster (Native)
 
 The following distance lookups are available:
 
@@ -193,7 +253,7 @@ The following distance lookups are available:
 
 Distance lookups take a tuple parameter comprising:
 
-#. A geometry to base calculations from; and
+#. A geometry or raster to base calculations from; and
 #. A number or :class:`~django.contrib.gis.measure.Distance` object containing the distance.
 
 If a :class:`~django.contrib.gis.measure.Distance` object is used,
@@ -241,6 +301,16 @@ Then distance queries may be performed as follows::
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(mi=20)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(chain=100)))
 
+Raster queries work the same way by simply replacing the geometry field
+``point`` with a raster field, or the ``pnt`` object with a raster object, or
+both. To specify the band index of a raster input on the right hand side, a
+3-tuple can be passed to the lookup as follows::
+
+    >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(rst, 2, D(km=7)))
+
+Where the band with index 2 (the third band) of the raster ``rst`` would be
+used for the lookup.
+
 __ https://github.com/django/django/blob/master/tests/gis_tests/distapp/models.py
 
 .. _compatibility-table:
@@ -254,43 +324,46 @@ Spatial Lookups
 ---------------
 
 The following table provides a summary of what spatial lookups are available
-for each spatial database backend.
+for each spatial database backend. The PostGIS Raster (PGRaster) lookups are
+divided into the three categories described in the
+:ref:`raster lookup details <spatial-lookup-raster>`: native support ``N``,
+bilateral native support ``B``, and geometry conversion support ``C``.
 
-=================================  =========  ========  ============ ==========
-Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite
-=================================  =========  ========  ============ ==========
-:lookup:`bbcontains`               X                    X            X
-:lookup:`bboverlaps`               X                    X            X
-:lookup:`contained`                X                    X            X
-:lookup:`contains <gis-contains>`  X          X         X            X
-:lookup:`contains_properly`        X
-:lookup:`coveredby`                X          X
-:lookup:`covers`                   X          X
-:lookup:`crosses`                  X                                 X
-:lookup:`disjoint`                 X          X         X            X
-:lookup:`distance_gt`              X          X                      X
-:lookup:`distance_gte`             X          X                      X
-:lookup:`distance_lt`              X          X                      X
-:lookup:`distance_lte`             X          X                      X
-:lookup:`dwithin`                  X          X
-:lookup:`equals`                   X          X         X            X
-:lookup:`exact`                    X          X         X            X
-:lookup:`intersects`               X          X         X            X
+=================================  =========  ========  ============ ========== ========
+Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite PGRaster
+=================================  =========  ========  ============ ========== ========
+:lookup:`bbcontains`               X                    X            X          N
+:lookup:`bboverlaps`               X                    X            X          N
+:lookup:`contained`                X                    X            X          N
+:lookup:`contains <gis-contains>`  X          X         X            X          B
+:lookup:`contains_properly`        X                                            B
+:lookup:`coveredby`                X          X                                 B
+:lookup:`covers`                   X          X                                 B
+:lookup:`crosses`                  X                                 X          C
+:lookup:`disjoint`                 X          X         X            X          B
+:lookup:`distance_gt`              X          X                      X          N
+:lookup:`distance_gte`             X          X                      X          N
+:lookup:`distance_lt`              X          X                      X          N
+:lookup:`distance_lte`             X          X                      X          N
+:lookup:`dwithin`                  X          X                                 B
+:lookup:`equals`                   X          X         X            X          C
+:lookup:`exact`                    X          X         X            X          B
+:lookup:`intersects`               X          X         X            X          B
 :lookup:`isvalid`                  X
-:lookup:`overlaps`                 X          X         X            X
-:lookup:`relate`                   X          X                      X
-:lookup:`same_as`                  X          X         X            X
-:lookup:`touches`                  X          X         X            X
-:lookup:`within`                   X          X         X            X
-:lookup:`left`                     X
-:lookup:`right`                    X
-:lookup:`overlaps_left`            X
-:lookup:`overlaps_right`           X
-:lookup:`overlaps_above`           X
-:lookup:`overlaps_below`           X
-:lookup:`strictly_above`           X
-:lookup:`strictly_below`           X
-=================================  =========  ========  ============ ==========
+:lookup:`overlaps`                 X          X         X            X          B
+:lookup:`relate`                   X          X                      X          C
+:lookup:`same_as`                  X          X         X            X          B
+:lookup:`touches`                  X          X         X            X          B
+:lookup:`within`                   X          X         X            X          B
+:lookup:`left`                     X                                            C
+:lookup:`right`                    X                                            C
+:lookup:`overlaps_left`            X                                            B
+:lookup:`overlaps_right`           X                                            B
+:lookup:`overlaps_above`           X                                            C
+:lookup:`overlaps_below`           X                                            C
+:lookup:`strictly_above`           X                                            C
+:lookup:`strictly_below`           X                                            C
+=================================  =========  ========  ============ ========== ========
 
 .. _database-functions-compatibility:
 

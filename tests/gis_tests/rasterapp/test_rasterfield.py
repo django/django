@@ -1,19 +1,46 @@
 import json
 
+from django.contrib.gis.db.models.lookups import (
+    DistanceLookupBase, gis_lookups,
+)
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Q
 from django.test import (
     TestCase, TransactionTestCase, mock, skipUnlessDBFeature,
 )
 
 from ..data.rasters.textrasters import JSON_RASTER
 from ..models import models
-from .models import RasterModel
+from .models import RasterModel, RasterRelatedModel
 
 
 @skipUnlessDBFeature('supports_raster')
 class RasterFieldTest(TransactionTestCase):
     available_apps = ['gis_tests.rasterapp']
+
+    def setUp(self):
+        from django.contrib.gis.gdal import GDALRaster
+        rast = GDALRaster({
+            "srid": 4326,
+            "origin": [0, 0],
+            "scale": [-1, 1],
+            "skew": [0, 0],
+            "width": 5,
+            "height": 5,
+            "nr_of_bands": 2,
+            "bands": [{"data": range(25)}, {"data": range(25, 50)}]
+        })
+
+        model_instance = RasterModel.objects.create(
+            rast=rast,
+            rastprojected=rast,
+            geom="POINT (-95.37040 29.70486)"
+        )
+
+        RasterRelatedModel.objects.create(rastermodel=model_instance)
 
     def test_field_null_value(self):
         """
@@ -88,6 +115,228 @@ class RasterFieldTest(TransactionTestCase):
             RasterModel._meta.get_field('rast').verbose_name,
             'A Verbose Raster Name'
         )
+
+    def test_all_gis_lookups_with_rasters(self):
+        """
+        Evaluates all possible lookups for all input combinations (i.e.
+        raster-raster, raster-geom, geom-raster) and for projected and
+        unprojected coordinate systems. This test just checks that the lookup
+        can be called, but does not check if the result makes logical sense.
+        """
+        from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
+        from django.contrib.gis.gdal import GDALRaster
+
+        # Create test raster and geom.
+        rast = GDALRaster(json.loads(JSON_RASTER))
+        stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
+        stx_pnt.transform(3086)
+
+        # Loop through all the GIS lookups.
+        for name, lookup in gis_lookups.items():
+            # Construct lookup filter strings.
+            combo_keys = [
+                field + name for field in [
+                    'rast__', 'rast__', 'rastprojected__0__', 'rast__',
+                    'rastprojected__', 'geom__', 'rast__',
+                ]
+            ]
+
+            if issubclass(lookup, DistanceLookupBase):
+                # Set lookup values for distance lookups.
+                combo_values = [
+                    (rast, 50, 'spheroid'),
+                    (rast, 0, 50, 'spheroid'),
+                    (rast, 0, D(km=1)),
+                    (stx_pnt, 0, 500),
+                    (stx_pnt, D(km=1000)),
+                    (rast, 500),
+                    (json.loads(JSON_RASTER), 500),
+                ]
+            elif name == 'relate':
+                # Set lookup values for the relate lookup.
+                combo_values = [
+                    (rast, 'T*T***FF*'),
+                    (rast, 0, 'T*T***FF*'),
+                    (rast, 0, 'T*T***FF*'),
+                    (stx_pnt, 0, 'T*T***FF*'),
+                    (stx_pnt, 'T*T***FF*'),
+                    (rast, 'T*T***FF*'),
+                    (json.loads(JSON_RASTER), 'T*T***FF*'),
+                ]
+            elif name == 'isvalid':
+                # The isvalid lookup does not make sense for rasters.
+                continue
+            elif PostGISOperations.gis_operators[name].func:
+                # Set lookup values for all function based operators.
+                combo_values = [
+                    rast, (rast, 0), (rast, 0), (stx_pnt, 0), stx_pnt,
+                    rast, rast, json.loads(JSON_RASTER)
+                ]
+            else:
+                # Override band lookup for these, as it is not supported.
+                combo_keys[2] = 'rastprojected__' + name
+                # Set lookup values for all other operators.
+                combo_values = [rast, rast, rast, stx_pnt, stx_pnt, rast, rast, json.loads(JSON_RASTER)]
+
+            # Create query filter combinations.
+            combos = [{x[0]: x[1]} for x in zip(combo_keys, combo_values)]
+
+            for combo in combos:
+                # Apply this query filter.
+                qs = RasterModel.objects.filter(**combo)
+
+                # Evaluate normal filter qs.
+                self.assertTrue(qs.count() in [0, 1])
+
+            # Evaluate on conditional Q expressions.
+            qs = RasterModel.objects.filter(Q(**combos[0]) & Q(**combos[1]))
+            self.assertTrue(qs.count() in [0, 1])
+
+    def test_dwithin_gis_lookup_ouptut_with_rasters(self):
+        """
+        Checks the logical functionality of the dwithin lookup for different
+        input parameters.
+        """
+        from django.contrib.gis.gdal import GDALRaster
+
+        # Create test raster and geom.
+        rast = GDALRaster(json.loads(JSON_RASTER))
+        stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
+        stx_pnt.transform(3086)
+
+        # Filter raster with different lookup raster formats.
+        qs = RasterModel.objects.filter(rastprojected__dwithin=(rast, D(km=1)))
+        self.assertEqual(qs.count(), 1)
+
+        qs = RasterModel.objects.filter(rastprojected__dwithin=(json.loads(JSON_RASTER), D(km=1)))
+        self.assertEqual(qs.count(), 1)
+
+        qs = RasterModel.objects.filter(rastprojected__dwithin=(JSON_RASTER, D(km=1)))
+        self.assertEqual(qs.count(), 1)
+
+        # Filter in an unprojected coordinate system.
+        qs = RasterModel.objects.filter(rast__dwithin=(rast, 40))
+        self.assertEqual(qs.count(), 1)
+
+        # Filter with band index transform.
+        qs = RasterModel.objects.filter(rast__1__dwithin=(rast, 1, 40))
+        self.assertEqual(qs.count(), 1)
+        qs = RasterModel.objects.filter(rast__1__dwithin=(rast, 40))
+        self.assertEqual(qs.count(), 1)
+        qs = RasterModel.objects.filter(rast__dwithin=(rast, 1, 40))
+        self.assertEqual(qs.count(), 1)
+
+        # Filter raster by geom.
+        qs = RasterModel.objects.filter(rast__dwithin=(stx_pnt, 500))
+        self.assertEqual(qs.count(), 1)
+
+        qs = RasterModel.objects.filter(rastprojected__dwithin=(stx_pnt, D(km=10000)))
+        self.assertEqual(qs.count(), 1)
+
+        qs = RasterModel.objects.filter(rast__dwithin=(stx_pnt, 5))
+        self.assertEqual(qs.count(), 0)
+
+        qs = RasterModel.objects.filter(rastprojected__dwithin=(stx_pnt, D(km=100)))
+        self.assertEqual(qs.count(), 0)
+
+        # Filter geom by raster.
+        qs = RasterModel.objects.filter(geom__dwithin=(rast, 500))
+        self.assertEqual(qs.count(), 1)
+
+        # Filter through related model.
+        qs = RasterRelatedModel.objects.filter(rastermodel__rast__dwithin=(rast, 40))
+        self.assertEqual(qs.count(), 1)
+
+        # Filter through related model with band index transform
+        qs = RasterRelatedModel.objects.filter(rastermodel__rast__1__dwithin=(rast, 40))
+        self.assertEqual(qs.count(), 1)
+
+        # Filter through conditional statements.
+        qs = RasterModel.objects.filter(Q(rast__dwithin=(rast, 40)) & Q(rastprojected__dwithin=(stx_pnt, D(km=10000))))
+        self.assertEqual(qs.count(), 1)
+
+        # Filter through different lookup.
+        qs = RasterModel.objects.filter(rastprojected__bbcontains=rast)
+        self.assertEqual(qs.count(), 1)
+
+    def test_lookup_input_tuple_too_long(self):
+        from django.contrib.gis.gdal import GDALRaster
+        rast = GDALRaster(json.loads(JSON_RASTER))
+        qs = RasterModel.objects.filter(rast__bbcontains=(rast, 1, 2))
+        msg = 'Tuple too long for lookup bbcontains.'
+        with self.assertRaisesMessage(ValueError, msg):
+            qs.count()
+
+    def test_lookup_input_band_not_allowed(self):
+        from django.contrib.gis.gdal import GDALRaster
+        rast = GDALRaster(json.loads(JSON_RASTER))
+        qs = RasterModel.objects.filter(rast__bbcontains=(rast, 1))
+        msg = 'Band indices are not allowed for this operator, it works on bbox only.'
+        with self.assertRaisesMessage(ValueError, msg):
+            qs.count()
+
+    def test_isvalid_lookup_with_raster_error(self):
+        qs = RasterModel.objects.filter(rast__isvalid=True)
+        msg = 'The isvalid lookup is only available on geometry fields.'
+        with self.assertRaisesMessage(ValueError, msg):
+            qs.count()
+
+    def test_result_of_gis_lookup_with_rasters(self):
+        # Point is in the interior
+        qs = RasterModel.objects.filter(
+            rast__contains=GEOSGeometry('POINT (-0.5 0.5)', 4326)
+        )
+        self.assertEqual(qs.count(), 1)
+        # Point is in the exterior
+        qs = RasterModel.objects.filter(
+            rast__contains=GEOSGeometry('POINT (0.5 0.5)', 4326)
+        )
+        self.assertEqual(qs.count(), 0)
+        # A point on the boundary is not contained properly
+        qs = RasterModel.objects.filter(
+            rast__contains_properly=GEOSGeometry('POINT (0 0)', 4326)
+        )
+        self.assertEqual(qs.count(), 0)
+        # Raster is located left of the point
+        qs = RasterModel.objects.filter(
+            rast__left=GEOSGeometry('POINT (1 0)', 4326)
+        )
+        self.assertEqual(qs.count(), 1)
+
+    def test_lookup_with_raster_bbox(self):
+        from django.contrib.gis.gdal import GDALRaster
+        rast = GDALRaster(json.loads(JSON_RASTER))
+        # Shift raster upwards
+        rast.origin.y = 2
+        # The raster in the model is not strictly below
+        qs = RasterModel.objects.filter(
+            rast__strictly_below=rast
+        )
+        self.assertEqual(qs.count(), 0)
+        # Shift raster further upwards
+        rast.origin.y = 6
+        # The raster in the model is strictly below
+        qs = RasterModel.objects.filter(
+            rast__strictly_below=rast
+        )
+        self.assertEqual(qs.count(), 1)
+
+    def test_lookup_with_polygonized_raster(self):
+        from django.contrib.gis.gdal import GDALRaster
+        rast = GDALRaster(json.loads(JSON_RASTER))
+        # Move raster to overlap with the model point on the left side
+        rast.origin.x = -95.37040 + 1
+        rast.origin.y = 29.70486
+        # Raster overlaps with point in model
+        qs = RasterModel.objects.filter(geom__intersects=rast)
+        self.assertEqual(qs.count(), 1)
+        # Change left side of raster to be nodata values
+        rast.bands[0].data(data=[0, 0, 0, 1, 1], shape=(5, 1))
+        rast.bands[0].nodata_value = 0
+        qs = RasterModel.objects.filter(geom__intersects=rast)
+        # Raster does not overlap anymore after polygonization
+        # where the nodata zone is not included.
+        self.assertEqual(qs.count(), 0)
 
 
 @mock.patch('django.contrib.gis.db.models.fields.HAS_GDAL', False)
