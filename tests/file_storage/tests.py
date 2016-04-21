@@ -644,6 +644,31 @@ class CustomStorageLegacyDatetimeHandlingTests(FileStorageTests):
     storage_class = CustomStorageLegacyDatetimeHandling
 
 
+class CustomStorageDiscardingFalseContent(FileSystemStorage):
+    def _save(self, name, content):
+        if content:
+            return super(CustomStorageDiscardingFalseContent, self)._save(name, content)
+        return ''
+
+
+class CustomStorageDiscardingFalseContentTests(FileStorageTests):
+    storage_class = CustomStorageDiscardingFalseContent
+
+    def test_custom_storage_discarding_empty_content(self):
+        self.storage.save('contentfile', ContentFile('content file'))
+        self.assertTrue(self.storage.exists('contentfile'))
+
+        with self.storage.open('contentfile') as f:
+            self.assertEqual(f.read(), b'content file')
+
+        output = six.StringIO('content')
+        self.storage.save('tests/stringio', output)
+        self.assertTrue(self.storage.exists('tests/stringio'))
+
+        with self.storage.open('tests/stringio') as f:
+            self.assertEqual(f.read(), b'content')
+
+
 class FileFieldStorageTests(TestCase):
     def tearDown(self):
         shutil.rmtree(temp_storage_location)
