@@ -82,9 +82,9 @@ class OperationTests(TransactionTestCase):
         operation = migration_class(*args)
         new_state = project_state.clone()
         operation.state_forwards('gis', new_state)
+        self.current_state = new_state
         with connection.schema_editor() as editor:
             operation.database_forwards('gis', editor, project_state, new_state)
-        self.current_state = new_state
 
     def test_add_geom_field(self):
         """
