@@ -276,6 +276,7 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite
 :lookup:`equals`                   X          X         X            X
 :lookup:`exact`                    X          X         X            X
 :lookup:`intersects`               X          X         X            X
+:lookup:`isvalid`                  X
 :lookup:`overlaps`                 X          X         X            X
 :lookup:`relate`                   X          X                      X
 :lookup:`same_as`                  X          X         X            X
@@ -318,7 +319,9 @@ Function                              PostGIS  Oracle  MySQL        SpatiaLite
 :class:`ForceRHR`                     X
 :class:`GeoHash`                      X                             X (≥ 4.0, LWGEOM)
 :class:`Intersection`                 X        X       X (≥ 5.6.1)  X
+:class:`IsValid`                      X
 :class:`Length`                       X        X       X            X
+:class:`MakeValid`                    X
 :class:`MemSize`                      X
 :class:`NumGeometries`                X        X       X            X
 :class:`NumPoints`                    X        X       X            X
