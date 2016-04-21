@@ -66,6 +66,7 @@ class LoggingFiltersTest(SimpleTestCase):
             self.assertEqual(filter_.filter("record is not used"), False)
 
 
+@override_settings(ROOT_URLCONF='logging_tests.urls')
 class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
 
     @classmethod
@@ -90,20 +91,67 @@ class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
             self.logger.error("Hey, this is an error.")
             self.assertEqual(self.logger_output.getvalue(), 'Hey, this is an error.\n')
 
+    @override_settings(DEBUG=True)
     def test_django_logger_warning(self):
-        with self.settings(DEBUG=True):
-            self.logger.warning('warning')
-            self.assertEqual(self.logger_output.getvalue(), 'warning\n')
+        self.logger.warning('warning')
+        self.assertEqual(self.logger_output.getvalue(), 'warning\n')
 
+    @override_settings(DEBUG=True)
     def test_django_logger_info(self):
-        with self.settings(DEBUG=True):
-            self.logger.info('info')
-            self.assertEqual(self.logger_output.getvalue(), 'info\n')
+        self.logger.info('info')
+        self.assertEqual(self.logger_output.getvalue(), 'info\n')
 
+    @override_settings(DEBUG=True)
     def test_django_logger_debug(self):
-        with self.settings(DEBUG=True):
-            self.logger.debug('debug')
-            self.assertEqual(self.logger_output.getvalue(), '')
+        self.logger.debug('debug')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
+    @override_settings(DEBUG=True)
+    def test_page_found_no_warning(self):
+        self.client.get('/innocent/')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
+    @override_settings(DEBUG=True)
+    def test_page_not_found_warning(self):
+        self.client.get('/does_not_exist/')
+        self.assertEqual(self.logger_output.getvalue(), 'Not Found: /does_not_exist/\n')
+
+
+@override_settings(
+    USE_I18N=True,
+    LANGUAGES=[
+        ('en', 'English'),
+    ],
+    MIDDLEWARE_CLASSES=[
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    ],
+    ROOT_URLCONF='logging_tests.urls_i18n',
+)
+class I18NLoggingTest(LoggingCaptureMixin, SimpleTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(I18NLoggingTest, cls).setUpClass()
+        cls._logging = settings.LOGGING
+        logging.config.dictConfig(DEFAULT_LOGGING)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(I18NLoggingTest, cls).tearDownClass()
+        logging.config.dictConfig(cls._logging)
+
+    @override_settings(DEBUG=True)
+    def test_i18n_page_found_no_warning(self):
+        self.client.get('/exists/')
+        self.client.get('/en/exists/')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
+    @override_settings(DEBUG=True)
+    def test_i18n_page_not_found_warning(self):
+        self.client.get('/this_does_not/')
+        self.client.get('/en/nor_this/')
+        self.assertEqual(self.logger_output.getvalue(), 'Not Found: /this_does_not/\nNot Found: /en/nor_this/\n')
 
 
 class WarningLoggerTests(SimpleTestCase):
