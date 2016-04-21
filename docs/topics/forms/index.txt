@@ -514,7 +514,7 @@ Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance:
     <p><label for="id_subject">Subject:</label>
         <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
     <p><label for="id_message">Message:</label>
-        <input type="text" name="message" id="id_message" /></p>
+        <textarea name="message" id="id_message"></textarea></p>
     <p><label for="id_sender">Sender:</label>
         <input type="email" name="sender" id="id_sender" /></p>
     <p><label for="id_cc_myself">Cc myself:</label>
