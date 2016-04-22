@@ -32,9 +32,18 @@ Fields
         ``max_length=191`` because MySQL can only create unique indexes with
         191 characters in that case by default.
 
+        .. admonition:: Usernames and Unicode
+
+            Django used to only accept ASCII letters in usernames. This changed,
+            albeit unnoticed when Python 3 support was added in Django 1.6.
+            Then Django 1.10 officially added Unicode support in usernames, with
+            :attr:`the ability to revert to the ASCII-only usernames
+            <username_validator>` if desired.
+
         .. versionchanged:: 1.10
 
-            The ``max_length`` increased from 30 to 150 characters.
+            The ``max_length`` increased from 30 to 150 characters. Unicode
+            usernames are supported, whatever the version of Python.
 
     .. attribute:: first_name
 
@@ -115,6 +124,25 @@ Attributes
 ----------
 
 .. class:: models.User
+
+    .. attribute:: username_validator
+
+        .. versionadded:: 1.10
+
+        This attributes points to a validator instance which is used to validate
+        usernames. Defaults to :class:`validators.UnicodeUsernameValidator()`.
+        If you'd rather not allow non-ASCII characters in usernames, you can
+        subclass the ``User`` model and replace this attribute value by a
+        :class:`validators.ASCIIUsernameValidator()` instance::
+
+            from django.contrib.auth.models import User
+            from django.contrib.auth.validators import ASCIIUsernameValidator
+
+            class CustomUser(User):
+                username_validator = ASCIIUsernameValidator()
+
+                class Meta:
+                    proxy = True  # If no new field is added.
 
     .. attribute:: is_authenticated
 
@@ -285,6 +313,22 @@ Manager methods
         Same as :meth:`create_user`, but sets :attr:`~models.User.is_staff` and
         :attr:`~models.User.is_superuser` to ``True``.
 
+Validators
+==========
+
+.. class:: validators.ASCIIUsernameValidator
+
+    .. versionadded:: 1.10
+
+    A field validator allowing only ASCII letters, in addition to ``@``, ``.``,
+    ``+``, ``-``, and ``_``.
+
+.. class:: validators.UnicodeUsernameValidator
+
+    .. versionadded:: 1.10
+
+    A field validator allowing Unicode letters, in addition to ``@``, ``.``,
+    ``+``, ``-``, and ``_``.
 
 ``AnonymousUser`` object
 ========================

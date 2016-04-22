@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import warnings
@@ -55,6 +56,10 @@ class BasicTestCase(TestCase):
         # Check API-based user creation with no password
         u2 = User.objects.create_user('testuser2', 'test2@example.com')
         self.assertFalse(u2.has_usable_password())
+
+    def test_unicode_username(self):
+        User.objects.create_user('jörg')
+        User.objects.create_user('Григорий')
 
     def test_is_anonymous_authenticated_method_deprecation(self):
         deprecation_message = (
