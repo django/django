@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
+import itertools
 import os
 import re
 import sys
@@ -119,7 +120,8 @@ class Field(object):
         messages.update(error_messages or {})
         self.error_messages = messages
 
-        self.validators = self.default_validators + validators
+        self.validators = list(itertools.chain(self.default_validators, validators))
+
         super(Field, self).__init__()
 
     def prepare_value(self, value):

@@ -5,6 +5,7 @@ import collections
 import copy
 import datetime
 import decimal
+import itertools
 import uuid
 import warnings
 from base64 import b64decode, b64encode
@@ -531,9 +532,11 @@ class Field(RegisterLookupMixin):
 
     @cached_property
     def validators(self):
-        # Some validators can't be created at field initialization time.
-        # This method provides a way to delay their creation until required.
-        return self.default_validators + self._validators
+        """
+        Some validators can't be created at field initialization time.
+        This method provides a way to delay their creation until required.
+        """
+        return list(itertools.chain(self.default_validators, self._validators))
 
     def run_validators(self, value):
         if value in self.empty_values:
