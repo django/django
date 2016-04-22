@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import unittest
+import warnings
 
 from django.conf import settings
 from django.core.checks import Error
@@ -739,3 +740,24 @@ class OtherModelTests(SimpleTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+    def test_missing_parent_link(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+
+            class Place(models.Model):
+                pass
+
+            class ParkingLot(Place):
+                # In lieu of any other connector, an existing OneToOneField will be
+                # promoted to the primary key.
+                parent = models.OneToOneField(Place, models.CASCADE)
+
+        self.assertEqual(len(warns), 1)
+        msg = str(warns[0].message)
+        self.assertEqual(
+            msg,
+            'Add parent_link=True to invalid_models_tests.ParkingLot.parent '
+            'as an implicit link is deprecated.'
+        )
+        self.assertEqual(ParkingLot._meta.pk.name, 'parent')
