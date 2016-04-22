@@ -301,7 +301,7 @@ class InheritBaseModel(BaseModel):
 
 
 class ExplicitInheritBaseModel(BaseModel):
-    parent = models.OneToOneField(BaseModel, models.CASCADE)
+    parent = models.OneToOneField(BaseModel, models.CASCADE, parent_link=True)
     child_data = models.IntegerField()
 
 
