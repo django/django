@@ -37,6 +37,22 @@ It also now includes trigram support, using the :lookup:`trigram_similar`
 lookup, and the :class:`~django.contrib.postgres.search.TrigramSimilarity` and
 :class:`~django.contrib.postgres.search.TrigramDistance` expressions.
 
+Official support for Unicode usernames
+--------------------------------------
+
+The :class:`~django.contrib.auth.models.User` model in ``django.contrib.auth``
+originally only accepted ASCII letters in usernames. Although it wasn't a
+deliberate choice, Unicode characters have always been accepted when using
+Python 3.
+
+The username validator now explicitly accepts Unicode letters by
+default on Python 3 only. This default behavior can be overridden by changing
+the :attr:`~django.contrib.auth.models.User.username_validator` attribute of
+the ``User`` model, or to any proxy of that model, using either
+:class:`~django.contrib.auth.validators.ASCIIUsernameValidator` or
+:class:`~django.contrib.auth.validators.UnicodeUsernameValidator`. Custom user
+models may also use those validators.
+
 Minor features
 --------------
 
