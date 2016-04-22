@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import unicodedata
+
 from django import forms
 from django.contrib.auth import (
     authenticate, get_user_model, password_validation,
@@ -60,6 +62,11 @@ class ReadOnlyPasswordHashField(forms.Field):
         return False
 
 
+class UsernameField(forms.CharField):
+    def to_python(self, value):
+        return unicodedata.normalize('NFKC', super(UsernameField, self).to_python(value))
+
+
 class UserCreationForm(forms.ModelForm):
     """
     A form that creates a user, with no privileges, from the given username and
@@ -83,6 +90,7 @@ class UserCreationForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ("username",)
+        field_classes = {'username': UsernameField}
 
     def __init__(self, *args, **kwargs):
         super(UserCreationForm, self).__init__(*args, **kwargs)
@@ -121,6 +129,7 @@ class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
         fields = '__all__'
+        field_classes = {'username': UsernameField}
 
     def __init__(self, *args, **kwargs):
         super(UserChangeForm, self).__init__(*args, **kwargs)
@@ -140,7 +149,7 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = forms.CharField(
+    username = UsernameField(
         max_length=254,
         widget=forms.TextInput(attrs={'autofocus': ''}),
     )
