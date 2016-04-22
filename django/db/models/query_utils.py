@@ -76,16 +76,6 @@ class Q(tree.Node):
         obj.negate()
         return obj
 
-    def clone(self):
-        clone = self.__class__._new_instance(
-            children=[], connector=self.connector, negated=self.negated)
-        for child in self.children:
-            if hasattr(child, 'clone'):
-                clone.children.append(child.clone())
-            else:
-                clone.children.append(child)
-        return clone
-
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
