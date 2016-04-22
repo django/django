@@ -726,6 +726,14 @@ utility methods:
         A ``classmethod`` that normalizes email addresses by lowercasing
         the domain portion of the email address.
 
+    .. method:: models.BaseUserManager.normalize_username(email)
+
+        .. versionadded:: 1.10
+
+        A ``classmethod`` that normalizes username inputs by using NFKC Unicode
+        normalization, so as visually identical characters with different
+        Unicode code points are considered identical.
+
     .. method:: models.BaseUserManager.get_by_natural_key(username)
 
         Retrieves a user instance using the contents of the field
