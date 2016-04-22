@@ -255,6 +255,11 @@ class Options(object):
                     field = already_created[0]
                 field.primary_key = True
                 self.setup_pk(field)
+                if not field.remote_field.parent_link:
+                    warnings.warn(
+                        'Add parent_link=True to %s as an implicit link is '
+                        'deprecated.' % field, RemovedInDjango20Warning
+                    )
             else:
                 auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
                 model.add_to_class('id', auto)

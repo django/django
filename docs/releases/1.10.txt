@@ -980,6 +980,9 @@ Miscellaneous
   favor of class-based views :class:`~django.views.i18n.JavaScriptCatalog`
   and :class:`~django.views.i18n.JSONCatalog`.
 
+* In multi-table inheritance, implicit promotion of a ``OneToOneField`` to a
+  ``parent_link`` is deprecated. Add ``parent_link=True`` to such fields.
+
 .. _removed-features-1.10:
 
 Features removed in 1.10

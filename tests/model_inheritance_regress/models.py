@@ -45,12 +45,6 @@ class ParkingLot(Place):
         return "%s the parking lot" % self.name
 
 
-class ParkingLot2(Place):
-    # In lieu of any other connector, an existing OneToOneField will be
-    # promoted to the primary key.
-    parent = models.OneToOneField(Place, models.CASCADE)
-
-
 class ParkingLot3(Place):
     # The parent_link connector need not be the pk on the model.
     primary_key = models.AutoField(primary_key=True)
