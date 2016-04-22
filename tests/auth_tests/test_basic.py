@@ -7,6 +7,7 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ImproperlyConfigured
+from django.db import IntegrityError
 from django.dispatch import receiver
 from django.test import TestCase, override_settings
 from django.test.signals import setting_changed
@@ -60,6 +61,12 @@ class BasicTestCase(TestCase):
     def test_unicode_username(self):
         User.objects.create_user('jörg')
         User.objects.create_user('Григорий')
+        # Two equivalent unicode normalized usernames should be duplicates
+        omega_username = 'iamtheΩ'  # U+03A9 GREEK CAPITAL LETTER OMEGA
+        ohm_username = 'iamtheΩ'  # U+2126 OHM SIGN
+        User.objects.create_user(ohm_username)
+        with self.assertRaises(IntegrityError):
+            User.objects.create_user(omega_username)
 
     def test_is_anonymous_authenticated_method_deprecation(self):
         deprecation_message = (
