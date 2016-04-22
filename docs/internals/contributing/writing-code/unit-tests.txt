@@ -142,7 +142,7 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
-*  argon2-cffi_ 16.0.0+
+*  argon2-cffi_ 16.1.0+
 *  bcrypt_
 *  docutils_
 *  enum34_ (Python 2 only)
