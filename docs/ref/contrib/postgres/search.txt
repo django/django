@@ -30,7 +30,7 @@ single column in the database. For example::
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]
 
 This creates a ``to_tsvector`` in the database from the ``body_text`` field
-and a ``plainto_tsquery`` from the search term ``'Potato'``, both using the
+and a ``plainto_tsquery`` from the search term ``'Cheese'``, both using the
 default database search configuration. The results are obtained by matching the
 query and the vector.
 
@@ -185,7 +185,7 @@ described in the `PostgreSQL documentation`_. You can then query the field as
 if it were an annotated ``SearchVector``::
 
     >>> Entry.objects.update(search_vector=SearchVector('body_text'))
-    >>> Entry.objects.filter(search_vector='potato')
+    >>> Entry.objects.filter(search_vector='cheese')
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
 
 .. _PostgreSQL documentation: http://www.postgresql.org/docs/current/static/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
