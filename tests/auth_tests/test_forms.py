@@ -16,7 +16,7 @@ from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field
 from django.test import SimpleTestCase, TestCase, mock, override_settings
-from django.utils import translation
+from django.utils import six, translation
 from django.utils.encoding import force_text
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -103,6 +103,20 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         u = form.save()
         self.assertEqual(password_changed.call_count, 1)
         self.assertEqual(repr(u), '<User: jsmith@example.com>')
+
+    def test_unicode_username(self):
+        data = {
+            'username': '宝',
+            'password1': 'test123',
+            'password2': 'test123',
+        }
+        form = UserCreationForm(data)
+        if six.PY3:
+            self.assertTrue(form.is_valid())
+            u = form.save()
+            self.assertEqual(u.username, '宝')
+        else:
+            self.assertFalse(form.is_valid())
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -249,6 +263,16 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         data = {
             'username': 'testclient',
             'password': 'password',
+        }
+        form = AuthenticationForm(None, data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.non_field_errors(), [])
+
+    def test_unicode_username(self):
+        User.objects.create_user(username='Σαρα', password='pwd')
+        data = {
+            'username': 'Σαρα',
+            'password': 'pwd',
         }
         form = AuthenticationForm(None, data)
         self.assertTrue(form.is_valid())
