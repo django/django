@@ -783,14 +783,7 @@ class Field(RegisterLookupMixin):
             value = self.get_prep_lookup(lookup_type, value)
             prepared = True
 
-        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
-            return [self.get_db_prep_value(value, connection=connection,
-                                           prepared=prepared)]
-        elif lookup_type in ('range', 'in'):
-            return [self.get_db_prep_value(v, connection=connection,
-                                           prepared=prepared) for v in value]
-        else:
-            return [value]
+        return [value]
 
     def has_default(self):
         """
