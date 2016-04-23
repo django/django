@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.db import connection, models
+from django.db import models
 from django.test import TestCase
 
 from .models import BigD, Foo
@@ -27,9 +27,10 @@ class DecimalFieldTests(TestCase):
         self.assertEqual(f._format(f.to_python('2.6')), '2.6')
         self.assertEqual(f._format(None), None)
 
-    def test_get_db_prep_lookup(self):
+    def test_get_prep_value(self):
         f = models.DecimalField(max_digits=5, decimal_places=1)
-        self.assertEqual(f.get_db_prep_lookup('exact', None, connection=connection), [None])
+        self.assertEqual(f.get_prep_value(None), None)
+        self.assertEqual(f.get_prep_value('2.4'), Decimal('2.4'))
 
     def test_filter_with_strings(self):
         """

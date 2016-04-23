@@ -154,7 +154,7 @@ class RangeContainedBy(models.Lookup):
         return sql % (lhs, rhs), params
 
     def get_prep_lookup(self):
-        return RangeField().get_prep_lookup(self.lookup_name, self.rhs)
+        return RangeField().get_prep_value(self.rhs)
 
 
 models.DateField.register_lookup(RangeContainedBy)

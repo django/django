@@ -16,6 +16,7 @@ from django.utils.six.moves import range
 
 class Lookup(object):
     lookup_name = None
+    prepare_rhs = True
 
     def __init__(self, lhs, rhs):
         self.lhs, self.rhs = lhs, rhs
@@ -56,12 +57,14 @@ class Lookup(object):
         return sqls, sqls_params
 
     def get_prep_lookup(self):
-        return self.lhs.output_field.get_prep_lookup(self.lookup_name, self.rhs)
+        if hasattr(self.rhs, '_prepare'):
+            return self.rhs._prepare(self.lhs.output_field)
+        if self.prepare_rhs and hasattr(self.lhs.output_field, 'get_prep_value'):
+            return self.lhs.output_field.get_prep_value(self.rhs)
+        return self.rhs
 
     def get_db_prep_lookup(self, value, connection):
-        return (
-            '%s', self.lhs.output_field.get_db_prep_lookup(
-                self.lookup_name, value, connection, prepared=True))
+        return ('%s', [value])
 
     def process_lhs(self, compiler, connection, lhs=None):
         lhs = lhs or self.lhs
@@ -199,6 +202,7 @@ Field.register_lookup(Exact)
 
 class IExact(BuiltinLookup):
     lookup_name = 'iexact'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(IExact, self).process_rhs(qn, connection)
@@ -253,6 +257,13 @@ IntegerField.register_lookup(IntegerLessThan)
 
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = 'in'
+
+    def get_prep_lookup(self):
+        if hasattr(self.rhs, '_prepare'):
+            return self.rhs._prepare(self.lhs.output_field)
+        if hasattr(self.lhs.output_field, 'get_prep_value'):
+            return [self.lhs.output_field.get_prep_value(v) for v in self.rhs]
+        return self.rhs
 
     def process_rhs(self, compiler, connection):
         db_rhs = getattr(self.rhs, '_db', None)
@@ -335,6 +346,7 @@ class PatternLookup(BuiltinLookup):
 
 class Contains(PatternLookup):
     lookup_name = 'contains'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(Contains, self).process_rhs(qn, connection)
@@ -346,11 +358,13 @@ Field.register_lookup(Contains)
 
 class IContains(Contains):
     lookup_name = 'icontains'
+    prepare_rhs = False
 Field.register_lookup(IContains)
 
 
 class StartsWith(PatternLookup):
     lookup_name = 'startswith'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(StartsWith, self).process_rhs(qn, connection)
@@ -362,6 +376,7 @@ Field.register_lookup(StartsWith)
 
 class IStartsWith(PatternLookup):
     lookup_name = 'istartswith'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(IStartsWith, self).process_rhs(qn, connection)
@@ -373,6 +388,7 @@ Field.register_lookup(IStartsWith)
 
 class EndsWith(PatternLookup):
     lookup_name = 'endswith'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(EndsWith, self).process_rhs(qn, connection)
@@ -384,6 +400,7 @@ Field.register_lookup(EndsWith)
 
 class IEndsWith(PatternLookup):
     lookup_name = 'iendswith'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(IEndsWith, self).process_rhs(qn, connection)
@@ -395,6 +412,11 @@ Field.register_lookup(IEndsWith)
 
 class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = 'range'
+
+    def get_prep_lookup(self):
+        if hasattr(self.rhs, '_prepare'):
+            return self.rhs._prepare(self.lhs.output_field)
+        return [self.lhs.output_field.get_prep_value(v) for v in self.rhs]
 
     def get_rhs_op(self, connection, rhs):
         return "BETWEEN %s AND %s" % (rhs[0], rhs[1])
@@ -411,6 +433,7 @@ Field.register_lookup(Range)
 
 class IsNull(BuiltinLookup):
     lookup_name = 'isnull'
+    prepare_rhs = False
 
     def as_sql(self, compiler, connection):
         sql, params = compiler.compile(self.lhs)
@@ -423,6 +446,7 @@ Field.register_lookup(IsNull)
 
 class Search(BuiltinLookup):
     lookup_name = 'search'
+    prepare_rhs = False
 
     def as_sql(self, compiler, connection):
         warnings.warn(
@@ -438,6 +462,7 @@ Field.register_lookup(Search)
 
 class Regex(BuiltinLookup):
     lookup_name = 'regex'
+    prepare_rhs = False
 
     def as_sql(self, compiler, connection):
         if self.lookup_name in connection.operators:
