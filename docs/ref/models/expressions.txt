@@ -170,6 +170,46 @@ robust: it will only ever update the field based on the value of the field in
 the database when the :meth:`~Model.save()` or ``update()`` is executed, rather
 than based on its value when the instance was retrieved.
 
+.. _avoiding-unintended-increment-or-decrement-using-f:
+
+Avoiding unintended increment or decrement using ``F()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you call :meth:`~Model.save()` more than once in the same scope, Django will
+execute an ``UPDATE`` that many times.
+
+Given this model::
+
+    class UserProfile(models.Model):
+        up_votes    = models.IntegerField(default=0)
+        down_votes  = models.IntegerField(default=0)
+        message     = models.CharField(max_length=512)
+
+One might decide to call :meth:`~Model.save()` twice::
+    
+    from django.db.models import F
+
+    user_profile = UserProfile.objects.get(pk=1)
+    user_profile.up_votes = F('up_votes') + 1
+    user_profile.save()
+
+    user_profile.message = 'I just cast an up vote!'
+    user_profile.save()
+    
+Due to the way :meth:`~Model.save()` works, an ``UPDATE`` will be executed 
+twice. This means that if ``up_votes`` was previously ``1``, the new value 
+will be ``3``. Instead, we could have done::
+
+    from django.db.models import F
+
+    user_profile = UserProfile.objects.get(pk=1)
+    user_profile.up_votes = F('up_votes') + 1
+    user_profile.message = 'I just cast an up vote!'
+    user_profile.save()
+
+Calling :meth:`~Model.save()` only once within the same scope ensures that 
+this unintended increment does not occur.
+
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
