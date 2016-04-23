@@ -259,6 +259,7 @@ class UtilsTests(SimpleTestCase):
             label_for_field(lambda x: "nothing", Article),
             "--"
         )
+        self.assertEqual(label_for_field('site_id', Article), 'Site id')
 
         class MockModelAdmin(object):
             def test_from_model(self, obj):

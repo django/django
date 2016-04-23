@@ -253,6 +253,10 @@ Miscellaneous
 * CSRF failures are logged to the ``django.security.csrf ``` logger instead of
   ``django.request``.
 
+* Using a foreign key's id (e.g. ``'field_id'``) in ``ModelAdmin.list_display``
+  displays the related object's ID instead of ``repr(object)``. Remove the
+  ``_id`` suffix if you want the ``repr()``.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
