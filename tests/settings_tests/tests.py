@@ -256,6 +256,8 @@ class SettingsTests(SimpleTestCase):
             del settings.USE_L10N
             with self.assertRaises(AttributeError):
                 getattr(settings, 'USE_L10N')
+            self.assertNotIn('USE_I18N', dir(settings))
+            self.assertNotIn('USE_L10N', dir(settings))
         self.assertEqual(settings.USE_I18N, previous_i18n)
         self.assertEqual(settings.USE_L10N, previous_l10n)
 
