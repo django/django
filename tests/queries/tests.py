@@ -3764,42 +3764,42 @@ class Ticket23622Tests(TestCase):
         c1 = Ticket23605C.objects.create(field_c0=0.0)
         Ticket23605B.objects.create(
             modela_fk=a1, field_b0=123,
-            field_b1=datetime.date(2013, 1, 6),
+            field_b1=True,
             modelc_fk=c1,
         )
         Ticket23605B.objects.create(
             modela_fk=a1, field_b0=23,
-            field_b1=datetime.date(2011, 6, 6),
+            field_b1=True,
             modelc_fk=c1,
         )
         Ticket23605B.objects.create(
             modela_fk=a1, field_b0=234,
-            field_b1=datetime.date(2011, 9, 2),
+            field_b1=True,
             modelc_fk=c1,
         )
         Ticket23605B.objects.create(
             modela_fk=a1, field_b0=12,
-            field_b1=datetime.date(2012, 9, 15),
+            field_b1=True,
             modelc_fk=c1,
         )
         Ticket23605B.objects.create(
             modela_fk=a2, field_b0=567,
-            field_b1=datetime.date(2014, 3, 1),
+            field_b1=True,
             modelc_fk=c1,
         )
         Ticket23605B.objects.create(
             modela_fk=a2, field_b0=76,
-            field_b1=datetime.date(2011, 3, 3),
+            field_b1=True,
             modelc_fk=c1,
         )
         Ticket23605B.objects.create(
             modela_fk=a2, field_b0=7,
-            field_b1=datetime.date(2012, 10, 20),
+            field_b1=True,
             modelc_fk=c1,
         )
         Ticket23605B.objects.create(
             modela_fk=a2, field_b0=56,
-            field_b1=datetime.date(2011, 1, 27),
+            field_b1=True,
             modelc_fk=c1,
         )
         qx = (
