@@ -31,13 +31,6 @@ class JSONField(Field):
             return Json(value)
         return value
 
-    def get_prep_lookup(self, lookup_type, value):
-        if lookup_type in ('has_key', 'has_keys', 'has_any_keys'):
-            return value
-        if isinstance(value, (dict, list)):
-            return Json(value)
-        return super(JSONField, self).get_prep_lookup(lookup_type, value)
-
     def validate(self, value, model_instance):
         super(JSONField, self).validate(value, model_instance)
         try:

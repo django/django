@@ -577,67 +577,6 @@ the end. You should also update the model's attribute if you make any changes
 to the value so that code holding references to the model will always see the
 correct value.
 
-.. _preparing-values-for-use-in-database-lookups:
-
-Preparing values for use in database lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-As with value conversions, preparing a value for database lookups is a
-two phase process.
-
-:meth:`.get_prep_lookup` performs the first phase of lookup preparation:
-type conversion and data validation.
-
-Prepares the ``value`` for passing to the database when used in a lookup (a
-``WHERE`` constraint in SQL). The ``lookup_type`` parameter will be one of the
-valid Django filter lookups: ``exact``, ``iexact``, ``contains``, ``icontains``,
-``gt``, ``gte``, ``lt``, ``lte``, ``in``, ``startswith``, ``istartswith``,
-``endswith``, ``iendswith``, ``range``, ``year``, ``month``, ``day``,
-``isnull``, ``search``, ``regex``, and ``iregex``.
-
-If you are using :doc:`custom lookups </howto/custom-lookups>`, the
-``lookup_type`` can be any ``lookup_name`` used by the project's custom lookups.
-
-Your method must be prepared to handle all of these ``lookup_type`` values and
-should raise either a ``ValueError`` if the ``value`` is of the wrong sort (a
-list when you were expecting an object, for example) or a ``TypeError`` if
-your field does not support that type of lookup. For many fields, you can get
-by with handling the lookup types that need special handling for your field
-and pass the rest to the :meth:`~Field.get_db_prep_lookup` method of the parent
-class.
-
-If you needed to implement :meth:`.get_db_prep_save`, you will usually need to
-implement :meth:`.get_prep_lookup`. If you don't, :meth:`.get_prep_value` will
-be called by the default implementation, to manage ``exact``, ``gt``, ``gte``,
-``lt``, ``lte``, ``in`` and ``range`` lookups.
-
-You may also want to implement this method to limit the lookup types that could
-be used with your custom field type.
-
-Note that, for ``"range"`` and ``"in"`` lookups, ``get_prep_lookup`` will receive
-a list of objects (presumably of the right type) and will need to convert them
-to a list of things of the right type for passing to the database. Most of the
-time, you can reuse ``get_prep_value()``, or at least factor out some common
-pieces.
-
-For example, the following code implements ``get_prep_lookup`` to limit the
-accepted lookup types to ``exact`` and ``in``::
-
-    class HandField(models.Field):
-        # ...
-
-        def get_prep_lookup(self, lookup_type, value):
-            # We only handle 'exact' and 'in'. All others are errors.
-            if lookup_type == 'exact':
-                return self.get_prep_value(value)
-            elif lookup_type == 'in':
-                return [self.get_prep_value(v) for v in value]
-            else:
-                raise TypeError('Lookup type %r not supported.' % lookup_type)
-
-For performing database-specific data conversions required by a lookup,
-you can override :meth:`~Field.get_db_prep_lookup`.
-
 .. _specifying-form-field-for-model-field:
 
 Specifying the form field for a model field

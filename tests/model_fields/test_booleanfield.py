@@ -1,29 +1,29 @@
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, connection, models, transaction
+from django.db import IntegrityError, models, transaction
 from django.test import SimpleTestCase, TestCase
 
 from .models import BooleanModel, FksToBooleans, NullBooleanModel
 
 
 class BooleanFieldTests(TestCase):
-    def _test_get_db_prep_lookup(self, f):
-        self.assertEqual(f.get_db_prep_lookup('exact', True, connection=connection), [True])
-        self.assertEqual(f.get_db_prep_lookup('exact', '1', connection=connection), [True])
-        self.assertEqual(f.get_db_prep_lookup('exact', 1, connection=connection), [True])
-        self.assertEqual(f.get_db_prep_lookup('exact', False, connection=connection), [False])
-        self.assertEqual(f.get_db_prep_lookup('exact', '0', connection=connection), [False])
-        self.assertEqual(f.get_db_prep_lookup('exact', 0, connection=connection), [False])
-        self.assertEqual(f.get_db_prep_lookup('exact', None, connection=connection), [None])
+    def _test_get_prep_value(self, f):
+        self.assertEqual(f.get_prep_value(True), True)
+        self.assertEqual(f.get_prep_value('1'), True)
+        self.assertEqual(f.get_prep_value(1), True)
+        self.assertEqual(f.get_prep_value(False), False)
+        self.assertEqual(f.get_prep_value('0'), False)
+        self.assertEqual(f.get_prep_value(0), False)
+        self.assertEqual(f.get_prep_value(None), None)
 
     def _test_to_python(self, f):
         self.assertIs(f.to_python(1), True)
         self.assertIs(f.to_python(0), False)
 
-    def test_booleanfield_get_db_prep_lookup(self):
-        self._test_get_db_prep_lookup(models.BooleanField())
+    def test_booleanfield_get_prep_value(self):
+        self._test_get_prep_value(models.BooleanField())
 
-    def test_nullbooleanfield_get_db_prep_lookup(self):
-        self._test_get_db_prep_lookup(models.NullBooleanField())
+    def test_nullbooleanfield_get_prep_value(self):
+        self._test_get_prep_value(models.NullBooleanField())
 
     def test_booleanfield_to_python(self):
         self._test_to_python(models.BooleanField())

@@ -741,8 +741,7 @@ class Field(RegisterLookupMixin):
         """Returns field's value prepared for interacting with the database
         backend.
 
-        Used by the default implementations of ``get_db_prep_save``and
-        `get_db_prep_lookup```
+        Used by the default implementations of get_db_prep_save().
         """
         if not prepared:
             value = self.get_prep_value(value)
@@ -754,36 +753,6 @@ class Field(RegisterLookupMixin):
         """
         return self.get_db_prep_value(value, connection=connection,
                                       prepared=False)
-
-    def get_prep_lookup(self, lookup_type, value):
-        """
-        Perform preliminary non-db specific lookup checks and conversions
-        """
-        if hasattr(value, '_prepare'):
-            return value._prepare(self)
-
-        if lookup_type in {
-            'iexact', 'contains', 'icontains',
-            'startswith', 'istartswith', 'endswith', 'iendswith',
-            'isnull', 'search', 'regex', 'iregex',
-        }:
-            return value
-        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
-            return self.get_prep_value(value)
-        elif lookup_type in ('range', 'in'):
-            return [self.get_prep_value(v) for v in value]
-        return self.get_prep_value(value)
-
-    def get_db_prep_lookup(self, lookup_type, value, connection,
-                           prepared=False):
-        """
-        Returns field's value prepared for database lookup.
-        """
-        if not prepared:
-            value = self.get_prep_lookup(lookup_type, value)
-            prepared = True
-
-        return [value]
 
     def has_default(self):
         """
@@ -1049,20 +1018,11 @@ class BooleanField(Field):
             params={'value': value},
         )
 
-    def get_prep_lookup(self, lookup_type, value):
-        # Special-case handling for filters coming from a Web request (e.g. the
-        # admin interface). Only works for scalar values (not lists). If you're
-        # passing in a list, you might as well make things the right type when
-        # constructing the list.
-        if value in ('1', '0'):
-            value = bool(int(value))
-        return super(BooleanField, self).get_prep_lookup(lookup_type, value)
-
     def get_prep_value(self, value):
         value = super(BooleanField, self).get_prep_value(value)
         if value is None:
             return None
-        return bool(value)
+        return self.to_python(value)
 
     def formfield(self, **kwargs):
         # Unlike most fields, BooleanField figures out include_blank from
@@ -1452,8 +1412,6 @@ class DateTimeField(DateField):
 
     # contribute_to_class is inherited from DateField, it registers
     # get_next_by_FOO and get_prev_by_FOO
-
-    # get_prep_lookup is inherited from DateField
 
     def get_prep_value(self, value):
         value = super(DateTimeField, self).get_prep_value(value)
@@ -2051,21 +2009,11 @@ class NullBooleanField(Field):
             params={'value': value},
         )
 
-    def get_prep_lookup(self, lookup_type, value):
-        # Special-case handling for filters coming from a Web request (e.g. the
-        # admin interface). Only works for scalar values (not lists). If you're
-        # passing in a list, you might as well make things the right type when
-        # constructing the list.
-        if value in ('1', '0'):
-            value = bool(int(value))
-        return super(NullBooleanField, self).get_prep_lookup(lookup_type,
-                                                             value)
-
     def get_prep_value(self, value):
         value = super(NullBooleanField, self).get_prep_value(value)
         if value is None:
             return None
-        return bool(value)
+        return self.to_python(value)
 
     def formfield(self, **kwargs):
         defaults = {

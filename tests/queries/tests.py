@@ -1229,9 +1229,8 @@ class Queries2Tests(TestCase):
         )
 
     def test_ticket12239(self):
-        # Float was being rounded to integer on gte queries on integer field.  Tests
-        # show that gt, lt, gte, and lte work as desired.  Note that the fix changes
-        # get_prep_lookup for gte and lt queries only.
+        # Custom lookups are registered to round float values correctly on gte
+        # and lt IntegerField queries.
         self.assertQuerysetEqual(
             Number.objects.filter(num__gt=11.9),
             ['<Number: 12>']

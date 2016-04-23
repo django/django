@@ -128,7 +128,6 @@ def url_params_from_lookup_dict(lookups):
             if isinstance(v, (tuple, list)):
                 v = ','.join(str(x) for x in v)
             elif isinstance(v, bool):
-                # See django.db.fields.BooleanField.get_prep_lookup
                 v = ('0', '1')[v]
             else:
                 v = six.text_type(v)

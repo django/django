@@ -1,4 +1,5 @@
 from django.db.models import Lookup, Transform
+from django.utils.encoding import force_text
 
 from .search import SearchVector, SearchVectorExact, SearchVectorField
 
@@ -29,14 +30,18 @@ class Overlap(PostgresSimpleLookup):
 class HasKey(PostgresSimpleLookup):
     lookup_name = 'has_key'
     operator = '?'
+    prepare_rhs = False
 
 
 class HasKeys(PostgresSimpleLookup):
     lookup_name = 'has_keys'
     operator = '?&'
 
+    def get_prep_lookup(self):
+        return [force_text(item) for item in self.rhs]
 
-class HasAnyKeys(PostgresSimpleLookup):
+
+class HasAnyKeys(HasKeys):
     lookup_name = 'has_any_keys'
     operator = '?|'
 

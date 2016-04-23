@@ -1717,8 +1717,7 @@ Field API reference
     ``Field`` is an abstract class that represents a database table column.
     Django uses fields to create the database table (:meth:`db_type`), to map
     Python types to database (:meth:`get_prep_value`) and vice-versa
-    (:meth:`from_db_value`), and to apply :doc:`/ref/models/lookups`
-    (:meth:`get_prep_lookup`).
+    (:meth:`from_db_value`).
 
     A field is thus a fundamental piece in different Django APIs, notably,
     :class:`models <django.db.models.Model>` and :class:`querysets
@@ -1846,26 +1845,6 @@ Field API reference
         ``self.attname`` (this is set up by :class:`~django.db.models.Field`).
 
         See :ref:`preprocessing-values-before-saving` for usage.
-
-    When a lookup is used on a field, the value may need to be "prepared".
-    Django exposes two methods for this:
-
-    .. method:: get_prep_lookup(lookup_type, value)
-
-        Prepares ``value`` to the database prior to be used in a lookup.
-        The ``lookup_type`` will be the registered name of the lookup. For
-        example: ``"exact"``, ``"iexact"``, or ``"contains"``.
-
-        See :ref:`preparing-values-for-use-in-database-lookups` for usage.
-
-    .. method:: get_db_prep_lookup(lookup_type, value, connection, prepared=False)
-
-        Similar to :meth:`get_db_prep_value`, but for performing a lookup.
-
-        As with :meth:`get_db_prep_value`, the specific connection that will
-        be used for the query is passed as ``connection``. In addition,
-        ``prepared`` describes whether the value has already been prepared with
-        :meth:`get_prep_lookup`.
 
     Fields often receive their values as a different type, either from
     serialization or from forms.

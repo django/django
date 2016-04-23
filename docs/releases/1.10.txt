@@ -677,6 +677,25 @@ You can check if your database has any of the removed hashers like this::
     # Unsalted MD5 passwords might not have an 'md5$$' prefix:
     User.objects.filter(password__length=32)
 
+``Field.get_prep_lookup()`` and ``Field.get_db_prep_lookup()`` methods are removed
+----------------------------------------------------------------------------------
+
+If you have a custom field that implements either of these methods, register a
+custom lookup for it. For example::
+
+    from django.db.models import Field
+    from django.db.models.lookups import Exact
+
+    class MyField(Field):
+        ...
+
+    class MyFieldExact(Exact):
+        def get_prep_lookup(self):
+            # do_custom_stuff_for_myfield
+            ....
+
+    MyField.register_lookup(MyFieldExact)
+
 :mod:`django.contrib.gis`
 -------------------------
 

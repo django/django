@@ -110,9 +110,6 @@ class ForeignObjectRel(object):
     def one_to_one(self):
         return self.field.one_to_one
 
-    def get_prep_lookup(self, lookup_name, value):
-        return self.field.get_prep_lookup(lookup_name, value)
-
     def get_lookup(self, lookup_name):
         return self.field.get_lookup(lookup_name)
 
@@ -141,10 +138,6 @@ class ForeignObjectRel(object):
         return (blank_choice if include_blank else []) + [
             (x._get_pk_val(), smart_text(x)) for x in self.related_model._default_manager.all()
         ]
-
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        # Defer to the actual field definition for db prep
-        return self.field.get_db_prep_lookup(lookup_type, value, connection=connection, prepared=prepared)
 
     def is_hidden(self):
         "Should the related object be hidden?"

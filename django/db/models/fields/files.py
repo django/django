@@ -271,11 +271,6 @@ class FileField(Field):
     def get_internal_type(self):
         return "FileField"
 
-    def get_prep_lookup(self, lookup_type, value):
-        if hasattr(value, 'name'):
-            value = value.name
-        return super(FileField, self).get_prep_lookup(lookup_type, value)
-
     def get_prep_value(self, value):
         "Returns field's value prepared for saving into a database."
         value = super(FileField, self).get_prep_value(value)
