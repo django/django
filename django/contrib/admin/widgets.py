@@ -376,7 +376,7 @@ class AdminURLFieldWidget(forms.URLInput):
     def render(self, name, value, attrs=None):
         html = super(AdminURLFieldWidget, self).render(name, value, attrs)
         if value:
-            value = force_text(self._format_value(value))
+            value = force_text(self.format_value(value))
             final_attrs = {'href': smart_urlquote(value)}
             html = format_html(
                 '<p class="url">{} <a{}>{}</a><br />{} {}</p>',
