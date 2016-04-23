@@ -170,6 +170,22 @@ robust: it will only ever update the field based on the value of the field in
 the database when the :meth:`~Model.save()` or ``update()`` is executed, rather
 than based on its value when the instance was retrieved.
 
+``F()`` assignments persist after ``Model.save()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``F()`` objects assigned to model fields persist after saving the model
+instance and will be applied on each :meth:`~Model.save()`. For example::
+
+    reporter = Reporters.objects.get(name='Tintin')
+    reporter.stories_filed = F('stories_filed') + 1
+    reporter.save()
+
+    reporter.name = 'Tintin Jr.'
+    reporter.save()
+
+``stories_filed`` will be updated twice in this case. If it's initially ``1``,
+the final value will be ``3``.
+
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
