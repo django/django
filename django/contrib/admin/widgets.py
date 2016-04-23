@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.html import escape, escapejs, format_html, smart_urlquote
+from django.utils.html import escapejs, smart_urlquote
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
@@ -166,6 +166,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
         if context['widget']['value']:
             context['link_label'] = self.label_for_value(value)
+            context['link_url'] = self.url_for_value(value)
 
         return context
 
@@ -185,14 +186,21 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         key = self.rel.get_related_field().name
         try:
             obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
-            return escape(Truncator(obj).words(14, truncate='...'))
         except (ValueError, self.rel.model.DoesNotExist):
             return ''
+        return Truncator(obj).words(14, truncate='...')
 
-        label = '&nbsp;<strong>{}</strong>'
-        text = Truncator(obj).words(14, truncate='...')
+    def url_for_value(self, value):
+        # XXX: any better way to organize to  reduce duplication of queries
+        # with label_for_value()?
+        key = self.rel.get_related_field().name
         try:
-            change_url = reverse(
+            obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
+        except (ValueError, self.rel.model.DoesNotExist):
+            return
+
+        try:
+            return reverse(
                 '%s:%s_%s_change' % (
                     self.admin_site.name,
                     obj._meta.app_label,
@@ -202,10 +210,6 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             )
         except NoReverseMatch:
             pass  # Admin not registered for target model.
-        else:
-            text = format_html('<a href="{}">{}</a>', change_url, text)
-
-        return format_html(label, text)
 
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
@@ -226,6 +230,9 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         return self.base_url_parameters()
 
     def label_for_value(self, value):
+        return ''
+
+    def url_for_value(self, value):
         return ''
 
     def value_from_datadict(self, data, files, name):
