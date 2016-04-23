@@ -260,6 +260,8 @@ class UtilsTests(SimpleTestCase):
             "--"
         )
 
+        self.assertEqual(label_for_field('site_id', Article), 'Site id')
+
         class MockModelAdmin(object):
             def test_from_model(self, obj):
                 return "nothing"
