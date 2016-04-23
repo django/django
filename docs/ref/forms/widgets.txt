@@ -228,6 +228,17 @@ foundation for custom widgets.
            In older versions, this attribute was only defined on the date
            and time widgets (as ``False``).
 
+    .. method:: format_value(value)
+
+        Cleans and returns a value for use in the widget template. ``value``
+        isn't guaranteed to be valid input, therefore subclass implementations
+        should program defensively.
+
+        .. versionchanged:: 1.10
+
+            In older versions, this method is a private API named
+            ``_format_value()``. The old name will work until Django 2.0.
+
     .. method:: id_for_label(self, id_)
 
         Returns the HTML ID attribute of this widget for use by a ``<label>``,
