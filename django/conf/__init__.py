@@ -168,7 +168,10 @@ class UserSettingsHolder(BaseSettings):
             super(UserSettingsHolder, self).__delattr__(name)
 
     def __dir__(self):
-        return list(self.__dict__) + dir(self.default_settings)
+        return sorted(
+            s for s in list(self.__dict__) + dir(self.default_settings)
+            if s not in self._deleted
+        )
 
     def is_overridden(self, setting):
         deleted = (setting in self._deleted)
