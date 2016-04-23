@@ -5,15 +5,11 @@ These tests use dialogue from the 1975 film Monty Python and the Holy Grail.
 All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
-from unittest import skipIf
-
 from django.contrib.postgres.search import (
     SearchQuery, SearchRank, SearchVector,
 )
 from django.db.models import F
-from django.test import ignore_warnings, modify_settings
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import modify_settings
 
 from . import PostgreSQLTestCase
 from .models import Character, Line, Scene
@@ -82,15 +78,6 @@ class GrailTestData(object):
             dialogue='Oh. Un cadeau. Oui oui.',
             dialogue_config='french',
         )
-
-
-class ContribPostgresNotInstalledTests(PostgreSQLTestCase):
-    @skipIf(six.PY2, "This test fails occasionally and weirdly on python 2")
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_search_lookup_missing(self):
-        msg = "Add 'django.contrib.postgres' to settings.INSTALLED_APPS to use the search operator."
-        with self.assertRaisesMessage(NotImplementedError, msg):
-            list(Line.objects.filter(dialogue__search='elbows'))
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
