@@ -21,3 +21,6 @@ Bugfixes
 
 * Fixed a regression where ``SessionBase.pop()`` returned ``None`` rather than
   raising a ``KeyError`` for nonexistent values (:ticket:`26520`).
+
+* Fixed a regression causing the cached template loader to crash when using
+  template names starting with a dash (:ticket:`26536`).

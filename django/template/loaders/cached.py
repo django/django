@@ -100,7 +100,7 @@ class Loader(BaseLoader):
         if template_dirs:
             dirs_prefix = self.generate_hash(template_dirs)
 
-        return ("%s-%s-%s" % (template_name, skip_prefix, dirs_prefix)).strip('-')
+        return '-'.join(filter(bool, [template_name, skip_prefix, dirs_prefix]))
 
     def generate_hash(self, values):
         return hashlib.sha1(force_bytes('|'.join(values))).hexdigest()
