@@ -146,6 +146,13 @@ class CachedLoaderTests(SimpleTestCase):
         # The two templates should not have the same content
         self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
 
+    def test_template_name_leading_dash_caching(self):
+        """
+        #26536 -- A leading dash in a template name shouldn't be stripped
+        from its cache key.
+        """
+        self.assertEqual(self.engine.template_loaders[0].cache_key('-template.html', []), '-template.html')
+
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
 class EggLoaderTests(SimpleTestCase):
