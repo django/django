@@ -69,6 +69,9 @@ Minor features
 * Added "No date" and "Has date" choices for ``DateFieldListFilter`` if the
   field is nullable.
 
+* To comply with WSGI best practice, the response content of HEAD requests will
+  no longer be removed.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
