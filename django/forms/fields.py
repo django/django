@@ -720,12 +720,9 @@ class BooleanField(Field):
             raise ValidationError(self.error_messages['required'], code='required')
 
     def has_changed(self, initial, data):
-        # Sometimes data or initial could be None or '' which should be the
-        # same thing as False.
-        if initial == 'False':
-            # show_hidden_initial may have transformed False to 'False'
-            initial = False
-        return bool(initial) != bool(data)
+        # Sometimes data or initial may be a string equivalent of a boolean
+        # so we should run it through to_python first to get a boolean value
+        return self.to_python(initial) != self.to_python(data)
 
 
 class NullBooleanField(BooleanField):
@@ -753,14 +750,6 @@ class NullBooleanField(BooleanField):
 
     def validate(self, value):
         pass
-
-    def has_changed(self, initial, data):
-        # None (unknown) and False (No) are not the same
-        if initial is not None:
-            initial = bool(initial)
-        if data is not None:
-            data = bool(data)
-        return initial != data
 
 
 class CallableChoiceIterator(object):
