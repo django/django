@@ -1,0 +1,28 @@
+OK, I've always been a creative commons guy... 
+but now that I'm  working on my own services and products I actually see how generous Djangos licensing policy is.
+
+Let me explain.
+NEXTUS is obviously open source and largely based on open source materials; my new project on the other hand, is entirely closed source.
+
+Here's why (obviously with out divulging any details about what the project is! That's a secret :D):
+
+  1. Open sourcing my new project wouldn't really bring anything fresh or helpful to the Open Source world:
+     With regards to the code, obviously its not like its all readily available, I have developed some pretty useful proprietary algorithms,
+     but, its not like they would revolutionise the world of programming and the project is largely unrevolutionary.
+
+  2. Open sourcing the code for my project would allow competitors steal some of our functions more easily, which is bad, because fundamenally
+     this is a business.
+
+  3. Open sourcing, actually poses more of a security threat than a security help. On larger projects (like Django) many people are auditing
+     code all the time, left and right, if I were to open-source the code for this new project, for which I AM the backend, there's no one else,
+     I feel as though at least at the beginning it is more likely for black hats to be auditing my code than helpful people, maybe I'm paranoid though...
+ 
+  4. With regards to the other end of this op, my frontend guy, he's not comfortable with this, to bring a business to fruition, you can't just give away the product,
+     we are working hard on this, coding, graphic design, businesss planning, it all takes up time and energy, and as we're both students,
+     those are particularly valuable to us right now, during our examinations, so we don't just want to give this away, we feel protective over it.
+  
+  This brings my to my fifth and final point, this is all to do with my situation right now, once my project gains momentum, then I can re-evaluate the benefits of open source!
+  hard work fronten
+
+Thanks for reading!
+Strategos_Sama @SAIKONO
