@@ -59,7 +59,7 @@ msgstr "密碼"
 msgid "Password confirmation"
 msgstr "密碼確認"
 
-msgid "Enter the same password as above, for verification."
+msgid "Enter the same password as before, for verification."
 msgstr "為檢查用，請輸入與上面相同的密碼。"
 
 msgid ""
