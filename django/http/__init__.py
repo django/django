@@ -9,7 +9,6 @@ from django.http.response import (
     HttpResponsePermanentRedirect, HttpResponseRedirect,
     HttpResponseServerError, JsonResponse, StreamingHttpResponse,
 )
-from django.http.utils import conditional_content_removal
 
 __all__ = [
     'SimpleCookie', 'parse_cookie', 'HttpRequest', 'QueryDict',
@@ -19,5 +18,4 @@ __all__ = [
     'HttpResponseBadRequest', 'HttpResponseForbidden', 'HttpResponseNotFound',
     'HttpResponseNotAllowed', 'HttpResponseGone', 'HttpResponseServerError',
     'Http404', 'BadHeaderError', 'JsonResponse', 'FileResponse',
-    'conditional_content_removal',
 ]

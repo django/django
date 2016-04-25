@@ -92,6 +92,26 @@ def closing_iterator_wrapper(iterable, close):
         request_finished.connect(close_old_connections)
 
 
+def conditional_content_removal(request, response):
+    """
+    Simulate the behavior of most Web servers by removing the content of
+    responses for HEAD requests, 1xx, 204, and 304 responses. Ensures
+    compliance with RFC 2616, section 4.3.
+    """
+    if 100 <= response.status_code < 200 or response.status_code in (204, 304):
+        if response.streaming:
+            response.streaming_content = []
+        else:
+            response.content = b''
+        response['Content-Length'] = '0'
+    if request.method == 'HEAD':
+        if response.streaming:
+            response.streaming_content = []
+        else:
+            response.content = b''
+    return response
+
+
 class ClientHandler(BaseHandler):
     """
     A HTTP Handler that can be used for testing purposes. Uses the WSGI
@@ -120,6 +140,10 @@ class ClientHandler(BaseHandler):
 
         # Request goes through middleware.
         response = self.get_response(request)
+
+        # Simulate behaviors of most Web servers.
+        conditional_content_removal(request, response)
+
         # Attach the originating request to the response so that it could be
         # later retrieved.
         response.wsgi_request = request

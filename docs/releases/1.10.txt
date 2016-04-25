@@ -778,6 +778,11 @@ Miscellaneous
   attribute to ``False`` to disable it. You could also add the ``novalidate``
   attribute to ``<form>`` if you don't want browser validation.
 
+* The WSGI handler no longer removes content of responses from ``HEAD``
+  requests or responses with a ``status_code`` of 100-199, 204, or 304. Most
+  Web servers already implement this behavior. Responses retrieved using the
+  Django test client continue to have these "response fixes" applied.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
