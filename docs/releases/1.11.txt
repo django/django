@@ -481,6 +481,21 @@ Backwards incompatible changes in 1.11
   updated. Check your project if you subclass these widgets or extend the
   templates.
 
+:mod:`django.contrib.staticfiles`
+---------------------------------
+
+* ``collectstatic`` may now fail during post-processing when using a hashed
+  static files storage if a reference loop exists (e.g. ``'foo.css'``
+  references ``'bar.css'`` which itself references ``'foo.css'``) or if the
+  chain of files referencing other files is too deep to resolve in several
+  passes. In the latter case, increase the number of passes using
+  :attr:`.ManifestStaticFilesStorage.max_post_process_passes`.
+
+* When using ``ManifestStaticFilesStorage``, static files not found in the
+  manifest at runtime now raise a ``ValueError`` instead of returning an
+  unchanged path. You can revert to the old behavior by setting
+  :attr:`.ManifestStaticFilesStorage.manifest_strict` to ``False``.
+
 Database backend API
 --------------------
 

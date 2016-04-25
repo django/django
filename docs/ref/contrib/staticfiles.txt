@@ -293,6 +293,24 @@ content:
 
     @import url("../admin/css/base.27e20196a850.css");
 
+.. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
+
+Since static files might reference other static files that need to have their
+paths replaced, multiple passes of replacing paths may be needed until the file
+hashes converge. To prevent an infinite loop due to hashes not converging (for
+example, if ``'foo.css'`` references ``'bar.css'`` which references
+``'foo.css'``) there is a maximum number of passes before post-processing is
+abandoned. In cases with a large number of references, a higher number of
+passes might be needed. Increase the maximum number of passes by subclassing
+``ManifestStaticFilesStorage`` and setting the ``max_post_process_passes``
+attribute. It defaults to 5.
+
+.. versionchanged:: 1.11
+
+    Previous versions didn't make multiple passes to ensure file hashes
+    converged, so often times file hashes weren't correct. The
+    ``max_post_process_passes`` attribute was added.
+
 To enable the ``ManifestStaticFilesStorage`` you have to make sure the
 following requirements are met:
 
@@ -314,6 +332,18 @@ during runtime, ``staticfiles`` will automatically store the mapping with
 hashed names for all processed files in a file called ``staticfiles.json``.
 This happens once when you run the :djadmin:`collectstatic` management
 command.
+
+.. attribute:: storage.ManifestStaticFilesStorage.manifest_strict
+
+If a file isn't found in the ``staticfiles.json`` manifest at runtime, a
+``ValueError`` is raised. This behavior can be disabled by subclassing
+``ManifestStaticFilesStorage`` and setting the ``manifest_strict`` attribute to
+``False`` -- nonexistent paths will remain unchanged.
+
+.. versionchanged:: 1.11
+
+    The ``manifest_strict`` attribute was added. In older versions, the
+    behavior is the same as ``manifest_strict=False``.
 
 Due to the requirement of running :djadmin:`collectstatic`, this storage
 typically shouldn't be used when running tests as ``collectstatic`` isn't run
@@ -349,6 +379,16 @@ have access to the file system.
 If you want to override certain options of the cache backend the storage uses,
 simply specify a custom entry in the :setting:`CACHES` setting named
 ``'staticfiles'``. It falls back to using the ``'default'`` cache backend.
+
+.. warning::
+
+    ``CachedStaticFilesStorage`` isn't recommended --  in almost all cases
+    ``ManifestStaticFilesStorage`` is a better choice. There are several
+    performance penalties when using ``CachedStaticFilesStorage`` since a cache
+    miss requires hashing files at runtime. Remote file storage require several
+    round-trips to hash a file on a cache miss, as several file accesses are
+    required to ensure that the file hash is correct in the case of nested file
+    paths.
 
 Finders Module
 ==============
