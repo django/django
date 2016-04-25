@@ -67,7 +67,7 @@ msgid "Password confirmation"
 msgstr "密碼確認"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "為檢查用，請輸入與上面相同的密碼。"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "

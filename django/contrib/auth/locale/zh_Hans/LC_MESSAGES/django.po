@@ -59,8 +59,8 @@ msgstr "密码"
 
 msgid "Password confirmation"
 msgstr "密码确认"
-
-msgid "Enter the same password as above, for verification."
+	   
+msgid "Enter the same password as before, for verification."
 msgstr "为了校验，输入与上面相同的密码。"
 
 msgid ""
