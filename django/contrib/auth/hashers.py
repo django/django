@@ -327,11 +327,11 @@ class Argon2PasswordHasher(BasePasswordHasher):
 
     def verify(self, password, encoded):
         argon2 = self._load_library()
-        algorithm, data = encoded.split('$', 1)
+        algorithm, rest = encoded.split('$', 1)
         assert algorithm == self.algorithm
         try:
             return argon2.low_level.verify_secret(
-                force_bytes('$' + data),
+                force_bytes('$' + rest),
                 force_bytes(password),
                 type=argon2.low_level.Type.I,
             )
@@ -339,35 +339,59 @@ class Argon2PasswordHasher(BasePasswordHasher):
             return False
 
     def safe_summary(self, encoded):
-        algorithm, variety, raw_pars, salt, data = encoded.split('$', 5)
-        pars = dict(bit.split('=', 1) for bit in raw_pars.split(','))
+        (algorithm, variety, version, time_cost, memory_cost, parallelism, salt,
+            data) = self._decode(encoded)
         assert algorithm == self.algorithm
-        assert len(pars) == 3 and 't' in pars and 'm' in pars and 'p' in pars
         return OrderedDict([
             (_('algorithm'), algorithm),
             (_('variety'), variety),
-            (_('memory cost'), int(pars['m'])),
-            (_('time cost'), int(pars['t'])),
-            (_('parallelism'), int(pars['p'])),
+            (_('version'), version),
+            (_('memory cost'), memory_cost),
+            (_('time cost'), time_cost),
+            (_('parallelism'), parallelism),
             (_('salt'), mask_hash(salt)),
             (_('hash'), mask_hash(data)),
         ])
 
     def must_update(self, encoded):
-        algorithm, variety, raw_pars, salt, data = encoded.split('$', 5)
-        pars = dict([bit.split('=', 1) for bit in raw_pars.split(',')])
+        (algorithm, variety, version, time_cost, memory_cost, parallelism, salt,
+            data) = self._decode(encoded)
         assert algorithm == self.algorithm
-        assert len(pars) == 3 and 't' in pars and 'm' in pars and 'p' in pars
+        argon2 = self._load_library()
+
         return (
-            self.time_cost != int(pars['t']) or
-            self.memory_cost != int(pars['m']) or
-            self.parallelism != int(pars['p'])
+            argon2.low_level.ARGON2_VERSION != version or
+            self.time_cost != time_cost or
+            self.memory_cost != memory_cost or
+            self.parallelism != parallelism
         )
 
     def harden_runtime(self, password, encoded):
         # The runtime for Argon2 is too complicated to implement a sensible
         # hardening algorithm.
         pass
+
+    def _decode(self, encoded):
+        """ Splits an encoded hash.
+
+            Returns (algorithm, variety, version, time_cost, memory_cost,
+                        parallelism, salt, data). """
+        bits = encoded.split('$')
+        if len(bits) == 5:
+            algorithm, variety, raw_pars, salt, data = bits
+            version = 0x10
+        else:
+            assert len(bits) == 6
+            algorithm, variety, raw_version, raw_pars, salt, data = bits
+            assert raw_version.startswith('v=')
+            version = int(raw_version[len('v='):])
+        pars = dict(bit.split('=', 1) for bit in raw_pars.split(','))
+        assert len(pars) == 3 and 't' in pars and 'm' in pars and 'p' in pars
+        time_cost = int(pars['t'])
+        memory_cost = int(pars['m'])
+        parallelism = int(pars['p'])
+        return (algorithm, variety, version, time_cost, memory_cost,
+                parallelism, salt, data)
 
 
 class BCryptSHA256PasswordHasher(BasePasswordHasher):
