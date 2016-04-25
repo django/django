@@ -4,8 +4,8 @@ import gzip
 import io
 
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
-from django.http.utils import conditional_content_removal
 from django.test import SimpleTestCase
+from django.test.client import conditional_content_removal
 
 
 # based on Python 3.3's gzip.compress
@@ -19,12 +19,12 @@ def gzip_compress(data):
     return buf.getvalue()
 
 
-class HttpUtilTests(SimpleTestCase):
+class ConditionalContentTests(SimpleTestCase):
 
     def test_conditional_content_removal(self):
         """
-        Tests that content is removed from regular and streaming responses with
-        a status_code of 100-199, 204, 304 or a method of "HEAD".
+        Content is removed from regular and streaming responses with a
+        status_code of 100-199, 204, 304, or a method of "HEAD".
         """
         req = HttpRequest()
 
