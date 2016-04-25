@@ -653,10 +653,8 @@ The ``__hash__`` method is based on the instance's primary key value. It
 is effectively hash(obj.pk). If the instance doesn't have a primary key
 value then a ``TypeError`` will be raised (otherwise the ``__hash__``
 method would return different values before and after the instance is
-saved, but changing the ``__hash__`` value of an instance `is forbidden
-in Python`_).
-
-.. _is forbidden in Python: https://docs.python.org/reference/datamodel.html#object.__hash__
+saved, but changing the ``:ref:__hash__ <python:datamodel.html#object.__hash__>``
+value of an instance `is forbidden in Python`_).
 
 ``get_absolute_url``
 --------------------

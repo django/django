@@ -402,9 +402,7 @@ translates (roughly) into the following SQL:
 
    Python has the ability to define functions that accept arbitrary name-value
    arguments whose names and values are evaluated at runtime. For more
-   information, see `Keyword Arguments`_ in the official Python tutorial.
-
-   .. _`Keyword Arguments`: https://docs.python.org/tutorial/controlflow.html#keyword-arguments
+   information, see :ref:`Keyword Arguments <python:tut-controlflow#keyword-arguments>` in the official Python tutorial.
 
 The field specified in a lookup has to be the name of a model field. There's
 one exception though, in case of a :class:`~django.db.models.ForeignKey` you

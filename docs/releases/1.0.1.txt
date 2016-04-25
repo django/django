@@ -45,7 +45,7 @@ highlights:
   attributes in ``list_display``.
 
 * A fix to the application of autoescaping for literal strings passed
-  to the ``join`` template filter. Previously, literal strings passed
+  to the :tfilter:`join` template filter. Previously, literal strings passed
   to ``join`` were automatically escaped, contrary to :ref:`the
   documented behavior for autoescaping and literal strings
   <string-literals-and-automatic-escaping>`. Literal strings

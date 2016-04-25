@@ -682,7 +682,7 @@ November 24, 2015 - CVE-2015-8213
 ---------------------------------
 
 `CVE-2015-8213 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-8213&cid=2>`_:
-Settings leak possibility in ``date`` template filter.
+Settings leak possibility in :tfilter:`date` template filter.
 `Full description <https://www.djangoproject.com/weblog/2015/nov/24/security-releases-issued/>`__
 
 Versions affected

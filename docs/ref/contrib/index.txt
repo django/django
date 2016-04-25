@@ -2,7 +2,7 @@
 ``contrib`` packages
 ====================
 
-Django aims to follow Python's `"batteries included" philosophy`_. It ships
+Django aims to follow Python's :ref:`"batteries included" philosophy <batteries-included>`. It ships
 with a variety of extra, optional tools that solve common Web-development
 problems.
 
@@ -16,8 +16,6 @@ those packages have.
     models or template tags -- you'll need to add the package name (e.g.,
     ``'django.contrib.redirects'``) to your :setting:`INSTALLED_APPS` setting
     and re-run ``manage.py migrate``.
-
-.. _"batteries included" philosophy: https://docs.python.org/tutorial/stdlib.html#batteries-included
 
 .. toctree::
    :maxdepth: 1

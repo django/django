@@ -231,7 +231,7 @@ Logging is configured as part of the general Django ``setup()`` function.
 Therefore, you can be certain that loggers are always ready for use in your
 project code.
 
-.. _dictConfig format: https://docs.python.org/library/logging.config.html#configuration-dictionary-schema
+.. _dictConfig format: https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema
 
 Examples
 --------
@@ -408,7 +408,7 @@ This logging configuration does the following things:
     printed to the console; ``ERROR`` and ``CRITICAL``
     messages will also be output via email.
 
-.. _formatter documentation: https://docs.python.org/library/logging.html#formatter-objects
+.. _formatter documentation: https://docs.python.org/3/library/logging.html#formatter-objects
 
 Custom logging configuration
 ----------------------------

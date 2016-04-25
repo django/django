@@ -42,7 +42,7 @@ developers are used to dealing with such constraints.
 Porting tools provided by Django are inspired by this philosophy, and it's
 reflected throughout this guide.
 
-.. _Python's official porting guide: https://docs.python.org/3/howto/pyporting.html
+.. _: :ref:`datetime module syntax <python:howto-pyporting>` https://docs.python.org/3/howto/pyporting.html
 .. _Pragmatic Unicode: http://nedbatchelder.com/text/unipain.html
 
 Porting tips
@@ -243,9 +243,7 @@ consequence, the following pattern is sometimes necessary::
 
     value = value.encode('ascii', 'ignore').decode('ascii')
 
-Be cautious if you have to `index bytestrings`_.
-
-.. _index bytestrings: https://docs.python.org/3/howto/pyporting.html#text-versus-binary-data
+Be cautious if you have to :ref:`index bytestrings <howto-pyporting.html-text-versus-binary-data>`.
 
 Exceptions
 ~~~~~~~~~~

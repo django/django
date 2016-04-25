@@ -258,7 +258,7 @@ serializer to make the format compatible with `ECMA-262`_.
 
 Be aware that not all Django output can be passed unmodified to :mod:`json`.
 For example, if you have some custom type in an object to be serialized, you'll
-have to write a `special encoder`_ for it. Something like this will work::
+have to write a :py:class:`zipfile.ZipFile`special encoder`_ for it. Something like this will work::
 
     from django.utils.encoding import force_text
     from django.core.serializers.json import DjangoJSONEncoder
@@ -272,7 +272,7 @@ have to write a `special encoder`_ for it. Something like this will work::
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
-.. _special encoder: https://docs.python.org/library/json.html#encoders-and-decoders
+.. _special encoder: :ref:``library/json.html#encoders-and-decoders
 .. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 
 YAML
