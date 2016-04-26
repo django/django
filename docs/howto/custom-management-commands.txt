@@ -259,7 +259,7 @@ All attributes can be set in your derived class and can be used in
     effects. Seethe `Management commands and locales`_ section above for
     further details.
 
-    This option can't be ``False`` when the
+    This option can't be ``True`` when the
     :data:`~BaseCommand.can_import_settings` option is set to ``False`` too
     because attempting to set the locale needs access to settings. This
     condition will generate a :exc:`CommandError`.
