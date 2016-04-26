@@ -21,7 +21,7 @@ class RequestTests(ChannelTestCase):
             "reply_channel": "test-reply",
             "http_version": "1.1",
             "method": "GET",
-            "path": b"/test/",
+            "path": "/test/",
         })
         request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.path, "/test/")
@@ -45,8 +45,8 @@ class RequestTests(ChannelTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "GET",
-            "path": b"/test2/",
-            "query_string": b"x=1&y=foo%20bar+baz",
+            "path": "/test2/",
+            "query_string": "x=1&y=foo bar+baz",
             "headers": {
                 "host": b"example.com",
                 "cookie": b"test-time=1448995585123; test-value=yeah",
@@ -78,8 +78,8 @@ class RequestTests(ChannelTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
-            "path": b"/test2/",
-            "query_string": b"django=great",
+            "path": "/test2/",
+            "query_string": "django=great",
             "body": b"ponies=are+awesome",
             "headers": {
                 "host": b"example.com",
@@ -108,7 +108,7 @@ class RequestTests(ChannelTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
-            "path": b"/test/",
+            "path": "/test/",
             "body": b"there_a",
             "body_channel": "test-input",
             "headers": {
@@ -148,7 +148,7 @@ class RequestTests(ChannelTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
-            "path": b"/test/",
+            "path": "/test/",
             "body_channel": "test-input",
             "headers": {
                 "content-type": b"multipart/form-data; boundary=BOUNDARY",
@@ -178,7 +178,7 @@ class RequestTests(ChannelTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "PUT",
-            "path": b"/",
+            "path": "/",
             "body": b"onetwothree",
             "headers": {
                 "host": b"example.com",
@@ -198,7 +198,7 @@ class RequestTests(ChannelTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
-            "path": b"/test/",
+            "path": "/test/",
             "body": b"there_a",
             "body_channel": "test-input",
             "headers": {
@@ -227,7 +227,7 @@ class RequestTests(ChannelTestCase):
             "reply_channel": "test",
             "http_version": "1.1",
             "method": "POST",
-            "path": b"/test/",
+            "path": "/test/",
             "body": b"there_a",
             "body_channel": "test-input",
             "headers": {
