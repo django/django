@@ -231,6 +231,9 @@ class Patchinator(object):
         FileMap(
             "docs/testing.rst", "docs/topics/channels/testing.txt", docs_transforms,
         ),
+        FileMap(
+            "docs/cross-compat.rst", "docs/topics/channels/cross-compat.txt", docs_transforms,
+        ),
     ]
 
     def __init__(self, source, destination):
