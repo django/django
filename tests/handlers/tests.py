@@ -2,6 +2,8 @@
 
 from __future__ import unicode_literals
 
+from unittest import skipIf
+
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections, connection
@@ -10,6 +12,11 @@ from django.test import (
 )
 from django.utils import six
 from django.utils.encoding import force_str
+
+try:
+    from http import HTTPStatus
+except ImportError:
+    HTTPStatus = None
 
 
 class HandlerTests(SimpleTestCase):
@@ -208,3 +215,17 @@ class ScriptNameTests(SimpleTestCase):
             'PATH_INFO': '/milestones/accounts/login/help',
         })
         self.assertEqual(script_name, '/mst')
+
+
+@override_settings(ROOT_URLCONF='handlers.urls')
+class HandlerHTTPStatusEnumTest(SimpleTestCase):
+
+    @skipIf(HTTPStatus is None, 'this test is only valid on Python >= 3.5')
+    def test_handle_accepts_httpstatus_enum_value(self):
+
+        def start_response(status, headers):
+            start_response.status = status
+
+        environ = RequestFactory().get('/httpstatus_enum/').environ
+        WSGIHandler()(environ, start_response)
+        self.assertEqual(start_response.status, '200 OK')
