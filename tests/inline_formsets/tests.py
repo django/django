@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.forms.models import inlineformset_factory
+from django.forms.models import ModelForm, inlineformset_factory
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
@@ -176,3 +176,34 @@ class InlineFormsetFactoryTest(TestCase):
         formset = PoemFormSet(data, instance=poet)
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), ['Please correct the duplicate data for name.'])
+
+    def test_form_fields(self):
+        """
+        Ensure foreign key name isn't duplicated in the form._meta fields,
+        regression test for #26537
+        """
+        poet = Poet.objects.create(name='test')
+        poet.poem_set.create(name='first test poem')
+        poet.poem_set.create(name='second test poem')
+        poet.poem_set.create(name='third test poem')
+        PoemFormSet = inlineformset_factory(Poet, Poem, fields=('name',), extra=0)
+        formset = PoemFormSet(None, instance=poet)
+        self.assertEqual(len(formset.forms), 3)
+        self.assertEqual(['name', 'poet'], PoemFormSet.form._meta.fields)
+
+    def test_form_fields2(self):
+        """
+        Ensure foreign key field is present in Meta for all forms in the formset,
+        regression test for #26538
+        """
+        class PoemModelForm(ModelForm):
+            def __init__(self, *args, **kwargs):
+                assert 'poet' in self._meta.fields
+                super(PoemModelForm, self).__init__(*args, **kwargs)
+
+        poet = Poet.objects.create(name='test')
+        poet.poem_set.create(name='first test poem')
+        poet.poem_set.create(name='second test poem')
+        PoemFormSet = inlineformset_factory(Poet, Poem, form=PoemModelForm, fields=('name',), extra=0)
+        formset = PoemFormSet(None, instance=poet)
+        formset.forms  # Trigger form instantiation
