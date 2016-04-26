@@ -156,10 +156,10 @@ class URLTranslationTests(URLTestCaseBase):
             self.assertEqual(translate_url('/en/non-existent/', 'nl'), '/en/non-existent/')
             self.assertEqual(translate_url('/en/users/', 'nl'), '/nl/gebruikers/')
             # URL with arguments
-            self.assertEqual(translate_url('/en/with-arguments/regular-argument/', 'nl'), 
-                                           '/nl/with-arguments/regular-argument/')
-            self.assertEqual(translate_url('/en/with-arguments/regular-argument/optional-argument.html', 'nl'), 
-                                           '/nl/with-arguments/regular-argument/optional-argument.html')
+            self.assertEqual(translate_url('/en/with-arguments/regular-argument/', 'nl'),
+                             '/nl/with-arguments/regular-argument/')
+            self.assertEqual(translate_url('/en/with-arguments/regular-argument/optional-argument.html', 'nl'),
+                             '/nl/with-arguments/regular-argument/optional-argument.html')
             # Namespaced URL
             self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registeren/')
             self.assertEqual(translation.get_language(), 'en')
