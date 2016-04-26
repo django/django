@@ -310,7 +310,7 @@ Use the ``django.test.Client`` class to make requests.
 
     .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, **extra)
 
-        Makes an DELETE request on the provided ``path`` and returns a
+        Makes a DELETE request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
 
         When ``data`` is provided, it is used as the request body, and
