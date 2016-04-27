@@ -652,7 +652,7 @@ Keys:
 * ``scheme``: Unicode string URL scheme portion (likely ``ws`` or ``wss``).
   Optional (but must not be empty), default is ``ws``.
 
-* ``path``: Byte string HTTP path from URL.
+* ``path``: Unicode HTTP path from URL, already urldecoded.
 
 * ``query_string``: Byte string URL portion after the ``?``. Optional, default
   is empty string.
