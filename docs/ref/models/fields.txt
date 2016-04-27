@@ -788,7 +788,7 @@ that can be used to interact with the underlying file:
 
     The name of the file including the relative path from the root of the
     :class:`django.core.files.storage.Storage` in use by the associated
-    :class:`FileField`.
+    :class:`~django.db.models.FileField`.
 
 .. attribute:: FieldFile.size
 
