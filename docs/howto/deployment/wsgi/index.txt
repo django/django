@@ -37,7 +37,7 @@ deployments.
 
 WSGI servers obtain the path to the ``application`` callable from their
 configuration. Django's built-in server, namely the :djadmin:`runserver`
-command, read it from the :setting:`WSGI_APPLICATION` setting. By default, it's
+command, reads it from the :setting:`WSGI_APPLICATION` setting. By default, it's
 set to ``<project_name>.wsgi.application``, which points to the ``application``
 callable in :file:`<project_name>/wsgi.py`.
 
