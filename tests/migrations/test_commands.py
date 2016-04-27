@@ -598,10 +598,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
-            try:
-                call_command("makemigrations", merge=True, stdout=out)
-            except CommandError:
-                self.fail("Makemigrations errored in merge mode with no conflicts")
+            call_command("makemigrations", merge=True, stdout=out)
         self.assertIn("No conflicts detected to merge.", out.getvalue())
 
     def test_makemigrations_no_app_sys_exit(self):
@@ -625,10 +622,7 @@ class MakeMigrationsTests(MigrationTestBase):
         Makes sure that makemigrations properly constructs an empty migration.
         """
         with self.temporary_migration_module() as migration_dir:
-            try:
-                call_command("makemigrations", "migrations", empty=True, verbosity=0)
-            except CommandError:
-                self.fail("Makemigrations errored in creating empty migration for a proper app.")
+            call_command("makemigrations", "migrations", empty=True, verbosity=0)
 
             # Check for existing 0001_initial.py file in migration folder
             initial_file = os.path.join(migration_dir, "0001_initial.py")
@@ -710,13 +704,10 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         # Monkeypatch interactive questioner to auto reject
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
-            try:
-                with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                    call_command("makemigrations", "migrations", merge=True, interactive=True, verbosity=0)
-                    merge_file = os.path.join(migration_dir, '0003_merge.py')
-                    self.assertFalse(os.path.exists(merge_file))
-            except CommandError:
-                self.fail("Makemigrations failed while running interactive questioner")
+            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                call_command("makemigrations", "migrations", merge=True, interactive=True, verbosity=0)
+                merge_file = os.path.join(migration_dir, '0003_merge.py')
+                self.assertFalse(os.path.exists(merge_file))
 
     def test_makemigrations_interactive_accept(self):
         """
@@ -725,13 +716,10 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto accept
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
             out = six.StringIO()
-            try:
-                with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                    call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
-                    merge_file = os.path.join(migration_dir, '0003_merge.py')
-                    self.assertTrue(os.path.exists(merge_file))
-            except CommandError:
-                self.fail("Makemigrations failed while running interactive questioner")
+            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
+                merge_file = os.path.join(migration_dir, '0003_merge.py')
+                self.assertTrue(os.path.exists(merge_file))
             self.assertIn("Created new merge migration", force_text(out.getvalue()))
 
     def test_makemigrations_non_interactive_not_null_addition(self):
@@ -763,11 +751,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = "migrations"
 
         out = six.StringIO()
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations"):
-                call_command("makemigrations", "migrations", interactive=False, stdout=out)
-        except CommandError:
-            self.fail("Makemigrations failed while running non-interactive questioner.")
+        with self.temporary_migration_module(module="migrations.test_migrations"):
+            call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Alter field slug on author", force_text(out.getvalue()))
 
     def test_makemigrations_non_interactive_no_model_rename(self):
@@ -781,11 +766,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = "migrations"
 
         out = six.StringIO()
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
-                call_command("makemigrations", "migrations", interactive=False, stdout=out)
-        except CommandError:
-            self.fail("Makemigrations failed while running non-interactive questioner")
+        with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
+            call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Delete model SillyModel", force_text(out.getvalue()))
         self.assertIn("Create model RenamedModel", force_text(out.getvalue()))
 
@@ -800,11 +782,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = "migrations"
 
         out = six.StringIO()
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
-                call_command("makemigrations", "migrations", interactive=False, stdout=out)
-        except CommandError:
-            self.fail("Makemigrations failed while running non-interactive questioner")
+        with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
+            call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Remove field silly_field from sillymodel", force_text(out.getvalue()))
         self.assertIn("Add field silly_rename to sillymodel", force_text(out.getvalue()))
 
@@ -948,14 +927,11 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto reject
         out = six.StringIO()
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
-            try:
-                with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                    call_command("makemigrations", "migrations", merge=True, stdout=out)
-                    merge_file = os.path.join(migration_dir, '0003_merge.py')
-                    # This will fail if interactive is False by default
-                    self.assertFalse(os.path.exists(merge_file))
-            except CommandError:
-                self.fail("Makemigrations failed while running interactive questioner")
+            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                call_command("makemigrations", "migrations", merge=True, stdout=out)
+                merge_file = os.path.join(migration_dir, '0003_merge.py')
+                # This will fail if interactive is False by default
+                self.assertFalse(os.path.exists(merge_file))
             self.assertNotIn("Created new merge migration", out.getvalue())
 
     @override_settings(
@@ -967,11 +943,8 @@ class MakeMigrationsTests(MigrationTestBase):
         Makes sure that makemigrations does not raise a CommandError when an
         unspecified app has conflicting migrations.
         """
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
-                call_command("makemigrations", "migrations", merge=False, verbosity=0)
-        except CommandError:
-            self.fail("Makemigrations fails resolving conflicts in an unspecified app")
+        with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
+            call_command("makemigrations", "migrations", merge=False, verbosity=0)
 
     @override_settings(
         INSTALLED_APPS=[
@@ -985,14 +958,11 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto accept
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
             out = six.StringIO()
-            try:
-                with self.temporary_migration_module(app_label="migrated_app") as migration_dir:
-                    call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=out)
-                    merge_file = os.path.join(migration_dir, '0003_merge.py')
-                    self.assertFalse(os.path.exists(merge_file))
-                self.assertIn("No conflicts detected to merge.", out.getvalue())
-            except CommandError:
-                self.fail("Makemigrations fails resolving conflicts in an unspecified app")
+            with self.temporary_migration_module(app_label="migrated_app") as migration_dir:
+                call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=out)
+                merge_file = os.path.join(migration_dir, '0003_merge.py')
+                self.assertFalse(os.path.exists(merge_file))
+            self.assertIn("No conflicts detected to merge.", out.getvalue())
 
     @override_settings(
         INSTALLED_APPS=[
@@ -1034,10 +1004,7 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module() as migration_dir:
 
             def cmd(migration_count, migration_name, *args):
-                try:
-                    call_command("makemigrations", "migrations", "--verbosity", "0", "--name", migration_name, *args)
-                except CommandError:
-                    self.fail("Makemigrations errored in creating empty migration with custom name for a proper app.")
+                call_command("makemigrations", "migrations", "--verbosity", "0", "--name", migration_name, *args)
                 migration_file = os.path.join(migration_dir, "%s_%s.py" % (migration_count, migration_name))
                 # Check for existing migration file in migration folder
                 self.assertTrue(os.path.exists(migration_file))
