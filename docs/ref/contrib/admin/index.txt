@@ -641,7 +641,7 @@ subclass::
 
           admin.site.empty_value_display = '(None)'
 
-      You can also use :attr:`AdminSite.empty_value_display`::
+      You can also use :attr:`ModelAdmin.empty_value_display`::
 
           class PersonAdmin(admin.ModelAdmin):
               empty_value_display = 'unknown'
