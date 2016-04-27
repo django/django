@@ -5,7 +5,7 @@ from django.db.migrations import operations
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.test import SimpleTestCase
 
-from .models import CustomModelBase, EmptyManager
+from .models import EmptyManager, UnicodeModel
 
 
 class OptimizerTests(SimpleTestCase):
@@ -71,7 +71,7 @@ class OptimizerTests(SimpleTestCase):
                     name="Foo",
                     fields=[("name", models.CharField(max_length=255))],
                     options={'verbose_name': 'Foo'},
-                    bases=(CustomModelBase),
+                    bases=(UnicodeModel,),
                     managers=managers,
                 ),
                 migrations.RenameModel("Foo", "Bar"),
@@ -81,7 +81,7 @@ class OptimizerTests(SimpleTestCase):
                     "Bar",
                     [("name", models.CharField(max_length=255))],
                     options={'verbose_name': 'Foo'},
-                    bases=(CustomModelBase),
+                    bases=(UnicodeModel,),
                     managers=managers,
                 )
             ],
@@ -237,7 +237,7 @@ class OptimizerTests(SimpleTestCase):
                     name="Foo",
                     fields=[("name", models.CharField(max_length=255))],
                     options={'verbose_name': 'Foo'},
-                    bases=(CustomModelBase),
+                    bases=(UnicodeModel,),
                     managers=managers,
                 ),
                 migrations.AddField("Foo", "age", models.IntegerField()),
@@ -250,7 +250,7 @@ class OptimizerTests(SimpleTestCase):
                         ("age", models.IntegerField()),
                     ],
                     options={'verbose_name': 'Foo'},
-                    bases=(CustomModelBase),
+                    bases=(UnicodeModel,),
                     managers=managers,
                 ),
             ],
@@ -309,7 +309,7 @@ class OptimizerTests(SimpleTestCase):
                     name="Foo",
                     fields=[("name", models.CharField(max_length=255))],
                     options={'verbose_name': 'Foo'},
-                    bases=(CustomModelBase),
+                    bases=(UnicodeModel,),
                     managers=managers,
                 ),
                 migrations.AlterField("Foo", "name", models.IntegerField()),
@@ -321,7 +321,7 @@ class OptimizerTests(SimpleTestCase):
                         ("name", models.IntegerField()),
                     ],
                     options={'verbose_name': 'Foo'},
-                    bases=(CustomModelBase),
+                    bases=(UnicodeModel,),
                     managers=managers,
                 ),
             ],
@@ -338,7 +338,7 @@ class OptimizerTests(SimpleTestCase):
                     name="Foo",
                     fields=[("name", models.CharField(max_length=255))],
                     options={'verbose_name': 'Foo'},
-                    bases=(CustomModelBase),
+                    bases=(UnicodeModel,),
                     managers=managers,
                 ),
                 migrations.RenameField("Foo", "name", "title"),
@@ -350,7 +350,7 @@ class OptimizerTests(SimpleTestCase):
                         ("title", models.CharField(max_length=255)),
                     ],
                     options={'verbose_name': 'Foo'},
-                    bases=(CustomModelBase),
+                    bases=(UnicodeModel,),
                     managers=managers,
                 ),
             ],
@@ -401,7 +401,7 @@ class OptimizerTests(SimpleTestCase):
                         ("age", models.IntegerField()),
                     ],
                     options={'verbose_name': 'Foo'},
-                    bases=(CustomModelBase),
+                    bases=(UnicodeModel,),
                     managers=managers,
                 ),
                 migrations.RemoveField("Foo", "age"),
@@ -413,7 +413,7 @@ class OptimizerTests(SimpleTestCase):
                         ("name", models.CharField(max_length=255)),
                     ],
                     options={'verbose_name': 'Foo'},
-                    bases=(CustomModelBase),
+                    bases=(UnicodeModel,),
                     managers=managers,
                 ),
             ],
