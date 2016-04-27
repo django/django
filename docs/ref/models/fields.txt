@@ -786,83 +786,83 @@ that can be used to interact with the underlying file:
 
 .. attribute:: FieldFile.name
 
-    The name of the file including the relative path from the root of the
-    :class:`django.core.files.storage.Storage` in use by the associated
-    :class:`~django.db.models.FileField`.
+The name of the file including the relative path from the root of the
+:class:`django.core.files.storage.Storage` in use by the associated
+:class:`~django.db.models.FileField`.
 
 .. attribute:: FieldFile.size
 
-    The result of the underlying :attr:`django.core.files.storage.Storage.size`
-    method.
+The result of the underlying :attr:`django.core.files.storage.Storage.size`
+method.
 
 .. attribute:: FieldFile.url
 
-    A read-only property to access the file's relative URL by calling the
-    :meth:`~django.core.files.storage.Storage.url` method of the underlying
-    :class:`~django.core.files.storage.Storage` class.
+A read-only property to access the file's relative URL by calling the
+:meth:`~django.core.files.storage.Storage.url` method of the underlying
+:class:`~django.core.files.storage.Storage` class.
 
 .. method:: FieldFile.open(mode='rb')
 
-    Opens or reopens the file associated with this instance in the mode
-    specified by ``mode``. Unlike the standard Python ``open()`` method, this
-    method does *not* return a file descriptor.
+Opens or reopens the file associated with this instance in the mode
+specified by ``mode``. Unlike the standard Python ``open()`` method, this
+method does *not* return a file descriptor.
 
-    .. note::
-        The underlying ``file`` attribute (the object wrapped by this class) is
-        opened implicitly when accessed for the first time, so it may be
-        unnecessary to call this method except to reset the pointer to the
-        underlying file or change the ``mode``.
+.. note::
+    The underlying ``file`` attribute (the object wrapped by this class) is
+    opened implicitly when accessed for the first time, so it may be
+    unnecessary to call this method except to reset the pointer to the
+    underlying file or change the ``mode``.
 
 .. method:: FieldFile.close()
 
-    Behaves like the standard Python ``file.close()`` method and closes the file
-    associated with this instance.
+Behaves like the standard Python ``file.close()`` method and closes the file
+associated with this instance.
 
 .. method:: FieldFile.save(name, content, save=True)
 
-    This method takes a filename and file contents and passes them to the
-    storage class for the field, then associates the stored file with the model
-    field. If you want to manually associate file data with
-    :class:`~django.db.models.FileField` instances on your model, the ``save()``
-    method is used to persist that file data.
+This method takes a filename and file contents and passes them to the storage
+class for the field, then associates the stored file with the model field.
+If you want to manually associate file data with
+:class:`~django.db.models.FileField` instances on your model, the ``save()``
+method is used to persist that file data.
 
-    Takes two required arguments: ``name`` which is the name of the file, and
-    ``content`` which is an object containing the file's contents.  The
-    optional ``save`` argument controls whether or not the model instance is
-    saved after the file associated with this field has been altered. Defaults
-    to ``True``.
+Takes two required arguments: ``name`` which is the name of the file, and
+``content`` which is an object containing the file's contents.  The
+optional ``save`` argument controls whether or not the model instance is
+saved after the file associated with this field has been altered. Defaults to
+``True``.
 
-    Note that the ``content`` argument should be an instance of
-    :class:`django.core.files.File`, not Python's built-in file object.
-    You can construct a :class:`~django.core.files.File` from an existing
-    Python file object like this::
+Note that the ``content`` argument should be an instance of
+:class:`django.core.files.File`, not Python's built-in file object.
+You can construct a :class:`~django.core.files.File` from an existing
+Python file object like this::
 
-        from django.core.files import File
-        # Open an existing file using Python's built-in open()
-        f = open('/path/to/hello.world')
-        myfile = File(f)
+    from django.core.files import File
+    # Open an existing file using Python's built-in open()
+    f = open('/path/to/hello.world')
+    myfile = File(f)
 
-    Or you can construct one from a Python string like this::
+Or you can construct one from a Python string like this::
 
-        from django.core.files.base import ContentFile
-        myfile = ContentFile("hello world")
+    from django.core.files.base import ContentFile
+    myfile = ContentFile("hello world")
 
-    For more information, see :doc:`/topics/files`.
+For more information, see :doc:`/topics/files`.
 
 .. method:: FieldFile.delete(save=True)
 
-    Deletes the file associated with this instance and clears all attributes on
-    the field. Note: This method will close the file if it happens to be open
-    when ``delete()`` is called.
+Deletes the file associated with this instance and clears all attributes on
+the field. Note: This method will close the file if it happens to be open when
+``delete()`` is called.
 
-    The optional ``save`` argument controls whether or not the model instance is
-    saved after the file associated with this field has been deleted. Defaults
-    to ``True``.
+The optional ``save`` argument controls whether or not the model instance is
+saved after the file associated with this field has been deleted. Defaults to
+``True``.
 
-    Note that when a model is deleted, related files are not deleted. If you
-    need to cleanup orphaned files, you'll need to handle it yourself (for
-    instance, with a custom management command that can be run manually or
-    scheduled to run periodically via e.g. cron).
+Note that when a model is deleted, related files are not deleted. If you need
+to cleanup orphaned files, you'll need to handle it yourself (for instance,
+with a custom management command that can be run manually or scheduled to run
+periodically via e.g. cron).
 
 .. currentmodule:: django.db.models
 
