@@ -1,5 +1,7 @@
 from django.conf import settings
-from django.core.checks.urls import check_url_config
+from django.core.checks.urls import (
+    check_url_config, get_warning_for_invalid_pattern,
+)
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
@@ -60,3 +62,19 @@ class CheckUrlsTest(SimpleTestCase):
         delattr(settings, 'ROOT_URLCONF')
         result = check_url_config(None)
         self.assertEqual(result, [])
+
+    def test_get_warning_for_invalid_pattern_string(self):
+        warning = get_warning_for_invalid_pattern('')[0]
+        self.assertEqual(
+            warning.hint,
+            "Try removing the string ''. The list of urlpatterns should "
+            "not have a prefix string as the first element.",
+        )
+
+    def test_get_warning_for_invalid_pattern_tuple(self):
+        warning = get_warning_for_invalid_pattern((r'^$', lambda x: x))[0]
+        self.assertEqual(warning.hint, "Try using url() instead of a tuple.")
+
+    def test_get_warning_for_invalid_pattern_other(self):
+        warning = get_warning_for_invalid_pattern(object())[0]
+        self.assertIsNone(warning.hint)
