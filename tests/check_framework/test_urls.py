@@ -10,6 +10,14 @@ class CheckUrlsTest(SimpleTestCase):
         result = check_url_config(None)
         self.assertEqual(result, [])
 
+    @override_settings(ROOT_URLCONF='check_framework.urls.warning_in_include')
+    def test_check_resolver_recursive(self):
+        # The resolver is checked recursively (examining url()s in include()).
+        result = check_url_config(None)
+        self.assertEqual(len(result), 1)
+        warning = result[0]
+        self.assertEqual(warning.id, 'urls.W001')
+
     @override_settings(ROOT_URLCONF='check_framework.urls.include_with_dollar')
     def test_include_with_dollar(self):
         result = check_url_config(None)
