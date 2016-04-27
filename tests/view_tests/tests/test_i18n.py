@@ -167,6 +167,13 @@ class I18NTests(TestCase):
         )
         self.assertRedirects(response, '/en/translated/')
 
+
+@override_settings(ROOT_URLCONF='view_tests.urls')
+class JsI18NTests(SimpleTestCase):
+    """
+    Tests views in django/views/i18n.py that need to change
+    settings.LANGUAGE_CODE.
+    """
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""
         for lang_code in ['es', 'fr', 'ru']:
@@ -185,6 +192,13 @@ class I18NTests(TestCase):
                     # Message with context (msgctxt)
                     self.assertContains(response, '"month name\\u0004May": "mai"', 1)
 
+    @override_settings(USE_I18N=False)
+    def test_jsi18n_USE_I18N_False(self):
+        response = self.client.get('/jsi18n/')
+        # default plural function
+        self.assertContains(response, 'django.pluralidx = function(count) { return (count == 1) ? 0 : 1; };')
+        self.assertNotContains(response, 'var newcatalog =')
+
     def test_jsoni18n(self):
         """
         The json_catalog returns the language catalog and settings as JSON.
@@ -198,14 +212,6 @@ class I18NTests(TestCase):
             self.assertEqual(data['catalog']['month name\x04May'], 'Mai')
             self.assertIn('DATETIME_FORMAT', data['formats'])
             self.assertEqual(data['plural'], '(n != 1)')
-
-
-@override_settings(ROOT_URLCONF='view_tests.urls')
-class JsI18NTests(SimpleTestCase):
-    """
-    Tests django views in django/views/i18n.py that need to change
-    settings.LANGUAGE_CODE.
-    """
 
     def test_jsi18n_with_missing_en_files(self):
         """
@@ -304,7 +310,7 @@ class JsI18NTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class JsI18NTestsMultiPackage(SimpleTestCase):
     """
-    Tests for django views in django/views/i18n.py that need to change
+    Tests views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE and merge JS translation from several packages.
     """
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})

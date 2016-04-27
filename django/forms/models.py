@@ -278,7 +278,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
 class BaseModelForm(BaseForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
-                 empty_permitted=False, instance=None):
+                 empty_permitted=False, instance=None, use_required_attribute=None):
         opts = self._meta
         if opts.model is None:
             raise ValueError('ModelForm has no model class specified.')
@@ -296,8 +296,10 @@ class BaseModelForm(BaseForm):
         # It is False by default so overriding self.clean() and failing to call
         # super will stop validate_unique from being called.
         self._validate_unique = False
-        super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
-                                            error_class, label_suffix, empty_permitted)
+        super(BaseModelForm, self).__init__(
+            data, files, auto_id, prefix, object_data, error_class,
+            label_suffix, empty_permitted, use_required_attribute=use_required_attribute,
+        )
         # Apply ``limit_choices_to`` to each field.
         for field_name in self.fields:
             formfield = self.fields[field_name]
@@ -887,6 +889,13 @@ class BaseInlineFormSet(BaseModelFormSet):
         super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix,
                                                 queryset=qs, **kwargs)
 
+        # Add the generated field to form._meta.fields if it's defined to make
+        # sure validation isn't skipped on that field.
+        if self.form._meta.fields and self.fk.name not in self.form._meta.fields:
+            if isinstance(self.form._meta.fields, tuple):
+                self.form._meta.fields = list(self.form._meta.fields)
+            self.form._meta.fields.append(self.fk.name)
+
     def initial_form_count(self):
         if self.save_as_new:
             return 0
@@ -957,13 +966,6 @@ class BaseInlineFormSet(BaseModelFormSet):
                 setattr(self.instance, to_field.attname, None)
 
         form.fields[name] = InlineForeignKeyField(self.instance, **kwargs)
-
-        # Add the generated field to form._meta.fields if it's defined to make
-        # sure validation isn't skipped on that field.
-        if form._meta.fields:
-            if isinstance(form._meta.fields, tuple):
-                form._meta.fields = list(form._meta.fields)
-            form._meta.fields.append(self.fk.name)
 
     def get_unique_error_message(self, unique_check):
         unique_check = [field for field in unique_check if field != self.fk.name]

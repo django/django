@@ -24,7 +24,14 @@ recommend** and only officially support the latest release of each series.
 What's new in Django 1.10
 =========================
 
-...
+Full text search for PostgreSQL
+-------------------------------
+
+``django.contrib.postgres`` now includes a :doc:`collection of database
+functions </ref/contrib/postgres/search>` to allow the use of the full text
+search engine. You can search across multiple fields in your relational
+database, combine the searches with other lookups, use different language
+configurations and weightings, and rank the results by relevance.
 
 Minor features
 --------------
@@ -256,6 +263,15 @@ Forms
 * Form and widget ``Media`` is now served using
   :mod:`django.contrib.staticfiles` if installed.
 
+* The ``<input>`` tag rendered by :class:`~django.forms.CharField` now includes
+  a ``minlength`` attribute if the field has a ``min_length``.
+
+* Required form fields now have the ``required`` HTML attribute. Set the new
+  :attr:`Form.use_required_attribute <django.forms.Form.use_required_attribute>`
+  attribute to ``False`` to disable it. The ``required`` attribute isn't
+  included on forms of formsets because the browser validation may not be
+  correct when adding and deleting formsets.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -276,6 +292,14 @@ Internationalization
 * :func:`~django.views.i18n.set_language` now returns a 204 status code (No
   Content) for AJAX requests when there is no ``next`` parameter in ``POST`` or
   ``GET``.
+
+* The :class:`~django.views.i18n.JavaScriptCatalog` and
+  :class:`~django.views.i18n.JSONCatalog` class-based views supersede the
+  deprecated ``javascript_catalog()`` and ``json_catalog()`` function-based
+  views. The new views are almost equivalent to the old ones except that by
+  default the new views collect all JavaScript strings in the ``djangojs``
+  translation domain from all installed apps rather than only the JavaScript
+  strings from :setting:`LOCALE_PATHS`.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -646,13 +670,28 @@ You can check if your database has any of the removed hashers like this::
     # Unsalted MD5 passwords might not have an 'md5$$' prefix:
     User.objects.filter(password__length=32)
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for SpatiaLite < 3.0 and GEOS < 3.3 is dropped.
+
+* The ``add_postgis_srs()`` backwards compatibility alias for
+  ``django.contrib.gis.utils.add_srs_entry()`` is removed.
+
+* On Oracle/GIS, the :class:`~django.contrib.gis.db.models.functions.Area`
+  aggregate function now returns a ``float`` instead of ``decimal.Decimal``.
+  (It's still wrapped in a measure of square meters.)
+
+* The default :class:`~django.contrib.gis.geos.GEOSGeometry` representation (WKT
+  output) is trimmed by default. That is, instead of
+  ``POINT (23.0000000000000000 5.5000000000000000)``, you'll get
+  ``POINT (23 5.5)``.
+
 Miscellaneous
 -------------
 
 * The ``repr()`` of a ``QuerySet`` is wrapped in ``<QuerySet >`` to
   disambiguate it from a plain list when debugging.
-
-* Support for SpatiaLite < 3.0 and GEOS < 3.3 is dropped.
 
 * ``utils.version.get_version()`` returns :pep:`440` compliant release
   candidate versions (e.g. '1.10rc1' instead of '1.10c1').
@@ -660,9 +699,6 @@ Miscellaneous
 * The ``LOGOUT_URL`` setting is removed as Django hasn't made use of it
   since pre-1.0. If you use it in your project, you can add it to your
   project's settings. The default value was ``'/accounts/logout/'``.
-
-* The ``add_postgis_srs()`` backwards compatibility alias for
-  ``django.contrib.gis.utils.add_srs_entry()`` is removed.
 
 * Objects with a ``close()`` method such as files and generators passed to
   :class:`~django.http.HttpResponse` are now closed immediately instead of when
@@ -689,10 +725,6 @@ Miscellaneous
   ``SelectMultiple`` widgets' ``render()`` method is removed. The ``choices``
   argument of the ``render_options()`` method is also removed, making
   ``selected_choices`` the first argument.
-
-* On Oracle/GIS, the :class:`~django.contrib.gis.db.models.functions.Area`
-  aggregate function now returns a ``float`` instead of ``decimal.Decimal``.
-  (It's still wrapped in a measure of square meters.)
 
 * Tests that violate deferrable database constraints will now error when run on
   a database that supports deferrable constraints.
@@ -733,6 +765,23 @@ Miscellaneous
 * If you override ``is_authenticated()`` or ``is_anonymous()`` in a custom user
   model, you must convert them to attributes or properties as described in
   :ref:`the deprecation note <user-is-auth-anon-deprecation>`.
+
+* When using :attr:`ModelAdmin.save_as=True
+  <django.contrib.admin.ModelAdmin.save_as>`, the "Save as new" button now
+  redirects to the change view for the new object instead of to the model's
+  changelist. If you need the previous behavior, set the new
+  :attr:`ModelAdmin.save_as_continue
+  <django.contrib.admin.ModelAdmin.save_as_continue>` attribute to ``False``.
+
+* Required form fields now have the ``required`` HTML attribute. Set the
+  :attr:`Form.use_required_attribute <django.forms.Form.use_required_attribute>`
+  attribute to ``False`` to disable it. You could also add the ``novalidate``
+  attribute to ``<form>`` if you don't want browser validation.
+
+* The WSGI handler no longer removes content of responses from ``HEAD``
+  requests or responses with a ``status_code`` of 100-199, 204, or 304. Most
+  Web servers already implement this behavior. Responses retrieved using the
+  Django test client continue to have these "response fixes" applied.
 
 .. _deprecated-features-1.10:
 
@@ -787,6 +836,9 @@ wish to support earlier versions of Django.
 * The ``cascaded_union`` property of
   :class:`~django.contrib.gis.geos.MultiPolygon` is deprecated in favor of the
   :attr:`~django.contrib.gis.geos.GEOSGeometry.unary_union` property.
+
+* The ``django.contrib.gis.utils.precision_wkt()`` function is deprecated in
+  favor of :class:`~django.contrib.gis.geos.WKTWriter`.
 
 ``CommaSeparatedIntegerField`` model field
 ------------------------------------------
@@ -928,6 +980,17 @@ Miscellaneous
   ``Field.contribute_to_class()`` and ``virtual`` in
   ``Model._meta.add_field()`` are deprecated in favor of ``private_only``
   and ``private``, respectively.
+
+* The ``javascript_catalog()`` and ``json_catalog()`` views are deprecated in
+  favor of class-based views :class:`~django.views.i18n.JavaScriptCatalog`
+  and :class:`~django.views.i18n.JSONCatalog`.
+
+* In multi-table inheritance, implicit promotion of a ``OneToOneField`` to a
+  ``parent_link`` is deprecated. Add ``parent_link=True`` to such fields.
+
+* The private API ``Widget._format_value()`` is made public and renamed to
+  :meth:`~django.forms.Widget.format_value`. The old name will work
+  through a deprecation period.
 
 .. _removed-features-1.10:
 

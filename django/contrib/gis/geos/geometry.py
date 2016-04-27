@@ -408,7 +408,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def wkt(self):
         "Returns the WKT (Well-Known Text) representation of this Geometry."
-        return wkt_w(3 if self.hasz else 2).write(self).decode()
+        return wkt_w(dim=3 if self.hasz else 2, trim=True).write(self).decode()
 
     @property
     def hex(self):
@@ -419,7 +419,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         # A possible faster, all-python, implementation:
         #  str(self.wkb).encode('hex')
-        return wkb_w(3 if self.hasz else 2).write_hex(self)
+        return wkb_w(dim=3 if self.hasz else 2).write_hex(self)
 
     @property
     def hexewkb(self):
@@ -428,7 +428,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         extension of the WKB specification that includes SRID value that are
         a part of this geometry.
         """
-        return ewkb_w(3 if self.hasz else 2).write_hex(self)
+        return ewkb_w(dim=3 if self.hasz else 2).write_hex(self)
 
     @property
     def json(self):

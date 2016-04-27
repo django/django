@@ -14,7 +14,7 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property, curry
 from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_docs_version
@@ -696,13 +696,6 @@ class ForeignObject(RelatedField):
     def get_transform(self, *args, **kwargs):
         raise NotImplementedError('Relational fields do not support transforms.')
 
-    @property
-    def attnames(self):
-        return tuple(field.attname for field in self.local_related_fields)
-
-    def get_defaults(self):
-        return tuple(field.get_default() for field in self.local_related_fields)
-
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
         super(ForeignObject, self).contribute_to_class(cls, name, private_only=private_only, **kwargs)
         setattr(cls, self.name, ForwardManyToOneDescriptor(self))
@@ -917,18 +910,6 @@ class ForeignKey(ForeignObject):
 
     def get_db_prep_value(self, value, connection, prepared=False):
         return self.target_field.get_db_prep_value(value, connection, prepared)
-
-    def value_to_string(self, obj):
-        if not obj:
-            # In required many-to-one fields with only one available choice,
-            # select that one available choice. Note: For SelectFields
-            # we have to check that the length of choices is *2*, not 1,
-            # because SelectFields always have an initial "blank" value.
-            if not self.blank and self.choices:
-                choice_list = self.get_choices_default()
-                if len(choice_list) == 2:
-                    return smart_text(choice_list[1][0])
-        return super(ForeignKey, self).value_to_string(obj)
 
     def contribute_to_related_class(self, cls, related):
         super(ForeignKey, self).contribute_to_related_class(cls, related)
@@ -1462,9 +1443,6 @@ class ManyToManyField(RelatedField):
     def get_reverse_path_info(self):
         return self._get_path_info(direct=False)
 
-    def get_choices_default(self):
-        return Field.get_choices(self, include_blank=False)
-
     def _get_m2m_db_table(self, opts):
         """
         Function that can be curried to provide the m2m table name for this
@@ -1524,20 +1502,6 @@ class ManyToManyField(RelatedField):
                     setattr(self, cache_attr, getattr(f, attr))
                     break
         return getattr(self, cache_attr)
-
-    def value_to_string(self, obj):
-        data = ''
-        if obj:
-            qs = getattr(obj, self.name).all()
-            data = [instance._get_pk_val() for instance in qs]
-        else:
-            # In required many-to-many fields with only one available choice,
-            # select that one available choice.
-            if not self.blank:
-                choices_list = self.get_choices_default()
-                if len(choices_list) == 1:
-                    data = [choices_list[0][0]]
-        return smart_text(data)
 
     def contribute_to_class(self, cls, name, **kwargs):
         # To support multiple relations to self, it's useful to have a non-None

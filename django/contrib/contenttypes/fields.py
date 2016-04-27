@@ -401,9 +401,6 @@ class GenericRelation(ForeignObject):
         from_opts = self.remote_field.model._meta
         return [PathInfo(from_opts, opts, (opts.pk,), self, not self.unique, False)]
 
-    def get_choices_default(self):
-        return super(GenericRelation, self).get_choices(include_blank=False)
-
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
         return smart_text([instance._get_pk_val() for instance in qs])
@@ -574,7 +571,7 @@ def create_generic_related_manager(superclass, rel):
                     if obj._state.adding or obj._state.db != db:
                         raise ValueError(
                             "%r instance isn't saved. Use bulk=False or save "
-                            "the object first. but must be." % obj
+                            "the object first." % obj
                         )
                     check_and_update_obj(obj)
                     pks.append(obj.pk)

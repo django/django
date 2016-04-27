@@ -81,16 +81,29 @@ class CharFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         """
         CharField.widget_attrs() always returns a dictionary (#15912).
         """
-        # Return an empty dictionary if max_length is None
+        # Return an empty dictionary if max_length and min_length are both None.
         f = CharField()
         self.assertEqual(f.widget_attrs(TextInput()), {})
         self.assertEqual(f.widget_attrs(Textarea()), {})
 
-        # Otherwise, return a maxlength attribute equal to max_length
+        # Return a maxlength attribute equal to max_length.
         f = CharField(max_length=10)
         self.assertEqual(f.widget_attrs(TextInput()), {'maxlength': '10'})
         self.assertEqual(f.widget_attrs(PasswordInput()), {'maxlength': '10'})
         self.assertEqual(f.widget_attrs(Textarea()), {'maxlength': '10'})
+
+        # Return a minlength attribute equal to min_length.
+        f = CharField(min_length=5)
+        self.assertEqual(f.widget_attrs(TextInput()), {'minlength': '5'})
+        self.assertEqual(f.widget_attrs(PasswordInput()), {'minlength': '5'})
+        self.assertEqual(f.widget_attrs(Textarea()), {'minlength': '5'})
+
+        # Return both maxlength and minlength when both max_length and
+        # min_length are set.
+        f = CharField(max_length=10, min_length=5)
+        self.assertEqual(f.widget_attrs(TextInput()), {'maxlength': '10', 'minlength': '5'})
+        self.assertEqual(f.widget_attrs(PasswordInput()), {'maxlength': '10', 'minlength': '5'})
+        self.assertEqual(f.widget_attrs(Textarea()), {'maxlength': '10', 'minlength': '5'})
 
     def test_charfield_strip(self):
         """
@@ -106,4 +119,4 @@ class CharFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_charfield_disabled(self):
         f = CharField(disabled=True)
-        self.assertWidgetRendersTo(f, '<input type="text" name="f" id="id_f" disabled />')
+        self.assertWidgetRendersTo(f, '<input type="text" name="f" id="id_f" disabled required />')

@@ -5,8 +5,7 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import Q, refs_aggregate
+from django.db.models.query_utils import Q
 from django.utils import six, timezone
 from django.utils.functional import cached_property
 
@@ -125,9 +124,11 @@ class BaseExpression(object):
 
     # aggregate specific fields
     is_summary = False
+    _output_field = None
 
     def __init__(self, output_field=None):
-        self._output_field = output_field
+        if output_field is not None:
+            self._output_field = output_field
 
     def get_db_converters(self, connection):
         return [self.convert_value] + self.output_field.get_db_converters(connection)
@@ -304,24 +305,6 @@ class BaseExpression(object):
         c.copied = True
         return c
 
-    def refs_aggregate(self, existing_aggregates):
-        """
-        Does this expression contain a reference to some of the
-        existing aggregates? If so, returns the aggregate and also
-        the lookup parts that *weren't* found. So, if
-            existing_aggregates = {'max_id': Max('id')}
-            self.name = 'max_id'
-            queryset.filter(max_id__range=[10,100])
-        then this method will return Max('id') and those parts of the
-        name that weren't found. In this case `max_id` is found and the range
-        portion is returned as ('range',).
-        """
-        for node in self.get_source_expressions():
-            agg, lookup = node.refs_aggregate(existing_aggregates)
-            if agg:
-                return agg, lookup
-        return False, ()
-
     def get_group_by_cols(self):
         if not self.contains_aggregate:
             return [self]
@@ -479,9 +462,6 @@ class F(Combinable):
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return query.resolve_ref(self.name, allow_joins, reuse, summarize)
-
-    def refs_aggregate(self, existing_aggregates):
-        return refs_aggregate(self.name.split(LOOKUP_SEP), existing_aggregates)
 
     def asc(self):
         return OrderBy(self)

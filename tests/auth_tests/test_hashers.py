@@ -457,11 +457,43 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
+        # Old hashes without version attribute
+        encoded = (
+            'argon2$argon2i$m=8,t=1,p=1$c29tZXNhbHQ$gwQOXSNhxiOxPOA0+PY10P9QFO'
+            '4NAYysnqRt1GSQLE55m+2GYDt9FEjPMHhP2Cuf0nOEXXMocVrsJAtNSsKyfg'
+        )
+        self.assertTrue(check_password('secret', encoded))
+        self.assertFalse(check_password('wrong', encoded))
 
     def test_argon2_upgrade(self):
         self._test_argon2_upgrade('time_cost', 'time cost', 1)
         self._test_argon2_upgrade('memory_cost', 'memory cost', 16)
         self._test_argon2_upgrade('parallelism', 'parallelism', 1)
+
+    def test_argon2_version_upgrade(self):
+        hasher = get_hasher('argon2')
+        state = {'upgraded': False}
+        encoded = (
+            'argon2$argon2i$m=8,t=1,p=1$c29tZXNhbHQ$gwQOXSNhxiOxPOA0+PY10P9QFO'
+            '4NAYysnqRt1GSQLE55m+2GYDt9FEjPMHhP2Cuf0nOEXXMocVrsJAtNSsKyfg'
+        )
+
+        def setter(password):
+            state['upgraded'] = True
+
+        old_m = hasher.memory_cost
+        old_t = hasher.time_cost
+        old_p = hasher.parallelism
+        try:
+            hasher.memory_cost = 8
+            hasher.time_cost = 1
+            hasher.parallelism = 1
+            self.assertTrue(check_password('secret', encoded, setter, 'argon2'))
+            self.assertTrue(state['upgraded'])
+        finally:
+            hasher.memory_cost = old_m
+            hasher.time_cost = old_t
+            hasher.parallelism = old_p
 
     def _test_argon2_upgrade(self, attr, summary_key, new_value):
         hasher = get_hasher('argon2')

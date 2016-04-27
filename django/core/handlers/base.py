@@ -24,10 +24,6 @@ logger = logging.getLogger('django.request')
 
 
 class BaseHandler(object):
-    # Changes that are always applied to a response (in this order).
-    response_fixes = [
-        http.conditional_content_removal,
-    ]
 
     def __init__(self):
         self._request_middleware = None
@@ -179,10 +175,6 @@ class BaseHandler(object):
                 response_is_rendered = True
 
         except http.Http404 as exc:
-            logger.warning(
-                'Not Found: %s', request.path,
-                extra={'status_code': 404, 'request': request},
-            )
             if settings.DEBUG:
                 response = debug.technical_404_response(request, exc)
             else:
@@ -234,7 +226,6 @@ class BaseHandler(object):
                         "%s.process_response didn't return an "
                         "HttpResponse object. It returned None instead."
                         % (middleware_method.__self__.__class__.__name__))
-            response = self.apply_response_fixes(request, response)
         except Exception:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
@@ -245,6 +236,12 @@ class BaseHandler(object):
         # been rendered, force it to be rendered.
         if not response_is_rendered and callable(getattr(response, 'render', None)):
             response = response.render()
+
+        if response.status_code == 404:
+            logger.warning(
+                'Not Found: %s', request.path,
+                extra={'status_code': 404, 'request': request},
+            )
 
         return response
 
@@ -287,13 +284,3 @@ class BaseHandler(object):
         # Return an HttpResponse that displays a friendly error message.
         callback, param_dict = resolver.resolve_error_handler(500)
         return callback(request, **param_dict)
-
-    def apply_response_fixes(self, request, response):
-        """
-        Applies each of the functions in self.response_fixes to the request and
-        response, modifying the response in the process. Returns the new
-        response.
-        """
-        for func in self.response_fixes:
-            response = func(request, response)
-        return response

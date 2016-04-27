@@ -5,6 +5,7 @@ import collections
 import copy
 import datetime
 import decimal
+import itertools
 import uuid
 import warnings
 from base64 import b64decode, b64encode
@@ -19,7 +20,7 @@ from django.core import checks, exceptions, validators
 # purposes.
 from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
-from django.db.models.query_utils import QueryWrapper, RegisterLookupMixin
+from django.db.models.query_utils import RegisterLookupMixin
 from django.utils import six, timezone
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
@@ -531,9 +532,11 @@ class Field(RegisterLookupMixin):
 
     @cached_property
     def validators(self):
-        # Some validators can't be created at field initialization time.
-        # This method provides a way to delay their creation until required.
-        return self.default_validators + self._validators
+        """
+        Some validators can't be created at field initialization time.
+        This method provides a way to delay their creation until required.
+        """
+        return list(itertools.chain(self.default_validators, self._validators))
 
     def run_validators(self, value):
         if value in self.empty_values:
@@ -777,31 +780,13 @@ class Field(RegisterLookupMixin):
         if not prepared:
             value = self.get_prep_lookup(lookup_type, value)
             prepared = True
-        if hasattr(value, 'get_compiler'):
-            value = value.get_compiler(connection=connection)
-        if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
-            # If the value has a relabeled_clone method it means the
-            # value will be handled later on.
-            if hasattr(value, 'relabeled_clone'):
-                return value
-            if hasattr(value, 'as_sql'):
-                sql, params = value.as_sql()
-            else:
-                sql, params = value._as_sql(connection=connection)
-            return QueryWrapper(('(%s)' % sql), params)
 
-        if lookup_type in ('search', 'regex', 'iregex', 'contains',
-                           'icontains', 'iexact', 'startswith', 'endswith',
-                           'istartswith', 'iendswith'):
-            return [value]
-        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
+        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
             return [self.get_db_prep_value(value, connection=connection,
                                            prepared=prepared)]
         elif lookup_type in ('range', 'in'):
             return [self.get_db_prep_value(v, connection=connection,
                                            prepared=prepared) for v in value]
-        elif lookup_type == 'isnull':
-            return []
         else:
             return [value]
 
@@ -851,9 +836,6 @@ class Field(RegisterLookupMixin):
                    for x in rel_model._default_manager.complex_filter(
                        limit_choices_to)]
         return first_choice + lst
-
-    def get_choices_default(self):
-        return self.get_choices()
 
     @warn_about_renamed_method(
         'Field', '_get_val_from_obj', 'value_from_object',

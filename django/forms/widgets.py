@@ -15,6 +15,9 @@ from django.templatetags.static import static
 from django.utils import datetime_safe, formats, six
 from django.utils.datastructures import MultiValueDict
 from django.utils.dates import MONTHS
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RenameMethodsBase,
+)
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
@@ -174,7 +177,13 @@ class SubWidget(object):
         return self.parent_widget.render(*args)
 
 
-class Widget(six.with_metaclass(MediaDefiningClass)):
+class RenameWidgetMethods(MediaDefiningClass, RenameMethodsBase):
+    renamed_methods = (
+        ('_format_value', 'format_value', RemovedInDjango20Warning),
+    )
+
+
+class Widget(six.with_metaclass(RenameWidgetMethods)):
     needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
@@ -248,7 +257,7 @@ class Input(Widget):
     """
     input_type = None  # Subclasses must define this.
 
-    def _format_value(self, value):
+    def format_value(self, value):
         if self.is_localized:
             return formats.localize_input(value)
         return value
@@ -259,7 +268,7 @@ class Input(Widget):
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_text(self._format_value(value))
+            final_attrs['value'] = force_text(self.format_value(value))
         return format_html('<input{} />', flatatt(final_attrs))
 
 
@@ -443,7 +452,7 @@ class DateTimeBaseInput(TextInput):
         super(DateTimeBaseInput, self).__init__(attrs)
         self.format = format if format else None
 
-    def _format_value(self, value):
+    def format_value(self, value):
         return formats.localize_input(value, self.format or formats.get_format(self.format_key)[0])
 
 

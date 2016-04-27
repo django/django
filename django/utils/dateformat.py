@@ -34,6 +34,11 @@ class Formatter(object):
         pieces = []
         for i, piece in enumerate(re_formatchars.split(force_text(formatstr))):
             if i % 2:
+                if type(self.data) is datetime.date and hasattr(TimeFormat, piece):
+                    raise TypeError(
+                        "The format for date objects may not contain "
+                        "time-related format specifiers (found '%s')." % piece
+                    )
                 pieces.append(force_text(getattr(self, piece)()))
             elif piece:
                 pieces.append(re_escaped.sub(r'\1', piece))

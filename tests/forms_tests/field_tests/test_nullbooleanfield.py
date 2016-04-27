@@ -67,3 +67,10 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertTrue(f.has_changed(True, False))
         self.assertTrue(f.has_changed(True, None))
         self.assertTrue(f.has_changed(True, False))
+        # HiddenInput widget sends string values for boolean but doesn't clean them in value_from_datadict
+        self.assertFalse(f.has_changed(False, 'False'))
+        self.assertFalse(f.has_changed(True, 'True'))
+        self.assertFalse(f.has_changed(None, ''))
+        self.assertTrue(f.has_changed(False, 'True'))
+        self.assertTrue(f.has_changed(True, 'False'))
+        self.assertTrue(f.has_changed(None, 'False'))

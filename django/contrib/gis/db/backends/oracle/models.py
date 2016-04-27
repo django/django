@@ -65,7 +65,3 @@ class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
     @property
     def wkt(self):
         return self.wktext
-
-    @classmethod
-    def wkt_col(cls):
-        return 'wktext'
