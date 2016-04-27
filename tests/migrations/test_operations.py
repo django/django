@@ -10,7 +10,7 @@ from django.db.transaction import atomic
 from django.db.utils import IntegrityError
 from django.test import override_settings, skipUnlessDBFeature
 
-from .models import FoodManager, FoodQuerySet
+from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import MigrationTestBase
 
 try:
@@ -199,6 +199,60 @@ class OperationTests(OperationTestBase):
         operation = migrations.CreateModel("Foo", fields=[], managers=[("objects", models.Manager())])
         definition = operation.deconstruct()
         self.assertNotIn('managers', definition[2])
+
+    def test_create_model_with_duplicate_field_name(self):
+        with self.assertRaisesMessage(ValueError, "Found duplicate field in CreateModel operation."):
+            migrations.CreateModel(
+                "Pony",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("pink", models.TextField()),
+                    ("pink", models.IntegerField(default=1)),
+                ],
+            )
+
+    def test_create_model_with_duplicate_base(self):
+        with self.assertRaisesMessage(ValueError, "Found duplicate base in CreateModel operation."):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=("test_crmo.Pony", "test_crmo.Pony",),
+            )
+        with self.assertRaisesMessage(ValueError, "Found duplicate base in CreateModel operation."):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=(UnicodeModel, UnicodeModel,),
+            )
+        with self.assertRaisesMessage(ValueError, "Found duplicate base in CreateModel operation."):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=("test_crmo.Pony", "test_crmo.pony",),
+            )
+        with self.assertRaisesMessage(ValueError, "Found duplicate base in CreateModel operation."):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=(UnicodeModel, 'migrations.unicodemodel',),
+            )
+        with self.assertRaisesMessage(ValueError, "Found duplicate base in CreateModel operation."):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=(UnicodeModel, 'migrations.UnicodeModel',),
+            )
+
+    def test_create_model_with_duplicate_manager_name(self):
+        with self.assertRaisesMessage(ValueError, "Found duplicate manager in CreateModel operation."):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                managers=[
+                    ("objects", models.Manager()),
+                    ("objects", models.Manager()),
+                ],
+            )
 
     def test_create_model_with_unique_after(self):
         """
