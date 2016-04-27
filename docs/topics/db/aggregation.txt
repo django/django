@@ -194,24 +194,25 @@ results <https://code.djangoproject.com/ticket/10060>`_, as multiple tables are
 cross joined. Due to the use of ``LEFT OUTER JOIN``, duplicate records will be
 generated if some of the joined tables contain more records than the others:
 
-    >>> Book.objects.first().authors.count()
+    >>> book = Book.objects.first()
+    >>> book.authors.count()
     2
-    >>> Book.objects.first().chapters.count()
+    >>> book.store_set.count()
     3
-    >>> q = Book.objects.annotate(Count('authors'), Count('chapters'))
+    >>> q = Book.objects.annotate(Count('authors'), Count('store'))
     >>> q[0].authors__count
     6
-    >>> q[0].chapters__count
+    >>> q[0].store__count
     6
 
 For most aggregates, there is no way to avoid this problem, however, the
 :class:`~django.db.models.Count` aggregate has a ``distinct`` parameter that
 may help:
 
-    >>> q = Book.objects.annotate(Count('authors', distinct=True), Count('chapters', distinct=True))
+    >>> q = Book.objects.annotate(Count('authors', distinct=True), Count('store', distinct=True))
     >>> q[0].authors__count
     2
-    >>> q[0].chapters__count
+    >>> q[0].store__count
     3
 
 .. admonition:: If in doubt, inspect the SQL query!
