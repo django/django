@@ -12,11 +12,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db import connections, models
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, mock, override_settings
 from django.test.utils import captured_stdout, isolate_apps
 from django.utils.encoding import force_str, force_text
 
-from .models import Article, Author, SchemeIncludedURL
+from .models import (
+    Article, Author, ModelWithNullFKToSite, SchemeIncludedURL,
+    Site as MockSite,
+)
 
 
 @override_settings(ROOT_URLCONF='contenttypes_tests.urls')
@@ -44,6 +47,9 @@ class ContentTypesViewsTests(TestCase):
         cls.scheme1 = SchemeIncludedURL.objects.create(url='http://test_scheme_included_http/')
         cls.scheme2 = SchemeIncludedURL.objects.create(url='https://test_scheme_included_https/')
         cls.scheme3 = SchemeIncludedURL.objects.create(url='//test_default_scheme_kept/')
+
+    def setUp(self):
+        Site.objects.clear_cache()
 
     def test_shortcut_with_absolute_url(self):
         "Can view a shortcut for an Author object that has a get_absolute_url method"
@@ -93,6 +99,21 @@ class ContentTypesViewsTests(TestCase):
         short_url = '/shortcut/%s/%s/' % (42424242, an_author.pk)
         response = self.client.get(short_url)
         self.assertEqual(response.status_code, 404)
+
+    @mock.patch('django.apps.apps.get_model')
+    def test_shortcut_view_with_null_site_fk(self, get_model):
+        """
+        The shortcut view works if a model's ForeignKey to site is None.
+        """
+        get_model.side_effect = lambda *args, **kwargs: MockSite if args[0] == 'sites.Site' else ModelWithNullFKToSite
+
+        obj = ModelWithNullFKToSite.objects.create(title='title')
+        url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(ModelWithNullFKToSite).id, obj.pk)
+        response = self.client.get(url)
+        self.assertRedirects(
+            response, '%s' % obj.get_absolute_url(),
+            fetch_redirect_response=False,
+        )
 
     def test_create_contenttype_on_the_spot(self):
         """
@@ -252,9 +273,11 @@ class GenericRelationshipTests(SimpleTestCase):
                 'custom_content_type', 'custom_object_id')
 
         class Bookmark(models.Model):
-            tags = GenericRelation('TaggedItem',
+            tags = GenericRelation(
+                'TaggedItem',
                 content_type_field='custom_content_type',
-                object_id_field='custom_object_id')
+                object_id_field='custom_object_id',
+            )
 
         errors = Bookmark.tags.field.check()
         self.assertEqual(errors, [])

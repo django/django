@@ -132,9 +132,9 @@ Django quotes column and table names behind the scenes.
 
             >>> bar = Bar.objects.get(pk=1)
             >>> # Using model name "bar" as lookup string is deprecated.
-            >>> Foo.object.get(bar=bar)
+            >>> Foo.objects.get(bar=bar)
             >>> # You should use default_related_name "bars".
-            >>> Foo.object.get(bars=bar)
+            >>> Foo.objects.get(bars=bar)
 
 ``get_latest_by``
 -----------------

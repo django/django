@@ -112,19 +112,24 @@ class DeferTests(AssertionMixin, TestCase):
         self.assertEqual(obj.name, "p1")
 
     def test_defer_select_related_raises_invalid_query(self):
-        # When we defer a field and also select_related it, the query is
-        # invalid and raises an exception.
-        with self.assertRaises(InvalidQuery):
+        msg = (
+            'Field Primary.related cannot be both deferred and traversed '
+            'using select_related at the same time.'
+        )
+        with self.assertRaisesMessage(InvalidQuery, msg):
             Primary.objects.defer("related").select_related("related")[0]
 
     def test_only_select_related_raises_invalid_query(self):
-        with self.assertRaises(InvalidQuery):
+        msg = (
+            'Field Primary.related cannot be both deferred and traversed using '
+            'select_related at the same time.'
+        )
+        with self.assertRaisesMessage(InvalidQuery, msg):
             Primary.objects.only("name").select_related("related")[0]
 
     def test_defer_foreign_keys_are_deferred_and_not_traversed(self):
-        # With a depth-based select_related, all deferred ForeignKeys are
-        # deferred instead of traversed.
-        with self.assertNumQueries(3):
+        # select_related() overrides defer().
+        with self.assertNumQueries(1):
             obj = Primary.objects.defer("related").select_related()[0]
             self.assert_delayed(obj, 1)
             self.assertEqual(obj.related.id, self.s1.pk)

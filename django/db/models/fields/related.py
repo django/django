@@ -14,7 +14,7 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property, curry
 from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_docs_version
@@ -221,8 +221,7 @@ class RelatedField(Field):
         # model_set and it clashes with Target.model_set.
         potential_clashes = rel_opts.fields + rel_opts.many_to_many
         for clash_field in potential_clashes:
-            clash_name = "%s.%s" % (rel_opts.object_name,
-                clash_field.name)  # i. e. "Target.model_set"
+            clash_name = "%s.%s" % (rel_opts.object_name, clash_field.name)  # i.e. "Target.model_set"
             if not rel_is_hidden and clash_field.name == rel_name:
                 errors.append(
                     checks.Error(
@@ -283,9 +282,9 @@ class RelatedField(Field):
         # columns from another table.
         return None
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
+    def contribute_to_class(self, cls, name, private_only=False, **kwargs):
 
-        super(RelatedField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+        super(RelatedField, self).contribute_to_class(cls, name, private_only=private_only, **kwargs)
 
         self.opts = cls._meta
 
@@ -441,8 +440,8 @@ class ForeignObject(RelatedField):
     rel_class = ForeignObjectRel
 
     def __init__(self, to, on_delete, from_fields, to_fields, rel=None, related_name=None,
-            related_query_name=None, limit_choices_to=None, parent_link=False,
-            swappable=True, **kwargs):
+                 related_query_name=None, limit_choices_to=None, parent_link=False,
+                 swappable=True, **kwargs):
 
         if rel is None:
             rel = self.rel_class(
@@ -491,8 +490,9 @@ class ForeignObject(RelatedField):
         has_unique_constraint = any(u <= foreign_fields for u in unique_foreign_fields)
 
         if not has_unique_constraint and len(self.foreign_related_fields) > 1:
-            field_combination = ', '.join("'%s'" % rel_field.name
-                for rel_field in self.foreign_related_fields)
+            field_combination = ', '.join(
+                "'%s'" % rel_field.name for rel_field in self.foreign_related_fields
+            )
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
@@ -696,15 +696,8 @@ class ForeignObject(RelatedField):
     def get_transform(self, *args, **kwargs):
         raise NotImplementedError('Relational fields do not support transforms.')
 
-    @property
-    def attnames(self):
-        return tuple(field.attname for field in self.local_related_fields)
-
-    def get_defaults(self):
-        return tuple(field.get_default() for field in self.local_related_fields)
-
-    def contribute_to_class(self, cls, name, virtual_only=False):
-        super(ForeignObject, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+    def contribute_to_class(self, cls, name, private_only=False, **kwargs):
+        super(ForeignObject, self).contribute_to_class(cls, name, private_only=private_only, **kwargs)
         setattr(cls, self.name, ForwardManyToOneDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):
@@ -743,8 +736,8 @@ class ForeignKey(ForeignObject):
     description = _("Foreign Key (type determined by related field)")
 
     def __init__(self, to, on_delete=None, related_name=None, related_query_name=None,
-            limit_choices_to=None, parent_link=False, to_field=None,
-            db_constraint=True, **kwargs):
+                 limit_choices_to=None, parent_link=False, to_field=None,
+                 db_constraint=True, **kwargs):
         try:
             to._meta.model_name
         except AttributeError:
@@ -918,18 +911,6 @@ class ForeignKey(ForeignObject):
     def get_db_prep_value(self, value, connection, prepared=False):
         return self.target_field.get_db_prep_value(value, connection, prepared)
 
-    def value_to_string(self, obj):
-        if not obj:
-            # In required many-to-one fields with only one available choice,
-            # select that one available choice. Note: For SelectFields
-            # we have to check that the length of choices is *2*, not 1,
-            # because SelectFields always have an initial "blank" value.
-            if not self.blank and self.choices:
-                choice_list = self.get_choices_default()
-                if len(choice_list) == 2:
-                    return smart_text(choice_list[1][0])
-        return super(ForeignKey, self).value_to_string(obj)
-
     def contribute_to_related_class(self, cls, related):
         super(ForeignKey, self).contribute_to_related_class(cls, related)
         if self.remote_field.field_name is None:
@@ -949,11 +930,14 @@ class ForeignKey(ForeignObject):
         defaults.update(kwargs)
         return super(ForeignKey, self).formfield(**defaults)
 
+    def db_check(self, connection):
+        return []
+
     def db_type(self, connection):
         return self.target_field.rel_db_type(connection=connection)
 
     def db_parameters(self, connection):
-        return {"type": self.db_type(connection), "check": []}
+        return {"type": self.db_type(connection), "check": self.db_check(connection)}
 
     def convert_empty_strings(self, value, expression, connection, context):
         if (not value) and isinstance(value, six.string_types):
@@ -1108,9 +1092,9 @@ class ManyToManyField(RelatedField):
     description = _("Many-to-many relationship")
 
     def __init__(self, to, related_name=None, related_query_name=None,
-            limit_choices_to=None, symmetrical=None, through=None,
-            through_fields=None, db_constraint=True, db_table=None,
-            swappable=True, **kwargs):
+                 limit_choices_to=None, symmetrical=None, through=None,
+                 through_fields=None, db_constraint=True, db_table=None,
+                 swappable=True, **kwargs):
         try:
             to._meta
         except AttributeError:
@@ -1238,8 +1222,10 @@ class ManyToManyField(RelatedField):
 
             # Count foreign keys in intermediate model
             if self_referential:
-                seen_self = sum(from_model == getattr(field.remote_field, 'model', None)
-                    for field in self.remote_field.through._meta.fields)
+                seen_self = sum(
+                    from_model == getattr(field.remote_field, 'model', None)
+                    for field in self.remote_field.through._meta.fields
+                )
 
                 if seen_self > 2 and not self.remote_field.through_fields:
                     errors.append(
@@ -1257,10 +1243,14 @@ class ManyToManyField(RelatedField):
 
             else:
                 # Count foreign keys in relationship model
-                seen_from = sum(from_model == getattr(field.remote_field, 'model', None)
-                    for field in self.remote_field.through._meta.fields)
-                seen_to = sum(to_model == getattr(field.remote_field, 'model', None)
-                    for field in self.remote_field.through._meta.fields)
+                seen_from = sum(
+                    from_model == getattr(field.remote_field, 'model', None)
+                    for field in self.remote_field.through._meta.fields
+                )
+                seen_to = sum(
+                    to_model == getattr(field.remote_field, 'model', None)
+                    for field in self.remote_field.through._meta.fields
+                )
 
                 if seen_from > 1 and not self.remote_field.through_fields:
                     errors.append(
@@ -1453,9 +1443,6 @@ class ManyToManyField(RelatedField):
     def get_reverse_path_info(self):
         return self._get_path_info(direct=False)
 
-    def get_choices_default(self):
-        return Field.get_choices(self, include_blank=False)
-
     def _get_m2m_db_table(self, opts):
         """
         Function that can be curried to provide the m2m table name for this
@@ -1466,8 +1453,7 @@ class ManyToManyField(RelatedField):
         elif self.db_table:
             return self.db_table
         else:
-            return utils.truncate_name('%s_%s' % (opts.db_table, self.name),
-                                      connection.ops.max_name_length())
+            return utils.truncate_name('%s_%s' % (opts.db_table, self.name), connection.ops.max_name_length())
 
     def _get_m2m_attr(self, related, attr):
         """
@@ -1516,20 +1502,6 @@ class ManyToManyField(RelatedField):
                     setattr(self, cache_attr, getattr(f, attr))
                     break
         return getattr(self, cache_attr)
-
-    def value_to_string(self, obj):
-        data = ''
-        if obj:
-            qs = getattr(obj, self.name).all()
-            data = [instance._get_pk_val() for instance in qs]
-        else:
-            # In required many-to-many fields with only one available choice,
-            # select that one available choice.
-            if not self.blank:
-                choices_list = self.get_choices_default()
-                if len(choices_list) == 1:
-                    data = [choices_list[0][0]]
-        return smart_text(data)
 
     def contribute_to_class(self, cls, name, **kwargs):
         # To support multiple relations to self, it's useful to have a non-None
@@ -1613,6 +1585,9 @@ class ManyToManyField(RelatedField):
                 initial = initial()
             defaults['initial'] = [i._get_pk_val() for i in initial]
         return super(ManyToManyField, self).formfield(**defaults)
+
+    def db_check(self, connection):
+        return None
 
     def db_type(self, connection):
         # A ManyToManyField is not represented by a single column,

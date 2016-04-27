@@ -108,8 +108,7 @@ class Settings(BaseSettings):
 
                 if (setting in tuple_settings and
                         not isinstance(setting_value, (list, tuple))):
-                    raise ImproperlyConfigured("The %s setting must be a list or a tuple. "
-                            "Please fix your settings." % setting)
+                    raise ImproperlyConfigured("The %s setting must be a list or a tuple. " % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
@@ -169,7 +168,10 @@ class UserSettingsHolder(BaseSettings):
             super(UserSettingsHolder, self).__delattr__(name)
 
     def __dir__(self):
-        return list(self.__dict__) + dir(self.default_settings)
+        return sorted(
+            s for s in list(self.__dict__) + dir(self.default_settings)
+            if s not in self._deleted
+        )
 
     def is_overridden(self, setting):
         deleted = (setting in self._deleted)

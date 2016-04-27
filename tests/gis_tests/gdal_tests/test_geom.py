@@ -15,9 +15,10 @@ except ImportError:
 
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType,
-        GDALException, OGRIndexError, SpatialReference, CoordTransform,
-        GDAL_VERSION)
+    from django.contrib.gis.gdal import (
+        OGRGeometry, OGRGeomType, GDALException, OGRIndexError,
+        SpatialReference, CoordTransform, GDAL_VERSION,
+    )
 
 
 @skipUnless(HAS_GDAL, "GDAL is required")

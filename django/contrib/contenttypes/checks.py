@@ -15,10 +15,10 @@ def check_generic_foreign_keys(app_configs=None, **kwargs):
     else:
         models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
     errors = []
-    fields = (obj
-        for model in models
-        for obj in six.itervalues(vars(model))
-        if isinstance(obj, GenericForeignKey))
+    fields = (
+        obj for model in models for obj in six.itervalues(vars(model))
+        if isinstance(obj, GenericForeignKey)
+    )
     for field in fields:
         errors.extend(field.check())
     return errors

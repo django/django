@@ -66,8 +66,7 @@ class ExtractorTests(SerializeMixin, SimpleTestCase):
     def _run_makemessages(self, **options):
         os.chdir(self.test_dir)
         out = StringIO()
-        management.call_command('makemessages', locale=[LOCALE], verbosity=2,
-            stdout=out, **options)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=2, stdout=out, **options)
         output = out.getvalue()
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
@@ -776,10 +775,8 @@ class CustomLayoutExtractionTests(ExtractorTests):
           * translations outside of that app are in LOCALE_PATHS[0]
         """
         os.chdir(self.test_dir)
-        self.addCleanup(shutil.rmtree,
-            os.path.join(settings.LOCALE_PATHS[0], LOCALE), True)
-        self.addCleanup(shutil.rmtree,
-            os.path.join(self.test_dir, 'app_with_locale', 'locale', LOCALE), True)
+        self.addCleanup(shutil.rmtree, os.path.join(settings.LOCALE_PATHS[0], LOCALE), True)
+        self.addCleanup(shutil.rmtree, os.path.join(self.test_dir, 'app_with_locale', 'locale', LOCALE), True)
 
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         project_de_locale = os.path.join(

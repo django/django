@@ -5,23 +5,15 @@ from datetime import date
 
 from django.apps import apps
 from django.contrib.auth import management
-from django.contrib.auth.checks import check_user_model
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import (
     changepassword, createsuperuser,
 )
-from django.contrib.auth.models import (
-    AbstractBaseUser, Group, Permission, User,
-)
+from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.core import checks, exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.db import models
-from django.test import (
-    SimpleTestCase, TestCase, mock, override_settings, override_system_checks,
-)
-from django.test.utils import isolate_apps
+from django.test import TestCase, mock, override_settings
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
@@ -569,129 +561,16 @@ class MultiDBCreatesuperuserTestCase(TestCase):
         self.assertEqual(user.email, 'joe@somewhere.org')
 
 
-class CustomUserModelValidationTestCase(SimpleTestCase):
-    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserNonListRequiredFields')
-    @override_system_checks([check_user_model])
-    @isolate_apps('auth_tests', kwarg_name='apps')
-    def test_required_fields_is_list(self, apps):
-        """REQUIRED_FIELDS should be a list."""
-        class CustomUserNonListRequiredFields(AbstractBaseUser):
-            username = models.CharField(max_length=30, unique=True)
-            date_of_birth = models.DateField()
-
-            USERNAME_FIELD = 'username'
-            REQUIRED_FIELDS = 'date_of_birth'
-
-        errors = checks.run_checks(app_configs=apps.get_app_configs())
-        expected = [
-            checks.Error(
-                "'REQUIRED_FIELDS' must be a list or tuple.",
-                obj=CustomUserNonListRequiredFields,
-                id='auth.E001',
-            ),
-        ]
-        self.assertEqual(errors, expected)
-
-    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserBadRequiredFields')
-    @override_system_checks([check_user_model])
-    @isolate_apps('auth_tests', kwarg_name='apps')
-    def test_username_not_in_required_fields(self, apps):
-        """USERNAME_FIELD should not appear in REQUIRED_FIELDS."""
-        class CustomUserBadRequiredFields(AbstractBaseUser):
-            username = models.CharField(max_length=30, unique=True)
-            date_of_birth = models.DateField()
-
-            USERNAME_FIELD = 'username'
-            REQUIRED_FIELDS = ['username', 'date_of_birth']
-
-        errors = checks.run_checks(apps.get_app_configs())
-        expected = [
-            checks.Error(
-                "The field named as the 'USERNAME_FIELD' for a custom user model "
-                "must not be included in 'REQUIRED_FIELDS'.",
-                obj=CustomUserBadRequiredFields,
-                id='auth.E002',
-            ),
-        ]
-        self.assertEqual(errors, expected)
-
-    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserNonUniqueUsername')
-    @override_system_checks([check_user_model])
-    def test_username_non_unique(self):
-        """
-        A non-unique USERNAME_FIELD should raise an error only if we use the
-        default authentication backend. Otherwise, an warning should be raised.
-        """
-        errors = checks.run_checks()
-        expected = [
-            checks.Error(
-                "'CustomUserNonUniqueUsername.username' must be "
-                "unique because it is named as the 'USERNAME_FIELD'.",
-                obj=CustomUserNonUniqueUsername,
-                id='auth.E003',
-            ),
-        ]
-        self.assertEqual(errors, expected)
-        with self.settings(AUTHENTICATION_BACKENDS=['my.custom.backend']):
-            errors = checks.run_checks()
-            expected = [
-                checks.Warning(
-                    "'CustomUserNonUniqueUsername.username' is named as "
-                    "the 'USERNAME_FIELD', but it is not unique.",
-                    hint='Ensure that your authentication backend(s) can handle non-unique usernames.',
-                    obj=CustomUserNonUniqueUsername,
-                    id='auth.W004',
-                )
-            ]
-            self.assertEqual(errors, expected)
-
-
 class PermissionTestCase(TestCase):
 
     def setUp(self):
         self._original_permissions = Permission._meta.permissions[:]
         self._original_default_permissions = Permission._meta.default_permissions
-        self._original_verbose_name = Permission._meta.verbose_name
 
     def tearDown(self):
         Permission._meta.permissions = self._original_permissions
         Permission._meta.default_permissions = self._original_default_permissions
-        Permission._meta.verbose_name = self._original_verbose_name
         ContentType.objects.clear_cache()
-
-    def test_duplicated_permissions(self):
-        """
-        Test that we show proper error message if we are trying to create
-        duplicate permissions.
-        """
-        auth_app_config = apps.get_app_config('auth')
-
-        # check duplicated default permission
-        Permission._meta.permissions = [
-            ('change_permission', 'Can edit permission (duplicate)')]
-        msg = (
-            "The permission codename 'change_permission' clashes with a "
-            "builtin permission for model 'auth.Permission'."
-        )
-        with self.assertRaisesMessage(CommandError, msg):
-            create_permissions(auth_app_config, verbosity=0)
-
-        # check duplicated custom permissions
-        Permission._meta.permissions = [
-            ('my_custom_permission', 'Some permission'),
-            ('other_one', 'Some other permission'),
-            ('my_custom_permission', 'Some permission with duplicate permission code'),
-        ]
-        msg = "The permission codename 'my_custom_permission' is duplicated for model 'auth.Permission'."
-        with self.assertRaisesMessage(CommandError, msg):
-            create_permissions(auth_app_config, verbosity=0)
-
-        # should not raise anything
-        Permission._meta.permissions = [
-            ('my_custom_permission', 'Some permission'),
-            ('other_one', 'Some other permission'),
-        ]
-        create_permissions(auth_app_config, verbosity=0)
 
     def test_default_permissions(self):
         auth_app_config = apps.get_app_config('auth')
@@ -715,32 +594,3 @@ class PermissionTestCase(TestCase):
         self.assertEqual(Permission.objects.filter(
             content_type=permission_content_type,
         ).count(), 1)
-
-    def test_verbose_name_length(self):
-        auth_app_config = apps.get_app_config('auth')
-
-        permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
-        Permission.objects.filter(content_type=permission_content_type).delete()
-        Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control" * 5
-
-        msg = "The verbose_name of auth.permission is longer than 244 characters"
-        with self.assertRaisesMessage(exceptions.ValidationError, msg):
-            create_permissions(auth_app_config, verbosity=0)
-
-    def test_custom_permission_name_length(self):
-        auth_app_config = apps.get_app_config('auth')
-
-        ContentType.objects.get_by_natural_key('auth', 'permission')
-        custom_perm_name = 'a' * 256
-        Permission._meta.permissions = [
-            ('my_custom_permission', custom_perm_name),
-        ]
-        try:
-            msg = (
-                "The permission name %s of auth.permission is longer than "
-                "255 characters" % custom_perm_name
-            )
-            with self.assertRaisesMessage(exceptions.ValidationError, msg):
-                create_permissions(auth_app_config, verbosity=0)
-        finally:
-            Permission._meta.permissions = []

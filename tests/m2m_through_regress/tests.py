@@ -128,8 +128,7 @@ class M2MThroughSerializationTestCase(TestCase):
         )
 
         out = StringIO()
-        management.call_command("dumpdata", "m2m_through_regress", format="xml",
-            indent=2, stdout=out)
+        management.call_command("dumpdata", "m2m_through_regress", format="xml", indent=2, stdout=out)
         self.assertXMLEqual(out.getvalue().strip(), """
 <?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">

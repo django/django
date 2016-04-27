@@ -161,7 +161,7 @@ class ModelBase(type):
         new_fields = chain(
             new_class._meta.local_fields,
             new_class._meta.local_many_to_many,
-            new_class._meta.virtual_fields
+            new_class._meta.private_fields
         )
         field_names = {f.name for f in new_fields}
 
@@ -268,9 +268,9 @@ class ModelBase(type):
             if is_proxy:
                 new_class.copy_managers(original_base._meta.concrete_managers)
 
-            # Inherit virtual fields (like GenericForeignKey) from the parent
+            # Inherit private fields (like GenericForeignKey) from the parent
             # class
-            for field in base._meta.virtual_fields:
+            for field in base._meta.private_fields:
                 if base._meta.abstract and field.name in field_names:
                     raise FieldError(
                         'Local field %r in class %r clashes '
@@ -397,8 +397,8 @@ class Model(six.with_metaclass(ModelBase)):
             # data-descriptor object (DeferredAttribute) without triggering its
             # __get__ method.
             if (field.attname not in kwargs and
-                    (isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)
-                     or field.column is None)):
+                    (isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute) or
+                        field.column is None)):
                 # This field will be populated on request.
                 continue
             if kwargs:
@@ -519,9 +519,10 @@ class Model(six.with_metaclass(ModelBase)):
         if pickled_version:
             current_version = get_version()
             if current_version != pickled_version:
-                msg = ("Pickled model instance's Django version %s does"
-                    " not match the current version %s."
-                    % (pickled_version, current_version))
+                msg = (
+                    "Pickled model instance's Django version %s does not match "
+                    "the current version %s." % (pickled_version, current_version)
+                )
         else:
             msg = "Pickled model instance's Django version is not specified."
 
@@ -753,8 +754,8 @@ class Model(six.with_metaclass(ModelBase)):
         meta = cls._meta
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.
-            if (field and getattr(self, parent._meta.pk.attname) is None
-                    and getattr(self, field.attname) is not None):
+            if (field and getattr(self, parent._meta.pk.attname) is None and
+                    getattr(self, field.attname) is not None):
                 setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
             self._save_parents(cls=parent, using=using, update_fields=update_fields)
             self._save_table(cls=parent, using=using, update_fields=update_fields)
@@ -1285,9 +1286,7 @@ class Model(six.with_metaclass(ModelBase)):
     @classmethod
     def _check_id_field(cls):
         """ Check if `id` field is a primary key. """
-
-        fields = list(f for f in cls._meta.local_fields
-            if f.name == 'id' and f != cls._meta.pk)
+        fields = list(f for f in cls._meta.local_fields if f.name == 'id' and f != cls._meta.pk)
         # fields is empty or consists of the invalid "id" field
         if fields and not fields[0].primary_key and cls._meta.pk.name == 'id':
             return [
@@ -1342,8 +1341,7 @@ class Model(six.with_metaclass(ModelBase)):
             # field "id" and automatically added unique field "id", both
             # defined at the same model. This special case is considered in
             # _check_id_field and here we ignore it.
-            id_conflict = (f.name == "id" and
-                clash and clash.name == "id" and clash.model == cls)
+            id_conflict = f.name == "id" and clash and clash.name == "id" and clash.model == cls
             if clash and not id_conflict:
                 errors.append(
                     checks.Error(
@@ -1397,8 +1395,7 @@ class Model(six.with_metaclass(ModelBase)):
                 )
             ]
 
-        elif any(not isinstance(fields, (tuple, list))
-                for fields in cls._meta.index_together):
+        elif any(not isinstance(fields, (tuple, list)) for fields in cls._meta.index_together):
             return [
                 checks.Error(
                     "All 'index_together' elements must be lists or tuples.",
@@ -1425,8 +1422,7 @@ class Model(six.with_metaclass(ModelBase)):
                 )
             ]
 
-        elif any(not isinstance(fields, (tuple, list))
-                for fields in cls._meta.unique_together):
+        elif any(not isinstance(fields, (tuple, list)) for fields in cls._meta.unique_together):
             return [
                 checks.Error(
                     "All 'unique_together' elements must be lists or tuples.",
@@ -1589,8 +1585,7 @@ class Model(six.with_metaclass(ModelBase)):
 
             # Check if auto-generated name for the field is too long
             # for the database.
-            if (f.db_column is None and column_name is not None
-                    and len(column_name) > allowed_len):
+            if f.db_column is None and column_name is not None and len(column_name) > allowed_len:
                 errors.append(
                     checks.Error(
                         'Autogenerated column name too long for field "%s". '
@@ -1607,8 +1602,7 @@ class Model(six.with_metaclass(ModelBase)):
             # for the database.
             for m2m in f.remote_field.through._meta.local_fields:
                 _, rel_name = m2m.get_attname_column()
-                if (m2m.db_column is None and rel_name is not None
-                        and len(rel_name) > allowed_len):
+                if m2m.db_column is None and rel_name is not None and len(rel_name) > allowed_len:
                     errors.append(
                         checks.Error(
                             'Autogenerated column name too long for M2M field '

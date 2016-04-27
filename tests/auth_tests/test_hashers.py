@@ -57,8 +57,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
     def test_pbkdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
-        self.assertEqual(encoded,
-            'pbkdf2_sha256$30000$seasalt$VrX+V8drCGo68wlvy6rfu8i1d1pfkdeXA4LJkRGJodY=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$30000$seasalt$VrX+V8drCGo68wlvy6rfu8i1d1pfkdeXA4LJkRGJodY=')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -73,8 +72,7 @@ class TestUtilsHashPass(SimpleTestCase):
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
     def test_sha1(self):
         encoded = make_password('lètmein', 'seasalt', 'sha1')
-        self.assertEqual(encoded,
-            'sha1$seasalt$cff36ea83f5706ce9aa7454e63e431fc726b2dc8')
+        self.assertEqual(encoded, 'sha1$seasalt$cff36ea83f5706ce9aa7454e63e431fc726b2dc8')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -89,8 +87,7 @@ class TestUtilsHashPass(SimpleTestCase):
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
     def test_md5(self):
         encoded = make_password('lètmein', 'seasalt', 'md5')
-        self.assertEqual(encoded,
-                         'md5$seasalt$3f86d0d3d465b7b458c231bf3555c0e3')
+        self.assertEqual(encoded, 'md5$seasalt$3f86d0d3d465b7b458c231bf3555c0e3')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -165,8 +162,10 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertEqual(identify_hasher(encoded).algorithm, "bcrypt_sha256")
 
         # Verify that password truncation no longer works
-        password = ('VSK0UYV6FFQVZ0KG88DYN9WADAADZO1CTSIVDJUNZSUML6IBX7LN7ZS3R5'
-                    'JGB3RGZ7VI7G7DJQ9NI8BQFSRPTG6UWTTVESA5ZPUN')
+        password = (
+            'VSK0UYV6FFQVZ0KG88DYN9WADAADZO1CTSIVDJUNZSUML6IBX7LN7ZS3R5'
+            'JGB3RGZ7VI7G7DJQ9NI8BQFSRPTG6UWTTVESA5ZPUN'
+        )
         encoded = make_password(password, hasher='bcrypt_sha256')
         self.assertTrue(check_password(password, encoded))
         self.assertFalse(check_password(password[:72], encoded))
@@ -282,15 +281,13 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_low_level_pbkdf2(self):
         hasher = PBKDF2PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded,
-            'pbkdf2_sha256$30000$seasalt2$a75qzbogeVhNFeMqhdgyyoqGKpIzYUo651sq57RERew=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$30000$seasalt2$a75qzbogeVhNFeMqhdgyyoqGKpIzYUo651sq57RERew=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     def test_low_level_pbkdf2_sha1(self):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded,
-            'pbkdf2_sha1$30000$seasalt2$pMzU1zNPcydf6wjnJFbiVKwgULc=')
+        self.assertEqual(encoded, 'pbkdf2_sha1$30000$seasalt2$pMzU1zNPcydf6wjnJFbiVKwgULc=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     @override_settings(
@@ -433,15 +430,13 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_load_library_no_algorithm(self):
         with self.assertRaises(ValueError) as e:
             BasePasswordHasher()._load_library()
-        self.assertEqual("Hasher 'BasePasswordHasher' doesn't specify a "
-                         "library attribute", str(e.exception))
+        self.assertEqual("Hasher 'BasePasswordHasher' doesn't specify a library attribute", str(e.exception))
 
     def test_load_library_importerror(self):
-        PlainHasher = type(str('PlainHasher'), (BasePasswordHasher,),
-                           {'algorithm': 'plain', 'library': 'plain'})
+        PlainHasher = type(str('PlainHasher'), (BasePasswordHasher,), {'algorithm': 'plain', 'library': 'plain'})
         # Python 3 adds quotes around module name
-        with six.assertRaisesRegex(self, ValueError,
-                "Couldn't load 'PlainHasher' algorithm library: No module named '?plain'?"):
+        msg = "Couldn't load 'PlainHasher' algorithm library: No module named '?plain'?"
+        with six.assertRaisesRegex(self, ValueError, msg):
             PlainHasher()._load_library()
 
 
@@ -462,11 +457,43 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
+        # Old hashes without version attribute
+        encoded = (
+            'argon2$argon2i$m=8,t=1,p=1$c29tZXNhbHQ$gwQOXSNhxiOxPOA0+PY10P9QFO'
+            '4NAYysnqRt1GSQLE55m+2GYDt9FEjPMHhP2Cuf0nOEXXMocVrsJAtNSsKyfg'
+        )
+        self.assertTrue(check_password('secret', encoded))
+        self.assertFalse(check_password('wrong', encoded))
 
     def test_argon2_upgrade(self):
         self._test_argon2_upgrade('time_cost', 'time cost', 1)
         self._test_argon2_upgrade('memory_cost', 'memory cost', 16)
         self._test_argon2_upgrade('parallelism', 'parallelism', 1)
+
+    def test_argon2_version_upgrade(self):
+        hasher = get_hasher('argon2')
+        state = {'upgraded': False}
+        encoded = (
+            'argon2$argon2i$m=8,t=1,p=1$c29tZXNhbHQ$gwQOXSNhxiOxPOA0+PY10P9QFO'
+            '4NAYysnqRt1GSQLE55m+2GYDt9FEjPMHhP2Cuf0nOEXXMocVrsJAtNSsKyfg'
+        )
+
+        def setter(password):
+            state['upgraded'] = True
+
+        old_m = hasher.memory_cost
+        old_t = hasher.time_cost
+        old_p = hasher.parallelism
+        try:
+            hasher.memory_cost = 8
+            hasher.time_cost = 1
+            hasher.parallelism = 1
+            self.assertTrue(check_password('secret', encoded, setter, 'argon2'))
+            self.assertTrue(state['upgraded'])
+        finally:
+            hasher.memory_cost = old_m
+            hasher.time_cost = old_t
+            hasher.parallelism = old_p
 
     def _test_argon2_upgrade(self, attr, summary_key, new_value):
         hasher = get_hasher('argon2')

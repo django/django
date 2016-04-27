@@ -81,7 +81,7 @@ def model_to_dict(instance, fields=None, exclude=None):
     """
     opts = instance._meta
     data = {}
-    for f in chain(opts.concrete_fields, opts.virtual_fields, opts.many_to_many):
+    for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
         if not getattr(f, 'editable', False):
             continue
         if fields and f.name not in fields:
@@ -142,9 +142,8 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     opts = model._meta
     # Avoid circular import
     from django.db.models.fields import Field as ModelField
-    sortable_virtual_fields = [f for f in opts.virtual_fields
-                               if isinstance(f, ModelField)]
-    for f in sorted(chain(opts.concrete_fields, sortable_virtual_fields, opts.many_to_many)):
+    sortable_private_fields = [f for f in opts.private_fields if isinstance(f, ModelField)]
+    for f in sorted(chain(opts.concrete_fields, sortable_private_fields, opts.many_to_many)):
         if not getattr(f, 'editable', False):
             if (fields is not None and f.name in fields and
                     (exclude is None or f.name not in exclude)):
@@ -279,7 +278,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
 class BaseModelForm(BaseForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
-                 empty_permitted=False, instance=None):
+                 empty_permitted=False, instance=None, use_required_attribute=None):
         opts = self._meta
         if opts.model is None:
             raise ValueError('ModelForm has no model class specified.')
@@ -297,8 +296,10 @@ class BaseModelForm(BaseForm):
         # It is False by default so overriding self.clean() and failing to call
         # super will stop validate_unique from being called.
         self._validate_unique = False
-        super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
-                                            error_class, label_suffix, empty_permitted)
+        super(BaseModelForm, self).__init__(
+            data, files, auto_id, prefix, object_data, error_class,
+            label_suffix, empty_permitted, use_required_attribute=use_required_attribute,
+        )
         # Apply ``limit_choices_to`` to each field.
         for field_name in self.fields:
             formfield = self.fields[field_name]
@@ -431,9 +432,9 @@ class BaseModelForm(BaseForm):
         fields = self._meta.fields
         opts = self.instance._meta
         # Note that for historical reasons we want to include also
-        # virtual_fields here. (GenericRelation was previously a fake
+        # private_fields here. (GenericRelation was previously a fake
         # m2m field).
-        for f in chain(opts.many_to_many, opts.virtual_fields):
+        for f in chain(opts.many_to_many, opts.private_fields):
             if not hasattr(f, 'save_form_data'):
                 continue
             if fields and f.name not in fields:
@@ -707,8 +708,8 @@ class BaseModelFormSet(BaseFormSet):
             uclass, lookup, field, unique_for = date_check
             for form in valid_forms:
                 # see if we have data for both fields
-                if (form.cleaned_data and form.cleaned_data[field] is not None
-                        and form.cleaned_data[unique_for] is not None):
+                if (form.cleaned_data and form.cleaned_data[field] is not None and
+                        form.cleaned_data[unique_for] is not None):
                     # if it's a date lookup we need to get the data for all the fields
                     if lookup == 'date':
                         date = form.cleaned_data[unique_for]
@@ -738,14 +739,15 @@ class BaseModelFormSet(BaseFormSet):
                 "field": unique_check[0],
             }
         else:
-            return ugettext("Please correct the duplicate data for %(field)s, "
-                "which must be unique.") % {
+            return ugettext("Please correct the duplicate data for %(field)s, which must be unique.") % {
                 "field": get_text_list(unique_check, six.text_type(_("and"))),
             }
 
     def get_date_error_message(self, date_check):
-        return ugettext("Please correct the duplicate data for %(field_name)s "
-            "which must be unique for the %(lookup)s in %(date_field)s.") % {
+        return ugettext(
+            "Please correct the duplicate data for %(field_name)s "
+            "which must be unique for the %(lookup)s in %(date_field)s."
+        ) % {
             'field_name': date_check[2],
             'date_field': date_check[3],
             'lookup': six.text_type(date_check[1]),
@@ -806,8 +808,8 @@ class BaseModelFormSet(BaseFormSet):
         def pk_is_not_editable(pk):
             return (
                 (not pk.editable) or (pk.auto_created or isinstance(pk, AutoField)) or (
-                    pk.remote_field and pk.remote_field.parent_link
-                    and pk_is_not_editable(pk.remote_field.model._meta.pk)
+                    pk.remote_field and pk.remote_field.parent_link and
+                    pk_is_not_editable(pk.remote_field.model._meta.pk)
                 )
             )
         if pk_is_not_editable(pk) or pk.name not in form.fields:
@@ -887,6 +889,13 @@ class BaseInlineFormSet(BaseModelFormSet):
         super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix,
                                                 queryset=qs, **kwargs)
 
+        # Add the generated field to form._meta.fields if it's defined to make
+        # sure validation isn't skipped on that field.
+        if self.form._meta.fields and self.fk.name not in self.form._meta.fields:
+            if isinstance(self.form._meta.fields, tuple):
+                self.form._meta.fields = list(self.form._meta.fields)
+            self.form._meta.fields.append(self.fk.name)
+
     def initial_form_count(self):
         if self.save_as_new:
             return 0
@@ -958,13 +967,6 @@ class BaseInlineFormSet(BaseModelFormSet):
 
         form.fields[name] = InlineForeignKeyField(self.instance, **kwargs)
 
-        # Add the generated field to form._meta.fields if it's defined to make
-        # sure validation isn't skipped on that field.
-        if form._meta.fields:
-            if isinstance(form._meta.fields, tuple):
-                form._meta.fields = list(form._meta.fields)
-            form._meta.fields.append(self.fk.name)
-
     def get_unique_error_message(self, unique_check):
         unique_check = [field for field in unique_check if field != self.fk.name]
         return super(BaseInlineFormSet, self).get_unique_error_message(unique_check)
@@ -999,9 +1001,10 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         # Try to discover what the ForeignKey from model to parent_model is
         fks_to_parent = [
             f for f in opts.fields
-            if isinstance(f, ForeignKey)
-            and (f.remote_field.model == parent_model
-                or f.remote_field.model in parent_model._meta.get_parent_list())
+            if isinstance(f, ForeignKey) and (
+                f.remote_field.model == parent_model or
+                f.remote_field.model in parent_model._meta.get_parent_list()
+            )
         ]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
@@ -1125,8 +1128,7 @@ class ModelChoiceIterator(object):
             yield self.choice(obj)
 
     def __len__(self):
-        return (len(self.queryset) +
-            (1 if self.field.empty_label is not None else 0))
+        return (len(self.queryset) + (1 if self.field.empty_label is not None else 0))
 
     def choice(self, obj):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
@@ -1251,8 +1253,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def __init__(self, queryset, required=True, widget=None, label=None,
                  initial=None, help_text='', *args, **kwargs):
-        super(ModelMultipleChoiceField, self).__init__(queryset, None,
-            required, widget, label, initial, help_text, *args, **kwargs)
+        super(ModelMultipleChoiceField, self).__init__(
+            queryset, None, required, widget, label, initial, help_text,
+            *args, **kwargs
+        )
 
     def to_python(self, value):
         if not value:

@@ -39,8 +39,8 @@ class LocaleMiddleware(object):
             path_valid = is_valid_path(language_path, urlconf)
             path_needs_slash = (
                 not path_valid and (
-                    settings.APPEND_SLASH and not language_path.endswith('/')
-                    and is_valid_path('%s/' % language_path, urlconf)
+                    settings.APPEND_SLASH and not language_path.endswith('/') and
+                    is_valid_path('%s/' % language_path, urlconf)
                 )
             )
 

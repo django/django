@@ -12,7 +12,8 @@ if HAS_GDAL:
 
     # List of acceptable data sources.
     ds_list = (
-        TestDS('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
+        TestDS(
+            'test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
             fields={'dbl': OFTReal, 'int': OFTInteger, 'str': OFTString},
             extent=(-1.35011, 0.166623, -0.524093, 0.824508),  # Got extent from QGIS
             srs_wkt=(
@@ -27,7 +28,8 @@ if HAS_GDAL:
             },
             fids=range(5)
         ),
-        TestDS('test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D',
+        TestDS(
+            'test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D',
             driver='OGR_VRT' if GDAL_VERSION >= (2, 0) else 'VRT',
             fields={
                 'POINT_X': OFTString,
@@ -42,7 +44,8 @@ if HAS_GDAL:
             },
             fids=range(1, 4)
         ),
-        TestDS('test_poly', nfeat=3, nfld=3, geom='POLYGON', gtype=3,
+        TestDS(
+            'test_poly', nfeat=3, nfld=3, geom='POLYGON', gtype=3,
             driver='ESRI Shapefile',
             fields={'float': OFTReal, 'int': OFTInteger, 'str': OFTString},
             extent=(-1.01513, -0.558245, 0.161876, 0.839637),  # Got extent from QGIS

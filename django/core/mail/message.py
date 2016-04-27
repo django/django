@@ -25,10 +25,14 @@ from django.utils.encoding import force_text
 # some spam filters.
 utf8_charset = Charset.Charset('utf-8')
 utf8_charset.body_encoding = None  # Python defaults to BASE64
+utf8_charset_qp = Charset.Charset('utf-8')
+utf8_charset_qp.body_encoding = Charset.QP
 
 # Default MIME type to use on attachments (if it is not explicitly given
 # and cannot be guessed).
 DEFAULT_ATTACHMENT_MIME_TYPE = 'application/octet-stream'
+
+RFC5322_EMAIL_LINE_LENGTH_LIMIT = 998
 
 
 class BadHeaderError(ValueError):
@@ -90,8 +94,7 @@ def forbid_multi_line_headers(name, val, encoding):
         val.encode('ascii')
     except UnicodeEncodeError:
         if name.lower() in ADDRESS_HEADERS:
-            val = ', '.join(sanitize_address(addr, encoding)
-                for addr in getaddresses((val,)))
+            val = ', '.join(sanitize_address(addr, encoding) for addr in getaddresses((val,)))
         else:
             val = Header(val, encoding).encode()
     else:
@@ -170,7 +173,10 @@ class SafeMIMEText(MIMEMixin, MIMEText):
             # We do it manually and trigger re-encoding of the payload.
             MIMEText.__init__(self, _text, _subtype, None)
             del self['Content-Transfer-Encoding']
-            self.set_payload(_text, utf8_charset)
+            has_long_lines = any(len(l) > RFC5322_EMAIL_LINE_LENGTH_LIMIT for l in _text.splitlines())
+            # Quoted-Printable encoding has the side effect of shortening long
+            # lines, if any (#22561).
+            self.set_payload(_text, utf8_charset_qp if has_long_lines else utf8_charset)
             self.replace_header('Content-Type', 'text/%s; charset="%s"' % (_subtype, _charset))
         elif _charset is None:
             # the default value of '_charset' is 'us-ascii' on Python 2
@@ -418,8 +424,8 @@ class EmailMultiAlternatives(EmailMessage):
     alternative_subtype = 'alternative'
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
-            connection=None, attachments=None, headers=None, alternatives=None,
-            cc=None, reply_to=None):
+                 connection=None, attachments=None, headers=None, alternatives=None,
+                 cc=None, reply_to=None):
         """
         Initialize a single email message (which can be sent to multiple
         recipients).

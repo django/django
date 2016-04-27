@@ -48,7 +48,7 @@ class Storage(object):
             name = content.name
 
         if not hasattr(content, 'chunks'):
-            content = File(content)
+            content = File(content, name)
 
         name = self.get_available_name(name, max_length=max_length)
         name = self._save(name, content)
@@ -405,7 +405,10 @@ class FileSystemStorage(Storage):
     def url(self, name):
         if self.base_url is None:
             raise ValueError("This file is not accessible via a URL.")
-        return urljoin(self.base_url, filepath_to_uri(name))
+        url = filepath_to_uri(name)
+        if url is not None:
+            url = url.lstrip('/')
+        return urljoin(self.base_url, url)
 
     def accessed_time(self, name):
         warnings.warn(

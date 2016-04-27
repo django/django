@@ -106,10 +106,12 @@ class AdminRadioSelect(forms.RadioSelect):
 
 
 class AdminFileWidget(forms.ClearableFileInput):
-    template_with_initial = ('<p class="file-upload">%s</p>'
-                            % forms.ClearableFileInput.template_with_initial)
-    template_with_clear = ('<span class="clearable-file-input">%s</span>'
-                           % forms.ClearableFileInput.template_with_clear)
+    template_with_initial = (
+        '<p class="file-upload">%s</p>' % forms.ClearableFileInput.template_with_initial
+    )
+    template_with_clear = (
+        '<span class="clearable-file-input">%s</span>' % forms.ClearableFileInput.template_with_clear
+    )
 
 
 def url_params_from_lookup_dict(lookups):
@@ -170,8 +172,10 @@ class ForeignKeyRawIdWidget(forms.TextInput):
                 attrs['class'] = 'vForeignKeyRawIdAdminField'  # The JavaScript code looks for this hook.
             # TODO: "lookup_id_" is hard-coded here. This should instead use
             # the correct API to determine the ID dynamically.
-            extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" title="%s"></a>' %
-                (related_url, url, name, _('Lookup')))
+            extra.append(
+                '<a href="%s%s" class="related-lookup" id="lookup_id_%s" title="%s"></a>'
+                % (related_url, url, name, _('Lookup'))
+            )
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)] + extra
         if value:
             output.append(self.label_for_value(value))
@@ -372,7 +376,7 @@ class AdminURLFieldWidget(forms.URLInput):
     def render(self, name, value, attrs=None):
         html = super(AdminURLFieldWidget, self).render(name, value, attrs)
         if value:
-            value = force_text(self._format_value(value))
+            value = force_text(self.format_value(value))
             final_attrs = {'href': smart_urlquote(value)}
             html = format_html(
                 '<p class="url">{} <a{}>{}</a><br />{} {}</p>',
@@ -394,11 +398,3 @@ class AdminIntegerFieldWidget(forms.TextInput):
 
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
     class_name = 'vBigIntegerField'
-
-
-class AdminCommaSeparatedIntegerFieldWidget(forms.TextInput):
-    def __init__(self, attrs=None):
-        final_attrs = {'class': 'vCommaSeparatedIntegerField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super(AdminCommaSeparatedIntegerFieldWidget, self).__init__(attrs=final_attrs)

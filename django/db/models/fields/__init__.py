@@ -5,7 +5,7 @@ import collections
 import copy
 import datetime
 import decimal
-import math
+import itertools
 import uuid
 import warnings
 from base64 import b64decode, b64encode
@@ -20,7 +20,7 @@ from django.core import checks, exceptions, validators
 # purposes.
 from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
-from django.db.models.query_utils import QueryWrapper, RegisterLookupMixin
+from django.db.models.query_utils import RegisterLookupMixin
 from django.utils import six, timezone
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
@@ -137,12 +137,12 @@ class Field(RegisterLookupMixin):
     description = property(_description)
 
     def __init__(self, verbose_name=None, name=None, primary_key=False,
-            max_length=None, unique=False, blank=False, null=False,
-            db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
-            serialize=True, unique_for_date=None, unique_for_month=None,
-            unique_for_year=None, choices=None, help_text='', db_column=None,
-            db_tablespace=None, auto_created=False, validators=[],
-            error_messages=None):
+                 max_length=None, unique=False, blank=False, null=False,
+                 db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
+                 serialize=True, unique_for_date=None, unique_for_month=None,
+                 unique_for_year=None, choices=None, help_text='', db_column=None,
+                 db_tablespace=None, auto_created=False, validators=[],
+                 error_messages=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -532,9 +532,11 @@ class Field(RegisterLookupMixin):
 
     @cached_property
     def validators(self):
-        # Some validators can't be created at field initialization time.
-        # This method provides a way to delay their creation until required.
-        return self.default_validators + self._validators
+        """
+        Some validators can't be created at field initialization time.
+        This method provides a way to delay their creation until required.
+        """
+        return list(itertools.chain(self.default_validators, self._validators))
 
     def run_validators(self, value):
         if value in self.empty_values:
@@ -594,9 +596,21 @@ class Field(RegisterLookupMixin):
         self.run_validators(value)
         return value
 
+    def db_check(self, connection):
+        """
+        Return the database column check constraint for this field, for the
+        provided connection. Works the same way as db_type() for the case that
+        get_internal_type() does not map to a preexisting model field.
+        """
+        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        try:
+            return connection.data_type_check_constraints[self.get_internal_type()] % data
+        except KeyError:
+            return None
+
     def db_type(self, connection):
         """
-        Returns the database column data type for this field, for the provided
+        Return the database column data type for this field, for the provided
         connection.
         """
         # The default implementation of this method looks at the
@@ -634,12 +648,8 @@ class Field(RegisterLookupMixin):
         values (type, checks).
         This will look at db_type(), allowing custom model fields to override it.
         """
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         type_string = self.db_type(connection)
-        try:
-            check_string = connection.data_type_check_constraints[self.get_internal_type()] % data
-        except KeyError:
-            check_string = None
+        check_string = self.db_check(connection)
         return {
             "type": type_string,
             "check": check_string,
@@ -665,11 +675,25 @@ class Field(RegisterLookupMixin):
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
+    def contribute_to_class(self, cls, name, private_only=False, virtual_only=NOT_PROVIDED):
+        """
+        Register the field with the model class it belongs to.
+
+        If private_only is True, a separate instance of this field will be
+        created for every subclass of cls, even if cls is not an abstract
+        model.
+        """
+        if virtual_only is not NOT_PROVIDED:
+            warnings.warn(
+                "The `virtual_only` argument of Field.contribute_to_class() "
+                "has been renamed to `private_only`.",
+                RemovedInDjango20Warning, stacklevel=2
+            )
+            private_only = virtual_only
         self.set_attributes_from_name(name)
         self.model = cls
-        if virtual_only:
-            cls._meta.add_field(self, virtual=True)
+        if private_only:
+            cls._meta.add_field(self, private=True)
         else:
             cls._meta.add_field(self)
         if self.choices:
@@ -756,31 +780,13 @@ class Field(RegisterLookupMixin):
         if not prepared:
             value = self.get_prep_lookup(lookup_type, value)
             prepared = True
-        if hasattr(value, 'get_compiler'):
-            value = value.get_compiler(connection=connection)
-        if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
-            # If the value has a relabeled_clone method it means the
-            # value will be handled later on.
-            if hasattr(value, 'relabeled_clone'):
-                return value
-            if hasattr(value, 'as_sql'):
-                sql, params = value.as_sql()
-            else:
-                sql, params = value._as_sql(connection=connection)
-            return QueryWrapper(('(%s)' % sql), params)
 
-        if lookup_type in ('search', 'regex', 'iregex', 'contains',
-                           'icontains', 'iexact', 'startswith', 'endswith',
-                           'istartswith', 'iendswith'):
-            return [value]
-        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
+        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
             return [self.get_db_prep_value(value, connection=connection,
                                            prepared=prepared)]
         elif lookup_type in ('range', 'in'):
             return [self.get_db_prep_value(v, connection=connection,
                                            prepared=prepared) for v in value]
-        elif lookup_type == 'isnull':
-            return []
         else:
             return [value]
 
@@ -798,8 +804,7 @@ class Field(RegisterLookupMixin):
             if callable(self.default):
                 return self.default()
             return self.default
-        if (not self.empty_strings_allowed or (self.null and
-                   not connection.features.interprets_empty_strings_as_nulls)):
+        if not self.empty_strings_allowed or self.null and not connection.features.interprets_empty_strings_as_nulls:
             return None
         return ""
 
@@ -831,9 +836,6 @@ class Field(RegisterLookupMixin):
                    for x in rel_model._default_manager.complex_filter(
                        limit_choices_to)]
         return first_choice + lst
-
-    def get_choices_default(self):
-        return self.get_choices()
 
     @warn_about_renamed_method(
         'Field', '_get_val_from_obj', 'value_from_object',
@@ -1169,10 +1171,8 @@ class DateTimeCheckMixin(object):
         # auto_now, auto_now_add, and default are mutually exclusive
         # options. The use of more than one of these options together
         # will trigger an Error
-        mutually_exclusive_options = [self.auto_now_add, self.auto_now,
-                                      self.has_default()]
-        enabled_options = [option not in (None, False)
-                          for option in mutually_exclusive_options].count(True)
+        mutually_exclusive_options = [self.auto_now_add, self.auto_now, self.has_default()]
+        enabled_options = [option not in (None, False) for option in mutually_exclusive_options].count(True)
         if enabled_options > 1:
             return [
                 checks.Error(
@@ -1306,12 +1306,14 @@ class DateField(DateTimeCheckMixin, Field):
     def contribute_to_class(self, cls, name, **kwargs):
         super(DateField, self).contribute_to_class(cls, name, **kwargs)
         if not self.null:
-            setattr(cls, 'get_next_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self,
-                      is_next=True))
-            setattr(cls, 'get_previous_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self,
-                      is_next=False))
+            setattr(
+                cls, 'get_next_by_%s' % self.name,
+                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=True)
+            )
+            setattr(
+                cls, 'get_previous_by_%s' % self.name,
+                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)
+            )
 
     def get_prep_value(self, value):
         value = super(DateField, self).get_prep_value(value)
@@ -1625,8 +1627,7 @@ class DecimalField(Field):
         return utils.format_number(value, self.max_digits, self.decimal_places)
 
     def get_db_prep_save(self, value, connection):
-        return connection.ops.adapt_decimalfield_value(self.to_python(value),
-                self.max_digits, self.decimal_places)
+        return connection.ops.adapt_decimalfield_value(self.to_python(value), self.max_digits, self.decimal_places)
 
     def get_prep_value(self, value):
         value = super(DecimalField, self).get_prep_value(value)
@@ -1869,12 +1870,6 @@ class IntegerField(Field):
             return None
         return int(value)
 
-    def get_prep_lookup(self, lookup_type, value):
-        if ((lookup_type == 'gte' or lookup_type == 'lt')
-                and isinstance(value, float)):
-            value = math.ceil(value)
-        return super(IntegerField, self).get_prep_lookup(lookup_type, value)
-
     def get_internal_type(self):
         return "IntegerField"
 
@@ -1995,8 +1990,7 @@ class GenericIPAddressField(Field):
             value = force_text(value)
         value = value.strip()
         if ':' in value:
-            return clean_ipv6_address(value,
-                self.unpack_ipv4, self.error_messages['invalid'])
+            return clean_ipv6_address(value, self.unpack_ipv4, self.error_messages['invalid'])
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):

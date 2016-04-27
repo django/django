@@ -18,8 +18,7 @@ class LinebreaksTests(SimpleTestCase):
         output = self.engine.render_to_string('linebreaks01', {"a": "x&\ny", "b": mark_safe("x&\ny")})
         self.assertEqual(output, "<p>x&amp;<br />y</p> <p>x&<br />y</p>")
 
-    @setup({'linebreaks02':
-        '{% autoescape off %}{{ a|linebreaks }} {{ b|linebreaks }}{% endautoescape %}'})
+    @setup({'linebreaks02': '{% autoescape off %}{{ a|linebreaks }} {{ b|linebreaks }}{% endautoescape %}'})
     def test_linebreaks02(self):
         output = self.engine.render_to_string('linebreaks02', {"a": "x&\ny", "b": mark_safe("x&\ny")})
         self.assertEqual(output, "<p>x&<br />y</p> <p>x&<br />y</p>")

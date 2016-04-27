@@ -24,10 +24,6 @@ logger = logging.getLogger('django.request')
 
 
 class BaseHandler(object):
-    # Changes that are always applied to a response (in this order).
-    response_fixes = [
-        http.conditional_content_removal,
-    ]
 
     def __init__(self):
         self._request_middleware = None
@@ -78,8 +74,7 @@ class BaseHandler(object):
     def make_view_atomic(self, view):
         non_atomic_requests = getattr(view, '_non_atomic_requests', set())
         for db in connections.all():
-            if (db.settings_dict['ATOMIC_REQUESTS']
-                    and db.alias not in non_atomic_requests):
+            if db.settings_dict['ATOMIC_REQUESTS'] and db.alias not in non_atomic_requests:
                 view = transaction.atomic(using=db.alias)(view)
         return view
 
@@ -155,8 +150,10 @@ class BaseHandler(object):
                     view_name = callback.__name__
                 else:                                           # CBV
                     view_name = callback.__class__.__name__ + '.__call__'
-                raise ValueError("The view %s.%s didn't return an HttpResponse object. It returned None instead."
-                                 % (callback.__module__, view_name))
+                raise ValueError(
+                    "The view %s.%s didn't return an HttpResponse object. It "
+                    "returned None instead." % (callback.__module__, view_name)
+                )
 
             # If the response supports deferred rendering, apply template
             # response middleware and then render the response
@@ -168,7 +165,8 @@ class BaseHandler(object):
                         raise ValueError(
                             "%s.process_template_response didn't return an "
                             "HttpResponse object. It returned None instead."
-                            % (middleware_method.__self__.__class__.__name__))
+                            % (middleware_method.__self__.__class__.__name__)
+                        )
                 try:
                     response = response.render()
                 except Exception as e:
@@ -177,11 +175,6 @@ class BaseHandler(object):
                 response_is_rendered = True
 
         except http.Http404 as exc:
-            logger.warning('Not Found: %s', request.path,
-                        extra={
-                            'status_code': 404,
-                            'request': request
-                        })
             if settings.DEBUG:
                 response = debug.technical_404_response(request, exc)
             else:
@@ -190,32 +183,25 @@ class BaseHandler(object):
         except PermissionDenied as exc:
             logger.warning(
                 'Forbidden (Permission denied): %s', request.path,
-                extra={
-                    'status_code': 403,
-                    'request': request
-                })
+                extra={'status_code': 403, 'request': request},
+            )
             response = self.get_exception_response(request, resolver, 403, exc)
 
         except MultiPartParserError as exc:
             logger.warning(
                 'Bad request (Unable to parse request body): %s', request.path,
-                extra={
-                    'status_code': 400,
-                    'request': request
-                })
+                extra={'status_code': 400, 'request': request},
+            )
             response = self.get_exception_response(request, resolver, 400, exc)
 
         except SuspiciousOperation as exc:
             # The request logger receives events for any problematic request
             # The security logger receives events for all SuspiciousOperations
-            security_logger = logging.getLogger('django.security.%s' %
-                            exc.__class__.__name__)
+            security_logger = logging.getLogger('django.security.%s' % exc.__class__.__name__)
             security_logger.error(
                 force_text(exc),
-                extra={
-                    'status_code': 400,
-                    'request': request
-                })
+                extra={'status_code': 400, 'request': request},
+            )
             if settings.DEBUG:
                 return debug.technical_500_response(request, *sys.exc_info(), status_code=400)
 
@@ -240,7 +226,6 @@ class BaseHandler(object):
                         "%s.process_response didn't return an "
                         "HttpResponse object. It returned None instead."
                         % (middleware_method.__self__.__class__.__name__))
-            response = self.apply_response_fixes(request, response)
         except Exception:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
@@ -251,6 +236,12 @@ class BaseHandler(object):
         # been rendered, force it to be rendered.
         if not response_is_rendered and callable(getattr(response, 'render', None)):
             response = response.render()
+
+        if response.status_code == 404:
+            logger.warning(
+                'Not Found: %s', request.path,
+                extra={'status_code': 404, 'request': request},
+            )
 
         return response
 
@@ -278,12 +269,10 @@ class BaseHandler(object):
         if settings.DEBUG_PROPAGATE_EXCEPTIONS:
             raise
 
-        logger.error('Internal Server Error: %s', request.path,
+        logger.error(
+            'Internal Server Error: %s', request.path,
             exc_info=exc_info,
-            extra={
-                'status_code': 500,
-                'request': request
-            }
+            extra={'status_code': 500, 'request': request},
         )
 
         if settings.DEBUG:
@@ -295,13 +284,3 @@ class BaseHandler(object):
         # Return an HttpResponse that displays a friendly error message.
         callback, param_dict = resolver.resolve_error_handler(500)
         return callback(request, **param_dict)
-
-    def apply_response_fixes(self, request, response):
-        """
-        Applies each of the functions in self.response_fixes to the request and
-        response, modifying the response in the process. Returns the new
-        response.
-        """
-        for func in self.response_fixes:
-            response = func(request, response)
-        return response

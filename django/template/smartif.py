@@ -88,8 +88,6 @@ def prefix(bp, func):
 
 
 # Operator precedence follows Python.
-# NB - we can get slightly more accurate syntax error messages by not using the
-# same object for '==' and '='.
 # We defer variable evaluation to the lambda to ensure that terms are
 # lazily evaluated using Python's boolean parsing logic.
 OPERATORS = {
@@ -99,6 +97,7 @@ OPERATORS = {
     'in': infix(9, lambda context, x, y: x.eval(context) in y.eval(context)),
     'not in': infix(9, lambda context, x, y: x.eval(context) not in y.eval(context)),
     'is': infix(10, lambda context, x, y: x.eval(context) is y.eval(context)),
+    'is not': infix(10, lambda context, x, y: x.eval(context) is not y.eval(context)),
     '==': infix(10, lambda context, x, y: x.eval(context) == y.eval(context)),
     '!=': infix(10, lambda context, x, y: x.eval(context) != y.eval(context)),
     '>': infix(10, lambda context, x, y: x.eval(context) > y.eval(context)),
@@ -151,13 +150,16 @@ class IfParser(object):
     error_class = ValueError
 
     def __init__(self, tokens):
-        # pre-pass necessary to turn  'not','in' into single token
+        # Turn 'is','not' and 'not','in' into single tokens.
         l = len(tokens)
         mapped_tokens = []
         i = 0
         while i < l:
             token = tokens[i]
-            if token == "not" and i + 1 < l and tokens[i + 1] == "in":
+            if token == "is" and i + 1 < l and tokens[i + 1] == "not":
+                token = "is not"
+                i += 1  # skip 'not'
+            elif token == "not" and i + 1 < l and tokens[i + 1] == "in":
                 token = "not in"
                 i += 1  # skip 'in'
             mapped_tokens.append(self.translate_token(token))

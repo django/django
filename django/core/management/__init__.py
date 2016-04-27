@@ -196,8 +196,10 @@ class ManagementUtility(object):
                 settings.INSTALLED_APPS
             else:
                 sys.stderr.write("No Django settings specified.\n")
-            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" %
-                (subcommand, self.prog_name))
+            sys.stderr.write(
+                "Unknown command: %r\nType '%s help' for usage.\n"
+                % (subcommand, self.prog_name)
+            )
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.
@@ -276,7 +278,10 @@ class ManagementUtility(object):
                 if option[1]:
                     opt_label += '='
                 print(opt_label)
-        sys.exit(1)
+        # Exit code of the bash completion function is never passed back to
+        # the user, so it's safe to always exit with 0.
+        # For more details see #25420.
+        sys.exit(0)
 
     def execute(self):
         """

@@ -255,8 +255,7 @@ class PasswordResetTest(AuthViewsTestCase):
 
     def test_confirm_complete(self):
         url, path = self._test_confirm_start()
-        response = self.client.post(path, {'new_password1': 'anewpassword',
-                                           'new_password2': 'anewpassword'})
+        response = self.client.post(path, {'new_password1': 'anewpassword', 'new_password2': 'anewpassword'})
         # Check the password has been changed
         u = User.objects.get(email='staffmember@example.com')
         self.assertTrue(u.check_password("anewpassword"))
@@ -267,48 +266,41 @@ class PasswordResetTest(AuthViewsTestCase):
 
     def test_confirm_different_passwords(self):
         url, path = self._test_confirm_start()
-        response = self.client.post(path, {'new_password1': 'anewpassword',
-                                           'new_password2': 'x'})
+        response = self.client.post(path, {'new_password1': 'anewpassword', 'new_password2': 'x'})
         self.assertFormError(response, SetPasswordForm.error_messages['password_mismatch'])
 
     def test_reset_redirect_default(self):
-        response = self.client.post('/password_reset/',
-            {'email': 'staffmember@example.com'})
+        response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/password_reset/done/')
 
     def test_reset_custom_redirect(self):
-        response = self.client.post('/password_reset/custom_redirect/',
-            {'email': 'staffmember@example.com'})
+        response = self.client.post('/password_reset/custom_redirect/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/custom/')
 
     def test_reset_custom_redirect_named(self):
-        response = self.client.post('/password_reset/custom_redirect/named/',
-            {'email': 'staffmember@example.com'})
+        response = self.client.post('/password_reset/custom_redirect/named/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/password_reset/')
 
     def test_confirm_redirect_default(self):
         url, path = self._test_confirm_start()
-        response = self.client.post(path, {'new_password1': 'anewpassword',
-                                           'new_password2': 'anewpassword'})
+        response = self.client.post(path, {'new_password1': 'anewpassword', 'new_password2': 'anewpassword'})
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/reset/done/')
 
     def test_confirm_redirect_custom(self):
         url, path = self._test_confirm_start()
         path = path.replace('/reset/', '/reset/custom/')
-        response = self.client.post(path, {'new_password1': 'anewpassword',
-                                           'new_password2': 'anewpassword'})
+        response = self.client.post(path, {'new_password1': 'anewpassword', 'new_password2': 'anewpassword'})
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/custom/')
 
     def test_confirm_redirect_custom_named(self):
         url, path = self._test_confirm_start()
         path = path.replace('/reset/', '/reset/custom/named/')
-        response = self.client.post(path, {'new_password1': 'anewpassword',
-                                           'new_password2': 'anewpassword'})
+        response = self.client.post(path, {'new_password1': 'anewpassword', 'new_password2': 'anewpassword'})
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/password_reset/')
 

@@ -65,9 +65,8 @@ See :doc:`/howto/error-reporting` for more information.
 Default: ``[]`` (Empty list)
 
 A list of strings representing the host/domain names that this Django site can
-serve. This is a security measure to prevent an attacker from poisoning caches
-and triggering password reset emails with links to malicious hosts by submitting
-requests with a fake HTTP ``Host`` header, which is possible even under many
+serve. This is a security measure to prevent :ref:`HTTP Host header attacks
+<host-headers-virtual-hosting>`, which are possible even under many
 seemingly-safe web server configurations.
 
 Values in this list can be fully qualified names (e.g. ``'www.example.com'``),
@@ -1004,8 +1003,8 @@ environment, such as all the currently defined Django settings (from
 ``settings.py``).
 
 As a security measure, Django will *not* include settings that might be
-sensitive (or offensive), such as :setting:`SECRET_KEY`. Specifically, it will
-exclude any setting whose name includes any of the following:
+sensitive, such as :setting:`SECRET_KEY`. Specifically, it will exclude any
+setting whose name includes any of the following:
 
 * ``'API'``
 * ``'KEY'``
@@ -2520,9 +2519,13 @@ See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
 Default: ``False``
 
-A boolean that specifies whether to use the X-Forwarded-Host header in
-preference to the Host header. This should only be enabled if a proxy
+A boolean that specifies whether to use the ``X-Forwarded-Host`` header in
+preference to the ``Host`` header. This should only be enabled if a proxy
 which sets this header is in use.
+
+This setting takes priority over :setting:`USE_X_FORWARDED_PORT`. Per
+:rfc:`7239#page-7`, the ``X-Forwarded-Host`` header can include the port
+number, in which case you shouldn't use :setting:`USE_X_FORWARDED_PORT`.
 
 .. setting:: USE_X_FORWARDED_PORT
 
@@ -2533,9 +2536,11 @@ which sets this header is in use.
 
 Default: ``False``
 
-A boolean that specifies whether to use the X-Forwarded-Port header in
+A boolean that specifies whether to use the ``X-Forwarded-Port`` header in
 preference to the ``SERVER_PORT`` ``META`` variable. This should only be
 enabled if a proxy which sets this header is in use.
+
+:setting:`USE_X_FORWARDED_HOST` takes priority over this setting.
 
 .. setting:: WSGI_APPLICATION
 

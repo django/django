@@ -14,6 +14,7 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
+from django.views.i18n import JavaScriptCatalog
 
 system_check_errors = []
 
@@ -84,8 +85,9 @@ class AdminSite(object):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model._meta.abstract:
-                raise ImproperlyConfigured('The model %s is abstract, so it '
-                      'cannot be registered with admin.' % model.__name__)
+                raise ImproperlyConfigured(
+                    'The model %s is abstract, so it cannot be registered with admin.' % model.__name__
+                )
 
             if model in self._registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
@@ -315,15 +317,8 @@ class AdminSite(object):
     def i18n_javascript(self, request):
         """
         Displays the i18n JavaScript that the Django admin requires.
-
-        This takes into account the USE_I18N setting. If it's set to False, the
-        generated JavaScript will be leaner and faster.
         """
-        if settings.USE_I18N:
-            from django.views.i18n import javascript_catalog
-        else:
-            from django.views.i18n import null_javascript_catalog as javascript_catalog
-        return javascript_catalog(request, packages=['django.conf', 'django.contrib.admin'])
+        return JavaScriptCatalog.as_view(packages=['django.contrib.admin'])(request)
 
     @never_cache
     def logout(self, request, extra_context=None):
@@ -362,7 +357,8 @@ class AdminSite(object):
         # it cannot import models from other applications at the module level,
         # and django.contrib.admin.forms eventually imports User.
         from django.contrib.admin.forms import AdminAuthenticationForm
-        context = dict(self.each_context(request),
+        context = dict(
+            self.each_context(request),
             title=_('Log in'),
             app_path=request.get_full_path(),
         )
@@ -479,8 +475,7 @@ class AdminSite(object):
 
         request.current_app = self.name
 
-        return TemplateResponse(request, self.index_template or
-                                'admin/index.html', context)
+        return TemplateResponse(request, self.index_template or 'admin/index.html', context)
 
     def app_index(self, request, app_label, extra_context=None):
         app_dict = self._build_app_dict(request, app_label)
@@ -489,7 +484,8 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         app_name = apps.get_app_config(app_label).verbose_name
-        context = dict(self.each_context(request),
+        context = dict(
+            self.each_context(request),
             title=_('%(app)s administration') % {'app': app_name},
             app_list=[app_dict],
             app_label=app_label,

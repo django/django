@@ -100,8 +100,7 @@ class SelectRelatedTests(TestCase):
         with self.assertNumQueries(5):
             world = Species.objects.all().select_related('genus__family')
             orders = [o.genus.family.order.name for o in world]
-            self.assertEqual(sorted(orders),
-                ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
+            self.assertEqual(sorted(orders), ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
 
     def test_select_related_with_extra(self):
         s = (Species.objects.all()
@@ -120,8 +119,7 @@ class SelectRelatedTests(TestCase):
         with self.assertNumQueries(1):
             world = Species.objects.select_related('genus__family')
             families = [o.genus.family.name for o in world]
-            self.assertEqual(sorted(families),
-                ['Amanitacae', 'Drosophilidae', 'Fabaceae', 'Hominidae'])
+            self.assertEqual(sorted(families), ['Amanitacae', 'Drosophilidae', 'Fabaceae', 'Hominidae'])
 
     def test_more_certain_fields(self):
         """
@@ -162,9 +160,7 @@ class SelectRelatedTests(TestCase):
         """
         Running select_related() after calling values() raises a TypeError
         """
-
         message = "Cannot call select_related() after .values() or .values_list()"
-
         with self.assertRaisesMessage(TypeError, message):
             list(Species.objects.values('name').select_related('genus'))
 
@@ -172,9 +168,7 @@ class SelectRelatedTests(TestCase):
         """
         Running select_related() after calling values_list() raises a TypeError
         """
-
         message = "Cannot call select_related() after .values() or .values_list()"
-
         with self.assertRaisesMessage(TypeError, message):
             list(Species.objects.values_list('name').select_related('genus'))
 

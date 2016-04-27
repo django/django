@@ -67,7 +67,3 @@ class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
     @property
     def wkt(self):
         return self.srtext
-
-    @classmethod
-    def wkt_col(cls):
-        return 'srtext'

@@ -234,14 +234,17 @@ class BaseCache(object):
         cache code.
         """
         if len(key) > MEMCACHE_MAX_KEY_LENGTH:
-            warnings.warn('Cache key will cause errors if used with memcached: '
-                    '%s (longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH),
-                    CacheKeyWarning)
+            warnings.warn(
+                'Cache key will cause errors if used with memcached: %r '
+                '(longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH), CacheKeyWarning
+            )
         for char in key:
             if ord(char) < 33 or ord(char) == 127:
-                warnings.warn('Cache key contains characters that will cause '
-                        'errors if used with memcached: %r' % key,
-                              CacheKeyWarning)
+                warnings.warn(
+                    'Cache key contains characters that will cause errors if '
+                    'used with memcached: %r' % key, CacheKeyWarning
+                )
+                break
 
     def incr_version(self, key, delta=1, version=None):
         """Adds delta to the cache version for the supplied key. Returns the

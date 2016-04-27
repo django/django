@@ -295,8 +295,7 @@ class ProxyModelTests(TestCase):
         resp = [s.name for s in StateProxy.objects.select_related()]
         self.assertEqual(resp, ['New South Wales'])
 
-        self.assertEqual(StateProxy.objects.get(name='New South Wales').name,
-            'New South Wales')
+        self.assertEqual(StateProxy.objects.get(name='New South Wales').name, 'New South Wales')
 
         resp = StateProxy.objects.select_related().get(name='New South Wales')
         self.assertEqual(resp.name, 'New South Wales')
@@ -317,16 +316,15 @@ class ProxyModelTests(TestCase):
         )
 
     def test_proxy_bug(self):
-        contributor = ProxyTrackerUser.objects.create(name='Contributor',
-            status='contrib')
+        contributor = ProxyTrackerUser.objects.create(name='Contributor', status='contrib')
         someone = BaseUser.objects.create(name='Someone')
-        Bug.objects.create(summary='fix this', version='1.1beta',
-            assignee=contributor, reporter=someone)
-        pcontributor = ProxyTrackerUser.objects.create(name='OtherContributor',
-            status='proxy')
-        Improvement.objects.create(summary='improve that', version='1.1beta',
+        Bug.objects.create(summary='fix this', version='1.1beta', assignee=contributor, reporter=someone)
+        pcontributor = ProxyTrackerUser.objects.create(name='OtherContributor', status='proxy')
+        Improvement.objects.create(
+            summary='improve that', version='1.1beta',
             assignee=contributor, reporter=pcontributor,
-            associated_bug=ProxyProxyBug.objects.all()[0])
+            associated_bug=ProxyProxyBug.objects.all()[0],
+        )
 
         # Related field filter on proxy
         resp = ProxyBug.objects.get(version__icontains='beta')

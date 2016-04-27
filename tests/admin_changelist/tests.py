@@ -130,8 +130,7 @@ class ChangeListTests(TestCase):
             '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
             '<td class="field-parent nowrap">-</td></tr></tbody>' % link
         )
-        self.assertNotEqual(table_output.find(row_html), -1,
-            'Failed to find expected row element: %s' % table_output)
+        self.assertNotEqual(table_output.find(row_html), -1, 'Failed to find expected row element: %s' % table_output)
 
     def test_result_list_set_empty_value_display_on_admin_site(self):
         """
@@ -152,8 +151,7 @@ class ChangeListTests(TestCase):
             '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
             '<td class="field-parent nowrap">???</td></tr></tbody>' % link
         )
-        self.assertNotEqual(table_output.find(row_html), -1,
-            'Failed to find expected row element: %s' % table_output)
+        self.assertNotEqual(table_output.find(row_html), -1, 'Failed to find expected row element: %s' % table_output)
 
     def test_result_list_set_empty_value_display_in_model_admin(self):
         """
@@ -172,8 +170,7 @@ class ChangeListTests(TestCase):
             '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
             '<td class="field-age_display">&amp;dagger;</td><td class="field-age">-empty-</td></tr></tbody>' % link
         )
-        self.assertNotEqual(table_output.find(row_html), -1,
-            'Failed to find expected row element: %s' % table_output)
+        self.assertNotEqual(table_output.find(row_html), -1, 'Failed to find expected row element: %s' % table_output)
 
     def test_result_list_html(self):
         """
@@ -194,8 +191,7 @@ class ChangeListTests(TestCase):
             '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
             '<td class="field-parent nowrap">Parent object</td></tr></tbody>' % link
         )
-        self.assertNotEqual(table_output.find(row_html), -1,
-            'Failed to find expected row element: %s' % table_output)
+        self.assertNotEqual(table_output.find(row_html), -1, 'Failed to find expected row element: %s' % table_output)
 
     def test_result_list_editable_html(self):
         """
@@ -894,8 +890,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         Ensure that the status line for selected rows gets updated correctly (#22038)
         """
         self.admin_login(username='super', password='secret')
-        self.selenium.get('%s%s' % (self.live_server_url,
-                                    reverse('admin:auth_user_changelist')))
+        self.selenium.get(self.live_server_url + reverse('admin:auth_user_changelist'))
 
         form_id = '#changelist-form'
 

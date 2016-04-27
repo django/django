@@ -8,6 +8,7 @@ import os
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import DatabaseError, connection, connections, models
+from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
@@ -51,6 +52,16 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
+
+    @override_settings(INSTALLED_APPS=[
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'migrations.migrations_test_apps.migrated_app',
+    ])
+    def test_migrate_with_system_checks(self):
+        out = six.StringIO()
+        call_command('migrate', skip_checks=False, no_color=True, stdout=out)
+        self.assertIn('Apply all migrations: migrated_app', out.getvalue())
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_initial_false"})
     def test_migrate_initial_false(self):
@@ -337,16 +348,26 @@ class MigrateTests(MigrationTestBase):
         index_tx_end = output.find(connection.ops.end_transaction_sql().lower())
 
         self.assertGreater(index_tx_start, -1, "Transaction start not found")
-        self.assertGreater(index_op_desc_author, index_tx_start,
-            "Operation description (author) not found or found before transaction start")
-        self.assertGreater(index_create_table, index_op_desc_author,
-            "CREATE TABLE not found or found before operation description (author)")
-        self.assertGreater(index_op_desc_tribble, index_create_table,
-            "Operation description (tribble) not found or found before CREATE TABLE (author)")
-        self.assertGreater(index_op_desc_unique_together, index_op_desc_tribble,
-            "Operation description (unique_together) not found or found before operation description (tribble)")
-        self.assertGreater(index_tx_end, index_op_desc_unique_together,
-            "Transaction end not found or found before operation description (unique_together)")
+        self.assertGreater(
+            index_op_desc_author, index_tx_start,
+            "Operation description (author) not found or found before transaction start"
+        )
+        self.assertGreater(
+            index_create_table, index_op_desc_author,
+            "CREATE TABLE not found or found before operation description (author)"
+        )
+        self.assertGreater(
+            index_op_desc_tribble, index_create_table,
+            "Operation description (tribble) not found or found before CREATE TABLE (author)"
+        )
+        self.assertGreater(
+            index_op_desc_unique_together, index_op_desc_tribble,
+            "Operation description (unique_together) not found or found before operation description (tribble)"
+        )
+        self.assertGreater(
+            index_tx_end, index_op_desc_unique_together,
+            "Transaction end not found or found before operation description (unique_together)"
+        )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate_backwards(self):
@@ -368,17 +389,27 @@ class MigrateTests(MigrationTestBase):
         index_tx_end = output.find(connection.ops.end_transaction_sql().lower())
 
         self.assertGreater(index_tx_start, -1, "Transaction start not found")
-        self.assertGreater(index_op_desc_unique_together, index_tx_start,
-            "Operation description (unique_together) not found or found before transaction start")
-        self.assertGreater(index_op_desc_tribble, index_op_desc_unique_together,
-            "Operation description (tribble) not found or found before operation description (unique_together)")
-        self.assertGreater(index_op_desc_author, index_op_desc_tribble,
-            "Operation description (author) not found or found before operation description (tribble)")
+        self.assertGreater(
+            index_op_desc_unique_together, index_tx_start,
+            "Operation description (unique_together) not found or found before transaction start"
+        )
+        self.assertGreater(
+            index_op_desc_tribble, index_op_desc_unique_together,
+            "Operation description (tribble) not found or found before operation description (unique_together)"
+        )
+        self.assertGreater(
+            index_op_desc_author, index_op_desc_tribble,
+            "Operation description (author) not found or found before operation description (tribble)"
+        )
 
-        self.assertGreater(index_drop_table, index_op_desc_author,
-            "DROP TABLE not found or found before operation description (author)")
-        self.assertGreater(index_tx_end, index_op_desc_unique_together,
-            "Transaction end not found or found before DROP TABLE")
+        self.assertGreater(
+            index_drop_table, index_op_desc_author,
+            "DROP TABLE not found or found before operation description (author)"
+        )
+        self.assertGreater(
+            index_tx_end, index_op_desc_unique_together,
+            "Transaction end not found or found before DROP TABLE"
+        )
 
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
@@ -462,6 +493,20 @@ class MigrateTests(MigrationTestBase):
         )
         # No changes were actually applied so there is nothing to rollback
 
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations'})
+    def test_migrate_inconsistent_history(self):
+        """
+        Running migrate with some migrations applied before their dependencies
+        should not be allowed.
+        """
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied("migrations", "0002_second")
+        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
+            call_command("migrate")
+        applied_migrations = recorder.applied_migrations()
+        self.assertNotIn(("migrations", "0001_initial"), applied_migrations)
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """
@@ -469,14 +514,14 @@ class MakeMigrationsTests(MigrationTestBase):
     """
 
     def setUp(self):
-        super(MigrationTestBase, self).setUp()
+        super(MakeMigrationsTests, self).setUp()
         self._old_models = apps.app_configs['migrations'].models.copy()
 
     def tearDown(self):
         apps.app_configs['migrations'].models = self._old_models
         apps.all_models['migrations'] = self._old_models
         apps.clear_cache()
-        super(MigrationTestBase, self).tearDown()
+        super(MakeMigrationsTests, self).tearDown()
 
     def test_files_content(self):
         self.assertTableNotExists("migrations_unicodemodel")
@@ -1054,6 +1099,18 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module() as migration_dir:
             call_command("makemigrations", "migrations", stdout=out)
             self.assertIn(os.path.join(migration_dir, '0001_initial.py'), out.getvalue())
+
+    def test_makemigrations_inconsistent_history(self):
+        """
+        makemigrations should raise InconsistentMigrationHistory exception if
+        there are some migrations applied before their dependencies.
+        """
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0002_second')
+        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        with self.temporary_migration_module(module="migrations.test_migrations"):
+            with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
+                call_command("makemigrations")
 
 
 class SquashMigrationsTests(MigrationTestBase):

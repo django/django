@@ -78,6 +78,9 @@ CSRF_FAILURE_TEMPLATE = """
     <code>csrf_protect</code> on any views that use the <code>csrf_token</code>
     template tag, as well as those that accept the POST data.</li>
 
+    <li>The form has a valid CSRF token. After logging in in another browser
+    tab or hitting the back button after a login, you may need to reload the
+    page with the form, because the token is rotated after a login.</li>
   </ul>
 
   <p>You're seeing the help section of this page because you have <code>DEBUG =

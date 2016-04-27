@@ -1137,16 +1137,24 @@ subclass::
 
 .. attribute:: ModelAdmin.save_as
 
-    Set ``save_as`` to enable a "save as" feature on admin change forms.
+    Set ``save_as`` to enable a "save as new" feature on admin change forms.
 
     Normally, objects have three save options: "Save", "Save and continue
-    editing" and "Save and add another". If ``save_as`` is ``True``, "Save
-    and add another" will be replaced by a "Save as" button.
-
-    "Save as" means the object will be saved as a new object (with a new ID),
-    rather than the old object.
+    editing", and "Save and add another". If ``save_as`` is ``True``, "Save
+    and add another" will be replaced by a "Save as new" button that creates a
+    new object (with a new ID) rather than updating the existing object.
 
     By default, ``save_as`` is set to ``False``.
+
+.. attribute:: ModelAdmin.save_as_continue
+
+    .. versionadded:: 1.10
+
+    When :attr:`save_as=True <save_as>`, the default redirect after saving the
+    new object is to the change view for that object. If you set
+    ``save_as_continue=False``, the redirect will be to the changelist view.
+
+    By default, ``save_as_continue`` is set to ``True``.
 
 .. attribute:: ModelAdmin.save_on_top
 

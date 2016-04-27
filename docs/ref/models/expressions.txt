@@ -526,23 +526,6 @@ calling the appropriate methods on the wrapped expression.
         A hook allowing the expression to coerce ``value`` into a more
         appropriate type.
 
-    .. method:: refs_aggregate(existing_aggregates)
-
-        Returns a tuple containing the ``(aggregate, lookup_path)`` of the
-        first aggregate that this expression (or any nested expression)
-        references, or ``(False, ())`` if no aggregate is referenced.
-        For example::
-
-            queryset.filter(num_chairs__gt=F('sum__employees'))
-
-        The ``F()`` expression here references a previous ``Sum()``
-        computation which means that this filter expression should be
-        added to the ``HAVING`` clause rather than the ``WHERE`` clause.
-
-        In the majority of cases, returning the result of ``refs_aggregate``
-        on any nested expression should be appropriate, as the necessary
-        built-in expressions will return the correct values.
-
     .. method:: get_group_by_cols()
 
         Responsible for returning the list of columns references by

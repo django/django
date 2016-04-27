@@ -220,9 +220,10 @@ class QuerySet(object):
         if pickled_version:
             current_version = get_version()
             if current_version != pickled_version:
-                msg = ("Pickled queryset instance's Django version %s does"
-                    " not match the current version %s."
-                    % (pickled_version, current_version))
+                msg = (
+                    "Pickled queryset instance's Django version %s does not "
+                    "match the current version %s." % (pickled_version, current_version)
+                )
         else:
             msg = "Pickled queryset instance's Django version is not specified."
 
@@ -443,8 +444,8 @@ class QuerySet(object):
         objs = list(objs)
         self._populate_pk_values(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
-                    and self.model._meta.has_auto_field):
+            if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk and
+                    self.model._meta.has_auto_field):
                 self._batched_insert(objs, fields, batch_size)
             else:
                 objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
@@ -673,9 +674,7 @@ class QuerySet(object):
     def raw(self, raw_query, params=None, translations=None, using=None):
         if using is None:
             using = self.db
-        return RawQuerySet(raw_query, model=self.model,
-                params=params, translations=translations,
-                using=using)
+        return RawQuerySet(raw_query, model=self.model, params=params, translations=translations, using=using)
 
     def _values(self, *fields):
         clone = self._clone()
@@ -726,8 +725,7 @@ class QuerySet(object):
     def values_list(self, *fields, **kwargs):
         flat = kwargs.pop('flat', False)
         if kwargs:
-            raise TypeError('Unexpected keyword arguments to values_list: %s'
-                    % (list(kwargs),))
+            raise TypeError('Unexpected keyword arguments to values_list: %s' % (list(kwargs),))
 
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
@@ -1116,8 +1114,10 @@ class QuerySet(object):
                 set(self.query.values_select) != set(other.query.values_select) or
                 set(self.query.extra_select) != set(other.query.extra_select) or
                 set(self.query.annotation_select) != set(other.query.annotation_select)):
-            raise TypeError("Merging '%s' classes must involve the same values in each case."
-                    % self.__class__.__name__)
+            raise TypeError(
+                "Merging '%s' classes must involve the same values in each case."
+                % self.__class__.__name__
+            )
 
     def _merge_known_related_objects(self, other):
         """
@@ -1214,7 +1214,7 @@ class RawQuerySet(object):
     annotated model instances.
     """
     def __init__(self, raw_query, model=None, query=None, params=None,
-            translations=None, using=None, hints=None):
+                 translations=None, using=None, hints=None):
         self.raw_query = raw_query
         self.model = model
         self._db = using
@@ -1291,10 +1291,12 @@ class RawQuerySet(object):
         """
         Selects which database this Raw QuerySet should execute its query against.
         """
-        return RawQuerySet(self.raw_query, model=self.model,
-                query=self.query.clone(using=alias),
-                params=self.params, translations=self.translations,
-                using=alias)
+        return RawQuerySet(
+            self.raw_query, model=self.model,
+            query=self.query.clone(using=alias),
+            params=self.params, translations=self.translations,
+            using=alias,
+        )
 
     @property
     def columns(self):

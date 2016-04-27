@@ -13,18 +13,21 @@ class Command(LabelCommand):
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
-        parser.add_argument('--first', action='store_false', dest='all',
+        parser.add_argument(
+            '--first', action='store_false', dest='all',
             default=True,
-            help="Only return the first match for each static file.")
+            help="Only return the first match for each static file.",
+        )
 
     def handle_label(self, path, **options):
         verbosity = options['verbosity']
         result = finders.find(path, all=options['all'])
         path = force_text(path)
         if verbosity >= 2:
-            searched_locations = ("\nLooking in the following locations:\n  %s" %
-                                  "\n  ".join(force_text(location)
-                                  for location in finders.searched_locations))
+            searched_locations = (
+                "\nLooking in the following locations:\n  %s" %
+                "\n  ".join(force_text(location) for location in finders.searched_locations)
+            )
         else:
             searched_locations = ''
         if result:

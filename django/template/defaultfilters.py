@@ -168,8 +168,7 @@ def floatformat(text, arg=-1):
 
         # Avoid conversion to scientific notation by accessing `sign`, `digits`
         # and `exponent` from `Decimal.as_tuple()` directly.
-        sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP,
-            Context(prec=prec)).as_tuple()
+        sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
         digits = [six.text_type(digit) for digit in reversed(digits)]
         while len(digits) <= abs(exponent):
             digits.append('0')
@@ -367,8 +366,7 @@ def urlizetrunc(value, limit, autoescape=True):
 
     Argument: Length to truncate URLs to.
     """
-    return mark_safe(_urlize(value, trim_url_limit=int(limit), nofollow=True,
-                            autoescape=autoescape))
+    return mark_safe(_urlize(value, trim_url_limit=int(limit), nofollow=True, autoescape=autoescape))
 
 
 @register.filter(is_safe=False)
@@ -769,10 +767,10 @@ def time(value, arg=None):
         return ''
     try:
         return formats.time_format(value, arg)
-    except AttributeError:
+    except (AttributeError, TypeError):
         try:
             return time_format(value, arg)
-        except AttributeError:
+        except (AttributeError, TypeError):
             return ''
 
 

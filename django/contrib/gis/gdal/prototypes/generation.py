@@ -112,8 +112,7 @@ def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     # Dynamically defining our error-checking function with the
     # given offset.
     def _check_str(result, func, cargs):
-        res = check_string(result, func, cargs,
-            offset=offset, str_result=str_result)
+        res = check_string(result, func, cargs, offset=offset, str_result=str_result)
         if res and decoding:
             res = res.decode(decoding)
         return res

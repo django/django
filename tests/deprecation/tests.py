@@ -36,8 +36,7 @@ class RenameMethodsTests(SimpleTestCase):
                     pass
             self.assertEqual(len(recorded), 1)
             msg = str(recorded[0].message)
-            self.assertEqual(msg,
-                '`Manager.old` method should be renamed `new`.')
+            self.assertEqual(msg, '`Manager.old` method should be renamed `new`.')
 
     def test_get_new_defined(self):
         """
@@ -56,8 +55,7 @@ class RenameMethodsTests(SimpleTestCase):
             manager.old()
             self.assertEqual(len(recorded), 1)
             msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                '`Manager.old` is deprecated, use `new` instead.')
+            self.assertEqual(msg, '`Manager.old` is deprecated, use `new` instead.')
 
     def test_get_old_defined(self):
         """
@@ -76,8 +74,7 @@ class RenameMethodsTests(SimpleTestCase):
             manager.old()
             self.assertEqual(len(recorded), 1)
             msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                '`Manager.old` is deprecated, use `new` instead.')
+            self.assertEqual(msg, '`Manager.old` is deprecated, use `new` instead.')
 
     def test_deprecated_subclass_renamed(self):
         """
@@ -99,8 +96,7 @@ class RenameMethodsTests(SimpleTestCase):
             deprecated.new()
             self.assertEqual(len(recorded), 1)
             msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                '`Renamed.old` is deprecated, use `new` instead.')
+            self.assertEqual(msg, '`Renamed.old` is deprecated, use `new` instead.')
             recorded[:] = []
             deprecated.old()
             self.assertEqual(len(recorded), 2)
@@ -132,8 +128,7 @@ class RenameMethodsTests(SimpleTestCase):
             renamed.old()
             self.assertEqual(len(recorded), 1)
             msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                '`Renamed.old` is deprecated, use `new` instead.')
+            self.assertEqual(msg, '`Renamed.old` is deprecated, use `new` instead.')
 
     def test_deprecated_subclass_renamed_and_mixins(self):
         """
@@ -163,8 +158,7 @@ class RenameMethodsTests(SimpleTestCase):
             deprecated.new()
             self.assertEqual(len(recorded), 1)
             msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                '`RenamedMixin.old` is deprecated, use `new` instead.')
+            self.assertEqual(msg, '`RenamedMixin.old` is deprecated, use `new` instead.')
             deprecated.old()
             self.assertEqual(len(recorded), 2)
             msgs = [str(warning.message) for warning in recorded]

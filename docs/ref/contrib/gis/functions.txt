@@ -25,13 +25,12 @@ Function's summary:
 ==================  =======================   ======================  ===================  ==================  =====================
 Measurement         Relationships             Operations              Editors              Output format       Miscellaneous
 ==================  =======================   ======================  ===================  ==================  =====================
-:class:`Area`       :class:`BoundingCircle`   :class:`Difference`     :class:`ForceRHR`    :class:`AsGeoJSON`  :class:`MemSize`
-:class:`Distance`   :class:`Centroid`         :class:`Intersection`   :class:`Reverse`     :class:`AsGML`      :class:`NumGeometries`
-:class:`Length`     :class:`Envelope`         :class:`SymDifference`  :class:`Scale`       :class:`AsKML`      :class:`NumPoints`
-:class:`Perimeter`  :class:`PointOnSurface`   :class:`Union`          :class:`SnapToGrid`  :class:`AsSVG`
-
-                                                                      :class:`Transform`   :class:`GeoHash`
-
+:class:`Area`       :class:`BoundingCircle`   :class:`Difference`     :class:`ForceRHR`    :class:`AsGeoJSON`  :class:`IsValid`
+:class:`Distance`   :class:`Centroid`         :class:`Intersection`   :class:`MakeValid`   :class:`AsGML`      :class:`MemSize`
+:class:`Length`     :class:`Envelope`         :class:`SymDifference`  :class:`Reverse`     :class:`AsKML`      :class:`NumGeometries`
+:class:`Perimeter`  :class:`PointOnSurface`   :class:`Union`          :class:`Scale`       :class:`AsSVG`      :class:`NumPoints`
+                                                                      :class:`SnapToGrid`  :class:`GeoHash`
+                                                                      :class:`Transform`
                                                                       :class:`Translate`
 ==================  =======================   ======================  ===================  ==================  =====================
 
@@ -291,6 +290,18 @@ intersection between them.
 
     MySQL support was added.
 
+``IsValid``
+===========
+
+.. class:: IsValid(expr)
+
+.. versionadded:: 1.10
+
+*Availability*: PostGIS
+
+Accepts a geographic field or expression and tests if the value is well formed.
+Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
+
 ``Length``
 ==========
 
@@ -307,6 +318,20 @@ On PostGIS and SpatiaLite, when the coordinates are geodetic (angular), you can
 specify if the calculation should be based on a simple sphere (less
 accurate, less resource-intensive) or on a spheroid (more accurate, more
 resource-intensive) with the ``spheroid`` keyword argument.
+
+``MakeValid``
+=============
+
+.. class:: MakeValid(expr)
+
+.. versionadded:: 1.10
+
+*Availability*: PostGIS
+
+Accepts a geographic field or expression and attempts to convert the value into
+a valid geometry without losing any of the input vertices. Geometries that are
+already valid are returned without changes. Simple polygons might become a
+multipolygon and the result might be of lower dimension than the input.
 
 ``MemSize``
 ===========

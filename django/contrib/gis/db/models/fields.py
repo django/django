@@ -225,7 +225,7 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
         returning to the caller.
         """
         value = super(GeometryField, self).get_prep_value(value)
-        if isinstance(value, Expression):
+        if isinstance(value, (Expression, bool)):
             return value
         elif isinstance(value, (tuple, list)):
             geom = value[0]

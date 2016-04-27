@@ -1,19 +1,16 @@
 from __future__ import unicode_literals
 
-import unittest
-
 from django.core.exceptions import ImproperlyConfigured
 from django.core.servers.basehttp import get_internal_wsgi_application
 from django.core.signals import request_started
 from django.core.wsgi import get_wsgi_application
 from django.db import close_old_connections
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.client import RequestFactory
-from django.utils import six
 
 
 @override_settings(ROOT_URLCONF='wsgi.urls')
-class WSGITest(TestCase):
+class WSGITest(SimpleTestCase):
 
     def setUp(self):
         request_started.disconnect(close_old_connections)
@@ -73,7 +70,7 @@ class WSGITest(TestCase):
         self.assertIsInstance(response, FileWrapper)
 
 
-class GetInternalWSGIApplicationTest(unittest.TestCase):
+class GetInternalWSGIApplicationTest(SimpleTestCase):
     @override_settings(WSGI_APPLICATION="wsgi.wsgi.application")
     def test_success(self):
         """
@@ -110,16 +107,12 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
 
     @override_settings(WSGI_APPLICATION="wsgi.noexist.app")
     def test_bad_module(self):
-        with six.assertRaisesRegex(self,
-                ImproperlyConfigured,
-                r"^WSGI application 'wsgi.noexist.app' could not be loaded; Error importing.*"):
-
+        msg = "WSGI application 'wsgi.noexist.app' could not be loaded; Error importing"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_internal_wsgi_application()
 
     @override_settings(WSGI_APPLICATION="wsgi.wsgi.noexist")
     def test_bad_name(self):
-        with six.assertRaisesRegex(self,
-                ImproperlyConfigured,
-                r"^WSGI application 'wsgi.wsgi.noexist' could not be loaded; Error importing.*"):
-
+        msg = "WSGI application 'wsgi.wsgi.noexist' could not be loaded; Error importing"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_internal_wsgi_application()

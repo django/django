@@ -432,7 +432,8 @@ Use of actual parentheses in the :ttag:`if` tag is invalid syntax. If you need
 them to indicate precedence, you should use nested :ttag:`if` tags.
 
 :ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
-``<=``, ``>=``, ``in``, and ``is`` which work as follows:
+``<=``, ``>=``, ``in``, ``not in``, ``is``, and ``is not`` which work as
+follows:
 
 ``==`` operator
 ^^^^^^^^^^^^^^^
@@ -515,15 +516,6 @@ of how ``x in y`` will be interpreted::
 
 Not contained within. This is the negation of the ``in`` operator.
 
-The comparison operators cannot be 'chained' like in Python or in mathematical
-notation. For example, instead of using::
-
-    {% if a > b > c %}  (WRONG)
-
-you should use::
-
-    {% if a > b and b > c %}
-
 ``is`` operator
 ^^^^^^^^^^^^^^^
 
@@ -533,6 +525,18 @@ Object identity. Tests if two values are the same object. Example::
 
     {% if value is None %}
       This will output if and only if value is None.
+    {% endif %}
+
+``is not`` operator
+^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 1.10
+
+Tests if two values are not the same object. This is the negation of
+the ``is`` operator. Example::
+
+    {% if value is not None %}
+      This will output if and only if value is not None.
     {% endif %}
 
 Filters
@@ -572,6 +576,15 @@ operators, from lowest to highest, is as follows:
 If you need different precedence, you will need to use nested :ttag:`if` tags.
 Sometimes that is better for clarity anyway, for the sake of those who do not
 know the precedence rules.
+
+The comparison operators cannot be 'chained' like in Python or in mathematical
+notation. For example, instead of using::
+
+    {% if a > b > c %}  (WRONG)
+
+you should use::
+
+    {% if a > b and b > c %}
 
 ``ifequal`` and ``ifnotequal``
 ------------------------------

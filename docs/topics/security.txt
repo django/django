@@ -196,9 +196,9 @@ For more details see the full :setting:`ALLOWED_HOSTS` documentation.
    Django now requires that you set :setting:`ALLOWED_HOSTS` explicitly rather
    than relying on web server configuration.
 
-Additionally, as of 1.3.1, Django requires you to explicitly enable support for
-the ``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST`
-setting) if your configuration requires it.
+Additionally, Django requires you to explicitly enable support for the
+``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST` setting)
+if your configuration requires it.
 
 Session security
 ================
@@ -273,5 +273,10 @@ security protection of the Web server, operating system and other components.
 * Keep your :setting:`SECRET_KEY` a secret.
 * It is a good idea to limit the accessibility of your caching system and
   database using a firewall.
+* Take a look at the Open Web Application Security Project (OWASP) `Top 10
+  list`_ which identifies some common vulnerabilities in web applications. While
+  Django has tools to address some of the issues, other issues must be
+  accounted for in the design of your project.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
+.. _Top 10 list: https://www.owasp.org/index.php/Top_10_2013-Top_10

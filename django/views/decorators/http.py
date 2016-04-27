@@ -32,11 +32,9 @@ def require_http_methods(request_method_list):
         @wraps(func, assigned=available_attrs(func))
         def inner(request, *args, **kwargs):
             if request.method not in request_method_list:
-                logger.warning('Method Not Allowed (%s): %s', request.method, request.path,
-                    extra={
-                        'status_code': 405,
-                        'request': request
-                    }
+                logger.warning(
+                    'Method Not Allowed (%s): %s', request.method, request.path,
+                    extra={'status_code': 405, 'request': request}
                 )
                 return HttpResponseNotAllowed(request_method_list)
             return func(request, *args, **kwargs)

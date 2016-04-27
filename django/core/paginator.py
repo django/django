@@ -2,6 +2,7 @@ import collections
 from math import ceil
 
 from django.utils import six
+from django.utils.functional import cached_property
 
 
 class InvalidPage(Exception):
@@ -24,7 +25,6 @@ class Paginator(object):
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
-        self._num_pages = self._count = None
 
     def validate_number(self, number):
         """
@@ -63,41 +63,36 @@ class Paginator(object):
         """
         return Page(*args, **kwargs)
 
-    def _get_count(self):
+    @cached_property
+    def count(self):
         """
         Returns the total number of objects, across all pages.
         """
-        if self._count is None:
-            try:
-                self._count = self.object_list.count()
-            except (AttributeError, TypeError):
-                # AttributeError if object_list has no count() method.
-                # TypeError if object_list.count() requires arguments
-                # (i.e. is of type list).
-                self._count = len(self.object_list)
-        return self._count
-    count = property(_get_count)
+        try:
+            return self.object_list.count()
+        except (AttributeError, TypeError):
+            # AttributeError if object_list has no count() method.
+            # TypeError if object_list.count() requires arguments
+            # (i.e. is of type list).
+            return len(self.object_list)
 
-    def _get_num_pages(self):
+    @cached_property
+    def num_pages(self):
         """
         Returns the total number of pages.
         """
-        if self._num_pages is None:
-            if self.count == 0 and not self.allow_empty_first_page:
-                self._num_pages = 0
-            else:
-                hits = max(1, self.count - self.orphans)
-                self._num_pages = int(ceil(hits / float(self.per_page)))
-        return self._num_pages
-    num_pages = property(_get_num_pages)
+        if self.count == 0 and not self.allow_empty_first_page:
+            return 0
+        hits = max(1, self.count - self.orphans)
+        return int(ceil(hits / float(self.per_page)))
 
-    def _get_page_range(self):
+    @property
+    def page_range(self):
         """
         Returns a 1-based range of pages for iterating through within
         a template for loop.
         """
         return six.moves.range(1, self.num_pages + 1)
-    page_range = property(_get_page_range)
 
 
 QuerySetPaginator = Paginator   # For backwards-compatibility.

@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
+import itertools
 import os
 import re
 import sys
@@ -119,7 +120,8 @@ class Field(object):
         messages.update(error_messages or {})
         self.error_messages = messages
 
-        self.validators = self.default_validators + validators
+        self.validators = list(itertools.chain(self.default_validators, validators))
+
         super(Field, self).__init__()
 
     def prepare_value(self, value):
@@ -235,7 +237,10 @@ class CharField(Field):
         attrs = super(CharField, self).widget_attrs(widget)
         if self.max_length is not None:
             # The HTML attribute is maxlength, not max_length.
-            attrs.update({'maxlength': str(self.max_length)})
+            attrs['maxlength'] = str(self.max_length)
+        if self.min_length is not None:
+            # The HTML attribute is minlength, not min_length.
+            attrs['minlength'] = str(self.min_length)
         return attrs
 
 
@@ -715,12 +720,9 @@ class BooleanField(Field):
             raise ValidationError(self.error_messages['required'], code='required')
 
     def has_changed(self, initial, data):
-        # Sometimes data or initial could be None or '' which should be the
-        # same thing as False.
-        if initial == 'False':
-            # show_hidden_initial may have transformed False to 'False'
-            initial = False
-        return bool(initial) != bool(data)
+        # Sometimes data or initial may be a string equivalent of a boolean
+        # so we should run it through to_python first to get a boolean value
+        return self.to_python(initial) != self.to_python(data)
 
 
 class NullBooleanField(BooleanField):
@@ -749,14 +751,6 @@ class NullBooleanField(BooleanField):
     def validate(self, value):
         pass
 
-    def has_changed(self, initial, data):
-        # None (unknown) and False (No) are not the same
-        if initial is not None:
-            initial = bool(initial)
-        if data is not None:
-            data = bool(data)
-        return initial != data
-
 
 class CallableChoiceIterator(object):
     def __init__(self, choices_func):
@@ -775,8 +769,10 @@ class ChoiceField(Field):
 
     def __init__(self, choices=(), required=True, widget=None, label=None,
                  initial=None, help_text='', *args, **kwargs):
-        super(ChoiceField, self).__init__(required=required, widget=widget, label=label,
-                                        initial=initial, help_text=help_text, *args, **kwargs)
+        super(ChoiceField, self).__init__(
+            required=required, widget=widget, label=label, initial=initial,
+            help_text=help_text, *args, **kwargs
+        )
         self.choices = choices
 
     def __deepcopy__(self, memo):
@@ -1090,9 +1086,10 @@ class FilePathField(ChoiceField):
                  initial=None, help_text='', *args, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
         self.allow_files, self.allow_folders = allow_files, allow_folders
-        super(FilePathField, self).__init__(choices=(), required=required,
-            widget=widget, label=label, initial=initial, help_text=help_text,
-            *args, **kwargs)
+        super(FilePathField, self).__init__(
+            choices=(), required=required, widget=widget, label=label,
+            initial=initial, help_text=help_text, *args, **kwargs
+        )
 
         if self.required:
             self.choices = []

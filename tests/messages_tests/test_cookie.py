@@ -127,9 +127,9 @@ class CookieTest(BaseTests, SimpleTestCase):
         messages = [
             {
                 'message': Message(constants.INFO, 'Test message'),
-                'message_list': [Message(constants.INFO, 'message %s')
-                                 for x in range(5)] + [{'another-message':
-                                 Message(constants.ERROR, 'error')}],
+                'message_list': [
+                    Message(constants.INFO, 'message %s') for x in range(5)
+                ] + [{'another-message': Message(constants.ERROR, 'error')}],
             },
             Message(constants.INFO, 'message %s'),
         ]

@@ -64,8 +64,8 @@ class StartsWithRelation(models.ForeignObject):
         from_opts = self.remote_field.model._meta
         return [PathInfo(from_opts, to_opts, (to_opts.pk,), self.remote_field, False, False)]
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
-        super(StartsWithRelation, self).contribute_to_class(cls, name, virtual_only)
+    def contribute_to_class(self, cls, name, private_only=False):
+        super(StartsWithRelation, self).contribute_to_class(cls, name, private_only)
         setattr(cls, self.name, ReverseManyToOneDescriptor(self))
 
 

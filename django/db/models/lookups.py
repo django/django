@@ -1,3 +1,4 @@
+import math
 import warnings
 from copy import copy
 
@@ -201,6 +202,27 @@ class LessThanOrEqual(BuiltinLookup):
 Field.register_lookup(LessThanOrEqual)
 
 
+class IntegerFieldFloatRounding(object):
+    """
+    Allow floats to work as query values for IntegerField. Without this, the
+    decimal portion of the float would always be discarded.
+    """
+    def get_prep_lookup(self):
+        if isinstance(self.rhs, float):
+            self.rhs = math.ceil(self.rhs)
+        return super(IntegerFieldFloatRounding, self).get_prep_lookup()
+
+
+class IntegerGreaterThanOrEqual(IntegerFieldFloatRounding, GreaterThanOrEqual):
+    pass
+IntegerField.register_lookup(IntegerGreaterThanOrEqual)
+
+
+class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
+    pass
+IntegerField.register_lookup(IntegerLessThan)
+
+
 class In(BuiltinLookup):
     lookup_name = 'in'
 
@@ -275,8 +297,8 @@ class PatternLookup(BuiltinLookup):
         # So, for Python values we don't need any special pattern, but for
         # SQL reference values or SQL transformations we need the correct
         # pattern added.
-        if (hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql')
-                or hasattr(self.rhs, '_as_sql') or self.bilateral_transforms):
+        if (hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql') or
+                hasattr(self.rhs, '_as_sql') or self.bilateral_transforms):
             pattern = connection.pattern_ops[self.lookup_name].format(connection.pattern_esc)
             return pattern.format(rhs)
         else:

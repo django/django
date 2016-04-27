@@ -388,13 +388,16 @@ class ColourfulItem(models.Model):
 
 
 class CustomErrorMessage(models.Model):
-    name1 = models.CharField(max_length=50,
+    name1 = models.CharField(
+        max_length=50,
         validators=[validators.validate_slug],
-        error_messages={'invalid': 'Model custom error message.'})
-
-    name2 = models.CharField(max_length=50,
+        error_messages={'invalid': 'Model custom error message.'},
+    )
+    name2 = models.CharField(
+        max_length=50,
         validators=[validators.validate_slug],
-        error_messages={'invalid': 'Model custom error message.'})
+        error_messages={'invalid': 'Model custom error message.'},
+    )
 
     def clean(self):
         if self.name1 == 'FORBIDDEN_VALUE':

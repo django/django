@@ -9,6 +9,8 @@ of a DjangoTemplates backend and used by RequestContext.
 
 from __future__ import unicode_literals
 
+import itertools
+
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.utils.encoding import smart_text
@@ -40,10 +42,13 @@ def debug(request):
     context_extras = {}
     if settings.DEBUG and request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS:
         context_extras['debug'] = True
-        from django.db import connection
+        from django.db import connections
         # Return a lazy reference that computes connection.queries on access,
         # to ensure it contains queries triggered after this function runs.
-        context_extras['sql_queries'] = lazy(lambda: connection.queries, list)
+        context_extras['sql_queries'] = lazy(
+            lambda: list(itertools.chain(*[connections[x].queries for x in connections])),
+            list
+        )
     return context_extras
 
 

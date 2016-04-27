@@ -79,6 +79,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         'disjoint': PostGISOperator(func='ST_Disjoint'),
         'equals': PostGISOperator(func='ST_Equals'),
         'intersects': PostGISOperator(func='ST_Intersects', geography=True),
+        'isvalid': PostGISOperator(func='ST_IsValid'),
         'overlaps': PostGISOperator(func='ST_Overlaps'),
         'relate': PostGISOperator(func='ST_Relate'),
         'touches': PostGISOperator(func='ST_Touches'),
@@ -118,11 +119,13 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         self.geojson = prefix + 'AsGeoJson'
         self.gml = prefix + 'AsGML'
         self.intersection = prefix + 'Intersection'
+        self.isvalid = prefix + 'IsValid'
         self.kml = prefix + 'AsKML'
         self.length = prefix + 'Length'
         self.length3d = prefix + '3DLength'
         self.length_spheroid = prefix + 'length_spheroid'
         self.makeline = prefix + 'MakeLine'
+        self.makevalid = prefix + 'MakeValid'
         self.mem_size = prefix + 'mem_size'
         self.num_geom = prefix + 'NumGeometries'
         self.num_points = prefix + 'npoints'
@@ -261,8 +264,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # also handles it (#25524).
         if handle_spheroid and len(dist_val) > 1:
             option = dist_val[1]
-            if (not geography and geodetic and lookup_type != 'dwithin'
-                    and option == 'spheroid'):
+            if not geography and geodetic and lookup_type != 'dwithin' and option == 'spheroid':
                 # using distance_spheroid requires the spheroid of the field as
                 # a parameter.
                 params.insert(0, f._spheroid)

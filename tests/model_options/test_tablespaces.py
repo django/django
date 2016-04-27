@@ -43,8 +43,7 @@ class TablespacesTests(TestCase):
 
     def assertNumContains(self, haystack, needle, count):
         real_count = haystack.count(needle)
-        self.assertEqual(real_count, count, "Found %d instances of '%s', "
-                "expected %d" % (real_count, needle, count))
+        self.assertEqual(real_count, count, "Found %d instances of '%s', expected %d" % (real_count, needle, count))
 
     @skipUnlessDBFeature('supports_tablespaces')
     def test_tablespace_for_model(self):

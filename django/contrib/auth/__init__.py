@@ -82,8 +82,7 @@ def authenticate(**credentials):
         return user
 
     # The credentials supplied are invalid to all backends, fire signal
-    user_login_failed.send(sender=__name__,
-            credentials=_clean_credentials(credentials))
+    user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials))
 
 
 def login(request, user, backend=None):
@@ -139,7 +138,7 @@ def logout(request):
     # Dispatch the signal before the user is logged out so the receivers have a
     # chance to find out *who* logged out.
     user = getattr(request, 'user', None)
-    if hasattr(user, 'is_authenticated') and not user.is_authenticated():
+    if hasattr(user, 'is_authenticated') and not user.is_authenticated:
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
 

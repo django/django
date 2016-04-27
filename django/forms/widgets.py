@@ -15,6 +15,9 @@ from django.templatetags.static import static
 from django.utils import datetime_safe, formats, six
 from django.utils.datastructures import MultiValueDict
 from django.utils.dates import MONTHS
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RenameMethodsBase,
+)
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
@@ -147,8 +150,7 @@ class MediaDefiningClass(type):
     Metaclass for classes that can have media definitions.
     """
     def __new__(mcs, name, bases, attrs):
-        new_class = (super(MediaDefiningClass, mcs)
-            .__new__(mcs, name, bases, attrs))
+        new_class = super(MediaDefiningClass, mcs).__new__(mcs, name, bases, attrs)
 
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
@@ -175,7 +177,13 @@ class SubWidget(object):
         return self.parent_widget.render(*args)
 
 
-class Widget(six.with_metaclass(MediaDefiningClass)):
+class RenameWidgetMethods(MediaDefiningClass, RenameMethodsBase):
+    renamed_methods = (
+        ('_format_value', 'format_value', RemovedInDjango20Warning),
+    )
+
+
+class Widget(six.with_metaclass(RenameWidgetMethods)):
     needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
@@ -249,7 +257,7 @@ class Input(Widget):
     """
     input_type = None  # Subclasses must define this.
 
-    def _format_value(self, value):
+    def format_value(self, value):
         if self.is_localized:
             return formats.localize_input(value)
         return value
@@ -260,7 +268,7 @@ class Input(Widget):
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_text(self._format_value(value))
+            final_attrs['value'] = force_text(self.format_value(value))
         return format_html('<input{} />', flatatt(final_attrs))
 
 
@@ -433,9 +441,7 @@ class Textarea(Widget):
         if value is None:
             value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        return format_html('<textarea{}>\r\n{}</textarea>',
-                           flatatt(final_attrs),
-                           force_text(value))
+        return format_html('<textarea{}>\r\n{}</textarea>', flatatt(final_attrs), force_text(value))
 
 
 class DateTimeBaseInput(TextInput):
@@ -446,9 +452,8 @@ class DateTimeBaseInput(TextInput):
         super(DateTimeBaseInput, self).__init__(attrs)
         self.format = format if format else None
 
-    def _format_value(self, value):
-        return formats.localize_input(value,
-            self.format or formats.get_format(self.format_key)[0])
+    def format_value(self, value):
+        return formats.localize_input(value, self.format or formats.get_format(self.format_key)[0])
 
 
 class DateInput(DateTimeBaseInput):
@@ -536,10 +541,7 @@ class Select(Widget):
                 selected_choices.remove(option_value)
         else:
             selected_html = ''
-        return format_html('<option value="{}"{}>{}</option>',
-                           option_value,
-                           selected_html,
-                           force_text(option_label))
+        return format_html('<option value="{}"{}>{}</option>', option_value, selected_html, force_text(option_label))
 
     def render_options(self, selected_choices):
         # Normalize to strings.
@@ -561,9 +563,11 @@ class NullBooleanSelect(Select):
     A Select Widget intended to be used with NullBooleanField.
     """
     def __init__(self, attrs=None):
-        choices = (('1', ugettext_lazy('Unknown')),
-                   ('2', ugettext_lazy('Yes')),
-                   ('3', ugettext_lazy('No')))
+        choices = (
+            ('1', ugettext_lazy('Unknown')),
+            ('2', ugettext_lazy('Yes')),
+            ('3', ugettext_lazy('No')),
+        )
         super(NullBooleanSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None):
@@ -575,12 +579,14 @@ class NullBooleanSelect(Select):
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
-        return {'2': True,
-                True: True,
-                'True': True,
-                '3': False,
-                'False': False,
-                False: False}.get(value)
+        return {
+            '2': True,
+            True: True,
+            'True': True,
+            '3': False,
+            'False': False,
+            False: False,
+        }.get(value)
 
 
 class SelectMultiple(Select):
@@ -714,16 +720,18 @@ class ChoiceFieldRenderer(object):
                     choices=choice_label,
                 )
                 sub_ul_renderer.choice_input_class = self.choice_input_class
-                output.append(format_html(self.inner_html, choice_value=choice_value,
-                                          sub_widgets=sub_ul_renderer.render()))
+                output.append(format_html(
+                    self.inner_html, choice_value=choice_value,
+                    sub_widgets=sub_ul_renderer.render(),
+                ))
             else:
-                w = self.choice_input_class(self.name, self.value,
-                                            self.attrs.copy(), choice, i)
-                output.append(format_html(self.inner_html,
-                                          choice_value=force_text(w), sub_widgets=''))
-        return format_html(self.outer_html,
-                           id_attr=format_html(' id="{}"', id_) if id_ else '',
-                           content=mark_safe('\n'.join(output)))
+                w = self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, i)
+                output.append(format_html(self.inner_html, choice_value=force_text(w), sub_widgets=''))
+        return format_html(
+            self.outer_html,
+            id_attr=format_html(' id="{}"', id_) if id_ else '',
+            content=mark_safe('\n'.join(output)),
+        )
 
 
 class RadioFieldRenderer(ChoiceFieldRenderer):
@@ -889,8 +897,10 @@ class SplitDateTimeWidget(MultiWidget):
     supports_microseconds = False
 
     def __init__(self, attrs=None, date_format=None, time_format=None):
-        widgets = (DateInput(attrs=attrs, format=date_format),
-                   TimeInput(attrs=attrs, format=time_format))
+        widgets = (
+            DateInput(attrs=attrs, format=date_format),
+            TimeInput(attrs=attrs, format=time_format),
+        )
         super(SplitDateTimeWidget, self).__init__(widgets, attrs)
 
     def decompress(self, value):

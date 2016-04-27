@@ -13,6 +13,7 @@ class Tags(object):
     admin = 'admin'
     caches = 'caches'
     compatibility = 'compatibility'
+    database = 'database'
     models = 'models'
     security = 'security'
     signals = 'signals'
@@ -70,6 +71,11 @@ class CheckRegistry(object):
         if tags is not None:
             checks = [check for check in checks
                       if hasattr(check, 'tags') and set(check.tags) & set(tags)]
+        else:
+            # By default, 'database'-tagged checks are not run as they do more
+            # than mere static code analysis.
+            checks = [check for check in checks
+                      if not hasattr(check, 'tags') or Tags.database not in check.tags]
 
         for check in checks:
             new_errors = check(app_configs=app_configs)

@@ -38,15 +38,15 @@ class RemoteUserTest(TestCase):
         num_users = User.objects.count()
 
         response = self.client.get('/remote_user/')
-        self.assertTrue(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous)
         self.assertEqual(User.objects.count(), num_users)
 
         response = self.client.get('/remote_user/', **{self.header: None})
-        self.assertTrue(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous)
         self.assertEqual(User.objects.count(), num_users)
 
         response = self.client.get('/remote_user/', **{self.header: ''})
-        self.assertTrue(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous)
         self.assertEqual(User.objects.count(), num_users)
 
     def test_unknown_user(self):
@@ -118,7 +118,7 @@ class RemoteUserTest(TestCase):
         self.assertEqual(response.context['user'].username, 'knownuser')
         # During the session, the REMOTE_USER header disappears. Should trigger logout.
         response = self.client.get('/remote_user/')
-        self.assertEqual(response.context['user'].is_anonymous(), True)
+        self.assertTrue(response.context['user'].is_anonymous)
         # verify the remoteuser middleware will not remove a user
         # authenticated via another backend
         User.objects.create_user(username='modeluser', password='foo')
@@ -148,7 +148,7 @@ class RemoteUserTest(TestCase):
     def test_inactive_user(self):
         User.objects.create(username='knownuser', is_active=False)
         response = self.client.get('/remote_user/', **{self.header: 'knownuser'})
-        self.assertTrue(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous)
 
 
 class RemoteUserNoCreateBackend(RemoteUserBackend):
@@ -167,7 +167,7 @@ class RemoteUserNoCreateTest(RemoteUserTest):
     def test_unknown_user(self):
         num_users = User.objects.count()
         response = self.client.get('/remote_user/', **{self.header: 'newuser'})
-        self.assertTrue(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous)
         self.assertEqual(User.objects.count(), num_users)
 
 
@@ -268,5 +268,5 @@ class PersistentRemoteUserTest(RemoteUserTest):
         self.assertEqual(response.context['user'].username, 'knownuser')
         # Should stay logged in if the REMOTE_USER header disappears.
         response = self.client.get('/remote_user/')
-        self.assertEqual(response.context['user'].is_anonymous(), False)
+        self.assertFalse(response.context['user'].is_anonymous)
         self.assertEqual(response.context['user'].username, 'knownuser')

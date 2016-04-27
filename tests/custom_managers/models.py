@@ -116,7 +116,6 @@ class FunPerson(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     fun = models.BooleanField(default=True)
-
     favorite_book = models.ForeignKey(
         'Book',
         models.SET_NULL,
@@ -141,12 +140,16 @@ class Book(models.Model):
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
     fun_authors = models.ManyToManyField(FunPerson, related_name='books')
-
-    favorite_things = GenericRelation(Person,
-        content_type_field='favorite_thing_type', object_id_field='favorite_thing_id')
-
-    fun_people_favorite_things = GenericRelation(FunPerson,
-        content_type_field='favorite_thing_type', object_id_field='favorite_thing_id')
+    favorite_things = GenericRelation(
+        Person,
+        content_type_field='favorite_thing_type',
+        object_id_field='favorite_thing_id',
+    )
+    fun_people_favorite_things = GenericRelation(
+        FunPerson,
+        content_type_field='favorite_thing_type',
+        object_id_field='favorite_thing_id',
+    )
 
     def __str__(self):
         return self.title

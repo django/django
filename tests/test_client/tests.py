@@ -348,6 +348,13 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
 
+    @override_settings(
+        INSTALLED_APPS=['django.contrib.auth'],
+        SESSION_ENGINE='django.contrib.sessions.backends.file',
+    )
+    def test_view_with_login_when_sessions_app_is_not_installed(self):
+        self.test_view_with_login()
+
     def test_view_with_force_login(self):
         "Request a page that is protected with @login_required"
         # Get the page without logging in. Should result in 302.
@@ -590,6 +597,21 @@ class ClientTest(TestCase):
         # Check that the session was modified
         self.assertEqual(self.client.session['tobacconist'], 'hovercraft')
 
+    @override_settings(
+        INSTALLED_APPS=[],
+        SESSION_ENGINE='django.contrib.sessions.backends.file',
+    )
+    def test_sessions_app_is_not_installed(self):
+        self.test_session_modifying_view()
+
+    @override_settings(
+        INSTALLED_APPS=[],
+        SESSION_ENGINE='django.contrib.sessions.backends.nonexistent',
+    )
+    def test_session_engine_is_invalid(self):
+        with self.assertRaisesMessage(ImportError, 'nonexistent'):
+            self.test_session_modifying_view()
+
     def test_view_with_exception(self):
         "Request a page that is known to throw an error"
         with self.assertRaises(KeyError):
@@ -622,6 +644,14 @@ class ClientTest(TestCase):
 
         # Check some response details
         self.assertContains(response, 'This is a test')
+
+    def test_relative_redirect(self):
+        response = self.client.get('/accounts/')
+        self.assertRedirects(response, '/accounts/login/')
+
+    def test_relative_redirect_no_trailing_slash(self):
+        response = self.client.get('/accounts/no_trailing_slash')
+        self.assertRedirects(response, '/accounts/login/')
 
     def test_mass_mail_sending(self):
         "Test that mass mail is redirected to a dummy outbox during test setup"

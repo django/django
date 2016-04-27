@@ -9,6 +9,7 @@ try:
         ArrayField, BigIntegerRangeField, DateRangeField, DateTimeRangeField,
         FloatRangeField, HStoreField, IntegerRangeField, JSONField,
     )
+    from django.contrib.postgres.search import SearchVectorField
 except ImportError:
     class DummyArrayField(models.Field):
         def __init__(self, base_field, size=None, **kwargs):
@@ -30,3 +31,4 @@ except ImportError:
     HStoreField = models.Field
     IntegerRangeField = models.Field
     JSONField = models.Field
+    SearchVectorField = models.Field

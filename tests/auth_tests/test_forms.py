@@ -180,10 +180,13 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         }
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.non_field_errors(),
-                [force_text(form.error_messages['invalid_login'] % {
+        self.assertEqual(
+            form.non_field_errors(), [
+                force_text(form.error_messages['invalid_login'] % {
                     'username': User._meta.get_field('username').verbose_name
-                })])
+                })
+            ]
+        )
 
     def test_inactive_user(self):
         # The user is inactive.
@@ -193,8 +196,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         }
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.non_field_errors(),
-                         [force_text(form.error_messages['inactive'])])
+        self.assertEqual(form.non_field_errors(), [force_text(form.error_messages['inactive'])])
 
     def test_inactive_user_i18n(self):
         with self.settings(USE_I18N=True), translation.override('pt-br', deactivate=True):
@@ -205,8 +207,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
             }
             form = AuthenticationForm(None, data)
             self.assertFalse(form.is_valid())
-            self.assertEqual(form.non_field_errors(),
-                             [force_text(form.error_messages['inactive'])])
+            self.assertEqual(form.non_field_errors(), [force_text(form.error_messages['inactive'])])
 
     def test_custom_login_allowed_policy(self):
         # The user is inactive, but our custom form policy allows them to log in.
@@ -298,8 +299,10 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         }
         form = SetPasswordForm(user, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form["new_password2"].errors,
-                         [force_text(form.error_messages['password_mismatch'])])
+        self.assertEqual(
+            form["new_password2"].errors,
+            [force_text(form.error_messages['password_mismatch'])]
+        )
 
     @mock.patch('django.contrib.auth.password_validation.password_changed')
     def test_success(self, password_changed):
@@ -359,8 +362,7 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         }
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form["old_password"].errors,
-                         [force_text(form.error_messages['password_incorrect'])])
+        self.assertEqual(form["old_password"].errors, [force_text(form.error_messages['password_incorrect'])])
 
     def test_password_verification(self):
         # The two new passwords do not match.
@@ -372,8 +374,7 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         }
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form["new_password2"].errors,
-                         [force_text(form.error_messages['password_mismatch'])])
+        self.assertEqual(form["new_password2"].errors, [force_text(form.error_messages['password_mismatch'])])
 
     @mock.patch('django.contrib.auth.password_validation.password_changed')
     def test_success(self, password_changed):
@@ -394,8 +395,7 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
     def test_field_order(self):
         # Regression test - check the order of fields:
         user = User.objects.get(username='testclient')
-        self.assertEqual(list(PasswordChangeForm(user, {}).fields),
-                         ['old_password', 'new_password1', 'new_password2'])
+        self.assertEqual(list(PasswordChangeForm(user, {}).fields), ['old_password', 'new_password1', 'new_password2'])
 
     def test_password_whitespace_not_stripped(self):
         user = User.objects.get(username='testclient')
@@ -452,14 +452,12 @@ class UserChangeFormTest(TestDataMixin, TestCase):
     def test_bug_17944_unmanageable_password(self):
         user = User.objects.get(username='unmanageable_password')
         form = UserChangeForm(instance=user)
-        self.assertIn(_("Invalid password format or unknown hashing algorithm."),
-            form.as_table())
+        self.assertIn(_("Invalid password format or unknown hashing algorithm."), form.as_table())
 
     def test_bug_17944_unknown_password_algorithm(self):
         user = User.objects.get(username='unknown_password')
         form = UserChangeForm(instance=user)
-        self.assertIn(_("Invalid password format or unknown hashing algorithm."),
-            form.as_table())
+        self.assertIn(_("Invalid password format or unknown hashing algorithm."), form.as_table())
 
     def test_bug_19133(self):
         "The change form does not return the password value"
@@ -574,8 +572,10 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
                     None, [to_email],
                     ['site_monitor@example.com'],
                     headers={'Reply-To': 'webmaster@example.com'},
-                    alternatives=[("Really sorry to hear you forgot your password.",
-                                   "text/html")]).send()
+                    alternatives=[
+                        ("Really sorry to hear you forgot your password.", "text/html")
+                    ],
+                ).send()
 
         form = CustomEmailPasswordResetForm(data)
         self.assertTrue(form.is_valid())
@@ -663,10 +663,10 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
         self.assertEqual(message.get_all('to'), [email])
         self.assertTrue(re.match(r'^http://example.com/reset/[\w/-]+', message.get_payload(0).get_payload()))
-        self.assertTrue(
-            re.match(r'^<html><a href="http://example.com/reset/[\w/-]+/">Link</a></html>$',
-            message.get_payload(1).get_payload())
-        )
+        self.assertTrue(re.match(
+            r'^<html><a href="http://example.com/reset/[\w/-]+/">Link</a></html>$',
+            message.get_payload(1).get_payload()
+        ))
 
 
 class ReadOnlyPasswordHashTest(SimpleTestCase):

@@ -50,10 +50,11 @@ Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 Using another ``settings`` module
 ---------------------------------
 
-The included settings module allows you to run the test suite using
-SQLite. If you want to test behavior using a different database (and
-if you're proposing patches for Django, it's a good idea to test
-across databases), you may need to define your own settings file.
+The included settings module (``tests/test_sqlite.py``) allows you to run the
+test suite using SQLite. If you want to run the tests using a different
+database, you'll need to define your own settings file. Some tests, such as
+those for ``contrib.postgres``, are specific to a particular database backend
+and will be skipped if run with a different backend.
 
 To run the tests with different settings, ensure that the module is on your
 ``PYTHONPATH`` and pass the module with ``--settings``.
@@ -141,7 +142,7 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
-*  argon2-cffi_ 16.0.0+
+*  argon2-cffi_ 16.1.0+
 *  bcrypt_
 *  docutils_
 *  enum34_ (Python 2 only)

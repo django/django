@@ -92,8 +92,7 @@ class SessionStore(SessionBase):
                     session_data = self.decode(file_data)
                 except (EOFError, SuspiciousOperation) as e:
                     if isinstance(e, SuspiciousOperation):
-                        logger = logging.getLogger('django.security.%s' %
-                                e.__class__.__name__)
+                        logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
                         logger.warning(force_text(e))
                     self.create()
 
@@ -160,8 +159,7 @@ class SessionStore(SessionBase):
         dir, prefix = os.path.split(session_file_name)
 
         try:
-            output_file_fd, output_file_name = tempfile.mkstemp(dir=dir,
-                prefix=prefix + '_out_')
+            output_file_fd, output_file_name = tempfile.mkstemp(dir=dir, prefix=prefix + '_out_')
             renamed = False
             try:
                 try:

@@ -31,8 +31,10 @@ if PY3:
     from email import message_from_bytes, message_from_binary_file
 else:
     from email.Utils import parseaddr
-    from email import (message_from_string as message_from_bytes,
-        message_from_file as message_from_binary_file)
+    from email import (
+        message_from_string as message_from_bytes,
+        message_from_file as message_from_binary_file,
+    )
 
 
 class HeadersCheckMixin(object):
@@ -613,9 +615,10 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
 
     def get_the_message(self):
         mailbox = self.get_mailbox_content()
-        self.assertEqual(len(mailbox), 1,
-            "Expected exactly one message, got %d.\n%r" % (len(mailbox), [
-                m.as_string() for m in mailbox]))
+        self.assertEqual(
+            len(mailbox), 1,
+            "Expected exactly one message, got %d.\n%r" % (len(mailbox), [m.as_string() for m in mailbox])
+        )
         return mailbox[0]
 
     def test_send(self):
@@ -635,6 +638,22 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         message = self.get_the_message()
         self.assertEqual(message["subject"], '=?utf-8?q?Ch=C3=A8re_maman?=')
         self.assertEqual(force_text(message.get_payload(decode=True)), 'Je t\'aime très fort')
+
+    def test_send_long_lines(self):
+        """
+        Email line length is limited to 998 chars by the RFC:
+        https://tools.ietf.org/html/rfc5322#section-2.1.1
+        Message body containing longer lines are converted to Quoted-Printable
+        to avoid having to insert newlines, which could be hairy to do properly.
+        """
+        email = EmailMessage('Subject', "Comment ça va? " * 100, 'from@example.com', ['to@example.com'])
+        email.send()
+        message = self.get_the_message()
+        self.assertMessageHasHeaders(message, {
+            ('MIME-Version', '1.0'),
+            ('Content-Type', 'text/plain; charset="utf-8"'),
+            ('Content-Transfer-Encoding', 'quoted-printable'),
+        })
 
     def test_send_many(self):
         email1 = EmailMessage('Subject', 'Content1', 'from@example.com', ['to@example.com'])
@@ -769,8 +788,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         self.assertEqual(message.get('to'), 'to@xn--4ca9at.com')
 
         self.flush_mailbox()
-        m = EmailMessage('Subject', 'Content', 'from@öäü.com',
-                     ['to@öäü.com'], cc=['cc@öäü.com'])
+        m = EmailMessage('Subject', 'Content', 'from@öäü.com', ['to@öäü.com'], cc=['cc@öäü.com'])
         m.send()
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')

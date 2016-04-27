@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import functools
 import re
 
 from django.apps import apps
@@ -657,6 +658,59 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
 
+    def test_supports_functools_partial(self):
+        def _content_file_name(instance, filename, key, **kwargs):
+            return '{}/{}'.format(instance, filename)
+
+        def content_file_name(key, **kwargs):
+            return functools.partial(_content_file_name, key, **kwargs)
+
+        # An unchanged partial reference.
+        before = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
+        ])])
+        after = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
+        ])])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 0)
+
+        # A changed partial reference.
+        args_changed = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('other-file'))),
+        ])])
+        autodetector = MigrationAutodetector(before, args_changed)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AlterField'])
+        # Can't use assertOperationFieldAttributes because we need the
+        # deconstructed version, i.e., the exploded func/args/keywords rather
+        # than the partial: we don't care if it's not the same instance of the
+        # partial, only if it's the same source function, args, and keywords.
+        value = changes['testapp'][0].operations[0].field.upload_to
+        self.assertEqual(
+            (_content_file_name, ('other-file',), {}),
+            (value.func, value.args, value.keywords)
+        )
+
+        kwargs_changed = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('file', spam='eggs'))),
+        ])])
+        autodetector = MigrationAutodetector(before, kwargs_changed)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AlterField'])
+        value = changes['testapp'][0].operations[0].field.upload_to
+        self.assertEqual(
+            (_content_file_name, ('file',), {'spam': 'eggs'}),
+            (value.func, value.args, value.keywords)
+        )
+
     @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
     def test_alter_field_to_not_null_with_default(self, mocked_ask_method):
@@ -1290,8 +1344,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
-        self.assertOperationAttributes(changes, 'testapp', 0, 0,
-            name="AuthorUnmanaged", options={"managed": False})
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged", options={"managed": False})
 
     def test_unmanaged_to_managed(self):
         # Now, we test turning an unmanaged model into a managed model
@@ -1302,8 +1355,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterModelOptions"])
-        self.assertOperationAttributes(changes, 'testapp', 0, 0,
-            name="authorunmanaged", options={})
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="authorunmanaged", options={})
 
     def test_managed_to_unmanaged(self):
         # Now, we turn managed to unmanaged.
@@ -1314,8 +1366,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, "testapp", 0, ["AlterModelOptions"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0,
-            name="authorunmanaged", options={"managed": False})
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="authorunmanaged", options={"managed": False})
 
     def test_unmanaged_custom_pk(self):
         """

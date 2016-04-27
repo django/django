@@ -11,9 +11,10 @@ class Command(AppCommand):
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
-        parser.add_argument('--database', default=DEFAULT_DB_ALIAS,
-            help='Nominates a database to print the SQL for. Defaults to the '
-                 '"default" database.')
+        parser.add_argument(
+            '--database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to print the SQL for. Defaults to the "default" database.',
+        )
 
     def handle_app_config(self, app_config, **options):
         if app_config.models_module is None:

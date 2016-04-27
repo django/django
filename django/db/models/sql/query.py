@@ -576,8 +576,7 @@ class Query(object):
             # really make sense (or return consistent value sets). Not worth
             # the extra complexity when you can write a real query instead.
             if self._extra and rhs._extra:
-                raise ValueError("When merging querysets using 'or', you "
-                        "cannot have extra(select=...) on both sides.")
+                raise ValueError("When merging querysets using 'or', you cannot have extra(select=...) on both sides.")
         self.extra.update(rhs.extra)
         extra_select_mask = set()
         if self.extra_select_mask is not None:
@@ -735,9 +734,7 @@ class Query(object):
             # Only the first alias (skipped above) should have None join_type
             assert self.alias_map[alias].join_type is not None
             parent_alias = self.alias_map[alias].parent_alias
-            parent_louter = (
-                parent_alias
-                and self.alias_map[parent_alias].join_type == LOUTER)
+            parent_louter = parent_alias and self.alias_map[parent_alias].join_type == LOUTER
             already_louter = self.alias_map[alias].join_type == LOUTER
             if ((self.alias_map[alias].nullable or parent_louter) and
                     not already_louter):
@@ -746,8 +743,8 @@ class Query(object):
                 # refer to this one.
                 aliases.extend(
                     join for join in self.alias_map.keys()
-                    if (self.alias_map[join].parent_alias == alias
-                        and join not in aliases))
+                    if self.alias_map[join].parent_alias == alias and join not in aliases
+                )
 
     def demote_joins(self, aliases):
         """
@@ -1641,8 +1638,7 @@ class Query(object):
                 # from the model on which the lookup failed.
                 raise
             else:
-                names = sorted(list(get_field_names_from_opts(opts)) + list(self.extra)
-                               + list(self.annotation_select))
+                names = sorted(list(get_field_names_from_opts(opts)) + list(self.extra) + list(self.annotation_select))
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (name, ", ".join(names)))
 
@@ -1963,8 +1959,7 @@ class Query(object):
         # used. The proper fix would be to defer all decisions where
         # is_nullable() is needed to the compiler stage, but that is not easy
         # to do currently.
-        if ((connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls)
-                and field.empty_strings_allowed):
+        if connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and field.empty_strings_allowed:
             return True
         else:
             return field.null

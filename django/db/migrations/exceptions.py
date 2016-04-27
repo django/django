@@ -25,6 +25,13 @@ class CircularDependencyError(Exception):
     pass
 
 
+class InconsistentMigrationHistory(Exception):
+    """
+    Raised when an applied migration has some of its dependencies not applied.
+    """
+    pass
+
+
 class InvalidBasesError(ValueError):
     """
     Raised when a model's base classes can't be resolved.

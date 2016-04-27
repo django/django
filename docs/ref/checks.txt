@@ -84,6 +84,14 @@ Django's system checks are organized using the following tags:
 * ``templates``: Checks template related configuration.
 * ``caches``: Checks cache related configuration.
 * ``urls``: Checks URL configuration.
+* ``database``: Checks database-related configuration issues. Database checks
+  are not run by default because they do more than static code analysis as
+  regular checks do. They are only run by the :djadmin:`migrate` command or if
+  you specify the ``database`` tag when calling the :djadmin:`check` command.
+
+.. versionadded:: 1.10
+
+    The ``database`` tag was added.
 
 Some checks may be registered with multiple tags.
 
@@ -432,6 +440,16 @@ Auth
   ``USERNAME_FIELD``.
 * **auth.W004**: ``<field>`` is named as the ``USERNAME_FIELD``, but it is not
   unique.
+* **auth.E005**: The permission codenamed ``<codename>`` clashes with a builtin
+  permission for model ``<model>``.
+* **auth.E006**: The permission codenamed ``<codename>`` is duplicated for model
+  ``<model>``.
+* **auth.E007**: The :attr:`verbose_name
+  <django.db.models.Options.verbose_name>` of model ``<model>`` must be at most
+  244 characters for its builtin permission names
+  to be at most 255 characters.
+* **auth.E008**: The permission named ``<name>`` of model ``<model>`` is longer
+  than 255 characters.
 
 
 Content Types
@@ -574,6 +592,8 @@ If you're using MySQL, the following checks will be performed:
 
 * **mysql.E001**: MySQL does not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+* **mysql.W002**: MySQL Strict Mode is not set for database connection
+  '<alias>'. See also :ref:`mysql-sql-mode`.
 
 Templates
 ---------

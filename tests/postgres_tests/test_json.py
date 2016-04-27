@@ -3,7 +3,9 @@ import unittest
 
 from django.core import exceptions, serializers
 from django.db import connection
+from django.forms import CharField, Form
 from django.test import TestCase
+from django.utils.html import escape
 
 from . import PostgreSQLTestCase
 from .models import JSONModel
@@ -258,7 +260,34 @@ class TestFormField(PostgreSQLTestCase):
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, forms.JSONField)
 
+    def test_formfield_disabled(self):
+        class JsonForm(Form):
+            name = CharField()
+            jfield = forms.JSONField(disabled=True)
+
+        form = JsonForm({'name': 'xyz', 'jfield': '["bar"]'}, initial={'jfield': ['foo']})
+        self.assertIn('[&quot;foo&quot;]</textarea>', form.as_p())
+
     def test_prepare_value(self):
         field = forms.JSONField()
         self.assertEqual(field.prepare_value({'a': 'b'}), '{"a": "b"}')
         self.assertEqual(field.prepare_value(None), 'null')
+        self.assertEqual(field.prepare_value('foo'), '"foo"')
+
+    def test_redisplay_wrong_input(self):
+        """
+        When displaying a bound form (typically due to invalid input), the form
+        should not overquote JSONField inputs.
+        """
+        class JsonForm(Form):
+            name = CharField(max_length=2)
+            jfield = forms.JSONField()
+
+        # JSONField input is fine, name is too long
+        form = JsonForm({'name': 'xyz', 'jfield': '["foo"]'})
+        self.assertIn('[&quot;foo&quot;]</textarea>', form.as_p())
+
+        # This time, the JSONField input is wrong
+        form = JsonForm({'name': 'xy', 'jfield': '{"foo"}'})
+        # Appears once in the textarea and once in the error message
+        self.assertEqual(form.as_p().count(escape('{"foo"}')), 2)
