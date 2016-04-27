@@ -42,8 +42,8 @@ class AsgiRequest(http.HttpRequest):
         self._post_parse_error = False
         self.resolver_match = None
         # Path info
-        self.path = self.message['path'].decode("ascii")
-        self.script_name = self.message.get('root_path', b'')
+        self.path = self.message['path']
+        self.script_name = self.message.get('root_path', '')
         if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
             self.path_info = self.path[len(self.script_name):]
@@ -53,8 +53,8 @@ class AsgiRequest(http.HttpRequest):
         self.method = self.message['method'].upper()
         self.META = {
             "REQUEST_METHOD": self.method,
-            "QUERY_STRING": self.message.get('query_string', b'').decode("ascii"),
-            "SCRIPT_NAME": self.script_name.decode("ascii"),
+            "QUERY_STRING": self.message.get('query_string', ''),
+            "SCRIPT_NAME": self.script_name,
             # Old code will need these for a while
             "wsgi.multithread": True,
             "wsgi.multiprocess": True,
@@ -134,10 +134,7 @@ class AsgiRequest(http.HttpRequest):
 
     @cached_property
     def GET(self):
-        return http.QueryDict(
-            self.message.get('query_string', ''),
-            encoding=self._encoding,
-        )
+        return http.QueryDict(self.message.get('query_string', '').encode("utf8"))
 
     def _get_post(self):
         if not hasattr(self, '_post'):
@@ -150,6 +147,7 @@ class AsgiRequest(http.HttpRequest):
 
     def _get_files(self):
         if not hasattr(self, '_files'):
+            self._read_started = False
             self._load_post_and_files()
         return self._files
 
