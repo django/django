@@ -768,6 +768,10 @@ file. In addition to the functionality inherited from
 :class:`django.core.files.File`, this class has several attributes and methods
 that can be used to interact with file data:
 
+.. warning::
+    Two methods of this class, ``save()`` and ``delete()``, default to saving
+    the model object of the associated ``FileField`` in the database. See below.
+
 .. attribute:: FieldFile.url
 
 A read-only property to access the file's relative URL by calling the
@@ -776,8 +780,15 @@ A read-only property to access the file's relative URL by calling the
 
 .. method:: FieldFile.open(mode='rb')
 
-Behaves like the standard Python ``open()`` method and opens the file
-associated with this instance in the mode specified by ``mode``.
+Opens or reopens the file associated with this instance in the mode specified
+by ``mode``. Unlike the standard Python ``open()`` method, this method does
+*not* return a file descriptor.
+
+.. note::
+    The ``file`` attribute (as described in the :class:`django.core.files.File`
+    documentation) is opened implicitly when accessed for the first time, so it
+    may be unnecessary to call this method except to reset the pointer to the
+    underlying file or change the ``mode``.
 
 .. method:: FieldFile.close()
 
