@@ -17,7 +17,7 @@ def _check_for_duplicates(arg_name, objs):
     for val in objs:
         if val in used_vals:
             raise ValueError(
-                'Found duplicate %s in CreateModel operation.' % arg_name
+                "Found duplicate value %s in CreateModel %s argument." % (val, arg_name)
             )
         used_vals.add(val)
 
@@ -55,14 +55,14 @@ class CreateModel(ModelOperation):
         super(CreateModel, self).__init__(name)
         # Sanity-check that there are no duplicated field names, bases, or
         # manager names
-        _check_for_duplicates("field", (name for name, _ in self.fields))
+        _check_for_duplicates('fields', (name for name, _ in self.fields))
         _check_for_duplicates(
-            "base",
+            'bases',
             (base._meta.label_lower if isinstance(base, models.base.ModelBase) else base.lower()
              for base in self.bases
              if base is not models.Model)
         )
-        _check_for_duplicates("manager", (name for name, _ in self.managers))
+        _check_for_duplicates('managers', (name for name, _ in self.managers))
 
     def deconstruct(self):
         kwargs = {
