@@ -31,6 +31,17 @@ The ``File`` class
 
         The underlying :py:term:`file object` that this class wraps.
 
+        .. admonition:: Be careful with this attribute in subclasses.
+
+            Some subclasses of :class:`File`, including
+            :class:`~django.core.files.base.ContentFile` and
+            :class:`~django.db.models.fields.files.FieldFile`, may replace this
+            attribute with an object other than a Python :py:term:`file object`.
+            In these cases, this attribute may itself be a :class:`File`
+            subclass (and not necessarily the same subclass). Whenever
+            possible, use the attributes and methods of the subclass itself
+            rather than the those of the subclass's ``file`` attribute.
+
     .. attribute:: mode
 
         The read/write mode for the file.
