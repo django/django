@@ -764,9 +764,36 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 When you access a :class:`~django.db.models.FileField` on a model, you are
 given an instance of :class:`FieldFile` as a proxy for accessing the underlying
-file. In addition to the functionality inherited from
-:class:`django.core.files.File`, this class has several attributes and methods
-that can be used to interact with file data:
+file.
+
+The API of :class:`FieldFile` mirrors that of :class:`~django.core.files.File`,
+with one key difference: *The object wrapped by the class is not necessarily a
+wrapper around Python's built-in file object.* Instead, it is a wrapper around
+the result of the :attr:`Storage.open()<django.core.files.storage.Storage.open>`
+method, which may be a :class:`~django.core.files.File` object, or it may be a
+custom storage's implementation of the :class:`~django.core.files.File` API.
+
+In addition to the API inherited from
+:class:`~django.core.files.File` such as :meth:`~django.core.files.File.read`
+and :meth:`~django.core.files.File.write`, :class:`FieldFile` includes several
+methods that can be used to interact with the underlying file:
+
+.. warning::
+
+    Two methods of this class, :meth:`~FieldFile.save` and
+    :meth:`~FieldFile.delete`, default to saving the model object of the
+    associated ``FieldFile`` in the database.
+
+.. attribute:: FieldFile.name
+
+The name of the file including the relative path from the root of the
+:class:`~django.core.files.storage.Storage` of the associated
+:class:`~django.db.models.FileField`.
+
+.. attribute:: FieldFile.size
+
+The result of the underlying :attr:`Storage.size()
+<django.core.files.storage.Storage.size>` method.
 
 .. attribute:: FieldFile.url
 
@@ -776,8 +803,13 @@ A read-only property to access the file's relative URL by calling the
 
 .. method:: FieldFile.open(mode='rb')
 
-Behaves like the standard Python ``open()`` method and opens the file
-associated with this instance in the mode specified by ``mode``.
+Opens or reopens the file associated with this instance in the specified
+``mode``. Unlike the standard Python ``open()`` method, it doesn't return a
+file descriptor.
+
+Since the underlying file is opened implicitly when accessing it, it may be
+unnecessary to call this method except to reset the pointer to the underlying
+file or to change the ``mode``.
 
 .. method:: FieldFile.close()
 
