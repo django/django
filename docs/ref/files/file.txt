@@ -16,6 +16,18 @@ The ``File`` class
     :py:term:`file object` with some Django-specific additions.
     Internally, Django uses this class when it needs to represent a file.
 
+    .. note::
+        Some subclasses of :class:`File`, including
+        :class:`django.core.files.base.ContentFile` and
+        :class:`django.db.models.fields.files.FieldFile`, may replace the
+        underlying :attr:`~django.core.files.File.file` attribute with an object
+        other than a Python :py:term:`file object`. In some cases, the
+        :attr:`~django.core.files.File.file` attribute of a
+        :class:`File` subclass may itself be a
+        :class:`File` subclass (and not necessarily the same subclass). Whenever
+        possible, please use the :class:`File` API defined here rather than
+        relying on the :attr:`~django.core.files.File.file` attribute.
+
     :class:`File` objects have the following attributes and methods:
 
     .. attribute:: name
