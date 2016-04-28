@@ -13,7 +13,7 @@ Localflavor
 and cultures.
 
 * `GitHub <https://github.com/django/django-localflavor>`__
-* `Documentation <https://django-localflavor.readthedocs.org/>`__
+* `Documentation <https://django-localflavor.readthedocs.io/>`__
 * `PyPI <https://pypi.python.org/pypi/django-localflavor>`__
 
 Comments
@@ -25,7 +25,7 @@ else. Most users will be better served with a custom solution, or a hosted
 product like Disqus.
 
 * `GitHub <https://github.com/django/django-contrib-comments>`__
-* `Documentation <http://django-contrib-comments.readthedocs.org/>`__
+* `Documentation <https://django-contrib-comments.readthedocs.io/>`__
 * `PyPI <https://pypi.python.org/pypi/django-contrib-comments>`__
 
 Formtools
@@ -34,5 +34,5 @@ Formtools
 ``django-formtools`` is a collection of assorted utilities to work with forms.
 
 * `GitHub <https://github.com/django/django-formtools>`__
-* `Documentation <http://django-formtools.readthedocs.org/>`__
+* `Documentation <https://django-formtools.readthedocs.io/>`__
 * `PyPI <https://pypi.python.org/pypi/django-formtools>`__

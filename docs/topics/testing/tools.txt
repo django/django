@@ -922,7 +922,7 @@ out the `full reference`_ for more details.
 
 .. _Selenium: http://seleniumhq.org/
 .. _selenium package: https://pypi.python.org/pypi/selenium
-.. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
+.. _full reference: https://selenium-python.readthedocs.io/api.html
 .. _Firefox: https://www.mozilla.com/firefox/
 
 .. note::
