@@ -564,6 +564,16 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string('template', {'foo': 1})
         self.assertEqual(output, 'no')
 
+    @setup({'template': '{% if foo is bar %}yes{% else %}no{% endif %}'})
+    def test_if_is_variable_missing(self):
+        output = self.engine.render_to_string('template', {'foo': 1})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo is bar %}yes{% else %}no{% endif %}'})
+    def test_if_is_both_variables_missing(self):
+        output = self.engine.render_to_string('template', {})
+        self.assertEqual(output, 'yes')
+
     @setup({'template': '{% if foo is not None %}yes{% else %}no{% endif %}'})
     def test_if_is_not_match(self):
         # For this to act as a regression test, it's important not to use
@@ -574,4 +584,14 @@ class IfTagTests(SimpleTestCase):
     @setup({'template': '{% if foo is not None %}yes{% else %}no{% endif %}'})
     def test_if_is_not_no_match(self):
         output = self.engine.render_to_string('template', {'foo': None})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo is not bar %}yes{% else %}no{% endif %}'})
+    def test_if_is_not_variable_missing(self):
+        output = self.engine.render_to_string('template', {'foo': False})
+        self.assertEqual(output, 'yes')
+
+    @setup({'template': '{% if foo is not bar %}yes{% else %}no{% endif %}'})
+    def test_if_is_not_both_variables_missing(self):
+        output = self.engine.render_to_string('template', {})
         self.assertEqual(output, 'no')
