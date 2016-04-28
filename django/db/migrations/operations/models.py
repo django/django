@@ -56,12 +56,11 @@ class CreateModel(ModelOperation):
         # Sanity-check that there are no duplicated field names, bases, or
         # manager names
         _check_for_duplicates('fields', (name for name, _ in self.fields))
-        _check_for_duplicates(
-            'bases',
-            (base._meta.label_lower if isinstance(base, models.base.ModelBase) else base.lower()
-             for base in self.bases
-             if base is not models.Model)
-        )
+        _check_for_duplicates('bases', (
+            base._meta.label_lower if hasattr(base, '_meta') else
+            base.lower() if isinstance(base, six.string_types) else base
+            for base in self.bases
+        ))
         _check_for_duplicates('managers', (name for name, _ in self.managers))
 
     def deconstruct(self):
