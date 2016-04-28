@@ -753,20 +753,19 @@ class RendererMixin(object):
             self.renderer = renderer
         super(RendererMixin, self).__init__(*args, **kwargs)
 
-    def subwidgets(self, name, value, attrs=None, choices=()):
-        for widget in self.get_renderer(name, value, attrs, choices):
+    def subwidgets(self, name, value, attrs=None):
+        for widget in self.get_renderer(name, value, attrs):
             yield widget
 
-    def get_renderer(self, name, value, attrs=None, choices=()):
+    def get_renderer(self, name, value, attrs=None):
         """Returns an instance of the renderer."""
         if value is None:
             value = self._empty_value
         final_attrs = self.build_attrs(attrs)
-        choices = list(chain(self.choices, choices))
-        return self.renderer(name, value, final_attrs, choices)
+        return self.renderer(name, value, final_attrs, self.choices)
 
-    def render(self, name, value, attrs=None, choices=()):
-        return self.get_renderer(name, value, attrs, choices).render()
+    def render(self, name, value, attrs=None):
+        return self.get_renderer(name, value, attrs).render()
 
     def id_for_label(self, id_):
         # Widgets using this RendererMixin are made of a collection of
