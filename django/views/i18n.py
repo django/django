@@ -13,7 +13,7 @@ from django.utils import six
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import smart_text
-from django.utils.formats import get_format, get_format_modules
+from django.utils.formats import get_format
 from django.utils.http import is_safe_url, urlunquote
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, check_for_language, get_language, to_locale,
@@ -75,9 +75,8 @@ def get_formats():
         'DATE_INPUT_FORMATS', 'TIME_INPUT_FORMATS', 'DATETIME_INPUT_FORMATS'
     )
     result = {}
-    for module in [settings] + get_format_modules(reverse=True):
-        for attr in FORMAT_SETTINGS:
-            result[attr] = get_format(attr)
+    for attr in FORMAT_SETTINGS:
+        result[attr] = get_format(attr)
     formats = {}
     for k, v in result.items():
         if isinstance(v, (six.string_types, int)):
