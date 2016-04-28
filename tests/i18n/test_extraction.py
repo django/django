@@ -107,10 +107,9 @@ class ExtractorTests(SerializeMixin, SimpleTestCase):
         else:
             # #: path/to/file.html:123
             cwd_prefix = ''
-        parts = ['#: ']
 
         path = os.path.join(cwd_prefix, *comment_parts)
-        parts.append(path)
+        parts = [path]
 
         if isinstance(line_number, six.string_types):
             line_number = self._get_token_line_number(path, line_number)
@@ -118,10 +117,18 @@ class ExtractorTests(SerializeMixin, SimpleTestCase):
             parts.append(':%d' % line_number)
 
         needle = ''.join(parts)
+        pattern = re.compile(r'^\#\:.*' + re.escape(needle), re.MULTILINE)
         if assert_presence:
-            return self.assertIn(needle, po_contents, '"%s" not found in final .po file.' % needle)
+            return six.assertRegex(self, po_contents, pattern, '"%s" not found in final .po file.' % needle)
         else:
-            return self.assertNotIn(needle, po_contents, '"%s" shouldn\'t be in final .po file.' % needle)
+            if six.PY3:
+                return self.assertNotRegex(
+                    po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle
+                )
+            else:
+                return self.assertNotRegexpMatches(
+                    po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle
+                )
 
     def _get_token_line_number(self, path, token):
         with open(path) as f:
@@ -632,7 +639,7 @@ class LocationCommentsTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_location=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        self.assertLocationCommentNotPresent(self.PO_FILE, 55, 'templates', 'test.html.py')
+        self.assertLocationCommentNotPresent(self.PO_FILE, None, 'test.html')
 
     def test_no_location_disabled(self):
         """Behavior is correct if --no-location switch isn't specified."""
@@ -642,7 +649,7 @@ class LocationCommentsTests(ExtractorTests):
         # #16903 -- Standard comment with source file relative path should be present
         self.assertLocationCommentPresent(self.PO_FILE, 'Translatable literal #6b', 'templates', 'test.html')
 
-        # #21208 -- Leaky paths in comments on Windows e.g. #: path\to\file.html.py:123
+        # #21209 -- Leaky paths in comments on Windows e.g. #: path\to\file.html.py:123
         self.assertLocationCommentNotPresent(self.PO_FILE, None, 'templates', 'test.html.py')
 
 
