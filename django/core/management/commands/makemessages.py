@@ -128,13 +128,18 @@ class BuildFile(object):
         # Remove '.py' suffix
         if os.name == 'nt':
             # Preserve '.\' prefix on Windows to respect gettext behavior
-            old = '#: ' + self.work_path
-            new = '#: ' + self.path
+            old_path = self.work_path
+            new_path = self.path
         else:
-            old = '#: ' + self.work_path[2:]
-            new = '#: ' + self.path[2:]
+            old_path = self.work_path[2:]
+            new_path = self.path[2:]
 
-        return msgs.replace(old, new)
+        return re.sub(
+            r'^(#: .*)(' + re.escape(old_path) + r')',
+            r'\1' + new_path,
+            msgs,
+            flags=re.MULTILINE
+        )
 
     def cleanup(self):
         """
