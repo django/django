@@ -112,6 +112,32 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string('if-tag-eq05')
         self.assertEqual(output, 'no')
 
+    # Inequality
+    @setup({'if-tag-noteq01': '{% if foo != bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_noteq01(self):
+        output = self.engine.render_to_string('if-tag-noteq01')
+        self.assertEqual(output, 'no')
+
+    @setup({'if-tag-noteq02': '{% if foo != bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_noteq02(self):
+        output = self.engine.render_to_string('if-tag-noteq02', {'foo': 1})
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-noteq03': '{% if foo != bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_noteq03(self):
+        output = self.engine.render_to_string('if-tag-noteq03', {'foo': 1, 'bar': 1})
+        self.assertEqual(output, 'no')
+
+    @setup({'if-tag-noteq04': '{% if foo != bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_noteq04(self):
+        output = self.engine.render_to_string('if-tag-noteq04', {'foo': 1, 'bar': 2})
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-noteq05': '{% if foo != "" %}yes{% else %}no{% endif %}'})
+    def test_if_tag_noteq05(self):
+        output = self.engine.render_to_string('if-tag-noteq05')
+        self.assertEqual(output, 'yes')
+
     # Comparison
     @setup({'if-tag-gt-01': '{% if 2 > 1 %}yes{% else %}no{% endif %}'})
     def test_if_tag_gt_01(self):
