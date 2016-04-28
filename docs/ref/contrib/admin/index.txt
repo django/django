@@ -1845,7 +1845,7 @@ Other methods
 
 .. method:: ModelAdmin.change_view(request, object_id, form_url='', extra_context=None)
 
-    Django view for the model instance edition page. See note below.
+    Django view for the model instance editing page. See note below.
 
 .. method:: ModelAdmin.changelist_view(request, extra_context=None)
 
