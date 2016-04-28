@@ -825,7 +825,7 @@ as you put your South migrations in the ``south_migrations`` directory and
 your Django migrations in the ``migrations`` directory.
 
 More information is available in the
-`South 1.0 release notes <http://south.readthedocs.org/en/latest/releasenotes/1.0.html#library-migration-path>`_.
+`South 1.0 release notes <https://south.readthedocs.io/en/latest/releasenotes/1.0.html#library-migration-path>`_.
 
 .. seealso::
 

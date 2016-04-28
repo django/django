@@ -116,7 +116,7 @@ though:
 * The new :attr:`~django.contrib.auth.mixins.AccessMixin.permission_denied_message`
   attribute allows passing a message to the ``PermissionDenied`` exception.
 
-.. _django-braces: http://django-braces.readthedocs.org/en/latest/index.html
+.. _django-braces: https://django-braces.readthedocs.io/en/latest/index.html
 
 New styling for ``contrib.admin``
 ---------------------------------

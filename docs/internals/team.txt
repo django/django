@@ -405,7 +405,7 @@ Daniele Procida
 
     .. _Divio: https://divio.ch/
     .. _Arkestra: http://arkestra-project.org/
-    .. _Don\'t be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.org
+    .. _Don\'t be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.io
 
 `Erik Romijn`_
     Erik started using Django in the days of 1.2. His largest contribution to Django was
