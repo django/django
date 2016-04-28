@@ -19,6 +19,10 @@ except ImportError:
     sqlparse = None
 
 
+class Mixin(object):
+    pass
+
+
 class OperationTestBase(MigrationTestBase):
     """
     Common functions to help test operations.
@@ -243,6 +247,20 @@ class OperationTests(OperationTestBase):
                 "Pony",
                 fields=[],
                 bases=(UnicodeModel, 'migrations.UnicodeModel',),
+            )
+        message = "Found duplicate value <class 'django.db.models.base.Model'> in CreateModel bases argument."
+        with self.assertRaisesMessage(ValueError, message):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=(models.Model, models.Model,),
+            )
+        message = "Found duplicate value <class 'migrations.test_operations.Mixin'> in CreateModel bases argument."
+        with self.assertRaisesMessage(ValueError, message):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=(Mixin, Mixin,),
             )
 
     def test_create_model_with_duplicate_manager_name(self):
