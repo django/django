@@ -125,3 +125,11 @@ which is the unique channel representing the connection, but remember that
 whatever you store in must be **network-transparent** - storing things in a
 global variable won't work outside of development.
 
+
+
+Are channels Python 2, 3 or 2+3?
+--------------------------------
+
+Django-channels and all of its dependencies are 2+3 (2.7, 3.4+). Compatibility may change with time. If in doubt, refer to the ``.travis.yml`` configuration file to see which Python versions that are included in CI testing.
+
+This includes Twisted, for which the used subsets of the library used by Daphne are all py3k ready.
