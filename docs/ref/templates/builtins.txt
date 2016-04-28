@@ -2042,7 +2042,7 @@ output will be ``"Joel is a slug"``.
     more robust, you can use the ``bleach`` Python library, notably its
     `clean`_ method.
 
-.. _clean: https://bleach.readthedocs.org/en/latest/clean.html
+.. _clean: https://bleach.readthedocs.io/en/latest/clean.html
 
 .. templatefilter:: time
 

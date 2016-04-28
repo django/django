@@ -1,6 +1,6 @@
 """
 This module houses the GeoIP2 object, a wrapper for the MaxMind GeoIP2(R)
-Python API (http://geoip2.readthedocs.org/). This is an alternative to the
+Python API (https://geoip2.readthedocs.io/). This is an alternative to the
 Python GeoIP2 interface provided by MaxMind.
 
 GeoIP(R) is a registered trademark of MaxMind, Inc.

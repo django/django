@@ -18,8 +18,8 @@ The `official mod_wsgi documentation`_ is fantastic; it's your source for all
 the details about how to use mod_wsgi. You'll probably want to start with the
 `installation and configuration documentation`_.
 
-.. _official mod_wsgi documentation: https://modwsgi.readthedocs.org/
-.. _installation and configuration documentation: https://modwsgi.readthedocs.org/en/develop/installation.html
+.. _official mod_wsgi documentation: https://modwsgi.readthedocs.io/
+.. _installation and configuration documentation: https://modwsgi.readthedocs.io/en/develop/installation.html
 
 Basic configuration
 ===================
@@ -139,7 +139,7 @@ to the configuration above:
 See the official mod_wsgi documentation for `details on setting up daemon
 mode`_.
 
-.. _details on setting up daemon mode: https://modwsgi.readthedocs.org/en/develop/user-guides/quick-configuration-guide.html#delegation-to-daemon-process
+.. _details on setting up daemon mode: https://modwsgi.readthedocs.io/en/develop/user-guides/quick-configuration-guide.html#delegation-to-daemon-process
 
 .. _serving-files:
 
@@ -197,7 +197,7 @@ If you are using a version of Apache older than 2.4, replace
 .. More details on configuring a mod_wsgi site to serve static files can be found
 .. in the mod_wsgi documentation on `hosting static files`_.
 
-.. _hosting static files: https://modwsgi.readthedocs.org/en/develop/user-guides/configuration-guidelines.html#hosting-of-static-files
+.. _hosting static files: https://modwsgi.readthedocs.io/en/develop/user-guides/configuration-guidelines.html#hosting-of-static-files
 
 .. _serving-the-admin-files:
 

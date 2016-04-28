@@ -188,7 +188,7 @@ If the ``source`` command is not available, you can try using a dot instead:
 You have to activate the virtualenv whenever you open a new terminal window.
 virtualenvwrapper__ is a useful tool for making this more convenient.
 
-__ https://virtualenvwrapper.readthedocs.org/en/latest/
+__ https://virtualenvwrapper.readthedocs.io/en/latest/
 
 Anything you install through ``pip`` from now on will be installed in your new
 virtualenv, isolated from other environments and system-wide packages. Also, the
