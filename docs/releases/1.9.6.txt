@@ -27,3 +27,6 @@ Bugfixes
 
 * Restored conversion of an empty string to null when saving values of
   ``GenericIPAddressField`` on SQLite and MySQL (:ticket:`26557`).
+
+* Fixed a ``makemessages`` regression where temporary ``.py`` extensions were
+  leaked in source file paths (:ticket:`26341`).

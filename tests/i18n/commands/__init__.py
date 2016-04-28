@@ -12,3 +12,6 @@ number = 3
 dummy3 = ungettext("%(number)s Foo", "%(number)s Foos", number) % {'number': number}
 
 dummy4 = _('Size')
+
+# This string is intentionally duplicated in test.html
+dummy5 = _('This literal should be included.')
