@@ -299,5 +299,5 @@ class BaseDatabaseCreation(object):
             settings_dict['HOST'],
             settings_dict['PORT'],
             settings_dict['ENGINE'],
-            settings_dict['NAME']
+            self._get_test_db_name(),
         )
