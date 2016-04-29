@@ -523,8 +523,12 @@ Not contained within. This is the negation of the ``in`` operator.
 
 Object identity. Tests if two values are the same object. Example::
 
-    {% if value is None %}
-      This will output if and only if value is None.
+    {% if somevar is True %}
+      This appears if and only if somevar is True.
+    {% endif %}
+
+    {% if somevar is None %}
+      This appears if somevar is None, or if somevar is not found in the context.
     {% endif %}
 
 ``is not`` operator
@@ -532,11 +536,16 @@ Object identity. Tests if two values are the same object. Example::
 
 .. versionadded:: 1.10
 
-Tests if two values are not the same object. This is the negation of
-the ``is`` operator. Example::
+Negated object identity. Tests if two values are not the same object. This is
+the negation of the ``is`` operator. Example::
 
-    {% if value is not None %}
-      This will output if and only if value is not None.
+    {% if somevar is not True %}
+      This appears if somevar is not True, or if somevar is not found in the
+      context.
+    {% endif %}
+
+    {% if somevar is not None %}
+      This appears if and only if somevar is not None.
     {% endif %}
 
 Filters
