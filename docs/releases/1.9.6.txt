@@ -24,3 +24,6 @@ Bugfixes
 
 * Fixed a regression causing the cached template loader to crash when using
   template names starting with a dash (:ticket:`26536`).
+
+* Restored conversion of an empty string to null when saving values of
+  ``GenericIPAddressField`` on SQLite and MySQL (:ticket:`26557`).
