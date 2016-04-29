@@ -198,6 +198,18 @@ class ClientTest(TestCase):
         self.assertRedirects(response, '/get_view/', status_code=302, target_status_code=200)
         self.assertEqual(len(response.redirect_chain), 2)
 
+    def test_follow_relative_redirect(self):
+        "A URL with a relative redirect can be followed."
+        response = self.client.get('/accounts/', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.request['PATH_INFO'], '/accounts/login/')
+
+    def test_follow_relative_redirect_no_trailing_slash(self):
+        "A URL with a relative redirect with no trailing slash can be followed."
+        response = self.client.get('/accounts/no_trailing_slash', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.request['PATH_INFO'], '/accounts/login/')
+
     def test_redirect_http(self):
         "GET a URL that redirects to an http URI"
         response = self.client.get('/http_redirect_view/', follow=True)
