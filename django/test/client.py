@@ -27,7 +27,7 @@ from django.utils.encoding import force_bytes, force_str, uri_to_iri
 from django.utils.functional import SimpleLazyObject, curry
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
-from django.utils.six.moves.urllib.parse import urlparse, urlsplit
+from django.utils.six.moves.urllib.parse import urljoin, urlparse, urlsplit
 
 __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'encode_multipart')
 
@@ -678,7 +678,12 @@ class Client(RequestFactory):
             if url.port:
                 extra['SERVER_PORT'] = str(url.port)
 
-            response = self.get(url.path, QueryDict(url.query), follow=False, **extra)
+            # Prepend the request path to handle relative path redirects
+            path = url.path
+            if not path.startswith('/'):
+                path = urljoin(response.request['PATH_INFO'], path)
+
+            response = self.get(path, QueryDict(url.query), follow=False, **extra)
             response.redirect_chain = redirect_chain
 
             if redirect_chain[-1] in redirect_chain[:-1]:
