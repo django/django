@@ -108,6 +108,8 @@ class DjangoJSONEncoder(json.JSONEncoder):
             if o.microsecond:
                 r = r[:12]
             return r
+        elif isinstance(o, datetime.timedelta):
+            return o.total_seconds()
         elif isinstance(o, decimal.Decimal):
             return str(o)
         elif isinstance(o, uuid.UUID):
