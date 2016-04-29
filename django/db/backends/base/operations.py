@@ -481,7 +481,7 @@ class BaseDatabaseOperations(object):
         Transforms a string representation of an IP address into the expected
         type for the backend driver.
         """
-        return value
+        return value or None
 
     def year_lookup_bounds_for_date_field(self, value):
         """

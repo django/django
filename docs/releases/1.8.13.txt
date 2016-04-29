@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed ``TimeField`` microseconds round-tripping on MySQL and SQLite
   (:ticket:`26498`).
+
+* Restored conversion of an empty string to null when saving values of
+  ``GenericIPAddressField`` on SQLite and MySQL (:ticket:`26557`).

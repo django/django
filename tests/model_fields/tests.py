@@ -722,6 +722,14 @@ class GenericIPAddressFieldTests(test.TestCase):
         o = GenericIPAddress.objects.get()
         self.assertIsNone(o.ip)
 
+    def test_blank_string_saved_as_null(self):
+        o = GenericIPAddress.objects.create(ip='')
+        o.refresh_from_db()
+        self.assertIsNone(o.ip)
+        GenericIPAddress.objects.update(ip='')
+        o.refresh_from_db()
+        self.assertIsNone(o.ip)
+
     def test_save_load(self):
         instance = GenericIPAddress.objects.create(ip='::1')
         loaded = GenericIPAddress.objects.get()
