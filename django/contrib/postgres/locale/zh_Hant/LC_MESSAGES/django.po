@@ -1,0 +1,103 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Chen Chun-Chia <ccc.larc@gmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-10 08:55+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
+"language/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "PostgreSQL extensions"
+msgstr ""
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr ""
+
+msgid "Nested arrays must have the same length."
+msgstr ""
+
+msgid "Map of strings to strings"
+msgstr ""
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr ""
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
+
+msgid "Could not load JSON data."
+msgstr ""
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr ""
+
+msgid "Enter two valid values."
+msgstr "請輸入兩個有效的值"
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr ""
+
+msgid "Enter two whole numbers."
+msgstr "請輸入兩個整數"
+
+msgid "Enter two numbers."
+msgstr "請輸入兩個數字"
+
+msgid "Enter two valid date/times."
+msgstr "請輸入兩個有效的日期/時間"
+
+msgid "Enter two valid dates."
+msgstr "請輸入兩個有效的日期"
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr ""
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr ""

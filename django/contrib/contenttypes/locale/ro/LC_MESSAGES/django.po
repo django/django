@@ -3,13 +3,14 @@
 # Translators:
 # Daniel Ursache-Dogariu <contact@danniel.net>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2014
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-10-20 12:20+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-01-07 10:47+0000\n"
+"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 "2:1));\n"
 
 msgid "Content Types"
-msgstr ""
+msgstr "Tipuri de conținut"
 
 msgid "python model class name"
 msgstr "nume clasă model Python"
@@ -41,4 +42,4 @@ msgstr "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr ""
+msgstr "Obiectele %(ct_name)s nu au o metodă get_absolute_url()"

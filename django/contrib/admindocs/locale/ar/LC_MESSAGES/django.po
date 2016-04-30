@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bashar Al-Abdulhadi, 2015
+# Bashar Al-Abdulhadi, 2015-2016
 # Bashar Al-Abdulhadi, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Ossama Khayat <okhayat@gmail.com>, 2012
@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-11-27 21:21+0000\n"
+"PO-Revision-Date: 2016-04-02 13:22+0000\n"
 "Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +40,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"لتثبيت أوامر المفضلة، اسحب الرابط إلى المواقع المفضلة في شريط الأدوات الخاص "
+"بك، أو إضغط بزر الماوس الأيمن على الرابط وأضفه إلى قائمة المواقع المفضلة "
+"الخاصة بك. الآن يمكنك اختيار أوامر المفضلة من أي صفحة في الموقع."
 
 msgid "Documentation for this page"
 msgstr "الوثائق لهذه الصفحة"
@@ -120,13 +123,13 @@ msgid "Description"
 msgstr "وصف"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "طُرق بمُعطيات"
 
 msgid "Method"
 msgstr "الطريقة"
 
 msgid "Arguments"
-msgstr ""
+msgstr "مُعطيات"
 
 msgid "Back to Model Documentation"
 msgstr "العودة إلى وثائق الموديول"

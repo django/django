@@ -2,6 +2,7 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# Eduardo Cereto Carvalho, 2016
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Guilherme Gondim, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -11,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-27 17:37+0000\n"
-"Last-Translator: Lucas Infante <maccinza@gmail.com>\n"
+"PO-Revision-Date: 2016-03-18 21:48+0000\n"
+"Last-Translator: Eduardo Cereto Carvalho\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -58,7 +59,7 @@ msgid "Tags"
 msgstr "Tags"
 
 msgid "List of all the template tags and their functions."
-msgstr "Lista de todas as template tags e suas funções."
+msgstr "Lista de todas as tags de template e suas funções."
 
 msgid "Filters"
 msgstr "Filtros"

@@ -3,6 +3,7 @@
 # Translators:
 # Fery Setiawan <gembelweb@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011,2013
 # rodin <romihardiyanto@gmail.com>, 2013-2015
 msgid ""
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-12-15 22:47+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"PO-Revision-Date: 2016-04-17 19:58+0000\n"
+"Last-Translator: oon arfiandwi <oon.arfiandwi@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +32,7 @@ msgstr "Tanggal penting"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s objek dengan primary key %(key)r tidak ditemukan."
 
 msgid "Password changed successfully."
 msgstr "Sandi berhasil diubah."
@@ -176,6 +177,8 @@ msgid ""
 "Enter a valid username. This value may contain only letters, numbers and @/./"
 "+/-/_ characters."
 msgstr ""
+"Masukkan username yang benar. Nilainya hanya boleh mengandung huruf, angka "
+"dan karakter @/./+/-/_ ."
 
 msgid "A user with that username already exists."
 msgstr "Seorang pengguna dengan nama pengguna tersebut sudah ada."
@@ -222,18 +225,20 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Kata sandi terlalu singkat. Kata sandi harus memuat setidaknya "
+"%(min_length)d huruf."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
+msgstr[0] "Kata sandi anda harus memuat setidaknya %(min_length)d huruf."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Kata sandi terlalu mirip dengan %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "Kata sandi tidak boleh terlalu mirip dengan informasi personal lainnya"
 
 msgid "This password is too common."
 msgstr "Kata sandi ini terlalu umum."
@@ -258,7 +263,7 @@ msgid "Password reset"
 msgstr "Setel ulang sandi"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Reset kata sandi terkirim"
 
 msgid "Enter new password"
 msgstr "Masukkan sandi baru"

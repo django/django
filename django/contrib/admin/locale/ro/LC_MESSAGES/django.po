@@ -5,14 +5,14 @@
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2015
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-27 12:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-01-07 11:00+0000\n"
+"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -72,6 +72,8 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Introduceți vă rog un %(username)s și o parolă pentru un cont de membru. De "
+"remarcat că ambele țin cont de capitalizare."
 
 msgid "Action:"
 msgstr "Acțiune:"
@@ -404,13 +406,13 @@ msgstr ""
 "itemuri asociate vor fi șterse:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Obiecte"
 
 msgid "Yes, I'm sure"
 msgstr "Da, cu siguranță"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Nu, vreau să mă întorc"
 
 msgid "Delete multiple objects"
 msgstr "Ștergeți obiecte multiple"
@@ -459,11 +461,11 @@ msgid " By %(filter_title)s "
 msgstr "După %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
+msgstr "Sumar"
 
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "Modele în aplicația %(name)s"
 
 msgid "You don't have permission to edit anything."
 msgstr "Nu nicio permisiune de editare."
@@ -494,6 +496,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Sunteți autentificat ca %(username)s, dar nu sunteți autorizat să accesați "
+"această pagină. Doriți să vă autentificați cu un alt cont?"
 
 msgid "Forgotten your password or username?"
 msgstr "Ați uitat parola sau utilizatorul ?"
@@ -521,19 +525,19 @@ msgid "Save"
 msgstr "Salvează"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Fereastra se închide..."
 
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "Modifică %(model)s selectat"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "Adaugă alt %(model)s"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "Șterge %(model)s selectat"
 
 msgid "Search"
 msgstr "Caută"
@@ -615,17 +619,24 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"V-am transmis pe email instrucțiunile pentru setarea unei parole noi, dacă "
+"există un cont cu adresa email introdusă. Ar trebui să le primiți în scurt "
+"timp."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Dacă nu primiți un email, asigurați-vă că ați introdus adresa cu care v-ați "
+"înregistrat și verificați directorul spam."
 
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Primiți acest email deoarece ați cerut o resetare a parolei pentru contul de "
+"utilizator de la %(site_name)s."
 
 msgid "Please go to the following page and choose a new password:"
 msgstr "Mergeți la următoarea pagină și alegeți o parolă nouă:"
@@ -644,6 +655,8 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
+"Ați uitat parola? Introduceți adresa email mai jos și veți primi "
+"instrucțiuni pentru setarea unei noi parole."
 
 msgid "Email address:"
 msgstr "Adresă e-mail:"

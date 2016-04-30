@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# András Veres-Szentkirályi, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kristóf Gruber <>, 2012
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-04-13 11:01+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -20,14 +21,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Az alap GIS mező."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Az alap Geometry mező -- az OpenGIS specifikáció geometria típusának "
+"megfelelően"
 
 msgid "Point"
 msgstr "Pont"
@@ -51,10 +54,10 @@ msgid "Geometry collection"
 msgstr "Geometria gyűjtemény"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Terület összegző mező"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Raszter mező"
 
 msgid "No geometry value provided."
 msgstr "Geometriai adat nem került megadásra."
@@ -71,16 +74,16 @@ msgid ""
 msgstr "Hiba történt a geometriai transzformáció során."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Minden Feature törlése"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "WKT debug ablak:"
 
 msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "Google Maps GeoDjango-val"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Debug ablak (szerializált érték)"
 
 msgid "No feeds are registered."
 msgstr "Nincs regisztrált feed."

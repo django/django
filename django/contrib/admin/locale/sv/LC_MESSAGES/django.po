@@ -9,14 +9,14 @@
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
 # sorl <mikko@aino.se>, 2011
-# Thomas Lundqvist <thomas@biljettshop.se>, 2013
+# Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-03-23 11:27+0000\n"
+"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -85,10 +85,10 @@ msgid "action time"
 msgstr "händelsetid"
 
 msgid "user"
-msgstr ""
+msgstr "användare"
 
 msgid "content type"
-msgstr ""
+msgstr "innehållstyp"
 
 msgid "object id"
 msgstr "objektets id"
@@ -132,7 +132,7 @@ msgstr ""
 "Håll ner \"Control\", eller \"Command\" på en Mac, för att välja fler än en."
 
 msgid "Added."
-msgstr ""
+msgstr "Lagt till."
 
 #, python-format
 msgid "Changed %s."
@@ -492,6 +492,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Du är autentiserad som %(username)s men är inte behörig att komma åt denna "
+"sida. Vill du logga in med ett annat konto?"
 
 msgid "Forgotten your password or username?"
 msgstr "Har du glömt lösenordet eller användarnamnet?"
@@ -519,7 +521,7 @@ msgid "Save"
 msgstr "Spara"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Popup stänger..."
 
 #, python-format
 msgid "Change selected %(model)s"

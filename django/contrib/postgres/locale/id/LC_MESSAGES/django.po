@@ -3,14 +3,15 @@
 # Translators:
 # Fery Setiawan <gembelweb@gmail.com>, 2015
 # M Asep Indrayana <me@drayanaindra.com>, 2015
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-15 22:41+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"PO-Revision-Date: 2016-04-17 20:04+0000\n"
+"Last-Translator: oon arfiandwi <oon.arfiandwi@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +31,7 @@ msgid "Nested arrays must have the same length."
 msgstr "Array bersarang harus mempunyai panjang sama."
 
 msgid "Map of strings to strings"
-msgstr ""
+msgstr "Pemetaan dari strings ke strings"
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string."
