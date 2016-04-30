@@ -3,13 +3,14 @@
 # Translators:
 # Daniel Ursache-Dogariu <contact@danniel.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-20 12:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-01-07 11:06+0000\n"
+"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 "2:1));\n"
 
 msgid "Redirects"
-msgstr ""
+msgstr "Redirecționări"
 
 msgid "site"
 msgstr "pagină"

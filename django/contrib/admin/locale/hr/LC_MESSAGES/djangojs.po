@@ -5,13 +5,14 @@
 # Bojan Mihelač <bmihelac@mihelac.org>, 2012
 # Davor Lučić <r.dav.lc@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-12-11 09:09+0000\n"
+"Last-Translator: Mislav Cimperšak <mislav.cimpersak@gmail.com>\n"
 "Language-Team: Croatian (http://www.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
@@ -119,7 +120,7 @@ msgid "Now"
 msgstr "Sada"
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "Izaberite vrijeme"
 
 msgid "Choose a time"
 msgstr "Izaberite vrijeme"
@@ -134,7 +135,7 @@ msgid "Noon"
 msgstr "Podne"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "6 popodne"
 
 msgid "Cancel"
 msgstr "Odustani"
@@ -143,7 +144,7 @@ msgid "Today"
 msgstr "Danas"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Odaberite datum"
 
 msgid "Yesterday"
 msgstr "Jučer"

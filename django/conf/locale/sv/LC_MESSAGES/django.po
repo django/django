@@ -10,14 +10,14 @@
 # Mattias Jansson <mattias@colourandcode.se>, 2011
 # Rasmus Précenth <prillan91@gmail.com>, 2014
 # Samuel Linde <samuel@linde.im>, 2011
-# Thomas Lundqvist <thomas@biljettshop.se>, 2013
+# Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-03-23 11:09+0000\n"
+"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -90,7 +90,7 @@ msgid "Argentinian Spanish"
 msgstr "Argentinsk spanska"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "Colombiansk spanska"
 
 msgid "Mexican Spanish"
 msgstr "Mexikansk Spanska"
@@ -123,7 +123,7 @@ msgid "Irish"
 msgstr "Irländska"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "Skotsk gäliska"
 
 msgid "Galician"
 msgstr "Galisiska"
@@ -321,6 +321,8 @@ msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Fyll i en giltig 'slug', beståendes av Unicode bokstäver, siffror, "
+"understreck eller bindestreck."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Fyll i en giltig IPv4 adress."

@@ -3,13 +3,14 @@
 # Translators:
 # Daniel Ursache-Dogariu <contact@danniel.net>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-01-07 10:52+0000\n"
+"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -20,14 +21,16 @@ msgstr ""
 "2:1));\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Câmpul GIS de bază."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Câmpul Geometrie de bază -- mapat către tipul Geometrie din Specificația "
+"OpenGIS."
 
 msgid "Point"
 msgstr "Punct"
@@ -51,10 +54,10 @@ msgid "Geometry collection"
 msgstr "Colecție geometrie"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Câmp de Agregare Extinsă"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Câmp raster"
 
 msgid "No geometry value provided."
 msgstr "Nicio valoare geometrică furnizată."
@@ -73,16 +76,16 @@ msgstr ""
 "geometric al formularului."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Șterge toate Entitățile"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "Fereastra de depanare WKT:"
 
 msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "Google Maps prin GeoDjango"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Fereastra de depanare (valoare serializată)"
 
 msgid "No feeds are registered."
 msgstr "Nici un feed registrat."

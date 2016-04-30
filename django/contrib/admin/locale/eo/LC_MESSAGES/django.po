@@ -2,7 +2,7 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2015
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2016
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2012
 # Adamo Mesha <adam.raizen@gmail.com>, 2012
@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-20 13:22+0000\n"
+"PO-Revision-Date: 2016-03-06 17:23+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
@@ -34,7 +34,7 @@ msgstr "Ĉu vi certas?"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Forigi elektitajn %(verbose_name_plural)s"
+msgstr "Forigi elektitajn %(verbose_name_plural)sn"
 
 msgid "Administration"
 msgstr "Administrado"
@@ -165,7 +165,7 @@ msgid ""
 "%(name)s below."
 msgstr ""
 "La %(name)s \"%(obj)s\" estis sukcese aldonita. Vi povas sube aldoni alian "
-"%(name)s-n."
+"%(name)sn."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
@@ -185,7 +185,7 @@ msgid ""
 "%(name)s below."
 msgstr ""
 "La %(name)s \"%(obj)s\" estis sukcese ŝanĝita. Vi povas sube aldoni alian "
-"%(name)s-n."
+"%(name)sn."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
@@ -211,7 +211,7 @@ msgstr "%(name)s objekto kun ĉefŝlosilo %(key)r ne ekzistas."
 
 #, python-format
 msgid "Add %s"
-msgstr "Aldoni %s"
+msgstr "Aldoni %sn"
 
 #, python-format
 msgid "Change %s"
@@ -357,7 +357,7 @@ msgstr "Vidi sur retejo"
 
 #, python-format
 msgid "Add %(name)s"
-msgstr "Aldoni %(name)s"
+msgstr "Aldoni %(name)sn"
 
 msgid "Filter"
 msgstr "Filtri"
@@ -446,7 +446,7 @@ msgstr "Forigu"
 
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "Aldoni alian %(verbose_name)s"
+msgstr "Aldoni alian %(verbose_name)sn"
 
 msgid "Delete?"
 msgstr "Forviŝi?"
@@ -541,7 +541,7 @@ msgstr "Serĉu"
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s resulto"
-msgstr[1] "%(counter)s resultoj"
+msgstr[1] "%(counter)s rezultoj"
 
 #, python-format
 msgid "%(full_result_count)s total"

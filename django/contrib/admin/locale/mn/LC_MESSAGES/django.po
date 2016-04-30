@@ -4,6 +4,7 @@
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
+# Zorig <zorig_ezd@yahoo.com>, 2016
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
 msgid ""
@@ -11,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-03-08 13:17+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -519,7 +520,7 @@ msgid "Save"
 msgstr "Хадгалах"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Цонх хаагдлаа"
 
 #, python-format
 msgid "Change selected %(model)s"

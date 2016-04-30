@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# András Veres-Szentkirályi, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
 msgid ""
@@ -8,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-04-13 10:47+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +23,7 @@ msgid "Advanced options"
 msgstr "További beállítások"
 
 msgid "Flat Pages"
-msgstr ""
+msgstr "Egyszerű oldalak"
 
 msgid "URL"
 msgstr "URL"
@@ -76,7 +77,7 @@ msgstr ""
 "megnézni."
 
 msgid "sites"
-msgstr ""
+msgstr "honlapok"
 
 msgid "flat page"
 msgstr "egyszerű oldal"
