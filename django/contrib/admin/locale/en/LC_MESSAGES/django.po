@@ -292,11 +292,11 @@ msgid ""
 "protected related objects: %(related_objects)s"
 msgstr ""
 
-#: contrib/admin/sites.py:40 contrib/admin/templates/admin/base_site.html.py:3
+#: contrib/admin/sites.py:40 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr ""
 
-#: contrib/admin/sites.py:43 contrib/admin/templates/admin/base_site.html.py:6
+#: contrib/admin/sites.py:43 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr ""
 
