@@ -118,10 +118,21 @@ Requires jQuery, core.js, and SelectBox.js.
             addEvent(filter_input, 'keypress', function(e) { SelectFilter.filter_key_press(e, field_id); });
             addEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id); });
             addEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id); });
-            addEvent(from_box, 'change', function(e) { SelectFilter.refresh_icons(field_id); });
-            addEvent(to_box, 'change', function(e) { SelectFilter.refresh_icons(field_id); });
-            addEvent(from_box, 'dblclick', function() { SelectBox.move(field_id + '_from', field_id + '_to'); SelectFilter.refresh_icons(field_id); });
-            addEvent(to_box, 'dblclick', function() { SelectBox.move(field_id + '_to', field_id + '_from'); SelectFilter.refresh_icons(field_id); });
+            addEvent(selector_div, 'change', function(e) {
+                if (e.target.tagName === 'SELECT') {
+                    SelectFilter.refresh_icons(field_id);
+                }
+            });
+            addEvent(selector_div, 'dblclick', function(e) {
+                if (e.target.tagName === 'OPTION') {
+                    if (e.target.closest('select').id === field_id + '_to') {
+                        SelectBox.move(field_id + '_to', field_id + '_from');
+                    } else {
+                        SelectBox.move(field_id + '_from', field_id + '_to');
+                    }
+                    SelectFilter.refresh_icons(field_id);
+                }
+            });
             addEvent(findForm(from_box), 'submit', function() { SelectBox.select_all(field_id + '_to'); });
             SelectBox.init(field_id + '_from');
             SelectBox.init(field_id + '_to');
@@ -144,14 +155,26 @@ Requires jQuery, core.js, and SelectBox.js.
             // Initial icon refresh
             SelectFilter.refresh_icons(field_id);
         },
+        any_selected: function(field) {
+            var any_selected = false;
+            try {
+                // Temporarily add the required attribute and check validity.
+                // This is much faster in WebKit browsers than the fallback.
+                field.attr('required', 'required');
+                any_selected = field.is(':valid');
+                field.removeAttr('required');
+            } catch (e) {
+                // Browsers that don't support :valid (IE < 10)
+                any_selected = field.find('option:selected').length > 0;
+            }
+            return any_selected;
+        },
         refresh_icons: function(field_id) {
             var from = $('#' + field_id + '_from');
             var to = $('#' + field_id + '_to');
-            var is_from_selected = from.find('option:selected').length > 0;
-            var is_to_selected = to.find('option:selected').length > 0;
             // Active if at least one item is selected
-            $('#' + field_id + '_add_link').toggleClass('active', is_from_selected);
-            $('#' + field_id + '_remove_link').toggleClass('active', is_to_selected);
+            $('#' + field_id + '_add_link').toggleClass('active', SelectFilter.any_selected(from));
+            $('#' + field_id + '_remove_link').toggleClass('active', SelectFilter.any_selected(to));
             // Active if the corresponding box isn't empty
             $('#' + field_id + '_add_all_link').toggleClass('active', from.find('option').length > 0);
             $('#' + field_id + '_remove_all_link').toggleClass('active', to.find('option').length > 0);
