@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# András Veres-Szentkirályi, 2016
 # Attila Nagy <>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János Péter Ronkay <transifex2@hangya.net>, 2012
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-04-13 10:48+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Humanize"
-msgstr ""
+msgstr "Emberi formázás"
 
 msgid "th"
 msgstr "."
@@ -215,24 +216,24 @@ msgstr "most"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "egy másodperce"
+msgstr[1] "%(count)s másodperce"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "egy perce"
+msgstr[1] "%(count)s perce"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "egy órája"
+msgstr[1] "%(count)s órája"
 
 #, python-format
 msgctxt "naturaltime"
@@ -244,21 +245,21 @@ msgstr "%(delta)s mostantól"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "egy másodperc múlva"
+msgstr[1] "%(count)s másodperc múlva"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "egy perc múlva"
+msgstr[1] "%(count)s perc múlva"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "egy óra múlva"
+msgstr[1] "%(count)s óra múlva"

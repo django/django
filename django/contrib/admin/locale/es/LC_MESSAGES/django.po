@@ -10,6 +10,7 @@
 # Igor Támara <igor@tamarapatino.org>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jorge Puente-Sarrín <puentesarrin@gmail.com>, 2014-2015
+# Yusuf (Josè) Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # Pablo, 2015
@@ -19,8 +20,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-03-21 12:00+0000\n"
+"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -532,7 +533,7 @@ msgid "Save"
 msgstr "Grabar"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Cerrando ventana emergente..."
 
 #, python-format
 msgid "Change selected %(model)s"

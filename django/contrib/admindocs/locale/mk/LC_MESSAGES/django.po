@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2014
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2012
 msgid ""
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-04-26 14:09+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -39,6 +40,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"За да инсталирате букмарклети повлечете го линкот во траката со bookmarks, "
+"или кликенете со десното копче и додадете го во bookmarks. Така ќе можете да "
+"го одберете букмарклетот од било која страна на сајтот."
 
 msgid "Documentation for this page"
 msgstr "Документација за оваа страница"
@@ -117,7 +121,7 @@ msgid "Model: %(name)s"
 msgstr "Модел %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Полиња"
 
 msgid "Field"
 msgstr "Поле"
@@ -129,13 +133,13 @@ msgid "Description"
 msgstr "Опис"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "Методи со аргументи"
 
 msgid "Method"
-msgstr ""
+msgstr "Метод"
 
 msgid "Arguments"
-msgstr ""
+msgstr "Аргументи"
 
 msgid "Back to Model Documentation"
 msgstr "Назад во документација за модели"

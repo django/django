@@ -5,6 +5,7 @@
 # Fery Setiawan <gembelweb@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011-2013
 # rodin <romihardiyanto@gmail.com>, 2013-2015
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-12-17 23:03+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"PO-Revision-Date: 2016-04-17 19:50+0000\n"
+"Last-Translator: oon arfiandwi <oon.arfiandwi@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -490,6 +491,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Anda dikenali sebagai %(username)s, tapi tidak diperbolehkan untuk mengakses "
+"halaman ini. Anda ingin mencoba mengakses menggunakan akun yang lain?"
 
 msgid "Forgotten your password or username?"
 msgstr "Lupa nama pengguna atau sandi?"
@@ -608,6 +611,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Kami mengirimi anda instruksi untuk pengubahan kata sandi, jika ada akun "
+"dengan alamat email yang sesuai. Anda seharusnya menerimanya sesaat lagi."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "

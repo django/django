@@ -4,6 +4,7 @@
 # Fery Setiawan <gembelweb@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011
 # rodin <romihardiyanto@gmail.com>, 2013-2015
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-15 22:49+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"PO-Revision-Date: 2016-04-17 20:03+0000\n"
+"Last-Translator: oon arfiandwi <oon.arfiandwi@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -317,6 +318,8 @@ msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Masukkan 'slug' yang terdiri dari huruf, bilangan, garis bawah, atau tanda "
+"minus."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Masukkan alamat IPv4 yang valid."
@@ -442,12 +445,16 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"nilai '%(value)s' tidak sesuai format penanggalan. Formatnya harus dalam "
+"YYYY-MM-DD."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"nilai '%(value)s' memiliki format yang sesuai (YYYY-MM-DD) tetap tanggalnya "
+"tidak benar."
 
 msgid "Date (without time)"
 msgstr "Tanggal (tanpa waktu)"
@@ -479,6 +486,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"nilai '%(value)s' tidak sesuai format. Formatnya harus dalam [DD] [HH:"
+"[MM:]]ss[.uuuuuu] ."
 
 msgid "Duration"
 msgstr "Durasi"
@@ -507,7 +516,7 @@ msgstr "Alamat IP"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' nilai harus salah satu antara None, True atau False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (Salah satu dari True, False, atau None)"
@@ -533,12 +542,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"nilai '%(value)s' tidak sesuai format. Formatnya harus dalam HH:MM[:ss[."
+"uuuuuu]] ."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"nilai '%(value)s' sesuai dengan format (HH:MM[:ss[.uuuuuu]]) tetapi waktunya "
+"tidak benar."
 
 msgid "Time"
 msgstr "Waktu"
@@ -561,7 +574,7 @@ msgstr "Gambar"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(model)s instan dengan %(field)s %(value)r tidak ditemukan."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Kunci Asing (tipe tergantung dari bidang yang berkaitan)"
@@ -662,7 +675,7 @@ msgstr[0] "Pastikan mengirim %d formulir atau lebih sedikit. "
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
+msgstr[0] "Kirimkan %d atau lebih forms."
 
 msgid "Order"
 msgstr "Urutan"
@@ -1033,7 +1046,7 @@ msgid "0 minutes"
 msgstr "0 menit"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "Terlarang"
 
 msgid "CSRF verification failed. Request aborted."
 msgstr "verifikasi CSRF gagal, permintann di batalkan"
@@ -1044,12 +1057,19 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Anda melihat pesan ini karena situs HTTP ini membutuhkan 'Referer header' "
+"dikirim dari Web browser anda, tapi tidak terkirim. Header tersebut wajib "
+"karena alasan keamanan, untuk memastikan bahwa browser anda tidak dibajak "
+"oleh pihak ketiga."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Jika anda menonaktifkan 'Referer' headers pada konfigurasi browser anda, "
+"mohon aktfikan kembali, setidaknya untuk situs ini atau untuk koneksi HTTPS, "
+"atau untuk 'same-origin' requests."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1083,11 +1103,17 @@ msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"Tentu saja, anda belum menyelesaikan pekerjaan apapun. Selanjutnya, mulai "
+"aplikasi pertama anda dengan ekseskusi <code>python manage.py startapp "
+"[app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"Anda dapat meilhat pesan ini karena ada <code>DEBUG = True</code> di berkas "
+"konfigurasi Django dan belum dikonfigurasi untuk suatu URL apapun. Get to "
+"work!"
 
 msgid "No year specified"
 msgstr "Tidak ada tahun dipilih"

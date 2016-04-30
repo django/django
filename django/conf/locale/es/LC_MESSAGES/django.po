@@ -11,6 +11,7 @@
 # franchukelly <inactive+franchukelly@transifex.com>, 2011
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Yusuf (Josè) Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2013
 # Marc Garcia <garcia.marc@gmail.com>, 2011
@@ -25,8 +26,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-03-09 22:54+0000\n"
+"Last-Translator: Yusuf (Josè) Luis <alagunajs@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -99,7 +100,7 @@ msgid "Argentinian Spanish"
 msgstr "Español de Argentina"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "Español Colombiano"
 
 msgid "Mexican Spanish"
 msgstr "Español de México"
@@ -132,7 +133,7 @@ msgid "Irish"
 msgstr "Irlandés"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "Gaélico Escocés"
 
 msgid "Galician"
 msgstr "Gallego"
@@ -330,6 +331,8 @@ msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Ingrese un 'slug' consistente en letras, números, subrayados o guiones "
+"Unicodes."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Introduzca una dirección IPv4 válida."

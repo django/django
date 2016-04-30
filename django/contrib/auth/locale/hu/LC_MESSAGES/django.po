@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# András Veres-Szentkirályi, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János Péter Ronkay <transifex2@hangya.net>, 2014
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-12-10 16:14+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-04-13 09:27+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +31,7 @@ msgstr "Fontos dátumok"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s objektum %(key)r elsődleges kulccsal nem létezik."
 
 msgid "Password changed successfully."
 msgstr "Sikeres jelszóváltoztatás."
@@ -64,13 +65,16 @@ msgid "Password confirmation"
 msgstr "Jelszó megerősítése"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Írja be az előbb megadott jelszót, ellenőrzés céljából."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"../password/"
 "\">this form</a>."
 msgstr ""
+"A kódolatlan jelszavakat nem tároljuk, így a felhasználó jelszavát nem lehet "
+"megtekinteni, azonban <a href=\"../password/\">ezzel az űrlappal</a> a "
+"jelszó megváltoztatható."
 
 #, python-format
 msgid ""
@@ -154,6 +158,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"A csoportok, amelyekhez a felhasználó tartozik. A felhasználó minden egyes "
+"csoportja jogosultságaival rendelkezni fog."
 
 msgid "user permissions"
 msgstr "felhasználói jogosultságok"
@@ -172,6 +178,8 @@ msgid ""
 "Enter a valid username. This value may contain only letters, numbers and @/./"
 "+/-/_ characters."
 msgstr ""
+"Írjon be egy érvényes felhasználónevet, mely csak betűket, számokat és @/./"
+"+/-/_ karaktereket tartalmazhat."
 
 msgid "A user with that username already exists."
 msgstr "Létezik már egy felhasználó ezzel a névvel."
@@ -219,32 +227,36 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Ez a jelszó túl rövid. Legalább %(min_length)d karakter hosszú legyen."
 msgstr[1] ""
+"Ez a jelszó túl rövid. Legalább %(min_length)d karakter hosszú legyen."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] ""
+"A jelszavának legalább %(min_length)d karakter hosszúnak kell lennie."
 msgstr[1] ""
+"A jelszavának legalább %(min_length)d karakter hosszúnak kell lennie."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "A jelszava túlságosan hasonlít a következőhöz: %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "A jelszava nem lehet túlságosan hasonló egyéb személyes adataihoz."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Ez a jelszó túlságosan gyakori."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "A jelszava nem lehet gyakran használt jelszó."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "A jelszava kizárólag számjegyekből áll."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "A jelszava nem állhat kizárólag számjegyekből."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -257,19 +269,19 @@ msgid "Password reset"
 msgstr "Jelszó újragenerálása"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Jelszó beállítás infók elküldve"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Írja be az új jelszavát"
 
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Jelszó beállítása sikertelen"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Jelszó beállítása kész"
 
 msgid "Password change"
-msgstr ""
+msgstr "Jelszó megváltoztatása"
 
 msgid "Password change successful"
-msgstr ""
+msgstr "Sikeres jelszóváltoztatás"
