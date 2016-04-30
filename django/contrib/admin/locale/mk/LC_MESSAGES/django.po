@@ -3,6 +3,7 @@
 # Translators:
 # dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
 msgid ""
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-02-15 10:30+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -80,10 +81,10 @@ msgid "action time"
 msgstr "време на акција"
 
 msgid "user"
-msgstr ""
+msgstr "корисник"
 
 msgid "content type"
-msgstr ""
+msgstr "тип содржина"
 
 msgid "object id"
 msgstr "идентификационен број на објект"
@@ -128,7 +129,7 @@ msgstr ""
 "од едно."
 
 msgid "Added."
-msgstr ""
+msgstr "Додадено."
 
 #, python-format
 msgid "Changed %s."
@@ -491,6 +492,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Најавени сте како  %(username)s, но не сте авторизирани да пристапите до "
+"оваа страна. Сакате ли да се најавите како друг корисник?"
 
 msgid "Forgotten your password or username?"
 msgstr "Ја заборавивте вашата лозинка или корисничко име?"
@@ -518,7 +521,7 @@ msgid "Save"
 msgstr "Сними"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Попапот се затвара..."
 
 #, python-format
 msgid "Change selected %(model)s"

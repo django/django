@@ -6,6 +6,7 @@
 # Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
 # Herty Nava <translation@bolmedia.ca>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Yusuf (Josè) Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-03-09 22:52+0000\n"
+"Last-Translator: Yusuf (Josè) Luis <alagunajs@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -43,6 +44,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"Para instalar bookmarklets, arrastre el enlace a su barra de favoritos, o "
+"pulse con el botón derecho el enlace y añádalo a sus favoritos. Ahora puede "
+"escoger el bookmarklet desde cualquier página del sitio. "
 
 msgid "Documentation for this page"
 msgstr "Documentación para esta página"

@@ -6,13 +6,14 @@
 # Jonathan Lindén, 2014
 # Mattias Jansson <mattias@colourandcode.se>, 2011
 # Samuel Linde <samuel@linde.im>, 2011
+# Thomas Lundqvist <thomas@biljettshop.se>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-03-23 11:24+0000\n"
+"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -118,7 +119,7 @@ msgid "Now"
 msgstr "Nu"
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "Välj en tidpunkt"
 
 msgid "Choose a time"
 msgstr "Välj en tidpunkt"
@@ -133,7 +134,7 @@ msgid "Noon"
 msgstr "Middag"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "6 p.m."
 
 msgid "Cancel"
 msgstr "Avbryt"
@@ -142,7 +143,7 @@ msgid "Today"
 msgstr "I dag"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Välj ett datum"
 
 msgid "Yesterday"
 msgstr "I går"

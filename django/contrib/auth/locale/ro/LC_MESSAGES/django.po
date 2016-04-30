@@ -5,13 +5,14 @@
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Răzvan Ionescu <ionescu77@gmail.com>, 2015
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-11-27 12:28+0000\n"
-"Last-Translator: Răzvan Ionescu <ionescu77@gmail.com>\n"
+"PO-Revision-Date: 2016-01-07 10:47+0000\n"
+"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +33,7 @@ msgstr "Date importante"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Obiectul %(name)s cu cheia primară %(key)r nu există."
 
 msgid "Password changed successfully."
 msgstr "Parolă schimbată cu succes."
@@ -74,12 +75,17 @@ msgid ""
 "password, but you can change the password using <a href=\"../password/"
 "\">this form</a>."
 msgstr ""
+"Parolele nu sunt stocate în clar, deci nu există nici o metodă de a vedea "
+"care este parola unui utilizator, dar puteți schimba parola utilizând <a "
+"href=\"../password/\">acest formular</a>."
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Introduceți vă rog un %(username)s corect și o parolă. De remarcat că ambele "
+"țint cont de capitalizare."
 
 msgid "This account is inactive."
 msgstr "Acest cont este inactiv."
@@ -109,13 +115,13 @@ msgid "iterations"
 msgstr "iterații"
 
 msgid "salt"
-msgstr ""
+msgstr "salt"
 
 msgid "hash"
-msgstr ""
+msgstr "hash"
 
 msgid "work factor"
-msgstr ""
+msgstr "factor de efort"
 
 msgid "checksum"
 msgstr "sumă de control"
@@ -226,19 +232,25 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d "
+"caracter."
 msgstr[1] ""
+"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d "
+"caractere."
 msgstr[2] ""
+"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d "
+"caractere."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Parola trebuie să conțină cel puțin %(min_length)d caracter."
+msgstr[1] "Parola trebuie să conțină cel puțin %(min_length)d caractere."
+msgstr[2] "Parola trebuie să conțină cel puțin %(min_length)d caractere."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Parola este prea asemănătoare cu %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
 msgstr ""
