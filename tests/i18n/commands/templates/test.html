@@ -72,6 +72,8 @@ continued here.{% endcomment %}
 
 <!-- Source file inside a msgid, should be left as-is. -->
 {% trans "#: templates/test.html.py" %}
+<!-- Deliberate duplicated string. -->
+{% trans "This literal should be included." %}
 
 {% blocktrans context "Special blocktrans context #1" %}Translatable literal #8a{% endblocktrans %}
 {% blocktrans count 2 context "Special blocktrans context #2" %}Translatable literal #8b-singular{% plural %}Translatable literal #8b-plural{% endblocktrans %}
