@@ -80,7 +80,21 @@ requests will take longer and longer to return as the messages queue up
 (until the expiry limit is reached, at which point HTTP connections will
 start dropping).
 
-TODO: We should probably ship some kind of latency measuring tooling.
+In a more complex project, you won't want all your channels being served by the
+same workers, especially if you have long-running tasks (if you serve them from
+the same workers as HTTP requests, there's a chance long-running tasks could
+block up all the workers and delay responding to HTTP requests).
+
+To manage this, it's possible to tell workers to either limit themselves to
+just certain channel names or ignore sepcific channels using the
+``--only-channels`` and ``--exclude-channels`` options. Here's an example
+of configuring a worker to only serve HTTP and WebSocket requests::
+
+    python manage.py runworker --only-channels=http.* --only-channels=websocket.*
+
+Or telling a worker to ignore all messages on the "thumbnail" channel::
+
+    python manage.py runworker --exclude-channels=thumbnail
 
 
 Run interface servers

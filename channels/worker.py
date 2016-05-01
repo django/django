@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import fnmatch
 import logging
 import signal
 import sys
@@ -18,11 +19,14 @@ class Worker(object):
     and runs their consumers.
     """
 
-    def __init__(self, channel_layer, callback=None, message_retries=10, signal_handlers=True):
+    def __init__(self, channel_layer, callback=None, message_retries=10, signal_handlers=True,
+        only_channels=None, exclude_channels=None):
         self.channel_layer = channel_layer
         self.callback = callback
         self.message_retries = message_retries
         self.signal_handlers = signal_handlers
+        self.only_channels = only_channels
+        self.exclude_channels = exclude_channels
         self.termed = False
         self.in_job = False
 
@@ -38,13 +42,30 @@ class Worker(object):
             logger.info("Shutdown signal received while idle, terminating immediately")
             sys.exit(0)
 
+    def apply_channel_filters(self, channels):
+        """
+        Applies our include and exclude filters to the channel list and returns it
+        """
+        if self.only_channels:
+            channels = [
+                channel for channel in channels
+                if any(fnmatch.fnmatchcase(channel, pattern) for pattern in self.only_channels)
+            ]
+        if self.exclude_channels:
+            channels = [
+                channel for channel in channels
+                if not any(fnmatch.fnmatchcase(channel, pattern) for pattern in self.exclude_channels)
+            ]
+        return channels
+
     def run(self):
         """
         Tries to continually dispatch messages to consumers.
         """
         if self.signal_handlers:
             self.install_signal_handler()
-        channels = self.channel_layer.router.channels
+        channels = self.apply_channel_filters(self.channel_layer.router.channels)
+        logger.info("Listening on channels %s", ", ".join(channels))
         while not self.termed:
             self.in_job = False
             channel, content = self.channel_layer.receive_many(channels, block=True)
