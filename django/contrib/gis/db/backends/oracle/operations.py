@@ -122,8 +122,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         'dwithin': SDODWithin(),
     }
 
-    truncate_params = {'relate': None}
-
     unsupported_functions = {
         'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
         'BoundingCircle', 'Envelope',
