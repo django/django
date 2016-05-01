@@ -555,6 +555,23 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
         with self.assertRaises(IntegrityError):
             TaggedItem.objects.create(tag="shiny", content_object=quartz)
 
+    def test_cache_invalidation_for_content_type_id(self):
+        # Create a Vegetable and Mineral with the same id.
+        new_id = max(Vegetable.objects.order_by('-id')[0].id,
+                     Mineral.objects.order_by('-id')[0].id) + 1
+        broccoli = Vegetable.objects.create(id=new_id, name="Broccoli")
+        diamond = Mineral.objects.create(id=new_id, name="Diamond", hardness=7)
+        tag = TaggedItem.objects.create(content_object=broccoli, tag="yummy")
+        tag.content_type = ContentType.objects.get_for_model(diamond)
+        self.assertEqual(tag.content_object, diamond)
+
+    def test_cache_invalidation_for_object_id(self):
+        broccoli = Vegetable.objects.create(name="Broccoli")
+        cauliflower = Vegetable.objects.create(name="Cauliflower")
+        tag = TaggedItem.objects.create(content_object=broccoli, tag="yummy")
+        tag.object_id = cauliflower.id
+        self.assertEqual(tag.content_object, cauliflower)
+
 
 class CustomWidget(forms.TextInput):
     pass

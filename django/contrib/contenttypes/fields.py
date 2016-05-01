@@ -209,7 +209,7 @@ class GenericForeignKey(object):
                 lambda obj: (obj._get_pk_val(), obj.__class__),
                 gfk_key,
                 True,
-                self.cache_attr)
+                self.name)
 
     def is_cached(self, instance):
         return hasattr(instance, self.cache_attr)
@@ -218,25 +218,35 @@ class GenericForeignKey(object):
         if instance is None:
             return self
 
+        # We do not want to use ``getattr(instance, self.ct_field)`` here,
+        # because that way we might end up reloading the same ContentType
+        # over and over again (see ticket #5570). Instead, we just get the
+        # content type ID here, and later when we need an actual instance,
+        # use ContentType.objects.get_for_id(), which has a global cache.
+        f = self.model._meta.get_field(self.ct_field)
+        ct_id = getattr(instance, f.get_attname(), None)
+        pk_val = getattr(instance, self.fk_field)
+
         try:
-            return getattr(instance, self.cache_attr)
+            rel_obj = getattr(instance, self.cache_attr)
         except AttributeError:
             rel_obj = None
+        else:
+            if rel_obj and (ct_id != self.get_content_type(obj=rel_obj, using=instance._state.db).id or
+                            rel_obj._meta.pk.to_python(pk_val) != rel_obj._get_pk_val()):
+                rel_obj = None
 
-            # Make sure to use ContentType.objects.get_for_id() to ensure that
-            # lookups are cached (see ticket #5570). This takes more code than
-            # the naive ``getattr(instance, self.ct_field)``, but has better
-            # performance when dealing with GFKs in loops and such.
-            f = self.model._meta.get_field(self.ct_field)
-            ct_id = getattr(instance, f.get_attname(), None)
-            if ct_id is not None:
-                ct = self.get_content_type(id=ct_id, using=instance._state.db)
-                try:
-                    rel_obj = ct.get_object_for_this_type(pk=getattr(instance, self.fk_field))
-                except ObjectDoesNotExist:
-                    pass
-            setattr(instance, self.cache_attr, rel_obj)
+        if rel_obj is not None:
             return rel_obj
+
+        if ct_id is not None:
+            ct = self.get_content_type(id=ct_id, using=instance._state.db)
+            try:
+                rel_obj = ct.get_object_for_this_type(pk=pk_val)
+            except ObjectDoesNotExist:
+                pass
+        setattr(instance, self.cache_attr, rel_obj)
+        return rel_obj
 
     def __set__(self, instance, value):
         ct = None
