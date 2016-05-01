@@ -780,6 +780,10 @@ Allows creating tables for apps without migrations. While this isn't
 recommended, the migrations framework is sometimes too slow on large projects
 with hundreds of models.
 
+.. django-admin-option:: --noinput
+
+Tells Django to NOT prompt the user for input of any kind. For example, with this argument, the migrate command will not propose to remove stalled content types.
+
 ``runserver``
 -------------
 
