@@ -314,10 +314,6 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
                 if self.class_lookups[lookup_type].distance:
                     # Getting the distance parameter in the units of the field.
                     params += self.get_distance(value[1:], lookup_type, connection)
-                elif lookup_type in connection.ops.truncate_params:
-                    # Lookup is one where SQL parameters aren't needed from the
-                    # given lookup value.
-                    pass
                 else:
                     params += value[1:]
             elif isinstance(value, Expression):
