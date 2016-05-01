@@ -118,10 +118,21 @@ Requires jQuery, core.js, and SelectBox.js.
             addEvent(filter_input, 'keypress', function(e) { SelectFilter.filter_key_press(e, field_id); });
             addEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id); });
             addEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id); });
-            addEvent(from_box, 'change', function(e) { SelectFilter.refresh_icons(field_id); });
-            addEvent(to_box, 'change', function(e) { SelectFilter.refresh_icons(field_id); });
-            addEvent(from_box, 'dblclick', function() { SelectBox.move(field_id + '_from', field_id + '_to'); SelectFilter.refresh_icons(field_id); });
-            addEvent(to_box, 'dblclick', function() { SelectBox.move(field_id + '_to', field_id + '_from'); SelectFilter.refresh_icons(field_id); });
+            addEvent(selector_div, 'change', function(e) {
+                if (e.target.tagName === 'SELECT') {
+                    SelectFilter.refresh_icons(field_id);
+                }
+            });
+            addEvent(selector_div, 'dblclick', function(e) {
+                if (e.target.tagName === 'OPTION') {
+                    if (e.target.closest('select').id === field_id + '_to') {
+                        SelectBox.move(field_id + '_to', field_id + '_from');
+                    } else {
+                        SelectBox.move(field_id + '_from', field_id + '_to');
+                    }
+                    SelectFilter.refresh_icons(field_id);
+                }
+            });
             addEvent(findForm(from_box), 'submit', function() { SelectBox.select_all(field_id + '_to'); });
             SelectBox.init(field_id + '_from');
             SelectBox.init(field_id + '_to');
