@@ -155,7 +155,7 @@ class BuildFile(object):
 
         return re.sub(
             r'^(#: .*)(' + re.escape(old_path) + r')',
-            r'\1' + new_path,
+            lambda match: match.group().replace(old_path, new_path),
             msgs,
             flags=re.MULTILINE
         )
