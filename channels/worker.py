@@ -27,7 +27,7 @@ class Worker(object):
             signal_handlers=True,
             only_channels=None,
             exclude_channels=None
-        ):
+            ):
         self.channel_layer = channel_layer
         self.callback = callback
         self.message_retries = message_retries
