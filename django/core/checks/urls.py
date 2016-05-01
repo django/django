@@ -64,16 +64,38 @@ def check_pattern_startswith_slash(pattern):
     """
     Check that the pattern does not begin with a forward slash.
     """
-    regex_pattern = pattern.regex.pattern
-    if regex_pattern.startswith('/') or regex_pattern.startswith('^/'):
+    errors = []
+
+    if not hasattr(pattern, 'regex'):
         warning = Warning(
-            "Your URL pattern {} has a regex beginning with a '/'. "
-            "Remove this slash as it is unnecessary.".format(describe_pattern(pattern)),
-            id="urls.W002",
+            "Your URL pattern {} is not an object returned from the 'url()'"
+            "method. If you are using a custom object, it should provide a `pattern`"
+            "attribute that represents a regular expression object. Hint: Did you forget"
+            "to add `url` to your pattern?".format(describe_pattern(pattern)),
+            id="urls.W004"
         )
-        return [warning]
-    else:
-        return []
+        errors.append(warning)
+    if hasattr(pattern, 'regex') and not hasattr(pattern.regex, 'pattern'):
+        warning = Warning(
+            "Your URL pattern {} is not an object returned from the 'url()'"
+            "method. If you are using a custom object, it should provide a regular "
+            "expression object at pattern.regex.pattern where pattern is a text like object"
+            "representing the pattern. If you are not using a custom object, you may have"
+            "forgotten to add 'url' to your pattern.".format(describe_pattern(pattern)),
+            id="urls.W005"
+        )
+        errors.append(warning)
+    if not errors:
+        regex_pattern = pattern.regex.pattern
+        if regex_pattern.startswith('/') or regex_pattern.startswith('^/'):
+            warning = Warning(
+                "Your URL pattern {} has a regex beginning with a '/'. "
+                "Remove this slash as it is unnecessary.".format(describe_pattern(pattern)),
+                id="urls.W002",
+            )
+            errors.append(warning)
+
+    return errors
 
 
 def check_pattern_name(pattern):
