@@ -19,8 +19,15 @@ class Worker(object):
     and runs their consumers.
     """
 
-    def __init__(self, channel_layer, callback=None, message_retries=10, signal_handlers=True,
-        only_channels=None, exclude_channels=None):
+    def __init__(
+            self,
+            channel_layer,
+            callback=None,
+            message_retries=10,
+            signal_handlers=True,
+            only_channels=None,
+            exclude_channels=None
+        ):
         self.channel_layer = channel_layer
         self.callback = callback
         self.message_retries = message_retries
