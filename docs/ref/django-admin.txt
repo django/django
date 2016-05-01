@@ -783,6 +783,15 @@ with hundreds of models.
     The ``--list`` option has been moved to the :djadmin:`showmigrations`
     command.
 
+.. django-admin-option:: --noinput, --no-input
+
+Suppresses all user prompts. An example prompt is asking about removing stale
+content types.
+
+.. versionchanged:: 1.9
+
+    The ``--no-input`` alias was added.
+
 ``runserver``
 -------------
 
