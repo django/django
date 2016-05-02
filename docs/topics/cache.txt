@@ -1127,9 +1127,8 @@ directly. This function sets, or adds to, the ``Vary header``. For example::
 its first argument and a list/tuple of case-insensitive header names as its
 second argument.
 
-For more on Vary headers, see the `official Vary spec`_.
-
-.. _`official Vary spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+For more on Vary headers, see the :rfc:`official Vary spec
+<7231#section-7.1.4>`.
 
 Controlling cache: Using other headers
 ======================================
@@ -1211,7 +1210,8 @@ Here's a full list:
 * ``max_age=num_seconds``
 * ``s_maxage=num_seconds``
 
-For explanation of Cache-Control HTTP directives, see the `Cache-Control spec`_.
+For explanation of Cache-Control HTTP directives, see the :rfc:`Cache-Control
+spec <7234#section-5.2>`.
 
 (Note that the caching middleware already sets the cache header's max-age with
 the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. If you use a custom
@@ -1228,8 +1228,6 @@ Example::
     @never_cache
     def myview(request):
         # ...
-
-.. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
 Order of ``MIDDLEWARE_CLASSES``
 ===============================
