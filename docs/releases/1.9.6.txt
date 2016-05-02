@@ -2,7 +2,7 @@
 Django 1.9.6 release notes
 ==========================
 
-*Under development*
+*May 2, 2016*
 
 Django 1.9.6 fixes several bugs in 1.9.5.
 
