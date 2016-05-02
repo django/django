@@ -21,8 +21,7 @@ managing the ``Vary`` header of responses. It includes functions to patch the
 header of response objects directly and decorators that change functions to do
 that header-patching themselves.
 
-For information on the ``Vary`` header, see :rfc:`2616#section-14.44` section
-14.44.
+For information on the ``Vary`` header, see :rfc:`7231#section-7.1.4`.
 
 Essentially, the ``Vary`` HTTP header defines which headers a cache should take
 into account when building its cache key. Requests with the same path but
@@ -736,7 +735,7 @@ escaping HTML.
 .. function:: http_date(epoch_seconds=None)
 
     Formats the time to match the :rfc:`1123` date format as specified by HTTP
-    :rfc:`2616#section-3.3.1` section 3.3.1.
+    :rfc:`7231#section-7.1.1.1`.
 
     Accepts a floating point number expressed in seconds since the epoch in
     UTC--such as that outputted by ``time.time()``. If set to ``None``,
