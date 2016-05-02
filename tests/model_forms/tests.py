@@ -2291,7 +2291,7 @@ class ModelOtherFieldTests(SimpleTestCase):
 
     def test_modelform_non_editable_field(self):
         """
-        When explicitely including a non-editable field in a ModelForm, the
+        When explicitly including a non-editable field in a ModelForm, the
         error message should be explicit.
         """
         # 'created', non-editable, is excluded by default
