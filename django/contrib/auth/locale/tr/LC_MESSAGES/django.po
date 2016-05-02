@@ -2,6 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
+# BouRock, 2015
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
@@ -9,15 +10,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2012
 # Murat Çorlu <muratcorlu@gmail.com>, 2012
-# Ozan <uobasar@gmail.com>, 2011
+# U. Ozan Basar <software@nano.net.tr>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:35+0000\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-10-11 09:22+0000\n"
 "Last-Translator: BouRock\n"
-"Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -48,6 +49,12 @@ msgstr "Parolayı değiştir: %s"
 msgid "Authentication and Authorization"
 msgstr "Kimlik Doğrulama ve Yetkilendirme"
 
+msgid "password"
+msgstr "parola"
+
+msgid "last login"
+msgstr "son oturum açma"
+
 msgid "No password set."
 msgstr "Ayarlı parola yok."
 
@@ -63,16 +70,16 @@ msgstr "Parola"
 msgid "Password confirmation"
 msgstr "Parola onayı"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Doğrulama için yukarıdaki parolanın aynısını girin."
+msgid "Enter the same password as before, for verification."
+msgstr "Doğrulama için önceki gibi aynı parolayı girin."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"Ham parolalar saklanmaz, bu yüzden bu kullanıcının parolasını görmenin yolu "
-"yoktur, fakat <a href=\"password/\">bu formu</a> kullanarak parolayı "
+"Ham parolalar saklanmazlar, bu yüzden bu kullanıcının parolasını görmenin "
+"yolu yoktur, fakat <a href=\"../password/\">bu formu</a> kullanarak parolayı "
 "değiştirebilirsiniz."
 
 #, python-format
@@ -125,6 +132,9 @@ msgstr "sağlama"
 msgid "name"
 msgstr "adı"
 
+msgid "content type"
+msgstr "içerik türü"
+
 msgid "codename"
 msgstr "kod adı"
 
@@ -139,12 +149,6 @@ msgstr "grup"
 
 msgid "groups"
 msgstr "gruplar"
-
-msgid "password"
-msgstr "parola"
-
-msgid "last login"
-msgstr "son oturum açma"
 
 msgid "superuser status"
 msgstr "süper kullanıcı durumu"
@@ -220,6 +224,41 @@ msgstr "kullanıcı"
 
 msgid "users"
 msgstr "kullanıcılar"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] "Bu parola çok kısa. En az %(min_length)d karakter içermek zorunda."
+msgstr[1] "Bu parola çok kısa. En az %(min_length)d karakter içermek zorunda."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Parolanız en az %(min_length)d karakter içermek zorunda."
+msgstr[1] "Parolanız en az %(min_length)d karakter içermek zorunda."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Parolanız %(verbose_name)s ile çok benzerdir."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr "Parolanız diğer kişisel bilgileriniz ile çok benzer olamaz."
+
+msgid "This password is too common."
+msgstr "Bu parola çok geneldir."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Parolanız genellikle kullanılan bir parola olamaz."
+
+msgid "This password is entirely numeric."
+msgstr "Bu parola tamamıyla sayısaldır."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Parolanız tamamıyla sayısal olamaz."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

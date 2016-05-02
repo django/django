@@ -9,11 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 08:16+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
-"language/ml/)\n"
+"Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
+"ml/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -80,6 +80,12 @@ msgstr "ആക്ഷന്‍"
 msgid "action time"
 msgstr "ആക്ഷന്‍ സമയം"
 
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
 msgid "object id"
 msgstr "ഒബ്ജെക്ട് ഐഡി"
 
@@ -118,6 +124,9 @@ msgstr "ഒന്നുമില്ല"
 
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+msgid "Added."
 msgstr ""
 
 #, python-format
@@ -463,6 +472,12 @@ msgstr ""
 "നിങ്ങളുടെ ഡേറ്റാബേസ് ഇന്‍സ്ടാലേഷനില്‍ എന്തോ പിശകുണ്ട്. ശരിയായ ടേബിളുകള്‍ ഉണ്ടെന്നും ഡേറ്റാബേസ് "
 "വായനായോഗ്യമാണെന്നും ഉറപ്പു വരുത്തുക."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
 msgid "Forgotten your password or username?"
 msgstr "രഹസ്യവാക്കോ ഉപയോക്തൃനാമമോ മറന്നുപോയോ?"
 
@@ -487,6 +502,9 @@ msgstr "എല്ലാം കാണട്ടെ"
 
 msgid "Save"
 msgstr "സേവ് ചെയ്യണം"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -621,9 +639,6 @@ msgstr "എന്റെ പാസ് വേര്‍ഡ് പുനസ്ഥാ
 
 msgid "All dates"
 msgstr "എല്ലാ തീയതികളും"
-
-msgid "(None)"
-msgstr "(ഒന്നുമില്ല)"
 
 #, python-format
 msgid "Select %s"

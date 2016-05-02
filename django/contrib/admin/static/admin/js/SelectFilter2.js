@@ -2,7 +2,7 @@
 /*
 SelectFilter2 - Turns a multiple-select box into a filter interface.
 
-Requires core.js, SelectBox.js and addevent.js.
+Requires jQuery, core.js, and SelectBox.js.
 */
 (function($) {
     'use strict';
@@ -75,15 +75,15 @@ Requires core.js, SelectBox.js and addevent.js.
             filter_input.id = field_id + '_input';
 
             selector_available.appendChild(from_box);
-            var choose_all = quickElement('a', selector_available, gettext('Choose all'), 'title', interpolate(gettext('Click to choose all %s at once.'), [field_name]), 'href', 'javascript:void(0);', 'id', field_id + '_add_all_link');
+            var choose_all = quickElement('a', selector_available, gettext('Choose all'), 'title', interpolate(gettext('Click to choose all %s at once.'), [field_name]), 'href', '#', 'id', field_id + '_add_all_link');
             choose_all.className = 'selector-chooseall';
 
             // <ul class="selector-chooser">
             var selector_chooser = quickElement('ul', selector_div);
             selector_chooser.className = 'selector-chooser';
-            var add_link = quickElement('a', quickElement('li', selector_chooser), gettext('Choose'), 'title', gettext('Choose'), 'href', 'javascript:void(0);', 'id', field_id + '_add_link');
+            var add_link = quickElement('a', quickElement('li', selector_chooser), gettext('Choose'), 'title', gettext('Choose'), 'href', '#', 'id', field_id + '_add_link');
             add_link.className = 'selector-add';
-            var remove_link = quickElement('a', quickElement('li', selector_chooser), gettext('Remove'), 'title', gettext('Remove'), 'href', 'javascript:void(0);', 'id', field_id + '_remove_link');
+            var remove_link = quickElement('a', quickElement('li', selector_chooser), gettext('Remove'), 'title', gettext('Remove'), 'href', '#', 'id', field_id + '_remove_link');
             remove_link.className = 'selector-remove';
 
             // <div class="selector-chosen">
@@ -105,7 +105,7 @@ Requires core.js, SelectBox.js and addevent.js.
 
             var to_box = quickElement('select', selector_chosen, '', 'id', field_id + '_to', 'multiple', 'multiple', 'size', from_box.size, 'name', from_box.getAttribute('name'));
             to_box.className = 'filtered';
-            var clear_all = quickElement('a', selector_chosen, gettext('Remove all'), 'title', interpolate(gettext('Click to remove all chosen %s at once.'), [field_name]), 'href', 'javascript:void(0);', 'id', field_id + '_remove_all_link');
+            var clear_all = quickElement('a', selector_chosen, gettext('Remove all'), 'title', interpolate(gettext('Click to remove all chosen %s at once.'), [field_name]), 'href', '#', 'id', field_id + '_remove_all_link');
             clear_all.className = 'selector-clearall';
 
             from_box.setAttribute('name', from_box.getAttribute('name') + '_old');
@@ -194,5 +194,13 @@ Requires core.js, SelectBox.js and addevent.js.
             return true;
         }
     };
+
+    addEvent(window, 'load', function(e) {
+        $('select.selectfilter, select.selectfilterstacked').each(function() {
+            var $el = $(this),
+                data = $el.data();
+            SelectFilter.init($el.attr('id'), data.fieldName, parseInt(data.isStacked, 10));
+        });
+    });
 
 })(django.jQuery);

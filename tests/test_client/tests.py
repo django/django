@@ -22,43 +22,24 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
-import datetime
-
 from django.contrib.auth.models import User
 from django.core import mail
-from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.test import (
     Client, RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
+from django.urls import reverse_lazy
 
 from .views import get_view, post_view, trace_view
 
 
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='test_client.urls',)
+@override_settings(ROOT_URLCONF='test_client.urls')
 class ClientTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
-            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u2 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
-            first_name='Inactive', last_name='User', email='testclient@example.com', is_staff=False, is_active=False,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
-        cls.u3 = User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
-            first_name='Staff', last_name='Member', email='testclient@example.com', is_staff=True, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
+        cls.u1 = User.objects.create_user(username='testclient', password='password')
+        cls.u2 = User.objects.create_user(username='inactive', password='password', is_active=False)
 
     def test_get_view(self):
         "GET a view"
@@ -217,6 +198,18 @@ class ClientTest(TestCase):
         self.assertRedirects(response, '/get_view/', status_code=302, target_status_code=200)
         self.assertEqual(len(response.redirect_chain), 2)
 
+    def test_follow_relative_redirect(self):
+        "A URL with a relative redirect can be followed."
+        response = self.client.get('/accounts/', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.request['PATH_INFO'], '/accounts/login/')
+
+    def test_follow_relative_redirect_no_trailing_slash(self):
+        "A URL with a relative redirect with no trailing slash can be followed."
+        response = self.client.get('/accounts/no_trailing_slash', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.request['PATH_INFO'], '/accounts/login/')
+
     def test_redirect_http(self):
         "GET a URL that redirects to an http URI"
         response = self.client.get('/http_redirect_view/', follow=True)
@@ -367,6 +360,13 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
 
+    @override_settings(
+        INSTALLED_APPS=['django.contrib.auth'],
+        SESSION_ENGINE='django.contrib.sessions.backends.file',
+    )
+    def test_view_with_login_when_sessions_app_is_not_installed(self):
+        self.test_view_with_login()
+
     def test_view_with_force_login(self):
         "Request a page that is protected with @login_required"
         # Get the page without logging in. Should result in 302.
@@ -451,11 +451,21 @@ class ClientTest(TestCase):
         self.assertFalse(login)
 
     def test_view_with_inactive_login(self):
-        "Request a page that is protected with @login, but use an inactive login"
+        """
+        An inactive user may login if the authenticate backend allows it.
+        """
+        credentials = {'username': 'inactive', 'password': 'password'}
+        self.assertFalse(self.client.login(**credentials))
 
-        login = self.client.login(username='inactive', password='password')
-        self.assertFalse(login)
+        with self.settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend']):
+            self.assertTrue(self.client.login(**credentials))
 
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            'django.contrib.auth.backends.ModelBackend',
+            'django.contrib.auth.backends.AllowAllUsersModelBackend',
+        ]
+    )
     def test_view_with_inactive_force_login(self):
         "Request a page that is protected with @login, but use an inactive login"
 
@@ -464,7 +474,7 @@ class ClientTest(TestCase):
         self.assertRedirects(response, '/accounts/login/?next=/login_protected_view/')
 
         # Log in
-        self.client.force_login(self.u2)
+        self.client.force_login(self.u2, backend='django.contrib.auth.backends.AllowAllUsersModelBackend')
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')
@@ -522,7 +532,6 @@ class ClientTest(TestCase):
 
         # Log in
         self.client.force_login(self.u1, backend='test_client.auth_backends.TestClientBackend')
-        self.assertEqual(self.u1.backend, 'test_client.auth_backends.TestClientBackend')
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')
@@ -600,9 +609,25 @@ class ClientTest(TestCase):
         # Check that the session was modified
         self.assertEqual(self.client.session['tobacconist'], 'hovercraft')
 
+    @override_settings(
+        INSTALLED_APPS=[],
+        SESSION_ENGINE='django.contrib.sessions.backends.file',
+    )
+    def test_sessions_app_is_not_installed(self):
+        self.test_session_modifying_view()
+
+    @override_settings(
+        INSTALLED_APPS=[],
+        SESSION_ENGINE='django.contrib.sessions.backends.nonexistent',
+    )
+    def test_session_engine_is_invalid(self):
+        with self.assertRaisesMessage(ImportError, 'nonexistent'):
+            self.test_session_modifying_view()
+
     def test_view_with_exception(self):
         "Request a page that is known to throw an error"
-        self.assertRaises(KeyError, self.client.get, "/broken_view/")
+        with self.assertRaises(KeyError):
+            self.client.get("/broken_view/")
 
         # Try the same assertion, a different way
         try:
@@ -631,6 +656,14 @@ class ClientTest(TestCase):
 
         # Check some response details
         self.assertContains(response, 'This is a test')
+
+    def test_relative_redirect(self):
+        response = self.client.get('/accounts/')
+        self.assertRedirects(response, '/accounts/login/')
+
+    def test_relative_redirect_no_trailing_slash(self):
+        response = self.client.get('/accounts/no_trailing_slash')
+        self.assertRedirects(response, '/accounts/login/')
 
     def test_mass_mail_sending(self):
         "Test that mass mail is redirected to a dummy outbox during test setup"
@@ -691,7 +724,8 @@ class CustomTestClientTest(SimpleTestCase):
         self.assertEqual(hasattr(self.client, "i_am_customized"), True)
 
 
-_generic_view = lambda request: HttpResponse(status=200)
+def _generic_view(request):
+    return HttpResponse(status=200)
 
 
 @override_settings(ROOT_URLCONF='test_client.urls')
@@ -729,7 +763,6 @@ class RequestFactoryTest(SimpleTestCase):
         request = self.request_factory.get('/somewhere/')
         response = get_view(request)
 
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'This is a test')
 
     def test_trace_request_from_factory(self):
@@ -740,5 +773,4 @@ class RequestFactoryTest(SimpleTestCase):
         protocol = request.META["SERVER_PROTOCOL"]
         echoed_request_line = "TRACE {} {}".format(url_path, protocol)
 
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, echoed_request_line)

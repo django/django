@@ -29,8 +29,10 @@ class Feature(GDALBase):
 
     def __del__(self):
         "Releases a reference to this object."
-        if self._ptr and capi:
+        try:
             capi.destroy_feature(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     def __getitem__(self, index):
         """

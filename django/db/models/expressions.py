@@ -5,8 +5,7 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import Q, refs_aggregate
+from django.db.models.query_utils import Q
 from django.utils import six, timezone
 from django.utils.functional import cached_property
 
@@ -125,9 +124,11 @@ class BaseExpression(object):
 
     # aggregate specific fields
     is_summary = False
+    _output_field = None
 
     def __init__(self, output_field=None):
-        self._output_field = output_field
+        if output_field is not None:
+            self._output_field = output_field
 
     def get_db_converters(self, connection):
         return [self.convert_value] + self.output_field.get_db_converters(connection)
@@ -210,7 +211,7 @@ class BaseExpression(object):
         ])
         return c
 
-    def _prepare(self):
+    def _prepare(self, field):
         """
         Hook used by Field.get_prep_lookup() to do custom preparation.
         """
@@ -304,24 +305,6 @@ class BaseExpression(object):
         c.copied = True
         return c
 
-    def refs_aggregate(self, existing_aggregates):
-        """
-        Does this expression contain a reference to some of the
-        existing aggregates? If so, returns the aggregate and also
-        the lookup parts that *weren't* found. So, if
-            exsiting_aggregates = {'max_id': Max('id')}
-            self.name = 'max_id'
-            queryset.filter(max_id__range=[10,100])
-        then this method will return Max('id') and those parts of the
-        name that weren't found. In this case `max_id` is found and the range
-        portion is returned as ('range',).
-        """
-        for node in self.get_source_expressions():
-            agg, lookup = node.refs_aggregate(existing_aggregates)
-            if agg:
-                return agg, lookup
-        return False, ()
-
     def get_group_by_cols(self):
         if not self.contains_aggregate:
             return [self]
@@ -395,9 +378,13 @@ class CombinedExpression(Expression):
         except FieldError:
             rhs_output = None
         if (not connection.features.has_native_duration_field and
-                ((lhs_output and lhs_output.get_internal_type() == 'DurationField')
-                or (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
+                ((lhs_output and lhs_output.get_internal_type() == 'DurationField') or
+                 (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
             return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
+        if (lhs_output and rhs_output and self.connector == self.SUB and
+            lhs_output.get_internal_type() in {'DateField', 'DateTimeField', 'TimeField'} and
+                lhs_output.get_internal_type() == lhs_output.get_internal_type()):
+            return TemporalSubtraction(self.lhs, self.rhs).as_sql(compiler, connection)
         expressions = []
         expression_params = []
         sql, params = compiler.compile(self.lhs)
@@ -448,6 +435,17 @@ class DurationExpression(CombinedExpression):
         return expression_wrapper % sql, expression_params
 
 
+class TemporalSubtraction(CombinedExpression):
+    def __init__(self, lhs, rhs):
+        super(TemporalSubtraction, self).__init__(lhs, self.SUB, rhs, output_field=fields.DurationField())
+
+    def as_sql(self, compiler, connection):
+        connection.ops.check_expression_support(self)
+        lhs = compiler.compile(self.lhs, connection)
+        rhs = compiler.compile(self.rhs, connection)
+        return connection.ops.subtract_temporals(self.lhs.output_field.get_internal_type(), lhs, rhs)
+
+
 class F(Combinable):
     """
     An object capable of resolving references to existing query objects.
@@ -464,9 +462,6 @@ class F(Combinable):
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return query.resolve_ref(self.name, allow_joins, reuse, summarize)
-
-    def refs_aggregate(self, existing_aggregates):
-        return refs_aggregate(self.name.split(LOOKUP_SEP), existing_aggregates)
 
     def asc(self):
         return OrderBy(self)
@@ -519,7 +514,7 @@ class Func(Expression):
             c.source_expressions[pos] = arg.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         return c
 
-    def as_sql(self, compiler, connection, function=None, template=None):
+    def as_sql(self, compiler, connection, function=None, template=None, arg_joiner=None, **extra_context):
         connection.ops.check_expression_support(self)
         sql_parts = []
         params = []
@@ -527,16 +522,22 @@ class Func(Expression):
             arg_sql, arg_params = compiler.compile(arg)
             sql_parts.append(arg_sql)
             params.extend(arg_params)
-        if function is None:
-            self.extra['function'] = self.extra.get('function', self.function)
+        data = self.extra.copy()
+        data.update(**extra_context)
+        # Use the first supplied value in this order: the parameter to this
+        # method, a value supplied in __init__()'s **extra (the value in
+        # `data`), or the value defined on the class.
+        if function is not None:
+            data['function'] = function
         else:
-            self.extra['function'] = function
-        self.extra['expressions'] = self.extra['field'] = self.arg_joiner.join(sql_parts)
-        template = template or self.extra.get('template', self.template)
-        return template % self.extra, params
+            data.setdefault('function', self.function)
+        template = template or data.get('template', self.template)
+        arg_joiner = arg_joiner or data.get('arg_joiner', self.arg_joiner)
+        data['expressions'] = data['field'] = arg_joiner.join(sql_parts)
+        return template % data, params
 
-    def as_sqlite(self, *args, **kwargs):
-        sql, params = self.as_sql(*args, **kwargs)
+    def as_sqlite(self, compiler, connection):
+        sql, params = self.as_sql(compiler, connection)
         try:
             if self.output_field.get_internal_type() == 'DecimalField':
                 sql = 'CAST(%s AS NUMERIC)' % sql
@@ -758,13 +759,14 @@ class When(Expression):
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         c = self.copy()
         c.is_summary = summarize
-        c.condition = c.condition.resolve_expression(query, allow_joins, reuse, summarize, False)
+        if hasattr(c.condition, 'resolve_expression'):
+            c.condition = c.condition.resolve_expression(query, allow_joins, reuse, summarize, False)
         c.result = c.result.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         return c
 
-    def as_sql(self, compiler, connection, template=None):
+    def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
-        template_params = {}
+        template_params = extra_context
         sql_params = []
         condition_sql, condition_params = compiler.compile(self.condition)
         template_params['condition'] = condition_sql
@@ -806,6 +808,7 @@ class Case(Expression):
         super(Case, self).__init__(output_field)
         self.cases = list(cases)
         self.default = self._parse_expressions(default)[0]
+        self.extra = extra
 
     def __str__(self):
         return "CASE %s, ELSE %r" % (', '.join(str(c) for c in self.cases), self.default)
@@ -833,22 +836,24 @@ class Case(Expression):
         c.cases = c.cases[:]
         return c
 
-    def as_sql(self, compiler, connection, template=None, extra=None):
+    def as_sql(self, compiler, connection, template=None, case_joiner=None, **extra_context):
         connection.ops.check_expression_support(self)
         if not self.cases:
             return compiler.compile(self.default)
-        template_params = dict(extra) if extra else {}
+        template_params = self.extra.copy()
+        template_params.update(extra_context)
         case_parts = []
         sql_params = []
         for case in self.cases:
             case_sql, case_params = compiler.compile(case)
             case_parts.append(case_sql)
             sql_params.extend(case_params)
-        template_params['cases'] = self.case_joiner.join(case_parts)
+        case_joiner = case_joiner or self.case_joiner
+        template_params['cases'] = case_joiner.join(case_parts)
         default_sql, default_params = compiler.compile(self.default)
         template_params['default'] = default_sql
         sql_params.extend(default_params)
-        template = template or self.template
+        template = template or template_params.get('template', self.template)
         sql = template % template_params
         if self._output_field_or_none is not None:
             sql = connection.ops.unification_cast_sql(self.output_field) % sql
@@ -979,14 +984,16 @@ class OrderBy(BaseExpression):
     def get_source_expressions(self):
         return [self.expression]
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)
         placeholders = {
             'expression': expression_sql,
             'ordering': 'DESC' if self.descending else 'ASC',
         }
-        return (self.template % placeholders).rstrip(), params
+        placeholders.update(extra_context)
+        template = template or self.template
+        return (template % placeholders).rstrip(), params
 
     def get_group_by_cols(self):
         cols = []

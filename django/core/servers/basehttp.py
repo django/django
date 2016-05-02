@@ -9,13 +9,13 @@ been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 
 from __future__ import unicode_literals
 
+import logging
 import socket
 import sys
 from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8
-from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils import six
 from django.utils.encoding import uri_to_iri
@@ -23,6 +23,8 @@ from django.utils.module_loading import import_string
 from django.utils.six.moves import socketserver
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler')
+
+logger = logging.getLogger('django.server')
 
 
 def get_internal_wsgi_application():
@@ -70,6 +72,7 @@ class WSGIServer(simple_server.WSGIServer, object):
     def __init__(self, *args, **kwargs):
         if kwargs.pop('ipv6', False):
             self.address_family = socket.AF_INET6
+        self.allow_reuse_address = kwargs.pop('allow_reuse_address', True)
         super(WSGIServer, self).__init__(*args, **kwargs)
 
     def server_bind(self):
@@ -79,7 +82,7 @@ class WSGIServer(simple_server.WSGIServer, object):
 
     def handle_error(self, request, client_address):
         if is_broken_pipe_error():
-            sys.stderr.write("- Broken pipe from %s\n" % (client_address,))
+            logger.info("- Broken pipe from %s\n", client_address)
         else:
             super(WSGIServer, self).handle_error(request, client_address)
 
@@ -93,47 +96,39 @@ class ServerHandler(simple_server.ServerHandler, object):
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
-
-    def __init__(self, *args, **kwargs):
-        self.style = color_style()
-        super(WSGIRequestHandler, self).__init__(*args, **kwargs)
-
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
         return self.client_address[0]
 
     def log_message(self, format, *args):
-
-        msg = "[%s] " % self.log_date_time_string()
-        try:
-            msg += "%s\n" % (format % args)
-        except UnicodeDecodeError:
-            # e.g. accessing the server via SSL on Python 2
-            msg += "\n"
-
-        # Utilize terminal colors, if available
-        if args[1][0] == '2':
-            # Put 2XX first, since it should be the common case
-            msg = self.style.HTTP_SUCCESS(msg)
-        elif args[1][0] == '1':
-            msg = self.style.HTTP_INFO(msg)
-        elif args[1] == '304':
-            msg = self.style.HTTP_NOT_MODIFIED(msg)
-        elif args[1][0] == '3':
-            msg = self.style.HTTP_REDIRECT(msg)
-        elif args[1] == '404':
-            msg = self.style.HTTP_NOT_FOUND(msg)
-        elif args[1][0] == '4':
+        extra = {
+            'request': self.request,
+            'server_time': self.log_date_time_string(),
+        }
+        if args[1][0] == '4':
             # 0x16 = Handshake, 0x03 = SSL 3.0 or TLS 1.x
             if args[0].startswith(str('\x16\x03')):
-                msg = ("You're accessing the development server over HTTPS, "
-                    "but it only supports HTTP.\n")
-            msg = self.style.HTTP_BAD_REQUEST(msg)
-        else:
-            # Any 5XX, or any other response
-            msg = self.style.HTTP_SERVER_ERROR(msg)
+                extra['status_code'] = 500
+                logger.error(
+                    "You're accessing the development server over HTTPS, but "
+                    "it only supports HTTP.\n", extra=extra,
+                )
+                return
 
-        sys.stderr.write(msg)
+        if args[1].isdigit() and len(args[1]) == 3:
+            status_code = int(args[1])
+            extra['status_code'] = status_code
+
+            if status_code >= 500:
+                level = logger.error
+            elif status_code >= 400:
+                level = logger.warning
+            else:
+                level = logger.info
+        else:
+            level = logger.info
+
+        level(format, *args, extra=extra)
 
     def get_environ(self):
         # Strip all headers with underscores in the name before constructing

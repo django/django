@@ -195,10 +195,11 @@ class SyndicationFeedTest(FeedTestCase):
             self.assertEqual(len(enclosures), 1)
 
     def test_rss2_multiple_enclosures(self):
-        with self.assertRaisesMessage(ValueError, (
+        with self.assertRaisesMessage(
+            ValueError,
             "RSS feed items may only have one enclosure, see "
             "http://www.rssboard.org/rss-profile#element-channel-item-enclosure"
-        )):
+        ):
             self.client.get('/syndication/rss2/multiple-enclosure/')
 
     def test_rss091_feed(self):
@@ -461,9 +462,8 @@ class SyndicationFeedTest(FeedTestCase):
         Test that an ImproperlyConfigured is raised if no link could be found
         for the item(s).
         """
-        self.assertRaises(ImproperlyConfigured,
-                          self.client.get,
-                          '/syndication/articles/')
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/syndication/articles/')
 
     def test_template_feed(self):
         """
@@ -531,9 +531,8 @@ class SyndicationFeedTest(FeedTestCase):
 class FeedgeneratorTestCase(TestCase):
     def test_add_item_warns_when_enclosure_kwarg_is_used(self):
         feed = SyndicationFeed(title='Example', link='http://example.com', description='Foo')
-        with self.assertRaisesMessage(RemovedInDjango20Warning, (
-            'The enclosure keyword argument is deprecated, use enclosures instead.'
-        )):
+        msg = 'The enclosure keyword argument is deprecated, use enclosures instead.'
+        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
             feed.add_item(
                 title='Example Item',
                 link='https://example.com/item',

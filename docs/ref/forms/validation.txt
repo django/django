@@ -1,9 +1,8 @@
-.. currentmodule:: django.forms
-
-.. _form-and-field-validation:
-
+=========================
 Form and field validation
 =========================
+
+.. currentmodule:: django.forms
 
 Form validation happens when the data is cleaned. If you want to customize
 this process, there are various places to make changes, each one serving a
@@ -75,7 +74,7 @@ overridden:
 
 * The form subclass's ``clean()`` method can perform validation that requires
   access to multiple form fields. This is where you might put in checks such as
-  "if field ``A``is supplied, field ``B`` must contain a valid email address".
+  "if field ``A`` is supplied, field ``B`` must contain a valid email address".
   This method can return a completely different dictionary if it wishes, which
   will be used as the ``cleaned_data``.
 
@@ -112,7 +111,7 @@ for all remaining fields are still executed.
 .. _raising-validation-error:
 
 Raising ``ValidationError``
----------------------------
+===========================
 
 In order to make error messages flexible and easy to override, consider the
 following guidelines:
@@ -184,7 +183,7 @@ greatly benefit from fully featured ``ValidationError``\s (with a ``code`` name
 and a ``params`` dictionary).
 
 Raising multiple errors
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 If you detect multiple errors during a cleaning method and wish to signal all
 of them to the form submitter, it is possible to pass a list of errors to the
@@ -206,7 +205,7 @@ with ``code``\s and ``params`` but a list of strings will also work::
     ])
 
 Using validation in practice
-----------------------------
+============================
 
 The previous sections explained how validation works in general for forms.
 Since it can sometimes be easier to put things into place by seeing each
@@ -216,7 +215,7 @@ previous features.
 .. _validators:
 
 Using validators
-~~~~~~~~~~~~~~~~
+----------------
 
 Django's form (and model) fields support use of simple utility functions and
 classes known as validators. A validator is merely a callable object or
@@ -254,7 +253,7 @@ argument being the pattern: ``^[-a-zA-Z0-9_]+$``. See the section on
 available and for an example of how to write a validator.
 
 Form field default cleaning
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 Let's first create a custom form field that validates its input is a string
 containing comma-separated email addresses. The full class looks like this::
@@ -300,7 +299,7 @@ method will be run as part of the cleaning process and it will, in turn, call
 the custom ``to_python()`` and ``validate()`` methods.
 
 Cleaning a specific field attribute
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 Continuing on from the previous example, suppose that in our ``ContactForm``,
 we want to make sure that the ``recipients`` field always contains the address
@@ -326,7 +325,7 @@ write a cleaning method that operates on the ``recipients`` field, like so::
 .. _validating-fields-with-clean:
 
 Cleaning and validating fields that depend on each other
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------------
 
 Suppose we add another requirement to our contact form: if the ``cc_myself``
 field is ``True``, the ``subject`` must contain the word ``"help"``. We are

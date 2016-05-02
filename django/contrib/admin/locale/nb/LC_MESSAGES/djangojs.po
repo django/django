@@ -3,16 +3,17 @@
 # Translators:
 # Eirik Krogstad <eirikkr@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jon <jon@funkbit.no>, 2015
 # Jon <jon@funkbit.no>, 2014
 # Jon <jon@funkbit.no>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-29 22:59+0000\n"
-"Last-Translator: Eirik Krogstad <eirikkr@gmail.com>\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-17 10:13+0000\n"
+"Last-Translator: Jon <jon@funkbit.no>\n"
+"Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -115,8 +116,8 @@ msgstr[1] "Merk: Du er %s timer bak server-tid."
 msgid "Now"
 msgstr "Nå"
 
-msgid "Clock"
-msgstr "Klokke"
+msgid "Choose a Time"
+msgstr "Velg et klokkeslett"
 
 msgid "Choose a time"
 msgstr "Velg et klokkeslett"
@@ -130,14 +131,17 @@ msgstr "06:00"
 msgid "Noon"
 msgstr "12:00"
 
+msgid "6 p.m."
+msgstr "18:00"
+
 msgid "Cancel"
 msgstr "Avbryt"
 
 msgid "Today"
 msgstr "I dag"
 
-msgid "Calendar"
-msgstr "Kalender"
+msgid "Choose a Date"
+msgstr "Velg en dato"
 
 msgid "Yesterday"
 msgstr "I går"

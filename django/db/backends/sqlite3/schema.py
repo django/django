@@ -76,8 +76,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
           3. copy the data from the old renamed table to the new table
           4. delete the "app_model__old" table
         """
+        # Self-referential fields must be recreated rather than copied from
+        # the old model to ensure their remote_field.field_name doesn't refer
+        # to an altered field.
+        def is_self_referential(f):
+            return f.is_relation and f.remote_field.model is model
         # Work out the new fields dict / mapping
-        body = {f.name: f for f in model._meta.local_concrete_fields}
+        body = {
+            f.name: f.clone() if is_self_referential(f) else f
+            for f in model._meta.local_concrete_fields
+        }
         # Since mapping might mix column names and default values,
         # its values must be already quoted.
         mapping = {f.column: self.quote_name(f.column) for f in model._meta.local_concrete_fields}

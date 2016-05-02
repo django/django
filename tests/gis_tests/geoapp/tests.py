@@ -300,6 +300,13 @@ class GeoLookupTest(TestCase):
             0
         )
 
+    @skipUnlessDBFeature("supports_isvalid_lookup")
+    def test_isvalid_lookup(self):
+        invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
+        State.objects.create(name='invalid', poly=invalid_geom)
+        self.assertEqual(State.objects.filter(poly__isvalid=False).count(), 1)
+        self.assertEqual(State.objects.filter(poly__isvalid=True).count(), State.objects.count() - 1)
+
     @skipUnlessDBFeature("supports_left_right_lookups")
     def test_left_right_lookups(self):
         "Testing the 'left' and 'right' lookup types."
@@ -408,13 +415,15 @@ class GeoLookupTest(TestCase):
 
         # Not passing in a geometry as first param should
         # raise a type error when initializing the GeoQuerySet
-        self.assertRaises(ValueError, Country.objects.filter, mpoly__relate=(23, 'foo'))
+        with self.assertRaises(ValueError):
+            Country.objects.filter(mpoly__relate=(23, 'foo'))
 
         # Making sure the right exception is raised for the given
         # bad arguments.
         for bad_args, e in [((pnt1, 0), ValueError), ((pnt2, 'T*T***FF*', 0), ValueError)]:
             qs = Country.objects.filter(mpoly__relate=bad_args)
-            self.assertRaises(e, qs.count)
+            with self.assertRaises(e):
+                qs.count()
 
         # Relate works differently for the different backends.
         if postgis or spatialite:
@@ -556,7 +565,8 @@ class GeoQuerySetTest(TestCase):
         "Testing GeoJSON output from the database using GeoQuerySet.geojson()."
         # Only PostGIS and SpatiaLite support GeoJSON.
         if not connection.ops.geojson:
-            self.assertRaises(NotImplementedError, Country.objects.all().geojson, field_name='mpoly')
+            with self.assertRaises(NotImplementedError):
+                Country.objects.all().geojson(field_name='mpoly')
             return
 
         pueblo_json = '{"type":"Point","coordinates":[-104.609252,38.255001]}'
@@ -579,7 +589,8 @@ class GeoQuerySetTest(TestCase):
             )
 
         # Precision argument should only be an integer
-        self.assertRaises(TypeError, City.objects.geojson, precision='foo')
+        with self.assertRaises(TypeError):
+            City.objects.geojson(precision='foo')
 
         # Reference queries and values.
         # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 0)
@@ -610,7 +621,8 @@ class GeoQuerySetTest(TestCase):
         # Should throw a TypeError when trying to obtain GML from a
         # non-geometry field.
         qs = City.objects.all()
-        self.assertRaises(TypeError, qs.gml, field_name='name')
+        with self.assertRaises(TypeError):
+            qs.gml(field_name='name')
         ptown1 = City.objects.gml(field_name='point', precision=9).get(name='Pueblo')
         ptown2 = City.objects.gml(precision=9).get(name='Pueblo')
 
@@ -639,7 +651,8 @@ class GeoQuerySetTest(TestCase):
         # Should throw a TypeError when trying to obtain KML from a
         #  non-geometry field.
         qs = City.objects.all()
-        self.assertRaises(TypeError, qs.kml, 'name')
+        with self.assertRaises(TypeError):
+            qs.kml('name')
 
         # Ensuring the KML is as expected.
         ptown1 = City.objects.kml(field_name='point', precision=9).get(name='Pueblo')
@@ -652,12 +665,8 @@ class GeoQuerySetTest(TestCase):
         Testing the `MakeLine` aggregate.
         """
         if not connection.features.supports_make_line_aggr:
-            # Only PostGIS has support for the MakeLine aggregate. For other
-            # backends, test that NotImplementedError is raised
-            self.assertRaises(
-                NotImplementedError,
-                City.objects.all().aggregate, MakeLine('point')
-            )
+            with self.assertRaises(NotImplementedError):
+                City.objects.all().aggregate(MakeLine('point'))
             return
 
         # MakeLine on an inappropriate field returns simply None
@@ -736,7 +745,8 @@ class GeoQuerySetTest(TestCase):
         coords.reverse()
         self.assertEqual(tuple(coords), t.reverse_geom.coords)
         if oracle:
-            self.assertRaises(TypeError, State.objects.reverse_geom)
+            with self.assertRaises(TypeError):
+                State.objects.reverse_geom()
 
     @skipUnlessDBFeature("has_scale_method")
     def test_scale(self):
@@ -756,9 +766,11 @@ class GeoQuerySetTest(TestCase):
         "Testing GeoQuerySet.snap_to_grid()."
         # Let's try and break snap_to_grid() with bad combinations of arguments.
         for bad_args in ((), range(3), range(5)):
-            self.assertRaises(ValueError, Country.objects.snap_to_grid, *bad_args)
+            with self.assertRaises(ValueError):
+                Country.objects.snap_to_grid(*bad_args)
         for bad_args in (('1.0',), (1.0, None), tuple(map(six.text_type, range(4)))):
-            self.assertRaises(TypeError, Country.objects.snap_to_grid, *bad_args)
+            with self.assertRaises(TypeError):
+                Country.objects.snap_to_grid(*bad_args)
 
         # Boundary for San Marino, courtesy of Bjorn Sandvik of thematicmapping.org
         # from the world borders dataset he provides.
@@ -804,7 +816,8 @@ class GeoQuerySetTest(TestCase):
     def test_svg(self):
         "Testing SVG output using GeoQuerySet.svg()."
 
-        self.assertRaises(TypeError, City.objects.svg, precision='foo')
+        with self.assertRaises(TypeError):
+            City.objects.svg(precision='foo')
         # SELECT AsSVG(geoapp_city.point, 0, 8) FROM geoapp_city WHERE name = 'Pueblo';
         svg1 = 'cx="-104.609252" cy="-38.255001"'
         # Even though relative, only one point so it's practically the same except for
@@ -863,7 +876,8 @@ class GeoQuerySetTest(TestCase):
         union1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
         union2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)')
         qs = City.objects.filter(point__within=tx)
-        self.assertRaises(ValueError, qs.aggregate, Union('name'))
+        with self.assertRaises(ValueError):
+            qs.aggregate(Union('name'))
         # Using `field_name` keyword argument in one query and specifying an
         # order in the other (which should not be used because this is
         # an aggregate method on a spatial column)

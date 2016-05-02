@@ -7,7 +7,7 @@ from django.contrib.gis.geos.prototypes.errcheck import check_predicate
 
 # Prepared geometry constructor and destructors.
 geos_prepare = GEOSFuncFactory('GEOSPrepare', argtypes=[GEOM_PTR], restype=PREPGEOM_PTR)
-prepared_destroy = GEOSFuncFactory('GEOSPreparedGeom_destroy', argtpes=[PREPGEOM_PTR])
+prepared_destroy = GEOSFuncFactory('GEOSPreparedGeom_destroy', argtypes=[PREPGEOM_PTR])
 
 
 # Prepared geometry binary predicate support.

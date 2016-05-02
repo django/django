@@ -5,7 +5,7 @@ import collections
 import copy
 import datetime
 import decimal
-import math
+import itertools
 import uuid
 import warnings
 from base64 import b64decode, b64encode
@@ -20,7 +20,7 @@ from django.core import checks, exceptions, validators
 # purposes.
 from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
-from django.db.models.query_utils import QueryWrapper, RegisterLookupMixin
+from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import six, timezone
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
@@ -42,14 +42,14 @@ from django.utils.translation import ugettext_lazy as _
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
 __all__ = [str(x) for x in (
-    'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
-    'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
-    'DateTimeField', 'DecimalField', 'DurationField', 'EmailField', 'Empty',
-    'Field', 'FieldDoesNotExist', 'FilePathField', 'FloatField',
-    'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
-    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
-    'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
-    'UUIDField',
+    'AutoField', 'BLANK_CHOICE_DASH', 'BigAutoField', 'BigIntegerField',
+    'BinaryField', 'BooleanField', 'CharField', 'CommaSeparatedIntegerField',
+    'DateField', 'DateTimeField', 'DecimalField', 'DurationField',
+    'EmailField', 'Empty', 'Field', 'FieldDoesNotExist', 'FilePathField',
+    'FloatField', 'GenericIPAddressField', 'IPAddressField', 'IntegerField',
+    'NOT_PROVIDED', 'NullBooleanField', 'PositiveIntegerField',
+    'PositiveSmallIntegerField', 'SlugField', 'SmallIntegerField', 'TextField',
+    'TimeField', 'URLField', 'UUIDField',
 )]
 
 
@@ -137,12 +137,12 @@ class Field(RegisterLookupMixin):
     description = property(_description)
 
     def __init__(self, verbose_name=None, name=None, primary_key=False,
-            max_length=None, unique=False, blank=False, null=False,
-            db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
-            serialize=True, unique_for_date=None, unique_for_month=None,
-            unique_for_year=None, choices=None, help_text='', db_column=None,
-            db_tablespace=None, auto_created=False, validators=[],
-            error_messages=None):
+                 max_length=None, unique=False, blank=False, null=False,
+                 db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
+                 serialize=True, unique_for_date=None, unique_for_month=None,
+                 unique_for_year=None, choices=None, help_text='', db_column=None,
+                 db_tablespace=None, auto_created=False, validators=[],
+                 error_messages=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -217,7 +217,6 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     'Field names must not end with an underscore.',
-                    hint=None,
                     obj=self,
                     id='fields.E001',
                 )
@@ -226,7 +225,6 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     'Field names must not contain "__".',
-                    hint=None,
                     obj=self,
                     id='fields.E002',
                 )
@@ -235,7 +233,6 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     "'pk' is a reserved word that cannot be used as a field name.",
-                    hint=None,
                     obj=self,
                     id='fields.E003',
                 )
@@ -257,7 +254,6 @@ class Field(RegisterLookupMixin):
                 return [
                     checks.Error(
                         "'choices' must be an iterable (e.g., a list or tuple).",
-                        hint=None,
                         obj=self,
                         id='fields.E004',
                     )
@@ -267,9 +263,8 @@ class Field(RegisterLookupMixin):
                      for choice in self.choices):
                 return [
                     checks.Error(
-                        ("'choices' must be an iterable containing "
-                         "(actual value, human readable name) tuples."),
-                        hint=None,
+                        "'choices' must be an iterable containing "
+                        "(actual value, human readable name) tuples.",
                         obj=self,
                         id='fields.E005',
                     )
@@ -284,7 +279,6 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     "'db_index' must be None, True or False.",
-                    hint=None,
                     obj=self,
                     id='fields.E006',
                 )
@@ -313,7 +307,7 @@ class Field(RegisterLookupMixin):
     def _check_backend_specific_checks(self, **kwargs):
         app_label = self.model._meta.app_label
         for db in connections:
-            if router.allow_migrate(db, app_label, model=self.model):
+            if router.allow_migrate(db, app_label, model_name=self.model._meta.model_name):
                 return connections[db].validation.check_field(self, **kwargs)
         return []
 
@@ -510,10 +504,6 @@ class Field(RegisterLookupMixin):
             # class self.__class__, then update its dict with self.__dict__
             # values - so, this is very close to normal pickle.
             return _empty, (self.__class__,), self.__dict__
-        if self.model._deferred:
-            # Deferred model will not be found from the app registry. This
-            # could be fixed by reconstructing the deferred model on unpickle.
-            raise RuntimeError("Fields of deferred models can't be reduced")
         return _load_field, (self.model._meta.app_label, self.model._meta.object_name,
                              self.name)
 
@@ -538,9 +528,11 @@ class Field(RegisterLookupMixin):
 
     @cached_property
     def validators(self):
-        # Some validators can't be created at field initialization time.
-        # This method provides a way to delay their creation until required.
-        return self.default_validators + self._validators
+        """
+        Some validators can't be created at field initialization time.
+        This method provides a way to delay their creation until required.
+        """
+        return list(itertools.chain(self.default_validators, self._validators))
 
     def run_validators(self, value):
         if value in self.empty_values:
@@ -600,9 +592,21 @@ class Field(RegisterLookupMixin):
         self.run_validators(value)
         return value
 
+    def db_check(self, connection):
+        """
+        Return the database column check constraint for this field, for the
+        provided connection. Works the same way as db_type() for the case that
+        get_internal_type() does not map to a preexisting model field.
+        """
+        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        try:
+            return connection.data_type_check_constraints[self.get_internal_type()] % data
+        except KeyError:
+            return None
+
     def db_type(self, connection):
         """
-        Returns the database column data type for this field, for the provided
+        Return the database column data type for this field, for the provided
         connection.
         """
         # The default implementation of this method looks at the
@@ -626,18 +630,22 @@ class Field(RegisterLookupMixin):
         except KeyError:
             return None
 
+    def rel_db_type(self, connection):
+        """
+        Return the data type that a related field pointing to this field should
+        use. For example, this method is called by ForeignKey and OneToOneField
+        to determine its data type.
+        """
+        return self.db_type(connection)
+
     def db_parameters(self, connection):
         """
         Extension of db_type(), providing a range of different return
         values (type, checks).
         This will look at db_type(), allowing custom model fields to override it.
         """
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         type_string = self.db_type(connection)
-        try:
-            check_string = connection.data_type_check_constraints[self.get_internal_type()] % data
-        except KeyError:
-            check_string = None
+        check_string = self.db_check(connection)
         return {
             "type": type_string,
             "check": check_string,
@@ -663,13 +671,33 @@ class Field(RegisterLookupMixin):
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
+    def contribute_to_class(self, cls, name, private_only=False, virtual_only=NOT_PROVIDED):
+        """
+        Register the field with the model class it belongs to.
+
+        If private_only is True, a separate instance of this field will be
+        created for every subclass of cls, even if cls is not an abstract
+        model.
+        """
+        if virtual_only is not NOT_PROVIDED:
+            warnings.warn(
+                "The `virtual_only` argument of Field.contribute_to_class() "
+                "has been renamed to `private_only`.",
+                RemovedInDjango20Warning, stacklevel=2
+            )
+            private_only = virtual_only
         self.set_attributes_from_name(name)
         self.model = cls
-        if virtual_only:
-            cls._meta.add_field(self, virtual=True)
+        if private_only:
+            cls._meta.add_field(self, private=True)
         else:
             cls._meta.add_field(self)
+        if self.column:
+            # Don't override classmethods with the descriptor. This means that
+            # if you have a classmethod and a field with the same name, then
+            # such fields can't be deferred (we don't have a check for this).
+            if not getattr(cls, self.attname, None):
+                setattr(cls, self.attname, DeferredAttribute(self.attname, cls))
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
                     curry(cls._get_FIELD_display, field=self))
@@ -732,7 +760,7 @@ class Field(RegisterLookupMixin):
         Perform preliminary non-db specific lookup checks and conversions
         """
         if hasattr(value, '_prepare'):
-            return value._prepare()
+            return value._prepare(self)
 
         if lookup_type in {
             'iexact', 'contains', 'icontains',
@@ -754,33 +782,8 @@ class Field(RegisterLookupMixin):
         if not prepared:
             value = self.get_prep_lookup(lookup_type, value)
             prepared = True
-        if hasattr(value, 'get_compiler'):
-            value = value.get_compiler(connection=connection)
-        if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
-            # If the value has a relabeled_clone method it means the
-            # value will be handled later on.
-            if hasattr(value, 'relabeled_clone'):
-                return value
-            if hasattr(value, 'as_sql'):
-                sql, params = value.as_sql()
-            else:
-                sql, params = value._as_sql(connection=connection)
-            return QueryWrapper(('(%s)' % sql), params)
 
-        if lookup_type in ('search', 'regex', 'iregex', 'contains',
-                           'icontains', 'iexact', 'startswith', 'endswith',
-                           'istartswith', 'iendswith'):
-            return [value]
-        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
-            return [self.get_db_prep_value(value, connection=connection,
-                                           prepared=prepared)]
-        elif lookup_type in ('range', 'in'):
-            return [self.get_db_prep_value(v, connection=connection,
-                                           prepared=prepared) for v in value]
-        elif lookup_type == 'isnull':
-            return []
-        else:
-            return [value]
+        return [value]
 
     def has_default(self):
         """
@@ -796,8 +799,7 @@ class Field(RegisterLookupMixin):
             if callable(self.default):
                 return self.default()
             return self.default
-        if (not self.empty_strings_allowed or (self.null and
-                   not connection.features.interprets_empty_strings_as_nulls)):
+        if not self.empty_strings_allowed or self.null and not connection.features.interprets_empty_strings_as_nulls:
             return None
         return ""
 
@@ -829,9 +831,6 @@ class Field(RegisterLookupMixin):
                    for x in rel_model._default_manager.complex_filter(
                        limit_choices_to)]
         return first_choice + lst
-
-    def get_choices_default(self):
-        return self.get_choices()
 
     @warn_about_renamed_method(
         'Field', '_get_val_from_obj', 'value_from_object',
@@ -931,7 +930,6 @@ class AutoField(Field):
             return [
                 checks.Error(
                     'AutoFields must set primary_key=True.',
-                    hint=None,
                     obj=self,
                     id='fields.E100',
                 ),
@@ -960,6 +958,9 @@ class AutoField(Field):
                 params={'value': value},
             )
 
+    def rel_db_type(self, connection):
+        return IntegerField().db_type(connection=connection)
+
     def validate(self, value, model_instance):
         pass
 
@@ -984,6 +985,16 @@ class AutoField(Field):
 
     def formfield(self, **kwargs):
         return None
+
+
+class BigAutoField(AutoField):
+    description = _("Big (8 byte) integer")
+
+    def get_internal_type(self):
+        return "BigAutoField"
+
+    def rel_db_type(self, connection):
+        return BigIntegerField().db_type(connection=connection)
 
 
 class BooleanField(Field):
@@ -1082,7 +1093,6 @@ class CharField(Field):
             return [
                 checks.Error(
                     "CharFields must define a 'max_length' attribute.",
-                    hint=None,
                     obj=self,
                     id='fields.E120',
                 )
@@ -1091,7 +1101,6 @@ class CharField(Field):
             return [
                 checks.Error(
                     "'max_length' must be a positive integer.",
-                    hint=None,
                     obj=self,
                     id='fields.E121',
                 )
@@ -1123,6 +1132,17 @@ class CharField(Field):
 class CommaSeparatedIntegerField(CharField):
     default_validators = [validators.validate_comma_separated_integer_list]
     description = _("Comma-separated integers")
+    system_check_deprecated_details = {
+        'msg': (
+            'CommaSeparatedIntegerField has been deprecated. Support '
+            'for it (except in historical migrations) will be removed '
+            'in Django 2.0.'
+        ),
+        'hint': (
+            'Use CharField(validators=[validate_comma_separated_integer_list]) instead.'
+        ),
+        'id': 'fields.W901',
+    }
 
     def formfield(self, **kwargs):
         defaults = {
@@ -1146,17 +1166,14 @@ class DateTimeCheckMixin(object):
         # auto_now, auto_now_add, and default are mutually exclusive
         # options. The use of more than one of these options together
         # will trigger an Error
-        mutually_exclusive_options = [self.auto_now_add, self.auto_now,
-                                      self.has_default()]
-        enabled_options = [option not in (None, False)
-                          for option in mutually_exclusive_options].count(True)
+        mutually_exclusive_options = [self.auto_now_add, self.auto_now, self.has_default()]
+        enabled_options = [option not in (None, False) for option in mutually_exclusive_options].count(True)
         if enabled_options > 1:
             return [
                 checks.Error(
                     "The options auto_now, auto_now_add, and default "
                     "are mutually exclusive. Only one of these options "
                     "may be present.",
-                    hint=None,
                     obj=self,
                     id='fields.E160',
                 )
@@ -1284,12 +1301,14 @@ class DateField(DateTimeCheckMixin, Field):
     def contribute_to_class(self, cls, name, **kwargs):
         super(DateField, self).contribute_to_class(cls, name, **kwargs)
         if not self.null:
-            setattr(cls, 'get_next_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self,
-                      is_next=True))
-            setattr(cls, 'get_previous_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self,
-                      is_next=False))
+            setattr(
+                cls, 'get_next_by_%s' % self.name,
+                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=True)
+            )
+            setattr(
+                cls, 'get_previous_by_%s' % self.name,
+                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)
+            )
 
     def get_prep_value(self, value):
         value = super(DateField, self).get_prep_value(value)
@@ -1503,7 +1522,6 @@ class DecimalField(Field):
             return [
                 checks.Error(
                     "DecimalFields must define a 'decimal_places' attribute.",
-                    hint=None,
                     obj=self,
                     id='fields.E130',
                 )
@@ -1512,7 +1530,6 @@ class DecimalField(Field):
             return [
                 checks.Error(
                     "'decimal_places' must be a non-negative integer.",
-                    hint=None,
                     obj=self,
                     id='fields.E131',
                 )
@@ -1529,7 +1546,6 @@ class DecimalField(Field):
             return [
                 checks.Error(
                     "DecimalFields must define a 'max_digits' attribute.",
-                    hint=None,
                     obj=self,
                     id='fields.E132',
                 )
@@ -1538,7 +1554,6 @@ class DecimalField(Field):
             return [
                 checks.Error(
                     "'max_digits' must be a positive integer.",
-                    hint=None,
                     obj=self,
                     id='fields.E133',
                 )
@@ -1551,7 +1566,6 @@ class DecimalField(Field):
             return [
                 checks.Error(
                     "'max_digits' must be greater or equal to 'decimal_places'.",
-                    hint=None,
                     obj=self,
                     id='fields.E134',
                 )
@@ -1608,8 +1622,7 @@ class DecimalField(Field):
         return utils.format_number(value, self.max_digits, self.decimal_places)
 
     def get_db_prep_save(self, value, connection):
-        return connection.ops.adapt_decimalfield_value(self.to_python(value),
-                self.max_digits, self.decimal_places)
+        return connection.ops.adapt_decimalfield_value(self.to_python(value), self.max_digits, self.decimal_places)
 
     def get_prep_value(self, value):
         value = super(DecimalField, self).get_prep_value(value)
@@ -1665,7 +1678,8 @@ class DurationField(Field):
             return value
         if value is None:
             return None
-        return value.total_seconds() * 1000000
+        # Discard any fractional microseconds due to floating point arithmetic.
+        return int(round(value.total_seconds() * 1000000))
 
     def get_db_converters(self, connection):
         converters = []
@@ -1730,7 +1744,6 @@ class FilePathField(Field):
             return [
                 checks.Error(
                     "FilePathFields must have either 'allow_files' or 'allow_folders' set to True.",
-                    hint=None,
                     obj=self,
                     id='fields.E140',
                 )
@@ -1852,12 +1865,6 @@ class IntegerField(Field):
             return None
         return int(value)
 
-    def get_prep_lookup(self, lookup_type, value):
-        if ((lookup_type == 'gte' or lookup_type == 'lt')
-                and isinstance(value, float)):
-            value = math.ceil(value)
-        return super(IntegerField, self).get_prep_lookup(lookup_type, value)
-
     def get_internal_type(self):
         return "IntegerField"
 
@@ -1950,9 +1957,8 @@ class GenericIPAddressField(Field):
         if not getattr(self, 'null', False) and getattr(self, 'blank', False):
             return [
                 checks.Error(
-                    ('GenericIPAddressFields cannot have blank=True if null=False, '
-                     'as blank values are stored as nulls.'),
-                    hint=None,
+                    'GenericIPAddressFields cannot have blank=True if null=False, '
+                    'as blank values are stored as nulls.',
                     obj=self,
                     id='fields.E150',
                 )
@@ -1979,8 +1985,7 @@ class GenericIPAddressField(Field):
             value = force_text(value)
         value = value.strip()
         if ':' in value:
-            return clean_ipv6_address(value,
-                self.unpack_ipv4, self.error_messages['invalid'])
+            return clean_ipv6_address(value, self.unpack_ipv4, self.error_messages['invalid'])
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):
@@ -2072,7 +2077,24 @@ class NullBooleanField(Field):
         return super(NullBooleanField, self).formfield(**defaults)
 
 
-class PositiveIntegerField(IntegerField):
+class PositiveIntegerRelDbTypeMixin(object):
+
+    def rel_db_type(self, connection):
+        """
+        Return the data type that a related field pointing to this field should
+        use. In most cases, a foreign key pointing to a positive integer
+        primary key will have an integer column data type but some databases
+        (e.g. MySQL) have an unsigned integer type. In that case
+        (related_fields_match_type=True), the primary key should return its
+        db_type.
+        """
+        if connection.features.related_fields_match_type:
+            return self.db_type(connection)
+        else:
+            return IntegerField().db_type(connection=connection)
+
+
+class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
     description = _("Positive integer")
 
     def get_internal_type(self):
@@ -2084,7 +2106,7 @@ class PositiveIntegerField(IntegerField):
         return super(PositiveIntegerField, self).formfield(**defaults)
 
 
-class PositiveSmallIntegerField(IntegerField):
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
     description = _("Positive small integer")
 
     def get_internal_type(self):
@@ -2337,6 +2359,9 @@ class BinaryField(Field):
 
     def get_internal_type(self):
         return "BinaryField"
+
+    def get_placeholder(self, value, compiler, connection):
+        return connection.ops.binary_placeholder_sql(value)
 
     def get_default(self):
         if self.has_default() and not callable(self.default):

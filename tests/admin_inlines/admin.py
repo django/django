@@ -20,10 +20,12 @@ class BookInline(admin.TabularInline):
 
 class NonAutoPKBookTabularInline(admin.TabularInline):
     model = NonAutoPKBook
+    classes = ('collapse',)
 
 
 class NonAutoPKBookStackedInline(admin.StackedInline):
     model = NonAutoPKBook
+    classes = ('collapse',)
 
 
 class EditablePKBookTabularInline(admin.TabularInline):
@@ -35,9 +37,10 @@ class EditablePKBookStackedInline(admin.StackedInline):
 
 
 class AuthorAdmin(admin.ModelAdmin):
-    inlines = [BookInline,
-        NonAutoPKBookTabularInline, NonAutoPKBookStackedInline,
-        EditablePKBookTabularInline, EditablePKBookStackedInline]
+    inlines = [
+        BookInline, NonAutoPKBookTabularInline, NonAutoPKBookStackedInline,
+        EditablePKBookTabularInline, EditablePKBookStackedInline,
+    ]
 
 
 class InnerInline(admin.StackedInline):

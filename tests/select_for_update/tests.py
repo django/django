@@ -110,11 +110,8 @@ class SelectForUpdateTests(TransactionTestCase):
         that supports FOR UPDATE but not NOWAIT, then we should find
         that a DatabaseError is raised.
         """
-        self.assertRaises(
-            DatabaseError,
-            list,
-            Person.objects.all().select_for_update(nowait=True)
-        )
+        with self.assertRaises(DatabaseError):
+            list(Person.objects.all().select_for_update(nowait=True))
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_requires_transaction(self):

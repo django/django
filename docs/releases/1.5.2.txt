@@ -7,7 +7,7 @@ Django 1.5.2 release notes
 This is Django 1.5.2, a bugfix and security release for Django 1.5.
 
 Mitigated possible XSS attack via user-supplied redirect URLs
--------------------------------------------------------------
+=============================================================
 
 Django relies on user input in some cases (e.g.
 :func:`django.contrib.auth.views.login`, ``django.contrib.comments``, and
@@ -21,7 +21,7 @@ Django currently, since we only put this URL into the ``Location`` response
 header and browsers seem to ignore JavaScript there.
 
 XSS vulnerability in :mod:`django.contrib.admin`
-------------------------------------------------
+================================================
 
 If a :class:`~django.db.models.URLField` is used in Django 1.5, it displays the
 current value of the field and a link to the target on the admin change page.

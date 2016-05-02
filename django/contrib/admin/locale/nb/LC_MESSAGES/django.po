@@ -12,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-03-02 15:19+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-17 10:10+0000\n"
 "Last-Translator: Jon <jon@funkbit.no>\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
+"Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,6 +83,12 @@ msgstr "Handling:"
 msgid "action time"
 msgstr "tid for handling"
 
+msgid "user"
+msgstr "bruker"
+
+msgid "content type"
+msgstr "innholdstype"
+
 msgid "object id"
 msgstr "objekt-ID"
 
@@ -123,6 +129,9 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Hold nede «Control», eller «Command» på en Mac, for å velge mer enn en."
+
+msgid "Added."
+msgstr "Lagt til."
 
 #, python-format
 msgid "Changed %s."
@@ -474,6 +483,14 @@ msgstr ""
 "Noe er galt med databaseinstallasjonen din. Sørg for at databasetabellene er "
 "opprettet og at brukeren har de nødvendige rettighetene."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Du er logget inn som %(username)s, men er ikke autorisert til å få tilgang "
+"til denne siden. Ønsker du å logge inn med en annen konto?"
+
 msgid "Forgotten your password or username?"
 msgstr "Glemt brukernavnet eller passordet ditt?"
 
@@ -498,6 +515,9 @@ msgstr "Vis alle"
 
 msgid "Save"
 msgstr "Lagre"
+
+msgid "Popup closing..."
+msgstr "Lukker popup..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -634,9 +654,6 @@ msgstr "Nullstill mitt passord"
 
 msgid "All dates"
 msgstr "Alle datoer"
-
-msgid "(None)"
-msgstr "(Ingen)"
 
 #, python-format
 msgid "Select %s"

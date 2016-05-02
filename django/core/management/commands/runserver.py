@@ -8,12 +8,8 @@ import sys
 from datetime import datetime
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import get_internal_wsgi_application, run
-from django.db import DEFAULT_DB_ALIAS, connections
-from django.db.migrations.exceptions import MigrationSchemaMissing
-from django.db.migrations.executor import MigrationExecutor
 from django.utils import autoreload, six
 from django.utils.encoding import force_text, get_system_encoding
 
@@ -36,17 +32,25 @@ class Command(BaseCommand):
     default_port = '8000'
 
     def add_arguments(self, parser):
-        parser.add_argument('addrport', nargs='?',
-            help='Optional port number, or ipaddr:port')
-        parser.add_argument('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
-            help='Tells Django to use an IPv6 address.')
-        parser.add_argument('--nothreading', action='store_false', dest='use_threading', default=True,
-            help='Tells Django to NOT use threading.')
-        parser.add_argument('--noreload', action='store_false', dest='use_reloader', default=True,
-            help='Tells Django to NOT use the auto-reloader.')
+        parser.add_argument(
+            'addrport', nargs='?',
+            help='Optional port number, or ipaddr:port'
+        )
+        parser.add_argument(
+            '--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
+            help='Tells Django to use an IPv6 address.',
+        )
+        parser.add_argument(
+            '--nothreading', action='store_false', dest='use_threading', default=True,
+            help='Tells Django to NOT use threading.',
+        )
+        parser.add_argument(
+            '--noreload', action='store_false', dest='use_reloader', default=True,
+            help='Tells Django to NOT use the auto-reloader.',
+        )
 
     def execute(self, *args, **options):
-        if options.get('no_color'):
+        if options['no_color']:
             # We rely on the environment because it's currently the only
             # way to reach WSGIRequestHandler. This seems an acceptable
             # compromise considering `runserver` runs indefinitely.
@@ -65,11 +69,11 @@ class Command(BaseCommand):
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
             raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
 
-        self.use_ipv6 = options.get('use_ipv6')
+        self.use_ipv6 = options['use_ipv6']
         if self.use_ipv6 and not socket.has_ipv6:
             raise CommandError('Your Python does not support IPv6.')
         self._raw_ipv6 = False
-        if not options.get('addrport'):
+        if not options['addrport']:
             self.addr = ''
             self.port = self.default_port
         else:
@@ -89,14 +93,14 @@ class Command(BaseCommand):
                     raise CommandError('"%s" is not a valid IPv6 address.' % self.addr)
         if not self.addr:
             self.addr = '::1' if self.use_ipv6 else '127.0.0.1'
-            self._raw_ipv6 = bool(self.use_ipv6)
+            self._raw_ipv6 = self.use_ipv6
         self.run(**options)
 
     def run(self, **options):
         """
         Runs the server, using the autoreloader if needed
         """
-        use_reloader = options.get('use_reloader')
+        use_reloader = options['use_reloader']
 
         if use_reloader:
             autoreload.main(self.inner_run, None, options)
@@ -108,12 +112,15 @@ class Command(BaseCommand):
         # to be raised in the child process, raise it now.
         autoreload.raise_last_exception()
 
-        threading = options.get('use_threading')
+        threading = options['use_threading']
+        # 'shutdown_message' is a stealth option.
         shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
         self.stdout.write("Performing system checks...\n\n")
         self.check(display_num_errors=True)
+        # Need to check migrations here, so can't use the
+        # requires_migrations_check attribute.
         self.check_migrations()
         now = datetime.now().strftime('%B %d, %Y - %X')
         if six.PY2:
@@ -153,29 +160,6 @@ class Command(BaseCommand):
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
-
-    def check_migrations(self):
-        """
-        Checks to see if the set of migrations on disk matches the
-        migrations in the database. Prints a warning if they don't match.
-        """
-        try:
-            executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
-        except ImproperlyConfigured:
-            # No databases are configured (or the dummy one)
-            return
-        except MigrationSchemaMissing:
-            self.stdout.write(self.style.NOTICE(
-                "\nNot checking migrations as it is not possible to access/create the django_migrations table."
-            ))
-            return
-
-        plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
-        if plan:
-            self.stdout.write(self.style.NOTICE(
-                "\nYou have unapplied migrations; your app may not work properly until they are applied."
-            ))
-            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
 
 # Kept for backward compatibility
 BaseRunserverCommand = Command

@@ -7,17 +7,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-21 12:31+0000\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-10-22 18:05+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "Personal info"
 msgstr "Персональная информация"
@@ -42,6 +43,12 @@ msgstr "Изменить пароль: %s"
 msgid "Authentication and Authorization"
 msgstr "Пользователи и группы"
 
+msgid "password"
+msgstr "пароль"
+
+msgid "last login"
+msgstr "последний вход"
+
 msgid "No password set."
 msgstr "Пароль не задан."
 
@@ -57,17 +64,17 @@ msgstr "Пароль"
 msgid "Password confirmation"
 msgstr "Подтверждение пароля"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Введите тот же пароль, что и выше, для подтверждения."
+msgid "Enter the same password as before, for verification."
+msgstr "Для подтверждения введите, пожалуйста, пароль ещё раз."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"Пароли не хранятся в открытом виде, поэтому нет возможности увидеть пароль "
-"этого пользователя. Но вы можете изменить пароль используя <a href="
-"\"password/\">эту форму</a>."
+"Пароли хранятся в защищённом виде, так что у нас нет способа узнать пароль "
+"этого пользователя. Однако вы можете сменить его/её пароль, используя <a "
+"href=\"../password/\">эту форму</a>."
 
 #, python-format
 msgid ""
@@ -119,6 +126,9 @@ msgstr "контрольная сумма"
 msgid "name"
 msgstr "имя"
 
+msgid "content type"
+msgstr "тип содержимого"
+
 msgid "codename"
 msgstr "кодовое название"
 
@@ -133,12 +143,6 @@ msgstr "группа"
 
 msgid "groups"
 msgstr "группы"
-
-msgid "password"
-msgstr "пароль"
-
-msgid "last login"
-msgstr "последний вход"
 
 msgid "superuser status"
 msgstr "статус суперпользователя"
@@ -213,6 +217,55 @@ msgstr "пользователь"
 
 msgid "users"
 msgstr "пользователи"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Введённый пароль слишком короткий. Он должен содержать как минимум "
+"%(min_length)d символ."
+msgstr[1] ""
+"Введённый пароль слишком короткий. Он должен содержать как минимум "
+"%(min_length)d символа."
+msgstr[2] ""
+"Введённый пароль слишком короткий. Он должен содержать как минимум "
+"%(min_length)d символов."
+msgstr[3] ""
+"Введённый пароль слишком короткий. Он должен содержать как минимум "
+"%(min_length)d символов."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Ваш пароль должен содержать как минимум %(min_length)d символ."
+msgstr[1] "Ваш пароль должен содержать как минимум %(min_length)d символа."
+msgstr[2] "Ваш пароль должен содержать как минимум %(min_length)d символов."
+msgstr[3] "Ваш пароль должен содержать как минимум %(min_length)d символов."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Введённый пароль слишком похож на %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"Ваш пароль не должен совпадать с вашим именем или другой персональной "
+"информацией или быть слишком похожим на неё."
+
+msgid "This password is too common."
+msgstr "Введённый пароль слишком широко распространён."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Ваш пароль не может быть одним из широко распространённых паролей."
+
+msgid "This password is entirely numeric."
+msgstr "Введённый пароль состоит только из цифр."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Ваш пароль не может состоять только из цифр."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

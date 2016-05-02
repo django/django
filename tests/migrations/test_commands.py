@@ -7,7 +7,8 @@ import os
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
-from django.db import DatabaseError, connection, models
+from django.db import DatabaseError, connection, connections, models
+from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
@@ -22,6 +23,7 @@ class MigrateTests(MigrationTestBase):
     """
     Tests running the migrate command.
     """
+    multi_db = True
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate(self):
@@ -51,6 +53,16 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
+    @override_settings(INSTALLED_APPS=[
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'migrations.migrations_test_apps.migrated_app',
+    ])
+    def test_migrate_with_system_checks(self):
+        out = six.StringIO()
+        call_command('migrate', skip_checks=False, no_color=True, stdout=out)
+        self.assertIn('Apply all migrations: migrated_app', out.getvalue())
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_initial_false"})
     def test_migrate_initial_false(self):
         """
@@ -75,25 +87,36 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations"},
+        DATABASE_ROUTERS=['migrations.routers.TestRouter'],
+    )
     def test_migrate_fake_initial(self):
         """
-        #24184 - Tests that --fake-initial only works if all tables created in
-        the initial migration of an app exists
+        --fake-initial only works if all tables created in the initial
+        migration of an app exists. Database routers must be obeyed when doing
+        that check.
         """
         # Make sure no tables are created
-        self.assertTableNotExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
+        for db in connections:
+            self.assertTableNotExists("migrations_author", using=db)
+            self.assertTableNotExists("migrations_tribble", using=db)
         # Run the migrations to 0001 only
         call_command("migrate", "migrations", "0001", verbosity=0)
+        call_command("migrate", "migrations", "0001", verbosity=0, database="other")
         # Make sure the right tables exist
         self.assertTableExists("migrations_author")
-        self.assertTableExists("migrations_tribble")
+        self.assertTableNotExists("migrations_tribble")
+        # Also check the "other" database
+        self.assertTableNotExists("migrations_author", using="other")
+        self.assertTableExists("migrations_tribble", using="other")
+
         # Fake a roll-back
         call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
+        call_command("migrate", "migrations", "zero", fake=True, verbosity=0, database="other")
         # Make sure the tables still exist
         self.assertTableExists("migrations_author")
-        self.assertTableExists("migrations_tribble")
+        self.assertTableExists("migrations_tribble", using="other")
         # Try to run initial migration
         with self.assertRaises(DatabaseError):
             call_command("migrate", "migrations", "0001", verbosity=0)
@@ -101,18 +124,24 @@ class MigrateTests(MigrationTestBase):
         out = six.StringIO()
         with mock.patch('django.core.management.color.supports_color', lambda *args: False):
             call_command("migrate", "migrations", "0001", fake_initial=True, stdout=out, verbosity=1)
+            call_command("migrate", "migrations", "0001", fake_initial=True, verbosity=0, database="other")
         self.assertIn(
             "migrations.0001_initial... faked",
             out.getvalue().lower()
         )
         # Run migrations all the way
         call_command("migrate", verbosity=0)
+        call_command("migrate", verbosity=0, database="other")
         # Make sure the right tables exist
         self.assertTableExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         self.assertTableExists("migrations_book")
+        self.assertTableNotExists("migrations_author", using="other")
+        self.assertTableNotExists("migrations_tribble", using="other")
+        self.assertTableNotExists("migrations_book", using="other")
         # Fake a roll-back
         call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
+        call_command("migrate", "migrations", "zero", fake=True, verbosity=0, database="other")
         # Make sure the tables still exist
         self.assertTableExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
@@ -127,12 +156,15 @@ class MigrateTests(MigrationTestBase):
             call_command("migrate", "migrations", fake_initial=True, verbosity=0)
         # Fake a apply
         call_command("migrate", "migrations", fake=True, verbosity=0)
+        call_command("migrate", "migrations", fake=True, verbosity=0, database="other")
         # Unmigrate everything
         call_command("migrate", "migrations", "zero", verbosity=0)
+        call_command("migrate", "migrations", "zero", verbosity=0, database="other")
         # Make sure it's all gone
-        self.assertTableNotExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
-        self.assertTableNotExists("migrations_book")
+        for db in connections:
+            self.assertTableNotExists("migrations_author", using=db)
+            self.assertTableNotExists("migrations_tribble", using=db)
+            self.assertTableNotExists("migrations_book", using=db)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_fake_split_initial"})
     def test_migrate_fake_split_initial(self):
@@ -316,16 +348,26 @@ class MigrateTests(MigrationTestBase):
         index_tx_end = output.find(connection.ops.end_transaction_sql().lower())
 
         self.assertGreater(index_tx_start, -1, "Transaction start not found")
-        self.assertGreater(index_op_desc_author, index_tx_start,
-            "Operation description (author) not found or found before transaction start")
-        self.assertGreater(index_create_table, index_op_desc_author,
-            "CREATE TABLE not found or found before operation description (author)")
-        self.assertGreater(index_op_desc_tribble, index_create_table,
-            "Operation description (tribble) not found or found before CREATE TABLE (author)")
-        self.assertGreater(index_op_desc_unique_together, index_op_desc_tribble,
-            "Operation description (unique_together) not found or found before operation description (tribble)")
-        self.assertGreater(index_tx_end, index_op_desc_unique_together,
-            "Transaction end not found or found before operation description (unique_together)")
+        self.assertGreater(
+            index_op_desc_author, index_tx_start,
+            "Operation description (author) not found or found before transaction start"
+        )
+        self.assertGreater(
+            index_create_table, index_op_desc_author,
+            "CREATE TABLE not found or found before operation description (author)"
+        )
+        self.assertGreater(
+            index_op_desc_tribble, index_create_table,
+            "Operation description (tribble) not found or found before CREATE TABLE (author)"
+        )
+        self.assertGreater(
+            index_op_desc_unique_together, index_op_desc_tribble,
+            "Operation description (unique_together) not found or found before operation description (tribble)"
+        )
+        self.assertGreater(
+            index_tx_end, index_op_desc_unique_together,
+            "Transaction end not found or found before operation description (unique_together)"
+        )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate_backwards(self):
@@ -347,20 +389,43 @@ class MigrateTests(MigrationTestBase):
         index_tx_end = output.find(connection.ops.end_transaction_sql().lower())
 
         self.assertGreater(index_tx_start, -1, "Transaction start not found")
-        self.assertGreater(index_op_desc_unique_together, index_tx_start,
-            "Operation description (unique_together) not found or found before transaction start")
-        self.assertGreater(index_op_desc_tribble, index_op_desc_unique_together,
-            "Operation description (tribble) not found or found before operation description (unique_together)")
-        self.assertGreater(index_op_desc_author, index_op_desc_tribble,
-            "Operation description (author) not found or found before operation description (tribble)")
+        self.assertGreater(
+            index_op_desc_unique_together, index_tx_start,
+            "Operation description (unique_together) not found or found before transaction start"
+        )
+        self.assertGreater(
+            index_op_desc_tribble, index_op_desc_unique_together,
+            "Operation description (tribble) not found or found before operation description (unique_together)"
+        )
+        self.assertGreater(
+            index_op_desc_author, index_op_desc_tribble,
+            "Operation description (author) not found or found before operation description (tribble)"
+        )
 
-        self.assertGreater(index_drop_table, index_op_desc_author,
-            "DROP TABLE not found or found before operation description (author)")
-        self.assertGreater(index_tx_end, index_op_desc_unique_together,
-            "Transaction end not found or found before DROP TABLE")
+        self.assertGreater(
+            index_drop_table, index_op_desc_author,
+            "DROP TABLE not found or found before operation description (author)"
+        )
+        self.assertGreater(
+            index_tx_end, index_op_desc_unique_together,
+            "Transaction end not found or found before DROP TABLE"
+        )
 
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_non_atomic"})
+    def test_sqlmigrate_for_non_atomic_migration(self):
+        """
+        Transaction wrappers aren't shown for non-atomic migrations.
+        """
+        out = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=out)
+        output = out.getvalue().lower()
+        queries = [q.strip() for q in output.splitlines()]
+        if connection.ops.start_transaction_sql():
+            self.assertNotIn(connection.ops.start_transaction_sql().lower(), queries)
+        self.assertNotIn(connection.ops.end_transaction_sql().lower(), queries)
 
     @override_settings(
         INSTALLED_APPS=[
@@ -428,6 +493,20 @@ class MigrateTests(MigrationTestBase):
         )
         # No changes were actually applied so there is nothing to rollback
 
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations'})
+    def test_migrate_inconsistent_history(self):
+        """
+        Running migrate with some migrations applied before their dependencies
+        should not be allowed.
+        """
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied("migrations", "0002_second")
+        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
+            call_command("migrate")
+        applied_migrations = recorder.applied_migrations()
+        self.assertNotIn(("migrations", "0001_initial"), applied_migrations)
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """
@@ -435,14 +514,14 @@ class MakeMigrationsTests(MigrationTestBase):
     """
 
     def setUp(self):
-        super(MigrationTestBase, self).setUp()
+        super(MakeMigrationsTests, self).setUp()
         self._old_models = apps.app_configs['migrations'].models.copy()
 
     def tearDown(self):
         apps.app_configs['migrations'].models = self._old_models
         apps.all_models['migrations'] = self._old_models
         apps.clear_cache()
-        super(MigrationTestBase, self).tearDown()
+        super(MakeMigrationsTests, self).tearDown()
 
     def test_files_content(self):
         self.assertTableNotExists("migrations_unicodemodel")
@@ -499,7 +578,7 @@ class MakeMigrationsTests(MigrationTestBase):
         apps.register_model('migrations', UnserializableModel)
 
         with self.temporary_migration_module() as migration_dir:
-            with six.assertRaisesRegex(self, ValueError, r'Cannot serialize'):
+            with self.assertRaisesMessage(ValueError, 'Cannot serialize'):
                 call_command("makemigrations", "migrations", verbosity=0)
 
             initial_file = os.path.join(migration_dir, "0001_initial.py")
@@ -519,10 +598,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
-            try:
-                call_command("makemigrations", merge=True, stdout=out)
-            except CommandError:
-                self.fail("Makemigrations errored in merge mode with no conflicts")
+            call_command("makemigrations", merge=True, stdout=out)
         self.assertIn("No conflicts detected to merge.", out.getvalue())
 
     def test_makemigrations_no_app_sys_exit(self):
@@ -546,10 +622,7 @@ class MakeMigrationsTests(MigrationTestBase):
         Makes sure that makemigrations properly constructs an empty migration.
         """
         with self.temporary_migration_module() as migration_dir:
-            try:
-                call_command("makemigrations", "migrations", empty=True, verbosity=0)
-            except CommandError:
-                self.fail("Makemigrations errored in creating empty migration for a proper app.")
+            call_command("makemigrations", "migrations", empty=True, verbosity=0)
 
             # Check for existing 0001_initial.py file in migration folder
             initial_file = os.path.join(migration_dir, "0001_initial.py")
@@ -631,13 +704,10 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         # Monkeypatch interactive questioner to auto reject
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
-            try:
-                with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                    call_command("makemigrations", "migrations", merge=True, interactive=True, verbosity=0)
-                    merge_file = os.path.join(migration_dir, '0003_merge.py')
-                    self.assertFalse(os.path.exists(merge_file))
-            except CommandError:
-                self.fail("Makemigrations failed while running interactive questioner")
+            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                call_command("makemigrations", "migrations", merge=True, interactive=True, verbosity=0)
+                merge_file = os.path.join(migration_dir, '0003_merge.py')
+                self.assertFalse(os.path.exists(merge_file))
 
     def test_makemigrations_interactive_accept(self):
         """
@@ -646,13 +716,10 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto accept
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
             out = six.StringIO()
-            try:
-                with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                    call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
-                    merge_file = os.path.join(migration_dir, '0003_merge.py')
-                    self.assertTrue(os.path.exists(merge_file))
-            except CommandError:
-                self.fail("Makemigrations failed while running interactive questioner")
+            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
+                merge_file = os.path.join(migration_dir, '0003_merge.py')
+                self.assertTrue(os.path.exists(merge_file))
             self.assertIn("Created new merge migration", force_text(out.getvalue()))
 
     def test_makemigrations_non_interactive_not_null_addition(self):
@@ -684,11 +751,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = "migrations"
 
         out = six.StringIO()
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations"):
-                call_command("makemigrations", "migrations", interactive=False, stdout=out)
-        except CommandError:
-            self.fail("Makemigrations failed while running non-interactive questioner.")
+        with self.temporary_migration_module(module="migrations.test_migrations"):
+            call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Alter field slug on author", force_text(out.getvalue()))
 
     def test_makemigrations_non_interactive_no_model_rename(self):
@@ -702,11 +766,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = "migrations"
 
         out = six.StringIO()
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
-                call_command("makemigrations", "migrations", interactive=False, stdout=out)
-        except CommandError:
-            self.fail("Makemigrations failed while running non-interactive questioner")
+        with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
+            call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Delete model SillyModel", force_text(out.getvalue()))
         self.assertIn("Create model RenamedModel", force_text(out.getvalue()))
 
@@ -721,11 +782,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = "migrations"
 
         out = six.StringIO()
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
-                call_command("makemigrations", "migrations", interactive=False, stdout=out)
-        except CommandError:
-            self.fail("Makemigrations failed while running non-interactive questioner")
+        with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
+            call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Remove field silly_field from sillymodel", force_text(out.getvalue()))
         self.assertIn("Add field silly_rename to sillymodel", force_text(out.getvalue()))
 
@@ -869,14 +927,11 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto reject
         out = six.StringIO()
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
-            try:
-                with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                    call_command("makemigrations", "migrations", merge=True, stdout=out)
-                    merge_file = os.path.join(migration_dir, '0003_merge.py')
-                    # This will fail if interactive is False by default
-                    self.assertFalse(os.path.exists(merge_file))
-            except CommandError:
-                self.fail("Makemigrations failed while running interactive questioner")
+            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                call_command("makemigrations", "migrations", merge=True, stdout=out)
+                merge_file = os.path.join(migration_dir, '0003_merge.py')
+                # This will fail if interactive is False by default
+                self.assertFalse(os.path.exists(merge_file))
             self.assertNotIn("Created new merge migration", out.getvalue())
 
     @override_settings(
@@ -888,11 +943,8 @@ class MakeMigrationsTests(MigrationTestBase):
         Makes sure that makemigrations does not raise a CommandError when an
         unspecified app has conflicting migrations.
         """
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
-                call_command("makemigrations", "migrations", merge=False, verbosity=0)
-        except CommandError:
-            self.fail("Makemigrations fails resolving conflicts in an unspecified app")
+        with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
+            call_command("makemigrations", "migrations", merge=False, verbosity=0)
 
     @override_settings(
         INSTALLED_APPS=[
@@ -906,14 +958,11 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto accept
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
             out = six.StringIO()
-            try:
-                with self.temporary_migration_module(app_label="migrated_app") as migration_dir:
-                    call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=out)
-                    merge_file = os.path.join(migration_dir, '0003_merge.py')
-                    self.assertFalse(os.path.exists(merge_file))
-                self.assertIn("No conflicts detected to merge.", out.getvalue())
-            except CommandError:
-                self.fail("Makemigrations fails resolving conflicts in an unspecified app")
+            with self.temporary_migration_module(app_label="migrated_app") as migration_dir:
+                call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=out)
+                merge_file = os.path.join(migration_dir, '0003_merge.py')
+                self.assertFalse(os.path.exists(merge_file))
+            self.assertIn("No conflicts detected to merge.", out.getvalue())
 
     @override_settings(
         INSTALLED_APPS=[
@@ -955,10 +1004,7 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module() as migration_dir:
 
             def cmd(migration_count, migration_name, *args):
-                try:
-                    call_command("makemigrations", "migrations", "--verbosity", "0", "--name", migration_name, *args)
-                except CommandError:
-                    self.fail("Makemigrations errored in creating empty migration with custom name for a proper app.")
+                call_command("makemigrations", "migrations", "--verbosity", "0", "--name", migration_name, *args)
                 migration_file = os.path.join(migration_dir, "%s_%s.py" % (migration_count, migration_name))
                 # Check for existing migration file in migration folder
                 self.assertTrue(os.path.exists(migration_file))
@@ -1009,6 +1055,30 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
             call_command("makemigrations", "--check", "migrations", verbosity=0)
 
+    def test_makemigrations_migration_path_output(self):
+        """
+        makemigrations should print the relative paths to the migrations unless
+        they are outside of the current tree, in which case the absolute path
+        should be shown.
+        """
+        out = six.StringIO()
+        apps.register_model('migrations', UnicodeModel)
+        with self.temporary_migration_module() as migration_dir:
+            call_command("makemigrations", "migrations", stdout=out)
+            self.assertIn(os.path.join(migration_dir, '0001_initial.py'), out.getvalue())
+
+    def test_makemigrations_inconsistent_history(self):
+        """
+        makemigrations should raise InconsistentMigrationHistory exception if
+        there are some migrations applied before their dependencies.
+        """
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0002_second')
+        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        with self.temporary_migration_module(module="migrations.test_migrations"):
+            with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
+                call_command("makemigrations")
+
 
 class SquashMigrationsTests(MigrationTestBase):
     """
@@ -1041,7 +1111,7 @@ class SquashMigrationsTests(MigrationTestBase):
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=1, stdout=out)
-        self.assertIn("Optimized from 7 operations to 3 operations.", force_text(out.getvalue()))
+        self.assertIn("Optimized from 8 operations to 3 operations.", force_text(out.getvalue()))
 
     def test_ticket_23799_squashmigrations_no_optimize(self):
         """

@@ -24,7 +24,7 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
         # and that they are part of a GenericForeignKey.
 
         gfks = [
-            f for f in obj.model._meta.virtual_fields
+            f for f in obj.model._meta.private_fields
             if isinstance(f, GenericForeignKey)
         ]
         if len(gfks) == 0:
@@ -33,7 +33,6 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
                     "'%s.%s' has no GenericForeignKey." % (
                         obj.model._meta.app_label, obj.model._meta.object_name
                     ),
-                    hint=None,
                     obj=obj.__class__,
                     id='admin.E301'
                 )
@@ -48,7 +47,6 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
                         "'ct_field' references '%s', which is not a field on '%s.%s'." % (
                             obj.ct_field, obj.model._meta.app_label, obj.model._meta.object_name
                         ),
-                        hint=None,
                         obj=obj.__class__,
                         id='admin.E302'
                     )
@@ -62,7 +60,6 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
                         "'ct_fk_field' references '%s', which is not a field on '%s.%s'." % (
                             obj.ct_fk_field, obj.model._meta.app_label, obj.model._meta.object_name
                         ),
-                        hint=None,
                         obj=obj.__class__,
                         id='admin.E303'
                     )
@@ -79,7 +76,6 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
                     "'%s.%s' has no GenericForeignKey using content type field '%s' and object ID field '%s'." % (
                         obj.model._meta.app_label, obj.model._meta.object_name, obj.ct_field, obj.ct_fk_field
                     ),
-                    hint=None,
                     obj=obj.__class__,
                     id='admin.E304'
                 )

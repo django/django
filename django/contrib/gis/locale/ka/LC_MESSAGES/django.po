@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# André Bouatchidzé <a@anbz.net>, 2013
+# André Bouatchidzé <a@anbz.net>, 2013,2015
 # avsd05 <avsd05@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:35+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-10 09:11+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Georgian (http://www.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,8 +22,12 @@ msgstr ""
 msgid "GIS"
 msgstr ""
 
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr "GIS-ის ბაზური ველი -- შეესაბამება OpenGIS სპეციფიკაციის Geometry ტიპს."
+msgid "The base GIS field."
+msgstr ""
+
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
 
 msgid "Point"
 msgstr "წერტილი"
@@ -49,6 +53,9 @@ msgstr "გეომეტრიული კოლექცია"
 msgid "Extent Aggregate Field"
 msgstr ""
 
+msgid "Raster Field"
+msgstr ""
+
 msgid "No geometry value provided."
 msgstr "გეომეტრიის მნიშვნელობა მოცემული არ არის."
 
@@ -70,7 +77,7 @@ msgid "WKT debugging window:"
 msgstr ""
 
 msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "Google Maps GeoDjango-ს მეშვეობით"
 
 msgid "Debugging window (serialized value)"
 msgstr ""

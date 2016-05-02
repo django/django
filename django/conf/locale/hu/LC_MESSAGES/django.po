@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# András Veres-Szentkirályi, 2016
 # Attila Nagy <>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János Péter Ronkay <transifex2@hangya.net>, 2011-2012,2014
@@ -10,11 +11,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Hungarian (http://www.transifex.com/projects/p/django/"
-"language/hu/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-04-13 10:39+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
+"Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
+"hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -84,6 +85,9 @@ msgstr "Spanyol"
 msgid "Argentinian Spanish"
 msgstr "Argentin spanyol"
 
+msgid "Colombian Spanish"
+msgstr "Kolumbiai spanyol"
+
 msgid "Mexican Spanish"
 msgstr "Mexikói spanyol"
 
@@ -113,6 +117,9 @@ msgstr "Fríz"
 
 msgid "Irish"
 msgstr "Ír"
+
+msgid "Scottish Gaelic"
+msgstr "Skót gael"
 
 msgid "Galician"
 msgstr "Gall"
@@ -181,7 +188,7 @@ msgid "Mongolian"
 msgstr "Mongol"
 
 msgid "Marathi"
-msgstr ""
+msgstr "Maráthi"
 
 msgid "Burmese"
 msgstr "Burmai"
@@ -274,19 +281,19 @@ msgid "Traditional Chinese"
 msgstr "Hagyományos kínai"
 
 msgid "Messages"
-msgstr ""
+msgstr "Üzenetek"
 
 msgid "Site Maps"
-msgstr ""
+msgstr "Oldaltérképek"
 
 msgid "Static Files"
-msgstr ""
+msgstr "Statikus fájlok"
 
 msgid "Syndication"
-msgstr ""
+msgstr "Szindikáció"
 
 msgid "Web Design"
-msgstr ""
+msgstr "Web Design"
 
 msgid "Enter a valid value."
 msgstr "Adjon meg egy érvényes értéket."
@@ -295,7 +302,7 @@ msgid "Enter a valid URL."
 msgstr "Adjon meg egy érvényes URL-t."
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Adjon meg egy érvényes számot."
 
 msgid "Enter a valid email address."
 msgstr "Írjon be egy érvényes e-mail címet."
@@ -304,6 +311,13 @@ msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Az URL barát cím csak betűket, számokat, aláhúzásokat és kötőjeleket "
+"tartalmazhat."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Az URL barát cím csak Unicode betűket, számokat, aláhúzásokat és kötőjeleket "
 "tartalmazhat."
 
 msgid "Enter a valid IPv4 address."
@@ -360,16 +374,42 @@ msgstr[1] ""
 "Bizonyosodjon meg arról, hogy ez az érték legfeljebb %(limit_value)d "
 "karaktert tartalmaz (jelenlegi hossza: %(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Bizonyosodjon meg arról, hogy legfeljebb %(max)s számjegyből áll."
+msgstr[1] "Bizonyosodjon meg arról, hogy legfeljebb %(max)s számjegyből áll."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+"Bizonyosodjon meg arról, hogy legfeljebb %(max)s tizedesjegyből áll."
+msgstr[1] ""
+"Bizonyosodjon meg arról, hogy legfeljebb %(max)s tizedesjegyből áll."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Bizonyosodjon meg arról, hogy legfeljebb %(max)s számjegy van a "
+"tizedesvessző előtt."
+msgstr[1] ""
+"Bizonyosodjon meg arról, hogy legfeljebb %(max)s számjegy van a "
+"tizedesvessző előtt."
+
 msgid "and"
 msgstr "és"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "Már létezik %(model_name)s ilyennel: %(field_labels)s."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "%(value)r érték érvénytelen."
 
 msgid "This field cannot be null."
 msgstr "Ez a mező nem lehet nulla."
@@ -387,6 +427,8 @@ msgstr "Már létezik %(model_name)s ilyennel: %(field_label)s."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s egyedi kell hogy legyen %(lookup_type)s alapján a(z) "
+"%(date_field_label)s mezőn."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -397,11 +439,11 @@ msgstr "Egész"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "'%(value)s' értéknek egész számnak kell lennie."
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "'%(value)s' érték csak igaz (True) vagy hamis (False) lehet."
 
 msgid "Boolean (Either True or False)"
 msgstr "Logikai (True vagy False)"
@@ -418,12 +460,16 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' érték érvénytelen dátum formátumban van. A dátumnak YYYY-MM-DD "
+"formátumban kell lennie."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"'%(value)s' érték megfelelő formátumban van (YYYY-MM-DD), de a megadott "
+"dátum érvénytelen."
 
 msgid "Date (without time)"
 msgstr "Dátum (idő nélkül)"
@@ -433,19 +479,23 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' érték érvénytelen dátum formátumban van. A dátumnak YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] formátumban kell lennie."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"'%(value)s' érték megfelelő formátumban van (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]), de a megadott dátum/idő érvénytelen."
 
 msgid "Date (with time)"
 msgstr "Dátum (idővel)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "'%(value)s' értéknek decimálisnak kell lennie."
 
 msgid "Decimal number"
 msgstr "Tizes számrendszerű (decimális) szám"
@@ -455,9 +505,11 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"'%(value)s' érték érvénytelen formátumban van. Az értéknek [DD] [HH:"
+"[MM:]]ss[.uuuuuu] formátumban kell lennie."
 
 msgid "Duration"
-msgstr ""
+msgstr "Időtartam"
 
 msgid "Email address"
 msgstr "E-mail cím"
@@ -467,7 +519,7 @@ msgstr "Elérési út"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' értéknek lebegőpontos számnak kell lennie."
 
 msgid "Floating point number"
 msgstr "Lebegőpontos szám"
@@ -484,6 +536,7 @@ msgstr "IP cím"
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
 msgstr ""
+"'%(value)s' érték csak semmi (None), igaz (True) vagy hamis (False) lehet."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Logikai (True, False vagy None)"
@@ -509,12 +562,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"'%(value)s' érték formátuma érvénytelen. Az időnek HH:MM[:ss[.uuuuuu]] "
+"formátumban kell lennie."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"'%(value)s' formátuma megfelelő (HH:MM[:ss[.uuuuuu]]), de a megadott időpont "
+"érvénytelen."
 
 msgid "Time"
 msgstr "Idő"
@@ -527,7 +584,7 @@ msgstr "Nyers bináris adat"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' nem egy érvényes UUID."
 
 msgid "File"
 msgstr "Fájl"
@@ -537,7 +594,7 @@ msgstr "Kép"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(model)s példány %(value)r %(field)s értékkel nem létezik."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Idegen kulcs (típusa a kapcsolódó mezőtől függ)"
@@ -548,6 +605,12 @@ msgstr "Egy-egy kapcsolat"
 msgid "Many-to-many relationship"
 msgstr "Több-több kapcsolat"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Ennek a mezőnek a megadása kötelező."
 
@@ -556,26 +619,6 @@ msgstr "Adjon meg egy egész számot."
 
 msgid "Enter a number."
 msgstr "Adj meg egy számot."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "Enter a valid date."
 msgstr "Adjon meg egy érvényes dátumot."
@@ -587,7 +630,7 @@ msgid "Enter a valid date/time."
 msgstr "Adjon meg egy érvényes dátumot/időt."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Adjon meg egy érvényes időtartamot."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nem küldött el fájlt. Ellenőrizze a kódolás típusát az űrlapon."
@@ -630,39 +673,33 @@ msgid "Enter a list of values."
 msgstr "Adja meg értékek egy listáját."
 
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Adjon meg egy teljes értéket."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Adjon meg egy érvényes UUID-t."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
-msgstr ""
+msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Rejtett mező: %(name)s) %(error)s"
 
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ""
-
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "ManagementForm adatok hiányoznak vagy belenyúltak"
 
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Legfeljebb %d űrlapot küldjön be."
+msgstr[1] "Legfeljebb %d űrlapot küldjön be."
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Legalább %d űrlapot küldjön be."
+msgstr[1] "Legalább %d űrlapot küldjön be."
 
 msgid "Order"
 msgstr "Sorrend"
@@ -703,7 +740,7 @@ msgstr ""
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%(pk)s\" egy érvénytelen elsődleges kulcs érték."
 
 #, python-format
 msgid ""
@@ -989,7 +1026,7 @@ msgid "December"
 msgstr "december"
 
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Ez nem egy érvényes IPv6 cím."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1043,10 +1080,10 @@ msgid "0 minutes"
 msgstr "0 perc"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "Hozzáférés megtagadva"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "CSRF ellenőrzés sikertelen. Kérést kiszolgálása megszakítva."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1054,45 +1091,63 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Azért látja ezt az üzenetet, mert ez a HTTPS oldal elvárja a 'Referer "
+"fejléc' küldését a böngészőtől, azonban ilyen nem érkezett. Erre a fejlécre "
+"biztonsági okból van szükség annak kiszűrésére, hogy harmadik fél eltérítse "
+"az ön böngészőjét."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Ha a böngészőjében le van tiltva a 'Referer' fejléc, kérem engedélyezze "
+"azokat, legalább erre a weboldalra, vagy azonos forrásból ('same-origin') "
+"származó kérésekre."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Azért látja ezt az üzenetet, mert ez a weboldal elvárja a CSRF cookie "
+"elküldését űrlapoknál. Erre a cookie-ra biztonsági okból van szükség annak "
+"kiszűrésére, hogy harmadik fél eltérítse az ön böngészőjét."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Ha a böngészője elutasítja a cookie-kat, kérem engedélyezze azokat, legalább "
+"erre a weboldalra, vagy azonos forrásból ('same-origin') származó kérésekre."
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "További információ DEBUG=True beállítással érhető el."
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "Üdvözli a Django"
 
 msgid "It worked!"
-msgstr ""
+msgstr "Működik!"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "Gratulálunk az első Django alapú oldalhoz!"
 
 msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"Természetesen még hátra van a munka nagy része. Következő lépésként indítsa "
+"el az első appot a <code>python manage.py startapp [app_label]</code> "
+"paranccsal."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"Azért jelenik meg ez az üzenet, mert a <code>DEBUG = True</code> szerepel a "
+"Django settings fájlban, és még nem került beállításra egy URL sem. Jó "
+"munkát!"
 
 msgid "No year specified"
 msgstr "Nincs év megadva"

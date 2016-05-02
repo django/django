@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2015
 # Nurlan Rakhimzhanov <nurlan.rakhimzhanov@gmail.com>, 2011
 # yun_man_ger <germanilyin@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 08:16+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Kazakh (http://www.transifex.com/projects/p/django/language/"
-"kk/)\n"
+"Language-Team: Kazakh (http://www.transifex.com/django/django/language/kk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,10 +24,10 @@ msgstr "Таңдалған %(count)d %(items)s элемент өшірілді."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr "%(name)s өшіре алмайды"
+msgstr "%(name)s өшіру мүмкін емес"
 
 msgid "Are you sure?"
-msgstr "Сенімдісіз бе?"
+msgstr "Осыған сенімдісіз бе?"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
@@ -75,6 +75,12 @@ msgstr "Әрекет:"
 msgid "action time"
 msgstr "әрекет уақыты"
 
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
 msgid "object id"
 msgstr "объекттің id-i"
 
@@ -113,6 +119,9 @@ msgstr "Ешнәрсе"
 
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+msgid "Added."
 msgstr ""
 
 #, python-format
@@ -463,6 +472,12 @@ msgstr ""
 "Дерекқор орнатуыңызда бір қате бар. Дерекқор кестелері дұрыс құрылғаның және "
 "дерекқор көрсетілген дерекқор пайдаланушыда оқұ рұқсаты бар."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
 msgid "Forgotten your password or username?"
 msgstr ""
 
@@ -486,6 +501,9 @@ msgstr "Барлығын көрсету"
 
 msgid "Save"
 msgstr "Сақтау"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -611,9 +629,6 @@ msgstr "Құпия сөзді жаңала"
 
 msgid "All dates"
 msgstr "Барлық мерзімдер"
-
-msgid "(None)"
-msgstr "(Ешнарсе)"
 
 #, python-format
 msgid "Select %s"

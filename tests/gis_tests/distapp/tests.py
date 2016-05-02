@@ -1,13 +1,16 @@
 from __future__ import unicode_literals
 
+from unittest import skipUnless
+
 from django.contrib.gis.db.models.functions import (
     Area, Distance, Length, Perimeter, Transform,
 )
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 from django.contrib.gis.measure import D  # alias for Distance
 from django.db import connection
 from django.db.models import F, Q
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings, mock, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from ..utils import no_oracle, oracle, postgis
@@ -92,7 +95,8 @@ class DistanceTest(TestCase):
             if type_error:
                 # A ValueError should be raised on PostGIS when trying to pass
                 # Distance objects into a DWithin query using a geodetic field.
-                self.assertRaises(ValueError, AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist)).count)
+                with self.assertRaises(ValueError):
+                    AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist)).count()
             else:
                 self.assertListEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
 
@@ -146,7 +150,7 @@ class DistanceTest(TestCase):
         """
         Test the `distance` GeoQuerySet method on geodetic coordinate systems.
         """
-        tol = 2 if oracle else 5
+        tol = 2 if oracle else 4
 
         # Testing geodetic distance calculation with a non-point geometry
         # (a LineString of Wollongong and Shellharbour coords).
@@ -286,11 +290,12 @@ class DistanceTest(TestCase):
 
         # Too many params (4 in this case) should raise a ValueError.
         queryset = AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4'))
-        self.assertRaises(ValueError, len, queryset)
+        with self.assertRaises(ValueError):
+            len(queryset)
 
         # Not enough params should raise a ValueError.
-        self.assertRaises(ValueError, len,
-                          AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)',)))
+        with self.assertRaises(ValueError):
+            len(AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)',)))
 
         # Getting all cities w/in 550 miles of Hobart.
         hobart = AustraliaCity.objects.get(name='Hobart')
@@ -379,7 +384,8 @@ class DistanceTest(TestCase):
             self.assertAlmostEqual(len_m1, qs[0].length.m, tol)
         else:
             # Does not support geodetic coordinate systems.
-            self.assertRaises(ValueError, Interstate.objects.length)
+            with self.assertRaises(ValueError):
+                Interstate.objects.length()
 
         # Now doing length on a projected coordinate system.
         i10 = SouthTexasInterstate.objects.length().get(name='I-10')
@@ -441,6 +447,8 @@ Distance_Sphere(geom1, geom2)                 |    N/A             |   OK (meter
 
 Distance_Spheroid(geom1, geom2, spheroid)     |    N/A             |   OK (meters)    |    N/A
 
+ST_Perimeter(geom1)                           |    OK              |   :-( (degrees)  |    OK
+
 
 ================================
 Distance functions on Spatialite
@@ -453,6 +461,8 @@ ST_Distance(geom1, geom2)                       |    OK (meters)     |      N/A
 ST_Distance(geom1, geom2, use_ellipsoid=True)   |    N/A             |      OK (meters)
 
 ST_Distance(geom1, geom2, use_ellipsoid=False)  |    N/A             |      OK (meters), less accurate, quick
+
+Perimeter(geom1)                                |    OK              |      :-( (degrees)
 
 '''  # NOQA
 
@@ -487,6 +497,7 @@ class DistanceFunctionsTests(TestCase):
             tol
         )
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     @skipUnlessDBFeature("has_Distance_function", "has_Transform_function")
     def test_distance_projected(self):
         """
@@ -509,24 +520,26 @@ class DistanceFunctionsTests(TestCase):
                         455411.438904354, 519386.252102563, 696139.009211594,
                         232513.278304279, 542445.630586414, 456679.155883207]
 
-        # Testing using different variations of parameters and using models
-        # with different projected coordinate systems.
-        dist1 = SouthTexasCity.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
-        if oracle:
-            dist_qs = [dist1]
-        else:
-            dist2 = SouthTexasCityFt.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
-            dist_qs = [dist1, dist2]
+        for has_gdal in [False, True]:
+            with mock.patch('django.contrib.gis.gdal.HAS_GDAL', has_gdal):
+                # Testing using different variations of parameters and using models
+                # with different projected coordinate systems.
+                dist1 = SouthTexasCity.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
+                if oracle:
+                    dist_qs = [dist1]
+                else:
+                    dist2 = SouthTexasCityFt.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
+                    dist_qs = [dist1, dist2]
 
-        # Original query done on PostGIS, have to adjust AlmostEqual tolerance
-        # for Oracle.
-        tol = 2 if oracle else 5
+                # Original query done on PostGIS, have to adjust AlmostEqual tolerance
+                # for Oracle.
+                tol = 2 if oracle else 5
 
-        # Ensuring expected distances are returned for each distance queryset.
-        for qs in dist_qs:
-            for i, c in enumerate(qs):
-                self.assertAlmostEqual(m_distances[i], c.distance.m, tol)
-                self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, tol)
+                # Ensuring expected distances are returned for each distance queryset.
+                for qs in dist_qs:
+                    for i, c in enumerate(qs):
+                        self.assertAlmostEqual(m_distances[i], c.distance.m, tol)
+                        self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, tol)
 
     @skipUnlessDBFeature("has_Distance_function", "supports_distance_geodetic")
     def test_distance_geodetic(self):
@@ -550,7 +563,7 @@ class DistanceFunctionsTests(TestCase):
 
     @skipUnlessDBFeature("has_Distance_function", "supports_distance_geodetic")
     def test_distance_geodetic_spheroid(self):
-        tol = 2 if oracle else 5
+        tol = 2 if oracle else 4
 
         # Got the reference distances using the raw SQL statements:
         #  SELECT ST_distance_spheroid(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326),
@@ -681,6 +694,20 @@ class DistanceFunctionsTests(TestCase):
         qs = SouthTexasCity.objects.annotate(perim=Perimeter('point'))
         for city in qs:
             self.assertEqual(0, city.perim.m)
+
+    @skipUnlessDBFeature("has_Perimeter_function")
+    def test_perimeter_geodetic(self):
+        # Currently only Oracle supports calculating the perimeter on geodetic
+        # geometries (without being transformed).
+        qs1 = CensusZipcode.objects.annotate(perim=Perimeter('poly'))
+        if connection.features.supports_perimeter_geodetic:
+            self.assertAlmostEqual(qs1[0].perim.m, 18406.3818954314, 3)
+        else:
+            with self.assertRaises(NotImplementedError):
+                list(qs1)
+        # But should work fine when transformed to projected coordinates
+        qs2 = CensusZipcode.objects.annotate(perim=Perimeter(Transform('poly', 32140))).filter(name='77002')
+        self.assertAlmostEqual(qs2[0].perim.m, 18404.355, 3)
 
     @skipUnlessDBFeature("supports_null_geometries", "has_Area_function", "has_Distance_function")
     def test_measurement_null_fields(self):

@@ -10,7 +10,10 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
 
-from .exceptions import AmbiguityError, BadMigrationError, NodeNotFoundError
+from .exceptions import (
+    AmbiguityError, BadMigrationError, InconsistentMigrationHistory,
+    NodeNotFoundError,
+)
 
 MIGRATIONS_MODULE_NAME = 'migrations'
 
@@ -48,8 +51,10 @@ class MigrationLoader(object):
         if load:
             self.build_graph()
 
-    @classmethod
-    def migrations_module(cls, app_label):
+    def migrations_module(self, app_label):
+        if (self.connection is not None and
+                not self.connection.settings_dict.get('TEST', {}).get('MIGRATE', True)):
+            return None
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label]
         else:
@@ -272,6 +277,8 @@ class MigrationLoader(object):
                         ),
                         missing)
                     exc_value.__cause__ = exc
+                    if not hasattr(exc, '__traceback__'):
+                        exc.__traceback__ = sys.exc_info()[2]
                     six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
             raise exc
 
@@ -313,6 +320,25 @@ class MigrationLoader(object):
                         # Since we added "key" to the nodes before this implies
                         # "child" is not in there.
                         _reraise_missing_dependency(migration, child, e)
+
+    def check_consistent_history(self, connection):
+        """
+        Raise InconsistentMigrationHistory if any applied migrations have
+        unapplied dependencies.
+        """
+        recorder = MigrationRecorder(connection)
+        applied = recorder.applied_migrations()
+        for migration in applied:
+            # If the migration is unknown, skip it.
+            if migration not in self.graph.nodes:
+                continue
+            for parent in self.graph.node_map[migration].parents:
+                if parent not in applied:
+                    raise InconsistentMigrationHistory(
+                        "Migration {}.{} is applied before its dependency {}.{}".format(
+                            migration[0], migration[1], parent[0], parent[1],
+                        )
+                    )
 
     def detect_conflicts(self):
         """

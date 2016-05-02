@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bashar Al-Abdulhadi, 2015
+# Bashar Al-Abdulhadi, 2015-2016
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -9,11 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
-"ar/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-04-02 13:22+0000\n"
+"Last-Translator: Bashar Al-Abdulhadi\n"
+"Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,8 +23,14 @@ msgstr ""
 msgid "GIS"
 msgstr "نظم المعلومات الجغرافية GIS"
 
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr "حقل GIS الأساسي -- مُرتبط بنوع مواصفات OpenGIS الهندسية."
+msgid "The base GIS field."
+msgstr "حقل نظم المعلومات الجغرافية الرئيسي"
+
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"قاعدة الحقل الهندسي ترتكز لمواصفات نوع OpenGIS (نظم المعلومات الجغرافية "
+"المفتوحة) الهندسية."
 
 msgid "Point"
 msgstr "نقطة إحداثية"
@@ -51,6 +56,9 @@ msgstr "مجموعة إحداثية"
 msgid "Extent Aggregate Field"
 msgstr "حقل مجموع التحصيل"
 
+msgid "Raster Field"
+msgstr "حقل خطوط المسح التسامتي"
+
 msgid "No geometry value provided."
 msgstr "لم تُدخل أي أحداثيات."
 
@@ -66,16 +74,16 @@ msgid ""
 msgstr "حدث خطأ أثناء تحويل geometry إلى حقل SRID."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "حذف جميع المميزات"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "نافذة تدقيق WKT:"
 
 msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "خرائط جوجل عبر GeoDjango"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "نافذة التدقيق (قيمة تسلسلية)"
 
 msgid "No feeds are registered."
 msgstr "لا موجز مسجّل"

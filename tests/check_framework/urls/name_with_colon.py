@@ -1,7 +1,5 @@
-from django.conf.urls import include, url
+from django.conf.urls import url
 
 urlpatterns = [
-    url('^', include([
-        url(r'^$', lambda x: x, name='name_with:colon'),
-    ])),
+    url(r'^$', lambda x: x, name='name_with:colon'),
 ]

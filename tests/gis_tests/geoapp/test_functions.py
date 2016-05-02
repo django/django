@@ -5,12 +5,14 @@ from decimal import Decimal
 
 from django.contrib.gis.db.models import functions
 from django.contrib.gis.geos import LineString, Point, Polygon, fromstr
+from django.contrib.gis.measure import Area
 from django.db import connection
+from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
 from ..utils import mysql, oracle, postgis, spatialite
-from .models import City, Country, State, Track
+from .models import City, Country, CountryWebMercator, State, Track
 
 
 @skipUnlessDBFeature("gis_enabled")
@@ -87,12 +89,12 @@ class GISFunctionsTests(TestCase):
             chicago_json,
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True, crs=True, precision=5)
-                ).get(name='Chicago').geojson
+            ).get(name='Chicago').geojson
         )
 
     @skipUnlessDBFeature("has_AsGML_function")
     def test_asgml(self):
-        # Should throw a TypeError when tyring to obtain GML from a
+        # Should throw a TypeError when trying to obtain GML from a
         # non-geometry field.
         qs = City.objects.all()
         with self.assertRaises(TypeError):
@@ -230,6 +232,41 @@ class GISFunctionsTests(TestCase):
             else:
                 expected = c.mpoly.intersection(geom)
             self.assertEqual(c.inter, expected)
+
+    @skipUnlessDBFeature("has_IsValid_function")
+    def test_isvalid(self):
+        valid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))')
+        invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
+        State.objects.create(name='valid', poly=valid_geom)
+        State.objects.create(name='invalid', poly=invalid_geom)
+        valid = State.objects.filter(name='valid').annotate(isvalid=functions.IsValid('poly')).first()
+        invalid = State.objects.filter(name='invalid').annotate(isvalid=functions.IsValid('poly')).first()
+        self.assertEqual(valid.isvalid, True)
+        self.assertEqual(invalid.isvalid, False)
+
+    @skipUnlessDBFeature("has_Area_function")
+    def test_area_with_regular_aggregate(self):
+        # Create projected country objects, for this test to work on all backends.
+        for c in Country.objects.all():
+            CountryWebMercator.objects.create(name=c.name, mpoly=c.mpoly)
+        # Test in projected coordinate system
+        qs = CountryWebMercator.objects.annotate(area_sum=Sum(functions.Area('mpoly')))
+        # Some backends (e.g. Oracle) cannot group by multipolygon values, so
+        # defer such fields in the aggregation query.
+        for c in qs.defer('mpoly'):
+            result = c.area_sum
+            # If the result is a measure object, get value.
+            if isinstance(result, Area):
+                result = result.sq_m
+            self.assertAlmostEqual((result - c.mpoly.area) / c.mpoly.area, 0)
+
+    @skipUnlessDBFeature("has_MakeValid_function")
+    def test_make_valid(self):
+        invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
+        State.objects.create(name='invalid', poly=invalid_geom)
+        invalid = State.objects.filter(name='invalid').annotate(repaired=functions.MakeValid('poly')).first()
+        self.assertEqual(invalid.repaired.valid, True)
+        self.assertEqual(invalid.repaired, fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))'))
 
     @skipUnlessDBFeature("has_MemSize_function")
     def test_memsize(self):
@@ -425,7 +462,7 @@ class GISFunctionsTests(TestCase):
             union=functions.Union('mpoly', geom),
         )
 
-        # For some reason SpatiaLite does something screwey with the Texas geometry here.
+        # For some reason SpatiaLite does something screwy with the Texas geometry here.
         # Also, it doesn't like the null intersection.
         if spatialite:
             qs = qs.exclude(name='Texas')

@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
-    F, BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, Func,
+    BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, F, Func,
     IntegerField, Sum, Value,
 )
 from django.db.models.functions import Lower
@@ -428,8 +428,9 @@ class NonAggregateAnnotationTestCase(TestCase):
                 F('ticker_name'),
                 F('description'),
                 Value('No Tag'),
-                function='COALESCE')
-            ).order_by('name')
+                function='COALESCE'
+            )
+        ).order_by('name')
 
         self.assertQuerysetEqual(
             qs, [

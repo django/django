@@ -3,14 +3,15 @@
 # Translators:
 # Gustaf Hansen <gustaf.hansen@gmail.com>, 2015
 # Jonathan Lindén, 2015
+# Thomas Lundqvist <thomas@biljettshop.se>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-20 20:12+0000\n"
-"Last-Translator: Jonathan Lindén\n"
-"Language-Team: Swedish (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-03-23 11:23+0000\n"
+"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
+"Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,8 +36,18 @@ msgstr "Mappning av strängar till strängar."
 msgid "The value of \"%(key)s\" is not a string."
 msgstr "Värdet för \"%(key)s\" är inte en sträng."
 
+msgid "A JSON object"
+msgstr "Ett JSON-objekt"
+
+msgid "Value must be valid JSON."
+msgstr "Värdet måste vara giltig JSON."
+
 msgid "Could not load JSON data."
 msgstr "Kunde inte ladda JSON-data."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' måste vara giltig JSON."
 
 msgid "Enter two valid values."
 msgstr "Fyll i två giltiga värden"

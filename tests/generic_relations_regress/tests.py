@@ -5,7 +5,7 @@ from django.forms.models import modelform_factory
 from django.test import TestCase, skipIfDBFeature
 
 from .models import (
-    A, B, C, D, Address, Board, CharLink, Company, Contact, Content, Developer,
+    A, Address, B, Board, C, CharLink, Company, Contact, Content, D, Developer,
     Guild, HasLinkThing, Link, Node, Note, OddRelation1, OddRelation2,
     Organization, Person, Place, Related, Restaurant, Tag, Team, TextLink,
 )
@@ -111,7 +111,8 @@ class GenericRelationTests(TestCase):
         # Fails with another, ORM-level error
         dev1 = Developer(name='Joe')
         note = Note(note='Deserves promotion', content_object=dev1)
-        self.assertRaises(IntegrityError, note.save)
+        with self.assertRaises(IntegrityError):
+            note.save()
 
     def test_target_model_len_zero(self):
         """Test for #13085 -- __len__() returns 0"""

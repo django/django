@@ -21,12 +21,7 @@ class SpatialRefSysMixin(object):
     # TODO: Figure out how to pull out angular units of projected coordinate system and
     # fix for LOCAL_CS types.  GDAL should be highly recommended for performing
     # distance queries.
-    units_regex = re.compile(
-        r'.+UNIT ?\["(?P<unit_name>[\w \'\(\)]+)", ?(?P<unit>[\d\.]+)'
-        r'(,AUTHORITY\["(?P<unit_auth_name>[\w \'\(\)]+)",'
-        r'"(?P<unit_auth_val>\d+)"\])?\]([\w ]+)?(,'
-        r'AUTHORITY\["(?P<auth_name>[\w \'\(\)]+)","(?P<auth_val>\d+)"\])?\]$'
-    )
+    units_regex = re.compile(r'.+UNIT ?\["(?P<unit_name>[\w \.\'\(\)]+)", ?(?P<unit>[^ ,\]]+)', re.DOTALL)
 
     @property
     def srs(self):
@@ -169,15 +164,14 @@ class SpatialRefSysMixin(object):
     @classmethod
     def get_units(cls, wkt):
         """
-        Class method used by GeometryField on initialization to
-        retrieve the units on the given WKT, without having to use
-        any of the database fields.
+        Return a tuple of (unit_value, unit_name) for the given WKT without
+        using any of the database fields.
         """
         if gdal.HAS_GDAL:
             return gdal.SpatialReference(wkt).units
         else:
             m = cls.units_regex.match(wkt)
-            return m.group('unit'), m.group('unit_name')
+            return float(m.group('unit')), m.group('unit_name')
 
     @classmethod
     def get_spheroid(cls, wkt, string=True):

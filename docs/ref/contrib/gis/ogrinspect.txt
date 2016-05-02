@@ -3,7 +3,7 @@ OGR Inspection
 ==============
 
 .. module:: django.contrib.gis.utils.ogrinspect
-   :synopsis: Utilities for inspecting OGR data sources.
+    :synopsis: Utilities for inspecting OGR data sources.
 
 .. currentmodule:: django.contrib.gis.utils
 

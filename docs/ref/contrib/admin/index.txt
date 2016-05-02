@@ -6,10 +6,18 @@ The Django admin site
    :synopsis: Django's admin site.
 
 One of the most powerful parts of Django is the automatic admin interface. It
-reads metadata in your model to provide a powerful and production-ready
-interface that content producers can immediately use to start adding content to
-the site. In this document, we discuss how to activate, use and customize
-Django's admin interface.
+reads metadata from your models to provide a quick, model-centric interface
+where trusted users can manage content on your site. The admin's recommended
+use is limited to an organization's internal management tool. It's not intended
+for building your entire front end around.
+
+The admin has many hooks for customization, but beware of trying to use those
+hooks exclusively. If you need to provide a more process-centric interface
+that abstracts away the implementation details of database tables and fields,
+then it's probably time to write your own views.
+
+In this document we discuss how to activate, use, and customize Django's admin
+interface.
 
 Overview
 ========
@@ -49,7 +57,9 @@ For reference, here are the requirements:
 7. Hook the ``AdminSite`` instance into your URLconf.
 
 After you've taken these steps, you'll be able to use your Django admin site
-by visiting the URL you hooked it into (``/admin/``, by default).
+by visiting the URL you hooked it into (``/admin/``, by default). If you need
+to create a user to login with, you can use the :djadmin:`createsuperuser`
+command.
 
 Other topics
 ------------
@@ -99,8 +109,8 @@ Other topics
 
             admin.site.register(Author)
 
-The register decorator
-----------------------
+The ``register`` decorator
+--------------------------
 
 .. function:: register(*models, site=django.admin.sites.site)
 
@@ -631,7 +641,7 @@ subclass::
 
           admin.site.empty_value_display = '(None)'
 
-      You can also use :attr:`AdminSite.empty_value_display`::
+      You can also use :attr:`ModelAdmin.empty_value_display`::
 
           class PersonAdmin(admin.ModelAdmin):
               empty_value_display = 'unknown'
@@ -1127,16 +1137,24 @@ subclass::
 
 .. attribute:: ModelAdmin.save_as
 
-    Set ``save_as`` to enable a "save as" feature on admin change forms.
+    Set ``save_as`` to enable a "save as new" feature on admin change forms.
 
     Normally, objects have three save options: "Save", "Save and continue
-    editing" and "Save and add another". If ``save_as`` is ``True``, "Save
-    and add another" will be replaced by a "Save as" button.
-
-    "Save as" means the object will be saved as a new object (with a new ID),
-    rather than the old object.
+    editing", and "Save and add another". If ``save_as`` is ``True``, "Save
+    and add another" will be replaced by a "Save as new" button that creates a
+    new object (with a new ID) rather than updating the existing object.
 
     By default, ``save_as`` is set to ``False``.
+
+.. attribute:: ModelAdmin.save_as_continue
+
+    .. versionadded:: 1.10
+
+    When :attr:`save_as=True <save_as>`, the default redirect after saving the
+    new object is to the change view for that object. If you set
+    ``save_as_continue=False``, the redirect will be to the changelist view.
+
+    By default, ``save_as_continue`` is set to ``True``.
 
 .. attribute:: ModelAdmin.save_on_top
 
@@ -1252,12 +1270,12 @@ subclass::
     For example::
 
         from django.contrib import admin
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
 
         class PersonAdmin(admin.ModelAdmin):
             def view_on_site(self, obj):
-                return 'http://example.com' + reverse('person-detail',
-                                                      kwargs={'slug': obj.slug})
+                return 'https://example.com' + reverse('person-detail',
+                                                       kwargs={'slug': obj.slug})
 
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1827,7 +1845,7 @@ Other methods
 
 .. method:: ModelAdmin.change_view(request, object_id, form_url='', extra_context=None)
 
-    Django view for the model instance edition page. See note below.
+    Django view for the model instance editing page. See note below.
 
 .. method:: ModelAdmin.changelist_view(request, extra_context=None)
 
@@ -1929,7 +1947,7 @@ files for the forms and/or formsets. If :setting:`DEBUG` is ``True`` it will
 return the uncompressed versions of the various JavaScript files, including
 ``jquery.js``; if not, it will return the 'minified' versions.
 
-.. _jQuery: http://jquery.com
+.. _jQuery: https://jquery.com
 
 .. _admin-custom-validation:
 
@@ -2057,6 +2075,16 @@ The ``InlineModelAdmin`` class adds:
     of writing validation that relies on features of the parent model. If the
     parent model fails to validate, it may be left in an inconsistent state as
     described in the warning in :ref:`validation-on-modelform`.
+
+.. attribute:: InlineModelAdmin.classes
+
+    .. versionadded:: 1.10
+
+    A list or tuple containing extra CSS classes to apply to the fieldset that
+    is rendered for the inlines. Defaults to ``None``. As with classes
+    configured in :attr:`~ModelAdmin.fieldsets`, inlines with a ``collapse``
+    class will be initially collapsed and their header will have a small "show"
+    link.
 
 .. attribute:: InlineModelAdmin.extra
 
@@ -2813,7 +2841,18 @@ password box.
 .. attribute:: LogEntry.change_message
 
     The detailed description of the modification. In the case of an edit, for
-    example, the message contains a list of the edited fields.
+    example, the message contains a list of the edited fields. The Django admin
+    site formats this content as a JSON structure, so that
+    :meth:`get_change_message` can recompose a message translated in the current
+    user language. Custom code might set this as a plain string though. You are
+    advised to use the :meth:`get_change_message` method to retrieve this value
+    instead of accessing it directly.
+
+    .. versionchanged:: 1.10
+
+        Previously, this attribute was always a plain string. It is
+        now JSON-structured so that the message can be translated in the current
+        user language. Old messages are untouched.
 
 ``LogEntry`` methods
 --------------------
@@ -2821,6 +2860,14 @@ password box.
 .. method:: LogEntry.get_edited_object()
 
     A shortcut that returns the referenced object.
+
+.. method:: LogEntry.get_change_message()
+
+    .. versionadded:: 1.10
+
+    Formats and translates :attr:`change_message` into the current user
+    language. Messages created before Django 1.10 will always be displayed in
+    the language in which they were logged.
 
 .. currentmodule:: django.contrib.admin
 
@@ -2873,9 +2920,9 @@ So - if you wanted to get a reference to the Change view for a particular
 ``Choice`` object (from the polls application) in the default admin, you would
 call::
 
-    >>> from django.core import urlresolvers
+    >>> from django.urls import reverse
     >>> c = Choice.objects.get(...)
-    >>> change_url = urlresolvers.reverse('admin:polls_choice_change', args=(c.id,))
+    >>> change_url = reverse('admin:polls_choice_change', args=(c.id,))
 
 This will find the first registered instance of the admin application
 (whatever the instance name), and resolve to the view for changing
@@ -2886,8 +2933,7 @@ that instance as a ``current_app`` hint to the reverse call. For example,
 if you specifically wanted the admin view from the admin instance named
 ``custom``, you would need to call::
 
-    >>> change_url = urlresolvers.reverse('admin:polls_choice_change',
-    ...                                   args=(c.id,), current_app='custom')
+    >>> change_url = reverse('admin:polls_choice_change', args=(c.id,), current_app='custom')
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.

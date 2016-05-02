@@ -16,7 +16,7 @@ anyone.
 .. _django-users-mailing-list:
 
 ``django-users``
-----------------
+================
 
 This is the right place if you are looking to ask any question regarding the
 installation, usage, or debugging of Django.
@@ -38,7 +38,7 @@ installation, usage, or debugging of Django.
 .. _django-core-mentorship-mailing-list:
 
 ``django-core-mentorship``
---------------------------
+==========================
 
 The Django Core Mentorship list is intended to provide a welcoming
 introductory environment for community members interested in contributing to
@@ -55,7 +55,7 @@ the Django Project.
 .. _django-developers-mailing-list:
 
 ``django-developers``
----------------------
+=====================
 
 The discussion about the development of Django itself takes place here.
 
@@ -76,7 +76,7 @@ The discussion about the development of Django itself takes place here.
 .. _django-i18n-mailing-list:
 
 ``django-i18n``
----------------
+===============
 
 This is the place to discuss the internationalization and localization of
 Django's components.
@@ -92,7 +92,7 @@ Django's components.
 .. _django-announce-mailing-list:
 
 ``django-announce``
--------------------
+===================
 
 A (very) low-traffic list for announcing new releases of Django and important
 bugfixes.
@@ -108,7 +108,7 @@ bugfixes.
 .. _django-updates-mailing-list:
 
 ``django-updates``
-------------------
+==================
 
 All the ticket updates are mailed automatically to this list, which is tracked
 by developers and interested community members.

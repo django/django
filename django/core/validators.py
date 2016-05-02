@@ -83,9 +83,17 @@ class URLValidator(RegexValidator):
     ipv6_re = r'\[[0-9a-f:\.]+\]'  # (simple regex, validated later)
 
     # Host patterns
-    hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]*[a-z' + ul + r'0-9])?'
-    domain_re = r'(?:\.(?!-)[a-z' + ul + r'0-9-]+(?<!-))*'
-    tld_re = r'\.(?:[a-z' + ul + r']{2,}|xn--[a-z0-9]+)\.?'
+    hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]{0,61}[a-z' + ul + r'0-9])?'
+    # Max length for domain name labels is 63 characters per RFC 1034 sec. 3.1
+    domain_re = r'(?:\.(?!-)[a-z' + ul + r'0-9-]{1,63}(?<!-))*'
+    tld_re = (
+        '\.'                                # dot
+        '(?!-)'                             # can't start with a dash
+        '(?:[a-z' + ul + '-]{2,63}'         # domain label
+        '|xn--[a-z0-9]{1,59})'              # or punycode label
+        '(?<!-)'                            # can't end with a dash
+        '\.?'                               # may have a trailing dot
+    )
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
     regex = _lazy_re_compile(
@@ -135,6 +143,13 @@ class URLValidator(RegexValidator):
                 except ValidationError:
                     raise ValidationError(self.message, code=self.code)
             url = value
+
+        # The maximum length of a full host name is 253 characters per RFC 1034
+        # section 3.1. It's defined to be 255 bytes or less, but this includes
+        # one byte for the length of the name and one byte for the trailing dot
+        # that's used to indicate absolute names in DNS.
+        if len(urlsplit(value).netloc) > 253:
+            raise ValidationError(self.message, code=self.code)
 
 integer_validator = RegexValidator(
     _lazy_re_compile('^-?\d+\Z'),
@@ -275,8 +290,11 @@ def ip_address_validators(protocol, unpack_ipv4):
                          % (protocol, list(ip_address_validator_map)))
 
 
-def int_list_validator(sep=',', message=None, code='invalid'):
-    regexp = _lazy_re_compile('^\d+(?:%s\d+)*\Z' % re.escape(sep))
+def int_list_validator(sep=',', message=None, code='invalid', allow_negative=False):
+    regexp = _lazy_re_compile('^%(neg)s\d+(?:%(sep)s%(neg)s\d+)*\Z' % {
+        'neg': '(-)?' if allow_negative else '',
+        'sep': re.escape(sep),
+    })
     return RegexValidator(regexp, message=message, code=code)
 
 
@@ -287,8 +305,6 @@ validate_comma_separated_integer_list = int_list_validator(
 
 @deconstructible
 class BaseValidator(object):
-    compare = lambda self, a, b: a is not b
-    clean = lambda self, x: x
     message = _('Ensure this value is %(limit_value)s (it is %(show_value)s).')
     code = 'limit_value'
 
@@ -306,46 +322,64 @@ class BaseValidator(object):
     def __eq__(self, other):
         return (
             isinstance(other, self.__class__) and
-            (self.limit_value == other.limit_value)
-            and (self.message == other.message)
-            and (self.code == other.code)
+            self.limit_value == other.limit_value and
+            self.message == other.message and
+            self.code == other.code
         )
+
+    def compare(self, a, b):
+        return a is not b
+
+    def clean(self, x):
+        return x
 
 
 @deconstructible
 class MaxValueValidator(BaseValidator):
-    compare = lambda self, a, b: a > b
     message = _('Ensure this value is less than or equal to %(limit_value)s.')
     code = 'max_value'
+
+    def compare(self, a, b):
+        return a > b
 
 
 @deconstructible
 class MinValueValidator(BaseValidator):
-    compare = lambda self, a, b: a < b
     message = _('Ensure this value is greater than or equal to %(limit_value)s.')
     code = 'min_value'
+
+    def compare(self, a, b):
+        return a < b
 
 
 @deconstructible
 class MinLengthValidator(BaseValidator):
-    compare = lambda self, a, b: a < b
-    clean = lambda self, x: len(x)
     message = ungettext_lazy(
         'Ensure this value has at least %(limit_value)d character (it has %(show_value)d).',
         'Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
     code = 'min_length'
 
+    def compare(self, a, b):
+        return a < b
+
+    def clean(self, x):
+        return len(x)
+
 
 @deconstructible
 class MaxLengthValidator(BaseValidator):
-    compare = lambda self, a, b: a > b
-    clean = lambda self, x: len(x)
     message = ungettext_lazy(
         'Ensure this value has at most %(limit_value)d character (it has %(show_value)d).',
         'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
     code = 'max_length'
+
+    def compare(self, a, b):
+        return a > b
+
+    def clean(self, x):
+        return len(x)
 
 
 @deconstructible
@@ -401,8 +435,8 @@ class DecimalValidator(object):
                 code='max_decimal_places',
                 params={'max': self.decimal_places},
             )
-        if (self.max_digits is not None and self.decimal_places is not None
-                and whole_digits > (self.max_digits - self.decimal_places)):
+        if (self.max_digits is not None and self.decimal_places is not None and
+                whole_digits > (self.max_digits - self.decimal_places)):
             raise ValidationError(
                 self.messages['max_whole_digits'],
                 code='max_whole_digits',

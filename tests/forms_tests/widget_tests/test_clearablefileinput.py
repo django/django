@@ -105,3 +105,42 @@ class ClearableFileInputTest(WidgetTest):
             name='myfile',
         )
         self.assertEqual(value, field)
+
+    def test_html_does_not_mask_exceptions(self):
+        """
+        A ClearableFileInput should not mask exceptions produced while
+        checking that it has a value.
+        """
+        @python_2_unicode_compatible
+        class FailingURLFieldFile(object):
+            @property
+            def url(self):
+                raise ValueError('Canary')
+
+            def __str__(self):
+                return 'value'
+
+        with self.assertRaisesMessage(ValueError, 'Canary'):
+            self.widget.render('myfile', FailingURLFieldFile())
+
+    def test_url_as_property(self):
+        @python_2_unicode_compatible
+        class URLFieldFile(object):
+            @property
+            def url(self):
+                return 'https://www.python.org/'
+
+            def __str__(self):
+                return 'value'
+
+        html = self.widget.render('myfile', URLFieldFile())
+        self.assertInHTML('<a href="https://www.python.org/">value</a>', html)
+
+    def test_return_false_if_url_does_not_exists(self):
+        @python_2_unicode_compatible
+        class NoURLFieldFile(object):
+            def __str__(self):
+                return 'value'
+
+        html = self.widget.render('myfile', NoURLFieldFile())
+        self.assertHTMLEqual(html, '<input name="myfile" type="file" />')

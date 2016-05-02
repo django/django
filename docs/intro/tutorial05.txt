@@ -362,7 +362,7 @@ With that ready, we can ask the client to do some work for us::
     404
     >>> # on the other hand we should expect to find something at '/polls/'
     >>> # we'll use 'reverse()' rather than a hardcoded URL
-    >>> from django.core.urlresolvers import reverse
+    >>> from django.urls import reverse
     >>> response = client.get(reverse('polls:index'))
     >>> response.status_code
     200
@@ -447,7 +447,7 @@ Add the following to ``polls/tests.py``:
 .. snippet::
     :filename: polls/tests.py
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 
 and we'll create a shortcut function to create questions as well as a new test
 class:
@@ -457,8 +457,8 @@ class:
 
     def create_question(question_text, days):
         """
-        Creates a question with the given `question_text` published the given
-        number of `days` offset to now (negative for questions published
+        Creates a question with the given `question_text` and published the
+        given number of `days` offset to now (negative for questions published
         in the past, positive for questions that have yet to be published).
         """
         time = timezone.now() + datetime.timedelta(days=days)

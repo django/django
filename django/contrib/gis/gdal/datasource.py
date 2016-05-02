@@ -87,8 +87,10 @@ class DataSource(GDALBase):
 
     def __del__(self):
         "Destroys this DataStructure object."
-        if self._ptr and capi:
+        try:
             capi.destroy_ds(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     def __iter__(self):
         "Allows for iteration over the layers in a data source."

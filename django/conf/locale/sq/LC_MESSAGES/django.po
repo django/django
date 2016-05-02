@@ -2,15 +2,16 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011-2014
+# Besnik <besnik@programeshqip.org>, 2015-2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-04-16 09:15+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -81,6 +82,9 @@ msgstr "Spanjolle"
 msgid "Argentinian Spanish"
 msgstr "Spanjishte Argjentinase"
 
+msgid "Colombian Spanish"
+msgstr "Spanjishte Kolombiane"
+
 msgid "Mexican Spanish"
 msgstr "Spanjishte Meksikane"
 
@@ -110,6 +114,9 @@ msgstr "Frisiane"
 
 msgid "Irish"
 msgstr "Irlandeze"
+
+msgid "Scottish Gaelic"
+msgstr "Skoceze Gaelike"
 
 msgid "Galician"
 msgstr "Galike"
@@ -271,7 +278,7 @@ msgid "Traditional Chinese"
 msgstr "Kineze Tradicionale"
 
 msgid "Messages"
-msgstr ""
+msgstr "Mesazhe"
 
 msgid "Site Maps"
 msgstr "Harta Sajti"
@@ -302,6 +309,13 @@ msgid ""
 msgstr ""
 "Jepni një 'slug' të vlefshëm, të përbërë nga shkronja, numra, nëvija ose "
 "vija në mes."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Jeoni një 'slug' të vlefshëm, të përbërë nga shkronja, numra, nënvija ose "
+"vija ndarëse Unikod."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Jepni një vendndodhje të vlefshme IPv4."
@@ -356,6 +370,28 @@ msgstr[0] ""
 msgstr[1] ""
 "Sigurohuni që kjo vlerë ka të shumtën %(limit_value)d shenja (ka "
 "%(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Sigurohuni që nuk ka më  tepër se %(max)s shifër gjithsej."
+msgstr[1] "Sigurohuni që nuk ka më  tepër se %(max)s shifra gjithsej."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Sigurohuni që nuk ka më shumë se %(max)s vend dhjetor."
+msgstr[1] "Sigurohuni që nuk ka më shumë se %(max)s vende dhjetore."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Sigurohuni që nuk ka më tepër se %(max)s shifër para presjes dhjetore."
+msgstr[1] ""
+"Sigurohuni që nuk ka më tepër se %(max)s shifra para presjes dhjetore."
 
 msgid "and"
 msgstr " dhe "
@@ -461,9 +497,11 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"Vlera '%(value)s' ka format të pavlefshëm. Duhet të jetë në formatin [DD] "
+"[HH:[MM:]]ss[.uuuuuu]."
 
 msgid "Duration"
-msgstr ""
+msgstr "Kohëzgjatje"
 
 msgid "Email address"
 msgstr "Adresë email"
@@ -537,7 +575,7 @@ msgstr "Të dhëna dyore të papërpunuara"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' s’është UUID i vlefshëm."
 
 msgid "File"
 msgstr "Kartelë"
@@ -547,7 +585,7 @@ msgstr "Figurë"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "Instanca %(model)s me %(field)s %(value)r nuk ekziston."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Kyç i Jashtëm (lloj i përcaktuar nga fusha përkatëse)"
@@ -558,6 +596,12 @@ msgstr "Marrëdhënie një-për-një"
 msgid "Many-to-many relationship"
 msgstr "Marrëdhënie shumë-për-shumë"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Kjo fushë është e domosdoshme."
 
@@ -566,28 +610,6 @@ msgstr "Jepni një numër të tërë."
 
 msgid "Enter a number."
 msgstr "Jepni një numër."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Sigurohuni që nuk ka më  tepër se %(max)s shifër gjithsej."
-msgstr[1] "Sigurohuni që nuk ka më  tepër se %(max)s shifra gjithsej."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Sigurohuni që nuk ka më shumë se %(max)s vend dhjetor."
-msgstr[1] "Sigurohuni që nuk ka më shumë se %(max)s vende dhjetore."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Sigurohuni që nuk ka më tepër se %(max)s shifër para presjes dhjetore."
-msgstr[1] ""
-"Sigurohuni që nuk ka më tepër se %(max)s shifra para presjes dhjetore."
 
 msgid "Enter a valid date."
 msgstr "Jepni një datë të vlefshme."
@@ -599,7 +621,7 @@ msgid "Enter a valid date/time."
 msgstr "Jepni një datë/kohë të vlefshme."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Jepni një kohëzgjatje të vlefshme."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -647,7 +669,7 @@ msgid "Enter a complete value."
 msgstr "Jepni një vlerë të plotë."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Jepni një UUID të vlefshëm."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -656,12 +678,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Fushë e fshehur %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "Të dhënat ManagementForm mungojnë ose është vënë dorë mbi to"
@@ -1101,23 +1117,28 @@ msgid "More information is available with DEBUG=True."
 msgstr "Më tepër të dhëna mund të gjeni me DEBUG=True."
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "Mirë se vini te Django"
 
 msgid "It worked!"
-msgstr ""
+msgstr "Funksionoi!"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "Urime për faqen tuaj të parë me Django."
 
 msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"Kuptohet, që s’keni bërë ende ndonjë punë. Në vazhdim, filloni aplikacionin "
+"tuaj të parë duke xhiruar <code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"Po e shihni këtë mesazh ngaqë keni caktuar <code>DEBUG = True</code> te "
+"kartela juaj e rregullimeve Django dhe s’keni formësuar ndonjë URL. Vijuni "
+"punës!"
 
 msgid "No year specified"
 msgstr "Nuk është caktuar vit"

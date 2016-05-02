@@ -60,6 +60,15 @@ class TemplateLoaderTests(SimpleTestCase):
         with self.assertRaises(TemplateDoesNotExist):
             select_template([])
 
+    def test_select_template_string(self):
+        with self.assertRaisesMessage(
+            TypeError,
+            "select_template() takes an iterable of template names but got a "
+            "string: 'template_loader/hello.html'. Use get_template() if you "
+            "want to load a single template by name."
+        ):
+            select_template('template_loader/hello.html')
+
     def test_select_template_not_found(self):
         with self.assertRaises(TemplateDoesNotExist) as e:
             select_template(["template_loader/unknown.html",

@@ -1,5 +1,3 @@
-.. _glossary:
-
 ========
 Glossary
 ========

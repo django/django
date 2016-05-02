@@ -53,7 +53,7 @@ class GenericForeignKey(object):
         self.name = name
         self.model = cls
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_field(self, virtual=True)
+        cls._meta.add_field(self, private=True)
 
         # Only run pre-initialization field assignment on non-abstract models
         if not cls._meta.abstract:
@@ -92,7 +92,6 @@ class GenericForeignKey(object):
             return [
                 checks.Error(
                     'Field names must not end with an underscore.',
-                    hint=None,
                     obj=self,
                     id='fields.E001',
                 )
@@ -107,7 +106,6 @@ class GenericForeignKey(object):
             return [
                 checks.Error(
                     "The GenericForeignKey object ID references the non-existent field '%s'." % self.fk_field,
-                    hint=None,
                     obj=self,
                     id='contenttypes.E001',
                 )
@@ -128,7 +126,6 @@ class GenericForeignKey(object):
                     "The GenericForeignKey content type references the non-existent field '%s.%s'." % (
                         self.model._meta.object_name, self.ct_field
                     ),
-                    hint=None,
                     obj=self,
                     id='contenttypes.E002',
                 )
@@ -302,7 +299,7 @@ class GenericRelation(ForeignObject):
     rel_class = GenericRel
 
     def __init__(self, to, object_id_field='object_id', content_type_field='content_type',
-            for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
+                 for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
         kwargs['rel'] = self.rel_class(
             self, to,
             related_query_name=related_query_name,
@@ -334,7 +331,7 @@ class GenericRelation(ForeignObject):
     def _check_generic_foreign_key_existence(self):
         target = self.remote_field.model
         if isinstance(target, ModelBase):
-            fields = target._meta.virtual_fields
+            fields = target._meta.private_fields
             if any(isinstance(field, GenericForeignKey) and
                     field.ct_field == self.content_type_field_name and
                     field.fk_field == self.object_id_field_name
@@ -343,11 +340,10 @@ class GenericRelation(ForeignObject):
             else:
                 return [
                     checks.Error(
-                        ("The GenericRelation defines a relation with the model "
-                         "'%s.%s', but that model does not have a GenericForeignKey.") % (
+                        "The GenericRelation defines a relation with the model "
+                        "'%s.%s', but that model does not have a GenericForeignKey." % (
                             target._meta.app_label, target._meta.object_name
                         ),
-                        hint=None,
                         obj=self,
                         id='contenttypes.E004',
                     )
@@ -359,25 +355,58 @@ class GenericRelation(ForeignObject):
         self.to_fields = [self.model._meta.pk.name]
         return [(self.remote_field.model._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
+    def _get_path_info_with_parent(self):
+        """
+        Return the path that joins the current model through any parent models.
+        The idea is that if you have a GFK defined on a parent model then we
+        need to join the parent model first, then the child model.
+        """
+        # With an inheritance chain ChildTag -> Tag and Tag defines the
+        # GenericForeignKey, and a TaggedItem model has a GenericRelation to
+        # ChildTag, then we need to generate a join from TaggedItem to Tag
+        # (as Tag.object_id == TaggedItem.pk), and another join from Tag to
+        # ChildTag (as that is where the relation is to). Do this by first
+        # generating a join to the parent model, then generating joins to the
+        # child models.
+        path = []
+        opts = self.remote_field.model._meta
+        parent_opts = opts.get_field(self.object_id_field_name).model._meta
+        target = parent_opts.pk
+        path.append(PathInfo(self.model._meta, parent_opts, (target,), self.remote_field, True, False))
+        # Collect joins needed for the parent -> child chain. This is easiest
+        # to do if we collect joins for the child -> parent chain and then
+        # reverse the direction (call to reverse() and use of
+        # field.remote_field.get_path_info()).
+        parent_field_chain = []
+        while parent_opts != opts:
+            field = opts.get_ancestor_link(parent_opts.model)
+            parent_field_chain.append(field)
+            opts = field.remote_field.model._meta
+        parent_field_chain.reverse()
+        for field in parent_field_chain:
+            path.extend(field.remote_field.get_path_info())
+        return path
+
     def get_path_info(self):
         opts = self.remote_field.model._meta
-        target = opts.pk
-        return [PathInfo(self.model._meta, opts, (target,), self.remote_field, True, False)]
+        object_id_field = opts.get_field(self.object_id_field_name)
+        if object_id_field.model != opts.model:
+            return self._get_path_info_with_parent()
+        else:
+            target = opts.pk
+            return [PathInfo(self.model._meta, opts, (target,), self.remote_field, True, False)]
 
     def get_reverse_path_info(self):
         opts = self.model._meta
         from_opts = self.remote_field.model._meta
         return [PathInfo(from_opts, opts, (opts.pk,), self, not self.unique, False)]
 
-    def get_choices_default(self):
-        return super(GenericRelation, self).get_choices(include_blank=False)
-
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
         return smart_text([instance._get_pk_val() for instance in qs])
 
     def contribute_to_class(self, cls, name, **kwargs):
-        kwargs['virtual_only'] = True
+        kwargs['private_only'] = True
         super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
         self.model = cls
         setattr(cls, self.name, ReverseGenericManyToOneDescriptor(self.remote_field))
@@ -489,12 +518,19 @@ def create_generic_related_manager(superclass, rel):
         def __str__(self):
             return repr(self)
 
+        def _apply_rel_filters(self, queryset):
+            """
+            Filter the queryset for the instance this manager is bound to.
+            """
+            db = self._db or router.db_for_read(self.model, instance=self.instance)
+            return queryset.using(db).filter(**self.core_filters)
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
-                db = self._db or router.db_for_read(self.model, instance=self.instance)
-                return super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**self.core_filters)
+                queryset = super(GenericRelatedObjectManager, self).get_queryset()
+                return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
@@ -535,7 +571,7 @@ def create_generic_related_manager(superclass, rel):
                     if obj._state.adding or obj._state.db != db:
                         raise ValueError(
                             "%r instance isn't saved. Use bulk=False or save "
-                            "the object first. but must be." % obj
+                            "the object first." % obj
                         )
                     check_and_update_obj(obj)
                     pks.append(obj.pk)

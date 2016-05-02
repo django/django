@@ -6,17 +6,17 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mazdak Badakhshan <geraneum@gmail.com>, 2014
 # Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2013
-# Reza Mohammadi <reza@teeleh.ir>, 2013-2015
+# Reza Mohammadi <reza@teeleh.ir>, 2013-2016
 # Saeed <sd.javadi@gmail.com>, 2011
 # Sina Cheraghi <sinacher@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-04-11 14:04+0000\n"
-"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
-"Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-02-15 08:31+0000\n"
+"Last-Translator: Reza Mohammadi <reza@teeleh.ir>\n"
+"Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -87,6 +87,9 @@ msgstr "اسپانیایی"
 msgid "Argentinian Spanish"
 msgstr "اسپانیایی آرژانتینی"
 
+msgid "Colombian Spanish"
+msgstr ""
+
 msgid "Mexican Spanish"
 msgstr "اسپانیولی مکزیکی"
 
@@ -116,6 +119,9 @@ msgstr "فریزی"
 
 msgid "Irish"
 msgstr "ایرلندی"
+
+msgid "Scottish Gaelic"
+msgstr ""
 
 msgid "Galician"
 msgstr "گالیسیایی"
@@ -307,6 +313,11 @@ msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "یک 'slug' معتبر شامل حروف، ارقام، خط زیر و یا خط تیره وارد کنید."
 
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+
 msgid "Enter a valid IPv4 address."
 msgstr "یک نشانی IPv4 معتبر وارد کنید."
 
@@ -352,6 +363,23 @@ msgid_plural ""
 msgstr[0] ""
 "طول این مقدار باید حداکثر %(limit_value)d کاراکتر باشد (طولش %(show_value)d "
 "است)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "نباید در مجموع بیش از %(max)s رقم داشته باشد."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "نباید بیش از %(max)s رقم اعشار داشته باشد."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "نباید بیش از %(max)s رقم قبل ممیز داشته باشد."
 
 msgid "and"
 msgstr "و"
@@ -457,6 +485,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"مقدار «%(value)s» در قالب نادرستی وارد شده است. باید در قالب ‎[DD] [HH:"
+"[MM:]]ss[.uuuuuu]‎ باشد."
 
 msgid "Duration"
 msgstr "بازهٔ زمانی"
@@ -554,6 +584,12 @@ msgstr "رابطه یک به یک "
 msgid "Many-to-many relationship"
 msgstr "رابطه چند به چند"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":؟.!"
+
 msgid "This field is required."
 msgstr "این فیلد لازم است."
 
@@ -562,23 +598,6 @@ msgstr "به طور کامل یک عدد وارد کنید."
 
 msgid "Enter a number."
 msgstr "یک عدد وارد کنید."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "نباید در مجموع بیش از %(max)s رقم داشته باشد."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "نباید بیش از %(max)s رقم اعشار داشته باشد."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "نباید بیش از %(max)s رقم قبل ممیز داشته باشد."
 
 msgid "Enter a valid date."
 msgstr "یک تاریخ معتبر وارد کنید."
@@ -638,12 +657,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(فیلد پنهان %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":؟.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "اطلاعات ManagementForm ناقص است و یا دستکاری شده است."

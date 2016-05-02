@@ -156,8 +156,7 @@ class Apps(object):
 
     # This method is performance-critical at least for Django's test suite.
     @lru_cache.lru_cache(maxsize=None)
-    def get_models(self, include_auto_created=False,
-                   include_deferred=False, include_swapped=False):
+    def get_models(self, include_auto_created=False, include_swapped=False):
         """
         Returns a list of all installed models.
 
@@ -174,8 +173,7 @@ class Apps(object):
 
         result = []
         for app_config in self.app_configs.values():
-            result.extend(list(app_config.get_models(
-                include_auto_created, include_deferred, include_swapped)))
+            result.extend(list(app_config.get_models(include_auto_created, include_swapped)))
         return result
 
     def get_model(self, app_label, model_name=None):
@@ -297,8 +295,10 @@ class Apps(object):
         available = set(available)
         installed = set(app_config.name for app_config in self.get_app_configs())
         if not available.issubset(installed):
-            raise ValueError("Available apps isn't a subset of installed "
-                "apps, extra apps: %s" % ", ".join(available - installed))
+            raise ValueError(
+                "Available apps isn't a subset of installed apps, extra apps: %s"
+                % ", ".join(available - installed)
+            )
 
         self.stored_app_configs.append(self.app_configs)
         self.app_configs = OrderedDict(

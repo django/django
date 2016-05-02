@@ -84,7 +84,7 @@ class RemoteTestResult(object):
     def test_index(self):
         return self.testsRun - 1
 
-    def check_pickleable(self, test, err):
+    def check_picklable(self, test, err):
         # Ensure that sys.exc_info() tuples are picklable. This displays a
         # clear multiprocessing.pool.RemoteTraceback generated in the child
         # process instead of a multiprocessing.pool.MaybeEncodingError, making
@@ -152,12 +152,12 @@ failure and get a correct traceback.
         self.events.append(('stopTest', self.test_index))
 
     def addError(self, test, err):
-        self.check_pickleable(test, err)
+        self.check_picklable(test, err)
         self.events.append(('addError', self.test_index, err))
         self.stop_if_failfast()
 
     def addFailure(self, test, err):
-        self.check_pickleable(test, err)
+        self.check_picklable(test, err)
         self.events.append(('addFailure', self.test_index, err))
         self.stop_if_failfast()
 
@@ -177,7 +177,7 @@ failure and get a correct traceback.
         # expected failure occurs.
         if tblib is None:
             err = err[0], err[1], None
-        self.check_pickleable(test, err)
+        self.check_picklable(test, err)
         self.events.append(('addExpectedFailure', self.test_index, err))
 
     def addUnexpectedSuccess(self, test):
@@ -299,7 +299,7 @@ class ParallelTestSuite(unittest.TestSuite):
         To minimize pickling errors when getting results from workers:
 
         - pass back numeric indexes in self.subsuites instead of tests
-        - make tracebacks pickleable with tblib, if available
+        - make tracebacks picklable with tblib, if available
 
         Even with tblib, errors may still occur for dynamically created
         exception classes such Model.DoesNotExist which cannot be unpickled.
@@ -360,11 +360,10 @@ class DiscoverRunner(object):
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
                  reverse=False, debug_sql=False, parallel=0,
-                 **kwargs):
+                 tags=None, exclude_tags=None, **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
-
         self.verbosity = verbosity
         self.interactive = interactive
         self.failfast = failfast
@@ -372,28 +371,44 @@ class DiscoverRunner(object):
         self.reverse = reverse
         self.debug_sql = debug_sql
         self.parallel = parallel
+        self.tags = set(tags or [])
+        self.exclude_tags = set(exclude_tags or [])
 
     @classmethod
     def add_arguments(cls, parser):
-        parser.add_argument('-t', '--top-level-directory',
-            action='store', dest='top_level', default=None,
-            help='Top level of project for unittest discovery.')
-        parser.add_argument('-p', '--pattern', action='store', dest='pattern',
-            default="test*.py",
-            help='The test matching pattern. Defaults to test*.py.')
-        parser.add_argument('-k', '--keepdb', action='store_true', dest='keepdb',
-            default=False,
-            help='Preserves the test DB between runs.')
-        parser.add_argument('-r', '--reverse', action='store_true', dest='reverse',
-            default=False,
-            help='Reverses test cases order.')
-        parser.add_argument('-d', '--debug-sql', action='store_true', dest='debug_sql',
-            default=False,
-            help='Prints logged SQL queries on failure.')
+        parser.add_argument(
+            '-t', '--top-level-directory', action='store', dest='top_level', default=None,
+            help='Top level of project for unittest discovery.',
+        )
+        parser.add_argument(
+            '-p', '--pattern', action='store', dest='pattern', default="test*.py",
+            help='The test matching pattern. Defaults to test*.py.',
+        )
+        parser.add_argument(
+            '-k', '--keepdb', action='store_true', dest='keepdb', default=False,
+            help='Preserves the test DB between runs.'
+        )
+        parser.add_argument(
+            '-r', '--reverse', action='store_true', dest='reverse', default=False,
+            help='Reverses test cases order.',
+        )
+        parser.add_argument(
+            '-d', '--debug-sql', action='store_true', dest='debug_sql', default=False,
+            help='Prints logged SQL queries on failure.',
+        )
         parser.add_argument(
             '--parallel', dest='parallel', nargs='?', default=1, type=int,
-            const=default_test_processes(),
-            help='Run tests in parallel processes.')
+            const=default_test_processes(), metavar='N',
+            help='Run tests using up to N parallel processes.',
+        )
+        parser.add_argument(
+            '--tag', action='append', dest='tags',
+            help='Run only tests with the specified tag. Can be used multiple times.',
+        )
+        parser.add_argument(
+            '--exclude-tag', action='append', dest='exclude_tags',
+            help='Do not run tests with the specified tag. Can be used multiple times.',
+        )
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
@@ -459,6 +474,8 @@ class DiscoverRunner(object):
         for test in extra_tests:
             suite.addTest(test)
 
+        if self.tags or self.exclude_tags:
+            suite = filter_tests_by_tags(suite, self.tags, self.exclude_tags)
         suite = reorder_suite(suite, self.reorder_by, self.reverse)
 
         if self.parallel > 1:
@@ -747,3 +764,23 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
             connections[alias].force_debug_cursor = True
 
     return old_names
+
+
+def filter_tests_by_tags(suite, tags, exclude_tags):
+    suite_class = type(suite)
+    filtered_suite = suite_class()
+
+    for test in suite:
+        if isinstance(test, suite_class):
+            filtered_suite.addTests(filter_tests_by_tags(test, tags, exclude_tags))
+        else:
+            test_tags = set(getattr(test, 'tags', set()))
+            test_fn_name = getattr(test, '_testMethodName', str(test))
+            test_fn = getattr(test, test_fn_name, test)
+            test_fn_tags = set(getattr(test_fn, 'tags', set()))
+            all_tags = test_tags.union(test_fn_tags)
+            matched_tags = all_tags.intersection(tags)
+            if (matched_tags or not tags) and not all_tags.intersection(exclude_tags):
+                filtered_suite.addTest(test)
+
+    return filtered_suite

@@ -18,15 +18,21 @@ This registry is simply called :attr:`~django.apps.apps` and it's available in
 Projects and applications
 =========================
 
-Django has historically used the term **project** to describe an installation
-of Django. A project is defined primarily by a settings module.
+The term **project** describes a Django web application. The project Python
+package is defined primarily by a settings module, but it usually contains
+other things. For example, when you run  ``django-admin startproject mysite``
+you'll get a ``mysite`` project directory that contains a ``mysite`` Python
+package with ``settings.py``, ``urls.py``, and ``wsgi.py``. The project package
+is often extended to include things like fixtures, CSS, and templates which
+aren't tied to a particular application.
+
+A **project's root directory** (the one that contains ``manage.py``) is usually
+the container for all of a project's applications which aren't installed
+separately.
 
 The term **application** describes a Python package that provides some set of
-features. Applications may be reused in various projects.
-
-.. note::
-    This terminology is somewhat confusing these days as it became common to
-    use the phrase "web app" to describe what equates to a Django project.
+features. Applications :doc:`may be reused </intro/reusable-apps/>` in various
+projects.
 
 Applications include some combination of models, views, templates, template
 tags, static files, URLs, middleware, etc. They're generally wired into
@@ -40,6 +46,10 @@ an ``Application`` object. However, there's a few places where Django needs to
 interact with installed applications, mainly for configuration and also for
 introspection. That's why the application registry maintains metadata in an
 :class:`~django.apps.AppConfig` instance for each installed application.
+
+There's no restriction that a project package can't also be considered an
+application and have models, etc. (which would require adding it to
+:setting:`INSTALLED_APPS`).
 
 .. _configuring-applications-ref:
 
@@ -122,20 +132,20 @@ For application users
 ---------------------
 
 If you're using "Rock ’n’ roll" in a project called ``anthology``, but you
-want it to show up as "Gypsy jazz" instead, you can provide your own
+want it to show up as "Jazz Manouche" instead, you can provide your own
 configuration::
 
     # anthology/apps.py
 
     from rock_n_roll.apps import RockNRollConfig
 
-    class GypsyJazzConfig(RockNRollConfig):
-        verbose_name = "Gypsy jazz"
+    class JazzManoucheConfig(RockNRollConfig):
+        verbose_name = "Jazz Manouche"
 
     # anthology/settings.py
 
     INSTALLED_APPS = [
-        'anthology.apps.GypsyJazzConfig',
+        'anthology.apps.JazzManoucheConfig',
         # ...
     ]
 
@@ -294,8 +304,8 @@ Application registry
 
 .. attribute:: apps.ready
 
-    Boolean attribute that is set to ``True`` when the registry is fully
-    populated.
+    Boolean attribute that is set to ``True`` after the registry is fully
+    populated and all :meth:`AppConfig.ready` methods are called.
 
 .. method:: apps.get_app_configs()
 

@@ -11,7 +11,7 @@ from django.db.models.functions import (
     Upper,
 )
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils import six, timezone
+from django.utils import timezone
 
 from .models import Article, Author, Fan
 
@@ -491,7 +491,7 @@ class FunctionTests(TestCase):
 
         self.assertEqual(a.name_part_1[1:], a.name_part_2)
 
-        with six.assertRaisesRegex(self, ValueError, "'pos' must be greater than 0"):
+        with self.assertRaisesMessage(ValueError, "'pos' must be greater than 0"):
             Author.objects.annotate(raises=Substr('name', 0))
 
     def test_substr_with_expressions(self):

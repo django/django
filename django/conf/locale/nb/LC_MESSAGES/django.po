@@ -4,7 +4,7 @@
 # Alexander Hansen <alexander.l.hansen@gmail.com>, 2014
 # Eirik Krogstad <eirikkr@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
-# jensadne <jensadne@pvv.ntnu.no>, 2014
+# jensadne <jensadne@pvv.ntnu.no>, 2014-2015
 # Jon <jon@funkbit.no>, 2015
 # Jon <jon@funkbit.no>, 2014
 # Jon <jon@funkbit.no>, 2013
@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-27 09:35+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
+"Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -89,6 +89,9 @@ msgstr "Spansk"
 msgid "Argentinian Spanish"
 msgstr "Argentinsk spansk"
 
+msgid "Colombian Spanish"
+msgstr ""
+
 msgid "Mexican Spanish"
 msgstr "Meksikansk spansk"
 
@@ -118,6 +121,9 @@ msgstr "Frisisk"
 
 msgid "Irish"
 msgstr "Irsk"
+
+msgid "Scottish Gaelic"
+msgstr ""
 
 msgid "Galician"
 msgstr "Galisisk"
@@ -279,7 +285,7 @@ msgid "Traditional Chinese"
 msgstr "Tradisjonell kinesisk"
 
 msgid "Messages"
-msgstr ""
+msgstr "Meldinger"
 
 msgid "Site Maps"
 msgstr "Sidekart"
@@ -310,6 +316,13 @@ msgid ""
 msgstr ""
 "Oppgi en gyldig «slug» bestående av bokstaver, nummer, understreker eller "
 "bindestreker."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Oppgi en gyldig «slug» bestående av Unicode-bokstaver, nummer, understreker "
+"eller bindestreker."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Oppgi en gyldig IPv4-adresse."
@@ -346,7 +359,7 @@ msgstr[0] ""
 "Sørg for denne verdien har minst %(limit_value)d tegn (den har "
 "%(show_value)d)."
 msgstr[1] ""
-"Sørg for denne verdien har minst %(limit_value)d tegn (den har "
+"Sørg for at denne verdien har minst %(limit_value)d tegn (den har "
 "%(show_value)d)."
 
 #, python-format
@@ -359,8 +372,28 @@ msgid_plural ""
 msgstr[0] ""
 "Sørg for denne verdien har %(limit_value)d tegn (den har nå %(show_value)d)."
 msgstr[1] ""
-"Sørg for denne verdien har %(limit_value)d eller færre tegn (den har nå "
+"Sørg for at denne verdien har %(limit_value)d eller færre tegn (den har nå "
 "%(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Sørg for at det er kun %(max)s tall."
+msgstr[1] "Sørg for at det er %(max)s eller færre tall totalt."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Sørg for at det er kun %(max)s desimal."
+msgstr[1] "Sørg for at det er %(max)s eller færre desimaler."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Sørg for at det kun %(max)s tall før desimalpunkt."
+msgstr[1] "Sørg for at det er %(max)s eller færre tall før desimalpunkt."
 
 msgid "and"
 msgstr "og"
@@ -563,6 +596,12 @@ msgstr "En-til-en-relasjon"
 msgid "Many-to-many relationship"
 msgstr "Mange-til-mange-relasjon"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Feltet er påkrevet."
 
@@ -571,26 +610,6 @@ msgstr "Oppgi et heltall."
 
 msgid "Enter a number."
 msgstr "Oppgi et tall."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Sørg for at det er kun %(max)s tall."
-msgstr[1] "Sørg for at det er %(max)s eller færre tall totalt."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Sørg for at det er kun %(max)s desimal."
-msgstr[1] "Sørg for at det er %(max)s eller færre desimaler."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "Sørg for at det kun %(max)s tall før desimalpunkt."
-msgstr[1] "Sørg for at det er %(max)s eller færre tall før desimalpunkt."
 
 msgid "Enter a valid date."
 msgstr "Oppgi en gyldig dato."
@@ -651,12 +670,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Skjult felt %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "ManagementForm-data mangler eller har blitt endret."

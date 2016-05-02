@@ -20,12 +20,12 @@ compress all jQuery-based files of the admin app. Requires the Google Closure
 Compiler library and Java version 6 or later."""
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('file', nargs='*')
-    parser.add_argument("-c", dest="compiler", default="~/bin/compiler.jar",
-                      help="path to Closure Compiler jar file")
-    parser.add_argument("-v", "--verbose",
-                      action="store_true", dest="verbose")
-    parser.add_argument("-q", "--quiet",
-                      action="store_false", dest="verbose")
+    parser.add_argument(
+        "-c", dest="compiler", default="~/bin/compiler.jar",
+        help="path to Closure Compiler jar file",
+    )
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose")
+    parser.add_argument("-q", "--quiet", action="store_false", dest="verbose")
     options = parser.parse_args()
 
     compiler = closure_compiler if closure_compiler else os.path.expanduser(options.compiler)
@@ -38,8 +38,10 @@ Compiler library and Java version 6 or later."""
     if not options.file:
         if options.verbose:
             sys.stdout.write("No filenames given; defaulting to admin scripts\n")
-        files = [os.path.join(js_path, f) for f in [
-            "actions.js", "collapse.js", "inlines.js", "prepopulate.js"]]
+        files = [
+            os.path.join(js_path, f) for f in
+            ["actions.js", "collapse.js", "inlines.js", "prepopulate.js"]
+        ]
     else:
         files = options.file
 

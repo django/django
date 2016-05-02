@@ -3,15 +3,15 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Vláďa Macek <macek@sandbox.cz>, 2012-2014
+# Vláďa Macek <macek@sandbox.cz>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
-"cs/)\n"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2015-10-15 17:30+0000\n"
+"Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
+"Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,24 +34,13 @@ msgid "Documentation bookmarklets"
 msgstr "Dokumentační bookmarklety"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">Pro nainstalování bookmarkletů, přetáhněte odkaz na vaše "
-"záložky (oblíbené),\n"
-"nebo klepněte pravým tlačítkem na odkaz a přidejte ho k vašim záložkám "
-"(oblíbeným). Nyní můžete\n"
-"zvolit bookmarklet z libovolné stránky. Poznámka: Některé tyto\n"
-"bookmarklety vyžadují, abyste prohlížel(a) stránky z počítače, který je "
-"nastaven jako\n"
-"\"\"interní\" (promluvte si s vaším správcem, jestli si nejste jisti,\n"
-"zda je váš počítač \"interní\").</p>\n"
+"Pro nainstalování bookmarkletů, přetáhněte odkaz na vaše záložky "
+"(„Oblíbené“), nebo klepněte pravým tlačítkem na odkaz a přidejte ho k vašim "
+"záložkám. Nyní můžete zvolit bookmarklet z libovolné stránky jakéhokoli webu."
 
 msgid "Documentation for this page"
 msgstr "Dokumentace k této stránce"
@@ -62,28 +51,6 @@ msgid ""
 msgstr ""
 "Z libovolné stránky otevře dokumentaci pohledu (view), který generoval tuto "
 "stránku."
-
-msgid "Show object ID"
-msgstr "Ukázat id položky"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Zobrazí content-type a unikátní ID stránek reprezentujících jedinou položku."
-
-msgid "Edit this object (current window)"
-msgstr "Upravit tuto položku (ve stávajícím okně)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Přepne do administračního rozhraní stránek reprezentujících jedinou položku."
-
-msgid "Edit this object (new window)"
-msgstr "Upravit tuto položku (v novém okně)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "Jako výše, ale otevře prostředí správy v novém okně."
 
 msgid "Tags"
 msgstr "Tagy"
@@ -150,6 +117,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
+msgid "Fields"
+msgstr "Pole"
+
 msgid "Field"
 msgstr "Pole"
 
@@ -158,6 +128,15 @@ msgstr "Typ"
 
 msgid "Description"
 msgstr "Popis"
+
+msgid "Methods with arguments"
+msgstr "Metody s argumenty"
+
+msgid "Method"
+msgstr "Metoda"
+
+msgid "Arguments"
+msgstr "Argumenty"
 
 msgid "Back to Model Documentation"
 msgstr "Zpět na dokumentaci modelu"

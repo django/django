@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-29 02:13+0000\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-10-31 12:40+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
-"Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -41,6 +41,12 @@ msgstr "パスワードの変更: %s"
 msgid "Authentication and Authorization"
 msgstr "認証と認可"
 
+msgid "password"
+msgstr "パスワード"
+
+msgid "last login"
+msgstr "最終ログイン"
+
 msgid "No password set."
 msgstr "パスワードは設定されませんでした。"
 
@@ -56,17 +62,17 @@ msgstr "パスワード"
 msgid "Password confirmation"
 msgstr "パスワードの確認"
 
-msgid "Enter the same password as above, for verification."
+msgid "Enter the same password as before, for verification."
 msgstr "確認のため、再度パスワードを入力してください。"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
 "生のパスワードが格納されていないので、このユーザーのパスワードは参照できませ"
-"んが、 <a href=\"password/\">このフォーム</a> を使用してパスワードを変更でき"
-"ます 。"
+"んが、 <a href=\"../password/\">このフォーム</a> を使用してパスワードを変更で"
+"きます 。"
 
 #, python-format
 msgid ""
@@ -118,6 +124,9 @@ msgstr "チェックサム"
 msgid "name"
 msgstr "名前"
 
+msgid "content type"
+msgstr "コンテンツタイプ"
+
 msgid "codename"
 msgstr "コード名"
 
@@ -132,12 +141,6 @@ msgstr "グループ"
 
 msgid "groups"
 msgstr "グループ"
-
-msgid "password"
-msgstr "パスワード"
-
-msgid "last login"
-msgstr "最終ログイン"
 
 msgid "superuser status"
 msgstr "スーパーユーザー権限"
@@ -211,6 +214,39 @@ msgstr "ユーザー"
 
 msgid "users"
 msgstr "ユーザー"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] "このパスワードは短すぎます。最低 %(min_length)d 文字以上必要です。"
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "パスワードは最低 %(min_length)d 文字以上必要です。"
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "このパスワードは %(verbose_name)s と似すぎています。"
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr "あなたの他の個人情報と似ているパスワードにはできません。"
+
+msgid "This password is too common."
+msgstr "このパスワードは一般的すぎます。"
+
+msgid "Your password can't be a commonly used password."
+msgstr "よく使われるパスワードにはできません。"
+
+msgid "This password is entirely numeric."
+msgstr "このパスワードは数字しか使われていません。"
+
+msgid "Your password can't be entirely numeric."
+msgstr "数字だけのパスワードにはできません。"
 
 #, python-format
 msgid "Password reset on %(site_name)s"

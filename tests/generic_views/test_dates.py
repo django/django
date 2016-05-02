@@ -82,7 +82,8 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
         self.assertTemplateUsed(res, 'generic_views/book_detail.html')
 
     def test_archive_view_invalid(self):
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/dates/books/invalid/')
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/dates/books/invalid/')
 
     def test_archive_view_by_month(self):
         res = self.client.get('/dates/books/by_month/')
@@ -664,7 +665,8 @@ class DateDetailViewTests(TestDataMixin, TestCase):
         self.assertTemplateUsed(res, 'generic_views/book_detail.html')
 
     def test_invalid_url(self):
-        self.assertRaises(AttributeError, self.client.get, "/dates/books/2008/oct/01/nopk/")
+        with self.assertRaises(AttributeError):
+            self.client.get("/dates/books/2008/oct/01/nopk/")
 
     def test_get_object_custom_queryset(self):
         """

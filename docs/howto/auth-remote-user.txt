@@ -9,10 +9,10 @@ intranet sites, with single sign-on solutions such as IIS and Integrated
 Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 `WebAuth`_, `mod_auth_sspi`_, etc.
 
-.. _mod_authnz_ldap: http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
+.. _mod_authnz_ldap: https://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
 .. _CAS: https://www.apereo.org/projects/cas
 .. _Cosign: http://weblogin.org
-.. _WebAuth: http://www.stanford.edu/services/webauth/
+.. _WebAuth: https://www.stanford.edu/services/webauth/
 .. _mod_auth_sspi: http://sourceforge.net/projects/mod-auth-sspi
 
 When the Web server takes care of authentication it typically sets the
@@ -64,9 +64,20 @@ remote users. These interfaces work with users stored in the database
 regardless of ``AUTHENTICATION_BACKENDS``.
 
 .. note::
-   Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
-   still have all of the same permissions checking that is implemented in
-   ``ModelBackend``.
+
+    Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
+    still have all of the same permissions checking that is implemented in
+    ``ModelBackend``.
+
+    Users with :attr:`is_active=False
+    <django.contrib.auth.models.User.is_active>` won't be allowed to
+    authenticate. Use
+    :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if
+    you want to allow them to.
+
+    .. versionchanged:: 1.10
+
+        In older versions, inactive users weren't rejected as described above.
 
 If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the

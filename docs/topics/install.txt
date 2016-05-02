@@ -25,8 +25,8 @@ your operating system's package manager.
     If you are just starting with Django and using Windows, you may find
     :doc:`/howto/windows` useful.
 
-Install Apache and mod_wsgi
-=============================
+Install Apache and ``mod_wsgi``
+===============================
 
 If you just want to experiment with Django, skip ahead to the next
 section; Django includes a lightweight web server you can use for
@@ -58,7 +58,7 @@ deployment options. One is :doc:`uWSGI </howto/deployment/wsgi/uwsgi>`; it works
 very well with `nginx`_. Additionally, Django follows the WSGI spec
 (:pep:`3333`), which allows it to run on a variety of server platforms.
 
-.. _Apache: http://httpd.apache.org/
+.. _Apache: https://httpd.apache.org/
 .. _nginx: http://nginx.org/
 .. _mod_wsgi: http://www.modwsgi.org/
 
@@ -116,9 +116,9 @@ If you're using Django's :doc:`testing framework</topics/testing/index>` to test
 database queries, Django will need permission to create a test database.
 
 .. _PostgreSQL: http://www.postgresql.org/
-.. _MySQL: http://www.mysql.com/
+.. _MySQL: https://www.mysql.com/
 .. _psycopg2: http://initd.org/psycopg/
-.. _SQLite: http://www.sqlite.org/
+.. _SQLite: https://www.sqlite.org/
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
 
@@ -158,15 +158,14 @@ It's easy, no matter which way you choose.
 .. _installing-official-release:
 
 Installing an official release with ``pip``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
 
 This is the recommended way to install Django.
 
 1. Install pip_. The easiest is to use the `standalone pip installer`_. If your
    distribution already has ``pip`` installed, you might need to update it if
-   it's outdated. (If it's outdated, you'll know because installation won't
-   work. You might see some :ref:`harmless SyntaxErrors
-   <syntax-error-old-pip-django-19>` also.)
+   it's outdated. If it's outdated, you'll know because installation won't
+   work.
 
 2. Take a look at virtualenv_ and virtualenvwrapper_. These tools provide
    isolated Python environments, which are more practical than installing
@@ -179,11 +178,11 @@ This is the recommended way to install Django.
 
 .. _pip: https://pip.pypa.io/
 .. _virtualenv: http://www.virtualenv.org/
-.. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
+.. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
 .. _standalone pip installer: https://pip.pypa.io/en/latest/installing.html#install-pip
 
 Installing a distribution-specific package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 Check the :doc:`distribution specific notes </misc/distributions>` to see if
 your platform/distribution provides official Django packages/installers.
@@ -194,7 +193,7 @@ contain the latest release of Django.
 .. _installing-development-version:
 
 Installing the development version
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 .. admonition:: Tracking Django development
 

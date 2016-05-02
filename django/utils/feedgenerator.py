@@ -89,9 +89,10 @@ def get_tag_uri(url, date):
 class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
     def __init__(self, title, link, description, language=None, author_email=None,
-            author_name=None, author_link=None, subtitle=None, categories=None,
-            feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
-        to_unicode = lambda s: force_text(s, strings_only=True)
+                 author_name=None, author_link=None, subtitle=None, categories=None,
+                 feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
+        def to_unicode(s):
+            return force_text(s, strings_only=True)
         if categories:
             categories = [force_text(c) for c in categories]
         if ttl is not None:
@@ -116,17 +117,18 @@ class SyndicationFeed(object):
         self.items = []
 
     def add_item(self, title, link, description, author_email=None,
-            author_name=None, author_link=None, pubdate=None, comments=None,
-            unique_id=None, unique_id_is_permalink=None, enclosure=None,
-            categories=(), item_copyright=None, ttl=None, updateddate=None,
-            enclosures=None, **kwargs):
+                 author_name=None, author_link=None, pubdate=None, comments=None,
+                 unique_id=None, unique_id_is_permalink=None, enclosure=None,
+                 categories=(), item_copyright=None, ttl=None, updateddate=None,
+                 enclosures=None, **kwargs):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
         objects except pubdate and updateddate, which are datetime.datetime
         objects, and enclosures, which is an iterable of instances of the
         Enclosure class.
         """
-        to_unicode = lambda s: force_text(s, strings_only=True)
+        def to_unicode(s):
+            return force_text(s, strings_only=True)
         if categories:
             categories = [to_unicode(c) for c in categories]
         if ttl is not None:
@@ -260,8 +262,7 @@ class RssFeed(SyndicationFeed):
         handler.addQuickElement("link", self.feed['link'])
         handler.addQuickElement("description", self.feed['description'])
         if self.feed['feed_url'] is not None:
-            handler.addQuickElement("atom:link", None,
-                    {"rel": "self", "href": self.feed['feed_url']})
+            handler.addQuickElement("atom:link", None, {"rel": "self", "href": self.feed['feed_url']})
         if self.feed['language'] is not None:
             handler.addQuickElement("language", self.feed['language'])
         for cat in self.feed['categories']:
@@ -307,13 +308,13 @@ class Rss201rev2Feed(RssFeed):
 
         # Author information.
         if item["author_name"] and item["author_email"]:
-            handler.addQuickElement("author", "%s (%s)" %
-                (item['author_email'], item['author_name']))
+            handler.addQuickElement("author", "%s (%s)" % (item['author_email'], item['author_name']))
         elif item["author_email"]:
             handler.addQuickElement("author", item["author_email"])
         elif item["author_name"]:
-            handler.addQuickElement("dc:creator", item["author_name"],
-                {"xmlns:dc": "http://purl.org/dc/elements/1.1/"})
+            handler.addQuickElement(
+                "dc:creator", item["author_name"], {"xmlns:dc": "http://purl.org/dc/elements/1.1/"}
+            )
 
         if item['pubdate'] is not None:
             handler.addQuickElement("pubDate", rfc2822_date(item['pubdate']))
@@ -322,8 +323,7 @@ class Rss201rev2Feed(RssFeed):
         if item['unique_id'] is not None:
             guid_attrs = {}
             if isinstance(item.get('unique_id_is_permalink'), bool):
-                guid_attrs['isPermaLink'] = str(
-                    item['unique_id_is_permalink']).lower()
+                guid_attrs['isPermaLink'] = str(item['unique_id_is_permalink']).lower()
             handler.addQuickElement("guid", item['unique_id'], guid_attrs)
         if item['ttl'] is not None:
             handler.addQuickElement("ttl", item['ttl'])

@@ -12,7 +12,8 @@ if HAS_GDAL:
 
     # List of acceptable data sources.
     ds_list = (
-        TestDS('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
+        TestDS(
+            'test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
             fields={'dbl': OFTReal, 'int': OFTInteger, 'str': OFTString},
             extent=(-1.35011, 0.166623, -0.524093, 0.824508),  # Got extent from QGIS
             srs_wkt=(
@@ -27,7 +28,8 @@ if HAS_GDAL:
             },
             fids=range(5)
         ),
-        TestDS('test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D',
+        TestDS(
+            'test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D',
             driver='OGR_VRT' if GDAL_VERSION >= (2, 0) else 'VRT',
             fields={
                 'POINT_X': OFTString,
@@ -42,7 +44,8 @@ if HAS_GDAL:
             },
             fids=range(1, 4)
         ),
-        TestDS('test_poly', nfeat=3, nfld=3, geom='POLYGON', gtype=3,
+        TestDS(
+            'test_poly', nfeat=3, nfld=3, geom='POLYGON', gtype=3,
             driver='ESRI Shapefile',
             fields={'float': OFTReal, 'int': OFTInteger, 'str': OFTString},
             extent=(-1.01513, -0.558245, 0.161876, 0.839637),  # Got extent from QGIS
@@ -87,7 +90,8 @@ class DataSourceTest(unittest.TestCase):
     def test02_invalid_shp(self):
         "Testing invalid SHP files for the Data Source."
         for source in bad_ds:
-            self.assertRaises(GDALException, DataSource, source.ds)
+            with self.assertRaises(GDALException):
+                DataSource(source.ds)
 
     def test03a_layers(self):
         "Testing Data Source Layers."
@@ -122,8 +126,10 @@ class DataSourceTest(unittest.TestCase):
                     self.assertIn(f, source.fields)
 
                 # Negative FIDs are not allowed.
-                self.assertRaises(OGRIndexError, layer.__getitem__, -1)
-                self.assertRaises(OGRIndexError, layer.__getitem__, 50000)
+                with self.assertRaises(OGRIndexError):
+                    layer.__getitem__(-1)
+                with self.assertRaises(OGRIndexError):
+                    layer.__getitem__(50000)
 
                 if hasattr(source, 'field_values'):
                     fld_names = source.field_values.keys()
@@ -233,11 +239,13 @@ class DataSourceTest(unittest.TestCase):
         self.assertIsNone(lyr.spatial_filter)
 
         # Must be set a/an OGRGeometry or 4-tuple.
-        self.assertRaises(TypeError, lyr._set_spatial_filter, 'foo')
+        with self.assertRaises(TypeError):
+            lyr._set_spatial_filter('foo')
 
         # Setting the spatial filter with a tuple/list with the extent of
         # a buffer centering around Pueblo.
-        self.assertRaises(ValueError, lyr._set_spatial_filter, list(range(5)))
+        with self.assertRaises(ValueError):
+            lyr._set_spatial_filter(list(range(5)))
         filter_extent = (-105.609252, 37.255001, -103.609252, 39.255001)
         lyr.spatial_filter = (-105.609252, 37.255001, -103.609252, 39.255001)
         self.assertEqual(OGRGeometry.from_bbox(filter_extent), lyr.spatial_filter)

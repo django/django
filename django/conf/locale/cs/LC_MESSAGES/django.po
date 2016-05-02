@@ -11,11 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-20 08:46+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-12-09 08:40+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
-"Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
-"cs/)\n"
+"Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -85,6 +84,9 @@ msgstr "španělsky"
 msgid "Argentinian Spanish"
 msgstr "argentinskou španělštinou"
 
+msgid "Colombian Spanish"
+msgstr "kolumbijskou španělštinou"
+
 msgid "Mexican Spanish"
 msgstr "Mexická španělština"
 
@@ -114,6 +116,9 @@ msgstr "frísky"
 
 msgid "Irish"
 msgstr "irsky"
+
+msgid "Scottish Gaelic"
+msgstr "skotskou keltštinou"
 
 msgid "Galician"
 msgstr "galicijsky"
@@ -307,6 +312,13 @@ msgstr ""
 "Zadejte platný identifikátor složený pouze z písmen, čísel, podtržítek a "
 "pomlček."
 
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Zadejte platný identifikátor složený pouze z písmen, čísel, podtržítek a "
+"pomlček typu Unicode."
+
 msgid "Enter a valid IPv4 address."
 msgstr "Zadejte platnou adresu typu IPv4."
 
@@ -358,6 +370,35 @@ msgstr[1] ""
 "Tato hodnota má mít nejvýše %(limit_value)d znaky (nyní má %(show_value)d)."
 msgstr[2] ""
 "Tato hodnota má mít nejvýše %(limit_value)d znaků (nyní má %(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslici."
+msgstr[1] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslice."
+msgstr[2] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslic."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Ujistěte se, že pole neobsahuje více než %(max)s desetinné místo."
+msgstr[1] "Ujistěte se, že pole neobsahuje více než %(max)s desetinná místa."
+msgstr[2] "Ujistěte se, že pole neobsahuje více než %(max)s desetinných míst."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Ujistěte se, že hodnota neobsahuje více než %(max)s místo před desetinnou "
+"čárkou (tečkou)."
+msgstr[1] ""
+"Ujistěte se, že hodnota neobsahuje více než %(max)s místa před desetinnou "
+"čárkou (tečkou)."
+msgstr[2] ""
+"Ujistěte se, že hodnota neobsahuje více než %(max)s míst před desetinnou "
+"čárkou (tečkou)."
 
 msgid "and"
 msgstr "a"
@@ -564,6 +605,12 @@ msgstr "Vazba jedna-jedna"
 msgid "Many-to-many relationship"
 msgstr "Vazba mnoho-mnoho"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?!"
+
 msgid "This field is required."
 msgstr "Toto pole je třeba vyplnit."
 
@@ -572,35 +619,6 @@ msgstr "Zadejte celé číslo."
 
 msgid "Enter a number."
 msgstr "Zadejte číslo."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslici."
-msgstr[1] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslice."
-msgstr[2] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslic."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Ujistěte se, že pole neobsahuje více než %(max)s desetinné místo."
-msgstr[1] "Ujistěte se, že pole neobsahuje více než %(max)s desetinná místa."
-msgstr[2] "Ujistěte se, že pole neobsahuje více než %(max)s desetinných míst."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Ujistěte se, že hodnota neobsahuje více než %(max)s místo před desetinnou "
-"čárkou (tečkou)."
-msgstr[1] ""
-"Ujistěte se, že hodnota neobsahuje více než %(max)s místa před desetinnou "
-"čárkou (tečkou)."
-msgstr[2] ""
-"Ujistěte se, že hodnota neobsahuje více než %(max)s míst před desetinnou "
-"čárkou (tečkou)."
 
 msgid "Enter a valid date."
 msgstr "Zadejte platné datum."
@@ -664,12 +682,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Skryté pole %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "Data objektu ManagementForm chybí nebo byla pozměněna."

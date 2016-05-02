@@ -2,17 +2,18 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2014
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
-"language/mk/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-02-15 10:39+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
+"mk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -39,21 +40,21 @@ msgid "Filter"
 msgstr "Филтер"
 
 msgid "Choose all"
-msgstr "Избери ги сите"
+msgstr "Одбери ги сите ги сите"
 
 #, javascript-format
 msgid "Click to choose all %s at once."
-msgstr "Кликнете за да ги изберете сите %s од еднаш."
+msgstr "Кликнете за да ги одберете сите %s од еднаш."
 
 msgid "Choose"
-msgstr "Изберете"
+msgstr "Одбери"
 
 msgid "Remove"
 msgstr "Отстрани"
 
 #, javascript-format
 msgid "Chosen %s"
-msgstr "Избрано %s"
+msgstr "Одбрано %s"
 
 #, javascript-format
 msgid ""
@@ -73,7 +74,7 @@ msgstr "Кликнете за да ги отстраните сите одбра
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "избрано %(sel)s од %(cnt)s"
-msgstr[1] "избрани %(sel)s од %(cnt)s"
+msgstr[1] "одбрани %(sel)s од %(cnt)s"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -114,11 +115,11 @@ msgstr[1] "Забелешка: Вие сте %s часа поназад од в�
 msgid "Now"
 msgstr "Сега"
 
-msgid "Clock"
-msgstr "Часовник"
+msgid "Choose a Time"
+msgstr "Одбери време"
 
 msgid "Choose a time"
-msgstr "Избери време"
+msgstr "Одбери време"
 
 msgid "Midnight"
 msgstr "Полноќ"
@@ -129,14 +130,17 @@ msgstr "6 наутро"
 msgid "Noon"
 msgstr "Пладне"
 
+msgid "6 p.m."
+msgstr "6 попладне"
+
 msgid "Cancel"
 msgstr "Откажи"
 
 msgid "Today"
 msgstr "Денеска"
 
-msgid "Calendar"
-msgstr "Календар"
+msgid "Choose a Date"
+msgstr "Одбери датум"
 
 msgid "Yesterday"
 msgstr "Вчера"

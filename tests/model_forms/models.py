@@ -388,13 +388,16 @@ class ColourfulItem(models.Model):
 
 
 class CustomErrorMessage(models.Model):
-    name1 = models.CharField(max_length=50,
+    name1 = models.CharField(
+        max_length=50,
         validators=[validators.validate_slug],
-        error_messages={'invalid': 'Model custom error message.'})
-
-    name2 = models.CharField(max_length=50,
+        error_messages={'invalid': 'Model custom error message.'},
+    )
+    name2 = models.CharField(
+        max_length=50,
         validators=[validators.validate_slug],
-        error_messages={'invalid': 'Model custom error message.'})
+        error_messages={'invalid': 'Model custom error message.'},
+    )
 
     def clean(self):
         if self.name1 == 'FORBIDDEN_VALUE':
@@ -474,3 +477,9 @@ class StrictAssignmentAll(models.Model):
         if self._should_error is True:
             raise ValidationError(message="Cannot set attribute", code='invalid')
         super(StrictAssignmentAll, self).__setattr__(key, value)
+
+
+# A model with ForeignKey(blank=False, null=True)
+class Award(models.Model):
+    name = models.CharField(max_length=30)
+    character = models.ForeignKey(Character, models.SET_NULL, blank=False, null=True)

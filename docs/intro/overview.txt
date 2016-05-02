@@ -304,7 +304,7 @@ Here's what the "base.html" template, including the use of :doc:`static files
 .. snippet:: html+django
     :filename: mysite/templates/base.html
 
-    {% load staticfiles %}
+    {% load static %}
     <html>
     <head>
         <title>{% block title %}{% endblock %}</title>

@@ -3,14 +3,15 @@
 # Translators:
 # aljosa <aljosa.mohorovic@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Croatian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-12-08 12:22+0000\n"
+"Last-Translator: Mislav Cimperšak <mislav.cimpersak@gmail.com>\n"
+"Language-Team: Croatian (http://www.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgid "Advanced options"
 msgstr "Napredne opcije"
 
 msgid "Flat Pages"
-msgstr ""
+msgstr "Statične stranice"
 
 msgid "URL"
 msgstr "URL"
@@ -76,6 +77,9 @@ msgstr "registracija obavezna"
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Ako je ovo selektirano samo logirani korisnici moći će vidjeti ovu stranicu."
+
+msgid "sites"
+msgstr "stranice"
 
 msgid "flat page"
 msgstr "statična stranica"

@@ -3,17 +3,16 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Juraj Bubniak <translations@jbub.eu>, 2012-2013
-# Marian Andre <marian@andre.sk>, 2013
+# Marian Andre <marian@andre.sk>, 2013,2015
 # Martin Kosír, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-27 09:35+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
-"sk/)\n"
+"Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -30,13 +29,13 @@ msgid "Asturian"
 msgstr ""
 
 msgid "Azerbaijani"
-msgstr "azerbajdžanský"
+msgstr "azerbajdžansky"
 
 msgid "Bulgarian"
-msgstr "bulharský"
+msgstr "bulharsky"
 
 msgid "Belarusian"
-msgstr "bieloruský"
+msgstr "bielorusky"
 
 msgid "Bengali"
 msgstr "bengálsky"
@@ -51,37 +50,40 @@ msgid "Catalan"
 msgstr "katalánsky"
 
 msgid "Czech"
-msgstr "český"
+msgstr "česky"
 
 msgid "Welsh"
-msgstr "waleský"
+msgstr "walesky"
 
 msgid "Danish"
 msgstr "dánsky"
 
 msgid "German"
-msgstr "nemecký"
+msgstr "nemecky"
 
 msgid "Greek"
 msgstr "grécky"
 
 msgid "English"
-msgstr "anglický"
+msgstr "anglicky"
 
 msgid "Australian English"
 msgstr ""
 
 msgid "British English"
-msgstr "britský"
+msgstr "britsky"
 
 msgid "Esperanto"
-msgstr "esperantský"
+msgstr "esperantsky"
 
 msgid "Spanish"
 msgstr "španielsky"
 
 msgid "Argentinian Spanish"
 msgstr "argentínska španielčina"
+
+msgid "Colombian Spanish"
+msgstr ""
 
 msgid "Mexican Spanish"
 msgstr "mexická španielčina"
@@ -99,7 +101,7 @@ msgid "Basque"
 msgstr "baskický"
 
 msgid "Persian"
-msgstr "perzský"
+msgstr "perzsky"
 
 msgid "Finnish"
 msgstr "fínsky"
@@ -113,20 +115,23 @@ msgstr "frízsky"
 msgid "Irish"
 msgstr "írsky"
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
-msgstr "galícijský"
+msgstr "galícijsky"
 
 msgid "Hebrew"
-msgstr "hebrejský"
+msgstr "hebrejsky"
 
 msgid "Hindi"
-msgstr "hindský"
+msgstr "hindsky"
 
 msgid "Croatian"
 msgstr "chorvátsky"
 
 msgid "Hungarian"
-msgstr "maďarský"
+msgstr "maďarsky"
 
 msgid "Interlingua"
 msgstr "interlinguánsky"
@@ -138,13 +143,13 @@ msgid "Ido"
 msgstr ""
 
 msgid "Icelandic"
-msgstr "islandský"
+msgstr "islandsky"
 
 msgid "Italian"
 msgstr "taliansky"
 
 msgid "Japanese"
-msgstr "japonský"
+msgstr "japonsky"
 
 msgid "Georgian"
 msgstr "gruzínsky"
@@ -159,16 +164,16 @@ msgid "Kannada"
 msgstr "kanadský"
 
 msgid "Korean"
-msgstr "kórejský"
+msgstr "kórejsky"
 
 msgid "Luxembourgish"
-msgstr "luxemburský"
+msgstr "luxembursky"
 
 msgid "Lithuanian"
-msgstr "litovský"
+msgstr "litovsky"
 
 msgid "Latvian"
-msgstr "lotyšský"
+msgstr "lotyšsky"
 
 msgid "Macedonian"
 msgstr "macedónsky"
@@ -177,7 +182,7 @@ msgid "Malayalam"
 msgstr "malajalámsky"
 
 msgid "Mongolian"
-msgstr "mongolský"
+msgstr "mongolsky"
 
 msgid "Marathi"
 msgstr ""
@@ -192,7 +197,7 @@ msgid "Nepali"
 msgstr "nepálsky"
 
 msgid "Dutch"
-msgstr "holandský"
+msgstr "holandsky"
 
 msgid "Norwegian Nynorsk"
 msgstr "nórsky (Nynorsk)"
@@ -204,34 +209,34 @@ msgid "Punjabi"
 msgstr "pandžábsky"
 
 msgid "Polish"
-msgstr "poľský"
+msgstr "poľsky"
 
 msgid "Portuguese"
-msgstr "portugalský"
+msgstr "portugalsky"
 
 msgid "Brazilian Portuguese"
 msgstr "portugalský (Brazília)"
 
 msgid "Romanian"
-msgstr "rumunský"
+msgstr "rumunsky"
 
 msgid "Russian"
-msgstr "ruský"
+msgstr "rusky"
 
 msgid "Slovak"
-msgstr "slovenský"
+msgstr "slovensky"
 
 msgid "Slovenian"
-msgstr "slovinský"
+msgstr "slovinsky"
 
 msgid "Albanian"
 msgstr "albánsky"
 
 msgid "Serbian"
-msgstr "srbský"
+msgstr "srbsky"
 
 msgid "Serbian Latin"
-msgstr "srbský (Latin)"
+msgstr "srbsky (Latin)"
 
 msgid "Swedish"
 msgstr "švédsky"
@@ -240,16 +245,16 @@ msgid "Swahili"
 msgstr "svahilský"
 
 msgid "Tamil"
-msgstr "tamilský"
+msgstr "tamilsky"
 
 msgid "Telugu"
 msgstr "telúgsky"
 
 msgid "Thai"
-msgstr "thajský"
+msgstr "thajsky"
 
 msgid "Turkish"
-msgstr "turecký"
+msgstr "turecky"
 
 msgid "Tatar"
 msgstr "tatársky"
@@ -258,13 +263,13 @@ msgid "Udmurt"
 msgstr "udmurtský"
 
 msgid "Ukrainian"
-msgstr "ukrajinský"
+msgstr "ukrajinsky"
 
 msgid "Urdu"
-msgstr "urdský"
+msgstr "urdsky"
 
 msgid "Vietnamese"
-msgstr "vietnamský"
+msgstr "vietnamsky"
 
 msgid "Simplified Chinese"
 msgstr "čínsky (zjednodušene)"
@@ -304,6 +309,11 @@ msgid ""
 msgstr ""
 "Zadajte platný 'slug' pozostávajúci z písmen, čísel, podčiarkovníkov alebo "
 "pomlčiek."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "Zadajte platnú IPv4 adresu."
@@ -362,6 +372,35 @@ msgstr[1] ""
 msgstr[2] ""
 "Uistite sa, že táto hodnota má najviac %(limit_value)d  znakov (má "
 "%(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Uistite sa, že nie je zadaných celkovo viac ako %(max)s číslica."
+msgstr[1] "Uistite sa, že nie je zadaných celkovo viac ako %(max)s číslice."
+msgstr[2] "Uistite sa, že nie je zadaných celkovo viac ako %(max)s číslic."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Uistite sa, že nie je zadané viac ako %(max)s desatinné miesto."
+msgstr[1] "Uistite sa, že nie sú zadané viac ako %(max)s desatinné miesta."
+msgstr[2] "Uistite sa, že nie je zadaných viac ako %(max)s desatinných miest."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Uistite sa, že nie je zadaných viac ako %(max)s číslica pred desatinnou "
+"čiarkou."
+msgstr[1] ""
+"Uistite sa, že nie sú zadané viac ako %(max)s číslice pred desatinnou "
+"čiarkou."
+msgstr[2] ""
+"Uistite sa, že nie je zadaných viac ako %(max)s číslic pred desatinnou "
+"čiarkou."
 
 msgid "and"
 msgstr "a"
@@ -551,6 +590,12 @@ msgstr "Typ relácie: jedna k jednej"
 msgid "Many-to-many relationship"
 msgstr "Typ relácie: M ku N"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Toto pole je povinné."
 
@@ -559,35 +604,6 @@ msgstr "Zadajte celé číslo."
 
 msgid "Enter a number."
 msgstr "Zadajte číslo."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Uistite sa, že nie je zadaných celkovo viac ako %(max)s číslica."
-msgstr[1] "Uistite sa, že nie je zadaných celkovo viac ako %(max)s číslice."
-msgstr[2] "Uistite sa, že nie je zadaných celkovo viac ako %(max)s číslic."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Uistite sa, že nie je zadané viac ako %(max)s desatinné miesto."
-msgstr[1] "Uistite sa, že nie sú zadané viac ako %(max)s desatinné miesta."
-msgstr[2] "Uistite sa, že nie je zadaných viac ako %(max)s desatinných miest."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Uistite sa, že nie je zadaných viac ako %(max)s číslica pred desatinnou "
-"čiarkou."
-msgstr[1] ""
-"Uistite sa, že nie sú zadané viac ako %(max)s číslice pred desatinnou "
-"čiarkou."
-msgstr[2] ""
-"Uistite sa, že nie je zadaných viac ako %(max)s číslic pred desatinnou "
-"čiarkou."
 
 msgid "Enter a valid date."
 msgstr "Zadajte platný dátum."
@@ -653,12 +669,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Skryté pole %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""

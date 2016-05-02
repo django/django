@@ -106,6 +106,8 @@ def lazy_number(func, resultclass, number=None, **kwargs):
         kwargs['number'] = number
         proxy = lazy(func, resultclass)(**kwargs)
     else:
+        original_kwargs = kwargs.copy()
+
         class NumberAwareString(resultclass):
             def __bool__(self):
                 return bool(kwargs['singular'])
@@ -118,10 +120,11 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                     try:
                         number_value = rhs[number]
                     except KeyError:
-                        raise KeyError('Your dictionary lacks key \'%s\'. '
-                            'Please provide it, because it is required to '
-                            'determine whether string is singular or plural.'
-                            % number)
+                        raise KeyError(
+                            "Your dictionary lacks key '%s\'. Please provide "
+                            "it, because it is required to determine whether "
+                            "string is singular or plural." % number
+                        )
                 else:
                     number_value = rhs
                 kwargs['number'] = number_value
@@ -134,7 +137,12 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                 return translated
 
         proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
+        proxy.__reduce__ = lambda: (_lazy_number_unpickle, (func, resultclass, number, original_kwargs))
     return proxy
+
+
+def _lazy_number_unpickle(func, resultclass, number, kwargs):
+    return lazy_number(func, resultclass, number=number, **kwargs)
 
 
 def ngettext_lazy(singular, plural, number=None):

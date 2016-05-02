@@ -658,11 +658,11 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         if not self.get_allow_future() and date > datetime.date.today():
             raise Http404(_(
                 "Future %(verbose_name_plural)s not available because "
-                "%(class_name)s.allow_future is False.") % {
+                "%(class_name)s.allow_future is False."
+            ) % {
                 'verbose_name_plural': qs.model._meta.verbose_name_plural,
                 'class_name': self.__class__.__name__,
-                },
-            )
+            })
 
         # Filter down a queryset from self.queryset using the date from the
         # URL. This'll get passed as the queryset to DetailView.get_object,

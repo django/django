@@ -13,7 +13,6 @@ try:
     # raised if GDAL isn't installed.
     models.OriginalRasterField = models.RasterField
 except ImproperlyConfigured:
-    models.GeoManager = models.Manager
     models.GeometryField = DummyField
     models.LineStringField = DummyField
     models.MultiPointField = DummyField

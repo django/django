@@ -8,7 +8,7 @@ This is Django 1.5.4, the fourth release in the Django 1.5 series. It addresses
 two security issues and one bug.
 
 Denial-of-service via password hashers
---------------------------------------
+======================================
 
 In previous versions of Django, no limit was imposed on the plaintext
 length of a password. This allowed a denial-of-service attack through
@@ -21,7 +21,7 @@ limit on passwords, and will fail authentication with any submitted
 password of greater length.
 
 Corrected usage of :func:`~django.views.decorators.debug.sensitive_post_parameters` in :mod:`django.contrib.auth`’s admin
--------------------------------------------------------------------------------------------------------------------------
+=========================================================================================================================
 
 The decoration of the ``add_view`` and ``user_change_password`` user admin
 views with :func:`~django.views.decorators.debug.sensitive_post_parameters`

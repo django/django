@@ -1,5 +1,3 @@
-.. _time-zones:
-
 ==========
 Time zones
 ==========
@@ -259,8 +257,8 @@ Template tags
 
 .. templatetag:: localtime
 
-localtime
-~~~~~~~~~
+``localtime``
+~~~~~~~~~~~~~
 
 Enables or disables conversion of aware datetime objects to the current time
 zone in the contained block.
@@ -288,8 +286,8 @@ To activate or deactivate conversion for a template block, use::
 
 .. templatetag:: timezone
 
-timezone
-~~~~~~~~
+``timezone``
+~~~~~~~~~~~~
 
 Sets or unsets the current time zone in the contained block. When the current
 time zone is unset, the default time zone applies.
@@ -308,8 +306,8 @@ time zone is unset, the default time zone applies.
 
 .. templatetag:: get_current_timezone
 
-get_current_timezone
-~~~~~~~~~~~~~~~~~~~~
+``get_current_timezone``
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can get the name of the current time zone using the
 ``get_current_timezone`` tag::
@@ -329,8 +327,8 @@ return aware datetimes.
 
 .. templatefilter:: localtime
 
-localtime
-~~~~~~~~~
+``localtime``
+~~~~~~~~~~~~~
 
 Forces conversion of a single value to the current time zone.
 
@@ -342,8 +340,8 @@ For example::
 
 .. templatefilter:: utc
 
-utc
-~~~
+``utc``
+~~~~~~~
 
 Forces conversion of a single value to UTC.
 
@@ -355,8 +353,8 @@ For example::
 
 .. templatefilter:: timezone
 
-timezone
-~~~~~~~~
+``timezone``
+~~~~~~~~~~~~
 
 Forces conversion of a single value to an arbitrary timezone.
 

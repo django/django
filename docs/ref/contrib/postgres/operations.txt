@@ -1,3 +1,4 @@
+=============================
 Database migration operations
 =============================
 
@@ -6,8 +7,8 @@ the ``django.contrib.postgres.operations`` module.
 
 .. currentmodule:: django.contrib.postgres.operations
 
-CreateExtension
----------------
+``CreateExtension``
+===================
 
 .. class:: CreateExtension(name)
 
@@ -17,8 +18,8 @@ CreateExtension
 
         This is a required argument. The name of the extension to be installed.
 
-HStoreExtension
----------------
+``HStoreExtension``
+===================
 
 .. class:: HStoreExtension()
 
@@ -26,8 +27,8 @@ HStoreExtension
     which will install the ``hstore`` extension and also immediately set up the
     connection to interpret hstore data.
 
-UnaccentExtension
------------------
+``UnaccentExtension``
+=====================
 
 .. class:: UnaccentExtension()
 

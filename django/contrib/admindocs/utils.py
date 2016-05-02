@@ -4,7 +4,7 @@ import re
 from email.errors import HeaderParseError
 from email.parser import HeaderParser
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.safestring import mark_safe
 
@@ -65,7 +65,7 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
     """
     overrides = {
         'doctitle_xform': True,
-        'inital_header_level': 3,
+        'initial_header_level': 3,
         "default_reference_context": default_reference_context,
         "link_base": reverse('django-admindocs-docroot').rstrip('/'),
         'raw_enabled': False,
@@ -82,9 +82,11 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
 
 .. default-role::
 """
-    parts = docutils.core.publish_parts(source % text,
-                source_path=thing_being_parsed, destination_path=None,
-                writer_name='html', settings_overrides=overrides)
+    parts = docutils.core.publish_parts(
+        source % text,
+        source_path=thing_being_parsed, destination_path=None,
+        writer_name='html', settings_overrides=overrides,
+    )
     return mark_safe(parts['fragment'])
 
 #

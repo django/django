@@ -34,11 +34,12 @@ from .models import (
     GenRelReference, Grommet, ImplicitlyGeneratedPK, Ingredient,
     InlineReference, InlineReferer, Inquisition, Language, Link,
     MainPrepopulated, ModelWithStringPrimaryKey, NotReferenced, OldSubscriber,
-    OtherStory, Paper, Parent, ParentWithDependentChildren, Person, Persona,
-    Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
-    PrePopulatedPost, PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo,
-    Question, Recipe, Recommendation, Recommender, ReferencedByGenRel,
-    ReferencedByInline, ReferencedByParent, RelatedPrepopulated, Report,
+    OtherStory, Paper, Parent, ParentWithDependentChildren, ParentWithUUIDPK,
+    Person, Persona, Picture, Pizza, Plot, PlotDetails, PlotProxy,
+    PluggableSearchPerson, Podcast, Post, PrePopulatedPost,
+    PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo, Question, Recipe,
+    Recommendation, Recommender, ReferencedByGenRel, ReferencedByInline,
+    ReferencedByParent, RelatedPrepopulated, RelatedWithUUIDPKModel, Report,
     Reservation, Restaurant, RowLevelChangePermissionModel, Section,
     ShortMessage, Simple, Sketch, State, Story, StumpJoke, Subscriber,
     SuperVillain, Telegram, Thing, Topping, UnchangeableObject,
@@ -87,8 +88,11 @@ class ChapterXtra1Admin(admin.ModelAdmin):
 
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('content', 'date', callable_year, 'model_year',
-                    'modeladmin_year', 'model_year_reversed')
+    list_display = (
+        'content', 'date', callable_year, 'model_year', 'modeladmin_year',
+        'model_year_reversed', 'section', lambda obj: obj.title,
+    )
+    list_editable = ('section',)
     list_filter = ('date', 'section')
     view_on_site = False
     fieldsets = (
@@ -204,8 +208,7 @@ class PersonAdmin(admin.ModelAdmin):
     save_as = True
 
     def get_changelist_formset(self, request, **kwargs):
-        return super(PersonAdmin, self).get_changelist_formset(request,
-            formset=BasePersonModelFormSet, **kwargs)
+        return super(PersonAdmin, self).get_changelist_formset(request, formset=BasePersonModelFormSet, **kwargs)
 
     def get_queryset(self, request):
         # Order by a field that isn't in list display, to be able to test
@@ -384,7 +387,7 @@ class LinkInline(admin.TabularInline):
     model = Link
     extra = 1
 
-    readonly_fields = ("posted", "multiline")
+    readonly_fields = ("posted", "multiline", "readonly_link_content")
 
     def multiline(self, instance):
         return "InlineMultiline\ntest\nstring"
@@ -432,7 +435,7 @@ class PostAdmin(admin.ModelAdmin):
     readonly_fields = (
         'posted', 'awesomeness_level', 'coolness', 'value',
         'multiline', 'multiline_html', lambda obj: "foo",
-        'multiline_html_allow_tags',
+        'multiline_html_allow_tags', 'readonly_content',
     )
 
     inlines = [
@@ -508,8 +511,7 @@ class CoverLetterAdmin(admin.ModelAdmin):
     """
     A ModelAdmin with a custom get_queryset() method that uses defer(), to test
     verbose_name display in messages shown after adding/editing CoverLetter
-    instances.
-    Note that the CoverLetter model defines a __unicode__ method.
+    instances. Note that the CoverLetter model defines a __str__ method.
     For testing fix for ticket #14529.
     """
 
@@ -545,8 +547,7 @@ class TelegramAdmin(admin.ModelAdmin):
     """
     A ModelAdmin with a custom get_queryset() method that uses only(), to test
     verbose_name display in messages shown after adding/editing Telegram
-    instances.
-    Note that the Telegram model defines a __unicode__ method.
+    instances. Note that the Telegram model defines a __str__ method.
     For testing fix for ticket #14529.
     """
 
@@ -865,6 +866,10 @@ class InlineRefererAdmin(admin.ModelAdmin):
     inlines = [InlineReferenceInline]
 
 
+class PlotReadonlyAdmin(admin.ModelAdmin):
+    readonly_fields = ('plotdetails',)
+
+
 class GetFormsetsArgumentCheckingAdmin(admin.ModelAdmin):
     fields = ['name']
 
@@ -919,6 +924,7 @@ site.register(Villain)
 site.register(SuperVillain)
 site.register(Plot)
 site.register(PlotDetails)
+site.register(PlotProxy, PlotReadonlyAdmin)
 site.register(Bookmark)
 site.register(CyclicOne)
 site.register(CyclicTwo)
@@ -948,6 +954,8 @@ site.register(ReferencedByInline)
 site.register(InlineReferer, InlineRefererAdmin)
 site.register(ReferencedByGenRel)
 site.register(GenRelReference)
+site.register(ParentWithUUIDPK)
+site.register(RelatedWithUUIDPKModel)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
@@ -998,5 +1006,14 @@ site.register(Group, GroupAdmin)
 site2 = admin.AdminSite(name="namespaced_admin")
 site2.register(User, UserAdmin)
 site2.register(Group, GroupAdmin)
+site2.register(ParentWithUUIDPK)
+site2.register(
+    RelatedWithUUIDPKModel,
+    list_display=['pk', 'parent'],
+    list_editable=['parent'],
+    raw_id_fields=['parent'],
+)
+site2.register(Person, save_as_continue=False)
+
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)

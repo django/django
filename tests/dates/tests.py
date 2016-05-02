@@ -87,10 +87,8 @@ class DatesTests(TestCase):
         )
 
     def test_dates_fails_when_no_arguments_are_provided(self):
-        self.assertRaises(
-            TypeError,
-            Article.objects.dates,
-        )
+        with self.assertRaises(TypeError):
+            Article.objects.dates()
 
     def test_dates_fails_when_given_invalid_field_argument(self):
         six.assertRaisesRegex(
@@ -104,25 +102,12 @@ class DatesTests(TestCase):
         )
 
     def test_dates_fails_when_given_invalid_kind_argument(self):
-        six.assertRaisesRegex(
-            self,
-            AssertionError,
-            "'kind' must be one of 'year', 'month' or 'day'.",
-            Article.objects.dates,
-            "pub_date",
-            "bad_kind",
-        )
+        with self.assertRaisesMessage(AssertionError, "'kind' must be one of 'year', 'month' or 'day'."):
+            Article.objects.dates("pub_date", "bad_kind")
 
     def test_dates_fails_when_given_invalid_order_argument(self):
-        six.assertRaisesRegex(
-            self,
-            AssertionError,
-            "'order' must be either 'ASC' or 'DESC'.",
-            Article.objects.dates,
-            "pub_date",
-            "year",
-            order="bad order",
-        )
+        with self.assertRaisesMessage(AssertionError, "'order' must be either 'ASC' or 'DESC'."):
+            Article.objects.dates("pub_date", "year", order="bad order")
 
     @override_settings(USE_TZ=False)
     def test_dates_trunc_datetime_fields(self):

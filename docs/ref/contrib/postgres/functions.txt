@@ -1,3 +1,4 @@
+======================================
 PostgreSQL specific database functions
 ======================================
 
@@ -6,8 +7,8 @@ All of these functions are available from the
 
 .. currentmodule:: django.contrib.postgres.functions
 
-TransactionNow
---------------
+``TransactionNow``
+==================
 
 .. class:: TransactionNow()
 

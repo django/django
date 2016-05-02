@@ -70,8 +70,6 @@ as a shorter alias, ``_``, to save typing.
        global ``_()`` function causes interference. Explicitly importing
        ``ugettext()`` as ``_()`` avoids this problem.
 
-.. highlightlang:: python
-
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
@@ -182,7 +180,7 @@ translation string and the number of objects.
 
 This function is useful when you need your Django application to be localizable
 to languages where the number and complexity of `plural forms
-<http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
+<https://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
 greater than the two forms used in English ('object' for the singular and
 'objects' for all the cases where ``count`` is different from one, irrespective
 of its value.)
@@ -479,8 +477,8 @@ directly with the ``number`` argument::
                 raise forms.ValidationError(self.error_message % number)
 
 
-Joining strings: string_concat()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Joining strings: ``string_concat()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Standard Python string joins (``''.join([...])``) will not work on lists
 containing lazy translation objects. Instead, you can use
@@ -961,14 +959,75 @@ Django provides an integrated solution for these problems: It passes the
 translations into JavaScript, so you can call ``gettext``, etc., from within
 JavaScript.
 
+The main solution to these problems is the following ``JavaScriptCatalog`` view,
+which generates a JavaScript code library with functions that mimic the
+``gettext`` interface, plus an array of translation strings.
+
 .. _javascript_catalog-view:
+
+The ``JavaScriptCatalog`` view
+------------------------------
+
+.. module:: django.views.i18n
+
+.. versionadded:: 1.10
+
+.. class:: JavaScriptCatalog
+
+    A view that produces a JavaScript code library with functions that mimic
+    the ``gettext`` interface, plus an array of translation strings.
+
+    **Attributes**
+
+    .. attribute:: domain
+
+        Translation domain containing strings to add in the view output.
+        Defaults to ``'djangojs'``.
+
+    .. attribute:: packages
+
+        A list of :attr:`application names <django.apps.AppConfig.name>` among
+        installed applications. Those apps should contain a ``locale``
+        directory. All those catalogs plus all catalogs found in
+        :setting:`LOCALE_PATHS` (which are always included) are merged into one
+        catalog. Defaults to ``None``, which means that all available
+        translations from all :setting:`INSTALLED_APPS` are provided in the
+        JavaScript output.
+
+    **Example with default values**::
+
+        from django.views.i18n import JavaScriptCatalog
+
+        urlpatterns = [
+            url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+        ]
+
+    **Example with custom packages**::
+
+        urlpatterns = [
+            url(r'^jsi18n/myapp/$',
+                JavaScriptCatalog.as_view(packages=['your.app.label']),
+                name='javascript-catalog'),
+        ]
+
+The precedence of translations is such that the packages appearing later in the
+``packages`` argument have higher precedence than the ones appearing at the
+beginning. This is important in the case of clashing translations for the same
+literal.
+
+If you use more than one ``JavaScriptCatalog`` view on a site and some of them
+define the same strings, the strings in the catalog that was loaded last take
+precedence.
 
 The ``javascript_catalog`` view
 -------------------------------
 
-.. module:: django.views.i18n
-
 .. function:: javascript_catalog(request, domain='djangojs', packages=None)
+
+.. deprecated:: 1.10
+
+    ``javascript_catalog()`` is deprecated in favor of
+    :class:`JavaScriptCatalog` and will be removed in Django 2.0.
 
 The main solution to these problems is the
 :meth:`django.views.i18n.javascript_catalog` view, which sends out a JavaScript
@@ -986,7 +1045,7 @@ You hook it up like this::
     }
 
     urlpatterns = [
-        url(r'^jsi18n/$', javascript_catalog, js_info_dict),
+        url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
     ]
 
 Each string in ``packages`` should be in Python dotted-package syntax (the
@@ -1006,7 +1065,7 @@ changed by altering the ``domain`` argument.
 You can make the view dynamic by putting the packages into the URL pattern::
 
     urlpatterns = [
-        url(r'^jsi18n/(?P<packages>\S+?)/$', javascript_catalog),
+        url(r'^jsi18n/(?P<packages>\S+?)/$', javascript_catalog, name='javascript-catalog'),
     ]
 
 With this, you specify the packages as a list of package names delimited by '+'
@@ -1056,7 +1115,7 @@ To use the catalog, just pull in the dynamically generated script like this:
 
 .. code-block:: html+django
 
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 
 This uses reverse URL lookup to find the URL of the JavaScript catalog view.
 When the catalog is loaded, your JavaScript code can use the following methods:
@@ -1209,12 +1268,50 @@ Additionally, if there are complex rules around pluralization, the catalog view
 will render a conditional expression. This will evaluate to either a ``true``
 (should pluralize) or ``false`` (should **not** pluralize) value.
 
+.. highlight:: python
+
+The ``JSONCatalog`` view
+------------------------
+
+.. versionadded:: 1.10
+
+.. class:: JSONCatalog
+
+    In order to use another client-side library to handle translations, you may
+    want to take advantage of the ``JSONCatalog`` view. It's similar to
+    :class:`~django.views.i18n.JavaScriptCatalog` but returns a JSON response.
+
+    See the documentation for :class:`~django.views.i18n.JavaScriptCatalog`
+    to learn about possible values and use of the ``domain`` and ``packages``
+    attributes.
+
+    The response format is as follows:
+
+    .. code-block:: text
+
+        {
+            "catalog": {
+                # Translations catalog
+            },
+            "formats": {
+                # Language formats for date, time, etc.
+            },
+            "plural": "..."  # Expression for plural forms, or null.
+        }
+
+    .. JSON doesn't allow comments so highlighting as JSON won't work here.
+
 The ``json_catalog`` view
 -------------------------
 
 .. versionadded:: 1.9
 
 .. function:: json_catalog(request, domain='djangojs', packages=None)
+
+.. deprecated:: 1.10
+
+    ``json_catalog()`` is deprecated in favor of :class:`JSONCatalog` and will
+    be removed in Django 2.0.
 
 In order to use another client-side library to handle translations, you may
 want to take advantage of the ``json_catalog()`` view. It's similar to
@@ -1243,7 +1340,7 @@ The view is hooked up to your application and configured in the same fashion as
 
 The response format is as follows:
 
-.. code-block:: json
+.. code-block:: text
 
     {
         "catalog": {
@@ -1255,52 +1352,54 @@ The response format is as follows:
         "plural": "..."  # Expression for plural forms, or null.
     }
 
+.. JSON doesn't allow comments so highlighting as JSON won't work here.
+
 Note on performance
 -------------------
 
-The :func:`~django.views.i18n.javascript_catalog` view generates the catalog
-from ``.mo`` files on every request. Since its output is constant — at least
-for a given version of a site — it's a good candidate for caching.
+The various JavaScript/JSON i18n views generate the catalog from ``.mo`` files
+on every request. Since its output is constant, at least for a given version
+of a site, it's a good candidate for caching.
 
 Server-side caching will reduce CPU load. It's easily implemented with the
 :func:`~django.views.decorators.cache.cache_page` decorator. To trigger cache
 invalidation when your translations change, provide a version-dependent key
 prefix, as shown in the example below, or map the view at a version-dependent
-URL.
-
-.. code-block:: python
+URL::
 
     from django.views.decorators.cache import cache_page
-    from django.views.i18n import javascript_catalog
+    from django.views.i18n import JavaScriptCatalog
 
     # The value returned by get_version() must change when translations change.
-    @cache_page(86400, key_prefix='js18n-%s' % get_version())
-    def cached_javascript_catalog(request, domain='djangojs', packages=None):
-        return javascript_catalog(request, domain, packages)
+    urlpatterns = [
+        url(r'^jsi18n/$',
+            cache_page(86400, key_prefix='js18n-%s' % get_version())(JavaScriptCatalog.as_view()),
+            name='javascript-catalog'),
+    ]
 
 Client-side caching will save bandwidth and make your site load faster. If
 you're using ETags (:setting:`USE_ETAGS = True <USE_ETAGS>`), you're already
 covered. Otherwise, you can apply :ref:`conditional decorators
 <conditional-decorators>`. In the following example, the cache is invalidated
-whenever you restart your application server.
-
-.. code-block:: python
+whenever you restart your application server::
 
     from django.utils import timezone
     from django.views.decorators.http import last_modified
-    from django.views.i18n import javascript_catalog
+    from django.views.i18n import JavaScriptCatalog
 
     last_modified_date = timezone.now()
 
-    @last_modified(lambda req, **kw: last_modified_date)
-    def cached_javascript_catalog(request, domain='djangojs', packages=None):
-        return javascript_catalog(request, domain, packages)
+    urlpatterns = [
+        url(r'^jsi18n/$',
+            last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()),
+            name='javascript-catalog'),
+    ]
 
 You can even pre-generate the JavaScript catalog as part of your deployment
 procedure and serve it as a static file. This radical technique is implemented
 in django-statici18n_.
 
-.. _django-statici18n: http://django-statici18n.readthedocs.org/en/latest/
+.. _django-statici18n: https://django-statici18n.readthedocs.io/en/latest/
 
 .. _url-internationalization:
 
@@ -1328,11 +1427,17 @@ Django provides two mechanisms to internationalize URL patterns:
 Language prefix in URL patterns
 -------------------------------
 
-.. function:: i18n_patterns(*pattern_list)
+.. function:: i18n_patterns(*urls, prefix_default_language=True)
 
-This function can be used in your root URLconf and Django will automatically
+This function can be used in a root URLconf and Django will automatically
 prepend the current active language code to all url patterns defined within
-:func:`~django.conf.urls.i18n.i18n_patterns`. Example URL patterns::
+:func:`~django.conf.urls.i18n.i18n_patterns`.
+
+Setting ``prefix_default_language`` to ``False`` removes the prefix from the
+default language (:setting:`LANGUAGE_CODE`). This can be useful when adding
+translations to existing site so that the current URLs won't change.
+
+Example URL patterns::
 
     from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
@@ -1360,8 +1465,8 @@ After defining these URL patterns, Django will automatically add the
 language prefix to the URL patterns that were added by the ``i18n_patterns``
 function. Example::
 
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import activate
+    >>> from django.urls import reverse
+    >>> from django.utils.translation import activate
 
     >>> activate('en')
     >>> reverse('sitemap-xml')
@@ -1373,11 +1478,32 @@ function. Example::
     >>> reverse('news:detail', kwargs={'slug': 'news-slug'})
     '/nl/news/news-slug/'
 
+With ``prefix_default_language=False`` and  ``LANGUAGE_CODE='en'``, the URLs
+will be::
+
+    >>> activate('en')
+    >>> reverse('news:index')
+    '/news/'
+
+    >>> activate('nl')
+    >>> reverse('news:index')
+    '/nl/news/'
+
+.. versionadded:: 1.10
+
+    The ``prefix_default_language`` parameter was added.
+
 .. warning::
 
-    :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in your root
+    :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in a root
     URLconf. Using it within an included URLconf will throw an
     :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
+
+.. versionchanged:: 1.10
+
+    In older version, using ``i18n_patterns`` in a root URLconf different from
+    :setting:`ROOT_URLCONF` by setting :attr:`request.urlconf
+    <django.http.HttpRequest.urlconf>` wasn't supported.
 
 .. warning::
 
@@ -1414,12 +1540,11 @@ URL patterns can also be marked translatable using the
         url(_(r'^news/'), include(news_patterns, namespace='news')),
     )
 
-After you've created the translations, the
-:func:`~django.core.urlresolvers.reverse` function will return the URL in the
-active language. Example::
+After you've created the translations, the :func:`~django.urls.reverse`
+function will return the URL in the active language. Example::
 
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import activate
+    >>> from django.urls import reverse
+    >>> from django.utils.translation import activate
 
     >>> activate('en')
     >>> reverse('news:category', kwargs={'slug': 'recent'})
@@ -1686,25 +1811,8 @@ updating message files, just run :djadmin:`django-admin compilemessages
 This is only needed for people who either want to extract message IDs or compile
 message files (``.po``). Translation work itself just involves editing existing
 files of this type, but if you want to create your own message files, or want to
-test or compile a changed message file, you will need the ``gettext`` utilities:
-
-* Download the following zip files from the GNOME servers
-  https://download.gnome.org/binaries/win32/dependencies/
-
-  * ``gettext-runtime-X.zip``
-  * ``gettext-tools-X.zip``
-
-  ``X`` is the version number, we are requiring ``0.15`` or higher.
-
-* Extract the contents of the ``bin\`` directories in both files to the
-  same folder on your system (i.e. ``C:\Program Files\gettext-utils``)
-
-* Update the system PATH:
-
-  * ``Control Panel > System > Advanced > Environment Variables``.
-  * In the ``System variables`` list, click ``Path``, click ``Edit``.
-  * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
-    ``Variable value`` field.
+test or compile a changed message file, download `a precompiled binary
+installer <http://mlocati.github.io/gettext-iconv-windows/>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
@@ -1716,8 +1824,6 @@ translation utilities with a ``gettext`` package if the command ``xgettext
 
 Customizing the ``makemessages`` command
 ----------------------------------------
-
-.. highlightlang:: python
 
 If you want to pass additional parameters to ``xgettext``, you need to create a
 custom :djadmin:`makemessages` command and override its ``xgettext_options``
@@ -1757,8 +1863,6 @@ Miscellaneous
 The ``set_language`` redirect view
 ----------------------------------
 
-.. highlightlang:: python
-
 .. currentmodule:: django.views.i18n
 
 .. function:: set_language(request)
@@ -1785,14 +1889,21 @@ saves the language choice in the user's session. Otherwise, it saves the
 language choice in a cookie that is by default named ``django_language``.
 (The name can be changed through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
 
-After setting the language choice, Django redirects the user, following this
-algorithm:
+After setting the language choice, Django looks for a ``next`` parameter in the
+``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
+URL (i.e. it doesn't point to a different host and uses a safe scheme), a
+redirect to that URL will be performed. Otherwise, Django may fall back to
+redirecting the user to the URL from the ``Referer`` header or, if it is not
+set, to ``/``, depending on the nature of the request:
 
-* Django looks for a ``next`` parameter in the ``POST`` data.
-* If that doesn't exist, or is empty, Django tries the URL in the
-  ``Referrer`` header.
-* If that's empty -- say, if a user's browser suppresses that header --
-  then the user will be redirected to ``/`` (the site root) as a fallback.
+* For AJAX requests, the fallback will be performed only if the ``next``
+  parameter was set. Otherwise a 204 status code (No Content) will be returned.
+* For non-AJAX requests, the fallback will always be performed.
+
+.. versionchanged:: 1.10
+
+    Returning a 204 status code for AJAX requests when no redirect is specified
+    is new.
 
 Here's example HTML template code:
 

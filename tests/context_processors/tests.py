@@ -87,3 +87,5 @@ class DebugContextProcessorTests(TestCase):
         self.assertContains(response, 'Second query list: 1')
         # Check we have not actually memoized connection.queries
         self.assertContains(response, 'Third query list: 2')
+        # Check queries for DB connection 'other'
+        self.assertContains(response, 'Fourth query list: 3')

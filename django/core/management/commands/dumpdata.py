@@ -1,3 +1,4 @@
+import warnings
 from collections import OrderedDict
 
 from django.apps import apps
@@ -6,50 +7,74 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, router
 
 
+class ProxyModelWarning(Warning):
+    pass
+
+
 class Command(BaseCommand):
-    help = ("Output the contents of the database as a fixture of the given "
-            "format (using each model's default manager unless --all is "
-            "specified).")
+    help = (
+        "Output the contents of the database as a fixture of the given format "
+        "(using each model's default manager unless --all is specified)."
+    )
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='app_label[.ModelName]', nargs='*',
-            help='Restricts dumped data to the specified app_label or app_label.ModelName.')
-        parser.add_argument('--format', default='json', dest='format',
-            help='Specifies the output serialization format for fixtures.')
-        parser.add_argument('--indent', default=None, dest='indent', type=int,
-            help='Specifies the indent level to use when pretty-printing output.')
-        parser.add_argument('--database', action='store', dest='database',
+        parser.add_argument(
+            'args', metavar='app_label[.ModelName]', nargs='*',
+            help='Restricts dumped data to the specified app_label or app_label.ModelName.',
+        )
+        parser.add_argument(
+            '--format', default='json', dest='format',
+            help='Specifies the output serialization format for fixtures.',
+        )
+        parser.add_argument(
+            '--indent', default=None, dest='indent', type=int,
+            help='Specifies the indent level to use when pretty-printing output.',
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS,
             help='Nominates a specific database to dump fixtures from. '
-                 'Defaults to the "default" database.')
-        parser.add_argument('-e', '--exclude', dest='exclude', action='append', default=[],
+                 'Defaults to the "default" database.',
+        )
+        parser.add_argument(
+            '-e', '--exclude', dest='exclude', action='append', default=[],
             help='An app_label or app_label.ModelName to exclude '
-                 '(use multiple --exclude to exclude multiple apps/models).')
-        parser.add_argument('--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
-            help='Use natural foreign keys if they are available.')
-        parser.add_argument('--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
-            help='Use natural primary keys if they are available.')
-        parser.add_argument('-a', '--all', action='store_true', dest='use_base_manager', default=False,
+                 '(use multiple --exclude to exclude multiple apps/models).',
+        )
+        parser.add_argument(
+            '--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
+            help='Use natural foreign keys if they are available.',
+        )
+        parser.add_argument(
+            '--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
+            help='Use natural primary keys if they are available.',
+        )
+        parser.add_argument(
+            '-a', '--all', action='store_true', dest='use_base_manager', default=False,
             help="Use Django's base manager to dump all models stored in the database, "
-                 "including those that would otherwise be filtered or modified by a custom manager.")
-        parser.add_argument('--pks', dest='primary_keys',
-            help="Only dump objects with given primary keys. "
-                 "Accepts a comma separated list of keys. "
-                 "This option will only work when you specify one model.")
-        parser.add_argument('-o', '--output', default=None, dest='output',
-            help='Specifies file to which the output is written.')
+                 "including those that would otherwise be filtered or modified by a custom manager.",
+        )
+        parser.add_argument(
+            '--pks', dest='primary_keys',
+            help="Only dump objects with given primary keys. Accepts a comma-separated "
+                 "list of keys. This option only works when you specify one model.",
+        )
+        parser.add_argument(
+            '-o', '--output', default=None, dest='output',
+            help='Specifies file to which the output is written.'
+        )
 
     def handle(self, *app_labels, **options):
-        format = options.get('format')
-        indent = options.get('indent')
-        using = options.get('database')
-        excludes = options.get('exclude')
-        output = options.get('output')
-        show_traceback = options.get('traceback')
-        use_natural_foreign_keys = options.get('use_natural_foreign_keys')
-        use_natural_primary_keys = options.get('use_natural_primary_keys')
-        use_base_manager = options.get('use_base_manager')
-        pks = options.get('primary_keys')
+        format = options['format']
+        indent = options['indent']
+        using = options['database']
+        excludes = options['exclude']
+        output = options['output']
+        show_traceback = options['traceback']
+        use_natural_foreign_keys = options['use_natural_foreign_keys']
+        use_natural_primary_keys = options['use_natural_primary_keys']
+        use_base_manager = options['use_base_manager']
+        pks = options['primary_keys']
 
         if pks:
             primary_keys = pks.split(',')
@@ -75,9 +100,10 @@ class Command(BaseCommand):
         if len(app_labels) == 0:
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = OrderedDict((app_config, None)
-                for app_config in apps.get_app_configs()
-                if app_config.models_module is not None and app_config not in excluded_apps)
+            app_list = OrderedDict(
+                (app_config, None) for app_config in apps.get_app_configs()
+                if app_config.models_module is not None and app_config not in excluded_apps
+            )
         else:
             if len(app_labels) > 1 and primary_keys:
                 raise CommandError("You can only use --pks option with one model")
@@ -132,9 +158,15 @@ class Command(BaseCommand):
             Collate the objects to be serialized. If count_only is True, just
             count the number of objects to be serialized.
             """
-            for model in serializers.sort_dependencies(app_list.items()):
+            models = serializers.sort_dependencies(app_list.items())
+            for model in models:
                 if model in excluded_models:
                     continue
+                if model._meta.proxy and model._meta.proxy_for_model not in models:
+                    warnings.warn(
+                        "%s is a proxy model and won't be serialized." % model._meta.label,
+                        category=ProxyModelWarning,
+                    )
                 if not model._meta.proxy and router.allow_migrate_model(using, model):
                     if use_base_manager:
                         objects = model._base_manager
@@ -160,11 +192,13 @@ class Command(BaseCommand):
                 object_count = sum(get_objects(count_only=True))
             stream = open(output, 'w') if output else None
             try:
-                serializers.serialize(format, get_objects(), indent=indent,
-                        use_natural_foreign_keys=use_natural_foreign_keys,
-                        use_natural_primary_keys=use_natural_primary_keys,
-                        stream=stream or self.stdout, progress_output=progress_output,
-                        object_count=object_count)
+                serializers.serialize(
+                    format, get_objects(), indent=indent,
+                    use_natural_foreign_keys=use_natural_foreign_keys,
+                    use_natural_primary_keys=use_natural_primary_keys,
+                    stream=stream or self.stdout, progress_output=progress_output,
+                    object_count=object_count,
+                )
             finally:
                 if stream:
                     stream.close()

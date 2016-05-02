@@ -22,6 +22,10 @@ class Country(NamedModel):
     mpoly = models.MultiPolygonField()  # SRID, by default, is 4326
 
 
+class CountryWebMercator(NamedModel):
+    mpoly = models.MultiPolygonField(srid=3857)
+
+
 class City(NamedModel):
     point = models.PointField()
 
@@ -34,10 +38,6 @@ class City(NamedModel):
 class PennsylvaniaCity(City):
     county = models.CharField(max_length=30)
     founded = models.DateTimeField(null=True)
-
-    # TODO: This should be implicitly inherited.
-
-    objects = models.GeoManager()
 
     class Meta:
         app_label = 'geoapp'
@@ -77,8 +77,6 @@ class UniqueTogetherModel(models.Model):
 class Truth(models.Model):
     val = models.BooleanField(default=False)
 
-    objects = models.GeoManager()
-
     class Meta:
         required_db_features = ['gis_enabled']
 
@@ -89,8 +87,6 @@ class Feature(NamedModel):
 
 class MinusOneSRID(models.Model):
     geom = models.PointField(srid=-1)  # Minus one SRID.
-
-    objects = models.GeoManager()
 
     class Meta:
         required_db_features = ['gis_enabled']

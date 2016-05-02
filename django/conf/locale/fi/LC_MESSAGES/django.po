@@ -2,7 +2,7 @@
 #
 # Translators:
 # Aarni Koskela, 2015
-# Antti Kaihola <antti-2013@ambitone.com>, 2011
+# Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lasse Liehu <larso@gmx.com>, 2015
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
@@ -10,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Finnish (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-12-07 08:11+0000\n"
+"Last-Translator: Aarni Koskela\n"
+"Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,6 +84,9 @@ msgstr "espanja"
 msgid "Argentinian Spanish"
 msgstr "Argentiinan espanja"
 
+msgid "Colombian Spanish"
+msgstr "Kolumbian espanja"
+
 msgid "Mexican Spanish"
 msgstr "Meksikon espanja"
 
@@ -113,6 +116,9 @@ msgstr "friisi"
 
 msgid "Irish"
 msgstr "irlanti"
+
+msgid "Scottish Gaelic"
+msgstr "Skottilainen gaeli"
 
 msgid "Galician"
 msgstr "galicia"
@@ -274,7 +280,7 @@ msgid "Traditional Chinese"
 msgstr "kiina (perinteinen)"
 
 msgid "Messages"
-msgstr ""
+msgstr "Viestit"
 
 msgid "Site Maps"
 msgstr "Sivukartat"
@@ -305,6 +311,13 @@ msgid ""
 msgstr ""
 "Tässä voidaan käyttää vain kirjaimia (a-z), numeroita (0-9) sekä ala- ja "
 "tavuviivoja (_ -)."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Tässä voidaan käyttää vain Unicode-kirjaimia, numeroita sekä ala- ja "
+"tavuviivoja."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Syötä kelvollinen IPv4-osoite."
@@ -357,6 +370,28 @@ msgstr[0] ""
 msgstr[1] ""
 "Varmista, että tämä arvo on enintään %(limit_value)d merkkiä pitkä (tällä "
 "hetkellä %(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Tässä luvussa voi olla yhteensä enintään %(max)s numero."
+msgstr[1] "Tässä luvussa voi olla yhteensä enintään %(max)s numeroa."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Tässä luvussa saa olla enintään %(max)s desimaali."
+msgstr[1] "Tässä luvussa saa olla enintään %(max)s desimaalia."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Tässä luvussa saa olla enintään %(max)s numero ennen desimaalipilkkua."
+msgstr[1] ""
+"Tässä luvussa saa olla enintään %(max)s numeroa ennen desimaalipilkkua."
 
 msgid "and"
 msgstr "ja"
@@ -462,10 +497,10 @@ msgstr "Desimaaliluku"
 msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
-msgstr ""
+msgstr "%(value)s-arvo pitää olla muodossa [PP] TT:MM[:ss[.uuuuuu]]."
 
 msgid "Duration"
-msgstr ""
+msgstr "Kesto"
 
 msgid "Email address"
 msgstr "Sähköpostiosoite"
@@ -537,7 +572,7 @@ msgstr "Raaka binaaridata"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "%(value)s ei ole kelvollinen UUID."
 
 msgid "File"
 msgstr "Tiedosto"
@@ -547,7 +582,7 @@ msgstr "Kuva"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(model)s-tietuetta %(field)s-kentällä %(value)r ei ole olemassa."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Vierasavain (tyyppi määräytyy liittyvän kentän mukaan)"
@@ -558,6 +593,12 @@ msgstr "Yksi-yhteen relaatio"
 msgid "Many-to-many relationship"
 msgstr "Moni-moneen relaatio"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Tämä kenttä vaaditaan."
 
@@ -566,28 +607,6 @@ msgstr "Syötä kokonaisluku."
 
 msgid "Enter a number."
 msgstr "Syötä luku."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Tässä luvussa voi olla yhteensä enintään %(max)s numero."
-msgstr[1] "Tässä luvussa voi olla yhteensä enintään %(max)s numeroa."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Tässä luvussa saa olla enintään %(max)s desimaali."
-msgstr[1] "Tässä luvussa saa olla enintään %(max)s desimaalia."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Tässä luvussa saa olla enintään %(max)s numero ennen desimaalipilkkua."
-msgstr[1] ""
-"Tässä luvussa saa olla enintään %(max)s numeroa ennen desimaalipilkkua."
 
 msgid "Enter a valid date."
 msgstr "Syötä oikea päivämäärä."
@@ -599,7 +618,7 @@ msgid "Enter a valid date/time."
 msgstr "Syötä oikea pvm/kellonaika."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Syötä oikea kesto."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tiedostoa ei lähetetty. Tarkista lomakkeen koodaus (encoding)."
@@ -641,7 +660,7 @@ msgid "Enter a complete value."
 msgstr "Syötä kokonainen arvo."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Syötä oikea UUID."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -650,12 +669,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Piilokenttä %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "ManagementForm-tiedot puuttuvat tai niitä on muutettu"
@@ -1094,20 +1107,25 @@ msgid "Welcome to Django"
 msgstr "Tervetuloa Djangoon"
 
 msgid "It worked!"
-msgstr ""
+msgstr "Kappas, sehän toimi!"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "Onnittelut ensimmäisestä Django-sivustasi!"
 
 msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"Et toki ole vielä tehnyt yhtään oikeaa työtä. Seuraavaksi voit aloittaa "
+"ensimmäisen sovelluksesi ajamalla <code>python manage.py startapp "
+"[sovelluksen_nimike]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"Näet tämän viestin, koska asetuksissasi on <code>DEBUG = True</code> etkä "
+"ole konfiguroinut yhtään URL-osoitetta. Töihin siitä!"
 
 msgid "No year specified"
 msgstr "Vuosi puuttuu"

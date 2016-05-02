@@ -16,7 +16,7 @@ class TestAuthenticationMiddleware(TestCase):
         self.request.session = self.client.session
         self.middleware.process_request(self.request)
         self.assertIsNotNone(self.request.user)
-        self.assertFalse(self.request.user.is_anonymous())
+        self.assertFalse(self.request.user.is_anonymous)
 
     def test_changed_password_invalidates_session(self):
         # After password change, user should be anonymous
@@ -24,6 +24,6 @@ class TestAuthenticationMiddleware(TestCase):
         self.user.save()
         self.middleware.process_request(self.request)
         self.assertIsNotNone(self.request.user)
-        self.assertTrue(self.request.user.is_anonymous())
+        self.assertTrue(self.request.user.is_anonymous)
         # session should be flushed
         self.assertIsNone(self.request.session.session_key)

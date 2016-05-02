@@ -17,7 +17,7 @@ API Reference
 ``CheckMessage``
 -----------------
 
-.. class:: CheckMessage(level, msg, hint, obj=None, id=None)
+.. class:: CheckMessage(level, msg, hint=None, obj=None, id=None)
 
 The warnings and errors raised by system checks must be instances of
 ``CheckMessage``. An instance encapsulates a single reportable error or
@@ -60,14 +60,16 @@ There are subclasses to make creating messages with common levels easier. When
 using them you can omit the ``level`` argument because it is implied by the
 class name.
 
-.. class:: Debug(msg, hint, obj=None, id=None)
-.. class:: Info(msg, hint, obj=None, id=None)
-.. class:: Warning(msg, hint, obj=None, id=None)
-.. class:: Error(msg, hint, obj=None, id=None)
-.. class:: Critical(msg, hint, obj=None, id=None)
+.. class:: Debug(msg, hint=None, obj=None, id=None)
+.. class:: Info(msg, hint=None, obj=None, id=None)
+.. class:: Warning(msg, hint=None obj=None, id=None)
+.. class:: Error(msg, hint=None, obj=None, id=None)
+.. class:: Critical(msg, hint=None, obj=None, id=None)
 
 Builtin checks
 ==============
+
+.. _system-check-builtin-tags:
 
 Builtin tags
 ------------
@@ -82,6 +84,14 @@ Django's system checks are organized using the following tags:
 * ``templates``: Checks template related configuration.
 * ``caches``: Checks cache related configuration.
 * ``urls``: Checks URL configuration.
+* ``database``: Checks database-related configuration issues. Database checks
+  are not run by default because they do more than static code analysis as
+  regular checks do. They are only run by the :djadmin:`migrate` command or if
+  you specify the ``database`` tag when calling the :djadmin:`check` command.
+
+.. versionadded:: 1.10
+
+    The ``database`` tag was added.
 
 Some checks may be registered with multiple tags.
 
@@ -163,6 +173,8 @@ Fields
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
   (except in historical migrations) will be removed in Django 1.9. *This check
   appeared in Django 1.7 and 1.8*.
+* **fields.W901**: ``CommaSeparatedIntegerField`` has been deprecated. Support
+  for it (except in historical migrations) will be removed in Django 2.0.
 
 File Fields
 ~~~~~~~~~~~
@@ -267,8 +279,8 @@ with the admin site:
 * **admin.E001**: The value of ``raw_id_fields`` must be a list or tuple.
 * **admin.E002**: The value of ``raw_id_fields[n]`` refers to ``<field name>``,
   which is not an attribute of ``<model>``.
-* **admin.E003**: The value of ``raw_id_fields[n]`` must be a ``ForeignKey`` or
-  ``ManyToManyField``.
+* **admin.E003**: The value of ``raw_id_fields[n]`` must be a foreign key or
+  a many-to-many field.
 * **admin.E004**: The value of ``fields`` must be a list or tuple.
 * **admin.E005**: Both ``fieldsets`` and ``fields`` are specified.
 * **admin.E006**: The value of ``fields`` contains duplicate field(s).
@@ -280,7 +292,7 @@ with the admin site:
   ``fields``.
 * **admin.E012**: There are duplicate field(s) in ``fieldsets[n][1]``.
 * **admin.E013**: ``fields[n]/fieldsets[n][m]`` cannot include the
-  ``ManyToManyField`` ``<field name>``, because that field manually specifies a
+  many-to-many field ``<field name>``, because that field manually specifies a
   relationship model.
 * **admin.E014**: The value of ``exclude`` must be a list or tuple.
 * **admin.E015**: The value of ``exclude`` contains duplicate field(s).
@@ -290,7 +302,7 @@ with the admin site:
 * **admin.E019**: The value of ``filter_vertical[n]/filter_vertical[n]`` refers
   to ``<field name>``, which is not an attribute of ``<model>``.
 * **admin.E020**: The value of ``filter_vertical[n]/filter_vertical[n]`` must
-  be a ``ManyToManyField``.
+  be a many-to-many field.
 * **admin.E021**: The value of ``radio_fields`` must be a dictionary.
 * **admin.E022**: The value of ``radio_fields`` refers to ``<field name>``,
   which is not an attribute of ``<model>``.
@@ -304,8 +316,8 @@ with the admin site:
 * **admin.E027**: The value of ``prepopulated_fields`` refers to
   ``<field name>``, which is not an attribute of ``<model>``.
 * **admin.E028**: The value of ``prepopulated_fields`` refers to
-  ``<field name>``, which must not be a ``DateTimeField``, ``ForeignKey`` or
-  ``ManyToManyField``.
+  ``<field name>``, which must not be a ``DateTimeField``, a foreign key or a
+  many-to-many field.
 * **admin.E029**: The value of ``prepopulated_fields[<field name>]`` must be a
   list or tuple.
 * **admin.E030**: The value of ``prepopulated_fields`` refers to
@@ -319,8 +331,8 @@ with the admin site:
 * **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
   attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
 
-ModelAdmin
-~~~~~~~~~~
+``ModelAdmin``
+~~~~~~~~~~~~~~
 
 The following checks are performed on any
 :class:`~django.contrib.admin.ModelAdmin` that is registered
@@ -339,7 +351,7 @@ with the admin site:
   which is not a callable, an attribute of ``<ModelAdmin class>``, or an
   attribute or method on ``<model>``.
 * **admin.E109**: The value of ``list_display[n]`` must not be a
-  ``ManyToManyField``.
+  many-to-many field.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
   or ``None``.
 * **admin.E111**: The value of ``list_display_links[n]`` refers to ``<label>``,
@@ -375,8 +387,8 @@ with the admin site:
 * **admin.E128**: The value of ``date_hierarchy`` must be a ``DateField`` or
   ``DateTimeField``.
 
-InlineModelAdmin
-~~~~~~~~~~~~~~~~
+``InlineModelAdmin``
+~~~~~~~~~~~~~~~~~~~~
 
 The following checks are performed on any
 :class:`~django.contrib.admin.InlineModelAdmin` that is registered as an
@@ -392,8 +404,8 @@ inline on a :class:`~django.contrib.admin.ModelAdmin`.
 * **admin.E206**: The value of ``formset`` must inherit from
   ``BaseModelFormSet``.
 
-GenericInlineModelAdmin
-~~~~~~~~~~~~~~~~~~~~~~~
+``GenericInlineModelAdmin``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following checks are performed on any
 :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin` that is
@@ -407,6 +419,16 @@ registered as an inline on a :class:`~django.contrib.admin.ModelAdmin`.
 * **admin.E304**: ``<model>`` has no ``GenericForeignKey`` using content type
   field ``<field name>`` and object ID field ``<field name>``.
 
+``AdminSite``
+~~~~~~~~~~~~~
+
+The following checks are performed on the default
+:class:`~django.contrib.admin.AdminSite`:
+
+* **admin.E401**: :mod:`django.contrib.contenttypes` must be in
+  :setting:`INSTALLED_APPS` in order to use the admin application.
+* **admin.E402**: :mod:`django.contrib.auth.context_processors.auth`
+  must be in :setting:`TEMPLATES` in order to use the admin application.
 
 Auth
 ----
@@ -418,6 +440,16 @@ Auth
   ``USERNAME_FIELD``.
 * **auth.W004**: ``<field>`` is named as the ``USERNAME_FIELD``, but it is not
   unique.
+* **auth.E005**: The permission codenamed ``<codename>`` clashes with a builtin
+  permission for model ``<model>``.
+* **auth.E006**: The permission codenamed ``<codename>`` is duplicated for model
+  ``<model>``.
+* **auth.E007**: The :attr:`verbose_name
+  <django.db.models.Options.verbose_name>` of model ``<model>`` must be at most
+  244 characters for its builtin permission names
+  to be at most 255 characters.
+* **auth.E008**: The permission named ``<name>`` of model ``<model>`` is longer
+  than 255 characters.
 
 
 Content Types
@@ -449,8 +481,7 @@ balancer, it'd be irritating to be constantly warned about not having enabled
 :setting:`SECURE_SSL_REDIRECT`. Use :setting:`SILENCED_SYSTEM_CHECKS` to
 silence unneeded checks.
 
-The following checks will be run if you use the :djadminopt:`--deploy` option
-of the :djadmin:`check` command:
+The following checks are run if you use the :option:`check --deploy` option:
 
 * **security.W001**: You do not have
   :class:`django.middleware.security.SecurityMiddleware` in your
@@ -549,7 +580,7 @@ The following checks are performed on any model using a
 * **sites.E001**: ``CurrentSiteManager`` could not find a field named
   ``<field name>``.
 * **sites.E002**: ``CurrentSiteManager`` cannot use ``<field>`` as it is not a
-  ``ForeignKey`` or ``ManyToManyField``.
+  foreign key or a many-to-many field.
 
 Database
 --------
@@ -561,6 +592,8 @@ If you're using MySQL, the following checks will be performed:
 
 * **mysql.E001**: MySQL does not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+* **mysql.W002**: MySQL Strict Mode is not set for database connection
+  '<alias>'. See also :ref:`mysql-sql-mode`.
 
 Templates
 ---------
@@ -571,6 +604,9 @@ configured:
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
   remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+* **templates.E002**: ``string_if_invalid`` in :setting:`TEMPLATES`
+  :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
+  (``{type}``).
 
 Caches
 ------
@@ -595,3 +631,5 @@ The following checks are performed on your URL configuration:
 * **urls.W003**: Your URL pattern ``<pattern>`` has a ``name``
   including a ``:``. Remove the colon, to avoid ambiguous namespace
   references.
+* **urls.E004**: Your URL pattern ``<pattern>`` is invalid. Ensure that
+  ``urlpatterns`` is a list of :func:`~django.conf.urls.url()` instances.

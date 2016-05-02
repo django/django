@@ -44,10 +44,12 @@ END;
     def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
         # create a sequence and a trigger.
-        sq_name = self._get_sequence_name(table)
-        tr_name = self._get_trigger_name(table)
-        tbl_name = self.quote_name(table)
-        col_name = self.quote_name(column)
+        args = {
+            'sq_name': self._get_sequence_name(table),
+            'tr_name': self._get_trigger_name(table),
+            'tbl_name': self.quote_name(table),
+            'col_name': self.quote_name(column),
+        }
         sequence_sql = """
 DECLARE
     i INTEGER;
@@ -58,7 +60,7 @@ BEGIN
         EXECUTE IMMEDIATE 'CREATE SEQUENCE "%(sq_name)s"';
     END IF;
 END;
-/""" % locals()
+/""" % args
         trigger_sql = """
 CREATE OR REPLACE TRIGGER "%(tr_name)s"
 BEFORE INSERT ON %(tbl_name)s
@@ -68,7 +70,7 @@ WHEN (new.%(col_name)s IS NULL)
         SELECT "%(sq_name)s".nextval
         INTO :new.%(col_name)s FROM dual;
     END;
-/""" % locals()
+/""" % args
         return sequence_sql, trigger_sql
 
     def cache_key_culling_sql(self):
@@ -97,8 +99,7 @@ WHEN (new.%(col_name)s IS NULL)
         days = str(timedelta.days)
         day_precision = len(days)
         fmt = "INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6)"
-        return fmt % (days, hours, minutes, seconds, timedelta.microseconds,
-                day_precision), []
+        return fmt % (days, hours, minutes, seconds, timedelta.microseconds, day_precision), []
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
@@ -447,3 +448,10 @@ WHEN (new.%(col_name)s IS NULL)
             "SELECT %s FROM DUAL" % ", ".join(row)
             for row in placeholder_rows
         )
+
+    def subtract_temporals(self, internal_type, lhs, rhs):
+        if internal_type == 'DateField':
+            lhs_sql, lhs_params = lhs
+            rhs_sql, rhs_params = rhs
+            return "NUMTODSINTERVAL(%s - %s, 'DAY')" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+        return super(DatabaseOperations, self).subtract_temporals(internal_type, lhs, rhs)

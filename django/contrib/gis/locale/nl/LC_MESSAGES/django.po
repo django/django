@@ -3,6 +3,7 @@
 # Translators:
 # Blue <alexandervanratingen@gmail.com>, 2011
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
+# Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011
 # Sander Steffann <sander@steffann.nl>, 2015
@@ -10,11 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-20 22:56+0000\n"
-"Last-Translator: Sander Steffann <sander@steffann.nl>\n"
-"Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
-"nl/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-25 19:50+0000\n"
+"Last-Translator: Ilja Maas <iljamaas@dreamsolution.nl>\n"
+"Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,10 +24,14 @@ msgstr ""
 msgid "GIS"
 msgstr "GIS"
 
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgid "The base GIS field."
+msgstr "Het basis GIS veld"
+
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Het basis GIS veld -- corresponderend met het OpenGIS Specificatie "
-"Geometrisch type"
+"Het basis Geometrie veld --  corresponderend met het OpenGIS Specificatie "
+"Geometrie type."
 
 msgid "Point"
 msgstr "Punt"
@@ -52,6 +56,9 @@ msgstr "Geometrie collectie"
 
 msgid "Extent Aggregate Field"
 msgstr "Gebieds-aggregatieveld"
+
+msgid "Raster Field"
+msgstr "Raster veld"
 
 msgid "No geometry value provided."
 msgstr "Geen geometrische waarde opgegeven."

@@ -5,6 +5,24 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
+class City(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class District(models.Model):
+    city = models.ForeignKey(City, models.CASCADE)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
 class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -27,6 +45,7 @@ class Article(models.Model):
     body = models.TextField(default='')
     reporter = models.ForeignKey(Reporter, models.CASCADE)
     response_to = models.ForeignKey('self', models.SET_NULL, null=True)
+    unmanaged_reporters = models.ManyToManyField(Reporter, through='ArticleReporter')
 
     def __str__(self):
         return self.headline
@@ -36,3 +55,11 @@ class Article(models.Model):
         index_together = [
             ["headline", "pub_date"],
         ]
+
+
+class ArticleReporter(models.Model):
+    article = models.ForeignKey(Article, models.CASCADE)
+    reporter = models.ForeignKey(Reporter, models.CASCADE)
+
+    class Meta:
+        managed = False

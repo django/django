@@ -1,5 +1,7 @@
 from django.template.defaultfilters import linebreaks_filter
 from django.test import SimpleTestCase
+from django.utils import six
+from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -16,8 +18,7 @@ class LinebreaksTests(SimpleTestCase):
         output = self.engine.render_to_string('linebreaks01', {"a": "x&\ny", "b": mark_safe("x&\ny")})
         self.assertEqual(output, "<p>x&amp;<br />y</p> <p>x&<br />y</p>")
 
-    @setup({'linebreaks02':
-        '{% autoescape off %}{{ a|linebreaks }} {{ b|linebreaks }}{% endautoescape %}'})
+    @setup({'linebreaks02': '{% autoescape off %}{{ a|linebreaks }} {{ b|linebreaks }}{% endautoescape %}'})
     def test_linebreaks02(self):
         output = self.engine.render_to_string('linebreaks02', {"a": "x&\ny", "b": mark_safe("x&\ny")})
         self.assertEqual(output, "<p>x&<br />y</p> <p>x&<br />y</p>")
@@ -50,4 +51,11 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(
             linebreaks_filter('foo\n<a>bar</a>\nbuz', autoescape=False),
             '<p>foo<br /><a>bar</a><br />buz</p>',
+        )
+
+    def test_lazy_string_input(self):
+        add_header = lazy(lambda string: 'Header\n\n' + string, six.text_type)
+        self.assertEqual(
+            linebreaks_filter(add_header('line 1\r\nline2')),
+            '<p>Header</p>\n\n<p>line 1<br />line2</p>'
         )

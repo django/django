@@ -97,9 +97,9 @@ class MinimumLengthValidatorTest(TestCase):
 
 class UserAttributeSimilarityValidatorTest(TestCase):
     def test_validate(self):
-        user = User.objects.create(
-            username='testclient', first_name='Test', last_name='Client', email='testclient@example.com',
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+        user = User.objects.create_user(
+            username='testclient', password='password', email='testclient@example.com',
+            first_name='Test', last_name='Client',
         )
         expected_error = "The password is too similar to the %s."
 

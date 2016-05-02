@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 
 @python_2_unicode_compatible
@@ -17,8 +18,8 @@ class Article(models.Model):
     """
     site = models.ForeignKey(Site, models.CASCADE, related_name="admin_articles")
     title = models.CharField(max_length=100)
-    title2 = models.CharField(max_length=100, verbose_name="another name")
-    created = models.DateTimeField()
+    hist = models.CharField(max_length=100, verbose_name=_("History"))
+    created = models.DateTimeField(null=True)
 
     def test_from_model(self):
         return "nothing"
@@ -26,6 +27,11 @@ class Article(models.Model):
     def test_from_model_with_override(self):
         return "nothing"
     test_from_model_with_override.short_description = "not What you Expect"
+
+
+class ArticleProxy(Article):
+    class Meta:
+        proxy = True
 
 
 @python_2_unicode_compatible

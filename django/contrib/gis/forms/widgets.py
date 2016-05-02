@@ -40,10 +40,7 @@ class BaseGeometryWidget(Widget):
         try:
             return GEOSGeometry(value, self.map_srid)
         except (GEOSException, ValueError) as err:
-            logger.error(
-                "Error creating geometry from value '%s' (%s)" % (
-                    value, err)
-            )
+            logger.error("Error creating geometry from value '%s' (%s)", value, err)
         return None
 
     def render(self, name, value, attrs=None):
@@ -61,8 +58,8 @@ class BaseGeometryWidget(Widget):
                     value = ogr
                 except gdal.GDALException as err:
                     logger.error(
-                        "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
-                            value.srid, self.map_srid, err)
+                        "Error transforming geometry from srid '%s' to srid '%s' (%s)",
+                        value.srid, self.map_srid, err
                     )
 
         context = self.build_attrs(

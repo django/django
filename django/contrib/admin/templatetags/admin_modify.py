@@ -1,4 +1,7 @@
+import json
+
 from django import template
+from django.template.context import Context
 
 register = template.Library()
 
@@ -17,7 +20,22 @@ def prepopulated_fields_js(context):
             for inline_admin_form in inline_admin_formset:
                 if inline_admin_form.original is None:
                     prepopulated_fields.extend(inline_admin_form.prepopulated_fields)
-    context.update({'prepopulated_fields': prepopulated_fields})
+
+    prepopulated_fields_json = []
+    for field in prepopulated_fields:
+        prepopulated_fields_json.append({
+            "id": "#%s" % field["field"].auto_id,
+            "name": field["field"].name,
+            "dependency_ids": ["#%s" % dependency.auto_id for dependency in field["dependencies"]],
+            "dependency_list": [dependency.name for dependency in field["dependencies"]],
+            "maxLength": field["field"].field.max_length or 50,
+            "allowUnicode": getattr(field["field"].field, "allow_unicode", False)
+        })
+
+    context.update({
+        'prepopulated_fields': prepopulated_fields,
+        'prepopulated_fields_json': json.dumps(prepopulated_fields_json),
+    })
     return context
 
 
@@ -26,14 +44,13 @@ def submit_row(context):
     """
     Displays the row of buttons for delete and save.
     """
-    opts = context['opts']
     change = context['change']
     is_popup = context['is_popup']
     save_as = context['save_as']
     show_save = context.get('show_save', True)
     show_save_and_continue = context.get('show_save_and_continue', True)
-    ctx = {
-        'opts': opts,
+    ctx = Context(context)
+    ctx.update({
         'show_delete_link': (
             not is_popup and context['has_delete_permission'] and
             change and context.get('show_delete', True)
@@ -44,12 +61,8 @@ def submit_row(context):
             (not save_as or context['add'])
         ),
         'show_save_and_continue': not is_popup and context['has_change_permission'] and show_save_and_continue,
-        'is_popup': is_popup,
         'show_save': show_save,
-        'preserved_filters': context.get('preserved_filters'),
-    }
-    if context.get('original') is not None:
-        ctx['original'] = context['original']
+    })
     return ctx
 
 

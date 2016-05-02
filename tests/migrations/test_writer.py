@@ -23,10 +23,16 @@ from django.test import SimpleTestCase, ignore_warnings, mock
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.deconstruct import deconstructible
+from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import ugettext_lazy as _
 
 from .models import FoodManager, FoodQuerySet
+
+try:
+    import enum
+except ImportError:
+    enum = None
 
 
 class TestModel1(object):
@@ -229,8 +235,68 @@ class WriterTests(SimpleTestCase):
             ("[list, tuple, dict, set, frozenset]", set())
         )
 
+    def test_serialize_lazy_objects(self):
+        pattern = re.compile(r'^foo$', re.UNICODE)
+        lazy_pattern = SimpleLazyObject(lambda: pattern)
+        self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
+
+    @unittest.skipUnless(enum, "enum34 is required on Python 2")
+    def test_serialize_enums(self):
+        class TextEnum(enum.Enum):
+            A = 'a-value'
+            B = 'value-b'
+
+        class BinaryEnum(enum.Enum):
+            A = b'a-value'
+            B = b'value-b'
+
+        class IntEnum(enum.IntEnum):
+            A = 1
+            B = 2
+
+        self.assertSerializedResultEqual(
+            TextEnum.A,
+            ("migrations.test_writer.TextEnum('a-value')", {'import migrations.test_writer'})
+        )
+        self.assertSerializedResultEqual(
+            BinaryEnum.A,
+            ("migrations.test_writer.BinaryEnum(b'a-value')", {'import migrations.test_writer'})
+        )
+        self.assertSerializedResultEqual(
+            IntEnum.B,
+            ("migrations.test_writer.IntEnum(2)", {'import migrations.test_writer'})
+        )
+
+        field = models.CharField(default=TextEnum.B, choices=[(m.value, m) for m in TextEnum])
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.CharField(choices=["
+            "('a-value', migrations.test_writer.TextEnum('a-value')), "
+            "('value-b', migrations.test_writer.TextEnum('value-b'))], "
+            "default=migrations.test_writer.TextEnum('value-b'))"
+        )
+        field = models.CharField(default=BinaryEnum.B, choices=[(m.value, m) for m in BinaryEnum])
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.CharField(choices=["
+            "(b'a-value', migrations.test_writer.BinaryEnum(b'a-value')), "
+            "(b'value-b', migrations.test_writer.BinaryEnum(b'value-b'))], "
+            "default=migrations.test_writer.BinaryEnum(b'value-b'))"
+        )
+        field = models.IntegerField(default=IntEnum.A, choices=[(m.value, m) for m in IntEnum])
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.IntegerField(choices=["
+            "(1, migrations.test_writer.IntEnum(1)), "
+            "(2, migrations.test_writer.IntEnum(2))], "
+            "default=migrations.test_writer.IntEnum(1))"
+        )
+
     def test_serialize_functions(self):
-        with six.assertRaisesRegex(self, ValueError, 'Cannot serialize function: lambda'):
+        with self.assertRaisesMessage(ValueError, 'Cannot serialize function: lambda'):
             self.assertSerializedEqual(lambda x: 42)
         self.assertSerializedEqual(models.SET_NULL)
         string, imports = MigrationWriter.serialize(models.SET(42))
@@ -291,6 +357,8 @@ class WriterTests(SimpleTestCase):
             SettingsReference("someapp.model", "AUTH_USER_MODEL"),
             ("settings.AUTH_USER_MODEL", {"from django.conf import settings"})
         )
+
+    def test_serialize_iterators(self):
         self.assertSerializedResultEqual(
             ((x, x * x) for x in range(3)),
             ("((0, 0), (1, 1), (2, 4))", set())
@@ -395,8 +463,7 @@ class WriterTests(SimpleTestCase):
                 return "somewhere dynamic"
             thing = models.FileField(upload_to=upload_to)
 
-        with six.assertRaisesRegex(self, ValueError,
-                '^Could not find function upload_to in migrations.test_writer'):
+        with self.assertRaisesMessage(ValueError, 'Could not find function upload_to in migrations.test_writer'):
             self.serialize_round_trip(TestModel2.thing)
 
     def test_serialize_managers(self):
@@ -558,7 +625,7 @@ class WriterTests(SimpleTestCase):
                 migrations.AlterModelOptions(
                     name='model',
                     options={'verbose_name': 'model', 'verbose_name_plural': 'models'},
-                    ),
+                ),
             ]
         })
         writer = MigrationWriter(migration)
@@ -569,9 +636,9 @@ class WriterTests(SimpleTestCase):
         # Yes, it doesn't make sense to use a class as a default for a
         # CharField. It does make sense for custom fields though, for example
         # an enumfield that takes the enum class as an argument.
-        class DeconstructableInstances(object):
+        class DeconstructibleInstances(object):
             def deconstruct(self):
-                return ('DeconstructableInstances', [], {})
+                return ('DeconstructibleInstances', [], {})
 
-        string = MigrationWriter.serialize(models.CharField(default=DeconstructableInstances))[0]
-        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructableInstances)")
+        string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
+        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")

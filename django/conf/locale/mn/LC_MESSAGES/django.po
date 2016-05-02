@@ -7,19 +7,19 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
 # Tsolmon <mnts26@gmail.com>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2013-2014
+# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2015
-# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
+# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2015
 # Ганзориг БП <ganzo.bp@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
-"language/mn/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-03-08 13:19+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
+"Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
+"mn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -33,7 +33,7 @@ msgid "Arabic"
 msgstr "Араб"
 
 msgid "Asturian"
-msgstr ""
+msgstr "Астури"
 
 msgid "Azerbaijani"
 msgstr "Азербажан"
@@ -89,6 +89,9 @@ msgstr "Испани"
 msgid "Argentinian Spanish"
 msgstr "Аргентинийн Испани"
 
+msgid "Colombian Spanish"
+msgstr "Колумбийн Испаниар"
+
 msgid "Mexican Spanish"
 msgstr "Мексикийн Испани"
 
@@ -119,6 +122,9 @@ msgstr "Фриз"
 msgid "Irish"
 msgstr "Ирланд"
 
+msgid "Scottish Gaelic"
+msgstr "Шотландийн Гаелик"
+
 msgid "Galician"
 msgstr "Галици"
 
@@ -141,7 +147,7 @@ msgid "Indonesian"
 msgstr "Индонези"
 
 msgid "Ido"
-msgstr ""
+msgstr "Идо"
 
 msgid "Icelandic"
 msgstr "Исланд"
@@ -186,7 +192,7 @@ msgid "Mongolian"
 msgstr "Монгол"
 
 msgid "Marathi"
-msgstr ""
+msgstr "маратхи"
 
 msgid "Burmese"
 msgstr "Бирм"
@@ -279,7 +285,7 @@ msgid "Traditional Chinese"
 msgstr "Хятад (уламжлалт)"
 
 msgid "Messages"
-msgstr ""
+msgstr "Мэдээллүүд"
 
 msgid "Site Maps"
 msgstr "Сайтын бүтэц"
@@ -307,6 +313,12 @@ msgstr "Зөв имэйл хаяг оруулна уу"
 
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Үсэг, тоо, доогуур зураас, дундуур зурааснаас бүрдэх зөв 'slug' оруулна уу."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
 msgstr ""
 "Үсэг, тоо, доогуур зураас, дундуур зурааснаас бүрдэх зөв 'slug' оруулна уу."
 
@@ -364,6 +376,26 @@ msgstr[1] ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "%(max)s -ээс ихгүй утга оруулна уу "
+msgstr[1] "%(max)s -ээс ихгүй утга оруулна уу "
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Энд %(max)s -аас олонгүй бутархайн орон байх ёстой. "
+msgstr[1] "Энд %(max)s -аас олонгүй бутархайн орон байх ёстой. "
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Энд бутархайн таслалаас өмнө %(max)s-аас олонгүй цифр байх ёстой."
+msgstr[1] "Энд бутархайн таслалаас өмнө %(max)s-аас олонгүй цифр байх ёстой."
+
 msgid "and"
 msgstr "ба"
 
@@ -391,6 +423,8 @@ msgstr "%(field_label)s-тэй %(model_name)s-ийг аль хэдийнэ ор�
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s талбарт давхардахгүй байх хэрэгтэй %(date_field_label)s "
+"%(lookup_type)s оруулна."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -437,12 +471,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' утга буруу форматтай байна. Формат нь заавал YYYY-MM-DD HH:MM[:"
+"ss[.uuuuuu]][TZ] байх хэрэгтэй."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"'%(value)s' утга зөв форматтай байна(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"гэвч буруу огноо/цаг байна. "
 
 msgid "Date (with time)"
 msgstr "Огноо (цагтай)"
@@ -459,6 +497,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"'%(value)s' утга буруу форматтай байна. Формат нь заавал [DD] [HH:[MM:]]ss[."
+"uuuuuu] байх хэрэгтэй."
 
 msgid "Duration"
 msgstr "Үргэлжлэх хугацаа"
@@ -487,7 +527,7 @@ msgstr "IP хаяг"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' заавал  None, True эсвэл False утга авах ёстой."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (Үнэн, худал, эсвэл юу ч биш)"
@@ -513,12 +553,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"'%(value)s' утга буруу форматтай байна. Формат нь заавал HH:MM[:ss[.uuuuuu]] "
+"байх хэрэгтэй."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"'%(value)s' утгын формат зөв байна (HH:MM[:ss[.uuuuuu]]) гэвч цаг буруу "
+"байна."
 
 msgid "Time"
 msgstr "Цаг"
@@ -531,7 +575,7 @@ msgstr "Бинари өгөгдөл"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' утга зөв UUID биш байна."
 
 msgid "File"
 msgstr "Файл"
@@ -541,7 +585,7 @@ msgstr "Зураг"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(field)s %(value)r утгатай %(model)s байхгүй байна."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Гадаад түлхүүр (тодорхой төрлийн холбоос талбар)"
@@ -552,6 +596,12 @@ msgstr "Нэг-нэг холбоос"
 msgid "Many-to-many relationship"
 msgstr "Олон-олон холбоос"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Энэ талбарыг бөглөх шаардлагатай."
 
@@ -560,26 +610,6 @@ msgstr "Бүхэл тоон утга оруулна уу."
 
 msgid "Enter a number."
 msgstr "Тоон утга оруулна уу."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "%(max)s -ээс ихгүй утга оруулна уу "
-msgstr[1] "%(max)s -ээс ихгүй утга оруулна уу "
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Энд %(max)s -аас олонгүй бутархайн орон байх ёстой. "
-msgstr[1] "Энд %(max)s -аас олонгүй бутархайн орон байх ёстой. "
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "Энд бутархайн таслалаас өмнө %(max)s-аас олонгүй цифр байх ёстой."
-msgstr[1] "Энд бутархайн таслалаас өмнө %(max)s-аас олонгүй цифр байх ёстой."
 
 msgid "Enter a valid date."
 msgstr "Зөв огноо оруулна уу."
@@ -644,14 +674,8 @@ msgstr ":"
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Нууц талбар%(name)s) %(error)s"
 
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
-
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "УдирдахФормын мэдээлэл олдсонгүй эсвэл өөрчлөгдсөн байна"
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -662,8 +686,8 @@ msgstr[1] "%d ихгүй форм илгээн үү"
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d эсвэл их форм илгээнэ үү"
+msgstr[1] "%d эсвэл их форм илгээнэ үү"
 
 msgid "Order"
 msgstr "Эрэмбэлэх"
@@ -1052,23 +1076,33 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Таны веб хөтөчөөс 'Referer header'-ийг HTTPS хуудасд илгээх шаардлагатай "
+"байдаг учир Та энэ мэдэгдлийг харж байна. Энэ нь гуравдагч этгээдээс "
+"хамгаалахын тулд шаардлагатай."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Хэрвээ та веб хөтөчөө 'Referer' толгойг идэвхигүй болгосон бол энэ хуудас, "
+"HTTPS холболт эсвэл 'same-origin' хүсэлтэнд зориулж идэвхижүүлнэ үү."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Энэ хуудсанд форм илгээхийн тулд CSRF күүки шаардлагатай учир Та энэ "
+"мэдэгдлийг харж байна. Энэ күүки нь гуравдагч этгээдээс хамгаалахын тулд "
+"шаардлагатай."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Хэрвээ та веб хөтөчийн күүкийг хаасан бол энэ хуудас эсвэл 'same-origin' "
+"хүсэлтэнд зориулж идэвхижүүлнэ үү."
 
 msgid "More information is available with DEBUG=True."
 msgstr "DEBUG=True үед дэлгэрэнгүй мэдээлэл харах боломжтой."
@@ -1093,6 +1127,8 @@ msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"Та Джангогийнхоо тохиргооны файлд <code>DEBUG = True</code> гэсэн ба ямарч  "
+"URLs тохируулаагүй учир энэ мэдэгдлийг уншиж байна. Ажиллаж байна!"
 
 msgid "No year specified"
 msgstr "Он тодорхойлоогүй байна"

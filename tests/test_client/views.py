@@ -9,7 +9,7 @@ from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed,
     HttpResponseNotFound, HttpResponseRedirect,
 )
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import Context, Template
 from django.test import Client
 from django.utils.decorators import method_decorator
@@ -168,12 +168,10 @@ def form_view_with_template(request):
     else:
         form = TestForm()
         message = 'GET form page'
-    return render_to_response('form_view.html',
-        {
-            'form': form,
-            'message': message
-        }
-    )
+    return render(request, 'form_view.html', {
+        'form': form,
+        'message': message,
+    })
 
 
 class BaseTestFormSet(BaseFormSet):

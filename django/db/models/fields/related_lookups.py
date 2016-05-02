@@ -1,5 +1,6 @@
 from django.db.models.lookups import (
-    Exact, GreaterThan, GreaterThanOrEqual, In, LessThan, LessThanOrEqual,
+    Exact, GreaterThan, GreaterThanOrEqual, In, IsNull, LessThan,
+    LessThanOrEqual,
 )
 
 
@@ -130,4 +131,8 @@ class RelatedGreaterThanOrEqual(RelatedLookupMixin, GreaterThanOrEqual):
 
 
 class RelatedLessThanOrEqual(RelatedLookupMixin, LessThanOrEqual):
+    pass
+
+
+class RelatedIsNull(RelatedLookupMixin, IsNull):
     pass

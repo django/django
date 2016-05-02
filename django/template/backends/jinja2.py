@@ -26,8 +26,9 @@ class Jinja2(BaseEngine):
         environment = options.pop('environment', 'jinja2.Environment')
         environment_cls = import_string(environment)
 
+        if 'loader' not in options:
+            options['loader'] = jinja2.FileSystemLoader(self.template_dirs)
         options.setdefault('autoescape', True)
-        options.setdefault('loader', jinja2.FileSystemLoader(self.template_dirs))
         options.setdefault('auto_reload', settings.DEBUG)
         options.setdefault('undefined',
                            jinja2.DebugUndefined if settings.DEBUG else jinja2.Undefined)

@@ -3,16 +3,17 @@
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
 import json
+import warnings
 from ctypes import byref, c_int, c_uint
 
 from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.geometry import (
-    GEOSGeometry, ProjectInterpolateMixin,
-)
-from django.contrib.gis.geos.libgeos import get_pointer_arr
+from django.contrib.gis.geos.error import GEOSException
+from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
+from django.contrib.gis.geos.libgeos import geos_version_info, get_pointer_arr
 from django.contrib.gis.geos.linestring import LinearRing, LineString
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six.moves import range
 
 
@@ -23,9 +24,6 @@ class GeometryCollection(GEOSGeometry):
         "Initializes a Geometry Collection from a sequence of Geometry objects."
 
         # Checking the arguments
-        if not args:
-            raise TypeError('Must provide at least one Geometry to initialize %s.' % self.__class__.__name__)
-
         if len(args) == 1:
             # If only one geometry provided or a list of geometries is provided
             #  in the first argument.
@@ -115,17 +113,15 @@ class MultiPoint(GeometryCollection):
     _typeid = 4
 
 
-class MultiLineString(ProjectInterpolateMixin, GeometryCollection):
+class MultiLineString(LinearGeometryMixin, GeometryCollection):
     _allowed = (LineString, LinearRing)
     _typeid = 5
 
     @property
-    def merged(self):
-        """
-        Returns a LineString representing the line merge of this
-        MultiLineString.
-        """
-        return self._topology(capi.geos_linemerge(self.ptr))
+    def closed(self):
+        if geos_version_info()['version'] < '3.5':
+            raise GEOSException("MultiLineString.closed requires GEOS >= 3.5.0.")
+        return super(MultiLineString, self).closed
 
 
 class MultiPolygon(GeometryCollection):
@@ -135,6 +131,10 @@ class MultiPolygon(GeometryCollection):
     @property
     def cascaded_union(self):
         "Returns a cascaded union of this MultiPolygon."
+        warnings.warn(
+            "`cascaded_union` is deprecated, use the `unary_union` property instead.",
+            RemovedInDjango20Warning, 2
+        )
         return GEOSGeometry(capi.geos_cascaded_union(self.ptr), self.srid)
 
 # Setting the allowed types here since GeometryCollection is defined before

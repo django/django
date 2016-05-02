@@ -230,6 +230,7 @@ dumpdata
 Dunck
 dwithin
 editability
+elidable
 encodings
 Endian
 endswith
@@ -454,6 +455,7 @@ Magee
 makemessages
 makemigrations
 Mako
+manouche
 Mapnik
 Marczewski
 Marino
@@ -558,7 +560,7 @@ Peucker
 pgAdmin
 phishing
 php
-pickleable
+picklable
 picosecond
 PIL
 pingback
@@ -586,6 +588,7 @@ precomputation
 preconfigured
 prefetch
 prefetched
+prefetches
 prefetching
 prefork
 preforked
@@ -630,6 +633,7 @@ quoteless
 Radziej
 rc
 readded
+reallow
 reallowed
 rebase
 rebased
@@ -713,6 +717,7 @@ sharding
 showmigrations
 sid
 simultaneously
+Sitarska
 sitemap
 sitemaps
 sitewide

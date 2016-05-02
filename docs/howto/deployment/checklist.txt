@@ -32,10 +32,9 @@ module for production.
 Run ``manage.py check --deploy``
 ================================
 
-Some of the checks described below can be automated using the
-:djadminopt:`--deploy` option of the :djadmin:`check` command. Be sure to run it
-against your production settings file as described in the option's
-documentation.
+Some of the checks described below can be automated using the :option:`check
+--deploy` option. Be sure to run it against your production settings file as
+described in the option's documentation.
 
 Critical settings
 =================
@@ -234,7 +233,7 @@ See :doc:`/howto/error-reporting` for details on error reporting by email.
     Consider using an error monitoring system such as Sentry_ before your
     inbox is flooded by reports. Sentry can also aggregate logs.
 
-    .. _Sentry: http://sentry.readthedocs.org/en/latest/
+    .. _Sentry: https://docs.getsentry.com/
 
 Customize the default error views
 ---------------------------------
@@ -255,8 +254,9 @@ Python Options
 ==============
 
 It's strongly recommended that you invoke the Python process running your
-Django application using the `-R`_ option or with the
-:envvar:`PYTHONHASHSEED` environment variable set to ``random``.
+Django application using the `-R`_ option or with the :envvar:`PYTHONHASHSEED`
+environment variable set to ``random``. This option is enabled by default
+starting with Python 3.3.
 
 These options help protect your site from denial-of-service (DoS)
 attacks triggered by carefully crafted inputs. Such an attack can

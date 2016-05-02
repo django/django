@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls admin_static admin_list %}
+{% load i18n admin_urls static admin_list %}
 
 {% block extrastyle %}
   {{ block.super }}
@@ -21,15 +21,6 @@
 {% block extrahead %}
 {{ block.super }}
 {{ media.js }}
-{% if action_form %}{% if actions_on_top or actions_on_bottom %}
-<script type="text/javascript">
-(function($) {
-    $(document).ready(function($) {
-        $("tr input.action-select").actions();
-    });
-})(django.jQuery);
-</script>
-{% endif %}{% endif %}
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
@@ -49,18 +40,18 @@
 {% block content %}
   <div id="content-main">
     {% block object-tools %}
-      {% if has_add_permission %}
         <ul class="object-tools">
           {% block object-tools-items %}
+            {% if has_add_permission %}
             <li>
               {% url cl.opts|admin_urlname:'add' as add_url %}
               <a href="{% add_preserved_filters add_url is_popup to_field %}" class="addlink">
                 {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
               </a>
             </li>
+            {% endif %}
           {% endblock %}
         </ul>
-      {% endif %}
     {% endblock %}
     {% if cl.formset.errors %}
         <p class="errornote">

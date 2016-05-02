@@ -10,10 +10,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode
 
 
-@override_settings(
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='auth_tests.urls',
-)
+@override_settings(ROOT_URLCONF='auth_tests.urls')
 class AuthTemplateTests(TestCase):
 
     def test_titles(self):

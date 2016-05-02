@@ -6,7 +6,8 @@ from unittest import skipUnless
 
 from django.core.management import call_command
 from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, mock, skipUnlessDBFeature
+from django.utils.encoding import force_text
 from django.utils.six import PY3, StringIO
 
 from .models import ColumnTypes
@@ -26,6 +27,17 @@ class InspectDBTestCase(TestCase):
         # the Django test suite, check that one of its tables hasn't been
         # inspected
         self.assertNotIn("class DjangoContentType(models.Model):", out.getvalue(), msg=error_message)
+
+    def test_table_option(self):
+        """
+        inspectdb can inspect a subset of tables by passing the table names as
+        arguments.
+        """
+        out = StringIO()
+        call_command('inspectdb', 'inspectdb_people', stdout=out)
+        output = out.getvalue()
+        self.assertIn('class InspectdbPeople(models.Model):', output)
+        self.assertNotIn("InspectdbPeopledata", output)
 
     def make_field_type_asserter(self):
         """Call inspectdb and return a function to validate a field type in its output"""
@@ -234,10 +246,18 @@ class InspectDBTestCase(TestCase):
                      table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'),
                      stdout=out)
         output = out.getvalue()
-        self.assertIn(
-            "        unique_together = (('field1', 'field2'),)", output,
-            msg='inspectdb should generate unique_together.'
-        )
+        unique_re = re.compile(r'.*unique_together = \((.+),\).*')
+        unique_together_match = re.findall(unique_re, output)
+        # There should be one unique_together tuple.
+        self.assertEqual(len(unique_together_match), 1)
+        fields = unique_together_match[0]
+        # Fields with db_column = field name.
+        self.assertIn("('field1', 'field2')", fields)
+        # Fields from columns whose names are Python keywords.
+        self.assertIn("('field1', 'field2')", fields)
+        # Fields whose names normalize to the same Python field name and hence
+        # are given an integer suffix.
+        self.assertIn("('non_unique_column', 'non_unique_column_0')", fields)
 
     @skipUnless(connection.vendor == 'sqlite',
                 "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
@@ -260,3 +280,17 @@ class InspectDBTestCase(TestCase):
             self.assertIn("big_int_field = models.BigIntegerField()", output)
         finally:
             connection.introspection.data_types_reverse = orig_data_types_reverse
+
+    def test_introspection_errors(self):
+        """
+        Introspection errors should not crash the command, and the error should
+        be visible in the output.
+        """
+        out = StringIO()
+        with mock.patch('django.db.backends.base.introspection.BaseDatabaseIntrospection.table_names',
+                        return_value=['nonexistent']):
+            call_command('inspectdb', stdout=out)
+        output = force_text(out.getvalue())
+        self.assertIn("# Unable to inspect table 'nonexistent'", output)
+        # The error message depends on the backend
+        self.assertIn("# The error was:", output)

@@ -6,7 +6,7 @@ import re
 
 from django.utils import six
 from django.utils.encoding import force_str, force_text
-from django.utils.functional import allow_lazy
+from django.utils.functional import keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
 from django.utils.six.moves.urllib.parse import (
@@ -17,7 +17,12 @@ from django.utils.text import normalize_newlines
 from .html_parser import HTMLParseError, HTMLParser
 
 # Configuration for urlize() function.
-TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'', '!']
+TRAILING_PUNCTUATION_RE = re.compile(
+    '^'           # Beginning of word
+    '(.*?)'       # The URL in word
+    '([.,:;!]+)'  # Allowed non-wrapping, trailing punctuation
+    '$'           # End of word
+)
 WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
 
 # List of possible strings used for bullets in bulleted lists.
@@ -33,11 +38,12 @@ html_gunk_re = re.compile(
     r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|'
     '<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
 hard_coded_bullets_re = re.compile(
-    r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x)
-    for x in DOTS), re.DOTALL)
+    r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x) for x in DOTS), re.DOTALL
+)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 
 
+@keep_lazy(six.text_type, SafeText)
 def escape(text):
     """
     Returns the given text with ampersands, quotes and angle brackets encoded
@@ -47,9 +53,10 @@ def escape(text):
     marked as such. This may result in double-escaping. If this is a concern,
     use conditional_escape() instead.
     """
-    return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;')
-        .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
-escape = allow_lazy(escape, six.text_type, SafeText)
+    return mark_safe(
+        force_text(text).replace('&', '&amp;').replace('<', '&lt;')
+        .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+    )
 
 _js_escapes = {
     ord('\\'): '\\u005C',
@@ -69,10 +76,10 @@ _js_escapes = {
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
 
+@keep_lazy(six.text_type, SafeText)
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
-escapejs = allow_lazy(escapejs, six.text_type, SafeText)
 
 
 def conditional_escape(text):
@@ -118,16 +125,16 @@ def format_html_join(sep, format_string, args_generator):
         for args in args_generator))
 
 
+@keep_lazy_text
 def linebreaks(value, autoescape=False):
     """Converts newlines into <p> and <br />s."""
-    value = normalize_newlines(value)
+    value = normalize_newlines(force_text(value))
     paras = re.split('\n{2,}', value)
     if autoescape:
         paras = ['<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
     else:
         paras = ['<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
     return '\n\n'.join(paras)
-linebreaks = allow_lazy(linebreaks, six.text_type)
 
 
 class MLStripper(HTMLParser):
@@ -166,10 +173,12 @@ def _strip_once(value):
         return s.get_data()
 
 
+@keep_lazy_text
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
     # Note: in typical case this loop executes _strip_once once. Loop condition
     # is redundant, but helps to reduce number of executions of _strip_once.
+    value = force_text(value)
     while '<' in value and '>' in value:
         new_value = _strip_once(value)
         if len(new_value) >= len(value):
@@ -179,13 +188,12 @@ def strip_tags(value):
             break
         value = new_value
     return value
-strip_tags = allow_lazy(strip_tags)
 
 
+@keep_lazy_text
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_text(value))
-strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, six.text_type)
 
 
 def smart_urlquote(url):
@@ -224,6 +232,7 @@ def smart_urlquote(url):
     return urlunsplit((scheme, netloc, path, query, fragment))
 
 
+@keep_lazy_text
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
     Converts any URLs in text into clickable links.
@@ -266,24 +275,46 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             trail = ''
         return text, unescaped, trail
 
-    words = word_split_re.split(force_text(text))
-    for i, word in enumerate(words):
-        if '.' in word or '@' in word or ':' in word:
-            # Deal with punctuation.
-            lead, middle, trail = '', word, ''
-            for punctuation in TRAILING_PUNCTUATION:
-                if middle.endswith(punctuation):
-                    middle = middle[:-len(punctuation)]
-                    trail = punctuation + trail
+    def trim_punctuation(lead, middle, trail):
+        """
+        Trim trailing and wrapping punctuation from `middle`. Return the items
+        of the new state.
+        """
+        # Continue trimming until middle remains unchanged.
+        trimmed_something = True
+        while trimmed_something:
+            trimmed_something = False
+
+            # Trim trailing punctuation.
+            match = TRAILING_PUNCTUATION_RE.match(middle)
+            if match:
+                middle = match.group(1)
+                trail = match.group(2) + trail
+                trimmed_something = True
+
+            # Trim wrapping punctuation.
             for opening, closing in WRAPPING_PUNCTUATION:
                 if middle.startswith(opening):
                     middle = middle[len(opening):]
-                    lead = lead + opening
+                    lead += opening
+                    trimmed_something = True
                 # Keep parentheses at the end only if they're balanced.
-                if (middle.endswith(closing)
-                        and middle.count(closing) == middle.count(opening) + 1):
+                if (middle.endswith(closing) and
+                        middle.count(closing) == middle.count(opening) + 1):
                     middle = middle[:-len(closing)]
                     trail = closing + trail
+                    trimmed_something = True
+        return lead, middle, trail
+
+    words = word_split_re.split(force_text(text))
+    for i, word in enumerate(words):
+        if '.' in word or '@' in word or ':' in word:
+            # lead: Current punctuation trimmed from the beginning of the word.
+            # middle: Current state of the word.
+            # trail: Current punctuation trimmed from the end of the word.
+            lead, middle, trail = '', word, ''
+            # Deal with punctuation.
+            lead, middle, trail = trim_punctuation(lead, middle, trail)
 
             # Make URL we want to point to.
             url = None
@@ -321,7 +352,6 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         elif autoescape:
             words[i] = escape(word)
     return ''.join(words)
-urlize = allow_lazy(urlize, six.text_type)
 
 
 def avoid_wrapping(value):

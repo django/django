@@ -255,11 +255,6 @@ p.datetime {
     font-weight: bold;
 }
 
-form .form-row p.datetime {
-    margin-left: 160px;
-    padding-left: 10px;
-}
-
 .datetime span {
     white-space: nowrap;
     font-weight: normal;
@@ -274,7 +269,7 @@ form .form-row p.datetime {
 }
 
 table p.datetime {
-    font-size: 10px;
+    font-size: 11px;
     margin-left: 0;
     padding-left: 0;
 }

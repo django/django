@@ -3,20 +3,22 @@ from __future__ import unicode_literals
 from datetime import date
 
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, SESSION_KEY, authenticate, get_user,
+    BACKEND_SESSION_KEY, SESSION_KEY, authenticate, get_user, signals,
 )
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
 from django.contrib.auth.models import AnonymousUser, Group, Permission, User
-from django.contrib.auth.tests.custom_user import CustomUser, ExtensionUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
 from django.test import (
-    SimpleTestCase, TestCase, modify_settings, override_settings,
+    SimpleTestCase, TestCase, mock, modify_settings, override_settings,
 )
 
-from .models import CustomPermissionsUser, UUIDUser
+from .models import (
+    CustomPermissionsUser, CustomUser, CustomUserWithoutIsActiveField,
+    ExtensionUser, UUIDUser,
+)
 
 
 class CountingMD5PasswordHasher(MD5PasswordHasher):
@@ -140,11 +142,10 @@ class BaseModelBackendTest(object):
         self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
         self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
-        user.is_anonymous = lambda: True
-
-        self.assertEqual(backend.get_all_permissions(user), set())
-        self.assertEqual(backend.get_user_permissions(user), set())
-        self.assertEqual(backend.get_group_permissions(user), set())
+        with mock.patch.object(self.UserModel, 'is_anonymous', True):
+            self.assertEqual(backend.get_all_permissions(user), set())
+            self.assertEqual(backend.get_user_permissions(user), set())
+            self.assertEqual(backend.get_group_permissions(user), set())
 
     def test_inactive_has_no_permissions(self):
         """
@@ -201,21 +202,37 @@ class ModelBackendTest(BaseModelBackendTest, TestCase):
     Tests for the ModelBackend using the default User model.
     """
     UserModel = User
+    user_credentials = {'username': 'test', 'password': 'test'}
 
     def create_users(self):
-        self.user = User.objects.create_user(
-            username='test',
-            email='test@example.com',
-            password='test',
-        )
+        self.user = User.objects.create_user(email='test@example.com', **self.user_credentials)
         self.superuser = User.objects.create_superuser(
             username='test2',
             email='test2@example.com',
             password='test',
         )
 
+    def test_authenticate_inactive(self):
+        """
+        An inactive user can't authenticate.
+        """
+        self.assertEqual(authenticate(**self.user_credentials), self.user)
+        self.user.is_active = False
+        self.user.save()
+        self.assertIsNone(authenticate(**self.user_credentials))
 
-@override_settings(AUTH_USER_MODEL='auth.ExtensionUser')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithoutIsActiveField')
+    def test_authenticate_user_without_is_active_field(self):
+        """
+        A custom user without an `is_active` field is allowed to authenticate.
+        """
+        user = CustomUserWithoutIsActiveField.objects._create_user(
+            username='test', email='test@example.com', password='test',
+        )
+        self.assertEqual(authenticate(username='test', password='test'), user)
+
+
+@override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser')
 class ExtensionUserModelBackendTest(BaseModelBackendTest, TestCase):
     """
     Tests for the ModelBackend using the custom ExtensionUser model.
@@ -275,7 +292,7 @@ class CustomPermissionsUserModelBackendTest(BaseModelBackendTest, TestCase):
         )
 
 
-@override_settings(AUTH_USER_MODEL='auth.CustomUser')
+@override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
 class CustomUserModelBackendAuthenticateTest(TestCase):
     """
     Tests that the model backend can accept a credentials kwarg labeled with
@@ -316,14 +333,14 @@ class SimpleRowlevelBackend(object):
         if isinstance(obj, TestObj):
             if user.username == 'test2':
                 return True
-            elif user.is_anonymous() and perm == 'anon':
+            elif user.is_anonymous and perm == 'anon':
                 return True
             elif not user.is_active and perm == 'inactive':
                 return True
         return False
 
     def has_module_perms(self, user, app_label):
-        if not user.is_anonymous() and not user.is_active:
+        if not user.is_anonymous and not user.is_active:
             return False
         return app_label == "app1"
 
@@ -334,7 +351,7 @@ class SimpleRowlevelBackend(object):
         if not isinstance(obj, TestObj):
             return ['none']
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             return ['anon']
         if user.username == 'test2':
             return ['simple', 'advanced']
@@ -429,7 +446,8 @@ class NoBackendsTest(TestCase):
         self.user = User.objects.create_user('test', 'test@example.com', 'test')
 
     def test_raises_exception(self):
-        self.assertRaises(ImproperlyConfigured, self.user.has_perm, ('perm', TestObj(),))
+        with self.assertRaises(ImproperlyConfigured):
+            self.user.has_perm(('perm', TestObj()))
 
 
 @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.SimpleRowlevelBackend'])
@@ -475,12 +493,21 @@ class PermissionDeniedBackendTest(TestCase):
 
     def setUp(self):
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
-        self.user1.save()
+        self.user_login_failed = []
+        signals.user_login_failed.connect(self.user_login_failed_listener)
+
+    def tearDown(self):
+        signals.user_login_failed.disconnect(self.user_login_failed_listener)
+
+    def user_login_failed_listener(self, sender, credentials, **kwargs):
+        self.user_login_failed.append(credentials)
 
     @modify_settings(AUTHENTICATION_BACKENDS={'prepend': backend})
     def test_permission_denied(self):
         "user is not authenticated after a backend raises permission denied #2550"
         self.assertEqual(authenticate(username='test', password='test'), None)
+        # user_login_failed signal is sent.
+        self.assertEqual(self.user_login_failed, [{'password': '********************', 'username': 'test'}])
 
     @modify_settings(AUTHENTICATION_BACKENDS={'append': backend})
     def test_authenticates(self):
@@ -550,7 +577,7 @@ class ChangedBackendSettingsTest(TestCase):
             # Assert that the user retrieval is successful and the user is
             # anonymous as the backend is not longer available.
             self.assertIsNotNone(user)
-            self.assertTrue(user.is_anonymous())
+            self.assertTrue(user.is_anonymous)
 
 
 class TypeErrorBackend(object):
@@ -575,7 +602,8 @@ class TypeErrorBackendTest(TestCase):
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend])
     def test_type_error_raised(self):
-        self.assertRaises(TypeError, authenticate, username='test', password='test')
+        with self.assertRaises(TypeError):
+            authenticate(username='test', password='test')
 
 
 class ImproperlyConfiguredUserModelTest(TestCase):
@@ -598,10 +626,19 @@ class ImproperlyConfiguredUserModelTest(TestCase):
         request = HttpRequest()
         request.session = self.client.session
 
-        self.assertRaises(ImproperlyConfigured, get_user, request)
+        with self.assertRaises(ImproperlyConfigured):
+            get_user(request)
 
 
 class ImportedModelBackend(ModelBackend):
+    pass
+
+
+class CustomModelBackend(ModelBackend):
+    pass
+
+
+class OtherModelBackend(ModelBackend):
     pass
 
 
@@ -622,3 +659,64 @@ class ImportedBackendTests(TestCase):
         request = HttpRequest()
         request.session = self.client.session
         self.assertEqual(request.session[BACKEND_SESSION_KEY], self.backend)
+
+
+class SelectingBackendTests(TestCase):
+    backend = 'auth_tests.test_auth_backends.CustomModelBackend'
+    other_backend = 'auth_tests.test_auth_backends.OtherModelBackend'
+    username = 'username'
+    password = 'password'
+
+    def assertBackendInSession(self, backend):
+        request = HttpRequest()
+        request.session = self.client.session
+        self.assertEqual(request.session[BACKEND_SESSION_KEY], backend)
+
+    @override_settings(AUTHENTICATION_BACKENDS=[backend])
+    def test_backend_path_login_without_authenticate_single_backend(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        self.client._login(user)
+        self.assertBackendInSession(self.backend)
+
+    @override_settings(AUTHENTICATION_BACKENDS=[backend, other_backend])
+    def test_backend_path_login_without_authenticate_multiple_backends(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        expected_message = (
+            'You have multiple authentication backends configured and '
+            'therefore must provide the `backend` argument or set the '
+            '`backend` attribute on the user.'
+        )
+        with self.assertRaisesMessage(ValueError, expected_message):
+            self.client._login(user)
+
+    @override_settings(AUTHENTICATION_BACKENDS=[backend, other_backend])
+    def test_backend_path_login_with_explicit_backends(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        self.client._login(user, self.other_backend)
+        self.assertBackendInSession(self.other_backend)
+
+
+@override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend'])
+class AllowAllUsersModelBackendTest(TestCase):
+    """
+    Inactive users may authenticate with the AllowAllUsersModelBackend.
+    """
+    user_credentials = {'username': 'test', 'password': 'test'}
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            email='test@example.com', is_active=False,
+            **cls.user_credentials
+        )
+
+    def test_authenticate(self):
+        self.assertFalse(self.user.is_active)
+        self.assertEqual(authenticate(**self.user_credentials), self.user)
+
+    def test_get_user(self):
+        self.client.force_login(self.user)
+        request = HttpRequest()
+        request.session = self.client.session
+        user = get_user(request)
+        self.assertEqual(user, self.user)

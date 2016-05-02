@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 08:16+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Breton (http://www.transifex.com/projects/p/django/language/"
-"br/)\n"
+"Language-Team: Breton (http://www.transifex.com/django/django/language/br/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -74,6 +73,12 @@ msgstr "Ober :"
 msgid "action time"
 msgstr "eur an ober"
 
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
 msgid "object id"
 msgstr ""
 
@@ -112,6 +117,9 @@ msgstr "Hini ebet"
 
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+msgid "Added."
 msgstr ""
 
 #, python-format
@@ -438,6 +446,12 @@ msgid ""
 "the appropriate user."
 msgstr ""
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
 msgid "Forgotten your password or username?"
 msgstr "Disoñjet ho ker-tremen pe hoc'h anv implijer ganeoc'h ?"
 
@@ -460,6 +474,9 @@ msgstr "Diskouez pep tra"
 
 msgid "Save"
 msgstr "Enrollañ"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -582,9 +599,6 @@ msgstr ""
 
 msgid "All dates"
 msgstr "An holl zeiziadoù"
-
-msgid "(None)"
-msgstr "(hini)"
 
 #, python-format
 msgid "Select %s"

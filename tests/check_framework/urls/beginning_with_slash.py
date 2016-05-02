@@ -1,7 +1,5 @@
-from django.conf.urls import include, url
+from django.conf.urls import url
 
 urlpatterns = [
-    url('^', include([
-        url(r'/starting-with-slash/$', lambda x: x),
-    ])),
+    url(r'/starting-with-slash/$', lambda x: x),
 ]

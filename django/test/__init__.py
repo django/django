@@ -9,14 +9,14 @@ from django.test.testcases import (
 )
 from django.test.utils import (
     ignore_warnings, modify_settings, override_settings,
-    override_system_checks,
+    override_system_checks, tag,
 )
 
 __all__ = [
     'Client', 'RequestFactory', 'TestCase', 'TransactionTestCase',
     'SimpleTestCase', 'LiveServerTestCase', 'skipIfDBFeature',
     'skipUnlessAnyDBFeature', 'skipUnlessDBFeature', 'ignore_warnings',
-    'modify_settings', 'override_settings', 'override_system_checks'
+    'modify_settings', 'override_settings', 'override_system_checks', 'tag',
 ]
 
 # To simplify Django's test suite; not meant as a public API

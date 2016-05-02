@@ -10,14 +10,14 @@ from .base import WidgetTest
 
 
 class SelectTest(WidgetTest):
-    widget = Select()
+    widget = Select
     nested_widget = Select(choices=(
         ('outer1', 'Outer 1'),
         ('Group "1"', (('inner1', 'Inner 1'), ('inner2', 'Inner 2'))),
     ))
 
     def test_render(self):
-        self.check_html(self.widget, 'beatle', 'J', choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatle', 'J', html=(
             """<select name="beatle">
             <option value="J" selected="selected">John</option>
             <option value="P">Paul</option>
@@ -30,7 +30,7 @@ class SelectTest(WidgetTest):
         """
         If the value is None, none of the options are selected.
         """
-        self.check_html(self.widget, 'beatle', None, choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatle', None, html=(
             """<select name="beatle">
             <option value="J">John</option>
             <option value="P">Paul</option>
@@ -44,7 +44,7 @@ class SelectTest(WidgetTest):
         If the value corresponds to a label (but not to an option value), none
         of the options are selected.
         """
-        self.check_html(self.widget, 'beatle', 'John', choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatle', 'John', html=(
             """<select name="beatle">
             <option value="J">John</option>
             <option value="P">Paul</option>
@@ -59,7 +59,7 @@ class SelectTest(WidgetTest):
         """
         choices = [('0', '0'), ('1', '1'), ('2', '2'), ('3', '3'), ('0', 'extra')]
 
-        self.check_html(self.widget, 'choices', '0', choices=choices, html=(
+        self.check_html(self.widget(choices=choices), 'choices', '0', html=(
             """<select name="choices">
             <option value="0" selected="selected">0</option>
             <option value="1">1</option>
@@ -90,8 +90,8 @@ class SelectTest(WidgetTest):
         The value is compared to its str().
         """
         self.check_html(
-            self.widget, 'num', 2,
-            choices=[('1', '1'), ('2', '2'), ('3', '3')],
+            self.widget(choices=[('1', '1'), ('2', '2'), ('3', '3')]),
+            'num', 2,
             html=(
                 """<select name="num">
                 <option value="1">1</option>
@@ -101,8 +101,8 @@ class SelectTest(WidgetTest):
             ),
         )
         self.check_html(
-            self.widget, 'num', '2',
-            choices=[(1, 1), (2, 2), (3, 3)],
+            self.widget(choices=[(1, 1), (2, 2), (3, 3)]),
+            'num', '2',
             html=(
                 """<select name="num">
                 <option value="1">1</option>
@@ -112,8 +112,8 @@ class SelectTest(WidgetTest):
             ),
         )
         self.check_html(
-            self.widget, 'num', 2,
-            choices=[(1, 1), (2, 2), (3, 3)],
+            self.widget(choices=[(1, 1), (2, 2), (3, 3)]),
+            'num', 2,
             html=(
                 """<select name="num">
                 <option value="1">1</option>
@@ -162,25 +162,9 @@ class SelectTest(WidgetTest):
             </select>"""
         ))
 
-    def test_choices_constuctor_and_render(self):
-        """
-        If 'choices' is passed to both the constructor and render(), then
-        they'll both be in the output.
-        """
-        widget = Select(choices=[(1, 1), (2, 2), (3, 3)])
-        self.check_html(widget, 'num', 2, choices=[(4, 4), (5, 5)], html=(
-            """<select name="num">
-            <option value="1">1</option>
-            <option value="2" selected="selected">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            </select>"""
-        ))
-
     def test_choices_escaping(self):
         choices = (('bad', 'you & me'), ('good', mark_safe('you &gt; me')))
-        self.check_html(self.widget, 'escape', None, choices=choices, html=(
+        self.check_html(self.widget(choices=choices), 'escape', None, html=(
             """<select name="escape">
             <option value="bad">you &amp; me</option>
             <option value="good">you &gt; me</option>
@@ -189,8 +173,8 @@ class SelectTest(WidgetTest):
 
     def test_choices_unicode(self):
         self.check_html(
-            self.widget, 'email', 'ŠĐĆŽćžšđ',
-            choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')],
+            self.widget(choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')]),
+            'email', 'ŠĐĆŽćžšđ',
             html=(
                 """<select name="email">
                 <option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">

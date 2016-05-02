@@ -8,6 +8,7 @@ from django.test import SimpleTestCase
 from django.utils import html, safestring, six
 from django.utils._os import upath
 from django.utils.encoding import force_text
+from django.utils.functional import lazystr
 
 
 class TestUtilsHtml(SimpleTestCase):
@@ -35,6 +36,7 @@ class TestUtilsHtml(SimpleTestCase):
         for value, output in items:
             for pattern in patterns:
                 self.check_output(f, pattern % value, pattern % output)
+                self.check_output(f, lazystr(pattern % value), pattern % output)
             # Check repeated values.
             self.check_output(f, value * 2, output * 2)
         # Verify it doesn't double replace &.
@@ -61,6 +63,7 @@ class TestUtilsHtml(SimpleTestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_strip_tags(self):
         f = html.strip_tags
@@ -86,6 +89,7 @@ class TestUtilsHtml(SimpleTestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
         # Some convoluted syntax for which parsing may differ between python versions
         output = html.strip_tags('<sc<!-- -->ript>test<<!-- -->/script>')
@@ -113,6 +117,7 @@ class TestUtilsHtml(SimpleTestCase):
         items = (' <adf>', '<adf> ', ' </adf> ', ' <f> x</f>')
         for value in items:
             self.check_output(f, value)
+            self.check_output(f, lazystr(value))
         # Strings that have spaces to strip.
         items = (
             ('<d> </d>', '<d></d>'),
@@ -121,6 +126,7 @@ class TestUtilsHtml(SimpleTestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_escapejs(self):
         f = html.escapejs
@@ -139,6 +145,7 @@ class TestUtilsHtml(SimpleTestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_smart_urlquote(self):
         quote = html.smart_urlquote

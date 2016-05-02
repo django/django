@@ -181,10 +181,11 @@ class MultiPartParser(object):
                 elif item_type == FILE:
                     # This is a file, use the handler...
                     file_name = disposition.get('filename')
+                    if file_name:
+                        file_name = force_text(file_name, encoding, errors='replace')
+                        file_name = self.IE_sanitize(unescape_entities(file_name))
                     if not file_name:
                         continue
-                    file_name = force_text(file_name, encoding, errors='replace')
-                    file_name = self.IE_sanitize(unescape_entities(file_name))
 
                     content_type, content_type_extra = meta_data.get('content-type', ('', {}))
                     content_type = content_type.strip()

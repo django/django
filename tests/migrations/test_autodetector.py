@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import functools
 import re
 
 from django.apps import apps
@@ -17,9 +18,9 @@ from django.test.utils import isolate_lru_cache
 from .models import FoodManager, FoodQuerySet
 
 
-class DeconstructableObject(object):
+class DeconstructibleObject(object):
     """
-    A custom deconstructable object.
+    A custom deconstructible object.
     """
 
     def __init__(self, *args, **kwargs):
@@ -60,117 +61,117 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default='Ada Lovelace')),
     ])
-    author_name_deconstructable_1 = ModelState("testapp", "Author", [
+    author_name_deconstructible_1 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=DeconstructableObject())),
+        ("name", models.CharField(max_length=200, default=DeconstructibleObject())),
     ])
-    author_name_deconstructable_2 = ModelState("testapp", "Author", [
+    author_name_deconstructible_2 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=DeconstructableObject())),
+        ("name", models.CharField(max_length=200, default=DeconstructibleObject())),
     ])
-    author_name_deconstructable_3 = ModelState("testapp", "Author", [
+    author_name_deconstructible_3 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=models.IntegerField())),
     ])
-    author_name_deconstructable_4 = ModelState("testapp", "Author", [
+    author_name_deconstructible_4 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=models.IntegerField())),
     ])
-    author_name_deconstructable_list_1 = ModelState("testapp", "Author", [
+    author_name_deconstructible_list_1 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=[DeconstructableObject(), 123])),
+        ("name", models.CharField(max_length=200, default=[DeconstructibleObject(), 123])),
     ])
-    author_name_deconstructable_list_2 = ModelState("testapp", "Author", [
+    author_name_deconstructible_list_2 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=[DeconstructableObject(), 123])),
+        ("name", models.CharField(max_length=200, default=[DeconstructibleObject(), 123])),
     ])
-    author_name_deconstructable_list_3 = ModelState("testapp", "Author", [
+    author_name_deconstructible_list_3 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=[DeconstructableObject(), 999])),
+        ("name", models.CharField(max_length=200, default=[DeconstructibleObject(), 999])),
     ])
-    author_name_deconstructable_tuple_1 = ModelState("testapp", "Author", [
+    author_name_deconstructible_tuple_1 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=(DeconstructableObject(), 123))),
+        ("name", models.CharField(max_length=200, default=(DeconstructibleObject(), 123))),
     ])
-    author_name_deconstructable_tuple_2 = ModelState("testapp", "Author", [
+    author_name_deconstructible_tuple_2 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=(DeconstructableObject(), 123))),
+        ("name", models.CharField(max_length=200, default=(DeconstructibleObject(), 123))),
     ])
-    author_name_deconstructable_tuple_3 = ModelState("testapp", "Author", [
+    author_name_deconstructible_tuple_3 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=(DeconstructableObject(), 999))),
+        ("name", models.CharField(max_length=200, default=(DeconstructibleObject(), 999))),
     ])
-    author_name_deconstructable_dict_1 = ModelState("testapp", "Author", [
+    author_name_deconstructible_dict_1 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default={
-            'item': DeconstructableObject(), 'otheritem': 123
+            'item': DeconstructibleObject(), 'otheritem': 123
         })),
     ])
-    author_name_deconstructable_dict_2 = ModelState("testapp", "Author", [
+    author_name_deconstructible_dict_2 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default={
-            'item': DeconstructableObject(), 'otheritem': 123
+            'item': DeconstructibleObject(), 'otheritem': 123
         })),
     ])
-    author_name_deconstructable_dict_3 = ModelState("testapp", "Author", [
+    author_name_deconstructible_dict_3 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default={
-            'item': DeconstructableObject(), 'otheritem': 999
+            'item': DeconstructibleObject(), 'otheritem': 999
         })),
     ])
-    author_name_nested_deconstructable_1 = ModelState("testapp", "Author", [
+    author_name_nested_deconstructible_1 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=DeconstructableObject(
-            DeconstructableObject(1),
-            (DeconstructableObject('t1'), DeconstructableObject('t2'),),
-            a=DeconstructableObject('A'),
-            b=DeconstructableObject(B=DeconstructableObject('c')),
+        ("name", models.CharField(max_length=200, default=DeconstructibleObject(
+            DeconstructibleObject(1),
+            (DeconstructibleObject('t1'), DeconstructibleObject('t2'),),
+            a=DeconstructibleObject('A'),
+            b=DeconstructibleObject(B=DeconstructibleObject('c')),
         ))),
     ])
-    author_name_nested_deconstructable_2 = ModelState("testapp", "Author", [
+    author_name_nested_deconstructible_2 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=DeconstructableObject(
-            DeconstructableObject(1),
-            (DeconstructableObject('t1'), DeconstructableObject('t2'),),
-            a=DeconstructableObject('A'),
-            b=DeconstructableObject(B=DeconstructableObject('c')),
+        ("name", models.CharField(max_length=200, default=DeconstructibleObject(
+            DeconstructibleObject(1),
+            (DeconstructibleObject('t1'), DeconstructibleObject('t2'),),
+            a=DeconstructibleObject('A'),
+            b=DeconstructibleObject(B=DeconstructibleObject('c')),
         ))),
     ])
-    author_name_nested_deconstructable_changed_arg = ModelState("testapp", "Author", [
+    author_name_nested_deconstructible_changed_arg = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=DeconstructableObject(
-            DeconstructableObject(1),
-            (DeconstructableObject('t1'), DeconstructableObject('t2-changed'),),
-            a=DeconstructableObject('A'),
-            b=DeconstructableObject(B=DeconstructableObject('c')),
+        ("name", models.CharField(max_length=200, default=DeconstructibleObject(
+            DeconstructibleObject(1),
+            (DeconstructibleObject('t1'), DeconstructibleObject('t2-changed'),),
+            a=DeconstructibleObject('A'),
+            b=DeconstructibleObject(B=DeconstructibleObject('c')),
         ))),
     ])
-    author_name_nested_deconstructable_extra_arg = ModelState("testapp", "Author", [
+    author_name_nested_deconstructible_extra_arg = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=DeconstructableObject(
-            DeconstructableObject(1),
-            (DeconstructableObject('t1'), DeconstructableObject('t2'),),
+        ("name", models.CharField(max_length=200, default=DeconstructibleObject(
+            DeconstructibleObject(1),
+            (DeconstructibleObject('t1'), DeconstructibleObject('t2'),),
             None,
-            a=DeconstructableObject('A'),
-            b=DeconstructableObject(B=DeconstructableObject('c')),
+            a=DeconstructibleObject('A'),
+            b=DeconstructibleObject(B=DeconstructibleObject('c')),
         ))),
     ])
-    author_name_nested_deconstructable_changed_kwarg = ModelState("testapp", "Author", [
+    author_name_nested_deconstructible_changed_kwarg = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=DeconstructableObject(
-            DeconstructableObject(1),
-            (DeconstructableObject('t1'), DeconstructableObject('t2'),),
-            a=DeconstructableObject('A'),
-            b=DeconstructableObject(B=DeconstructableObject('c-changed')),
+        ("name", models.CharField(max_length=200, default=DeconstructibleObject(
+            DeconstructibleObject(1),
+            (DeconstructibleObject('t1'), DeconstructibleObject('t2'),),
+            a=DeconstructibleObject('A'),
+            b=DeconstructibleObject(B=DeconstructibleObject('c-changed')),
         ))),
     ])
-    author_name_nested_deconstructable_extra_kwarg = ModelState("testapp", "Author", [
+    author_name_nested_deconstructible_extra_kwarg = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("name", models.CharField(max_length=200, default=DeconstructableObject(
-            DeconstructableObject(1),
-            (DeconstructableObject('t1'), DeconstructableObject('t2'),),
-            a=DeconstructableObject('A'),
-            b=DeconstructableObject(B=DeconstructableObject('c')),
+        ("name", models.CharField(max_length=200, default=DeconstructibleObject(
+            DeconstructibleObject(1),
+            (DeconstructibleObject('t1'), DeconstructibleObject('t2'),),
+            a=DeconstructibleObject('A'),
+            b=DeconstructibleObject(B=DeconstructibleObject('c')),
             c=None,
         ))),
     ])
@@ -656,6 +657,59 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
+
+    def test_supports_functools_partial(self):
+        def _content_file_name(instance, filename, key, **kwargs):
+            return '{}/{}'.format(instance, filename)
+
+        def content_file_name(key, **kwargs):
+            return functools.partial(_content_file_name, key, **kwargs)
+
+        # An unchanged partial reference.
+        before = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
+        ])])
+        after = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
+        ])])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 0)
+
+        # A changed partial reference.
+        args_changed = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('other-file'))),
+        ])])
+        autodetector = MigrationAutodetector(before, args_changed)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AlterField'])
+        # Can't use assertOperationFieldAttributes because we need the
+        # deconstructed version, i.e., the exploded func/args/keywords rather
+        # than the partial: we don't care if it's not the same instance of the
+        # partial, only if it's the same source function, args, and keywords.
+        value = changes['testapp'][0].operations[0].field.upload_to
+        self.assertEqual(
+            (_content_file_name, ('other-file',), {}),
+            (value.func, value.args, value.keywords)
+        )
+
+        kwargs_changed = self.make_project_state([ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("file", models.FileField(max_length=200, upload_to=content_file_name('file', spam='eggs'))),
+        ])])
+        autodetector = MigrationAutodetector(before, kwargs_changed)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AlterField'])
+        value = changes['testapp'][0].operations[0].field.upload_to
+        self.assertEqual(
+            (_content_file_name, ('file',), {'spam': 'eggs'}),
+            (value.func, value.args, value.keywords)
+        )
 
     @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
@@ -1174,6 +1228,34 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={("title", "newfield")})
         self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", index_together={("title", "newfield")})
 
+    def test_create_model_and_unique_together(self):
+        author = ModelState("otherapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200)),
+        ])
+        book_with_author = ModelState("otherapp", "Book", [
+            ("id", models.AutoField(primary_key=True)),
+            ("author", models.ForeignKey("otherapp.Author", models.CASCADE)),
+            ("title", models.CharField(max_length=200)),
+        ], {
+            "index_together": {("title", "author")},
+            "unique_together": {("title", "author")},
+        })
+        before = self.make_project_state([self.book_with_no_author])
+        after = self.make_project_state([author, book_with_author])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 4)
+        # Right actions order?
+        self.assertOperationTypes(
+            changes, 'otherapp', 0,
+            ['CreateModel', 'AddField', 'AlterUniqueTogether', 'AlterIndexTogether']
+        )
+
     def test_remove_field_and_foo_together(self):
         """
         Tests that removed fields will be removed after updating
@@ -1262,8 +1344,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
-        self.assertOperationAttributes(changes, 'testapp', 0, 0,
-            name="AuthorUnmanaged", options={"managed": False})
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged", options={"managed": False})
 
     def test_unmanaged_to_managed(self):
         # Now, we test turning an unmanaged model into a managed model
@@ -1274,8 +1355,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterModelOptions"])
-        self.assertOperationAttributes(changes, 'testapp', 0, 0,
-            name="authorunmanaged", options={})
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="authorunmanaged", options={})
 
     def test_managed_to_unmanaged(self):
         # Now, we turn managed to unmanaged.
@@ -1286,8 +1366,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, "testapp", 0, ["AlterModelOptions"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0,
-            name="authorunmanaged", options={"managed": False})
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="authorunmanaged", options={"managed": False})
 
     def test_unmanaged_custom_pk(self):
         """
@@ -1355,13 +1434,13 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="name")
 
-    def test_custom_deconstructable(self):
+    def test_custom_deconstructible(self):
         """
         Two instances which deconstruct to the same value aren't considered a
         change.
         """
-        before = self.make_project_state([self.author_name_deconstructable_1])
-        after = self.make_project_state([self.author_name_deconstructable_2])
+        before = self.make_project_state([self.author_name_deconstructible_1])
+        after = self.make_project_state([self.author_name_deconstructible_2])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
@@ -1369,70 +1448,70 @@ class AutodetectorTests(TestCase):
 
     def test_deconstruct_field_kwarg(self):
         """Field instances are handled correctly by nested deconstruction."""
-        before = self.make_project_state([self.author_name_deconstructable_3])
-        after = self.make_project_state([self.author_name_deconstructable_4])
+        before = self.make_project_state([self.author_name_deconstructible_3])
+        after = self.make_project_state([self.author_name_deconstructible_4])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(changes, {})
 
-    def test_deconstructable_list(self):
+    def test_deconstructible_list(self):
         """Nested deconstruction descends into lists."""
         # When lists contain items that deconstruct to identical values, those lists
         # should be considered equal for the purpose of detecting state changes
         # (even if the original items are unequal).
-        before = self.make_project_state([self.author_name_deconstructable_list_1])
-        after = self.make_project_state([self.author_name_deconstructable_list_2])
+        before = self.make_project_state([self.author_name_deconstructible_list_1])
+        after = self.make_project_state([self.author_name_deconstructible_list_2])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(changes, {})
 
         # Legitimate differences within the deconstructed lists should be reported
         # as a change
-        before = self.make_project_state([self.author_name_deconstructable_list_1])
-        after = self.make_project_state([self.author_name_deconstructable_list_3])
+        before = self.make_project_state([self.author_name_deconstructible_list_1])
+        after = self.make_project_state([self.author_name_deconstructible_list_3])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(len(changes), 1)
 
-    def test_deconstructable_tuple(self):
+    def test_deconstructible_tuple(self):
         """Nested deconstruction descends into tuples."""
         # When tuples contain items that deconstruct to identical values, those tuples
         # should be considered equal for the purpose of detecting state changes
         # (even if the original items are unequal).
-        before = self.make_project_state([self.author_name_deconstructable_tuple_1])
-        after = self.make_project_state([self.author_name_deconstructable_tuple_2])
+        before = self.make_project_state([self.author_name_deconstructible_tuple_1])
+        after = self.make_project_state([self.author_name_deconstructible_tuple_2])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(changes, {})
 
         # Legitimate differences within the deconstructed tuples should be reported
         # as a change
-        before = self.make_project_state([self.author_name_deconstructable_tuple_1])
-        after = self.make_project_state([self.author_name_deconstructable_tuple_3])
+        before = self.make_project_state([self.author_name_deconstructible_tuple_1])
+        after = self.make_project_state([self.author_name_deconstructible_tuple_3])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(len(changes), 1)
 
-    def test_deconstructable_dict(self):
+    def test_deconstructible_dict(self):
         """Nested deconstruction descends into dict values."""
         # When dicts contain items whose values deconstruct to identical values,
         # those dicts should be considered equal for the purpose of detecting
         # state changes (even if the original values are unequal).
-        before = self.make_project_state([self.author_name_deconstructable_dict_1])
-        after = self.make_project_state([self.author_name_deconstructable_dict_2])
+        before = self.make_project_state([self.author_name_deconstructible_dict_1])
+        after = self.make_project_state([self.author_name_deconstructible_dict_2])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(changes, {})
 
         # Legitimate differences within the deconstructed dicts should be reported
         # as a change
-        before = self.make_project_state([self.author_name_deconstructable_dict_1])
-        after = self.make_project_state([self.author_name_deconstructable_dict_3])
+        before = self.make_project_state([self.author_name_deconstructible_dict_1])
+        after = self.make_project_state([self.author_name_deconstructible_dict_3])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(len(changes), 1)
 
-    def test_nested_deconstructable_objects(self):
+    def test_nested_deconstructible_objects(self):
         """
         Nested deconstruction is applied recursively to the args/kwargs of
         deconstructed objects.
@@ -1440,45 +1519,45 @@ class AutodetectorTests(TestCase):
         # If the items within a deconstructed object's args/kwargs have the same
         # deconstructed values - whether or not the items themselves are different
         # instances - then the object as a whole is regarded as unchanged.
-        before = self.make_project_state([self.author_name_nested_deconstructable_1])
-        after = self.make_project_state([self.author_name_nested_deconstructable_2])
+        before = self.make_project_state([self.author_name_nested_deconstructible_1])
+        after = self.make_project_state([self.author_name_nested_deconstructible_2])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(changes, {})
 
         # Differences that exist solely within the args list of a deconstructed object
         # should be reported as changes
-        before = self.make_project_state([self.author_name_nested_deconstructable_1])
-        after = self.make_project_state([self.author_name_nested_deconstructable_changed_arg])
+        before = self.make_project_state([self.author_name_nested_deconstructible_1])
+        after = self.make_project_state([self.author_name_nested_deconstructible_changed_arg])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(len(changes), 1)
 
         # Additional args should also be reported as a change
-        before = self.make_project_state([self.author_name_nested_deconstructable_1])
-        after = self.make_project_state([self.author_name_nested_deconstructable_extra_arg])
+        before = self.make_project_state([self.author_name_nested_deconstructible_1])
+        after = self.make_project_state([self.author_name_nested_deconstructible_extra_arg])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(len(changes), 1)
 
         # Differences that exist solely within the kwargs dict of a deconstructed object
         # should be reported as changes
-        before = self.make_project_state([self.author_name_nested_deconstructable_1])
-        after = self.make_project_state([self.author_name_nested_deconstructable_changed_kwarg])
+        before = self.make_project_state([self.author_name_nested_deconstructible_1])
+        after = self.make_project_state([self.author_name_nested_deconstructible_changed_kwarg])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(len(changes), 1)
 
         # Additional kwargs should also be reported as a change
-        before = self.make_project_state([self.author_name_nested_deconstructable_1])
-        after = self.make_project_state([self.author_name_nested_deconstructable_extra_kwarg])
+        before = self.make_project_state([self.author_name_nested_deconstructible_1])
+        after = self.make_project_state([self.author_name_nested_deconstructible_extra_kwarg])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(len(changes), 1)
 
     def test_deconstruct_type(self):
         """
-        #22951 -- Uninstanted classes with deconstruct are correctly returned
+        #22951 -- Uninstantiated classes with deconstruct are correctly returned
         by deep_deconstruct during serialization.
         """
         author = ModelState(

@@ -13,10 +13,10 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
@@ -48,6 +48,13 @@ def deprecate_current_app(func):
     return inner
 
 
+def _get_login_redirect_url(request, redirect_to):
+    # Ensure the user-originating redirection URL is safe.
+    if not is_safe_url(url=redirect_to, host=request.get_host()):
+        return resolve_url(settings.LOGIN_REDIRECT_URL)
+    return redirect_to
+
+
 @deprecate_current_app
 @sensitive_post_parameters()
 @csrf_protect
@@ -55,25 +62,25 @@ def deprecate_current_app(func):
 def login(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
-          extra_context=None):
+          extra_context=None, redirect_authenticated_user=False):
     """
     Displays the login form and handles the login action.
     """
-    redirect_to = request.POST.get(redirect_field_name,
-                                   request.GET.get(redirect_field_name, ''))
+    redirect_to = request.POST.get(redirect_field_name, request.GET.get(redirect_field_name, ''))
 
-    if request.method == "POST":
+    if redirect_authenticated_user and request.user.is_authenticated:
+        redirect_to = _get_login_redirect_url(request, redirect_to)
+        if redirect_to == request.path:
+            raise ValueError(
+                "Redirection loop for authenticated user detected. Check that "
+                "your LOGIN_REDIRECT_URL doesn't point to a login page."
+            )
+        return HttpResponseRedirect(redirect_to)
+    elif request.method == "POST":
         form = authentication_form(request, data=request.POST)
         if form.is_valid():
-
-            # Ensure the user-originating redirection url is safe.
-            if not is_safe_url(url=redirect_to, host=request.get_host()):
-                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
-
-            # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
-
-            return HttpResponseRedirect(redirect_to)
+            return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
     else:
         form = authentication_form(request)
 
@@ -104,6 +111,8 @@ def logout(request, next_page=None,
 
     if next_page is not None:
         next_page = resolve_url(next_page)
+    elif settings.LOGOUT_REDIRECT_URL:
+        next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
 
     if (redirect_field_name in request.POST or
             redirect_field_name in request.GET):

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import json
 
 from django.core import exceptions, serializers
@@ -37,6 +40,20 @@ class SimpleTests(PostgreSQLTestCase):
         reloaded = HStoreModel.objects.get()
         self.assertEqual(reloaded.field, value)
 
+    def test_key_val_cast_to_string(self):
+        value = {'a': 1, 'b': 'B', 2: 'c', 'ï': 'ê', b'x': b'test'}
+        expected_value = {'a': '1', 'b': 'B', '2': 'c', 'ï': 'ê', 'x': 'test'}
+
+        instance = HStoreModel.objects.create(field=value)
+        instance = HStoreModel.objects.get()
+        self.assertDictEqual(instance.field, expected_value)
+
+        instance = HStoreModel.objects.get(field__a=1)
+        self.assertDictEqual(instance.field, expected_value)
+
+        instance = HStoreModel.objects.get(field__has_keys=[2, 'a', 'ï'])
+        self.assertDictEqual(instance.field, expected_value)
+
 
 class TestQuerying(PostgreSQLTestCase):
 
@@ -65,6 +82,14 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__contains={'a': 'b'}),
             self.objs[:2]
+        )
+
+    def test_in_generator(self):
+        def search():
+            yield {'a': 'b'}
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__in=search()),
+            self.objs[:1]
         )
 
     def test_has_key(self):
@@ -140,7 +165,8 @@ class TestQuerying(PostgreSQLTestCase):
 
 
 class TestSerialization(PostgreSQLTestCase):
-    test_data = '[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, "model": "postgres_tests.hstoremodel", "pk": null}]'
+    test_data = ('[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, '
+                 '"model": "postgres_tests.hstoremodel", "pk": null}]')
 
     def test_dumping(self):
         instance = HStoreModel(field={'a': 'b'})
@@ -150,6 +176,12 @@ class TestSerialization(PostgreSQLTestCase):
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.field, {'a': 'b'})
+
+    def test_roundtrip_with_null(self):
+        instance = HStoreModel(field={'a': 'b', 'c': None})
+        data = serializers.serialize('json', [instance])
+        new_instance = list(serializers.deserialize('json', data))[0].object
+        self.assertEqual(instance.field, new_instance.field)
 
 
 class TestValidation(PostgreSQLTestCase):

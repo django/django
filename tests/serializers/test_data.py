@@ -120,15 +120,19 @@ def inherited_create(pk, klass, data):
 def data_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     if klass == BinaryData and data is not None:
-        testcase.assertEqual(bytes(data), bytes(instance.data),
-             "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (
-                 pk, repr(bytes(data)), type(data), repr(bytes(instance.data)),
-                 type(instance.data))
+        testcase.assertEqual(
+            bytes(data), bytes(instance.data),
+            "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (
+                pk, repr(bytes(data)), type(data), repr(bytes(instance.data)),
+                type(instance.data),
+            )
         )
     else:
-        testcase.assertEqual(data, instance.data,
-             "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (
-                 pk, data, type(data), instance, type(instance.data))
+        testcase.assertEqual(
+            data, instance.data,
+            "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (
+                pk, data, type(data), instance, type(instance.data),
+            )
         )
 
 
@@ -297,7 +301,7 @@ The end."""),
 
     (im2m_obj, 470, M2MIntermediateData, None),
 
-    # testing post- and prereferences and extra fields
+    # testing post- and pre-references and extra fields
     (im_obj, 480, Intermediate, {'right': 300, 'left': 470}),
     (im_obj, 481, Intermediate, {'right': 300, 'left': 490}),
     (im_obj, 482, Intermediate, {'right': 500, 'left': 470}),

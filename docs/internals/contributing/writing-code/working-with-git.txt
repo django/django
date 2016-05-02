@@ -1,3 +1,4 @@
+===========================
 Working with Git and GitHub
 ===========================
 
@@ -14,7 +15,7 @@ You could also upload a traditional patch to Trac, but it's less practical for
 reviews.
 
 Installing Git
---------------
+==============
 
 Django uses `Git`_ for its source control. You can `download
 <http://git-scm.com/download>`_ Git, but it's often easier to install with
@@ -38,7 +39,7 @@ used to associate your commits with your GitHub account.
 .. _GitHub: https://github.com/
 
 Setting up local repository
----------------------------
+===========================
 
 When you have created your GitHub account, with the nick "GitHub_nick", and
 forked Django's repository, create a local copy of your fork::
@@ -64,7 +65,7 @@ You can add other remotes similarly, for example::
     git remote add akaariai git@github.com:akaariai/django.git
 
 Working on a ticket
--------------------
+===================
 
 When working on a ticket create a new branch for the work, and base that work
 on upstream/master::
@@ -94,7 +95,7 @@ necessary::
     git commit -m 'Added two more tests for edge cases'
 
 Publishing work
-~~~~~~~~~~~~~~~
+---------------
 
 You can publish your work on GitHub just by doing::
 
@@ -143,7 +144,7 @@ ready for merging -- or sufficiently close that a committer will finish it
 himself.
 
 Rebasing branches
-~~~~~~~~~~~~~~~~~
+-----------------
 
 In the example above you created two commits, the "Fixed ticket_xxxxx" commit
 and "Added two more tests" commit.
@@ -189,7 +190,7 @@ commit hashes do not match any more. This is acceptable, as the branch is merely
 a topic branch, and nobody should be basing their work on it.
 
 After upstream has changed
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 When upstream (django/django) has changed, you should rebase your work. To
 do this, use::
@@ -215,7 +216,7 @@ This way your branch will contain only commits related to its topic, which
 makes squashing easier.
 
 After review
-~~~~~~~~~~~~
+------------
 
 It is unusual to get any non-trivial amount of code into core without changes
 requested by reviewers. In this case, it is often a good idea to add the
@@ -247,7 +248,7 @@ Note that the committer is likely to squash the review commit into the previous
 commit when committing the code.
 
 Working on a patch
-------------------
+==================
 
 One of the ways that developers can contribute to Django is by reviewing
 patches. Those patches will typically exist as pull requests on GitHub and
@@ -264,7 +265,7 @@ For more detail on working with pull requests see the
 :ref:`guidelines for committers <handling-pull-requests>`.
 
 Summary
--------
+=======
 
 * Work on GitHub if you can.
 * Announce your work on the Trac ticket by linking to your GitHub branch.

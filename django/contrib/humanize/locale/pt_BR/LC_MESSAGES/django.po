@@ -4,7 +4,7 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # Eduardo Carvalho <eduardocereto@gmail.com>, 2012
-# Guilherme Gondim <semente@taurinus.org>, 2012-2013
+# Guilherme Gondim, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Sandro <sandrossv@hotmail.com>, 2011
 msgid ""
@@ -12,10 +12,10 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
-"django/language/pt_BR/)\n"
+"PO-Revision-Date: 2015-09-08 00:46+0000\n"
+"Last-Translator: andrewsmedina <andrewsmedina@gmail.com>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
+"language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

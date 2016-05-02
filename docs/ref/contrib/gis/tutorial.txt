@@ -38,7 +38,7 @@ basic apps`_ project. [#]_
 
 .. _OGC: http://www.opengeospatial.org/
 .. _world borders: http://thematicmapping.org/downloads/world_borders.php
-.. _GeoDjango basic apps: http://code.google.com/p/geodjango-basic-apps/
+.. _GeoDjango basic apps: https://code.google.com/p/geodjango-basic-apps/
 
 Setting Up
 ==========
@@ -81,7 +81,7 @@ file. Edit the database connection settings to match your setup::
              'ENGINE': 'django.contrib.gis.db.backends.postgis',
              'NAME': 'geodjango',
              'USER': 'geo',
-         }
+        },
     }
 
 In addition, modify the :setting:`INSTALLED_APPS` setting to include
@@ -96,7 +96,7 @@ and ``world`` (your newly created application)::
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'django.contrib.gis',
-        'world'
+        'world',
     ]
 
 Geographic Data
@@ -239,7 +239,7 @@ create a database migration:
 
     $ python manage.py makemigrations
     Migrations for 'world':
-      0001_initial.py:
+      world/migrations/0001_initial.py:
         - Create model WorldBorder
 
 Let's look at the SQL that will generate the table for the ``WorldBorder``
@@ -283,7 +283,7 @@ database:
 
     $ python manage.py migrate
     Operations to perform:
-      Apply all migrations: admin, world, contenttypes, auth, sessions
+      Apply all migrations: admin, auth, contenttypes, sessions, world
     Running migrations:
       ...
       Applying world.0001_initial... OK
@@ -435,7 +435,7 @@ with the following code::
 
     import os
     from django.contrib.gis.utils import LayerMapping
-    from models import WorldBorder
+    from .models import WorldBorder
 
     world_mapping = {
         'fips' : 'FIPS',
@@ -695,7 +695,7 @@ GeoDjango extends :doc:`Django's admin application </ref/contrib/admin/index>`
 with support for editing geometry fields.
 
 Basics
-^^^^^^
+~~~~~~
 
 GeoDjango also supplements the Django admin by allowing users to create
 and modify geometries on a JavaScript slippy map (powered by `OpenLayers`_).
@@ -704,7 +704,7 @@ Let's dive right in.  Create a file called ``admin.py`` inside the
 ``world`` application with the following code::
 
     from django.contrib.gis import admin
-    from models import WorldBorder
+    from .models import WorldBorder
 
     admin.site.register(WorldBorder, admin.GeoModelAdmin)
 
@@ -735,14 +735,14 @@ may be edited by clicking on a polygon and dragging the vertexes to the desired
 position.
 
 .. _OpenLayers: http://openlayers.org/
-.. _Open Street Map: http://www.openstreetmap.org/
+.. _Open Street Map: https://www.openstreetmap.org/
 .. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: http://www.osgeo.org
 
 .. _osmgeoadmin-intro:
 
 ``OSMGeoAdmin``
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 
 With the :class:`~django.contrib.gis.admin.OSMGeoAdmin`, GeoDjango uses
 a `Open Street Map`_ layer in the admin.
@@ -771,6 +771,6 @@ option class in your ``admin.py`` file::
 .. [#] GeoDjango basic apps was written by Dane Springmeyer, Josh Livni, and
        Christopher Schmidt.
 .. [#] This point is the `University of Houston Law Center
-       <http://www.law.uh.edu/>`_.
+       <https://www.law.uh.edu/>`_.
 .. [#] Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification
        For SQL <http://www.opengeospatial.org/standards/sfs>`_.

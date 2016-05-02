@@ -65,9 +65,10 @@ def api_get_area(x):
 def api_get_length(x):
     return x.length
 
-geos_function_tests = [val for name, val in vars().items()
-                       if hasattr(val, '__call__')
-                       and name.startswith('api_get_')]
+geos_function_tests = [
+    val for name, val in vars().items()
+    if hasattr(val, '__call__') and name.startswith('api_get_')
+]
 
 
 @skipUnless(HAS_GEOS, "Geos is required.")
@@ -82,8 +83,10 @@ class GEOSMutationTest(unittest.TestCase):
         p = Point(1, 2)
         for i in range(-2, 2):
             p._checkindex(i)
-        self.assertRaises(IndexError, p._checkindex, 2)
-        self.assertRaises(IndexError, p._checkindex, -3)
+        with self.assertRaises(IndexError):
+            p._checkindex(2)
+        with self.assertRaises(IndexError):
+            p._checkindex(-3)
 
     def test01_PointMutations(self):
         'Testing Point mutations'
@@ -100,8 +103,10 @@ class GEOSMutationTest(unittest.TestCase):
 
     def test02_PointExceptions(self):
         'Testing Point exceptions'
-        self.assertRaises(TypeError, Point, range(1))
-        self.assertRaises(TypeError, Point, range(4))
+        with self.assertRaises(TypeError):
+            Point(range(1))
+        with self.assertRaises(TypeError):
+            Point(range(4))
 
     def test03_PointApi(self):
         'Testing Point API'
@@ -142,8 +147,7 @@ class GEOSMutationTest(unittest.TestCase):
                              'Polygon _get_single_external(1)')
 
             # _set_list
-            pg._set_list(2, (((1, 2), (10, 0), (12, 9), (-1, 15), (1, 2)),
-                             ((4, 2), (5, 2), (5, 3), (4, 2))))
+            pg._set_list(2, (((1, 2), (10, 0), (12, 9), (-1, 15), (1, 2)), ((4, 2), (5, 2), (5, 3), (4, 2))))
             self.assertEqual(
                 pg.coords,
                 (((1.0, 2.0), (10.0, 0.0), (12.0, 9.0), (-1.0, 15.0), (1.0, 2.0)),
@@ -156,8 +160,11 @@ class GEOSMutationTest(unittest.TestCase):
 
     def test06_Collection(self):
         'Testing Collection mutations'
-        for mp in (MultiPoint(*map(Point, ((3, 4), (-1, 2), (5, -4), (2, 8)))),
-                fromstr('MULTIPOINT (3 4,-1 2,5 -4,2 8)')):
+        points = (
+            MultiPoint(*map(Point, ((3, 4), (-1, 2), (5, -4), (2, 8)))),
+            fromstr('MULTIPOINT (3 4,-1 2,5 -4,2 8)'),
+        )
+        for mp in points:
             self.assertEqual(mp._get_single_external(2), Point(5, -4), 'Collection _get_single_external')
 
             mp._set_list(3, map(Point, ((5, 5), (3, -2), (8, 1))))

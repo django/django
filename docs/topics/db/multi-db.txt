@@ -76,7 +76,7 @@ Synchronizing your databases
 
 The :djadmin:`migrate` management command operates on one database at a
 time. By default, it operates on the ``default`` database, but by
-providing a :djadminopt:`--database` argument, you can tell :djadmin:`migrate`
+providing the :option:`--database <migrate --database>` option, you can tell it
 to synchronize a different database. So, to synchronize all models onto
 all databases in our example, you would need to call::
 
@@ -91,10 +91,9 @@ constraining the availability of particular models.
 Using other management commands
 -------------------------------
 
-The other ``django-admin`` commands that interact with the database
-operate in the same way as :djadmin:`migrate` -- they only ever operate
-on one database at a time, using :djadminopt:`--database` to control
-the database used.
+The other ``django-admin`` commands that interact with the database operate in
+the same way as :djadmin:`migrate` -- they only ever operate on one database at
+a time, using ``--database`` to control the database used.
 
 .. _topics-db-multi-db-routing:
 
@@ -309,7 +308,7 @@ send queries for the ``auth`` app to ``auth_db``::
                return True
             return None
 
-        def allow_migrate(self, db, app_label, model=None, **hints):
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
             """
             Make sure the auth app only appears in the 'auth_db'
             database.
@@ -347,7 +346,7 @@ from::
                 return True
             return None
 
-        def allow_migrate(self, db, app_label, model=None, **hints):
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
             """
             All non-auth models end up in this pool.
             """
@@ -571,15 +570,15 @@ multiple-database support::
             # Tell Django to look for objects on the 'other' database.
             return super(MultiDBModelAdmin, self).get_queryset(request).using(self.using)
 
-        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        def formfield_for_foreignkey(self, db_field, request, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
             # on the 'other' database.
-            return super(MultiDBModelAdmin, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+            return super(MultiDBModelAdmin, self).formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
 
-        def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        def formfield_for_manytomany(self, db_field, request, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
             # on the 'other' database.
-            return super(MultiDBModelAdmin, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+            return super(MultiDBModelAdmin, self).formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
 
 The implementation provided here implements a multi-database strategy
 where all objects of a given type are stored on a specific database
@@ -596,15 +595,15 @@ Inlines can be handled in a similar fashion. They require three customized metho
             # Tell Django to look for inline objects on the 'other' database.
             return super(MultiDBTabularInline, self).get_queryset(request).using(self.using)
 
-        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        def formfield_for_foreignkey(self, db_field, request, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
             # on the 'other' database.
-            return super(MultiDBTabularInline, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+            return super(MultiDBTabularInline, self).formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
 
-        def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        def formfield_for_manytomany(self, db_field, request, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
             # on the 'other' database.
-            return super(MultiDBTabularInline, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+            return super(MultiDBTabularInline, self).formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
 
 Once you've written your model admin definitions, they can be
 registered with any ``Admin`` instance::

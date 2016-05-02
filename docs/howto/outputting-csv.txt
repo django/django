@@ -76,7 +76,7 @@ mention:
 .. _streaming-csv-files:
 
 Streaming large CSV files
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 When dealing with views that generate very large responses, you might want to
 consider using Django's :class:`~django.http.StreamingHttpResponse` instead.

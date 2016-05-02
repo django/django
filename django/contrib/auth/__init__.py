@@ -74,7 +74,7 @@ def authenticate(**credentials):
             user = backend.authenticate(**credentials)
         except PermissionDenied:
             # This backend says to stop in our tracks - this user should not be allowed in at all.
-            return None
+            break
         if user is None:
             continue
         # Annotate the user object with the path of the backend.
@@ -82,11 +82,10 @@ def authenticate(**credentials):
         return user
 
     # The credentials supplied are invalid to all backends, fire signal
-    user_login_failed.send(sender=__name__,
-            credentials=_clean_credentials(credentials))
+    user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials))
 
 
-def login(request, user):
+def login(request, user, backend=None):
     """
     Persist a user id and a backend in the request. This way a user doesn't
     have to reauthenticate on every request. Note that data set during
@@ -108,8 +107,22 @@ def login(request, user):
             request.session.flush()
     else:
         request.session.cycle_key()
+
+    try:
+        backend = backend or user.backend
+    except AttributeError:
+        backends = _get_backends(return_tuples=True)
+        if len(backends) == 1:
+            _, backend = backends[0]
+        else:
+            raise ValueError(
+                'You have multiple authentication backends configured and '
+                'therefore must provide the `backend` argument or set the '
+                '`backend` attribute on the user.'
+            )
+
     request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
-    request.session[BACKEND_SESSION_KEY] = user.backend
+    request.session[BACKEND_SESSION_KEY] = backend
     request.session[HASH_SESSION_KEY] = session_auth_hash
     if hasattr(request, 'user'):
         request.user = user
@@ -125,7 +138,7 @@ def logout(request):
     # Dispatch the signal before the user is logged out so the receivers have a
     # chance to find out *who* logged out.
     user = getattr(request, 'user', None)
-    if hasattr(user, 'is_authenticated') and not user.is_authenticated():
+    if hasattr(user, 'is_authenticated') and not user.is_authenticated:
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
 

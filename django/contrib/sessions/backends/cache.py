@@ -1,5 +1,7 @@
 from django.conf import settings
-from django.contrib.sessions.backends.base import CreateError, SessionBase
+from django.contrib.sessions.backends.base import (
+    CreateError, SessionBase, UpdateError,
+)
 from django.core.cache import caches
 from django.utils.six.moves import range
 
@@ -55,8 +57,10 @@ class SessionStore(SessionBase):
             return self.create()
         if must_create:
             func = self._cache.add
-        else:
+        elif self._cache.get(self.cache_key) is not None:
             func = self._cache.set
+        else:
+            raise UpdateError
         result = func(self.cache_key,
                       self._get_session(no_load=must_create),
                       self.get_expiry_age())

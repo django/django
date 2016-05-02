@@ -115,7 +115,8 @@ class CustomManagerTests(TestCase):
         The default manager, "objects", doesn't exist, because a custom one
         was provided.
         """
-        self.assertRaises(AttributeError, lambda: Book.objects)
+        with self.assertRaises(AttributeError):
+            Book.objects
 
     def test_filtering(self):
         """

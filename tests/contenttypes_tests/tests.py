@@ -12,11 +12,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db import connections, models
-from django.test import TestCase, override_settings
-from django.test.utils import captured_stdout
+from django.test import SimpleTestCase, TestCase, mock, override_settings
+from django.test.utils import captured_stdout, isolate_apps
 from django.utils.encoding import force_str, force_text
 
-from .models import Article, Author, SchemeIncludedURL
+from .models import (
+    Article, Author, ModelWithNullFKToSite, SchemeIncludedURL,
+    Site as MockSite,
+)
 
 
 @override_settings(ROOT_URLCONF='contenttypes_tests.urls')
@@ -44,6 +47,9 @@ class ContentTypesViewsTests(TestCase):
         cls.scheme1 = SchemeIncludedURL.objects.create(url='http://test_scheme_included_http/')
         cls.scheme2 = SchemeIncludedURL.objects.create(url='https://test_scheme_included_https/')
         cls.scheme3 = SchemeIncludedURL.objects.create(url='//test_default_scheme_kept/')
+
+    def setUp(self):
+        Site.objects.clear_cache()
 
     def test_shortcut_with_absolute_url(self):
         "Can view a shortcut for an Author object that has a get_absolute_url method"
@@ -94,6 +100,21 @@ class ContentTypesViewsTests(TestCase):
         response = self.client.get(short_url)
         self.assertEqual(response.status_code, 404)
 
+    @mock.patch('django.apps.apps.get_model')
+    def test_shortcut_view_with_null_site_fk(self, get_model):
+        """
+        The shortcut view works if a model's ForeignKey to site is None.
+        """
+        get_model.side_effect = lambda *args, **kwargs: MockSite if args[0] == 'sites.Site' else ModelWithNullFKToSite
+
+        obj = ModelWithNullFKToSite.objects.create(title='title')
+        url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(ModelWithNullFKToSite).id, obj.pk)
+        response = self.client.get(url)
+        self.assertRedirects(
+            response, '%s' % obj.get_absolute_url(),
+            fetch_redirect_response=False,
+        )
+
     def test_create_contenttype_on_the_spot(self):
         """
         Make sure ContentTypeManager.get_for_model creates the corresponding
@@ -114,20 +135,9 @@ class ContentTypesViewsTests(TestCase):
         self.assertEqual(force_text(ct), 'modelcreatedonthefly')
 
 
-class IsolatedModelsTestCase(TestCase):
-    def setUp(self):
-        # The unmanaged models need to be removed after the test in order to
-        # prevent bad interactions with the flush operation in other tests.
-        self._old_models = apps.app_configs['contenttypes_tests'].models.copy()
-
-    def tearDown(self):
-        apps.app_configs['contenttypes_tests'].models = self._old_models
-        apps.all_models['contenttypes_tests'] = self._old_models
-        apps.clear_cache()
-
-
 @override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
-class GenericForeignKeyTests(IsolatedModelsTestCase):
+@isolate_apps('contenttypes_tests', attr_name='apps')
+class GenericForeignKeyTests(SimpleTestCase):
 
     def test_str(self):
         class Model(models.Model):
@@ -146,7 +156,6 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 "The GenericForeignKey content type references the non-existent field 'TaggedItem.content_type'.",
-                hint=None,
                 obj=TaggedItem.content_object,
                 id='contenttypes.E002',
             )
@@ -205,7 +214,6 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 "The GenericForeignKey object ID references the non-existent field 'object_id'.",
-                hint=None,
                 obj=TaggedItem.content_object,
                 id='contenttypes.E001',
             )
@@ -223,7 +231,6 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 'Field names must not end with an underscore.',
-                hint=None,
                 obj=Model.content_object_,
                 id='fields.E001',
             )
@@ -239,11 +246,12 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         class Model(models.Model):
             content_object = MyGenericForeignKey()
 
-        errors = checks.run_checks()
+        errors = checks.run_checks(app_configs=self.apps.get_app_configs())
         self.assertEqual(errors, ['performed!'])
 
 
-class GenericRelationshipTests(IsolatedModelsTestCase):
+@isolate_apps('contenttypes_tests')
+class GenericRelationshipTests(SimpleTestCase):
 
     def test_valid_generic_relationship(self):
         class TaggedItem(models.Model):
@@ -265,9 +273,11 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
                 'custom_content_type', 'custom_object_id')
 
         class Bookmark(models.Model):
-            tags = GenericRelation('TaggedItem',
+            tags = GenericRelation(
+                'TaggedItem',
                 content_type_field='custom_content_type',
-                object_id_field='custom_object_id')
+                object_id_field='custom_object_id',
+            )
 
         errors = Bookmark.tags.field.check()
         self.assertEqual(errors, [])
@@ -279,9 +289,8 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Model.rel.field.check()
         expected = [
             checks.Error(
-                ("Field defines a relation with model 'MissingModel', "
-                 "which is either not installed, or is abstract."),
-                hint=None,
+                "Field defines a relation with model 'MissingModel', "
+                "which is either not installed, or is abstract.",
                 obj=Model.rel.field,
                 id='fields.E300',
             )
@@ -310,10 +319,9 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Bookmark.tags.field.check()
         expected = [
             checks.Error(
-                ("The GenericRelation defines a relation with the model "
-                 "'contenttypes_tests.TaggedItem', but that model does not have a "
-                 "GenericForeignKey."),
-                hint=None,
+                "The GenericRelation defines a relation with the model "
+                "'contenttypes_tests.TaggedItem', but that model does not have a "
+                "GenericForeignKey.",
                 obj=Bookmark.tags.field,
                 id='contenttypes.E004',
             )
@@ -339,9 +347,9 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Model.rel.field.check()
         expected = [
             checks.Error(
-                ("Field defines a relation with the model "
-                 "'contenttypes_tests.SwappedModel', "
-                 "which has been swapped out."),
+                "Field defines a relation with the model "
+                "'contenttypes_tests.SwappedModel', "
+                "which has been swapped out.",
                 hint="Update the relation to point at 'settings.TEST_SWAPPED_MODEL'.",
                 obj=Model.rel.field,
                 id='fields.E301',
@@ -362,7 +370,6 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 'Field names must not end with an underscore.',
-                hint=None,
                 obj=InvalidBookmark.tags_.field,
                 id='fields.E001',
             )

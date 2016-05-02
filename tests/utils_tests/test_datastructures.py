@@ -49,8 +49,8 @@ class MultiValueDictTests(SimpleTestCase):
             [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
         )
 
-        six.assertRaisesRegex(self, MultiValueDictKeyError, 'lastname',
-            d.__getitem__, 'lastname')
+        with self.assertRaisesMessage(MultiValueDictKeyError, 'lastname'):
+            d.__getitem__('lastname')
 
         self.assertEqual(d.get('lastname'), None)
         self.assertEqual(d.get('lastname', 'nonexistent'), 'nonexistent')
@@ -108,8 +108,8 @@ class ImmutableListTests(SimpleTestCase):
         d = ImmutableList(range(10))
 
         # AttributeError: ImmutableList object is immutable.
-        self.assertRaisesMessage(AttributeError,
-            'ImmutableList object is immutable.', d.sort)
+        with self.assertRaisesMessage(AttributeError, 'ImmutableList object is immutable.'):
+            d.sort()
 
         self.assertEqual(repr(d), '(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)')
 
@@ -119,14 +119,15 @@ class ImmutableListTests(SimpleTestCase):
         self.assertEqual(d[1], 1)
 
         # AttributeError: Object is immutable!
-        self.assertRaisesMessage(AttributeError,
-            'Object is immutable!', d.__setitem__, 1, 'test')
+        with self.assertRaisesMessage(AttributeError, 'Object is immutable!'):
+            d.__setitem__(1, 'test')
 
 
 class DictWrapperTests(SimpleTestCase):
 
     def test_dictwrapper(self):
-        f = lambda x: "*%s" % x
+        def f(x):
+            return "*%s" % x
         d = DictWrapper({'a': 'a'}, f, 'xx_')
         self.assertEqual(
             "Normal: %(a)s. Modified: %(xx_a)s" % d,

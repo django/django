@@ -13,13 +13,18 @@ views or various mixins. Because this inheritance chain is very important, the
 ancestor classes are  documented under the section title of **Ancestors (MRO)**.
 MRO is an acronym for Method Resolution Order.
 
-View
-----
+``View``
+========
 
 .. class:: django.views.generic.base.View
 
     The master class-based base view. All other class-based views inherit from
-    this base class.
+    this base class. It isn't strictly a generic view and thus can also be
+    imported from ``django.views``.
+
+    .. versionchanged:: 1.10
+
+        The ability to import from ``django.views`` was added.
 
     **Method Flowchart**
 
@@ -30,7 +35,7 @@ View
     **Example views.py**::
 
         from django.http import HttpResponse
-        from django.views.generic import View
+        from django.views import View
 
         class MyView(View):
 
@@ -97,8 +102,8 @@ View
         Handles responding to requests for the OPTIONS HTTP verb.  Returns a
         list of the allowed HTTP method names for the view.
 
-TemplateView
-------------
+``TemplateView``
+================
 
 .. class:: django.views.generic.base.TemplateView
 
@@ -149,8 +154,8 @@ TemplateView
     * Populated (through :class:`~django.views.generic.base.ContextMixin`) with
       the keyword arguments captured from the URL pattern that served the view.
 
-RedirectView
-------------
+``RedirectView``
+================
 
 .. class:: django.views.generic.base.RedirectView
 
@@ -205,7 +210,7 @@ RedirectView
         urlpatterns = [
             url(r'^counter/(?P<pk>[0-9]+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
             url(r'^details/(?P<pk>[0-9]+)/$', ArticleDetail.as_view(), name='article-detail'),
-            url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
+            url(r'^go-to-django/$', RedirectView.as_view(url='https://djangoproject.com'), name='go-to-django'),
         ]
 
     **Attributes**

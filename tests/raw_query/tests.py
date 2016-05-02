@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from datetime import date
+from decimal import Decimal
 
 from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase, skipUnlessDBFeature
@@ -43,7 +44,7 @@ class RawQueryTests(TestCase):
         cls.r1.reviewed.add(cls.b2, cls.b3, cls.b4)
 
     def assertSuccessfulRawQuery(self, model, query, expected_results,
-            expected_annotations=(), params=[], translations=None):
+                                 expected_annotations=(), params=[], translations=None):
         """
         Execute the passed query against the passed model and check the output
         """
@@ -275,13 +276,11 @@ class RawQueryTests(TestCase):
         first_two = Author.objects.raw(query)[0:2]
         self.assertEqual(len(first_two), 2)
 
-        self.assertRaises(TypeError, lambda: Author.objects.raw(query)['test'])
+        with self.assertRaises(TypeError):
+            Author.objects.raw(query)['test']
 
     def test_inheritance(self):
-        # date is the end of the Cuban Missile Crisis, I have no idea when
-        # Wesley was born
-        f = FriendlyAuthor.objects.create(first_name="Wesley", last_name="Chun",
-            dob=date(1962, 10, 28))
+        f = FriendlyAuthor.objects.create(first_name="Wesley", last_name="Chun", dob=date(1962, 10, 28))
         query = "SELECT * FROM raw_query_friendlyauthor"
         self.assertEqual(
             [o.pk for o in FriendlyAuthor.objects.raw(query)], [f.pk]
@@ -306,3 +305,8 @@ class RawQueryTests(TestCase):
         """
         b = BookFkAsPk.objects.create(book=self.b1)
         self.assertEqual(list(BookFkAsPk.objects.raw('SELECT not_the_default FROM raw_query_bookfkaspk')), [b])
+
+    def test_decimal_parameter(self):
+        c = Coffee.objects.create(brand='starbucks', price=20.5)
+        qs = Coffee.objects.raw("SELECT * FROM raw_query_coffee WHERE price >= %s", params=[Decimal(20)])
+        self.assertEqual(list(qs), [c])

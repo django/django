@@ -146,6 +146,8 @@ class LocalTimezone(ReferenceLocalTimezone):
             exc_value = exc_type(
                 "Unsupported value: %r. You should install pytz." % dt)
             exc_value.__cause__ = exc
+            if not hasattr(exc, '__traceback__'):
+                exc.__traceback__ = sys.exc_info()[2]
             six.reraise(exc_type, exc_value, sys.exc_info()[2])
 
 utc = pytz.utc if pytz else UTC()
@@ -286,10 +288,12 @@ def template_localtime(value, use_tz=None):
 
     This function is designed for use by the template engine.
     """
-    should_convert = (isinstance(value, datetime)
-        and (settings.USE_TZ if use_tz is None else use_tz)
-        and not is_naive(value)
-        and getattr(value, 'convert_to_local_time', True))
+    should_convert = (
+        isinstance(value, datetime) and
+        (settings.USE_TZ if use_tz is None else use_tz) and
+        not is_naive(value) and
+        getattr(value, 'convert_to_local_time', True)
+    )
     return localtime(value) if should_convert else value
 
 

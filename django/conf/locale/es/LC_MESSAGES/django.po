@@ -11,6 +11,7 @@
 # franchukelly <inactive+franchukelly@transifex.com>, 2011
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Yusuf (Josè) Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2013
 # Marc Garcia <garcia.marc@gmail.com>, 2011
@@ -19,14 +20,15 @@
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # Pablo, 2015
 # Sebastián Ramírez Magrí <sebasmagri@gmail.com>, 2013
+# Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-20 21:49+0000\n"
-"Last-Translator: Igor Támara <igor@tamarapatino.org>\n"
-"Language-Team: Spanish (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-03-09 22:54+0000\n"
+"Last-Translator: Yusuf (Josè) Luis <alagunajs@gmail.com>\n"
+"Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -97,6 +99,9 @@ msgstr "Español"
 msgid "Argentinian Spanish"
 msgstr "Español de Argentina"
 
+msgid "Colombian Spanish"
+msgstr "Español Colombiano"
+
 msgid "Mexican Spanish"
 msgstr "Español de México"
 
@@ -126,6 +131,9 @@ msgstr "Frisón"
 
 msgid "Irish"
 msgstr "Irlandés"
+
+msgid "Scottish Gaelic"
+msgstr "Gaélico Escocés"
 
 msgid "Galician"
 msgstr "Gallego"
@@ -319,6 +327,13 @@ msgstr ""
 "Introduzca un 'slug' válido, consistente en letras, números, guiones bajos o "
 "medios."
 
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Ingrese un 'slug' consistente en letras, números, subrayados o guiones "
+"Unicodes."
+
 msgid "Enter a valid IPv4 address."
 msgstr "Introduzca una dirección IPv4 válida."
 
@@ -373,6 +388,28 @@ msgstr[1] ""
 "Asegúrese de que este valor tenga menos de %(limit_value)d caracteres (tiene "
 "%(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Asegúrese de que no hay más de %(max)s dígito en total."
+msgstr[1] "Asegúrese de que no haya más de %(max)s dígitos en total."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Asegúrese de que no haya más de %(max)s dígito decimal."
+msgstr[1] "Asegúrese de que no haya más de %(max)s dígitos decimales."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Asegúrese de que no haya más de %(max)s dígito antes del punto decimal"
+msgstr[1] ""
+"Asegúrese de que no haya más de %(max)s dígitos antes del punto decimal."
+
 msgid "and"
 msgstr "y"
 
@@ -400,7 +437,7 @@ msgstr "Ya existe %(model_name)s con este %(field_label)s."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
-"%(field_label)s debe ser unico para %(date_field_label)s %(lookup_type)s."
+"%(field_label)s debe ser único para %(date_field_label)s %(lookup_type)s."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -411,11 +448,11 @@ msgstr "Entero"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' valor debe ser un entero."
+msgstr "El valor'%(value)s' debe ser un entero."
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr "Valor '%(value)s' debe ser verdadero o falso."
+msgstr "El valor '%(value)s' debe ser verdadero o falso."
 
 msgid "Boolean (Either True or False)"
 msgstr "Booleano (Verdadero o Falso)"
@@ -432,16 +469,16 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"'%(value)s' valor tiene un formato de fecha no válida. Debe estar en formato "
-"AAAA-MM-DD."
+"El valor '%(value)s' tiene un formato de fecha no válida. Debe estar en "
+"formato AAAA-MM-DD."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"'%(value)s' valor tiene el formato correcto (AAAA-MM-DD), pero es una fecha "
-"no válida."
+"El valor '%(value)s' tiene el formato correcto (AAAA-MM-DD), pero la fecha "
+"no es válida."
 
 msgid "Date (without time)"
 msgstr "Fecha (sin hora)"
@@ -451,23 +488,23 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"'%(value)s' valor tiene un formato válido. Debe estar en formato AAAA-MM-DD "
-"HH: [TZ]: MM [ss [uuuuuu].]."
+"El valor'%(value)s' no tiene un formato válido. Debe estar en formato AAAA-"
+"MM-DD HH: [TZ]: MM [ss [uuuuuu].]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"'%(value)s' valor tiene el formato correcto (AAAA-MM-DD HH: MM [:. Ss "
-"[uuuuuu]] [TZ]), pero es una fecha no válida / hora."
+"El valor '%(value)s' tiene el formato correcto (AAAA-MM-DD HH: MM [:. Ss "
+"[uuuuuu]] [TZ]), pero la fecha/hora no es válida."
 
 msgid "Date (with time)"
 msgstr "Fecha (con hora)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' valor debe ser un número decimal."
+msgstr "El valor '%(value)s' debe ser un número decimal."
 
 msgid "Decimal number"
 msgstr "Número decimal"
@@ -484,14 +521,14 @@ msgid "Duration"
 msgstr "Duración"
 
 msgid "Email address"
-msgstr "dirección de correo electrónico"
+msgstr "Correo electrónico"
 
 msgid "File path"
 msgstr "Ruta de fichero"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr "Valor '%(value)s' debe ser un float."
+msgstr "El valor '%(value)s' debe ser un float."
 
 msgid "Floating point number"
 msgstr "Número en coma flotante"
@@ -507,7 +544,7 @@ msgstr "Dirección IP"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr "Valor '%(value)s' debe ser Ninguno, Verdadero o Falso."
+msgstr "El valor '%(value)s' debe ser Ninguno, Verdadero o Falso."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Booleano (Verdadero, Falso o Nulo)"
@@ -533,16 +570,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"'%(value)s' valor tiene un formato inválido. Debe estar en  formato HH: MM "
-"[: SS [uuuuuu].] ."
+"El valor '%(value)s' no tiene un formato válido. Debe estar en formato HH: "
+"MM [: SS [uuuuuu].] ."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"'%(value)s' valor tiene el formato correcto (HH: MM [:. Ss [uuuuuu]]), pero "
-"es un tiempo no válido."
+"El valor '%(value)s' tiene el formato correcto (HH: MM [:. Ss [uuuuuu]]), "
+"pero es una hora no válida."
 
 msgid "Time"
 msgstr "Hora"
@@ -565,7 +602,7 @@ msgstr "Imagen"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "La instancia de %(model)s with %(field)s %(value)r no existe."
+msgstr "La instancia de %(model)s con %(field)s %(value)r no existe."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Llave foránea (tipo determinado por el campo relacionado)"
@@ -576,6 +613,12 @@ msgstr "Relación uno-a-uno"
 msgid "Many-to-many relationship"
 msgstr "Relación muchos-a-muchos"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Este campo es obligatorio."
 
@@ -584,28 +627,6 @@ msgstr "Introduzca un número entero."
 
 msgid "Enter a number."
 msgstr "Introduzca un número."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Asegúrese de que no hay más de %(max)s dígito en total."
-msgstr[1] "Asegúrese de que no hay más de %(max)s dígitos en total."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Asegúrese de que no haya más de %(max)s dígito decimal."
-msgstr[1] "Asegúrese de que no haya más de %(max)s dígitos decimales."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Asegúrese de que no haya más de %(max)s dígito antes del punto decimal"
-msgstr[1] ""
-"Asegúrese de que no haya más de %(max)s dígitos antes del punto decimal."
 
 msgid "Enter a valid date."
 msgstr "Introduzca una fecha válida."
@@ -674,14 +695,8 @@ msgstr ":"
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Compo oculto %(name)s) *%(error)s"
 
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
-
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr "Datos ManagementForm falta o ha sido manipulado"
+msgstr "Los datos de ManagementForm faltan o han sido manipulados"
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -708,14 +723,14 @@ msgstr "Por favor, corrija el dato duplicado para %(field)s."
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
-"Por favor corriga el dato duplicado para %(field)s, el cual debe ser único."
+"Por favor corrija el dato duplicado para %(field)s, ya que debe ser único."
 
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Por favor corriga los datos duplicados para %(field_name)s el cual debe ser "
+"Por favor corrija los datos duplicados para %(field_name)s ya que debe ser "
 "único para %(lookup)s en %(date_field)s."
 
 msgid "Please correct the duplicate values below."
@@ -801,10 +816,10 @@ msgid "AM"
 msgstr "AM"
 
 msgid "midnight"
-msgstr "media noche"
+msgstr "medianoche"
 
 msgid "noon"
-msgstr "medio día"
+msgstr "mediodía"
 
 msgid "Monday"
 msgstr "Lunes"
@@ -1017,7 +1032,7 @@ msgid "December"
 msgstr "Diciembre"
 
 msgid "This is not a valid IPv6 address."
-msgstr "Esto no es una dirección IPv6 válida."
+msgstr "Esta no es una dirección IPv6 válida."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1074,7 +1089,7 @@ msgid "Forbidden"
 msgstr "Prohibido"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr "CSRF verificacion fallida. Solicitud abortada"
+msgstr "Verificación CSRF fallida. Solicitud abortada"
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "

@@ -3,7 +3,7 @@
 ====================================
 
 .. module:: django.contrib.gis.utils.layermapping
-   :synopsis: Spatial data import utility for GeoDjango models.
+    :synopsis: Spatial data import utility for GeoDjango models.
 
 .. currentmodule:: django.contrib.gis.utils
 

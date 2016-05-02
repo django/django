@@ -7,12 +7,12 @@ from decimal import Decimal
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    F, Avg, Count, DecimalField, DurationField, FloatField, Func, IntegerField,
+    Avg, Count, DecimalField, DurationField, F, FloatField, Func, IntegerField,
     Max, Min, Sum, Value,
 )
 from django.test import TestCase
 from django.test.utils import Approximate, CaptureQueriesContext
-from django.utils import six, timezone
+from django.utils import timezone
 
 from .models import Author, Book, Publisher, Store
 
@@ -496,8 +496,14 @@ class AggregateTestCase(TestCase):
         self.assertEqual(vals, {"num_authors__avg": Approximate(1.66, places=1)})
 
     def test_avg_duration_field(self):
+        # Explicit `output_field`.
         self.assertEqual(
             Publisher.objects.aggregate(Avg('duration', output_field=DurationField())),
+            {'duration__avg': datetime.timedelta(days=1, hours=12)}
+        )
+        # Implicit `output_field`.
+        self.assertEqual(
+            Publisher.objects.aggregate(Avg('duration')),
             {'duration__avg': datetime.timedelta(days=1, hours=12)}
         )
 
@@ -509,7 +515,7 @@ class AggregateTestCase(TestCase):
 
     def test_sum_distinct_aggregate(self):
         """
-        Sum on a distict() QuerySet should aggregate only the distinct items.
+        Sum on a distinct() QuerySet should aggregate only the distinct items.
         """
         authors = Author.objects.filter(book__in=[5, 6])
         self.assertEqual(authors.count(), 3)
@@ -906,7 +912,7 @@ class AggregateTestCase(TestCase):
         self.assertEqual(book['price_sum'], Decimal("99999.80"))
 
     def test_nonaggregate_aggregation_throws(self):
-        with six.assertRaisesRegex(self, TypeError, 'fail is not an aggregate expression'):
+        with self.assertRaisesMessage(TypeError, 'fail is not an aggregate expression'):
             Book.objects.aggregate(fail=F('price'))
 
     def test_nonfield_annotation(self):
@@ -918,7 +924,7 @@ class AggregateTestCase(TestCase):
         self.assertEqual(book.val, 2)
 
     def test_missing_output_field_raises_error(self):
-        with six.assertRaisesRegex(self, FieldError, 'Cannot resolve expression type, unknown output_field'):
+        with self.assertRaisesMessage(FieldError, 'Cannot resolve expression type, unknown output_field'):
             Book.objects.annotate(val=Max(2)).first()
 
     def test_annotation_expressions(self):
@@ -962,7 +968,7 @@ class AggregateTestCase(TestCase):
         self.assertEqual(p2, {'avg_price': Approximate(53.39, places=2)})
 
     def test_combine_different_types(self):
-        with six.assertRaisesRegex(self, FieldError, 'Expression contains mixed types. You must set output_field'):
+        with self.assertRaisesMessage(FieldError, 'Expression contains mixed types. You must set output_field'):
             Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price')).get(pk=self.b4.pk)
 
         b1 = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
@@ -978,11 +984,11 @@ class AggregateTestCase(TestCase):
         self.assertEqual(b3.sums, Approximate(Decimal("383.69"), places=2))
 
     def test_complex_aggregations_require_kwarg(self):
-        with six.assertRaisesRegex(self, TypeError, 'Complex annotations require an alias'):
+        with self.assertRaisesMessage(TypeError, 'Complex annotations require an alias'):
             Author.objects.annotate(Sum(F('age') + F('friends__age')))
-        with six.assertRaisesRegex(self, TypeError, 'Complex aggregates require an alias'):
+        with self.assertRaisesMessage(TypeError, 'Complex aggregates require an alias'):
             Author.objects.aggregate(Sum('age') / Count('age'))
-        with six.assertRaisesRegex(self, TypeError, 'Complex aggregates require an alias'):
+        with self.assertRaisesMessage(TypeError, 'Complex aggregates require an alias'):
             Author.objects.aggregate(Sum(1))
 
     def test_aggregate_over_complex_annotation(self):

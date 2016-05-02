@@ -68,7 +68,7 @@ class DeleteQuery(Query):
                 # We can't do the delete using subquery.
                 values = list(query.values_list('pk', flat=True))
                 if not values:
-                    return
+                    return 0
                 return self.delete_batch(values, using)
             else:
                 innerq.clear_select_clause()
@@ -105,8 +105,7 @@ class UpdateQuery(Query):
             self.related_updates = {}
 
     def clone(self, klass=None, **kwargs):
-        return super(UpdateQuery, self).clone(klass,
-                related_updates=self.related_updates.copy(), **kwargs)
+        return super(UpdateQuery, self).clone(klass, related_updates=self.related_updates.copy(), **kwargs)
 
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)

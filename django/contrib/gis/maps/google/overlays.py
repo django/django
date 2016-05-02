@@ -24,7 +24,7 @@ class GEvent(object):
 
     Example:
 
-      from django.shortcuts import render_to_response
+      from django.shortcuts import render
       from django.contrib.gis.maps.google import GoogleMap, GEvent, GPolyline
 
       def sample_request(request):
@@ -32,8 +32,9 @@ class GEvent(object):
           event = GEvent('click',
             'function() { location.href = "http://www.google.com"}')
           polyline.add_event(event)
-          return render_to_response('mytemplate.html',
-          {'google' : GoogleMap(polylines=[polyline])})
+          return render(request, 'mytemplate.html', {
+              'google': GoogleMap(polylines=[polyline]),
+          })
     """
 
     def __init__(self, event, action):
@@ -271,7 +272,7 @@ class GMarker(GOverlayBase):
 
     Example:
 
-      from django.shortcuts import render_to_response
+      from django.shortcuts import render
       from django.contrib.gis.maps.google.overlays import GMarker, GEvent
 
       def sample_request(request):
@@ -279,8 +280,9 @@ class GMarker(GOverlayBase):
           event = GEvent('click',
                          'function() { location.href = "http://www.google.com"}')
           marker.add_event(event)
-          return render_to_response('mytemplate.html',
-                 {'google' : GoogleMap(markers=[marker])})
+          return render(request, 'mytemplate.html', {
+              'google': GoogleMap(markers=[marker]),
+          })
     """
     def __init__(self, geom, title=None, draggable=False, icon=None):
         """

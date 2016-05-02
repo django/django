@@ -11,7 +11,6 @@ from xml.dom.minidom import parseString
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
 from django.db import connection, connections
 from django.db.models import Max, Min
 from django.http import HttpRequest
@@ -23,6 +22,7 @@ from django.test import (
     skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.utils import requires_tz_support
+from django.urls import reverse
 from django.utils import six, timezone
 
 from .forms import (
@@ -127,7 +127,7 @@ class LegacyDatabaseTests(TestCase):
         self.assertEqual(event.dt.replace(tzinfo=EAT), dt)
 
     @skipIfDBFeature('supports_timezones')
-    def test_aware_datetime_unspported(self):
+    def test_aware_datetime_unsupported(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
         with self.assertRaises(ValueError):
             Event.objects.create(dt=dt)
@@ -692,8 +692,7 @@ class SerializationTests(SimpleTestCase):
 
     def assert_yaml_contains_datetime(self, yaml, dt):
         # Depending on the yaml dumper, '!timestamp' might be absent
-        six.assertRegex(self, yaml,
-            r"\n  fields: {dt: !(!timestamp)? '%s'}" % re.escape(dt))
+        six.assertRegex(self, yaml, r"\n  fields: {dt: !(!timestamp)? '%s'}" % re.escape(dt))
 
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
@@ -1162,18 +1161,24 @@ class NewFormsTests(TestCase):
         with timezone.override(pytz.timezone('Europe/Paris')):
             form = EventForm({'dt': '2011-03-27 02:30:00'})
             self.assertFalse(form.is_valid())
-            self.assertEqual(form.errors['dt'],
-                ["2011-03-27 02:30:00 couldn't be interpreted in time zone "
-                 "Europe/Paris; it may be ambiguous or it may not exist."])
+            self.assertEqual(
+                form.errors['dt'], [
+                    "2011-03-27 02:30:00 couldn't be interpreted in time zone "
+                    "Europe/Paris; it may be ambiguous or it may not exist."
+                ]
+            )
 
     @requires_pytz
     def test_form_with_ambiguous_time(self):
         with timezone.override(pytz.timezone('Europe/Paris')):
             form = EventForm({'dt': '2011-10-30 02:30:00'})
             self.assertFalse(form.is_valid())
-            self.assertEqual(form.errors['dt'],
-                ["2011-10-30 02:30:00 couldn't be interpreted in time zone "
-                 "Europe/Paris; it may be ambiguous or it may not exist."])
+            self.assertEqual(
+                form.errors['dt'], [
+                    "2011-10-30 02:30:00 couldn't be interpreted in time zone "
+                    "Europe/Paris; it may be ambiguous or it may not exist."
+                ]
+            )
 
     @requires_tz_support
     def test_split_form(self):
@@ -1200,16 +1205,19 @@ class NewFormsTests(TestCase):
             self.assertIn("2011-09-01 17:20:30", str(form))
 
 
-@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True,
-                  PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                  ROOT_URLCONF='timezones.urls')
+@override_settings(
+    DATETIME_FORMAT='c',
+    TIME_ZONE='Africa/Nairobi',
+    USE_L10N=False,
+    USE_TZ=True,
+    ROOT_URLCONF='timezones.urls',
+)
 class AdminTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # password = "secret"
-        cls.u1 = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+        cls.u1 = User.objects.create_user(
+            password='secret',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10, tzinfo=UTC),
             is_superuser=True, username='super', first_name='Super', last_name='User',
             email='super@example.com', is_staff=True, is_active=True,
@@ -1217,7 +1225,7 @@ class AdminTests(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
 
     @requires_tz_support
     def test_changelist(self):

@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 08:16+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Urdu (http://www.transifex.com/projects/p/django/language/"
-"ur/)\n"
+"Language-Team: Urdu (http://www.transifex.com/django/django/language/ur/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -74,6 +73,12 @@ msgstr "کاروائی:"
 msgid "action time"
 msgstr "کاروائی کا وقت"
 
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
 msgid "object id"
 msgstr "شے کا شناختی نمبر"
 
@@ -112,6 +117,9 @@ msgstr "کوئی نھیں"
 
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+msgid "Added."
 msgstr ""
 
 #, python-format
@@ -460,6 +468,12 @@ msgstr ""
 "ٹیبل بنائے گئے تھے، اور یقین کر لیں کہ ڈیٹ بیس مناسب صارف کے پڑھے جانے کے "
 "قابل ھے۔"
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
 msgid "Forgotten your password or username?"
 msgstr ""
 
@@ -484,6 +498,9 @@ msgstr "تمام دکھائیں"
 
 msgid "Save"
 msgstr "محفوظ کریں"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -614,9 +631,6 @@ msgstr "میرا لفظ اجازت دوبارہ مرتب کریں"
 
 msgid "All dates"
 msgstr "تمام تاریخیں"
-
-msgid "(None)"
-msgstr "(None)"
 
 #, python-format
 msgid "Select %s"

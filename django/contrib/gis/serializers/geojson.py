@@ -18,6 +18,9 @@ class Serializer(JSONSerializer):
         super(Serializer, self)._init_options()
         self.geometry_field = self.json_kwargs.pop('geometry_field', None)
         self.srid = self.json_kwargs.pop('srid', 4326)
+        if (self.selected_fields is not None and self.geometry_field is not None and
+                self.geometry_field not in self.selected_fields):
+            self.selected_fields = list(self.selected_fields) + [self.geometry_field]
 
     def start_serialization(self):
         self._init_options()
@@ -44,6 +47,9 @@ class Serializer(JSONSerializer):
             "type": "Feature",
             "properties": self._current,
         }
+        if ((self.selected_fields is None or 'pk' in self.selected_fields) and
+                'pk' not in data["properties"]):
+            data["properties"]["pk"] = obj._meta.pk.value_to_string(obj)
         if self._geometry:
             if self._geometry.srid != self.srid:
                 # If needed, transform the geometry in the srid of the global geojson srid

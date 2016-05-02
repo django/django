@@ -6,7 +6,7 @@ from django.utils.translation import override
 from django.views.csrf import CSRF_FAILURE_TEMPLATE_NAME, csrf_failure
 
 
-@override_settings(ROOT_URLCONF="view_tests.urls")
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class CsrfViewTests(SimpleTestCase):
 
     def setUp(self):

@@ -340,6 +340,9 @@ Now you're ready to actually put the release out there. To do this:
    announcement blog post. If this is a security release, also include
    oss-security@lists.openwall.com.
 
+#. Add a link to the blog post in the topic of the #django IRC channel:
+   ``/msg chanserv TOPIC #django new topic goes here``.
+
 Post-release
 ============
 
@@ -362,7 +365,7 @@ You're almost done! All that's left to do now is:
 New stable branch tasks
 =======================
 
-There are several items to do in the time following a the creation of a new
+There are several items to do in the time following the creation of a new
 stable branch (often following an alpha release). Some of these tasks don't
 need to be done by the releaser.
 

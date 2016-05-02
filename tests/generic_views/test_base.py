@@ -4,10 +4,10 @@ import time
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import resolve
 from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
+from django.urls import resolve
 from django.views.generic import RedirectView, TemplateView, View
 
 from . import views
@@ -145,12 +145,14 @@ class ViewTest(unittest.TestCase):
         # Check each of the allowed method names
         for method in SimpleView.http_method_names:
             kwargs = dict(((method, "value"),))
-            self.assertRaises(TypeError, SimpleView.as_view, **kwargs)
+            with self.assertRaises(TypeError):
+                SimpleView.as_view(**kwargs)
 
         # Check the case view argument is ok if predefined on the class...
         CustomizableView.as_view(parameter="value")
         # ...but raises errors otherwise.
-        self.assertRaises(TypeError, CustomizableView.as_view, foobar="value")
+        with self.assertRaises(TypeError):
+            CustomizableView.as_view(foobar="value")
 
     def test_calling_more_than_once(self):
         """
@@ -247,7 +249,6 @@ class TemplateViewTest(SimpleTestCase):
 
     def _assert_about(self, response):
         response.render()
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<h1>About</h1>')
 
     def test_get(self):
@@ -281,7 +282,8 @@ class TemplateViewTest(SimpleTestCase):
         """
         A template view must provide a template name.
         """
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/template/no_template/')
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/template/no_template/')
 
     @require_jinja2
     def test_template_engine(self):
@@ -528,4 +530,5 @@ class SingleObjectTemplateResponseMixinTest(unittest.TestCase):
         TemplateDoesNotExist.
         """
         view = views.TemplateResponseWithoutTemplate()
-        self.assertRaises(ImproperlyConfigured, view.get_template_names)
+        with self.assertRaises(ImproperlyConfigured):
+            view.get_template_names()

@@ -9,7 +9,7 @@ and localization infrastructure available to Django applications, described in
 the :doc:`i18n documentation </topics/i18n/index>`.
 
 Translations
-------------
+============
 
 Translations are contributed by Django users worldwide. The translation work is
 coordinated at `Transifex`_.
@@ -53,11 +53,11 @@ translation manager's availability. So don't miss the string freeze period
 to complete and fix the translations for your language!
 
 Formats
--------
+=======
 
 You can also review ``conf/locale/<locale>/formats.py``. This file describes
 the date, time and numbers formatting particularities of your locale. See
-:ref:`format-localization` for details.
+:doc:`/topics/i18n/formatting` for details.
 
 The format files aren't managed by the use of Transifex. To change them, you
 must :doc:`create a patch<writing-code/submitting-patches>` against the
@@ -75,7 +75,7 @@ Django source tree, as for any code change:
 .. _translating-documentation:
 
 Documentation
--------------
+=============
 
 There is also an opportunity to translate the documentation, though this is a
 huge undertaking to complete entirely (you have been warned!). We use the same

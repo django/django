@@ -4,17 +4,18 @@
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
+# Zorig <zorig_ezd@yahoo.com>, 2016
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-02-13 08:11+0000\n"
-"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
-"Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
-"language/mn/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2016-03-08 13:17+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
+"Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
+"mn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -80,6 +81,12 @@ msgstr "Үйлдэл:"
 msgid "action time"
 msgstr "үйлдлийн хугацаа"
 
+msgid "user"
+msgstr "хэрэглэгч"
+
+msgid "content type"
+msgstr "агуулгын төрөл"
+
 msgid "object id"
 msgstr "обектийн id"
 
@@ -121,6 +128,9 @@ msgid ""
 msgstr ""
 "Олон утга сонгохын тулд \"Control\", эсвэл Mac дээр \"Command\" товчыг дарж "
 "байгаад сонгоно."
+
+msgid "Added."
+msgstr "Нэмэгдсэн."
 
 #, python-format
 msgid "Changed %s."
@@ -242,6 +252,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+" %(class_name)s төрлийн %(instance)s-ийг устгах гэж байна. Эхлээд дараах "
+"холбоотой хамгаалагдсан обектуудыг устгах шаардлагатай: %(related_objects)s"
 
 msgid "Django site admin"
 msgstr "Сайтын удирдлага"
@@ -474,6 +486,14 @@ msgstr ""
 "зохих хүснэгт үүсгэгдсэн эсэх, өгөгдлийн санг зохих хэрэглэгч унших "
 "боломжтой байгаа эсэхийг шалгаарай."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Та  %(username)s нэрээр нэвтэрсэн байна гэвч энэ хуудасхуу хандах эрх "
+"байхгүй байна. Та өөр эрхээр логин хийх үү?"
+
 msgid "Forgotten your password or username?"
 msgstr "Таны мартсан нууц үг эсвэл нэрвтэр нэр?"
 
@@ -498,6 +518,9 @@ msgstr "Бүгдийг харуулах"
 
 msgid "Save"
 msgstr "Хадгалах"
+
+msgid "Popup closing..."
+msgstr "Цонх хаагдлаа"
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -588,6 +611,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Таны оруулсан имайл хаяг бүртгэлтэй бол таны имайл хаягруу нууц үг "
+"тохируулах зааварыг удахгүй очих болно. Та удахгүй имайл хүлээж авах болно. "
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -632,9 +657,6 @@ msgstr "Нууц үгээ шинэчлэх"
 
 msgid "All dates"
 msgstr "Бүх огноо"
-
-msgid "(None)"
-msgstr "(Хоосон)"
 
 #, python-format
 msgid "Select %s"

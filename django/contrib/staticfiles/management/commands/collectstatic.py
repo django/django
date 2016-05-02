@@ -3,12 +3,14 @@ from __future__ import unicode_literals
 import os
 from collections import OrderedDict
 
+from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.utils.encoding import smart_text
+from django.utils.functional import cached_property
 from django.utils.six.moves import input
 
 
@@ -28,38 +30,53 @@ class Command(BaseCommand):
         self.post_processed_files = []
         self.storage = staticfiles_storage
         self.style = no_style()
+
+    @cached_property
+    def local(self):
         try:
             self.storage.path('')
         except NotImplementedError:
-            self.local = False
-        else:
-            self.local = True
+            return False
+        return True
 
     def add_arguments(self, parser):
-        parser.add_argument('--noinput', '--no-input',
+        parser.add_argument(
+            '--noinput', '--no-input',
             action='store_false', dest='interactive', default=True,
-            help="Do NOT prompt the user for input of any kind.")
-        parser.add_argument('--no-post-process',
+            help="Do NOT prompt the user for input of any kind.",
+        )
+        parser.add_argument(
+            '--no-post-process',
             action='store_false', dest='post_process', default=True,
-            help="Do NOT post process collected files.")
-        parser.add_argument('-i', '--ignore', action='append', default=[],
+            help="Do NOT post process collected files.",
+        )
+        parser.add_argument(
+            '-i', '--ignore', action='append', default=[],
             dest='ignore_patterns', metavar='PATTERN',
             help="Ignore files or directories matching this glob-style "
-                "pattern. Use multiple times to ignore more.")
-        parser.add_argument('-n', '--dry-run',
+                 "pattern. Use multiple times to ignore more.",
+        )
+        parser.add_argument(
+            '-n', '--dry-run',
             action='store_true', dest='dry_run', default=False,
-            help="Do everything except modify the filesystem.")
-        parser.add_argument('-c', '--clear',
+            help="Do everything except modify the filesystem.",
+        )
+        parser.add_argument(
+            '-c', '--clear',
             action='store_true', dest='clear', default=False,
             help="Clear the existing files using the storage "
-                 "before trying to copy or link the original file.")
-        parser.add_argument('-l', '--link',
+                 "before trying to copy or link the original file.",
+        )
+        parser.add_argument(
+            '-l', '--link',
             action='store_true', dest='link', default=False,
-            help="Create a symbolic link to each file instead of copying.")
-        parser.add_argument('--no-default-ignore', action='store_false',
+            help="Create a symbolic link to each file instead of copying.",
+        )
+        parser.add_argument(
+            '--no-default-ignore', action='store_false',
             dest='use_default_ignore_patterns', default=True,
-            help="Don't ignore the common private glob-style patterns 'CVS', "
-                "'.*' and '*~'.")
+            help="Don't ignore the common private glob-style patterns (defaults to 'CVS', '.*' and '*~').",
+        )
 
     def set_options(self, **options):
         """
@@ -72,7 +89,7 @@ class Command(BaseCommand):
         self.dry_run = options['dry_run']
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
-            ignore_patterns += ['CVS', '.*', '*~']
+            ignore_patterns += apps.get_app_config('staticfiles').ignore_patterns
         self.ignore_patterns = list(set(ignore_patterns))
         self.post_process = options['post_process']
 
@@ -191,7 +208,7 @@ class Command(BaseCommand):
                                    ', %s post-processed'
                                    % post_processed_count or ''),
             }
-            self.stdout.write(summary)
+            return summary
 
     def log(self, msg, level=2):
         """
@@ -218,12 +235,16 @@ class Command(BaseCommand):
                          smart_text(fpath), level=1)
             else:
                 self.log("Deleting '%s'" % smart_text(fpath), level=1)
-                full_path = self.storage.path(fpath)
-                if not os.path.exists(full_path) and os.path.lexists(full_path):
-                    # Delete broken symlinks
-                    os.unlink(full_path)
-                else:
+                try:
+                    full_path = self.storage.path(fpath)
+                except NotImplementedError:
                     self.storage.delete(fpath)
+                else:
+                    if not os.path.exists(full_path) and os.path.lexists(full_path):
+                        # Delete broken symlinks
+                        os.unlink(full_path)
+                    else:
+                        self.storage.delete(fpath)
         for d in dirs:
             self.clear_dir(os.path.join(path, d))
 
@@ -234,15 +255,14 @@ class Command(BaseCommand):
         if self.storage.exists(prefixed_path):
             try:
                 # When was the target file modified last time?
-                target_last_modified = \
-                    self.storage.modified_time(prefixed_path)
+                target_last_modified = self.storage.get_modified_time(prefixed_path)
             except (OSError, NotImplementedError, AttributeError):
-                # The storage doesn't support ``modified_time`` or failed
+                # The storage doesn't support get_modified_time() or failed
                 pass
             else:
                 try:
                     # When was the source file modified last time?
-                    source_last_modified = source_storage.modified_time(path)
+                    source_last_modified = source_storage.get_modified_time(path)
                 except (OSError, NotImplementedError, AttributeError):
                     pass
                 else:
@@ -253,16 +273,12 @@ class Command(BaseCommand):
                         full_path = None
                     # Skip the file if the source file is younger
                     # Avoid sub-second precision (see #14665, #19540)
-                    if (target_last_modified.replace(microsecond=0)
-                            >= source_last_modified.replace(microsecond=0)):
-                        if not ((self.symlink and full_path
-                                 and not os.path.islink(full_path)) or
-                                (not self.symlink and full_path
-                                 and os.path.islink(full_path))):
-                            if prefixed_path not in self.unmodified_files:
-                                self.unmodified_files.append(prefixed_path)
-                            self.log("Skipping '%s' (not modified)" % path)
-                            return False
+                    if (target_last_modified.replace(microsecond=0) >= source_last_modified.replace(microsecond=0) and
+                            full_path and not (self.symlink ^ os.path.islink(full_path))):
+                        if prefixed_path not in self.unmodified_files:
+                            self.unmodified_files.append(prefixed_path)
+                        self.log("Skipping '%s' (not modified)" % path)
+                        return False
             # Then delete the existing file if really needed
             if self.dry_run:
                 self.log("Pretending to delete '%s'" % path)

@@ -2,16 +2,16 @@
 #
 # Translators:
 # Aarni Koskela, 2015
-# Antti Kaihola <antti-2013@ambitone.com>, 2011
+# Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Finnish (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-11 11:43+0000\n"
+"Last-Translator: Aarni Koskela\n"
+"Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,8 +22,12 @@ msgstr ""
 msgid "GIS"
 msgstr "Paikkatietojärjestelmä"
 
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr "GIS-peruskenttä – vastaa OpenGIS-määrittelyn geometriatyyppiä."
+msgid "The base GIS field."
+msgstr "GIS-peruskenttä."
+
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr "Geometriaperuskenttä – vastaa OpenGIS-määrittelyn geometriatyyppiä."
 
 msgid "Point"
 msgstr "Piste"
@@ -47,7 +51,10 @@ msgid "Geometry collection"
 msgstr "Geometriakokoelma"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Laajuusaggregaattikenttä"
+
+msgid "Raster Field"
+msgstr "Rasterikenttä"
 
 msgid "No geometry value provided."
 msgstr "Geometria-arvoa ei annettu."
@@ -64,16 +71,16 @@ msgid ""
 msgstr "Kentän SRID-muunnoksessa tapahtui virhe."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Poista kaikki ominaisuudet"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "WKT-debuggausikkuna:"
 
 msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "Google Maps GeoDjangon kautta"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Debuggausikkuna (sarjoitettu arvo)"
 
 msgid "No feeds are registered."
 msgstr "Syötteitä ei ole rekisteröity."

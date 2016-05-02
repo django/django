@@ -3,7 +3,7 @@ GeoDjango Forms API
 ===================
 
 .. module:: django.contrib.gis.forms
-   :synopsis: GeoDjango forms API.
+    :synopsis: GeoDjango forms API.
 
 GeoDjango provides some specialized form fields and widgets in order to visually
 display and edit geolocalized data on a map. By default, they use
@@ -18,7 +18,7 @@ In addition to the regular :ref:`form field arguments <core-field-arguments>`,
 GeoDjango form fields take the following optional arguments.
 
 ``srid``
-~~~~~~~~
+--------
 
 .. attribute:: Field.srid
 
@@ -28,7 +28,7 @@ GeoDjango form fields take the following optional arguments.
     input values into that SRID.
 
 ``geom_type``
-~~~~~~~~~~~~~
+-------------
 
 .. attribute:: Field.geom_type
 
@@ -40,42 +40,42 @@ Form field classes
 ==================
 
 ``GeometryField``
-~~~~~~~~~~~~~~~~~
+-----------------
 
 .. class:: GeometryField
 
 ``PointField``
-~~~~~~~~~~~~~~
+--------------
 
 .. class:: PointField
 
 ``LineStringField``
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 .. class:: LineStringField
 
 ``PolygonField``
-~~~~~~~~~~~~~~~~
+----------------
 
 .. class:: PolygonField
 
 ``MultiPointField``
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 .. class:: MultiPointField
 
 ``MultiLineStringField``
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 .. class:: MultiLineStringField
 
 ``MultiPolygonField``
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 .. class:: MultiPolygonField
 
 ``GeometryCollectionField``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 .. class:: GeometryCollectionField
 
@@ -83,7 +83,7 @@ Form widgets
 ============
 
 .. module:: django.contrib.gis.widgets
-   :synopsis: GeoDjango widgets API.
+    :synopsis: GeoDjango widgets API.
 
 GeoDjango form widgets allow you to display and edit geographic data on a
 visual map.
@@ -91,7 +91,7 @@ Note that none of the currently available widgets supports 3D geometries, hence
 geometry fields will fallback using a simple ``Textarea`` widget for such data.
 
 Widget attributes
-~~~~~~~~~~~~~~~~~
+-----------------
 
 GeoDjango widgets are template-based, so their attributes are mostly different
 from other Django widget attributes.
@@ -134,7 +134,7 @@ widget. For example::
             forms.OSMWidget(attrs={'map_width': 800, 'map_height': 500}))
 
 Widget classes
-~~~~~~~~~~~~~~
+--------------
 
 ``BaseGeometryWidget``
 

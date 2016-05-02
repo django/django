@@ -375,6 +375,23 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_COOKIE_DOMAIN='.example.com', USE_X_FORWARDED_PORT=True)
+    def test_https_good_referer_behind_proxy(self):
+        """
+        A POST HTTPS request is accepted when USE_X_FORWARDED_PORT=True.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META.update({
+            'HTTP_HOST': '10.0.0.2',
+            'HTTP_REFERER': 'https://www.example.com/somepage',
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_HOST': 'www.example.com',
+            'HTTP_X_FORWARDED_PORT': '443',
+        })
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNone(req2)
+
     @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['dashboard.example.com'])
     def test_https_csrf_trusted_origin_allowed(self):
         """
@@ -392,7 +409,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
     def test_https_csrf_wildcard_trusted_origin_allowed(self):
         """
         A POST HTTPS request with a referer that matches a CSRF_TRUSTED_ORIGINS
-        wilcard is accepted.
+        wildcard is accepted.
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True

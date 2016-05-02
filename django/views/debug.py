@@ -5,10 +5,10 @@ import sys
 import types
 
 from django.conf import settings
-from django.core.urlresolvers import Resolver404, resolve
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
+from django.urls import Resolver404, resolve
 from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, smart_text
@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 # regardless of the project's TEMPLATES setting.
 DEBUG_ENGINE = Engine(debug=True)
 
-HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE')
+HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
 
 CLEANSED_SUBSTITUTE = '********************'
 
@@ -190,8 +190,8 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         current_frame = tb_frame.f_back
         sensitive_variables = None
         while current_frame is not None:
-            if (current_frame.f_code.co_name == 'sensitive_variables_wrapper'
-                    and 'sensitive_variables_wrapper' in current_frame.f_locals):
+            if (current_frame.f_code.co_name == 'sensitive_variables_wrapper' and
+                    'sensitive_variables_wrapper' in current_frame.f_locals):
                 # The sensitive_variables decorator was used, so we take note
                 # of the sensitive variables' names.
                 wrapper = current_frame.f_locals['sensitive_variables_wrapper']
@@ -219,8 +219,8 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
             for name, value in tb_frame.f_locals.items():
                 cleansed[name] = self.cleanse_special_types(request, value)
 
-        if (tb_frame.f_code.co_name == 'sensitive_variables_wrapper'
-                and 'sensitive_variables_wrapper' in tb_frame.f_locals):
+        if (tb_frame.f_code.co_name == 'sensitive_variables_wrapper' and
+                'sensitive_variables_wrapper' in tb_frame.f_locals):
             # For good measure, obfuscate the decorated function's arguments in
             # the sensitive_variables decorator's frame, in case the variables
             # associated with those arguments were meant to be obfuscated from
@@ -459,11 +459,12 @@ def technical_404_response(request, exception):
     except (IndexError, TypeError, KeyError):
         tried = []
     else:
-        if (not tried                           # empty URLconf
-            or (request.path == '/'
-                and len(tried) == 1             # default URLconf
-                and len(tried[0]) == 1
-                and getattr(tried[0][0], 'app_name', '') == getattr(tried[0][0], 'namespace', '') == 'admin')):
+        if (not tried or (                  # empty URLconf
+            request.path == '/' and
+            len(tried) == 1 and             # default URLconf
+            len(tried[0]) == 1 and
+            getattr(tried[0][0], 'app_name', '') == getattr(tried[0][0], 'namespace', '') == 'admin'
+        )):
             return default_urlconf(request)
 
     urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
@@ -508,10 +509,14 @@ def default_urlconf(request):
         "title": _("Welcome to Django"),
         "heading": _("It worked!"),
         "subheading": _("Congratulations on your first Django-powered page."),
-        "instructions": _("Of course, you haven't actually done any work yet. "
-            "Next, start your first app by running <code>python manage.py startapp [app_label]</code>."),
-        "explanation": _("You're seeing this message because you have <code>DEBUG = True</code> in your "
-            "Django settings file and you haven't configured any URLs. Get to work!"),
+        "instructions": _(
+            "Of course, you haven't actually done any work yet. "
+            "Next, start your first app by running <code>python manage.py startapp [app_label]</code>."
+        ),
+        "explanation": _(
+            "You're seeing this message because you have <code>DEBUG = True</code> in your "
+            "Django settings file and you haven't configured any URLs. Get to work!"
+        ),
     })
 
     return HttpResponse(t.render(c), content_type='text/html')
@@ -813,7 +818,7 @@ TECHNICAL_500_TEMPLATE = ("""
                 </tr>
               </thead>
               <tbody>
-                {% for var in frame.vars|dictsort:"0" %}
+                {% for var in frame.vars|dictsort:0 %}
                   <tr>
                     <td>{{ var.0|force_escape }}</td>
                     <td class="code"><pre>{{ var.1 }}</pre></td>
@@ -882,7 +887,7 @@ Exception Type: {{ exception_type|escape }}{% if request %} at {{ request.path_i
 Exception Value: {{ exception_value|force_escape }}
 </textarea>
   <br><br>
-  <input type="submit" value="Share this traceback on a public Web site">
+  <input type="submit" value="Share this traceback on a public website">
   </div>
 </form>
 </div>
@@ -995,7 +1000,7 @@ Exception Value: {{ exception_value|force_escape }}
       </tr>
     </thead>
     <tbody>
-      {% for var in request.META.items|dictsort:"0" %}
+      {% for var in request.META.items|dictsort:0 %}
         <tr>
           <td>{{ var.0 }}</td>
           <td class="code"><pre>{{ var.1|pprint }}</pre></td>
@@ -1017,7 +1022,7 @@ Exception Value: {{ exception_value|force_escape }}
       </tr>
     </thead>
     <tbody>
-      {% for var in settings.items|dictsort:"0" %}
+      {% for var in settings.items|dictsort:0 %}
         <tr>
           <td>{{ var.0 }}</td>
           <td class="code"><pre>{{ var.1|pprint }}</pre></td>
@@ -1038,7 +1043,7 @@ Exception Value: {{ exception_value|force_escape }}
 {% endif %}
 </body>
 </html>
-""")
+""")  # NOQA
 
 TECHNICAL_500_TEXT_TEMPLATE = (""""""
 """{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
@@ -1107,12 +1112,12 @@ FILES:{% for k, v in request.FILES.items %}
 COOKIES:{% for k, v in request.COOKIES.items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No cookie data{% endfor %}
 
-META:{% for k, v in request.META.items|dictsort:"0" %}
+META:{% for k, v in request.META.items|dictsort:0 %}
 {{ k }} = {{ v|stringformat:"r" }}{% endfor %}
 {% else %}Request data not supplied
 {% endif %}
 Settings:
-Using settings module {{ settings.SETTINGS_MODULE }}{% for k, v in settings.items|dictsort:"0" %}
+Using settings module {{ settings.SETTINGS_MODULE }}{% for k, v in settings.items|dictsort:0 %}
 {{ k }} = {{ v|stringformat:"r" }}{% endfor %}
 
 {% if not is_email %}
@@ -1120,7 +1125,7 @@ You're seeing this error because you have DEBUG = True in your
 Django settings file. Change that to False, and Django will
 display a standard page generated by the handler for this status code.
 {% endif %}
-""")
+""")  # NOQA
 
 TECHNICAL_404_TEMPLATE = """
 <!DOCTYPE html>

@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-29 02:32+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-31 12:15+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
-"Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,8 +34,18 @@ msgstr "文字列と文字列のマップ"
 msgid "The value of \"%(key)s\" is not a string."
 msgstr "\"%(key)s\" の値は文字列ではありません。"
 
+msgid "A JSON object"
+msgstr "JSONオブジェクト"
+
+msgid "Value must be valid JSON."
+msgstr "JSONとして正しい値にしてください。"
+
 msgid "Could not load JSON data."
 msgstr "JSONデータを読み込めませんでした。"
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' は正しいJSONにしなければなりません。"
 
 msgid "Enter two valid values."
 msgstr "2つの値を正しく入力してください。"

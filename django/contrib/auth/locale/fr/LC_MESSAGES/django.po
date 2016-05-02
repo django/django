@@ -9,11 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 15:03+0000\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-10-11 18:03+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
-"Language-Team: French (http://www.transifex.com/projects/p/django/language/"
-"fr/)\n"
+"Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -43,6 +42,12 @@ msgstr "Modifier le mot de passe : %s"
 msgid "Authentication and Authorization"
 msgstr "Authentification et autorisation"
 
+msgid "password"
+msgstr "mot de passe"
+
+msgid "last login"
+msgstr "dernière connexion"
+
 msgid "No password set."
 msgstr "Aucun mot de passe défini."
 
@@ -59,17 +64,17 @@ msgstr "Mot de passe"
 msgid "Password confirmation"
 msgstr "Confirmation du mot de passe"
 
-msgid "Enter the same password as above, for verification."
+msgid "Enter the same password as before, for verification."
 msgstr "Saisissez le même mot de passe que précédemment, pour vérification."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
 "Les mots de passe ne sont pas enregistrés en clair, ce qui ne permet pas "
 "d'afficher le mot de passe de cet utilisateur, mais il est possible de le "
-"changer en utilisant <a href=\"password/\">ce formulaire</a>. "
+"changer en utilisant <a href=\"../password/\">ce formulaire</a>. "
 
 #, python-format
 msgid ""
@@ -122,6 +127,9 @@ msgstr "somme de contrôle"
 msgid "name"
 msgstr "nom"
 
+msgid "content type"
+msgstr "type de contenu"
+
 msgid "codename"
 msgstr "nom de code"
 
@@ -136,12 +144,6 @@ msgstr "groupe"
 
 msgid "groups"
 msgstr "groupes"
-
-msgid "password"
-msgstr "mot de passe"
-
-msgid "last login"
-msgstr "dernière connexion"
 
 msgid "superuser status"
 msgstr "statut super-utilisateur"
@@ -217,6 +219,50 @@ msgstr "utilisateur"
 
 msgid "users"
 msgstr "utilisateurs"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Ce mot de passe est trop court. Il doit contenir au minimum %(min_length)d "
+"caractère."
+msgstr[1] ""
+"Ce mot de passe est trop court. Il doit contenir au minimum %(min_length)d "
+"caractères."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+"Votre mot de passe doit contenir au minimum %(min_length)d caractère."
+msgstr[1] ""
+"Votre mot de passe doit contenir au minimum %(min_length)d caractères."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Le mot de passe est trop semblable au champ « %(verbose_name)s »."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"Votre mot de passe ne peut pas trop ressembler à vos autres informations "
+"personnelles."
+
+msgid "This password is too common."
+msgstr "Ce mot de passe est trop courant."
+
+msgid "Your password can't be a commonly used password."
+msgstr ""
+"Votre mot de passe ne peut pas être un mot de passe couramment utilisé."
+
+msgid "This password is entirely numeric."
+msgstr "Ce mot de passe est entièrement numérique."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Votre mot de passe ne peut pas être entièrement numérique."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

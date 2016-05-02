@@ -6,6 +6,7 @@ from collections import OrderedDict
 from importlib import import_module
 
 from django.apps import apps
+from django.core.checks import Tags, run_checks
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.sql import (
     emit_post_migrate_signal, emit_pre_migrate_signal,
@@ -22,33 +23,49 @@ class Command(BaseCommand):
     help = "Updates database schema. Manages both apps with migrations and those without."
 
     def add_arguments(self, parser):
-        parser.add_argument('app_label', nargs='?',
-            help='App label of an application to synchronize the state.')
-        parser.add_argument('migration_name', nargs='?',
-            help=(
-                'Database state will be brought to the state after that '
-                'migration. Use the name "zero" to unapply all migrations.'
-            ),
+        parser.add_argument(
+            'app_label', nargs='?',
+            help='App label of an application to synchronize the state.',
         )
-        parser.add_argument('--noinput', '--no-input',
+        parser.add_argument(
+            'migration_name', nargs='?',
+            help='Database state will be brought to the state after that '
+                 'migration. Use the name "zero" to unapply all migrations.',
+        )
+        parser.add_argument(
+            '--noinput', '--no-input',
             action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.')
-        parser.add_argument('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
-                'Defaults to the "default" database.')
-        parser.add_argument('--fake', action='store_true', dest='fake', default=False,
-            help='Mark migrations as run without actually running them.')
-        parser.add_argument('--fake-initial', action='store_true', dest='fake_initial', default=False,
+            help='Tells Django to NOT prompt the user for input of any kind.',
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to synchronize. Defaults to the "default" database.',
+        )
+        parser.add_argument(
+            '--fake', action='store_true', dest='fake', default=False,
+            help='Mark migrations as run without actually running them.',
+        )
+        parser.add_argument(
+            '--fake-initial', action='store_true', dest='fake_initial', default=False,
             help='Detect if tables already exist and fake-apply initial migrations if so. Make sure '
                  'that the current database schema matches your initial migration before using this '
-                 'flag. Django will only check for an existing table name.')
-        parser.add_argument('--run-syncdb', action='store_true', dest='run_syncdb',
-            help='Creates tables for apps without migrations.')
+                 'flag. Django will only check for an existing table name.',
+        )
+        parser.add_argument(
+            '--run-syncdb', action='store_true', dest='run_syncdb',
+            help='Creates tables for apps without migrations.',
+        )
+
+    def _run_checks(self, **kwargs):
+        issues = run_checks(tags=[Tags.database])
+        issues.extend(super(Command, self)._run_checks(**kwargs))
+        return issues
 
     def handle(self, *args, **options):
 
-        self.verbosity = options.get('verbosity')
-        self.interactive = options.get('interactive')
+        self.verbosity = options['verbosity']
+        self.interactive = options['interactive']
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
@@ -57,13 +74,16 @@ class Command(BaseCommand):
                 import_module('.management', app_config.name)
 
         # Get the database we're operating from
-        db = options.get('database')
+        db = options['database']
         connection = connections[db]
 
         # Hook for backends needing any database preparation
         connection.prepare_database()
         # Work out which apps have migrations and which do not
         executor = MigrationExecutor(connection, self.migration_progress_callback)
+
+        # Raise an error if any migrations are applied before their dependencies.
+        executor.loader.check_consistent_history(connection)
 
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any
@@ -114,7 +134,7 @@ class Command(BaseCommand):
             targets = executor.loader.graph.leaf_nodes()
 
         plan = executor.migration_plan(targets)
-        run_syncdb = options.get('run_syncdb') and executor.loader.unmigrated_apps
+        run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps
 
         # Print some useful info
         if self.verbosity >= 1:
@@ -122,12 +142,12 @@ class Command(BaseCommand):
             if run_syncdb:
                 self.stdout.write(
                     self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
-                    (", ".join(executor.loader.unmigrated_apps))
+                    (", ".join(sorted(executor.loader.unmigrated_apps)))
                 )
             if target_app_labels_only:
                 self.stdout.write(
                     self.style.MIGRATE_LABEL("  Apply all migrations: ") +
-                    (", ".join(set(a for a, n in targets)) or "(none)")
+                    (", ".join(sorted(set(a for a, n in targets))) or "(none)")
                 )
             else:
                 if targets[0][1] is None:
@@ -172,8 +192,8 @@ class Command(BaseCommand):
                         "apply them."
                     ))
         else:
-            fake = options.get("fake")
-            fake_initial = options.get("fake_initial")
+            fake = options['fake']
+            fake_initial = options['fake_initial']
             executor.migrate(targets, plan, fake=fake, fake_initial=fake_initial)
 
         # Send the post_migrate signal, so individual apps can do whatever they need
@@ -235,8 +255,10 @@ class Command(BaseCommand):
                 opts = model._meta
                 converter = connection.introspection.table_name_converter
                 # Note that if a model is unmanaged we short-circuit and never try to install it
-                return not ((converter(opts.db_table) in tables) or
-                    (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables))
+                return not (
+                    (converter(opts.db_table) in tables) or
+                    (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables)
+                )
 
             manifest = OrderedDict(
                 (app_name, list(filter(model_installed, model_list)))

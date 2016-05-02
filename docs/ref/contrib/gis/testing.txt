@@ -3,7 +3,7 @@ Testing GeoDjango apps
 ======================
 
 Included in this documentation are some additional notes and settings
-for :ref:`testing-postgis` and :ref:`testing-spatialite` users.
+for :ref:`testing-postgis` users.
 
 .. _testing-postgis:
 
@@ -20,7 +20,7 @@ Settings
 .. setting:: POSTGIS_VERSION
 
 ``POSTGIS_VERSION``
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 When GeoDjango's spatial backend initializes on PostGIS, it has to perform
 an SQL query to determine the version in order to figure out what
@@ -43,7 +43,7 @@ only needs to have the ability to create databases. In other configurations,
 you may be required to use a database superuser.
 
 Create database user
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 To make a database user with the ability to create databases, use the
 following command::
@@ -59,7 +59,7 @@ Alternatively, you may alter an existing user's role from the SQL shell
     postgres# ALTER ROLE <user_name> CREATEDB NOSUPERUSER NOCREATEROLE;
 
 Create database superuser
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This may be done at the time the user is created, for example::
 
@@ -78,16 +78,6 @@ a simple way to add superuser privileges to your database user.
 
 By default, the PostGIS installer on Windows includes a template
 spatial database entitled ``template_postgis``.
-
-.. _testing-spatialite:
-
-SpatiaLite
-==========
-
-Make sure the necessary spatial tables are created in your test spatial
-database, as described in :ref:`create_spatialite_db`. Then just do this::
-
-    $ python manage.py test
 
 .. _geodjango-tests:
 
@@ -113,11 +103,11 @@ in :mod:`django.contrib.gis`::
             'NAME': 'geodjango',
             'USER': 'geodjango',
         },
-       'other': {
+        'other': {
             'ENGINE': 'django.contrib.gis.db.backends.postgis',
             'NAME': 'other',
             'USER': 'geodjango',
-       }
+        },
     }
 
     SECRET_KEY = 'django_tests_secret_key'

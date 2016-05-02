@@ -154,8 +154,7 @@ class BaseCache(object):
         also be any callable. If timeout is given, that timeout will be used
         for the key; otherwise the default cache timeout will be used.
 
-        Returns the value of the key stored or retrieved on success,
-        False on error.
+        Return the value of the key stored or retrieved.
         """
         if default is None:
             raise ValueError('You need to specify a value.')
@@ -163,9 +162,10 @@ class BaseCache(object):
         if val is None:
             if callable(default):
                 default = default()
-            val = self.add(key, default, timeout=timeout, version=version)
-            if val:
-                return self.get(key, version=version)
+            self.add(key, default, timeout=timeout, version=version)
+            # Fetch the value again to avoid a race condition if another caller
+            # added a value between the first get() and the add() above.
+            return self.get(key, default, version=version)
         return val
 
     def has_key(self, key, version=None):
@@ -216,7 +216,7 @@ class BaseCache(object):
 
     def delete_many(self, keys, version=None):
         """
-        Set a bunch of values in the cache at once.  For certain backends
+        Delete a bunch of values in the cache at once. For certain backends
         (memcached), this is much more efficient than calling delete() multiple
         times.
         """
@@ -234,14 +234,17 @@ class BaseCache(object):
         cache code.
         """
         if len(key) > MEMCACHE_MAX_KEY_LENGTH:
-            warnings.warn('Cache key will cause errors if used with memcached: '
-                    '%s (longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH),
-                    CacheKeyWarning)
+            warnings.warn(
+                'Cache key will cause errors if used with memcached: %r '
+                '(longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH), CacheKeyWarning
+            )
         for char in key:
             if ord(char) < 33 or ord(char) == 127:
-                warnings.warn('Cache key contains characters that will cause '
-                        'errors if used with memcached: %r' % key,
-                              CacheKeyWarning)
+                warnings.warn(
+                    'Cache key contains characters that will cause errors if '
+                    'used with memcached: %r' % key, CacheKeyWarning
+                )
+                break
 
     def incr_version(self, key, delta=1, version=None):
         """Adds delta to the cache version for the supplied key. Returns the

@@ -131,8 +131,10 @@ class GDALRaster(GDALBase):
             raise GDALException('Invalid data source input type: "{}".'.format(type(ds_input)))
 
     def __del__(self):
-        if self._ptr and capi:
+        try:
             capi.close_ds(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     def __str__(self):
         return self.name

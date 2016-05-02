@@ -52,8 +52,7 @@ class Serializer(base.Serializer):
             raise base.SerializationError("Non-model object (%s) encountered during serialization" % type(obj))
 
         self.indent(1)
-        model = obj._meta.proxy_for_model if obj._deferred else obj.__class__
-        attrs = OrderedDict([("model", smart_text(model._meta))])
+        attrs = OrderedDict([("model", smart_text(obj._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
             obj_pk = obj._get_pk_val()
             if obj_pk is not None:
@@ -275,7 +274,8 @@ class Deserializer(base.Deserializer):
                     obj_pk = model._meta.pk.to_python(n.getAttribute('pk'))
                 return obj_pk
         else:
-            m2m_convert = lambda n: model._meta.pk.to_python(n.getAttribute('pk'))
+            def m2m_convert(n):
+                return model._meta.pk.to_python(n.getAttribute('pk'))
         return [m2m_convert(c) for c in node.getElementsByTagName("object")]
 
     def _get_model_from_node(self, node, attr):

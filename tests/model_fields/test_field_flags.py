@@ -78,13 +78,13 @@ class FieldFlagsTests(test.SimpleTestCase):
         super(FieldFlagsTests, cls).setUpClass()
         cls.fields = (
             list(AllFieldsModel._meta.fields) +
-            list(AllFieldsModel._meta.virtual_fields)
+            list(AllFieldsModel._meta.private_fields)
         )
 
         cls.all_fields = (
             cls.fields +
             list(AllFieldsModel._meta.many_to_many) +
-            list(AllFieldsModel._meta.virtual_fields)
+            list(AllFieldsModel._meta.private_fields)
         )
 
         cls.fields_and_reverse_objects = (
@@ -103,8 +103,7 @@ class FieldFlagsTests(test.SimpleTestCase):
 
     def test_each_object_should_have_auto_created(self):
         self.assertTrue(
-            all(f.auto_created.__class__ == bool
-            for f in self.fields_and_reverse_objects)
+            all(f.auto_created.__class__ == bool for f in self.fields_and_reverse_objects)
         )
 
     def test_non_concrete_fields(self):

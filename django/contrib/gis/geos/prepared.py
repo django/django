@@ -21,8 +21,10 @@ class PreparedGeometry(GEOSBase):
         self.ptr = capi.geos_prepare(geom.ptr)
 
     def __del__(self):
-        if self._ptr and capi:
+        try:
             capi.prepared_destroy(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     def contains(self, other):
         return capi.prepared_contains(self.ptr, other.ptr)

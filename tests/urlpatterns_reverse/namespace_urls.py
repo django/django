@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 
 from . import views
-from .tests import URLObject
+from .utils import URLObject
 
 testobj1 = URLObject('testapp', 'test-ns1')
 testobj2 = URLObject('testapp', 'test-ns2')

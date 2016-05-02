@@ -2,15 +2,16 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011-2012
+# Emin Mastizada <emin@mastizada.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:10+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Azerbaijani (http://www.transifex.com/projects/p/django/"
-"language/az/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-02-17 21:31+0000\n"
+"Last-Translator: Emin Mastizada <emin@mastizada.com>\n"
+"Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
+"az/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -70,8 +71,8 @@ msgstr "Seçilmiş %s siyahısının hamısını silmək üçün tıqlayın."
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(sel)s / %(cnt)s seçilib"
+msgstr[1] "%(sel)s / %(cnt)s seçilib"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -100,20 +101,20 @@ msgstr ""
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Diqqət: Server vaxtından %s saat irəlidəsiniz."
+msgstr[1] "Diqqət: Server vaxtından %s saat irəlidəsiniz."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Diqqət: Server vaxtından %s saat geridəsiniz."
+msgstr[1] "Diqqət: Server vaxtından %s saat geridəsiniz."
 
 msgid "Now"
 msgstr "İndi"
 
-msgid "Clock"
-msgstr "Saat"
+msgid "Choose a Time"
+msgstr "Vaxt Seçin"
 
 msgid "Choose a time"
 msgstr "Vaxtı seçin"
@@ -127,14 +128,17 @@ msgstr "6 a.m."
 msgid "Noon"
 msgstr "Günorta"
 
+msgid "6 p.m."
+msgstr "6 p.m."
+
 msgid "Cancel"
 msgstr "Ləğv et"
 
 msgid "Today"
 msgstr "Bu gün"
 
-msgid "Calendar"
-msgstr "Təqvim"
+msgid "Choose a Date"
+msgstr "Tarix Seçin"
 
 msgid "Yesterday"
 msgstr "Dünən"

@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# André Bouatchidzé <a@anbz.net>, 2013
+# André Bouatchidzé <a@anbz.net>, 2013,2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2015-10-11 10:05+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Georgian (http://www.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "ადმინისტრირების დოკუმენტაცია"
 
 msgid "Home"
 msgstr "საწყისი გვერდი"
@@ -34,23 +34,10 @@ msgid "Documentation bookmarklets"
 msgstr "დოკუმენტაციის სანიშნები"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">სანიშნების დასაყენებლად გადაათრიეთ ბმული თქვენი "
-"სანიშნების\n"
-"პანელზე, ან დააწკაპეთ ბმულზე მარჯვენა ღილაკით და დაამატეთ იგი სანიშნებში.\n"
-"ამის შემდეგ თქვენ შეძლებთ სანიშნის არჩევას საიტის ნებისმიერი გვერდიდან.\n"
-"გაითვალისწინეთ, რომ ზოგიერთი სანიშნის მოხმარებისათვის საჭიროა, რომ თქვენ\n"
-"იყოთ შესული ამ საიტზე ე.წ. \"შიდა\" კომპიუტერიდან (შეუთანხმდით თქვენს\n"
-"ადმინისტრატორს, თუ არ ხართ დარწმუნებული, რომ თქვენი კომპიუტერი არის\n"
-"\"შიდა\" კომპიუტერი).</p>\n"
 
 msgid "Documentation for this page"
 msgstr "ამ გვერდის დოკუმენტაცია"
@@ -62,32 +49,11 @@ msgstr ""
 "გადასვლა ნებისმიერი გვერდიდან იმ წარმოდგენის დოკუმენტაციაზე, რომელიც ამ "
 "გვერდს აგენერირებს."
 
-msgid "Show object ID"
-msgstr "ობიექტის ID-ის ჩვენება"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"ერთი ობიექტის ამსახველი გვერდის content-type-ის და უნიკალური ID-ის ჩვენება."
-
-msgid "Edit this object (current window)"
-msgstr "შევცვალოთ ეს ობიექტი (იმავე ფანჯარაში)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "ერთი ობიექტის ამსახველი გვერდების ადმინისტრირებაზე გადასვლა."
-
-msgid "Edit this object (new window)"
-msgstr "შევცვალოთ ეს ობიექტი (ახალ ფანჯარაში)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "იგივე, ოღონდ ხსნის ადმინისტრირების გვერდს ახალ ფანჯარაში."
-
 msgid "Tags"
 msgstr "ტეგები"
 
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "ყველა შაბლონის ტეგის სია და მათი ფუნქციები."
 
 msgid "Filters"
 msgstr "ფილტრები"
@@ -96,6 +62,8 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
+"ფილტრები მოქმედებებია, რომელებიც შეიძლება გამოიყენებოდეს ცვლადებზე შაბლონში "
+"გამონატანის შესაცვლელად."
 
 msgid "Models"
 msgstr "მოდელები"
@@ -119,7 +87,7 @@ msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
 
 msgid "Please install docutils"
-msgstr ""
+msgstr "გთხოვთ, დააყენოთ docutils"
 
 #, python-format
 msgid ""
@@ -134,22 +102,34 @@ msgstr ""
 
 #, python-format
 msgid "Model: %(name)s"
+msgstr "მოდელი: %(name)s"
+
+msgid "Fields"
 msgstr ""
 
 msgid "Field"
-msgstr ""
+msgstr "ველი"
 
 msgid "Type"
-msgstr ""
+msgstr "ტიპი"
 
 msgid "Description"
+msgstr "აღწერა"
+
+msgid "Methods with arguments"
+msgstr ""
+
+msgid "Method"
+msgstr ""
+
+msgid "Arguments"
 msgstr ""
 
 msgid "Back to Model Documentation"
-msgstr ""
+msgstr "მოდელის დოკუმენტაციაში დაბრუნება"
 
 msgid "Model documentation"
-msgstr ""
+msgstr "მოდელის დოკუმენტაცია"
 
 msgid "Model groups"
 msgstr ""
@@ -159,24 +139,24 @@ msgstr "შაბლონები"
 
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "შაბლონი: %(name)s"
 
 #, python-format
 msgid "Template: \"%(name)s\""
-msgstr ""
+msgstr "შაბლონი: \"%(name)s\""
 
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr ""
 
 msgid "(does not exist)"
-msgstr ""
+msgstr "(არ არსებობს)"
 
 msgid "Back to Documentation"
 msgstr ""
 
 msgid "Template filters"
-msgstr ""
+msgstr "შაბლონის ფილტრები"
 
 msgid "Template filter documentation"
 msgstr ""
@@ -191,10 +171,10 @@ msgid ""
 msgstr ""
 
 msgid "Template tags"
-msgstr ""
+msgstr "შაბლონის ტეგები"
 
 msgid "Template tag documentation"
-msgstr ""
+msgstr "შაბლონის ტეგების დოკუმენტაცია"
 
 msgid "Built-in tags"
 msgstr ""
@@ -207,19 +187,19 @@ msgstr ""
 
 #, python-format
 msgid "View: %(name)s"
-msgstr ""
+msgstr "ხედი: %(name)s"
 
 msgid "Context:"
-msgstr ""
+msgstr "კონტექსტი"
 
 msgid "Templates:"
-msgstr ""
+msgstr "შაბლონები:"
 
 msgid "Back to Views Documentation"
-msgstr ""
+msgstr "ხედების დოკუმენტაციაში დაბრუნება"
 
 msgid "View documentation"
-msgstr ""
+msgstr "ხედების დოკუმენტაცია"
 
 msgid "Jump to namespace"
 msgstr ""

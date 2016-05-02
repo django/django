@@ -67,10 +67,12 @@ class M2MThroughTestCase(TestCase):
             self.roll.members.set([])
 
     def test_cannot_use_create_on_m2m_with_intermediary_model(self):
-        self.assertRaises(AttributeError, self.rock.members.create, name="Anne")
+        with self.assertRaises(AttributeError):
+            self.rock.members.create(name="Anne")
 
     def test_cannot_use_create_on_reverse_m2m_with_intermediary_model(self):
-        self.assertRaises(AttributeError, self.bob.group_set.create, name="Funk")
+        with self.assertRaises(AttributeError):
+            self.bob.group_set.create(name="Funk")
 
     def test_retrieve_reverse_m2m_items_via_custom_id_intermediary(self):
         self.assertQuerysetEqual(
@@ -126,8 +128,7 @@ class M2MThroughSerializationTestCase(TestCase):
         )
 
         out = StringIO()
-        management.call_command("dumpdata", "m2m_through_regress", format="xml",
-            indent=2, stdout=out)
+        management.call_command("dumpdata", "m2m_through_regress", format="xml", indent=2, stdout=out)
         self.assertXMLEqual(out.getvalue().strip(), """
 <?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">

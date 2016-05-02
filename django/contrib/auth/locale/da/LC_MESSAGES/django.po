@@ -10,11 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-20 11:00+0000\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-12-01 20:28+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
-"Language-Team: Danish (http://www.transifex.com/projects/p/django/language/"
-"da/)\n"
+"Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -44,6 +43,12 @@ msgstr "Skift adgangskode: %s"
 msgid "Authentication and Authorization"
 msgstr "Godkendelse og autorisation"
 
+msgid "password"
+msgstr "adgangskode"
+
+msgid "last login"
+msgstr "sidst logget ind"
+
 msgid "No password set."
 msgstr "Ingen adgangskode valgt."
 
@@ -59,17 +64,17 @@ msgstr "Adgangskode"
 msgid "Password confirmation"
 msgstr "Bekræftelse af adgangskode"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Indtast den samme adgangskode som ovenfor for verifikation."
+msgid "Enter the same password as before, for verification."
+msgstr "Indtast den samme adgangskode som før, for bekræftelse."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
 "Rå adgangskoder gemmes ikke, så det er ikke muligt at se denne brugers "
-"adgangskode, men du kan ændre adgangskoden ved hjælp af <a href=\"password/"
-"\">denne formular</a>."
+"adgangskode, men du kan ændre adgangskoden ved hjælp af <a href=\"../"
+"password/\">denne formular</a>."
 
 #, python-format
 msgid ""
@@ -122,6 +127,9 @@ msgstr "tjeksum"
 msgid "name"
 msgstr "navn"
 
+msgid "content type"
+msgstr "indholdstype"
+
 msgid "codename"
 msgstr "kodenavn"
 
@@ -136,12 +144,6 @@ msgstr "gruppe"
 
 msgid "groups"
 msgstr "grupper"
-
-msgid "password"
-msgstr "adgangskode"
-
-msgid "last login"
-msgstr "sidst logget ind"
 
 msgid "superuser status"
 msgstr "superbrugerstatus"
@@ -213,6 +215,43 @@ msgstr "bruger"
 
 msgid "users"
 msgstr "brugere"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Denne adgangskode er for kort. Den skal indeholde mindst %(min_length)d tegn."
+msgstr[1] ""
+"Denne adgangskode er for kort. Den skal indeholde mindst %(min_length)d tegn."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Din adgangskode skal indeholde mindst %(min_length)d tegn."
+msgstr[1] "Din adgangskode skal indeholde mindst %(min_length)d tegn."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Din adgangskode minder for meget om din/dit %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr "Din adgangskode må ikke minde om dine andre personlige oplysninger."
+
+msgid "This password is too common."
+msgstr "Denne adgangskode er for almindelig."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Din adgangskode må ikke være en ofte anvendt adgangskode."
+
+msgid "This password is entirely numeric."
+msgstr "Denne adgangskode er udelukkende numerisk."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Din adgangskode må ikke være udelukkende numerisk."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

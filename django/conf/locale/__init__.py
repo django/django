@@ -137,6 +137,12 @@ LANG_INFO = {
         'name': 'Argentinian Spanish',
         'name_local': 'español de Argentina',
     },
+    'es-co': {
+        'bidi': False,
+        'code': 'es-co',
+        'name': 'Colombian Spanish',
+        'name_local': 'español de Colombia',
+    },
     'es-mx': {
         'bidi': False,
         'code': 'es-mx',
@@ -196,6 +202,12 @@ LANG_INFO = {
         'code': 'ga',
         'name': 'Irish',
         'name_local': 'Gaeilge',
+    },
+    'gd': {
+        'bidi': False,
+        'code': 'gd',
+        'name': 'Scottish Gaelic',
+        'name_local': 'Gàidhlig',
     },
     'gl': {
         'bidi': False,
@@ -417,7 +429,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'sk',
         'name': 'Slovak',
-        'name_local': 'slovenský',
+        'name_local': 'Slovensky',
     },
     'sl': {
         'bidi': False,

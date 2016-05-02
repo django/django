@@ -92,6 +92,11 @@ class Spy(Person):
     cover_blown = models.BooleanField(default=False)
 
 
+class ProxySpy(Spy):
+    class Meta:
+        proxy = True
+
+
 @python_2_unicode_compatible
 class Visa(models.Model):
     person = models.ForeignKey(Person, models.CASCADE)

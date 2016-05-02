@@ -1,5 +1,3 @@
-.. _internals-security:
-
 ==========================
 Django's security policies
 ==========================

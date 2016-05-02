@@ -5,6 +5,7 @@ Tests for django.core.servers.
 from __future__ import unicode_literals
 
 import contextlib
+import errno
 import os
 import socket
 
@@ -174,3 +175,31 @@ class LiveServerDatabase(LiveServerBase):
             ['jane', 'robert', 'emily'],
             lambda b: b.name
         )
+
+
+class LiveServerPort(LiveServerBase):
+
+    def test_port_bind(self):
+        """
+        Each LiveServerTestCase binds to a unique port or fails to start a
+        server thread when run concurrently (#26011).
+        """
+        TestCase = type(str("TestCase"), (LiveServerBase,), {})
+        try:
+            TestCase.setUpClass()
+        except socket.error as e:
+            if e.errno == errno.EADDRINUSE:
+                # We're out of ports, LiveServerTestCase correctly fails with
+                # a socket error.
+                return
+            # Unexpected error.
+            raise
+        try:
+            # We've acquired a port, ensure our server threads acquired
+            # different addresses.
+            self.assertNotEqual(
+                self.live_server_url, TestCase.live_server_url,
+                "Acquired duplicate server addresses for server threads: %s" % self.live_server_url
+            )
+        finally:
+            TestCase.tearDownClass()

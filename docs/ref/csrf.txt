@@ -19,7 +19,7 @@ The first defense against CSRF attacks is to ensure that GET requests (and other
 such as POST, PUT and DELETE, can then be protected by following the steps
 below.
 
-.. _Cross Site Request Forgeries: http://www.squarefree.com/securitytips/web-developers.html#CSRF
+.. _Cross Site Request Forgeries: https://www.squarefree.com/securitytips/web-developers.html#CSRF
 
 .. _using-csrf:
 
@@ -40,36 +40,16 @@ To take advantage of CSRF protection in your views, follow these steps:
 2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
    the ``<form>`` element if the form is for an internal URL, e.g.::
 
-       <form action="." method="post">{% csrf_token %}
+       <form action="" method="post">{% csrf_token %}
 
    This should not be done for POST forms that target external URLs, since
    that would cause the CSRF token to be leaked, leading to a vulnerability.
 
-3. In the corresponding view functions, ensure that the
-   ``'django.template.context_processors.csrf'`` context processor is
-   being used. Usually, this can be done in one of two ways:
-
-   1. Use RequestContext, which always uses
-      ``'django.template.context_processors.csrf'`` (no matter what template
-      context processors are configured in the :setting:`TEMPLATES` setting).
-      If you are using generic views or contrib apps, you are covered already,
-      since these apps use RequestContext throughout.
-
-   2. Manually import and use the processor to generate the CSRF token and
-      add it to the template context. e.g.::
-
-          from django.shortcuts import render_to_response
-          from django.template.context_processors import csrf
-
-          def my_view(request):
-              c = {}
-              c.update(csrf(request))
-              # ... view code here
-              return render_to_response("a_template.html", c)
-
-      You may want to write your own
-      :func:`~django.shortcuts.render_to_response()` wrapper that takes care
-      of this step for you.
+3. In the corresponding view functions, ensure that
+   :class:`~django.template.RequestContext` is used to render the response so
+   that ``{% csrf_token %}`` will work properly. If you're using the
+   :func:`~django.shortcuts.render` function, generic views, or contrib apps,
+   you are covered already since these all use ``RequestContext``.
 
 .. _csrf-ajax:
 
@@ -142,7 +122,7 @@ The above code could be simplified by using the `JavaScript Cookie library
 
 Finally, you'll have to actually set the header on your AJAX request, while
 protecting the CSRF token from being sent to other domains using
-`settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5.1 and
+`settings.crossDomain <https://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5.1 and
 newer:
 
 .. code-block:: javascript
@@ -158,6 +138,14 @@ newer:
             }
         }
     });
+
+If you're using AngularJS 1.1.3 and newer, it's sufficient to configure the
+``$http`` provider with the cookie and header names:
+
+.. code-block:: javascript
+
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 Other template engines
 ----------------------
@@ -239,6 +227,9 @@ The CSRF protection is based on the following things:
    every response that has called ``django.middleware.csrf.get_token()``
    (the function used internally to retrieve the CSRF token).
 
+   For security reasons, the value of the CSRF cookie is changed each time a
+   user logs in.
+
 2. A hidden form field with the name 'csrfmiddlewaretoken' present in all
    outgoing POST forms.  The value of this field is the value of the CSRF
    cookie.
@@ -252,12 +243,16 @@ The CSRF protection is based on the following things:
    This check is done by ``CsrfViewMiddleware``.
 
 4. In addition, for HTTPS requests, strict referer checking is done by
-   ``CsrfViewMiddleware``.  This is necessary to address a Man-In-The-Middle
-   attack that is possible under HTTPS when using a session independent nonce,
-   due to the fact that HTTP 'Set-Cookie' headers are (unfortunately) accepted
-   by clients that are talking to a site under HTTPS.  (Referer checking is not
-   done for HTTP requests because the presence of the Referer header is not
-   reliable enough under HTTP.)
+   ``CsrfViewMiddleware``. This means that even if a subdomain can set or
+   modify cookies on your domain, it can't force a user to post to your
+   application since that request won't come from your own exact domain.
+
+   This also addresses a man-in-the-middle attack that's possible under HTTPS
+   when using a session independent nonce, due to the fact that HTTP
+   ``Set-Cookie`` headers are (unfortunately) accepted by clients even when
+   they are talking to a site under HTTPS. (Referer checking is not done for
+   HTTP requests because the presence of the ``Referer`` header isn't reliable
+   enough under HTTP.)
 
    If the :setting:`CSRF_COOKIE_DOMAIN` setting is set, the referer is compared
    against it. This setting supports subdomains. For example,
@@ -275,7 +270,15 @@ It deliberately ignores GET requests (and other requests that are defined as
 'safe' by :rfc:`2616`). These requests ought never to have any potentially
 dangerous side effects , and so a CSRF attack with a GET request ought to be
 harmless. :rfc:`2616` defines POST, PUT and DELETE as 'unsafe', and all other
-methods are assumed to be unsafe, for maximum protection.
+methods are also assumed to be unsafe, for maximum protection.
+
+The CSRF protection cannot protect against man-in-the-middle attacks, so use
+:ref:`HTTPS <security-recommendation-ssl>` with
+:ref:`http-strict-transport-security`. It also assumes :ref:`validation of
+the HOST header <host-headers-virtual-hosting>` and that there aren't any
+:ref:`cross-site scripting vulnerabilities <cross-site-scripting>` on your site
+(because XSS vulnerabilities already let an attacker do anything a CSRF
+vulnerability allows and much worse).
 
 .. versionchanged:: 1.9
 
@@ -474,3 +477,42 @@ A number of settings can be used to control Django's CSRF behavior:
 * :setting:`CSRF_FAILURE_VIEW`
 * :setting:`CSRF_HEADER_NAME`
 * :setting:`CSRF_TRUSTED_ORIGINS`
+
+Frequently Asked Questions
+==========================
+
+Is posting an arbitrary CSRF token pair (cookie and POST data) a vulnerability?
+-------------------------------------------------------------------------------
+
+No, this is by design. Without a man-in-the-middle attack, there is no way for
+an attacker to send a CSRF token cookie to a victim's browser, so a successful
+attack would need to obtain the victim's browser's cookie via XSS or similar,
+in which case an attacker usually doesn't need CSRF attacks.
+
+Some security audit tools flag this as a problem but as mentioned before, an
+attacker cannot steal a user's browser's CSRF cookie. "Stealing" or modifying
+*your own* token using Firebug, Chrome dev tools, etc. isn't a vulnerability.
+
+Is the fact that Django's CSRF protection isn't linked to a session a problem?
+------------------------------------------------------------------------------
+
+No, this is by design. Not linking CSRF protection to a session allows using
+the protection on sites such as a `pastebin` that allow submissions from
+anonymous users which don't have a session.
+
+Why not use a new token for each request?
+-----------------------------------------
+
+Generating a new token for each request is problematic from a UI perspective
+because it invalidates all previous forms. Most users would be very unhappy to
+find that opening a new tab on your site has invalidated the form they had
+just spent time filling out in another tab or that a form they accessed via
+the back button could not be filled out.
+
+Why might a user encounter a CSRF validation failure after logging in?
+----------------------------------------------------------------------
+
+For security reasons, CSRF tokens are rotated each time a user logs in. Any
+page with a form generated before a login will have an old, invalid CSRF token
+and need to be reloaded. This might happen if a user uses the back button after
+a login or if they log in in a different browser tab.

@@ -72,6 +72,13 @@ class ColumnTypes(models.Model):
 class UniqueTogether(models.Model):
     field1 = models.IntegerField()
     field2 = models.CharField(max_length=10)
+    from_field = models.IntegerField(db_column='from')
+    non_unique = models.IntegerField(db_column='non__unique_column')
+    non_unique_0 = models.IntegerField(db_column='non_unique__column')
 
     class Meta:
-        unique_together = ('field1', 'field2')
+        unique_together = [
+            ('field1', 'field2'),
+            ('from_field', 'field1'),
+            ('non_unique', 'non_unique_0'),
+        ]

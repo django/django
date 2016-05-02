@@ -9,10 +9,10 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils.html import escape
@@ -183,10 +183,12 @@ class UserAdmin(admin.ModelAdmin):
 
         request.current_app = self.admin_site.name
 
-        return TemplateResponse(request,
+        return TemplateResponse(
+            request,
             self.change_user_password_template or
             'admin/auth/user/change_password.html',
-            context)
+            context,
+        )
 
     def response_add(self, request, obj, post_url_continue=None):
         """

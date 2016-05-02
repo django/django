@@ -42,22 +42,29 @@ class TemplateCommand(BaseCommand):
     # Can't perform any active locale changes during this command, because
     # setting might not be available at all.
     leave_locale_alone = True
+    # Rewrite the following suffixes when determining the target filename.
+    rewrite_template_suffixes = (
+        # Allow shipping invalid .py files without byte-compilation.
+        ('.py-tpl', '.py'),
+    )
 
     def add_arguments(self, parser):
         parser.add_argument('name', help='Name of the application or project.')
         parser.add_argument('directory', nargs='?', help='Optional destination directory')
-        parser.add_argument('--template',
-            help='The path or URL to load the template from.')
-        parser.add_argument('--extension', '-e', dest='extensions',
+        parser.add_argument('--template', help='The path or URL to load the template from.')
+        parser.add_argument(
+            '--extension', '-e', dest='extensions',
             action='append', default=['py'],
             help='The file extension(s) to render (default: "py"). '
                  'Separate multiple extensions with commas, or use '
-                 '-e multiple times.')
-        parser.add_argument('--name', '-n', dest='files',
+                 '-e multiple times.'
+        )
+        parser.add_argument(
+            '--name', '-n', dest='files',
             action='append', default=[],
-            help='The file name(s) to render. '
-                 'Separate multiple extensions with commas, or use '
-                 '-n multiple times.')
+            help='The file name(s) to render. Separate multiple extensions '
+                 'with commas, or use -n multiple times.'
+        )
 
     def handle(self, app_or_project, name, target=None, **options):
         self.app_or_project = app_or_project
@@ -139,6 +146,11 @@ class TemplateCommand(BaseCommand):
                 old_path = path.join(root, filename)
                 new_path = path.join(top_dir, relative_dir,
                                      filename.replace(base_name, name))
+                for old_suffix, new_suffix in self.rewrite_template_suffixes:
+                    if new_path.endswith(old_suffix):
+                        new_path = new_path[:-len(old_suffix)] + new_suffix
+                        break  # Only rewrite once
+
                 if path.exists(new_path):
                     raise CommandError("%s already exists, overlaying a "
                                        "project or app into an existing "
@@ -149,7 +161,7 @@ class TemplateCommand(BaseCommand):
                 # accidentally render Django templates files
                 with open(old_path, 'rb') as template_file:
                     content = template_file.read()
-                if filename.endswith(extensions) or filename in extra_files:
+                if new_path.endswith(extensions) or filename in extra_files:
                     content = content.decode('utf-8')
                     template = Engine().from_string(content)
                     content = template.render(context)

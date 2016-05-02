@@ -1,22 +1,25 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alexander Chernihov <aleksandr.chernigov@gmail.com>, 2014
+# Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
+# Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
 # Boryslav Larin <brabadu@gmail.com>, 2011
 # Igor Melnyk, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
+# Mikhail Kolesnik <mike@openbunker.org>, 2015
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
-"language/uk/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-12-01 21:41+0000\n"
+"Last-Translator: Mikhail Kolesnik <mike@openbunker.org>\n"
+"Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
+"uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -83,6 +86,12 @@ msgstr "Дія:"
 msgid "action time"
 msgstr "час дії"
 
+msgid "user"
+msgstr "користувач"
+
+msgid "content type"
+msgstr "тип вмісту"
+
 msgid "object id"
 msgstr "id об'єкта"
 
@@ -122,6 +131,11 @@ msgstr "Ніщо"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Затисніть клавішу \"Control\", або \"Command\" на Mac, щоб обрати більше "
+"однієї опції."
+
+msgid "Added."
+msgstr "Додано."
 
 #, python-format
 msgid "Changed %s."
@@ -332,7 +346,7 @@ msgid "Welcome,"
 msgstr "Вітаємо,"
 
 msgid "View site"
-msgstr ""
+msgstr "Дивитися сайт"
 
 msgid "Documentation"
 msgstr "Документація"
@@ -396,13 +410,13 @@ msgstr ""
 "пов'язані записи, що перелічені, будуть видалені:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Об'єкти"
 
 msgid "Yes, I'm sure"
 msgstr "Так, я впевнений"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Ні, повернутись назад"
 
 msgid "Delete multiple objects"
 msgstr "Видалити кілька об'єктів"
@@ -450,7 +464,7 @@ msgid " By %(filter_title)s "
 msgstr "За %(filter_title)s"
 
 msgid "Summary"
-msgstr ""
+msgstr "Резюме"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -479,6 +493,15 @@ msgstr ""
 "Щось не так з інсталяцією бази даних. Перевірте, що відповідні таблиці бази "
 "даних створені та база даних може бути прочитана відповідним користувачем."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Ви аутентифіковані як %(username)s, але вам не надано доступ до цієї "
+"сторінки.\n"
+"Ввійти в інший аккаунт?"
+
 msgid "Forgotten your password or username?"
 msgstr "Забули пароль або ім'я користувача?"
 
@@ -504,17 +527,20 @@ msgstr "Показати всі"
 msgid "Save"
 msgstr "Зберегти"
 
+msgid "Popup closing..."
+msgstr "Закриття спливаючого вікна..."
+
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "Змінити обрану %(model)s"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "Додати ще одну %(model)s"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "Видалити обрану %(model)s"
 
 msgid "Search"
 msgstr "Пошук"
@@ -594,6 +620,9 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"На електронну адресу, яку ви ввели, надіслано ліста з інструкціями щодо "
+"встановлення пароля, якщо обліковий запис з введеною адресою існує. Ви маєте "
+"отримати його найближчим часом."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -638,9 +667,6 @@ msgstr "Перевстановіть мій пароль"
 
 msgid "All dates"
 msgstr "Всі дати"
-
-msgid "(None)"
-msgstr "(Не обрано)"
 
 #, python-format
 msgid "Select %s"

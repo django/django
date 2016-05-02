@@ -10,7 +10,7 @@ import logging
 import re
 
 from django.conf import settings
-from django.core.urlresolvers import get_callable
+from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.encoding import force_text
@@ -97,7 +97,8 @@ class CsrfViewMiddleware(object):
         return None
 
     def _reject(self, request, reason):
-        logger.warning('Forbidden (%s): %s', reason, request.path,
+        logger.warning(
+            'Forbidden (%s): %s', reason, request.path,
             extra={
                 'status_code': 403,
                 'request': request,
@@ -106,7 +107,6 @@ class CsrfViewMiddleware(object):
         return _get_failure_view()(request, reason=reason)
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
-
         if getattr(request, 'csrf_processing_done', False):
             return None
 
@@ -174,7 +174,7 @@ class CsrfViewMiddleware(object):
                     good_referer = request.get_host()
                 else:
                     good_referer = settings.CSRF_COOKIE_DOMAIN
-                    server_port = request.META['SERVER_PORT']
+                    server_port = request.get_port()
                     if server_port not in ('443', '80'):
                         good_referer = '%s:%s' % (good_referer, server_port)
 

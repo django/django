@@ -7,7 +7,7 @@ from io import BytesIO
 
 from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.functional import SimpleLazyObject, allow_lazy
+from django.utils.functional import SimpleLazyObject, keep_lazy, keep_lazy_text
 from django.utils.safestring import SafeText, mark_safe
 from django.utils.six.moves import html_entities
 from django.utils.translation import pgettext, ugettext as _, ugettext_lazy
@@ -19,8 +19,9 @@ if six.PY2:
 
 
 # Capitalizes the first letter of a string.
-capfirst = lambda x: x and force_text(x)[0].upper() + force_text(x)[1:]
-capfirst = allow_lazy(capfirst, six.text_type)
+def capfirst(x):
+    return x and force_text(x)[0].upper() + force_text(x)[1:]
+capfirst = keep_lazy_text(capfirst)
 
 # Set up regular expressions
 re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U | re.S)
@@ -30,6 +31,7 @@ re_newlines = re.compile(r'\r\n|\r')  # Used in normalize_newlines
 re_camel_case = re.compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
 
 
+@keep_lazy_text
 def wrap(text, width):
     """
     A word-wrap function that preserves existing line breaks. Expects that
@@ -60,7 +62,6 @@ def wrap(text, width):
             if line:
                 yield line
     return ''.join(_generator())
-wrap = allow_lazy(wrap, six.text_type)
 
 
 class Truncator(SimpleLazyObject):
@@ -95,6 +96,7 @@ class Truncator(SimpleLazyObject):
         string has been truncated, defaulting to a translatable string of an
         ellipsis (...).
         """
+        self._setup()
         length = int(num)
         text = unicodedata.normalize('NFC', self._wrapped)
 
@@ -108,7 +110,6 @@ class Truncator(SimpleLazyObject):
         if html:
             return self._truncate_html(length, truncate, text, truncate_len, False)
         return self._text_chars(length, truncate, text, truncate_len)
-    chars = allow_lazy(chars)
 
     def _text_chars(self, length, truncate, text, truncate_len):
         """
@@ -138,11 +139,11 @@ class Truncator(SimpleLazyObject):
         argument of what should be used to notify that the string has been
         truncated, defaulting to ellipsis (...).
         """
+        self._setup()
         length = int(num)
         if html:
             return self._truncate_html(length, truncate, self._wrapped, length, True)
         return self._text_words(length, truncate)
-    words = allow_lazy(words)
 
     def _text_words(self, length, truncate):
         """
@@ -229,6 +230,7 @@ class Truncator(SimpleLazyObject):
         return out
 
 
+@keep_lazy_text
 def get_valid_filename(s):
     """
     Returns the given string converted to a string that can be used for a clean
@@ -240,9 +242,9 @@ def get_valid_filename(s):
     """
     s = force_text(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
-get_valid_filename = allow_lazy(get_valid_filename, six.text_type)
 
 
+@keep_lazy_text
 def get_text_list(list_, last_word=ugettext_lazy('or')):
     """
     >>> get_text_list(['a', 'b', 'c', 'd'])
@@ -264,24 +266,25 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
         # Translators: This string is used as a separator between list elements
         _(', ').join(force_text(i) for i in list_[:-1]),
         force_text(last_word), force_text(list_[-1]))
-get_text_list = allow_lazy(get_text_list, six.text_type)
 
 
+@keep_lazy_text
 def normalize_newlines(text):
     """Normalizes CRLF and CR newlines to just LF."""
     text = force_text(text)
     return re_newlines.sub('\n', text)
-normalize_newlines = allow_lazy(normalize_newlines, six.text_type)
 
 
+@keep_lazy_text
 def phone2numeric(phone):
     """Converts a phone number with letters into its numeric equivalent."""
-    char2number = {'a': '2', 'b': '2', 'c': '2', 'd': '3', 'e': '3', 'f': '3',
-         'g': '4', 'h': '4', 'i': '4', 'j': '5', 'k': '5', 'l': '5', 'm': '6',
-         'n': '6', 'o': '6', 'p': '7', 'q': '7', 'r': '7', 's': '7', 't': '8',
-         'u': '8', 'v': '8', 'w': '9', 'x': '9', 'y': '9', 'z': '9'}
+    char2number = {
+        'a': '2', 'b': '2', 'c': '2', 'd': '3', 'e': '3', 'f': '3', 'g': '4',
+        'h': '4', 'i': '4', 'j': '5', 'k': '5', 'l': '5', 'm': '6', 'n': '6',
+        'o': '6', 'p': '7', 'q': '7', 'r': '7', 's': '7', 't': '8', 'u': '8',
+        'v': '8', 'w': '9', 'x': '9', 'y': '9', 'z': '9',
+    }
     return ''.join(char2number.get(c, c) for c in phone.lower())
-phone2numeric = allow_lazy(phone2numeric)
 
 
 # From http://www.xhaus.com/alan/python/httpcomp.html#gzip
@@ -384,11 +387,12 @@ def _replace_entity(match):
 _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
 
+@keep_lazy_text
 def unescape_entities(text):
-    return _entity_re.sub(_replace_entity, text)
-unescape_entities = allow_lazy(unescape_entities, six.text_type)
+    return _entity_re.sub(_replace_entity, force_text(text))
 
 
+@keep_lazy_text
 def unescape_string_literal(s):
     r"""
     Convert quoted string literals to unquoted strings with escaped quotes and
@@ -407,9 +411,9 @@ def unescape_string_literal(s):
         raise ValueError("Not a string literal: %r" % s)
     quote = s[0]
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
-unescape_string_literal = allow_lazy(unescape_string_literal)
 
 
+@keep_lazy(six.text_type, SafeText)
 def slugify(value, allow_unicode=False):
     """
     Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
@@ -424,7 +428,6 @@ def slugify(value, allow_unicode=False):
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub('[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub('[-\s]+', '-', value))
-slugify = allow_lazy(slugify, six.text_type, SafeText)
 
 
 def camel_case_to_spaces(value):

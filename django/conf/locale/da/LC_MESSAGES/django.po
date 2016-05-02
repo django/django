@@ -13,11 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-20 10:22+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-12-01 19:50+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
-"Language-Team: Danish (http://www.transifex.com/projects/p/django/language/"
-"da/)\n"
+"Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -87,6 +86,9 @@ msgstr "spansk"
 msgid "Argentinian Spanish"
 msgstr "argentinsk spansk"
 
+msgid "Colombian Spanish"
+msgstr "colombiansk spansk"
+
 msgid "Mexican Spanish"
 msgstr "mexikansk spansk"
 
@@ -116,6 +118,9 @@ msgstr "frisisk"
 
 msgid "Irish"
 msgstr "irsk"
+
+msgid "Scottish Gaelic"
+msgstr "skotsk gælisk"
 
 msgid "Galician"
 msgstr "galicisk"
@@ -309,6 +314,13 @@ msgstr ""
 "Indtast en \"slug\" bestående af bogstaver, cifre, understreger og "
 "bindestreger."
 
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Indtast en \"slug\" bestående af bogstaver, cifre, understreger og "
+"bindestreger."
+
 msgid "Enter a valid IPv4 address."
 msgstr "Indtast en gyldig IPv4-adresse."
 
@@ -356,6 +368,26 @@ msgstr[0] ""
 "Denne værdi må højst have %(limit_value)d tegn (den har %(show_value)d)."
 msgstr[1] ""
 "Denne værdi må højst have %(limit_value)d tegn (den har %(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Der må maksimalt være %(max)s ciffer i alt."
+msgstr[1] "Der må maksimalt være %(max)s cifre i alt."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Der må maksimalt være %(max)s decimal."
+msgstr[1] "Der må maksimalt være %(max)s decimaler."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Der må maksimalt være %(max)s ciffer før kommaet."
+msgstr[1] "Der må maksimalt være %(max)s cifre før kommaet."
 
 msgid "and"
 msgstr "og"
@@ -560,6 +592,12 @@ msgstr "En-til-en-relation"
 msgid "Many-to-many relationship"
 msgstr "Mange-til-mange-relation"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Dette felt er påkrævet."
 
@@ -568,26 +606,6 @@ msgstr "Indtast et heltal."
 
 msgid "Enter a number."
 msgstr "Indtast et tal."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Der må maksimalt være %(max)s ciffer i alt."
-msgstr[1] "Der må maksimalt være %(max)s cifre i alt."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Der må maksimalt være %(max)s decimal."
-msgstr[1] "Der må maksimalt være %(max)s decimaler."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "Der må maksimalt være %(max)s ciffer før kommaet."
-msgstr[1] "Der må maksimalt være %(max)s cifre før kommaet."
 
 msgid "Enter a valid date."
 msgstr "Indtast en gyldig dato."
@@ -651,12 +669,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Skjult felt %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "ManagementForm-data mangler eller er blevet manipuleret"

@@ -24,11 +24,28 @@ def pgettext(context, message):
 def npgettext(context, singular, plural, number):
     return ungettext(singular, plural, number)
 
-activate = lambda x: None
-deactivate = deactivate_all = lambda: None
-get_language = lambda: settings.LANGUAGE_CODE
-get_language_bidi = lambda: settings.LANGUAGE_CODE in settings.LANGUAGES_BIDI
-check_for_language = lambda x: True
+
+def activate(x):
+    return None
+
+
+def deactivate():
+    return None
+
+
+deactivate_all = deactivate
+
+
+def get_language():
+    return settings.LANGUAGE_CODE
+
+
+def get_language_bidi():
+    return settings.LANGUAGE_CODE in settings.LANGUAGES_BIDI
+
+
+def check_for_language(x):
+    return True
 
 
 def gettext(message):

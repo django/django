@@ -1,8 +1,8 @@
 from django.conf.urls import include, url
 
 from .views import (
-    absolute_kwargs_view, defaults_view, empty_view, empty_view_partial,
-    empty_view_wrapped, nested_view,
+    absolute_kwargs_view, defaults_view, empty_view, empty_view_nested_partial,
+    empty_view_partial, empty_view_wrapped, nested_view,
 )
 
 other_patterns = [
@@ -62,6 +62,7 @@ urlpatterns = [
 
     # Partials should be fine.
     url(r'^partial/', empty_view_partial, name="partial"),
+    url(r'^partial_nested/', empty_view_nested_partial, name="partial_nested"),
     url(r'^partial_wrapped/', empty_view_wrapped, name="partial_wrapped"),
 
     # This is non-reversible, but we shouldn't blow up when parsing it.

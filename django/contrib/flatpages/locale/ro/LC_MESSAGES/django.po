@@ -2,16 +2,17 @@
 #
 # Translators:
 # Daniel Ursache-Dogariu <contact@danniel.net>, 2011
-# Denis Darii <sinednx@gmail.com>, 2014
+# Denis Darii <denis.darii@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-01-07 11:01+0000\n"
+"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +25,7 @@ msgid "Advanced options"
 msgstr "Opțiuni avansate"
 
 msgid "Flat Pages"
-msgstr ""
+msgstr "Pagini Statice"
 
 msgid "URL"
 msgstr "URL"
@@ -78,6 +79,9 @@ msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Dacă aceasta este bifată, numai utilizatorii autentificați vor putea vedea "
 "pagina."
+
+msgid "sites"
+msgstr "pagini"
 
 msgid "flat page"
 msgstr "pagină statică"

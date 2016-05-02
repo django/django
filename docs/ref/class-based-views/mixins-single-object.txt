@@ -2,8 +2,8 @@
 Single object mixins
 ====================
 
-SingleObjectMixin
------------------
+``SingleObjectMixin``
+=====================
 
 .. class:: django.views.generic.detail.SingleObjectMixin
 
@@ -131,8 +131,8 @@ SingleObjectMixin
         default this simply returns the value of :attr:`slug_field`.
 
 
-SingleObjectTemplateResponseMixin
----------------------------------
+``SingleObjectTemplateResponseMixin``
+=====================================
 
 .. class:: django.views.generic.detail.SingleObjectTemplateResponseMixin
 

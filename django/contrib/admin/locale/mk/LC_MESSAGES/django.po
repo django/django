@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-02-01 17:17+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2016-02-15 10:30+0000\n"
 "Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
-"Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
-"language/mk/)\n"
+"Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
+"mk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -78,6 +80,12 @@ msgstr "Акција:"
 msgid "action time"
 msgstr "време на акција"
 
+msgid "user"
+msgstr "корисник"
+
+msgid "content type"
+msgstr "тип содржина"
+
 msgid "object id"
 msgstr "идентификационен број на објект"
 
@@ -120,6 +128,9 @@ msgstr ""
 "Држете го копчето \"Control\", или \"Command\" на Mac, за да изберете повеќе "
 "од едно."
 
+msgid "Added."
+msgstr "Додадено."
+
 #, python-format
 msgid "Changed %s."
 msgstr "Изменета %s."
@@ -154,7 +165,7 @@ msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
-"Ставката %(name)s \"%(obj)s\" беше успешно додаден. Можете да додадете нов "
+"Ставката %(name)s \"%(obj)s\" беше успешно додадена. Можете да додадете нов "
 "%(name)s подолу."
 
 #, python-format
@@ -193,11 +204,11 @@ msgstr "Ниедна акција не е одбрана."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "Ставаката %(name)s \"%(obj)s\" беше избришана успешно."
+msgstr "Ставаката %(name)s \"%(obj)s\" беше успешно избришана."
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "објект %(name)s со примарен клуч %(key)r не постои."
+msgstr "Објект %(name)s со примарен клуч %(key)r не постои."
 
 #, python-format
 msgid "Add %s"
@@ -245,7 +256,7 @@ msgstr ""
 "поврзани објекти: %(related_objects)s"
 
 msgid "Django site admin"
-msgstr "Џанго администрација на сајт"
+msgstr "Администрација на Џанго сајт"
 
 msgid "Django administration"
 msgstr "Џанго администрација"
@@ -282,8 +293,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Имаше грешка. Администраторите на сајтот се известени и треба да биде брзо "
-"поправена. Ви благодариме за вашето трпение."
+"Се случи грешка. Администраторите на сајтот се известени и треба да биде "
+"брзо поправена. Ви благодариме за вашето трпение."
 
 msgid "Run the selected action"
 msgstr "Изврши ја избраната акција"
@@ -292,7 +303,7 @@ msgid "Go"
 msgstr "Оди"
 
 msgid "Click here to select the objects across all pages"
-msgstr "Кликнете тука за да изберете објекти низ повеќе страници"
+msgstr "Кликнете тука за да изберете објекти низ сите страници"
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -476,6 +487,14 @@ msgstr ""
 "соодветни табели во базата се направени и потврдете дека базата може да биде "
 "прочитана од соодветниот корисник."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Најавени сте како  %(username)s, но не сте авторизирани да пристапите до "
+"оваа страна. Сакате ли да се најавите како друг корисник?"
+
 msgid "Forgotten your password or username?"
 msgstr "Ја заборавивте вашата лозинка или корисничко име?"
 
@@ -500,6 +519,9 @@ msgstr "Прикажи ги сите"
 
 msgid "Save"
 msgstr "Сними"
+
+msgid "Popup closing..."
+msgstr "Попапот се затвара..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -611,7 +633,7 @@ msgstr ""
 "корисничко име на %(site_name)s."
 
 msgid "Please go to the following page and choose a new password:"
-msgstr "Ве молам одите на следната страница и внесете нова лозинка:"
+msgstr "Ве молам одете на следната страница и внесете нова лозинка:"
 
 msgid "Your username, in case you've forgotten:"
 msgstr "Вашето корисничко име, во случај да сте го заборавиле:"
@@ -638,9 +660,6 @@ msgstr "Ресетирај ја мојата лозинка"
 
 msgid "All dates"
 msgstr "Сите датуми"
-
-msgid "(None)"
-msgstr "(Ништо)"
 
 #, python-format
 msgid "Select %s"

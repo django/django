@@ -4,17 +4,19 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
+# mozillazg <opensource.mozillazg@gmail.com>, 2016
 # pylemon <leeway1985@gmail.com>, 2012-2013
+# hizyn <zhangyanan5552@gmail.com>, 2016
 # Ziang Song <songziang@gmail.com>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 12:28+0000\n"
-"Last-Translator: Lele Long <schemacs@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2016-03-17 12:36+0000\n"
+"Last-Translator: mozillazg <opensource.mozillazg@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -45,6 +47,12 @@ msgstr "修改密码：%s"
 msgid "Authentication and Authorization"
 msgstr "认证和授权"
 
+msgid "password"
+msgstr "密码"
+
+msgid "last login"
+msgstr "上次登录"
+
 msgid "No password set."
 msgstr "密码未设置。"
 
@@ -60,16 +68,16 @@ msgstr "密码"
 msgid "Password confirmation"
 msgstr "密码确认"
 
-msgid "Enter the same password as above, for verification."
-msgstr "为了校验，输入与上面相同的密码。"
+msgid "Enter the same password as before, for verification."
+msgstr "为了校验，请输入与上面相同的密码。"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"原始密码不会存储到数据库，因此没有办法看到这个用户的密码，但您可以使用<a "
-"href=\"password/\">这个表单</a>来更改密码。"
+"原始密码不存储，所以没有办法看到这个用户的密码，但可以使用 <a href=\"../"
+"password/\">这个表单</a> 来更改密码 。"
 
 #, python-format
 msgid ""
@@ -119,6 +127,9 @@ msgstr "校验和"
 msgid "name"
 msgstr "名称"
 
+msgid "content type"
+msgstr "内容类型"
+
 msgid "codename"
 msgstr "代码名称"
 
@@ -133,12 +144,6 @@ msgstr "组"
 
 msgid "groups"
 msgstr "组"
-
-msgid "password"
-msgstr "密码"
-
-msgid "last login"
-msgstr "上次登录"
 
 msgid "superuser status"
 msgstr "超级用户状态"
@@ -204,6 +209,39 @@ msgstr "用户"
 
 msgid "users"
 msgstr "用户"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] "密码长度太短。密码必须包含至少 %(min_length)d 个字符。"
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "你的密码必须包含至少 %(min_length)d 个字符。"
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "密码跟 %(verbose_name)s 太相似了。"
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr "你的密码不能与其他个人信息太相似。"
+
+msgid "This password is too common."
+msgstr "这个密码太常见了。"
+
+msgid "Your password can't be a commonly used password."
+msgstr "你的密码不能是大家都爱用的常见密码。"
+
+msgid "This password is entirely numeric."
+msgstr "密码必须全部为数字。"
+
+msgid "Your password can't be entirely numeric."
+msgstr "你的密码不能全部为数字。"
 
 #, python-format
 msgid "Password reset on %(site_name)s"

@@ -9,15 +9,18 @@ from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
 from django.test import override_settings, skipUnlessDBFeature
-from django.utils import six
 
-from .models import FoodManager, FoodQuerySet
+from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import MigrationTestBase
 
 try:
     import sqlparse
 except ImportError:
     sqlparse = None
+
+
+class Mixin(object):
+    pass
 
 
 class OperationTestBase(MigrationTestBase):
@@ -47,7 +50,8 @@ class OperationTestBase(MigrationTestBase):
         operation.state_forwards(app_label, new_state)
         return project_state, new_state
 
-    def set_up_test_model(self, app_label, second_model=False, third_model=False,
+    def set_up_test_model(
+            self, app_label, second_model=False, third_model=False,
             related_model=False, mti_model=False, proxy_model=False, manager_model=False,
             unique_together=False, options=False, db_table=None, index_together=False):
         """
@@ -123,6 +127,7 @@ class OperationTestBase(MigrationTestBase):
                         'Pony',
                         models.CASCADE,
                         auto_created=True,
+                        parent_link=True,
                         primary_key=True,
                         to_field='id',
                         serialize=False,
@@ -198,6 +203,76 @@ class OperationTests(OperationTestBase):
         operation = migrations.CreateModel("Foo", fields=[], managers=[("objects", models.Manager())])
         definition = operation.deconstruct()
         self.assertNotIn('managers', definition[2])
+
+    def test_create_model_with_duplicate_field_name(self):
+        with self.assertRaisesMessage(ValueError, 'Found duplicate value pink in CreateModel fields argument.'):
+            migrations.CreateModel(
+                "Pony",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("pink", models.TextField()),
+                    ("pink", models.IntegerField(default=1)),
+                ],
+            )
+
+    def test_create_model_with_duplicate_base(self):
+        message = 'Found duplicate value test_crmo.pony in CreateModel bases argument.'
+        with self.assertRaisesMessage(ValueError, message):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=("test_crmo.Pony", "test_crmo.Pony",),
+            )
+        with self.assertRaisesMessage(ValueError, message):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=("test_crmo.Pony", "test_crmo.pony",),
+            )
+        message = 'Found duplicate value migrations.unicodemodel in CreateModel bases argument.'
+        with self.assertRaisesMessage(ValueError, message):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=(UnicodeModel, UnicodeModel,),
+            )
+        with self.assertRaisesMessage(ValueError, message):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=(UnicodeModel, 'migrations.unicodemodel',),
+            )
+        with self.assertRaisesMessage(ValueError, message):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=(UnicodeModel, 'migrations.UnicodeModel',),
+            )
+        message = "Found duplicate value <class 'django.db.models.base.Model'> in CreateModel bases argument."
+        with self.assertRaisesMessage(ValueError, message):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=(models.Model, models.Model,),
+            )
+        message = "Found duplicate value <class 'migrations.test_operations.Mixin'> in CreateModel bases argument."
+        with self.assertRaisesMessage(ValueError, message):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                bases=(Mixin, Mixin,),
+            )
+
+    def test_create_model_with_duplicate_manager_name(self):
+        with self.assertRaisesMessage(ValueError, 'Found duplicate value objects in CreateModel managers argument.'):
+            migrations.CreateModel(
+                "Pony",
+                fields=[],
+                managers=[
+                    ("objects", models.Manager()),
+                    ("objects", models.Manager()),
+                ],
+            )
 
     def test_create_model_with_unique_after(self):
         """
@@ -583,6 +658,7 @@ class OperationTests(OperationTestBase):
 
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
             migrations.CreateModel("ReflexivePony", fields=[
+                ("id", models.AutoField(primary_key=True)),
                 ("ponies", models.ManyToManyField("self")),
             ]),
         ])
@@ -596,8 +672,11 @@ class OperationTests(OperationTestBase):
     def test_rename_model_with_m2m(self):
         app_label = "test_rename_model_with_m2m"
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
-            migrations.CreateModel("Rider", fields=[]),
+            migrations.CreateModel("Rider", fields=[
+                ("id", models.AutoField(primary_key=True)),
+            ]),
             migrations.CreateModel("Pony", fields=[
+                ("id", models.AutoField(primary_key=True)),
                 ("riders", models.ManyToManyField("Rider")),
             ]),
         ])
@@ -622,8 +701,11 @@ class OperationTests(OperationTestBase):
     def test_rename_m2m_target_model(self):
         app_label = "test_rename_m2m_target_model"
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
-            migrations.CreateModel("Rider", fields=[]),
+            migrations.CreateModel("Rider", fields=[
+                ("id", models.AutoField(primary_key=True)),
+            ]),
             migrations.CreateModel("Pony", fields=[
+                ("id", models.AutoField(primary_key=True)),
                 ("riders", models.ManyToManyField("Rider")),
             ]),
         ])
@@ -1393,6 +1475,11 @@ class OperationTests(OperationTestBase):
         self.assertEqual(managers[2][0], "food_mgr_kwargs")
         self.assertIsInstance(managers[2][1], FoodManager)
         self.assertEqual(managers[2][1].args, ("x", "y", 3, 4))
+        rendered_state = new_state.apps
+        model = rendered_state.get_model('test_almoma', 'pony')
+        self.assertIsInstance(model.food_qs, models.Manager)
+        self.assertIsInstance(model.food_mgr, FoodManager)
+        self.assertIsInstance(model.food_mgr_kwargs, FoodManager)
 
     def test_alter_model_managers_emptying(self):
         """
@@ -1527,6 +1614,10 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RunSQL")
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2]), ["reverse_sql", "sql", "state_operations"])
+        # And elidable reduction
+        self.assertIs(False, operation.reduce(operation, []))
+        elidable_operation = migrations.RunSQL('SELECT 1 FROM void;', elidable=True)
+        self.assertEqual(elidable_operation.reduce(operation, []), [operation])
 
     def test_run_sql_params(self):
         """
@@ -1598,16 +1689,12 @@ class OperationTests(OperationTestBase):
         )
 
         with connection.schema_editor() as editor:
-            six.assertRaisesRegex(self, ValueError,
-                "Expected a 2-tuple but got 1",
-                operation.database_forwards,
-                "test_runsql", editor, project_state, new_state)
+            with self.assertRaisesMessage(ValueError, "Expected a 2-tuple but got 1"):
+                operation.database_forwards("test_runsql", editor, project_state, new_state)
 
         with connection.schema_editor() as editor:
-            six.assertRaisesRegex(self, ValueError,
-                "Expected a 2-tuple but got 3",
-                operation.database_backwards,
-                "test_runsql", editor, new_state, project_state)
+            with self.assertRaisesMessage(ValueError, "Expected a 2-tuple but got 3"):
+                operation.database_backwards("test_runsql", editor, new_state, project_state)
 
     def test_run_sql_noop(self):
         """
@@ -1700,6 +1787,10 @@ class OperationTests(OperationTestBase):
             operation.database_forwards("test_runpython", editor, project_state, new_state)
         self.assertEqual(project_state.apps.get_model("test_runpython", "Pony").objects.count(), 6)
         self.assertEqual(project_state.apps.get_model("test_runpython", "ShetlandPony").objects.count(), 2)
+        # And elidable reduction
+        self.assertIs(False, operation.reduce(operation, []))
+        elidable_operation = migrations.RunPython(inner_method, elidable=True)
+        self.assertEqual(elidable_operation.reduce(operation, []), [operation])
 
     def test_run_python_atomic(self):
         """
@@ -1801,6 +1892,144 @@ class OperationTests(OperationTestBase):
             create_old_man.state_forwards("test_books", new_state)
             create_old_man.database_forwards("test_books", editor, project_state, new_state)
 
+    def test_model_with_bigautofield(self):
+        """
+        A model with BigAutoField can be created.
+        """
+        def create_data(models, schema_editor):
+            Author = models.get_model("test_author", "Author")
+            Book = models.get_model("test_book", "Book")
+            author1 = Author.objects.create(name="Hemingway")
+            Book.objects.create(title="Old Man and The Sea", author=author1)
+            Book.objects.create(id=2 ** 33, title="A farewell to arms", author=author1)
+
+            author2 = Author.objects.create(id=2 ** 33, name="Remarque")
+            Book.objects.create(title="All quiet on the western front", author=author2)
+            Book.objects.create(title="Arc de Triomphe", author=author2)
+
+        create_author = migrations.CreateModel(
+            "Author",
+            [
+                ("id", models.BigAutoField(primary_key=True)),
+                ("name", models.CharField(max_length=100)),
+            ],
+            options={},
+        )
+        create_book = migrations.CreateModel(
+            "Book",
+            [
+                ("id", models.BigAutoField(primary_key=True)),
+                ("title", models.CharField(max_length=100)),
+                ("author", models.ForeignKey(to="test_author.Author", on_delete=models.CASCADE))
+            ],
+            options={},
+        )
+        fill_data = migrations.RunPython(create_data)
+
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        with connection.schema_editor() as editor:
+            create_author.state_forwards("test_author", new_state)
+            create_author.database_forwards("test_author", editor, project_state, new_state)
+
+        project_state = new_state
+        new_state = new_state.clone()
+        with connection.schema_editor() as editor:
+            create_book.state_forwards("test_book", new_state)
+            create_book.database_forwards("test_book", editor, project_state, new_state)
+
+        project_state = new_state
+        new_state = new_state.clone()
+        with connection.schema_editor() as editor:
+            fill_data.state_forwards("fill_data", new_state)
+            fill_data.database_forwards("fill_data", editor, project_state, new_state)
+
+    def test_autofield_foreignfield_growth(self):
+        """
+        A field may be migrated from AutoField to BigAutoField.
+        """
+        def create_initial_data(models, schema_editor):
+            Article = models.get_model("test_article", "Article")
+            Blog = models.get_model("test_blog", "Blog")
+            blog = Blog.objects.create(name="web development done right")
+            Article.objects.create(name="Frameworks", blog=blog)
+            Article.objects.create(name="Programming Languages", blog=blog)
+
+        def create_big_data(models, schema_editor):
+            Article = models.get_model("test_article", "Article")
+            Blog = models.get_model("test_blog", "Blog")
+            blog2 = Blog.objects.create(name="Frameworks", id=2 ** 33)
+            Article.objects.create(name="Django", blog=blog2)
+            Article.objects.create(id=2 ** 33, name="Django2", blog=blog2)
+
+        create_blog = migrations.CreateModel(
+            "Blog",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=100)),
+            ],
+            options={},
+        )
+        create_article = migrations.CreateModel(
+            "Article",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("blog", models.ForeignKey(to="test_blog.Blog", on_delete=models.CASCADE)),
+                ("name", models.CharField(max_length=100)),
+                ("data", models.TextField(default="")),
+            ],
+            options={},
+        )
+        fill_initial_data = migrations.RunPython(create_initial_data, create_initial_data)
+        fill_big_data = migrations.RunPython(create_big_data, create_big_data)
+
+        grow_article_id = migrations.AlterField("Article", "id", models.BigAutoField(primary_key=True))
+        grow_blog_id = migrations.AlterField("Blog", "id", models.BigAutoField(primary_key=True))
+
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        with connection.schema_editor() as editor:
+            create_blog.state_forwards("test_blog", new_state)
+            create_blog.database_forwards("test_blog", editor, project_state, new_state)
+
+        project_state = new_state
+        new_state = new_state.clone()
+        with connection.schema_editor() as editor:
+            create_article.state_forwards("test_article", new_state)
+            create_article.database_forwards("test_article", editor, project_state, new_state)
+
+        project_state = new_state
+        new_state = new_state.clone()
+        with connection.schema_editor() as editor:
+            fill_initial_data.state_forwards("fill_initial_data", new_state)
+            fill_initial_data.database_forwards("fill_initial_data", editor, project_state, new_state)
+
+        project_state = new_state
+        new_state = new_state.clone()
+        with connection.schema_editor() as editor:
+            grow_article_id.state_forwards("test_article", new_state)
+            grow_article_id.database_forwards("test_article", editor, project_state, new_state)
+
+        state = new_state.clone()
+        article = state.apps.get_model("test_article.Article")
+        self.assertIsInstance(article._meta.pk, models.BigAutoField)
+
+        project_state = new_state
+        new_state = new_state.clone()
+        with connection.schema_editor() as editor:
+            grow_blog_id.state_forwards("test_blog", new_state)
+            grow_blog_id.database_forwards("test_blog", editor, project_state, new_state)
+
+        state = new_state.clone()
+        blog = state.apps.get_model("test_blog.Blog")
+        self.assertTrue(isinstance(blog._meta.pk, models.BigAutoField))
+
+        project_state = new_state
+        new_state = new_state.clone()
+        with connection.schema_editor() as editor:
+            fill_big_data.state_forwards("fill_big_data", new_state)
+            fill_big_data.database_forwards("fill_big_data", editor, project_state, new_state)
+
     def test_run_python_noop(self):
         """
         #24098 - Tests no-op RunPython operations.
@@ -1849,6 +2078,85 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "SeparateDatabaseAndState")
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2]), ["database_operations", "state_operations"])
+
+    def test_separate_database_and_state2(self):
+        """
+        A complex SeparateDatabaseAndState operation: Multiple operations both
+        for state and database. Verify the state dependencies within each list
+        and that state ops don't affect the database.
+        """
+        app_label = "test_separatedatabaseandstate2"
+        project_state = self.set_up_test_model(app_label)
+        # Create the operation
+        database_operations = [
+            migrations.CreateModel(
+                "ILovePonies",
+                [("id", models.AutoField(primary_key=True))],
+                options={"db_table": "iloveponies"},
+            ),
+            migrations.CreateModel(
+                "ILoveMorePonies",
+                # We use IntegerField and not AutoField because
+                # the model is going to be deleted immediately
+                # and with an AutoField this fails on Oracle
+                [("id", models.IntegerField(primary_key=True))],
+                options={"db_table": "ilovemoreponies"},
+            ),
+            migrations.DeleteModel("ILoveMorePonies"),
+            migrations.CreateModel(
+                "ILoveEvenMorePonies",
+                [("id", models.AutoField(primary_key=True))],
+                options={"db_table": "iloveevenmoreponies"},
+            ),
+        ]
+        state_operations = [
+            migrations.CreateModel(
+                "SomethingElse",
+                [("id", models.AutoField(primary_key=True))],
+                options={"db_table": "somethingelse"},
+            ),
+            migrations.DeleteModel("SomethingElse"),
+            migrations.CreateModel(
+                "SomethingCompletelyDifferent",
+                [("id", models.AutoField(primary_key=True))],
+                options={"db_table": "somethingcompletelydifferent"},
+            ),
+        ]
+        operation = migrations.SeparateDatabaseAndState(
+            state_operations=state_operations,
+            database_operations=database_operations,
+        )
+        # Test the state alteration
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        def assertModelsAndTables(after_db):
+            # Check that tables and models exist, or don't, as they should:
+            self.assertNotIn((app_label, "somethingelse"), new_state.models)
+            self.assertEqual(len(new_state.models[app_label, "somethingcompletelydifferent"].fields), 1)
+            self.assertNotIn((app_label, "iloveponiesonies"), new_state.models)
+            self.assertNotIn((app_label, "ilovemoreponies"), new_state.models)
+            self.assertNotIn((app_label, "iloveevenmoreponies"), new_state.models)
+            self.assertTableNotExists("somethingelse")
+            self.assertTableNotExists("somethingcompletelydifferent")
+            self.assertTableNotExists("ilovemoreponies")
+            if after_db:
+                self.assertTableExists("iloveponies")
+                self.assertTableExists("iloveevenmoreponies")
+            else:
+                self.assertTableNotExists("iloveponies")
+                self.assertTableNotExists("iloveevenmoreponies")
+
+        assertModelsAndTables(after_db=False)
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        assertModelsAndTables(after_db=True)
+        # And test reversal
+        self.assertTrue(operation.reversible)
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        assertModelsAndTables(after_db=False)
 
 
 class SwappableOperationTests(OperationTestBase):

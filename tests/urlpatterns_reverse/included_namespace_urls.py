@@ -1,6 +1,6 @@
 from django.conf.urls import include, url
 
-from .namespace_urls import URLObject
+from .utils import URLObject
 from .views import empty_view, view_class_instance
 
 testobj3 = URLObject('testapp', 'test-ns3')

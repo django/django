@@ -122,8 +122,6 @@ Related objects reference
         the ``blog`` :class:`~django.db.models.ForeignKey` doesn't have
         ``null=True``, this is invalid.
 
-        .. versionchanged 1.7::
-
         For :class:`~django.db.models.ForeignKey` objects, this method accepts
         a ``bulk`` argument to control how to perform the operation.
         If ``True`` (the default), ``QuerySet.update()`` is used.
@@ -180,7 +178,7 @@ Related objects reference
        related manager's methods are disabled.
 
 Direct Assignment
------------------
+=================
 
 A related object set can be replaced in bulk with one operation by assigning a
 new iterable of objects to it::

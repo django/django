@@ -12,13 +12,9 @@ class SQLCompiler(compiler.SQLCompiler):
         If 'with_limits' is False, any limit/offset information is not
         included in the query.
         """
-        if with_limits and self.query.low_mark == self.query.high_mark:
-            return '', ()
-
         # The `do_offset` flag indicates whether we need to construct
         # the SQL needed to use limit/offset with Oracle.
-        do_offset = with_limits and (self.query.high_mark is not None
-                                     or self.query.low_mark)
+        do_offset = with_limits and (self.query.high_mark is not None or self.query.low_mark)
         if not do_offset:
             sql, params = super(SQLCompiler, self).as_sql(
                 with_limits=False,

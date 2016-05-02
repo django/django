@@ -151,6 +151,9 @@ class Origin(object):
             self.loader == other.loader
         )
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @property
     def loader_name(self):
         if self.loader:
@@ -222,6 +225,7 @@ class Template(object):
         tokens = lexer.tokenize()
         parser = Parser(
             tokens, self.engine.template_libraries, self.engine.template_builtins,
+            self.origin,
         )
 
         try:
@@ -354,9 +358,9 @@ class Token(object):
         for bit in bits:
             # Handle translation-marked template pieces
             if bit.startswith(('_("', "_('")):
-                sentinal = bit[2] + ')'
+                sentinel = bit[2] + ')'
                 trans_bit = [bit]
-                while not bit.endswith(sentinal):
+                while not bit.endswith(sentinel):
                     bit = next(bits)
                     trans_bit.append(bit)
                 bit = ' '.join(trans_bit)
@@ -442,7 +446,7 @@ class DebugLexer(Lexer):
 
 
 class Parser(object):
-    def __init__(self, tokens, libraries=None, builtins=None):
+    def __init__(self, tokens, libraries=None, builtins=None, origin=None):
         self.tokens = tokens
         self.tags = {}
         self.filters = {}
@@ -456,10 +460,11 @@ class Parser(object):
         self.libraries = libraries
         for builtin in builtins:
             self.add_library(builtin)
+        self.origin = origin
 
     def parse(self, parse_until=None):
         """
-        Iterate through the parser tokens and compils each one into a node.
+        Iterate through the parser tokens and compiles each one into a node.
 
         If parse_until is provided, parsing will stop once one of the
         specified tokens has been reached. This is formatted as a list of
@@ -532,8 +537,10 @@ class Parser(object):
             )
         if isinstance(nodelist, NodeList) and not isinstance(node, TextNode):
             nodelist.contains_nontext = True
-        # Set token here since we can't modify the node __init__ method
+        # Set origin and token here since we can't modify the node __init__()
+        # method.
         node.token = token
+        node.origin = self.origin
         nodelist.append(node)
 
     def error(self, token, e):
@@ -557,7 +564,7 @@ class Parser(object):
                 "forget to register or load this tag?" % (
                     token.lineno,
                     command,
-                    get_text_list(["'%s'" % p for p in parse_until]),
+                    get_text_list(["'%s'" % p for p in parse_until], 'or'),
                 ),
             )
         raise self.error(

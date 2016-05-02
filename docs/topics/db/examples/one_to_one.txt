@@ -1,8 +1,9 @@
-########################
+========================
 One-to-one relationships
-########################
+========================
 
-To define a one-to-one relationship, use :ref:`ref-onetoone`.
+To define a one-to-one relationship, use
+:class:`~django.db.models.OneToOneField`.
 
 In this example, a ``Place`` optionally can be a ``Restaurant``::
 

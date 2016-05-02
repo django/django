@@ -60,7 +60,7 @@ class BoundField(object):
     def __getitem__(self, idx):
         # Prevent unnecessary reevaluation when accessing BoundField's attrs
         # from templates.
-        if not isinstance(idx, six.integer_types):
+        if not isinstance(idx, six.integer_types + (slice,)):
             raise TypeError
         return list(self.__iter__())[idx]
 
@@ -85,6 +85,8 @@ class BoundField(object):
             widget.is_localized = True
 
         attrs = attrs or {}
+        if not widget.is_hidden and self.field.required and self.form.use_required_attribute:
+            attrs['required'] = True
         if self.field.disabled:
             attrs['disabled'] = True
         auto_id = self.auto_id

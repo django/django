@@ -1,5 +1,8 @@
+import warnings
 from contextlib import contextmanager
 from copy import copy
+
+from django.utils.deprecation import RemovedInDjango20Warning
 
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ('django.template.context_processors.csrf',)
@@ -76,13 +79,17 @@ class BaseContext(object):
         del self.dicts[-1][key]
 
     def has_key(self, key):
+        warnings.warn(
+            "%s.has_key() is deprecated in favor of the 'in' operator." % self.__class__.__name__,
+            RemovedInDjango20Warning
+        )
+        return key in self
+
+    def __contains__(self, key):
         for d in self.dicts:
             if key in d:
                 return True
         return False
-
-    def __contains__(self, key):
-        return self.has_key(key)
 
     def get(self, key, otherwise=None):
         for d in reversed(self.dicts):
@@ -184,7 +191,7 @@ class RenderContext(BaseContext):
         for d in self.dicts[-1]:
             yield d
 
-    def has_key(self, key):
+    def __contains__(self, key):
         return key in self.dicts[-1]
 
     def get(self, key, otherwise=None):

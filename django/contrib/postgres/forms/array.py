@@ -1,4 +1,5 @@
 import copy
+from itertools import chain
 
 from django import forms
 from django.contrib.postgres.validators import (
@@ -7,7 +8,9 @@ from django.contrib.postgres.validators import (
 from django.core.exceptions import ValidationError
 from django.utils import six
 from django.utils.safestring import mark_safe
-from django.utils.translation import string_concat, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
+
+from ..utils import prefix_validation_error
 
 
 class SimpleArrayField(forms.CharField):
@@ -38,16 +41,16 @@ class SimpleArrayField(forms.CharField):
             items = []
         errors = []
         values = []
-        for i, item in enumerate(items):
+        for index, item in enumerate(items):
             try:
                 values.append(self.base_field.to_python(item))
-            except ValidationError as e:
-                for error in e.error_list:
-                    errors.append(ValidationError(
-                        string_concat(self.error_messages['item_invalid'], error.message),
-                        code='item_invalid',
-                        params={'nth': i},
-                    ))
+            except ValidationError as error:
+                errors.append(prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
+                    code='item_invalid',
+                    params={'nth': index},
+                ))
         if errors:
             raise ValidationError(errors)
         return values
@@ -55,32 +58,32 @@ class SimpleArrayField(forms.CharField):
     def validate(self, value):
         super(SimpleArrayField, self).validate(value)
         errors = []
-        for i, item in enumerate(value):
+        for index, item in enumerate(value):
             try:
                 self.base_field.validate(item)
-            except ValidationError as e:
-                for error in e.error_list:
-                    errors.append(ValidationError(
-                        string_concat(self.error_messages['item_invalid'], error.message),
-                        code='item_invalid',
-                        params={'nth': i},
-                    ))
+            except ValidationError as error:
+                errors.append(prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
+                    code='item_invalid',
+                    params={'nth': index},
+                ))
         if errors:
             raise ValidationError(errors)
 
     def run_validators(self, value):
         super(SimpleArrayField, self).run_validators(value)
         errors = []
-        for i, item in enumerate(value):
+        for index, item in enumerate(value):
             try:
                 self.base_field.run_validators(item)
-            except ValidationError as e:
-                for error in e.error_list:
-                    errors.append(ValidationError(
-                        string_concat(self.error_messages['item_invalid'], error.message),
-                        code='item_invalid',
-                        params={'nth': i},
-                    ))
+            except ValidationError as error:
+                errors.append(prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
+                    code='item_invalid',
+                    params={'nth': index},
+                ))
         if errors:
             raise ValidationError(errors)
 
@@ -159,18 +162,20 @@ class SplitArrayField(forms.Field):
         if not any(value) and self.required:
             raise ValidationError(self.error_messages['required'])
         max_size = max(self.size, len(value))
-        for i in range(max_size):
-            item = value[i]
+        for index in range(max_size):
+            item = value[index]
             try:
                 cleaned_data.append(self.base_field.clean(item))
-                errors.append(None)
             except ValidationError as error:
-                errors.append(ValidationError(
-                    string_concat(self.error_messages['item_invalid'], ' '.join(error.messages)),
+                errors.append(prefix_validation_error(
+                    error,
+                    self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': i},
+                    params={'nth': index},
                 ))
                 cleaned_data.append(None)
+            else:
+                errors.append(None)
         if self.remove_trailing_nulls:
             null_index = None
             for i, value in reversed(list(enumerate(cleaned_data))):
@@ -178,10 +183,10 @@ class SplitArrayField(forms.Field):
                     null_index = i
                 else:
                     break
-            if null_index:
+            if null_index is not None:
                 cleaned_data = cleaned_data[:null_index]
                 errors = errors[:null_index]
         errors = list(filter(None, errors))
         if errors:
-            raise ValidationError(errors)
+            raise ValidationError(list(chain.from_iterable(errors)))
         return cleaned_data

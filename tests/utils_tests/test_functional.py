@@ -55,7 +55,8 @@ class FunctionalTestCase(unittest.TestCase):
             def _get_do(self):
                 return "DO IT"
 
-        self.assertRaises(NotImplementedError, lambda: A().do)
+        with self.assertRaises(NotImplementedError):
+            A().do
         self.assertEqual(B().do, 'DO IT')
 
     def test_lazy_object_to_string(self):

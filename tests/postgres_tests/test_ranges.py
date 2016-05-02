@@ -1,12 +1,10 @@
 import datetime
 import json
-import unittest
 
 from django import forms
 from django.core import exceptions, serializers
-from django.db import connection
 from django.db.models import F
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.utils import timezone
 
 from . import PostgreSQLTestCase
@@ -22,18 +20,7 @@ except ImportError:
     pass
 
 
-def skipUnlessPG92(test):
-    try:
-        PG_VERSION = connection.pg_version
-    except AttributeError:
-        PG_VERSION = 0
-    if PG_VERSION < 90200:
-        return unittest.skip('PostgreSQL >= 9.2 required')(test)
-    return test
-
-
-@skipUnlessPG92
-class TestSaveLoad(TestCase):
+class TestSaveLoad(PostgreSQLTestCase):
 
     def test_all_fields(self):
         now = timezone.now()
@@ -93,9 +80,14 @@ class TestSaveLoad(TestCase):
         loaded = RangesModel.objects.get()
         self.assertIsNone(loaded.ints)
 
+    def test_model_set_on_base_field(self):
+        instance = RangesModel()
+        field = instance._meta.get_field('ints')
+        self.assertEqual(field.model, RangesModel)
+        self.assertEqual(field.base_field.model, RangesModel)
 
-@skipUnlessPG92
-class TestQuerying(TestCase):
+
+class TestQuerying(PostgreSQLTestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -198,8 +190,7 @@ class TestQuerying(TestCase):
         )
 
 
-@skipUnlessPG92
-class TestQueringWithRanges(TestCase):
+class TestQueryingWithRanges(PostgreSQLTestCase):
     def test_date_range(self):
         objs = [
             RangeLookupsModel.objects.create(date='2015-01-01'),
@@ -288,8 +279,7 @@ class TestQueringWithRanges(TestCase):
         )
 
 
-@skipUnlessPG92
-class TestSerialization(TestCase):
+class TestSerialization(PostgreSQLTestCase):
     test_data = (
         '[{"fields": {"ints": "{\\"upper\\": \\"10\\", \\"lower\\": \\"0\\", '
         '\\"bounds\\": \\"[)\\"}", "floats": "{\\"empty\\": true}", '
@@ -305,9 +295,11 @@ class TestSerialization(TestCase):
     upper_dt = datetime.datetime(2014, 2, 2, 12, 12, 12, tzinfo=timezone.utc)
 
     def test_dumping(self):
-        instance = RangesModel(ints=NumericRange(0, 10), floats=NumericRange(empty=True),
+        instance = RangesModel(
+            ints=NumericRange(0, 10), floats=NumericRange(empty=True),
             timestamps=DateTimeTZRange(self.lower_dt, self.upper_dt),
-            dates=DateRange(self.lower_date, self.upper_date))
+            dates=DateRange(self.lower_date, self.upper_date),
+        )
         data = serializers.serialize('json', [instance])
         dumped = json.loads(data)
         for field in ('ints', 'dates', 'timestamps'):
@@ -324,6 +316,17 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.bigints, None)
         self.assertEqual(instance.dates, DateRange(self.lower_date, self.upper_date))
         self.assertEqual(instance.timestamps, DateTimeTZRange(self.lower_dt, self.upper_dt))
+
+    def test_serialize_range_with_null(self):
+        instance = RangesModel(ints=NumericRange(None, 10))
+        data = serializers.serialize('json', [instance])
+        new_instance = list(serializers.deserialize('json', data))[0].object
+        self.assertEqual(new_instance.ints, NumericRange(None, 10))
+
+        instance = RangesModel(ints=NumericRange(10, None))
+        data = serializers.serialize('json', [instance])
+        new_instance = list(serializers.deserialize('json', data))[0].object
+        self.assertEqual(new_instance.ints, NumericRange(10, None))
 
 
 class TestValidators(PostgreSQLTestCase):

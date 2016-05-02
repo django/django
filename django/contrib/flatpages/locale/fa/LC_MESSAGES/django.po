@@ -2,16 +2,17 @@
 #
 # Translators:
 # Ali Nikneshan <ali@nikneshan.com>, 2011-2012
+# Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Reza Mohammadi <reza@teeleh.ir>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-18 21:41+0000\n"
+"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
+"Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -75,6 +76,9 @@ msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "اگر این انتخاب شود، فقط کاربران وارد شده خواهند توانست این صفحه را مشاهده "
 "نمایند."
+
+msgid "sites"
+msgstr "وب‌گاه‌ها"
 
 msgid "flat page"
 msgstr "صفحه تخت"

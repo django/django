@@ -7,7 +7,7 @@ import tempfile
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
-    VALID_KEY_CHARS, CreateError, SessionBase,
+    VALID_KEY_CHARS, CreateError, SessionBase, UpdateError,
 )
 from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
@@ -92,8 +92,7 @@ class SessionStore(SessionBase):
                     session_data = self.decode(file_data)
                 except (EOFError, SuspiciousOperation) as e:
                     if isinstance(e, SuspiciousOperation):
-                        logger = logging.getLogger('django.security.%s' %
-                                e.__class__.__name__)
+                        logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
                         logger.warning(force_text(e))
                     self.create()
 
@@ -129,15 +128,17 @@ class SessionStore(SessionBase):
         try:
             # Make sure the file exists.  If it does not already exist, an
             # empty placeholder file is created.
-            flags = os.O_WRONLY | os.O_CREAT | getattr(os, 'O_BINARY', 0)
+            flags = os.O_WRONLY | getattr(os, 'O_BINARY', 0)
             if must_create:
-                flags |= os.O_EXCL
+                flags |= os.O_EXCL | os.O_CREAT
             fd = os.open(session_file_name, flags)
             os.close(fd)
 
         except OSError as e:
             if must_create and e.errno == errno.EEXIST:
                 raise CreateError
+            if not must_create and e.errno == errno.ENOENT:
+                raise UpdateError
             raise
 
         # Write the session file without interfering with other threads
@@ -158,8 +159,7 @@ class SessionStore(SessionBase):
         dir, prefix = os.path.split(session_file_name)
 
         try:
-            output_file_fd, output_file_name = tempfile.mkstemp(dir=dir,
-                prefix=prefix + '_out_')
+            output_file_fd, output_file_name = tempfile.mkstemp(dir=dir, prefix=prefix + '_out_')
             renamed = False
             try:
                 try:

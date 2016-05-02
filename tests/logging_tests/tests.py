@@ -9,15 +9,14 @@ from admin_scripts.tests import AdminScriptTestCase
 from django.conf import settings
 from django.core import mail
 from django.core.files.temp import NamedTemporaryFile
+from django.db import connection
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.utils.deprecation import RemovedInNextVersionWarning
-from django.utils.encoding import force_text
 from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
     RequireDebugTrue,
 )
-from django.utils.six import StringIO
 
 from .logconfig import MyEmailBackend
 
@@ -67,18 +66,21 @@ class LoggingFiltersTest(SimpleTestCase):
             self.assertEqual(filter_.filter("record is not used"), False)
 
 
-class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
+class SetupDefaultLoggingMixin(object):
 
     @classmethod
     def setUpClass(cls):
-        super(DefaultLoggingTest, cls).setUpClass()
+        super(SetupDefaultLoggingMixin, cls).setUpClass()
         cls._logging = settings.LOGGING
         logging.config.dictConfig(DEFAULT_LOGGING)
 
     @classmethod
     def tearDownClass(cls):
-        super(DefaultLoggingTest, cls).tearDownClass()
+        super(SetupDefaultLoggingMixin, cls).tearDownClass()
         logging.config.dictConfig(cls._logging)
+
+
+class DefaultLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
 
     def test_django_logger(self):
         """
@@ -91,20 +93,55 @@ class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
             self.logger.error("Hey, this is an error.")
             self.assertEqual(self.logger_output.getvalue(), 'Hey, this is an error.\n')
 
+    @override_settings(DEBUG=True)
     def test_django_logger_warning(self):
-        with self.settings(DEBUG=True):
-            self.logger.warning('warning')
-            self.assertEqual(self.logger_output.getvalue(), 'warning\n')
+        self.logger.warning('warning')
+        self.assertEqual(self.logger_output.getvalue(), 'warning\n')
 
+    @override_settings(DEBUG=True)
     def test_django_logger_info(self):
-        with self.settings(DEBUG=True):
-            self.logger.info('info')
-            self.assertEqual(self.logger_output.getvalue(), 'info\n')
+        self.logger.info('info')
+        self.assertEqual(self.logger_output.getvalue(), 'info\n')
 
+    @override_settings(DEBUG=True)
     def test_django_logger_debug(self):
-        with self.settings(DEBUG=True):
-            self.logger.debug('debug')
-            self.assertEqual(self.logger_output.getvalue(), '')
+        self.logger.debug('debug')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
+
+@override_settings(DEBUG=True, ROOT_URLCONF='logging_tests.urls')
+class HandlerLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
+
+    def test_page_found_no_warning(self):
+        self.client.get('/innocent/')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
+    def test_page_not_found_warning(self):
+        self.client.get('/does_not_exist/')
+        self.assertEqual(self.logger_output.getvalue(), 'Not Found: /does_not_exist/\n')
+
+
+@override_settings(
+    DEBUG=True,
+    USE_I18N=True,
+    LANGUAGES=[('en', 'English')],
+    MIDDLEWARE_CLASSES=[
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    ],
+    ROOT_URLCONF='logging_tests.urls_i18n',
+)
+class I18nLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
+
+    def test_i18n_page_found_no_warning(self):
+        self.client.get('/exists/')
+        self.client.get('/en/exists/')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
+    def test_i18n_page_not_found_warning(self):
+        self.client.get('/this_does_not/')
+        self.client.get('/en/nor_this/')
+        self.assertEqual(self.logger_output.getvalue(), 'Not Found: /this_does_not/\nNot Found: /en/nor_this/\n')
 
 
 class WarningLoggerTests(SimpleTestCase):
@@ -121,38 +158,9 @@ class WarningLoggerTests(SimpleTestCase):
         self._old_capture_state = bool(getattr(logging, '_warnings_showwarning', False))
         logging.captureWarnings(True)
 
-        # this convoluted setup is to avoid printing this deprecation to
-        # stderr during test running - as the test runner forces deprecations
-        # to be displayed at the global py.warnings level
-        self.logger = logging.getLogger('py.warnings')
-        self.outputs = []
-        self.old_streams = []
-        for handler in self.logger.handlers:
-            self.old_streams.append(handler.stream)
-            self.outputs.append(StringIO())
-            handler.stream = self.outputs[-1]
-
     def tearDown(self):
-        for i, handler in enumerate(self.logger.handlers):
-            self.logger.handlers[i].stream = self.old_streams[i]
-
         # Reset warnings state.
         logging.captureWarnings(self._old_capture_state)
-
-    @override_settings(DEBUG=True)
-    def test_warnings_capture(self):
-        with warnings.catch_warnings():
-            warnings.filterwarnings('always')
-            warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
-            output = force_text(self.outputs[0].getvalue())
-            self.assertIn('Foo Deprecated', output)
-
-    def test_warnings_capture_debug_false(self):
-        with warnings.catch_warnings():
-            warnings.filterwarnings('always')
-            warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
-            output = force_text(self.outputs[0].getvalue())
-            self.assertNotIn('Foo Deprecated', output)
 
     @override_settings(DEBUG=True)
     def test_error_filter_still_raises(self):
@@ -253,7 +261,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
             admin_email_handler.filters = []
             rf = RequestFactory()
             request = rf.get('/')
-            self.logger.error(message, token1, token2,
+            self.logger.error(
+                message, token1, token2,
                 extra={
                     'status_code': 403,
                     'request': request,
@@ -506,3 +515,23 @@ format=%(message)s
         out, err = self.run_manage(['check'])
         self.assertNoOutput(err)
         self.assertOutput(out, "System check identified no issues (0 silenced).")
+
+
+class SchemaLoggerTests(SimpleTestCase):
+
+    def test_extra_args(self):
+        editor = connection.schema_editor(collect_sql=True)
+        sql = "SELECT * FROM foo WHERE id in (%s, %s)"
+        params = [42, 1337]
+        with patch_logger('django.db.backends.schema', 'debug', log_kwargs=True) as logger:
+            editor.execute(sql, params)
+        self.assertEqual(
+            logger,
+            [(
+                'SELECT * FROM foo WHERE id in (%s, %s); (params [42, 1337])',
+                {'extra': {
+                    'sql': 'SELECT * FROM foo WHERE id in (%s, %s)',
+                    'params': [42, 1337],
+                }},
+            )]
+        )

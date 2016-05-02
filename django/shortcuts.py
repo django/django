@@ -3,14 +3,11 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
-from django.core import urlresolvers
-from django.db.models.base import ModelBase
-from django.db.models.manager import Manager
-from django.db.models.query import QuerySet
 from django.http import (
     Http404, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
 from django.template import loader
+from django.urls import NoReverseMatch, reverse
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
@@ -43,8 +40,8 @@ def redirect(to, *args, **kwargs):
 
         * A model: the model's `get_absolute_url()` function will be called.
 
-        * A view name, possibly with arguments: `urlresolvers.reverse()` will
-          be used to reverse-resolve the name.
+        * A view name, possibly with arguments: `urls.reverse()` will be used
+          to reverse-resolve the name.
 
         * A URL, which will be used as-is for the redirect location.
 
@@ -61,25 +58,15 @@ def redirect(to, *args, **kwargs):
 
 def _get_queryset(klass):
     """
-    Returns a QuerySet from a Model, Manager, or QuerySet. Created to make
-    get_object_or_404 and get_list_or_404 more DRY.
-
-    Raises a ValueError if klass is not a Model, Manager, or QuerySet.
+    Return a QuerySet or a Manager.
+    Duck typing in action: any class with a `get()` method (for
+    get_object_or_404) or a `filter()` method (for get_list_or_404) might do
+    the job.
     """
-    if isinstance(klass, QuerySet):
-        return klass
-    elif isinstance(klass, Manager):
-        manager = klass
-    elif isinstance(klass, ModelBase):
-        manager = klass._default_manager
-    else:
-        if isinstance(klass, type):
-            klass__name = klass.__name__
-        else:
-            klass__name = klass.__class__.__name__
-        raise ValueError("Object is of type '%s', but must be a Django Model, "
-                         "Manager, or QuerySet" % klass__name)
-    return manager.all()
+    # If it is a model class or anything else with ._default_manager
+    if hasattr(klass, '_default_manager'):
+        return klass._default_manager.all()
+    return klass
 
 
 def get_object_or_404(klass, *args, **kwargs):
@@ -96,6 +83,12 @@ def get_object_or_404(klass, *args, **kwargs):
     queryset = _get_queryset(klass)
     try:
         return queryset.get(*args, **kwargs)
+    except AttributeError:
+        klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        raise ValueError(
+            "First argument to get_object_or_404() must be a Model, Manager, "
+            "or QuerySet, not '%s'." % klass__name
+        )
     except queryset.model.DoesNotExist:
         raise Http404('No %s matches the given query.' % queryset.model._meta.object_name)
 
@@ -109,7 +102,14 @@ def get_list_or_404(klass, *args, **kwargs):
     arguments and keyword arguments are used in the filter() query.
     """
     queryset = _get_queryset(klass)
-    obj_list = list(queryset.filter(*args, **kwargs))
+    try:
+        obj_list = list(queryset.filter(*args, **kwargs))
+    except AttributeError:
+        klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        raise ValueError(
+            "First argument to get_list_or_404() must be a Model, Manager, or "
+            "QuerySet, not '%s'." % klass__name
+        )
     if not obj_list:
         raise Http404('No %s matches the given query.' % queryset.model._meta.object_name)
     return obj_list
@@ -123,8 +123,8 @@ def resolve_url(to, *args, **kwargs):
 
         * A model: the model's `get_absolute_url()` function will be called.
 
-        * A view name, possibly with arguments: `urlresolvers.reverse()` will
-          be used to reverse-resolve the name.
+        * A view name, possibly with arguments: `urls.reverse()` will be used
+          to reverse-resolve the name.
 
         * A URL, which will be returned as-is.
     """
@@ -144,8 +144,8 @@ def resolve_url(to, *args, **kwargs):
 
     # Next try a reverse URL resolution.
     try:
-        return urlresolvers.reverse(to, args=args, kwargs=kwargs)
-    except urlresolvers.NoReverseMatch:
+        return reverse(to, args=args, kwargs=kwargs)
+    except NoReverseMatch:
         # If this is a callable, re-raise.
         if callable(to):
             raise

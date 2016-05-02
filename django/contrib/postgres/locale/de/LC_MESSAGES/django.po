@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-20 09:38+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-12 12:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: German (http://www.transifex.com/projects/p/django/language/"
-"de/)\n"
+"Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,8 +33,18 @@ msgstr "Zuordnung von Zeichenketten zu Zeichenketten"
 msgid "The value of \"%(key)s\" is not a string."
 msgstr "Der Wert von „%(key)s“ ist keine Zeichenkette."
 
+msgid "A JSON object"
+msgstr "Ein JSON-Objekt"
+
+msgid "Value must be valid JSON."
+msgstr "Wert muss gültiges JSON sein."
+
 msgid "Could not load JSON data."
 msgstr "Konnte JSON-Daten nicht laden."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' Wert muss gültiges JSON sein."
 
 msgid "Enter two valid values."
 msgstr "Bitte zwei gültige Werte eingeben."

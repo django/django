@@ -1,36 +1,19 @@
 from django import template
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.templatetags.static import StaticNode
+from django.templatetags.static import (
+    do_static as _do_static, static as _static,
+)
 
 register = template.Library()
 
 
 def static(path):
-    return staticfiles_storage.url(path)
-
-
-class StaticFilesNode(StaticNode):
-
-    def url(self, context):
-        path = self.path.resolve(context)
-        return static(path)
+    # Backwards compatibility alias for django.templatetags.static.static().
+    # Deprecation should start in Django 2.0.
+    return _static(path)
 
 
 @register.tag('static')
 def do_static(parser, token):
-    """
-    A template tag that returns the URL to a file
-    using staticfiles' storage backend
-
-    Usage::
-
-        {% static path [as varname] %}
-
-    Examples::
-
-        {% static "myapp/css/base.css" %}
-        {% static variable_with_path %}
-        {% static "myapp/css/base.css" as admin_base_css %}
-        {% static variable_with_path as varname %}
-    """
-    return StaticFilesNode.handle_token(parser, token)
+    # Backwards compatibility alias for django.templatetags.static.do_static().
+    # Deprecation should start in Django 2.0.
+    return _do_static(parser, token)

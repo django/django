@@ -216,7 +216,7 @@ Like :djadmin:`migrate`, :djadmin:`createcachetable` won't touch an existing
 table. It will only create missing tables.
 
 To print the SQL that would be run, rather than run it, use the
-:djadminopt:`--dry-run` option.
+:option:`createcachetable --dry-run` option.
 
 Multiple databases
 ~~~~~~~~~~~~~~~~~~
@@ -1016,7 +1016,7 @@ the request reaches your website.
 Here are a few examples of downstream caches:
 
 * Your ISP may cache certain pages, so if you requested a page from
-  http://example.com/, your ISP would send you the page without having to
+  https://example.com/, your ISP would send you the page without having to
   access example.com directly. The maintainers of example.com have no
   knowledge of this caching; the ISP sits between example.com and your Web
   browser, handling all of the caching transparently.
@@ -1049,8 +1049,8 @@ pages. We'll look at some of these headers in the sections that follow.
 
 .. _using-vary-headers:
 
-Using Vary headers
-==================
+Using ``Vary`` headers
+======================
 
 The ``Vary`` header defines which request headers a cache
 mechanism should take into account when building its cache key. For example, if
@@ -1059,7 +1059,7 @@ said to "vary on language."
 
 By default, Django's cache system creates its cache keys using the requested
 fully-qualified URL -- e.g.,
-``"http://www.example.com/stories/2005/?order_by=author"``. This means every
+``"https://www.example.com/stories/2005/?order_by=author"``. This means every
 request to that URL will use the same cached version, regardless of user-agent
 differences such as cookies or language preferences. However, if this page
 produces different content based on some difference in request headers -- such
@@ -1114,11 +1114,12 @@ The headers you pass to ``vary_on_headers`` are not case sensitive;
 You can also use a helper function, :func:`django.utils.cache.patch_vary_headers`,
 directly. This function sets, or adds to, the ``Vary header``. For example::
 
+    from django.shortcuts import render
     from django.utils.cache import patch_vary_headers
 
     def my_view(request):
         # ...
-        response = render_to_response('template_name', context)
+        response = render(request, 'template_name', context)
         patch_vary_headers(response, ['Cookie'])
         return response
 
@@ -1169,7 +1170,7 @@ decorator)::
 
     @vary_on_cookie
     def list_blog_entries_view(request):
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             response = render_only_public_entries()
             patch_cache_control(response, public=True)
         else:
@@ -1230,8 +1231,8 @@ Example::
 
 .. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
-Order of MIDDLEWARE_CLASSES
-===========================
+Order of ``MIDDLEWARE_CLASSES``
+===============================
 
 If you use caching middleware, it's important to put each half in the right
 place within the :setting:`MIDDLEWARE_CLASSES` setting. That's because the cache

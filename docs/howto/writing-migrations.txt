@@ -9,7 +9,7 @@ migrations, see :doc:`the topic guide </topics/migrations>`.
 .. _data-migrations-and-multiple-databases:
 
 Data migrations and multiple databases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+======================================
 
 When using multiple databases, you may need to figure out whether or not to
 run a migration against a particular database. For example, you may want to
@@ -72,7 +72,7 @@ practice to pass ``model_name`` as a hint to make it as transparent as possible
 to the router. This is especially important for reusable and third-party apps.
 
 Migrations that add unique fields
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=================================
 
 Applying a "plain" migration that adds a unique non-nullable field to a table
 with existing rows will raise an error because the value used to populate
@@ -184,8 +184,55 @@ the respective field according to your needs.
   migration is running. Objects created after the ``AddField`` and before
   ``RunPython`` will have their original ``uuid``’s overwritten.
 
+.. _non-atomic-migrations:
+
+Non-atomic migrations
+~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.10
+
+On databases that support DDL transactions (SQLite and PostgreSQL), migrations
+will run inside a transaction by default. For use cases such as performing data
+migrations on large tables, you may want to prevent a migration from running in
+a transaction by setting the ``atomic`` attribute to ``False``::
+
+    from django.db import migrations
+
+    class Migration(migrations.Migration):
+        atomic = False
+
+Within such a migration, all operations are run without a transaction. It's
+possible to execute parts of the migration inside a transaction using
+:func:`~django.db.transaction.atomic()` or by passing ``atomic=True`` to
+``RunPython``.
+
+Here's an example of a non-atomic data migration that updates a large table in
+smaller batches::
+
+    import uuid
+
+    from django.db import migrations, transaction
+
+    def gen_uuid(apps, schema_editor):
+        MyModel = apps.get_model('myapp', 'MyModel')
+        while MyModel.objects.filter(uuid__isnull=True).exists():
+            with transaction.atomic():
+                for row in MyModel.objects.filter(uuid__isnull=True)[:1000]:
+                    row.uuid = uuid.uuid4()
+                    row.save()
+
+    class Migration(migrations.Migration):
+        atomic = False
+
+        operations = [
+            migrations.RunPython(gen_uuid),
+        ]
+
+The ``atomic`` attribute doesn't have an effect on databases that don't support
+DDL transactions (e.g. MySQL, Oracle).
+
 Controlling the order of migrations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===================================
 
 Django determines the order in which migrations should be applied not by the
 filename of each migration, but by building a graph using two properties on the
@@ -224,3 +271,54 @@ Prefer using ``dependencies`` over ``run_before`` when possible. You should
 only use ``run_before`` if it is undesirable or impractical to specify
 ``dependencies`` in the migration which you want to run after the one you are
 writing.
+
+Migrating data between third-party apps
+=======================================
+
+You can use a data migration to move data from one third-party application to
+another.
+
+If you plan to remove the old app later, you'll need to set the ``dependencies``
+property based on whether or not the old app is installed. Otherwise, you'll
+have missing dependencies once you uninstall the old app. Similarly, you'll
+need to catch :exc:`LookupError` in the ``apps.get_model()`` call that
+retrieves models from the old app. This approach allows you to deploy your
+project anywhere without first installing and then uninstalling the old app.
+
+Here's a sample migration:
+
+.. snippet::
+    :filename: myapp/migrations/0124_move_old_app_to_new_app.py
+
+    from django.apps import apps as global_apps
+    from django.db import migrations
+
+    def forwards(apps, schema_editor):
+        try:
+            OldModel = apps.get_model('old_app', 'OldModel')
+        except LookupError:
+            # The old app isn't installed.
+            return
+
+        NewModel = apps.get_model('new_app', 'NewModel')
+        NewModel.objects.bulk_create(
+            NewModel(new_attribute=old_object.old_attribute)
+            for old_object in OldModel.objects.all()
+        )
+
+    class Migration(migrations.Migration):
+        operations = [
+            migrations.RunPython(forwards, migrations.RunPython.noop),
+        ]
+        dependencies = [
+            ('myapp', '0123_the_previous_migration'),
+            ('new_app', '0001_initial'),
+        ]
+
+        if global_apps.is_installed('old_app'):
+            dependencies.append(('old_app', '0001_initial'))
+
+Also consider what you want to happen when the migration is unapplied. You
+could either do nothing (as in the example above) or remove some or all of the
+data from the new application. Adjust the second argument of the
+:mod:`~django.db.migrations.operations.RunPython` operation accordingly.

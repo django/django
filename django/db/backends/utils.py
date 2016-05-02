@@ -85,7 +85,8 @@ class CursorDebugWrapper(CursorWrapper):
                 'sql': sql,
                 'time': "%.3f" % duration,
             })
-            logger.debug('(%.3f) %s; args=%s' % (duration, sql, params),
+            logger.debug(
+                '(%.3f) %s; args=%s', duration, sql, params,
                 extra={'duration': duration, 'sql': sql, 'params': params}
             )
 
@@ -104,7 +105,8 @@ class CursorDebugWrapper(CursorWrapper):
                 'sql': '%s times: %s' % (times, sql),
                 'time': "%.3f" % duration,
             })
-            logger.debug('(%.3f) %s; args=%s' % (duration, sql, param_list),
+            logger.debug(
+                '(%.3f) %s; args=%s', duration, sql, param_list,
                 extra={'duration': duration, 'sql': sql, 'params': param_list}
             )
 
@@ -125,7 +127,7 @@ def typecast_time(s):  # does NOT store time zone information
         seconds, microseconds = seconds.split('.')
     else:
         microseconds = '0'
-    return datetime.time(int(hour), int(minutes), int(seconds), int(float('.' + microseconds) * 1000000))
+    return datetime.time(int(hour), int(minutes), int(seconds), int((microseconds + '000000')[:6]))
 
 
 def typecast_timestamp(s):  # does NOT store time zone information
@@ -154,9 +156,11 @@ def typecast_timestamp(s):  # does NOT store time zone information
     else:
         microseconds = '0'
     tzinfo = utc if settings.USE_TZ else None
-    return datetime.datetime(int(dates[0]), int(dates[1]), int(dates[2]),
+    return datetime.datetime(
+        int(dates[0]), int(dates[1]), int(dates[2]),
         int(times[0]), int(times[1]), int(seconds),
-        int((microseconds + '000000')[:6]), tzinfo)
+        int((microseconds + '000000')[:6]), tzinfo
+    )
 
 
 def typecast_decimal(s):

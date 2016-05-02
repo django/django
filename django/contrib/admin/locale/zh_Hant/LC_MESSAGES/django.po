@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013-2014
@@ -12,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 08:16+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -80,6 +81,12 @@ msgstr "動作:"
 msgid "action time"
 msgstr "動作時間"
 
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
 msgid "object id"
 msgstr "物件 id"
 
@@ -118,6 +125,9 @@ msgstr "None"
 
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "按住 \"Control\" 或 \"Command\" (Mac)，可選取多個值"
+
+msgid "Added."
 msgstr ""
 
 #, python-format
@@ -229,6 +239,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"刪除 %(class_name)s %(instance)s 將會同時刪除下面受保護的相關物件："
+"%(related_objects)s"
 
 msgid "Django site admin"
 msgstr "Django 網站管理"
@@ -374,13 +386,13 @@ msgstr ""
 "被刪除:"
 
 msgid "Objects"
-msgstr ""
+msgstr "物件"
 
 msgid "Yes, I'm sure"
 msgstr "是的，我確定"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "不，請帶我回去"
 
 msgid "Delete multiple objects"
 msgstr "刪除多個物件"
@@ -425,7 +437,7 @@ msgid " By %(filter_title)s "
 msgstr " 以 %(filter_title)s"
 
 msgid "Summary"
-msgstr ""
+msgstr "總結"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -454,6 +466,12 @@ msgstr ""
 "你的資料庫安裝有錯誤。確定資料庫表格已經建立，並確定資料庫可被合適的使用者讀"
 "取。"
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
 msgid "Forgotten your password or username?"
 msgstr "忘了你的密碼或是使用者名稱？"
 
@@ -477,17 +495,20 @@ msgstr "顯示全部"
 msgid "Save"
 msgstr "儲存"
 
+msgid "Popup closing..."
+msgstr ""
+
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "變更所選的 %(model)s"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "新增其它 %(model)s"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "刪除所選的 %(model)s"
 
 msgid "Search"
 msgstr "搜尋"
@@ -603,9 +624,6 @@ msgstr "重設我的密碼"
 
 msgid "All dates"
 msgstr "所有日期"
-
-msgid "(None)"
-msgstr "(無)"
 
 #, python-format
 msgid "Select %s"

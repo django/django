@@ -1,4 +1,4 @@
-/*global gettext, get_format, quickElement, removeChildren*/
+/*global gettext, pgettext, get_format, quickElement, removeChildren, addEvent*/
 /*
 calendar.js - Calendar functions by Adrian Holovaty
 depends on core.js for utility functions like removeChildren or quickElement
@@ -8,8 +8,29 @@ depends on core.js for utility functions like removeChildren or quickElement
     'use strict';
     // CalendarNamespace -- Provides a collection of HTML calendar-related helper functions
     var CalendarNamespace = {
-        monthsOfYear: gettext('January February March April May June July August September October November December').split(' '),
-        daysOfWeek: gettext('S M T W T F S').split(' '),
+        monthsOfYear: [
+            gettext('January'),
+            gettext('February'),
+            gettext('March'),
+            gettext('April'),
+            gettext('May'),
+            gettext('June'),
+            gettext('July'),
+            gettext('August'),
+            gettext('September'),
+            gettext('October'),
+            gettext('November'),
+            gettext('December')
+        ],
+        daysOfWeek: [
+            pgettext('one letter Sunday', 'S'),
+            pgettext('one letter Monday', 'M'),
+            pgettext('one letter Tuesday', 'T'),
+            pgettext('one letter Wednesday', 'W'),
+            pgettext('one letter Thursday', 'T'),
+            pgettext('one letter Friday', 'F'),
+            pgettext('one letter Saturday', 'S')
+        ],
         firstDayOfWeek: parseInt(get_format('FIRST_DAY_OF_WEEK')),
         isLeapYear: function(year) {
             return (((year % 4) === 0) && ((year % 100) !== 0 ) || ((year % 400) === 0));
@@ -79,6 +100,14 @@ depends on core.js for utility functions like removeChildren or quickElement
                 nonDayCell.className = "nonday";
             }
 
+            function calendarMonth(y, m) {
+                function onClick(e) {
+                    e.preventDefault();
+                    callback(y, m, django.jQuery(this).text());
+                }
+                return onClick;
+            }
+
             // Draw days of month
             var currentDay = 1;
             for (i = startingPos; currentDay <= days; i++) {
@@ -100,8 +129,8 @@ depends on core.js for utility functions like removeChildren or quickElement
                 }
 
                 var cell = quickElement('td', tableRow, '', 'class', todayClass);
-
-                quickElement('a', cell, currentDay, 'href', 'javascript:void(' + callback + '(' + year + ',' + month + ',' + currentDay + '));');
+                var link = quickElement('a', cell, currentDay, 'href', '#');
+                addEvent(link, 'click', calendarMonth(year, month));
                 currentDay++;
             }
 
@@ -175,4 +204,5 @@ depends on core.js for utility functions like removeChildren or quickElement
         }
     };
     window.Calendar = Calendar;
+    window.CalendarNamespace = CalendarNamespace;
 })();

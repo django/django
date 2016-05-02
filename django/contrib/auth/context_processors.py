@@ -13,7 +13,7 @@ class PermLookupDict(object):
         return self.user.has_perm("%s.%s" % (self.app_label, perm_name))
 
     def __iter__(self):
-        # To fix 'item in perms.someapp' and __getitem__ iteraction we need to
+        # To fix 'item in perms.someapp' and __getitem__ interaction we need to
         # define __iter__. See #18979 for details.
         raise TypeError("PermLookupDict is not iterable.")
 

@@ -1,14 +1,17 @@
 from django.db import models
 from django.test import SimpleTestCase
+from django.test.utils import isolate_apps
 
 
+@isolate_apps('absolute_url_overrides')
 class AbsoluteUrlOverrideTests(SimpleTestCase):
 
     def test_get_absolute_url(self):
         """
         get_absolute_url() functions as a normal method.
         """
-        get_absolute_url = lambda o: '/test-a/%s/' % o.pk
+        def get_absolute_url(o):
+            return '/test-a/%s/' % o.pk
         TestA = self._create_model_class('TestA', get_absolute_url)
 
         self.assertTrue(hasattr(TestA, 'get_absolute_url'))
@@ -19,7 +22,8 @@ class AbsoluteUrlOverrideTests(SimpleTestCase):
         """
         ABSOLUTE_URL_OVERRIDES should override get_absolute_url().
         """
-        get_absolute_url = lambda o: '/test-b/%s/' % o.pk
+        def get_absolute_url(o):
+            return '/test-b/%s/' % o.pk
         with self.settings(
             ABSOLUTE_URL_OVERRIDES={
                 'absolute_url_overrides.testb': lambda o: '/overridden-test-b/%s/' % o.pk,

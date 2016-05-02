@@ -8,7 +8,7 @@ Django 1.4.7 fixes one security issue present in previous Django releases in
 the 1.4 series.
 
 Directory traversal vulnerability in ``ssi`` template tag
----------------------------------------------------------
+=========================================================
 
 In previous versions of Django it was possible to bypass the
 ``ALLOWED_INCLUDE_ROOTS`` setting used for security with the ``ssi``

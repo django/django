@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Emin Mastizada <emin@mastizada.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Azerbaijani (http://www.transifex.com/projects/p/django/"
-"language/az/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2016-02-17 21:41+0000\n"
+"Last-Translator: Emin Mastizada <emin@mastizada.com>\n"
+"Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
+"az/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -32,7 +33,7 @@ msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Seçilmiş %(verbose_name_plural)s-ləri sil"
 
 msgid "Administration"
-msgstr ""
+msgstr "Administrasiya"
 
 msgid "All"
 msgstr "Hamısı"
@@ -66,12 +67,20 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Lütfən, əməkdaş hesabı üçün doğru %(username)s və parol daxil olun. Nəzərə "
+"alın ki, hər iki bölüm böyük/kiçik hərflərə həssasdırlar."
 
 msgid "Action:"
 msgstr "Əməliyyat:"
 
 msgid "action time"
 msgstr "əməliyyat vaxtı"
+
+msgid "user"
+msgstr "istifadəçi"
+
+msgid "content type"
+msgstr "məzmun növü"
 
 msgid "object id"
 msgstr "obyekt id"
@@ -112,6 +121,11 @@ msgstr "Heç nə"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Birdən çox seçmək üçün \"Control\" və ya Mac üçün \"Command\" düyməsini "
+"basılı tutun."
+
+msgid "Added."
+msgstr "Əlavə edildi."
 
 #, python-format
 msgid "Changed %s."
@@ -147,6 +161,8 @@ msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"\"%(obj)s\" %(name)s uğurla əlavə edildi. Aşağıdan başqa bir %(name)s əlavə "
+"edə bilərsiz."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
@@ -157,12 +173,15 @@ msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr ""
+"\"%(obj)s\" %(name)s uğurla dəyişdirildi. Bunu aşağıda yenidən dəyişdirə "
+"bilərsiniz."
 
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"\"%(obj)s\" %(name)s uğurla dəyişdirildi. Digər %(name)s əlavə edə bilərsiz."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
@@ -200,14 +219,14 @@ msgstr "Bazada xəta"
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)s %(name)s uğurlu dəyişdirildi."
+msgstr[1] "%(count)s %(name)s uğurlu dəyişdirildi."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(total_count)s seçili"
+msgstr[1] "Bütün %(total_count)s seçili"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -221,13 +240,15 @@ msgstr "Dəyişmə tarixi: %s"
 #. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
-msgstr ""
+msgstr "%(class_name)s %(instance)s"
 
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"%(class_name)s %(instance)s silmə əlaqəli qorunmalı obyektləri silməyi tələb "
+"edir: %(related_objects)s"
 
 msgid "Django site admin"
 msgstr "Django sayt administratoru"
@@ -243,7 +264,7 @@ msgstr "Daxil ol"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "%(app)s administrasiyası"
 
 msgid "Page not found"
 msgstr "Səhifə tapılmadı"
@@ -305,7 +326,7 @@ msgstr ""
 "other: Aşağıdakı səhvləri düzəltməyi xahiş edirik."
 
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Lütfən aşağıdakı səhvləri düzəldin."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -315,7 +336,7 @@ msgid "Welcome,"
 msgstr "Xoş gördük,"
 
 msgid "View site"
-msgstr ""
+msgstr "Saytı ziyarət et"
 
 msgid "Documentation"
 msgstr "Sənədləşdirmə"
@@ -379,13 +400,13 @@ msgstr ""
 "bağlı olan aşağıdakı obyektlər də silinəcək:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Obyektlər"
 
 msgid "Yes, I'm sure"
 msgstr "Hə, əminəm"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Xeyr, məni geri götür"
 
 msgid "Delete multiple objects"
 msgstr "Bir neçə obyekt sil"
@@ -434,7 +455,7 @@ msgid " By %(filter_title)s "
 msgstr " %(filter_title)s görə "
 
 msgid "Summary"
-msgstr ""
+msgstr "İcmal"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -463,6 +484,14 @@ msgstr ""
 "Bazanın qurulması ilə nəsə problem var. Lazımi cədvəllərin bazada "
 "yaradıldığını və uyğun istifadəçinin bazadan oxuya bildiyini yoxlayın."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"%(username)s olaraq daxil olmusunuz, amma bu səhifəyə icazəniz yoxdur. Başqa "
+"bir hesaba daxil olmaq istərdiniz?"
+
 msgid "Forgotten your password or username?"
 msgstr "Parol və ya istifadəçi adını unutmusan?"
 
@@ -488,17 +517,20 @@ msgstr "Hamısını göstər"
 msgid "Save"
 msgstr "Yadda saxla"
 
+msgid "Popup closing..."
+msgstr "Qəfl pəncərə qapatılır..."
+
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "Seçilmiş %(model)s dəyişdir"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "Başqa %(model)s əlavə et"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "Seçilmiş %(model)s sil"
 
 msgid "Search"
 msgstr "Axtar"
@@ -506,8 +538,8 @@ msgstr "Axtar"
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(counter)s nəticə"
+msgstr[1] "%(counter)s nəticə"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -575,11 +607,15 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Əgər daxil etdiyiniz e-poçt ünvanıyla hesab mövcuddursa, parolu qurmağınız "
+"üçün sizə e-poçt göndərdik. Qısa zamanda alacaqsınız."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Əgər e-poçt gəlmədiysə lütfən, qeyd olduğunuz ünvanla istədiyinizə əmin olun "
+"və spam qutunuzu yoxlayın."
 
 #, python-format
 msgid ""
@@ -618,9 +654,6 @@ msgstr "Parolumu sıfırla"
 msgid "All dates"
 msgstr "Bütün tarixlərdə"
 
-msgid "(None)"
-msgstr "(Heç nə)"
-
 #, python-format
 msgid "Select %s"
 msgstr "%s seç"
@@ -639,7 +672,7 @@ msgid "Lookup"
 msgstr "Sorğu"
 
 msgid "Currently:"
-msgstr ""
+msgstr "Hazırda:"
 
 msgid "Change:"
-msgstr ""
+msgstr "Dəyişdir:"

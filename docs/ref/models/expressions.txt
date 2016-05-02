@@ -261,6 +261,34 @@ The ``Func`` API is as follows:
         different number of expressions, ``TypeError`` will be raised. Defaults
         to ``None``.
 
+    .. method:: as_sql(compiler, connection, function=None, template=None, arg_joiner=None, **extra_context)
+
+        Generates the SQL for the database function.
+
+        The ``as_vendor()`` methods should use the ``function``, ``template``,
+        ``arg_joiner``, and any other ``**extra_context`` parameters to
+        customize the SQL as needed. For example:
+
+        .. snippet::
+            :filename: django/db/models/functions.py
+
+            class ConcatPair(Func):
+                ...
+                function = 'CONCAT'
+                ...
+
+                def as_mysql(self, compiler, connection):
+                    return super(ConcatPair, self).as_sql(
+                        compiler, connection,
+                        function='CONCAT_WS',
+                        template="%(function)s('', %(expressions)s)",
+                    )
+
+        .. versionchanged:: 1.10
+
+            Support for the ``arg_joiner`` and ``**extra_context`` parameters
+            was added.
+
 The ``*expressions`` argument is a list of positional expressions that the
 function will be applied to. The expressions will be converted to strings,
 joined together with ``arg_joiner``, and then interpolated into the ``template``
@@ -271,10 +299,10 @@ assumed to be column references and will be wrapped in ``F()`` expressions
 while other values will be wrapped in ``Value()`` expressions.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
-into the ``template`` attribute. Note that the keywords ``function`` and
-``template`` can be used to replace the ``function`` and ``template``
-attributes respectively, without having to define your own class.
-``output_field`` can be used to define the expected return type.
+into the ``template`` attribute. The ``function``, ``template``, and
+``arg_joiner`` keywords can be used to replace the attributes of the same name
+without having to define your own class. ``output_field`` can be used to define
+the expected return type.
 
 ``Aggregate()`` expressions
 ---------------------------
@@ -448,7 +476,7 @@ calling the appropriate methods on the wrapped expression.
         Tells Django that this expression contains an aggregate and that a
         ``GROUP BY`` clause needs to be added to the query.
 
-    .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False)
+    .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 
         Provides the chance to do any pre-processing or validation of
         the expression before it's added to the query. ``resolve_expression()``
@@ -498,23 +526,6 @@ calling the appropriate methods on the wrapped expression.
         A hook allowing the expression to coerce ``value`` into a more
         appropriate type.
 
-    .. method:: refs_aggregate(existing_aggregates)
-
-        Returns a tuple containing the ``(aggregate, lookup_path)`` of the
-        first aggregate that this expression (or any nested expression)
-        references, or ``(False, ())`` if no aggregate is referenced.
-        For example::
-
-            queryset.filter(num_chairs__gt=F('sum__employees'))
-
-        The ``F()`` expression here references a previous ``Sum()``
-        computation which means that this filter expression should be
-        added to the ``HAVING`` clause rather than the ``WHERE`` clause.
-
-        In the majority of cases, returning the result of ``refs_aggregate``
-        on any nested expression should be appropriate, as the necessary
-        built-in expressions will return the correct values.
-
     .. method:: get_group_by_cols()
 
         Responsible for returning the list of columns references by
@@ -560,7 +571,7 @@ an ``__init__()`` method to set some attributes::
   class Coalesce(Expression):
       template = 'COALESCE( %(expressions)s )'
 
-      def __init__(self, expressions, output_field, **extra):
+      def __init__(self, expressions, output_field):
         super(Coalesce, self).__init__(output_field=output_field)
         if len(expressions) < 2:
             raise ValueError('expressions must have at least 2 elements')
@@ -568,7 +579,6 @@ an ``__init__()`` method to set some attributes::
             if not hasattr(expression, 'resolve_expression'):
                 raise TypeError('%r is not an Expression' % expression)
         self.expressions = expressions
-        self.extra = extra
 
 We do some basic validation on the parameters, including requiring at least
 2 columns or values, and ensuring they are expressions. We are requiring
@@ -579,31 +589,39 @@ Now we implement the pre-processing and validation. Since we do not have
 any of our own validation at this point, we just delegate to the nested
 expressions::
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         c = self.copy()
         c.is_summary = summarize
         for pos, expression in enumerate(self.expressions):
-            c.expressions[pos] = expression.resolve_expression(query, allow_joins, reuse, summarize)
+            c.expressions[pos] = expression.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         return c
 
 Next, we write the method responsible for generating the SQL::
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, template=None):
         sql_expressions, sql_params = [], []
         for expression in self.expressions:
             sql, params = compiler.compile(expression)
             sql_expressions.append(sql)
             sql_params.extend(params)
-        self.extra['expressions'] = ','.join(sql_expressions)
-        return self.template % self.extra, sql_params
+        template = template or self.template
+        data = {'expressions': ','.join(sql_expressions)}
+        return template % data, params
 
     def as_oracle(self, compiler, connection):
         """
         Example of vendor specific handling (Oracle in this case).
         Let's make the function name lowercase.
         """
-        self.template = 'coalesce( %(expressions)s )'
-        return self.as_sql(compiler, connection)
+        return self.as_sql(compiler, connection, template='coalesce( %(expressions)s )')
+
+``as_sql()`` methods can support custom keyword arguments, allowing
+``as_vendorname()`` methods to override data used to generate the SQL string.
+Using ``as_sql()`` keyword arguments for customization is preferable to
+mutating ``self`` within ``as_vendorname()`` methods as the latter can lead to
+errors when running on different database backends. If your class relies on
+class attributes to define data, consider allowing overrides in your
+``as_sql()`` method.
 
 We generate the SQL for each of the ``expressions`` by using the
 ``compiler.compile()`` method, and join the result together with commas.
@@ -640,3 +658,34 @@ Let's see how it works::
     Apple: AAPL
     Yahoo: Internet Company
     Django Software Foundation: No Tagline
+
+Adding support in third-party database backends
+-----------------------------------------------
+
+If you're using a database backend that uses a different SQL syntax for a
+certain function, you can add support for it by monkey patching a new method
+onto the function's class.
+
+Let's say we're writing a backend for Microsoft's SQL Server which uses the SQL
+``LEN`` instead of ``LENGTH`` for the :class:`~functions.Length` function.
+We'll monkey patch a new method called ``as_sqlserver()`` onto the ``Length``
+class::
+
+    from django.db.models.functions import Length
+
+    def sqlserver_length(self, compiler, connection):
+        return self.as_sql(compiler, connection, function='LEN')
+
+    Length.as_sqlserver = sqlserver_length
+
+You can also customize the SQL using the ``template`` parameter of ``as_sql()``.
+
+We use ``as_sqlserver()`` because ``django.db.connection.vendor`` returns
+``sqlserver`` for the backend.
+
+Third-party backends can register their functions in the top level
+``__init__.py`` file of the backend package or in a top level ``expressions.py``
+file (or package) that is imported from the top level ``__init__.py``.
+
+For user projects wishing to patch the backend that they're using, this code
+should live in an :meth:`AppConfig.ready()<django.apps.AppConfig.ready>` method.

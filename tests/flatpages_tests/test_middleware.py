@@ -57,7 +57,6 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
     def test_view_flatpage(self):
         "A flatpage can be served through a view, even when the middleware is in use"
         response = self.client.get('/flatpage_root/flatpage/')
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_view_non_existent_flatpage(self):
@@ -69,16 +68,14 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         "A flatpage served through a view can require authentication"
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertRedirects(response, '/accounts/login/?next=/flatpage_root/sekrit/')
-        User.objects.create_user('testuser', 'test@example.com', 's3krit')
-        self.client.login(username='testuser', password='s3krit')
+        user = User.objects.create_user('testuser', 'test@example.com', 's3krit')
+        self.client.force_login(user)
         response = self.client.get('/flatpage_root/sekrit/')
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it sekrit!</p>")
 
     def test_fallback_flatpage(self):
         "A flatpage can be served by the fallback middleware"
         response = self.client.get('/flatpage/')
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_fallback_non_existent_flatpage(self):
@@ -90,10 +87,9 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         "A flatpage served by the middleware can require authentication"
         response = self.client.get('/sekrit/')
         self.assertRedirects(response, '/accounts/login/?next=/sekrit/')
-        User.objects.create_user('testuser', 'test@example.com', 's3krit')
-        self.client.login(username='testuser', password='s3krit')
+        user = User.objects.create_user('testuser', 'test@example.com', 's3krit')
+        self.client.force_login(user)
         response = self.client.get('/sekrit/')
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it sekrit!</p>")
 
     def test_fallback_flatpage_special_chars(self):
@@ -108,7 +104,6 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         fp.sites.add(settings.SITE_ID)
 
         response = self.client.get('/some.very_special~chars-here/')
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it special!</p>")
 
 
@@ -176,5 +171,4 @@ class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
         fp.sites.add(settings.SITE_ID)
 
         response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Root</p>")

@@ -123,8 +123,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Destroys this Geometry; in other words, frees the memory used by the
         GEOS C++ object.
         """
-        if self._ptr and capi:
+        try:
             capi.destroy_geom(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     def __copy__(self):
         """
@@ -294,6 +296,14 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Returns true if other.within(this) returns true."
         return capi.geos_contains(self.ptr, other.ptr)
 
+    def covers(self, other):
+        """
+        Return True if the DE-9IM Intersection Matrix for the two geometries is
+        T*****FF*, *T****FF*, ***T**FF*, or ****T*FF*. If either geometry is
+        empty, return False.
+        """
+        return capi.geos_covers(self.ptr, other.ptr)
+
     def crosses(self, other):
         """
         Returns true if the DE-9IM intersection matrix for the two Geometries
@@ -398,7 +408,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def wkt(self):
         "Returns the WKT (Well-Known Text) representation of this Geometry."
-        return wkt_w(3 if self.hasz else 2).write(self).decode()
+        return wkt_w(dim=3 if self.hasz else 2, trim=True).write(self).decode()
 
     @property
     def hex(self):
@@ -409,7 +419,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         # A possible faster, all-python, implementation:
         #  str(self.wkb).encode('hex')
-        return wkb_w(3 if self.hasz else 2).write_hex(self)
+        return wkb_w(dim=3 if self.hasz else 2).write_hex(self)
 
     @property
     def hexewkb(self):
@@ -418,7 +428,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         extension of the WKB specification that includes SRID value that are
         a part of this geometry.
         """
-        return ewkb_w(3 if self.hasz else 2).write_hex(self)
+        return ewkb_w(dim=3 if self.hasz else 2).write_hex(self)
 
     @property
     def json(self):
@@ -675,7 +685,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         return GEOSGeometry(capi.geom_clone(self.ptr), srid=self.srid)
 
 
-class ProjectInterpolateMixin(object):
+class LinearGeometryMixin(object):
     """
     Used for LineString and MultiLineString.
     """
@@ -696,3 +706,17 @@ class ProjectInterpolateMixin(object):
         if not isinstance(point, Point):
             raise TypeError('locate_point argument must be a Point')
         return capi.geos_project_normalized(self.ptr, point.ptr)
+
+    @property
+    def merged(self):
+        """
+        Return the line merge of this Geometry.
+        """
+        return self._topology(capi.geos_linemerge(self.ptr))
+
+    @property
+    def closed(self):
+        """
+        Return whether or not this Geometry is closed.
+        """
+        return capi.geos_isclosed(self.ptr)

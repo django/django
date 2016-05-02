@@ -56,10 +56,9 @@ class MigrateTests(TransactionTestCase):
             # Not all GIS backends have geometry columns model
             pass
         else:
-            self.assertEqual(
-                GeoColumn.objects.filter(
-                    **{'%s__in' % GeoColumn.table_name_col(): ["gis_neighborhood", "gis_household"]}
-                    ).count(),
-                0)
+            qs = GeoColumn.objects.filter(
+                **{'%s__in' % GeoColumn.table_name_col(): ["gis_neighborhood", "gis_household"]}
+            )
+            self.assertEqual(qs.count(), 0)
         # Revert the "unmigration"
         call_command("migrate", "gis_migrations", verbosity=0)

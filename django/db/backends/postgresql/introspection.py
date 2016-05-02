@@ -46,8 +46,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_field_type(self, data_type, description):
         field_type = super(DatabaseIntrospection, self).get_field_type(data_type, description)
-        if field_type == 'IntegerField' and description.default and 'nextval' in description.default:
-            return 'AutoField'
+        if description.default and 'nextval' in description.default:
+            if field_type == 'IntegerField':
+                return 'AutoField'
+            elif field_type == 'BigIntegerField':
+                return 'BigAutoField'
         return field_type
 
     def get_table_list(self, cursor):
@@ -75,9 +78,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE table_name = %s""", [table_name])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*((force_text(line[0]),) + line[1:6]
-                            + (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])))
-                for line in cursor.description]
+        return [
+            FieldInfo(*(
+                (force_text(line[0]),) +
+                line[1:6] +
+                (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])
+            )) for line in cursor.description
+        ]
 
     def get_relations(self, cursor, table_name):
         """

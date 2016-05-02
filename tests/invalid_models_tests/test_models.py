@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 
 import unittest
+import warnings
 
 from django.conf import settings
 from django.core.checks import Error
 from django.db import connections, models
-from django.test.utils import override_settings
-
-from .base import IsolatedModelsTestCase
+from django.test import SimpleTestCase
+from django.test.utils import isolate_apps, override_settings
 
 
 def get_max_column_name_length():
@@ -31,7 +31,8 @@ def get_max_column_name_length():
     return (allowed_len, db_alias)
 
 
-class IndexTogetherTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class IndexTogetherTests(SimpleTestCase):
 
     def test_non_iterable(self):
         class Model(models.Model):
@@ -42,7 +43,6 @@ class IndexTogetherTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'index_together' must be a list or tuple.",
-                hint=None,
                 obj=Model,
                 id='models.E008',
             ),
@@ -58,7 +58,6 @@ class IndexTogetherTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'index_together' must be a list or tuple.",
-                hint=None,
                 obj=Model,
                 id='models.E008',
             ),
@@ -74,7 +73,6 @@ class IndexTogetherTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "All 'index_together' elements must be lists or tuples.",
-                hint=None,
                 obj=Model,
                 id='models.E009',
             ),
@@ -92,7 +90,6 @@ class IndexTogetherTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'index_together' refers to the non-existent field 'missing_field'.",
-                hint=None,
                 obj=Model,
                 id='models.E012',
             ),
@@ -137,7 +134,6 @@ class IndexTogetherTests(IsolatedModelsTestCase):
             Error(
                 "'index_together' refers to a ManyToManyField 'm2m', but "
                 "ManyToManyFields are not permitted in 'index_together'.",
-                hint=None,
                 obj=Model,
                 id='models.E013',
             ),
@@ -146,7 +142,8 @@ class IndexTogetherTests(IsolatedModelsTestCase):
 
 
 # unique_together tests are very similar to index_together tests.
-class UniqueTogetherTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class UniqueTogetherTests(SimpleTestCase):
 
     def test_non_iterable(self):
         class Model(models.Model):
@@ -157,7 +154,6 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'unique_together' must be a list or tuple.",
-                hint=None,
                 obj=Model,
                 id='models.E010',
             ),
@@ -176,7 +172,6 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "All 'unique_together' elements must be lists or tuples.",
-                hint=None,
                 obj=Model,
                 id='models.E011',
             ),
@@ -192,7 +187,6 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'unique_together' must be a list or tuple.",
-                hint=None,
                 obj=Model,
                 id='models.E010',
             ),
@@ -222,7 +216,6 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'unique_together' refers to the non-existent field 'missing_field'.",
-                hint=None,
                 obj=Model,
                 id='models.E012',
             ),
@@ -243,7 +236,6 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
             Error(
                 "'unique_together' refers to a ManyToManyField 'm2m', but "
                 "ManyToManyFields are not permitted in 'unique_together'.",
-                hint=None,
                 obj=Model,
                 id='models.E013',
             ),
@@ -251,7 +243,8 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class FieldNamesTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class FieldNamesTests(SimpleTestCase):
 
     def test_ending_with_underscore(self):
         class Model(models.Model):
@@ -262,13 +255,11 @@ class FieldNamesTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Field names must not end with an underscore.',
-                hint=None,
                 obj=Model._meta.get_field('field_'),
                 id='fields.E001',
             ),
             Error(
                 'Field names must not end with an underscore.',
-                hint=None,
                 obj=Model._meta.get_field('m2m_'),
                 id='fields.E001',
             ),
@@ -277,8 +268,7 @@ class FieldNamesTests(IsolatedModelsTestCase):
 
     max_column_name_length, column_limit_db_alias = get_max_column_name_length()
 
-    @unittest.skipIf(max_column_name_length is None,
-                    "The database doesn't have a column name length limit.")
+    @unittest.skipIf(max_column_name_length is None, "The database doesn't have a column name length limit.")
     def test_M2M_long_column_name(self):
         """
         #13711 -- Model check for long M2M column names when database has
@@ -343,15 +333,15 @@ class FieldNamesTests(IsolatedModelsTestCase):
                     'Autogenerated column name too long for M2M field "%s". '
                     'Maximum length is "%s" for database "%s".'
                     % (m2m_long_name, self.max_column_name_length, self.column_limit_db_alias),
-                    hint=("Use 'through' to create a separate model for "
-                        "M2M and then set column_name using 'db_column'."),
+                    hint="Use 'through' to create a separate model for "
+                         "M2M and then set column_name using 'db_column'.",
                     obj=ModelWithLongField,
                     id='models.E019',
                 )
             ]
 
         # Second error because the FK specified in the `through` model
-        # `m2msimple` has auto-genererated name longer than allowed.
+        # `m2msimple` has auto-generated name longer than allowed.
         # There will be no check errors in the other M2M because it
         # specifies db_column for the FK in `through` model even if the actual
         # name is longer than the limits of the database.
@@ -360,8 +350,8 @@ class FieldNamesTests(IsolatedModelsTestCase):
                 'Autogenerated column name too long for M2M field "%s_id". '
                 'Maximum length is "%s" for database "%s".'
                 % (long_field_name, self.max_column_name_length, self.column_limit_db_alias),
-                hint=("Use 'through' to create a separate model for "
-                    "M2M and then set column_name using 'db_column'."),
+                hint="Use 'through' to create a separate model for "
+                     "M2M and then set column_name using 'db_column'.",
                 obj=ModelWithLongField,
                 id='models.E019',
             )
@@ -369,8 +359,7 @@ class FieldNamesTests(IsolatedModelsTestCase):
 
         self.assertEqual(errors, expected)
 
-    @unittest.skipIf(max_column_name_length is None,
-                    "The database doesn't have a column name length limit.")
+    @unittest.skipIf(max_column_name_length is None, "The database doesn't have a column name length limit.")
     def test_local_field_long_column_name(self):
         """
         #13711 -- Model check for long column names
@@ -411,7 +400,6 @@ class FieldNamesTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Field names must not contain "__".',
-                hint=None,
                 obj=Model._meta.get_field('some__field'),
                 id='fields.E002',
             )
@@ -426,7 +414,6 @@ class FieldNamesTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'pk' is a reserved word that cannot be used as a field name.",
-                hint=None,
                 obj=Model._meta.get_field('pk'),
                 id='fields.E003',
             )
@@ -434,7 +421,8 @@ class FieldNamesTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ShadowingFieldsTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ShadowingFieldsTests(SimpleTestCase):
 
     def test_field_name_clash_with_child_accessor(self):
         class Parent(models.Model):
@@ -448,7 +436,6 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
             Error(
                 "The field 'child' clashes with the field "
                 "'child' from model 'invalid_models_tests.parent'.",
-                hint=None,
                 obj=Child._meta.get_field('child'),
                 id='models.E006',
             )
@@ -473,7 +460,6 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
                 "The field 'id' from parent model "
                 "'invalid_models_tests.mother' clashes with the field 'id' "
                 "from parent model 'invalid_models_tests.father'.",
-                hint=None,
                 obj=Child,
                 id='models.E005',
             ),
@@ -481,7 +467,6 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
                 "The field 'clash' from parent model "
                 "'invalid_models_tests.mother' clashes with the field 'clash' "
                 "from parent model 'invalid_models_tests.father'.",
-                hint=None,
                 obj=Child,
                 id='models.E005',
             )
@@ -505,7 +490,6 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
             Error(
                 "The field 'f' clashes with the field 'f_id' "
                 "from model 'invalid_models_tests.parent'.",
-                hint=None,
                 obj=Child._meta.get_field('f'),
                 id='models.E006',
             )
@@ -530,7 +514,6 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
             Error(
                 "The field 'clash' clashes with the field 'clash' "
                 "from model 'invalid_models_tests.grandparent'.",
-                hint=None,
                 obj=GrandChild._meta.get_field('clash'),
                 id='models.E006',
             )
@@ -550,7 +533,6 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
             Error(
                 "The field 'fk_id' clashes with the field 'fk' from model "
                 "'invalid_models_tests.model'.",
-                hint=None,
                 obj=Model._meta.get_field('fk_id'),
                 id='models.E006',
             )
@@ -558,7 +540,8 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class OtherModelTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class OtherModelTests(SimpleTestCase):
 
     def test_unique_primary_key(self):
         invalid_id = models.IntegerField(primary_key=False)
@@ -571,7 +554,6 @@ class OtherModelTests(IsolatedModelsTestCase):
             Error(
                 "'id' can only be used as a field name if the field also sets "
                 "'primary_key=True'.",
-                hint=None,
                 obj=Model,
                 id='models.E004',
             ),
@@ -588,7 +570,6 @@ class OtherModelTests(IsolatedModelsTestCase):
             Error(
                 "'ordering' must be a tuple or list "
                 "(even if you want to order by only one field).",
-                hint=None,
                 obj=Model,
                 id='models.E014',
             ),
@@ -632,7 +613,6 @@ class OtherModelTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'ordering' and 'order_with_respect_to' cannot be used together.",
-                hint=None,
                 obj=Answer,
                 id='models.E021',
             ),
@@ -653,7 +633,6 @@ class OtherModelTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'ordering' refers to the non-existent field 'relation'.",
-                hint=None,
                 obj=Model,
                 id='models.E015',
             ),
@@ -669,7 +648,6 @@ class OtherModelTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'ordering' refers to the non-existent field 'missing_field'.",
-                hint=None,
                 obj=Model,
                 id='models.E015',
             )
@@ -689,7 +667,6 @@ class OtherModelTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'ordering' refers to the non-existent field 'missing_fk_field_id'.",
-                hint=None,
                 obj=Model,
                 id='models.E015',
             )
@@ -720,8 +697,6 @@ class OtherModelTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 "'TEST_SWAPPED_MODEL_BAD_VALUE' is not of the form 'app_label.app_name'.",
-                hint=None,
-                obj=None,
                 id='models.E001',
             ),
         ]
@@ -738,8 +713,6 @@ class OtherModelTests(IsolatedModelsTestCase):
             Error(
                 "'TEST_SWAPPED_MODEL_BAD_MODEL' references 'not_an_app.Target', "
                 'which has not been installed, or is abstract.',
-                hint=None,
-                obj=None,
                 id='models.E002',
             ),
         ]
@@ -750,10 +723,8 @@ class OtherModelTests(IsolatedModelsTestCase):
             pass
 
         class Group(models.Model):
-            primary = models.ManyToManyField(Person,
-                through="Membership", related_name="primary")
-            secondary = models.ManyToManyField(Person, through="Membership",
-                related_name="secondary")
+            primary = models.ManyToManyField(Person, through="Membership", related_name="primary")
+            secondary = models.ManyToManyField(Person, through="Membership", related_name="secondary")
 
         class Membership(models.Model):
             person = models.ForeignKey(Person, models.CASCADE)
@@ -764,9 +735,29 @@ class OtherModelTests(IsolatedModelsTestCase):
             Error(
                 "The model has two many-to-many relations through "
                 "the intermediate model 'invalid_models_tests.Membership'.",
-                hint=None,
                 obj=Group,
                 id='models.E003',
             )
         ]
         self.assertEqual(errors, expected)
+
+    def test_missing_parent_link(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+
+            class Place(models.Model):
+                pass
+
+            class ParkingLot(Place):
+                # In lieu of any other connector, an existing OneToOneField will be
+                # promoted to the primary key.
+                parent = models.OneToOneField(Place, models.CASCADE)
+
+        self.assertEqual(len(warns), 1)
+        msg = str(warns[0].message)
+        self.assertEqual(
+            msg,
+            'Add parent_link=True to invalid_models_tests.ParkingLot.parent '
+            'as an implicit link is deprecated.'
+        )
+        self.assertEqual(ParkingLot._meta.pk.name, 'parent')

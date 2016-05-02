@@ -14,7 +14,7 @@ class Point(GEOSGeometry):
     _maxlength = 3
     has_cs = True
 
-    def __init__(self, x, y=None, z=None, srid=None):
+    def __init__(self, x=None, y=None, z=None, srid=None):
         """
         The Point object may be initialized with either a tuple, or individual
         parameters.
@@ -23,22 +23,21 @@ class Point(GEOSGeometry):
         >>> p = Point((5, 23)) # 2D point, passed in as a tuple
         >>> p = Point(5, 23, 8) # 3D point, passed in with individual parameters
         """
-        if isinstance(x, (tuple, list)):
+        if x is None:
+            coords = []
+        elif isinstance(x, (tuple, list)):
             # Here a tuple or list was passed in under the `x` parameter.
-            ndim = len(x)
             coords = x
         elif isinstance(x, six.integer_types + (float,)) and isinstance(y, six.integer_types + (float,)):
             # Here X, Y, and (optionally) Z were passed in individually, as parameters.
             if isinstance(z, six.integer_types + (float,)):
-                ndim = 3
                 coords = [x, y, z]
             else:
-                ndim = 2
                 coords = [x, y]
         else:
             raise TypeError('Invalid parameters given for Point initialization.')
 
-        point = self._create_point(ndim, coords)
+        point = self._create_point(len(coords), coords)
 
         # Initializing using the address returned from the GEOS
         #  createPoint factory.
@@ -48,6 +47,9 @@ class Point(GEOSGeometry):
         """
         Create a coordinate sequence, set X, Y, [Z], and create point
         """
+        if not ndim:
+            return capi.create_point(None)
+
         if ndim < 2 or ndim > 3:
             raise TypeError('Invalid point dimension: %s' % str(ndim))
 

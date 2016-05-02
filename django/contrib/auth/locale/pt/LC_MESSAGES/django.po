@@ -9,11 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:30+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Portuguese (http://www.transifex.com/projects/p/django/"
-"language/pt/)\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-11-24 18:29+0000\n"
+"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
+"Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
+"pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -31,7 +31,7 @@ msgstr "Datas importantes"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "O objecto %(name)s com a chave primária %(key)r não existe."
 
 msgid "Password changed successfully."
 msgstr "Palavra-passe modificada com sucesso."
@@ -42,6 +42,12 @@ msgstr "Modificar a palavra-passe: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autenticação e Autorização"
+
+msgid "password"
+msgstr "palavra-passe"
+
+msgid "last login"
+msgstr "última entrada"
 
 msgid "No password set."
 msgstr "Nenhuma palavra-chave definida."
@@ -58,13 +64,13 @@ msgstr "Palavra-passe"
 msgid "Password confirmation"
 msgstr "Confirmação da palavra-passe"
 
-msgid "Enter the same password as above, for verification."
+msgid "Enter the same password as before, for verification."
 msgstr "Introduza a palavra-passe como acima, para verificação."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
 "Não são guardadas palavras-passe sem encriptação, portanto não é possível "
 "visualizar a password deste utilizador, mas poderá modificar a palavra-passe "
@@ -122,6 +128,9 @@ msgstr "verificação"
 msgid "name"
 msgstr "nome"
 
+msgid "content type"
+msgstr "tipo de conteúdo"
+
 msgid "codename"
 msgstr "nome de código"
 
@@ -136,12 +145,6 @@ msgstr "grupo"
 
 msgid "groups"
 msgstr "grupos"
-
-msgid "password"
-msgstr "palavra-passe"
-
-msgid "last login"
-msgstr "última entrada"
 
 msgid "superuser status"
 msgstr "Status de superuser"
@@ -216,6 +219,49 @@ msgstr "utilizador"
 
 msgid "users"
 msgstr "utilizadores"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Esta palavra-passe é muito curta. Deve conter pelo menos %(min_length)d "
+"caractere."
+msgstr[1] ""
+"Esta palavra-passe é muito curta. Deve conter pelo menos %(min_length)d "
+"caracteres."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+"A sua palavra-passe deve conter pelo menos %(min_length)d caractere."
+msgstr[1] ""
+"A sua palavra-passe deve conter pelo menos %(min_length)d caracteres."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "A palavra-passe é muito semelhante ao %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"Sua palavra-passe não pode ser muito semelhante a outras informações "
+"pessoais."
+
+msgid "This password is too common."
+msgstr "Esta palavra-passe é muito comum."
+
+msgid "Your password can't be a commonly used password."
+msgstr "A sua palavra-passe não pode ser uma palavra-passe comum."
+
+msgid "This password is entirely numeric."
+msgstr "Esta palavra-passe é inteiramente numérica."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Sua palavra-passe não pode ser inteiramente numérica."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

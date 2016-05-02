@@ -33,7 +33,7 @@ the ``admin.site.register(Question)`` line with:
 
 You'll follow this pattern -- create a model admin class, then pass it as the
 second argument to ``admin.site.register()`` -- any time you need to change the
-admin options for an model.
+admin options for a model.
 
 This particular change above makes the "Publication date" come before the
 "Question" field:
@@ -232,7 +232,8 @@ attributes, as follows:
     class Question(models.Model):
         # ...
         def was_published_recently(self):
-            return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+            now = timezone.now()
+            return now - datetime.timedelta(days=1) <= self.pub_date <= now
         was_published_recently.admin_order_field = 'pub_date'
         was_published_recently.boolean = True
         was_published_recently.short_description = 'Published recently?'

@@ -1,5 +1,3 @@
-import datetime
-
 from django.contrib.auth import authenticate
 from django.contrib.auth.context_processors import PermLookupDict, PermWrapper
 from django.contrib.auth.models import Permission, User
@@ -59,12 +57,7 @@ class PermWrapperTests(SimpleTestCase):
             self.EQLimiterObject() in pldict
 
 
-@override_settings(
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='auth_tests.urls',
-    TEMPLATES=AUTH_TEMPLATES,
-    USE_TZ=False,                           # required for loading the fixture
-)
+@override_settings(ROOT_URLCONF='auth_tests.urls', TEMPLATES=AUTH_TEMPLATES)
 class AuthContextProcessorTests(TestCase):
     """
     Tests for the ``django.contrib.auth.context_processors.auth`` processor
@@ -72,13 +65,7 @@ class AuthContextProcessorTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # password = "secret"
-        cls.u1 = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
-            first_name='Super', last_name='User', email='super@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
+        cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
 
     @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE_CLASSES)
     def test_session_not_accessed(self):
@@ -104,7 +91,7 @@ class AuthContextProcessorTests(TestCase):
             Permission.objects.get(
                 content_type=ContentType.objects.get_for_model(Permission),
                 codename='add_permission'))
-        self.client.login(username='normal', password='secret')
+        self.client.force_login(u)
         response = self.client.get('/auth_processor_perms/')
         self.assertContains(response, "Has auth permissions")
         self.assertContains(response, "Has auth.add_permission permissions")
@@ -123,7 +110,7 @@ class AuthContextProcessorTests(TestCase):
         self.assertNotContains(response, "nonexisting")
 
     def test_message_attrs(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
         response = self.client.get('/auth_processor_messages/')
         self.assertContains(response, "Message 1")
 
@@ -138,7 +125,7 @@ class AuthContextProcessorTests(TestCase):
         user = authenticate(username='super', password='secret')
         response = self.client.get('/auth_processor_user/')
         self.assertContains(response, "unicode: super")
-        self.assertContains(response, "id: 100")
+        self.assertContains(response, "id: %d" % self.superuser.pk)
         self.assertContains(response, "username: super")
         # bug #12037 is tested by the {% url %} in the template:
         self.assertContains(response, "url: /userpage/super/")
