@@ -702,7 +702,7 @@ Attributes
         ``reason_phrase`` no longer defaults to all capital letters. It now
         uses the `HTTP standard's`_ default reason phrases.
 
-        .. _`HTTP standard's`: https://www.ietf.org/rfc/rfc2616.txt
+        .. _`HTTP standard's`: https://tools.ietf.org/html/rfc7231
 
         Unless explicitly set, ``reason_phrase`` is determined by the current
         value of :attr:`status_code`.
@@ -865,7 +865,7 @@ Methods
     Writes a list of lines to the response. Line separators are not added. This
     method makes an :class:`HttpResponse` instance a stream-like object.
 
-.. _HTTP status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
+.. _HTTP status code: https://tools.ietf.org/html/rfc7231#section-6
 
 .. _ref-httpresponse-subclasses:
 
@@ -1074,7 +1074,7 @@ Attributes
         ``reason_phrase`` no longer defaults to all capital letters. It now
         uses the `HTTP standard's`_ default reason phrases.
 
-        .. _`HTTP standard's`: https://www.ietf.org/rfc/rfc2616.txt
+        .. _`HTTP standard's`: https://tools.ietf.org/html/rfc7231
 
         Unless explicitly set, ``reason_phrase`` is determined by the current
         value of :attr:`status_code`.
