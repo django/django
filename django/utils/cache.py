@@ -6,7 +6,7 @@ that header-patching themselves.
 
 For information on the Vary header, see:
 
-    http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+    https://tools.ietf.org/html/rfc7231#section-7.1.4
 
 Essentially, the "Vary" HTTP header defines which headers a cache should take
 into account when building its cache key. Requests with the same path but
