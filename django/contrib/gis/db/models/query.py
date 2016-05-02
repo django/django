@@ -453,7 +453,7 @@ class GeoQuerySet(QuerySet):
             # Using the field's get_placeholder() routine to get any needed
             # transformation SQL.
             geom = geo_field.get_prep_value(settings['procedure_args'][name])
-            params = geo_field.get_db_prep_lookup('contains', geom, connection=connection)
+            params = geo_field._get_db_prep_lookup('contains', geom, connection=connection)
             geom_placeholder = geo_field.get_placeholder(geom, None, connection)
 
             # Replacing the procedure format with that of any needed
@@ -510,7 +510,7 @@ class GeoQuerySet(QuerySet):
             raise ValueError('Unknown distance function: %s' % func)
         geom_3d = geo_field.dim == 3
 
-        # The field's get_db_prep_lookup() is used to get any
+        # The field's _get_db_prep_lookup() is used to get any
         # extra distance parameters.  Here we set up the
         # parameters that will be passed in to field's function.
         lookup_params = [geom or 'POINT (0 0)', 0]
@@ -526,7 +526,7 @@ class GeoQuerySet(QuerySet):
                         (not geography) and length):
             lookup_params.append('spheroid')
         lookup_params = geo_field.get_prep_value(lookup_params)
-        params = geo_field.get_db_prep_lookup('distance_lte', lookup_params, connection=connection)
+        params = geo_field._get_db_prep_lookup('distance_lte', lookup_params, connection=connection)
 
         # The `geom_args` flag is set to true if a geometry parameter was
         # passed in.
