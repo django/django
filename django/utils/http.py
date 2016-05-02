@@ -114,7 +114,7 @@ def cookie_date(epoch_seconds=None):
 def http_date(epoch_seconds=None):
     """
     Formats the time to match the RFC1123 date format as specified by HTTP
-    RFC2616 section 3.3.1.
+    RFC7231 section 7.1.1.1.
 
     Accepts a floating point number expressed in seconds since the epoch, in
     UTC - such as that outputted by time.time(). If set to None, defaults to
@@ -127,7 +127,7 @@ def http_date(epoch_seconds=None):
 
 def parse_http_date(date):
     """
-    Parses a date format as specified by HTTP RFC2616 section 3.3.1.
+    Parses a date format as specified by HTTP RFC7231 section 7.1.1.1.
 
     The three formats allowed by the RFC are accepted, even if only the first
     one is still in widespread use.
@@ -135,7 +135,7 @@ def parse_http_date(date):
     Returns an integer expressed in seconds since the epoch, in UTC.
     """
     # emails.Util.parsedate does the job for RFC1123 dates; unfortunately
-    # RFC2616 makes it mandatory to support RFC850 dates too. So we roll
+    # RFC7231 makes it mandatory to support RFC850 dates too. So we roll
     # our own RFC-compliant parsing.
     for regex in RFC1123_DATE, RFC850_DATE, ASCTIME_DATE:
         m = regex.match(date)

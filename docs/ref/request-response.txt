@@ -673,7 +673,7 @@ Attributes
 
 .. attribute:: HttpResponse.status_code
 
-    The `HTTP status code`_ for the response.
+    The :rfc:`HTTP status code <7231#section-6>` for the response.
 
     .. versionchanged:: 1.9
 
@@ -688,9 +688,8 @@ Attributes
     .. versionchanged:: 1.9
 
         ``reason_phrase`` no longer defaults to all capital letters. It now
-        uses the `HTTP standard's`_ default reason phrases.
-
-        .. _`HTTP standard's`: https://www.ietf.org/rfc/rfc2616.txt
+        uses the :rfc:`HTTP standard's <7231#section-6.1>` default reason
+        phrases.
 
         Unless explicitly set, ``reason_phrase`` is determined by the current
         value of :attr:`status_code`.
@@ -727,7 +726,7 @@ Methods
     specified, it is formed by the :setting:`DEFAULT_CONTENT_TYPE` and
     :setting:`DEFAULT_CHARSET` settings, by default: "`text/html; charset=utf-8`".
 
-    ``status`` is the `HTTP status code`_ for the response.
+    ``status`` is the :rfc:`HTTP status code <7231#section-6>` for the response.
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -852,8 +851,6 @@ Methods
 
     Writes a list of lines to the response. Line separators are not added. This
     method makes an :class:`HttpResponse` instance a stream-like object.
-
-.. _HTTP status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
 
 .. _ref-httpresponse-subclasses:
 
@@ -1045,7 +1042,7 @@ Attributes
 
 .. attribute:: StreamingHttpResponse.status_code
 
-    The `HTTP status code`_ for the response.
+    The :rfc:`HTTP status code <7231#section-6>` for the response.
 
     .. versionchanged:: 1.9
 
@@ -1060,9 +1057,8 @@ Attributes
     .. versionchanged:: 1.9
 
         ``reason_phrase`` no longer defaults to all capital letters. It now
-        uses the `HTTP standard's`_ default reason phrases.
-
-        .. _`HTTP standard's`: https://www.ietf.org/rfc/rfc2616.txt
+        uses the :rfc:`HTTP standard's <7231#section-6.1>` default reason
+        phrases.
 
         Unless explicitly set, ``reason_phrase`` is determined by the current
         value of :attr:`status_code`.

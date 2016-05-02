@@ -91,7 +91,7 @@ def permission_denied(request, exception, template_name='403.html'):
     Context: None
 
     If the template does not exist, an Http403 response containing the text
-    "403 Forbidden" (as per RFC 2616) will be returned.
+    "403 Forbidden" (as per RFC 7231) will be returned.
     """
     try:
         template = loader.get_template(template_name)

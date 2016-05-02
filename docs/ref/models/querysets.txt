@@ -1733,9 +1733,7 @@ Finally, a word on using ``get_or_create()`` in Django views. Please make sure
 to use it only in ``POST`` requests unless you have a good reason not to.
 ``GET`` requests shouldn't have any effect on data. Instead, use ``POST``
 whenever a request to a page has a side effect on your data. For more, see
-`Safe methods`_ in the HTTP spec.
-
-.. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
+:rfc:`Safe methods <7231#section-4.2.1>` in the HTTP spec.
 
 .. warning::
 

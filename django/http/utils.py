@@ -12,7 +12,7 @@ Functions that modify an HTTP request or response in some way.
 def conditional_content_removal(request, response):
     """
     Removes the content of responses for HEAD requests, 1xx, 204 and 304
-    responses. Ensures compliance with RFC 2616, section 4.3.
+    responses. Ensures compliance with RFC 7230, section 3.3.3.
     """
     if 100 <= response.status_code < 200 or response.status_code in (204, 304):
         if response.streaming:
