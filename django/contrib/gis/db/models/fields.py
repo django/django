@@ -295,40 +295,26 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             defaults['widget'] = forms.Textarea
         return super(GeometryField, self).formfield(**defaults)
 
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
+    def _get_db_prep_lookup(self, lookup_type, value, connection):
         """
         Prepare for the database lookup, and return any spatial parameters
         necessary for the query.  This includes wrapping any geometry
         parameters with a backend-specific adapter and formatting any distance
         parameters into the correct units for the coordinate system of the
         field.
-        """
-        # special case for isnull lookup
-        if lookup_type == 'isnull':
-            return []
-        elif lookup_type in self.class_lookups:
-            # Populating the parameters list, and wrapping the Geometry
-            # with the Adapter of the spatial backend.
-            if isinstance(value, (tuple, list)):
-                params = [connection.ops.Adapter(value[0])]
-                if self.class_lookups[lookup_type].distance:
-                    # Getting the distance parameter in the units of the field.
-                    params += self.get_distance(value[1:], lookup_type, connection)
-                elif lookup_type in connection.ops.truncate_params:
-                    # Lookup is one where SQL parameters aren't needed from the
-                    # given lookup value.
-                    pass
-                else:
-                    params += value[1:]
-            elif isinstance(value, Expression):
-                params = []
-            else:
-                params = [connection.ops.Adapter(value)]
 
-            return params
+        Only used by the deprecated GeoQuerySet and to be
+        RemovedInDjango20Warning.
+        """
+        # Populating the parameters list, and wrapping the Geometry
+        # with the Adapter of the spatial backend.
+        if isinstance(value, (tuple, list)):
+            params = [connection.ops.Adapter(value[0])]
+            # Getting the distance parameter in the units of the field.
+            params += self.get_distance(value[1:], lookup_type, connection)
         else:
-            raise ValueError('%s is not a valid spatial lookup for %s.' %
-                             (lookup_type, self.__class__.__name__))
+            params = [connection.ops.Adapter(value)]
+        return params
 
     def get_prep_lookup(self, lookup_type, value):
         if lookup_type == 'contains':
