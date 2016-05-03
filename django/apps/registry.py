@@ -177,7 +177,7 @@ class Apps(object):
             result.extend(list(app_config.get_models(include_auto_created, include_swapped)))
         return result
 
-    def get_model(self, app_label, model_name=None):
+    def get_model(self, app_label, model_name=None, require_ready=True):
         """
         Returns the model matching the given app_label and model_name.
 
@@ -190,10 +190,20 @@ class Apps(object):
         model exists with this name in the application. Raises ValueError if
         called with a single argument that doesn't contain exactly one dot.
         """
-        self.check_models_ready()
+        if require_ready:
+            self.check_models_ready()
+        else:
+            self.check_apps_ready()
+
         if model_name is None:
             app_label, model_name = app_label.split('.')
-        return self.get_app_config(app_label).get_model(model_name.lower())
+
+        app_config = self.get_app_config(app_label)
+
+        if not require_ready and app_config.models is None:
+            app_config.import_models()
+
+        return app_config.get_model(model_name, require_ready=require_ready)
 
     def register_model(self, app_label, model):
         # Since this method is called when models are imported, it cannot

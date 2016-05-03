@@ -584,7 +584,8 @@ Miscellaneous
   :exc:`~django.core.exceptions.AppRegistryNotReady` if they're called before
   models of all applications have been loaded. Previously they only required
   the target application's models to be loaded and thus could return models
-  without all their relations set up.
+  without all their relations set up. If you need the old behavior of
+  ``get_model()``, set the ``require_ready`` argument to ``False``.
 
 .. _deprecated-features-1.11:
 

@@ -155,13 +155,16 @@ class AppConfig(object):
         # Entry is a path to an app config class.
         return cls(app_name, app_module)
 
-    def get_model(self, model_name):
+    def get_model(self, model_name, require_ready=True):
         """
         Returns the model with the given case-insensitive model_name.
 
         Raises LookupError if no model exists with this name.
         """
-        self.apps.check_models_ready()
+        if require_ready:
+            self.apps.check_models_ready()
+        else:
+            self.apps.check_apps_ready()
         try:
             return self.models[model_name.lower()]
         except KeyError:
