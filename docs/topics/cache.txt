@@ -1129,7 +1129,7 @@ second argument.
 
 For more on Vary headers, see the `official Vary spec`_.
 
-.. _`official Vary spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+.. _`official Vary spec`: https://tools.ietf.org/html/rfc7231#section-7.1.4
 
 Controlling cache: Using other headers
 ======================================
@@ -1229,7 +1229,7 @@ Example::
     def myview(request):
         # ...
 
-.. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
+.. _`Cache-Control spec`: https://tools.ietf.org/html/rfc7234#section-5.2
 
 Order of ``MIDDLEWARE_CLASSES``
 ===============================
