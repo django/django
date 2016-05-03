@@ -836,6 +836,10 @@ Miscellaneous
   <django.core.files.storage.Storage.generate_filename>` instead. It
   might be possible to use :attr:`~django.db.models.FileField.upload_to` also.
 
+* The subject of mail sent by ``AdminEmailHandler`` is no longer truncated at
+  989 characters. If you were counting on a limited length, truncate the subject
+  yourself.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10

@@ -300,28 +300,6 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(
-        ADMINS=(('admin', 'admin@example.com'),),
-        EMAIL_SUBJECT_PREFIX='',
-        DEBUG=False,
-    )
-    def test_truncate_subject(self):
-        """
-        RFC 2822's hard limit is 998 characters per line.
-        So, minus "Subject: ", the actual subject must be no longer than 989
-        characters.
-        Refs #17281.
-        """
-        message = 'a' * 1000
-        expected_subject = 'ERROR: aa' + 'a' * 980
-
-        self.assertEqual(len(mail.outbox), 0)
-
-        self.logger.error(message)
-
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, expected_subject)
-
-    @override_settings(
         ADMINS=[('admin', 'admin@example.com')],
         DEBUG=False,
     )
