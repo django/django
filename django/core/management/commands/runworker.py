@@ -12,8 +12,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
-        parser.add_argument('--layer', action='store', dest='layer', default=DEFAULT_CHANNEL_LAYER,
-            help='Channel layer alias to use, if not the default.')
+        parser.add_argument(
+            '--layer', action='store', dest='layer', default=DEFAULT_CHANNEL_LAYER,
+            help='Channel layer alias to use, if not the default.',
+        )
+        parser.add_argument(
+            '--only-channels', action='append', dest='only_channels',
+            help='Limits this worker to only listening on the provided channels (supports globbing).',
+        )
+        parser.add_argument(
+            '--exclude-channels', action='append', dest='exclude_channels',
+            help='Prevents this worker from listening on the provided channels (supports globbing).',
+        )
 
     def handle(self, *args, **options):
         # Get the backend to use
@@ -36,7 +46,12 @@ class Command(BaseCommand):
             callback = self.consumer_called
         # Run the worker
         try:
-            Worker(channel_layer=self.channel_layer, callback=callback).run()
+            Worker(
+                channel_layer=self.channel_layer,
+                callback=callback,
+                only_channels=options.get("only_channels", None),
+                exclude_channels=options.get("exclude_channels", None),
+            ).run()
         except KeyboardInterrupt:
             pass
 

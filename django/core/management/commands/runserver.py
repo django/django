@@ -12,7 +12,6 @@ from datetime import datetime
 from django.channels import DEFAULT_CHANNEL_LAYER, channel_layers
 from django.channels.worker import Worker
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.asgi import ViewConsumer
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import get_internal_wsgi_application, run
