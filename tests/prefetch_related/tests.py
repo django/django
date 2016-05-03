@@ -733,6 +733,10 @@ class CustomPrefetchTests(TestCase):
         self.assertEqual(str(warns[0].message), msg)
         self.assertEqual(str(warns[0].message), msg)
 
+    def test_values_queryset(self):
+        with self.assertRaisesMessage(ValueError, 'Prefetch querysets cannot use values().'):
+            Prefetch('houses', House.objects.values('pk'))
+
 
 class DefaultManagerTests(TestCase):
 
