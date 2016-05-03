@@ -102,7 +102,6 @@ class AdminEmailHandler(logging.Handler):
                 record.getMessage()
             )
             request = None
-        subject = self.format_subject(subject)
 
         # Since we add a nicely formatted traceback on our own, create a copy
         # of the log record without the exception data.
@@ -125,15 +124,6 @@ class AdminEmailHandler(logging.Handler):
 
     def connection(self):
         return get_connection(backend=self.email_backend, fail_silently=True)
-
-    def format_subject(self, subject):
-        """
-        Escape CR and LF characters, and limit length.
-        RFC 2822's hard limit is 998 characters per line. So, minus "Subject: "
-        the actual subject must be no longer than 989 characters.
-        """
-        formatted_subject = subject.replace('\n', '\\n').replace('\r', '\\r')
-        return formatted_subject[:989]
 
 
 class CallbackFilter(logging.Filter):

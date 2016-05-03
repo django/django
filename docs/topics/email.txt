@@ -169,7 +169,7 @@ email headers to control the "To:" and "From:" in email messages that your
 scripts generate.
 
 The Django email functions outlined above all protect against header injection
-by forbidding newlines in header values. If any ``subject``, ``from_email`` or
+by forbidding newlines in header values. If any ``from_email`` or
 ``recipient_list`` contains a newline (in either Unix, Windows or Mac style),
 the email function (e.g. :meth:`~django.core.mail.send_mail()`) will raise
 ``django.core.mail.BadHeaderError`` (a subclass of ``ValueError``) and, hence,
@@ -245,7 +245,14 @@ following parameters (in the given order, if positional arguments are used).
 All parameters are optional and can be set at any time prior to calling the
 ``send()`` method.
 
-* ``subject``: The subject line of the email.
+* ``subject``: The subject line of the email. Django automatically escapes any
+  newlines in the subject and truncates the subject to 989 characters, as
+  required by :rfc:`5322#section-2.1.1`.
+
+    ..versionchanged:: 1.10
+
+        Previously, newlines in subject lines were generating ``BadHeaderError``
+        and the length was not limited.
 
 * ``body``: The body text. This should be a plain text message.
 
