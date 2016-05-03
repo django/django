@@ -120,7 +120,7 @@ class MultiPartParser(object):
         # HTTP spec says that Content-Length >= 0 is valid
         # handling content-length == 0 before continuing
         if self._content_length == 0:
-            return QueryDict('', encoding=self._encoding), MultiValueDict()
+            return QueryDict(encoding=self._encoding), MultiValueDict()
 
         # See if any of the handlers take care of the parsing.
         # This allows overriding everything if need be.
@@ -135,7 +135,7 @@ class MultiPartParser(object):
                 return result[0], result[1]
 
         # Create the data structures to be used later.
-        self._post = QueryDict('', mutable=True)
+        self._post = QueryDict(mutable=True)
         self._files = MultiValueDict()
 
         # Instantiate the parser and stream:

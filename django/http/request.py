@@ -267,14 +267,14 @@ class HttpRequest(object):
         return self._body
 
     def _mark_post_parse_error(self):
-        self._post = QueryDict('')
+        self._post = QueryDict()
         self._files = MultiValueDict()
         self._post_parse_error = True
 
     def _load_post_and_files(self):
         """Populate self._post and self._files if the content-type is a form type"""
         if self.method != 'POST':
-            self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
+            self._post, self._files = QueryDict(encoding=self._encoding), MultiValueDict()
             return
         if self._read_started and not hasattr(self, '_body'):
             self._mark_post_parse_error()
@@ -301,7 +301,7 @@ class HttpRequest(object):
         elif self.content_type == 'application/x-www-form-urlencoded':
             self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
         else:
-            self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
+            self._post, self._files = QueryDict(encoding=self._encoding), MultiValueDict()
 
     def close(self):
         if hasattr(self, '_files'):
@@ -473,7 +473,7 @@ class QueryDict(MultiValueDict):
         :arg safe: Used to specify characters which do not require quoting, for
             example::
 
-                >>> q = QueryDict('', mutable=True)
+                >>> q = QueryDict(mutable=True)
                 >>> q['next'] = '/a&b/'
                 >>> q.urlencode()
                 'next=%2Fa%26b%2F'
