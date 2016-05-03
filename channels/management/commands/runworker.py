@@ -13,12 +13,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
-        parser.add_argument('--layer', action='store', dest='layer', default=DEFAULT_CHANNEL_LAYER,
-            help='Channel layer alias to use, if not the default.')
-        parser.add_argument('--only-channels', action='append', dest='only_channels',
-            help='Limits this worker to only listening on the provided channels (supports globbing).')
-        parser.add_argument('--exclude-channels', action='append', dest='exclude_channels',
-            help='Prevents this worker from listening on the provided channels (supports globbing).')
+        parser.add_argument(
+            '--layer', action='store', dest='layer', default=DEFAULT_CHANNEL_LAYER,
+            help='Channel layer alias to use, if not the default.',
+        )
+        parser.add_argument(
+            '--only-channels', action='append', dest='only_channels',
+            help='Limits this worker to only listening on the provided channels (supports globbing).',
+        )
+        parser.add_argument(
+            '--exclude-channels', action='append', dest='exclude_channels',
+            help='Prevents this worker from listening on the provided channels (supports globbing).',
+        )
 
     def handle(self, *args, **options):
         # Get the backend to use
