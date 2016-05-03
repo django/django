@@ -243,7 +243,7 @@ class ForwardManyToOneDescriptor(object):
             for lh_field, rh_field in self.field.related_fields:
                 setattr(instance, lh_field.attname, getattr(value, rh_field.attname))
 
-        # Set the related instance cache used by __get__ to avoid a SQL query
+        # Set the related instance cache used by __get__ to avoid an SQL query
         # when accessing the attribute we just set.
         setattr(instance, self.cache_name, value)
 
@@ -416,7 +416,7 @@ class ReverseOneToOneDescriptor(object):
             for index, field in enumerate(self.related.field.local_related_fields):
                 setattr(value, field.attname, related_pk[index])
 
-            # Set the related instance cache used by __get__ to avoid a SQL query
+            # Set the related instance cache used by __get__ to avoid an SQL query
             # when accessing the attribute we just set.
             setattr(instance, self.cache_name, value)
 

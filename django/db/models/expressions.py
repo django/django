@@ -477,7 +477,7 @@ class F(Combinable):
 
 class Func(Expression):
     """
-    A SQL function call.
+    An SQL function call.
     """
     function = None
     template = '%(function)s(%(expressions)s)'
