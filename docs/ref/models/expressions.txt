@@ -88,7 +88,7 @@ makes it possible to refer to model field values and perform  database
 operations using them without actually having to pull them out of the  database
 into Python memory.
 
-Instead, Django uses the ``F()`` object to generate a SQL expression that
+Instead, Django uses the ``F()`` object to generate an SQL expression that
 describes the required operation at the database level.
 
 This is easiest to understand through an example. Normally, one might do
