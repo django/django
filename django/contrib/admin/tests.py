@@ -158,6 +158,18 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
             actual_values.append(option.get_attribute('value'))
         self.assertEqual(values, actual_values)
 
+    def assertSelectedOptions(self, selector, values):
+        """
+        Asserts that the <SELECT> widget identified by `selector` has the
+        selected options with the given `values`.
+        """
+        options = self.selenium.find_elements_by_css_selector('%s > option' % selector)
+        actual_values = []
+        for option in options:
+            if option.get_attribute('selected'):
+                actual_values.append(option.get_attribute('value'))
+        self.assertEqual(values, actual_values)
+
     def has_css_class(self, selector, klass):
         """
         Returns True if the element identified by `selector` has the CSS class
