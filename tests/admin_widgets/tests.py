@@ -15,7 +15,7 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models import CharField, DateField
+from django.db.models import CharField, DateField, DateTimeField
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 from django.utils import six, translation
@@ -149,6 +149,28 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         self.assertEqual(f1.widget.attrs['maxlength'], '100')
         self.assertEqual(f2.widget.attrs['maxlength'], '20')
         self.assertEqual(f2.widget.attrs['size'], '10')
+
+    def test_formfield_overrides_for_datetime_field(self):
+        """
+        Overriding the widget for DateTimeField doesn't overrides the default
+        form_class for that field (#26449).
+        """
+        class MemberAdmin(admin.ModelAdmin):
+            formfield_overrides = {DateTimeField: {'widget': widgets.AdminSplitDateTime}}
+        ma = MemberAdmin(models.Member, admin.site)
+        f1 = ma.formfield_for_dbfield(models.Member._meta.get_field('birthdate'), request=None)
+        self.assertIsInstance(f1.widget, widgets.AdminSplitDateTime)
+        self.assertIsInstance(f1, forms.SplitDateTimeField)
+
+    def test_formfield_overrides_for_custom_field(self):
+        """
+        formfield_overrides works for a custom field class.
+        """
+        class AlbumAdmin(admin.ModelAdmin):
+            formfield_overrides = {models.MyFileField: {'widget': forms.TextInput()}}
+        ma = AlbumAdmin(models.Member, admin.site)
+        f1 = ma.formfield_for_dbfield(models.Album._meta.get_field('backside_art'), request=None)
+        self.assertIsInstance(f1.widget, forms.TextInput)
 
     def test_field_with_choices(self):
         self.assertFormfield(models.Member, 'gender', forms.Select)
