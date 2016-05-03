@@ -229,14 +229,20 @@ Methods
 
     Requires the app registry to be fully populated.
 
-.. method:: AppConfig.get_model(model_name)
+.. method:: AppConfig.get_model(model_name, require_ready=True)
 
     Returns the :class:`~django.db.models.Model` with the given
     ``model_name``. ``model_name`` is case-insensitive.
 
     Raises :exc:`LookupError` if no such model exists in this application.
 
-    Requires the app registry to be fully populated.
+    Requires the app registry to be fully populated, unless the
+    ``require_ready`` argument is set to ``False``.  ``require_ready`` behaves
+    exactly as in :meth:`apps.get_model()`.
+
+    .. versionadded:: 1.11
+
+        The ``require_ready`` keyword argument was added.
 
 .. method:: AppConfig.ready()
 
@@ -341,7 +347,7 @@ Application registry
     Checks whether an application with the given name exists in the registry.
     ``app_name`` is the full name of the app, e.g. ``'django.contrib.admin'``.
 
-.. method:: apps.get_model(app_label, model_name)
+.. method:: apps.get_model(app_label, model_name, require_ready=True)
 
     Returns the :class:`~django.db.models.Model` with the given ``app_label``
     and ``model_name``. As a shortcut, this method also accepts a single
@@ -351,6 +357,26 @@ Application registry
     Raises :exc:`LookupError` if no such application or model exists. Raises
     :exc:`ValueError` when called with a single argument that doesn't contain
     exactly one dot.
+
+    Requires the app registry to be fully populated, unless the
+    ``require_ready`` argument is set to ``False``.
+
+    Setting ``require_ready`` to ``False`` allows looking up models
+    :ref:`while the app registry is being populated <app-loading-process>`,
+    specifically during the second phase, where it imports models. Then
+    ``get_model()`` has the same effect as importing the model. The main use
+    case is to configure model classes with settings, such as
+    :setting:`AUTH_USER_MODEL`.
+
+    When ``require_ready`` is ``False``, ``get_model()`` returns a model class
+    that may not be fully functional (reverse accessors may be missing, for
+    example) until the app registry is fully populated. For this reason, it's
+    best to leave ``require_ready`` to the default value of ``True`` whenever
+    possible.
+
+    .. versionadded:: 1.11
+
+        The ``require_ready`` keyword argument was added.
 
 .. _app-loading-process:
 
