@@ -1572,7 +1572,7 @@ class SchemaTests(TransactionTestCase):
                 editor.create_model(Thing)
             except OperationalError as e:
                 self.fail("Errors when applying initial migration for a model "
-                          "with a table named after a SQL reserved word: %s" % e)
+                          "with a table named after an SQL reserved word: %s" % e)
         # Check that it's there
         list(Thing.objects.all())
         # Clean up that table
