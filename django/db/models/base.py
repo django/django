@@ -452,11 +452,14 @@ class Model(six.with_metaclass(ModelBase)):
         if kwargs:
             for prop in list(kwargs):
                 try:
-                    if isinstance(getattr(self.__class__, prop), property):
+                    # Any remaining kwargs need to correspond either to
+                    # properties, or to virtual fields.
+                    if (isinstance(getattr(self.__class__, prop), property) or
+                            self._meta.get_field(prop)):
                         if kwargs[prop] is not DEFERRED:
                             setattr(self, prop, kwargs[prop])
                         del kwargs[prop]
-                except AttributeError:
+                except (AttributeError, FieldDoesNotExist):
                     pass
             if kwargs:
                 raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
