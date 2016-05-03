@@ -111,10 +111,16 @@ Requires jQuery, core.js, and SelectBox.js.
             from_box.setAttribute('name', from_box.getAttribute('name') + '_old');
 
             // Set up the JavaScript event handlers for the select box filter interface
-            addEvent(choose_all, 'click', function() { SelectBox.move_all(field_id + '_from', field_id + '_to'); SelectFilter.refresh_icons(field_id); });
-            addEvent(add_link, 'click', function() { SelectBox.move(field_id + '_from', field_id + '_to'); SelectFilter.refresh_icons(field_id); });
-            addEvent(remove_link, 'click', function() { SelectBox.move(field_id + '_to', field_id + '_from'); SelectFilter.refresh_icons(field_id); });
-            addEvent(clear_all, 'click', function() { SelectBox.move_all(field_id + '_to', field_id + '_from'); SelectFilter.refresh_icons(field_id); });
+            var move_selection = function(elem, move_func, from, to) {
+                if (elem.className.indexOf('active') !== -1) {
+                    move_func(from, to);
+                    SelectFilter.refresh_icons(field_id);
+                }
+            };
+            addEvent(choose_all, 'click', function(e) { move_selection(this, SelectBox.move_all, field_id + '_from', field_id + '_to'); });
+            addEvent(add_link, 'click', function(e) { move_selection(this, SelectBox.move, field_id + '_from', field_id + '_to'); });
+            addEvent(remove_link, 'click', function(e) { move_selection(this, SelectBox.move, field_id + '_to', field_id + '_from'); });
+            addEvent(clear_all, 'click', function(e) { move_selection(this, SelectBox.move_all, field_id + '_to', field_id + '_from'); });
             addEvent(filter_input, 'keypress', function(e) { SelectFilter.filter_key_press(e, field_id); });
             addEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id); });
             addEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id); });

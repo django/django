@@ -966,6 +966,32 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             str(self.arthur.id), str(self.cliff.id),
         ])
 
+        # Choose some more options --------------------------------------------
+        self.get_select_option(from_box, str(self.peter.id)).click()
+        self.get_select_option(from_box, str(self.lisa.id)).click()
+
+        # Confirm they're selected after clicking inactive buttons: ticket #26575
+        self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
+        self.selenium.find_element_by_id(remove_link).click()
+        self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
+
+        # Unselect the options ------------------------------------------------
+        self.get_select_option(from_box, str(self.peter.id)).click()
+        self.get_select_option(from_box, str(self.lisa.id)).click()
+
+        # Choose some more options --------------------------------------------
+        self.get_select_option(to_box, str(self.jason.id)).click()
+        self.get_select_option(to_box, str(self.john.id)).click()
+
+        # Confirm they're selected after clicking inactive buttons: ticket #26575
+        self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])
+        self.selenium.find_element_by_id(choose_link).click()
+        self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])
+
+        # Unselect the options ------------------------------------------------
+        self.get_select_option(to_box, str(self.jason.id)).click()
+        self.get_select_option(to_box, str(self.john.id)).click()
+
     def test_basic(self):
         self.school.students.set([self.lisa, self.peter])
         self.school.alumni.set([self.lisa, self.peter])
