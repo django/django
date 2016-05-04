@@ -1,4 +1,4 @@
-Cross-Compatability
+Cross-Compatibility
 ===================
 
 Channels is being released as both a third-party app for Django 1.8 and 1.9,

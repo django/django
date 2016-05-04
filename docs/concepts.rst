@@ -32,7 +32,7 @@ What is a channel? It is an *ordered*, *first-in first-out queue* with
 
 You can think of it as analogous to a task queue - messages are put onto
 the channel by *producers*, and then given to just one of the *consumers*
-listening to that channnel.
+listening to that channel.
 
 By *at-most-once* we say that either one consumer gets the message or nobody
 does (if the channel implementation crashes, let's say). The

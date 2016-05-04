@@ -182,7 +182,7 @@ of the time anyway.
     on 100% guaranteed delivery, which Channels won't give you, look at each
     failure case and program something to expect and handle it - be that retry
     logic, partial content handling, or just having something not work that one
-    time. HTTP requests are just as fallible, and most people's reponse to that
+    time. HTTP requests are just as fallible, and most people's response to that
     is a generic error page!
 
 .. _websocket-example:
