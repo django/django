@@ -9,4 +9,5 @@ Django 1.9.7 fixes several bugs in 1.9.6.
 Bugfixes
 ========
 
-* ...
+* Removed the need for the ``request`` context processor on the admin login
+  page to fix a regression in 1.9 (:ticket:`26558`).

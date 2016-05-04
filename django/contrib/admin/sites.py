@@ -398,6 +398,7 @@ class AdminSite(object):
         context = dict(self.each_context(request),
             title=_('Log in'),
             app_path=request.get_full_path(),
+            username=request.user.get_username(),
         )
         if (REDIRECT_FIELD_NAME not in request.GET and
                 REDIRECT_FIELD_NAME not in request.POST):
