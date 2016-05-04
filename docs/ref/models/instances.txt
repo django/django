@@ -667,7 +667,7 @@ method would return different values before and after the instance is
 saved, but changing the ``__hash__`` value of an instance `is forbidden
 in Python`_).
 
-.. _is forbidden in Python: https://docs.python.org/reference/datamodel.html#object.__hash__
+.. _is forbidden in Python: https://docs.python.org/3/reference/datamodel.html#object.__hash__
 
 ``get_absolute_url``
 --------------------
