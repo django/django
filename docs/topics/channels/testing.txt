@@ -2,7 +2,7 @@ Testing Consumers
 =================
 
 When you want to write unit tests for your new Channels consumers, you'll
-realise that you can't use the standard Django test client to submit fake HTTP
+realize that you can't use the standard Django test client to submit fake HTTP
 requests - instead, you'll need to submit fake Messages to your consumers,
 and inspect what Messages they send themselves.
 
@@ -15,7 +15,7 @@ ChannelTestCase
 
 If your tests inherit from the ``channels.tests.ChannelTestCase`` base class,
 whenever you run tests your channel layer will be swapped out for a captive
-in-memory layer, meaning you don't need an exernal server running to run tests.
+in-memory layer, meaning you don't need an external server running to run tests.
 
 Moreover, you can inject messages onto this layer and inspect ones sent to it
 to help test your consumers.

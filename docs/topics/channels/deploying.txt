@@ -86,7 +86,7 @@ the same workers as HTTP requests, there's a chance long-running tasks could
 block up all the workers and delay responding to HTTP requests).
 
 To manage this, it's possible to tell workers to either limit themselves to
-just certain channel names or ignore sepcific channels using the
+just certain channel names or ignore specific channels using the
 ``--only-channels`` and ``--exclude-channels`` options. Here's an example
 of configuring a worker to only serve HTTP and WebSocket requests::
 
@@ -166,7 +166,7 @@ rollouts to make sure workers on new code aren't experiencing high error rates.
 There's no need to restart the WSGI or WebSocket interface servers unless
 you've upgraded your version of Channels or changed any settings;
 none of your code is used by them, and all middleware and code that can
-customise requests is run on the consumers.
+customize requests is run on the consumers.
 
 You can even use different Python versions for the interface servers and the
 workers; the ASGI protocol that channel layers communicate over

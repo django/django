@@ -3,7 +3,7 @@ Channels
 ========
 
 Django's channel layer provides the ability to write code against non-HTTP
-protocols and run code outside of a request-response contenxt.
+protocols and run code outside of a request-response context.
 
 .. toctree::
    :maxdepth: 2
