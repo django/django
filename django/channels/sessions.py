@@ -24,7 +24,11 @@ def session_for_reply_channel(reply_channel):
     session_engine = import_module(getattr(settings, "CHANNEL_SESSION_ENGINE", settings.SESSION_ENGINE))
     if session_engine is signed_cookies:
         raise ValueError("You cannot use channels session functionality with signed cookie sessions!")
-    return session_engine.SessionStore(session_key=session_key)
+    # Force the instance to load in case it resets the session when it does
+    instance = session_engine.SessionStore(session_key=session_key)
+    instance._session.keys()
+    instance._session_key = session_key
+    return instance
 
 
 def channel_session(func):
