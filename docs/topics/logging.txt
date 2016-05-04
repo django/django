@@ -236,7 +236,7 @@ project code.
 Examples
 --------
 
-The full documentation for `dictConfig format`_ is the best source of
+The full documentation for :ref:`dictConfig format <python:logging>` is the best source of
 information about logging configuration dictionaries. However, to give
 you a taste of what is possible, here are several examples.
 
