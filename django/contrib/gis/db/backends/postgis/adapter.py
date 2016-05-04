@@ -13,7 +13,7 @@ from django.contrib.gis.geometry.backend import Geometry
 class PostGISAdapter(object):
     def __init__(self, obj, geography=False):
         """
-        Initializes on the spatial object.
+        Initialize on the spatial object.
         """
         self.is_geometry = isinstance(obj, Geometry)
 
@@ -56,7 +56,7 @@ class PostGISAdapter(object):
 
     def getquoted(self):
         """
-        Returns a properly quoted string for use in PostgreSQL/PostGIS.
+        Return a properly quoted string for use in PostgreSQL/PostGIS.
         """
         if self.is_geometry:
             # Psycopg will figure out whether to use E'\\000' or '\000'.

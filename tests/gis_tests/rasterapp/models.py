@@ -14,7 +14,7 @@ class RasterModel(models.Model):
 
 
 class RasterRelatedModel(models.Model):
-    rastermodel = models.ForeignKey(RasterModel, on_delete=models.CASCADE)
+    rastermodel = models.ForeignKey(RasterModel, models.CASCADE)
 
     class Meta:
         required_db_features = ['supports_raster']

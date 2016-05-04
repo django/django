@@ -52,14 +52,13 @@ on a different spatial backend.
 Raster Support
 --------------
 
-The ``RasterField`` is currently only implemented for the PostGIS backend.
-Spatial lookups are available for raster fields, but spatial database functions
-and aggregates are not implemented for raster fields.
+``RasterField`` is currently only implemented for the PostGIS backend. Spatial
+lookups are available for raster fields, but spatial database functions and
+aggregates aren't implemented for raster fields.
 
 .. versionchanged:: 1.10
 
     ``RasterField`` now supports spatial lookups.
-
 
 Creating and Saving Models with Geometry Fields
 ===============================================
@@ -143,13 +142,13 @@ Spatial Lookups
 GeoDjango's lookup types may be used with any manager method like
 ``filter()``, ``exclude()``, etc.  However, the lookup types unique to
 GeoDjango are only available on spatial fields.
+
 Filters on 'normal' fields (e.g. :class:`~django.db.models.CharField`)
 may be chained with those on geographic fields. Geographic lookups accept
 geometry and raster input on both sides and input types can be mixed freely.
 
-The general structure of geographic lookups is described below, a
-complete reference can be found in the :ref:`spatial lookup reference
-<spatial-lookups>`.
+The general structure of geographic lookups is described below. A complete
+reference can be found in the :ref:`spatial lookup reference<spatial-lookups>`.
 
 Geometry Lookups
 ----------------
@@ -178,17 +177,18 @@ Raster Lookups
 
 .. versionadded:: 1.10
 
-The raster lookup syntax similar to the syntax for geometries. The only difference is
-that a band index can specified as additional input. If no band index is
-specified, the first band is used by default (index ``0``). In that case the syntax is
-identical to the syntax for geometry lookups.
+The raster lookup syntax is similar to the syntax for geometries. The only
+difference is that a band index can specified as additional input. If no band
+index is specified, the first band is used by default (index ``0``). In that
+case the syntax is identical to the syntax for geometry lookups.
 
-To specify the band index explicitly, an additional parameter can be specified on both
-sides of the lookup. On the left hand side, the double underscore syntax is used to pass
-a band index. On the right hand side, a tuple of the raster and band index can be specified.
+To specify the band index, an additional parameter can be specified on both
+sides of the lookup. On the left hand side, the double underscore syntax is
+used to pass a band index. On the right hand side, a tuple of the raster and
+band index can be specified.
 
-This results in the following general form for lookups involving rasters (assuming
-the ``Elevation`` model used in the :doc:`model-api`)::
+This results in the following general form for lookups involving rasters
+(assuming the ``Elevation`` model used in the :doc:`model-api`)::
 
     >>> qs = Elevation.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Elevation.objects.filter(<field>__<band_index>__<lookup_type>=<parameter>)
@@ -204,18 +204,18 @@ Fore example::
 
 On the left hand side of the example, ``rast`` is the geographic raster field
 and :lookup:`contains <gis-contains>` is the spatial lookup type. On the right
-hand side, ``geom`` is a geometry input, and ``rst`` is a
+hand side, ``geom`` is a geometry input and ``rst`` is a
 :class:`~django.contrib.gis.gdal.GDALRaster` object. The band index defaults to
-``0`` in the first two queries, and is set to ``1`` on the others.
+``0`` in the first two queries and is set to ``1`` on the others.
 
 While all spatial lookups can be used with raster objects on both sides, not all
 underlying operators natively accept raster input. For cases where the operator
-expects geometry input, the raster is automatically converted to a geometry. It
-is important to keep this in mind when interpreting the lookup results.
+expects geometry input, the raster is automatically converted to a geometry.
+It's important to keep this in mind when interpreting the lookup results.
 
-The type of raster support is listed for all lookups in the
-:ref:`compatibility table <spatial-lookup-compatibility>`. Lookups involving
-rasters are currently only available for the PostGIS backend.
+The type of raster support is listed for all lookups in the :ref:`compatibility
+table <spatial-lookup-compatibility>`. Lookups involving rasters are currently
+only available for the PostGIS backend.
 
 .. _distance-queries:
 
@@ -325,9 +325,9 @@ Spatial Lookups
 
 The following table provides a summary of what spatial lookups are available
 for each spatial database backend. The PostGIS Raster (PGRaster) lookups are
-divided into the three categories described in the
-:ref:`raster lookup details <spatial-lookup-raster>`: native support ``N``,
-bilateral native support ``B``, and geometry conversion support ``C``.
+divided into the three categories described in the :ref:`raster lookup details
+<spatial-lookup-raster>`: native support ``N``, bilateral native support ``B``,
+and geometry conversion support ``C``.
 
 =================================  =========  ========  ============ ========== ========
 Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite PGRaster

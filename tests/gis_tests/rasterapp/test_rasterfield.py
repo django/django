@@ -31,15 +31,13 @@ class RasterFieldTest(TransactionTestCase):
             "width": 5,
             "height": 5,
             "nr_of_bands": 2,
-            "bands": [{"data": range(25)}, {"data": range(25, 50)}]
+            "bands": [{"data": range(25)}, {"data": range(25, 50)}],
         })
-
         model_instance = RasterModel.objects.create(
             rast=rast,
             rastprojected=rast,
-            geom="POINT (-95.37040 29.70486)"
+            geom="POINT (-95.37040 29.70486)",
         )
-
         RasterRelatedModel.objects.create(rastermodel=model_instance)
 
     def test_field_null_value(self):
@@ -118,10 +116,10 @@ class RasterFieldTest(TransactionTestCase):
 
     def test_all_gis_lookups_with_rasters(self):
         """
-        Evaluates all possible lookups for all input combinations (i.e.
+        Evaluate all possible lookups for all input combinations (i.e.
         raster-raster, raster-geom, geom-raster) and for projected and
         unprojected coordinate systems. This test just checks that the lookup
-        can be called, but does not check if the result makes logical sense.
+        can be called, but doesn't check if the result makes logical sense.
         """
         from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
         from django.contrib.gis.gdal import GDALRaster
@@ -140,7 +138,6 @@ class RasterFieldTest(TransactionTestCase):
                     'rastprojected__', 'geom__', 'rast__',
                 ]
             ]
-
             if issubclass(lookup, DistanceLookupBase):
                 # Set lookup values for distance lookups.
                 combo_values = [
@@ -164,7 +161,7 @@ class RasterFieldTest(TransactionTestCase):
                     (json.loads(JSON_RASTER), 'T*T***FF*'),
                 ]
             elif name == 'isvalid':
-                # The isvalid lookup does not make sense for rasters.
+                # The isvalid lookup doesn't make sense for rasters.
                 continue
             elif PostGISOperations.gis_operators[name].func:
                 # Set lookup values for all function based operators.
@@ -173,7 +170,7 @@ class RasterFieldTest(TransactionTestCase):
                     rast, rast, json.loads(JSON_RASTER)
                 ]
             else:
-                # Override band lookup for these, as it is not supported.
+                # Override band lookup for these, as it's not supported.
                 combo_keys[2] = 'rastprojected__' + name
                 # Set lookup values for all other operators.
                 combo_values = [rast, rast, rast, stx_pnt, stx_pnt, rast, rast, json.loads(JSON_RASTER)]
@@ -194,7 +191,7 @@ class RasterFieldTest(TransactionTestCase):
 
     def test_dwithin_gis_lookup_ouptut_with_rasters(self):
         """
-        Checks the logical functionality of the dwithin lookup for different
+        Check the logical functionality of the dwithin lookup for different
         input parameters.
         """
         from django.contrib.gis.gdal import GDALRaster
@@ -283,24 +280,16 @@ class RasterFieldTest(TransactionTestCase):
 
     def test_result_of_gis_lookup_with_rasters(self):
         # Point is in the interior
-        qs = RasterModel.objects.filter(
-            rast__contains=GEOSGeometry('POINT (-0.5 0.5)', 4326)
-        )
+        qs = RasterModel.objects.filter(rast__contains=GEOSGeometry('POINT (-0.5 0.5)', 4326))
         self.assertEqual(qs.count(), 1)
         # Point is in the exterior
-        qs = RasterModel.objects.filter(
-            rast__contains=GEOSGeometry('POINT (0.5 0.5)', 4326)
-        )
+        qs = RasterModel.objects.filter(rast__contains=GEOSGeometry('POINT (0.5 0.5)', 4326))
         self.assertEqual(qs.count(), 0)
         # A point on the boundary is not contained properly
-        qs = RasterModel.objects.filter(
-            rast__contains_properly=GEOSGeometry('POINT (0 0)', 4326)
-        )
+        qs = RasterModel.objects.filter(rast__contains_properly=GEOSGeometry('POINT (0 0)', 4326))
         self.assertEqual(qs.count(), 0)
         # Raster is located left of the point
-        qs = RasterModel.objects.filter(
-            rast__left=GEOSGeometry('POINT (1 0)', 4326)
-        )
+        qs = RasterModel.objects.filter(rast__left=GEOSGeometry('POINT (1 0)', 4326))
         self.assertEqual(qs.count(), 1)
 
     def test_lookup_with_raster_bbox(self):
@@ -309,16 +298,12 @@ class RasterFieldTest(TransactionTestCase):
         # Shift raster upwards
         rast.origin.y = 2
         # The raster in the model is not strictly below
-        qs = RasterModel.objects.filter(
-            rast__strictly_below=rast
-        )
+        qs = RasterModel.objects.filter(rast__strictly_below=rast)
         self.assertEqual(qs.count(), 0)
         # Shift raster further upwards
         rast.origin.y = 6
         # The raster in the model is strictly below
-        qs = RasterModel.objects.filter(
-            rast__strictly_below=rast
-        )
+        qs = RasterModel.objects.filter(rast__strictly_below=rast)
         self.assertEqual(qs.count(), 1)
 
     def test_lookup_with_polygonized_raster(self):

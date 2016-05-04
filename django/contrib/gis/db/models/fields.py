@@ -162,9 +162,10 @@ class BaseSpatialField(Field):
 
     def get_srid(self, obj):
         """
-        Returns the default SRID for the given geometry or raster, taking into account
-        the SRID set for the field.  For example, if the input geometry or raster
-        has no SRID, then that of the field will be returned.
+        Return the default SRID for the given geometry or raster, taking into
+        account the SRID set for the field. For example, if the input geometry
+        or raster doesn't have an SRID, then the SRID of the field will be
+        returned.
         """
         srid = obj.srid  # SRID of given geometry.
         if srid is None or self.srid == -1 or (srid == -1 and self.srid != -1):
@@ -174,7 +175,7 @@ class BaseSpatialField(Field):
 
     def get_db_prep_save(self, value, connection):
         """
-        Prepares the value for saving in the database.
+        Prepare the value for saving in the database.
         """
         if not value:
             return None
@@ -185,14 +186,14 @@ class BaseSpatialField(Field):
         """
         Spatial lookup values are either a parameter that is (or may be
         converted to) a geometry or raster, or a sequence of lookup values
-        that begins with a geometry or raster.  This routine will setup the
-        geometry or raster value properly, and preserve any other lookup
-        parameters before returning to the caller.
+        that begins with a geometry or raster. This routine sets up the
+        geometry or raster value properly and preserves any other lookup
+        parameters.
         """
         from django.contrib.gis.gdal import GDALRaster
 
         value = super(BaseSpatialField, self).get_prep_value(value)
-        # For IsValid lookups, boolean values are allowed
+        # For IsValid lookups, boolean values are allowed.
         if isinstance(value, (Expression, bool)):
             return value
         elif isinstance(value, (tuple, list)):
@@ -213,12 +214,12 @@ class BaseSpatialField(Field):
                 try:
                     obj = GDALRaster(obj)
                 except GDALException:
-                    raise ValueError('Could not create spatial object from lookup value.')
+                    raise ValueError("Couldn't create spatial object from lookup value.")
         elif isinstance(obj, dict):
             try:
                 obj = GDALRaster(obj)
             except GDALException:
-                raise ValueError('Could not create spatial object from lookup value.')
+                raise ValueError("Couldn't create spatial object from lookup value.")
         else:
             raise ValueError('Cannot use object with type %s for a spatial lookup parameter.' % type(obj).__name__)
 

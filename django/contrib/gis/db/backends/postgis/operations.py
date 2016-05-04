@@ -24,9 +24,9 @@ class PostGISOperator(SpatialOperator):
         # geography type.
         self.geography = geography
         # Only a subset of the operators and functions are available for the
-        # raster type. For lookups that do not suport raster they will be
-        # converted to polygons. If the raster argument is set to 'bilateral',
-        # then the operator can not handle mixed geom-raster lookups.
+        # raster type. Lookups that don't suport raster will be converted to
+        # polygons. If the raster argument is set to 'bilateral', then the
+        # operator cannot handle mixed geom-raster lookups.
         self.raster = raster
         super(PostGISOperator, self).__init__(**kwargs)
 
@@ -39,7 +39,7 @@ class PostGISOperator(SpatialOperator):
         return super(PostGISOperator, self).as_sql(connection, lookup, template_params, *args)
 
     def check_raster(self, lookup, template_params):
-        # Get rhs value
+        # Get rhs value.
         if isinstance(lookup.rhs, (tuple, list)):
             rhs_val = lookup.rhs[0]
             spheroid = lookup.rhs[-1] == 'spheroid'
@@ -70,8 +70,8 @@ class PostGISOperator(SpatialOperator):
             if rhs_is_raster:
                 template_params['rhs'] = 'ST_Polygon(%s)' % template_params['rhs']
         elif self.raster == 'bilateral':
-            # Operators with raster support but do not support mixed
-            # (rast-geom) lookups.
+            # Operators with raster support but don't support mixed (rast-geom)
+            # lookups.
             if lhs_is_raster and not rhs_is_raster:
                 template_params['lhs'] = 'ST_Polygon(%s)' % template_params['lhs']
             elif rhs_is_raster and not lhs_is_raster:

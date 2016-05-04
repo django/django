@@ -36,7 +36,7 @@ class GISLookup(Lookup):
         'address__point'.
 
         If a BaseSpatialField exists according to the given lookup on the model
-        options, it will be returned. Otherwise returns None.
+        options, it will be returned. Otherwise return None.
         """
         from django.contrib.gis.db.models.fields import BaseSpatialField
         # This takes into account the situation where the lookup is a
@@ -365,7 +365,7 @@ class DistanceLookupBase(GISLookup):
 
     def process_rhs(self, compiler, connection):
         if not isinstance(self.rhs, (tuple, list)) or not 2 <= len(self.rhs) <= 4:
-            raise ValueError("2, 3 or 4-element tuple required for '%s' lookup." % self.lookup_name)
+            raise ValueError("2, 3, or 4-element tuple required for '%s' lookup." % self.lookup_name)
         elif len(self.rhs) == 4 and not self.rhs[3] == 'spheroid':
             raise ValueError("For 4-element tuples the last argument must be the 'speroid' directive.")
 
@@ -384,7 +384,7 @@ class DistanceLookupBase(GISLookup):
             params.extend(expr_params)
         else:
             params += connection.ops.get_distance(
-                self.lhs.output_field, (dist_param, ) + self.rhs[2:],
+                self.lhs.output_field, (dist_param,) + self.rhs[2:],
                 self.lookup_name, handle_spheroid=False
             )
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, params[0], compiler)

@@ -27,11 +27,11 @@ Lookups with rasters
 --------------------
 
 All examples in the reference below are given for geometry fields and inputs,
-but the lookups can be used the same way with rasters on both sides.
-Whenever a lookup does not support raster input, the input is automatically
-converted to a geometry where necessary using the
-`ST_Polygon <http://postgis.net/docs/RT_ST_Polygon.html>`_ function. See also
-the :ref:`introduction to raster lookups <spatial-lookup-raster>`.
+but the lookups can be used the same way with rasters on both sides. Whenever
+a lookup doesn't support raster input, the input is automatically
+converted to a geometry where necessary using the `ST_Polygon
+<http://postgis.net/docs/RT_ST_Polygon.html>`_ function. See also the
+:ref:`introduction to raster lookups <spatial-lookup-raster>`.
 
 The database operators used by the lookups can be divided into three categories:
 
@@ -341,7 +341,7 @@ The intersection pattern matrix may only use the following characters:
 ``1``, ``2``, ``T``, ``F``, or ``*``.  This lookup type allows users to "fine tune"
 a specific geometric relationship consistent with the DE-9IM model. [#fnde9im]_
 
-Geometry Example::
+Geometry example::
 
     # A tuple lookup parameter is used to specify the geometry and
     # the intersection pattern (the pattern here is for 'contains').
@@ -355,7 +355,7 @@ SpatiaLite SQL equivalent::
 
     SELECT ... WHERE Relate(poly, geom, 'T*T***FF*')
 
-Raster Example::
+Raster example::
 
     Zipcode.objects.filter(poly__relate=(rast, 1, 'T*T***FF*'))
     Zipcode.objects.filter(rast__2__relate=(rast, 1, 'T*T***FF*'))
@@ -597,12 +597,12 @@ and a distance value (either a number in units of the field, a
 where the second entry is the band index.
 
 With PostGIS, on every distance lookup but :lookup:`dwithin`, an optional
-element, ``'spheroid'``, may be included to tell GeoDjango
-to use the more accurate spheroid distance calculation functions on
-fields with a geodetic coordinate system (e.g., ``ST_Distance_Spheroid``
-would be used instead of ``ST_Distance_Sphere``). The simpler ``ST_Distance``
-function is used with projected coordinate systems. Rasters are converted
-to geometries for spheroid based lookups.
+element, ``'spheroid'``, may be included to tell GeoDjango to use the more
+accurate spheroid distance calculation functions on fields with a geodetic
+coordinate system (e.g., ``ST_Distance_Spheroid`` would be used instead of
+``ST_Distance_Sphere``). The simpler ``ST_Distance`` function is used with
+projected coordinate systems. Rasters are converted to geometries for spheroid
+based lookups.
 
 .. versionadded:: 1.10
 
