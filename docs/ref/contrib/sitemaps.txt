@@ -56,7 +56,7 @@ To activate sitemap generation on your Django site, add this line to your
 
     from django.contrib.sitemaps.views import sitemap
 
-    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
+    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemap},
         name='django.contrib.sitemaps.views.sitemap')
 
 This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
