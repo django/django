@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import decimal
 import functools
 import math
 import os
@@ -33,6 +34,15 @@ try:
     import enum
 except ImportError:
     enum = None
+
+
+class Money(decimal.Decimal):
+    def deconstruct(self):
+        return (
+            '%s.%s' % (self.__class__.__module__, self.__class__.__name__),
+            [six.text_type(self)],
+            {}
+        )
 
 
 class TestModel1(object):
@@ -199,6 +209,18 @@ class WriterTests(SimpleTestCase):
         self.assertTrue(math.isinf(self.serialize_round_trip(float("inf"))))
         self.assertTrue(math.isinf(self.serialize_round_trip(float("-inf"))))
         self.assertTrue(math.isnan(self.serialize_round_trip(float("nan"))))
+
+        self.assertSerializedEqual(decimal.Decimal('1.3'))
+        self.assertSerializedResultEqual(
+            decimal.Decimal('1.3'),
+            ("Decimal('1.3')", {'from decimal import Decimal'})
+        )
+
+        self.assertSerializedEqual(Money('1.3'))
+        self.assertSerializedResultEqual(
+            Money('1.3'),
+            ("migrations.test_writer.Money('1.3')", {'import migrations.test_writer'})
+        )
 
     def test_serialize_constants(self):
         self.assertSerializedEqual(None)
