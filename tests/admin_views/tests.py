@@ -1279,7 +1279,20 @@ def get_perm(Model, perm):
     return Permission.objects.get(content_type=ct, codename=perm)
 
 
-@override_settings(ROOT_URLCONF='admin_views.urls')
+@override_settings(
+    ROOT_URLCONF='admin_views.urls',
+    # Test with the admin's documented list of required context processors.
+    TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    }],
+)
 class AdminViewPermissionsTest(TestCase):
     """Tests for Admin Views Permissions."""
 
