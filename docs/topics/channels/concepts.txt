@@ -13,7 +13,7 @@ And, beyond that, there are plenty of non-critical tasks that applications
 could easily offload until after a response has been sent - like saving things
 into a cache or thumbnailing newly-uploaded images.
 
-Channels changes the way Django runs to be "event oriented" - rather than 
+It changes the way Django runs to be "event oriented" - rather than
 just responding to requests, instead Django responds to a wide array of events
 sent on *channels*. There's still no persistent state - each event handler,
 or *consumer* as we call them, is called independently in a way much like a
@@ -26,7 +26,7 @@ Let's look at what *channels* are first.
 What is a channel?
 ------------------
 
-The core of Channels is, unsurprisingly, a datastructure called a *channel*.
+The core of the system is, unsurprisingly, a datastructure called a *channel*.
 What is a channel? It is an *ordered*, *first-in first-out queue* with
 *message expiry* and *at-most-once delivery* to *only one listener at a time*.
 
@@ -81,7 +81,7 @@ attribute which is always a dict of data, and a "channel" attribute which
 is the channel it came from, as well as some others).
 
 Instead of having Django run in the traditional request-response mode, 
-Channels changes Django so that it runs in a worker mode - it listens on 
+channels changes Django so that it runs in a worker mode - it listens on 
 all channels that have consumers assigned, and when a message arrives on
 one, it runs the relevant consumer. So rather than running in just a 
 single process tied to a WSGI server, Django runs in three separate layers:
@@ -118,7 +118,7 @@ message. Suddenly, a view is merely another example of a consumer::
         for chunk in AsgiHandler.encode_response(django_response):
             message.reply_channel.send(chunk)
 
-In fact, this is how Channels works. The interface servers transform connections
+In fact, this is how channels work. The interface servers transform connections
 from the outside world (HTTP, WebSockets, etc.) into messages on channels,
 and then you write workers to handle these messages. Usually you leave normal
 HTTP up to Django's built-in consumers that plug it into the view/template
@@ -154,7 +154,7 @@ clusters of channel servers and workers - after all, any worker can process
 the message - but response channels would have to have their messages sent
 to the channel server they're listening on.
 
-For this reason, Channels treats these as two different *channel types*, and
+For this reason, channels treats these as two different *channel types*, and
 denotes a *response channel* by having the channel name contain
 the character ``!`` - e.g. ``http.response!f5G3fE21f``. *Normal
 channels* do not contain it, but along with the rest of the response
@@ -201,7 +201,7 @@ loses power before it can send disconnect signals - your code will never
 see any disconnect notification but the response channel is completely
 invalid and messages you send there will sit there until they expire.
 
-Because the basic design of channels is stateless, the channel server has no
+Because the basic design of channels are stateless, the channel server has no
 concept of "closing" a channel if an interface server goes away - after all,
 channels are meant to hold messages until a consumer comes along (and some
 types of interface server, e.g. an SMS gateway, could theoretically serve
@@ -216,7 +216,7 @@ likely take weeks).
 
 Now, we could go back into our example above and add an expiring set and keep
 track of expiry times and so forth, but what would be the point of a framework
-if it made you add boilerplate code? Instead, Channels implements this
+if it made you add boilerplate code? Instead, channels implements this
 abstraction as a core concept called Groups::
 
     @receiver(post_save, sender=BlogUpdate)
@@ -262,6 +262,6 @@ retries and persistence (e.g. Celery), or alternatively make a management
 command that checks for completion and re-submits a message to the channel
 if nothing is completed (rolling your own retry logic, essentially).
 
-We'll cover more about what kind of tasks fit well into Channels in the rest
+We'll cover more about what kind of tasks fit well into channels in the rest
 of the documentation, but for now, let's progress to :doc:`/intro/channels`
 and writing some code.

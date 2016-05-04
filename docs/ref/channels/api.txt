@@ -6,9 +6,10 @@ Reference
 Consumers
 ---------
 
-When you configure channel routing, Channels expects the object assigned to
-a channel to be a callable that takes exactly one positional argument, here
-called ``message``. This is a :ref:`message object <ref-message>`.
+When you configure channel routing, the object assigned to a channel
+should be a callable that takes exactly one positional argument, here
+called ``message``, which is a :ref:`message object <ref-message>`. A consumer
+is any callable that fits this definition.
 
 Consumers are not expected to return anything, and if they do, it will be
 ignored. They may raise ``channels.exceptions.ConsumeLater`` to re-insert

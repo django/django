@@ -28,7 +28,7 @@ of Django in 1.10 that made more sense:
 * The ``runserver`` and ``runworker`` commands are in ``django.core.management.commands``
 
 
-Writing third-party apps against Channels
+Writing third-party apps against channels
 -----------------------------------------
 
 If you're writing a third-party app that is designed to work with both the
