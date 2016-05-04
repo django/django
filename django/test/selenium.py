@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import sys
 import unittest
+from contextlib import contextmanager
 
 from django.test import LiveServerTestCase, tag
 from django.utils.module_loading import import_string
@@ -56,11 +57,12 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
 
 @tag('selenium')
 class SeleniumTestCase(with_metaclass(SeleniumTestCaseBase, LiveServerTestCase)):
+    implicit_wait = 10
 
     @classmethod
     def setUpClass(cls):
         cls.selenium = cls.create_webdriver()
-        cls.selenium.implicitly_wait(10)
+        cls.selenium.implicitly_wait(cls.implicit_wait)
         super(SeleniumTestCase, cls).setUpClass()
 
     @classmethod
@@ -71,3 +73,12 @@ class SeleniumTestCase(with_metaclass(SeleniumTestCaseBase, LiveServerTestCase))
         if hasattr(cls, 'selenium'):
             cls.selenium.quit()
         super(SeleniumTestCase, cls)._tearDownClassInternal()
+
+    @contextmanager
+    def disable_implicit_wait(self):
+        """Context manager that disables the default implicit wait."""
+        self.selenium.implicitly_wait(0)
+        try:
+            yield
+        finally:
+            self.selenium.implicitly_wait(self.implicit_wait)
