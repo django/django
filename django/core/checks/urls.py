@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 
-import six
-
 from django.conf import settings
+from django.utils import six
 
 from . import Error, Tags, Warning, register
 
