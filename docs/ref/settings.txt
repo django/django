@@ -342,6 +342,12 @@ Allows you to specify an alternative session backend to use for per-channel
 sessions, if you want different performance characteristics than the one you're
 using for HTTP sessions. Takes the same values as :setting:`SESSION_ENGINE`.
 
+Note that the session engine specified for channels must be able to retrieve
+information only given a static session ID, and so the signed cookie backend
+(``django.contrib.sessions.backends.signed_cookies``) cannot be used.
+If you set :setting:`SESSION_ENGINE` to use signed cookies, you **must** set
+this setting to an alternative backend.
+
 .. _settings-csrf:
 .. setting:: CSRF_COOKIE_AGE
 
