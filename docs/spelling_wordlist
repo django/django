@@ -29,6 +29,8 @@ args
 asgi
 ASGI
 assistive
+async
+asyncio
 atomicity
 Atomicity
 attr
@@ -112,6 +114,8 @@ Changelist
 changepassword
 changeset
 charset
+chatroom
+chatrooms
 checkbox
 checkboxes
 checkin
@@ -307,6 +311,7 @@ Georg
 geospatial
 Geospatial
 Gettext
+gevent
 GiB
 gid
 gis
