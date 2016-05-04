@@ -194,3 +194,12 @@ that backs onto ASGI underneath::
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_test.settings")
     channel_layer = get_channel_layer()
     application = WsgiToAsgiAdapter(channel_layer)
+
+While this removes WebSocket support through the same port that HTTP is served
+on, it still lets you use other channels features such as background tasks or
+alternative interface servers (that would let you write consumers against
+incoming emails or IRC messages). 
+
+You can also use this method to serve HTTP through your existing stack
+and run Daphne on a separate port or domain to receive only WebSocket
+connections.
