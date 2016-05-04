@@ -147,28 +147,35 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
                 return option
         raise NoSuchElementException('Option "%s" not found in "%s"' % (value, selector))
 
+    def _assertOptionsValues(self, options_selector, values):
+        if values:
+            options = self.selenium.find_elements_by_css_selector(options_selector)
+            actual_values = []
+            for option in options:
+                actual_values.append(option.get_attribute('value'))
+            self.assertEqual(values, actual_values)
+        else:
+            # Prevent the `find_elements_by_css_selector` call from blocking
+            # if the selector doesn't match any options as we expect it
+            # to be the case.
+            with self.disable_implicit_wait():
+                self.wait_until(
+                    lambda driver: len(driver.find_elements_by_css_selector(options_selector)) == 0
+                )
+
     def assertSelectOptions(self, selector, values):
         """
         Asserts that the <SELECT> widget identified by `selector` has the
         options with the given `values`.
         """
-        options = self.selenium.find_elements_by_css_selector('%s > option' % selector)
-        actual_values = []
-        for option in options:
-            actual_values.append(option.get_attribute('value'))
-        self.assertEqual(values, actual_values)
+        self._assertOptionsValues("%s > option" % selector, values)
 
     def assertSelectedOptions(self, selector, values):
         """
         Asserts that the <SELECT> widget identified by `selector` has the
         selected options with the given `values`.
         """
-        options = self.selenium.find_elements_by_css_selector('%s > option' % selector)
-        actual_values = []
-        for option in options:
-            if option.get_attribute('selected'):
-                actual_values.append(option.get_attribute('value'))
-        self.assertEqual(values, actual_values)
+        self._assertOptionsValues("%s > option:checked" % selector, values)
 
     def has_css_class(self, selector, klass):
         """
