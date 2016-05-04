@@ -87,14 +87,16 @@ class AsgiRequest(http.HttpRequest):
             self.META[corrected_name] = value
         # Pull out request encoding if we find it
         if "CONTENT_TYPE" in self.META:
-            _, content_params = cgi.parse_header(self.META["CONTENT_TYPE"])
-            if 'charset' in content_params:
+            self.content_type, self.content_params = cgi.parse_header(self.META["CONTENT_TYPE"])
+            if 'charset' in self.content_params:
                 try:
-                    codecs.lookup(content_params['charset'])
+                    codecs.lookup(self.content_params['charset'])
                 except LookupError:
                     pass
                 else:
-                    self.encoding = content_params['charset']
+                    self.encoding = self.content_params['charset']
+        else:
+            self.content_type, self.content_params = "", {}
         # Pull out content length info
         if self.META.get('CONTENT_LENGTH', None):
             try:

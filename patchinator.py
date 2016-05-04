@@ -124,6 +124,7 @@ global_transforms = [
     Replacement(r"from django.channels.tests import", r"from django.test.channels import"),
     Replacement(r"from django.channels.handler import", r"from django.core.handlers.asgi import"),
     Replacement(r"channels.tests.test_routing", r"channels_tests.test_routing"),
+    Replacement(r"django.core.urlresolvers", r"django.urls"),
 ]
 
 python_transforms = global_transforms + [
