@@ -13,7 +13,7 @@ And, beyond that, there are plenty of non-critical tasks that applications
 could easily offload until after a response has been sent - like saving things
 into a cache or thumbnailing newly-uploaded images.
 
-Channels changes the way Django runs to be "event oriented" - rather than 
+It changes the way Django runs to be "event oriented" - rather than
 just responding to requests, instead Django responds to a wide array of events
 sent on *channels*. There's still no persistent state - each event handler,
 or *consumer* as we call them, is called independently in a way much like a
@@ -26,7 +26,7 @@ Let's look at what *channels* are first.
 What is a channel?
 ------------------
 
-The core of Channels is, unsurprisingly, a datastructure called a *channel*.
+The core of the system is, unsurprisingly, a datastructure called a *channel*.
 What is a channel? It is an *ordered*, *first-in first-out queue* with
 *message expiry* and *at-most-once delivery* to *only one listener at a time*.
 

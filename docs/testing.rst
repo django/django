@@ -6,7 +6,7 @@ realize that you can't use the standard Django test client to submit fake HTTP
 requests - instead, you'll need to submit fake Messages to your consumers,
 and inspect what Messages they send themselves.
 
-Channels comes with a ``TestCase`` subclass that sets all of this up for you,
+We provide a ``TestCase`` subclass that sets all of this up for you,
 however, so you can easily write tests and check what your consumers are sending.
 
 

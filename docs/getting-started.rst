@@ -19,8 +19,8 @@ with a WSGI-based Django, and your views and static file serving (from
 
 As a very basic introduction, let's write a consumer that overrides the built-in
 handling and handles every HTTP request directly. This isn't something you'd
-usually do in a project, but it's a good illustration of how Channels
-underlies even core Django - it's less of an addition and more adding a whole
+usually do in a project, but it's a good illustration of how channels
+underlie even core Django - it's less of an addition and more adding a whole
 new layer under the existing view layer.
 
 Make a new project, a new app, and put this in a ``consumers.py`` file in the app::
@@ -279,7 +279,7 @@ see :doc:`backends` for more.
 
 The second thing, once we have a networked channel backend set up, is to make
 sure we're running an interface server that's capable of serving WebSockets.
-Luckily, installing Channels will also install ``daphne``, an interface server
+To solve this, Channels comes with ``daphne``, an interface server
 that can handle both HTTP and WebSockets at the same time, and then ties this
 in to run when you run ``runserver`` - you shouldn't notice any difference
 from the normal Django ``runserver``, though some of the options may be a little
@@ -471,7 +471,7 @@ Django session ID as part of the URL, like this::
     socket = new WebSocket("ws://127.0.0.1:9000/?session_key=abcdefg");
 
 You can get the current session key in a template with ``{{ request.session.session_key }}``.
-Note that Channels can't work with signed cookie sessions - since only HTTP
+Note that this can't work with signed cookie sessions - since only HTTP
 responses can set cookies, it needs a backend it can write to to separately
 store state.
 
@@ -479,7 +479,7 @@ store state.
 Routing
 -------
 
-Channels' ``routing.py`` acts very much like Django's ``urls.py``, including the
+The ``routing.py`` file acts very much like Django's ``urls.py``, including the
 ability to route things to different consumers based on ``path``, or any other
 message attribute that's a string (for example, ``http.request`` messages have
 a ``method`` key you could route based on).
@@ -508,7 +508,7 @@ routing our chat from above::
         include(http_routing),
     ]
 
-Channels will resolve the routing in order, short-circuiting around the
+The routing is resolved in order, short-circuiting around the
 includes if one or more of their matches fails. You don't have to start with
 the ``^`` symbol - we use Python's ``re.match`` function, which starts at the
 start of a line anyway - but it's considered good practice.
@@ -624,7 +624,7 @@ same effect if someone tried to request a view before the login view had finishe
 processing, but there you're not expecting that page to run after the login,
 whereas you'd naturally expect ``receive`` to run after ``connect``.
 
-Channels has a solution - the ``enforce_ordering`` decorator. All WebSocket 
+Channels has a solution - the ``enforce_ordering`` decorator. All WebSocket
 messages contain an ``order`` key, and this decorator uses that to make sure that
 messages are consumed in the right order, in one of two modes:
 
@@ -695,6 +695,6 @@ to manage logical sets of channels, and how Django's session and authentication
 systems easily integrate with WebSockets.
 
 We recommend you read through the rest of the reference documentation to see
-all of what Channels has to offer; in particular, you may want to look at
+more about what you can do with channels; in particular, you may want to look at
 our :doc:`deploying` and :doc:`scaling` resources to get an idea of how to
 design and run apps in production environments.

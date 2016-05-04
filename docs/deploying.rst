@@ -4,9 +4,9 @@ Deploying
 Deploying applications using Channels requires a few more steps than a normal
 Django WSGI application, but it's not very many.
 
-Firstly, remember that even if you have Channels installed, it's an entirely
-optional part of Django. If you leave a project with the default settings
-(no ``CHANNEL_BACKENDS``), it'll just run and work like a normal WSGI app.
+Firstly, remember that it's an entirely optional part of Django.
+If you leave a project with the default settings (no ``CHANNEL_LAYERS``),
+it'll just run and work like a normal WSGI app.
 
 When you want to enable channels in production, you need to do three things:
 
@@ -112,7 +112,7 @@ cluster on the backend, see :ref:`wsgi-to-asgi`.
 If you want to support WebSockets, long-poll HTTP requests and other Channels
 features, you'll need to run a native ASGI interface server, as the WSGI
 specification has no support for running these kinds of requests concurrently.
-Channels ships with an interface server that we recommend you use called
+We ship with an interface server that we recommend you use called
 `Daphne <http://github.com/andrewgodwin/daphne/>`_; it supports WebSockets,
 long-poll HTTP requests, HTTP/2 *(soon)* and performs quite well.
 Of course, any ASGI-compliant server will work!
@@ -164,7 +164,7 @@ workers. As long as the new code is session-compatible, you can even do staged
 rollouts to make sure workers on new code aren't experiencing high error rates.
 
 There's no need to restart the WSGI or WebSocket interface servers unless
-you've upgraded your version of Channels or changed any settings;
+you've upgraded the interface server itself or changed any Django settings;
 none of your code is used by them, and all middleware and code that can
 customize requests is run on the consumers.
 
