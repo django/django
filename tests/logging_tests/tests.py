@@ -306,7 +306,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_truncate_subject(self):
         """
-        RFC 2822's hard limit is 998 characters per line.
+        RFC 5322's hard limit is 998 characters per line.
         So, minus "Subject: ", the actual subject must be no longer than 989
         characters.
         Refs #17281.

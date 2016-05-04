@@ -1325,7 +1325,7 @@ P                 Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:3
                   if they're zero and the special-case
                   strings 'midnight' and 'noon' if
                   appropriate. Proprietary extension.
-r                 :rfc:`2822` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+r                 :rfc:`5322` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
 s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
 S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
                   month, 2 characters.

@@ -129,7 +129,7 @@ class AdminEmailHandler(logging.Handler):
     def format_subject(self, subject):
         """
         Escape CR and LF characters, and limit length.
-        RFC 2822's hard limit is 998 characters per line. So, minus "Subject: "
+        RFC 5322's hard limit is 998 characters per line. So, minus "Subject: "
         the actual subject must be no longer than 989 characters.
         """
         formatted_subject = subject.replace('\n', '\\n').replace('\r', '\\r')
