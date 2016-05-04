@@ -17,4 +17,4 @@ protocols and run code outside of a request-response contenxt.
 
 .. seealso::
 
-    Also see the :doc:`reference documentation `/ref/channels`.
+    Also see the :doc:`reference documentation </ref/channels>`.
