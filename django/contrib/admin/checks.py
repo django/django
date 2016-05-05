@@ -840,12 +840,16 @@ class ModelAdminChecks(BaseModelAdminChecks):
             return []
         else:
             try:
-                field = obj.model._meta.get_field(obj.date_hierarchy)
-            except FieldDoesNotExist:
-                return refer_to_missing_field(
-                    option='date_hierarchy', field=obj.date_hierarchy,
-                    model=obj.model, obj=obj, id='admin.E127',
-                )
+                field = get_fields_from_path(obj.model, obj.date_hierarchy)[-1]
+            except (NotRelationField, FieldDoesNotExist):
+                return [
+                    checks.Error(
+                        "The value of 'date_hierarchy' refers to '%s', which "
+                        "does not refer to a Field." % obj.date_hierarchy,
+                        obj=obj.__class__,
+                        id='admin.E127',
+                    )
+                ]
             else:
                 if not isinstance(field, (models.DateField, models.DateTimeField)):
                     return must_be('a DateField or DateTimeField', option='date_hierarchy', obj=obj, id='admin.E128')

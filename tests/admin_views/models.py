@@ -621,6 +621,7 @@ class WorkHour(models.Model):
 
 class Question(models.Model):
     question = models.CharField(max_length=20)
+    posted = models.DateField(default=datetime.date.today)
 
 
 @python_2_unicode_compatible

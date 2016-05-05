@@ -213,9 +213,18 @@ subclass::
 
         date_hierarchy = 'pub_date'
 
+    You can also specify a field on a related model using the ``__`` lookup,
+    for example::
+
+        date_hierarchy = 'author__pub_date'
+
     This will intelligently populate itself based on available data,
     e.g. if all the dates are in one month, it'll show the day-level
     drill-down only.
+
+    .. versionchanged:: 1.11
+
+        The ability to reference fields on related models was added.
 
     .. note::
 
