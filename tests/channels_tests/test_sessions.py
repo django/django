@@ -32,10 +32,12 @@ class SessionTests(ChannelTestCase):
         """
         # Construct message to send
         message = Message({"reply_channel": "test-reply"}, None, None)
+
         # Run through a simple fake consumer that assigns to it
         @channel_session
         def inner(message):
             message.channel_session["num_ponies"] = -1
+
         inner(message)
         # Test the session worked
         session2 = session_for_reply_channel("test-reply")
@@ -48,12 +50,14 @@ class SessionTests(ChannelTestCase):
         """
         # Construct message to send
         message = Message({"reply_channel": "test-reply"}, None, None)
+
         # Run through a simple fake consumer that should trigger the error
         @channel_session
         @channel_session
         def inner(message):
             message.channel_session["num_ponies"] = -1
         inner(message)
+
         # Test the session worked
         session2 = session_for_reply_channel("test-reply")
         self.assertEqual(session2["num_ponies"], -1)
@@ -64,11 +68,13 @@ class SessionTests(ChannelTestCase):
         """
         # Construct message to send
         message = Message({}, None, None)
+
         # Run through a simple fake consumer that should trigger the error
         @channel_session
         @channel_session
         def inner(message):
             message.channel_session["num_ponies"] = -1
+
         with self.assertRaises(ValueError):
             inner(message)
 
@@ -89,11 +95,13 @@ class SessionTests(ChannelTestCase):
                 "cookie": ("%s=%s" % (settings.SESSION_COOKIE_NAME, session1.session_key)).encode("ascii"),
             },
         }, None, None)
+
         # Run it through http_session, make sure it works (test double here too)
         @http_session
         @http_session
         def inner(message):
             message.http_session["species"] = "horse"
+
         inner(message)
         # Check value assignment stuck
         session2 = session_for_reply_channel("test-reply")
@@ -107,10 +115,12 @@ class SessionTests(ChannelTestCase):
         message0 = Message({"reply_channel": "test-reply-a", "order": 0}, None, None)
         message1 = Message({"reply_channel": "test-reply-a", "order": 1}, None, None)
         message2 = Message({"reply_channel": "test-reply-a", "order": 2}, None, None)
+
         # Run them in an acceptable slight order
         @enforce_ordering(slight=True)
         def inner(message):
             pass
+
         inner(message0)
         inner(message2)
         inner(message1)
@@ -121,10 +131,12 @@ class SessionTests(ChannelTestCase):
         """
         # Construct messages to send
         message2 = Message({"reply_channel": "test-reply-e", "order": 2}, None, None)
+
         # Run them in an acceptable strict order
         @enforce_ordering(slight=True)
         def inner(message):
             pass
+
         with self.assertRaises(ConsumeLater):
             inner(message2)
 
@@ -136,10 +148,12 @@ class SessionTests(ChannelTestCase):
         message0 = Message({"reply_channel": "test-reply-b", "order": 0}, None, None)
         message1 = Message({"reply_channel": "test-reply-b", "order": 1}, None, None)
         message2 = Message({"reply_channel": "test-reply-b", "order": 2}, None, None)
+
         # Run them in an acceptable strict order
         @enforce_ordering
         def inner(message):
             pass
+
         inner(message0)
         inner(message1)
         inner(message2)
@@ -151,10 +165,12 @@ class SessionTests(ChannelTestCase):
         # Construct messages to send
         message0 = Message({"reply_channel": "test-reply-c", "order": 0}, None, None)
         message2 = Message({"reply_channel": "test-reply-c", "order": 2}, None, None)
+
         # Run them in an acceptable strict order
         @enforce_ordering
         def inner(message):
             pass
+
         inner(message0)
         with self.assertRaises(ConsumeLater):
             inner(message2)
@@ -164,8 +180,10 @@ class SessionTests(ChannelTestCase):
         Makes sure messages with no "order" key fail
         """
         message0 = Message({"reply_channel": "test-reply-d"}, None, None)
+
         @enforce_ordering(slight=True)
         def inner(message):
             pass
+
         with self.assertRaises(ValueError):
             inner(message0)
