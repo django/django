@@ -1178,45 +1178,34 @@ decorator)::
 
         return response
 
-There are a few other ways to control cache parameters. For example, HTTP
-allows applications to do the following:
-
-* Define the maximum time a page should be cached.
-
-* Specify whether a cache should always check for newer versions, only
-  delivering the cached content when there are no changes. (Some caches
-  might deliver cached content even if the server page changed, simply
-  because the cache copy isn't yet expired.)
-
-In Django, use the ``cache_control`` view decorator to specify these cache
-parameters. In this example, ``cache_control`` tells caches to revalidate the
-cache on every access and to store cached versions for, at most, 3,600 seconds::
+You can control downstream caches in other ways as well (see :rfc:`7234`
+for full details on HTTP caching). For example, even if you don't use Django's
+server-side cache framework, you can still tell clients to cache a view for
+a certain amount of time with the :rfc:`max-age <7234#section-5.2.2.8>`
+directive::
 
     from django.views.decorators.cache import cache_control
 
-    @cache_control(must_revalidate=True, max_age=3600)
+    @cache_control(max_age=3600)
     def my_view(request):
         # ...
 
-Any valid ``Cache-Control`` HTTP directive is valid in ``cache_control()``.
-Here's a full list:
+(If you *do* use the caching middleware, it already sets the ``max-age`` with
+the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. In that case,
+the custom ``max_age`` from the ``cache_control`` decorator will take
+precedence, and the header values will be merged correctly.)
 
-* ``public=True``
-* ``private=True``
-* ``no_cache=True``
+Any valid ``Cache-Control`` response directive is valid in ``cache_control()``.
+Here are some more examples:
+
 * ``no_transform=True``
 * ``must_revalidate=True``
-* ``proxy_revalidate=True``
-* ``max_age=num_seconds``
-* ``s_maxage=num_seconds``
+* ``stale_while_revalidate=num_seconds``
 
-For explanation of Cache-Control HTTP directives, see the :rfc:`Cache-Control
-spec <7234#section-5.2>`.
+The full list of known directives can be found in the `IANA registry`_
+(note that not all of them apply to responses).
 
-(Note that the caching middleware already sets the cache header's max-age with
-the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. If you use a custom
-``max_age`` in a ``cache_control`` decorator, the decorator will take
-precedence, and the header values will be merged correctly.)
+.. _IANA registry: http://www.iana.org/assignments/http-cache-directives/http-cache-directives.xhtml
 
 If you want to use headers to disable caching altogether,
 :func:`django.views.decorators.cache.never_cache` is a view decorator that adds
