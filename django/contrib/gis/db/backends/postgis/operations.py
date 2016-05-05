@@ -17,6 +17,9 @@ from .adapter import PostGISAdapter
 from .models import PostGISGeometryColumns, PostGISSpatialRefSys
 from .pgraster import from_pgraster, get_pgraster_srid, to_pgraster
 
+# Identifier to mark raster lookups as bilateral.
+BILATERAL = 'bilateral'
+
 
 class PostGISOperator(SpatialOperator):
     def __init__(self, geography=False, raster=False, **kwargs):
@@ -25,7 +28,7 @@ class PostGISOperator(SpatialOperator):
         self.geography = geography
         # Only a subset of the operators and functions are available for the
         # raster type. Lookups that don't suport raster will be converted to
-        # polygons. If the raster argument is set to 'bilateral', then the
+        # polygons. If the raster argument is set to BILATERAL, then the
         # operator cannot handle mixed geom-raster lookups.
         self.raster = raster
         super(PostGISOperator, self).__init__(**kwargs)
@@ -69,7 +72,7 @@ class PostGISOperator(SpatialOperator):
                 template_params['lhs'] = 'ST_Polygon(%s)' % template_params['lhs']
             if rhs_is_raster:
                 template_params['rhs'] = 'ST_Polygon(%s)' % template_params['rhs']
-        elif self.raster == 'bilateral':
+        elif self.raster == BILATERAL:
             # Operators with raster support but don't support mixed (rast-geom)
             # lookups.
             if lhs_is_raster and not rhs_is_raster:
@@ -112,30 +115,30 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         'bbcontains': PostGISOperator(op='~', raster=True),
         'bboverlaps': PostGISOperator(op='&&', geography=True, raster=True),
         'contained': PostGISOperator(op='@', raster=True),
-        'overlaps_left': PostGISOperator(op='&<', raster='bilateral'),
-        'overlaps_right': PostGISOperator(op='&>', raster='bilateral'),
+        'overlaps_left': PostGISOperator(op='&<', raster=BILATERAL),
+        'overlaps_right': PostGISOperator(op='&>', raster=BILATERAL),
         'overlaps_below': PostGISOperator(op='&<|'),
         'overlaps_above': PostGISOperator(op='|&>'),
         'left': PostGISOperator(op='<<'),
         'right': PostGISOperator(op='>>'),
         'strictly_below': PostGISOperator(op='<<|'),
         'strictly_above': PostGISOperator(op='|>>'),
-        'same_as': PostGISOperator(op='~=', raster='bilateral'),
-        'exact': PostGISOperator(op='~=', raster='bilateral'),  # alias of same_as
-        'contains': PostGISOperator(func='ST_Contains', raster='bilateral'),
-        'contains_properly': PostGISOperator(func='ST_ContainsProperly', raster='bilateral'),
-        'coveredby': PostGISOperator(func='ST_CoveredBy', geography=True, raster='bilateral'),
-        'covers': PostGISOperator(func='ST_Covers', geography=True, raster='bilateral'),
+        'same_as': PostGISOperator(op='~=', raster=BILATERAL),
+        'exact': PostGISOperator(op='~=', raster=BILATERAL),  # alias of same_as
+        'contains': PostGISOperator(func='ST_Contains', raster=BILATERAL),
+        'contains_properly': PostGISOperator(func='ST_ContainsProperly', raster=BILATERAL),
+        'coveredby': PostGISOperator(func='ST_CoveredBy', geography=True, raster=BILATERAL),
+        'covers': PostGISOperator(func='ST_Covers', geography=True, raster=BILATERAL),
         'crosses': PostGISOperator(func='ST_Crosses'),
-        'disjoint': PostGISOperator(func='ST_Disjoint', raster='bilateral'),
+        'disjoint': PostGISOperator(func='ST_Disjoint', raster=BILATERAL),
         'equals': PostGISOperator(func='ST_Equals'),
-        'intersects': PostGISOperator(func='ST_Intersects', geography=True, raster='bilateral'),
+        'intersects': PostGISOperator(func='ST_Intersects', geography=True, raster=BILATERAL),
         'isvalid': PostGISOperator(func='ST_IsValid'),
-        'overlaps': PostGISOperator(func='ST_Overlaps', raster='bilateral'),
+        'overlaps': PostGISOperator(func='ST_Overlaps', raster=BILATERAL),
         'relate': PostGISOperator(func='ST_Relate'),
-        'touches': PostGISOperator(func='ST_Touches', raster='bilateral'),
-        'within': PostGISOperator(func='ST_Within', raster='bilateral'),
-        'dwithin': PostGISOperator(func='ST_DWithin', geography=True, raster='bilateral'),
+        'touches': PostGISOperator(func='ST_Touches', raster=BILATERAL),
+        'within': PostGISOperator(func='ST_Within', raster=BILATERAL),
+        'dwithin': PostGISOperator(func='ST_DWithin', geography=True, raster=BILATERAL),
         'distance_gt': PostGISDistanceOperator(func='ST_Distance', op='>', geography=True),
         'distance_gte': PostGISDistanceOperator(func='ST_Distance', op='>=', geography=True),
         'distance_lt': PostGISDistanceOperator(func='ST_Distance', op='<', geography=True),

@@ -3,6 +3,7 @@ import json
 from django.contrib.gis.db.models.lookups import (
     DistanceLookupBase, gis_lookups,
 )
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
@@ -16,13 +17,15 @@ from ..data.rasters.textrasters import JSON_RASTER
 from ..models import models
 from .models import RasterModel, RasterRelatedModel
 
+if HAS_GDAL:
+    from django.contrib.gis.gdal import GDALRaster
+
 
 @skipUnlessDBFeature('supports_raster')
 class RasterFieldTest(TransactionTestCase):
     available_apps = ['gis_tests.rasterapp']
 
     def setUp(self):
-        from django.contrib.gis.gdal import GDALRaster
         rast = GDALRaster({
             "srid": 4326,
             "origin": [0, 0],
@@ -122,7 +125,6 @@ class RasterFieldTest(TransactionTestCase):
         can be called, but doesn't check if the result makes logical sense.
         """
         from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
-        from django.contrib.gis.gdal import GDALRaster
 
         # Create test raster and geom.
         rast = GDALRaster(json.loads(JSON_RASTER))
@@ -194,8 +196,6 @@ class RasterFieldTest(TransactionTestCase):
         Check the logical functionality of the dwithin lookup for different
         input parameters.
         """
-        from django.contrib.gis.gdal import GDALRaster
-
         # Create test raster and geom.
         rast = GDALRaster(json.loads(JSON_RASTER))
         stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
@@ -257,7 +257,6 @@ class RasterFieldTest(TransactionTestCase):
         self.assertEqual(qs.count(), 1)
 
     def test_lookup_input_tuple_too_long(self):
-        from django.contrib.gis.gdal import GDALRaster
         rast = GDALRaster(json.loads(JSON_RASTER))
         qs = RasterModel.objects.filter(rast__bbcontains=(rast, 1, 2))
         msg = 'Tuple too long for lookup bbcontains.'
@@ -265,7 +264,6 @@ class RasterFieldTest(TransactionTestCase):
             qs.count()
 
     def test_lookup_input_band_not_allowed(self):
-        from django.contrib.gis.gdal import GDALRaster
         rast = GDALRaster(json.loads(JSON_RASTER))
         qs = RasterModel.objects.filter(rast__bbcontains=(rast, 1))
         msg = 'Band indices are not allowed for this operator, it works on bbox only.'
@@ -293,7 +291,6 @@ class RasterFieldTest(TransactionTestCase):
         self.assertEqual(qs.count(), 1)
 
     def test_lookup_with_raster_bbox(self):
-        from django.contrib.gis.gdal import GDALRaster
         rast = GDALRaster(json.loads(JSON_RASTER))
         # Shift raster upwards
         rast.origin.y = 2
@@ -307,7 +304,6 @@ class RasterFieldTest(TransactionTestCase):
         self.assertEqual(qs.count(), 1)
 
     def test_lookup_with_polygonized_raster(self):
-        from django.contrib.gis.gdal import GDALRaster
         rast = GDALRaster(json.loads(JSON_RASTER))
         # Move raster to overlap with the model point on the left side
         rast.origin.x = -95.37040 + 1
@@ -322,6 +318,18 @@ class RasterFieldTest(TransactionTestCase):
         # Raster does not overlap anymore after polygonization
         # where the nodata zone is not included.
         self.assertEqual(qs.count(), 0)
+
+    def test_lookup_value_error(self):
+        # Test with invalid dict lookup parameter
+        obj = dict()
+        msg = "Couldn't create spatial object from lookup value '%s'." % obj
+        with self.assertRaisesMessage(ValueError, msg):
+            RasterModel.objects.filter(geom__intersects=obj)
+        # Test with invalid string lookup parameter
+        obj = '00000'
+        msg = "Couldn't create spatial object from lookup value '%s'." % obj
+        with self.assertRaisesMessage(ValueError, msg):
+            RasterModel.objects.filter(geom__intersects=obj)
 
 
 @mock.patch('django.contrib.gis.db.models.fields.HAS_GDAL', False)

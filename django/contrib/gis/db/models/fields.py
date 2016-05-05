@@ -214,12 +214,12 @@ class BaseSpatialField(Field):
                 try:
                     obj = GDALRaster(obj)
                 except GDALException:
-                    raise ValueError("Couldn't create spatial object from lookup value.")
+                    raise ValueError("Couldn't create spatial object from lookup value '%s'." % obj)
         elif isinstance(obj, dict):
             try:
                 obj = GDALRaster(obj)
             except GDALException:
-                raise ValueError("Couldn't create spatial object from lookup value.")
+                raise ValueError("Couldn't create spatial object from lookup value '%s'." % obj)
         else:
             raise ValueError('Cannot use object with type %s for a spatial lookup parameter.' % type(obj).__name__)
 
