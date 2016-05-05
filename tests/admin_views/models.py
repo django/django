@@ -330,6 +330,10 @@ class Podcast(Media):
         ordering = ('release_date',)  # overridden in PodcastAdmin
 
 
+class PodcastInfo(models.Model):
+    podcast = models.ForeignKey(Podcast, models.CASCADE, related_name='info')
+
+
 class Vodcast(Media):
     media = models.OneToOneField(Media, models.CASCADE, primary_key=True, parent_link=True)
     released = models.BooleanField(default=False)

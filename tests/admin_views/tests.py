@@ -5331,6 +5331,26 @@ class DateHierarchyTests(TestCase):
             self.assert_non_localized_year(response, 2003)
             self.assert_non_localized_year(response, 2005)
 
+    def test_related(self):
+        """
+        Ensure that date hierarchy works over relations. Refs #xxxxx.
+        """
+        DATE_INFOS = ((datetime.date(2001, 1, 30), 0),
+                      (datetime.date(2003, 3, 15), 1),
+                      (datetime.date(2005, 5, 3), 2))
+        for date, info_count in DATE_INFOS:
+            podcast = Podcast.objects.create(release_date=date)
+            for i in range(info_count):
+                podcast.info.create()
+
+        response = self.client.get(reverse('admin:admin_views_podcastinfo_changelist'))
+        for date, info_count in DATE_INFOS:
+            link = '?podcast__release_date__year=%d"' % (date.year,)
+            if info_count > 0:
+                self.assertContains(response, link)
+            else:
+                self.assertNotContains(response, link)
+
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class AdminCustomSaveRelatedTests(TestCase):

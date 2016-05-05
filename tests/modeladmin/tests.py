@@ -1176,7 +1176,7 @@ class DateHierarchyCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             ("The value of 'date_hierarchy' refers to 'non_existent_field', which "
-             "is not an attribute of 'modeladmin.ValidationTestModel'."),
+             "does not refer to a Field."),
             'admin.E127')
 
     def test_invalid_field_type(self):
@@ -1193,6 +1193,21 @@ class DateHierarchyCheckTests(CheckTestCase):
             date_hierarchy = 'pub_date'
 
         self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
+
+    def test_related_valid_case(self):
+        class ValidationTestModelAdmin(ModelAdmin):
+            date_hierarchy = 'band__sign_date'
+
+        self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
+
+    def test_related_invalid_field_type(self):
+        class ValidationTestModelAdmin(ModelAdmin):
+            date_hierarchy = 'band__name'
+
+        self.assertIsInvalid(
+            ValidationTestModelAdmin, ValidationTestModel,
+            "The value of 'date_hierarchy' must be a DateField or DateTimeField.",
+            'admin.E128')
 
 
 class OrderingCheckTests(CheckTestCase):

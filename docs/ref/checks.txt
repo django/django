@@ -393,7 +393,7 @@ with the admin site:
   which is not editable through the admin.
 * **admin.E126**: The value of ``search_fields`` must be a list or tuple.
 * **admin.E127**: The value of ``date_hierarchy`` refers to ``<field name>``,
-  which is not an attribute of ``<model>``.
+  which does not refer to a Field.
 * **admin.E128**: The value of ``date_hierarchy`` must be a ``DateField`` or
   ``DateTimeField``.
 

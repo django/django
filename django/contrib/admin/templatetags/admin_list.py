@@ -5,7 +5,8 @@ import warnings
 
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
-    display_for_field, display_for_value, label_for_field, lookup_field,
+    display_for_field, display_for_value, get_fields_from_path,
+    label_for_field, lookup_field,
 )
 from django.contrib.admin.views.main import (
     ALL_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
@@ -346,7 +347,7 @@ def date_hierarchy(cl):
     """
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
-        field = cl.opts.get_field(field_name)
+        field = get_fields_from_path(cl.model, field_name)[-1]
         dates_or_datetimes = 'datetimes' if isinstance(field, models.DateTimeField) else 'dates'
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
