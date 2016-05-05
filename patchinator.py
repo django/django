@@ -221,6 +221,9 @@ class Patchinator(object):
         FileMap(
             "channels/tests/test_request.py", "tests/channels_tests/test_request.py", python_transforms,
         ),
+        FileMap(
+            "channels/tests/test_sessions.py", "tests/channels_tests/test_sessions.py", python_transforms,
+        ),
         # Docs
         FileMap(
             "docs/backends.rst", "docs/ref/channels/backends.txt", docs_transforms,
