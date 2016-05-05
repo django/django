@@ -450,6 +450,12 @@ Auth
   to be at most 255 characters.
 * **auth.E008**: The permission named ``<name>`` of model ``<model>`` is longer
   than 255 characters.
+* **auth.C009**: ``<User model>.is_anonymous`` must be an attribute or property
+  rather than a method. Ignoring this is a security issue as anonymous users
+  will be treated as authenticated!
+* **auth.C010**: ``<User model>.is_authenticated`` must be an attribute or
+  property rather than a method. Ignoring this is a security issue as anonymous
+  users will be treated as authenticated!
 
 
 Content Types
