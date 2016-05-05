@@ -6,6 +6,7 @@ from itertools import chain
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
+from django.utils import six
 
 from .management import _get_builtin_permissions
 
@@ -73,6 +74,26 @@ def check_user_model(app_configs=None, **kwargs):
                 )
             )
 
+    if isinstance(cls().is_anonymous, six.types.MethodType):
+        errors.append(
+            checks.Critical(
+                '%s.is_anonymous must be an attribute or property rather than '
+                'a method. Ignoring this is a security issue as anonymous '
+                'users will be treated as authenticated!' % cls,
+                obj=cls,
+                id='auth.C009',
+            )
+        )
+    if isinstance(cls().is_authenticated, six.types.MethodType):
+        errors.append(
+            checks.Critical(
+                '%s.is_authenticated must be an attribute or property rather '
+                'than a method. Ignoring this is a security issue as anonymous '
+                'users will be treated as authenticated!' % cls,
+                obj=cls,
+                id='auth.C010',
+            )
+        )
     return errors
 
 
