@@ -116,6 +116,11 @@ class Worker(object):
                         repr(content)[:100],
                     )
                     continue
-                self.channel_layer.send(channel, content)
+                # Try to re-insert it a few times then drop it
+                for _ in range(10):
+                    try:
+                        self.channel_layer.send(channel, content)
+                    except self.channel_layer.ChannelFull:
+                        time.sleep(0.05)
             except:
                 logger.exception("Error processing message with consumer %s:", name_that_thing(consumer))

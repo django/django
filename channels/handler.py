@@ -328,4 +328,15 @@ class ViewConsumer(object):
 
     def __call__(self, message):
         for reply_message in self.handler(message):
-            message.reply_channel.send(reply_message)
+            while True:
+                # If we get ChannelFull we just wait and keep trying until
+                # it goes through.
+                # TODO: Add optional death timeout? Don't want to lock up
+                # a whole worker if the client just vanishes and leaves the response
+                # channel full.
+                try:
+                    message.reply_channel.send(reply_message)
+                except message.channel_layer.ChannelFull:
+                    time.sleep(0.05)
+                else:
+                    break
