@@ -762,8 +762,7 @@ won't cache the value.
 
 If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
 
-    # Wait 30 seconds for 'my_key' to expire...
-
+    >>> # Wait 30 seconds for 'my_key' to expire...
     >>> cache.get('my_key')
     None
 
@@ -920,12 +919,12 @@ default cache key version. However, the primitive cache functions all
 include a ``version`` argument, so you can specify a particular cache
 key version to set or get. For example::
 
-    # Set version 2 of a cache key
+    >>> # Set version 2 of a cache key
     >>> cache.set('my_key', 'hello world!', version=2)
-    # Get the default version (assuming version=1)
+    >>> # Get the default version (assuming version=1)
     >>> cache.get('my_key')
     None
-    # Get version 2 of the same key
+    >>> # Get version 2 of the same key
     >>> cache.get('my_key', version=2)
     'hello world!'
 
@@ -934,15 +933,15 @@ the ``incr_version()`` and ``decr_version()`` methods. This
 enables specific keys to be bumped to a new version, leaving other
 keys unaffected. Continuing our previous example::
 
-    # Increment the version of 'my_key'
+    >>> # Increment the version of 'my_key'
     >>> cache.incr_version('my_key')
-    # The default version still isn't available
+    >>> # The default version still isn't available
     >>> cache.get('my_key')
     None
     # Version 2 isn't available, either
     >>> cache.get('my_key', version=2)
     None
-    # But version 3 *is* available
+    >>> # But version 3 *is* available
     >>> cache.get('my_key', version=3)
     'hello world!'
 
@@ -1000,7 +999,7 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
     class CustomLocMemCache(LocMemCache):
         def validate_key(self, key):
             """Custom validation, raising exceptions or warnings as needed."""
-            # ...
+            ...
 
 ...and use the dotted Python path to this class in the
 :setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
@@ -1073,7 +1072,7 @@ To do this in Django, use the convenient
 
     @vary_on_headers('User-Agent')
     def my_view(request):
-        # ...
+        ...
 
 In this case, a caching mechanism (such as Django's own cache middleware) will
 cache a separate version of the page for each unique user-agent.
@@ -1088,7 +1087,7 @@ You can pass multiple headers to ``vary_on_headers()``::
 
     @vary_on_headers('User-Agent', 'Cookie')
     def my_view(request):
-        # ...
+        ...
 
 This tells downstream caches to vary on *both*, which means each combination of
 user-agent and cookie will get its own cache value. For example, a request with
@@ -1102,11 +1101,11 @@ are equivalent::
 
     @vary_on_cookie
     def my_view(request):
-        # ...
+        ...
 
     @vary_on_headers('Cookie')
     def my_view(request):
-        # ...
+        ...
 
 The headers you pass to ``vary_on_headers`` are not case sensitive;
 ``"User-Agent"`` is the same thing as ``"user-agent"``.
@@ -1118,7 +1117,7 @@ directly. This function sets, or adds to, the ``Vary header``. For example::
     from django.utils.cache import patch_vary_headers
 
     def my_view(request):
-        # ...
+        ...
         response = render(request, 'template_name', context)
         patch_vary_headers(response, ['Cookie'])
         return response
@@ -1150,7 +1149,7 @@ Django, use the ``cache_control`` view decorator. Example::
 
     @cache_control(private=True)
     def my_view(request):
-        # ...
+        ...
 
 This decorator takes care of sending out the appropriate HTTP header behind the
 scenes.
@@ -1196,7 +1195,7 @@ cache on every access and to store cached versions for, at most, 3,600 seconds::
 
     @cache_control(must_revalidate=True, max_age=3600)
     def my_view(request):
-        # ...
+        ...
 
 Any valid ``Cache-Control`` HTTP directive is valid in ``cache_control()``.
 Here's a full list:
@@ -1227,7 +1226,7 @@ Example::
 
     @never_cache
     def myview(request):
-        # ...
+        ...
 
 Order of ``MIDDLEWARE_CLASSES``
 ===============================
