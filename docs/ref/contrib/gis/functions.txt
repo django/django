@@ -20,6 +20,14 @@ function to see if your database backend supports the function you want to use.
 If you call a geographic function on a backend that doesn't support it, you'll
 get a ``NotImplementedError`` exception.
 
+.. admonition:: Raw geometry values in annotations
+
+    If you need to add a geometry value in an annotation but outside a geometry
+    function, you have to wrap it inside a ``GeomValue()`` container::
+
+        >>> from django.contrib.gis.db.models import GeomValue
+        >>> Track.objects.annotate(GeomValue(Point(12, 5)))
+
 Function's summary:
 
 ==================  =======================   ======================  ===================  ==================  =====================
