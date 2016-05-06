@@ -11,3 +11,6 @@ Bugfixes
 
 * Removed the need for the ``request`` context processor on the admin login
   page to fix a regression in 1.9 (:ticket:`26558`).
+
+* Fixed translation of password validators' ``help_text`` in forms
+  (:ticket:`26544`).
