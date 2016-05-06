@@ -68,7 +68,7 @@ class MultiPartParser(object):
         # Content-Type should contain multipart and the boundary information.
         #
 
-        content_type = META.get('HTTP_CONTENT_TYPE', META.get('CONTENT_TYPE', ''))
+        content_type = META.get('CONTENT_TYPE', '')
         if not content_type.startswith('multipart/'):
             raise MultiPartParserError('Invalid Content-Type: %s' % content_type)
 
@@ -81,7 +81,7 @@ class MultiPartParser(object):
         # Content-Length should contain the length of the body we are about
         # to receive.
         try:
-            content_length = int(META.get('HTTP_CONTENT_LENGTH', META.get('CONTENT_LENGTH', 0)))
+            content_length = int(META.get('CONTENT_LENGTH', 0))
         except (ValueError, TypeError):
             content_length = 0
 
