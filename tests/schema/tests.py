@@ -1628,6 +1628,7 @@ class SchemaTests(TransactionTestCase):
                     "column": editor.quote_name(column),
                     "to_table": editor.quote_name(table),
                     "to_column": editor.quote_name(model._meta.auto_field.column),
+                    "deferrable": connection.ops.deferrable_sql(),
                 }
             )
             editor.alter_field(model, get_field(Author, CASCADE, field_class=ForeignKey), field)

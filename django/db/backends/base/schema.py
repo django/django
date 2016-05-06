@@ -58,7 +58,7 @@ class BaseDatabaseSchemaEditor(object):
 
     sql_create_fk = (
         "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
-        "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+        "REFERENCES %(to_table)s (%(to_column)s)%(deferrable)s"
     )
     sql_create_inline_fk = None
     sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
@@ -889,6 +889,7 @@ class BaseDatabaseSchemaEditor(object):
             "column": self.quote_name(from_column),
             "to_table": self.quote_name(to_table),
             "to_column": self.quote_name(to_column),
+            "deferrable": self.connection.ops.deferrable_sql(),
         }
 
     def _create_unique_sql(self, model, columns):
