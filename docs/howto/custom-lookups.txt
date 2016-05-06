@@ -307,7 +307,7 @@ would override ``get_lookup`` with something like::
                     dimension = int(lookup_name[1:])
                 except ValueError:
                     pass
-                finally:
+                else:
                     return get_coordinate_lookup(dimension)
             return super(CoordinatesField, self).get_lookup(lookup_name)
 
