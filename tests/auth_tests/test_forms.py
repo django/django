@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import datetime
@@ -360,6 +361,23 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['new_password1'], data['new_password1'])
         self.assertEqual(form.cleaned_data['new_password2'], data['new_password2'])
+
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
+            'min_length': 12,
+        }},
+    ])
+    def test_help_text_translation(self):
+        french_help_texts = [
+            'Votre mot de passe ne peut pas trop ressembler à vos autres informations personnelles.',
+            'Votre mot de passe doit contenir au minimum 12 caractères.',
+        ]
+        form = SetPasswordForm(self.u1)
+        with translation.override('fr'):
+            html = form.as_p()
+            for french_text in french_help_texts:
+                self.assertIn(french_text, html)
 
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
