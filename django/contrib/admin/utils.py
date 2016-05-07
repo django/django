@@ -402,7 +402,7 @@ def display_for_field(value, field, empty_value_display):
     elif isinstance(field, models.FileField) and value:
         return format_html('<a href="{}">{}</a>', value.url, value)
     else:
-        return smart_text(value)
+        return display_for_value(value, empty_value_display)
 
 
 def display_for_value(value, empty_value_display, boolean=False):
@@ -418,6 +418,8 @@ def display_for_value(value, empty_value_display, boolean=False):
         return formats.localize(value)
     elif isinstance(value, six.integer_types + (decimal.Decimal, float)):
         return formats.number_format(value)
+    elif isinstance(value, (list, tuple)):
+        return ', '.join(force_text(v) for v in value)
     else:
         return smart_text(value)
 
