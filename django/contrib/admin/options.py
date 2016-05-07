@@ -117,8 +117,11 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         return self.checks_class().check(self, **kwargs)
 
     def __init__(self):
-        overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
-        overrides.update(self.formfield_overrides)
+        # we need a deep copy here as FORMFIELD_FOR_DBFIELD_DEFAULTS is nested;
+        # this merges the dict one level deep;
+        overrides = copy.deepcopy(FORMFIELD_FOR_DBFIELD_DEFAULTS)
+        for k, v in self.formfield_overrides.items():
+            overrides.setdefault(k, {}).update(v)
         self.formfield_overrides = overrides
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
