@@ -11,7 +11,6 @@ protocols and run code outside of a request-response context.
    introduction
    concepts
    deploying
-   scaling
    testing
    cross-compat
 
