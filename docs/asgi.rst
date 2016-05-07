@@ -128,14 +128,11 @@ Messages should expire after a set time sitting unread in a channel;
 the recommendation is one minute, though the best value depends on the
 channel layer and the way it is deployed.
 
-The maximum message size is finite, though it varies based on the channel layer
-and the encoding it's using. Channel layers may reject messages at ``send()``
-time with a ``MessageTooLarge`` exception; the calling code should take
-appropriate action (e.g. HTTP responses can be chunked, while HTTP
-requests should be closed with a ``413 Request Entity Too Large`` response).
-It is intended that some channel layers will only support messages of around a
-megabyte, while others will be able to take a gigabyte or more, and that it
-may be configurable.
+The maximum message size is 1MB; if more data than this needs to be transmitted
+it should be chunked or placed onto its own single-reader channel (see how
+HTTP request bodies are done, for example). All channel layers must support
+messages up to this size.
+
 
 Handling Protocols
 ------------------
