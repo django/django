@@ -294,6 +294,21 @@ class EmailMessage(object):
         self.extra_headers = headers or {}
         self.connection = connection
 
+    @property
+    def subject(self):
+        return self._subject
+
+    @subject.setter
+    def subject(self, value):
+        """
+        Escape CR and LF characters, and limit length.
+        RFC 2822's hard limit is 998 characters per line. So, minus "Subject: "
+        the actual subject must be no longer than 989 characters.
+        """
+        formatted_subject = value.replace('\n', '\\n').replace('\r', '\\r')
+        max_length = RFC5322_EMAIL_LINE_LENGTH_LIMIT - len('Subject: ')
+        self._subject = formatted_subject[:max_length]
+
     def get_connection(self, fail_silently=False):
         from django.core.mail import get_connection
         if not self.connection:

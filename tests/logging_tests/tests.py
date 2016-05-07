@@ -278,51 +278,6 @@ class AdminEmailHandlerTest(SimpleTestCase):
 
     @override_settings(
         ADMINS=[('admin', 'admin@example.com')],
-        EMAIL_SUBJECT_PREFIX='',
-        DEBUG=False,
-    )
-    def test_subject_accepts_newlines(self):
-        """
-        Ensure that newlines in email reports' subjects are escaped to avoid
-        AdminErrorHandler to fail.
-        Refs #17281.
-        """
-        message = 'Message \r\n with newlines'
-        expected_subject = 'ERROR: Message \\r\\n with newlines'
-
-        self.assertEqual(len(mail.outbox), 0)
-
-        self.logger.error(message)
-
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertNotIn('\n', mail.outbox[0].subject)
-        self.assertNotIn('\r', mail.outbox[0].subject)
-        self.assertEqual(mail.outbox[0].subject, expected_subject)
-
-    @override_settings(
-        ADMINS=(('admin', 'admin@example.com'),),
-        EMAIL_SUBJECT_PREFIX='',
-        DEBUG=False,
-    )
-    def test_truncate_subject(self):
-        """
-        RFC 2822's hard limit is 998 characters per line.
-        So, minus "Subject: ", the actual subject must be no longer than 989
-        characters.
-        Refs #17281.
-        """
-        message = 'a' * 1000
-        expected_subject = 'ERROR: aa' + 'a' * 980
-
-        self.assertEqual(len(mail.outbox), 0)
-
-        self.logger.error(message)
-
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, expected_subject)
-
-    @override_settings(
-        ADMINS=[('admin', 'admin@example.com')],
         DEBUG=False,
     )
     def test_uses_custom_email_backend(self):

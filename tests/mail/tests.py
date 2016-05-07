@@ -144,12 +144,19 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         with self.assertRaisesMessage(TypeError, '"reply_to" argument must be a list or tuple'):
             EmailMessage(reply_to='reply_to@example.com')
 
+    def test_subject_with_newlines(self):
+        """
+        Newlines are forbidden in subjects, Django automatically escapes those.
+        """
+        message = EmailMessage('Subject\r\n with newlines')
+        self.assertEqual(message.subject, 'Subject\\r\\n with newlines')
+
     def test_header_injection(self):
-        email = EmailMessage('Subject\nInjection Test', 'Content', 'from@example.com', ['to@example.com'])
+        email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com\nInjection Test'])
         with self.assertRaises(BadHeaderError):
             email.message()
         email = EmailMessage(
-            ugettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
+            'Subject', 'Content', 'from@example.com', [ugettext_lazy('to@example.com\nInjection Test')]
         )
         with self.assertRaises(BadHeaderError):
             email.message()
@@ -682,8 +689,11 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         https://tools.ietf.org/html/rfc5322#section-2.1.1
         Message body containing longer lines are converted to Quoted-Printable
         to avoid having to insert newlines, which could be hairy to do properly.
+        Too long subject lines are truncated.
         """
-        email = EmailMessage('Subject', "Comment ça va? " * 100, 'from@example.com', ['to@example.com'])
+        email = EmailMessage(
+            'Subject' * 200, "Comment ça va? " * 100, 'from@example.com', ['to@example.com']
+        )
         email.send()
         message = self.get_the_message()
         self.assertMessageHasHeaders(message, {
@@ -691,6 +701,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
             ('Content-Type', 'text/plain; charset="utf-8"'),
             ('Content-Transfer-Encoding', 'quoted-printable'),
         })
+        self.assertEqual(len(message['Subject']), 989)  # 998 - len('Subject: ')
 
     def test_send_many(self):
         email1 = EmailMessage('Subject', 'Content1', 'from@example.com', ['to@example.com'])
@@ -927,7 +938,7 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
     def test_validate_multiline_headers(self):
         # Ticket #18861 - Validate emails when using the locmem backend
         with self.assertRaises(BadHeaderError):
-            send_mail('Subject\nMultiline', 'Content', 'from@example.com', ['to@example.com'])
+            send_mail('Subject', 'Content', 'from@example.com', ['to@example.com\nMultiline'])
 
 
 class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):

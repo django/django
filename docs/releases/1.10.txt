@@ -242,7 +242,9 @@ Database backends
 Email
 ~~~~~
 
-* ...
+* Newlines in message subject lines are automatically escaped instead of
+  producing a ``BadHeaderError`` exception, and the subject lines are truncated
+  to 989 characters.
 
 File Storage
 ~~~~~~~~~~~~
