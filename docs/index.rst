@@ -29,7 +29,6 @@ Contents:
    installation
    getting-started
    deploying
-   scaling
    backends
    testing
    cross-compat

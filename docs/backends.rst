@@ -55,24 +55,23 @@ settings. Any misconfigured interface server or worker will drop some or all
 messages.
 
 
-Database
---------
+IPC
+---
 
-The database layer is intended as a short-term solution for people who can't
-use a more production-ready layer (for example, Redis), but still want something
-that will work cross-process. It has poor performance, and is only
-recommended for development or extremely small deployments.
+The IPC backend uses POSIX shared memory segments and semaphores in order to
+allow different processes on the same machine to communicate with each other.
 
-This layer is included with Channels; just set your ``BACKEND`` to
-``channels.database_layer.DatabaseChannelLayer``, and it will use the
-default Django database alias to store messages. You can change the alias
-by setting ``CONFIG`` to ``{'alias': 'aliasname'}``.
+As it uses shared memory, it does not require any additional servers running
+to get working, and is quicker than any network-based channel layer. However,
+it can only run between processes on the same machine.
 
 .. warning::
-    The database channel layer is NOT fast, and performs especially poorly at
-    latency and throughput. We recommend its use only as a last resort, and only
-    on a database with good transaction support (e.g. Postgres), or you may
-    get errors with multiple message delivery.
+    The IPC layer only communicates between processes on the same machine,
+    and while you might initially be tempted to run a cluster of machines all
+    with their own IPC-based set of processes, this will result in groups not
+    working properly; events sent to a group will only go to those channels
+    that joined the group on the same machine. This backend is for
+    single-machine deployments only.
 
 
 In-memory

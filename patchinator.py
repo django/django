@@ -171,9 +171,6 @@ class Patchinator(object):
             "channels/channel.py", "django/channels/channel.py", python_transforms,
         ),
         FileMap(
-            "channels/database_layer.py", "django/channels/database_layer.py", python_transforms,
-        ),
-        FileMap(
             "channels/exceptions.py", "django/channels/exceptions.py", python_transforms,
         ),
         FileMap(
@@ -210,9 +207,6 @@ class Patchinator(object):
             "tests/channels_tests/__init__.py",
         ),
         FileMap(
-            "channels/tests/test_database_layer.py", "tests/channels_tests/test_database_layer.py", python_transforms,
-        ),
-        FileMap(
             "channels/tests/test_handler.py", "tests/channels_tests/test_handler.py", python_transforms,
         ),
         FileMap(
@@ -239,9 +233,6 @@ class Patchinator(object):
         ),
         FileMap(
             "docs/reference.rst", "docs/ref/channels/api.txt", docs_transforms,
-        ),
-        FileMap(
-            "docs/scaling.rst", "docs/topics/channels/scaling.txt", docs_transforms,
         ),
         FileMap(
             "docs/testing.rst", "docs/topics/channels/testing.txt", docs_transforms,
