@@ -771,7 +771,8 @@ Composite widgets
 .. class:: SplitDateTimeWidget
 
     Wrapper (using :class:`MultiWidget`) around two widgets: :class:`DateInput`
-    for the date, and :class:`TimeInput` for the time.
+    for the date, and :class:`TimeInput` for the time. Must be used with
+    :class:`SplitDateTimeField` rather than :class:`DateTimeField`.
 
     ``SplitDateTimeWidget`` has two optional attributes:
 
