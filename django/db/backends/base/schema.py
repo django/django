@@ -204,7 +204,7 @@ class BaseDatabaseSchemaEditor(object):
         else:
             default = None
         # If it's a callable, call it
-        if six.callable(default):
+        if callable(default):
             default = default()
         # Run it through the field's get_db_prep_save method so we can send it
         # to the database.
