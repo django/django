@@ -70,7 +70,7 @@ mention:
 
     For more information, see the Python documentation of the :mod:`csv` module.
 
-    .. _`csv module's examples section`: https://docs.python.org/library/csv.html#examples
+    .. _`csv module's examples section`: https://docs.python.org/2/library/csv.html#examples
     .. _`python-unicodecsv module`: https://github.com/jdunck/python-unicodecsv
 
 .. _streaming-csv-files:

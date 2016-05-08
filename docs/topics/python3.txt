@@ -16,9 +16,10 @@ Philosophy
 ==========
 
 This document assumes that you are familiar with the changes between Python 2
-and Python 3. If you aren't, read `Python's official porting guide`_ first.
-Refreshing your knowledge of unicode handling on Python 2 and 3 will help; the
-`Pragmatic Unicode`_ presentation is a good resource.
+and Python 3. If you aren't, read :ref:`Python's official porting guide
+<pyporting-howto>` first. Refreshing your knowledge of unicode handling on
+Python 2 and 3 will help; the `Pragmatic Unicode`_ presentation is a good
+resource.
 
 Django uses the *Python 2/3 Compatible Source* strategy. Of course, you're
 free to chose another strategy for your own code, especially if you don't need
@@ -42,7 +43,6 @@ developers are used to dealing with such constraints.
 Porting tools provided by Django are inspired by this philosophy, and it's
 reflected throughout this guide.
 
-.. _Python's official porting guide: https://docs.python.org/3/howto/pyporting.html
 .. _Pragmatic Unicode: http://nedbatchelder.com/text/unipain.html
 
 Porting tips
