@@ -14,8 +14,8 @@ from django.core.validators import ValidationError
 from django.db import connection, models
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import (
-    ModelFormMetaclass, construct_instance, fields_for_model, model_to_dict,
-    modelform_factory,
+    ModelChoiceIterator, ModelFormMetaclass, construct_instance,
+    fields_for_model, model_to_dict, modelform_factory,
 )
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
@@ -1572,6 +1572,23 @@ class ModelChoiceFieldTests(TestCase):
         template = Template('{{ field.name }}{{ field }}{{ field.help_text }}')
         with self.assertNumQueries(1):
             template.render(Context({'field': field}))
+
+    def test_modelchoicefield_iterator(self):
+        """
+        Iterator defaults to ModelChoiceIterator and can be overridden with
+        the iterator attribute on a ModelChoiceField subclass.
+        """
+        field = forms.ModelChoiceField(Category.objects.all())
+        self.assertIsInstance(field.choices, ModelChoiceIterator)
+
+        class CustomModelChoiceIterator(ModelChoiceIterator):
+            pass
+
+        class CustomModelChoiceField(forms.ModelChoiceField):
+            iterator = CustomModelChoiceIterator
+
+        field = CustomModelChoiceField(Category.objects.all())
+        self.assertIsInstance(field.choices, CustomModelChoiceIterator)
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
