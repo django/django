@@ -51,3 +51,21 @@ test('add/remove form events', function(assert) {
     });
     deleteLink.click();
 });
+
+test('existing add button', function(assert) {
+    var $ = django.jQuery;
+    $('#qunit-fixture').empty();  // Clear the table added in beforeEach
+    $('#qunit-fixture').append($('#tabular-formset').text());
+    this.table = $('table.inline');
+    this.inlineRow = this.table.find('tr');
+    this.table.append('<i class="add-button"></i>');
+    var addButton = this.table.find('.add-button');
+    this.inlineRow.tabularFormset({
+        prefix: 'first',
+        deleteText: 'Remove',
+        addButton: addButton
+    });
+    assert.equal(this.table.find('.add-row a').length, 0);
+    addButton.click();
+    assert.ok(this.table.find('#first-1').hasClass('row2'));
+});
