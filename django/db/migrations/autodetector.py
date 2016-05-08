@@ -802,10 +802,16 @@ class MigrationAutodetector(object):
         # You can't just add NOT NULL fields with no default or fields
         # which don't allow empty strings as default.
         preserve_default = True
-        if (not field.null and not field.has_default() and not field.many_to_many and
-                not (field.blank and field.empty_strings_allowed)):
+        time_fields = (models.DateField, models.DateTimeField, models.TimeField)
+        if (not field.null and not field.has_default() and
+                not field.many_to_many and
+                not (field.blank and field.empty_strings_allowed) and
+                not (isinstance(field, time_fields) and field.auto_now)):
             field = field.clone()
-            field.default = self.questioner.ask_not_null_addition(field_name, model_name)
+            if isinstance(field, time_fields) and field.auto_now_add:
+                field.default = self.questioner.ask_auto_now_add_addition(field_name, model_name)
+            else:
+                field.default = self.questioner.ask_not_null_addition(field_name, model_name)
             preserve_default = False
         self.add_operation(
             app_label,

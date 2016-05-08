@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import codecs
 import importlib
 import os
+import sys
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
@@ -1077,6 +1078,30 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations"):
             with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
                 call_command("makemigrations")
+
+    @mock.patch('django.db.migrations.questioner.input', return_value='1')
+    @mock.patch('django.db.migrations.questioner.sys.stdin', mock.MagicMock(encoding=sys.getdefaultencoding()))
+    def test_makemigrations_auto_now_add_interactive(self, *args):
+        """
+        makemigrations prompts the user when adding auto_now_add to an existing
+        model.
+        """
+        class Entry(models.Model):
+            title = models.CharField(max_length=255)
+            creation_date = models.DateTimeField(auto_now_add=True)
+
+            class Meta:
+                app_label = 'migrations'
+
+        # Monkeypatch interactive questioner to auto accept
+        with mock.patch('django.db.migrations.questioner.sys.stdout', new_callable=six.StringIO) as prompt_stdout:
+            out = six.StringIO()
+            with self.temporary_migration_module(module='migrations.test_auto_now_add'):
+                call_command('makemigrations', 'migrations', interactive=True, stdout=out)
+            output = force_text(out.getvalue())
+            prompt_output = force_text(prompt_stdout.getvalue())
+            self.assertIn("You can accept the default 'timezone.now' by pressing 'Enter'", prompt_output)
+            self.assertIn("Add field creation_date to entry", output)
 
 
 class SquashMigrationsTests(MigrationTestBase):
