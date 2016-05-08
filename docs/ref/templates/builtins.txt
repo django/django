@@ -1578,6 +1578,12 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off::
         {{ title|escape }}
     {% endautoescape %}
 
+.. deprecated:: 1.10
+
+    The "lazy" behavior of the ``escape`` filter is deprecated. It will change
+    to immediately apply :func:`~django.utils.html.conditional_escape` in
+    Django 2.0.
+
 .. templatefilter:: escapejs
 
 ``escapejs``

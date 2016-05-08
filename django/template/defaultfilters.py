@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import random as random_module
 import re
+import warnings
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from operator import itemgetter
@@ -10,6 +11,7 @@ from pprint import pformat
 
 from django.utils import formats, six
 from django.utils.dateformat import format, time_format
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (
     avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
@@ -439,7 +441,11 @@ def escape_filter(value):
     """
     Marks the value as a string that should be auto-escaped.
     """
-    return mark_for_escaping(value)
+    with warnings.catch_warnings():
+        # Ignore mark_for_escaping deprecation -- this will use
+        # conditional_escape() in Django 2.0.
+        warnings.simplefilter('ignore', category=RemovedInDjango20Warning)
+        return mark_for_escaping(value)
 
 
 @register.filter(is_safe=True)

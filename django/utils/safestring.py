@@ -4,7 +4,10 @@ without further escaping in HTML. Marking something as a "safe string" means
 that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
+import warnings
+
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import Promise, curry
 
 
@@ -138,6 +141,7 @@ def mark_for_escaping(s):
     Can be called multiple times on a single string (the resulting escaping is
     only applied once).
     """
+    warnings.warn('mark_for_escaping() is deprecated.', RemovedInDjango20Warning)
     if hasattr(s, '__html__') or isinstance(s, EscapeData):
         return s
     if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):

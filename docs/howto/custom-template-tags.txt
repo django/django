@@ -210,15 +210,6 @@ passed around inside the template code:
           # Do something with the "safe" string.
           ...
 
-* **Strings marked as "needing escaping"** are *always* escaped on
-  output, regardless of whether they are in an :ttag:`autoescape` block or
-  not. These strings are only escaped once, however, even if auto-escaping
-  applies.
-
-  Internally, these strings are of type ``EscapeBytes`` or
-  ``EscapeText``. Generally you don't have to worry about these; they
-  exist for the implementation of the :tfilter:`escape` filter.
-
 Template filter code falls into one of two situations:
 
 1. Your filter does not introduce any HTML-unsafe characters (``<``, ``>``,
