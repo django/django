@@ -102,8 +102,8 @@ These files are:
   anything inside it (e.g. ``mysite.urls``).
 
 * :file:`mysite/__init__.py`: An empty file that tells Python that this
-  directory should be considered a Python package. (Read `more about
-  packages`_ in the official Python docs if you're a Python beginner.)
+  directory should be considered a Python package. If you're a Python beginner,
+  read :ref:`more about packages <tut-packages>` in the official Python docs.
 
 * :file:`mysite/settings.py`: Settings/configuration for this Django
   project.  :doc:`/topics/settings` will tell you all about how settings
@@ -115,8 +115,6 @@ These files are:
 
 * :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
-
-.. _more about packages: https://docs.python.org/tutorial/modules.html#packages
 
 The development server
 ======================
@@ -211,9 +209,9 @@ rather than creating directories.
     configuration and apps for a particular website. A project can contain
     multiple apps. An app can be in multiple projects.
 
-Your apps can live anywhere on your `Python path`_. In this tutorial, we'll
-create our poll app right next to your :file:`manage.py` file so that it can be
-imported as its own top-level module, rather than a submodule of ``mysite``.
+Your apps can live anywhere on your :ref:`Python path <tut-the-module-search-path>`.
+In this tutorial, we'll create our poll app right next to your :file:`manage.py`
+file so that it can be imported as its own top-level module, rather than a submodule of ``mysite``.
 
 To create your app, make sure you're in the same directory as :file:`manage.py`
 and type this command:
@@ -235,8 +233,6 @@ That'll create a directory :file:`polls`, which is laid out like this::
         views.py
 
 This directory structure will house the poll application.
-
-.. _`Python path`: https://docs.python.org/tutorial/modules.html#the-module-search-path
 
 Write your first view
 =====================

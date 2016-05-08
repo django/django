@@ -140,6 +140,7 @@ intersphinx_mapping = {
     'six': ('https://pythonhosted.org/six/', None),
     'formtools': ('https://django-formtools.readthedocs.io/en/latest/', None),
     'psycopg2': ('http://initd.org/psycopg/docs/', None),
+    'pypi': ('https://pypi.python.org/pypi/', None),
 }
 
 # Python's docs don't change every week.

@@ -924,15 +924,14 @@ Default::
 
 A list of formats that will be accepted when inputting data on a date field.
 Formats will be tried in order, using the first valid one. Note that these
-format strings use Python's datetime_ module syntax, not the format strings
-from the ``date`` Django template tag.
+format strings use Python's :ref:`datetime module syntax
+<strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
+template filter.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
-
-.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: DATETIME_FORMAT
 
@@ -972,15 +971,14 @@ Default::
 
 A list of formats that will be accepted when inputting data on a datetime
 field. Formats will be tried in order, using the first valid one. Note that
-these format strings use Python's datetime_ module syntax, not the format
-strings from the ``date`` Django template tag.
+these format strings use Python's :ref:`datetime module syntax
+<python:strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
+template filter.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
-
-.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: DEBUG
 
@@ -1061,7 +1059,6 @@ format has higher precedence and will be applied instead.
 
 See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
-
 
 .. setting:: DEFAULT_CHARSET
 
@@ -1730,13 +1727,13 @@ __ https://github.com/django/django/blob/master/django/utils/log.py
 Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
-Django project. Points at a instance of Python's `dictConfig`_
+Django project. Points at a instance of Python's :ref:`dictConfig <python:>`
 configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
 
-.. _dictConfig: https://docs.python.org/library/logging.config.html#configuration-dictionary-schema
+.. _dictConfig: https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema
 
 .. setting:: MANAGERS
 
@@ -2368,15 +2365,13 @@ Default::
 
 A list of formats that will be accepted when inputting data on a time field.
 Formats will be tried in order, using the first valid one. Note that these
-format strings use Python's datetime_ module syntax, not the format strings
-from the ``date`` Django template tag.
+format strings use Python's :ref:`datetime <python:strftime-strptime-behavior>`
+module syntax, not the format strings from the ``date`` Django template tag.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
-
-.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: TIME_ZONE
 

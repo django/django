@@ -373,10 +373,10 @@ that passing a ``prefix`` parameter when creating an instance still works too.
     * Dive Into Python (a free online book for beginning Python developers)
       includes a great `introduction to Unit Testing`__.
     * After reading those, if you want something a little meatier to sink
-      your teeth into, there's always the `Python unittest documentation`__.
+      your teeth into, there's always the
+      ``:ref:`Python unittest documentation` <python:library/unittest.html>``
 
 __ http://www.diveintopython.net/unit_testing/index.html
-__ https://docs.python.org/library/unittest.html
 
 Running your new test
 ---------------------
