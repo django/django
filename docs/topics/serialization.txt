@@ -258,7 +258,7 @@ serializer to make the format compatible with `ECMA-262`_.
 
 Be aware that not all Django output can be passed unmodified to :mod:`json`.
 In particular, :ref:`lazy translation objects <lazy-translations>` need a
-`special encoder`_ written for them. Something like this will work::
+custom :mod:`json` encoder. Something like this will work::
 
     from django.utils.functional import Promise
     from django.utils.encoding import force_text
@@ -273,7 +273,6 @@ In particular, :ref:`lazy translation objects <lazy-translations>` need a
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
-.. _special encoder: https://docs.python.org/library/json.html#encoders-and-decoders
 .. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 
 YAML
@@ -481,7 +480,8 @@ command line flags to generate natural keys.
     You don't need to define both ``natural_key()`` and
     ``get_by_natural_key()``. If you don't want Django to output
     natural keys during serialization, but you want to retain the
-    ability to load natural keys, then you can opt to not implement
+    ability to load natural keys, then you can
+    opt to not implement
     the ``natural_key()`` method.
 
     Conversely, if (for some strange reason) you want Django to output

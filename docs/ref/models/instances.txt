@@ -596,8 +596,8 @@ Other model instance methods
 
 A few object methods have special purposes.
 
-``__str__``
------------
+``__str__()``
+-------------
 
 .. method:: Model.__str__()
 
@@ -623,8 +623,8 @@ For example::
 If you'd like compatibility with Python 2, you can decorate your model class
 with :func:`~django.utils.encoding.python_2_unicode_compatible` as shown above.
 
-``__eq__``
-----------
+``__eq__()``
+------------
 
 .. method:: Model.__eq__()
 
@@ -652,22 +652,20 @@ For example::
     MyModel(id=1) != MultitableInherited(id=1)
     MyModel(id=1) != MyModel(id=2)
 
-``__hash__``
-------------
+``__hash__()``
+--------------
 
 .. method:: Model.__hash__()
 
-The ``__hash__`` method is based on the instance's primary key value. It
-is effectively hash(obj.pk). If the instance doesn't have a primary key
-value then a ``TypeError`` will be raised (otherwise the ``__hash__``
+The ``__hash__()`` method is based on the instance's primary key value. It
+is effectively ``hash(obj.pk)``. If the instance doesn't have a primary key
+value then a ``TypeError`` will be raised (otherwise the ``__hash__()``
 method would return different values before and after the instance is
-saved, but changing the ``__hash__`` value of an instance `is forbidden
-in Python`_).
+saved, but changing the :meth:`~object.__hash__` value of an instance is
+forbidden in Python.
 
-.. _is forbidden in Python: https://docs.python.org/reference/datamodel.html#object.__hash__
-
-``get_absolute_url``
---------------------
+``get_absolute_url()``
+----------------------
 
 .. method:: Model.get_absolute_url()
 

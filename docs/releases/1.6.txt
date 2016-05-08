@@ -422,7 +422,8 @@ support some types of tests that were supported by the previous runner:
   found and run. Move them to a file whose name begins with ``test``.
 
 * Doctests will no longer be automatically discovered. To integrate doctests in
-  your test suite, follow the `recommendations in the Python documentation`_.
+  your test suite, follow the :ref:`recommendations in the Python documentation
+  <doctest-unittest-api>`.
 
 Django bundles a modified version of the :mod:`doctest` module from the Python
 standard library (in ``django.test._doctest``) and includes some additional
@@ -434,8 +435,6 @@ If you wish to delay updates to your test suite, you can set your
 :setting:`TEST_RUNNER` setting to ``django.test.simple.DjangoTestSuiteRunner``
 to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is deprecated
 but will not be removed from Django until version 1.8.
-
-.. _recommendations in the Python documentation: https://docs.python.org/library/doctest.html#unittest-api
 
 Removal of ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` GeoDjango custom test runner
 ---------------------------------------------------------------------------------------------

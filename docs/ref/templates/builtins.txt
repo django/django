@@ -2055,11 +2055,8 @@ If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
 ----------------
 
 Formats the variable according to the argument, a string formatting specifier.
-This specifier uses Python string formatting syntax, with the exception that
-the leading "%" is dropped.
-
-See https://docs.python.org/library/stdtypes.html#string-formatting-operations
-for documentation of Python string formatting
+This specifier uses the :ref:`old-string-formatting` syntax, with the exception
+that the leading "%" is dropped.
 
 For example::
 

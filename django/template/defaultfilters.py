@@ -246,8 +246,8 @@ def stringformat(value, arg):
     This specifier uses Python string formating syntax, with the exception that
     the leading "%" is dropped.
 
-    See http://docs.python.org/lib/typesseq-strings.html for documentation
-    of Python string formatting
+    See https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
+    for documentation of Python string formatting.
     """
     try:
         return ("%" + six.text_type(arg)) % value
