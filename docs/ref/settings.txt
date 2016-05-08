@@ -1736,7 +1736,7 @@ configuration method by default.
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
 
-.. _dictConfig: https://docs.python.org/library/logging.config.html#configuration-dictionary-schema
+.. _dictConfig: https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema
 
 .. setting:: MANAGERS
 
@@ -2376,7 +2376,7 @@ precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
-.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
+.. _datetime: https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: TIME_ZONE
 

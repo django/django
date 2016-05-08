@@ -376,7 +376,7 @@ that passing a ``prefix`` parameter when creating an instance still works too.
       your teeth into, there's always the `Python unittest documentation`__.
 
 __ http://www.diveintopython.net/unit_testing/index.html
-__ https://docs.python.org/library/unittest.html
+__ https://docs.python.org/3/library/unittest.html
 
 Running your new test
 ---------------------
