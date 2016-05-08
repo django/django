@@ -4,6 +4,7 @@ from django.db import models
 from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 
 from .models import (
@@ -167,3 +168,55 @@ class ManagersRegressionTests(TestCase):
         related = RelatedModel.objects.create(exact=False)
         relation = related.test_fk.create()
         self.assertEqual(related.test_fk.get(), relation)
+
+    @isolate_apps('managers_regress')
+    def test_parent_custom_manager_is_not_available_for_child_with_multi_table_inheritance(self):
+        class BaseModel(models.Model):
+            test_objects = models.Manager()
+
+        class TestModel(BaseModel):
+            pass
+
+        with self.assertRaisesMessage(
+            RemovedInDjango20Warning,
+            "Access to manager 'test_objects' defined on non-abstract base "
+            "class 'BaseModel' from child class 'TestModel' is deprecated. "
+            "Add the manager to the child class to silence this warning."
+        ):
+            TestModel.test_objects.all()
+
+    @isolate_apps('managers_regress')
+    def test_parent_objects_is_not_available_for_class_with_custom_manager_and_multi_table_inheritance(self):
+        class BaseModel(models.Model):
+            pass
+
+        class TestModel(BaseModel):
+            test_objects = models.Manager()
+
+        with self.assertRaisesMessage(
+            RemovedInDjango20Warning,
+            "Access to manager 'objects' defined on non-abstract base "
+            "class 'BaseModel' from child class 'TestModel' is deprecated. "
+            "Add the manager to the child class to silence this warning."
+        ):
+            TestModel.objects.all()
+
+    @isolate_apps('managers_regress')
+    def test_custom_manager_for_base_class_is_not_available_in_childs_proxy(self):
+        class BaseModel(models.Model):
+            test_objects = models.Manager()
+
+        class TestModel(BaseModel):
+            pass
+
+        class ProxyModel(TestModel):
+            class Meta:
+                proxy = True
+
+        with self.assertRaisesMessage(
+            RemovedInDjango20Warning,
+            "Access to manager 'test_objects' defined on non-abstract base "
+            "class 'BaseModel' from child class 'ProxyModel' is deprecated. "
+            "Add the manager to the child class to silence this warning."
+        ):
+            ProxyModel.test_objects.all()

@@ -1025,6 +1025,9 @@ Miscellaneous
   favor of its new location, :mod:`django.urls`.
 
 * The template ``Context.has_key()`` method is deprecated in favor of ``in``.
+* Accessing managers defined on non-abstract base classes from non-abstract
+  child classes is deprecated. If you want to reuse manager from a non-abstract
+  base, redeclare it explicitly on the child class.
 
 * The private attribute ``virtual_fields`` of ``Model._meta`` is
   deprecated in favor of ``private_fields``.

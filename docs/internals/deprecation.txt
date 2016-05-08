@@ -130,6 +130,9 @@ details on these changes.
 
 * The ``django.core.urlresolvers`` module will be removed.
 
+* Support of access to managers defined on non-abstract base classes from non-abstract
+  child classes will be removed.
+
 * The model ``CommaSeparatedIntegerField`` will be removed. A stub field will
   remain for compatibility with historical migrations.
 
