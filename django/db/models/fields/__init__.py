@@ -1241,11 +1241,11 @@ class DateField(DateTimeCheckMixin, Field):
         if not timezone.is_naive(now):
             now = timezone.make_naive(now, timezone.utc)
         value = self.default
-        if isinstance(value, datetime.datetime):
+        if hasattr(value, 'tzinfo') and hasattr(value, 'date'):
             if not timezone.is_naive(value):
                 value = timezone.make_naive(value, timezone.utc)
             value = value.date()
-        elif isinstance(value, datetime.date):
+        if hasattr(value, 'year') and hasattr(value, 'month') and hasattr(value, 'day'):
             # Nothing to do, as dates don't have tz information
             pass
         else:
@@ -1286,14 +1286,14 @@ class DateField(DateTimeCheckMixin, Field):
     def to_python(self, value):
         if value is None:
             return value
-        if isinstance(value, datetime.datetime):
+        if hasattr(value, 'tzinfo') and hasattr(value, 'date'):
             if settings.USE_TZ and timezone.is_aware(value):
                 # Convert aware datetimes to the default time zone
                 # before casting them to dates (#17742).
                 default_timezone = timezone.get_default_timezone()
                 value = timezone.make_naive(value, default_timezone)
             return value.date()
-        if isinstance(value, datetime.date):
+        if hasattr(value, 'year') and hasattr(value, 'month') and hasattr(value, 'day'):
             return value
         # duck type check for objects that may be mocks
         if hasattr(value, 'isoformat'):
@@ -1386,13 +1386,13 @@ class DateTimeField(DateField):
         if not timezone.is_naive(now):
             now = timezone.make_naive(now, timezone.utc)
         value = self.default
-        if isinstance(value, datetime.datetime):
+        if hasattr(value, 'tzinfo') and hasattr(value, 'date'):
             second_offset = datetime.timedelta(seconds=10)
             lower = now - second_offset
             upper = now + second_offset
             if timezone.is_aware(value):
                 value = timezone.make_naive(value, timezone.utc)
-        elif isinstance(value, datetime.date):
+        elif hasattr(value, 'year') and hasattr(value, 'month') and hasattr(value, 'day'):
             second_offset = datetime.timedelta(seconds=10)
             lower = now - second_offset
             lower = datetime.datetime(lower.year, lower.month, lower.day)
@@ -1423,12 +1423,12 @@ class DateTimeField(DateField):
     def to_python(self, value):
         if value is None:
             return value
-        if isinstance(value, datetime.datetime):
+        if hasattr(value, 'tzinfo') and hasattr(value, 'date'):
             return value
-        if isinstance(value, datetime.date):
+        if hasattr(value, 'year') and hasattr(value, 'month') and hasattr(value, 'day'):
             # edge case - if we are mocking out datetime.datetime, and manage
             # to pass a 'real' datetime into this method, then it will return
-            # True to isinstance(value,  datetime.date), but should really be
+            # True to hasattr(value, 'year'), but should really be
             # treated as a datetime.
             try:
                 value = datetime.datetime(
@@ -2258,13 +2258,13 @@ class TimeField(DateTimeCheckMixin, Field):
         if not timezone.is_naive(now):
             now = timezone.make_naive(now, timezone.utc)
         value = self.default
-        if isinstance(value, datetime.datetime):
+        if hasattr(value, 'tzinfo') and hasattr(value, 'date'):
             second_offset = datetime.timedelta(seconds=10)
             lower = now - second_offset
             upper = now + second_offset
             if timezone.is_aware(value):
                 value = timezone.make_naive(value, timezone.utc)
-        elif isinstance(value, datetime.time):
+        elif hasattr(value, 'hour') and not hasattr(value, 'day'):
             second_offset = datetime.timedelta(seconds=10)
             lower = now - second_offset
             upper = now + second_offset
@@ -2306,9 +2306,9 @@ class TimeField(DateTimeCheckMixin, Field):
     def to_python(self, value):
         if value is None:
             return None
-        if isinstance(value, datetime.time):
+        if hasattr(value, 'hour') and not hasattr(value, 'day'):
             return value
-        if isinstance(value, datetime.datetime):
+        if hasattr(value, 'time') and callable(value.time):
             # Not usually a good idea to pass in a datetime here (it loses
             # information), but this can be a side-effect of interacting with a
             # database backend (e.g. Oracle), so we'll be accommodating.
