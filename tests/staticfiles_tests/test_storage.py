@@ -32,6 +32,9 @@ class TestHashedFiles(object):
         # Clear hashed files to avoid side effects among tests.
         storage.staticfiles_storage.hashed_files.clear()
 
+    def postCondition(self):
+        pass
+
     def test_template_tag_return(self):
         """
         Test the CachedStaticFilesStorage backend.
@@ -42,6 +45,7 @@ class TestHashedFiles(object):
         self.assertStaticRenders("cached/styles.css", "/static/cached/styles.bb84a0240107.css")
         self.assertStaticRenders("path/", "/static/path/")
         self.assertStaticRenders("path/?query", "/static/path/?query")
+        self.postCondition()
 
     def test_template_tag_simple_content(self):
         relpath = self.hashed_file_path("cached/styles.css")
@@ -50,6 +54,7 @@ class TestHashedFiles(object):
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
+        self.postCondition()
 
     def test_path_ignored_completely(self):
         relpath = self.hashed_file_path("cached/css/ignored.css")
@@ -61,6 +66,7 @@ class TestHashedFiles(object):
             self.assertIn(b'https:foobar', content)
             self.assertIn(b'data:foobar', content)
             self.assertIn(b'//foobar', content)
+        self.postCondition()
 
     def test_path_with_querystring(self):
         relpath = self.hashed_file_path("cached/styles.css?spam=eggs")
@@ -70,6 +76,7 @@ class TestHashedFiles(object):
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
+        self.postCondition()
 
     def test_path_with_fragment(self):
         relpath = self.hashed_file_path("cached/styles.css#eggs")
@@ -79,6 +86,7 @@ class TestHashedFiles(object):
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
+        self.postCondition()
 
     def test_path_with_querystring_and_fragment(self):
         relpath = self.hashed_file_path("cached/css/fragments.css")
@@ -90,6 +98,7 @@ class TestHashedFiles(object):
             self.assertIn(b'fonts/font.b8d603e42714.svg#path/to/../../fonts/font.svg', content)
             self.assertIn(b'data:font/woff;charset=utf-8;base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA', content)
             self.assertIn(b'#default#VML', content)
+        self.postCondition()
 
     def test_template_tag_absolute(self):
         relpath = self.hashed_file_path("cached/absolute.css")
@@ -101,6 +110,7 @@ class TestHashedFiles(object):
             self.assertNotIn(b"/static/styles_root.css", content)
             self.assertIn(b"/static/styles_root.401f2509a628.css", content)
             self.assertIn(b'/static/cached/img/relative.acae32e4532b.png', content)
+        self.postCondition()
 
     def test_template_tag_absolute_root(self):
         """
@@ -112,6 +122,7 @@ class TestHashedFiles(object):
             content = relfile.read()
             self.assertNotIn(b"/static/styles_root.css", content)
             self.assertIn(b"/static/styles_root.401f2509a628.css", content)
+        self.postCondition()
 
     def test_template_tag_relative(self):
         relpath = self.hashed_file_path("cached/relative.css")
@@ -123,6 +134,7 @@ class TestHashedFiles(object):
             self.assertNotIn(b'url(img/relative.png)', content)
             self.assertIn(b'url("img/relative.acae32e4532b.png")', content)
             self.assertIn(b"../cached/styles.bb84a0240107.css", content)
+        self.postCondition()
 
     def test_import_replacement(self):
         "See #18050"
@@ -130,6 +142,7 @@ class TestHashedFiles(object):
         self.assertEqual(relpath, "cached/import.2b1d40b0bbd4.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             self.assertIn(b"""import url("styles.bb84a0240107.css")""", relfile.read())
+        self.postCondition()
 
     def test_template_tag_deep_relative(self):
         relpath = self.hashed_file_path("cached/css/window.css")
@@ -138,12 +151,14 @@ class TestHashedFiles(object):
             content = relfile.read()
             self.assertNotIn(b'url(img/window.png)', content)
             self.assertIn(b'url("img/window.acae32e4532b.png")', content)
+        self.postCondition()
 
     def test_template_tag_url(self):
         relpath = self.hashed_file_path("cached/url.css")
         self.assertEqual(relpath, "cached/url.902310b73412.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             self.assertIn(b"https://", relfile.read())
+        self.postCondition()
 
     def test_post_processing(self):
         """
@@ -172,6 +187,7 @@ class TestHashedFiles(object):
         self.assertIn(os.path.join('cached', 'css', 'window.css'), stats['post_processed'])
         self.assertIn(os.path.join('cached', 'css', 'img', 'window.png'), stats['unmodified'])
         self.assertIn(os.path.join('test', 'nonascii.css'), stats['post_processed'])
+        self.postCondition()
 
     def test_css_import_case_insensitive(self):
         relpath = self.hashed_file_path("cached/styles_insensitive.css")
@@ -180,6 +196,7 @@ class TestHashedFiles(object):
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
+        self.postCondition()
 
     @override_settings(
         STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'faulty')],
@@ -195,6 +212,7 @@ class TestHashedFiles(object):
         with self.assertRaises(Exception):
             call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
+        self.postCondition()
 
 
 @override_settings(
@@ -289,6 +307,15 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
             STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir])
         self.patched_settings.enable()
         self.addCleanup(shutil.rmtree, six.text_type(temp_dir))
+
+    def postCondition(self):
+        hashed_files = storage.staticfiles_storage.hashed_files
+ 
+        # The in-memory version of the manifest should match the one on disk
+        # since a properly created manifest should cover all filenames
+        if hashed_files:
+            manifest = storage.staticfiles_storage.load_manifest()
+            self.assertEqual(hashed_files, manifest)
 
     def tearDown(self):
         self.patched_settings.disable()
