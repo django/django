@@ -31,7 +31,7 @@ class ChannelTestCase(TestCase):
                 ChannelLayerWrapper(
                     InMemoryChannelLayer(),
                     alias,
-                    channel_layers[alias].routing,
+                    channel_layers[alias].routing[:],
                 )
             )
 

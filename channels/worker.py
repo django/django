@@ -122,5 +122,7 @@ class Worker(object):
                         self.channel_layer.send(channel, content)
                     except self.channel_layer.ChannelFull:
                         time.sleep(0.05)
+                    else:
+                        break
             except:
                 logger.exception("Error processing message with consumer %s:", name_that_thing(consumer))
