@@ -204,7 +204,8 @@ formatters to ensure that logging output is output in a useful way.
 
 Python's logging library provides several techniques to configure
 logging, ranging from a programmatic interface to configuration files.
-By default, Django uses the `dictConfig format`_.
+By default, Django uses the :ref:`dictConfig format
+<logging-config-dictschema>`.
 
 In order to configure logging, you use :setting:`LOGGING` to define a
 dictionary of logging settings. These settings describes the loggers,
@@ -231,14 +232,12 @@ Logging is configured as part of the general Django ``setup()`` function.
 Therefore, you can be certain that loggers are always ready for use in your
 project code.
 
-.. _dictConfig format: https://docs.python.org/library/logging.config.html#configuration-dictionary-schema
-
 Examples
 --------
 
-The full documentation for `dictConfig format`_ is the best source of
-information about logging configuration dictionaries. However, to give
-you a taste of what is possible, here are several examples.
+The full documentation for :ref:`dictConfig format <logging-config-dictschema>`
+is the best source of information about logging configuration dictionaries.
+However, to give you a taste of what is possible, here are several examples.
 
 First, here's a simple configuration which writes all logging from the
 :ref:`django-logger` logger to a local file::
@@ -364,7 +363,7 @@ This logging configuration does the following things:
     The ``format`` string is a normal Python formatting string
     describing the details that are to be output on each logging
     line. The full list of detail that can be output can be
-    found in the `formatter documentation`_.
+    found in :ref:`formatter-objects`.
 
   * ``verbose``, that outputs the log level name, the log
     message, plus the time, process, thread and module that
@@ -407,8 +406,6 @@ This logging configuration does the following things:
     means that all ``INFO`` level messages (or higher) will be
     printed to the console; ``ERROR`` and ``CRITICAL``
     messages will also be output via email.
-
-.. _formatter documentation: https://docs.python.org/library/logging.html#formatter-objects
 
 Custom logging configuration
 ----------------------------
