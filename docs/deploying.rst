@@ -242,6 +242,25 @@ default and selectively route some back to the WSGI server, if you have
 particular URLs or domains you want to use that server on.
 
 
+Running on a PaaS
+-----------------
+
+To run Django with channels enabled on a Platform-as-a-Service (PaaS), you will
+need to ensure that your PaaS allows you to run multiple processes at different
+scaling levels; one group will be running Daphne, as a pure Python application
+(not a WSGI application), and the other should be running ``runworker``.
+
+The PaaS will also either have to provide either its own Redis service or
+a third process type that lets you run Redis yourself to use the cross-network
+channel backend; both interface and worker processes need to be able to see
+Redis, but not each other.
+
+If you are only allowed one running process type, it's possible you could
+combine both interface server and worker into one process using threading
+and the in-memory backend; however, this is not recommended for production
+use as you cannot scale up past a single node without groups failing to work.
+
+
 .. _scaling-up:
 
 Scaling Up
