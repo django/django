@@ -301,10 +301,10 @@ class LoaderTests(TestCase):
 
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
         expected_plan = {
-            ('app1', '4_auto'),
-            ('app1', '2_squashed_3'),
+            ('app1', '1_auto'),
             ('app2', '1_squashed_2'),
-            ('app1', '1_auto')
+            ('app1', '2_squashed_3'),
+            ('app1', '4_auto'),
         }
         self.assertEqual(plan, expected_plan)
 
@@ -326,9 +326,9 @@ class LoaderTests(TestCase):
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
         plan = plan - loader.applied_migrations
         expected_plan = {
-            ('app1', '4_auto'),
-            ('app1', '3_auto'),
             ('app2', '1_squashed_2'),
+            ('app1', '3_auto'),
+            ('app1', '4_auto'),
         }
 
         self.assertEqual(plan, expected_plan)
