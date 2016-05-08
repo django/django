@@ -52,8 +52,9 @@ class NodeNotFoundError(LookupError):
     Raised when an attempt on a node is made that is not available in the graph.
     """
 
-    def __init__(self, message, node):
+    def __init__(self, message, node, origin=None):
         self.message = message
+        self.origin = origin
         self.node = node
 
     def __str__(self):
