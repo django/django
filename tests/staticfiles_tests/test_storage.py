@@ -76,7 +76,6 @@ class TestHashedFiles(object):
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
-        self.postCondition()
 
     def test_path_with_fragment(self):
         relpath = self.hashed_file_path("cached/styles.css#eggs")
@@ -344,7 +343,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertEqual(hashed_files, manifest)
 
     def test_clear_empties_manifest(self):
-        cleared_file_name = os.path.join('test', 'cleared.txt')
+        cleared_file_name = storage.staticfiles_storage.clean_name(os.path.join('test', 'cleared.txt'))
         # collect the additional file
         self.run_collectstatic()
 

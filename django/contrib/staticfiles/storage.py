@@ -234,6 +234,8 @@ class HashedFilesMixin(object):
             # file, which might be somewhere far away, like S3
             storage, path = paths[name]
             with storage.open(path) as original_file:
+                cleaned_name = self.clean_name(name)
+                hash_key = self.hash_key(cleaned_name)
 
                 # generate the hash with the original content, even for
                 # adjustable files.
@@ -273,7 +275,7 @@ class HashedFilesMixin(object):
                         hashed_name = force_text(self.clean_name(saved_name))
 
                 # and then set the cache accordingly
-                hashed_files[self.hash_key(name)] = hashed_name
+                hashed_files[hash_key] = hashed_name
                 yield name, hashed_name, processed
 
         # Finally store the processed paths
@@ -286,7 +288,8 @@ class HashedFilesMixin(object):
         return name
 
     def stored_name(self, name):
-        hash_key = self.hash_key(name)
+        cleaned_name = self.clean_name(name)
+        hash_key = self.hash_key(cleaned_name)
         cache_name = self.hashed_files.get(hash_key)
         if cache_name is None:
             cache_name = self.clean_name(self.hashed_name(name))
