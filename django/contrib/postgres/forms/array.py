@@ -6,6 +6,7 @@ from django.contrib.postgres.validators import (
     ArrayMaxLengthValidator, ArrayMinLengthValidator,
 )
 from django.core.exceptions import ValidationError
+from django.forms.widgets import ChoiceFieldRenderer
 from django.utils import six
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -30,11 +31,24 @@ class SimpleArrayField(forms.CharField):
             self.validators.append(ArrayMaxLengthValidator(int(max_length)))
 
     def prepare_value(self, value):
-        if isinstance(value, list):
-            return self.delimiter.join(six.text_type(self.base_field.prepare_value(v)) for v in value)
+        if value and issubclass(self.widget.renderer, ChoiceFieldRenderer):
+            if isinstance(value, list):
+                return value
+            else:
+                value = self.base_field.prepare_value(value)
+                return value.split(self.delimiter)
+
+        elif isinstance(value, list):
+            return self.delimiter.join(
+                six.text_type(self.base_field.prepare_value(v))
+                for v in value
+            )
         return value
 
     def to_python(self, value):
+        if isinstance(value, list):
+            return self.delimiter.join(value)
+
         if value:
             items = value.split(self.delimiter)
         else:
