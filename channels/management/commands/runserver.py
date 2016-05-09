@@ -36,7 +36,7 @@ class Command(RunserverCommand):
         # Check a handler is registered for http reqs; if not, add default one
         self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
         self.channel_layer.router.check_default(
-            http_consumer=self.get_consumer(),
+            http_consumer=self.get_consumer(*args, **options),
         )
         # Run checks
         self.stdout.write("Performing system checks...\n\n")
