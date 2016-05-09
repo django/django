@@ -266,6 +266,9 @@ that might occur as a result of a version upgrade.
   put the values of the following settings into your defaults ``TEMPLATES``
   dict: ``TEMPLATE_DIRS``, ``TEMPLATE_CONTEXT_PROCESSORS``, ``TEMPLATE_DEBUG``,
   ``TEMPLATE_LOADERS``, ``TEMPLATE_STRING_IF_INVALID``.
+* **1_10.W001**: The ``MIDDLEWARE_CLASSES`` setting is deprecated in Django
+  1.10  and the :setting:`MIDDLEWARE` setting takes precedence. Since you've
+  set ``MIDDLEWARE``, the value of ``MIDDLEWARE_CLASSES`` is ignored.
 
 Admin
 -----
