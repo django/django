@@ -43,6 +43,11 @@ class BaseHandler(object):
         self._exception_middleware = []
 
         if settings.MIDDLEWARE is None:
+            warnings.warn(
+                "Old-style middleware using settings.MIDDLEWARE_CLASSES is "
+                "deprecated. Update your middleware and use settings.MIDDLEWARE "
+                "instead.", RemovedInDjango20Warning
+            )
             handler = self._legacy_get_response
             for middleware_path in settings.MIDDLEWARE_CLASSES:
                 mw_class = import_string(middleware_path)

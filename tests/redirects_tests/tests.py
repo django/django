@@ -5,7 +5,9 @@ from django.contrib.redirects.models import Redirect
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, modify_settings, override_settings
+from django.test.utils import ignore_warnings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 @modify_settings(MIDDLEWARE={'append': 'django.contrib.redirects.middleware.RedirectFallbackMiddleware'})
@@ -42,11 +44,13 @@ class RedirectTests(TestCase):
         response = self.client.get('/initial')
         self.assertEqual(response.status_code, 410)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(MIDDLEWARE=None)
     @modify_settings(MIDDLEWARE_CLASSES={'append': 'django.contrib.redirects.middleware.RedirectFallbackMiddleware'})
     def test_redirect_middleware_classes(self):
         self.test_redirect()
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(MIDDLEWARE=None)
     @modify_settings(MIDDLEWARE_CLASSES={'append': 'django.contrib.redirects.middleware.RedirectFallbackMiddleware'})
     def test_more_redirects_middleware_classes(self):

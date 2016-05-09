@@ -10,9 +10,11 @@ from django.test import (
     SimpleTestCase, TestCase, modify_settings, override_settings,
 )
 from django.test.selenium import SeleniumTestCase
+from django.test.utils import ignore_warnings
 from django.urls import reverse
 from django.utils import six
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, get_language, override,
 )
@@ -138,6 +140,7 @@ class I18NTests(TestCase):
             self.assertEqual(language_cookie['path'], '/test/')
             self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_setlang_cookie_middleware_classes(self):
         # we force saving language to a cookie rather than a session
         # by excluding session middleware and those which do require it
@@ -187,6 +190,7 @@ class I18NTests(TestCase):
         )
         self.assertRedirects(response, '/en/translated/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(
         MIDDLEWARE=None,
         MIDDLEWARE_CLASSES=[

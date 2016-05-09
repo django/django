@@ -11,8 +11,8 @@ from django.template.response import (
 from django.test import (
     RequestFactory, SimpleTestCase, modify_settings, override_settings,
 )
-from django.test.utils import require_jinja2
-from django.utils.deprecation import MiddlewareMixin
+from django.test.utils import ignore_warnings, require_jinja2
+from django.utils.deprecation import MiddlewareMixin, RemovedInDjango20Warning
 
 from .utils import TEMPLATE_DIR
 
@@ -361,6 +361,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertNotEqual(response.content, response2.content)
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 @override_settings(
     MIDDLEWARE=None,
     MIDDLEWARE_CLASSES=[

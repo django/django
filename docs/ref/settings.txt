@@ -1860,6 +1860,12 @@ A list of middleware to use. See :doc:`/topics/http/middleware`.
 ``MIDDLEWARE_CLASSES``
 ----------------------
 
+.. deprecated:: 1.10
+
+    Old-style middleware that uses  ``settings.MIDDLEWARE_CLASSES`` are
+    deprecated. :ref:`Adapt old, custom middleware <upgrading-middleware>` and
+    use the :setting:`MIDDLEWARE` setting.
+
 Default::
 
     [
