@@ -7,8 +7,8 @@ from django.http import HttpResponse
 from django.template import engines
 from django.template.response import TemplateResponse
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import patch_logger
-from django.utils.deprecation import MiddlewareMixin
+from django.test.utils import ignore_warnings, patch_logger
+from django.utils.deprecation import MiddlewareMixin, RemovedInDjango20Warning
 
 
 class TestException(Exception):
@@ -117,6 +117,7 @@ class NoResponseMiddleware(TestMiddleware):
         super(NoResponseMiddleware, self).process_response(request, response)
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 @override_settings(
     ROOT_URLCONF='middleware_exceptions.urls',
     MIDDLEWARE_CLASSES=['django.middleware.common.CommonMiddleware'],
@@ -929,6 +930,7 @@ class MiddlewareNotUsedTests(SimpleTestCase):
         self.assertEqual(len(calls), 0)
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 @override_settings(
     MIDDLEWARE_CLASSES=['django.middleware.common.CommonMiddleware'],
     MIDDLEWARE=None,

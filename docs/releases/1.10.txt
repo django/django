@@ -1142,6 +1142,10 @@ Miscellaneous
   :meth:`Storage.generate_filename()
   <django.core.files.storage.Storage.generate_filename>`).
 
+* Old-style middleware that uses  ``settings.MIDDLEWARE_CLASSES`` are
+  deprecated. :ref:`Adapt old, custom middleware <upgrading-middleware>` and
+  use the new :setting:`MIDDLEWARE` setting.
+
 .. _removed-features-1.10:
 
 Features removed in 1.10

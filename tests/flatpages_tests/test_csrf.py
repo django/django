@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import Site
 from django.test import Client, TestCase, modify_settings, override_settings
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .settings import FLATPAGES_TEMPLATES
 
@@ -99,6 +101,7 @@ class FlatpageCSRFTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 @override_settings(
     MIDDLEWARE=None,
     MIDDLEWARE_CLASSES=[

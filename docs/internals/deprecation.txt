@@ -181,6 +181,9 @@ details on these changes.
   ``Meta.manager_inheritance_from_future`` to opt-in to this behavior will be
   removed.
 
+* Support for old-style middleware using ``settings.MIDDLEWARE_CLASSES`` will
+  be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
