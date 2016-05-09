@@ -9,6 +9,8 @@ from django.contrib.auth.models import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
+from django.db import connection, migrations
+from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
 
@@ -153,6 +155,23 @@ class UserManagerTestCase(TestCase):
         self.assertEqual(len(password), 5)
         for char in password:
             self.assertIn(char, allowed_chars)
+
+    def test_runpython_manager_model_methods(self):
+        def forwards(apps, schema_editor):
+            UserModel = apps.get_model('auth', 'User')
+            UserModel.objects.create_user('Ms X', password='secure')
+
+        operation = migrations.RunPython(forwards, migrations.RunPython.noop)
+        project_state = ProjectState()
+        project_state.add_model(ModelState.from_model(User))
+        project_state.add_model(ModelState.from_model(Group))
+        project_state.add_model(ModelState.from_model(Permission))
+        project_state.add_model(ModelState.from_model(ContentType))
+        new_state = project_state.clone()
+        with connection.schema_editor() as editor:
+            operation.state_forwards('migrations', new_state)
+            operation.database_forwards('migrations', editor, project_state, new_state)
+        self.assertEqual(User.objects.filter(username='Ms X').count(), 1)
 
 
 class AbstractBaseUserTests(TestCase):
