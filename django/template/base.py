@@ -54,6 +54,7 @@ from __future__ import unicode_literals
 import inspect
 import logging
 import re
+import warnings
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
@@ -722,6 +723,7 @@ class FilterExpression(object):
                         obj = string_if_invalid
         else:
             obj = self.var
+        escape_isnt_last_filter = True
         for func, args in self.filters:
             arg_vals = []
             for lookup, arg in args:
@@ -738,9 +740,21 @@ class FilterExpression(object):
             if getattr(func, 'is_safe', False) and isinstance(obj, SafeData):
                 obj = mark_safe(new_obj)
             elif isinstance(obj, EscapeData):
-                obj = mark_for_escaping(new_obj)
+                with warnings.catch_warnings():
+                    # Ignore mark_for_escaping deprecation as this will be
+                    # removed in Django 2.0.
+                    warnings.simplefilter('ignore', category=RemovedInDjango20Warning)
+                    obj = mark_for_escaping(new_obj)
+                    escape_isnt_last_filter = False
             else:
                 obj = new_obj
+        if not escape_isnt_last_filter:
+            warnings.warn(
+                "escape isn't the last filter in %s and will be applied "
+                "immediately in Django 2.0 so the output may change."
+                % [func.__name__ for func, _ in self.filters],
+                RemovedInDjango20Warning, stacklevel=2
+            )
         return obj
 
     def args_check(name, func, provided):

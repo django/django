@@ -177,7 +177,7 @@ Bugfixes
   setup (:ticket:`24000`).
 
 * Restored support for objects that aren't :class:`str` or :class:`bytes` in
-  :func:`~django.utils.safestring.mark_for_escaping` on Python 3.
+  ``django.utils.safestring.mark_for_escaping()`` on Python 3.
 
 * Supported strings escaped by third-party libraries with the ``__html__``
   convention in the template engine (:ticket:`23831`).
