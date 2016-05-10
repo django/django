@@ -259,6 +259,10 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Contract")),
     ])
+    author_with_renamed_m2m_through = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Deal")),
+    ])
     author_with_former_m2m = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.CharField(max_length=100)),
@@ -282,6 +286,11 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
     ], {"db_table": "author_three"})
     contract = ModelState("testapp", "Contract", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+        ("publisher", models.ForeignKey("testapp.Publisher", models.CASCADE)),
+    ])
+    contract_renamed = ModelState("testapp", "Deal", [
         ("id", models.AutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("publisher", models.ForeignKey("testapp.Publisher", models.CASCADE)),
@@ -847,6 +856,21 @@ class AutodetectorTests(TestCase):
         # Now that RenameModel handles related fields too, there should be
         # no AlterField for the related field.
         self.assertNumberMigrations(changes, 'otherapp', 0)
+
+    def test_rename_m2m_through_model(self):
+        """
+        Tests autodetection of renamed models that are used in M2M relations as
+        through models.
+        """
+        # Make state
+        before = self.make_project_state([self.author_with_m2m_through, self.publisher, self.contract])
+        after = self.make_project_state([self.author_with_renamed_m2m_through, self.publisher, self.contract_renamed])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({'ask_rename_model': True}))
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['RenameModel'])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, old_name='Contract', new_name='Deal')
 
     def test_rename_model_with_renamed_rel_field(self):
         """

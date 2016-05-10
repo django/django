@@ -307,6 +307,28 @@ class RenameModel(ModelOperation):
                 new_fields.append((name, field))
             state.models[related_key].fields = new_fields
             state.reload_model(*related_key)
+        # Repoint M2Ms with through pointing to us
+        related_models = {
+            f.remote_field.model for f in model._meta.fields
+            if getattr(f.remote_field, 'model', None)
+        }
+        model_name = '%s.%s' % (app_label, self.old_name)
+        for related_model in related_models:
+            if related_model == model:
+                related_key = (app_label, self.new_name_lower)
+            else:
+                related_key = (related_model._meta.app_label, related_model._meta.model_name)
+            new_fields = []
+            changed = False
+            for name, field in state.models[related_key].fields:
+                if field.is_relation and field.many_to_many and field.remote_field.through == model_name:
+                    field = field.clone()
+                    field.remote_field.through = '%s.%s' % (app_label, self.new_name)
+                    changed = True
+                new_fields.append((name, field))
+            if changed:
+                state.models[related_key].fields = new_fields
+                state.reload_model(*related_key)
         state.reload_model(app_label, self.new_name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
