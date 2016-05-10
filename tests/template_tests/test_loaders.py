@@ -13,7 +13,8 @@ from django.template.engine import Engine
 from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.functional import lazystr
+from django.utils.encoding import force_text
+from django.utils.functional import lazy
 
 from .utils import TEMPLATE_DIR
 
@@ -159,6 +160,7 @@ class CachedLoaderTests(SimpleTestCase):
         #26603 -- A template name specified as a lazy string should be forced
         to text before computing its cache key.
         """
+        lazystr = lazy(force_text, six.text_type)
         self.assertEqual(self.engine.template_loaders[0].cache_key(lazystr('template.html'), []), 'template.html')
 
 
