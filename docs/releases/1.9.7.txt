@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed translation of password validators' ``help_text`` in forms
   (:ticket:`26544`).
+
+* Fixed a regression causing the cached template loader to crash when using
+  lazy template names (:ticket:`26603`).
