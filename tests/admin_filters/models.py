@@ -75,16 +75,12 @@ class Bookmark(models.Model):
     url = models.URLField()
     tags = GenericRelation(TaggedItem)
 
-    def __str__(self):
-        return self.url
-
-
-class Direction(models.Model):
-    DIRECTIONS = [
-        ('trip_from', 'From'),
-        ('trip_to', 'To'),
+    CHOICES = [
+        ('a', 'A'),
         (None, 'None'),
         ('', '-'),
     ]
+    none_or_null = models.CharField(max_length=20, choices=CHOICES, blank=True, null=True)
 
-    direction = models.CharField(max_length=20, choices=DIRECTIONS, blank=True, null=True)
+    def __str__(self):
+        return self.url

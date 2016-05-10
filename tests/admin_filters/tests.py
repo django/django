@@ -15,7 +15,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 from django.utils.encoding import force_text
 
-from .models import Book, Bookmark, Department, Direction, Employee, TaggedItem
+from .models import Book, Bookmark, Department, Employee, TaggedItem
 
 
 def select_by(dictlist, key, value):
@@ -247,9 +247,9 @@ class BookmarkAdminGenericRelation(ModelAdmin):
     list_filter = ['tags__tag']
 
 
-class DirectionAdmin(ModelAdmin):
-    list_display = ['direction']
-    list_filter = ['direction']
+class BookmarkChoicesAdmin(ModelAdmin):
+    list_display = ['none_or_null']
+    list_filter = ['none_or_null']
 
 
 class ListFiltersTests(TestCase):
@@ -308,17 +308,19 @@ class ListFiltersTests(TestCase):
         )
 
     def test_choicesfieldlistfilter_has_none_choice(self):
-        modeladmin = DirectionAdmin(Direction, site)
+        """
+        The last choice is for the None value.
+        """
+        modeladmin = BookmarkChoicesAdmin(Bookmark, site)
 
         request = self.request_factory.get('/', {})
 
-        changelist = self.get_changelist(request, Direction, modeladmin)
+        changelist = self.get_changelist(request, Bookmark, modeladmin)
         filterspec = changelist.get_filters(request)[0][0]
         choices = list(filterspec.choices(changelist))
 
-        # Checks that the last choice is for the None value
         self.assertEqual(choices[-1]['display'], 'None')
-        self.assertEqual(choices[-1]['query_string'], '?direction__isnull=True')
+        self.assertEqual(choices[-1]['query_string'], '?none_or_null__isnull=True')
 
     def test_datefieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)

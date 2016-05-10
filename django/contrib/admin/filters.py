@@ -264,43 +264,41 @@ FieldListFilter.register(lambda f: isinstance(f,
 class ChoicesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = '%s__exact' % field_path
-        self.lookup_kwarg2 = '%s__isnull' % field_path
+        self.lookup_kwarg_null = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg)
-        self.lookup_val2 = request.GET.get(self.lookup_kwarg2)
+        self.lookup_val2 = request.GET.get(self.lookup_kwarg_null)
         super(ChoicesFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
-        return [self.lookup_kwarg, self.lookup_kwarg2]
+        return [self.lookup_kwarg, self.lookup_kwarg_null]
 
     def choices(self, changelist):
         yield {
             'selected': self.lookup_val is None,
             'query_string': changelist.get_query_string(
-                {}, [self.lookup_kwarg, self.lookup_kwarg2]
+                {}, [self.lookup_kwarg, self.lookup_kwarg_null]
             ),
             'display': _('All')
         }
-        has_none = False
         none_title = ''
         for lookup, title in self.field.flatchoices:
             if lookup is None:
-                has_none = True
                 none_title = title
                 continue
             yield {
                 'selected': smart_text(lookup) == self.lookup_val,
                 'query_string': changelist.get_query_string(
-                    {self.lookup_kwarg: lookup}, [self.lookup_kwarg2]
+                    {self.lookup_kwarg: lookup}, [self.lookup_kwarg_null]
                 ),
                 'display': title,
             }
 
-        if has_none:
+        if none_title != '':
             yield {
                 'selected': bool(self.lookup_val2),
                 'query_string': changelist.get_query_string({
-                    self.lookup_kwarg2: 'True',
+                    self.lookup_kwarg_null: 'True',
                 }, [self.lookup_kwarg]),
                 'display': none_title,
             }
