@@ -208,6 +208,13 @@ class AlterField(FieldOperation):
                     from_field.remote_field.model = to_field.remote_field.model
                 elif to_field.remote_field and isinstance(to_field.remote_field.model, six.string_types):
                     to_field.remote_field.model = from_field.remote_field.model
+            # And a similar fix for migrations that rename the through model
+            # of a M2M field.
+            if from_field.many_to_many and from_field.remote_field and from_field.remote_field.through:
+                if isinstance(from_field.remote_field.through, six.string_types):
+                    from_field.remote_field.through = to_field.remote_field.through
+                elif to_field.remote_field and isinstance(to_field.remote_field.through, six.string_types):
+                    to_field.remote_field.through = from_field.remote_field.through
             if not self.preserve_default:
                 to_field.default = self.field.default
             schema_editor.alter_field(from_model, from_field, to_field)
