@@ -13,6 +13,7 @@ from django.template.engine import Engine
 from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.functional import lazystr
 
 from .utils import TEMPLATE_DIR
 
@@ -152,6 +153,13 @@ class CachedLoaderTests(SimpleTestCase):
         from its cache key.
         """
         self.assertEqual(self.engine.template_loaders[0].cache_key('-template.html', []), '-template.html')
+
+    def test_template_name_lazy_string(self):
+        """
+        #26603 -- A template name specified as a lazy string should be forced
+        to text before computing its cache key.
+        """
+        self.assertEqual(self.engine.template_loaders[0].cache_key(lazystr('template.html'), []), 'template.html')
 
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
