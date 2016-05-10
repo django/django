@@ -839,6 +839,8 @@ appropriate entities.
 
 .. function:: mark_for_escaping(s)
 
+    .. deprecated:: 1.10
+
     Explicitly mark a string as requiring HTML escaping upon output. Has no
     effect on ``SafeData`` subclasses.
 

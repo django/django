@@ -1012,6 +1012,18 @@ This method must accept a :class:`~django.db.models.query.QuerySet` instance
 as its single argument and return a filtered version of the queryset for the
 model instance the manager is bound to.
 
+The "escape" half of ``django.utils.safestring``
+------------------------------------------------
+
+The ``mark_for_escaping()`` function and the classes it uses: ``EscapeData``,
+``EscapeBytes``, ``EscapeText``, ``EscapeString``, and ``EscapeUnicode`` are
+deprecated.
+
+As a result, the "lazy" behavior of the ``escape`` filter (where it would
+always be applied as the last filter no matter where in the filter chain it
+appeared) is deprecated. The filter will change to immediately apply
+:func:`~django.utils.html.conditional_escape` in Django 2.0.
+
 Miscellaneous
 -------------
 
