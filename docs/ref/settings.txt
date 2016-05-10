@@ -275,8 +275,80 @@ The default number of seconds to cache a page for the :ref:`cache middleware
 
 See :doc:`/topics/cache`.
 
-.. _settings-csrf:
+.. setting:: CHANNEL_LAYERS
 
+``CHANNEL_LAYERS``
+------------------
+
+Default: ``{}``
+
+Specifies the channel layers Django is configured to use for
+:doc:`channels support </topics/channels/introduction>`. You can configure multiple
+channel layers and refer to them by alias; the layer with alias ``default`` is
+selected by default if no alias is specified when interacting with channel
+features.
+
+If no channel layers are configured (the default), Django will work in WSGI
+mode but no channel features will be available to you, and an error will
+be raised if you try to use them. ``runserver`` will automatically fall back to
+WSGI mode if no channel layers are configured.
+
+The setting is a dict, with string keys of the alias names, and dict values
+containing up to three keys:
+
+``BACKEND``
+~~~~~~~~~~~
+
+The dotted path to an ASGI-compliant channel layer class (not
+instance) to use as the channel layer. Django will instantiate this class once
+on startup and use the same instance for all references to this alias. Required.
+
+``ROUTING``
+~~~~~~~~~~~
+
+The dotted path to a channel routing list, by convention found in a project's
+``routing.py`` file. The path should include both the module name and the
+variable name (the variable must be at the top level); for example,
+``"myproject.routing.channel_routing"`` means the variable ``channel_routing``
+in the ``myproject.routing`` module. Required.
+
+``CONFIG``
+~~~~~~~~~~
+
+Optional extra settings to pass to the channel layer class on instantiation;
+set this to a dictionary that represents the keyword arguments you wish to
+pass (positional arguments are not supported).
+
+Example::
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "asgi_redis.RedisChannelLayer",
+            "ROUTING": myproject.routing.channel_routing
+            "CONFIG": {
+                "hosts": [("redis-channel-1", 6379), ("redis-channel-2", 6379)],
+            },
+        },
+    }
+
+.. setting:: CHANNEL_SESSION_ENGINE
+
+``CHANNEL_SESSION_ENGINE``
+--------------------------
+
+Default: Value of :setting:`SESSION_ENGINE`
+
+Allows you to specify an alternative session backend to use for per-channel
+sessions, if you want different performance characteristics than the one you're
+using for HTTP sessions. Takes the same values as :setting:`SESSION_ENGINE`.
+
+Note that the session engine specified for channels must be able to retrieve
+information only given a static session ID, and so the signed cookie backend
+(``django.contrib.sessions.backends.signed_cookies``) cannot be used.
+If you set :setting:`SESSION_ENGINE` to use signed cookies, you **must** set
+this setting to an alternative backend.
+
+.. _settings-csrf:
 .. setting:: CSRF_COOKIE_AGE
 
 ``CSRF_COOKIE_AGE``

@@ -1,0 +1,51 @@
+Introduction to Channels
+========================
+
+.. versionadded:: 1.10
+
+Channels is a new feature for Django 1.10 that allows Django projects to have
+code that runs outside of the request-response setting (where Views and
+Middleware run).
+
+In particular, it allows you to use protocols other than HTTP - such as
+WebSockets - and write code that runs against these protocols in an easy
+fashion. It also lets you run tasks in background threads after you've sent
+a response - for example, thumbnailing images or sending emails.
+
+It's a pluggable framework that allows for any protocol to interface with
+Django, and there's a defined spec you can follow to write software that will
+coexist and send messages to and receive them from channels.
+
+It's an optional part of Django; you don't need to interact with it if you're
+just writing a normal website, but if you want the features, you can just turn
+it on. Running it in production requires a few changes, too, but those are
+covered both in the :doc:`tutorial </intro/channels>` and the more in-depth
+:doc:`deploying </topics/channels/deploying>` documentation.
+
+
+First Reading
+-------------
+
+To get started with Channels, first read up on the
+:doc:`concepts </topics/channels/concepts>`, and then dive into the
+:doc:`tutorial </intro/channels>`.
+
+
+A bit more
+----------
+
+Channels separates Django into two process types:
+
+* One that handles HTTP and WebSockets (or other protocols)
+* One that runs views, websocket handlers and background tasks (*consumers*)
+
+They communicate via a protocol called ASGI, which is similar
+to WSGI but runs over a network and allows for more protocol types.
+
+Channels does not introduce asyncio, gevent, or any other async code to
+your Django code.
+
+All your code runs synchronously without any sockets or event loops to
+block. You can use async code within a Django view or channel consumer if you
+like - for example, to fetch lots of URLs in parallel - but it doesn't
+affect the overall deployed site.

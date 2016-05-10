@@ -198,6 +198,30 @@ manipulation of form data.
   :doc:`Formsets <topics/forms/formsets>` |
   :doc:`Customizing validation <ref/forms/validation>`
 
+The channel layer
+=================
+
+.. versionadded:: 1.10
+
+The channel layer is the very lowest level of Django, where you can write code
+that handles low-level networking protocols, write applications against
+things like WebSockets, and spin off parts of your application into
+background tasks outside of the request-response cycle.
+
+* **Introduction:**
+  :doc:`Introduction <topics/channels/introduction>` |
+  :doc:`Concepts <topics/channels/concepts>` |
+  :doc:`Tutorial <intro/channels>`
+
+* **Running:**
+  :doc:`Testing <topics/channels/testing>` |
+  :doc:`Deploying <topics/channels/deploying>` |
+  :doc:`Channel Layers <ref/channels/backends>` |
+  :doc:`Cross-compatibility <topics/channels/cross-compat>`
+
+* **Reference:**
+  :doc:`API <ref/channels/api>`
+
 The development process
 =======================
 

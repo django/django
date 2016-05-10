@@ -10,3 +10,5 @@ pytz > dev
 selenium
 sqlparse
 tblib
+asgiref
+daphne

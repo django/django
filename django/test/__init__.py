@@ -2,6 +2,7 @@
 Django Unit Test and Doctest framework.
 """
 
+from django.test.channels import ChannelTestCase
 from django.test.client import Client, RequestFactory
 from django.test.testcases import (
     LiveServerTestCase, SimpleTestCase, TestCase, TransactionTestCase,
@@ -14,7 +15,7 @@ from django.test.utils import (
 
 __all__ = [
     'Client', 'RequestFactory', 'TestCase', 'TransactionTestCase',
-    'SimpleTestCase', 'LiveServerTestCase', 'skipIfDBFeature',
+    'SimpleTestCase', 'LiveServerTestCase', 'ChannelTestCase', 'skipIfDBFeature',
     'skipUnlessAnyDBFeature', 'skipUnlessDBFeature', 'ignore_warnings',
     'modify_settings', 'override_settings', 'override_system_checks', 'tag',
 ]

@@ -26,7 +26,11 @@ apps
 architected
 arg
 args
+asgi
+ASGI
 assistive
+async
+asyncio
 atomicity
 Atomicity
 attr
@@ -110,6 +114,8 @@ Changelist
 changepassword
 changeset
 charset
+chatroom
+chatrooms
 checkbox
 checkboxes
 checkin
@@ -171,6 +177,8 @@ Databrowse
 datafile
 dataset
 datasets
+datastore
+datastructure
 datatype
 datetimes
 dbshell
@@ -303,6 +311,7 @@ Georg
 geospatial
 Geospatial
 Gettext
+gevent
 GiB
 gid
 gis
@@ -423,8 +432,11 @@ linebreaksbr
 linenumbers
 linestring
 linework
+liveblog
 Livni
 ljust
+loadbalance
+loadbalancer
 loaddata
 localdomain
 localflavor
@@ -480,6 +492,7 @@ minified
 minify
 mis
 misconfiguration
+misconfigured
 Mispelon
 mixin
 mixins
@@ -643,6 +656,8 @@ recomputation
 recursed
 redeclare
 redirections
+redis
+Redis
 redisplay
 redisplayed
 redisplaying
@@ -683,6 +698,7 @@ rhs
 rjust
 roadmap
 Roald
+rollouts
 rss
 runserver
 runtime
@@ -714,6 +730,7 @@ sha
 Shai
 shapefile
 shapefiles
+sharded
 sharding
 showmigrations
 sid
@@ -796,6 +813,7 @@ subviews
 subwidgets
 superclass
 superset
+supervisord
 swappable
 symlink
 symlinking
@@ -822,6 +840,7 @@ that'll
 That'll
 Thejaswi
 This'll
+thumbnailing
 timedelta
 timeframe
 timeline
@@ -842,6 +861,7 @@ toolkits
 toolset
 trac
 tracebacks
+tradeoffs
 transactional
 Transifex
 Tredinnick
@@ -953,6 +973,8 @@ Weblog
 webpages
 webserver
 webservers
+websocket
+WebSocket
 whatsnext
 whitelist
 whitelisted

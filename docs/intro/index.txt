@@ -18,6 +18,7 @@ place: read this material to quickly get up and running.
    tutorial06
    tutorial07
    reusable-apps
+   channels
    whatsnext
    contributing
 
