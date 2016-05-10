@@ -4,6 +4,7 @@ from operator import attrgetter
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
+from django.db import models
 from django.db.models import Count
 from django.test import TestCase, override_settings
 
@@ -238,3 +239,39 @@ class DeferAnnotateSelectRelatedTest(TestCase):
                  .defer('request1', 'request2', 'request3', 'request4')),
             list
         )
+
+
+class DeferDeletionSignalsTests(TestCase):
+    senders = [Item, Proxy]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.item_pk = Item.objects.create(value=1).pk
+
+    def setUp(self):
+        self.pre_delete_senders = []
+        self.post_delete_senders = []
+        for sender in self.senders:
+            models.signals.pre_delete.connect(self.pre_delete_receiver, sender)
+            models.signals.post_delete.connect(self.post_delete_receiver, sender)
+
+    def tearDown(self):
+        for sender in self.senders:
+            models.signals.pre_delete.disconnect(self.pre_delete_receiver, sender)
+            models.signals.post_delete.disconnect(self.post_delete_receiver, sender)
+
+    def pre_delete_receiver(self, sender, **kwargs):
+        self.pre_delete_senders.append(sender)
+
+    def post_delete_receiver(self, sender, **kwargs):
+        self.post_delete_senders.append(sender)
+
+    def test_delete_defered_model(self):
+        Item.objects.only('value').get(pk=self.item_pk).delete()
+        self.assertEqual(self.pre_delete_senders, [Item])
+        self.assertEqual(self.post_delete_senders, [Item])
+
+    def test_delete_defered_proxy_model(self):
+        Proxy.objects.only('value').get(pk=self.item_pk).delete()
+        self.assertEqual(self.pre_delete_senders, [Proxy])
+        self.assertEqual(self.post_delete_senders, [Proxy])
