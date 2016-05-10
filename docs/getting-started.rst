@@ -100,7 +100,6 @@ serve HTTP requests from now on, which happens if you don't specify a consumer
 for ``http.request`` - and make this WebSocket consumer instead::
 
     # In consumers.py
-    from channels import Group
 
     def ws_message(message):
         # ASGI WebSocket packet-received and send-packet message types
