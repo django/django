@@ -1565,7 +1565,10 @@ class ManyToManyField(RelatedField):
         """
         Return the value of this field in the given model instance.
         """
-        return getattr(obj, self.attname).all()
+        qs = getattr(obj, self.attname).all()
+        if qs._result_cache is not None:
+            return [item.pk for item in qs]
+        return list(qs.values_list('pk', flat=True))
 
     def save_form_data(self, instance, data):
         getattr(instance, self.attname).set(data)
