@@ -72,8 +72,8 @@ class GeometryFieldTest(SimpleTestCase):
         self.assertEqual(kwargs, {})
 
         # MultiPolygon
-        p1 = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
-        p2 = Polygon( ((1, 1), (1, 2), (2, 2), (1, 1)) )
+        p1 = Polygon(((0, 0), (0, 1), (1, 1), (0, 0)))
+        p2 = Polygon(((1, 1), (1, 2), (2, 2), (1, 1)))
         mp = MultiPolygon(p1, p2)
         path, args, kwargs = mp.deconstruct()
         self.assertEqual(path, 'django.contrib.gis.geos.collections.MultiPolygon')
@@ -81,7 +81,7 @@ class GeometryFieldTest(SimpleTestCase):
         self.assertEqual(kwargs, {})
 
         # GeometryCollection
-        poly = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
+        poly = Polygon(((0, 0), (0, 1), (1, 1), (0, 0)))
         gc = GeometryCollection(Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly)
         path, args, kwargs = gc.deconstruct()
         self.assertEqual(path, 'django.contrib.gis.geos.collections.GeometryCollection')
