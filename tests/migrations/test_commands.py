@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import codecs
+import datetime
 import importlib
 import os
 import sys
@@ -705,7 +706,7 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto reject
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
             with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                call_command("makemigrations", "migrations", merge=True, interactive=True, verbosity=0)
+                call_command("makemigrations", "migrations", name="merge", merge=True, interactive=True, verbosity=0)
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
                 self.assertFalse(os.path.exists(merge_file))
 
@@ -717,8 +718,19 @@ class MakeMigrationsTests(MigrationTestBase):
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
             out = six.StringIO()
             with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
+                call_command("makemigrations", "migrations", name="merge", merge=True, interactive=True, stdout=out)
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
+                self.assertTrue(os.path.exists(merge_file))
+            self.assertIn("Created new merge migration", force_text(out.getvalue()))
+
+    @mock.patch('django.db.migrations.utils.datetime')
+    def test_makemigrations_default_merge_name(self, mock_datetime):
+        mock_datetime.datetime.now.return_value = datetime.datetime(2016, 1, 2, 3, 4)
+        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
+            out = six.StringIO()
+            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
+                merge_file = os.path.join(migration_dir, '0003_merge_20160102_0304.py')
                 self.assertTrue(os.path.exists(merge_file))
             self.assertIn("Created new merge migration", force_text(out.getvalue()))
 
@@ -793,7 +805,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-            call_command("makemigrations", "migrations", merge=True, interactive=False, stdout=out)
+            call_command("makemigrations", "migrations", name="merge", merge=True, interactive=False, stdout=out)
             merge_file = os.path.join(migration_dir, '0003_merge.py')
             self.assertTrue(os.path.exists(merge_file))
         output = force_text(out.getvalue())
@@ -809,7 +821,10 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-            call_command("makemigrations", "migrations", dry_run=True, merge=True, interactive=False, stdout=out)
+            call_command(
+                "makemigrations", "migrations", name="merge", dry_run=True,
+                merge=True, interactive=False, stdout=out,
+            )
             merge_file = os.path.join(migration_dir, '0003_merge.py')
             self.assertFalse(os.path.exists(merge_file))
         output = force_text(out.getvalue())
@@ -825,8 +840,10 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-            call_command("makemigrations", "migrations", dry_run=True, merge=True, interactive=False,
-                         stdout=out, verbosity=3)
+            call_command(
+                "makemigrations", "migrations", name="merge", dry_run=True,
+                merge=True, interactive=False, stdout=out, verbosity=3,
+            )
             merge_file = os.path.join(migration_dir, '0003_merge.py')
             self.assertFalse(os.path.exists(merge_file))
         output = force_text(out.getvalue())
@@ -928,7 +945,7 @@ class MakeMigrationsTests(MigrationTestBase):
         out = six.StringIO()
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
             with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                call_command("makemigrations", "migrations", merge=True, stdout=out)
+                call_command("makemigrations", "migrations", name="merge", merge=True, stdout=out)
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
                 # This will fail if interactive is False by default
                 self.assertFalse(os.path.exists(merge_file))
@@ -959,7 +976,7 @@ class MakeMigrationsTests(MigrationTestBase):
         with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
             out = six.StringIO()
             with self.temporary_migration_module(app_label="migrated_app") as migration_dir:
-                call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=out)
+                call_command("makemigrations", "migrated_app", name="merge", merge=True, interactive=True, stdout=out)
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
                 self.assertFalse(os.path.exists(merge_file))
             self.assertIn("No conflicts detected to merge.", out.getvalue())
