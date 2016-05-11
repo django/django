@@ -1,6 +1,7 @@
 import warnings
 
 from django.test import SimpleTestCase, ignore_warnings
+from django.test.utils import reset_warning_registry
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.safestring import mark_safe
 
@@ -41,6 +42,7 @@ class ChainingTests(SimpleTestCase):
     # Using a filter that forces safeness does not lead to double-escaping
     @setup({'chaining05': '{{ a|escape|capfirst }}'})
     def test_chaining05(self):
+        reset_warning_registry()
         with warnings.catch_warnings(record=True) as warns:
             warnings.simplefilter('always')
             output = self.engine.render_to_string('chaining05', {'a': 'a < b'})
