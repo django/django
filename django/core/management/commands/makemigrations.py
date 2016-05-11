@@ -14,6 +14,7 @@ from django.db.migrations.questioner import (
     NonInteractiveMigrationQuestioner,
 )
 from django.db.migrations.state import ProjectState
+from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.migrations.writer import MigrationWriter
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six import iteritems
@@ -283,7 +284,11 @@ class Command(BaseCommand):
                 subclass = type("Migration", (Migration, ), {
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
-                new_migration = subclass("%04i_merge" % (biggest_number + 1), app_label)
+                migration_name = "%04i_%s" % (
+                    biggest_number + 1,
+                    self.migration_name or ("merge_%s" % get_migration_name_timestamp())
+                )
+                new_migration = subclass(migration_name, app_label)
                 writer = MigrationWriter(new_migration)
 
                 if not self.dry_run:
