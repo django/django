@@ -1,4 +1,4 @@
-from django.contrib.postgres.functions import Levenshtein
+from django.contrib.postgres.functions import Levenshtein, LevenshteinLessEqual
 from django.test import modify_settings
 
 from . import PostgreSQLTestCase
@@ -47,6 +47,15 @@ class FuzzyStrMatchTest(PostgreSQLTestCase):
             self.Model.objects.annotate(
                 distance=Levenshtein('field', 'Emelie')).order_by('distance'),
             [('Emelia', 1), ('Amelie', 1), ('Emily', 3), ('Fred', 5)],
+            transform=lambda instance: (instance.field, instance.distance),
+            ordered=True
+        )
+
+    def test_levenshteinlessequal(self):
+        self.assertQuerysetEqual(
+            self.Model.objects.annotate(
+                distance=LevenshteinLessEqual('field', 'Emelie', 3)).order_by('distance'),
+            [('Emelia', 1), ('Amelie', 1), ('Emily', 3), ('Fred', 4)],
             transform=lambda instance: (instance.field, instance.distance),
             ordered=True
         )

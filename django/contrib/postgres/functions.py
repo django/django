@@ -19,3 +19,13 @@ class Levenshtein(Func):
         if not hasattr(string, 'resolve_expression'):
             string = Value(string)
         super(Levenshtein, self).__init__(expression, string, output_field=PositiveIntegerField(), **extra)
+
+
+class LevenshteinLessEqual(Func):
+    function = 'LEVENSHTEIN_LESS_EQUAL'
+
+    def __init__(self, expression, string, max_d, **extra):
+        if not hasattr(string, 'resolve_expression'):
+            string = Value(string)
+        super(LevenshteinLessEqual, self).__init__(
+            expression, string, max_d, output_field=PositiveIntegerField(), **extra)
