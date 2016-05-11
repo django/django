@@ -45,7 +45,7 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
     resource.
 
     .. note::
-        Django will automatically strip the content of responses to HEAD
+        Web servers should automatically strip the content of responses to HEAD
         requests while leaving the headers unchanged, so you may handle HEAD
         requests exactly like GET requests in your views. Since some software,
         such as link checkers, rely on HEAD requests, you might prefer
