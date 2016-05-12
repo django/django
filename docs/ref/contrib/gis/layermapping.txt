@@ -133,7 +133,7 @@ Keyword Arguments
 
 ``unique``             Setting this to the name, or a tuple of names,
                        from the given  model will create models unique
-                       only to the given name(s). Geometries will from
+                       only to the given name(s). Geometries from
                        each feature will be added into the collection
                        associated with the unique model.  Forces
                        the transaction mode to be ``'autocommit'``.
