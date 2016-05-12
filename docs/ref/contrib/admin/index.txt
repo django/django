@@ -2210,6 +2210,20 @@ The ``InlineModelAdmin`` class adds:
     inline forms. For example, this may be based on the model instance
     (passed as the keyword argument ``obj``).
 
+.. method:: InlineModelAdmin.get_formset_initial_data(request)
+
+    .. versionadded:: 1.10
+
+    A hook for initial formset data on admin change forms. Initial data is only
+    for extra forms, see :ref:`providing-initial-values` for more information.
+    By default, no initial data will be provided.
+
+    This method should return a list of dictionaries in the form
+    ``{'fieldname': 'fieldval'}``::
+
+        def get_formset_initial_data(self, request):
+            return [{'name': 'first_custom_name'}, {'name': 'second_custom_name'}]
+
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
 

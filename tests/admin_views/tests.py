@@ -1062,6 +1062,19 @@ class AdminViewFormUrlTest(TestCase):
         # this is the overridden behaviour
         self.assertContains(response, 'value="overridden_value"')
 
+    def test_formset_initial_data_can_be_overridden(self):
+        """
+        Tests that the behavior for setting initial
+        formset data can be overridden in the InlineModelAdmin class.
+        """
+        response = self.client.get(
+            reverse('admin:admin_views_restaurant_add', current_app=self.current_app),
+        )
+        # this is the overridden behaviour if there are extra forms
+        self.assertContains(response, 'value="overridden_inline_value"', count=1)
+        regex = force_bytes(r'name="worker_set-2-0-name"[^>]*value="overridden_inline_value"')
+        six.assertRegex(self, response.content, regex)
+
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class AdminJavaScriptTest(TestCase):

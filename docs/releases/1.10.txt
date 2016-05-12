@@ -69,6 +69,10 @@ Minor features
 * Added "No date" and "Has date" choices for ``DateFieldListFilter`` if the
   field is nullable.
 
+* The new :meth:`InlineModelAdmin.get_formset_initial_data()
+  <django.contrib.admin.InlineModelAdmin.get_formset_initial_data>` method may
+  be overridden to provide initial data for an inline formset on add.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

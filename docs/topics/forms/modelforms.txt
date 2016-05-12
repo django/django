@@ -843,6 +843,8 @@ fields in the form.
 If ``localized_fields`` is set to the special value ``'__all__'``, all fields
 will be localized.
 
+.. _providing-initial-values:
+
 Providing initial values
 ------------------------
 
