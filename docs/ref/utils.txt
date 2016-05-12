@@ -167,9 +167,26 @@ The functions defined in this module share the following properties:
     middleware functionality on a per-view basis. The middleware is created
     with no params passed.
 
-    It assumes middleware that's compatible with the old style of Django 1.9
-    and earlier (having methods like ``process_request()``,
-    ``process_exception()``, and ``process_response()``).
+    If this decorator is used on a view that returns a
+    :class:`~django.template.response.TemplateResponse`, the decorator will
+    receive the response unrendered, whereas normally a middleware would
+    receive the response after it had been rendered. Middlewares that need
+    access to the response content, if they wish to be compatible with
+    ``decorator_from_middleware`` and views using
+    :class:`~django.template.response.TemplateResponse`, should attach
+    post-render callbacks to the response using
+    :meth:`~django.template.response.SimpleTemplateResponse.add_post_render_callback()`
+    rather than accessing the response content immediately.
+
+    .. versionchanged:: 1.10
+
+        In Django versions prior to 1.10, ``decorator_from_middleware`` was
+        able to automatically defer middleware ``process_response`` on
+        :class:`~django.template.response.TemplateResponse` until after
+        render. This is no longer possible in general with callable middleware
+        in Django 1.10+, though middleware adapted from the old style using
+        :class:`~django.utils.deprecation.MiddlewareMixin` are still
+        automatically protected.
 
 .. function:: decorator_from_middleware_with_args(middleware_class)
 

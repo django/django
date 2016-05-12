@@ -132,38 +132,52 @@ def available_attrs(fn):
 
 def make_middleware_decorator(middleware_class):
     def _make_decorator(*m_args, **m_kwargs):
-        middleware = middleware_class(*m_args, **m_kwargs)
-
         def _decorator(view_func):
             @wraps(view_func, assigned=available_attrs(view_func))
             def _wrapped_view(request, *args, **kwargs):
-                if hasattr(middleware, 'process_request'):
-                    result = middleware.process_request(request)
-                    if result is not None:
-                        return result
-                if hasattr(middleware, 'process_view'):
-                    result = middleware.process_view(request, view_func, args, kwargs)
-                    if result is not None:
-                        return result
+                def get_response(req):
+                    return view_func(req, *args, **kwargs)
+
+                legacy = False
                 try:
-                    response = view_func(request, *args, **kwargs)
-                except Exception as e:
-                    if hasattr(middleware, 'process_exception'):
-                        result = middleware.process_exception(request, e)
-                        if result is not None:
-                            return result
-                    raise
+                    middleware = middleware_class(get_response, *m_args, **m_kwargs)
+                except TypeError:
+                    # wrong signature, probably legacy-style middleware
+                    legacy = True
+                else:
+                    if not callable(middleware):
+                        legacy = True
+
+                if legacy:
+                    middleware = middleware_class(*m_args, **m_kwargs)
+
+                response = None
+                if legacy and hasattr(middleware, 'process_request'):
+                    response = middleware.process_request(request)
+                if not response and hasattr(middleware, 'process_view'):
+                    response = middleware.process_view(request, view_func, args, kwargs)
+                if not response:
+                    try:
+                        if legacy:
+                            response = view_func(request, *args, **kwargs)
+                        else:
+                            response = middleware(request)
+                    except Exception as e:
+                        if hasattr(middleware, 'process_exception'):
+                            response = middleware.process_exception(request, e)
+                        if response is None:
+                            raise
                 if hasattr(response, 'render') and callable(response.render):
                     if hasattr(middleware, 'process_template_response'):
                         response = middleware.process_template_response(request, response)
                     # Defer running of process_response until after the template
                     # has been rendered:
-                    if hasattr(middleware, 'process_response'):
+                    if legacy and hasattr(middleware, 'process_response'):
                         def callback(response):
                             return middleware.process_response(request, response)
                         response.add_post_render_callback(callback)
                 else:
-                    if hasattr(middleware, 'process_response'):
+                    if legacy and hasattr(middleware, 'process_response'):
                         return middleware.process_response(request, response)
                 return response
             return _wrapped_view

@@ -258,6 +258,25 @@ called.
 Middleware are run in reverse order during the response phase, which
 includes ``process_template_response()``.
 
+Exception handling
+==================
+
+Django automatically converts exceptions raised by the view or by middleware
+into an appropriate HTTP response with an error status code. :ref:`Certain
+exceptions <error-views>` are converted to 4xx status codes, while an unknown
+exception is converted to a 500 status code.
+
+This conversion takes place before and after each middleware (you can think of
+it as the thin film in between each layer of the onion), so that every
+middleware can always rely on getting some kind of HTTP response back from
+calling its ``get_response`` callable. Middleware don't need to worry about
+wrapping their call to ``get_response`` in a ``try/except`` and handling an
+exception that might have been raised by a later middleware or the view. Even
+if the very next middleware in the chain raises an
+:class:`~django.http.Http404` exception, for example, your middleware won't see
+that exception; instead it will get an :class:`~django.http.HttpResponse`
+object with a :attr:`~django.http.HttpResponse.status_code` of 404.
+
 Dealing with streaming responses
 ================================
 
@@ -282,24 +301,44 @@ must test for streaming responses and adjust their behavior accordingly::
             for chunk in content:
                 yield alter_content(chunk)
 
-Exception handling
-==================
+Compatibility with ``TemplateResponse`` and ``decorator_from_middleware``
+=========================================================================
 
-Django automatically converts exceptions raised by the view or by middleware
-into an appropriate HTTP response with an error status code. :ref:`Certain
-exceptions <error-views>` are converted to 4xx status codes, while an unknown
-exception is converted to a 500 status code.
+In normal use, Django ensures that
+:class:`~django.template.response.TemplateResponse`\s will be rendered before
+they reach middleware.
 
-This conversion takes place before and after each middleware (you can think of
-it as the thin film in between each layer of the onion), so that every
-middleware can always rely on getting some kind of HTTP response back from
-calling its ``get_response`` callable. Middleware don't need to worry about
-wrapping their call to ``get_response`` in a ``try/except`` and handling an
-exception that might have been raised by a later middleware or the view. Even
-if the very next middleware in the chain raises an
-:class:`~django.http.Http404` exception, for example, your middleware won't see
-that exception; instead it will get an :class:`~django.http.HttpResponse`
-object with a :attr:`~django.http.HttpResponse.status_code` of 404.
+However, if your middleware a) accesses ``response.content``, b) might be
+turned into a decorator via
+:func:`~django.utils.decorators.decorator_from_middleware`, and c) might then
+be used to decorate a view that returns a
+:class:`~django.template.response.TemplateResponse`, it needs to defer
+accessing ``response.content`` using
+:meth:`~django.template.response.SimpleTemplateResponse.add_post_render_callback()`.
+
+For example, rather than simply accessing ``response.content`` in the body of a
+middleware::
+
+    response = get_response(request)
+    log("Response length is %s" % len(response.content))
+    return response
+
+You would instead defer it::
+
+    response = get_response(request)
+    def callback(response):
+        log("Response length is %s" % len(response.content))
+    if hasattr(response, 'render'):
+        response.add_post_render_callback(callback)
+    else:
+        callback(response)
+    return response
+
+If your middleware does not access ``response.content``, or it won't be passed
+through :func:`~django.utils.decorators.decorator_from_middleware` and then
+used to decorate a view that returns a
+:class:`~django.template.response.TemplateResponse`, you don't need to worry
+about this.
 
 .. _upgrading-middleware:
 
@@ -321,7 +360,15 @@ The ``__call__()`` method:
 #. Calls ``self.process_request(request)`` (if defined).
 #. Calls ``self.get_response(request)`` to get the response from later
    middleware and the view.
-#. Calls ``self.process_response(request, response)`` (if defined).
+#. Calls ``self.process_response(request, response)`` (if defined), or defers
+   it using
+   :meth:`~django.template.response.SimpleTemplateResponse.add_post_render_callback()`
+   if the response is a
+   :class:`~django.template.response.TemplateResponse`. (Normally this deferral
+   is unnecessary, since template-responses will be rendered before they reach
+   middleware, but it may be necessary if a view decorator is created from the
+   middleware using
+   :func:`~django.utils.decorators.decorator_from_middleware`.)
 #. Returns the response.
 
 If used with :setting:`MIDDLEWARE_CLASSES`, the ``__call__()`` method will

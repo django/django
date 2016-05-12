@@ -126,5 +126,12 @@ class MiddlewareMixin(object):
         if not response:
             response = self.get_response(request)
         if hasattr(self, 'process_response'):
-            response = self.process_response(request, response)
+            # In case we've got an unrendered template response, make sure we
+            # delay response handling until it's rendered.
+            if hasattr(response, 'render') and callable(response.render):
+                def callback(response):
+                    return self.process_response(request, response)
+                response.add_post_render_callback(callback)
+            else:
+                response = self.process_response(request, response)
         return response
