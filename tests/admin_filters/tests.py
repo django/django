@@ -247,6 +247,11 @@ class BookmarkAdminGenericRelation(ModelAdmin):
     list_filter = ['tags__tag']
 
 
+class BookmarkChoicesAdmin(ModelAdmin):
+    list_display = ['none_or_null']
+    list_filter = ['none_or_null']
+
+
 class ListFiltersTests(TestCase):
 
     def setUp(self):
@@ -301,6 +306,21 @@ class ListFiltersTests(TestCase):
             modeladmin.list_select_related, modeladmin.list_per_page,
             modeladmin.list_max_show_all, modeladmin.list_editable, modeladmin,
         )
+
+    def test_choicesfieldlistfilter_has_none_choice(self):
+        """
+        The last choice is for the None value.
+        """
+        modeladmin = BookmarkChoicesAdmin(Bookmark, site)
+
+        request = self.request_factory.get('/', {})
+
+        changelist = self.get_changelist(request, Bookmark, modeladmin)
+        filterspec = changelist.get_filters(request)[0][0]
+        choices = list(filterspec.choices(changelist))
+
+        self.assertEqual(choices[-1]['display'], 'None')
+        self.assertEqual(choices[-1]['query_string'], '?none_or_null__isnull=True')
 
     def test_datefieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)
