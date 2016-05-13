@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.apps import apps
+from django.apps.registry import Apps
 from django.conf import settings
 from django.contrib.sites import models
 from django.contrib.sites.management import create_default_site
@@ -292,6 +293,14 @@ class CreateDefaultSiteTests(TestCase):
         del settings.SITE_ID
         create_default_site(self.app_config, verbosity=0)
         self.assertEqual(Site.objects.get().pk, 1)
+
+    def test_unavailable_site_model(self):
+        """
+        #24075 - A Site shouldn't be created if the model isn't available.
+        """
+        apps = Apps()
+        create_default_site(self.app_config, verbosity=0, apps=apps)
+        self.assertFalse(Site.objects.exists())
 
 
 class MiddlewareTest(TestCase):

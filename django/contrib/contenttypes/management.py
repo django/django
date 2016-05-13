@@ -1,10 +1,10 @@
-from django.apps import apps
+from django.apps import apps as global_apps
 from django.db import DEFAULT_DB_ALIAS, router
 from django.utils import six
 from django.utils.six.moves import input
 
 
-def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
+def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
     """
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
@@ -12,7 +12,9 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     if not app_config.models_module:
         return
 
+    app_label = app_config.label
     try:
+        app_config = apps.get_app_config(app_label)
         ContentType = apps.get_model('contenttypes', 'ContentType')
     except LookupError:
         return
@@ -21,8 +23,9 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
         return
 
     ContentType.objects.clear_cache()
-
-    app_label = app_config.label
+    # Always clear the global content types cache.
+    if apps is not global_apps:
+        global_apps.get_model('contenttypes', 'ContentType').objects.clear_cache()
 
     app_models = {
         model._meta.model_name: model

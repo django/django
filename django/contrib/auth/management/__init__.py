@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import getpass
 import unicodedata
 
-from django.apps import apps
+from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.core import exceptions
 from django.db import DEFAULT_DB_ALIAS, router
@@ -37,19 +37,20 @@ def _get_builtin_permissions(opts):
     return perms
 
 
-def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
+def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
     if not app_config.models_module:
         return
 
+    app_label = app_config.label
     try:
+        app_config = apps.get_app_config(app_label)
+        ContentType = apps.get_model('contenttypes', 'ContentType')
         Permission = apps.get_model('auth', 'Permission')
     except LookupError:
         return
 
     if not router.allow_migrate_model(using, Permission):
         return
-
-    from django.contrib.contenttypes.models import ContentType
 
     # This will hold the permissions we're looking for as
     # (content_type, (codename, name))

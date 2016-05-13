@@ -404,6 +404,16 @@ class UpdateContentTypesTests(TestCase):
         self.assertIn("Stale content types remain.", stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count + 1)
 
+    def test_unavailable_content_type_model(self):
+        """
+        #24075 - A ContentType shouldn't be created or deleted if the model
+        isn't available.
+        """
+        apps = Apps()
+        with self.assertNumQueries(0):
+            management.update_contenttypes(self.app_config, interactive=False, verbosity=0, apps=apps)
+        self.assertEqual(ContentType.objects.count(), self.before_count + 1)
+
 
 class TestRouter(object):
     def db_for_read(self, model, **hints):
