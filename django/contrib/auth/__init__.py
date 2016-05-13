@@ -100,7 +100,7 @@ def login(request, user, backend=None):
     if SESSION_KEY in request.session:
         if _get_user_session_key(request) != user.pk or (
                 session_auth_hash and
-                request.session.get(HASH_SESSION_KEY) != session_auth_hash):
+                not constant_time_compare(request.session.get(HASH_SESSION_KEY, ''), session_auth_hash)):
             # To avoid reusing another user's session, create a new, empty
             # session if the existing session corresponds to a different
             # authenticated user.
