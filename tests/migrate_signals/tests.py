@@ -1,11 +1,12 @@
 from django.apps import apps
 from django.core import management
+from django.db import migrations
 from django.db.models import signals
 from django.test import TestCase, override_settings
 from django.utils import six
 
 APP_CONFIG = apps.get_app_config('migrate_signals')
-SIGNAL_ARGS = ['app_config', 'verbosity', 'interactive', 'using']
+SIGNAL_ARGS = ['app_config', 'verbosity', 'interactive', 'using', 'plan', 'apps']
 MIGRATE_DATABASE = 'default'
 MIGRATE_VERBOSITY = 1
 MIGRATE_INTERACTIVE = False
@@ -80,6 +81,8 @@ class MigrateSignalTests(TestCase):
             self.assertEqual(args['verbosity'], MIGRATE_VERBOSITY)
             self.assertEqual(args['interactive'], MIGRATE_INTERACTIVE)
             self.assertEqual(args['using'], 'default')
+            self.assertEqual(args['plan'], [])
+            self.assertIsInstance(args['apps'], migrations.state.StateApps)
 
     @override_settings(MIGRATION_MODULES={'migrate_signals': 'migrate_signals.custom_migrations'})
     def test_migrations_only(self):
@@ -101,3 +104,12 @@ class MigrateSignalTests(TestCase):
             self.assertEqual(args['verbosity'], MIGRATE_VERBOSITY)
             self.assertEqual(args['interactive'], MIGRATE_INTERACTIVE)
             self.assertEqual(args['using'], 'default')
+            self.assertIsInstance(args['plan'][0][0], migrations.Migration)
+            # The migration isn't applied backward.
+            self.assertFalse(args['plan'][0][1])
+            self.assertIsInstance(args['apps'], migrations.state.StateApps)
+        self.assertEqual(pre_migrate_receiver.call_args['apps'].get_models(), [])
+        self.assertEqual(
+            [model._meta.label for model in post_migrate_receiver.call_args['apps'].get_models()],
+            ['migrate_signals.Signal']
+        )

@@ -368,6 +368,10 @@ Migrations
   migration history. If they find some unapplied dependencies of an applied
   migration, ``InconsistentMigrationHistory`` is raised.
 
+* The :func:`~django.db.models.signals.pre_migrate` and
+  :func:`~django.db.models.signals.post_migrate` signals now dispatch their
+  migration ``plan`` and ``apps``.
+
 Models
 ~~~~~~
 

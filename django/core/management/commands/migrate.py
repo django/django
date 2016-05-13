@@ -15,7 +15,7 @@ from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
-from django.db.migrations.state import ProjectState
+from django.db.migrations.state import ModelState, ProjectState
 from django.utils.module_loading import module_has_submodule
 
 
@@ -160,7 +160,10 @@ class Command(BaseCommand):
                         % (targets[0][1], targets[0][0])
                     )
 
-        emit_pre_migrate_signal(self.verbosity, self.interactive, connection.alias)
+        pre_migrate_apps = executor._create_project_state().apps
+        emit_pre_migrate_signal(
+            self.verbosity, self.interactive, connection.alias, apps=pre_migrate_apps, plan=plan,
+        )
 
         # Run the syncdb phase.
         if run_syncdb:
@@ -191,14 +194,33 @@ class Command(BaseCommand):
                         "migrations, and then re-run 'manage.py migrate' to "
                         "apply them."
                     ))
+            post_migrate_apps = pre_migrate_apps
         else:
             fake = options['fake']
             fake_initial = options['fake_initial']
-            executor.migrate(targets, plan, fake=fake, fake_initial=fake_initial)
+            post_migrate_project_state = executor.migrate(
+                targets, plan, fake=fake, fake_initial=fake_initial
+            )
+            post_migrate_apps = post_migrate_project_state.apps
+
+        # Re-render models of real apps to include relationships now that
+        # we've got a final state. This wouldn't be necessary if real apps
+        # models were rendered with relationships in the first place.
+        with post_migrate_apps.bulk_update():
+            model_keys = []
+            for model_state in post_migrate_apps.real_models:
+                model_key = model_state.app_label, model_state.name_lower
+                model_keys.append(model_key)
+                post_migrate_apps.unregister_model(*model_key)
+        post_migrate_apps.render_multiple([
+            ModelState.from_model(apps.get_model(*model_key)) for model_key in model_keys
+        ])
 
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
-        emit_post_migrate_signal(self.verbosity, self.interactive, connection.alias)
+        emit_post_migrate_signal(
+            self.verbosity, self.interactive, connection.alias, apps=post_migrate_apps, plan=plan,
+        )
 
     def migration_progress_callback(self, action, migration=None, fake=False):
         if self.verbosity >= 1:
