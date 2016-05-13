@@ -1259,13 +1259,13 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         ls = LineString(((0, 0), (1, 1)))
         path, args, kwargs = ls.deconstruct()
         self.assertEqual(path, 'django.contrib.gis.geos.linestring.LineString')
-        self.assertEqual(args, (((0, 0), (1, 1))))
+        self.assertEqual(args, (((0, 0), (1, 1)),))
         self.assertEqual(kwargs, {})
 
         ls2 = LineString([Point(0, 0), Point(1, 1)], srid=4326)
         path, args, kwargs = ls2.deconstruct()
         self.assertEqual(path, 'django.contrib.gis.geos.linestring.LineString')
-        self.assertEqual(args, ([Point(0, 0), Point(1, 1)]))
+        self.assertEqual(args, ([Point(0, 0), Point(1, 1)],))
         self.assertEqual(kwargs, {'srid': 4326})
 
         ext_coords = ((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))
