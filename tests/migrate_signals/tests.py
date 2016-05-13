@@ -5,7 +5,7 @@ from django.test import TestCase, override_settings
 from django.utils import six
 
 APP_CONFIG = apps.get_app_config('migrate_signals')
-PRE_MIGRATE_ARGS = ['app_config', 'verbosity', 'interactive', 'using']
+SIGNAL_ARGS = ['app_config', 'verbosity', 'interactive', 'using']
 MIGRATE_DATABASE = 'default'
 MIGRATE_VERBOSITY = 1
 MIGRATE_INTERACTIVE = False
