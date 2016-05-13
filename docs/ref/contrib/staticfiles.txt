@@ -149,7 +149,7 @@ that class path inside your :setting:`INSTALLED_APPS` setting:
 ``findstatic``
 --------------
 
-.. django-admin:: findstatic static file [static file ...]
+.. django-admin:: findstatic static-file [static-file ...]
 
 Searches for one or more relative paths with the enabled finders.
 
