@@ -572,6 +572,11 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
         tag.object_id = cauliflower.id
         self.assertEqual(tag.content_object, cauliflower)
 
+    def test_assign_content_object_in_init(self):
+        spinach = Vegetable(name="spinach")
+        tag = TaggedItem(content_object=spinach)
+        self.assertEqual(tag.content_object, spinach)
+
 
 class CustomWidget(forms.TextInput):
     pass
