@@ -1282,8 +1282,8 @@ possible.
 
 .. _proxy-vs-unmanaged-models:
 
-Differences between proxy inheritance and  unmanaged models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Differences between proxy inheritance and unmanaged models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Proxy model inheritance might look fairly similar to creating an unmanaged
 model, using the :attr:`~django.db.models.Options.managed` attribute on a
