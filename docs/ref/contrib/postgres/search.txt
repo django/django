@@ -189,3 +189,59 @@ if it were an annotated ``SearchVector``::
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
 
 .. _PostgreSQL documentation: http://www.postgresql.org/docs/current/static/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
+
+
+``TrigramSimilarity``
+=====================
+
+.. class:: TrigramSimilarity(expression, expression, **extra)
+
+.. versionadded:: 1.10
+
+Accepts a field name or expression, and a string or expression. Returns the
+trigram similarity between the two arguments.
+
+To use it, you need to activate the `pg_trgm extension on PostgreSQL`_. You can
+install this using the
+:class:`~django.contrib.postgres.operations.TrigramExtension` migration
+operation.
+
+.. _pg_trgm extension on PostgreSQL: http://www.postgresql.org/docs/current/interactive/pg_trgm.html
+
+Usage example::
+
+    >>> from django.contrib.postgres.search import TrigramSimilarity
+    >>> Author.objects.create(name='Katy Stevens')
+    >>> Author.objects.create(name='Stephen Keats')
+    >>> test = 'Katie Stephens'
+    >>> print Author.objects.annotate(similarity=TrigramSimilarity('name', test)
+    ...    ).filter(similarity__gt=0.3).order_by('-similarity')
+    [<Author: Katy Stephens>, <Author: Stephen Keats>]
+
+
+``TrigramDistance``
+===================
+
+.. class:: TrigramDistance(expression, expression, **extra)
+
+.. versionadded:: 1.10
+
+Accepts a field name or expression, and a string or expression. Returns the
+trigram distance between the two arguments.
+
+To use it, you need to activate the `pg_trgm extension on PostgreSQL`_. You can
+install this using the
+:class:`~django.contrib.postgres.operations.TrigramExtension` migration
+operation.
+
+.. _pg_trgm extension on PostgreSQL: http://www.postgresql.org/docs/current/interactive/pg_trgm.html
+
+Usage example::
+
+    >>> from django.contrib.postgres.search import TrigramDistance
+    >>> Author.objects.create(name='Katy Stevens')
+    >>> Author.objects.create(name='Stephen Keats')
+    >>> test = 'Katie Stephens'
+    >>> print Author.objects.annotate(distance=TrigramDistance('name', test)
+    ...    ).filter(distance__lte=0.7).order_by('distance')
+    [<Author: Katy Stephens>, <Author: Stephen Keats>]

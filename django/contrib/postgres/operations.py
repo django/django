@@ -40,3 +40,9 @@ class UnaccentExtension(CreateExtension):
 
     def __init__(self):
         self.name = 'unaccent'
+
+
+class TrigramExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'pg_trgm'
