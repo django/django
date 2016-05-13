@@ -34,3 +34,13 @@ the ``django.contrib.postgres.operations`` module.
 
     A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
     which will install the ``unaccent`` extension.
+
+FuzzyStrMatchExtension
+----------------------
+
+.. class:: FuzzyStrMatchExtension()
+
+.. versionadded:: 1.10
+
+    A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
+    which will install the ``fuzzystrmatch`` extension.

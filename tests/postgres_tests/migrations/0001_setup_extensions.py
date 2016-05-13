@@ -5,11 +5,12 @@ from django.db import migrations
 
 try:
     from django.contrib.postgres.operations import (
-        CreateExtension, HStoreExtension, UnaccentExtension,
+        CreateExtension, FuzzyStrMatchExtension, HStoreExtension, UnaccentExtension,
     )
 except ImportError:
     from django.test import mock
     CreateExtension = mock.Mock()
+    FuzzyStrMatchExtension = mock.Mock()
     HStoreExtension = mock.Mock()
     UnaccentExtension = mock.Mock()
 
@@ -20,6 +21,7 @@ class Migration(migrations.Migration):
         # Ensure CreateExtension quotes extension names by creating one with a
         # dash in its name.
         CreateExtension('uuid-ossp'),
+        FuzzyStrMatchExtension(),
         HStoreExtension(),
         UnaccentExtension(),
     ]

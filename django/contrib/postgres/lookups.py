@@ -60,3 +60,25 @@ class SearchLookup(SearchVectorExact):
             self.lhs = SearchVector(self.lhs)
         lhs, lhs_params = super(SearchLookup, self).process_lhs(qn, connection)
         return lhs, lhs_params
+
+
+class Soundex(Transform):
+    bilateral = True
+    lookup_name = 'soundex'
+    function = 'SOUNDEX'
+
+
+class Metaphone(Transform):
+    bilateral = True
+    lookup_name = 'metaphone'
+    function = 'METAPHONE'
+
+    def as_sql(self, qn, connection):
+        lhs, params = qn.compile(self.lhs)
+        return "%s(%s, 255)" % (self.function, lhs), params
+
+
+class DoubleMetaphone(Transform):
+    bilateral = True
+    lookup_name = 'double_metaphone'
+    function = 'DMETAPHONE'

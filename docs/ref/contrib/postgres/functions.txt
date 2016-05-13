@@ -30,3 +30,54 @@ Usage example::
     >>> from django.contrib.postgres.functions import TransactionNow
     >>> Article.objects.filter(published__lte=TransactionNow())
     <QuerySet [<Article: How to Django>]>
+
+``Levenshtein``
+===============
+
+.. class:: Levenshtein(expression, expression, **extra)
+
+.. versionadded:: 1.10
+
+Accepts a field name or expression, and a string or expression. Returns the
+Levenshtein distance between the two arguments.
+
+To use it, you need to activate the `fuzzystrmatch extension on PostgreSQL`_.
+The :class:`~django.contrib.postgres.operations.FuzzyStrMatchExtension`
+migration operation is available if you want to perform this activation using
+migrations).
+
+.. _fuzzystrmatch extension on PostgreSQL: http://www.postgresql.org/docs/current/interactive/fuzzystrmatch.html
+
+Usage example::
+
+    >>> from django.contrib.postgres.functions import Levenshtein
+    >>> Author.objects.create(name='William')
+    >>> print Author.objects.annotate(distance=Levenshtein('name', 'Will')).first().distance
+    3
+
+``LevenshteinLessEqual``
+========================
+
+.. class:: LevenshteinLessEqual(expression, expression, max_distance, **extra)
+
+.. versionadded:: 1.10
+
+Accepts a field name or expression, a string or expression, and a maximum
+distance. This is faster than Levenshtein for low values of distance. If the
+actual distance is less or equal then max_distance, then LevenshteinLessEqual
+returns accurate value of it. Otherwise this function returns a value which is
+greater than max_distance.
+
+To use it, you need to activate the `fuzzystrmatch extension on PostgreSQL`_.
+The :class:`~django.contrib.postgres.operations.FuzzyStrMatchExtension`
+migration operation is available if you want to perform this activation using
+migrations).
+
+.. _fuzzystrmatch extension on PostgreSQL: http://www.postgresql.org/docs/current/interactive/fuzzystrmatch.html
+
+Usage example::
+
+    >>> from django.contrib.postgres.functions import LevenshteinLessEqual
+    >>> Author.objects.create(name='William')
+    >>> print Author.objects.annotate(distance=LevenshteinLessEqual('name', 'Will', 4)).first().distance
+    3
