@@ -1,3 +1,13 @@
+0.13.1 (2016-05-13)
+-------------------
+
+* enforce_ordering now queues future messages in a channel rather than
+  spinlocking worker processes to achieve delays.
+
+* ConsumeLater no longer duplicates messages when they're requeued below the
+  limit.
+
+
 0.13.0 (2016-05-07)
 -------------------
 
