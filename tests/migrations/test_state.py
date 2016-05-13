@@ -9,6 +9,7 @@ from django.db.migrations.state import (
     ModelState, ProjectState, get_related_models_recursive,
 )
 from django.test import SimpleTestCase, override_settings
+from django.test.utils import isolate_apps
 from django.utils import six
 
 from .models import (
@@ -910,6 +911,19 @@ class ModelStateTests(SimpleTestCase):
         # The default manager is used in migrations
         self.assertEqual([name for name, mgr in food_state.managers], ['food_mgr'])
         self.assertEqual(food_state.managers[0][1].args, ('a', 'b', 1, 2))
+
+    @isolate_apps('migrations', 'django.contrib.contenttypes')
+    def test_order_with_respect_to_private_field(self):
+        class PrivateFieldModel(models.Model):
+            content_type = models.ForeignKey('contenttypes.ContentType', models.CASCADE)
+            object_id = models.PositiveIntegerField()
+            private = GenericForeignKey()
+
+            class Meta:
+                order_with_respect_to = 'private'
+
+        state = ModelState.from_model(PrivateFieldModel)
+        self.assertNotIn('order_with_respect_to', state.options)
 
 
 class RelatedModelsTests(SimpleTestCase):

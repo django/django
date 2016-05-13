@@ -443,6 +443,9 @@ class ModelState(object):
             for key in ["unique_together", "index_together", "order_with_respect_to"]:
                 if key in options:
                     del options[key]
+        # Private fields are ignored, so remove options that refer to them.
+        elif options.get('order_with_respect_to') in {field.name for field in model._meta.private_fields}:
+            del options['order_with_respect_to']
 
         def flatten_bases(model):
             bases = []
