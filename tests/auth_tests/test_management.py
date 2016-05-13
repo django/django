@@ -13,6 +13,7 @@ from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.db import migrations
 from django.test import TestCase, mock, override_settings
 from django.utils import six
 from django.utils.encoding import force_str
@@ -561,11 +562,12 @@ class MultiDBCreatesuperuserTestCase(TestCase):
         self.assertEqual(user.email, 'joe@somewhere.org')
 
 
-class PermissionTestCase(TestCase):
+class CreatePermissionsTests(TestCase):
 
     def setUp(self):
         self._original_permissions = Permission._meta.permissions[:]
         self._original_default_permissions = Permission._meta.default_permissions
+        self.app_config = apps.get_app_config('auth')
 
     def tearDown(self):
         Permission._meta.permissions = self._original_permissions
@@ -573,13 +575,11 @@ class PermissionTestCase(TestCase):
         ContentType.objects.clear_cache()
 
     def test_default_permissions(self):
-        auth_app_config = apps.get_app_config('auth')
-
         permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
         Permission._meta.permissions = [
             ('my_custom_permission', 'Some permission'),
         ]
-        create_permissions(auth_app_config, verbosity=0)
+        create_permissions(self.app_config, verbosity=0)
 
         # add/change/delete permission by default + custom permission
         self.assertEqual(Permission.objects.filter(
@@ -588,9 +588,23 @@ class PermissionTestCase(TestCase):
 
         Permission.objects.filter(content_type=permission_content_type).delete()
         Permission._meta.default_permissions = []
-        create_permissions(auth_app_config, verbosity=0)
+        create_permissions(self.app_config, verbosity=0)
 
         # custom permission only since default permissions is empty
         self.assertEqual(Permission.objects.filter(
             content_type=permission_content_type,
         ).count(), 1)
+
+    def test_unvailable_models(self):
+        """
+        #24075 - Permissions shouldn't be created or deleted if the ContentType
+        or Permission models aren't available.
+        """
+        state = migrations.state.ProjectState()
+        # Unvailable contenttypes.ContentType
+        with self.assertNumQueries(0):
+            create_permissions(self.app_config, verbosity=0, apps=state.apps)
+        # Unvailable auth.Permission
+        state = migrations.state.ProjectState(real_apps=['contenttypes'])
+        with self.assertNumQueries(0):
+            create_permissions(self.app_config, verbosity=0, apps=state.apps)
