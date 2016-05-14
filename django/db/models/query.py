@@ -1056,15 +1056,13 @@ class QuerySet(object):
         inserted_ids = []
         for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
             if connections[self.db].features.can_return_ids_from_bulk_insert:
-                inserted_id = self.model._base_manager._insert(
-                    item, fields=fields, using=self.db, return_id=True
-                )
+                inserted_id = self._insert(item, fields=fields, using=self.db, return_id=True)
                 if len(objs) > 1:
                     inserted_ids.extend(inserted_id)
                 if len(objs) == 1:
                     inserted_ids.append(inserted_id)
             else:
-                self.model._base_manager._insert(item, fields=fields, using=self.db)
+                self._insert(item, fields=fields, using=self.db)
         return inserted_ids
 
     def _clone(self, **kwargs):
