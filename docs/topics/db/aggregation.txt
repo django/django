@@ -68,6 +68,7 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     {'price__max': Decimal('81.20')}
 
     # Cost per page
+    >>> from django.db.models import F, FloatField, Sum
     >>> Book.objects.all().aggregate(
     ...    price_per_page=Sum(F('price')/F('pages'), output_field=FloatField()))
     {'price_per_page': 0.4470664529184653}
