@@ -708,10 +708,10 @@ utility methods:
 
 .. class:: models.BaseUserManager
 
-    .. method:: models.BaseUserManager.normalize_email(email)
+    .. classmethod:: models.BaseUserManager.normalize_email(email)
 
-        A ``classmethod`` that normalizes email addresses by lowercasing
-        the domain portion of the email address.
+        Normalizes email addresses by lowercasing the domain portion of the
+        email address.
 
     .. method:: models.BaseUserManager.get_by_natural_key(username)
 
