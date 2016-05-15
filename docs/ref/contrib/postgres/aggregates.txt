@@ -61,7 +61,7 @@ General-purpose aggregation functions
 ``StringAgg``
 -------------
 
-.. class:: StringAgg(expression, delimiter)
+.. class:: StringAgg(expression, delimiter, distinct=False)
 
     Returns the input values concatenated into a string, separated by
     the ``delimiter`` string.
@@ -69,6 +69,13 @@ General-purpose aggregation functions
     .. attribute:: delimiter
 
         Required argument. Needs to be a string.
+
+    .. attribute:: distinct
+
+        .. versionadded:: 1.11
+
+        An optional boolean argument that determines if concatenated values
+        will be distinct. Defaults to ``False``.
 
 Aggregate functions for statistics
 ==================================
