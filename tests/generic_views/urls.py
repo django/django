@@ -292,5 +292,5 @@ urlpatterns = [
         views.BookSigningDetail.as_view()),
 
     # Useful for testing redirects
-    url(r'^accounts/login/$', auth_views.login)
+    url(r'^accounts/login/$', auth_views.LoginView.as_view())
 ]

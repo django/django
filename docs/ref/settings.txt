@@ -2736,8 +2736,8 @@ the URL in two places (``settings`` and URLconf).
 
 Default: ``None``
 
-The URL where requests are redirected after a user logs out using the
-:func:`~django.contrib.auth.views.logout` view (if the view doesn't get a
+The URL where requests are redirected after a user logs out using
+:class:`~django.contrib.auth.views.LogoutView` (if the view doesn't get a
 ``next_page`` argument).
 
 If ``None``, no redirect will be performed and the logout view will be

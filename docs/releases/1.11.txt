@@ -66,6 +66,10 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased by
   20%.
 
+* The :class:`~django.contrib.auth.views.LoginView` and
+  :class:`~django.contrib.auth.views.LogoutView` class-based views supersede the
+  deprecated ``login()`` and ``logout()`` function-based views.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -297,4 +301,7 @@ Features deprecated in 1.11
 Miscellaneous
 -------------
 
-* ...
+* ``contrib.auth``’s ``login()`` and ``logout()`` function-based views are
+  deprecated in favor of new class-based views
+  :class:`~django.contrib.auth.views.LoginView` and
+  :class:`~django.contrib.auth.views.LogoutView`.

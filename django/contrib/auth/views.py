@@ -17,7 +17,10 @@ from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.template.response import TemplateResponse
 from django.urls import reverse
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.decorators import method_decorator
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
@@ -25,6 +28,8 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from django.views.generic.base import TemplateView
+from django.views.generic.edit import FormView
 
 
 def deprecate_current_app(func):
@@ -48,94 +53,128 @@ def deprecate_current_app(func):
     return inner
 
 
-def _get_login_redirect_url(request, redirect_to):
-    # Ensure the user-originating redirection URL is safe.
-    if not is_safe_url(url=redirect_to, host=request.get_host()):
-        return resolve_url(settings.LOGIN_REDIRECT_URL)
-    return redirect_to
-
-
-@deprecate_current_app
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-def login(request, template_name='registration/login.html',
-          redirect_field_name=REDIRECT_FIELD_NAME,
-          authentication_form=AuthenticationForm,
-          extra_context=None, redirect_authenticated_user=False):
+class LoginView(FormView):
     """
     Displays the login form and handles the login action.
     """
-    redirect_to = request.POST.get(redirect_field_name, request.GET.get(redirect_field_name, ''))
+    form_class = AuthenticationForm
+    authentication_form = None
+    redirect_field_name = REDIRECT_FIELD_NAME
+    template_name = 'registration/login.html'
+    redirect_authenticated_user = False
+    extra_context = None
 
-    if redirect_authenticated_user and request.user.is_authenticated:
-        redirect_to = _get_login_redirect_url(request, redirect_to)
-        if redirect_to == request.path:
-            raise ValueError(
-                "Redirection loop for authenticated user detected. Check that "
-                "your LOGIN_REDIRECT_URL doesn't point to a login page."
-            )
-        return HttpResponseRedirect(redirect_to)
-    elif request.method == "POST":
-        form = authentication_form(request, data=request.POST)
-        if form.is_valid():
-            auth_login(request, form.get_user())
-            return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
-    else:
-        form = authentication_form(request)
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(csrf_protect)
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        if self.redirect_authenticated_user and self.request.user.is_authenticated:
+            redirect_to = self.get_success_url()
+            if redirect_to == self.request.path:
+                raise ValueError(
+                    "Redirection loop for authenticated user detected. Check that "
+                    "your LOGIN_REDIRECT_URL doesn't point to a login page."
+                )
+            return HttpResponseRedirect(redirect_to)
+        return super(LoginView, self).dispatch(request, *args, **kwargs)
 
-    current_site = get_current_site(request)
+    def get_success_url(self):
+        """Ensure the user-originating redirection URL is safe."""
+        redirect_to = self.request.POST.get(
+            self.redirect_field_name,
+            self.request.GET.get(self.redirect_field_name, '')
+        )
+        if not is_safe_url(url=redirect_to, host=self.request.get_host()):
+            return resolve_url(settings.LOGIN_REDIRECT_URL)
+        return redirect_to
 
-    context = {
-        'form': form,
-        redirect_field_name: redirect_to,
-        'site': current_site,
-        'site_name': current_site.name,
-    }
-    if extra_context is not None:
-        context.update(extra_context)
+    def get_form_class(self):
+        return self.authentication_form or self.form_class
 
-    return TemplateResponse(request, template_name, context)
+    def form_valid(self, form):
+        """Security check complete. Log the user in."""
+        auth_login(self.request, form.get_user())
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        context = super(LoginView, self).get_context_data(**kwargs)
+        current_site = get_current_site(self.request)
+        context.update({
+            self.redirect_field_name: self.get_success_url(),
+            'site': current_site,
+            'site_name': current_site.name,
+        })
+        if self.extra_context is not None:
+            context.update(self.extra_context)
+        return context
 
 
 @deprecate_current_app
-@never_cache
-def logout(request, next_page=None,
-           template_name='registration/logged_out.html',
-           redirect_field_name=REDIRECT_FIELD_NAME,
-           extra_context=None):
+def login(request, *args, **kwargs):
+    warnings.warn(
+        'The login() view is superseded by the class-based LoginView().',
+        RemovedInDjango21Warning, stacklevel=2
+    )
+    return LoginView.as_view(**kwargs)(request, *args, **kwargs)
+
+
+class LogoutView(TemplateView):
     """
     Logs out the user and displays 'You are logged out' message.
     """
-    auth_logout(request)
+    next_page = None
+    redirect_field_name = REDIRECT_FIELD_NAME
+    template_name = 'registration/logged_out.html'
+    extra_context = None
 
-    if next_page is not None:
-        next_page = resolve_url(next_page)
-    elif settings.LOGOUT_REDIRECT_URL:
-        next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        auth_logout(request)
+        next_page = self.get_next_page()
+        if next_page:
+            # Redirect to this page until the session has been cleared.
+            return HttpResponseRedirect(next_page)
+        return super(LogoutView, self).dispatch(request, *args, **kwargs)
 
-    if (redirect_field_name in request.POST or
-            redirect_field_name in request.GET):
-        next_page = request.POST.get(redirect_field_name,
-                                     request.GET.get(redirect_field_name))
-        # Security check -- don't allow redirection to a different host.
-        if not is_safe_url(url=next_page, host=request.get_host()):
-            next_page = request.path
+    def get_next_page(self):
+        if self.next_page is not None:
+            next_page = resolve_url(self.next_page)
+        elif settings.LOGOUT_REDIRECT_URL:
+            next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
+        else:
+            next_page = self.next_page
 
-    if next_page:
-        # Redirect to this page until the session has been cleared.
-        return HttpResponseRedirect(next_page)
+        if (self.redirect_field_name in self.request.POST or
+                self.redirect_field_name in self.request.GET):
+            next_page = self.request.POST.get(
+                self.redirect_field_name,
+                self.request.GET.get(self.redirect_field_name)
+            )
+            # Security check -- don't allow redirection to a different host.
+            if not is_safe_url(url=next_page, host=self.request.get_host()):
+                next_page = self.request.path
+        return next_page
 
-    current_site = get_current_site(request)
-    context = {
-        'site': current_site,
-        'site_name': current_site.name,
-        'title': _('Logged out')
-    }
-    if extra_context is not None:
-        context.update(extra_context)
+    def get_context_data(self, **kwargs):
+        context = super(LogoutView, self).get_context_data(**kwargs)
+        current_site = get_current_site(self.request)
+        context.update({
+            'site': current_site,
+            'site_name': current_site.name,
+            'title': _('Logged out'),
+        })
+        if self.extra_context is not None:
+            context.update(self.extra_context)
+        return context
 
-    return TemplateResponse(request, template_name, context)
+
+@deprecate_current_app
+def logout(request, *args, **kwargs):
+    warnings.warn(
+        'The logout() view is superseded by the class-based LogoutView().',
+        RemovedInDjango21Warning, stacklevel=2
+    )
+    return LogoutView.as_view(**kwargs)(request, *args, **kwargs)
 
 
 @deprecate_current_app

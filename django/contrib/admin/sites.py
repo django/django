@@ -327,7 +327,7 @@ class AdminSite(object):
 
         This should *not* assume the user is already logged in.
         """
-        from django.contrib.auth.views import logout
+        from django.contrib.auth.views import LogoutView
         defaults = {
             'extra_context': dict(
                 self.each_context(request),
@@ -340,7 +340,7 @@ class AdminSite(object):
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
         request.current_app = self.name
-        return logout(request, **defaults)
+        return LogoutView.as_view(**defaults)(request)
 
     @never_cache
     def login(self, request, extra_context=None):
@@ -352,7 +352,7 @@ class AdminSite(object):
             index_path = reverse('admin:index', current_app=self.name)
             return HttpResponseRedirect(index_path)
 
-        from django.contrib.auth.views import login
+        from django.contrib.auth.views import LoginView
         # Since this module gets imported in the application's root package,
         # it cannot import models from other applications at the module level,
         # and django.contrib.admin.forms eventually imports User.
@@ -374,7 +374,7 @@ class AdminSite(object):
             'template_name': self.login_template or 'admin/login.html',
         }
         request.current_app = self.name
-        return login(request, **defaults)
+        return LoginView.as_view(**defaults)(request)
 
     def _build_app_dict(self, request, label=None):
         """
