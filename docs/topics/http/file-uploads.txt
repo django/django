@@ -122,6 +122,46 @@ field in the model::
             form = UploadFileForm()
         return render(request, 'upload.html', {'form': form})
 
+Uploading multiple files
+------------------------
+
+If you want to upload multiple files using one form field, set the ``multiple``
+HTML attribute of field's widget:
+
+.. snippet::
+    :filename: forms.py
+
+    from django import forms
+
+    class FileFieldForm(forms.Form):
+        file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+
+Then override the ``post`` method of your
+:class:`~django.views.generic.edit.FormView` subclass to handle multiple file
+uploads:
+
+.. snippet::
+    :filename: views.py
+
+    from django.views.generic.edit import FormView
+    from .forms import FileFieldForm
+
+    class FileFieldView(FormView):
+        form_class = FileFieldForm
+        template_name = 'upload.html'  # Replace with your template.
+        success_url = '...'  # Replace with your URL or reverse().
+
+        def post(self, request, *args, **kwargs):
+            form_class = self.get_form_class()
+            form = self.get_form(form_class)
+            files = request.FILES.getlist('file_field')
+            if form.is_valid():
+                for f in files:
+                    ...  # Do something with each file.
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+
 Upload Handlers
 ===============
 
