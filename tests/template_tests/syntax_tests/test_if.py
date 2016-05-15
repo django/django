@@ -508,6 +508,12 @@ class IfTagTests(SimpleTestCase):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('if-tag-error12')
 
+    @setup({'else-if-tag-error01': '{% if foo is bar %} yes {% else if foo is not bar %} no {% endif %}'})
+    def test_else_if_tag_error01(self):
+        error_message = 'Malformed template tag at line 1: "else if foo is not bar"'
+        with self.assertRaisesMessage(TemplateSyntaxError, error_message):
+            self.engine.get_template('else-if-tag-error01')
+
     @setup({'if-tag-shortcircuit01': '{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}'})
     def test_if_tag_shortcircuit01(self):
         """
