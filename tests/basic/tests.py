@@ -692,6 +692,8 @@ class ModelRefreshTests(TestCase):
         with self.assertNumQueries(1):
             a.refresh_from_db()
             self.assertEqual(a.pub_date, new_pub_date)
+        with self.assertRaises(TypeError):
+            a.refresh_from_db(unknown_kwarg=10)
 
     def test_refresh_fk(self):
         s1 = SelfRef.objects.create()

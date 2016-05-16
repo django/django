@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed a regression causing the cached template loader to crash when using
   lazy template names (:ticket:`26603`).
+
+* Made refresh_from_db() fail when passing unknown keyword arguments
+  (:ticket:`26620`).

@@ -585,7 +585,7 @@ class Model(six.with_metaclass(ModelBase)):
             if f.attname not in self.__dict__
         }
 
-    def refresh_from_db(self, using=None, fields=None, **kwargs):
+    def refresh_from_db(self, using=None, fields=None):
         """
         Reloads field values from the database.
 
