@@ -423,7 +423,7 @@ Note that if the model in a
 :class:`~django.contrib.contenttypes.fields.GenericRelation` uses a
 non-default value for ``ct_field`` or ``fk_field`` in its
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey` (for example, if
-you had a ``Comment`` model that uses ``ct_field="object_pk"``),
+you had a ``Comment`` model that uses ``fk_field="object_pk"``),
 you'll need to set ``content_type_field`` and/or ``object_id_field`` in
 the :class:`~django.contrib.contenttypes.fields.GenericRelation` to
 match the ``ct_field`` and ``fk_field``, respectively, in the
