@@ -293,20 +293,14 @@ class AbstractInheritanceTests(TestCase):
             class Meta:
                 abstract = True
 
-        class Descendant(ConcreteParent, AbstractParent):
-            concreteparent_ptr = models.CharField(max_length=30)
+        msg = (
+            "Auto-generated field 'concreteparent_ptr' in class 'Descendant' for parent_link "
+            "to base class 'ConcreteParent' clashes with explicit field of similar name."
+        )
 
-        errors = Descendant.check()
-        expected = [
-            Error(
-                "The field 'concreteparent_ptr' clashes with the field 'concreteparent_ptr'"
-                " from model 'model_inheritance.descendant'.",
-                hint=None,
-                obj=Descendant._meta.get_field('concreteparent_ptr'),
-                id="models.E006",
-            ),
-        ]
-        self.assertEqual(errors, expected)
+        with self.assertRaisesMessage(FieldError, msg):
+            class Descendant(ConcreteParent, AbstractParent):
+                concreteparent_ptr = models.CharField(max_length=30)
 
     def test_abstract_model_with_regular_python_mixin_mro(self):
         class AbstractModel(models.Model):

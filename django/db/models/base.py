@@ -247,7 +247,7 @@ class ModelBase(type):
                 if base_key in parent_links:
                     field = parent_links[base_key]
                 elif not is_proxy:
-                    attr_name = '%s_ptr' % base._meta.model_name
+                    attr_name = str('%s_ptr' % base._meta.model_name)
                     field = OneToOneField(
                         base,
                         on_delete=CASCADE,
@@ -255,6 +255,17 @@ class ModelBase(type):
                         auto_created=True,
                         parent_link=True,
                     )
+
+                    if attr_name in field_names:
+                        raise FieldError(
+                            'Auto-generated field %r in class %r for parent_link to base class %r '
+                            'clashes with explicit field of similar name.' % (
+                                attr_name,
+                                name,
+                                base.__name__,
+                            )
+                        )
+
                     # Only add the ptr field if it's not already present;
                     # e.g. migrations will already have it specified
                     if not hasattr(new_class, attr_name):
