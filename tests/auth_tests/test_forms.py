@@ -104,6 +104,38 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertEqual(password_changed.call_count, 1)
         self.assertEqual(repr(u), '<User: jsmith@example.com>')
 
+    def test_unicode_username(self):
+        data = {
+            'username': '宝',
+            'password1': 'test123',
+            'password2': 'test123',
+        }
+        form = UserCreationForm(data)
+        self.assertTrue(form.is_valid())
+        u = form.save()
+        self.assertEqual(u.username, '宝')
+
+    def test_duplicate_normalized_unicode(self):
+        """
+        To prevent almost identical usernames, visually identical but differing
+        by their unicode code points only, Unicode NFKC normalization should
+        make appear them equal to Django.
+        """
+        omega_username = 'iamtheΩ'  # U+03A9 GREEK CAPITAL LETTER OMEGA
+        ohm_username = 'iamtheΩ'  # U+2126 OHM SIGN
+        self.assertNotEqual(omega_username, ohm_username)
+        User.objects.create_user(username=omega_username, password='pwd')
+        data = {
+            'username': ohm_username,
+            'password1': 'pwd2',
+            'password2': 'pwd2',
+        }
+        form = UserCreationForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors['username'], ["A user with that username already exists."]
+        )
+
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
         {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
@@ -249,6 +281,16 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         data = {
             'username': 'testclient',
             'password': 'password',
+        }
+        form = AuthenticationForm(None, data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.non_field_errors(), [])
+
+    def test_unicode_username(self):
+        User.objects.create_user(username='Σαρα', password='pwd')
+        data = {
+            'username': 'Σαρα',
+            'password': 'pwd',
         }
         form = AuthenticationForm(None, data)
         self.assertTrue(form.is_valid())
