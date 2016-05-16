@@ -74,12 +74,10 @@ get_band_statistics = void_output(
         c_void_p, c_int, c_int, POINTER(c_double), POINTER(c_double),
         POINTER(c_double), POINTER(c_double), c_void_p, c_void_p,
     ],
-    errcheck=False
 )
 compute_band_statistics = void_output(
     std_call('GDALComputeRasterStatistics'),
     [c_void_p, c_int, POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double), c_void_p, c_void_p],
-    errcheck=False
 )
 
 # Reprojection routine

@@ -1,4 +1,3 @@
-import math
 from ctypes import byref, c_double, c_int, c_void_p
 
 from django.contrib.gis.gdal.base import GDALBase
@@ -85,18 +84,19 @@ class GDALBand(GDALBase):
         ]
 
         if refresh or self._stats_refresh:
-            capi.compute_band_statistics(*stats_args)
+            func = capi.compute_band_statistics
         else:
             # Add additional argument to force computation if there is no
             # existing PAM file to take the values from.
             force = True
             stats_args.insert(2, c_int(force))
-            capi.get_band_statistics(*stats_args)
+            func = capi.get_band_statistics
 
-        result = smin.value, smax.value, smean.value, sstd.value
-
-        # Check if band is empty (in that case, set all statistics to None)
-        if any((math.isnan(val) for val in result)):
+        # Computation of statistics fails for empty bands.
+        try:
+            func(*stats_args)
+            result = smin.value, smax.value, smean.value, sstd.value
+        except GDALException:
             result = (None, None, None, None)
 
         self._stats_refresh = False
