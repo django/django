@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.apps import apps
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.signals import user_logged_in
@@ -144,7 +145,11 @@ class UserManager(BaseUserManager):
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
-        user = self.model(username=username, email=email, **extra_fields)
+        # We lookup the real model class from the global app registry so this
+        # manager method can be used in migrations. This is fine because
+        # managers are by definition working on the real model
+        UserModel = apps.get_model(self.model._meta.app_label, self.model._meta.object_name)
+        user = UserModel(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
