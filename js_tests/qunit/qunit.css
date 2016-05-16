@@ -1,12 +1,12 @@
 /*!
- * QUnit 1.20.0
- * http://qunitjs.com/
+ * QUnit 1.23.1
+ * https://qunitjs.com/
  *
  * Copyright jQuery Foundation and other contributors
  * Released under the MIT license
- * http://jquery.org/license
+ * https://jquery.org/license
  *
- * Date: 2015-10-27T17:53Z
+ * Date: 2016-04-12T17:29Z
  */
 
 /** Font Family and Sizes */
@@ -118,6 +118,10 @@
 #qunit-tests li.fail,
 #qunit-tests li.skipped {
 	display: list-item;
+}
+
+#qunit-tests.hidepass {
+	position: relative;
 }
 
 #qunit-tests.hidepass li.running,
