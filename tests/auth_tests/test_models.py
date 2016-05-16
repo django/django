@@ -17,8 +17,7 @@ from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, override_settings,
 )
 
-from .models import IntegerUsernameUser
-from .models.with_custom_email_field import CustomEmailField
+from .models import CustomEmailField, IntegerUsernameUser
 
 
 class NaturalKeysTestCase(TestCase):

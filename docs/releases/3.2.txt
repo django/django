@@ -552,6 +552,9 @@ Miscellaneous
   ``False`` if the file cannot be locked, instead of raising
   :exc:`BlockingIOError`.
 
+* The password reset mechanism now invalidates tokens when the user email is
+  changed.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
