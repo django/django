@@ -11,6 +11,7 @@ from django.contrib.auth.hashers import (
     check_password, is_password_usable, make_password,
 )
 from django.db import models
+from django.utils import six
 from django.utils.crypto import get_random_string, salted_hmac
 from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.encoding import force_text, python_2_unicode_compatible
@@ -126,6 +127,18 @@ class AbstractBaseUser(models.Model):
 
     def get_full_name(self):
         raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_full_name() method')
+
+    def get_hash_value(self, timestamp):
+        """Returns the timestamped hash value for purposes of generating
+        a password reset token; uses primary key, password, and, if
+        available, email address.
+        """
+        # Ensure results are consistent across DB backends
+        login_timestamp = '' if self.last_login is None else self.last_login.replace(microsecond=0, tzinfo=None)
+        return (
+            six.text_type(self.pk) + self.password +
+            six.text_type(login_timestamp) + six.text_type(timestamp)
+        )
 
     def get_short_name(self):
         raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_short_name() method.')

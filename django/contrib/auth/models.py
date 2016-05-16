@@ -359,6 +359,11 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         "Returns the short name for the user."
         return self.first_name
 
+    def get_hash_value(self, timestamp):
+        # Class now has email field and hash should depend on it
+        hash_value = super(AbstractUser, self).get_hash_value(timestamp)
+        return hash_value + self.email
+
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
         Sends an email to this User.
