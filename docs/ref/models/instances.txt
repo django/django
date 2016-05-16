@@ -128,7 +128,7 @@ in the ``from_db()`` method.
 Refreshing objects from database
 ================================
 
-.. method:: Model.refresh_from_db(using=None, fields=None, **kwargs)
+.. method:: Model.refresh_from_db(using=None, fields=None)
 
 If you need to reload a model's values from the database, you can use the
 ``refresh_from_db()`` method. When this method is called without arguments the
