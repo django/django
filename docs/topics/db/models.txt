@@ -1376,11 +1376,36 @@ Field name "hiding" is not permitted
 -------------------------------------
 
 In normal Python class inheritance, it is permissible for a child class to
-override any attribute from the parent class. In Django, this is not permitted
-for attributes that are :class:`~django.db.models.Field` instances (at
-least, not at the moment). If a base class has a field called ``author``, you
-cannot create another model field called ``author`` in any class that inherits
-from that base class.
+override any attribute from the parent class. In Django, this is usually not
+permitted for attributes of :class:`~django.db.models.Model` classes that are
+:class:`~django.db.models.Field` instances. If a non-abstract model base class
+has a field called ``author``, you cannot create another model field or define
+an attribute called ``author`` in any class that inherits from that base class.
+
+This restriction doesn't apply to model fields inherited from an abstract
+model. Such fields may be overridden with another field or value, or be removed
+by setting ``field_name = None``.
+
+.. versionchanged:: 1.10
+
+    The ability to override abstract fields was added.
+
+.. warning::
+
+    Model managers are inherited from abstract base classes. Overriding an
+    inherited field which is referenced by an inherited
+    :class:`~django.db.models.Manager` may cause subtle bugs. See :ref:`custom
+    managers and model inheritance <custom-managers-and-inheritance>`.
+
+.. note::
+
+    Some fields define extra attributes on the model, e.g. a
+    :class:`~django.db.models.ForeignKey` defines an extra attribute with
+    ``_id`` appended to the field name, as well as ``related_name`` and
+    ``related_query_name`` on the foreign model.
+
+    These extra attributes cannot be overridden unless the field that defines
+    it is changed or removed so that it no longer defines the extra attribute.
 
 Overriding fields in a parent model leads to difficulties in areas such as
 initializing new instances (specifying which field is being initialized in

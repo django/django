@@ -399,6 +399,7 @@ Models
 * :attr:`~django.db.models.ForeignKey.related_query_name` now supports
   app label and class interpolation using the ``'%(app_label)s'`` and
   ``'%(class)s'`` strings.
+* Allowed overriding model fields inherited from abstract base classes.
 
 * The :func:`~django.db.models.prefetch_related_objects` function is now a
   public API.
