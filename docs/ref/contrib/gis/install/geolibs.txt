@@ -5,7 +5,7 @@ Installing Geospatial libraries
 GeoDjango uses and/or provides interfaces for the following open source
 geospatial libraries:
 
-========================  ====================================  ================================  ============================
+========================  ====================================  ================================  ===================================
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ===================================
 :doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.4, 3.3
