@@ -110,6 +110,28 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=';'))
         self.assertEqual(values, {'stringagg': ''})
 
+    def test_string_agg_distinct_false(self):
+        AggregateTestModel.objects.all().delete()
+        AggregateTestModel.objects.create(char_field='Foo')
+        AggregateTestModel.objects.create(char_field='Foo')
+        AggregateTestModel.objects.create(char_field='Bar')
+        models = AggregateTestModel.objects.order_by('char_field')
+        values = models.aggregate(stringagg=StringAgg('char_field', delimiter=' ', distinct=False))
+        aggregates = values['stringagg']
+        self.assertEqual(aggregates.count('Foo'), 2)
+        self.assertEqual(aggregates.count('Bar'), 1)
+
+    def test_string_agg_distinct_true(self):
+        AggregateTestModel.objects.all().delete()
+        AggregateTestModel.objects.create(char_field='Foo')
+        AggregateTestModel.objects.create(char_field='Foo')
+        AggregateTestModel.objects.create(char_field='Bar')
+        models = AggregateTestModel.objects.order_by('char_field')
+        values = models.aggregate(stringagg=StringAgg('char_field', delimiter=' ', distinct=True))
+        aggregates = values['stringagg']
+        self.assertEqual(aggregates.count('Foo'), 1)
+        self.assertEqual(aggregates.count('Bar'), 1)
+
 
 class TestStatisticsAggregate(PostgreSQLTestCase):
     @classmethod
