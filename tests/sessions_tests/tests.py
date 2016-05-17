@@ -31,7 +31,9 @@ from django.test import (
     RequestFactory, TestCase, ignore_warnings, override_settings,
 )
 from django.test.utils import patch_logger
+from django.urls import reverse
 from django.utils import six, timezone
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.six.moves import http_cookies
 
@@ -631,6 +633,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertIsNotNone(caches['default'].get(self.session.cache_key))
 
 
+@override_settings(ROOT_URLCONF='sessions_tests.urls')
 class SessionMiddlewareTests(TestCase):
 
     @override_settings(SESSION_COOKIE_SECURE=True)
@@ -830,6 +833,20 @@ class SessionMiddlewareTests(TestCase):
             str(response.cookies)
         )
         self.assertEqual(response['Vary'], 'Cookie')
+
+    def test_view_raises_exception(self):
+        """
+        If a view that raises an Http404 modifies a session, the updates should
+        be saved.
+        """
+        response = self.client.get(reverse('http404-with-session-modify'))
+        self.assertTrue(response.cookies.items())
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    @override_settings(MIDDLEWARE_CLASSES=['django.contrib.sessions.middleware.SessionMiddleware'], MIDDLEWARE=None)
+    def test_view_raises_exception_middleware_classes(self):
+        response = self.client.get(reverse('http404-with-session-modify'))
+        self.assertTrue(response.cookies.items())
 
 
 # Don't need DB flushing for these tests, so can use unittest.TestCase as base class

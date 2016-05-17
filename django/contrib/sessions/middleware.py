@@ -3,21 +3,26 @@ from importlib import import_module
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
+from django.middleware.exception import ExceptionMiddleware
 from django.shortcuts import redirect
 from django.utils.cache import patch_vary_headers
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import cookie_date
 
 
-class SessionMiddleware(MiddlewareMixin):
+class SessionMiddleware(ExceptionMiddleware):
     def __init__(self, get_response=None):
-        self.get_response = get_response
         engine = import_module(settings.SESSION_ENGINE)
         self.SessionStore = engine.SessionStore
+        super(SessionMiddleware, self).__init__(get_response)
 
     def process_request(self, request):
         session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
         request.session = self.SessionStore(session_key)
+
+    def __call__(self, request):
+        self.process_request(request)
+        response = super(SessionMiddleware, self).__call__(request)
+        return self.process_response(request, response)
 
     def process_response(self, request, response):
         """
