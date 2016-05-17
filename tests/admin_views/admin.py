@@ -841,13 +841,21 @@ class WorkerAdmin(admin.ModelAdmin):
 
 class WorkerInlineAdmin(admin.TabularInline):
     model = Worker
+    extra = 0
 
     def view_on_site(self, obj):
         return '/worker_inline/%s/%s/' % (obj.surname, obj.name)
 
 
+class ExtraWorkerInlineAdmin(WorkerInlineAdmin):
+    extra = 1
+
+    def get_formset_initial_data(self, request):
+        return [{'name': 'overridden_inline_value'}]
+
+
 class RestaurantAdmin(admin.ModelAdmin):
-    inlines = [WorkerInlineAdmin]
+    inlines = [WorkerInlineAdmin, ExtraWorkerInlineAdmin]
     view_on_site = False
 
     def get_changeform_initial_data(self, request):

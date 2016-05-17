@@ -1812,6 +1812,8 @@ class ModelAdmin(BaseModelAdmin):
                     'files': request.FILES,
                     'save_as_new': '_saveasnew' in request.POST
                 })
+            elif not change:
+                formset_params['initial'] = inline.get_formset_initial_data(request)
             formsets.append(FormSet(**formset_params))
             inline_instances.append(inline)
         return formsets, inline_instances
@@ -1992,6 +1994,13 @@ class InlineModelAdmin(BaseModelAdmin):
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
         return super(InlineModelAdmin, self).has_delete_permission(request, obj)
+
+    def get_formset_initial_data(self, request):
+        """
+        Get the initial formset data.
+        Unless overridden, this does not provide any initial data.
+        """
+        return None
 
 
 class StackedInline(InlineModelAdmin):
