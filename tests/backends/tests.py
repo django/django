@@ -2,6 +2,7 @@
 # Unit and doctests for specific database backends.
 from __future__ import unicode_literals
 
+import copy
 import datetime
 import re
 import threading
@@ -16,6 +17,9 @@ from django.db import (
     reset_queries, transaction,
 )
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.base.creation import (
+    TEST_DATABASE_PREFIX, BaseDatabaseCreation,
+)
 from django.db.backends.postgresql import version as pg_version
 from django.db.backends.signals import connection_created
 from django.db.backends.utils import CursorWrapper, format_number
@@ -43,6 +47,43 @@ class DummyBackendTest(SimpleTestCase):
         self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'], 'django.db.backends.dummy')
         with self.assertRaises(ImproperlyConfigured):
             conns[DEFAULT_DB_ALIAS].ensure_connection()
+
+
+class TestsFrameworkMultipleDBHandling(SimpleTestCase):
+
+    def get_connection_copy(self):
+        # Get a copy of the default connection. Modifying a copy of django.db.connection will
+        # modify the default connection itself because it wrapped by DefaultConnectionProxy.
+        from django.db import connections
+        test_connection = copy.copy(connections[DEFAULT_DB_ALIAS])
+        test_connection.settings_dict = copy.copy(connections[DEFAULT_DB_ALIAS].settings_dict)
+
+        return test_connection
+
+    def test_default_name(self):
+        # validate test db signature when no test db name is explicitly set
+        prod_name = 'hodor'
+        test_connection = self.get_connection_copy()
+        test_connection.settings_dict['NAME'] = prod_name
+        test_connection.settings_dict['TEST'] = {'NAME': None}
+        signature = BaseDatabaseCreation(test_connection).test_db_signature()
+        self.assertEqual(signature[3], TEST_DATABASE_PREFIX + prod_name)
+
+    def test_custom_test_name(self):
+        # validate test db signature when a regular test db name is set
+        test_name = 'hodor'
+        test_connection = self.get_connection_copy()
+        test_connection.settings_dict['TEST'] = {'NAME': test_name}
+        signature = BaseDatabaseCreation(test_connection).test_db_signature()
+        self.assertEqual(signature[3], test_name)
+
+    def test_custom_test_name_with_test_prefix(self):
+        # validate test db signature when a test db name prefixed with TEST_DATABASE_PREFIX is set
+        test_name = TEST_DATABASE_PREFIX + 'hodor'
+        test_connection = self.get_connection_copy()
+        test_connection.settings_dict['TEST'] = {'NAME': test_name}
+        signature = BaseDatabaseCreation(test_connection).test_db_signature()
+        self.assertEqual(signature[3], test_name)
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', "Test only for Oracle")

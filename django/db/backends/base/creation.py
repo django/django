@@ -295,9 +295,10 @@ class BaseDatabaseCreation(object):
         accordingly to the RDBMS particularities.
         """
         settings_dict = self.connection.settings_dict
+
         return (
             settings_dict['HOST'],
             settings_dict['PORT'],
             settings_dict['ENGINE'],
-            settings_dict['NAME']
+            self._get_test_db_name()
         )
