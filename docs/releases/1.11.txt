@@ -169,7 +169,8 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`loaddata --exclude` option allows excluding models and apps
+  while loading data from fixtures.
 
 Migrations
 ~~~~~~~~~~

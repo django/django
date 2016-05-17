@@ -20,7 +20,7 @@ from django.test import (
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .models import Article, ProxySpy, Spy, Tag, Visa
+from .models import Article, Category, ProxySpy, Spy, Tag, Visa
 
 
 class TestCaseFixtureLoadingTests(TestCase):
@@ -370,7 +370,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['foo_app'])
 
         # Excluding a bogus model should throw an error
-        with self.assertRaisesMessage(management.CommandError, "Unknown model in excludes: fixtures.FooModel"):
+        with self.assertRaisesMessage(management.CommandError, "Unknown model: fixtures.FooModel"):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
 
     @unittest.skipIf(sys.platform.startswith('win'), "Windows doesn't support '?' in filenames.")
@@ -649,6 +649,30 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             'Prince</field></object></django-objects>',
             format='xml', natural_foreign_keys=True
         )
+
+    def test_loading_with_exclude_app(self):
+        Site.objects.all().delete()
+        management.call_command('loaddata', 'fixture1', exclude=['fixtures'], verbosity=0)
+        self.assertFalse(Article.objects.exists())
+        self.assertFalse(Category.objects.exists())
+        self.assertQuerysetEqual(Site.objects.all(), ['<Site: example.com>'])
+
+    def test_loading_with_exclude_model(self):
+        Site.objects.all().delete()
+        management.call_command('loaddata', 'fixture1', exclude=['fixtures.Article'], verbosity=0)
+        self.assertFalse(Article.objects.exists())
+        self.assertQuerysetEqual(Category.objects.all(), ['<Category: News Stories>'])
+        self.assertQuerysetEqual(Site.objects.all(), ['<Site: example.com>'])
+
+    def test_exclude_option_errors(self):
+        """Excluding a bogus app or model should raise an error."""
+        msg = "No installed app with label 'foo_app'."
+        with self.assertRaisesMessage(management.CommandError, msg):
+            management.call_command('loaddata', 'fixture1', exclude=['foo_app'], verbosity=0)
+
+        msg = "Unknown model: fixtures.FooModel"
+        with self.assertRaisesMessage(management.CommandError, msg):
+            management.call_command('loaddata', 'fixture1', exclude=['fixtures.FooModel'], verbosity=0)
 
 
 class NonExistentFixtureTests(TestCase):
