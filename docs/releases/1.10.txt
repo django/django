@@ -89,6 +89,9 @@ Minor features
 * Added "No date" and "Has date" choices for ``DateFieldListFilter`` if the
   field is nullable.
 
+* The jQuery library embedded in the admin is upgraded from version 2.1.4 to
+  2.2.3.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
