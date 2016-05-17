@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
-from django.test import TestCase, modify_settings, override_settings
+from django.test import Client, TestCase, modify_settings, override_settings
 from django.test.utils import ignore_warnings
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -265,6 +265,18 @@ class CustomHeaderRemoteUserTest(RemoteUserTest):
         'auth_tests.test_remote_user.CustomHeaderMiddleware'
     )
     header = 'HTTP_AUTHUSER'
+
+
+class CustomVarClient(Client):
+    def __init__(self, *args, **defaults):
+        defaults = defaults.copy()
+        defaults.update({'DJANGO_REMOTE_USER_VAR': 'HTTP_X_REMOTE_USER'})
+        super(CustomVarClient, self).__init__(*args, **defaults)
+
+
+class CustomVarRemoteUserTest(RemoteUserTest):
+    client_class = CustomVarClient
+    header = 'HTTP_X_REMOTE_USER'
 
 
 class PersistentRemoteUserTest(RemoteUserTest):

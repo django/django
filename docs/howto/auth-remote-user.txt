@@ -104,6 +104,10 @@ If your authentication mechanism uses a custom HTTP header and not
     start with ``HTTP_`` in ``request.META`` can only be set by your WSGI
     server, not directly from an HTTP request header.
 
+Alternatively, the name of the environment variable that is used as source
+of the user name can be changed by environment variable
+``DJANGO_REMOTE_USER_VAR``, to override the default ``REMOTE_USER`` value.
+
 If you need more control, you can create your own authentication backend
 that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
 override one or more of its attributes and methods.

@@ -46,7 +46,10 @@ Minor features
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The source of user name of authenticated user in
+  :class:`~django.contrib.auth.middleware.RemoteUserMiddleware` and
+  it subclasses can now be set with ``DJANGO_REMOTE_USER_VAR`` environment
+  variable if the default value ``REMOTE_USER`` needs to be overridden.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
