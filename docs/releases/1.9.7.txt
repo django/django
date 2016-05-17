@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed a regression causing the cached template loader to crash when using
   lazy template names (:ticket:`26603`).
+
+* GIS geometries are now deconstructible and therefore work better with
+  Migrations (:ticket:`26333`).
