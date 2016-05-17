@@ -617,12 +617,11 @@ class BaseDatabaseWrapper(object):
 
     def run_and_clear_commit_hooks(self):
         self.validate_no_atomic_block()
-        try:
-            while self.run_on_commit:
-                sids, func = self.run_on_commit.pop(0)
-                func()
-        finally:
-            self.run_on_commit = []
+        current_run_on_commit = self.run_on_commit
+        self.run_on_commit = []
+        while current_run_on_commit:
+            sids, func = current_run_on_commit.pop(0)
+            func()
 
     def copy(self, alias=None, allow_thread_sharing=None):
         """
