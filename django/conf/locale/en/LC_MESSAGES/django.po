@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -241,8 +241,8 @@ msgstr ""
 msgid "Burmese"
 msgstr ""
 
-#: conf/global_settings.py:106
-msgid "Norwegian Bokmal"
+#: conf/global_settings.py:113
+msgid "Norwegian Bokmål"
 msgstr ""
 
 #: conf/global_settings.py:107
@@ -371,10 +371,6 @@ msgstr ""
 
 #: contrib/syndication/apps.py:7
 msgid "Syndication"
-msgstr ""
-
-#: contrib/webdesign/apps.py:7
-msgid "Web Design"
 msgstr ""
 
 #: core/validators.py:33
@@ -529,7 +525,11 @@ msgstr ""
 msgid "'%(value)s' value must be an integer."
 msgstr ""
 
-#: db/models/fields/__init__.py:1009
+#: db/models/fields/__init__.py:960 db/models/fields/__init__.py:1849
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:972
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr ""
@@ -620,11 +620,7 @@ msgstr ""
 msgid "Floating point number"
 msgstr ""
 
-#: db/models/fields/__init__.py:1901
-msgid "Big (8 byte) integer"
-msgstr ""
-
-#: db/models/fields/__init__.py:1916
+#: db/models/fields/__init__.py:1864
 msgid "IPv4 address"
 msgstr ""
 
@@ -714,7 +710,17 @@ msgstr ""
 msgid "One-to-one relationship"
 msgstr ""
 
-#: db/models/fields/related.py:1100
+#: db/models/fields/related.py:1049
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#: db/models/fields/related.py:1050
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
+#: db/models/fields/related.py:1092
 msgid "Many-to-many relationship"
 msgstr ""
 

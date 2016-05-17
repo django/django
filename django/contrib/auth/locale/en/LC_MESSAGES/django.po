@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -142,7 +142,27 @@ msgstr ""
 msgid "hash"
 msgstr ""
 
-#: contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:347
+msgid "variety"
+msgstr ""
+
+#: contrib/auth/hashers.py:348
+msgid "version"
+msgstr ""
+
+#: contrib/auth/hashers.py:349
+msgid "memory cost"
+msgstr ""
+
+#: contrib/auth/hashers.py:350
+msgid "time cost"
+msgstr ""
+
+#: contrib/auth/hashers.py:351
+msgid "parallelism"
+msgstr ""
+
+#: contrib/auth/hashers.py:445
 msgid "work factor"
 msgstr ""
 
@@ -206,17 +226,11 @@ msgstr ""
 msgid "username"
 msgstr ""
 
-#: contrib/auth/models.py:308
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+#: contrib/auth/models.py:313
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 
-#: contrib/auth/models.py:312
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-
-#: contrib/auth/models.py:317
+#: contrib/auth/models.py:316
 msgid "A user with that username already exists."
 msgstr ""
 
@@ -310,7 +324,19 @@ msgstr ""
 msgid "Password reset on %(site_name)s"
 msgstr ""
 
-#: contrib/auth/views.py:125
+#: contrib/auth/validators.py:13
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+#: contrib/auth/validators.py:23
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+
+#: contrib/auth/views.py:133
 msgid "Logged out"
 msgstr ""
 
