@@ -661,9 +661,10 @@ class StateTests(SimpleTestCase):
         project_state = ProjectState()
         project_state.add_model(ModelState.from_model(Book))
         msg = (
-            "Unhandled pending operations for models:\n"
-            "  migrations.author (referred to by fields: migrations.Book.author)\n"
-            "  migrations.publisher (referred to by fields: migrations.Book.publisher)"
+            "The field migrations.Book.author was declared with a lazy reference "
+            "to 'migrations.author', but app 'migrations' doesn't provide model 'author'.\n"
+            "The field migrations.Book.publisher was declared with a lazy reference "
+            "to 'migrations.publisher', but app 'migrations' doesn't provide model 'publisher'."
         )
         with self.assertRaisesMessage(ValueError, msg):
             project_state.apps
@@ -672,9 +673,10 @@ class StateTests(SimpleTestCase):
         project_state = ProjectState()
         project_state.add_model(ModelState.from_model(Magazine))
         msg = (
-            "Unhandled pending operations for models:\n"
-            "  migrations.author (referred to by fields: "
-            "migrations.Magazine.authors, migrations.Magazine_authors.author)"
+            "The field migrations.Magazine.authors was declared with a lazy reference "
+            "to 'migrations.author\', but app 'migrations' doesn't provide model 'author'.\n"
+            "The field migrations.Magazine_authors.author was declared with a lazy reference "
+            "to \'migrations.author\', but app 'migrations' doesn't provide model 'author'."
         )
         with self.assertRaisesMessage(ValueError, msg):
             project_state.apps
@@ -682,10 +684,14 @@ class StateTests(SimpleTestCase):
         # And now with multiple models and multiple fields.
         project_state.add_model(ModelState.from_model(Book))
         msg = (
-            "Unhandled pending operations for models:\n"
-            "  migrations.author (referred to by fields: migrations.Book.author, "
-            "migrations.Magazine.authors, migrations.Magazine_authors.author)\n"
-            "  migrations.publisher (referred to by fields: migrations.Book.publisher)"
+            "The field migrations.Book.author was declared with a lazy reference "
+            "to 'migrations.author', but app 'migrations' doesn't provide model 'author'.\n"
+            "The field migrations.Book.publisher was declared with a lazy reference "
+            "to 'migrations.publisher', but app 'migrations' doesn't provide model 'publisher'.\n"
+            "The field migrations.Magazine.authors was declared with a lazy reference "
+            "to 'migrations.author', but app 'migrations' doesn't provide model 'author'.\n"
+            "The field migrations.Magazine_authors.author was declared with a lazy reference "
+            "to 'migrations.author', but app 'migrations' doesn't provide model 'author'."
         )
         with self.assertRaisesMessage(ValueError, msg):
             project_state.apps

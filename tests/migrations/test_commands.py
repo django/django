@@ -449,6 +449,12 @@ class MigrateTests(MigrationTestBase):
         """
         call_command("migrate", "migrated_unapplied_app", stdout=six.StringIO())
 
+        # unmigrated_app.SillyModel has a foreign key to 'migrations.Tribble',
+        # but that model is only defined in a migration, so the global app
+        # registry never sees it and the reference is left dangling. Remove it
+        # to avoid problems in subsequent tests.
+        del apps._pending_operations[('migrations', 'tribble')]
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_migrate_record_replaced(self):
         """
