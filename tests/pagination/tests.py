@@ -1,3 +1,20 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Gist
+ @EmadMokhtar
+ Unwatch 1
+  Star 0
+ Fork 7,981 EmadMokhtar/django
+forked from django/django
+ Code  Pull requests 0  Pulse  Graphs  Settings
+Tree: 0e571e909e Find file Copy pathdjango/tests/pagination/tests.py
+5cbb1f9  13 days ago
+@EmadMokhtar EmadMokhtar Solve flask8 and isort errors
+12 contributors @EmadMokhtar @alasdairnicol @timgraham @apollo13 @hramezani @mmardini @rhcarvalho @claudep @berkerpeksag @aaugustin @zedr @andrewjesaitis
+RawBlameHistory     329 lines (301 sloc)  13.4 KB
 from __future__ import unicode_literals
 
 import unittest
@@ -259,7 +276,6 @@ class ModelPaginationTests(TestCase):
     def test_first_page(self):
         paginator = Paginator(Article.objects.order_by('id'), 5)
         p = paginator.page(1)
-
         self.assertEqual("<Page 1 of 2>", six.text_type(p))
         self.assertQuerysetEqual(p.object_list, [
             "<Article: Article 1>",

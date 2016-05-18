@@ -115,9 +115,7 @@ sitemaps_lastmod_descending = OrderedDict([
 ])
 
 generic_sitemaps = {
-    'generic': GenericSitemap({'queryset': TestModel.objects
-                                                    .order_by('pk')
-                                                    .all()}),
+    'generic': GenericSitemap({'queryset': TestModel.objects.order_by('pk').all()}),
 }
 
 
