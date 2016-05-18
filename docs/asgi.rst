@@ -111,10 +111,10 @@ this is necessary to achieve this restriction.
 In order to aid with scaling and network architecture, a distinction
 is made between channels that have multiple readers (such as the
 ``http.request`` channel that web applications would listen on from every
-application worker process) and *single-reader channels*
+application worker process) and *process-specific channels*
 (such as a ``http.response!ABCDEF`` channel tied to a client socket).
 
-*Single-reader channel* names contain an exclamation mark
+*Process-specific channel* names contain an exclamation mark
 (``!``) character in order to indicate to the channel layer that it may
 have to route the data for these channels differently to ensure it reaches the
 single process that needs it; these channels are nearly always tied to
@@ -122,14 +122,16 @@ incoming connections from the outside world. The ``!`` is always preceded by
 the main channel name (e.g. ``http.response``) and followed by the
 per-client/random portion - channel layers can split on the ``!`` and use just
 the right hand part to route if they desire, or can ignore it if they don't
-need to use different routing rules.
+need to use different routing rules. Even if the right hand side contains
+client routing information, it must still contain random parts too so that
+each call to ``new_channel`` returns a new, unused name.
 
 Messages should expire after a set time sitting unread in a channel;
 the recommendation is one minute, though the best value depends on the
 channel layer and the way it is deployed.
 
 The maximum message size is 1MB; if more data than this needs to be transmitted
-it should be chunked or placed onto its own single-reader channel (see how
+it must be chunked or placed onto its own process-specific channel (see how
 HTTP request bodies are done, for example). All channel layers must support
 messages up to this size.
 
@@ -218,7 +220,7 @@ on a periodic basis.
 
 How this garbage collection happens is not specified here, as it depends on
 the internal implementation of the channel layer. The recommended approach,
-however, is when a message on a single-listener channel expires, the channel
+however, is when a message on a process-specific channel expires, the channel
 layer should remove that channel from all groups it's currently a member of;
 this is deemed an acceptable indication that the channel's listener is gone.
 
@@ -291,19 +293,20 @@ A *channel layer* must provide an object with these attributes
   or ``(channel, message)`` if a message is available. If ``block`` is True, then
   it will not return until after a built-in timeout or a message arrives; if
   ``block`` is false, it will always return immediately. It is perfectly
-  valid to ignore ``block`` and always return immediately. If ``block`` is True,
-  there must be a finite timeout before this returns ``(None, None)`` and that
-  timeout must be less than sixty seconds (preferably around five).
+  valid to ignore ``block`` and always return immediately, or after a delay;
+  ``block`` means that the call can take as long as it likes before returning
+  a message or nothing, not that it must block until it gets one.
 
 * ``new_channel(pattern)``, a callable that takes a unicode string pattern,
   and returns a new valid channel name that does not already exist, by
-  adding a single random unicode string after the ``!`` character in ``pattern``,
+  adding a unicode string after the ``!`` character in ``pattern``,
   and checking for existence of that name in the channel layer. The ``pattern``
-  MUST end with ``!`` or this function must error. This is NOT called prior to
-  a message being sent on a channel, and should not be used for channel
-  initialization, and is also not guaranteed to be called by the same channel
-  client that then reads the messages, so you cannot put process identifiers in
-  it for routing.
+  MUST end with ``!`` or this function must error. This is not always called
+  prior to a message being sent on a channel, and cannot be used for
+  channel initialization. ``new_channel`` must be called on the same channel
+  layer that intends to read the channel with ``receive_many``; any other
+  channel layer instance may not receive messages on this channel due to
+  client-routing portions of the appended string.
 
 * ``MessageTooLarge``, the exception raised when a send operation fails
   because the encoded message is over the layer's size limit.
@@ -514,10 +517,10 @@ Keys:
   Header names must be lowercased.
 
 * ``body``: Body of the request, as a byte string. Optional, defaults to ``""``.
-  If ``body_channel`` is set, treat as start of body and concatenate
+  If ``more_body`` is set, treat as start of body and concatenate
   on further chunks.
 
-* ``body_channel``: Single-reader channel name that contains
+* ``more_body``: Channel name that contains
   Request Body Chunk messages representing a large request body.
   Optional, defaults to ``None``. Chunks append to ``body`` if set. Presence of
   a channel indicates at least one Request Body Chunk message needs to be read,
@@ -683,10 +686,11 @@ Keys:
   is mounted at; same as ``SCRIPT_NAME`` in WSGI. Optional, defaults
   to empty string.
 
-* ``headers``: Dict of ``{name: value}``, where ``name`` is the lowercased
-  HTTP header name as byte string and ``value`` is the header value as a byte
-  string. If multiple headers with the same name are received, they should
-  be concatenated into a single header as per .
+* ``headers``: List of ``[name, value]``, where ``name`` is the
+  header name as byte string and ``value`` is the header value as a byte
+  string. Order should be preserved from the original HTTP request;
+  duplicates are possible and must be preserved in the message as received.
+  Header names must be lowercased.
 
 * ``client``: List of ``[host, port]`` where ``host`` is a unicode string of the
   remote host's IPv4 or IPv6 address, and ``port`` is the remote port as an
@@ -964,7 +968,7 @@ limitation that they only use the following characters:
 * Hyphen ``-``
 * Underscore ``_``
 * Period ``.``
-* Exclamation mark ``!`` (only to deliniate single-reader channel names,
+* Exclamation mark ``!`` (only to deliniate process-specific channel names,
   and only one per name)
 
 
