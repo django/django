@@ -39,8 +39,7 @@ class TokenGeneratorTest(TestCase):
         """
         # See ticket #26615
         username = 'changeemailuser'
-        user = User.objects.create_user(
-            username, 'test4@example.com', 'testpw')
+        user = User.objects.create_user(username, 'test4@example.com', 'testpw')
         p0 = PasswordResetTokenGenerator()
         tk1 = p0.make_token(user)
         user.email = 'test4newemail@example.com'
