@@ -144,7 +144,7 @@ ASGI messages represent two main things - internal application events
 uploaded videos), and protocol events to/from connected clients.
 
 As such, this specification outlines encodings to and from ASGI messages
-for three common protocols (HTTP, WebSocket and raw UDP); this allows any ASGI
+for HTTP and WebSocket; this allows any ASGI
 web server to talk to any ASGI web application, as well as servers and
 applications for any other protocol with a common specification. It is
 recommended that if other protocols become commonplace they should gain
@@ -768,129 +768,6 @@ A maximum of one of ``bytes`` or ``text`` may be provided. If both are
 provided, the protocol server should ignore the message entirely.
 
 
-Email
------
-
-Represents emails sent or received, likely over the SMTP protocol though that
-is not directly specified here (a protocol server could in theory deliver
-or receive email over HTTP to some external service, for example). Generally
-adheres to RFC 5322 as much as possible.
-
-As emails have no concept of a session and there's no trustable socket or
-author model, the send and receive channels are both multi-listener, and
-there is no ``reply_channel`` on any message type. If you want to persist
-data across different email receive consumers, you should decide what part
-of the message to use for an identifier (from address? to address? subject?
-thread id?) and provide the persistence yourself.
-
-The protocol server should handle encoding of headers by itself, understanding
-RFC 1342 format headers and decoding them into unicode upon receive, and 
-encoding outgoing emails similarly (preferably using UTF-8).
-
-
-Receive
-'''''''
-
-Sent when an email is received.
-
-Channel: ``email.receive``
-
-Keys:
-
-* ``from``: Unicode string specifying the return-path of the email as specified
-  in the SMTP envelope. Will be ``None`` if no return path was provided.
-
-* ``to``: List of unicode strings specifying the recipients requested in the
-  SMTP envelope using ``RCPT TO`` commands. Will always contain at least one
-  value.
-
-* ``headers``: Dictionary of unicode string keys and unicode string values,
-  containing all headers, including ``subject``. Header names are all forced
-  to lower case. Header values are decoded from RFC 1342 if needed.
-
-* ``content``: Contains a content object (see section below) representing the
-  body of the message.
-
-Note that ``from`` and ``to`` are extracted from the SMTP envelope, and not
-from the headers inside the message; if you wish to get the header values,
-you should use ``headers['from']`` and ``headers['to']``; they may be different.
-
-
-Send
-''''
-
-Sends an email out via whatever transport 
-
-
-Content objects
-'''''''''''''''
-
-Used in both send and receive to represent the tree structure of a MIME
-multipart message tree.
-
-A content object is always a dict, containing at least the key:
-
-* ``content-type``: The unicode string of the content type for this section.
-
-Multipart content objects also have:
-
-* ``parts``: A list of content objects contained inside this multipart
-
-Any other type of object has:
-
-* ``body``: Byte string content of this part, decoded from any
-  ``Content-Transfer-Encoding`` if one was specified as a MIME header.
-
-
-UDP
----
-
-Raw UDP is included here as it is a datagram-based, unordered and unreliable
-protocol, which neatly maps to the underlying message abstraction. It is not
-expected that many applications would use the low-level protocol, but it may
-be useful for some.
-
-While it might seem odd to have reply channels for UDP as it is a stateless
-protocol, replies need to come from the same server as the messages were
-sent to, so the reply channel here ensures that reply packets from an ASGI
-stack do not come from a different protocol server to the one you sent the
-initial packet to.
-
-
-Receive
-'''''''
-
-Sent when a UDP datagram is received.
-
-Channel: ``udp.receive``
-
-Keys:
-
-* ``reply_channel``: Channel name for sending data, starts with ``udp.send!``
-
-* ``data``: Byte string of UDP datagram payload.
-
-* ``client``: List of ``[host, port]`` where ``host`` is a unicode string of the
-  remote host's IPv4 or IPv6 address, and ``port`` is the remote port as an
-  integer.
-
-* ``server``: List of ``[host, port]`` where ``host`` is the listening address
-  for this server as a unicode string, and ``port`` is the integer listening port.
-  Optional, defaults to ``None``.
-
-
-Send
-''''
-
-Sent to send out a UDP datagram to a client.
-
-Channel: ``udp.send!``
-
-Keys:
-
-* ``data``: Byte string of UDP datagram payload.
-
-
 Protocol Format Guidelines
 --------------------------
 
@@ -1056,3 +933,14 @@ Copyright
 =========
 
 This document has been placed in the public domain.
+
+
+Protocol Definitions
+====================
+
+
+.. toctree::
+   :maxdepth: 1
+
+   /asgi/email
+   /asgi/udp
