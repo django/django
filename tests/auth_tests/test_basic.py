@@ -3,23 +3,14 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
-from django.dispatch import receiver
 from django.test import TestCase, override_settings
-from django.test.signals import setting_changed
 from django.utils import translation
 
 from .models import CustomUser
-
-
-@receiver(setting_changed)
-def user_model_swapped(**kwargs):
-    if kwargs['setting'] == 'AUTH_USER_MODEL':
-        apps.clear_cache()
 
 
 class BasicTestCase(TestCase):
