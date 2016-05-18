@@ -318,14 +318,23 @@ class GenericRelation(ForeignObject):
         errors.extend(self._check_generic_foreign_key_existence())
         return errors
 
+    def _is_matching_generic_foreign_key(self, field):
+        """
+        Return True if field is a GenericForeignKey whose content type and
+        object id fields correspond to the equivalent attributes on this
+        GenericRelation.
+        """
+        return (
+            isinstance(field, GenericForeignKey) and
+            field.ct_field == self.content_type_field_name and
+            field.fk_field == self.object_id_field_name
+        )
+
     def _check_generic_foreign_key_existence(self):
         target = self.remote_field.model
         if isinstance(target, ModelBase):
             fields = target._meta.private_fields
-            if any(isinstance(field, GenericForeignKey) and
-                    field.ct_field == self.content_type_field_name and
-                    field.fk_field == self.object_id_field_name
-                    for field in fields):
+            if any(self._is_matching_generic_foreign_key(field) for field in fields):
                 return []
             else:
                 return [
@@ -401,20 +410,16 @@ class GenericRelation(ForeignObject):
         self.model = cls
         setattr(cls, self.name, ReverseGenericManyToOneDescriptor(self.remote_field))
 
-        # Add get_RELATED_order() and set_RELATED_order() methods if the model
-        # on the other end of this relation is ordered with respect to this.
-        def matching_gfk(field):
-            return (
-                isinstance(field, GenericForeignKey) and
-                self.content_type_field_name == field.ct_field and
-                self.object_id_field_name == field.fk_field
-            )
+        # Add get_RELATED_order() and set_RELATED_order() to the model this
+        # field belongs to, if the model on the other end of this relation
+        # is ordered with respect to its corresponding GenericForeignKey.
+        if not cls._meta.abstract:
 
-        def make_generic_foreign_order_accessors(related_model, model):
-            if matching_gfk(model._meta.order_with_respect_to):
-                make_foreign_order_accessors(model, related_model)
+            def make_generic_foreign_order_accessors(related_model, model):
+                if self._is_matching_generic_foreign_key(model._meta.order_with_respect_to):
+                    make_foreign_order_accessors(model, related_model)
 
-        lazy_related_operation(make_generic_foreign_order_accessors, self.model, self.remote_field.model)
+            lazy_related_operation(make_generic_foreign_order_accessors, self.model, self.remote_field.model)
 
     def set_attributes_from_rel(self):
         pass

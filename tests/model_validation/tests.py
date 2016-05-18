@@ -1,8 +1,10 @@
 from django.core import management
 from django.core.checks import Error, run_checks
+from django.core.checks.model_checks import _check_lazy_references
+from django.db import models
 from django.db.models.signals import post_init
 from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from django.test.utils import isolate_apps, override_settings
 from django.utils import six
 
 
@@ -12,6 +14,10 @@ class OnPostInit(object):
 
 
 def on_post_init(**kwargs):
+    pass
+
+
+def dummy_function(model):
     pass
 
 
@@ -54,3 +60,42 @@ class ModelValidationTest(SimpleTestCase):
         self.assertEqual(errors, expected)
 
         post_init.unresolved_references = unresolved_references
+
+    @isolate_apps('django.contrib.auth', kwarg_name='apps')
+    def test_lazy_reference_checks(self, apps):
+
+        class DummyModel(models.Model):
+            author = models.ForeignKey('Author', models.CASCADE)
+
+            class Meta:
+                app_label = "model_validation"
+
+        apps.lazy_model_operation(dummy_function, ('auth', 'imaginarymodel'))
+        apps.lazy_model_operation(dummy_function, ('fanciful_app', 'imaginarymodel'))
+
+        errors = _check_lazy_references(apps)
+
+        expected = [
+            Error(
+                "%r contains a lazy reference to auth.imaginarymodel, "
+                "but app 'auth' doesn't provide model 'imaginarymodel'." % dummy_function,
+                obj=dummy_function,
+                id='models.E022',
+            ),
+            Error(
+                "%r contains a lazy reference to fanciful_app.imaginarymodel, "
+                "but app 'fanciful_app' isn't installed." % dummy_function,
+                obj=dummy_function,
+                id='models.E022',
+            ),
+            Error(
+                "The field model_validation.DummyModel.author was declared "
+                "with a lazy reference to 'model_validation.author', but app "
+                "'model_validation' isn't installed.",
+                hint=None,
+                obj=DummyModel.author.field,
+                id='fields.E307',
+            ),
+        ]
+
+        self.assertEqual(errors, expected)
