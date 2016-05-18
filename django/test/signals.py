@@ -3,6 +3,7 @@ import threading
 import time
 import warnings
 
+from django.apps import apps
 from django.core.signals import setting_changed
 from django.db import connections, router
 from django.db.utils import ConnectionRouter
@@ -168,3 +169,9 @@ def auth_password_validators_changed(**kwargs):
     if kwargs['setting'] == 'AUTH_PASSWORD_VALIDATORS':
         from django.contrib.auth.password_validation import get_default_password_validators
         get_default_password_validators.cache_clear()
+
+
+@receiver(setting_changed)
+def user_model_swapped(**kwargs):
+    if kwargs['setting'] == 'AUTH_USER_MODEL':
+        apps.clear_cache()
