@@ -125,7 +125,8 @@ class AbstractBaseUser(models.Model):
 
     def get_hash_value(self, timestamp):
         """Returns the timestamped hash value for purposes of generating
-        a password reset token.
+        a password reset token; uses primary key, password, and, if
+        available, email address.
         """
         # Ensure results are consistent across DB backends
         login_timestamp = '' if self.last_login is None else self.last_login.replace(microsecond=0, tzinfo=None)

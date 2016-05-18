@@ -358,9 +358,6 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         return self.first_name
 
     def get_hash_value(self, timestamp):
-        """Returns the timestamped hash value for purposes of generating
-        a password reset token.
-        """
         # Class now has email field and hash should depend on it
         hash_value = super(AbstractUser, self).get_hash_value(timestamp)
         return hash_value + self.email
