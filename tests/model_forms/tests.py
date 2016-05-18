@@ -28,9 +28,10 @@ from .models import (
     CustomErrorMessage, CustomFF, CustomFieldForExclusionModel, DateTimePost,
     DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel,
     FlexibleDatePost, Homepage, ImprovedArticle, ImprovedArticleWithParentLink,
-    Inventory, Person, Photo, Post, Price, Product, Publication,
-    PublicationDefaults, StrictAssignmentAll, StrictAssignmentFieldSpecific,
-    Student, StumpJoke, TextFile, Triple, Writer, WriterProfile, test_images,
+    Inventory, NullableUniqueCharFieldModel, Person, Photo, Post, Price,
+    Product, Publication, PublicationDefaults, StrictAssignmentAll,
+    StrictAssignmentFieldSpecific, Student, StumpJoke, TextFile, Triple,
+    Writer, WriterProfile, test_images,
 )
 
 if test_images:
@@ -269,6 +270,21 @@ class ModelFormBaseTest(TestCase):
         self.assertTrue(form.is_valid())
         obj = form.save()
         self.assertEqual(obj.name, '')
+
+    def test_save_blank_null_unique_charfield_saves_null(self):
+        form_class = modelform_factory(model=NullableUniqueCharFieldModel, fields=['codename'])
+        empty_value = '' if connection.features.interprets_empty_strings_as_nulls else None
+
+        form = form_class(data={'codename': ''})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(form.instance.codename, empty_value)
+
+        # Save a second form to verify there isn't a unique constraint violation.
+        form = form_class(data={'codename': ''})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(form.instance.codename, empty_value)
 
     def test_missing_fields_attribute(self):
         message = (
@@ -800,10 +816,14 @@ class UniqueTest(TestCase):
         form.save()
         form = ExplicitPKForm({'key': 'key1', 'desc': ''})
         self.assertFalse(form.is_valid())
-        self.assertEqual(len(form.errors), 3)
-        self.assertEqual(form.errors['__all__'], ['Explicit pk with this Key and Desc already exists.'])
-        self.assertEqual(form.errors['desc'], ['Explicit pk with this Desc already exists.'])
-        self.assertEqual(form.errors['key'], ['Explicit pk with this Key already exists.'])
+        if connection.features.interprets_empty_strings_as_nulls:
+            self.assertEqual(len(form.errors), 1)
+            self.assertEqual(form.errors['key'], ['Explicit pk with this Key already exists.'])
+        else:
+            self.assertEqual(len(form.errors), 3)
+            self.assertEqual(form.errors['__all__'], ['Explicit pk with this Key and Desc already exists.'])
+            self.assertEqual(form.errors['desc'], ['Explicit pk with this Desc already exists.'])
+            self.assertEqual(form.errors['key'], ['Explicit pk with this Key already exists.'])
 
     def test_unique_for_date(self):
         p = Post.objects.create(

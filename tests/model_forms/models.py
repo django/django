@@ -483,3 +483,7 @@ class StrictAssignmentAll(models.Model):
 class Award(models.Model):
     name = models.CharField(max_length=30)
     character = models.ForeignKey(Character, models.SET_NULL, blank=False, null=True)
+
+
+class NullableUniqueCharFieldModel(models.Model):
+    codename = models.CharField(max_length=50, blank=True, null=True, unique=True)
