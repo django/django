@@ -361,12 +361,9 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         """Returns the timestamped hash value for purposes of generating
         a password reset token.
         """
-        # Ensure results are consistent across DB backends
-        login_timestamp = '' if self.last_login is None else self.last_login.replace(microsecond=0, tzinfo=None)
-        return (
-            six.text_type(self.pk) + self.password + self.email +
-            six.text_type(login_timestamp) + six.text_type(timestamp)
-        )
+        # Class now has email field and hash should depend on it
+        hash_value = super(AbstractUser, self).get_hash_value(timestamp)
+        return hash_value + self.email
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
