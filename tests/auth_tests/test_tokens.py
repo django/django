@@ -32,7 +32,7 @@ class TokenGeneratorTest(TestCase):
         tk2 = p0.make_token(reload)
         self.assertEqual(tk1, tk2)
 
-    def test_26615(self):
+    def test_token_invalid_on_email_change(self):
         """
         Ensure that the token generated for a user will fail if that user
         changes email addresses.
