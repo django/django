@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed a regression causing the cached template loader to crash when using
   lazy template names (:ticket:`26603`).
+
+* Fixed on_commit callbacks being executed in wrong order when callbacks
+  make transactions (:ticket:`26627`).
