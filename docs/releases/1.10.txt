@@ -103,11 +103,6 @@ Minor features
 * The jQuery library embedded in the admin is upgraded from version 2.1.4 to
   2.2.3.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -134,11 +129,6 @@ Minor features
 * The new ``redirect_authenticated_user`` parameter for the
   :func:`~django.contrib.auth.views.login` view allows redirecting
   authenticated users visiting the login page.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -197,32 +187,17 @@ Minor features
 * Added raster support for all :doc:`spatial lookups
   </ref/contrib/gis/geoquerysets>`.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * For convenience, :class:`~django.contrib.postgres.fields.HStoreField` now
   casts its keys and values to strings.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The :djadmin:`clearsessions` management command now removes file-based
   sessions.
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -238,11 +213,6 @@ Minor features
   which can now always use ``{% load static %}`` (instead of
   ``{% load staticfiles %}`` or ``{% load static from staticfiles %}``) and
   not worry about whether or not the ``staticfiles`` app is installed.
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 Cache
 ~~~~~
@@ -279,11 +249,6 @@ Database backends
   parameters of :meth:`Func.as_sql() <django.db.models.Func.as_sql>` for an
   example.
 
-Email
-~~~~~
-
-* ...
-
 File Storage
 ~~~~~~~~~~~~
 
@@ -298,11 +263,6 @@ File Storage
   <django.core.files.storage.Storage.generate_filename>` method makes it easier
   to implement custom storages that don't use the ``os.path`` calls previously
   in :class:`~django.db.models.FileField`.
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
 
 Forms
 ~~~~~
@@ -490,11 +450,6 @@ Serialization
 
 * The ``django.core.serializers.json.DjangoJSONEncoder`` now knows how to
   serialize lazy strings, typically used for translatable content.
-
-Signals
-~~~~~~~
-
-* ...
 
 Templates
 ~~~~~~~~~
