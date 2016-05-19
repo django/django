@@ -50,7 +50,7 @@ Sphinx -- ``pip install Sphinx`` should do the trick.
 
 .. note::
 
-    Building the Django documentation requires Sphinx 1.0.2 or newer. Sphinx
+    Building the Django documentation requires Sphinx 1.3.4 or newer. Sphinx
     also requires the Pygments__ library for syntax highlighting; building the
     Django documentation requires Pygments 1.1 or newer (a new-enough version
     should automatically be installed along with Sphinx).
