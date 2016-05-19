@@ -1,8 +1,8 @@
 Cross-Compatibility
 ===================
 
-Channels is being released as both a third-party app for Django 1.8 and 1.9,
-and being integrated into Django in 1.10. Both of these implementations are
+Channels is being released as both a third-party app for Django 1.8 through 1.10,
+and being integrated into Django in future. Both of these implementations will be
 very similar, and code for one will work on the other with minimal changes.
 
 The only difference between the two is the import paths. Mostly, where you
@@ -19,8 +19,8 @@ Becomes::
     from django.channels import Channel
     from django.channels.auth import channel_session_user
 
-There are a few exceptions to this rule, where classes were moved to other parts
-of Django in 1.10 that made more sense:
+There are a few exceptions to this rule, where classes will be moved to other parts
+of Django in that make more sense:
 
 * ``channels.tests.ChannelTestCase`` is found under ``django.test.channels.ChannelTestCase``
 * ``channels.handler`` is moved to ``django.core.handlers.asgi``

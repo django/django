@@ -126,10 +126,31 @@ whatever you store in must be **network-transparent** - storing things in a
 global variable won't work outside of development.
 
 
+How do I talk to Channels from my non-Django application?
+---------------------------------------------------------
+
+If you have an external server or script you want to talk to Channels, you have
+a few choices:
+
+* If it's a Python program, and you've made an ``asgi.py`` file for your project
+  (see :doc:`deploying`), you can import the channel layer directly as
+  ``yourproject.asgi.channel_layer`` and call ``send()`` and ``receive_many()``
+  on it directly. See the :doc:`ASGI spec <asgi>` for the API the channel layer
+  presents.
+
+* If you just need to send messages in when events happen, you can make a
+  management command that calls ``Channel("namehere").send({...})``
+  so your external program can just call
+  ``manage.py send_custom_event`` (or similar) to send a message. Remember, you
+  can send onto channels from any code in your project.
+
+* If neither of these work, you'll have to communicate with Django over
+  HTTP, WebSocket, or another protocol that your project talks, as normal.
+
 
 Are channels Python 2, 3 or 2+3?
 --------------------------------
 
-Django-channels and all of its dependencies are 2+3 (2.7, 3.4+). Compatibility may change with time. If in doubt, refer to the ``.travis.yml`` configuration file to see which Python versions that are included in CI testing.
-
-This includes Twisted, for which the used subsets of the library used by Daphne are all py3k ready.
+Django-channels and all of its dependencies are compatible with Python 2.7,
+3.3, and higher. This includes the parts of Twisted that some of the Channels
+packages (like daphne) use.
