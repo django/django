@@ -48,15 +48,6 @@ __ http://docutils.sourceforge.net/
 To actually build the documentation locally, you'll currently need to install
 Sphinx -- ``pip install Sphinx`` should do the trick.
 
-.. note::
-
-    Building the Django documentation requires Sphinx 1.0.2 or newer. Sphinx
-    also requires the Pygments__ library for syntax highlighting; building the
-    Django documentation requires Pygments 1.1 or newer (a new-enough version
-    should automatically be installed along with Sphinx).
-
-__ http://pygments.org
-
 Then, building the HTML is easy; just ``make html`` (or ``make.bat html`` on
 Windows) from the ``docs`` directory.
 
