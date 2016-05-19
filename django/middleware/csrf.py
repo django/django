@@ -20,7 +20,6 @@ from django.utils.http import is_same_domain
 from django.utils.six.moves import zip
 from django.utils.six.moves.urllib.parse import urlparse
 
-
 logger = logging.getLogger('django.request')
 
 REASON_NO_REFERER = "Referer checking failed - no Referer."
