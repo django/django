@@ -449,7 +449,7 @@ a subclass of dictionary. Exceptions are outlined here:
         >>> q.getlist('a')
         ['1', '2']
         >>> q['a'] # returns the last
-        ['2']
+        '2'
 
 .. method:: QueryDict.items()
 
