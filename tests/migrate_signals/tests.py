@@ -2,7 +2,7 @@ from django.apps import apps
 from django.core import management
 from django.db import migrations
 from django.db.models import signals
-from django.test import TestCase, override_settings
+from django.test import TransactionTestCase, override_settings
 from django.utils import six
 
 APP_CONFIG = apps.get_app_config('migrate_signals')
@@ -57,7 +57,7 @@ pre_migrate_receiver = OneTimeReceiver(signals.pre_migrate)
 post_migrate_receiver = OneTimeReceiver(signals.post_migrate)
 
 
-class MigrateSignalTests(TestCase):
+class MigrateSignalTests(TransactionTestCase):
 
     available_apps = ['migrate_signals']
 
