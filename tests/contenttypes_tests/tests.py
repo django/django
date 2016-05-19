@@ -454,7 +454,11 @@ class ContentTypesMultidbTestCase(TestCase):
     MIGRATION_MODULES=dict(settings.MIGRATION_MODULES, contenttypes_tests='contenttypes_tests.operations_migrations'),
 )
 class ContentTypeOperationsTests(TransactionTestCase):
-    available_apps = ['django.contrib.contenttypes', 'contenttypes_tests']
+    available_apps = [
+        'contenttypes_tests',
+        'django.contrib.contenttypes',
+        'django.contrib.auth',
+    ]
 
     def setUp(self):
         app_config = apps.get_app_config('contenttypes_tests')
