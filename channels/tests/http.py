@@ -4,9 +4,6 @@ import copy
 from django.apps import apps
 from django.conf import settings
 
-
-from ..asgi import channel_layers
-from ..message import Message
 from ..sessions import session_for_reply_channel
 from .base import Client
 
@@ -59,23 +56,6 @@ class HttpClient(Client):
             self._session = session_for_reply_channel(self.reply_channel)
         return self._session
 
-    @property
-    def channel_layer(self):
-        """Channel layer as lazy property"""
-        return channel_layers[self.alias]
-
-    def get_next_message(self, channel):
-        """
-        Gets the next message that was sent to the channel during the test,
-        or None if no message is available.
-
-        If require is true, will fail the test if no message is received.
-        """
-        recv_channel, content = channel_layers[self.alias].receive_many([channel])
-        if recv_channel is None:
-            return
-        return Message(content, recv_channel, channel_layers[self.alias])
-
     def send(self, to, content={}):
         """
         Send a message to a channel.
@@ -86,30 +66,6 @@ class HttpClient(Client):
         content.setdefault('path', '/')
         content.setdefault('headers', self.headers)
         self.channel_layer.send(to, content)
-
-    def consume(self, channel):
-        """
-        Get next message for channel name and run appointed consumer
-        """
-        message = self.get_next_message(channel)
-        if message:
-            consumer, kwargs = self.channel_layer.router.match(message)
-            return consumer(message, **kwargs)
-
-    def send_and_consume(self, channel, content={}):
-        """
-        Reproduce full live cycle of the message
-        """
-        self.send(channel, content)
-        return self.consume(channel)
-
-    def receive(self):
-        """
-        Get content of next message for reply channel if message exists
-        """
-        message = self.get_next_message(self.reply_channel)
-        if message:
-            return message.content
 
     def login(self, **credentials):
         """

@@ -4,10 +4,10 @@ import string
 from functools import wraps
 
 from django.test.testcases import TestCase
-from channels import DEFAULT_CHANNEL_LAYER
-from channels.routing import Router, include
-from channels.asgi import channel_layers, ChannelLayerWrapper
-from channels.message import Message
+from .. import DEFAULT_CHANNEL_LAYER
+from ..routing import Router, include
+from ..asgi import channel_layers, ChannelLayerWrapper
+from ..message import Message
 from asgiref.inmemory import ChannelLayer as InMemoryChannelLayer
 
 
