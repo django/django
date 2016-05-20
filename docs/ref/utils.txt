@@ -161,12 +161,6 @@ The functions defined in this module share the following properties:
     See :ref:`decorating class based views <decorating-class-based-views>` for
     example usage.
 
-    .. versionchanged:: 1.9
-
-       The ability to decorate classes, the ``name`` parameter, and the ability
-       for ``decorator`` to accept a list/tuple of decorator functions were
-       added.
-
 .. function:: decorator_from_middleware(middleware_class)
 
     Given a middleware class, returns a view decorator. This lets you use
@@ -883,10 +877,6 @@ appropriate entities.
 
     If ``value`` is ``"你好 World"``, the output will be ``"你好-world"``.
 
-    .. versionchanged:: 1.9
-
-        The ``allow_unicode`` parameter was added.
-
 .. _time-zone-selection-functions:
 
 ``django.utils.timezone``
@@ -1011,10 +1001,6 @@ appropriate entities.
     would change the time to 3:30.
 
     ``is_dst`` has no effect when ``pytz`` is not installed.
-
-    .. versionchanged:: 1.9
-
-        The ``is_dst`` argument was added.
 
 .. function:: make_naive(value, timezone=None)
 

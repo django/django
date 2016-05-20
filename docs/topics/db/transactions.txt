@@ -254,8 +254,6 @@ something really strange.
 Performing actions after commit
 ===============================
 
-.. versionadded:: 1.9
-
 Sometimes you need to perform an action related to the current database
 transaction, but only if the transaction successfully commits. Examples might
 include a `Celery`_ task, an email notification, or a cache invalidation.

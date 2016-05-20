@@ -899,10 +899,6 @@ the number of deletions per object type. Example::
     >>> e.delete()
     (1, {'weblog.Entry': 1})
 
-.. versionchanged:: 1.9
-
-    The return value describing the number of objects deleted was added.
-
 You can also delete objects in bulk. Every
 :class:`~django.db.models.query.QuerySet` has a
 :meth:`~django.db.models.query.QuerySet.delete` method, which deletes all
@@ -923,10 +919,6 @@ on a model class and want to ensure that it is called, you will need to
 object individually) rather than using the bulk
 :meth:`~django.db.models.query.QuerySet.delete` method of a
 :class:`~django.db.models.query.QuerySet`.
-
-.. versionchanged:: 1.9
-
-    The return value describing the number of objects deleted was added.
 
 When Django deletes an object, by default it emulates the behavior of the SQL
 constraint ``ON DELETE CASCADE`` -- in other words, any objects which had

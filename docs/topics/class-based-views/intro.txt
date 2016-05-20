@@ -305,11 +305,6 @@ The decorators will process a request in the order they are passed to the
 decorator. In the example, ``never_cache()`` will process the request before
 ``login_required()``.
 
-.. versionchanged:: 1.9
-
-    The ability to use ``method_decorator()`` on a class and the ability for
-    it to accept a list or tuple of decorators were added.
-
 In this example, every instance of ``ProtectedView`` will have login protection.
 
 .. note::

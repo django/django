@@ -7,8 +7,6 @@ JavaScript customizations in the admin
 Inline form events
 ==================
 
-.. versionadded:: 1.9
-
 You may want to execute some JavaScript when an inline form is added or removed
 in the admin change form. The ``formset:added`` and ``formset:removed`` jQuery
 events allow this. The event handler is passed three arguments:

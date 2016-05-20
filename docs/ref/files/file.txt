@@ -95,10 +95,6 @@ The ``File`` class
     ``truncate``, ``writelines``, ``xreadlines``. If you are using
     Python 3, the ``seekable`` method is also available.
 
-    .. versionchanged:: 1.9
-
-        The ``seekable`` method was added.
-
 .. currentmodule:: django.core.files.base
 
 The ``ContentFile`` class

@@ -5,8 +5,6 @@ Geographic Database Functions
 .. module:: django.contrib.gis.db.models.functions
     :synopsis: Geographic Database Functions
 
-.. versionadded:: 1.9
-
 The functions documented on this page allow users to access geographic database
 functions to be used in annotations, aggregations, or filters in Django.
 

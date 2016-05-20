@@ -206,11 +206,6 @@ Attributes
 
     A 1-based range iterator of page numbers, e.g. yielding ``[1, 2, 3, 4]``.
 
-    .. versionchanged:: 1.9
-
-        In older versions, ``page_range`` returned a list instead of an
-        iterator.
-
 ``InvalidPage`` exceptions
 ==========================
 

@@ -142,10 +142,6 @@ If loading a template fails, the following two exceptions, defined in
         functions, such as :func:`~django.template.loader.get_template`, that
         try to load a given template from multiple engines.
 
-    .. versionadded:: 1.9
-
-        The ``backend``, ``tried``, and ``chain`` arguments were added.
-
 .. exception:: TemplateSyntaxError(msg)
 
     This exception is raised when a template was found but contains errors.
@@ -374,10 +370,6 @@ applications. This generic name was kept for backwards-compatibility.
   Tags and filters from built-in libraries can be used without first calling
   the :ttag:`{% load %} <load>` tag.
 
-.. versionadded:: 1.9
-
-    The ``libraries`` and ``builtins`` arguments were added.
-
 .. module:: django.template.backends.jinja2
 
 .. class:: Jinja2
@@ -514,10 +506,6 @@ See `DEP 182`_ for more information.
 
 Debug integration for custom engines
 ------------------------------------
-
-.. versionadded:: 1.9
-
-    Debug page integration for non-Django template engines was added.
 
 The Django debug page has hooks to provide detailed information when a template
 error arises. Custom template engines can use these hooks to enhance the

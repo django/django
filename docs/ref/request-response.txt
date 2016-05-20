@@ -200,11 +200,6 @@ application.
     ``urlconf`` can be set to ``None`` to revert any changes made by previous
     middleware and return to using the :setting:`ROOT_URLCONF`.
 
-    .. versionchanged:: 1.9
-
-        Setting ``urlconf=None`` raised
-        :exc:`~django.core.exceptions.ImproperlyConfigured` in older versions.
-
 Attributes set by middleware
 ----------------------------
 
@@ -283,8 +278,6 @@ Methods
         :class:`~django.middleware.csrf.CsrfViewMiddleware`.
 
 .. method:: HttpRequest.get_port()
-
-    .. versionadded:: 1.9
 
     Returns the originating port of the request using information from the
     ``HTTP_X_FORWARDED_PORT`` (if :setting:`USE_X_FORWARDED_PORT` is enabled)
@@ -689,24 +682,17 @@ Attributes
 
     The :rfc:`HTTP status code <7231#section-6>` for the response.
 
-    .. versionchanged:: 1.9
-
-        Unless :attr:`reason_phrase` is explicitly set, modifying the value of
-        ``status_code`` outside the constructor will also modify the value of
-        ``reason_phrase``.
+    Unless :attr:`reason_phrase` is explicitly set, modifying the value of
+    ``status_code`` outside the constructor will also modify the value of
+    ``reason_phrase``.
 
 .. attribute:: HttpResponse.reason_phrase
 
-    The HTTP reason phrase for the response.
+    The HTTP reason phrase for the response. It uses the :rfc:`HTTP standard's
+    <7231#section-6.1>` default reason phrases.
 
-    .. versionchanged:: 1.9
-
-        ``reason_phrase`` no longer defaults to all capital letters. It now
-        uses the :rfc:`HTTP standard's <7231#section-6.1>` default reason
-        phrases.
-
-        Unless explicitly set, ``reason_phrase`` is determined by the current
-        value of :attr:`status_code`.
+    Unless explicitly set, ``reason_phrase`` is determined by the value of
+    :attr:`status_code`.
 
 .. attribute:: HttpResponse.streaming
 
@@ -962,10 +948,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     The ``json_dumps_params`` parameter is a dictionary of keyword arguments
     to pass to the ``json.dumps()`` call used to generate the response.
 
-    .. versionchanged:: 1.9
-
-        The ``json_dumps_params`` argument was added.
-
 Usage
 -----
 
@@ -975,7 +957,6 @@ Typical usage could look like::
     >>> response = JsonResponse({'foo': 'bar'})
     >>> response.content
     b'{"foo": "bar"}'
-
 
 Serializing non-dictionary objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1058,24 +1039,17 @@ Attributes
 
     The :rfc:`HTTP status code <7231#section-6>` for the response.
 
-    .. versionchanged:: 1.9
-
-        Unless :attr:`reason_phrase` is explicitly set, modifying the value of
-        ``status_code`` outside the constructor will also modify the value of
-        ``reason_phrase``.
+    Unless :attr:`reason_phrase` is explicitly set, modifying the value of
+    ``status_code`` outside the constructor will also modify the value of
+    ``reason_phrase``.
 
 .. attribute:: StreamingHttpResponse.reason_phrase
 
-    The HTTP reason phrase for the response.
+    The HTTP reason phrase for the response. It uses the :rfc:`HTTP standard's
+    <7231#section-6.1>` default reason phrases.
 
-    .. versionchanged:: 1.9
-
-        ``reason_phrase`` no longer defaults to all capital letters. It now
-        uses the :rfc:`HTTP standard's <7231#section-6.1>` default reason
-        phrases.
-
-        Unless explicitly set, ``reason_phrase`` is determined by the current
-        value of :attr:`status_code`.
+    Unless explicitly set, ``reason_phrase`` is determined by the value of
+    :attr:`status_code`.
 
 .. attribute:: StreamingHttpResponse.streaming
 

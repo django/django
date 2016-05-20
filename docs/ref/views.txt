@@ -87,12 +87,6 @@ Three things to note about 404 views:
   your 404 view will never be used, and your URLconf will be displayed
   instead, with some debug information.
 
-.. versionchanged:: 1.9
-
-    The signature of ``page_not_found()`` changed. The function now accepts a
-    second parameter, the exception that triggered the error. A useful
-    representation of the exception is also passed in the template context.
-
 .. versionchanged:: 1.10
 
     Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.
@@ -149,13 +143,6 @@ view you can use code like this::
             raise PermissionDenied
         # ...
 
-.. versionchanged:: 1.9
-
-    The signature of ``permission_denied()`` changed in Django 1.9. The function
-    now accepts a second parameter, the exception that triggered the error. The
-    unicode representation of the exception is also passed in the template
-    context.
-
 .. versionchanged:: 1.10
 
     Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.
@@ -180,11 +167,6 @@ context, as the exception message might contain sensitive information like
 filesystem paths.
 
 ``bad_request`` views are also only used when :setting:`DEBUG` is ``False``.
-
-.. versionchanged:: 1.9
-
-    The signature of ``bad_request()`` changed in Django 1.9. The function
-    now accepts a second parameter, the exception that triggered the error.
 
 .. versionchanged:: 1.10
 

@@ -103,8 +103,6 @@ objects, refer to the :ref:`GEOS tutorial <geos-tutorial>`.
 Creating and Saving Models with Raster Fields
 =============================================
 
-.. versionadded:: 1.9
-
 When creating raster models, the raster field will implicitly convert the input
 into a :class:`~django.contrib.gis.gdal.GDALRaster` using lazy-evaluation.
 The raster field will therefore accept any input that is accepted by the

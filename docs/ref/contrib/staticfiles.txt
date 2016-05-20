@@ -92,10 +92,6 @@ Some commonly used options are:
 
     Do NOT prompt the user for input of any kind.
 
-    .. versionchanged:: 1.9
-
-        The ``--no-input`` alias was added.
-
 .. django-admin-option:: --ignore PATTERN, -i PATTERN
 
     Ignore files or directories matching this glob-style pattern. Use multiple

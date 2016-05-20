@@ -296,10 +296,6 @@ Or if only some variables should be escaped, you can use::
 You can use the syntax ``{% firstof var1 var2 var3 as value %}`` to store the
 output inside a variable.
 
-.. versionadded:: 1.9
-
-    The "as" syntax was added.
-
 .. templatetag:: for
 
 ``for``
@@ -731,10 +727,6 @@ turned on, an exception like :exc:`~django.template.TemplateDoesNotExist` or
 is turned off, ``{% include %}`` logs a warning to the ``django.template``
 logger with the exception that happens while rendering the included template
 and returns an empty string.
-
-.. versionchanged:: 1.9
-
-    Template logging now includes the warning logging mentioned above.
 
 .. note::
     The :ttag:`include` tag should be considered as an implementation of

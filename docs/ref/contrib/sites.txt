@@ -24,11 +24,6 @@ The sites framework is mainly based on a simple model:
         The fully qualified domain name associated with the website.
         For example, ``www.example.com``.
 
-        .. versionchanged:: 1.9
-
-            The ``domain`` field was set to be
-            :attr:`~django.db.models.Field.unique`.
-
     .. attribute:: name
 
         A human-readable "verbose" name for the website.
@@ -508,7 +503,3 @@ Finally, to avoid repetitive fallback code, the framework provides a
     only. This does not apply to
     :class:`~django.contrib.sites.requests.RequestSite` which will always
     use the unmodified host.
-
-    .. versionchanged:: 1.9
-
-        Retrying the lookup with the port stripped was added.

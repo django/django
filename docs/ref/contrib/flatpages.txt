@@ -206,10 +206,6 @@ registering a custom ``ModelAdmin`` for ``FlatPage``::
     admin.site.unregister(FlatPage)
     admin.site.register(FlatPage, FlatPageAdmin)
 
-.. versionchanged:: 1.9
-
-    The ``enable_comments`` field was removed from ``FlatPageAdmin``.
-
 Via the Python API
 ------------------
 

@@ -62,12 +62,6 @@ Related objects reference
         some custom logic when a relationship is created, listen to the
         :data:`~django.db.models.signals.m2m_changed` signal.
 
-        .. versionchanged:: 1.9
-
-            The ``bulk`` parameter was added. In older versions, foreign key
-            updates were always done using ``save()``. Use ``bulk=False`` if
-            you require the old behavior.
-
     .. method:: create(**kwargs)
 
         Creates a new object, saves it and puts it in the related object set.
@@ -147,8 +141,6 @@ Related objects reference
 
     .. method:: set(objs, bulk=True, clear=False)
 
-        .. versionadded:: 1.9
-
         Replace the set of related objects::
 
             >>> new_list = [obj1, obj2, obj3]
@@ -190,12 +182,6 @@ If the foreign key relationship has ``null=True``, then the related manager
 will first disassociate any existing objects in the related set before adding
 the contents of ``new_list``. Otherwise the objects in ``new_list`` will be
 added to the existing related object set.
-
-.. versionchanged:: 1.9
-
-    In earlier versions, direct assignment used to perform ``clear()`` followed
-    by ``add()``. It now performs a ``set()`` with the keyword argument
-    ``clear=False``.
 
 .. deprecated:: 1.10
 

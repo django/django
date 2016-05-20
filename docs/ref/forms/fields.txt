@@ -305,8 +305,6 @@ more information.
 
 .. attribute:: Field.disabled
 
-.. versionadded:: 1.9
-
 The ``disabled`` boolean argument, when set to ``True``, disables a form field
 using the ``disabled`` HTML attribute so that it won't be editable by users.
 Even if a user tampers with the field's value submitted to the server, it will
@@ -378,8 +376,6 @@ For each field, we describe the default widget used if you don't specify
     the given length.
 
     .. attribute:: strip
-
-       .. versionadded:: 1.9
 
        If ``True`` (default), the value will be stripped of leading and
        trailing whitespace.
@@ -834,8 +830,6 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: strip
 
-        .. versionadded:: 1.9
-
         Defaults to ``False``. If enabled, stripping will be applied before the
         regex validation.
 
@@ -857,8 +851,6 @@ For each field, we describe the default widget used if you don't specify
    Takes an optional parameter:
 
    .. attribute:: allow_unicode
-
-       .. versionadded:: 1.9
 
        A boolean instructing the field to accept Unicode letters in addition
        to ASCII letters. Defaults to ``False``.

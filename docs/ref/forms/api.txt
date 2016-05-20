@@ -716,8 +716,6 @@ There are several other ways to customize the order:
 
 .. attribute:: Form.field_order
 
-.. versionadded:: 1.9
-
 By default ``Form.field_order=None``, which retains the order in which you
 define the fields in your form class. If ``field_order`` is a list of field
 names, the fields are ordered as specified by the list and remaining fields are
@@ -731,8 +729,6 @@ override the field order. If a :class:`~django.forms.Form` defines
 the ``Form``, then the latter ``field_order`` will have precedence.
 
 .. method:: Form.order_fields(field_order)
-
-.. versionadded:: 1.9
 
 You may rearrange the fields any time using ``order_fields()`` with a list of
 field names as in :attr:`~django.forms.Form.field_order`.
@@ -1013,8 +1009,6 @@ Methods of ``BoundField``
 Customizing ``BoundField``
 ==========================
 
-.. versionadded:: 1.9
-
 If you need to access some additional information about a form field in a
 template and using a subclass of :class:`~django.forms.Field` isn't
 sufficient, consider also customizing :class:`~django.forms.BoundField`.
@@ -1201,7 +1195,3 @@ The prefix can also be specified on the form class::
     >>> class PersonForm(forms.Form):
     ...     ...
     ...     prefix = 'person'
-
-.. versionadded:: 1.9
-
-    The ability to specify ``prefix`` on the form class was added.

@@ -67,11 +67,6 @@ those are usually just people typing in broken URLs or broken Web bots. It also
 ignores 404s when the referer is equal to the requested URL, since this
 behavior is from broken Web bots too.
 
-.. versionchanged:: 1.9
-
-    In older versions, 404s were not ignored when the referer was equal to the
-    requested URL.
-
 .. note::
 
     :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` must appear

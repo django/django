@@ -1064,8 +1064,6 @@ of some other value.  You can do this automatically in the admin using
 
 .. attribute:: SlugField.allow_unicode
 
-    .. versionadded:: 1.9
-
     If ``True``, the field accepts Unicode letters in addition to ASCII
     letters. Defaults to ``False``.
 
@@ -1164,12 +1162,6 @@ Django also defines a set of fields that represent relations.
 
 A many-to-one relationship. Requires a positional argument: the class to which
 the model is related.
-
-.. versionchanged:: 1.9
-
-    ``on_delete`` can now be used as the second positional argument (previously
-    it was typically only passed as a keyword argument). It will be a required
-    argument in Django 2.0.
 
 .. _recursive-relationships:
 
@@ -1671,12 +1663,6 @@ relationship at the database level.
 A one-to-one relationship. Conceptually, this is similar to a
 :class:`ForeignKey` with :attr:`unique=True <Field.unique>`, but the
 "reverse" side of the relation will directly return a single object.
-
-.. versionchanged:: 1.9
-
-    ``on_delete`` can now be used as the second positional argument (previously
-    it was typically only passed as a keyword argument). It will be a required
-    argument in Django 2.0.
 
 This is most useful as the primary key of a model which "extends"
 another model in some way; :ref:`multi-table-inheritance` is

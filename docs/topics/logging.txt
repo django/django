@@ -292,11 +292,6 @@ verbose as it includes all database queries::
         },
     }
 
-.. versionchanged:: 1.9
-
-    Django's default logging configuration changed. See :ref:`the release notes
-    <default-logging-changes-19>` for a description of the changes.
-
 Finally, here's an example of a fairly complex logging setup::
 
     LOGGING = {
@@ -503,8 +498,6 @@ Messages to this logger have the following extra context:
 
 ``django.template``
 ~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.9
 
 Log messages related to the rendering of templates.
 
@@ -752,11 +745,6 @@ Independent of the value of :setting:`DEBUG`:
 
 * The :ref:`django-server-logger` logger sends all messages at the ``INFO``
   level or higher to the console.
-
-.. versionchanged:: 1.9
-
-    Django's default logging configuration changed. See :ref:`the release notes
-    <default-logging-changes-19>` for a description of the changes.
 
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
 complement or replace this default logging configuration.
