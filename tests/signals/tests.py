@@ -301,3 +301,21 @@ class LazyModelRefTest(BaseSignalTest):
             }])
         finally:
             signals.post_init.disconnect(self.receiver, sender=Created)
+
+    @isolate_apps('signals', kwarg_name='apps')
+    def test_disconnect(self, apps):
+
+        received = []
+
+        def receiver(**kwargs):
+            received.append(kwargs)
+
+        signals.post_init.connect(receiver, sender='signals.Created', apps=apps)
+        signals.post_init.disconnect(receiver, sender='signals.Created', apps=apps)
+
+        class Created(models.Model):
+            pass
+
+        Created()
+
+        self.assertEqual(received, [])
