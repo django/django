@@ -4,9 +4,6 @@ from django.db.models.utils import make_model_tuple
 from django.dispatch import Signal
 
 
-class_prepared = Signal(providing_args=["class"])
-
-
 class ModelSignal(Signal):
     """
     Signal subclass that allows the sender to be lazily specified as a string
@@ -21,6 +18,7 @@ class ModelSignal(Signal):
             apps = sender._meta.apps if hasattr(sender, '_meta') else Options.default_apps
         apps.lazy_model_operation(connect, *models)
 
+class_prepared = ModelSignal()
 
 pre_init = ModelSignal(providing_args=["instance", "args", "kwargs"], use_caching=True)
 post_init = ModelSignal(providing_args=["instance"], use_caching=True)

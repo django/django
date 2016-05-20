@@ -287,17 +287,18 @@ class LazyModelRefTest(BaseSignalTest):
 
     @isolate_apps('signals', kwarg_name='apps')
     def test_not_loaded_model(self, apps):
-        signals.post_init.connect(
-            self.receiver, sender='signals.Created', weak=False, apps=apps
-        )
+        signals.class_prepared.connect(self.receiver, sender='signals.Created', apps=apps)
+        signals.post_init.connect(self.receiver, sender='signals.Created', apps=apps)
 
-        try:
-            class Created(models.Model):
-                pass
+        class Created(models.Model):
+            pass
 
-            instance = Created()
-            self.assertEqual(self.received, [{
-                'signal': signals.post_init, 'sender': Created, 'instance': instance
-            }])
-        finally:
-            signals.post_init.disconnect(self.receiver, sender=Created)
+        instance = Created()
+        expected = [
+            {'signal': signals.class_prepared, 'sender': Created},
+            {'signal': signals.post_init, 'sender': Created, 'instance': instance}
+        ]
+        self.assertEqual(self.received, expected)
+
+        signals.post_init.disconnect(self.receiver, sender=Created)
+        signals.class_prepared.disconnect(self.receiver, sender=Created)
