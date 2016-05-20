@@ -3,12 +3,14 @@ from __future__ import unicode_literals
 import datetime
 import re
 import uuid
+from collections import defaultdict
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import truncate_name
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text
+from django.utils.functional import cached_property
 
 from .base import Database
 from .utils import InsertIdVar, Oracle_datetime, convert_unicode
@@ -310,17 +312,88 @@ WHEN (new.%(col_name)s IS NULL)
     def savepoint_rollback_sql(self, sid):
         return convert_unicode("ROLLBACK TO SAVEPOINT " + self.quote_name(sid))
 
+    @cached_property
+    def _foreign_key_constraints(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    cons.table_name,
+                    cons.constraint_name,
+                    rcons.table_name
+                FROM
+                    user_constraints cons
+                INNER JOIN
+                    user_constraints rcons ON cons.r_constraint_name = rcons.constraint_name
+                WHERE
+                    cons.constraint_type = 'R'
+            """)
+            return tuple(cursor.fetchall())
+
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
-        # 'TRUNCATE z;'... style SQL statements
         if tables:
-            # Oracle does support TRUNCATE, but it seems to get us into
-            # FK referential trouble, whereas DELETE FROM table works.
-            sql = ['%s %s %s;' % (
-                style.SQL_KEYWORD('DELETE'),
-                style.SQL_KEYWORD('FROM'),
-                style.SQL_FIELD(self.quote_name(table))
-            ) for table in tables]
+            constraints = []
+            truncated_tables = {table.upper() for table in tables}
+            if allow_cascade:
+                # We can't use TRUNCATE CASCADE as it only works with ON DELETE
+                # CASACADE foreign keys which Django doesn't define. Instead
+                # we emulate the PostgreSQL behavior which truncates all
+                # dependant tables by manually retrieving all foreign key
+                # constraints and resolving dependencies.
+                dependencies = defaultdict(list)
+                for table, constraint, foreign_table in self._foreign_key_constraints:
+                    dependencies[table].append((
+                        constraint,
+                        foreign_table,
+                    ))
+                # Resolve table cascading truncation based on dependencies.
+                truncated_tables_len = 0
+                while len(truncated_tables) != truncated_tables_len:
+                    truncated_tables_len = len(truncated_tables)
+                    for table, references in list(dependencies.items()):
+                        for constraint, foreign_table in list(references):
+                            if foreign_table in truncated_tables:
+                                truncated_tables.add(table)
+                                constraints.append((
+                                    style.SQL_FIELD(self.quote_name(table)),
+                                    style.SQL_FIELD(self.quote_name(constraint)),
+                                ))
+                                references.remove((constraint, foreign_table))
+                        if not references:
+                            dependencies.pop(table)
+            else:
+                for table, constraint, _ in self._foreign_key_constraints:
+                    if table in truncated_tables:
+                        constraints.append((
+                            style.SQL_FIELD(self.quote_name(table)),
+                            style.SQL_FIELD(self.quote_name(constraint)),
+                        ))
+            sql = [
+                "%s %s %s %s %s %s %s %s;" % (
+                    style.SQL_KEYWORD('ALTER'),
+                    style.SQL_KEYWORD('TABLE'),
+                    table,
+                    style.SQL_KEYWORD('DISABLE'),
+                    style.SQL_KEYWORD('CONSTRAINT'),
+                    constraint,
+                    style.SQL_KEYWORD('KEEP'),
+                    style.SQL_KEYWORD('INDEX'),
+                ) for table, constraint in constraints
+            ] + [
+                "%s %s %s;" % (
+                    style.SQL_KEYWORD('TRUNCATE'),
+                    style.SQL_KEYWORD('TABLE'),
+                    style.SQL_FIELD(self.quote_name(table)),
+                ) for table in truncated_tables
+            ] + [
+                "%s %s %s %s %s %s;" % (
+                    style.SQL_KEYWORD('ALTER'),
+                    style.SQL_KEYWORD('TABLE'),
+                    table,
+                    style.SQL_KEYWORD('ENABLE'),
+                    style.SQL_KEYWORD('CONSTRAINT'),
+                    constraint,
+                ) for table, constraint in constraints
+            ]
             # Since we've just deleted all the rows, running our sequence
             # ALTER code will reset the sequence to 0.
             sql.extend(self.sequence_reset_by_name_sql(style, sequences))
