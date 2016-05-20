@@ -315,17 +315,82 @@ WHEN (new.%(col_name)s IS NULL)
     def savepoint_rollback_sql(self, sid):
         return "ROLLBACK TO SAVEPOINT " + self.quote_name(sid)
 
+    def _foreign_key_constraints(self, table_name, recursive=False):
+        with self.connection.cursor() as cursor:
+            if recursive:
+                cursor.execute("""
+                    SELECT
+                        user_tables.table_name, rcons.constraint_name, MAX(level)
+                    FROM
+                        user_tables
+                    JOIN
+                        user_constraints cons
+                        ON (user_tables.table_name = cons.table_name AND cons.constraint_type = ANY('P', 'U'))
+                    LEFT JOIN
+                        user_constraints rcons
+                        ON (user_tables.table_name = rcons.table_name AND rcons.constraint_type = 'R')
+                    START WITH user_tables.table_name = UPPER(%s)
+                    CONNECT BY NOCYCLE PRIOR cons.constraint_name = rcons.r_constraint_name
+                    GROUP BY
+                        user_tables.table_name, rcons.constraint_name
+                    HAVING user_tables.table_name != UPPER(%s)
+                    ORDER BY MAX(level) DESC
+                """, (table_name, table_name))
+            else:
+                cursor.execute("""
+                    SELECT
+                        cons.table_name, cons.constraint_name, 1
+                    FROM
+                        user_constraints cons
+                    WHERE
+                        cons.constraint_type = 'R'
+                        AND cons.table_name = UPPER(%s)
+                """, (table_name,))
+            return [
+                (foreign_table, constraint) for foreign_table, constraint, _ in cursor.fetchall()
+            ]
+
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
-        # 'TRUNCATE z;'... style SQL statements
         if tables:
-            # Oracle does support TRUNCATE, but it seems to get us into
-            # FK referential trouble, whereas DELETE FROM table works.
-            sql = ['%s %s %s;' % (
-                style.SQL_KEYWORD('DELETE'),
-                style.SQL_KEYWORD('FROM'),
-                style.SQL_FIELD(self.quote_name(table))
-            ) for table in tables]
+            truncated_tables = {table.upper() for table in tables}
+            constraints = set()
+            # Oracle's TRUNCATE CASCADE only works with ON DELETE CASCADE
+            # foreign keys which Django doesn't define. Emulate the
+            # PostgreSQL behavior which truncates all dependent tables by
+            # manually retrieving all foreign key constraints and resolving
+            # dependencies.
+            for table in tables:
+                for foreign_table, constraint in self._foreign_key_constraints(table, recursive=allow_cascade):
+                    if allow_cascade:
+                        truncated_tables.add(foreign_table)
+                    constraints.add((foreign_table, constraint))
+            sql = [
+                "%s %s %s %s %s %s %s %s;" % (
+                    style.SQL_KEYWORD('ALTER'),
+                    style.SQL_KEYWORD('TABLE'),
+                    style.SQL_FIELD(self.quote_name(table)),
+                    style.SQL_KEYWORD('DISABLE'),
+                    style.SQL_KEYWORD('CONSTRAINT'),
+                    style.SQL_FIELD(self.quote_name(constraint)),
+                    style.SQL_KEYWORD('KEEP'),
+                    style.SQL_KEYWORD('INDEX'),
+                ) for table, constraint in constraints
+            ] + [
+                "%s %s %s;" % (
+                    style.SQL_KEYWORD('TRUNCATE'),
+                    style.SQL_KEYWORD('TABLE'),
+                    style.SQL_FIELD(self.quote_name(table)),
+                ) for table in truncated_tables
+            ] + [
+                "%s %s %s %s %s %s;" % (
+                    style.SQL_KEYWORD('ALTER'),
+                    style.SQL_KEYWORD('TABLE'),
+                    style.SQL_FIELD(self.quote_name(table)),
+                    style.SQL_KEYWORD('ENABLE'),
+                    style.SQL_KEYWORD('CONSTRAINT'),
+                    style.SQL_FIELD(self.quote_name(constraint)),
+                ) for table, constraint in constraints
+            ]
             # Since we've just deleted all the rows, running our sequence
             # ALTER code will reset the sequence to 0.
             sql.extend(self.sequence_reset_by_name_sql(style, sequences))
