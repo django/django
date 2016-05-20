@@ -46,9 +46,10 @@ class RemoteUserMiddleware(MiddlewareMixin):
     If authentication is successful, the user is automatically logged in to
     persist the user in the session.
 
-    The header used is configurable and defaults to ``REMOTE_USER``.  Subclass
-    this class and change the ``header`` attribute if you need to use a
-    different header.
+    The header used is configurable and defaults to ``REMOTE_USER``.  If you
+    need to use a different header, set environment variable
+    ``DJANGO_REMOTE_USER_VAR`` with the name of the request header, or subclass
+    this class and change the ``header`` attribute.
     """
 
     # Name of request header to grab username from.  This will be the key as
@@ -58,6 +59,9 @@ class RemoteUserMiddleware(MiddlewareMixin):
     force_logout_if_no_header = True
 
     def process_request(self, request):
+        custom_header = request.META.get("DJANGO_REMOTE_USER_VAR")
+        if custom_header is not None:
+            self.header = custom_header
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, 'user'):
             raise ImproperlyConfigured(
