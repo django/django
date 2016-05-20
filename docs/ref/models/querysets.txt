@@ -1831,10 +1831,6 @@ This has a number of caveats though:
   unless the database backend supports it (currently PostgreSQL).
 * It does not work with many-to-many relationships.
 
-.. versionchanged:: 1.9
-
-    Support for using ``bulk_create()`` with proxy models was added.
-
 .. versionchanged:: 1.10
 
     Support for setting primary keys on objects created using ``bulk_create()``
@@ -2168,10 +2164,6 @@ For example, to delete all the entries in a particular blog::
     # Delete all the entries belonging to this Blog.
     >>> Entry.objects.filter(blog=b).delete()
     (4, {'weblog.Entry': 2, 'weblog.Entry_authors': 2})
-
-.. versionchanged:: 1.9
-
-    The return value describing the number of objects deleted was added.
 
 By default, Django's :class:`~django.db.models.ForeignKey` emulates the SQL
 constraint ``ON DELETE CASCADE`` — in other words, any objects with foreign
@@ -2548,8 +2540,6 @@ numbers and even characters.
 ``date``
 ~~~~~~~~
 
-.. versionadded:: 1.9
-
 For datetime fields, casts the value as date. Allows chaining additional field
 lookups. Takes a date value.
 
@@ -2587,10 +2577,6 @@ SQL equivalent::
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering.
 
-.. versionchanged:: 1.9
-
-    Allowed chaining additional field lookups.
-
 .. fieldlookup:: month
 
 ``month``
@@ -2614,10 +2600,6 @@ SQL equivalent::
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering. This requires :ref:`time zone definitions
 in the database <database-time-zone-definitions>`.
-
-.. versionchanged:: 1.9
-
-    Allowed chaining additional field lookups.
 
 .. fieldlookup:: day
 
@@ -2646,10 +2628,6 @@ When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering. This requires :ref:`time zone definitions
 in the database <database-time-zone-definitions>`.
 
-.. versionchanged:: 1.9
-
-    Allowed chaining additional field lookups.
-
 .. fieldlookup:: week_day
 
 ``week_day``
@@ -2677,10 +2655,6 @@ When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering. This requires :ref:`time zone definitions
 in the database <database-time-zone-definitions>`.
 
-.. versionchanged:: 1.9
-
-    Allowed chaining additional field lookups.
-
 .. fieldlookup:: hour
 
 ``hour``
@@ -2705,15 +2679,6 @@ SQL equivalent::
 
 For datetime fields, when :setting:`USE_TZ` is ``True``, values are converted
 to the current time zone before filtering.
-
-.. versionchanged:: 1.9
-
-    Added support for :class:`~django.db.models.TimeField` on SQLite (other
-    databases supported it as of 1.7).
-
-.. versionchanged:: 1.9
-
-    Allowed chaining additional field lookups.
 
 .. fieldlookup:: minute
 
@@ -2740,15 +2705,6 @@ SQL equivalent::
 For datetime fields, When :setting:`USE_TZ` is ``True``, values are converted
 to the current time zone before filtering.
 
-.. versionchanged:: 1.9
-
-    Added support for :class:`~django.db.models.TimeField` on SQLite (other
-    databases supported it as of 1.7).
-
-.. versionchanged:: 1.9
-
-    Allowed chaining additional field lookups.
-
 .. fieldlookup:: second
 
 ``second``
@@ -2773,15 +2729,6 @@ SQL equivalent::
 
 For datetime fields, when :setting:`USE_TZ` is ``True``, values are converted
 to the current time zone before filtering.
-
-.. versionchanged:: 1.9
-
-    Added support for :class:`~django.db.models.TimeField` on SQLite (other
-    databases supported it as of 1.7).
-
-.. versionchanged:: 1.9
-
-    Allowed chaining additional field lookups.
 
 .. fieldlookup:: isnull
 
@@ -2941,11 +2888,6 @@ by the aggregate.
     * Default alias: ``<field>__avg``
     * Return type: ``float`` (or the type of whatever ``output_field`` is
       specified)
-
-    .. versionchanged:: 1.9
-
-        The ``output_field`` parameter was added to allow aggregating over
-        non-numeric columns, such as ``DurationField``.
 
 ``Count``
 ~~~~~~~~~

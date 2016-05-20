@@ -397,8 +397,6 @@ Returns objects where the given key is in the data. Uses the SQL operator
 ``has_any_keys``
 ~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.9
-
 Returns objects where any of the given keys are in the data. Uses the SQL
 operator ``?|``. For example::
 
@@ -459,8 +457,6 @@ using in conjunction with lookups on
 
 ``JSONField``
 =============
-
-.. versionadded:: 1.9
 
 .. class:: JSONField(**options)
 

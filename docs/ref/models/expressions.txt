@@ -10,10 +10,6 @@ number of built-in expressions (documented below) that can be used to help you
 write queries. Expressions can be combined, or in some cases nested, to form
 more complex computations.
 
-.. versionchanged:: 1.9
-
-    Support for using expressions when creating new model instances was added.
-
 Supported arithmetic
 ====================
 

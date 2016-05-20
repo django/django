@@ -804,10 +804,6 @@ You can also pass any callable as a *default* value::
     >>> cache.get_or_set('some-timestamp-key', datetime.datetime.now)
     datetime.datetime(2014, 12, 11, 0, 15, 49, 457920)
 
-.. versionchanged:: 1.9
-
-    The ``get_or_set()`` method was added.
-
 There's also a ``get_many()`` interface that only hits the cache once.
 ``get_many()`` returns a dictionary with all the keys you asked for that
 actually exist in the cache (and haven't expired)::

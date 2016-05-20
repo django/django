@@ -114,8 +114,6 @@ Usage example::
 
 .. class:: Greatest(*expressions, **extra)
 
-.. versionadded:: 1.9
-
 Accepts a list of at least two field names or expressions and returns the
 greatest value. Each argument must be of a similar type, so mixing text and
 numbers will result in a database error.
@@ -157,8 +155,6 @@ and ``comment.modified``.
 =========
 
 .. class:: Least(*expressions, **extra)
-
-.. versionadded:: 1.9
 
 Accepts a list of at least two field names or expressions and returns the
 least value. Each argument must be of a similar type, so mixing text and numbers
@@ -204,10 +200,6 @@ It can also be registered as a transform. For example::
     >>> # Get authors whose name is longer than 7 characters
     >>> authors = Author.objects.filter(name__length__gt=7)
 
-.. versionchanged:: 1.9
-
-    The ability to register the function as a transform was added.
-
 ``Lower``
 =========
 
@@ -226,16 +218,10 @@ Usage example::
     >>> print(author.name_lower)
     margaret smith
 
-.. versionchanged:: 1.9
-
-    The ability to register the function as a transform was added.
-
 ``Now``
 =======
 
 .. class:: Now()
-
-.. versionadded:: 1.9
 
 Returns the database server's current date and time when the query is executed,
 typically using the SQL ``CURRENT_TIMESTAMP``.
@@ -289,10 +275,6 @@ Usage example::
     >>> author = Author.objects.annotate(name_upper=Upper('name')).get()
     >>> print(author.name_upper)
     MARGARET SMITH
-
-.. versionchanged:: 1.9
-
-    The ability to register the function as a transform was added.
 
 Date Functions
 ==============

@@ -216,8 +216,6 @@ This example links the given user with the permission models with PKs 46 and 47.
 
 .. admonition:: Control characters
 
-    .. versionchanged:: 1.9
-
     If the content to be serialized contains control characters that are not
     accepted in the XML 1.0 standard, the serialization will fail with a
     :exc:`ValueError` exception. Read also the W3C's explanation of `HTML,

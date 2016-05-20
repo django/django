@@ -679,12 +679,6 @@ the fully qualified name into parts and then tries the following lookup:
    setting the current application on the :attr:`request.current_app
    <django.http.HttpRequest.current_app>` attribute.
 
-   .. versionchanged:: 1.9
-
-      Previously, the :ttag:`url` template tag did not use the namespace of the
-      currently resolved view and you had to set the ``current_app`` attribute
-      on the request.
-
 3. If there is no current application. Django looks for a default
    application instance. The default application instance is the instance
    that has an :term:`instance namespace` matching the :term:`application
@@ -831,11 +825,3 @@ The instance namespace can be specified using the ``namespace`` argument to
 :func:`~django.conf.urls.include`. If the instance namespace is not specified,
 it will default to the included URLconf's application namespace. This means
 it will also be the default instance for that namespace.
-
-.. versionchanged:: 1.9
-
-    In previous versions, you had to specify both the application namespace
-    and the instance namespace in a single place, either by passing them as
-    parameters to :func:`~django.conf.urls.include` or by including a 3-tuple
-    containing
-    ``(<list of url() instances>, <application namespace>, <instance namespace>)``.

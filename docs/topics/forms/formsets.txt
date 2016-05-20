@@ -573,11 +573,6 @@ argument - the index of the form in the formset. The index is ``None`` for the
     ...         kwargs['custom_kwarg'] = index
     ...         return kwargs
 
-
-.. versionadded:: 1.9
-
-    The ``form_kwargs`` argument was added.
-
 Using a formset in views and templates
 ======================================
 

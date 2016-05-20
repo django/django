@@ -187,8 +187,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 .. data:: validate_unicode_slug
 
-    .. versionadded:: 1.9
-
     A :class:`RegexValidator` instance that ensures a value consists of only
     Unicode letters, numbers, underscores, or hyphens.
 
@@ -227,8 +225,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 ----------------------
 
 .. function:: int_list_validator(sep=',', message=None, code='invalid', allow_negative=False)
-
-    .. versionadded:: 1.9
 
     Returns a :class:`RegexValidator` instance that ensures a string consists
     of integers separated by ``sep``. It allows negative integers when
@@ -274,8 +270,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 --------------------
 
 .. class:: DecimalValidator(max_digits, decimal_places)
-
-    .. versionadded:: 1.9
 
     Raises :exc:`~django.core.exceptions.ValidationError` with the following
     codes:

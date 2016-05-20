@@ -532,8 +532,6 @@ inheritance list.
 
 .. class:: LoginRequiredMixin
 
-    .. versionadded:: 1.9
-
     If a view is using this mixin, all requests by non-authenticated users will
     be redirected to the login page or shown an HTTP 403 Forbidden error,
     depending on the
@@ -620,8 +618,6 @@ redirects to the login page::
 .. currentmodule:: django.contrib.auth.mixins
 
 .. class:: UserPassesTestMixin
-
-    .. versionadded:: 1.9
 
     When using :doc:`class-based views </topics/class-based-views/index>`, you
     can use the ``UserPassesTestMixin`` to do this.
@@ -718,11 +714,6 @@ The ``permission_required`` decorator
         def my_view(request):
             ...
 
-    .. versionchanged:: 1.9
-
-        In older versions, the ``permission`` parameter only worked with
-        strings, lists, and tuples instead of strings and any iterable.
-
 .. currentmodule:: django.contrib.auth.mixins
 
 The ``PermissionRequiredMixin`` mixin
@@ -732,8 +723,6 @@ To apply permission checks to :doc:`class-based views
 </ref/class-based-views/index>`, you can use the ``PermissionRequiredMixin``:
 
 .. class:: PermissionRequiredMixin
-
-    .. versionadded:: 1.9
 
     This mixin, just like the ``permission_required``
     decorator, checks whether the user accessing a view has all given
@@ -774,8 +763,6 @@ To ease the handling of access restrictions in :doc:`class-based views
 user to the login page or issue an HTTP 403 Forbidden response.
 
 .. class:: AccessMixin
-
-    .. versionadded:: 1.9
 
     .. attribute:: login_url
 
@@ -1312,10 +1299,6 @@ implementation details see :ref:`using-the-views`.
 
         The ``current_app`` parameter is deprecated and will be removed in
         Django 2.0. Callers should set ``request.current_app`` instead.
-
-    .. versionadded:: 1.9
-
-        The ``extra_email_context`` parameter was added.
 
     **Template context:**
 

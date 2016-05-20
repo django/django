@@ -223,11 +223,6 @@ foundation for custom widgets.
        microseconds part of :class:`~datetime.datetime` and
        :class:`~datetime.time` values will be set to ``0``.
 
-       .. versionadded:: 1.9
-
-           In older versions, this attribute was only defined on the date
-           and time widgets (as ``False``).
-
     .. method:: format_value(value)
 
         Cleans and returns a value for use in the widget template. ``value``
@@ -843,9 +838,3 @@ Composite widgets
                     empty_label=("Choose Year", "Choose Month", "Choose Day"),
                 ),
             )
-
-    .. versionchanged:: 1.9
-
-        This widget used to be located in the ``django.forms.extras.widgets``
-        package. It is now defined in ``django.forms.widgets`` and like the
-        other widgets it can be imported directly from ``django.forms``.

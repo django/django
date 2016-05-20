@@ -69,8 +69,6 @@ following::
 
     register = template.Library()
 
-.. versionadded:: 1.9
-
 Alternatively, template tag modules can be registered through the
 ``'libraries'`` argument to
 :class:`~django.template.backends.django.DjangoTemplates`. This is useful if
@@ -445,11 +443,6 @@ code does not contain XSS vulnerabilities. For building small HTML snippets,
 use of :func:`~django.utils.html.format_html` instead of ``mark_safe()`` is
 strongly recommended.
 
-.. versionchanged:: 1.9
-
-   Auto-escaping for ``simple_tag`` as described in the previous two paragraphs
-   was added.
-
 If your template tag needs to access the current context, you can use the
 ``takes_context`` argument when registering your tag::
 
@@ -489,8 +482,6 @@ positional arguments. For example:
 .. code-block:: html+django
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
-
-.. versionadded:: 1.9
 
 It's possible to store the tag results in a template variable rather than
 directly outputting it. This is done by using the ``as`` argument followed by

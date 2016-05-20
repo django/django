@@ -407,8 +407,6 @@ Middleware for utilizing Web server provided authentication. See
 
 .. class:: PersistentRemoteUserMiddleware
 
-.. versionadded:: 1.9
-
 Middleware for utilizing Web server provided authentication when enabled only
 on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
 details.

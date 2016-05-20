@@ -702,8 +702,6 @@ the next section for details).
 Extending database-backed session engines
 =========================================
 
-.. versionadded:: 1.9
-
 Creating a custom database-backed session engine built upon those included in
 Django (namely ``db`` and ``cached_db``) may be done by inheriting
 :class:`~base_session.AbstractBaseSession` and either ``SessionStore`` class.
@@ -714,7 +712,6 @@ including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
 
 .. class:: base_session.AbstractBaseSession
 
-    .. versionadded:: 1.9
 
     The abstract base session model.
 
@@ -751,8 +748,6 @@ You can also customize the model manager by subclassing
 
 .. class:: base_session.BaseSessionManager
 
-    .. versionadded:: 1.9
-
     .. method:: encode(session_dict)
 
         Returns the given session dictionary serialized and encoded as a string.
@@ -773,13 +768,9 @@ and properties described below:
 
     .. classmethod:: get_model_class()
 
-        .. versionadded:: 1.9
-
         Override this method to return a custom session model if you need one.
 
     .. method:: create_model_instance(data)
-
-        .. versionadded:: 1.9
 
         Returns a new instance of the session model object, which represents
         the current session state.
@@ -792,8 +783,6 @@ and properties described below:
     Implements cached database-backed session store.
 
     .. attribute:: cache_key_prefix
-
-        .. versionadded:: 1.9
 
         A prefix added to a session key to build a cache key string.
 

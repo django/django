@@ -564,14 +564,6 @@ Sometimes with :ref:`multi-table inheritance <multi-table-inheritance>` you may
 want to delete only a child model's data. Specifying ``keep_parents=True`` will
 keep the parent model's data.
 
-.. versionchanged:: 1.9
-
-    The ``keep_parents`` parameter was added.
-
-.. versionchanged:: 1.9
-
-    The return value describing the number of objects deleted was added.
-
 Pickling objects
 ================
 

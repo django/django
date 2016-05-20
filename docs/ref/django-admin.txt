@@ -34,10 +34,6 @@ The command-line examples throughout this document use ``django-admin`` to
 be consistent, but any example can use ``manage.py`` or ``python -m django``
 just as well.
 
-.. versionadded:: 1.9
-
-    ``python -m django`` was added.
-
 Usage
 =====
 
@@ -168,11 +164,6 @@ are excluded.
 
 Includes fuzzy translations into compiled files.
 
-.. versionchanged:: 1.9
-
-    ``compilemessages`` now matches the operation of :djadmin:`makemessages`,
-    scanning the project tree for ``.po`` files to compile.
-
 Example usage::
 
     django-admin compilemessages --locale=pt_BR
@@ -202,10 +193,6 @@ Specifies the database in which the cache table(s) will be created. Defaults to
 
 Prints the SQL that would be run without actually running it, so you can
 customize it or use the migrations framework.
-
-.. versionchanged:: 1.9
-
-    The ``--dry-run`` option was added.
 
 ``dbshell``
 -----------
@@ -324,10 +311,6 @@ standard output.
 When this option is set and ``--verbosity`` is greater than 0 (the default), a
 progress bar is shown in the terminal.
 
-.. versionchanged:: 1.9
-
-    The progress bar in the terminal was added.
-
 ``flush``
 ---------
 
@@ -342,10 +325,6 @@ should drop and recreate the database and then run :djadmin:`migrate` instead.
 .. django-admin-option:: --noinput, --no-input
 
 Suppresses all user prompts.
-
-.. versionchanged:: 1.9
-
-    The ``--no-input`` alias was added.
 
 .. django-admin-option:: --database DATABASE
 
@@ -684,10 +663,6 @@ of a ``ForeignKey``, for example).
 Suppresses all user prompts. If a suppressed prompt cannot be resolved
 automatically, the command will exit with error code 3.
 
-.. versionchanged:: 1.9
-
-    The ``--no-input`` alias was added.
-
 .. django-admin-option:: --empty
 
 Outputs an empty migration for the specified apps, for manual editing. This is
@@ -774,8 +749,6 @@ schema matches what is recorded in your initial migration.
 
 .. django-admin-option:: --run-syncdb
 
-.. versionadded:: 1.9
-
 Allows creating tables for apps without migrations. While this isn't
 recommended, the migrations framework is sometimes too slow on large projects
 with hundreds of models.
@@ -784,10 +757,6 @@ with hundreds of models.
 
 Suppresses all user prompts. An example prompt is asking about removing stale
 content types.
-
-.. versionchanged:: 1.9
-
-    The ``--no-input`` alias was added.
 
 ``runserver``
 -------------
@@ -925,8 +894,6 @@ you want to configure Django to serve static media, read
 
 .. django-admin:: sendtestemail [email [email ...]]
 
-.. versionadded:: 1.9
-
 Sends a test email (to confirm email sending through Django is working) to the
 recipient(s) specified. For example::
 
@@ -1053,12 +1020,6 @@ for running the migration in the forwards direction.
 
 Specifies the database for which to generate the SQL. Defaults to ``default``.
 
-.. versionchanged:: 1.9
-
-    To increase the readability of the overall SQL output the SQL code
-    generated for each migration operation is preceded by the operation's
-    description.
-
 ``sqlsequencereset``
 --------------------
 
@@ -1086,8 +1047,6 @@ down into fewer migrations, if possible. The resulting squashed migrations
 can live alongside the unsquashed ones safely. For more information,
 please read :ref:`migration-squashing`.
 
-.. versionadded:: 1.9
-
 When ``start_migration_name`` is given, Django will only include migrations
 starting from and including this migration. This helps to mitigate the
 squashing limitation of :class:`~django.db.migrations.operations.RunPython` and
@@ -1104,10 +1063,6 @@ behavior, as optimization is meant to be safe.
 .. django-admin-option:: --noinput, --no-input
 
 Suppresses all user prompts.
-
-.. versionchanged:: 1.9
-
-    The ``--no-input`` alias was added.
 
 ``startapp``
 ------------
@@ -1173,10 +1128,6 @@ files is:
 - ``camel_case_app_name`` -- the app name in camel case format
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
 
-.. versionadded:: 1.9
-
-    ``camel_case_app_name`` was added.
-
 .. _render_warning:
 
 .. warning::
@@ -1194,10 +1145,6 @@ files is:
     language syntax while also preventing packaging systems from trying to
     byte-compile invalid ``*.py`` files, template files ending with ``.py-tpl``
     will be renamed to ``.py``.
-
-    .. versionchanged:: 1.9.2
-
-        Renaming of ``.py-tpl`` to ``.py`` was added.
 
 .. _source: https://github.com/django/django/tree/master/django/conf/app_template/
 
@@ -1278,18 +1225,10 @@ Overrides the default address where the live server (used with
 :class:`~django.test.LiveServerTestCase`) is expected to run from. The default
 value is ``localhost:8081-8179``.
 
-.. versionchanged:: 1.9
-
-    In earlier versions, the default value was ``localhost:8081``.
-
 .. django-admin-option:: --noinput, --no-input
 
 Suppresses all user prompts. A typical prompt is a warning about deleting an
 existing test database.
-
-.. versionchanged:: 1.9
-
-    The ``--no-input`` alias was added.
 
 Test runner options
 ~~~~~~~~~~~~~~~~~~~
@@ -1319,8 +1258,6 @@ Enables :ref:`SQL logging <django-db-logger>` for failing tests. If
 ``--verbosity`` is ``2``, then queries in passing tests are also output.
 
 .. django-admin-option:: --parallel [N]
-
-.. versionadded:: 1.9
 
 Runs tests in separate parallel processes. Since modern processors have
 multiple cores, this allows running tests significantly faster.
@@ -1440,10 +1377,6 @@ To run on 1.2.3.4:7000 with a ``test`` fixture::
 
 Suppresses all user prompts. A typical prompt is a warning about deleting an
 existing test database.
-
-.. versionchanged:: 1.9
-
-    The ``--no-input`` alias was added.
 
 Commands provided by applications
 =================================
@@ -1695,10 +1628,6 @@ number of roles in which color is used:
 * ``http_server_error`` - A 5XX HTTP Server Error response.
 * ``migrate_heading`` - A heading in a migrations management command.
 * ``migrate_label`` - A migration name.
-
-.. versionchanged:: 1.9
-
-    ``success`` was added.
 
 Each of these roles can be assigned a specific foreground and
 background color, from the following list:

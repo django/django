@@ -279,8 +279,6 @@ Initial migrations
 
 .. attribute:: Migration.initial
 
-.. versionadded:: 1.9
-
 The "initial migrations" for an app are the migrations that create the first
 version of that app's tables. Usually an app will have just one initial
 migration, but in some cases of complex model interdependencies it may have two
@@ -655,11 +653,6 @@ Django can serialize the following:
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
-
-.. versionchanged:: 1.9
-
-    Serialization support for ``functools.partial`` and ``LazyObject``
-    instances was added.
 
 .. versionchanged:: 1.10
 

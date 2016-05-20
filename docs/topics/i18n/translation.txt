@@ -700,10 +700,6 @@ In practice you'll use this to get a string you can use in multiple places in a
 template or so you can use the output as an argument for other template tags or
 filters.
 
-.. versionchanged:: 1.9
-
-    The ``asvar`` syntax was added.
-
 ``{% blocktrans %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
 
@@ -890,10 +886,6 @@ You can then access the information::
     Bi-directional: {{ lang.bidi }}
     Name in the active language: {{ lang.name_translated }}
 
-.. versionadded:: 1.9
-
-   The ``name_translated`` attribute was added.
-
 .. templatetag:: get_language_info_list
 
 ``get_language_info_list``
@@ -933,12 +925,6 @@ There are also simple filters available for convenience:
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
 * ``{{ LANGUAGE_CODE|language_bidi }}`` (False)
 * ``{{ LANGUAGE_CODE|language_name_translated }}`` ("německy", when active language is Czech)
-
-.. versionadded:: 1.9
-
-   The ``language_name_translated`` filter was added.
-
-.. _Django templates: ../templates_python/
 
 Internationalization: in JavaScript code
 ========================================
@@ -1093,11 +1079,6 @@ your sites::
 If you use more than one ``javascript_catalog`` on a site and some of them
 define the same strings, the strings in the catalog that was loaded last take
 precedence.
-
-.. versionchanged:: 1.9
-
-    Before Django 1.9, the catalogs completely overwrote each other and you
-    could only use one at a time.
 
 The JavaScript translations found in the paths listed in the
 :setting:`LOCALE_PATHS` setting are also always included. To keep consistency
@@ -1303,8 +1284,6 @@ The ``JSONCatalog`` view
 
 The ``json_catalog`` view
 -------------------------
-
-.. versionadded:: 1.9
 
 .. function:: json_catalog(request, domain='djangojs', packages=None)
 
@@ -1768,11 +1747,6 @@ which you ran :djadmin:`django-admin makemessages <makemessages>`, run
    django-admin compilemessages
 
 That's it. Your translations are ready for use.
-
-.. versionchanged:: 1.9
-
-    ``compilemessages`` now matches the operation of :djadmin:`makemessages`,
-    scanning the project tree for ``.po`` files to compile.
 
 .. admonition:: Working on Windows?
 

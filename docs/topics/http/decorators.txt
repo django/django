@@ -111,8 +111,3 @@ client-side caching.
     This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
     must-revalidate`` header to a response to indicate that a page should never
     be cached.
-
-    .. versionchanged:: 1.9
-
-        Before Django 1.9, ``Cache-Control: max-age=0`` was sent. This didn't
-        reliably prevent caching in all browsers.

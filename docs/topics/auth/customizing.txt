@@ -595,13 +595,9 @@ password resets. You must then provide some key implementation details:
 
     .. admonition:: Importing ``AbstractBaseUser``
 
-        .. versionadded:: 1.9
-
         ``AbstractBaseUser`` and ``BaseUserManager`` are importable from
         ``django.contrib.auth.base_user`` so that they can be imported without
-        including ``django.contrib.auth`` in :setting:`INSTALLED_APPS` (this
-        raised a deprecation warning in older versions and is no longer
-        supported in Django 1.9).
+        including ``django.contrib.auth`` in :setting:`INSTALLED_APPS`.
 
 The following attributes and methods are available on any subclass of
 :class:`~django.contrib.auth.models.AbstractBaseUser`:

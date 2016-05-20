@@ -72,19 +72,12 @@ Features specification [#fnogc]_. There is no such standard for raster data.
 ``RasterField``
 ---------------
 
-.. versionadded:: 1.9
-
 .. class:: RasterField
 
 ``RasterField`` is currently only implemented for the PostGIS backend.
 
 Spatial Field Options
 =====================
-
-.. versionchanged:: 1.9
-
-    The geometry field options ``srid`` and ``spatial_index`` are now shared by
-    ``GeometryField`` and ``RasterField`` through the ``BaseSpatialField``.
 
 In addition to the regular :ref:`common-model-field-options` available for
 Django model fields, spatial fields have the following additional options.
@@ -266,31 +259,6 @@ The ``GeoManager`` is required in order to use the legacy
     :doc:`equivalent database functions </ref/contrib/gis/functions>`. As soon
     as the legacy methods have been replaced in your code, you should be able
     to remove the special ``GeoManager`` from your GIS-enabled classes.
-
-.. versionchanged:: 1.9
-
-    In older versions, the manager was required to conduct geographic queries.
-    Without it, all geographic filters failed.
-
-    ``GeoManager`` was required even if the model did not have a geographic
-    field itself, e.g., in the case of a ``ForeignKey`` relation to a model
-    with a geographic field.  For example, if we had an ``Address`` model with
-    a ``ForeignKey`` to our ``Zipcode`` model::
-
-        from django.contrib.gis.db import models
-
-        class Address(models.Model):
-            num = models.IntegerField()
-            street = models.CharField(max_length=100)
-            city = models.CharField(max_length=100)
-            state = models.CharField(max_length=2)
-            zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE)
-            objects = models.GeoManager()
-
-    The geographic manager was needed to do spatial queries on related
-    ``Zipcode`` objects, for example::
-
-        qs = Address.objects.filter(zipcode__poly__contains='POINT(-104.590948 38.319914)')
 
 .. rubric:: Footnotes
 .. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.

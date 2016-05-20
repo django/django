@@ -307,11 +307,6 @@ test failures. You can adjust this behavior with the ``--parallel`` option::
 You can also use the ``DJANGO_TEST_PROCESSES`` environment variable for this
 purpose.
 
-.. versionadded:: 1.9
-
-    Support for running tests in parallel and the ``--parallel`` option were
-    added.
-
 Tips for writing tests
 ----------------------
 
