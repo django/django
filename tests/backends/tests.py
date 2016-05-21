@@ -453,9 +453,6 @@ class ParameterHandlingTest(TestCase):
             cursor.executemany(query, [(1,)])
 
 
-# Unfortunately, the following tests would be a good test to run on all
-# backends, but it breaks MySQL hard. Until #13711 is fixed, it can't be run
-# everywhere (although it would be an effective test of #13711).
 class LongNameTest(TransactionTestCase):
     """Long primary keys and model names can result in a sequence name
     that exceeds the database limits, which will result in truncation
