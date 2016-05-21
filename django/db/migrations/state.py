@@ -451,15 +451,17 @@ class ModelState(object):
             if model._default_manager.use_in_migrations:
                 default_manager = copy.copy(model._default_manager)
                 default_manager._set_creation_counter()
+                managers.append((force_text(default_manager.name), default_manager))
 
             # If the default manager doesn't have `use_in_migrations = True`,
             # shim a default manager so another manager isn't promoted in its
             # place.
-            else:
+            elif model._default_manager.name != 'objects':
                 default_manager = models.Manager()
                 default_manager.model = model
                 default_manager.name = model._default_manager.name
-            managers.append((force_text(default_manager.name), default_manager))
+                managers.append((force_text(default_manager.name), default_manager))
+
 
         for manager in model._meta.managers:
             if manager.use_in_migrations and manager is not model._default_manager:

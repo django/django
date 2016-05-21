@@ -191,6 +191,26 @@ class StateTests(SimpleTestCase):
         author_state = project_state.models['migrations', 'author']
         self.assertEqual(author_state.managers, [('authors', custom_manager)])
 
+    def test_manager_not_for_migration_not_added_to_the_model_state_when_named_objects(self):
+        """
+        #26643 - When a manager is added with a name of 'objects', but it
+        does not have use_in_migrations = True, no migration should be
+        added to the model state.
+        """
+        new_apps = Apps(['migrations'])
+        custom_manager = models.Manager()
+
+        class Author(models.Model):
+            objects = custom_manager
+
+            class Meta:
+                app_label = 'migrations'
+                apps = new_apps
+
+        project_state = ProjectState.from_apps(new_apps)
+        author_state = project_state.models['migrations', 'author']
+        self.assertEqual(author_state.managers, [])
+
     def test_apps_bulk_update(self):
         """
         StateApps.bulk_update() should update apps.ready to False and reset
