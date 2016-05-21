@@ -168,14 +168,6 @@ class NamedURL(models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
-class Copy(NamedURL):
-    content = models.TextField()
-
-    def __str__(self):
-        return self.content
-
-
 class Mixin(object):
     def __init__(self):
         self.other_attr = 1
