@@ -462,7 +462,6 @@ class ModelState(object):
                 default_manager.name = model._default_manager.name
                 managers.append((force_text(default_manager.name), default_manager))
 
-
         for manager in model._meta.managers:
             if manager.use_in_migrations and manager is not model._default_manager:
                 manager = copy.copy(manager)
