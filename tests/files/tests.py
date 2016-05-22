@@ -6,7 +6,7 @@ import os
 import struct
 import tempfile
 import unittest
-from io import BytesIO, StringIO
+from io import BytesIO, StringIO, TextIOWrapper
 
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -120,18 +120,39 @@ class FileTests(unittest.TestCase):
         f = File(StringIO('one\ntwo\nthree'))
         self.assertEqual(list(f), ['one\n', 'two\n', 'three'])
 
+    def test_readable(self):
+        with tempfile.TemporaryFile() as temp, File(temp, name='something.txt') as test_file:
+            self.assertTrue(test_file.readable())
+        self.assertFalse(test_file.readable())
+
+    def test_writable(self):
+        with tempfile.TemporaryFile() as temp, File(temp, name='something.txt') as test_file:
+            self.assertTrue(test_file.writable())
+        self.assertFalse(test_file.writable())
+        with tempfile.TemporaryFile('rb') as temp, File(temp, name='something.txt') as test_file:
+            self.assertFalse(test_file.writable())
+
     def test_seekable(self):
-        """
-        File.seekable() should be available on Python 3.
-        """
-        with tempfile.TemporaryFile() as temp:
-            temp.write(b"contents\n")
-            test_file = File(temp, name="something.txt")
-            if six.PY2:
-                self.assertFalse(hasattr(test_file, 'seekable'))
-            if six.PY3:
-                self.assertTrue(hasattr(test_file, 'seekable'))
-                self.assertTrue(test_file.seekable())
+        with tempfile.TemporaryFile() as temp, File(temp, name='something.txt') as test_file:
+            self.assertTrue(test_file.seekable())
+        self.assertFalse(test_file.seekable())
+
+    def test_io_wrapper(self):
+        content = "vive l'été\n"
+        with tempfile.TemporaryFile() as temp, File(temp, name='something.txt') as test_file:
+            test_file.write(content.encode('utf-8'))
+            test_file.seek(0)
+            wrapper = TextIOWrapper(test_file, 'utf-8', newline='\n')
+            self.assertEqual(wrapper.read(), content)
+            # The following seek() call is required on Windows Python 2 when
+            # switching from reading to writing.
+            wrapper.seek(0, 2)
+            wrapper.write(content)
+            wrapper.seek(0)
+            self.assertEqual(wrapper.read(), content * 2)
+            test_file = wrapper.detach()
+            test_file.seek(0)
+            self.assertEqual(test_file.read(), (content * 2).encode('utf-8'))
 
 
 class NoNameFileTestCase(unittest.TestCase):

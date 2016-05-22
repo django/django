@@ -122,7 +122,9 @@ Email
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* To make it wrappable by :class:`io.TextIOWrapper`,
+  :class:`~django.core.files.File` now has the ``readable()``, ``writable()``,
+  and ``seekable()`` methods.
 
 File Uploads
 ~~~~~~~~~~~~
