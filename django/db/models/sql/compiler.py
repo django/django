@@ -223,7 +223,12 @@ class SQLCompiler(object):
 
         ret = []
         for col, alias in select:
-            ret.append((col, self.compile(col, select_format=True), alias))
+            try:
+                sql, params = self.compile(col, select_format=True)
+            except EmptyResultSet:
+                # Selecting a predicate that is always false:
+                sql, params = '0', ()
+            ret.append((col, (sql, params), alias))
         return ret, klass_info, annotations
 
     def get_order_by(self):
