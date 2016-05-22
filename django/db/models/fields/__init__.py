@@ -20,6 +20,7 @@ from django.core import checks, exceptions, validators
 # purposes.
 from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import six, timezone
 from django.utils.datastructures import DictWrapper
@@ -221,10 +222,10 @@ class Field(RegisterLookupMixin):
                     id='fields.E001',
                 )
             ]
-        elif '__' in self.name:
+        elif LOOKUP_SEP in self.name:
             return [
                 checks.Error(
-                    'Field names must not contain "__".',
+                    'Field names must not contain "%s".' % (LOOKUP_SEP,),
                     obj=self,
                     id='fields.E002',
                 )
