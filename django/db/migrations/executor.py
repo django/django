@@ -116,8 +116,8 @@ class MigrationExecutor(object):
             if key in self.loader.graph.nodes
         }
         for migration, _ in full_plan:
-            if not migrations_to_run:
-                # We remove every migration that we applied from this set so
+            if not migrations_to_run and not applied_migrations:
+                # We remove every migration that we applied from these sets so
                 # that we can bail out once the last migration has been applied
                 # and don't always run until the very end of the migration
                 # process.
@@ -136,6 +136,7 @@ class MigrationExecutor(object):
                 # to make sure the resulting state doesn't include changes
                 # from unrelated migrations.
                 migration.mutate_state(state, preserve=False)
+                applied_migrations.remove(migration)
 
         return state
 
