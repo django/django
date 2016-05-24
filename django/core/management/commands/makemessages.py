@@ -153,16 +153,41 @@ class BuildFile(object):
                 os.unlink(self.work_path)
 
 
+def normalize_eols(raw_contents):
+    """
+    Take a block of raw text that will be passed through str.splitlines() to
+    get universal newlines treatment.
+
+    Return the resulting block of text with normalized `\n` EOL sequences ready
+    to be written to disk using current platform's native EOLs.
+    """
+    lines_list = raw_contents.splitlines()
+    # Ensure last line has its EOL
+    if lines_list and lines_list[-1]:
+        lines_list.append('')
+    return '\n'.join(lines_list)
+
+
 def write_pot_file(potfile, msgs):
     """
     Write the :param potfile: POT file with the :param msgs: contents,
     previously making sure its format is valid.
     """
+    pot_lines = msgs.splitlines()
     if os.path.exists(potfile):
         # Strip the header
-        msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
+        lines = dropwhile(len, pot_lines)
     else:
-        msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
+        lines = []
+        found, header_read = False, False
+        for line in pot_lines:
+            if not found and not header_read:
+                found = True
+                line = line.replace('charset=CHARSET', 'charset=UTF-8')
+            if not line and not found:
+                header_read = True
+            lines.append(line)
+    msgs = '\n'.join(lines)
     with io.open(potfile, 'a', encoding='utf-8') as fp:
         fp.write(msgs)
 
@@ -379,6 +404,7 @@ class Command(BaseCommand):
                         "errors happened while running msguniq\n%s" % errors)
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
+            msgs = normalize_eols(msgs)
             with io.open(potfile, 'w', encoding='utf-8') as fp:
                 fp.write(msgs)
             potfiles.append(potfile)
@@ -582,6 +608,7 @@ class Command(BaseCommand):
                 msgs = fp.read()
             if not self.invoked_for_django:
                 msgs = self.copy_plural_forms(msgs, locale)
+        msgs = normalize_eols(msgs)
         msgs = msgs.replace(
             "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % self.domain, "")
         with io.open(pofile, 'w', encoding='utf-8') as fp:
@@ -619,9 +646,9 @@ class Command(BaseCommand):
                         self.stdout.write("copying plural forms: %s\n" % plural_form_line)
                     lines = []
                     found = False
-                    for line in msgs.split('\n'):
+                    for line in msgs.splitlines():
                         if not found and (not line or plural_forms_re.search(line)):
-                            line = '%s\n' % plural_form_line
+                            line = plural_form_line
                             found = True
                         lines.append(line)
                     msgs = '\n'.join(lines)
