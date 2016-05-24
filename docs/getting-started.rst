@@ -60,6 +60,8 @@ Here's what that looks like::
             "ROUTING": "myproject.routing.channel_routing",
         },
     }
+..
+::
 
     # In routing.py
     from channels.routing import route
