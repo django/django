@@ -2,12 +2,18 @@
 (function($) {
     'use strict';
 
+    function escapeValue(val) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(val));
+        return div.innerHTML;
+    }
+
     function make_row(k, v) {
         k = k || '';
         v = v || '';
         return '<tr class="form-row"' + ((k === '') ? '' : ' data-value="' + encodeURIComponent(v) + '"') + '>' +
                    '<td><input type="text" value="' + encodeURIComponent(k) + '"></td>' +
-                   '<td><textarea class="vLargeTextField">' + v + '</textarea></td>' +
+                   '<td><textarea class="vLargeTextField">' + escapeValue(v) + '</textarea></td>' +
                    '<td>' +
                        '<a class="inline-deletelink">Delete</a>' +
                        ((k === '') ? '' : '<a class="inline-undolink">Undo</a>') +
