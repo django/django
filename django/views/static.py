@@ -38,17 +38,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     """
     path = posixpath.normpath(unquote(path))
     path = path.lstrip('/')
-    newpath = ''
-    for part in path.split('/'):
-        if not part:
-            # Strip empty path components.
-            continue
-        drive, part = os.path.splitdrive(part)
-        head, part = os.path.split(part)
-        if part in (os.curdir, os.pardir):
-            # Strip '.' and '..' in path.
-            continue
-        newpath = os.path.join(newpath, part).replace('\\', '/')
+    newpath = _normalize_path(path)
     if newpath and path != newpath:
         return HttpResponseRedirect(newpath)
     fullpath = os.path.join(document_root, newpath)
@@ -72,6 +62,24 @@ def serve(request, path, document_root=None, show_indexes=False):
     if encoding:
         response["Content-Encoding"] = encoding
     return response
+
+
+def _normalize_path(path):
+    """Clean the path from unnecessary constructs like '.', '..', '//'."""
+    newpath = ''
+
+    for part in path.split('/'):
+        if not part:
+            # Strip empty path components.
+            continue
+        drive, part = os.path.splitdrive(part)
+        head, part = os.path.split(part)
+        if part in (os.curdir, os.pardir):
+            # Strip '.' and '..' in path.
+            continue
+        newpath = os.path.join(newpath, part).replace('\\', '/')
+
+    return newpath
 
 
 DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
