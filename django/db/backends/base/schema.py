@@ -2,6 +2,9 @@ import hashlib
 import logging
 from datetime import datetime
 
+from django.db.backends.ddl_references import (
+    Columns, ForeignKeyName, IndexName, Statement, Table,
+)
 from django.db.backends.utils import strip_quotes
 from django.db.models import Index
 from django.db.transaction import TransactionManagementError, atomic
@@ -97,6 +100,8 @@ class BaseDatabaseSchemaEditor:
                 "Executing DDL statements while in a transaction on databases "
                 "that can't perform a rollback is prohibited."
             )
+        # Account for non-string statement objects.
+        sql = str(sql)
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)", sql, params, extra={'params': params, 'sql': sql})
         if self.collect_sql:
@@ -878,13 +883,19 @@ class BaseDatabaseSchemaEditor:
         tablespace_sql = self._get_index_tablespace_sql(model, fields)
         columns = [field.column for field in fields]
         sql_create_index = sql or self.sql_create_index
-        return sql_create_index % {
-            "table": self.quote_name(model._meta.db_table),
-            "name": self.quote_name(self._create_index_name(model._meta.db_table, columns, suffix=suffix)),
-            "using": "",
-            "columns": ", ".join(self.quote_name(column) for column in columns),
-            "extra": tablespace_sql,
-        }
+        table = model._meta.db_table
+
+        def create_index_name(*args, **kwargs):
+            return self.quote_name(self._create_index_name(*args, **kwargs))
+
+        return Statement(
+            sql_create_index,
+            table=Table(table, self.quote_name),
+            name=IndexName(table, columns, suffix, create_index_name),
+            using='',
+            columns=Columns(table, columns, self.quote_name),
+            extra=tablespace_sql,
+        )
 
     def _model_indexes_sql(self, model):
         """
@@ -930,26 +941,28 @@ class BaseDatabaseSchemaEditor:
         from_column = field.column
         to_table = field.target_field.model._meta.db_table
         to_column = field.target_field.column
-        suffix = suffix % {
-            "to_table": to_table,
-            "to_column": to_column,
-        }
 
-        return self.sql_create_fk % {
-            "table": self.quote_name(from_table),
-            "name": self.quote_name(self._create_index_name(model._meta.db_table, [from_column], suffix=suffix)),
-            "column": self.quote_name(from_column),
-            "to_table": self.quote_name(to_table),
-            "to_column": self.quote_name(to_column),
-            "deferrable": self.connection.ops.deferrable_sql(),
-        }
+        def create_fk_name(*args, **kwargs):
+            return self.quote_name(self._create_index_name(*args, **kwargs))
+
+        return Statement(
+            self.sql_create_fk,
+            table=Table(from_table, self.quote_name),
+            name=ForeignKeyName(from_table, [from_column], to_table, [to_column], suffix, create_fk_name),
+            column=Columns(from_table, [from_column], self.quote_name),
+            to_table=Table(to_table, self.quote_name),
+            to_column=Columns(to_table, [to_column], self.quote_name),
+            deferrable=self.connection.ops.deferrable_sql(),
+        )
 
     def _create_unique_sql(self, model, columns):
-        return self.sql_create_unique % {
-            "table": self.quote_name(model._meta.db_table),
-            "name": self.quote_name(self._create_index_name(model._meta.db_table, columns, suffix="_uniq")),
-            "columns": ", ".join(self.quote_name(column) for column in columns),
-        }
+        table = model._meta.db_table
+        return Statement(
+            self.sql_create_unique,
+            table=Table(table, self.quote_name),
+            name=IndexName(table, columns, '_uniq', self._create_index_name),
+            columns=Columns(table, columns, self.quote_name),
+        )
 
     def _delete_constraint_sql(self, template, model, name):
         return template % {

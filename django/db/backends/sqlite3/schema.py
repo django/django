@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from django.apps.registry import Apps
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.backends.ddl_references import Statement
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -189,9 +190,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # Rename the old table to make way for the new
             self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
 
-            # Create a new table with the updated schema. We remove things
-            # from the deferred SQL that match our table name, too
-            self.deferred_sql = [x for x in self.deferred_sql if temp_model._meta.db_table not in x]
+            # Remove all deferred statements referencing the temporary table.
+            for sql in list(self.deferred_sql):
+                if isinstance(sql, Statement) and sql.references_table(temp_model._meta.db_table):
+                    self.deferred_sql.remove(sql)
+
+            # Create a new table with the updated schema.
             self.create_model(temp_model)
 
             # Copy data from the old table into the new table
