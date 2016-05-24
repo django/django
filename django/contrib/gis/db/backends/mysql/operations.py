@@ -15,45 +15,61 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     Adapter = WKTAdapter
 
     @cached_property
+    def is_mysql_5_5(self):
+        return self.connection.mysql_version < (5, 6, 1)
+
+    @cached_property
+    def is_mysql_5_6(self):
+        return self.connection.mysql_version < (5, 7, 6)
+
+    @cached_property
     def select(self):
-        if self.connection.mysql_version < (5, 6, 0):
+        if self.is_mysql_5_5:
             return 'AsText(%s)'
         return 'ST_AsText(%s)'
 
     @cached_property
     def from_wkb(self):
-        if self.connection.mysql_version < (5, 6, 0):
+        if self.is_mysql_5_5:
             return 'GeomFromWKB'
         return 'ST_GeomFromWKB'
 
     @cached_property
     def from_text(self):
-        if self.connection.mysql_version < (5, 6, 0):
+        if self.is_mysql_5_5:
             return 'GeomFromText'
         return 'ST_GeomFromText'
 
-    gis_operators = {
-        'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
-        'bboverlaps': SpatialOperator(func='MBROverlaps'),  # .. ..
-        'contained': SpatialOperator(func='MBRWithin'),    # .. ..
-        'contains': SpatialOperator(func='MBRContains'),
-        'disjoint': SpatialOperator(func='MBRDisjoint'),
-        'equals': SpatialOperator(func='MBREqual'),
-        'exact': SpatialOperator(func='MBREqual'),
-        'intersects': SpatialOperator(func='MBRIntersects'),
-        'overlaps': SpatialOperator(func='MBROverlaps'),
-        'same_as': SpatialOperator(func='MBREqual'),
-        'touches': SpatialOperator(func='MBRTouches'),
-        'within': SpatialOperator(func='MBRWithin'),
-    }
+    @cached_property
+    def gis_operators(self):
+        MBREquals = 'MBREqual' if self.is_mysql_5_6 else 'MBREquals'
+        return {
+            'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
+            'bboverlaps': SpatialOperator(func='MBROverlaps'),  # ...
+            'contained': SpatialOperator(func='MBRWithin'),  # ...
+            'contains': SpatialOperator(func='MBRContains'),
+            'disjoint': SpatialOperator(func='MBRDisjoint'),
+            'equals': SpatialOperator(func=MBREquals),
+            'exact': SpatialOperator(func=MBREquals),
+            'intersects': SpatialOperator(func='MBRIntersects'),
+            'overlaps': SpatialOperator(func='MBROverlaps'),
+            'same_as': SpatialOperator(func=MBREquals),
+            'touches': SpatialOperator(func='MBRTouches'),
+            'within': SpatialOperator(func='MBRWithin'),
+        }
 
     @cached_property
     def function_names(self):
         return {
+            'Area': 'Area' if self.is_mysql_5_5 else 'ST_Area',
+            'Centroid': 'Centroid' if self.is_mysql_5_5 else 'ST_Centroid',
             'Difference': 'ST_Difference',
             'Distance': 'ST_Distance',
+            'Envelope': 'Envelope' if self.is_mysql_5_5 else 'ST_Envelope',
             'Intersection': 'ST_Intersection',
-            'Length': 'GLength' if self.connection.mysql_version < (5, 6, 0) else 'ST_Length',
+            'Length': 'GLength' if self.is_mysql_5_5 else 'ST_Length',
+            'NumGeometries': 'NumGeometries' if self.is_mysql_5_5 else 'ST_NumGeometries',
+            'NumPoints': 'NumPoints' if self.is_mysql_5_5 else 'ST_NumPoints',
             'SymDifference': 'ST_SymDifference',
             'Union': 'ST_Union',
         }
@@ -71,7 +87,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             'Perimeter', 'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid',
             'Transform', 'Translate',
         }
-        if self.connection.mysql_version < (5, 6, 1):
+        if self.is_mysql_5_5:
             unsupported.update({'Difference', 'Distance', 'Intersection', 'SymDifference', 'Union'})
         return unsupported
 
