@@ -49,6 +49,43 @@ def serve(request, path, document_root=None, show_indexes=False):
         return _make_response(request, fullpath, FileResponse, open(fullpath, 'rb'))
 
 
+def nginx_serve(request, path, location=None, alias=None, show_indexes=False):
+    """
+    Serve files with nginx "X-Accel-Redirect" header (you might know it as "X-Sendfile").
+
+    It works similarly as django.views.static.serve view. You have to specify 'location' and 'alias' keyword arguments
+    in the urlconf (which are corresponging to the appropriate nginx configuration directives)::
+
+        from django.views.static import nginx_serve
+
+        url(r'^(?P<path>.*)$', nginx_serve, {'location': '/protected/', alias': '/path/to/my/files/'})
+
+    For this urlconf, nginx configuration would be something like::
+
+        location /protected/ {
+            internal;
+            alias   /path/to/my/files/;  # note the trailing slash
+        }
+
+    You may also set ``show_indexes`` to ``True``. It works the same way as with serve.
+    For more details, see the xsendfile feature in nginx documentation:
+    https://www.nginx.com/resources/wiki/start/topics/examples/xsendfile/
+    """
+    path = posixpath.normpath(unquote(path))
+    path = path.lstrip('/')
+    newpath = _normalize_path(path)
+    if newpath and path != newpath:
+        return HttpResponseRedirect(newpath)
+    fullpath = os.path.join(alias, newpath)
+    is_dir = _check_path(fullpath, show_indexes)
+    if is_dir and show_indexes:
+        return directory_index(newpath, fullpath)
+    else:
+        response = _make_response(request, fullpath, HttpResponse, b'')
+        response['X-Accel-Redirect'] = os.path.join(location, alias)
+        return response
+
+
 def _normalize_path(path):
     """Clean the path from unnecessary constructs like '.', '..', '//'."""
     newpath = ''
