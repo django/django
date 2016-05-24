@@ -46,7 +46,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     if is_dir and show_indexes:
         return directory_index(newpath, fullpath)
     else:
-        return _make_response(request, fullpath)
+        return _make_response(request, fullpath, FileResponse, open(fullpath, 'rb'))
 
 
 def _normalize_path(path):
@@ -79,7 +79,7 @@ def _check_path(fullpath, show_indexes):
     return is_dir
 
 
-def _make_response(request, fullpath):
+def _make_response(request, fullpath, response_class, content):
     statobj = os.stat(fullpath)
     # Respect the If-Modified-Since header.
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
@@ -87,7 +87,7 @@ def _make_response(request, fullpath):
         return HttpResponseNotModified()
     content_type, encoding = mimetypes.guess_type(fullpath)
     content_type = content_type or 'application/octet-stream'
-    response = FileResponse(open(fullpath, 'rb'), content_type=content_type)
+    response = response_class(content, content_type=content_type)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     if stat.S_ISREG(statobj.st_mode):
         response["Content-Length"] = statobj.st_size
