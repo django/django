@@ -12,7 +12,7 @@
         k = k || '';
         v = v || '';
         return '<tr class="form-row"' + ((k === '') ? '' : ' data-value="' + encodeURIComponent(v) + '"') + '>' +
-                   '<td><input type="text" value="' + encodeURIComponent(k) + '"></td>' +
+                   '<td><input type="text" value="' + k + '"></td>' +
                    '<td><textarea class="vLargeTextField">' + escapeValue(v) + '</textarea></td>' +
                    '<td>' +
                        '<a class="inline-deletelink">Delete</a>' +
