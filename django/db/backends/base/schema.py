@@ -314,6 +314,10 @@ class BaseDatabaseSchemaEditor:
         self.execute(self.sql_delete_table % {
             "table": self.quote_name(model._meta.db_table),
         })
+        # Remove all deferred statements referencing the deleted table.
+        for sql in list(self.deferred_sql):
+            if isinstance(sql, Statement) and sql.references_table(model._meta.db_table):
+                self.deferred_sql.remove(sql)
 
     def add_index(self, model, index):
         """Add an index on a model."""
@@ -456,6 +460,10 @@ class BaseDatabaseSchemaEditor:
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
+        # Remove all deferred statements referencing the deleted table.
+        for sql in list(self.deferred_sql):
+            if isinstance(sql, Statement) and sql.references_column(model._meta.db_table, field.column):
+                self.deferred_sql.remove(sql)
 
     def alter_field(self, model, old_field, new_field, strict=False):
         """

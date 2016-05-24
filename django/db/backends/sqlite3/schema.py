@@ -190,11 +190,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # Rename the old table to make way for the new
             self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
 
-            # Remove all deferred statements referencing the temporary table.
-            for sql in list(self.deferred_sql):
-                if isinstance(sql, Statement) and sql.references_table(temp_model._meta.db_table):
-                    self.deferred_sql.remove(sql)
-
             # Create a new table with the updated schema.
             self.create_model(temp_model)
 
@@ -226,6 +221,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             self.execute(self.sql_delete_table % {
                 "table": self.quote_name(model._meta.db_table),
             })
+            # Remove all deferred statements referencing the deleted table.
+            for sql in list(self.deferred_sql):
+                if isinstance(sql, Statement) and sql.references_table(model._meta.db_table):
+                    self.deferred_sql.remove(sql)
 
     def add_field(self, model, field):
         """

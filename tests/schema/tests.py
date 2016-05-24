@@ -195,14 +195,15 @@ class SchemaTests(TransactionTestCase):
         """
         Tries creating a model's table, and then deleting it.
         """
-        # Create the table
         with connection.schema_editor() as editor:
+            # Create the table
             editor.create_model(Author)
-        # The table is there
-        list(Author.objects.all())
-        # Clean up that table
-        with connection.schema_editor() as editor:
+            # The table is there
+            list(Author.objects.all())
+            # Clean up that table
             editor.delete_model(Author)
+            # No deferred SQL should be left over.
+            self.assertEqual(editor.deferred_sql, [])
         # The table is gone
         with self.assertRaises(DatabaseError):
             list(Author.objects.all())
@@ -378,6 +379,17 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['age'][0], "IntegerField")
         self.assertEqual(columns['age'][1][6], True)
+
+    def test_add_field_remove_field(self):
+        """
+        Adding a field and removing it removes all deferred sql referring to it.
+        """
+        with connection.schema_editor() as editor:
+            # Create a table with a unique constraint on the slug field.
+            editor.create_model(Tag)
+            # Remove the slug column.
+            editor.remove_field(Tag, Tag._meta.get_field('slug'))
+        self.assertEqual(editor.deferred_sql, [])
 
     def test_add_field_temp_default(self):
         """
