@@ -36,10 +36,8 @@ def serve(request, path, document_root=None, show_indexes=False):
     but if you'd like to override it, you can create a template called
     ``static/directory_index.html``.
     """
-    path = posixpath.normpath(unquote(path))
-    path = path.lstrip('/')
-    newpath = _normalize_path(path)
-    if newpath and path != newpath:
+    normpath, newpath = _normalize_path(path)
+    if newpath and normpath != newpath:
         return HttpResponseRedirect(newpath)
     fullpath = os.path.join(document_root, newpath)
     is_dir = _check_path(fullpath, show_indexes)
@@ -71,10 +69,8 @@ def nginx_serve(request, path, location=None, alias=None, show_indexes=False):
     For more details, see the xsendfile feature in nginx documentation:
     https://www.nginx.com/resources/wiki/start/topics/examples/xsendfile/
     """
-    path = posixpath.normpath(unquote(path))
-    path = path.lstrip('/')
-    newpath = _normalize_path(path)
-    if newpath and path != newpath:
+    normpath, newpath = _normalize_path(path)
+    if newpath and normpath != newpath:
         return HttpResponseRedirect(newpath)
     fullpath = os.path.join(alias, newpath)
     is_dir = _check_path(fullpath, show_indexes)
@@ -88,9 +84,11 @@ def nginx_serve(request, path, location=None, alias=None, show_indexes=False):
 
 def _normalize_path(path):
     """Clean the path from unnecessary constructs like '.', '..', '//'."""
+    normpath = posixpath.normpath(unquote(path))
+    normpath = normpath.lstrip('/')
     newpath = ''
 
-    for part in path.split('/'):
+    for part in normpath.split('/'):
         if not part:
             # Strip empty path components.
             continue
@@ -101,7 +99,7 @@ def _normalize_path(path):
             continue
         newpath = os.path.join(newpath, part).replace('\\', '/')
 
-    return newpath
+    return normpath, newpath
 
 
 def _check_path(fullpath, show_indexes):
