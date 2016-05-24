@@ -31,6 +31,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.six import StringIO
 from django.utils.six.moves.urllib.parse import urlparse
+from django.utils.timezone import utc
 from django.utils.xmlutils import SimplerXMLGenerator
 
 
@@ -211,7 +212,7 @@ class SyndicationFeed(object):
     def latest_post_date(self):
         """
         Returns the latest item's pubdate or updateddate. If no items
-        have either of these attributes this returns the current date/time.
+        have either of these attributes this returns the current UTC date/time.
         """
         latest_date = None
         date_keys = ('updateddate', 'pubdate')
@@ -223,7 +224,8 @@ class SyndicationFeed(object):
                     if latest_date is None or item_date > latest_date:
                         latest_date = item_date
 
-        return latest_date or datetime.datetime.now()
+        # datetime.now(tz=utc) is slower, as documented in django.utils.timezone.now
+        return latest_date or datetime.datetime.utcnow().replace(tzinfo=utc)
 
 
 class Enclosure(object):

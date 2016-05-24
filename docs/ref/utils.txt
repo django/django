@@ -397,7 +397,12 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         Returns the latest ``pubdate`` or ``updateddate`` for all items in the
         feed. If no items have either of these attributes this returns the
-        current date/time.
+        current UTC date/time.
+
+        .. versionchanged:: 1.11
+
+            In older versions, it returned the current date/time without any
+            timezone information.
 
 ``Enclosure``
 -------------
