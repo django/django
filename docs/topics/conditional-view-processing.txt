@@ -25,10 +25,10 @@ Depending on the header, if the page has been modified or does not match the
 ``ETag`` sent by the client, a 412 status code (Precondition Failed) may be
 returned.
 
-.. _If-match: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.24
-.. _If-none-match: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26
-.. _If-modified-since: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25
-.. _If-unmodified-since: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.28
+.. _If-match: https://tools.ietf.org/html/rfc7232#section-3.1
+.. _If-none-match: https://tools.ietf.org/html/rfc7232#section-3.2
+.. _If-modified-since: https://tools.ietf.org/html/rfc7232#section-3.3
+.. _If-unmodified-since: https://tools.ietf.org/html/rfc7232#section-3.4
 
 When you need more fine-grained control you may use per-view conditional
 processing functions.
@@ -45,9 +45,9 @@ functions to provide an "early bailout" option for the view processing.
 Telling the client that the content has not been modified since the last
 request, perhaps.
 
-.. _ETag: http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.11
+.. _ETag: https://tools.ietf.org/html/rfc7232#section-2.3
 
-These two functions are passed as parameters the
+These two functions are passed as parameters to the
 ``django.views.decorators.http.condition`` decorator. This decorator uses
 the two functions (you only need to supply one, if you can't compute both
 quantities easily and quickly) to work out if the headers in the HTTP request

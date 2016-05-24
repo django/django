@@ -1,24 +1,27 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Fulong Sun <sunfulong@neusoft.edu.cn>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
-# ouyanghongyu <ouyanghongyu@gmail.com>, 2013-2014
+# mozillazg <opensource.mozillazg@gmail.com>, 2016
+# Ronald White <ouyanghongyu@gmail.com>, 2013-2014
 # Sean Lee <iseansay@gmail.com>, 2013
 # Sean Lee <iseansay@gmail.com>, 2013
 # slene <vslene@gmail.com>, 2011
 # Ziang Song <songziang@gmail.com>, 2012
 # Kevin Sze <leiarix@gmail.com>, 2012
-# ouyanghongyu <ouyanghongyu@gmail.com>, 2013
+# 雨翌 <yumendy@163.com>, 2016
+# Ronald White <ouyanghongyu@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-31 01:47+0000\n"
-"Last-Translator: Lele Long <schemacs@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2016-03-17 12:16+0000\n"
+"Last-Translator: mozillazg <opensource.mozillazg@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,6 +86,12 @@ msgstr "动作"
 msgid "action time"
 msgstr "动作时间"
 
+msgid "user"
+msgstr "用户"
+
+msgid "content type"
+msgstr "内容类型"
+
 msgid "object id"
 msgstr "对象id"
 
@@ -122,6 +131,9 @@ msgstr "无"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "按住 ”Control“，或者Mac上的 “Command”，可以选择多个。"
+
+msgid "Added."
+msgstr "已添加。"
 
 #, python-format
 msgid "Changed %s."
@@ -462,6 +474,14 @@ msgstr ""
 "你的数据库安装有误。确保已经创建了相应的数据库表，并确保数据库可被相关的用户"
 "读取。"
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"您当前以%(username)s登录，但是没有这个页面的访问权限。您想使用另外一个账号登"
+"录吗？"
+
 msgid "Forgotten your password or username?"
 msgstr "忘记了您的密码或用户名？"
 
@@ -484,6 +504,9 @@ msgstr "显示全部"
 
 msgid "Save"
 msgstr "保存"
+
+msgid "Popup closing..."
+msgstr "弹窗关闭中。。。"
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -612,9 +635,6 @@ msgstr "重设我的密码"
 
 msgid "All dates"
 msgstr "所有日期"
-
-msgid "(None)"
-msgstr "(None)"
 
 #, python-format
 msgid "Select %s"

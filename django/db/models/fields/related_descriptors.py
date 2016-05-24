@@ -104,11 +104,20 @@ class ForwardManyToOneDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        manager = self.field.remote_field.model._default_manager
-        # If the related manager indicates that it should be used for
-        # related fields, respect that.
-        if not getattr(manager, 'use_for_related_fields', False):
-            manager = self.field.remote_field.model._base_manager
+        related_model = self.field.remote_field.model
+
+        if (not related_model._meta.base_manager_name and
+                getattr(related_model._default_manager, 'use_for_related_fields', False)):
+            if not getattr(related_model._default_manager, 'silence_use_for_related_fields_deprecation', False):
+                warnings.warn(
+                    "use_for_related_fields is deprecated, instead "
+                    "set Meta.base_manager_name on '{}'.".format(related_model._meta.label),
+                    RemovedInDjango20Warning, 2
+                )
+            manager = related_model._default_manager
+        else:
+            manager = related_model._base_manager
+
         return manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
@@ -239,7 +248,7 @@ class ForwardManyToOneDescriptor(object):
             for lh_field, rh_field in self.field.related_fields:
                 setattr(instance, lh_field.attname, getattr(value, rh_field.attname))
 
-        # Set the related instance cache used by __get__ to avoid a SQL query
+        # Set the related instance cache used by __get__ to avoid an SQL query
         # when accessing the attribute we just set.
         setattr(instance, self.cache_name, value)
 
@@ -281,11 +290,20 @@ class ReverseOneToOneDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        manager = self.related.related_model._default_manager
-        # If the related manager indicates that it should be used for
-        # related fields, respect that.
-        if not getattr(manager, 'use_for_related_fields', False):
-            manager = self.related.related_model._base_manager
+        related_model = self.related.related_model
+
+        if (not related_model._meta.base_manager_name and
+                getattr(related_model._default_manager, 'use_for_related_fields', False)):
+            if not getattr(related_model._default_manager, 'silence_use_for_related_fields_deprecation', False):
+                warnings.warn(
+                    "use_for_related_fields is deprecated, instead "
+                    "set Meta.base_manager_name on '{}'.".format(related_model._meta.label),
+                    RemovedInDjango20Warning, 2
+                )
+            manager = related_model._default_manager
+        else:
+            manager = related_model._base_manager
+
         return manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
@@ -406,7 +424,7 @@ class ReverseOneToOneDescriptor(object):
             for index, field in enumerate(self.related.field.local_related_fields):
                 setattr(value, field.attname, related_pk[index])
 
-            # Set the related instance cache used by __get__ to avoid a SQL query
+            # Set the related instance cache used by __get__ to avoid an SQL query
             # when accessing the attribute we just set.
             setattr(instance, self.cache_name, value)
 
@@ -437,8 +455,10 @@ class ReverseManyToOneDescriptor(object):
 
     @cached_property
     def related_manager_cls(self):
+        related_model = self.rel.related_model
+
         return create_reverse_many_to_one_manager(
-            self.rel.related_model._default_manager.__class__,
+            related_model._default_manager.__class__,
             self.rel,
         )
 
@@ -697,9 +717,10 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
 
     @cached_property
     def related_manager_cls(self):
-        model = self.rel.related_model if self.reverse else self.rel.model
+        related_model = self.rel.related_model if self.reverse else self.rel.model
+
         return create_forward_many_to_many_manager(
-            model._default_manager.__class__,
+            related_model._default_manager.__class__,
             self.rel,
             reverse=self.reverse,
         )
@@ -868,16 +889,19 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         def clear(self):
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
-                signals.m2m_changed.send(sender=self.through, action="pre_clear",
+                signals.m2m_changed.send(
+                    sender=self.through, action="pre_clear",
                     instance=self.instance, reverse=self.reverse,
-                    model=self.model, pk_set=None, using=db)
-
+                    model=self.model, pk_set=None, using=db,
+                )
                 filters = self._build_remove_filters(super(ManyRelatedManager, self).get_queryset().using(db))
                 self.through._default_manager.using(db).filter(filters).delete()
 
-                signals.m2m_changed.send(sender=self.through, action="post_clear",
+                signals.m2m_changed.send(
+                    sender=self.through, action="post_clear",
                     instance=self.instance, reverse=self.reverse,
-                    model=self.model, pk_set=None, using=db)
+                    model=self.model, pk_set=None, using=db,
+                )
         clear.alters_data = True
 
         def set(self, objs, **kwargs):
@@ -905,9 +929,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
                     new_objs = []
                     for obj in objs:
-                        fk_val = (self.target_field.get_foreign_related_value(obj)[0]
-                            if isinstance(obj, self.model) else obj)
-
+                        fk_val = (
+                            self.target_field.get_foreign_related_value(obj)[0]
+                            if isinstance(obj, self.model) else obj
+                        )
                         if fk_val in old_ids:
                             old_ids.remove(fk_val)
                         else:
@@ -998,9 +1023,11 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     if self.reverse or source_field_name == self.source_field_name:
                         # Don't send the signal when we are inserting the
                         # duplicate data row for symmetrical reverse entries.
-                        signals.m2m_changed.send(sender=self.through, action='pre_add',
+                        signals.m2m_changed.send(
+                            sender=self.through, action='pre_add',
                             instance=self.instance, reverse=self.reverse,
-                            model=self.model, pk_set=new_ids, using=db)
+                            model=self.model, pk_set=new_ids, using=db,
+                        )
 
                     # Add the ones that aren't there already
                     self.through._default_manager.using(db).bulk_create([
@@ -1014,9 +1041,11 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     if self.reverse or source_field_name == self.source_field_name:
                         # Don't send the signal when we are inserting the
                         # duplicate data row for symmetrical reverse entries.
-                        signals.m2m_changed.send(sender=self.through, action='post_add',
+                        signals.m2m_changed.send(
+                            sender=self.through, action='post_add',
                             instance=self.instance, reverse=self.reverse,
-                            model=self.model, pk_set=new_ids, using=db)
+                            model=self.model, pk_set=new_ids, using=db,
+                        )
 
         def _remove_items(self, source_field_name, target_field_name, *objs):
             # source_field_name: the PK colname in join table for the source object
@@ -1037,9 +1066,11 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 # Send a signal to the other end if need be.
-                signals.m2m_changed.send(sender=self.through, action="pre_remove",
+                signals.m2m_changed.send(
+                    sender=self.through, action="pre_remove",
                     instance=self.instance, reverse=self.reverse,
-                    model=self.model, pk_set=old_ids, using=db)
+                    model=self.model, pk_set=old_ids, using=db,
+                )
                 target_model_qs = super(ManyRelatedManager, self).get_queryset()
                 if target_model_qs._has_filters():
                     old_vals = target_model_qs.using(db).filter(**{
@@ -1049,8 +1080,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 filters = self._build_remove_filters(old_vals)
                 self.through._default_manager.using(db).filter(filters).delete()
 
-                signals.m2m_changed.send(sender=self.through, action="post_remove",
+                signals.m2m_changed.send(
+                    sender=self.through, action="post_remove",
                     instance=self.instance, reverse=self.reverse,
-                    model=self.model, pk_set=old_ids, using=db)
+                    model=self.model, pk_set=old_ids, using=db,
+                )
 
     return ManyRelatedManager

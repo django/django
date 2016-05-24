@@ -119,8 +119,10 @@ class Library(object):
                 if len(bits) >= 2 and bits[-2] == 'as':
                     target_var = bits[-1]
                     bits = bits[:-2]
-                args, kwargs = parse_bits(parser, bits, params,
-                    varargs, varkw, defaults, takes_context, function_name)
+                args, kwargs = parse_bits(
+                    parser, bits, params, varargs, varkw, defaults,
+                    takes_context, function_name
+                )
                 return SimpleNode(func, takes_context, args, kwargs, target_var)
             self.tag(function_name, compile_func)
             return func

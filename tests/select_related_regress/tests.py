@@ -36,8 +36,10 @@ class SelectRelatedRegressTests(TestCase):
         c2 = Connection.objects.create(start=port2, end=port3)
 
         connections = Connection.objects.filter(start__device__building=b, end__device__building=b).order_by('id')
-        self.assertEqual([(c.id, six.text_type(c.start), six.text_type(c.end)) for c in connections],
-            [(c1.id, 'router/4', 'switch/7'), (c2.id, 'switch/7', 'server/1')])
+        self.assertEqual(
+            [(c.id, six.text_type(c.start), six.text_type(c.end)) for c in connections],
+            [(c1.id, 'router/4', 'switch/7'), (c2.id, 'switch/7', 'server/1')]
+        )
 
         connections = (
             Connection.objects
@@ -45,8 +47,10 @@ class SelectRelatedRegressTests(TestCase):
             .select_related()
             .order_by('id')
         )
-        self.assertEqual([(c.id, six.text_type(c.start), six.text_type(c.end)) for c in connections],
-            [(c1.id, 'router/4', 'switch/7'), (c2.id, 'switch/7', 'server/1')])
+        self.assertEqual(
+            [(c.id, six.text_type(c.start), six.text_type(c.end)) for c in connections],
+            [(c1.id, 'router/4', 'switch/7'), (c2.id, 'switch/7', 'server/1')]
+        )
 
         # This final query should only have seven tables (port, device and building
         # twice each, plus connection once). Thus, 6 joins plus the FROM table.

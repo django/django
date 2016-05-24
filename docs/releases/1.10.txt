@@ -24,7 +24,45 @@ recommend** and only officially support the latest release of each series.
 What's new in Django 1.10
 =========================
 
-...
+Full text search for PostgreSQL
+-------------------------------
+
+``django.contrib.postgres`` now includes a :doc:`collection of database
+functions </ref/contrib/postgres/search>` to allow the use of the full text
+search engine. You can search across multiple fields in your relational
+database, combine the searches with other lookups, use different language
+configurations and weightings, and rank the results by relevance.
+
+It also now includes trigram support, using the :lookup:`trigram_similar`
+lookup, and the :class:`~django.contrib.postgres.search.TrigramSimilarity` and
+:class:`~django.contrib.postgres.search.TrigramDistance` expressions.
+
+New-style middleware
+--------------------
+
+:doc:`A new style of middleware is introduced </topics/http/middleware>` to
+solve the lack of strict request/response layering of the old-style of
+middleware described in `DEP 0005
+<https://github.com/django/deps/blob/master/final/0005-improved-middleware.rst>`_.
+You'll need to :ref:`adapt old, custom middleware <upgrading-middleware>` and
+switch from the ``MIDDLEWARE_CLASSES`` setting to the new :setting:`MIDDLEWARE`
+setting to take advantage of the improvements.
+
+Official support for Unicode usernames
+--------------------------------------
+
+The :class:`~django.contrib.auth.models.User` model in ``django.contrib.auth``
+originally only accepted ASCII letters in usernames. Although it wasn't a
+deliberate choice, Unicode characters have always been accepted when using
+Python 3.
+
+The username validator now explicitly accepts Unicode letters by
+default on Python 3 only. This default behavior can be overridden by changing
+the :attr:`~django.contrib.auth.models.User.username_validator` attribute of
+the ``User`` model, or to any proxy of that model, using either
+:class:`~django.contrib.auth.validators.ASCIIUsernameValidator` or
+:class:`~django.contrib.auth.validators.UnicodeUsernameValidator`. Custom user
+models may also use those validators.
 
 Minor features
 --------------
@@ -62,10 +100,8 @@ Minor features
 * Added "No date" and "Has date" choices for ``DateFieldListFilter`` if the
   field is nullable.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* The jQuery library embedded in the admin is upgraded from version 2.1.4 to
+  2.2.3.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,11 +129,6 @@ Minor features
 * The new ``redirect_authenticated_user`` parameter for the
   :func:`~django.contrib.auth.views.login` view allows redirecting
   authenticated users visiting the login page.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -147,10 +178,14 @@ Minor features
   <django.contrib.gis.gdal.GDALBand.data>` method was added. Band data can
   now be updated with repeated values efficiently.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Added database functions
+  :class:`~django.contrib.gis.db.models.functions.IsValid` and
+  :class:`~django.contrib.gis.db.models.functions.MakeValid`, as well as the
+  :lookup:`isvalid` lookup, all for PostGIS. This allows filtering and
+  repairing invalid geometries on the database side.
 
-* ...
+* Added raster support for all :doc:`spatial lookups
+  </ref/contrib/gis/geoquerysets>`.
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -158,21 +193,11 @@ Minor features
 * For convenience, :class:`~django.contrib.postgres.fields.HStoreField` now
   casts its keys and values to strings.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The :djadmin:`clearsessions` management command now removes file-based
   sessions.
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -189,11 +214,6 @@ Minor features
   ``{% load staticfiles %}`` or ``{% load static from staticfiles %}``) and
   not worry about whether or not the ``staticfiles`` app is installed.
 
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 Cache
 ~~~~~
 
@@ -205,6 +225,12 @@ CSRF
 * The default :setting:`CSRF_FAILURE_VIEW`, ``views.csrf.csrf_failure()`` now
   accepts an optional ``template_name`` parameter, defaulting to
   ``'403_csrf.html'``, to control the template used to render the page.
+
+* To protect against `BREACH`_ attacks, the CSRF protection mechanism now
+  changes the form token value on every request (while keeping an invariant
+  secret which can be used to validate the different tokens).
+
+.. _BREACH: http://breachattack.com/
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -223,11 +249,6 @@ Database backends
   parameters of :meth:`Func.as_sql() <django.db.models.Func.as_sql>` for an
   example.
 
-Email
-~~~~~
-
-* ...
-
 File Storage
 ~~~~~~~~~~~~
 
@@ -238,17 +259,25 @@ File Storage
   timezone-aware ``datetime`` if :setting:`USE_TZ` is ``True`` and a naive
   ``datetime`` in the local timezone otherwise.
 
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
+* The new :meth:`Storage.generate_filename()
+  <django.core.files.storage.Storage.generate_filename>` method makes it easier
+  to implement custom storages that don't use the ``os.path`` calls previously
+  in :class:`~django.db.models.FileField`.
 
 Forms
 ~~~~~
 
 * Form and widget ``Media`` is now served using
   :mod:`django.contrib.staticfiles` if installed.
+
+* The ``<input>`` tag rendered by :class:`~django.forms.CharField` now includes
+  a ``minlength`` attribute if the field has a ``min_length``.
+
+* Required form fields now have the ``required`` HTML attribute. Set the new
+  :attr:`Form.use_required_attribute <django.forms.Form.use_required_attribute>`
+  attribute to ``False`` to disable it. The ``required`` attribute isn't
+  included on forms of formsets because the browser validation may not be
+  correct when adding and deleting formsets.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -270,6 +299,14 @@ Internationalization
 * :func:`~django.views.i18n.set_language` now returns a 204 status code (No
   Content) for AJAX requests when there is no ``next`` parameter in ``POST`` or
   ``GET``.
+
+* The :class:`~django.views.i18n.JavaScriptCatalog` and
+  :class:`~django.views.i18n.JSONCatalog` class-based views supersede the
+  deprecated ``javascript_catalog()`` and ``json_catalog()`` function-based
+  views. The new views are almost equivalent to the old ones except that by
+  default the new views collect all JavaScript strings in the ``djangojs``
+  translation domain from all installed apps rather than only the JavaScript
+  strings from :setting:`LOCALE_PATHS`.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -323,6 +360,14 @@ Migrations
 * Added support for :ref:`non-atomic migrations <non-atomic-migrations>` by
   setting the ``atomic`` attribute on a ``Migration``.
 
+* The ``migrate`` and ``makemigrations`` commands now check for a consistent
+  migration history. If they find some unapplied dependencies of an applied
+  migration, ``InconsistentMigrationHistory`` is raised.
+
+* The :func:`~django.db.models.signals.pre_migrate` and
+  :func:`~django.db.models.signals.post_migrate` signals now dispatch their
+  migration ``plan`` and ``apps``.
+
 Models
 ~~~~~~
 
@@ -351,6 +396,8 @@ Models
   app label and class interpolation using the ``'%(app_label)s'`` and
   ``'%(class)s'`` strings.
 
+* Allowed overriding model fields inherited from abstract base classes.
+
 * The :func:`~django.db.models.prefetch_related_objects` function is now a
   public API.
 
@@ -361,6 +408,23 @@ Models
 
 * A proxy model may now inherit multiple proxy models that share a common
   non-abstract parent class.
+
+* Added :class:`~django.db.models.functions.datetime.Extract` functions
+  to extract datetime components as integers, such as year and hour.
+
+* Added :class:`~django.db.models.functions.datetime.Trunc` functions to
+  truncate a date or datetime to a significant component. They enable queries
+  like sales-per-day or sales-per-hour.
+
+* ``Model.__init__()`` now sets values of virtual fields from its keyword
+  arguments.
+
+* The new :attr:`Meta.base_manager_name
+  <django.db.models.Options.base_manager_name>` and
+  :attr:`Meta.default_manager_name
+  <django.db.models.Options.default_manager_name>` options allow controlling
+  the :attr:`~django.db.models.Model._base_manager` and
+  :attr:`~django.db.models.Model._default_manager`, respectively.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -387,11 +451,6 @@ Serialization
 * The ``django.core.serializers.json.DjangoJSONEncoder`` now knows how to
   serialize lazy strings, typically used for translatable content.
 
-Signals
-~~~~~~~
-
-* ...
-
 Templates
 ~~~~~~~~~
 
@@ -399,10 +458,16 @@ Templates
   :class:`~django.template.backends.django.DjangoTemplates` backend and the
   :class:`~django.template.Engine` class.
 
-* Added the ``is`` comparison operator to the :ttag:`if` tag.
+* Added the ``is`` and ``is not`` comparison operators to the :ttag:`if` tag.
 
 * Allowed :tfilter:`dictsort` to order a list of lists by an element at a
   specified index.
+
+* The :func:`~django.template.context_processors.debug` context processor
+  contains queries for all database aliases instead of only the default alias.
+
+* Added relative path support for string arguments of the :ttag:`extends` and
+  :ttag:`include` template tags.
 
 Tests
 ~~~~~
@@ -416,6 +481,9 @@ Tests
 
 * Added the :setting:`DATABASES['TEST']['MIGRATE'] <TEST_MIGRATE>` option to
   allow disabling of migrations during test database creation.
+
+* You can now login and use sessions with the test client even if
+  :mod:`django.contrib.sessions` is not in :setting:`INSTALLED_APPS`.
 
 URLs
 ~~~~
@@ -630,23 +698,73 @@ You can check if your database has any of the removed hashers like this::
     # Unsalted MD5 passwords might not have an 'md5$$' prefix:
     User.objects.filter(password__length=32)
 
+``Field.get_prep_lookup()`` and ``Field.get_db_prep_lookup()`` methods are removed
+----------------------------------------------------------------------------------
+
+If you have a custom field that implements either of these methods, register a
+custom lookup for it. For example::
+
+    from django.db.models import Field
+    from django.db.models.lookups import Exact
+
+    class MyField(Field):
+        ...
+
+    class MyFieldExact(Exact):
+        def get_prep_lookup(self):
+            # do_custom_stuff_for_myfield
+            ....
+
+    MyField.register_lookup(MyFieldExact)
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for SpatiaLite < 3.0 and GEOS < 3.3 is dropped.
+
+* The ``add_postgis_srs()`` backwards compatibility alias for
+  ``django.contrib.gis.utils.add_srs_entry()`` is removed.
+
+* On Oracle/GIS, the :class:`~django.contrib.gis.db.models.functions.Area`
+  aggregate function now returns a ``float`` instead of ``decimal.Decimal``.
+  (It's still wrapped in a measure of square meters.)
+
+* The default :class:`~django.contrib.gis.geos.GEOSGeometry` representation (WKT
+  output) is trimmed by default. That is, instead of
+  ``POINT (23.0000000000000000 5.5000000000000000)``, you'll get
+  ``POINT (23 5.5)``.
+
+Maximum size of a request body and the number of GET/POST parameters is limited
+-------------------------------------------------------------------------------
+
+Two new settings help mitigate denial-of-service attacks via large requests:
+
+* :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` limits the size that a request body
+  may be. File uploads don't count towards this limit.
+* :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS` limits the number of GET/POST
+  parameters that are parsed.
+
+Applications that receive unusually large form posts may need to tune these
+settings.
+
 Miscellaneous
 -------------
 
 * The ``repr()`` of a ``QuerySet`` is wrapped in ``<QuerySet >`` to
   disambiguate it from a plain list when debugging.
 
-* Support for SpatiaLite < 3.0 and GEOS < 3.3 is dropped.
-
 * ``utils.version.get_version()`` returns :pep:`440` compliant release
   candidate versions (e.g. '1.10rc1' instead of '1.10c1').
+
+* CSRF token values are now required to be strings of 64 alphanumerics; values
+  of 32 alphanumerics, as set by older versions of Django by default, are
+  automatically replaced by strings of 64 characters. Other values are
+  considered invalid. This should only affect developers or users who replace
+  these tokens.
 
 * The ``LOGOUT_URL`` setting is removed as Django hasn't made use of it
   since pre-1.0. If you use it in your project, you can add it to your
   project's settings. The default value was ``'/accounts/logout/'``.
-
-* The ``add_postgis_srs()`` backwards compatibility alias for
-  ``django.contrib.gis.utils.add_srs_entry()`` is removed.
 
 * Objects with a ``close()`` method such as files and generators passed to
   :class:`~django.http.HttpResponse` are now closed immediately instead of when
@@ -674,10 +792,6 @@ Miscellaneous
   argument of the ``render_options()`` method is also removed, making
   ``selected_choices`` the first argument.
 
-* On Oracle/GIS, the :class:`~django.contrib.gis.db.models.functions.Area`
-  aggregate function now returns a ``float`` instead of ``decimal.Decimal``.
-  (It's still wrapped in a measure of square meters.)
-
 * Tests that violate deferrable database constraints will now error when run on
   a database that supports deferrable constraints.
 
@@ -704,6 +818,65 @@ Miscellaneous
 
 * :func:`django.views.i18n.set_language` may now return a 204 status code for
   AJAX requests.
+
+* The ``base_field`` attribute of
+  :class:`~django.contrib.postgres.fields.RangeField` is now a type of field,
+  not an instance of a field.  If you have created a custom subclass of
+  :class:`~django.contrib.postgres.fields.RangeField`, you should change the
+  ``base_field`` attribute.
+
+* Middleware classes are now initialized when the server starts rather than
+  during the first request.
+
+* If you override ``is_authenticated()`` or ``is_anonymous()`` in a custom user
+  model, you must convert them to attributes or properties as described in
+  :ref:`the deprecation note <user-is-auth-anon-deprecation>`.
+
+* When using :attr:`ModelAdmin.save_as=True
+  <django.contrib.admin.ModelAdmin.save_as>`, the "Save as new" button now
+  redirects to the change view for the new object instead of to the model's
+  changelist. If you need the previous behavior, set the new
+  :attr:`ModelAdmin.save_as_continue
+  <django.contrib.admin.ModelAdmin.save_as_continue>` attribute to ``False``.
+
+* Required form fields now have the ``required`` HTML attribute. Set the
+  :attr:`Form.use_required_attribute <django.forms.Form.use_required_attribute>`
+  attribute to ``False`` to disable it. You could also add the ``novalidate``
+  attribute to ``<form>`` if you don't want browser validation.
+
+* The WSGI handler no longer removes content of responses from ``HEAD``
+  requests or responses with a ``status_code`` of 100-199, 204, or 304. Most
+  Web servers already implement this behavior. Responses retrieved using the
+  Django test client continue to have these "response fixes" applied.
+
+* ``Model.__init__()`` now receives ``django.db.models.DEFERRED`` as the value
+  of deferred fields.
+
+* The ``Model._deferred`` attribute is removed as dynamic model classes when
+  using ``QuerySet.defer()`` and ``only()`` is removed.
+
+* :meth:`Storage.save() <django.core.files.storage.Storage.save>` no longer
+  replaces ``'\'`` with ``'/'``. This behavior is moved to
+  :class:`~django.core.files.storage.FileSystemStorage` since this is a storage
+  specific implementation detail. Any Windows user with a custom storage
+  implementation that relies on this behavior will need to implement it in the
+  custom storage's ``save()`` method.
+
+* Private :class:`~django.db.models.FileField` methods ``get_directory_name()``
+  and ``get_filename()`` are no longer called (and are now deprecated) which is
+  a backwards incompatible change for users overriding those methods on custom
+  fields. To adapt such code, override ``FileField.generate_filename()`` or
+  :meth:`Storage.generate_filename()
+  <django.core.files.storage.Storage.generate_filename>` instead. It
+  might be possible to use :attr:`~django.db.models.FileField.upload_to` also.
+
+* The subject of mail sent by ``AdminEmailHandler`` is no longer truncated at
+  989 characters. If you were counting on a limited length, truncate the subject
+  yourself.
+
+* Private expressions ``django.db.models.expressions.Date`` and ``DateTime``
+  are removed. The new :class:`~django.db.models.functions.datetime.Trunc`
+  expressions provide the same functionality.
 
 .. _deprecated-features-1.10:
 
@@ -758,6 +931,9 @@ wish to support earlier versions of Django.
 * The ``cascaded_union`` property of
   :class:`~django.contrib.gis.geos.MultiPolygon` is deprecated in favor of the
   :attr:`~django.contrib.gis.geos.GEOSGeometry.unary_union` property.
+
+* The ``django.contrib.gis.utils.precision_wkt()`` function is deprecated in
+  favor of :class:`~django.contrib.gis.geos.WKTWriter`.
 
 ``CommaSeparatedIntegerField`` model field
 ------------------------------------------
@@ -832,6 +1008,37 @@ features, is deprecated. Replace it with a custom lookup::
     models.CharField.register_lookup(Search)
     models.TextField.register_lookup(Search)
 
+.. _user-is-auth-anon-deprecation:
+
+Using ``User.is_authenticated()`` and ``User.is_anonymous()`` as methods
+------------------------------------------------------------------------
+
+The ``is_authenticated()`` and ``is_anonymous()`` methods of
+:class:`~django.contrib.auth.models.AbstractBaseUser` and
+:class:`~django.contrib.auth.models.AnonymousUser` classes are now
+properties. They will still work as methods until Django 2.0, but all usage
+in Django now uses attribute access.
+
+For example, if you use
+:class:`~django.contrib.auth.middleware.AuthenticationMiddleware` and want
+to know whether the user is currently logged-in you would use::
+
+    if request.user.is_authenticated:
+        ... # Do something for logged-in users.
+    else:
+        ... # Do something for anonymous users.
+
+instead of ``request.user.is_authenticated()``.
+
+This change avoids accidental information leakage if you forget to call the
+method, e.g.::
+
+    if request.user.is_authenticated:
+        return sensitive_information
+
+If you override these methods in a custom user model, you must change them to
+properties or attributes.
+
 Custom manager classes available through ``prefetch_related`` must define a ``_apply_rel_filters()`` method
 -----------------------------------------------------------------------------------------------------------
 
@@ -842,6 +1049,34 @@ it defines a ``_apply_rel_filters()`` method.
 This method must accept a :class:`~django.db.models.query.QuerySet` instance
 as its single argument and return a filtered version of the queryset for the
 model instance the manager is bound to.
+
+The "escape" half of ``django.utils.safestring``
+------------------------------------------------
+
+The ``mark_for_escaping()`` function and the classes it uses: ``EscapeData``,
+``EscapeBytes``, ``EscapeText``, ``EscapeString``, and ``EscapeUnicode`` are
+deprecated.
+
+As a result, the "lazy" behavior of the ``escape`` filter (where it would
+always be applied as the last filter no matter where in the filter chain it
+appeared) is deprecated. The filter will change to immediately apply
+:func:`~django.utils.html.conditional_escape` in Django 2.0.
+
+``Manager.use_for_related_fields`` and inheritance changes
+----------------------------------------------------------
+
+``Manager.use_for_related_fields`` is deprecated in favor of setting
+:attr:`Meta.base_manager_name <django.db.models.Options.base_manager_name>` on
+the model.
+
+Model ``Manager`` inheritance will follow MRO inheritance rules in Django 2.0,
+changing the current behavior where managers defined on non-abstract base
+classes aren't inherited by child classes. A deprecating warning with
+instructions on how to adapt your code is raised if you have any affected
+managers. You'll either redeclare a manager from an abstract model on the child
+class to override the manager from the concrete model, or you'll set the
+model's ``Meta.manager_inheritance_from_future=True`` option to opt-in to the
+new inheritance behavior.
 
 Miscellaneous
 -------------
@@ -860,6 +1095,34 @@ Miscellaneous
   favor of its new location, :mod:`django.urls`.
 
 * The template ``Context.has_key()`` method is deprecated in favor of ``in``.
+
+* The private attribute ``virtual_fields`` of ``Model._meta`` is
+  deprecated in favor of ``private_fields``.
+
+* The private keyword arguments ``virtual_only`` in
+  ``Field.contribute_to_class()`` and ``virtual`` in
+  ``Model._meta.add_field()`` are deprecated in favor of ``private_only``
+  and ``private``, respectively.
+
+* The ``javascript_catalog()`` and ``json_catalog()`` views are deprecated in
+  favor of class-based views :class:`~django.views.i18n.JavaScriptCatalog`
+  and :class:`~django.views.i18n.JSONCatalog`.
+
+* In multi-table inheritance, implicit promotion of a ``OneToOneField`` to a
+  ``parent_link`` is deprecated. Add ``parent_link=True`` to such fields.
+
+* The private API ``Widget._format_value()`` is made public and renamed to
+  :meth:`~django.forms.Widget.format_value`. The old name will work
+  through a deprecation period.
+
+* Private ``FileField`` methods ``get_directory_name()`` and ``get_filename()``
+  are deprecated in favor of performing this work in
+  :meth:`Storage.generate_filename()
+  <django.core.files.storage.Storage.generate_filename>`).
+
+* Old-style middleware that uses  ``settings.MIDDLEWARE_CLASSES`` are
+  deprecated. :ref:`Adapt old, custom middleware <upgrading-middleware>` and
+  use the new :setting:`MIDDLEWARE` setting.
 
 .. _removed-features-1.10:
 

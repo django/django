@@ -26,6 +26,10 @@ def index_page(request):
     return HttpResponse('<html><body>Dummy page</body></html>')
 
 
+def with_parameter(request, parameter):
+    return HttpResponse('ok')
+
+
 def raises(request):
     # Make sure that a callable that raises an exception in the stack frame's
     # local vars won't hijack the technical 500 response. See:
@@ -81,8 +85,16 @@ def jsi18n(request):
     return render(request, 'jsi18n.html')
 
 
+def old_jsi18n(request):
+    return render(request, 'old_jsi18n.html')
+
+
 def jsi18n_multi_catalogs(request):
-    return render(render, 'jsi18n-multi-catalogs.html')
+    return render(request, 'jsi18n-multi-catalogs.html')
+
+
+def old_jsi18n_multi_catalogs(request):
+    return render(request, 'old_jsi18n-multi-catalogs.html')
 
 
 def raises_template_does_not_exist(request, path='i_dont_exist.html'):
@@ -113,12 +125,10 @@ def send_log(request, exc_info):
     orig_filters = admin_email_handler.filters
     admin_email_handler.filters = []
     admin_email_handler.include_html = True
-    logger.error('Internal Server Error: %s', request.path,
+    logger.error(
+        'Internal Server Error: %s', request.path,
         exc_info=exc_info,
-        extra={
-            'status_code': 500,
-            'request': request
-        }
+        extra={'status_code': 500, 'request': request},
     )
     admin_email_handler.filters = orig_filters
 

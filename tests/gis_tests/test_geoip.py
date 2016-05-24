@@ -26,8 +26,10 @@ if HAS_GEOIP:
 # 'GeoLiteCity.dat'.
 
 
-@skipUnless(HAS_GEOIP and getattr(settings, "GEOIP_PATH", None),
-    "GeoIP is required along with the GEOIP_PATH setting.")
+@skipUnless(
+    HAS_GEOIP and getattr(settings, "GEOIP_PATH", None),
+    "GeoIP is required along with the GEOIP_PATH setting."
+)
 @ignore_warnings(category=RemovedInDjango20Warning)
 class GeoIPTest(unittest.TestCase):
     addr = '128.249.1.1'
@@ -143,7 +145,7 @@ class GeoIPTest(unittest.TestCase):
         fqdn = "duesseldorf.de"
         if self._is_dns_available(fqdn):
             d = g.city(fqdn)
-            self.assertEqual('Düsseldorf', d['city'])
+            self.assertEqual('Ratingen', d['city'])
         d = g.country('200.26.205.1')
         # Some databases have only unaccented countries
         self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))

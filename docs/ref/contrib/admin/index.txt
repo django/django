@@ -41,8 +41,8 @@ For reference, here are the requirements:
    defined in your :setting:`TEMPLATES` as well as
    :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
    :class:`django.contrib.messages.middleware.MessageMiddleware` to
-   :setting:`MIDDLEWARE_CLASSES`. (These are all active by default, so
-   you only need to do this if you've manually tweaked the settings.)
+   :setting:`MIDDLEWARE`. These are all active by default, so you only need to
+   do this if you've manually tweaked the settings.
 
 4. Determine which of your application's models should be editable in the
    admin interface.
@@ -225,8 +225,6 @@ subclass::
         enabled (:setting:`USE_TZ = True <USE_TZ>`).
 
 .. attribute:: ModelAdmin.empty_value_display
-
-    .. versionadded:: 1.9
 
     This attribute overrides the default display value for record's fields that
     are empty (``None``, empty string, etc.). The default value is ``-`` (a
@@ -641,7 +639,7 @@ subclass::
 
           admin.site.empty_value_display = '(None)'
 
-      You can also use :attr:`AdminSite.empty_value_display`::
+      You can also use :attr:`ModelAdmin.empty_value_display`::
 
           class PersonAdmin(admin.ModelAdmin):
               empty_value_display = 'unknown'
@@ -655,10 +653,6 @@ subclass::
                    return obj.birth_date
 
               birth_date_view.empty_value_display = 'unknown'
-
-      .. versionadded:: 1.9
-
-          The ability to customize ``empty_value_display`` was added.
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
       callable that returns True or False Django will display a pretty
@@ -1137,16 +1131,24 @@ subclass::
 
 .. attribute:: ModelAdmin.save_as
 
-    Set ``save_as`` to enable a "save as" feature on admin change forms.
+    Set ``save_as`` to enable a "save as new" feature on admin change forms.
 
     Normally, objects have three save options: "Save", "Save and continue
-    editing" and "Save and add another". If ``save_as`` is ``True``, "Save
-    and add another" will be replaced by a "Save as" button.
-
-    "Save as" means the object will be saved as a new object (with a new ID),
-    rather than the old object.
+    editing", and "Save and add another". If ``save_as`` is ``True``, "Save
+    and add another" will be replaced by a "Save as new" button that creates a
+    new object (with a new ID) rather than updating the existing object.
 
     By default, ``save_as`` is set to ``False``.
+
+.. attribute:: ModelAdmin.save_as_continue
+
+    .. versionadded:: 1.10
+
+    When :attr:`save_as=True <save_as>`, the default redirect after saving the
+    new object is to the change view for that object. If you set
+    ``save_as_continue=False``, the redirect will be to the changelist view.
+
+    By default, ``save_as_continue`` is set to ``True``.
 
 .. attribute:: ModelAdmin.save_on_top
 
@@ -1460,8 +1462,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_list_select_related(request)
 
-    .. versionadded:: 1.9
-
     The ``get_list_select_related`` method is given the ``HttpRequest`` and
     should return a boolean or list as :attr:`ModelAdmin.list_select_related`
     does.
@@ -1570,8 +1570,6 @@ templates used by the :class:`ModelAdmin` views:
     ``AdminSite.admin_view()``::
 
         url(r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
-
-    .. versionadded:: 1.9
 
     ``ModelAdmin`` views have ``model_admin`` attributes. Other
     ``AdminSite`` views have ``admin_site`` attributes.
@@ -1837,7 +1835,7 @@ Other methods
 
 .. method:: ModelAdmin.change_view(request, object_id, form_url='', extra_context=None)
 
-    Django view for the model instance edition page. See note below.
+    Django view for the model instance editing page. See note below.
 
 .. method:: ModelAdmin.changelist_view(request, extra_context=None)
 
@@ -1914,15 +1912,13 @@ jQuery
 Django admin JavaScript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 2.1.4) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 2.2.3) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
-.. versionchanged:: 1.9
+.. versionchanged:: 1.10
 
-    The embedded jQuery has been upgraded from 1.11.2 to 2.1.4. This drops
-    support for Internet Explorer 8 and below. You can restore support by
-    :ref:`including your own version of jQuery 1.X <admin-browser-support-19>`.
+    The embedded jQuery was upgraded from 2.1.4 to 2.2.3.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2574,8 +2570,6 @@ Templates can override or extend base admin templates as described in
 
 .. attribute:: AdminSite.empty_value_display
 
-    .. versionadded:: 1.9
-
     The string to use for displaying empty values in the admin site's change
     list. Defaults to a dash. The value can also be overridden on a per
     ``ModelAdmin`` basis and on a custom field within a ``ModelAdmin`` by
@@ -2637,10 +2631,6 @@ Templates can override or extend base admin templates as described in
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
 
-    .. versionchanged:: 1.9
-
-        The ``available_apps`` variable was added.
-
 .. method:: AdminSite.has_permission(request)
 
     Returns ``True`` if the user for the given ``HttpRequest`` has permission
@@ -2667,11 +2657,6 @@ In this example, we register the default ``AdminSite`` instance
     urlpatterns = [
         url(r'^admin/', admin.site.urls),
     ]
-
-.. versionchanged:: 1.9
-
-    In previous versions, you would pass ``admin.site.urls`` to
-    :func:`~django.conf.urls.include()`.
 
 .. _customizing-adminsite:
 

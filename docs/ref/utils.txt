@@ -21,8 +21,7 @@ managing the ``Vary`` header of responses. It includes functions to patch the
 header of response objects directly and decorators that change functions to do
 that header-patching themselves.
 
-For information on the ``Vary`` header, see :rfc:`2616#section-14.44` section
-14.44.
+For information on the ``Vary`` header, see :rfc:`7231#section-7.1.4`.
 
 Essentially, the ``Vary`` HTTP header defines which headers a cache should take
 into account when building its cache key. Requests with the same path but
@@ -162,17 +161,15 @@ The functions defined in this module share the following properties:
     See :ref:`decorating class based views <decorating-class-based-views>` for
     example usage.
 
-    .. versionchanged:: 1.9
-
-       The ability to decorate classes, the ``name`` parameter, and the ability
-       for ``decorator`` to accept a list/tuple of decorator functions were
-       added.
-
 .. function:: decorator_from_middleware(middleware_class)
 
     Given a middleware class, returns a view decorator. This lets you use
     middleware functionality on a per-view basis. The middleware is created
     with no params passed.
+
+    It assumes middleware that's compatible with the old style of Django 1.9
+    and earlier (having methods like ``process_request()``,
+    ``process_exception()``, and ``process_response()``).
 
 .. function:: decorator_from_middleware_with_args(middleware_class)
 
@@ -318,7 +315,7 @@ Sample usage::
     >>> feed.add_item(
     ...     title="Hello",
     ...     link="http://www.holovaty.com/test/",
-    ...     description="Testing."
+    ...     description="Testing.",
     ... )
     >>> with open('test.rss', 'w') as fp:
     ...     feed.write(fp, 'utf-8')
@@ -619,37 +616,39 @@ escaping HTML.
 
 .. function:: format_html(format_string, *args, **kwargs)
 
-    This is similar to `str.format`_, except that it is appropriate for
+    This is similar to :meth:`str.format`, except that it is appropriate for
     building up HTML fragments. All args and kwargs are passed through
-    :func:`conditional_escape` before being passed to ``str.format``.
+    :func:`conditional_escape` before being passed to ``str.format()``.
 
     For the case of building up small HTML fragments, this function is to be
-    preferred over string interpolation using ``%`` or ``str.format`` directly,
-    because it applies escaping to all arguments - just like the Template system
-    applies escaping by default.
+    preferred over string interpolation using ``%`` or ``str.format()``
+    directly, because it applies escaping to all arguments - just like the
+    template system applies escaping by default.
 
     So, instead of writing::
 
-        mark_safe("%s <b>%s</b> %s" % (some_html,
-                                        escape(some_text),
-                                        escape(some_other_text),
-                                        ))
+        mark_safe("%s <b>%s</b> %s" % (
+            some_html,
+            escape(some_text),
+            escape(some_other_text),
+        ))
 
     You should instead use::
 
         format_html("{} <b>{}</b> {}",
-                    mark_safe(some_html), some_text, some_other_text)
+            mark_safe(some_html),
+            some_text,
+            some_other_text,
+        )
 
     This has the advantage that you don't need to apply :func:`escape` to each
     argument and risk a bug and an XSS vulnerability if you forget one.
 
-    Note that although this function uses ``str.format`` to do the
-    interpolation, some of the formatting options provided by `str.format`_
+    Note that although this function uses ``str.format()`` to do the
+    interpolation, some of the formatting options provided by ``str.format()``
     (e.g. number formatting) will not work, since all arguments are passed
     through :func:`conditional_escape` which (ultimately) calls
     :func:`~django.utils.encoding.force_text` on the values.
-
-    .. _str.format: https://docs.python.org/library/stdtypes.html#str.format
 
 .. function:: format_html_join(sep, format_string, args_generator)
 
@@ -661,8 +660,10 @@ escaping HTML.
     ``args_generator`` should be an iterator that returns the sequence of
     ``args`` that will be passed to :func:`format_html`. For example::
 
-        format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
-                                                    for u in users))
+        format_html_join(
+            '\n', "<li>{} {}</li>",
+            ((u.first_name, u.last_name) for u in users)
+        )
 
 .. function:: strip_tags(value)
 
@@ -736,7 +737,7 @@ escaping HTML.
 .. function:: http_date(epoch_seconds=None)
 
     Formats the time to match the :rfc:`1123` date format as specified by HTTP
-    :rfc:`2616#section-3.3.1` section 3.3.1.
+    :rfc:`7231#section-7.1.1.1`.
 
     Accepts a floating point number expressed in seconds since the epoch in
     UTC--such as that outputted by ``time.time()``. If set to ``None``,
@@ -842,6 +843,8 @@ appropriate entities.
 
 .. function:: mark_for_escaping(s)
 
+    .. deprecated:: 1.10
+
     Explicitly mark a string as requiring HTML escaping upon output. Has no
     effect on ``SafeData`` subclasses.
 
@@ -873,10 +876,6 @@ appropriate entities.
         slugify(value, allow_unicode=True)
 
     If ``value`` is ``"你好 World"``, the output will be ``"你好-world"``.
-
-    .. versionchanged:: 1.9
-
-        The ``allow_unicode`` parameter was added.
 
 .. _time-zone-selection-functions:
 
@@ -1002,10 +1001,6 @@ appropriate entities.
     would change the time to 3:30.
 
     ``is_dst`` has no effect when ``pytz`` is not installed.
-
-    .. versionchanged:: 1.9
-
-        The ``is_dst`` argument was added.
 
 .. function:: make_naive(value, timezone=None)
 

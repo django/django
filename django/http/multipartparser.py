@@ -12,7 +12,9 @@ import cgi
 import sys
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousMultipartForm
+from django.core.exceptions import (
+    RequestDataTooBig, SuspiciousMultipartForm, TooManyFieldsSent,
+)
 from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,
 )
@@ -68,7 +70,7 @@ class MultiPartParser(object):
         # Content-Type should contain multipart and the boundary information.
         #
 
-        content_type = META.get('HTTP_CONTENT_TYPE', META.get('CONTENT_TYPE', ''))
+        content_type = META.get('CONTENT_TYPE', '')
         if not content_type.startswith('multipart/'):
             raise MultiPartParserError('Invalid Content-Type: %s' % content_type)
 
@@ -81,7 +83,7 @@ class MultiPartParser(object):
         # Content-Length should contain the length of the body we are about
         # to receive.
         try:
-            content_length = int(META.get('HTTP_CONTENT_LENGTH', META.get('CONTENT_LENGTH', 0)))
+            content_length = int(META.get('CONTENT_LENGTH', 0))
         except (ValueError, TypeError):
             content_length = 0
 
@@ -120,7 +122,7 @@ class MultiPartParser(object):
         # HTTP spec says that Content-Length >= 0 is valid
         # handling content-length == 0 before continuing
         if self._content_length == 0:
-            return QueryDict('', encoding=self._encoding), MultiValueDict()
+            return QueryDict(encoding=self._encoding), MultiValueDict()
 
         # See if any of the handlers take care of the parsing.
         # This allows overriding everything if need be.
@@ -135,7 +137,7 @@ class MultiPartParser(object):
                 return result[0], result[1]
 
         # Create the data structures to be used later.
-        self._post = QueryDict('', mutable=True)
+        self._post = QueryDict(mutable=True)
         self._files = MultiValueDict()
 
         # Instantiate the parser and stream:
@@ -144,6 +146,13 @@ class MultiPartParser(object):
         # Whether or not to signal a file-completion at the beginning of the loop.
         old_field_name = None
         counters = [0] * len(handlers)
+
+        # Number of bytes that have been read.
+        num_bytes_read = 0
+        # To count the number of keys in the request.
+        num_post_keys = 0
+        # To limit the amount of data read from the request.
+        read_size = None
 
         try:
             for item_type, meta_data, field_stream in Parser(stream, self._boundary):
@@ -166,15 +175,37 @@ class MultiPartParser(object):
                 field_name = force_text(field_name, encoding, errors='replace')
 
                 if item_type == FIELD:
+                    # Avoid storing more than DATA_UPLOAD_MAX_NUMBER_FIELDS.
+                    num_post_keys += 1
+                    if (settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and
+                            settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_post_keys):
+                        raise TooManyFieldsSent(
+                            'The number of GET/POST parameters exceeded '
+                            'settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+                        )
+
+                    # Avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE.
+                    if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None:
+                        read_size = settings.DATA_UPLOAD_MAX_MEMORY_SIZE - num_bytes_read
+
                     # This is a post field, we can just set it in the post
                     if transfer_encoding == 'base64':
-                        raw_data = field_stream.read()
+                        raw_data = field_stream.read(size=read_size)
+                        num_bytes_read += len(raw_data)
                         try:
                             data = base64.b64decode(raw_data)
                         except _BASE64_DECODE_ERROR:
                             data = raw_data
                     else:
-                        data = field_stream.read()
+                        data = field_stream.read(size=read_size)
+                        num_bytes_read += len(data)
+
+                    # Add two here to make the check consistent with the
+                    # x-www-form-urlencoded check that includes '&='.
+                    num_bytes_read += len(field_name) + 2
+                    if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
+                            num_bytes_read > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
+                        raise RequestDataTooBig('Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.')
 
                     self._post.appendlist(field_name,
                                           force_text(data, encoding, errors='replace'))

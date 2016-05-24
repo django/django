@@ -16,10 +16,8 @@ class IntrospectionTests(TransactionTestCase):
     def test_table_names(self):
         tl = connection.introspection.table_names()
         self.assertEqual(tl, sorted(tl))
-        self.assertIn(Reporter._meta.db_table, tl,
-                     "'%s' isn't in table_list()." % Reporter._meta.db_table)
-        self.assertIn(Article._meta.db_table, tl,
-                     "'%s' isn't in table_list()." % Article._meta.db_table)
+        self.assertIn(Reporter._meta.db_table, tl, "'%s' isn't in table_list()." % Reporter._meta.db_table)
+        self.assertIn(Article._meta.db_table, tl, "'%s' isn't in table_list()." % Article._meta.db_table)
 
     def test_django_table_names(self):
         with connection.cursor() as cursor:
@@ -48,10 +46,8 @@ class IntrospectionTests(TransactionTestCase):
                 else:
                     raise
 
-        self.assertIn('introspection_article_view',
-                      connection.introspection.table_names(include_views=True))
-        self.assertNotIn('introspection_article_view',
-                         connection.introspection.table_names())
+        self.assertIn('introspection_article_view', connection.introspection.table_names(include_views=True))
+        self.assertNotIn('introspection_article_view', connection.introspection.table_names())
 
     def test_unmanaged_through_model(self):
         tables = connection.introspection.django_table_names()
@@ -65,8 +61,7 @@ class IntrospectionTests(TransactionTestCase):
     def test_sequence_list(self):
         sequences = connection.introspection.sequence_list()
         expected = {'table': Reporter._meta.db_table, 'column': 'id'}
-        self.assertIn(expected, sequences,
-                     'Reporter sequence not found in sequence_list()')
+        self.assertIn(expected, sequences, 'Reporter sequence not found in sequence_list()')
 
     def test_get_table_description_names(self):
         with connection.cursor() as cursor:

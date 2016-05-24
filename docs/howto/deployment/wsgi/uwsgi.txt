@@ -15,7 +15,7 @@ container server coded in pure C.
     possible deployment setup of many). The docs below are focused on how to
     integrate Django with uWSGI.
 
-    .. _tutorial: https://uwsgi.readthedocs.org/en/latest/tutorials/Django_and_nginx.html
+    .. _tutorial: https://uwsgi.readthedocs.io/en/latest/tutorials/Django_and_nginx.html
 
 Prerequisite: uWSGI
 ===================
@@ -32,7 +32,7 @@ command. For example:
     # Or install LTS (long term support).
     $ pip install https://projects.unbit.it/downloads/uwsgi-lts.tar.gz
 
-.. _installation procedures: http://uwsgi-docs.readthedocs.org/en/latest/Install.html
+.. _installation procedures: https://uwsgi-docs.readthedocs.io/en/latest/Install.html
 
 .. warning::
 
@@ -58,7 +58,7 @@ Configuring and starting the uWSGI server for Django
 uWSGI supports multiple ways to configure the process. See uWSGI's
 `configuration documentation`_ and `examples`_.
 
-.. _configuration documentation: https://uwsgi.readthedocs.org/en/latest/Configuration.html
+.. _configuration documentation: https://uwsgi.readthedocs.io/en/latest/Configuration.html
 .. _examples: https://projects.unbit.it/uwsgi/wiki/Example
 
 Here's an example command to start a uWSGI server::
@@ -122,4 +122,4 @@ Example ini configuration file usage::
 See the uWSGI docs on `managing the uWSGI process`_ for information on
 starting, stopping and reloading the uWSGI workers.
 
-.. _managing the uWSGI process: http://uwsgi-docs.readthedocs.org/en/latest/Management.html
+.. _managing the uWSGI process: https://uwsgi-docs.readthedocs.io/en/latest/Management.html

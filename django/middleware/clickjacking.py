@@ -6,9 +6,10 @@ malicious site loading resources from your site in a hidden frame.
 """
 
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 
 
-class XFrameOptionsMiddleware(object):
+class XFrameOptionsMiddleware(MiddlewareMixin):
     """
     Middleware that sets the X-Frame-Options HTTP header in HTTP responses.
 

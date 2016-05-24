@@ -10,12 +10,18 @@ class Command(BaseCommand):
     missing_args_message = "You must specify some email recipients, or pass the --managers or --admin options."
 
     def add_arguments(self, parser):
-        parser.add_argument('email', nargs='*',
-            help='One or more email addresses to send a test email to.')
-        parser.add_argument('--managers', action='store_true', dest='managers', default=False,
-            help='Send a test email to the addresses specified in settings.MANAGERS.')
-        parser.add_argument('--admins', action='store_true', dest='admins', default=False,
-            help='Send a test email to the addresses specified in settings.ADMINS.')
+        parser.add_argument(
+            'email', nargs='*',
+            help='One or more email addresses to send a test email to.',
+        )
+        parser.add_argument(
+            '--managers', action='store_true', dest='managers', default=False,
+            help='Send a test email to the addresses specified in settings.MANAGERS.',
+        )
+        parser.add_argument(
+            '--admins', action='store_true', dest='admins', default=False,
+            help='Send a test email to the addresses specified in settings.ADMINS.',
+        )
 
     def handle(self, *args, **kwargs):
         subject = 'Test email from %s on %s' % (socket.gethostname(), timezone.now())

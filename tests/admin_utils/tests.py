@@ -7,8 +7,8 @@ from django import forms
 from django.conf import settings
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
-    NestedObjects, display_for_field, flatten, flatten_fieldsets,
-    label_for_field, lookup_field, quote,
+    NestedObjects, display_for_field, display_for_value, flatten,
+    flatten_fieldsets, label_for_field, lookup_field, quote,
 )
 from django.db import DEFAULT_DB_ALIAS, models
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -195,6 +195,13 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_field(12345, models.IntegerField(), self.empty_value)
         self.assertEqual(display_value, '12,345')
 
+    def test_list_display_for_value(self):
+        display_value = display_for_value([1, 2, 3], self.empty_value)
+        self.assertEqual(display_value, '1, 2, 3')
+
+        display_value = display_for_value([1, 2, 'buckle', 'my', 'shoe'], self.empty_value)
+        self.assertEqual(display_value, '1, 2, buckle, my, shoe')
+
     def test_label_for_field(self):
         """
         Tests for label_for_field
@@ -263,9 +270,7 @@ class UtilsTests(SimpleTestCase):
             "not Really the Model"
         )
         self.assertEqual(
-            label_for_field("test_from_model", Article,
-                model_admin=MockModelAdmin,
-                return_attr=True),
+            label_for_field("test_from_model", Article, model_admin=MockModelAdmin, return_attr=True),
             ("not Really the Model", MockModelAdmin.test_from_model)
         )
 

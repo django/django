@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import os
 from collections import OrderedDict
 
+from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
@@ -39,30 +40,43 @@ class Command(BaseCommand):
         return True
 
     def add_arguments(self, parser):
-        parser.add_argument('--noinput', '--no-input',
+        parser.add_argument(
+            '--noinput', '--no-input',
             action='store_false', dest='interactive', default=True,
-            help="Do NOT prompt the user for input of any kind.")
-        parser.add_argument('--no-post-process',
+            help="Do NOT prompt the user for input of any kind.",
+        )
+        parser.add_argument(
+            '--no-post-process',
             action='store_false', dest='post_process', default=True,
-            help="Do NOT post process collected files.")
-        parser.add_argument('-i', '--ignore', action='append', default=[],
+            help="Do NOT post process collected files.",
+        )
+        parser.add_argument(
+            '-i', '--ignore', action='append', default=[],
             dest='ignore_patterns', metavar='PATTERN',
             help="Ignore files or directories matching this glob-style "
-                "pattern. Use multiple times to ignore more.")
-        parser.add_argument('-n', '--dry-run',
+                 "pattern. Use multiple times to ignore more.",
+        )
+        parser.add_argument(
+            '-n', '--dry-run',
             action='store_true', dest='dry_run', default=False,
-            help="Do everything except modify the filesystem.")
-        parser.add_argument('-c', '--clear',
+            help="Do everything except modify the filesystem.",
+        )
+        parser.add_argument(
+            '-c', '--clear',
             action='store_true', dest='clear', default=False,
             help="Clear the existing files using the storage "
-                 "before trying to copy or link the original file.")
-        parser.add_argument('-l', '--link',
+                 "before trying to copy or link the original file.",
+        )
+        parser.add_argument(
+            '-l', '--link',
             action='store_true', dest='link', default=False,
-            help="Create a symbolic link to each file instead of copying.")
-        parser.add_argument('--no-default-ignore', action='store_false',
+            help="Create a symbolic link to each file instead of copying.",
+        )
+        parser.add_argument(
+            '--no-default-ignore', action='store_false',
             dest='use_default_ignore_patterns', default=True,
-            help="Don't ignore the common private glob-style patterns 'CVS', "
-                "'.*' and '*~'.")
+            help="Don't ignore the common private glob-style patterns (defaults to 'CVS', '.*' and '*~').",
+        )
 
     def set_options(self, **options):
         """
@@ -75,7 +89,7 @@ class Command(BaseCommand):
         self.dry_run = options['dry_run']
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
-            ignore_patterns += ['CVS', '.*', '*~']
+            ignore_patterns += apps.get_app_config('staticfiles').ignore_patterns
         self.ignore_patterns = list(set(ignore_patterns))
         self.post_process = options['post_process']
 
@@ -259,16 +273,12 @@ class Command(BaseCommand):
                         full_path = None
                     # Skip the file if the source file is younger
                     # Avoid sub-second precision (see #14665, #19540)
-                    if (target_last_modified.replace(microsecond=0)
-                            >= source_last_modified.replace(microsecond=0)):
-                        if not ((self.symlink and full_path
-                                 and not os.path.islink(full_path)) or
-                                (not self.symlink and full_path
-                                 and os.path.islink(full_path))):
-                            if prefixed_path not in self.unmodified_files:
-                                self.unmodified_files.append(prefixed_path)
-                            self.log("Skipping '%s' (not modified)" % path)
-                            return False
+                    if (target_last_modified.replace(microsecond=0) >= source_last_modified.replace(microsecond=0) and
+                            full_path and not (self.symlink ^ os.path.islink(full_path))):
+                        if prefixed_path not in self.unmodified_files:
+                            self.unmodified_files.append(prefixed_path)
+                        self.log("Skipping '%s' (not modified)" % path)
+                        return False
             # Then delete the existing file if really needed
             if self.dry_run:
                 self.log("Pretending to delete '%s'" % path)

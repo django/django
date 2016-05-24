@@ -19,8 +19,10 @@ if HAS_GEOIP2:
 # The GEOIP_DATA path should be the only setting set (the directory
 # should contain links or the actual database files 'GeoLite2-City.mmdb' and
 # 'GeoLite2-City.mmdb'.
-@skipUnless(HAS_GEOIP2 and getattr(settings, "GEOIP_PATH", None),
-    "GeoIP is required along with the GEOIP_PATH setting.")
+@skipUnless(
+    HAS_GEOIP2 and getattr(settings, "GEOIP_PATH", None),
+    "GeoIP is required along with the GEOIP_PATH setting."
+)
 class GeoIPTest(unittest.TestCase):
     addr = '128.249.1.1'
     fqdn = 'tmc.edu'

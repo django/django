@@ -51,8 +51,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
         Check that login_required works on a simple view wrapped in a
         login_required decorator with a login_url set.
         """
-        self.testLoginRequired(view_url='/login_required_login_url/',
-            login_url='/somewhere/')
+        self.testLoginRequired(view_url='/login_required_login_url/', login_url='/somewhere/')
 
 
 class PermissionsRequiredDecoratorTest(TestCase):

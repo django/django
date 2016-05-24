@@ -1,9 +1,10 @@
 import hashlib
 import logging
+from datetime import datetime
 
 from django.db.backends.utils import truncate_name
 from django.db.transaction import atomic
-from django.utils import six
+from django.utils import six, timezone
 from django.utils.encoding import force_bytes
 
 logger = logging.getLogger('django.db.backends.schema')
@@ -58,7 +59,7 @@ class BaseDatabaseSchemaEditor(object):
 
     sql_create_fk = (
         "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
-        "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+        "REFERENCES %(to_table)s (%(to_column)s)%(deferrable)s"
     )
     sql_create_inline_fk = None
     sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
@@ -201,10 +202,19 @@ class BaseDatabaseSchemaEditor(object):
                 default = six.binary_type()
             else:
                 default = six.text_type()
+        elif getattr(field, 'auto_now', False) or getattr(field, 'auto_now_add', False):
+            default = datetime.now()
+            internal_type = field.get_internal_type()
+            if internal_type == 'DateField':
+                default = default.date
+            elif internal_type == 'TimeField':
+                default = default.time
+            elif internal_type == 'DateTimeField':
+                default = timezone.now
         else:
             default = None
         # If it's a callable, call it
-        if six.callable(default):
+        if callable(default):
             default = default()
         # Run it through the field's get_db_prep_save method so we can send it
         # to the database.
@@ -889,6 +899,7 @@ class BaseDatabaseSchemaEditor(object):
             "column": self.quote_name(from_column),
             "to_table": self.quote_name(to_table),
             "to_column": self.quote_name(to_column),
+            "deferrable": self.connection.ops.deferrable_sql(),
         }
 
     def _create_unique_sql(self, model, columns):

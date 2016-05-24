@@ -10,9 +10,11 @@ from django.test import (
     SimpleTestCase, TestCase, modify_settings, override_settings,
 )
 from django.test.selenium import SeleniumTestCase
+from django.test.utils import ignore_warnings
 from django.urls import reverse
 from django.utils import six
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, get_language, override,
 )
@@ -123,6 +125,27 @@ class I18NTests(TestCase):
         # we force saving language to a cookie rather than a session
         # by excluding session middleware and those which do require it
         test_settings = dict(
+            MIDDLEWARE=['django.middleware.common.CommonMiddleware'],
+            LANGUAGE_COOKIE_NAME='mylanguage',
+            LANGUAGE_COOKIE_AGE=3600 * 7 * 2,
+            LANGUAGE_COOKIE_DOMAIN='.example.com',
+            LANGUAGE_COOKIE_PATH='/test/',
+        )
+        with self.settings(**test_settings):
+            post_data = dict(language='pl', next='/views/')
+            response = self.client.post('/i18n/setlang/', data=post_data)
+            language_cookie = response.cookies.get('mylanguage')
+            self.assertEqual(language_cookie.value, 'pl')
+            self.assertEqual(language_cookie['domain'], '.example.com')
+            self.assertEqual(language_cookie['path'], '/test/')
+            self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_setlang_cookie_middleware_classes(self):
+        # we force saving language to a cookie rather than a session
+        # by excluding session middleware and those which do require it
+        test_settings = dict(
+            MIDDLEWARE=None,
             MIDDLEWARE_CLASSES=['django.middleware.common.CommonMiddleware'],
             LANGUAGE_COOKIE_NAME='mylanguage',
             LANGUAGE_COOKIE_AGE=3600 * 7 * 2,
@@ -138,7 +161,19 @@ class I18NTests(TestCase):
             self.assertEqual(language_cookie['path'], '/test/')
             self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
 
-    @modify_settings(MIDDLEWARE_CLASSES={
+    def test_setlang_decodes_http_referer_url(self):
+        """
+        The set_language view decodes the HTTP_REFERER URL.
+        """
+        # The url() & view must exist for this to work as a regression test.
+        self.assertEqual(reverse('with_parameter', kwargs={'parameter': 'x'}), '/test-setlang/x/')
+        lang_code = self._get_inactive_language_code()
+        encoded_url = '/test-setlang/%C3%A4/'  # (%C3%A4 decodes to ä)
+        response = self.client.post('/i18n/setlang/', {'language': lang_code}, HTTP_REFERER=encoded_url)
+        self.assertRedirects(response, encoded_url, fetch_redirect_response=False)
+        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+
+    @modify_settings(MIDDLEWARE={
         'append': 'django.middleware.locale.LocaleMiddleware',
     })
     def test_lang_from_translated_i18n_pattern(self):
@@ -155,6 +190,35 @@ class I18NTests(TestCase):
         )
         self.assertRedirects(response, '/en/translated/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    @override_settings(
+        MIDDLEWARE=None,
+        MIDDLEWARE_CLASSES=[
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+        ],
+    )
+    def test_lang_from_translated_i18n_pattern_middleware_classes(self):
+        response = self.client.post(
+            '/i18n/setlang/', data={'language': 'nl'},
+            follow=True, HTTP_REFERER='/en/translated/'
+        )
+        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'nl')
+        self.assertRedirects(response, '/nl/vertaald/')
+        # And reverse
+        response = self.client.post(
+            '/i18n/setlang/', data={'language': 'en'},
+            follow=True, HTTP_REFERER='/nl/vertaald/'
+        )
+        self.assertRedirects(response, '/en/translated/')
+
+
+@override_settings(ROOT_URLCONF='view_tests.urls')
+class JsI18NTests(SimpleTestCase):
+    """
+    Tests views in django/views/i18n.py that need to change
+    settings.LANGUAGE_CODE.
+    """
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""
         for lang_code in ['es', 'fr', 'ru']:
@@ -173,6 +237,13 @@ class I18NTests(TestCase):
                     # Message with context (msgctxt)
                     self.assertContains(response, '"month name\\u0004May": "mai"', 1)
 
+    @override_settings(USE_I18N=False)
+    def test_jsi18n_USE_I18N_False(self):
+        response = self.client.get('/jsi18n/')
+        # default plural function
+        self.assertContains(response, 'django.pluralidx = function(count) { return (count == 1) ? 0 : 1; };')
+        self.assertNotContains(response, 'var newcatalog =')
+
     def test_jsoni18n(self):
         """
         The json_catalog returns the language catalog and settings as JSON.
@@ -186,14 +257,6 @@ class I18NTests(TestCase):
             self.assertEqual(data['catalog']['month name\x04May'], 'Mai')
             self.assertIn('DATETIME_FORMAT', data['formats'])
             self.assertEqual(data['plural'], '(n != 1)')
-
-
-@override_settings(ROOT_URLCONF='view_tests.urls')
-class JsI18NTests(SimpleTestCase):
-    """
-    Tests django views in django/views/i18n.py that need to change
-    settings.LANGUAGE_CODE.
-    """
 
     def test_jsi18n_with_missing_en_files(self):
         """
@@ -292,7 +355,7 @@ class JsI18NTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class JsI18NTestsMultiPackage(SimpleTestCase):
     """
-    Tests for django views in django/views/i18n.py that need to change
+    Tests views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE and merge JS translation from several packages.
     """
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})
@@ -329,8 +392,7 @@ class JsI18NTestsMultiPackage(SimpleTestCase):
         with self.settings(LANGUAGE_CODE='es-ar', LOCALE_PATHS=extended_locale_paths):
             with override('es-ar'):
                 response = self.client.get('/jsi18n/')
-                self.assertContains(response,
-                    'este texto de app3 debe ser traducido')
+                self.assertContains(response, 'este texto de app3 debe ser traducido')
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
@@ -344,7 +406,7 @@ class JavascriptI18nTests(SeleniumTestCase):
 
     @override_settings(LANGUAGE_CODE='de')
     def test_javascript_gettext(self):
-        self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_template/'))
+        self.selenium.get(self.live_server_url + '/jsi18n_template/')
 
         elem = self.selenium.find_element_by_id("gettext")
         self.assertEqual(elem.text, "Entfernen")
@@ -362,7 +424,7 @@ class JavascriptI18nTests(SeleniumTestCase):
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})
     @override_settings(LANGUAGE_CODE='fr')
     def test_multiple_catalogs(self):
-        self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_multi_catalogs/'))
+        self.selenium.get(self.live_server_url + '/jsi18n_multi_catalogs/')
 
         elem = self.selenium.find_element_by_id('app1string')
         self.assertEqual(elem.text, 'il faut traduire cette chaîne de caractères de app1')

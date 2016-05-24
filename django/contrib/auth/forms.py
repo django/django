@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import unicodedata
+
 from django import forms
 from django.contrib.auth import (
     authenticate, get_user_model, password_validation,
@@ -33,13 +35,13 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
                 hasher = identify_hasher(encoded)
             except ValueError:
                 summary = mark_safe("<strong>%s</strong>" % ugettext(
-                    "Invalid password format or unknown hashing algorithm."))
+                    "Invalid password format or unknown hashing algorithm."
+                ))
             else:
-                summary = format_html_join('',
-                                           "<strong>{}</strong>: {} ",
-                                           ((ugettext(key), value)
-                                            for key, value in hasher.safe_summary(encoded).items())
-                                           )
+                summary = format_html_join(
+                    '', '<strong>{}</strong>: {} ',
+                    ((ugettext(key), value) for key, value in hasher.safe_summary(encoded).items())
+                )
 
         return format_html("<div{}>{}</div>", flatatt(final_attrs), summary)
 
@@ -60,6 +62,11 @@ class ReadOnlyPasswordHashField(forms.Field):
         return False
 
 
+class UsernameField(forms.CharField):
+    def to_python(self, value):
+        return unicodedata.normalize('NFKC', super(UsernameField, self).to_python(value))
+
+
 class UserCreationForm(forms.ModelForm):
     """
     A form that creates a user, with no privileges, from the given username and
@@ -68,17 +75,22 @@ class UserCreationForm(forms.ModelForm):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
-    password1 = forms.CharField(label=_("Password"),
+    password1 = forms.CharField(
+        label=_("Password"),
         strip=False,
-        widget=forms.PasswordInput)
-    password2 = forms.CharField(label=_("Password confirmation"),
+        widget=forms.PasswordInput,
+    )
+    password2 = forms.CharField(
+        label=_("Password confirmation"),
         widget=forms.PasswordInput,
         strip=False,
-        help_text=_("Enter the same password as before, for verification."))
+        help_text=_("Enter the same password as before, for verification."),
+    )
 
     class Meta:
         model = User
         fields = ("username",)
+        field_classes = {'username': UsernameField}
 
     def __init__(self, *args, **kwargs):
         super(UserCreationForm, self).__init__(*args, **kwargs)
@@ -105,14 +117,19 @@ class UserCreationForm(forms.ModelForm):
 
 
 class UserChangeForm(forms.ModelForm):
-    password = ReadOnlyPasswordHashField(label=_("Password"),
-        help_text=_("Raw passwords are not stored, so there is no way to see "
-                    "this user's password, but you can change the password "
-                    "using <a href=\"../password/\">this form</a>."))
+    password = ReadOnlyPasswordHashField(
+        label=_("Password"),
+        help_text=_(
+            "Raw passwords are not stored, so there is no way to see this "
+            "user's password, but you can change the password using "
+            "<a href=\"../password/\">this form</a>."
+        ),
+    )
 
     class Meta:
         model = User
         fields = '__all__'
+        field_classes = {'username': UsernameField}
 
     def __init__(self, *args, **kwargs):
         super(UserChangeForm, self).__init__(*args, **kwargs)
@@ -132,15 +149,21 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = forms.CharField(
+    username = UsernameField(
         max_length=254,
         widget=forms.TextInput(attrs={'autofocus': ''}),
     )
-    password = forms.CharField(label=_("Password"), strip=False, widget=forms.PasswordInput)
+    password = forms.CharField(
+        label=_("Password"),
+        strip=False,
+        widget=forms.PasswordInput,
+    )
 
     error_messages = {
-        'invalid_login': _("Please enter a correct %(username)s and password. "
-                           "Note that both fields may be case-sensitive."),
+        'invalid_login': _(
+            "Please enter a correct %(username)s and password. Note that both "
+            "fields may be case-sensitive."
+        ),
         'inactive': _("This account is inactive."),
     }
 
@@ -164,8 +187,7 @@ class AuthenticationForm(forms.Form):
         password = self.cleaned_data.get('password')
 
         if username and password:
-            self.user_cache = authenticate(username=username,
-                                           password=password)
+            self.user_cache = authenticate(username=username, password=password)
             if self.user_cache is None:
                 raise forms.ValidationError(
                     self.error_messages['invalid_login'],
@@ -263,9 +285,10 @@ class PasswordResetForm(forms.Form):
             }
             if extra_email_context is not None:
                 context.update(extra_email_context)
-            self.send_mail(subject_template_name, email_template_name,
-                           context, from_email, user.email,
-                           html_email_template_name=html_email_template_name)
+            self.send_mail(
+                subject_template_name, email_template_name, context, from_email,
+                user.email, html_email_template_name=html_email_template_name,
+            )
 
 
 class SetPasswordForm(forms.Form):
@@ -276,13 +299,17 @@ class SetPasswordForm(forms.Form):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
-    new_password1 = forms.CharField(label=_("New password"),
-                                    widget=forms.PasswordInput,
-                                    strip=False,
-                                    help_text=password_validation.password_validators_help_text_html())
-    new_password2 = forms.CharField(label=_("New password confirmation"),
-                                    strip=False,
-                                    widget=forms.PasswordInput)
+    new_password1 = forms.CharField(
+        label=_("New password"),
+        widget=forms.PasswordInput,
+        strip=False,
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+    new_password2 = forms.CharField(
+        label=_("New password confirmation"),
+        strip=False,
+        widget=forms.PasswordInput,
+    )
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -314,8 +341,7 @@ class PasswordChangeForm(SetPasswordForm):
     password.
     """
     error_messages = dict(SetPasswordForm.error_messages, **{
-        'password_incorrect': _("Your old password was entered incorrectly. "
-                                "Please enter it again."),
+        'password_incorrect': _("Your old password was entered incorrectly. Please enter it again."),
     })
     old_password = forms.CharField(
         label=_("Old password"),

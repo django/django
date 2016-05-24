@@ -1506,8 +1506,7 @@ class ModelFormsetTest(TestCase):
         }
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset._non_form_errors,
-            ['Please correct the duplicate data for slug.'])
+        self.assertEqual(formset._non_form_errors, ['Please correct the duplicate data for slug.'])
 
         FormSet = modelformset_factory(Price, fields="__all__", extra=2)
         data = {
@@ -1521,8 +1520,10 @@ class ModelFormsetTest(TestCase):
         }
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset._non_form_errors,
-            ['Please correct the duplicate data for price and quantity, which must be unique.'])
+        self.assertEqual(
+            formset._non_form_errors,
+            ['Please correct the duplicate data for price and quantity, which must be unique.']
+        )
 
         # Only the price field is specified, this should skip any unique checks since
         # the unique_together is not fulfilled. This will fail with a KeyError if broken.
@@ -1559,10 +1560,8 @@ class ModelFormsetTest(TestCase):
         }
         formset = FormSet(data=data, instance=author)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset._non_form_errors,
-            ['Please correct the duplicate data for title.'])
-        self.assertEqual(formset.errors,
-            [{}, {'__all__': ['Please correct the duplicate values below.']}])
+        self.assertEqual(formset._non_form_errors, ['Please correct the duplicate data for title.'])
+        self.assertEqual(formset.errors, [{}, {'__all__': ['Please correct the duplicate values below.']}])
 
         FormSet = modelformset_factory(Post, fields="__all__", extra=2)
         data = {
@@ -1581,10 +1580,14 @@ class ModelFormsetTest(TestCase):
         }
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset._non_form_errors,
-            ['Please correct the duplicate data for title which must be unique for the date in posted.'])
-        self.assertEqual(formset.errors,
-            [{}, {'__all__': ['Please correct the duplicate values below.']}])
+        self.assertEqual(
+            formset._non_form_errors,
+            ['Please correct the duplicate data for title which must be unique for the date in posted.']
+        )
+        self.assertEqual(
+            formset.errors,
+            [{}, {'__all__': ['Please correct the duplicate values below.']}]
+        )
 
         data = {
             'form-TOTAL_FORMS': '2',
@@ -1602,8 +1605,10 @@ class ModelFormsetTest(TestCase):
         }
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset._non_form_errors,
-            ['Please correct the duplicate data for slug which must be unique for the year in posted.'])
+        self.assertEqual(
+            formset._non_form_errors,
+            ['Please correct the duplicate data for slug which must be unique for the year in posted.']
+        )
 
         data = {
             'form-TOTAL_FORMS': '2',
@@ -1621,8 +1626,10 @@ class ModelFormsetTest(TestCase):
         }
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset._non_form_errors,
-            ['Please correct the duplicate data for subtitle which must be unique for the month in posted.'])
+        self.assertEqual(
+            formset._non_form_errors,
+            ['Please correct the duplicate data for subtitle which must be unique for the month in posted.']
+        )
 
 
 class TestModelFormsetOverridesTroughFormMeta(TestCase):
@@ -1634,7 +1641,7 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         form = PoetFormSet.form()
         self.assertHTMLEqual(
             "%s" % form['name'],
-            '<input id="id_name" maxlength="100" type="text" class="poet" name="name" />'
+            '<input id="id_name" maxlength="100" type="text" class="poet" name="name" required />'
         )
 
     def test_inlineformset_factory_widgets(self):
@@ -1645,7 +1652,7 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         form = BookFormSet.form()
         self.assertHTMLEqual(
             "%s" % form['title'],
-            '<input class="book" id="id_title" maxlength="100" name="title" type="text" />'
+            '<input class="book" id="id_title" maxlength="100" name="title" type="text" required />'
         )
 
     def test_modelformset_factory_labels_overrides(self):

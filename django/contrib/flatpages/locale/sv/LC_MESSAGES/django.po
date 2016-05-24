@@ -4,13 +4,14 @@
 # Andreas Pelme <andreas@pelme.se>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2014
+# Thomas Lundqvist <thomas@biljettshop.se>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-03-23 11:23+0000\n"
+"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -76,7 +77,7 @@ msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "Om detta bockas för kommer endast inloggade användare kunna se sidan."
 
 msgid "sites"
-msgstr ""
+msgstr "webbplatser"
 
 msgid "flat page"
 msgstr "statisk sida"

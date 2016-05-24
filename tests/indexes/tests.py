@@ -40,8 +40,7 @@ class SchemaIndexesTests(TestCase):
         index_sql = connection.schema_editor()._model_indexes_sql(IndexTogetherSingleList)
         self.assertEqual(len(index_sql), 1)
 
-    @skipUnless(connection.vendor == 'postgresql',
-        "This is a postgresql-specific issue")
+    @skipUnless(connection.vendor == 'postgresql', "This is a postgresql-specific issue")
     def test_postgresql_text_indexes(self):
         """Test creation of PostgreSQL-specific text indexes (#12234)"""
         from .models import IndexedArticle
@@ -53,8 +52,7 @@ class SchemaIndexesTests(TestCase):
         # index (#19441).
         self.assertIn('("slug" varchar_pattern_ops)', index_sql[4])
 
-    @skipUnless(connection.vendor == 'postgresql',
-        "This is a postgresql-specific issue")
+    @skipUnless(connection.vendor == 'postgresql', "This is a postgresql-specific issue")
     def test_postgresql_virtual_relation_indexes(self):
         """Test indexes are not created for related objects"""
         index_sql = connection.schema_editor()._model_indexes_sql(Article)

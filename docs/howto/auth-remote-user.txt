@@ -29,10 +29,10 @@ Configuration
 
 First, you must add the
 :class:`django.contrib.auth.middleware.RemoteUserMiddleware` to the
-:setting:`MIDDLEWARE_CLASSES` setting **after** the
+:setting:`MIDDLEWARE` setting **after** the
 :class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         '...',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.RemoteUserMiddleware',
@@ -112,8 +112,6 @@ override one or more of its attributes and methods.
 
 Using ``REMOTE_USER`` on login pages only
 =========================================
-
-.. versionadded:: 1.9
 
 The ``RemoteUserMiddleware`` authentication middleware assumes that the HTTP
 request header ``REMOTE_USER`` is present with all authenticated requests. That

@@ -48,13 +48,10 @@ class Storage(object):
             name = content.name
 
         if not hasattr(content, 'chunks'):
-            content = File(content)
+            content = File(content, name)
 
         name = self.get_available_name(name, max_length=max_length)
-        name = self._save(name, content)
-
-        # Store filenames with forward slashes, even on Windows
-        return force_text(name.replace('\\', '/'))
+        return self._save(name, content)
 
     # These methods are part of the public API, with default implementations.
 
@@ -95,6 +92,15 @@ class Storage(object):
                     )
                 name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
         return name
+
+    def generate_filename(self, filename):
+        """
+        Validate the filename by calling get_valid_name() and return a filename
+        to be passed to the save() method.
+        """
+        # `filename` may include a path as returned by FileField.upload_to.
+        dirname, filename = os.path.split(filename)
+        return os.path.normpath(os.path.join(dirname, self.get_valid_name(filename)))
 
     def path(self, name):
         """
@@ -367,7 +373,8 @@ class FileSystemStorage(Storage):
         if self.file_permissions_mode is not None:
             os.chmod(full_path, self.file_permissions_mode)
 
-        return name
+        # Store filenames with forward slashes, even on Windows.
+        return force_text(name.replace('\\', '/'))
 
     def delete(self, name):
         assert name, "The name argument is not allowed to be empty."
@@ -405,7 +412,10 @@ class FileSystemStorage(Storage):
     def url(self, name):
         if self.base_url is None:
             raise ValueError("This file is not accessible via a URL.")
-        return urljoin(self.base_url, filepath_to_uri(name))
+        url = filepath_to_uri(name)
+        if url is not None:
+            url = url.lstrip('/')
+        return urljoin(self.base_url, url)
 
     def accessed_time(self, name):
         warnings.warn(

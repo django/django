@@ -4,14 +4,16 @@ from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
-from django.core import validators
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils import six, timezone
+from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+
+from .validators import ASCIIUsernameValidator, UnicodeUsernameValidator
 
 
 def update_last_login(sender, user, **kwargs):
@@ -143,6 +145,7 @@ class UserManager(BaseUserManager):
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
+        username = self.normalize_username(username)
         user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -301,18 +304,14 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     Username and password are required. Other fields are optional.
     """
+    username_validator = UnicodeUsernameValidator() if six.PY3 else ASCIIUsernameValidator()
+
     username = models.CharField(
         _('username'),
         max_length=150,
         unique=True,
         help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-        validators=[
-            validators.RegexValidator(
-                r'^[\w.@+-]+$',
-                _('Enter a valid username. This value may contain only '
-                  'letters, numbers ' 'and @/./+/-/_ characters.')
-            ),
-        ],
+        validators=[username_validator],
         error_messages={
             'unique': _("A user with that username already exists."),
         },
@@ -438,11 +437,13 @@ class AnonymousUser(object):
     def has_module_perms(self, module):
         return _user_has_module_perms(self, module)
 
+    @property
     def is_anonymous(self):
-        return True
+        return CallableTrue
 
+    @property
     def is_authenticated(self):
-        return False
+        return CallableFalse
 
     def get_username(self):
         return self.username

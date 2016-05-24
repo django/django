@@ -37,4 +37,5 @@ release. Some fields require higher versions.
     functions
     lookups
     operations
+    search
     validators

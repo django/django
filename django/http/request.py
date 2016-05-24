@@ -8,7 +8,9 @@ from itertools import chain
 
 from django.conf import settings
 from django.core import signing
-from django.core.exceptions import DisallowedHost, ImproperlyConfigured
+from django.core.exceptions import (
+    DisallowedHost, ImproperlyConfigured, RequestDataTooBig,
+)
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils import six
@@ -16,9 +18,9 @@ from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.encoding import (
     escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
 )
-from django.utils.http import is_same_domain
+from django.utils.http import is_same_domain, limited_parse_qsl
 from django.utils.six.moves.urllib.parse import (
-    parse_qsl, quote, urlencode, urljoin, urlsplit,
+    quote, urlencode, urljoin, urlsplit,
 )
 
 RAISE_ERROR = object()
@@ -259,6 +261,12 @@ class HttpRequest(object):
         if not hasattr(self, '_body'):
             if self._read_started:
                 raise RawPostDataException("You cannot access body after reading from request's data stream")
+
+            # Limit the maximum request data size that will be handled in-memory.
+            if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
+                    int(self.META.get('CONTENT_LENGTH', 0)) > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
+                raise RequestDataTooBig('Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.')
+
             try:
                 self._body = self.read()
             except IOError as e:
@@ -267,14 +275,14 @@ class HttpRequest(object):
         return self._body
 
     def _mark_post_parse_error(self):
-        self._post = QueryDict('')
+        self._post = QueryDict()
         self._files = MultiValueDict()
         self._post_parse_error = True
 
     def _load_post_and_files(self):
         """Populate self._post and self._files if the content-type is a form type"""
         if self.method != 'POST':
-            self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
+            self._post, self._files = QueryDict(encoding=self._encoding), MultiValueDict()
             return
         if self._read_started and not hasattr(self, '_body'):
             self._mark_post_parse_error()
@@ -301,7 +309,7 @@ class HttpRequest(object):
         elif self.content_type == 'application/x-www-form-urlencoded':
             self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
         else:
-            self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
+            self._post, self._files = QueryDict(encoding=self._encoding), MultiValueDict()
 
     def close(self):
         if hasattr(self, '_files'):
@@ -368,6 +376,12 @@ class QueryDict(MultiValueDict):
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
+        query_string = query_string or ''
+        parse_qsl_kwargs = {
+            'keep_blank_values': True,
+            'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
+            'encoding': encoding,
+        }
         if six.PY3:
             if isinstance(query_string, bytes):
                 # query_string normally contains URL-encoded data, a subset of ASCII.
@@ -376,13 +390,10 @@ class QueryDict(MultiValueDict):
                 except UnicodeDecodeError:
                     # ... but some user agents are misbehaving :-(
                     query_string = query_string.decode('iso-8859-1')
-            for key, value in parse_qsl(query_string or '',
-                                        keep_blank_values=True,
-                                        encoding=encoding):
+            for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
                 self.appendlist(key, value)
         else:
-            for key, value in parse_qsl(query_string or '',
-                                        keep_blank_values=True):
+            for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
                 try:
                     value = value.decode(encoding)
                 except UnicodeDecodeError:
@@ -473,7 +484,7 @@ class QueryDict(MultiValueDict):
         :arg safe: Used to specify characters which do not require quoting, for
             example::
 
-                >>> q = QueryDict('', mutable=True)
+                >>> q = QueryDict(mutable=True)
                 >>> q['next'] = '/a&b/'
                 >>> q.urlencode()
                 'next=%2Fa%26b%2F'

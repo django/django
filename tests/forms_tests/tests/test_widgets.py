@@ -23,8 +23,8 @@ class FormsWidgetTests(SimpleTestCase):
         # RadioSelect uses a RadioFieldRenderer to render the individual radio inputs.
         # You can manipulate that object directly to customize the way the RadioSelect
         # is rendered.
-        w = RadioSelect()
-        r = w.get_renderer('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+        w = RadioSelect(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+        r = w.get_renderer('beatle', 'J')
         inp_set1 = []
         inp_set2 = []
         inp_set3 = []
@@ -62,8 +62,8 @@ beatle J G George False
 beatle J R Ringo False""")
 
         # A RadioFieldRenderer object also allows index access to individual RadioChoiceInput
-        w = RadioSelect()
-        r = w.get_renderer('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+        w = RadioSelect(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+        r = w.get_renderer('beatle', 'J')
         self.assertHTMLEqual(str(r[1]), '<label><input type="radio" name="beatle" value="P" /> Paul</label>')
         self.assertHTMLEqual(
             str(r[0]),
@@ -86,9 +86,9 @@ beatle J R Ringo False""")
         class MyRenderer(RadioFieldRenderer):
             def render(self):
                 return '<br />\n'.join(six.text_type(choice) for choice in self)
-        w = RadioSelect(renderer=MyRenderer)
+        w = RadioSelect(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')), renderer=MyRenderer)
         self.assertHTMLEqual(
-            w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
+            w.render('beatle', 'G'),
             """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
 <label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
@@ -98,9 +98,9 @@ beatle J R Ringo False""")
         # Or you can use custom RadioSelect fields that use your custom renderer.
         class CustomRadioSelect(RadioSelect):
             renderer = MyRenderer
-        w = CustomRadioSelect()
+        w = CustomRadioSelect(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
         self.assertHTMLEqual(
-            w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
+            w.render('beatle', 'G'),
             """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
 <label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
@@ -112,10 +112,8 @@ beatle J R Ringo False""")
             # str is just to test some Python 2 issue with bytestrings
             outer_html = str('<div{id_attr}>{content}</div>')
             inner_html = '<p>{choice_value}{sub_widgets}</p>'
-        w = RadioSelect(renderer=MyRenderer)
-        output = w.render('beatle', 'J',
-                          choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')),
-                          attrs={'id': 'bar'})
+        w = RadioSelect(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')), renderer=MyRenderer)
+        output = w.render('beatle', 'J', attrs={'id': 'bar'})
         self.assertIsInstance(output, SafeData)
         self.assertHTMLEqual(
             output,
@@ -128,17 +126,36 @@ beatle J R Ringo False""")
 
     def test_subwidget(self):
         # Each subwidget tag gets a separate ID when the widget has an ID specified
-        self.assertHTMLEqual("\n".join(c.tag() for c in CheckboxSelectMultiple(attrs={'id': 'abc'}).subwidgets('letters', list('ac'), choices=zip(list('abc'), list('ABC')))), """<input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" />
+        self.assertHTMLEqual(
+            "\n".join(
+                c.tag() for c in CheckboxSelectMultiple(
+                    attrs={'id': 'abc'},
+                    choices=zip(list('abc'), list('ABC'))
+                ).subwidgets('letters', list('ac'))
+            ),
+            """<input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" />
 <input type="checkbox" name="letters" value="b" id="abc_1" />
 <input checked="checked" type="checkbox" name="letters" value="c" id="abc_2" />""")
 
         # Each subwidget tag does not get an ID if the widget does not have an ID specified
-        self.assertHTMLEqual("\n".join(c.tag() for c in CheckboxSelectMultiple().subwidgets('letters', list('ac'), choices=zip(list('abc'), list('ABC')))), """<input checked="checked" type="checkbox" name="letters" value="a" />
+        self.assertHTMLEqual(
+            "\n".join(c.tag() for c in CheckboxSelectMultiple(
+                choices=zip(list('abc'), list('ABC')),
+            ).subwidgets('letters', list('ac'))),
+            """<input checked="checked" type="checkbox" name="letters" value="a" />
 <input type="checkbox" name="letters" value="b" />
 <input checked="checked" type="checkbox" name="letters" value="c" />""")
 
         # The id_for_label property of the subwidget should return the ID that is used on the subwidget's tag
-        self.assertHTMLEqual("\n".join('<input type="checkbox" name="letters" value="%s" id="%s" />' % (c.choice_value, c.id_for_label) for c in CheckboxSelectMultiple(attrs={'id': 'abc'}).subwidgets('letters', [], choices=zip(list('abc'), list('ABC')))), """<input type="checkbox" name="letters" value="a" id="abc_0" />
+        self.assertHTMLEqual(
+            "\n".join(
+                '<input type="checkbox" name="letters" value="%s" id="%s" />'
+                % (c.choice_value, c.id_for_label) for c in CheckboxSelectMultiple(
+                    attrs={'id': 'abc'},
+                    choices=zip(list('abc'), list('ABC')),
+                ).subwidgets('letters', [])
+            ),
+            """<input type="checkbox" name="letters" value="a" id="abc_0" />
 <input type="checkbox" name="letters" value="b" id="abc_1" />
 <input type="checkbox" name="letters" value="c" id="abc_2" />""")
 
@@ -170,8 +187,7 @@ class LiveWidgetTests(AdminSeleniumTestCase):
         Test that a roundtrip on a ModelForm doesn't alter the TextField value
         """
         article = Article.objects.create(content="\nTst\n")
-        self.selenium.get('%s%s' % (self.live_server_url,
-            reverse('article_form', args=[article.pk])))
+        self.selenium.get(self.live_server_url + reverse('article_form', args=[article.pk]))
         self.selenium.find_element_by_id('submit').submit()
         article = Article.objects.get(pk=article.pk)
         # Should be "\nTst\n" after #19251 is fixed

@@ -70,6 +70,11 @@ continued here.{% endcomment %}
 {% trans "Translatable literal #7.1g"|add:2 context "context #7.1g" as var %}
 {% trans "Translatable literal #7.1h" | add:"foo" | add:2 context "context #7.1h" as var %}
 
+<!-- Source file inside a msgid, should be left as-is. -->
+{% trans "#: templates/test.html.py" %}
+<!-- Deliberate duplicated string. -->
+{% trans "This literal should be included." %}
+
 {% blocktrans context "Special blocktrans context #1" %}Translatable literal #8a{% endblocktrans %}
 {% blocktrans count 2 context "Special blocktrans context #2" %}Translatable literal #8b-singular{% plural %}Translatable literal #8b-plural{% endblocktrans %}
 {% blocktrans context "Special blocktrans context #3" count 2 %}Translatable literal #8c-singular{% plural %}Translatable literal #8c-plural{% endblocktrans %}

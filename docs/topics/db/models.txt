@@ -1282,38 +1282,24 @@ possible.
 
 .. _proxy-vs-unmanaged-models:
 
-Differences between proxy inheritance and  unmanaged models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Differences between proxy inheritance and unmanaged models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Proxy model inheritance might look fairly similar to creating an unmanaged
 model, using the :attr:`~django.db.models.Options.managed` attribute on a
-model's ``Meta`` class. The two alternatives are not quite the same and it's
-worth considering which one you should use.
+model's ``Meta`` class.
 
-One difference is that you can (and, in fact, must unless you want an empty
-model) specify model fields on models with ``Meta.managed=False``. You could,
-with careful setting of :attr:`Meta.db_table
-<django.db.models.Options.db_table>` create an unmanaged model that shadowed
-an existing model and add Python methods to it. However, that would be very
-repetitive and fragile as you need to keep both copies synchronized if you
+With careful setting of :attr:`Meta.db_table
+<django.db.models.Options.db_table>` you could create an unmanaged model that
+shadows an existing model and adds Python methods to it. However, that would be
+very repetitive and fragile as you need to keep both copies synchronized if you
 make any changes.
 
-The other difference that is more important for proxy models, is how model
-managers are handled. Proxy models are intended to behave exactly like the
-model they are proxying for. So they inherit the parent model's managers,
-including the default manager. In the normal multi-table model inheritance
-case, children do not inherit managers from their parents as the custom
-managers aren't always appropriate when extra fields are involved. The
-:ref:`manager documentation <custom-managers-and-inheritance>` has more
-details about this latter case.
+On the other hand, proxy models are intended to behave exactly like the model
+they are proxying for. They are always in sync with the parent model since they
+directly inherit its fields and managers.
 
-When these two features were implemented, attempts were made to squash them
-into a single option. It turned out that interactions with inheritance, in
-general, and managers, in particular, made the API very complicated and
-potentially difficult to understand and use. It turned out that two options
-were needed in any case, so the current separation arose.
-
-So, the general rules are:
+The general rules are:
 
 1. If you are mirroring an existing model or database table and don't want
    all the original database table columns, use ``Meta.managed=False``.
@@ -1376,11 +1362,35 @@ Field name "hiding" is not permitted
 -------------------------------------
 
 In normal Python class inheritance, it is permissible for a child class to
-override any attribute from the parent class. In Django, this is not permitted
-for attributes that are :class:`~django.db.models.Field` instances (at
-least, not at the moment). If a base class has a field called ``author``, you
-cannot create another model field called ``author`` in any class that inherits
-from that base class.
+override any attribute from the parent class. In Django, this isn't usually
+permitted for model fields. If a non-abstract model base class has a field
+called ``author``, you can't create another model field or define
+an attribute called ``author`` in any class that inherits from that base class.
+
+This restriction doesn't apply to model fields inherited from an abstract
+model. Such fields may be overridden with another field or value, or be removed
+by setting ``field_name = None``.
+
+.. versionchanged:: 1.10
+
+    The ability to override abstract fields was added.
+
+.. warning::
+
+    Model managers are inherited from abstract base classes. Overriding an
+    inherited field which is referenced by an inherited
+    :class:`~django.db.models.Manager` may cause subtle bugs. See :ref:`custom
+    managers and model inheritance <custom-managers-and-inheritance>`.
+
+.. note::
+
+    Some fields define extra attributes on the model, e.g. a
+    :class:`~django.db.models.ForeignKey` defines an extra attribute with
+    ``_id`` appended to the field name, as well as ``related_name`` and
+    ``related_query_name`` on the foreign model.
+
+    These extra attributes cannot be overridden unless the field that defines
+    it is changed or removed so that it no longer defines the extra attribute.
 
 Overriding fields in a parent model leads to difficulties in areas such as
 initializing new instances (specifying which field is being initialized in

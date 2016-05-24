@@ -9,6 +9,7 @@ from django.db.migrations.state import (
     ModelState, ProjectState, get_related_models_recursive,
 )
 from django.test import SimpleTestCase, override_settings
+from django.test.utils import isolate_apps
 from django.utils import six
 
 from .models import (
@@ -261,13 +262,11 @@ class StateTests(SimpleTestCase):
         self.assertEqual(len(new_apps.get_model("migrations", "SubTag")._meta.local_fields), 2)
 
         Food = new_apps.get_model("migrations", "Food")
-        managers = sorted(Food._meta.managers)
-        self.assertEqual([mgr.name for _, mgr, _ in managers],
+        self.assertEqual([mgr.name for mgr in Food._meta.managers],
                          ['default', 'food_mgr1', 'food_mgr2'])
-        self.assertTrue(all(isinstance(mgr.name, six.text_type) for _, mgr, _ in managers))
-        self.assertEqual([mgr.__class__ for _, mgr, _ in managers],
+        self.assertTrue(all(isinstance(mgr.name, six.text_type) for mgr in Food._meta.managers))
+        self.assertEqual([mgr.__class__ for mgr in Food._meta.managers],
                          [models.Manager, FoodManager, FoodManager])
-        self.assertIs(managers[0][1], Food._default_manager)
 
     def test_render_model_inheritance(self):
         class Book(models.Model):
@@ -662,9 +661,10 @@ class StateTests(SimpleTestCase):
         project_state = ProjectState()
         project_state.add_model(ModelState.from_model(Book))
         msg = (
-            "Unhandled pending operations for models:\n"
-            "  migrations.author (referred to by fields: migrations.Book.author)\n"
-            "  migrations.publisher (referred to by fields: migrations.Book.publisher)"
+            "The field migrations.Book.author was declared with a lazy reference "
+            "to 'migrations.author', but app 'migrations' doesn't provide model 'author'.\n"
+            "The field migrations.Book.publisher was declared with a lazy reference "
+            "to 'migrations.publisher', but app 'migrations' doesn't provide model 'publisher'."
         )
         with self.assertRaisesMessage(ValueError, msg):
             project_state.apps
@@ -673,9 +673,10 @@ class StateTests(SimpleTestCase):
         project_state = ProjectState()
         project_state.add_model(ModelState.from_model(Magazine))
         msg = (
-            "Unhandled pending operations for models:\n"
-            "  migrations.author (referred to by fields: "
-            "migrations.Magazine.authors, migrations.Magazine_authors.author)"
+            "The field migrations.Magazine.authors was declared with a lazy reference "
+            "to 'migrations.author\', but app 'migrations' doesn't provide model 'author'.\n"
+            "The field migrations.Magazine_authors.author was declared with a lazy reference "
+            "to \'migrations.author\', but app 'migrations' doesn't provide model 'author'."
         )
         with self.assertRaisesMessage(ValueError, msg):
             project_state.apps
@@ -683,10 +684,14 @@ class StateTests(SimpleTestCase):
         # And now with multiple models and multiple fields.
         project_state.add_model(ModelState.from_model(Book))
         msg = (
-            "Unhandled pending operations for models:\n"
-            "  migrations.author (referred to by fields: migrations.Book.author, "
-            "migrations.Magazine.authors, migrations.Magazine_authors.author)\n"
-            "  migrations.publisher (referred to by fields: migrations.Book.publisher)"
+            "The field migrations.Book.author was declared with a lazy reference "
+            "to 'migrations.author', but app 'migrations' doesn't provide model 'author'.\n"
+            "The field migrations.Book.publisher was declared with a lazy reference "
+            "to 'migrations.publisher', but app 'migrations' doesn't provide model 'publisher'.\n"
+            "The field migrations.Magazine.authors was declared with a lazy reference "
+            "to 'migrations.author', but app 'migrations' doesn't provide model 'author'.\n"
+            "The field migrations.Magazine_authors.author was declared with a lazy reference "
+            "to 'migrations.author', but app 'migrations' doesn't provide model 'author'."
         )
         with self.assertRaisesMessage(ValueError, msg):
             project_state.apps
@@ -817,23 +822,26 @@ class ModelStateTests(SimpleTestCase):
     def test_bound_field_sanity_check(self):
         field = models.CharField(max_length=1)
         field.model = models.Model
-        with self.assertRaisesMessage(ValueError,
-                'ModelState.fields cannot be bound to a model - "field" is.'):
+        with self.assertRaisesMessage(ValueError, 'ModelState.fields cannot be bound to a model - "field" is.'):
             ModelState('app', 'Model', [('field', field)])
 
     def test_sanity_check_to(self):
         field = models.ForeignKey(UnicodeModel, models.CASCADE)
-        with self.assertRaisesMessage(ValueError,
-                'ModelState.fields cannot refer to a model class - "field.to" does. '
-                'Use a string reference instead.'):
+        with self.assertRaisesMessage(
+            ValueError,
+            'ModelState.fields cannot refer to a model class - "field.to" does. '
+            'Use a string reference instead.'
+        ):
             ModelState('app', 'Model', [('field', field)])
 
     def test_sanity_check_through(self):
         field = models.ManyToManyField('UnicodeModel')
         field.remote_field.through = UnicodeModel
-        with self.assertRaisesMessage(ValueError,
-                'ModelState.fields cannot refer to a model class - "field.through" does. '
-                'Use a string reference instead.'):
+        with self.assertRaisesMessage(
+            ValueError,
+            'ModelState.fields cannot refer to a model class - "field.through" does. '
+            'Use a string reference instead.'
+        ):
             ModelState('app', 'Model', [('field', field)])
 
     def test_fields_immutability(self):
@@ -907,6 +915,19 @@ class ModelStateTests(SimpleTestCase):
         # The default manager is used in migrations
         self.assertEqual([name for name, mgr in food_state.managers], ['food_mgr'])
         self.assertEqual(food_state.managers[0][1].args, ('a', 'b', 1, 2))
+
+    @isolate_apps('migrations', 'django.contrib.contenttypes')
+    def test_order_with_respect_to_private_field(self):
+        class PrivateFieldModel(models.Model):
+            content_type = models.ForeignKey('contenttypes.ContentType', models.CASCADE)
+            object_id = models.PositiveIntegerField()
+            private = GenericForeignKey()
+
+            class Meta:
+                order_with_respect_to = 'private'
+
+        state = ModelState.from_model(PrivateFieldModel)
+        self.assertNotIn('order_with_respect_to', state.options)
 
 
 class RelatedModelsTests(SimpleTestCase):

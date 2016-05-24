@@ -12,8 +12,6 @@ All of these functions are available from the
 
 .. class:: TransactionNow()
 
-.. versionadded:: 1.9
-
 Returns the date and time on the database server that the current transaction
 started. If you are not in a transaction it will return the date and time of
 the current statement. This is a complement to

@@ -329,6 +329,18 @@ def serializer_factory(value):
         # tuple.
         value = value.__reduce__()[1][0]
 
+    if isinstance(value, models.Field):
+        return ModelFieldSerializer(value)
+    if isinstance(value, models.manager.BaseManager):
+        return ModelManagerSerializer(value)
+    if isinstance(value, Operation):
+        return OperationSerializer(value)
+    if isinstance(value, type):
+        return TypeSerializer(value)
+    # Anything that knows how to deconstruct itself.
+    if hasattr(value, 'deconstruct'):
+        return DeconstructableSerializer(value)
+
     # Unfortunately some of these are order-dependent.
     if isinstance(value, frozenset):
         return FrozensetSerializer(value)
@@ -362,19 +374,8 @@ def serializer_factory(value):
         return TextTypeSerializer(value)
     if isinstance(value, decimal.Decimal):
         return DecimalSerializer(value)
-    if isinstance(value, models.Field):
-        return ModelFieldSerializer(value)
-    if isinstance(value, type):
-        return TypeSerializer(value)
-    if isinstance(value, models.manager.BaseManager):
-        return ModelManagerSerializer(value)
-    if isinstance(value, Operation):
-        return OperationSerializer(value)
     if isinstance(value, functools.partial):
         return FunctoolsPartialSerializer(value)
-    # Anything that knows how to deconstruct itself.
-    if hasattr(value, 'deconstruct'):
-        return DeconstructableSerializer(value)
     if isinstance(value, (types.FunctionType, types.BuiltinFunctionType)):
         return FunctionTypeSerializer(value)
     if isinstance(value, collections.Iterable):

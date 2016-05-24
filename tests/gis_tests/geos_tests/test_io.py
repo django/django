@@ -42,6 +42,12 @@ class GEOSIOTest(SimpleTestCase):
         ref_wkt = 'POINT (5.0000000000000000 23.0000000000000000)'
         self.assertEqual(ref_wkt, wkt_w.write(ref).decode())
 
+    def test_wktwriter_constructor_arguments(self):
+        wkt_w = WKTWriter(dim=3, trim=True, precision=3)
+        ref = GEOSGeometry('POINT (5.34562 23 1.5)')
+        ref_wkt = 'POINT Z (5.35 23 1.5)'
+        self.assertEqual(ref_wkt, wkt_w.write(ref).decode())
+
     def test03_wkbreader(self):
         # Creating a WKBReader instance
         wkb_r = WKBReader()
@@ -101,9 +107,8 @@ class GEOSIOTest(SimpleTestCase):
 
         # Ensuring bad output dimensions are not accepted
         for bad_outdim in (-1, 0, 1, 4, 423, 'foo', None):
-            # Equivalent of `wkb_w.outdim = bad_outdim`
-            with self.assertRaises(ValueError):
-                wkb_w._set_outdim(bad_outdim)
+            with self.assertRaisesMessage(ValueError, 'WKB output dimension must be 2 or 3'):
+                wkb_w.outdim = bad_outdim
 
         # Now setting the output dimensions to be 3
         wkb_w.outdim = 3

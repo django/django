@@ -80,6 +80,12 @@ class TestSaveLoad(PostgreSQLTestCase):
         loaded = RangesModel.objects.get()
         self.assertIsNone(loaded.ints)
 
+    def test_model_set_on_base_field(self):
+        instance = RangesModel()
+        field = instance._meta.get_field('ints')
+        self.assertEqual(field.model, RangesModel)
+        self.assertEqual(field.base_field.model, RangesModel)
+
 
 class TestQuerying(PostgreSQLTestCase):
 
@@ -289,9 +295,11 @@ class TestSerialization(PostgreSQLTestCase):
     upper_dt = datetime.datetime(2014, 2, 2, 12, 12, 12, tzinfo=timezone.utc)
 
     def test_dumping(self):
-        instance = RangesModel(ints=NumericRange(0, 10), floats=NumericRange(empty=True),
+        instance = RangesModel(
+            ints=NumericRange(0, 10), floats=NumericRange(empty=True),
             timestamps=DateTimeTZRange(self.lower_dt, self.upper_dt),
-            dates=DateRange(self.lower_date, self.upper_date))
+            dates=DateRange(self.lower_date, self.upper_date),
+        )
         data = serializers.serialize('json', [instance])
         dumped = json.loads(data)
         for field in ('ints', 'dates', 'timestamps'):

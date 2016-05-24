@@ -147,6 +147,43 @@ details on these changes.
 * The shim for supporting custom related manager classes without a
   ``_apply_rel_filters()`` method will be removed.
 
+* Using ``User.is_authenticated()`` and ``User.is_anonymous()`` as methods
+  will no longer be supported.
+
+* The private attribute ``virtual_fields`` of ``Model._meta`` will be removed.
+
+* The private keyword arguments ``virtual_only`` in
+  ``Field.contribute_to_class()`` and ``virtual`` in
+  ``Model._meta.add_field()`` will be removed.
+
+* The ``javascript_catalog()`` and ``json_catalog()`` views will be removed.
+
+* The ``django.contrib.gis.utils.precision_wkt()`` function will be removed.
+
+* In multi-table inheritance, implicit promotion of a ``OneToOneField`` to a
+  ``parent_link`` will be removed.
+
+* Support for ``Widget._format_value()`` will be removed.
+
+* ``FileField`` methods ``get_directory_name()`` and ``get_filename()`` will be
+  removed.
+
+* The ``mark_for_escaping()`` function and the classes it uses: ``EscapeData``,
+  ``EscapeBytes``, ``EscapeText``, ``EscapeString``, and ``EscapeUnicode`` will
+  be removed.
+
+* The ``escape`` filter will change to use
+  ``django.utils.html.conditional_escape()``.
+
+* ``Manager.use_for_related_fields`` will be removed.
+
+* Model ``Manager`` inheritance will follow MRO inheritance rules and the
+  ``Meta.manager_inheritance_from_future`` to opt-in to this behavior will be
+  removed.
+
+* Support for old-style middleware using ``settings.MIDDLEWARE_CLASSES`` will
+  be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

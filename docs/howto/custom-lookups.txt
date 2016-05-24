@@ -67,7 +67,7 @@ We then need to define the ``as_sql`` method. This takes a ``SQLCompiler``
 object, called ``compiler``,  and the active database connection.
 ``SQLCompiler`` objects are not documented, but the only thing we need to know
 about them is that they have a ``compile()`` method which returns a tuple
-containing a SQL string, and the parameters to be interpolated into that
+containing an SQL string, and the parameters to be interpolated into that
 string. In most cases, you don't need to use it directly and can pass it on to
 ``process_lhs()`` and ``process_rhs()``.
 
@@ -88,7 +88,7 @@ example, ``process_lhs`` returns ``('"author"."name"', [])`` and
 parameters for the left hand side, but this would depend on the object we have,
 so we still need to include them in the parameters we return.
 
-Finally we combine the parts into a SQL expression with ``<>``, and supply all
+Finally we combine the parts into an SQL expression with ``<>``, and supply all
 the parameters for the query. We then return a tuple containing the generated
 SQL string and the parameters.
 
@@ -292,7 +292,7 @@ would override ``get_lookup`` with something like::
                     dimension = int(lookup_name[1:])
                 except ValueError:
                     pass
-                finally:
+                else:
                     return get_coordinate_lookup(dimension)
             return super(CoordinatesField, self).get_lookup(lookup_name)
 

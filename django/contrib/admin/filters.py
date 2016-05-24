@@ -155,8 +155,7 @@ class FieldListFilter(ListFilter):
         for test, list_filter_class in cls._field_list_filters:
             if not test(field):
                 continue
-            return list_filter_class(field, request, params,
-                model, model_admin, field_path=field_path)
+            return list_filter_class(field, request, params, model, model_admin, field_path=field_path)
 
 
 class RelatedFieldListFilter(FieldListFilter):
@@ -200,8 +199,10 @@ class RelatedFieldListFilter(FieldListFilter):
     def choices(self, changelist):
         yield {
             'selected': self.lookup_val is None and not self.lookup_val_isnull,
-            'query_string': changelist.get_query_string({},
-                [self.lookup_kwarg, self.lookup_kwarg_isnull]),
+            'query_string': changelist.get_query_string(
+                {},
+                [self.lookup_kwarg, self.lookup_kwarg_isnull]
+            ),
             'display': _('All'),
         }
         for pk_val, val in self.lookup_choices:
@@ -230,8 +231,10 @@ class BooleanFieldListFilter(FieldListFilter):
         self.lookup_kwarg2 = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg)
         self.lookup_val2 = request.GET.get(self.lookup_kwarg2)
-        super(BooleanFieldListFilter, self).__init__(field,
-            request, params, model, model_admin, field_path)
+        super(BooleanFieldListFilter, self).__init__(field, request, params, model, model_admin, field_path)
+        if (self.used_parameters and self.lookup_kwarg in self.used_parameters and
+                self.used_parameters[self.lookup_kwarg] in ('1', '0')):
+            self.used_parameters[self.lookup_kwarg] = bool(int(self.used_parameters[self.lookup_kwarg]))
 
     def expected_parameters(self):
         return [self.lookup_kwarg, self.lookup_kwarg2]
@@ -257,31 +260,51 @@ class BooleanFieldListFilter(FieldListFilter):
                 'display': _('Unknown'),
             }
 
-FieldListFilter.register(lambda f: isinstance(f,
-    (models.BooleanField, models.NullBooleanField)), BooleanFieldListFilter)
+FieldListFilter.register(
+    lambda f: isinstance(f, (models.BooleanField, models.NullBooleanField)),
+    BooleanFieldListFilter
+)
 
 
 class ChoicesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = '%s__exact' % field_path
+        self.lookup_kwarg_isnull = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg)
+        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
         super(ChoicesFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
-        return [self.lookup_kwarg]
+        return [self.lookup_kwarg, self.lookup_kwarg_isnull]
 
     def choices(self, changelist):
         yield {
             'selected': self.lookup_val is None,
-            'query_string': changelist.get_query_string({}, [self.lookup_kwarg]),
+            'query_string': changelist.get_query_string(
+                {}, [self.lookup_kwarg, self.lookup_kwarg_isnull]
+            ),
             'display': _('All')
         }
+        none_title = ''
         for lookup, title in self.field.flatchoices:
+            if lookup is None:
+                none_title = title
+                continue
             yield {
                 'selected': smart_text(lookup) == self.lookup_val,
-                'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}),
+                'query_string': changelist.get_query_string(
+                    {self.lookup_kwarg: lookup}, [self.lookup_kwarg_isnull]
+                ),
                 'display': title,
+            }
+        if none_title:
+            yield {
+                'selected': bool(self.lookup_val_isnull),
+                'query_string': changelist.get_query_string({
+                    self.lookup_kwarg_isnull: 'True',
+                }, [self.lookup_kwarg]),
+                'display': none_title,
             }
 
 FieldListFilter.register(lambda f: bool(f.choices), ChoicesFieldListFilter)
@@ -290,8 +313,7 @@ FieldListFilter.register(lambda f: bool(f.choices), ChoicesFieldListFilter)
 class DateFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.field_generic = '%s__' % field_path
-        self.date_params = {k: v for k, v in params.items()
-                            if k.startswith(self.field_generic)}
+        self.date_params = {k: v for k, v in params.items() if k.startswith(self.field_generic)}
 
         now = timezone.now()
         # When time zone support is enabled, convert "now" to the user's time
@@ -386,10 +408,8 @@ class AllValuesFieldListFilter(FieldListFilter):
 
     def choices(self, changelist):
         yield {
-            'selected': (self.lookup_val is None
-                and self.lookup_val_isnull is None),
-            'query_string': changelist.get_query_string({},
-                [self.lookup_kwarg, self.lookup_kwarg_isnull]),
+            'selected': self.lookup_val is None and self.lookup_val_isnull is None,
+            'query_string': changelist.get_query_string({}, [self.lookup_kwarg, self.lookup_kwarg_isnull]),
             'display': _('All'),
         }
         include_none = False

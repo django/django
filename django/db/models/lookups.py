@@ -1,13 +1,10 @@
+import math
 import warnings
 from copy import copy
 
-from django.conf import settings
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import (
-    DateField, DateTimeField, Field, IntegerField, TimeField,
-)
+from django.db.models.fields import DateTimeField, Field, IntegerField
 from django.db.models.query_utils import RegisterLookupMixin
-from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.six.moves import range
@@ -15,6 +12,7 @@ from django.utils.six.moves import range
 
 class Lookup(object):
     lookup_name = None
+    prepare_rhs = True
 
     def __init__(self, lhs, rhs):
         self.lhs, self.rhs = lhs, rhs
@@ -50,18 +48,19 @@ class Lookup(object):
                 sqls.append(sql)
                 sqls_params.extend(sql_params)
         else:
-            params = self.lhs.output_field.get_db_prep_lookup(
-                self.lookup_name, rhs, connection, prepared=True)
+            _, params = self.get_db_prep_lookup(rhs, connection)
             sqls, sqls_params = ['%s'] * len(params), params
         return sqls, sqls_params
 
     def get_prep_lookup(self):
-        return self.lhs.output_field.get_prep_lookup(self.lookup_name, self.rhs)
+        if hasattr(self.rhs, '_prepare'):
+            return self.rhs._prepare(self.lhs.output_field)
+        if self.prepare_rhs and hasattr(self.lhs.output_field, 'get_prep_value'):
+            return self.lhs.output_field.get_prep_value(self.rhs)
+        return self.rhs
 
     def get_db_prep_lookup(self, value, connection):
-        return (
-            '%s', self.lhs.output_field.get_db_prep_lookup(
-                self.lookup_name, value, connection, prepared=True))
+        return ('%s', [value])
 
     def process_lhs(self, compiler, connection, lhs=None):
         lhs = lhs or self.lhs
@@ -163,13 +162,43 @@ class BuiltinLookup(Lookup):
         return connection.operators[self.lookup_name] % rhs
 
 
-class Exact(BuiltinLookup):
+class FieldGetDbPrepValueMixin(object):
+    """
+    Some lookups require Field.get_db_prep_value() to be called on their
+    inputs.
+    """
+    get_db_prep_lookup_value_is_iterable = False
+
+    def get_db_prep_lookup(self, value, connection):
+        # For relational fields, use the output_field of the 'field' attribute.
+        field = getattr(self.lhs.output_field, 'field', None)
+        get_db_prep_value = getattr(field, 'get_db_prep_value', None)
+        if not get_db_prep_value:
+            get_db_prep_value = self.lhs.output_field.get_db_prep_value
+        return (
+            '%s',
+            [get_db_prep_value(v, connection, prepared=True) for v in value]
+            if self.get_db_prep_lookup_value_is_iterable else
+            [get_db_prep_value(value, connection, prepared=True)]
+        )
+
+
+class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
+    """
+    Some lookups require Field.get_db_prep_value() to be called on each value
+    in an iterable.
+    """
+    get_db_prep_lookup_value_is_iterable = True
+
+
+class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'exact'
 Field.register_lookup(Exact)
 
 
 class IExact(BuiltinLookup):
     lookup_name = 'iexact'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(IExact, self).process_rhs(qn, connection)
@@ -181,28 +210,56 @@ class IExact(BuiltinLookup):
 Field.register_lookup(IExact)
 
 
-class GreaterThan(BuiltinLookup):
+class GreaterThan(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'gt'
 Field.register_lookup(GreaterThan)
 
 
-class GreaterThanOrEqual(BuiltinLookup):
+class GreaterThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'gte'
 Field.register_lookup(GreaterThanOrEqual)
 
 
-class LessThan(BuiltinLookup):
+class LessThan(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'lt'
 Field.register_lookup(LessThan)
 
 
-class LessThanOrEqual(BuiltinLookup):
+class LessThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'lte'
 Field.register_lookup(LessThanOrEqual)
 
 
-class In(BuiltinLookup):
+class IntegerFieldFloatRounding(object):
+    """
+    Allow floats to work as query values for IntegerField. Without this, the
+    decimal portion of the float would always be discarded.
+    """
+    def get_prep_lookup(self):
+        if isinstance(self.rhs, float):
+            self.rhs = math.ceil(self.rhs)
+        return super(IntegerFieldFloatRounding, self).get_prep_lookup()
+
+
+class IntegerGreaterThanOrEqual(IntegerFieldFloatRounding, GreaterThanOrEqual):
+    pass
+IntegerField.register_lookup(IntegerGreaterThanOrEqual)
+
+
+class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
+    pass
+IntegerField.register_lookup(IntegerLessThan)
+
+
+class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = 'in'
+
+    def get_prep_lookup(self):
+        if hasattr(self.rhs, '_prepare'):
+            return self.rhs._prepare(self.lhs.output_field)
+        if hasattr(self.lhs.output_field, 'get_prep_value'):
+            return [self.lhs.output_field.get_prep_value(v) for v in self.rhs]
+        return self.rhs
 
     def process_rhs(self, compiler, connection):
         db_rhs = getattr(self.rhs, '_db', None)
@@ -275,8 +332,8 @@ class PatternLookup(BuiltinLookup):
         # So, for Python values we don't need any special pattern, but for
         # SQL reference values or SQL transformations we need the correct
         # pattern added.
-        if (hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql')
-                or hasattr(self.rhs, '_as_sql') or self.bilateral_transforms):
+        if (hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql') or
+                hasattr(self.rhs, '_as_sql') or self.bilateral_transforms):
             pattern = connection.pattern_ops[self.lookup_name].format(connection.pattern_esc)
             return pattern.format(rhs)
         else:
@@ -285,6 +342,7 @@ class PatternLookup(BuiltinLookup):
 
 class Contains(PatternLookup):
     lookup_name = 'contains'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(Contains, self).process_rhs(qn, connection)
@@ -296,11 +354,13 @@ Field.register_lookup(Contains)
 
 class IContains(Contains):
     lookup_name = 'icontains'
+    prepare_rhs = False
 Field.register_lookup(IContains)
 
 
 class StartsWith(PatternLookup):
     lookup_name = 'startswith'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(StartsWith, self).process_rhs(qn, connection)
@@ -312,6 +372,7 @@ Field.register_lookup(StartsWith)
 
 class IStartsWith(PatternLookup):
     lookup_name = 'istartswith'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(IStartsWith, self).process_rhs(qn, connection)
@@ -323,6 +384,7 @@ Field.register_lookup(IStartsWith)
 
 class EndsWith(PatternLookup):
     lookup_name = 'endswith'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(EndsWith, self).process_rhs(qn, connection)
@@ -334,6 +396,7 @@ Field.register_lookup(EndsWith)
 
 class IEndsWith(PatternLookup):
     lookup_name = 'iendswith'
+    prepare_rhs = False
 
     def process_rhs(self, qn, connection):
         rhs, params = super(IEndsWith, self).process_rhs(qn, connection)
@@ -343,8 +406,13 @@ class IEndsWith(PatternLookup):
 Field.register_lookup(IEndsWith)
 
 
-class Range(BuiltinLookup):
+class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = 'range'
+
+    def get_prep_lookup(self):
+        if hasattr(self.rhs, '_prepare'):
+            return self.rhs._prepare(self.lhs.output_field)
+        return [self.lhs.output_field.get_prep_value(v) for v in self.rhs]
 
     def get_rhs_op(self, connection, rhs):
         return "BETWEEN %s AND %s" % (rhs[0], rhs[1])
@@ -361,6 +429,7 @@ Field.register_lookup(Range)
 
 class IsNull(BuiltinLookup):
     lookup_name = 'isnull'
+    prepare_rhs = False
 
     def as_sql(self, compiler, connection):
         sql, params = compiler.compile(self.lhs)
@@ -373,6 +442,7 @@ Field.register_lookup(IsNull)
 
 class Search(BuiltinLookup):
     lookup_name = 'search'
+    prepare_rhs = False
 
     def as_sql(self, compiler, connection):
         warnings.warn(
@@ -388,6 +458,7 @@ Field.register_lookup(Search)
 
 class Regex(BuiltinLookup):
     lookup_name = 'regex'
+    prepare_rhs = False
 
     def as_sql(self, compiler, connection):
         if self.lookup_name in connection.operators:
@@ -405,46 +476,6 @@ class IRegex(Regex):
 Field.register_lookup(IRegex)
 
 
-class DateTimeDateTransform(Transform):
-    lookup_name = 'date'
-
-    @cached_property
-    def output_field(self):
-        return DateField()
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = compiler.compile(self.lhs)
-        tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
-        sql, tz_params = connection.ops.datetime_cast_date_sql(lhs, tzname)
-        lhs_params.extend(tz_params)
-        return sql, lhs_params
-
-
-class DateTransform(Transform):
-    def as_sql(self, compiler, connection):
-        sql, params = compiler.compile(self.lhs)
-        lhs_output_field = self.lhs.output_field
-        if isinstance(lhs_output_field, DateTimeField):
-            tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
-            sql, tz_params = connection.ops.datetime_extract_sql(self.lookup_name, sql, tzname)
-            params.extend(tz_params)
-        elif isinstance(lhs_output_field, DateField):
-            sql = connection.ops.date_extract_sql(self.lookup_name, sql)
-        elif isinstance(lhs_output_field, TimeField):
-            sql = connection.ops.time_extract_sql(self.lookup_name, sql)
-        else:
-            raise ValueError('DateTransform only valid on Date/Time/DateTimeFields')
-        return sql, params
-
-    @cached_property
-    def output_field(self):
-        return IntegerField()
-
-
-class YearTransform(DateTransform):
-    lookup_name = 'year'
-
-
 class YearLookup(Lookup):
     def year_lookup_bounds(self, connection, year):
         output_field = self.lhs.lhs.output_field
@@ -453,20 +484,6 @@ class YearLookup(Lookup):
         else:
             bounds = connection.ops.year_lookup_bounds_for_date_field(year)
         return bounds
-
-
-@YearTransform.register_lookup
-class YearExact(YearLookup):
-    lookup_name = 'exact'
-
-    def as_sql(self, compiler, connection):
-        # We will need to skip the extract part and instead go
-        # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        bounds = self.year_lookup_bounds(connection, rhs_params[0])
-        params.extend(bounds)
-        return '%s BETWEEN %%s AND %%s' % lhs_sql, params
 
 
 class YearComparisonLookup(YearLookup):
@@ -489,7 +506,27 @@ class YearComparisonLookup(YearLookup):
         )
 
 
-@YearTransform.register_lookup
+class YearExact(YearLookup, Exact):
+    lookup_name = 'exact'
+
+    def as_sql(self, compiler, connection):
+        # We will need to skip the extract part and instead go
+        # directly with the originating field, that is self.lhs.lhs.
+        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
+        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
+        try:
+            # Check that rhs_params[0] exists (IndexError),
+            # it isn't None (TypeError), and is a number (ValueError)
+            int(rhs_params[0])
+        except (IndexError, TypeError, ValueError):
+            # Can't determine the bounds before executing the query, so skip
+            # optimizations by falling back to a standard exact comparison.
+            return super(Exact, self).as_sql(compiler, connection)
+        bounds = self.year_lookup_bounds(connection, rhs_params[0])
+        params.extend(bounds)
+        return '%s BETWEEN %%s AND %%s' % lhs_sql, params
+
+
 class YearGt(YearComparisonLookup):
     lookup_name = 'gt'
 
@@ -497,7 +534,6 @@ class YearGt(YearComparisonLookup):
         return finish
 
 
-@YearTransform.register_lookup
 class YearGte(YearComparisonLookup):
     lookup_name = 'gte'
 
@@ -505,7 +541,6 @@ class YearGte(YearComparisonLookup):
         return start
 
 
-@YearTransform.register_lookup
 class YearLt(YearComparisonLookup):
     lookup_name = 'lt'
 
@@ -513,52 +548,8 @@ class YearLt(YearComparisonLookup):
         return start
 
 
-@YearTransform.register_lookup
 class YearLte(YearComparisonLookup):
     lookup_name = 'lte'
 
     def get_bound(self, start, finish):
         return finish
-
-
-class MonthTransform(DateTransform):
-    lookup_name = 'month'
-
-
-class DayTransform(DateTransform):
-    lookup_name = 'day'
-
-
-class WeekDayTransform(DateTransform):
-    lookup_name = 'week_day'
-
-
-class HourTransform(DateTransform):
-    lookup_name = 'hour'
-
-
-class MinuteTransform(DateTransform):
-    lookup_name = 'minute'
-
-
-class SecondTransform(DateTransform):
-    lookup_name = 'second'
-
-
-DateField.register_lookup(YearTransform)
-DateField.register_lookup(MonthTransform)
-DateField.register_lookup(DayTransform)
-DateField.register_lookup(WeekDayTransform)
-
-TimeField.register_lookup(HourTransform)
-TimeField.register_lookup(MinuteTransform)
-TimeField.register_lookup(SecondTransform)
-
-DateTimeField.register_lookup(DateTimeDateTransform)
-DateTimeField.register_lookup(YearTransform)
-DateTimeField.register_lookup(MonthTransform)
-DateTimeField.register_lookup(DayTransform)
-DateTimeField.register_lookup(WeekDayTransform)
-DateTimeField.register_lookup(HourTransform)
-DateTimeField.register_lookup(MinuteTransform)
-DateTimeField.register_lookup(SecondTransform)

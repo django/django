@@ -12,11 +12,6 @@ The GDAL library is required if any of the serialized geometries need
 coordinate transformations (that is if the geometry's spatial reference system
 differs from the ``srid`` serializer option).
 
-.. versionchanged:: 1.9
-
-    The GeoJSON serializer no longer needs GDAL if all geometries are in the
-    same coordinate system as the ``srid`` serializer option.
-
 __ http://geojson.org/
 
 The ``geojson`` serializer is not meant for round-tripping data, as it has no

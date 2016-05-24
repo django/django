@@ -108,6 +108,32 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string('if-tag-eq05')
         self.assertEqual(output, 'no')
 
+    # Inequality
+    @setup({'if-tag-noteq01': '{% if foo != bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_noteq01(self):
+        output = self.engine.render_to_string('if-tag-noteq01')
+        self.assertEqual(output, 'no')
+
+    @setup({'if-tag-noteq02': '{% if foo != bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_noteq02(self):
+        output = self.engine.render_to_string('if-tag-noteq02', {'foo': 1})
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-noteq03': '{% if foo != bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_noteq03(self):
+        output = self.engine.render_to_string('if-tag-noteq03', {'foo': 1, 'bar': 1})
+        self.assertEqual(output, 'no')
+
+    @setup({'if-tag-noteq04': '{% if foo != bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_noteq04(self):
+        output = self.engine.render_to_string('if-tag-noteq04', {'foo': 1, 'bar': 2})
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-noteq05': '{% if foo != "" %}yes{% else %}no{% endif %}'})
+    def test_if_tag_noteq05(self):
+        output = self.engine.render_to_string('if-tag-noteq05')
+        self.assertEqual(output, 'yes')
+
     # Comparison
     @setup({'if-tag-gt-01': '{% if 2 > 1 %}yes{% else %}no{% endif %}'})
     def test_if_tag_gt_01(self):
@@ -536,4 +562,36 @@ class IfTagTests(SimpleTestCase):
     @setup({'template': '{% if foo is True %}yes{% else %}no{% endif %}'})
     def test_if_is_no_match(self):
         output = self.engine.render_to_string('template', {'foo': 1})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo is bar %}yes{% else %}no{% endif %}'})
+    def test_if_is_variable_missing(self):
+        output = self.engine.render_to_string('template', {'foo': 1})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo is bar %}yes{% else %}no{% endif %}'})
+    def test_if_is_both_variables_missing(self):
+        output = self.engine.render_to_string('template', {})
+        self.assertEqual(output, 'yes')
+
+    @setup({'template': '{% if foo is not None %}yes{% else %}no{% endif %}'})
+    def test_if_is_not_match(self):
+        # For this to act as a regression test, it's important not to use
+        # foo=True because True is (not None)
+        output = self.engine.render_to_string('template', {'foo': False})
+        self.assertEqual(output, 'yes')
+
+    @setup({'template': '{% if foo is not None %}yes{% else %}no{% endif %}'})
+    def test_if_is_not_no_match(self):
+        output = self.engine.render_to_string('template', {'foo': None})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo is not bar %}yes{% else %}no{% endif %}'})
+    def test_if_is_not_variable_missing(self):
+        output = self.engine.render_to_string('template', {'foo': False})
+        self.assertEqual(output, 'yes')
+
+    @setup({'template': '{% if foo is not bar %}yes{% else %}no{% endif %}'})
+    def test_if_is_not_both_variables_missing(self):
+        output = self.engine.render_to_string('template', {})
         self.assertEqual(output, 'no')

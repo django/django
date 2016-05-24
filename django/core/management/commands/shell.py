@@ -11,15 +11,23 @@ class Command(BaseCommand):
     shells = ['ipython', 'bpython', 'python']
 
     def add_arguments(self, parser):
-        parser.add_argument('--plain', action='store_true', dest='plain',
+        parser.add_argument(
+            '--plain', action='store_true', dest='plain',
             help='Tells Django to use plain Python, not IPython or bpython. '
-            'Deprecated, use the `-i python` or `--interface python` option instead.')
-        parser.add_argument('--no-startup', action='store_true', dest='no_startup',
-            help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.')
-        parser.add_argument('-i', '--interface', choices=self.shells, dest='interface',
-            help='Specify an interactive interpreter interface. Available options: "ipython", "bpython", and "python"')
-        parser.add_argument('-c', '--command', dest='command',
-            help='Instead of opening an interactive shell, run a command as Django and exit.')
+                 'Deprecated, use the `-i python` or `--interface python` option instead.',
+        )
+        parser.add_argument(
+            '--no-startup', action='store_true', dest='no_startup',
+            help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.',
+        )
+        parser.add_argument(
+            '-i', '--interface', choices=self.shells, dest='interface',
+            help='Specify an interactive interpreter interface. Available options: "ipython", "bpython", and "python"',
+        )
+        parser.add_argument(
+            '-c', '--command', dest='command',
+            help='Instead of opening an interactive shell, run a command as Django and exit.',
+        )
 
     def _ipython_pre_011(self):
         """Start IPython pre-0.11"""

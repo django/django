@@ -22,8 +22,7 @@ class TestSigner(SimpleTestCase):
         ):
             self.assertEqual(
                 signer.signature(s),
-                signing.base64_hmac(signer.salt + 'signer', s,
-                    'predictable-secret').decode()
+                signing.base64_hmac(signer.salt + 'signer', s, 'predictable-secret').decode()
             )
             self.assertNotEqual(signer.signature(s), signer2.signature(s))
 
@@ -32,8 +31,7 @@ class TestSigner(SimpleTestCase):
         signer = signing.Signer('predictable-secret', salt='extra-salt')
         self.assertEqual(
             signer.signature('hello'),
-            signing.base64_hmac('extra-salt' + 'signer',
-                                'hello', 'predictable-secret').decode()
+            signing.base64_hmac('extra-salt' + 'signer', 'hello', 'predictable-secret').decode()
         )
         self.assertNotEqual(
             signing.Signer('predictable-secret', salt='one').signature('hello'),
@@ -134,8 +132,7 @@ class TestTimestampSigner(SimpleTestCase):
         with freeze_time(123456789):
             signer = signing.TimestampSigner('predictable-key')
             ts = signer.sign(value)
-            self.assertNotEqual(ts,
-                signing.Signer('predictable-key').sign(value))
+            self.assertNotEqual(ts, signing.Signer('predictable-key').sign(value))
             self.assertEqual(signer.unsign(ts), value)
 
         with freeze_time(123456800):

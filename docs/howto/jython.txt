@@ -71,4 +71,4 @@ running on standard Python. However, are a few differences to keep in mind:
 
 * Any part of Django that requires `Pillow`_ will not work.
 
-.. _Pillow: https://pillow.readthedocs.org/en/latest/
+.. _Pillow: https://pillow.readthedocs.io/en/latest/

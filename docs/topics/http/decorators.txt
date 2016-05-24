@@ -45,7 +45,7 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
     resource.
 
     .. note::
-        Django will automatically strip the content of responses to HEAD
+        Web servers should automatically strip the content of responses to HEAD
         requests while leaving the headers unchanged, so you may handle HEAD
         requests exactly like GET requests in your views. Since some software,
         such as link checkers, rely on HEAD requests, you might prefer
@@ -111,8 +111,3 @@ client-side caching.
     This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
     must-revalidate`` header to a response to indicate that a page should never
     be cached.
-
-    .. versionchanged:: 1.9
-
-        Before Django 1.9, ``Cache-Control: max-age=0`` was sent. This didn't
-        reliably prevent caching in all browsers.

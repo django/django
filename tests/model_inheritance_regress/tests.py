@@ -13,10 +13,9 @@ from django.test import TestCase
 from .models import (
     ArticleWithAuthor, BachelorParty, BirthdayParty, BusStation, Child,
     DerivedM, InternalCertificationAudit, ItalianRestaurant, M2MChild,
-    MessyBachelorParty, ParkingLot, ParkingLot2, ParkingLot3, ParkingLot4A,
-    ParkingLot4B, Person, Place, Profile, QualityControl, Restaurant,
-    SelfRefChild, SelfRefParent, Senator, Supplier, TrainStation, User,
-    Wholesaler,
+    MessyBachelorParty, ParkingLot, ParkingLot3, ParkingLot4A, ParkingLot4B,
+    Person, Place, Profile, QualityControl, Restaurant, SelfRefChild,
+    SelfRefParent, Senator, Supplier, TrainStation, User, Wholesaler,
 )
 
 
@@ -293,20 +292,11 @@ class ModelInheritanceTest(TestCase):
 
     def test_use_explicit_o2o_to_parent_as_pk(self):
         """
-        Regression tests for #10406
-        If there's a one-to-one link between a child model and the parent and
-        no explicit pk declared, we can use the one-to-one link as the pk on
-        the child.
+        The connector from child to parent need not be the pk on the child.
         """
-        self.assertEqual(ParkingLot2._meta.pk.name, "parent")
-
-        # However, the connector from child to parent need not be the pk on
-        # the child at all.
         self.assertEqual(ParkingLot3._meta.pk.name, "primary_key")
         # the child->parent link
-        self.assertEqual(
-            ParkingLot3._meta.get_ancestor_link(Place).name,
-            "parent")
+        self.assertEqual(ParkingLot3._meta.get_ancestor_link(Place).name, "parent")
 
     def test_use_explicit_o2o_to_parent_from_abstract_model(self):
         self.assertEqual(ParkingLot4A._meta.pk.name, "parent")

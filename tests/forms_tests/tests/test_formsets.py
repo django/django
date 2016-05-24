@@ -46,8 +46,7 @@ class EmptyFsetWontValidate(BaseFormSet):
 # Let's define a FormSet that takes a list of favorite drinks, but raises an
 # error if there are any duplicates. Used in ``test_clean_hook``,
 # ``test_regression_6926`` & ``test_regression_12878``.
-FavoriteDrinksFormSet = formset_factory(FavoriteDrinkForm,
-    formset=BaseFavoriteDrinksFormSet, extra=3)
+FavoriteDrinksFormSet = formset_factory(FavoriteDrinkForm, formset=BaseFavoriteDrinksFormSet, extra=3)
 
 
 # Used in ``test_formset_splitdatetimefield``.
@@ -65,7 +64,8 @@ class CustomKwargForm(Form):
 
 class FormsFormsetTestCase(SimpleTestCase):
 
-    def make_choiceformset(self, formset_data=None, formset_class=ChoiceFormSet,
+    def make_choiceformset(
+            self, formset_data=None, formset_class=ChoiceFormSet,
             total_forms=None, initial_forms=0, max_num_forms=0, min_num_forms=0, **kwargs):
         """
         Make a ChoiceFormset from the given formset_data.
@@ -1162,8 +1162,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         ChoiceFormSet = formset_factory(Choice, formset=BaseCustomFormSet)
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertIsInstance(formset.non_form_errors(), ErrorList)
-        self.assertEqual(list(formset.non_form_errors()),
-            ['This is a non-form error'])
+        self.assertEqual(list(formset.non_form_errors()), ['This is a non-form error'])
 
     def test_validate_max_ignores_forms_marked_for_deletion(self):
         class CheckForm(Form):

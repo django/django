@@ -14,7 +14,7 @@ This document contains all the API references of :class:`Field` including the
 
     If the built-in fields don't do the trick, you can try `django-localflavor
     <https://github.com/django/django-localflavor>`_ (`documentation
-    <https://django-localflavor.readthedocs.org/>`_), which contains assorted
+    <https://django-localflavor.readthedocs.io/>`_), which contains assorted
     pieces of code that are useful for particular countries and cultures.
 
     Also, you can easily :doc:`write your own custom model fields
@@ -764,9 +764,36 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 When you access a :class:`~django.db.models.FileField` on a model, you are
 given an instance of :class:`FieldFile` as a proxy for accessing the underlying
-file. In addition to the functionality inherited from
-:class:`django.core.files.File`, this class has several attributes and methods
-that can be used to interact with file data:
+file.
+
+The API of :class:`FieldFile` mirrors that of :class:`~django.core.files.File`,
+with one key difference: *The object wrapped by the class is not necessarily a
+wrapper around Python's built-in file object.* Instead, it is a wrapper around
+the result of the :attr:`Storage.open()<django.core.files.storage.Storage.open>`
+method, which may be a :class:`~django.core.files.File` object, or it may be a
+custom storage's implementation of the :class:`~django.core.files.File` API.
+
+In addition to the API inherited from
+:class:`~django.core.files.File` such as :meth:`~django.core.files.File.read`
+and :meth:`~django.core.files.File.write`, :class:`FieldFile` includes several
+methods that can be used to interact with the underlying file:
+
+.. warning::
+
+    Two methods of this class, :meth:`~FieldFile.save` and
+    :meth:`~FieldFile.delete`, default to saving the model object of the
+    associated ``FieldFile`` in the database.
+
+.. attribute:: FieldFile.name
+
+The name of the file including the relative path from the root of the
+:class:`~django.core.files.storage.Storage` of the associated
+:class:`~django.db.models.FileField`.
+
+.. attribute:: FieldFile.size
+
+The result of the underlying :attr:`Storage.size()
+<django.core.files.storage.Storage.size>` method.
 
 .. attribute:: FieldFile.url
 
@@ -776,8 +803,13 @@ A read-only property to access the file's relative URL by calling the
 
 .. method:: FieldFile.open(mode='rb')
 
-Behaves like the standard Python ``open()`` method and opens the file
-associated with this instance in the mode specified by ``mode``.
+Opens or reopens the file associated with this instance in the specified
+``mode``. Unlike the standard Python ``open()`` method, it doesn't return a
+file descriptor.
+
+Since the underlying file is opened implicitly when accessing it, it may be
+unnecessary to call this method except to reset the pointer to the underlying
+file or to change the ``mode``.
 
 .. method:: FieldFile.close()
 
@@ -933,7 +965,7 @@ optional arguments:
 
 Requires the `Pillow`_ library.
 
-.. _Pillow: https://pillow.readthedocs.org/en/latest/
+.. _Pillow: https://pillow.readthedocs.io/en/latest/
 
 :class:`ImageField` instances are created in your database as ``varchar``
 columns with a default max length of 100 characters. As with other fields, you
@@ -1031,8 +1063,6 @@ of some other value.  You can do this automatically in the admin using
 :attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
 
 .. attribute:: SlugField.allow_unicode
-
-    .. versionadded:: 1.9
 
     If ``True``, the field accepts Unicode letters in addition to ASCII
     letters. Defaults to ``False``.
@@ -1132,12 +1162,6 @@ Django also defines a set of fields that represent relations.
 
 A many-to-one relationship. Requires a positional argument: the class to which
 the model is related.
-
-.. versionchanged:: 1.9
-
-    ``on_delete`` can now be used as the second positional argument (previously
-    it was typically only passed as a keyword argument). It will be a required
-    argument in Django 2.0.
 
 .. _recursive-relationships:
 
@@ -1640,12 +1664,6 @@ A one-to-one relationship. Conceptually, this is similar to a
 :class:`ForeignKey` with :attr:`unique=True <Field.unique>`, but the
 "reverse" side of the relation will directly return a single object.
 
-.. versionchanged:: 1.9
-
-    ``on_delete`` can now be used as the second positional argument (previously
-    it was typically only passed as a keyword argument). It will be a required
-    argument in Django 2.0.
-
 This is most useful as the primary key of a model which "extends"
 another model in some way; :ref:`multi-table-inheritance` is
 implemented by adding an implicit one-to-one relation from the child
@@ -1717,8 +1735,7 @@ Field API reference
     ``Field`` is an abstract class that represents a database table column.
     Django uses fields to create the database table (:meth:`db_type`), to map
     Python types to database (:meth:`get_prep_value`) and vice-versa
-    (:meth:`from_db_value`), and to apply :doc:`/ref/models/lookups`
-    (:meth:`get_prep_lookup`).
+    (:meth:`from_db_value`).
 
     A field is thus a fundamental piece in different Django APIs, notably,
     :class:`models <django.db.models.Model>` and :class:`querysets
@@ -1846,26 +1863,6 @@ Field API reference
         ``self.attname`` (this is set up by :class:`~django.db.models.Field`).
 
         See :ref:`preprocessing-values-before-saving` for usage.
-
-    When a lookup is used on a field, the value may need to be "prepared".
-    Django exposes two methods for this:
-
-    .. method:: get_prep_lookup(lookup_type, value)
-
-        Prepares ``value`` to the database prior to be used in a lookup.
-        The ``lookup_type`` will be the registered name of the lookup. For
-        example: ``"exact"``, ``"iexact"``, or ``"contains"``.
-
-        See :ref:`preparing-values-for-use-in-database-lookups` for usage.
-
-    .. method:: get_db_prep_lookup(lookup_type, value, connection, prepared=False)
-
-        Similar to :meth:`get_db_prep_value`, but for performing a lookup.
-
-        As with :meth:`get_db_prep_value`, the specific connection that will
-        be used for the query is passed as ``connection``. In addition,
-        ``prepared`` describes whether the value has already been prepared with
-        :meth:`get_prep_lookup`.
 
     Fields often receive their values as a different type, either from
     serialization or from forms.

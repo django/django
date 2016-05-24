@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, models, router, transaction
-from django.db.models import DO_NOTHING, signals
+from django.db.models import DO_NOTHING
 from django.db.models.base import ModelBase, make_foreign_order_accessors
 from django.db.models.fields.related import (
     ForeignObject, ForeignObjectRel, ReverseManyToOneDescriptor,
@@ -53,12 +53,7 @@ class GenericForeignKey(object):
         self.name = name
         self.model = cls
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_field(self, virtual=True)
-
-        # Only run pre-initialization field assignment on non-abstract models
-        if not cls._meta.abstract:
-            signals.pre_init.connect(self.instance_pre_init, sender=cls)
-
+        cls._meta.add_field(self, private=True)
         setattr(cls, name, self)
 
     def get_filter_kwargs_for_object(self, obj):
@@ -162,20 +157,6 @@ class GenericForeignKey(object):
             else:
                 return []
 
-    def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
-        """
-        Handle initializing an object with the generic FK instead of
-        content_type and object_id fields.
-        """
-        if self.name in kwargs:
-            value = kwargs.pop(self.name)
-            if value is not None:
-                kwargs[self.ct_field] = self.get_content_type(obj=value)
-                kwargs[self.fk_field] = value._get_pk_val()
-            else:
-                kwargs[self.ct_field] = None
-                kwargs[self.fk_field] = None
-
     def get_content_type(self, obj=None, id=None, using=None):
         if obj is not None:
             return ContentType.objects.db_manager(obj._state.db).get_for_model(
@@ -227,7 +208,7 @@ class GenericForeignKey(object):
                 lambda obj: (obj._get_pk_val(), obj.__class__),
                 gfk_key,
                 True,
-                self.cache_attr)
+                self.name)
 
     def is_cached(self, instance):
         return hasattr(instance, self.cache_attr)
@@ -236,25 +217,34 @@ class GenericForeignKey(object):
         if instance is None:
             return self
 
+        # Don't use getattr(instance, self.ct_field) here because that might
+        # reload the same ContentType over and over (#5570). Instead, get the
+        # content type ID here, and later when the actual instance is needed,
+        # use ContentType.objects.get_for_id(), which has a global cache.
+        f = self.model._meta.get_field(self.ct_field)
+        ct_id = getattr(instance, f.get_attname(), None)
+        pk_val = getattr(instance, self.fk_field)
+
         try:
-            return getattr(instance, self.cache_attr)
+            rel_obj = getattr(instance, self.cache_attr)
         except AttributeError:
             rel_obj = None
+        else:
+            if rel_obj and (ct_id != self.get_content_type(obj=rel_obj, using=instance._state.db).id or
+                            rel_obj._meta.pk.to_python(pk_val) != rel_obj._get_pk_val()):
+                rel_obj = None
 
-            # Make sure to use ContentType.objects.get_for_id() to ensure that
-            # lookups are cached (see ticket #5570). This takes more code than
-            # the naive ``getattr(instance, self.ct_field)``, but has better
-            # performance when dealing with GFKs in loops and such.
-            f = self.model._meta.get_field(self.ct_field)
-            ct_id = getattr(instance, f.get_attname(), None)
-            if ct_id is not None:
-                ct = self.get_content_type(id=ct_id, using=instance._state.db)
-                try:
-                    rel_obj = ct.get_object_for_this_type(pk=getattr(instance, self.fk_field))
-                except ObjectDoesNotExist:
-                    pass
-            setattr(instance, self.cache_attr, rel_obj)
+        if rel_obj is not None:
             return rel_obj
+
+        if ct_id is not None:
+            ct = self.get_content_type(id=ct_id, using=instance._state.db)
+            try:
+                rel_obj = ct.get_object_for_this_type(pk=pk_val)
+            except ObjectDoesNotExist:
+                pass
+        setattr(instance, self.cache_attr, rel_obj)
+        return rel_obj
 
     def __set__(self, instance, value):
         ct = None
@@ -299,7 +289,7 @@ class GenericRelation(ForeignObject):
     rel_class = GenericRel
 
     def __init__(self, to, object_id_field='object_id', content_type_field='content_type',
-            for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
+                 for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
         kwargs['rel'] = self.rel_class(
             self, to,
             related_query_name=related_query_name,
@@ -328,14 +318,23 @@ class GenericRelation(ForeignObject):
         errors.extend(self._check_generic_foreign_key_existence())
         return errors
 
+    def _is_matching_generic_foreign_key(self, field):
+        """
+        Return True if field is a GenericForeignKey whose content type and
+        object id fields correspond to the equivalent attributes on this
+        GenericRelation.
+        """
+        return (
+            isinstance(field, GenericForeignKey) and
+            field.ct_field == self.content_type_field_name and
+            field.fk_field == self.object_id_field_name
+        )
+
     def _check_generic_foreign_key_existence(self):
         target = self.remote_field.model
         if isinstance(target, ModelBase):
-            fields = target._meta.virtual_fields
-            if any(isinstance(field, GenericForeignKey) and
-                    field.ct_field == self.content_type_field_name and
-                    field.fk_field == self.object_id_field_name
-                    for field in fields):
+            fields = target._meta.private_fields
+            if any(self._is_matching_generic_foreign_key(field) for field in fields):
                 return []
             else:
                 return [
@@ -401,33 +400,26 @@ class GenericRelation(ForeignObject):
         from_opts = self.remote_field.model._meta
         return [PathInfo(from_opts, opts, (opts.pk,), self, not self.unique, False)]
 
-    def get_choices_default(self):
-        return super(GenericRelation, self).get_choices(include_blank=False)
-
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
         return smart_text([instance._get_pk_val() for instance in qs])
 
     def contribute_to_class(self, cls, name, **kwargs):
-        kwargs['virtual_only'] = True
+        kwargs['private_only'] = True
         super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
         self.model = cls
         setattr(cls, self.name, ReverseGenericManyToOneDescriptor(self.remote_field))
 
-        # Add get_RELATED_order() and set_RELATED_order() methods if the model
-        # on the other end of this relation is ordered with respect to this.
-        def matching_gfk(field):
-            return (
-                isinstance(field, GenericForeignKey) and
-                self.content_type_field_name == field.ct_field and
-                self.object_id_field_name == field.fk_field
-            )
+        # Add get_RELATED_order() and set_RELATED_order() to the model this
+        # field belongs to, if the model on the other end of this relation
+        # is ordered with respect to its corresponding GenericForeignKey.
+        if not cls._meta.abstract:
 
-        def make_generic_foreign_order_accessors(related_model, model):
-            if matching_gfk(model._meta.order_with_respect_to):
-                make_foreign_order_accessors(model, related_model)
+            def make_generic_foreign_order_accessors(related_model, model):
+                if self._is_matching_generic_foreign_key(model._meta.order_with_respect_to):
+                    make_foreign_order_accessors(model, related_model)
 
-        lazy_related_operation(make_generic_foreign_order_accessors, self.model, self.remote_field.model)
+            lazy_related_operation(make_generic_foreign_order_accessors, self.model, self.remote_field.model)
 
     def set_attributes_from_rel(self):
         pass
@@ -574,7 +566,7 @@ def create_generic_related_manager(superclass, rel):
                     if obj._state.adding or obj._state.db != db:
                         raise ValueError(
                             "%r instance isn't saved. Use bulk=False or save "
-                            "the object first. but must be." % obj
+                            "the object first." % obj
                         )
                     check_and_update_obj(obj)
                     pks.append(obj.pk)

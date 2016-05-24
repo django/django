@@ -4,30 +4,83 @@ from django.conf import settings
 from django.contrib.gis.db.backends.base.operations import \
     BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
+from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.utils import ProgrammingError
+from django.utils import six
 from django.utils.functional import cached_property
 
 from .adapter import PostGISAdapter
 from .models import PostGISGeometryColumns, PostGISSpatialRefSys
 from .pgraster import from_pgraster, get_pgraster_srid, to_pgraster
 
+# Identifier to mark raster lookups as bilateral.
+BILATERAL = 'bilateral'
+
 
 class PostGISOperator(SpatialOperator):
-    def __init__(self, geography=False, **kwargs):
-        # Only a subset of the operators and functions are available
-        # for the geography type.
+    def __init__(self, geography=False, raster=False, **kwargs):
+        # Only a subset of the operators and functions are available for the
+        # geography type.
         self.geography = geography
+        # Only a subset of the operators and functions are available for the
+        # raster type. Lookups that don't suport raster will be converted to
+        # polygons. If the raster argument is set to BILATERAL, then the
+        # operator cannot handle mixed geom-raster lookups.
+        self.raster = raster
         super(PostGISOperator, self).__init__(**kwargs)
 
-    def as_sql(self, connection, lookup, *args):
+    def as_sql(self, connection, lookup, template_params, *args):
         if lookup.lhs.output_field.geography and not self.geography:
             raise ValueError('PostGIS geography does not support the "%s" '
                              'function/operator.' % (self.func or self.op,))
-        return super(PostGISOperator, self).as_sql(connection, lookup, *args)
+
+        template_params = self.check_raster(lookup, template_params)
+        return super(PostGISOperator, self).as_sql(connection, lookup, template_params, *args)
+
+    def check_raster(self, lookup, template_params):
+        # Get rhs value.
+        if isinstance(lookup.rhs, (tuple, list)):
+            rhs_val = lookup.rhs[0]
+            spheroid = lookup.rhs[-1] == 'spheroid'
+        else:
+            rhs_val = lookup.rhs
+            spheroid = False
+
+        # Check which input is a raster.
+        lhs_is_raster = lookup.lhs.field.geom_type == 'RASTER'
+        rhs_is_raster = isinstance(rhs_val, GDALRaster)
+
+        # Look for band indices and inject them if provided.
+        if lookup.band_lhs is not None and lhs_is_raster:
+            if not self.func:
+                raise ValueError('Band indices are not allowed for this operator, it works on bbox only.')
+            template_params['lhs'] = '%s, %s' % (template_params['lhs'], lookup.band_lhs)
+
+        if lookup.band_rhs is not None and rhs_is_raster:
+            if not self.func:
+                raise ValueError('Band indices are not allowed for this operator, it works on bbox only.')
+            template_params['rhs'] = '%s, %s' % (template_params['rhs'], lookup.band_rhs)
+
+        # Convert rasters to polygons if necessary.
+        if not self.raster or spheroid:
+            # Operators without raster support.
+            if lhs_is_raster:
+                template_params['lhs'] = 'ST_Polygon(%s)' % template_params['lhs']
+            if rhs_is_raster:
+                template_params['rhs'] = 'ST_Polygon(%s)' % template_params['rhs']
+        elif self.raster == BILATERAL:
+            # Operators with raster support but don't support mixed (rast-geom)
+            # lookups.
+            if lhs_is_raster and not rhs_is_raster:
+                template_params['lhs'] = 'ST_Polygon(%s)' % template_params['lhs']
+            elif rhs_is_raster and not lhs_is_raster:
+                template_params['rhs'] = 'ST_Polygon(%s)' % template_params['rhs']
+
+        return template_params
 
 
 class PostGISDistanceOperator(PostGISOperator):
@@ -35,6 +88,7 @@ class PostGISDistanceOperator(PostGISOperator):
 
     def as_sql(self, connection, lookup, template_params, sql_params):
         if not lookup.lhs.output_field.geography and lookup.lhs.output_field.geodetic(connection):
+            template_params = self.check_raster(lookup, template_params)
             sql_template = self.sql_template
             if len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid':
                 template_params.update({'op': self.op, 'func': 'ST_Distance_Spheroid'})
@@ -58,32 +112,33 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     Adapter = PostGISAdapter
 
     gis_operators = {
-        'bbcontains': PostGISOperator(op='~'),
-        'bboverlaps': PostGISOperator(op='&&', geography=True),
-        'contained': PostGISOperator(op='@'),
-        'contains': PostGISOperator(func='ST_Contains'),
-        'overlaps_left': PostGISOperator(op='&<'),
-        'overlaps_right': PostGISOperator(op='&>'),
+        'bbcontains': PostGISOperator(op='~', raster=True),
+        'bboverlaps': PostGISOperator(op='&&', geography=True, raster=True),
+        'contained': PostGISOperator(op='@', raster=True),
+        'overlaps_left': PostGISOperator(op='&<', raster=BILATERAL),
+        'overlaps_right': PostGISOperator(op='&>', raster=BILATERAL),
         'overlaps_below': PostGISOperator(op='&<|'),
         'overlaps_above': PostGISOperator(op='|&>'),
         'left': PostGISOperator(op='<<'),
         'right': PostGISOperator(op='>>'),
         'strictly_below': PostGISOperator(op='<<|'),
         'strictly_above': PostGISOperator(op='|>>'),
-        'same_as': PostGISOperator(op='~='),
-        'exact': PostGISOperator(op='~='),  # alias of same_as
-        'contains_properly': PostGISOperator(func='ST_ContainsProperly'),
-        'coveredby': PostGISOperator(func='ST_CoveredBy', geography=True),
-        'covers': PostGISOperator(func='ST_Covers', geography=True),
+        'same_as': PostGISOperator(op='~=', raster=BILATERAL),
+        'exact': PostGISOperator(op='~=', raster=BILATERAL),  # alias of same_as
+        'contains': PostGISOperator(func='ST_Contains', raster=BILATERAL),
+        'contains_properly': PostGISOperator(func='ST_ContainsProperly', raster=BILATERAL),
+        'coveredby': PostGISOperator(func='ST_CoveredBy', geography=True, raster=BILATERAL),
+        'covers': PostGISOperator(func='ST_Covers', geography=True, raster=BILATERAL),
         'crosses': PostGISOperator(func='ST_Crosses'),
-        'disjoint': PostGISOperator(func='ST_Disjoint'),
+        'disjoint': PostGISOperator(func='ST_Disjoint', raster=BILATERAL),
         'equals': PostGISOperator(func='ST_Equals'),
-        'intersects': PostGISOperator(func='ST_Intersects', geography=True),
-        'overlaps': PostGISOperator(func='ST_Overlaps'),
+        'intersects': PostGISOperator(func='ST_Intersects', geography=True, raster=BILATERAL),
+        'isvalid': PostGISOperator(func='ST_IsValid'),
+        'overlaps': PostGISOperator(func='ST_Overlaps', raster=BILATERAL),
         'relate': PostGISOperator(func='ST_Relate'),
-        'touches': PostGISOperator(func='ST_Touches'),
-        'within': PostGISOperator(func='ST_Within'),
-        'dwithin': PostGISOperator(func='ST_DWithin', geography=True),
+        'touches': PostGISOperator(func='ST_Touches', raster=BILATERAL),
+        'within': PostGISOperator(func='ST_Within', raster=BILATERAL),
+        'dwithin': PostGISOperator(func='ST_DWithin', geography=True, raster=BILATERAL),
         'distance_gt': PostGISDistanceOperator(func='ST_Distance', op='>', geography=True),
         'distance_gte': PostGISDistanceOperator(func='ST_Distance', op='>=', geography=True),
         'distance_lt': PostGISDistanceOperator(func='ST_Distance', op='<', geography=True),
@@ -118,11 +173,13 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         self.geojson = prefix + 'AsGeoJson'
         self.gml = prefix + 'AsGML'
         self.intersection = prefix + 'Intersection'
+        self.isvalid = prefix + 'IsValid'
         self.kml = prefix + 'AsKML'
         self.length = prefix + 'Length'
         self.length3d = prefix + '3DLength'
         self.length_spheroid = prefix + 'length_spheroid'
         self.makeline = prefix + 'MakeLine'
+        self.makevalid = prefix + 'MakeValid'
         self.mem_size = prefix + 'mem_size'
         self.num_geom = prefix + 'NumGeometries'
         self.num_points = prefix + 'npoints'
@@ -261,8 +318,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # also handles it (#25524).
         if handle_spheroid and len(dist_val) > 1:
             option = dist_val[1]
-            if (not geography and geodetic and lookup_type != 'dwithin'
-                    and option == 'spheroid'):
+            if not geography and geodetic and lookup_type != 'dwithin' and option == 'spheroid':
                 # using distance_spheroid requires the spheroid of the field as
                 # a parameter.
                 params.insert(0, f._spheroid)
@@ -270,14 +326,14 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def get_geom_placeholder(self, f, value, compiler):
         """
-        Provides a proper substitution value for Geometries that are not in the
-        SRID of the field.  Specifically, this routine will substitute in the
-        ST_Transform() function call.
+        Provide a proper substitution value for Geometries or rasters that are
+        not in the SRID of the field. Specifically, this routine will
+        substitute in the ST_Transform() function call.
         """
         # Get the srid for this object
         if value is None:
             value_srid = None
-        elif f.geom_type == 'RASTER':
+        elif f.geom_type == 'RASTER' and isinstance(value, six.string_types):
             value_srid = get_pgraster_srid(value)
         else:
             value_srid = value.srid
@@ -286,7 +342,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # is not equal to the field srid.
         if value_srid is None or value_srid == f.srid:
             placeholder = '%s'
-        elif f.geom_type == 'RASTER':
+        elif f.geom_type == 'RASTER' and isinstance(value, six.string_types):
             placeholder = '%s((%%s)::raster, %s)' % (self.transform, f.srid)
         else:
             placeholder = '%s(%%s, %s)' % (self.transform, f.srid)

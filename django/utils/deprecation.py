@@ -79,3 +79,55 @@ class DeprecationInstanceCheck(type):
             self.deprecation_warning, 2
         )
         return super(DeprecationInstanceCheck, self).__instancecheck__(instance)
+
+
+class CallableBool:
+    """
+    An boolean-like object that is also callable for backwards compatibility.
+    """
+    do_not_call_in_templates = True
+
+    def __init__(self, value):
+        self.value = value
+
+    def __bool__(self):
+        return self.value
+
+    def __call__(self):
+        warnings.warn(
+            "Using user.is_authenticated() and user.is_anonymous() as a method "
+            "is deprecated. Remove the parentheses to use it as an attribute.",
+            RemovedInDjango20Warning, stacklevel=2
+        )
+        return self.value
+
+    def __nonzero__(self):  # Python 2 compatibility
+        return self.value
+
+    def __repr__(self):
+        return 'CallableBool(%r)' % self.value
+
+CallableFalse = CallableBool(False)
+CallableTrue = CallableBool(True)
+
+
+class MiddlewareMixin(object):
+    def __init__(self, get_response=None):
+        self.get_response = get_response
+        super(MiddlewareMixin, self).__init__()
+
+    def __call__(self, request):
+        response = None
+        if hasattr(self, 'process_request'):
+            response = self.process_request(request)
+        if not response:
+            try:
+                response = self.get_response(request)
+            except Exception as e:
+                if hasattr(self, 'process_exception'):
+                    return self.process_exception(request, e)
+                else:
+                    raise
+        if hasattr(self, 'process_response'):
+            response = self.process_response(request, response)
+        return response

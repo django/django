@@ -10,7 +10,10 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
 
-from .exceptions import AmbiguityError, BadMigrationError, NodeNotFoundError
+from .exceptions import (
+    AmbiguityError, BadMigrationError, InconsistentMigrationHistory,
+    NodeNotFoundError,
+)
 
 MIGRATIONS_MODULE_NAME = 'migrations'
 
@@ -162,6 +165,30 @@ class MigrationLoader(object):
                     raise ValueError("Dependency on app with no migrations: %s" % key[0])
         raise ValueError("Dependency on unknown app: %s" % key[0])
 
+    def add_internal_dependencies(self, key, migration):
+        """
+        Internal dependencies need to be added first to ensure `__first__`
+        dependencies find the correct root node.
+        """
+        for parent in migration.dependencies:
+            if parent[0] != key[0] or parent[1] == '__first__':
+                # Ignore __first__ references to the same app (#22325).
+                continue
+            self.graph.add_dependency(migration, key, parent, skip_validation=True)
+
+    def add_external_dependencies(self, key, migration):
+        for parent in migration.dependencies:
+            # Skip internal dependencies
+            if key[0] == parent[0]:
+                continue
+            parent = self.check_key(parent, key[0])
+            if parent is not None:
+                self.graph.add_dependency(migration, key, parent, skip_validation=True)
+        for child in migration.run_before:
+            child = self.check_key(child, key[0])
+            if child is not None:
+                self.graph.add_dependency(migration, child, key, skip_validation=True)
+
     def build_graph(self):
         """
         Builds a migration dependency graph using both the disk and database.
@@ -176,92 +203,54 @@ class MigrationLoader(object):
         else:
             recorder = MigrationRecorder(self.connection)
             self.applied_migrations = recorder.applied_migrations()
-        # Do a first pass to separate out replacing and non-replacing migrations
-        normal = {}
-        replacing = {}
+        # To start, populate the migration graph with nodes for ALL migrations
+        # and their dependencies. Also make note of replacing migrations at this step.
+        self.graph = MigrationGraph()
+        self.replacements = {}
         for key, migration in self.disk_migrations.items():
+            self.graph.add_node(key, migration)
+            # Internal (aka same-app) dependencies.
+            self.add_internal_dependencies(key, migration)
+            # Replacing migrations.
             if migration.replaces:
-                replacing[key] = migration
-            else:
-                normal[key] = migration
-        # Calculate reverse dependencies - i.e., for each migration, what depends on it?
-        # This is just for dependency re-pointing when applying replacements,
-        # so we ignore run_before here.
-        reverse_dependencies = {}
-        for key, migration in normal.items():
-            for parent in migration.dependencies:
-                reverse_dependencies.setdefault(parent, set()).add(key)
-        # Remember the possible replacements to generate more meaningful error
-        # messages
-        reverse_replacements = {}
-        for key, migration in replacing.items():
-            for replaced in migration.replaces:
-                reverse_replacements.setdefault(replaced, set()).add(key)
-        # Carry out replacements if we can - that is, if all replaced migrations
-        # are either unapplied or missing.
-        for key, migration in replacing.items():
-            # Ensure this replacement migration is not in applied_migrations
-            self.applied_migrations.discard(key)
-            # Do the check. We can replace if all our replace targets are
-            # applied, or if all of them are unapplied.
+                self.replacements[key] = migration
+        # Add external dependencies now that the internal ones have been resolved.
+        for key, migration in self.disk_migrations.items():
+            self.add_external_dependencies(key, migration)
+        # Carry out replacements where possible.
+        for key, migration in self.replacements.items():
+            # Get applied status of each of this migration's replacement targets.
             applied_statuses = [(target in self.applied_migrations) for target in migration.replaces]
-            can_replace = all(applied_statuses) or (not any(applied_statuses))
-            if not can_replace:
-                continue
-            # Alright, time to replace. Step through the replaced migrations
-            # and remove, repointing dependencies if needs be.
-            for replaced in migration.replaces:
-                if replaced in normal:
-                    # We don't care if the replaced migration doesn't exist;
-                    # the usage pattern here is to delete things after a while.
-                    del normal[replaced]
-                for child_key in reverse_dependencies.get(replaced, set()):
-                    if child_key in migration.replaces:
-                        continue
-                    # List of migrations whose dependency on `replaced` needs
-                    # to be updated to a dependency on `key`.
-                    to_update = []
-                    # Child key may itself be replaced, in which case it might
-                    # not be in `normal` anymore (depending on whether we've
-                    # processed its replacement yet). If it's present, we go
-                    # ahead and update it; it may be deleted later on if it is
-                    # replaced, but there's no harm in updating it regardless.
-                    if child_key in normal:
-                        to_update.append(normal[child_key])
-                    # If the child key is replaced, we update its replacement's
-                    # dependencies too, if necessary. (We don't know if this
-                    # replacement will actually take effect or not, but either
-                    # way it's OK to update the replacing migration).
-                    if child_key in reverse_replacements:
-                        for replaces_child_key in reverse_replacements[child_key]:
-                            if replaced in replacing[replaces_child_key].dependencies:
-                                to_update.append(replacing[replaces_child_key])
-                    # Actually perform the dependency update on all migrations
-                    # that require it.
-                    for migration_needing_update in to_update:
-                        migration_needing_update.dependencies.remove(replaced)
-                        migration_needing_update.dependencies.append(key)
-            normal[key] = migration
-            # Mark the replacement as applied if all its replaced ones are
+            # Ensure the replacing migration is only marked as applied if all of
+            # its replacement targets are.
             if all(applied_statuses):
                 self.applied_migrations.add(key)
-        # Store the replacement migrations for later checks
-        self.replacements = replacing
-        # Finally, make a graph and load everything into it
-        self.graph = MigrationGraph()
-        for key, migration in normal.items():
-            self.graph.add_node(key, migration)
-
-        def _reraise_missing_dependency(migration, missing, exc):
-            """
-            Checks if ``missing`` could have been replaced by any squash
-            migration but wasn't because the the squash migration was partially
-            applied before. In that case raise a more understandable exception.
-
-            #23556
-            """
-            if missing in reverse_replacements:
-                candidates = reverse_replacements.get(missing, set())
+            else:
+                self.applied_migrations.discard(key)
+            # A replacing migration can be used if either all or none of its
+            # replacement targets have been applied.
+            if all(applied_statuses) or (not any(applied_statuses)):
+                self.graph.remove_replaced_nodes(key, migration.replaces)
+            else:
+                # This replacing migration cannot be used because it is partially applied.
+                # Remove it from the graph and remap dependencies to it (#25945).
+                self.graph.remove_replacement_node(key, migration.replaces)
+        # Ensure the graph is consistent.
+        try:
+            self.graph.validate_consistency()
+        except NodeNotFoundError as exc:
+            # Check if the missing node could have been replaced by any squash
+            # migration but wasn't because the squash migration was partially
+            # applied before. In that case raise a more understandable exception
+            # (#23556).
+            # Get reverse replacements.
+            reverse_replacements = {}
+            for key, migration in self.replacements.items():
+                for replaced in migration.replaces:
+                    reverse_replacements.setdefault(replaced, set()).add(key)
+            # Try to reraise exception with more detail.
+            if exc.node in reverse_replacements:
+                candidates = reverse_replacements.get(exc.node, set())
                 is_replaced = any(candidate in self.graph.nodes for candidate in candidates)
                 if not is_replaced:
                     tries = ', '.join('%s.%s' % c for c in candidates)
@@ -270,53 +259,34 @@ class MigrationLoader(object):
                         "Django tried to replace migration {1}.{2} with any of [{3}] "
                         "but wasn't able to because some of the replaced migrations "
                         "are already applied.".format(
-                            migration, missing[0], missing[1], tries
+                            exc.origin, exc.node[0], exc.node[1], tries
                         ),
-                        missing)
+                        exc.node
+                    )
                     exc_value.__cause__ = exc
                     if not hasattr(exc, '__traceback__'):
                         exc.__traceback__ = sys.exc_info()[2]
                     six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
             raise exc
 
-        # Add all internal dependencies first to ensure __first__ dependencies
-        # find the correct root node.
-        for key, migration in normal.items():
-            for parent in migration.dependencies:
-                if parent[0] != key[0] or parent[1] == '__first__':
-                    # Ignore __first__ references to the same app (#22325)
-                    continue
-                try:
-                    self.graph.add_dependency(migration, key, parent)
-                except NodeNotFoundError as e:
-                    # Since we added "key" to the nodes before this implies
-                    # "parent" is not in there. To make the raised exception
-                    # more understandable we check if parent could have been
-                    # replaced but hasn't (eg partially applied squashed
-                    # migration)
-                    _reraise_missing_dependency(migration, parent, e)
-        for key, migration in normal.items():
-            for parent in migration.dependencies:
-                if parent[0] == key[0]:
-                    # Internal dependencies already added.
-                    continue
-                parent = self.check_key(parent, key[0])
-                if parent is not None:
-                    try:
-                        self.graph.add_dependency(migration, key, parent)
-                    except NodeNotFoundError as e:
-                        # Since we added "key" to the nodes before this implies
-                        # "parent" is not in there.
-                        _reraise_missing_dependency(migration, parent, e)
-            for child in migration.run_before:
-                child = self.check_key(child, key[0])
-                if child is not None:
-                    try:
-                        self.graph.add_dependency(migration, child, key)
-                    except NodeNotFoundError as e:
-                        # Since we added "key" to the nodes before this implies
-                        # "child" is not in there.
-                        _reraise_missing_dependency(migration, child, e)
+    def check_consistent_history(self, connection):
+        """
+        Raise InconsistentMigrationHistory if any applied migrations have
+        unapplied dependencies.
+        """
+        recorder = MigrationRecorder(connection)
+        applied = recorder.applied_migrations()
+        for migration in applied:
+            # If the migration is unknown, skip it.
+            if migration not in self.graph.nodes:
+                continue
+            for parent in self.graph.node_map[migration].parents:
+                if parent not in applied:
+                    raise InconsistentMigrationHistory(
+                        "Migration {}.{} is applied before its dependency {}.{}".format(
+                            migration[0], migration[1], parent[0], parent[1],
+                        )
+                    )
 
     def detect_conflicts(self):
         """

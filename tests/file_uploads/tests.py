@@ -27,7 +27,7 @@ MEDIA_ROOT = sys_tempfile.mkdtemp()
 UPLOAD_TO = os.path.join(MEDIA_ROOT, 'test_upload')
 
 
-@override_settings(MEDIA_ROOT=MEDIA_ROOT, ROOT_URLCONF='file_uploads.urls', MIDDLEWARE_CLASSES=[])
+@override_settings(MEDIA_ROOT=MEDIA_ROOT, ROOT_URLCONF='file_uploads.urls', MIDDLEWARE=[])
 class FileUploadTests(TestCase):
 
     @classmethod
@@ -585,8 +585,7 @@ class DirectoryCreationTests(SimpleTestCase):
                 self.obj.testfile.save('foo.txt', file, save=False)
         # The test needs to be done on a specific string as IOError
         # is raised even without the patch (just not early enough)
-        self.assertEqual(exc_info.exception.args[0],
-            "%s exists and is not a directory." % UPLOAD_TO)
+        self.assertEqual(exc_info.exception.args[0], "%s exists and is not a directory." % UPLOAD_TO)
 
 
 class MultiParserTests(unittest.TestCase):

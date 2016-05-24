@@ -20,8 +20,9 @@ def CASCADE(collector, field, sub_objs, using):
 
 
 def PROTECT(collector, field, sub_objs, using):
-    raise ProtectedError("Cannot delete some instances of model '%s' because "
-        "they are referenced through a protected foreign key: '%s.%s'" % (
+    raise ProtectedError(
+        "Cannot delete some instances of model '%s' because they are "
+        "referenced through a protected foreign key: '%s.%s'" % (
             field.remote_field.model.__name__, sub_objs[0].__class__.__name__, field.name
         ),
         sub_objs
@@ -132,9 +133,9 @@ class Collector(object):
         if not (hasattr(objs, 'model') and hasattr(objs, '_raw_delete')):
             return False
         model = objs.model
-        if (signals.pre_delete.has_listeners(model)
-                or signals.post_delete.has_listeners(model)
-                or signals.m2m_changed.has_listeners(model)):
+        if (signals.pre_delete.has_listeners(model) or
+                signals.post_delete.has_listeners(model) or
+                signals.m2m_changed.has_listeners(model)):
             return False
         # The use of from_field comes from the need to avoid cascade back to
         # parent when parent delete is cascading to child.
@@ -146,7 +147,7 @@ class Collector(object):
         for related in get_candidate_relations_to_delete(opts):
             if related.field.remote_field.on_delete is not DO_NOTHING:
                 return False
-        for field in model._meta.virtual_fields:
+        for field in model._meta.private_fields:
             if hasattr(field, 'bulk_related_objects'):
                 # It's something like generic foreign key.
                 return False
@@ -165,7 +166,7 @@ class Collector(object):
             return [objs]
 
     def collect(self, objs, source=None, nullable=False, collect_related=True,
-            source_attr=None, reverse_dependency=False, keep_parents=False):
+                source_attr=None, reverse_dependency=False, keep_parents=False):
         """
         Adds 'objs' to the collection of objects to be deleted as well as all
         parent instances.  'objs' must be a homogeneous iterable collection of
@@ -220,7 +221,7 @@ class Collector(object):
                         self.fast_deletes.append(sub_objs)
                     elif sub_objs:
                         field.remote_field.on_delete(self, field, sub_objs, self.using)
-            for field in model._meta.virtual_fields:
+            for field in model._meta.private_fields:
                 if hasattr(field, 'bulk_related_objects'):
                     # It's something like generic foreign key.
                     sub_objs = field.bulk_related_objects(new_objs, self.using)

@@ -5,6 +5,7 @@ from itertools import takewhile
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
+from django.db import connections
 from django.db.migrations import Migration
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.loader import MigrationLoader
@@ -13,6 +14,7 @@ from django.db.migrations.questioner import (
     NonInteractiveMigrationQuestioner,
 )
 from django.db.migrations.state import ProjectState
+from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.migrations.writer import MigrationWriter
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six import iteritems
@@ -23,24 +25,40 @@ class Command(BaseCommand):
     help = "Creates new migration(s) for apps."
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='app_label', nargs='*',
-            help='Specify the app label(s) to create migrations for.')
-        parser.add_argument('--dry-run', action='store_true', dest='dry_run', default=False,
-            help="Just show what migrations would be made; don't actually write them.")
-        parser.add_argument('--merge', action='store_true', dest='merge', default=False,
-            help="Enable fixing of migration conflicts.")
-        parser.add_argument('--empty', action='store_true', dest='empty', default=False,
-            help="Create an empty migration.")
-        parser.add_argument('--noinput', '--no-input',
+        parser.add_argument(
+            'args', metavar='app_label', nargs='*',
+            help='Specify the app label(s) to create migrations for.',
+        )
+        parser.add_argument(
+            '--dry-run', action='store_true', dest='dry_run', default=False,
+            help="Just show what migrations would be made; don't actually write them.",
+        )
+        parser.add_argument(
+            '--merge', action='store_true', dest='merge', default=False,
+            help="Enable fixing of migration conflicts.",
+        )
+        parser.add_argument(
+            '--empty', action='store_true', dest='empty', default=False,
+            help="Create an empty migration.",
+        )
+        parser.add_argument(
+            '--noinput', '--no-input',
             action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.')
-        parser.add_argument('-n', '--name', action='store', dest='name', default=None,
-            help="Use this name for migration file(s).")
-        parser.add_argument('-e', '--exit', action='store_true', dest='exit_code', default=False,
+            help='Tells Django to NOT prompt the user for input of any kind.',
+        )
+        parser.add_argument(
+            '-n', '--name', action='store', dest='name', default=None,
+            help="Use this name for migration file(s).",
+        )
+        parser.add_argument(
+            '-e', '--exit', action='store_true', dest='exit_code', default=False,
             help='Exit with error code 1 if no changes needing migrations are found. '
-            'Deprecated, use the --check option instead.')
-        parser.add_argument('--check', action='store_true', dest='check_changes',
-            help='Exit with a non-zero status if model changes are missing migrations.')
+                 'Deprecated, use the --check option instead.',
+        )
+        parser.add_argument(
+            '--check', action='store_true', dest='check_changes',
+            help='Exit with a non-zero status if model changes are missing migrations.',
+        )
 
     def handle(self, *app_labels, **options):
         self.verbosity = options['verbosity']
@@ -74,6 +92,10 @@ class Command(BaseCommand):
         # Load the current graph state. Pass in None for the connection so
         # the loader doesn't try to resolve replaced migrations from DB.
         loader = MigrationLoader(None, ignore_no_migrations=True)
+
+        # Raise an error if any migrations are applied before their dependencies.
+        for db in connections:
+            loader.check_consistent_history(connections[db])
 
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge
@@ -262,7 +284,11 @@ class Command(BaseCommand):
                 subclass = type("Migration", (Migration, ), {
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
-                new_migration = subclass("%04i_merge" % (biggest_number + 1), app_label)
+                migration_name = "%04i_%s" % (
+                    biggest_number + 1,
+                    self.migration_name or ("merge_%s" % get_migration_name_timestamp())
+                )
+                new_migration = subclass(migration_name, app_label)
                 writer = MigrationWriter(new_migration)
 
                 if not self.dry_run:

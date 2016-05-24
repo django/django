@@ -6,8 +6,9 @@ from django.utils import six
 
 from .models import (
     Book, Car, CustomManager, CustomQuerySet, DeconstructibleCustomManager,
-    FunPerson, OneToOneRestrictedModel, Person, PersonFromAbstract,
-    PersonManager, PublishedBookManager, RelatedModel, RestrictedModel,
+    FastCarAsBase, FastCarAsDefault, FunPerson, OneToOneRestrictedModel,
+    Person, PersonFromAbstract, PersonManager, PublishedBookManager,
+    RelatedModel, RestrictedModel,
 )
 
 
@@ -554,6 +555,34 @@ class TestCars(TestCase):
         # alternate manager
         self.assertQuerysetEqual(
             Car.fast_cars.all(), [
+                "Corvette",
+            ],
+            lambda c: c.name
+        )
+        # explicit default manager
+        self.assertQuerysetEqual(
+            FastCarAsDefault.cars.order_by("name"), [
+                "Corvette",
+                "Neon",
+            ],
+            lambda c: c.name
+        )
+        self.assertQuerysetEqual(
+            FastCarAsDefault._default_manager.all(), [
+                "Corvette",
+            ],
+            lambda c: c.name
+        )
+        # explicit base manager
+        self.assertQuerysetEqual(
+            FastCarAsBase.cars.order_by("name"), [
+                "Corvette",
+                "Neon",
+            ],
+            lambda c: c.name
+        )
+        self.assertQuerysetEqual(
+            FastCarAsBase._base_manager.all(), [
                 "Corvette",
             ],
             lambda c: c.name

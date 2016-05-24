@@ -447,9 +447,9 @@ Once the cache is set up, the simplest way to use caching is to cache your
 entire site. You'll need to add
 ``'django.middleware.cache.UpdateCacheMiddleware'`` and
 ``'django.middleware.cache.FetchFromCacheMiddleware'`` to your
-:setting:`MIDDLEWARE_CLASSES` setting, as in this example::
+:setting:`MIDDLEWARE` setting, as in this example::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         'django.middleware.cache.UpdateCacheMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.cache.FetchFromCacheMiddleware',
@@ -459,7 +459,7 @@ entire site. You'll need to add
 
     No, that's not a typo: the "update" middleware must be first in the list,
     and the "fetch" middleware must be last. The details are a bit obscure, but
-    see `Order of MIDDLEWARE_CLASSES`_ below if you'd like the full story.
+    see `Order of MIDDLEWARE`_ below if you'd like the full story.
 
 Then, add the following required settings to your Django settings file:
 
@@ -762,8 +762,7 @@ won't cache the value.
 
 If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
 
-    # Wait 30 seconds for 'my_key' to expire...
-
+    >>> # Wait 30 seconds for 'my_key' to expire...
     >>> cache.get('my_key')
     None
 
@@ -804,10 +803,6 @@ You can also pass any callable as a *default* value::
     >>> import datetime
     >>> cache.get_or_set('some-timestamp-key', datetime.datetime.now)
     datetime.datetime(2014, 12, 11, 0, 15, 49, 457920)
-
-.. versionchanged:: 1.9
-
-    The ``get_or_set()`` method was added.
 
 There's also a ``get_many()`` interface that only hits the cache once.
 ``get_many()`` returns a dictionary with all the keys you asked for that
@@ -920,12 +915,12 @@ default cache key version. However, the primitive cache functions all
 include a ``version`` argument, so you can specify a particular cache
 key version to set or get. For example::
 
-    # Set version 2 of a cache key
+    >>> # Set version 2 of a cache key
     >>> cache.set('my_key', 'hello world!', version=2)
-    # Get the default version (assuming version=1)
+    >>> # Get the default version (assuming version=1)
     >>> cache.get('my_key')
     None
-    # Get version 2 of the same key
+    >>> # Get version 2 of the same key
     >>> cache.get('my_key', version=2)
     'hello world!'
 
@@ -934,15 +929,15 @@ the ``incr_version()`` and ``decr_version()`` methods. This
 enables specific keys to be bumped to a new version, leaving other
 keys unaffected. Continuing our previous example::
 
-    # Increment the version of 'my_key'
+    >>> # Increment the version of 'my_key'
     >>> cache.incr_version('my_key')
-    # The default version still isn't available
+    >>> # The default version still isn't available
     >>> cache.get('my_key')
     None
     # Version 2 isn't available, either
     >>> cache.get('my_key', version=2)
     None
-    # But version 3 *is* available
+    >>> # But version 3 *is* available
     >>> cache.get('my_key', version=3)
     'hello world!'
 
@@ -1000,7 +995,7 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
     class CustomLocMemCache(LocMemCache):
         def validate_key(self, key):
             """Custom validation, raising exceptions or warnings as needed."""
-            # ...
+            ...
 
 ...and use the dotted Python path to this class in the
 :setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
@@ -1073,7 +1068,7 @@ To do this in Django, use the convenient
 
     @vary_on_headers('User-Agent')
     def my_view(request):
-        # ...
+        ...
 
 In this case, a caching mechanism (such as Django's own cache middleware) will
 cache a separate version of the page for each unique user-agent.
@@ -1088,7 +1083,7 @@ You can pass multiple headers to ``vary_on_headers()``::
 
     @vary_on_headers('User-Agent', 'Cookie')
     def my_view(request):
-        # ...
+        ...
 
 This tells downstream caches to vary on *both*, which means each combination of
 user-agent and cookie will get its own cache value. For example, a request with
@@ -1102,11 +1097,11 @@ are equivalent::
 
     @vary_on_cookie
     def my_view(request):
-        # ...
+        ...
 
     @vary_on_headers('Cookie')
     def my_view(request):
-        # ...
+        ...
 
 The headers you pass to ``vary_on_headers`` are not case sensitive;
 ``"User-Agent"`` is the same thing as ``"user-agent"``.
@@ -1118,7 +1113,7 @@ directly. This function sets, or adds to, the ``Vary header``. For example::
     from django.utils.cache import patch_vary_headers
 
     def my_view(request):
-        # ...
+        ...
         response = render(request, 'template_name', context)
         patch_vary_headers(response, ['Cookie'])
         return response
@@ -1127,9 +1122,8 @@ directly. This function sets, or adds to, the ``Vary header``. For example::
 its first argument and a list/tuple of case-insensitive header names as its
 second argument.
 
-For more on Vary headers, see the `official Vary spec`_.
-
-.. _`official Vary spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+For more on Vary headers, see the :rfc:`official Vary spec
+<7231#section-7.1.4>`.
 
 Controlling cache: Using other headers
 ======================================
@@ -1151,7 +1145,7 @@ Django, use the ``cache_control`` view decorator. Example::
 
     @cache_control(private=True)
     def my_view(request):
-        # ...
+        ...
 
 This decorator takes care of sending out the appropriate HTTP header behind the
 scenes.
@@ -1170,7 +1164,7 @@ decorator)::
 
     @vary_on_cookie
     def list_blog_entries_view(request):
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             response = render_only_public_entries()
             patch_cache_control(response, public=True)
         else:
@@ -1179,44 +1173,34 @@ decorator)::
 
         return response
 
-There are a few other ways to control cache parameters. For example, HTTP
-allows applications to do the following:
-
-* Define the maximum time a page should be cached.
-
-* Specify whether a cache should always check for newer versions, only
-  delivering the cached content when there are no changes. (Some caches
-  might deliver cached content even if the server page changed, simply
-  because the cache copy isn't yet expired.)
-
-In Django, use the ``cache_control`` view decorator to specify these cache
-parameters. In this example, ``cache_control`` tells caches to revalidate the
-cache on every access and to store cached versions for, at most, 3,600 seconds::
+You can control downstream caches in other ways as well (see :rfc:`7234` for
+details on HTTP caching). For example, even if you don't use Django's
+server-side cache framework, you can still tell clients to cache a view for a
+certain amount of time with the :rfc:`max-age <7234#section-5.2.2.8>`
+directive::
 
     from django.views.decorators.cache import cache_control
 
-    @cache_control(must_revalidate=True, max_age=3600)
+    @cache_control(max_age=3600)
     def my_view(request):
-        # ...
+        ...
 
-Any valid ``Cache-Control`` HTTP directive is valid in ``cache_control()``.
-Here's a full list:
+(If you *do* use the caching middleware, it already sets the ``max-age`` with
+the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. In that case,
+the custom ``max_age`` from the ``cache_control`` decorator will take
+precedence, and the header values will be merged correctly.)
 
-* ``public=True``
-* ``private=True``
-* ``no_cache=True``
+Any valid ``Cache-Control`` response directive is valid in ``cache_control()``.
+Here are some more examples:
+
 * ``no_transform=True``
 * ``must_revalidate=True``
-* ``proxy_revalidate=True``
-* ``max_age=num_seconds``
-* ``s_maxage=num_seconds``
+* ``stale_while_revalidate=num_seconds``
 
-For explanation of Cache-Control HTTP directives, see the `Cache-Control spec`_.
+The full list of known directives can be found in the `IANA registry`_
+(note that not all of them apply to responses).
 
-(Note that the caching middleware already sets the cache header's max-age with
-the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. If you use a custom
-``max_age`` in a ``cache_control`` decorator, the decorator will take
-precedence, and the header values will be merged correctly.)
+.. _IANA registry: http://www.iana.org/assignments/http-cache-directives/http-cache-directives.xhtml
 
 If you want to use headers to disable caching altogether,
 :func:`django.views.decorators.cache.never_cache` is a view decorator that adds
@@ -1227,15 +1211,13 @@ Example::
 
     @never_cache
     def myview(request):
-        # ...
+        ...
 
-.. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
-
-Order of ``MIDDLEWARE_CLASSES``
-===============================
+Order of ``MIDDLEWARE``
+=======================
 
 If you use caching middleware, it's important to put each half in the right
-place within the :setting:`MIDDLEWARE_CLASSES` setting. That's because the cache
+place within the :setting:`MIDDLEWARE` setting. That's because the cache
 middleware needs to know which headers by which to vary the cache storage.
 Middleware always adds something to the ``Vary`` response header when it can.
 

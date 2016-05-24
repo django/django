@@ -22,11 +22,15 @@ class Command(BaseCommand):
         return p
 
     def add_arguments(self, parser):
-        parser.add_argument('username', nargs='?',
-            help='Username to change password for; by default, it\'s the current username.')
-        parser.add_argument('--database', action='store', dest='database',
+        parser.add_argument(
+            'username', nargs='?',
+            help='Username to change password for; by default, it\'s the current username.',
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS,
-            help='Specifies the database to use. Default is "default".')
+            help='Specifies the database to use. Default is "default".',
+        )
 
     def handle(self, *args, **options):
         if options['username']:

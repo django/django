@@ -30,7 +30,7 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
         ('en', 'English'),
         ('pt-br', 'Brazilian Portuguese'),
     ],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ],
@@ -223,7 +223,7 @@ class URLRedirectTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
 
     @override_settings(
-        MIDDLEWARE_CLASSES=[
+        MIDDLEWARE=[
             'i18n.patterns.tests.PermanentRedirectLocaleMiddleWare',
             'django.middleware.common.CommonMiddleware',
         ],

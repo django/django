@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^not_in_transaction/$', views.not_in_transaction),
     url(r'^suspicious/$', views.suspicious),
     url(r'^malformed_post/$', views.malformed_post),
+    url(r'^httpstatus_enum/$', views.httpstatus_enum),
 ]

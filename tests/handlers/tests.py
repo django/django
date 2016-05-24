@@ -2,6 +2,9 @@
 
 from __future__ import unicode_literals
 
+import unittest
+
+from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections, connection
@@ -10,6 +13,11 @@ from django.test import (
 )
 from django.utils import six
 from django.utils.encoding import force_str
+
+try:
+    from http import HTTPStatus
+except ImportError:  # Python < 3.5
+    HTTPStatus = None
 
 
 class HandlerTests(SimpleTestCase):
@@ -20,19 +28,9 @@ class HandlerTests(SimpleTestCase):
     def tearDown(self):
         request_started.connect(close_old_connections)
 
-    # Mangle settings so the handler will fail
-    @override_settings(MIDDLEWARE_CLASSES=42)
-    def test_lock_safety(self):
-        """
-        Tests for bug #11193 (errors inside middleware shouldn't leave
-        the initLock locked).
-        """
-        # Try running the handler, it will fail in load_middleware
+    def test_middleware_initialized(self):
         handler = WSGIHandler()
-        self.assertEqual(handler.initLock.locked(), False)
-        with self.assertRaises(Exception):
-            handler(None, None)
-        self.assertEqual(handler.initLock.locked(), False)
+        self.assertIsNotNone(handler._request_middleware)
 
     def test_bad_path_info(self):
         """Tests for bug #15672 ('request' referenced before assignment)"""
@@ -169,16 +167,16 @@ class SignalsTests(SimpleTestCase):
         self.assertEqual(self.signals, ['started', 'finished'])
 
 
+def empty_middleware(get_response):
+    pass
+
+
 @override_settings(ROOT_URLCONF='handlers.urls')
-class HandlerSuspiciousOpsTest(SimpleTestCase):
+class HandlerRequestTests(SimpleTestCase):
 
     def test_suspiciousop_in_view_returns_400(self):
         response = self.client.get('/suspicious/')
         self.assertEqual(response.status_code, 400)
-
-
-@override_settings(ROOT_URLCONF='handlers.urls')
-class HandlerNotFoundTest(SimpleTestCase):
 
     def test_invalid_urls(self):
         response = self.client.get('~%A9helloworld')
@@ -196,6 +194,21 @@ class HandlerNotFoundTest(SimpleTestCase):
     def test_environ_path_info_type(self):
         environ = RequestFactory().get('/%E2%A8%87%87%A5%E2%A8%A0').environ
         self.assertIsInstance(environ['PATH_INFO'], six.text_type)
+
+    @unittest.skipIf(HTTPStatus is None, 'HTTPStatus only exists on Python 3.5+')
+    def test_handle_accepts_httpstatus_enum_value(self):
+        def start_response(status, headers):
+            start_response.status = status
+
+        environ = RequestFactory().get('/httpstatus_enum/').environ
+        WSGIHandler()(environ, start_response)
+        self.assertEqual(start_response.status, '200 OK')
+
+    @override_settings(MIDDLEWARE=['handlers.tests.empty_middleware'])
+    def test_middleware_returns_none(self):
+        msg = 'Middleware factory handlers.tests.empty_middleware returned None.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.client.get('/')
 
 
 class ScriptNameTests(SimpleTestCase):

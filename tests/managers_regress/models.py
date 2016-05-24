@@ -115,14 +115,15 @@ class Child5(AbstractBase3):
         return self.name
 
 
-# Will inherit managers from AbstractBase1, but not Child4.
 class Child6(Child4):
     value = models.IntegerField()
 
+    class Meta:
+        manager_inheritance_from_future = True
 
-# Will not inherit default manager from parent.
+
 class Child7(Parent):
-    pass
+    objects = models.Manager()
 
 
 # RelatedManagers

@@ -5,8 +5,6 @@ Geolocation with GeoIP2
 .. module:: django.contrib.gis.geoip2
     :synopsis: Python interface for MaxMind's GeoIP2 databases.
 
-.. versionadded:: 1.9
-
 The :class:`GeoIP2` object is a wrapper for the `MaxMind geoip2 Python
 library`__. [#]_
 
@@ -19,7 +17,7 @@ in a directory corresponding to the :setting:`GEOIP_PATH` setting.
 Additionally, it is recommended to install the `libmaxminddb C library`__, so
 that ``geoip2`` can leverage the C library's faster speed.
 
-__ https://geoip2.readthedocs.org/
+__ https://geoip2.readthedocs.io/
 __ https://pypi.python.org/pypi/geoip2
 __ http://dev.maxmind.com/geoip/geoip2/geolite2/
 __ https://github.com/maxmind/libmaxminddb
@@ -47,7 +45,7 @@ Here is an example of its usage::
     >>> g.lon_lat('uh.edu')
     (-95.4342, 29.834)
     >>> g.geos('24.124.1.80').wkt
-    'POINT (-97.0000000000000000 38.0000000000000000)'
+    'POINT (-97 38)'
 
 ``GeoIP`` Settings
 ==================

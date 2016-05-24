@@ -6,7 +6,9 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.test import TestCase, modify_settings, override_settings
+from django.test.utils import ignore_warnings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
@@ -23,7 +25,7 @@ class RemoteUserTest(TestCase):
     def setUp(self):
         self.patched_settings = modify_settings(
             AUTHENTICATION_BACKENDS={'append': self.backend},
-            MIDDLEWARE_CLASSES={'append': self.middleware},
+            MIDDLEWARE={'append': self.middleware},
         )
         self.patched_settings.enable()
 
@@ -38,15 +40,15 @@ class RemoteUserTest(TestCase):
         num_users = User.objects.count()
 
         response = self.client.get('/remote_user/')
-        self.assertTrue(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous)
         self.assertEqual(User.objects.count(), num_users)
 
         response = self.client.get('/remote_user/', **{self.header: None})
-        self.assertTrue(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous)
         self.assertEqual(User.objects.count(), num_users)
 
         response = self.client.get('/remote_user/', **{self.header: ''})
-        self.assertTrue(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous)
         self.assertEqual(User.objects.count(), num_users)
 
     def test_unknown_user(self):
@@ -118,7 +120,7 @@ class RemoteUserTest(TestCase):
         self.assertEqual(response.context['user'].username, 'knownuser')
         # During the session, the REMOTE_USER header disappears. Should trigger logout.
         response = self.client.get('/remote_user/')
-        self.assertEqual(response.context['user'].is_anonymous(), True)
+        self.assertTrue(response.context['user'].is_anonymous)
         # verify the remoteuser middleware will not remove a user
         # authenticated via another backend
         User.objects.create_user(username='modeluser', password='foo')
@@ -148,7 +150,23 @@ class RemoteUserTest(TestCase):
     def test_inactive_user(self):
         User.objects.create(username='knownuser', is_active=False)
         response = self.client.get('/remote_user/', **{self.header: 'knownuser'})
-        self.assertTrue(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous)
+
+
+@ignore_warnings(category=RemovedInDjango20Warning)
+@override_settings(MIDDLEWARE=None)
+class RemoteUserTestMiddlewareClasses(RemoteUserTest):
+
+    def setUp(self):
+        self.patched_settings = modify_settings(
+            AUTHENTICATION_BACKENDS={'append': self.backend},
+            MIDDLEWARE_CLASSES={'append': [
+                'django.contrib.sessions.middleware.SessionMiddleware',
+                'django.contrib.auth.middleware.AuthenticationMiddleware',
+                self.middleware,
+            ]},
+        )
+        self.patched_settings.enable()
 
 
 class RemoteUserNoCreateBackend(RemoteUserBackend):
@@ -167,7 +185,7 @@ class RemoteUserNoCreateTest(RemoteUserTest):
     def test_unknown_user(self):
         num_users = User.objects.count()
         response = self.client.get('/remote_user/', **{self.header: 'newuser'})
-        self.assertTrue(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous)
         self.assertEqual(User.objects.count(), num_users)
 
 
@@ -268,5 +286,5 @@ class PersistentRemoteUserTest(RemoteUserTest):
         self.assertEqual(response.context['user'].username, 'knownuser')
         # Should stay logged in if the REMOTE_USER header disappears.
         response = self.client.get('/remote_user/')
-        self.assertEqual(response.context['user'].is_anonymous(), False)
+        self.assertFalse(response.context['user'].is_anonymous)
         self.assertEqual(response.context['user'].username, 'knownuser')

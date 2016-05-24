@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 def clean_ipv6_address(ip_str, unpack_ipv4=False,
-        error_message=_("This is not a valid IPv6 address.")):
+                       error_message=_("This is not a valid IPv6 address.")):
     """
     Cleans an IPv6 address string.
 

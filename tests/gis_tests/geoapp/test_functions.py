@@ -233,6 +233,17 @@ class GISFunctionsTests(TestCase):
                 expected = c.mpoly.intersection(geom)
             self.assertEqual(c.inter, expected)
 
+    @skipUnlessDBFeature("has_IsValid_function")
+    def test_isvalid(self):
+        valid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))')
+        invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
+        State.objects.create(name='valid', poly=valid_geom)
+        State.objects.create(name='invalid', poly=invalid_geom)
+        valid = State.objects.filter(name='valid').annotate(isvalid=functions.IsValid('poly')).first()
+        invalid = State.objects.filter(name='invalid').annotate(isvalid=functions.IsValid('poly')).first()
+        self.assertEqual(valid.isvalid, True)
+        self.assertEqual(invalid.isvalid, False)
+
     @skipUnlessDBFeature("has_Area_function")
     def test_area_with_regular_aggregate(self):
         # Create projected country objects, for this test to work on all backends.
@@ -248,6 +259,14 @@ class GISFunctionsTests(TestCase):
             if isinstance(result, Area):
                 result = result.sq_m
             self.assertAlmostEqual((result - c.mpoly.area) / c.mpoly.area, 0)
+
+    @skipUnlessDBFeature("has_MakeValid_function")
+    def test_make_valid(self):
+        invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
+        State.objects.create(name='invalid', poly=invalid_geom)
+        invalid = State.objects.filter(name='invalid').annotate(repaired=functions.MakeValid('poly')).first()
+        self.assertEqual(invalid.repaired.valid, True)
+        self.assertEqual(invalid.repaired, fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))'))
 
     @skipUnlessDBFeature("has_MemSize_function")
     def test_memsize(self):

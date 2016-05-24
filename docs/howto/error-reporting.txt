@@ -57,7 +57,7 @@ not found" errors). Django sends emails about 404 errors when:
 
 * :setting:`DEBUG` is ``False``;
 
-* Your :setting:`MIDDLEWARE_CLASSES` setting includes
+* Your :setting:`MIDDLEWARE` setting includes
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware`.
 
 If those conditions are met, Django will email the users listed in the
@@ -67,18 +67,13 @@ those are usually just people typing in broken URLs or broken Web bots. It also
 ignores 404s when the referer is equal to the requested URL, since this
 behavior is from broken Web bots too.
 
-.. versionchanged:: 1.9
-
-    In older versions, 404s were not ignored when the referer was equal to the
-    requested URL.
-
 .. note::
 
     :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` must appear
     before other middleware that intercepts 404 errors, such as
     :class:`~django.middleware.locale.LocaleMiddleware` or
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`.
-    Put it towards the top of your :setting:`MIDDLEWARE_CLASSES` setting.
+    Put it towards the top of your :setting:`MIDDLEWARE` setting.
 
 You can tell Django to stop reporting particular 404s by tweaking the
 :setting:`IGNORABLE_404_URLS` setting. It should be a list of compiled
@@ -256,7 +251,7 @@ given view by setting the ``HttpRequest``’s ``exception_reporter_filter``
 attribute::
 
     def my_view(request):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             request.exception_reporter_filter = CustomExceptionReporterFilter()
         ...
 

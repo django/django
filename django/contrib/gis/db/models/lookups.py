@@ -5,16 +5,23 @@ import re
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Expression
-from django.db.models.lookups import Lookup
+from django.db.models.lookups import BuiltinLookup, Lookup, Transform
 from django.utils import six
 
 gis_lookups = {}
+
+
+class RasterBandTransform(Transform):
+    def as_sql(self, compiler, connection):
+        return compiler.compile(self.lhs)
 
 
 class GISLookup(Lookup):
     sql_template = None
     transform_func = None
     distance = False
+    band_rhs = None
+    band_lhs = None
 
     def __init__(self, *args, **kwargs):
         super(GISLookup, self).__init__(*args, **kwargs)
@@ -28,10 +35,10 @@ class GISLookup(Lookup):
         'point, 'the_geom', or a related lookup on a geographic field like
         'address__point'.
 
-        If a GeometryField exists according to the given lookup on the model
-        options, it will be returned.  Otherwise returns None.
+        If a BaseSpatialField exists according to the given lookup on the model
+        options, it will be returned. Otherwise return None.
         """
-        from django.contrib.gis.db.models.fields import GeometryField
+        from django.contrib.gis.db.models.fields import BaseSpatialField
         # This takes into account the situation where the lookup is a
         # lookup to a related geographic field, e.g., 'address__point'.
         field_list = lookup.split(LOOKUP_SEP)
@@ -55,10 +62,33 @@ class GISLookup(Lookup):
             return False
 
         # Finally, make sure we got a Geographic field and return.
-        if isinstance(geo_fld, GeometryField):
+        if isinstance(geo_fld, BaseSpatialField):
             return geo_fld
         else:
             return False
+
+    def process_band_indices(self, only_lhs=False):
+        """
+        Extract the lhs band index from the band transform class and the rhs
+        band index from the input tuple.
+        """
+        # PostGIS band indices are 1-based, so the band index needs to be
+        # increased to be consistent with the GDALRaster band indices.
+        if only_lhs:
+            self.band_rhs = 1
+            self.band_lhs = self.lhs.band_index + 1
+            return
+
+        if isinstance(self.lhs, RasterBandTransform):
+            self.band_lhs = self.lhs.band_index + 1
+        else:
+            self.band_lhs = 1
+
+        self.band_rhs = self.rhs[1]
+        if len(self.rhs) == 1:
+            self.rhs = self.rhs[0]
+        else:
+            self.rhs = (self.rhs[0], ) + self.rhs[2:]
 
     def get_db_prep_lookup(self, value, connection):
         # get_db_prep_lookup is called by process_rhs from super class
@@ -70,10 +100,9 @@ class GISLookup(Lookup):
         return ('%s', params)
 
     def process_rhs(self, compiler, connection):
-        rhs, rhs_params = super(GISLookup, self).process_rhs(compiler, connection)
         if hasattr(self.rhs, '_as_sql'):
             # If rhs is some QuerySet, don't touch it
-            return rhs, rhs_params
+            return super(GISLookup, self).process_rhs(compiler, connection)
 
         geom = self.rhs
         if isinstance(self.rhs, Col):
@@ -85,9 +114,19 @@ class GISLookup(Lookup):
                 raise ValueError('No geographic field found in expression.')
             self.rhs.srid = geo_fld.srid
         elif isinstance(self.rhs, Expression):
-            raise ValueError('Complex expressions not supported for GeometryField')
+            raise ValueError('Complex expressions not supported for spatial fields.')
         elif isinstance(self.rhs, (list, tuple)):
             geom = self.rhs[0]
+            # Check if a band index was passed in the query argument.
+            if ((len(self.rhs) == 2 and not self.lookup_name == 'relate') or
+                    (len(self.rhs) == 3 and self.lookup_name == 'relate')):
+                self.process_band_indices()
+            elif len(self.rhs) > 2:
+                raise ValueError('Tuple too long for lookup %s.' % self.lookup_name)
+        elif isinstance(self.lhs, RasterBandTransform):
+            self.process_band_indices(only_lhs=True)
+
+        rhs, rhs_params = super(GISLookup, self).process_rhs(compiler, connection)
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler)
         return rhs, rhs_params
 
@@ -270,6 +309,21 @@ class IntersectsLookup(GISLookup):
 gis_lookups['intersects'] = IntersectsLookup
 
 
+class IsValidLookup(BuiltinLookup):
+    lookup_name = 'isvalid'
+
+    def as_sql(self, compiler, connection):
+        if self.lhs.field.geom_type == 'RASTER':
+            raise ValueError('The isvalid lookup is only available on geometry fields.')
+        gis_op = connection.ops.gis_operators[self.lookup_name]
+        sql, params = self.process_lhs(compiler, connection)
+        sql = '%(func)s(%(lhs)s)' % {'func': gis_op.func, 'lhs': sql}
+        if not self.rhs:
+            sql = 'NOT ' + sql
+        return sql, params
+gis_lookups['isvalid'] = IsValidLookup
+
+
 class OverlapsLookup(GISLookup):
     lookup_name = 'overlaps'
 gis_lookups['overlaps'] = OverlapsLookup
@@ -310,9 +364,17 @@ class DistanceLookupBase(GISLookup):
     sql_template = '%(func)s(%(lhs)s, %(rhs)s) %(op)s %(value)s'
 
     def process_rhs(self, compiler, connection):
-        if not isinstance(self.rhs, (tuple, list)) or not 2 <= len(self.rhs) <= 3:
-            raise ValueError("2 or 3-element tuple required for '%s' lookup." % self.lookup_name)
+        if not isinstance(self.rhs, (tuple, list)) or not 2 <= len(self.rhs) <= 4:
+            raise ValueError("2, 3, or 4-element tuple required for '%s' lookup." % self.lookup_name)
+        elif len(self.rhs) == 4 and not self.rhs[3] == 'spheroid':
+            raise ValueError("For 4-element tuples the last argument must be the 'speroid' directive.")
+
+        # Check if the second parameter is a band index.
+        if len(self.rhs) > 2 and not self.rhs[2] == 'spheroid':
+            self.process_band_indices()
+
         params = [connection.ops.Adapter(self.rhs[0])]
+
         # Getting the distance parameter in the units of the field.
         dist_param = self.rhs[1]
         if hasattr(dist_param, 'resolve_expression'):

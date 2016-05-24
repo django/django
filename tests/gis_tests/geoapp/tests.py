@@ -300,6 +300,13 @@ class GeoLookupTest(TestCase):
             0
         )
 
+    @skipUnlessDBFeature("supports_isvalid_lookup")
+    def test_isvalid_lookup(self):
+        invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
+        State.objects.create(name='invalid', poly=invalid_geom)
+        self.assertEqual(State.objects.filter(poly__isvalid=False).count(), 1)
+        self.assertEqual(State.objects.filter(poly__isvalid=True).count(), State.objects.count() - 1)
+
     @skipUnlessDBFeature("supports_left_right_lookups")
     def test_left_right_lookups(self):
         "Testing the 'left' and 'right' lookup types."

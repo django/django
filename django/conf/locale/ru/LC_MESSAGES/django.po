@@ -9,6 +9,7 @@
 # eXtractor <evg.kirov@gmail.com>, 2015
 # Igor Melnyk, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# lilo.panic, 2016
 # Mikhail Zholobov <legal90@gmail.com>, 2013
 # Алексей Борискин <sun.void@gmail.com>, 2013-2015
 msgid ""
@@ -16,8 +17,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-30 16:09+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"PO-Revision-Date: 2016-01-27 00:44+0000\n"
+"Last-Translator: lilo.panic\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -308,7 +309,7 @@ msgid "Enter a valid URL."
 msgstr "Введите правильный URL."
 
 msgid "Enter a valid integer."
-msgstr "Введите целое число."
+msgstr "Введите правильное число."
 
 msgid "Enter a valid email address."
 msgstr "Введите правильный адрес электронной почты."
@@ -1193,7 +1194,7 @@ msgid ""
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
 "Вы видите это сообщение, потому что в файле ваших настроек Django есть "
-"строчка <code>DEBUG = True</code> и вы не сконфигурировали на одного URL. За "
+"строчка <code>DEBUG = True</code> и вы не сконфигурировали ни одного URL. За "
 "работу!"
 
 msgid "No year specified"

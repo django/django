@@ -306,7 +306,7 @@ Use the ``django.test.Client`` class to make requests.
 
     .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, **extra)
 
-        Makes an DELETE request on the provided ``path`` and returns a
+        Makes a DELETE request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
 
         When ``data`` is provided, it is used as the request body, and
@@ -321,8 +321,8 @@ Use the ``django.test.Client`` class to make requests.
         ``Response`` object. Useful for simulating diagnostic probes.
 
         Unlike the other request methods, ``data`` is not provided as a keyword
-        parameter in order to comply with :rfc:`2616`, which mandates that
-        TRACE requests should not have an entity-body.
+        parameter in order to comply with :rfc:`7231#section-4.3.8`, which
+        mandates that TRACE requests must not have a body.
 
         The ``follow``, ``secure``, and ``extra`` arguments act the same as for
         :meth:`Client.get`.
@@ -378,8 +378,6 @@ Use the ``django.test.Client`` class to make requests.
             to login.
 
     .. method:: Client.force_login(user, backend=None)
-
-        .. versionadded:: 1.9
 
         If your site uses Django's :doc:`authentication
         system</topics/auth/index>`, you can use the ``force_login()`` method
@@ -461,8 +459,6 @@ Specifically, a ``Response`` object has the following attributes:
 
     .. method:: json(**kwargs)
 
-        .. versionadded:: 1.9
-
         The body of the response, parsed as JSON. Extra keyword arguments are
         passed to :func:`json.loads`. For example::
 
@@ -484,8 +480,10 @@ Specifically, a ``Response`` object has the following attributes:
 
     .. attribute:: status_code
 
-        The HTTP status of the response, as an integer. See
-        :rfc:`2616#section-10` for a full list of HTTP status codes.
+        The HTTP status of the response, as an integer. For a full list
+        of defined codes, see the `IANA status code registry`_.
+
+        .. _IANA status code registry: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 
     .. attribute:: templates
 
@@ -656,8 +654,6 @@ If your tests make any database queries, use subclasses
 
 .. attribute:: SimpleTestCase.allow_database_queries
 
-    .. versionadded:: 1.9
-
     :class:`~SimpleTestCase` disallows database queries by default. This
     helps to avoid executing write queries which will affect other tests
     since each ``SimpleTestCase`` test isn't run in a transaction. If you
@@ -822,23 +818,12 @@ By default the live server listens on ``localhost`` and picks the first
 available port in the ``8081-8179`` range. Its full URL can be accessed with
 ``self.live_server_url`` during the tests.
 
-.. versionchanged:: 1.9
-
-    In earlier versions, the live server's default address was always
-    ``'localhost:8081'``.
-
 If you'd like to select another address, you may pass a different one using the
 :option:`test --liveserver` option, for example:
 
 .. code-block:: console
 
     $ ./manage.py test --liveserver=localhost:8082
-
-.. versionchanged:: 1.9
-
-    In older versions ``live_server_url`` could only be accessed from an
-    instance. It now is a class property and can be accessed from class methods
-    like ``setUpClass()``.
 
 Another way of changing the default server address is by setting the
 `DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable somewhere in your
@@ -922,7 +907,7 @@ out the `full reference`_ for more details.
 
 .. _Selenium: http://seleniumhq.org/
 .. _selenium package: https://pypi.python.org/pypi/selenium
-.. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
+.. _full reference: https://selenium-python.readthedocs.io/api.html
 .. _Firefox: https://www.mozilla.com/firefox/
 
 .. note::
@@ -1180,7 +1165,7 @@ easy::
     class MiddlewareTestCase(TestCase):
 
         def test_cache_middleware(self):
-            with self.modify_settings(MIDDLEWARE_CLASSES={
+            with self.modify_settings(MIDDLEWARE={
                 'append': 'django.middleware.cache.FetchFromCacheMiddleware',
                 'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
                 'remove': [
@@ -1231,7 +1216,7 @@ decorator::
 
     class MiddlewareTestCase(TestCase):
 
-        @modify_settings(MIDDLEWARE_CLASSES={
+        @modify_settings(MIDDLEWARE={
             'append': 'django.middleware.cache.FetchFromCacheMiddleware',
             'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
         })
@@ -1243,7 +1228,7 @@ The decorator can also be applied to test case classes::
 
     from django.test import TestCase, modify_settings
 
-    @modify_settings(MIDDLEWARE_CLASSES={
+    @modify_settings(MIDDLEWARE={
         'append': 'django.middleware.cache.FetchFromCacheMiddleware',
         'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
     })
@@ -1332,7 +1317,7 @@ applications:
 The failure messages given by most of these assertion methods can be customized
 with the ``msg_prefix`` argument. This string will be prefixed to any failure
 message generated by the assertion. This allows you to provide additional
-details that may help you to identify the location and cause of an failure in
+details that may help you to identify the location and cause of a failure in
 your test suite.
 
 .. method:: SimpleTestCase.assertRaisesMessage(expected_exception, expected_message, callable, *args, **kwargs)
@@ -1701,9 +1686,11 @@ and contents::
     class EmailTest(TestCase):
         def test_send_email(self):
             # Send message.
-            mail.send_mail('Subject here', 'Here is the message.',
+            mail.send_mail(
+                'Subject here', 'Here is the message.',
                 'from@example.com', ['to@example.com'],
-                fail_silently=False)
+                fail_silently=False,
+            )
 
             # Test that one message has been sent.
             self.assertEqual(len(mail.outbox), 1)

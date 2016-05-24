@@ -129,8 +129,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self._add_installed_apps_translations()
 
         self._add_local_translations()
-        if (self.__language == settings.LANGUAGE_CODE and self.domain == 'django'
-                and self._catalog is None):
+        if self.__language == settings.LANGUAGE_CODE and self.domain == 'django' and self._catalog is None:
             # default lang should have at least one translation file available.
             raise IOError("No translation files found for default language %s." % settings.LANGUAGE_CODE)
         self._add_fallback(localedirs)
@@ -575,8 +574,10 @@ def templatize(src, origin=None):
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    from django.template.base import (Lexer, TOKEN_TEXT, TOKEN_VAR,
-        TOKEN_BLOCK, TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
+    from django.template.base import (
+        Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK, TOKEN_COMMENT,
+        TRANSLATOR_COMMENT_MARK,
+    )
     src = force_text(src, settings.FILE_CHARSET)
     out = StringIO('')
     message_context = None
@@ -691,9 +692,11 @@ def templatize(src, origin=None):
                             filemsg = ''
                             if origin:
                                 filemsg = 'file %s, ' % origin
-                            warn_msg = ("The translator-targeted comment '%s' "
-                                "(%sline %d) was ignored, because it wasn't the last item "
-                                "on the line.") % (c, filemsg, comment_lineno_cache)
+                            warn_msg = (
+                                "The translator-targeted comment '%s' "
+                                "(%sline %d) was ignored, because it wasn't "
+                                "the last item on the line."
+                            ) % (c, filemsg, comment_lineno_cache)
                             warnings.warn(warn_msg, TranslatorCommentWarning)
                         lineno_comment_map[comment_lineno_cache] = []
                 else:

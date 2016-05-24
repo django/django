@@ -250,6 +250,122 @@ class GraphTests(SimpleTestCase):
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
 
+    def test_validate_consistency(self):
+        """
+        Tests for missing nodes, using `validate_consistency()` to raise the error.
+        """
+        # Build graph
+        graph = MigrationGraph()
+        graph.add_node(("app_a", "0001"), None)
+        # Add dependency with missing parent node (skipping validation).
+        graph.add_dependency("app_a.0001", ("app_a", "0001"), ("app_b", "0002"), skip_validation=True)
+        msg = "Migration app_a.0001 dependencies reference nonexistent parent node ('app_b', '0002')"
+        with self.assertRaisesMessage(NodeNotFoundError, msg):
+            graph.validate_consistency()
+        # Add missing parent node and ensure `validate_consistency()` no longer raises error.
+        graph.add_node(("app_b", "0002"), None)
+        graph.validate_consistency()
+        # Add dependency with missing child node (skipping validation).
+        graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"), skip_validation=True)
+        msg = "Migration app_a.0002 dependencies reference nonexistent child node ('app_a', '0002')"
+        with self.assertRaisesMessage(NodeNotFoundError, msg):
+            graph.validate_consistency()
+        # Add missing child node and ensure `validate_consistency()` no longer raises error.
+        graph.add_node(("app_a", "0002"), None)
+        graph.validate_consistency()
+        # Rawly add dummy node.
+        msg = "app_a.0001 (req'd by app_a.0002) is missing!"
+        graph.add_dummy_node(
+            key=("app_a", "0001"),
+            origin="app_a.0002",
+            error_message=msg
+        )
+        with self.assertRaisesMessage(NodeNotFoundError, msg):
+            graph.validate_consistency()
+
+    def test_remove_replaced_nodes(self):
+        """
+        Tests that replaced nodes are properly removed and dependencies remapped.
+        """
+        # Add some dummy nodes to be replaced.
+        graph = MigrationGraph()
+        graph.add_dummy_node(key=("app_a", "0001"), origin="app_a.0002", error_message="BAD!")
+        graph.add_dummy_node(key=("app_a", "0002"), origin="app_b.0001", error_message="BAD!")
+        graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"), skip_validation=True)
+        # Add some normal parent and child nodes to test dependency remapping.
+        graph.add_node(("app_c", "0001"), None)
+        graph.add_node(("app_b", "0001"), None)
+        graph.add_dependency("app_a.0001", ("app_a", "0001"), ("app_c", "0001"), skip_validation=True)
+        graph.add_dependency("app_b.0001", ("app_b", "0001"), ("app_a", "0002"), skip_validation=True)
+        # Try replacing before replacement node exists.
+        msg = (
+            "Unable to find replacement node ('app_a', '0001_squashed_0002'). It was either"
+            " never added to the migration graph, or has been removed."
+        )
+        with self.assertRaisesMessage(NodeNotFoundError, msg):
+            graph.remove_replaced_nodes(
+                replacement=("app_a", "0001_squashed_0002"),
+                replaced=[("app_a", "0001"), ("app_a", "0002")]
+            )
+        graph.add_node(("app_a", "0001_squashed_0002"), None)
+        # Ensure `validate_consistency()` still raises an error at this stage.
+        with self.assertRaisesMessage(NodeNotFoundError, "BAD!"):
+            graph.validate_consistency()
+        # Remove the dummy nodes.
+        graph.remove_replaced_nodes(
+            replacement=("app_a", "0001_squashed_0002"),
+            replaced=[("app_a", "0001"), ("app_a", "0002")]
+        )
+        # Ensure graph is now consistent and dependencies have been remapped
+        graph.validate_consistency()
+        parent_node = graph.node_map[("app_c", "0001")]
+        replacement_node = graph.node_map[("app_a", "0001_squashed_0002")]
+        child_node = graph.node_map[("app_b", "0001")]
+        self.assertIn(parent_node, replacement_node.parents)
+        self.assertIn(replacement_node, parent_node.children)
+        self.assertIn(child_node, replacement_node.children)
+        self.assertIn(replacement_node, child_node.parents)
+
+    def test_remove_replacement_node(self):
+        """
+        Tests that a replacement node is properly removed and child dependencies remapped.
+        We assume parent dependencies are already correct.
+        """
+        # Add some dummy nodes to be replaced.
+        graph = MigrationGraph()
+        graph.add_node(("app_a", "0001"), None)
+        graph.add_node(("app_a", "0002"), None)
+        graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
+        # Try removing replacement node before replacement node exists.
+        msg = (
+            "Unable to remove replacement node ('app_a', '0001_squashed_0002'). It was"
+            " either never added to the migration graph, or has been removed already."
+        )
+        with self.assertRaisesMessage(NodeNotFoundError, msg):
+            graph.remove_replacement_node(
+                replacement=("app_a", "0001_squashed_0002"),
+                replaced=[("app_a", "0001"), ("app_a", "0002")]
+            )
+        graph.add_node(("app_a", "0001_squashed_0002"), None)
+        # Add a child node to test dependency remapping.
+        graph.add_node(("app_b", "0001"), None)
+        graph.add_dependency("app_b.0001", ("app_b", "0001"), ("app_a", "0001_squashed_0002"))
+        # Remove the replacement node.
+        graph.remove_replacement_node(
+            replacement=("app_a", "0001_squashed_0002"),
+            replaced=[("app_a", "0001"), ("app_a", "0002")]
+        )
+        # Ensure graph is consistent and child dependency has been remapped
+        graph.validate_consistency()
+        replaced_node = graph.node_map[("app_a", "0002")]
+        child_node = graph.node_map[("app_b", "0001")]
+        self.assertIn(child_node, replaced_node.children)
+        self.assertIn(replaced_node, child_node.parents)
+        # Ensure child dependency hasn't also gotten remapped to the other replaced node.
+        other_replaced_node = graph.node_map[("app_a", "0001")]
+        self.assertNotIn(child_node, other_replaced_node.children)
+        self.assertNotIn(other_replaced_node, child_node.parents)
+
     def test_infinite_loop(self):
         """
         Tests a complex dependency graph:

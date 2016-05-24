@@ -195,6 +195,20 @@ class TestCollectionExcludeNoDefaultIgnore(TestDefaults, CollectionTestCase):
         self.assertFileContains('test/CVS', 'should be ignored')
 
 
+@override_settings(INSTALLED_APPS=[
+    'staticfiles_tests.apps.staticfiles_config.IgnorePatternsAppConfig',
+    'staticfiles_tests.apps.test',
+])
+class TestCollectionCustomIgnorePatterns(CollectionTestCase):
+    def test_custom_ignore_patterns(self):
+        """
+        A custom ignore_patterns list, ['*.css'] in this case, can be specified
+        in an AppConfig definition.
+        """
+        self.assertFileNotFound('test/nonascii.css')
+        self.assertFileContains('test/.hidden', 'should be ignored')
+
+
 class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
     """
     Test ``--dry-run`` option for ``collectstatic`` management command.

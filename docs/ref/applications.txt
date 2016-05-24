@@ -37,8 +37,8 @@ projects.
 Applications include some combination of models, views, templates, template
 tags, static files, URLs, middleware, etc. They're generally wired into
 projects with the :setting:`INSTALLED_APPS` setting and optionally with other
-mechanisms such as URLconfs, the :setting:`MIDDLEWARE_CLASSES` setting, or
-template inheritance.
+mechanisms such as URLconfs, the :setting:`MIDDLEWARE` setting, or template
+inheritance.
 
 It is important to understand that a Django application is just a set of code
 that interacts with various parts of the framework. There's no such thing as

@@ -36,9 +36,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # The backend "mostly works" without this function and there are use
         # cases for compiling Python without the sqlite3 libraries (e.g.
         # security hardening).
-        import sqlite3
         try:
+            import sqlite3
             value = sqlite3.adapt(value)
+        except ImportError:
+            pass
         except sqlite3.ProgrammingError:
             pass
         # Manual emulation of SQLite parameter quoting

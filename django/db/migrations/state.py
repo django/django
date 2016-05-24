@@ -240,44 +240,11 @@ class StateApps(Apps):
         self.render_multiple(list(models.values()) + self.real_models)
 
         # There shouldn't be any operations pending at this point.
-        pending_models = set(self._pending_operations)
-        if ignore_swappable:
-            pending_models -= {make_model_tuple(settings.AUTH_USER_MODEL)}
-        if pending_models:
-            raise ValueError(self._pending_models_error(pending_models))
-
-    def _pending_models_error(self, pending_models):
-        """
-        Almost all internal uses of lazy operations are to resolve string model
-        references in related fields. We can extract the fields from those
-        operations and use them to provide a nicer error message.
-
-        This will work for any function passed to lazy_related_operation() that
-        has a keyword argument called 'field'.
-        """
-        def extract_field(operation):
-            # operation is annotated with the field in
-            # apps.registry.Apps.lazy_model_operation().
-            return getattr(operation, 'field', None)
-
-        def extract_field_names(operations):
-            return (str(field) for field in map(extract_field, operations) if field)
-
-        get_ops = self._pending_operations.__getitem__
-        # Ordered list of pairs of the form
-        # ((app_label, model_name), [field_name_1, field_name_2, ...])
-        models_fields = sorted(
-            (model_key, sorted(extract_field_names(get_ops(model_key))))
-            for model_key in pending_models
-        )
-
-        def model_text(model_key, fields):
-            field_list = ", ".join(fields)
-            field_text = " (referred to by fields: %s)" % field_list if fields else ""
-            return ("%s.%s" % model_key) + field_text
-
-        msg = "Unhandled pending operations for models:"
-        return "\n  ".join([msg] + [model_text(*i) for i in models_fields])
+        from django.core.checks.model_checks import _check_lazy_references
+        ignore = {make_model_tuple(settings.AUTH_USER_MODEL)} if ignore_swappable else set()
+        errors = _check_lazy_references(self, ignore=ignore)
+        if errors:
+            raise ValueError("\n".join(error.msg for error in errors))
 
     @contextmanager
     def bulk_update(self):
@@ -443,6 +410,9 @@ class ModelState(object):
             for key in ["unique_together", "index_together", "order_with_respect_to"]:
                 if key in options:
                     del options[key]
+        # Private fields are ignored, so remove options that refer to them.
+        elif options.get('order_with_respect_to') in {field.name for field in model._meta.private_fields}:
+            del options['order_with_respect_to']
 
         def flatten_bases(model):
             bases = []
@@ -473,48 +443,29 @@ class ModelState(object):
         if not any((isinstance(base, six.string_types) or issubclass(base, models.Model)) for base in bases):
             bases = (models.Model,)
 
-        # Constructs all managers on the model
-        managers_mapping = {}
+        managers = []
 
-        def reconstruct_manager(mgr):
-            as_manager, manager_path, qs_path, args, kwargs = mgr.deconstruct()
-            if as_manager:
-                qs_class = import_string(qs_path)
-                instance = qs_class.as_manager()
-            else:
-                manager_class = import_string(manager_path)
-                instance = manager_class(*args, **kwargs)
-            # We rely on the ordering of the creation_counter of the original
-            # instance
-            name = force_text(mgr.name)
-            managers_mapping[name] = (mgr.creation_counter, instance)
-
-        if hasattr(model, "_default_manager"):
-            default_manager_name = force_text(model._default_manager.name)
-            # Make sure the default manager is always the first
+        # Make sure the default manager is always first since ordering chooses
+        # the default manager.
+        if not model._default_manager.auto_created:
             if model._default_manager.use_in_migrations:
-                reconstruct_manager(model._default_manager)
+                default_manager = copy.copy(model._default_manager)
+                default_manager._set_creation_counter()
+
+            # If the default manager doesn't have `use_in_migrations = True`,
+            # shim a default manager so another manager isn't promoted in its
+            # place.
             else:
-                # Force this manager to be the first and thus default
-                managers_mapping[default_manager_name] = (0, models.Manager())
-            # Sort all managers by their creation counter
-            for _, manager, _ in sorted(model._meta.managers):
-                if manager.name == "_base_manager" or not manager.use_in_migrations:
-                    continue
-                reconstruct_manager(manager)
-            # Sort all managers by their creation counter but take only name and
-            # instance for further processing
-            managers = [
-                (name, instance) for name, (cc, instance) in
-                sorted(managers_mapping.items(), key=lambda v: v[1])
-            ]
-            # If the only manager on the model is the default manager defined
-            # by Django (`objects = models.Manager()`), this manager will not
-            # be added to the model state.
-            if managers == [('objects', models.Manager())]:
-                managers = []
-        else:
-            managers = []
+                default_manager = models.Manager()
+                default_manager.model = model
+                default_manager.name = model._default_manager.name
+            managers.append((force_text(default_manager.name), default_manager))
+
+        for manager in model._meta.managers:
+            if manager.use_in_migrations and manager is not model._default_manager:
+                manager = copy.copy(manager)
+                manager._set_creation_counter()
+                managers.append((force_text(manager.name), manager))
 
         # Construct the new ModelState
         return cls(

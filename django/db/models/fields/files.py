@@ -1,5 +1,7 @@
 import datetime
 import os
+import posixpath
+import warnings
 
 from django import forms
 from django.core import checks
@@ -9,6 +11,7 @@ from django.core.files.storage import default_storage
 from django.db.models import signals
 from django.db.models.fields import Field
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str, force_text
 from django.utils.translation import ugettext_lazy as _
 
@@ -268,11 +271,6 @@ class FileField(Field):
     def get_internal_type(self):
         return "FileField"
 
-    def get_prep_lookup(self, lookup_type, value):
-        if hasattr(value, 'name'):
-            value = value.name
-        return super(FileField, self).get_prep_lookup(lookup_type, value)
-
     def get_prep_value(self, value):
         "Returns field's value prepared for saving into a database."
         value = super(FileField, self).get_prep_value(value)
@@ -294,20 +292,34 @@ class FileField(Field):
         setattr(cls, self.name, self.descriptor_class(self))
 
     def get_directory_name(self):
+        warnings.warn(
+            'FileField now delegates file name and folder processing to the '
+            'storage. get_directory_name() will be removed in Django 2.0.',
+            RemovedInDjango20Warning, stacklevel=2
+        )
         return os.path.normpath(force_text(datetime.datetime.now().strftime(force_str(self.upload_to))))
 
     def get_filename(self, filename):
+        warnings.warn(
+            'FileField now delegates file name and folder processing to the '
+            'storage. get_filename() will be removed in Django 2.0.',
+            RemovedInDjango20Warning, stacklevel=2
+        )
         return os.path.normpath(self.storage.get_valid_name(os.path.basename(filename)))
 
     def generate_filename(self, instance, filename):
-        # If upload_to is a callable, make sure that the path it returns is
-        # passed through get_valid_name() of the underlying storage.
+        """
+        Apply (if callable) or prepend (if a string) upload_to to the filename,
+        then delegate further processing of the name to the storage backend.
+        Until the storage layer, all file paths are expected to be Unix style
+        (with forward slashes).
+        """
         if callable(self.upload_to):
-            directory_name, filename = os.path.split(self.upload_to(instance, filename))
-            filename = self.storage.get_valid_name(filename)
-            return os.path.normpath(os.path.join(directory_name, filename))
-
-        return os.path.join(self.get_directory_name(), self.get_filename(filename))
+            filename = self.upload_to(instance, filename)
+        else:
+            dirname = force_text(datetime.datetime.now().strftime(force_str(self.upload_to)))
+            filename = posixpath.join(dirname, filename)
+        return self.storage.generate_filename(filename)
 
     def save_form_data(self, instance, data):
         # Important: None means "no change", other false value means "clear"
@@ -369,8 +381,7 @@ class ImageField(FileField):
     descriptor_class = ImageFileDescriptor
     description = _("Image")
 
-    def __init__(self, verbose_name=None, name=None, width_field=None,
-            height_field=None, **kwargs):
+    def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
         super(ImageField, self).__init__(verbose_name, name, **kwargs)
 
@@ -440,8 +451,8 @@ class ImageField(FileField):
             return
 
         dimension_fields_filled = not(
-            (self.width_field and not getattr(instance, self.width_field))
-            or (self.height_field and not getattr(instance, self.height_field))
+            (self.width_field and not getattr(instance, self.width_field)) or
+            (self.height_field and not getattr(instance, self.height_field))
         )
         # When both dimension fields have values, we are most likely loading
         # data from the database or updating an image field that already had

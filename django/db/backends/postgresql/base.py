@@ -35,14 +35,14 @@ if PSYCOPG2_VERSION < (2, 4, 5):
 
 
 # Some of these import psycopg2, so import them after checking if it's installed.
-from .client import DatabaseClient                          # isort:skip
-from .creation import DatabaseCreation                      # isort:skip
-from .features import DatabaseFeatures                      # isort:skip
-from .introspection import DatabaseIntrospection            # isort:skip
-from .operations import DatabaseOperations                  # isort:skip
-from .schema import DatabaseSchemaEditor                    # isort:skip
-from .utils import utc_tzinfo_factory                       # isort:skip
-from .version import get_version                            # isort:skip
+from .client import DatabaseClient                          # NOQA isort:skip
+from .creation import DatabaseCreation                      # NOQA isort:skip
+from .features import DatabaseFeatures                      # NOQA isort:skip
+from .introspection import DatabaseIntrospection            # NOQA isort:skip
+from .operations import DatabaseOperations                  # NOQA isort:skip
+from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
+from .utils import utc_tzinfo_factory                       # NOQA isort:skip
+from .version import get_version                            # NOQA isort:skip
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError

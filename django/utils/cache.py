@@ -6,7 +6,7 @@ that header-patching themselves.
 
 For information on the Vary header, see:
 
-    http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+    https://tools.ietf.org/html/rfc7231#section-7.1.4
 
 Essentially, the "Vary" HTTP header defines which headers a cache should take
 into account when building its cache key. Requests with the same path but
@@ -94,8 +94,7 @@ def get_max_age(response):
     """
     if not response.has_header('Cache-Control'):
         return
-    cc = dict(_to_tuple(el) for el in
-        cc_delim_re.split(response['Cache-Control']))
+    cc = dict(_to_tuple(el) for el in cc_delim_re.split(response['Cache-Control']))
     if 'max-age' in cc:
         try:
             return int(cc['max-age'])
@@ -110,7 +109,8 @@ def set_response_etag(response):
 
 
 def _precondition_failed(request):
-    logger.warning('Precondition Failed: %s', request.path,
+    logger.warning(
+        'Precondition Failed: %s', request.path,
         extra={
             'status_code': 412,
             'request': request,
@@ -173,19 +173,17 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
             (if_match and if_none_match)):
         # We only get here if no undefined combinations of headers are
         # specified.
-        if ((if_none_match and (etag in etags or
-                '*' in etags and etag)) and
+        if ((if_none_match and (etag in etags or '*' in etags and etag)) and
                 (not if_modified_since or
-                    (last_modified and if_modified_since and
-                    last_modified <= if_modified_since))):
+                    (last_modified and if_modified_since and last_modified <= if_modified_since))):
             if request.method in ('GET', 'HEAD'):
                 return _not_modified(request, response)
             else:
                 return _precondition_failed(request)
-        elif (if_match and ((not etag and '*' in etags) or
-                (etag and etag not in etags) or
-                (last_modified and if_unmodified_since and
-                last_modified > if_unmodified_since))):
+        elif (if_match and (
+            (not etag and '*' in etags) or (etag and etag not in etags) or
+            (last_modified and if_unmodified_since and last_modified > if_unmodified_since)
+        )):
             return _precondition_failed(request)
         elif (not if_none_match and request.method in ('GET', 'HEAD') and
                 last_modified and if_modified_since and

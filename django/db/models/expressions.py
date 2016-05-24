@@ -1,13 +1,11 @@
 import copy
 import datetime
 
-from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import Q, refs_aggregate
-from django.utils import six, timezone
+from django.db.models.query_utils import Q
+from django.utils import six
 from django.utils.functional import cached_property
 
 
@@ -125,9 +123,11 @@ class BaseExpression(object):
 
     # aggregate specific fields
     is_summary = False
+    _output_field = None
 
     def __init__(self, output_field=None):
-        self._output_field = output_field
+        if output_field is not None:
+            self._output_field = output_field
 
     def get_db_converters(self, connection):
         return [self.convert_value] + self.output_field.get_db_converters(connection)
@@ -212,7 +212,7 @@ class BaseExpression(object):
 
     def _prepare(self, field):
         """
-        Hook used by Field.get_prep_lookup() to do custom preparation.
+        Hook used by Lookup.get_prep_lookup() to do custom preparation.
         """
         return self
 
@@ -304,24 +304,6 @@ class BaseExpression(object):
         c.copied = True
         return c
 
-    def refs_aggregate(self, existing_aggregates):
-        """
-        Does this expression contain a reference to some of the
-        existing aggregates? If so, returns the aggregate and also
-        the lookup parts that *weren't* found. So, if
-            existing_aggregates = {'max_id': Max('id')}
-            self.name = 'max_id'
-            queryset.filter(max_id__range=[10,100])
-        then this method will return Max('id') and those parts of the
-        name that weren't found. In this case `max_id` is found and the range
-        portion is returned as ('range',).
-        """
-        for node in self.get_source_expressions():
-            agg, lookup = node.refs_aggregate(existing_aggregates)
-            if agg:
-                return agg, lookup
-        return False, ()
-
     def get_group_by_cols(self):
         if not self.contains_aggregate:
             return [self]
@@ -395,8 +377,8 @@ class CombinedExpression(Expression):
         except FieldError:
             rhs_output = None
         if (not connection.features.has_native_duration_field and
-                ((lhs_output and lhs_output.get_internal_type() == 'DurationField')
-                or (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
+                ((lhs_output and lhs_output.get_internal_type() == 'DurationField') or
+                 (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
             return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
         if (lhs_output and rhs_output and self.connector == self.SUB and
             lhs_output.get_internal_type() in {'DateField', 'DateTimeField', 'TimeField'} and
@@ -480,9 +462,6 @@ class F(Combinable):
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return query.resolve_ref(self.name, allow_joins, reuse, summarize)
 
-    def refs_aggregate(self, existing_aggregates):
-        return refs_aggregate(self.name.split(LOOKUP_SEP), existing_aggregates)
-
     def asc(self):
         return OrderBy(self)
 
@@ -492,7 +471,7 @@ class F(Combinable):
 
 class Func(Expression):
     """
-    A SQL function call.
+    An SQL function call.
     """
     function = None
     template = '%(function)s(%(expressions)s)'
@@ -878,111 +857,6 @@ class Case(Expression):
         if self._output_field_or_none is not None:
             sql = connection.ops.unification_cast_sql(self.output_field) % sql
         return sql, sql_params
-
-
-class Date(Expression):
-    """
-    Add a date selection column.
-    """
-    def __init__(self, lookup, lookup_type):
-        super(Date, self).__init__(output_field=fields.DateField())
-        self.lookup = lookup
-        self.col = None
-        self.lookup_type = lookup_type
-
-    def __repr__(self):
-        return "{}({}, {})".format(self.__class__.__name__, self.lookup, self.lookup_type)
-
-    def get_source_expressions(self):
-        return [self.col]
-
-    def set_source_expressions(self, exprs):
-        self.col, = exprs
-
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        copy = self.copy()
-        copy.col = query.resolve_ref(self.lookup, allow_joins, reuse, summarize)
-        field = copy.col.output_field
-        assert isinstance(field, fields.DateField), "%r isn't a DateField." % field.name
-        if settings.USE_TZ:
-            assert not isinstance(field, fields.DateTimeField), (
-                "%r is a DateTimeField, not a DateField." % field.name
-            )
-        return copy
-
-    def as_sql(self, compiler, connection):
-        sql, params = self.col.as_sql(compiler, connection)
-        assert not(params)
-        return connection.ops.date_trunc_sql(self.lookup_type, sql), []
-
-    def copy(self):
-        copy = super(Date, self).copy()
-        copy.lookup = self.lookup
-        copy.lookup_type = self.lookup_type
-        return copy
-
-    def convert_value(self, value, expression, connection, context):
-        if isinstance(value, datetime.datetime):
-            value = value.date()
-        return value
-
-
-class DateTime(Expression):
-    """
-    Add a datetime selection column.
-    """
-    def __init__(self, lookup, lookup_type, tzinfo):
-        super(DateTime, self).__init__(output_field=fields.DateTimeField())
-        self.lookup = lookup
-        self.col = None
-        self.lookup_type = lookup_type
-        if tzinfo is None:
-            self.tzname = None
-        else:
-            self.tzname = timezone._get_timezone_name(tzinfo)
-        self.tzinfo = tzinfo
-
-    def __repr__(self):
-        return "{}({}, {}, {})".format(
-            self.__class__.__name__, self.lookup, self.lookup_type, self.tzinfo)
-
-    def get_source_expressions(self):
-        return [self.col]
-
-    def set_source_expressions(self, exprs):
-        self.col, = exprs
-
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        copy = self.copy()
-        copy.col = query.resolve_ref(self.lookup, allow_joins, reuse, summarize)
-        field = copy.col.output_field
-        assert isinstance(field, fields.DateTimeField), (
-            "%r isn't a DateTimeField." % field.name
-        )
-        return copy
-
-    def as_sql(self, compiler, connection):
-        sql, params = self.col.as_sql(compiler, connection)
-        assert not(params)
-        return connection.ops.datetime_trunc_sql(self.lookup_type, sql, self.tzname)
-
-    def copy(self):
-        copy = super(DateTime, self).copy()
-        copy.lookup = self.lookup
-        copy.lookup_type = self.lookup_type
-        copy.tzname = self.tzname
-        return copy
-
-    def convert_value(self, value, expression, connection, context):
-        if settings.USE_TZ:
-            if value is None:
-                raise ValueError(
-                    "Database returned an invalid value in QuerySet.datetimes(). "
-                    "Are time zone definitions for your database and pytz installed?"
-                )
-            value = value.replace(tzinfo=None)
-            value = timezone.make_aware(value, self.tzinfo)
-        return value
 
 
 class OrderBy(BaseExpression):

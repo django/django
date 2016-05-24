@@ -99,8 +99,7 @@ WHEN (new.%(col_name)s IS NULL)
         days = str(timedelta.days)
         day_precision = len(days)
         fmt = "INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6)"
-        return fmt % (days, hours, minutes, seconds, timedelta.microseconds,
-                day_precision), []
+        return fmt % (days, hours, minutes, seconds, timedelta.microseconds, day_precision), []
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
@@ -116,20 +115,19 @@ WHEN (new.%(col_name)s IS NULL)
     _tzname_re = re.compile(r'^[\w/:+-]+$')
 
     def _convert_field_to_tz(self, field_name, tzname):
-        if not settings.USE_TZ:
-            return field_name
-        if not self._tzname_re.match(tzname):
-            raise ValueError("Invalid time zone name: %s" % tzname)
-        # Convert from UTC to local time, returning TIMESTAMP WITH TIME ZONE.
-        result = "(FROM_TZ(%s, '0:00') AT TIME ZONE '%s')" % (field_name, tzname)
+        if settings.USE_TZ:
+            if not self._tzname_re.match(tzname):
+                raise ValueError("Invalid time zone name: %s" % tzname)
+            # Convert from UTC to local time, returning TIMESTAMP WITH TIME ZONE.
+            field_name = "(FROM_TZ(%s, '0:00') AT TIME ZONE '%s')" % (field_name, tzname)
         # Extracting from a TIMESTAMP WITH TIME ZONE ignore the time zone.
         # Convert to a DATETIME, which is called DATE by Oracle. There's no
         # built-in function to do that; the easiest is to go through a string.
-        result = "TO_CHAR(%s, 'YYYY-MM-DD HH24:MI:SS')" % result
-        result = "TO_DATE(%s, 'YYYY-MM-DD HH24:MI:SS')" % result
+        field_name = "TO_CHAR(%s, 'YYYY-MM-DD HH24:MI:SS')" % field_name
+        field_name = "TO_DATE(%s, 'YYYY-MM-DD HH24:MI:SS')" % field_name
         # Re-convert to a TIMESTAMP because EXTRACT only handles the date part
         # on DATE values, even though they actually store the time part.
-        return "CAST(%s AS TIMESTAMP)" % result
+        return "CAST(%s AS TIMESTAMP)" % field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)

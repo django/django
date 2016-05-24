@@ -22,7 +22,7 @@ machine. At the time of writing, Python 3.5 is the latest version.
 To install Python on your machine go to https://python.org/downloads/. The
 website should offer you a download button for the latest Python version.
 Download the executable installer and run it. Check the box next to ``Add
-Python 3.5 to PATH`` and then click ``Install Now``.
+Python to to environment variables`` and then click ``Install Now``.
 
 After installation, open the command prompt and check that the Python version
 matches the version you installed by executing::
@@ -35,6 +35,10 @@ About ``pip``
 `pip`_ is a package manage for Python. It makes installing and uninstalling
 Python packages (such as Django!) very easy. For the rest of the installation,
 we'll use ``pip`` to install Python packages from the command line.
+
+To install pip on your machine, go to
+https://pip.pypa.io/en/latest/installing/, and follow the ``Installing with
+get-pip.py`` instructions.
 
 .. _pip: https://pypi.python.org/pypi/pip
 
@@ -64,9 +68,10 @@ command prompt, you'll need to activate the environment again using::
 Install Django
 ==============
 
-Django can be installed easily using ``pip``.
+Django can be installed easily using ``pip`` within your virtual environment.
 
-In the command prompt, execute the following command::
+In the command prompt, ensure your virtual environment is active, and execute
+the following command::
 
     pip install django
 

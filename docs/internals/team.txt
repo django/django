@@ -387,7 +387,7 @@ Daniele Procida
 
     .. _Divio: https://divio.ch/
     .. _Arkestra: http://arkestra-project.org/
-    .. _Don\'t be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.org
+    .. _Don\'t be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.io
 
 `Erik Romijn`_
     Erik started using Django in the days of 1.2. His largest contribution to Django was
@@ -468,15 +468,18 @@ Daniele Procida
     .. _smaller django apps: https://github.com/funkybob/
 
 `Markus Holtermann`_
-    Markus is a Master of Science student in Computer Science at `Technical
-    University of Berlin`_. He started working with Django in 2010 when he
-    joined the `ubuntuusers.de`_ web team to work on *Inyoka*. Markus made his
-    first contribution to the Django project during DjangoCon Europe 2013 in
-    Warsaw. He was the web team leader for the `EuroPython 2014 website`_.
+    Markus is a senior backend developer at `LaterPay`_ in Munich. He studied
+    Computer Science at the `Technical University of Berlin`_. He started
+    working with Django in 2010 when he joined the `ubuntuusers.de`_ web team
+    to work on *Inyoka*. Markus made his first contribution to the Django
+    project during DjangoCon Europe 2013 in Warsaw. He was the web team leader
+    for the `EuroPython 2014 website`_ and started regular contributions to
+    Django after that.
 
     Markus lives in Berlin, Germany.
 
     .. _Markus Holtermann: https://github.com/MarkusH
+    .. _LaterPay: https://www.laterpay.net/
     .. _Technical University of Berlin: http://www.tu-berlin.de/
     .. _ubuntuusers.de: https://ubuntuusers.de/
     .. _EuroPython 2014 website: https://ep2014.europython.eu/

@@ -10,16 +10,28 @@ class Command(BaseCommand):
     help = "Shows all available migrations for the current project"
 
     def add_arguments(self, parser):
-        parser.add_argument('app_label', nargs='*',
-            help='App labels of applications to limit the output to.')
-        parser.add_argument('--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
-            help='Nominates a database to synchronize. Defaults to the "default" database.')
+        parser.add_argument(
+            'app_label', nargs='*',
+            help='App labels of applications to limit the output to.',
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to synchronize. Defaults to the "default" database.',
+        )
 
         formats = parser.add_mutually_exclusive_group()
-        formats.add_argument('--list', '-l', action='store_const', dest='format', const='list',
-            help='Shows a list of all migrations and which are applied.')
-        formats.add_argument('--plan', '-p', action='store_const', dest='format', const='plan',
-            help='Shows all migrations in the order they will be applied.')
+        formats.add_argument(
+            '--list', '-l', action='store_const', dest='format', const='list',
+            help='Shows a list of all migrations and which are applied.',
+        )
+        formats.add_argument(
+            '--plan', '-p', action='store_const', dest='format', const='plan',
+            help=(
+                'Shows all migrations in the order they will be applied. '
+                'With a verbosity level of 2 or above all direct migration dependencies '
+                'and reverse dependencies (run_before) will be included.'
+            )
+        )
 
         parser.set_defaults(format='list')
 
@@ -91,26 +103,24 @@ class Command(BaseCommand):
         for target in targets:
             for migration in graph.forwards_plan(target):
                 if migration not in seen:
-                    plan.append(graph.nodes[migration])
+                    node = graph.node_map[migration]
+                    plan.append(node)
                     seen.add(migration)
 
         # Output
-        def print_deps(migration):
+        def print_deps(node):
             out = []
-            for dep in migration.dependencies:
-                if dep[1] == "__first__":
-                    roots = graph.root_nodes(dep[0])
-                    dep = roots[0] if roots else (dep[0], "__first__")
-                out.append("%s.%s" % dep)
+            for parent in sorted(node.parents):
+                out.append("%s.%s" % parent.key)
             if out:
                 return " ... (%s)" % ", ".join(out)
             return ""
 
-        for migration in plan:
+        for node in plan:
             deps = ""
             if self.verbosity >= 2:
-                deps = print_deps(migration)
-            if (migration.app_label, migration.name) in loader.applied_migrations:
-                self.stdout.write("[X]  %s%s" % (migration, deps))
+                deps = print_deps(node)
+            if node.key in loader.applied_migrations:
+                self.stdout.write("[X]  %s.%s%s" % (node.key[0], node.key[1], deps))
             else:
-                self.stdout.write("[ ]  %s%s" % (migration, deps))
+                self.stdout.write("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))

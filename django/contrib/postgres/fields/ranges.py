@@ -17,6 +17,24 @@ __all__ = [
 class RangeField(models.Field):
     empty_strings_allowed = False
 
+    def __init__(self, *args, **kwargs):
+        # Initializing base_field here ensures that its model matches the model for self.
+        if hasattr(self, 'base_field'):
+            self.base_field = self.base_field()
+        super(RangeField, self).__init__(*args, **kwargs)
+
+    @property
+    def model(self):
+        try:
+            return self.__dict__['model']
+        except KeyError:
+            raise AttributeError("'%s' object has no attribute 'model'" % self.__class__.__name__)
+
+    @model.setter
+    def model(self, model):
+        self.__dict__['model'] = model
+        self.base_field.model = model
+
     def get_prep_value(self, value):
         if value is None:
             return None
@@ -65,7 +83,7 @@ class RangeField(models.Field):
 
 
 class IntegerRangeField(RangeField):
-    base_field = models.IntegerField()
+    base_field = models.IntegerField
     range_type = NumericRange
     form_field = forms.IntegerRangeField
 
@@ -74,7 +92,7 @@ class IntegerRangeField(RangeField):
 
 
 class BigIntegerRangeField(RangeField):
-    base_field = models.BigIntegerField()
+    base_field = models.BigIntegerField
     range_type = NumericRange
     form_field = forms.IntegerRangeField
 
@@ -83,7 +101,7 @@ class BigIntegerRangeField(RangeField):
 
 
 class FloatRangeField(RangeField):
-    base_field = models.FloatField()
+    base_field = models.FloatField
     range_type = NumericRange
     form_field = forms.FloatRangeField
 
@@ -92,7 +110,7 @@ class FloatRangeField(RangeField):
 
 
 class DateTimeRangeField(RangeField):
-    base_field = models.DateTimeField()
+    base_field = models.DateTimeField
     range_type = DateTimeTZRange
     form_field = forms.DateTimeRangeField
 
@@ -101,7 +119,7 @@ class DateTimeRangeField(RangeField):
 
 
 class DateRangeField(RangeField):
-    base_field = models.DateField()
+    base_field = models.DateField
     range_type = DateRange
     form_field = forms.DateRangeField
 
@@ -136,7 +154,7 @@ class RangeContainedBy(models.Lookup):
         return sql % (lhs, rhs), params
 
     def get_prep_lookup(self):
-        return RangeField().get_prep_lookup(self.lookup_name, self.rhs)
+        return RangeField().get_prep_value(self.rhs)
 
 
 models.DateField.register_lookup(RangeContainedBy)

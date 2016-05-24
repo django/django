@@ -3,14 +3,15 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Panasoft <cc072aa3@opayq.com>, 2016
 # Sergey Lysach <sergikoff88@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-03-17 23:07+0000\n"
+"Last-Translator: Panasoft <cc072aa3@opayq.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -80,7 +81,7 @@ msgstr ""
 "сторінку."
 
 msgid "sites"
-msgstr ""
+msgstr "сайти"
 
 msgid "flat page"
 msgstr "проста сторінка"

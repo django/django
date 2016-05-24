@@ -184,13 +184,17 @@ class RequestsTests(SimpleTestCase):
 
     def test_httprequest_location(self):
         request = HttpRequest()
-        self.assertEqual(request.build_absolute_uri(location="https://www.example.com/asdf"),
-            'https://www.example.com/asdf')
+        self.assertEqual(
+            request.build_absolute_uri(location="https://www.example.com/asdf"),
+            'https://www.example.com/asdf'
+        )
 
         request.get_host = lambda: 'www.example.com'
         request.path = ''
-        self.assertEqual(request.build_absolute_uri(location="/path/with:colons"),
-            'http://www.example.com/path/with:colons')
+        self.assertEqual(
+            request.build_absolute_uri(location="/path/with:colons"),
+            'http://www.example.com/path/with:colons'
+        )
 
     def test_near_expiration(self):
         "Cookie will expire when an near expiration time is provided"

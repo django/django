@@ -185,22 +185,28 @@ class TestInline(TestDataMixin, TestCase):
         prefixes. Bug #16838.
         """
         response = self.client.get(reverse('admin:admin_inlines_capofamiglia_add'))
-
-        self.assertContains(response,
-                '<input type="hidden" name="-1-0-id" id="id_-1-0-id" />', html=True)
-        self.assertContains(response,
-                '<input type="hidden" name="-1-0-capo_famiglia" id="id_-1-0-capo_famiglia" />', html=True)
-        self.assertContains(response,
-                '<input id="id_-1-0-name" type="text" class="vTextField" '
-                'name="-1-0-name" maxlength="100" />', html=True)
-
-        self.assertContains(response,
-                '<input type="hidden" name="-2-0-id" id="id_-2-0-id" />', html=True)
-        self.assertContains(response,
-                '<input type="hidden" name="-2-0-capo_famiglia" id="id_-2-0-capo_famiglia" />', html=True)
-        self.assertContains(response,
-                '<input id="id_-2-0-name" type="text" class="vTextField" '
-                'name="-2-0-name" maxlength="100" />', html=True)
+        self.assertContains(response, '<input type="hidden" name="-1-0-id" id="id_-1-0-id" />', html=True)
+        self.assertContains(
+            response,
+            '<input type="hidden" name="-1-0-capo_famiglia" id="id_-1-0-capo_famiglia" />',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<input id="id_-1-0-name" type="text" class="vTextField" name="-1-0-name" maxlength="100" />',
+            html=True
+        )
+        self.assertContains(response, '<input type="hidden" name="-2-0-id" id="id_-2-0-id" />', html=True)
+        self.assertContains(
+            response,
+            '<input type="hidden" name="-2-0-capo_famiglia" id="id_-2-0-capo_famiglia" />',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<input id="id_-2-0-name" type="text" class="vTextField" name="-2-0-name" maxlength="100" />',
+            html=True
+        )
 
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_localize_pk_shortcut(self):
@@ -622,8 +628,11 @@ class TestInlinePermissions(TestCase):
             'name="inner2_set-TOTAL_FORMS" />',
             html=True
         )
-        self.assertNotContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
-            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
+        self.assertNotContains(
+            response,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id" />' % self.inner2_id,
+            html=True
+        )
 
     def test_inline_change_fk_change_perm(self):
         permission = Permission.objects.get(codename='change_inner2', content_type=self.inner_ct)
@@ -632,13 +641,21 @@ class TestInlinePermissions(TestCase):
         # Change permission on inner2s, so we can change existing but not add new
         self.assertContains(response, '<h2>Inner2s</h2>')
         # Just the one form for existing instances
-        self.assertContains(response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" '
-            'value="1" name="inner2_set-TOTAL_FORMS" />', html=True)
-        self.assertContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
-            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
+        self.assertContains(
+            response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="1" name="inner2_set-TOTAL_FORMS" />',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id" />' % self.inner2_id,
+            html=True
+        )
         # max-num 0 means we can't add new ones
-        self.assertContains(response, '<input type="hidden" id="id_inner2_set-MAX_NUM_FORMS" '
-            'value="0" name="inner2_set-MAX_NUM_FORMS" />', html=True)
+        self.assertContains(
+            response,
+            '<input type="hidden" id="id_inner2_set-MAX_NUM_FORMS" value="0" name="inner2_set-MAX_NUM_FORMS" />',
+            html=True
+        )
 
     def test_inline_change_fk_add_change_perm(self):
         permission = Permission.objects.get(codename='add_inner2', content_type=self.inner_ct)
@@ -649,10 +666,15 @@ class TestInlinePermissions(TestCase):
         # Add/change perm, so we can add new and change existing
         self.assertContains(response, '<h2>Inner2s</h2>')
         # One form for existing instance and three extra for new
-        self.assertContains(response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" '
-            'value="4" name="inner2_set-TOTAL_FORMS" />', html=True)
-        self.assertContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
-            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
+        self.assertContains(
+            response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="4" name="inner2_set-TOTAL_FORMS" />',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id" />' % self.inner2_id,
+            html=True
+        )
 
     def test_inline_change_fk_change_del_perm(self):
         permission = Permission.objects.get(codename='change_inner2', content_type=self.inner_ct)
@@ -663,10 +685,16 @@ class TestInlinePermissions(TestCase):
         # Change/delete perm on inner2s, so we can change/delete existing
         self.assertContains(response, '<h2>Inner2s</h2>')
         # One form for existing instance only, no new
-        self.assertContains(response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" '
-            'value="1" name="inner2_set-TOTAL_FORMS" />', html=True)
-        self.assertContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
-            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
+        self.assertContains(
+            response,
+            '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="1" name="inner2_set-TOTAL_FORMS" />',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id" />' % self.inner2_id,
+            html=True
+        )
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
     def test_inline_change_fk_all_perms(self):
@@ -680,10 +708,16 @@ class TestInlinePermissions(TestCase):
         # All perms on inner2s, so we can add/change/delete
         self.assertContains(response, '<h2>Inner2s</h2>')
         # One form for existing instance only, three for new
-        self.assertContains(response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" '
-            'value="4" name="inner2_set-TOTAL_FORMS" />', html=True)
-        self.assertContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
-            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
+        self.assertContains(
+            response,
+            '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="4" name="inner2_set-TOTAL_FORMS" />',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id" />' % self.inner2_id,
+            html=True
+        )
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
 
@@ -701,8 +735,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         stacked formset.
         """
         self.admin_login(username='super', password='secret')
-        self.selenium.get('%s%s' % (self.live_server_url,
-            reverse('admin:admin_inlines_holder4_add')))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
 
         inline_id = '#inner4stacked_set-group'
 
@@ -718,8 +751,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_delete_stackeds(self):
         self.admin_login(username='super', password='secret')
-        self.selenium.get('%s%s' % (self.live_server_url,
-            reverse('admin:admin_inlines_holder4_add')))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
 
         inline_id = '#inner4stacked_set-group'
 
@@ -733,8 +765,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         add_button.click()
 
         self.assertEqual(rows_length(), 5, msg="sanity check")
-        for delete_link in self.selenium.find_elements_by_css_selector(
-                '%s .inline-deletelink' % inline_id):
+        for delete_link in self.selenium.find_elements_by_css_selector('%s .inline-deletelink' % inline_id):
             delete_link.click()
         self.assertEqual(rows_length(), 3)
 
@@ -744,8 +775,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         inline form.
         """
         self.admin_login(username='super', password='secret')
-        self.selenium.get('%s%s' % (self.live_server_url,
-            reverse('admin:admin_inlines_profilecollection_add')))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_profilecollection_add'))
 
         # Check that there's only one inline to start with and that it has the
         # correct ID.
@@ -764,8 +794,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Check that the inline has been added, that it has the right id, and
         # that it contains the right fields.
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set')), 2)
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('.dynamic-profile_set')), 2)
         self.assertEqual(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set')[1].get_attribute('id'), 'profile_set-1')
         self.assertEqual(len(self.selenium.find_elements_by_css_selector(
@@ -775,8 +804,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Let's add another one to be sure
         self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set')), 3)
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('.dynamic-profile_set')), 3)
         self.assertEqual(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set')[2].get_attribute('id'), 'profile_set-2')
         self.assertEqual(len(self.selenium.find_elements_by_css_selector(
@@ -801,8 +829,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_delete_inlines(self):
         self.admin_login(username='super', password='secret')
-        self.selenium.get('%s%s' % (self.live_server_url,
-            reverse('admin:admin_inlines_profilecollection_add')))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_profilecollection_add'))
 
         # Add a few inlines
         self.selenium.find_element_by_link_text('Add another Profile').click()
@@ -839,8 +866,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_alternating_rows(self):
         self.admin_login(username='super', password='secret')
-        self.selenium.get('%s%s' % (self.live_server_url,
-            reverse('admin:admin_inlines_profilecollection_add')))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_profilecollection_add'))
 
         # Add a few inlines
         self.selenium.find_element_by_link_text('Add another Profile').click()

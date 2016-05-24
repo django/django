@@ -4,13 +4,16 @@ not in INSTALLED_APPS.
 """
 from __future__ import unicode_literals
 
+import unicodedata
+
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
     check_password, is_password_usable, make_password,
 )
 from django.db import models
 from django.utils.crypto import get_random_string, salted_hmac
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.deprecation import CallableFalse, CallableTrue
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -29,6 +32,10 @@ class BaseUserManager(models.Manager):
         else:
             email = '@'.join([email_name, domain_part.lower()])
         return email
+
+    @classmethod
+    def normalize_username(cls, username):
+        return unicodedata.normalize('NFKC', force_text(username))
 
     def make_random_password(self, length=10,
                              allowed_chars='abcdefghjkmnpqrstuvwxyz'
@@ -79,19 +86,21 @@ class AbstractBaseUser(models.Model):
     def natural_key(self):
         return (self.get_username(),)
 
+    @property
     def is_anonymous(self):
         """
         Always return False. This is a way of comparing User objects to
         anonymous users.
         """
-        return False
+        return CallableFalse
 
+    @property
     def is_authenticated(self):
         """
         Always return True. This is a way to tell if the user has been
         authenticated in templates.
         """
-        return True
+        return CallableTrue
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)

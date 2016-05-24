@@ -96,8 +96,10 @@ class GDALRasterTests(unittest.TestCase):
 
     def test_geotransform_and_friends(self):
         # Assert correct values for file based raster
-        self.assertEqual(self.rs.geotransform,
-            [511700.4680706557, 100.0, 0.0, 435103.3771231986, 0.0, -100.0])
+        self.assertEqual(
+            self.rs.geotransform,
+            [511700.4680706557, 100.0, 0.0, 435103.3771231986, 0.0, -100.0]
+        )
         self.assertEqual(self.rs.origin, [511700.4680706557, 435103.3771231986])
         self.assertEqual(self.rs.origin.x, 511700.4680706557)
         self.assertEqual(self.rs.origin.y, 435103.3771231986)
@@ -124,9 +126,10 @@ class GDALRasterTests(unittest.TestCase):
         self.assertEqual(rsmem.height, 5)
 
     def test_rs_extent(self):
-        self.assertEqual(self.rs.extent,
-            (511700.4680706557, 417703.3771231986,
-             528000.4680706557, 435103.3771231986))
+        self.assertEqual(
+            self.rs.extent,
+            (511700.4680706557, 417703.3771231986, 528000.4680706557, 435103.3771231986)
+        )
 
     def test_rs_bands(self):
         self.assertEqual(len(self.rs.bands), 1)
@@ -305,8 +308,7 @@ class GDALRasterTests(unittest.TestCase):
 @unittest.skipUnless(HAS_GDAL, "GDAL is required")
 class GDALBandTests(SimpleTestCase):
     def setUp(self):
-        self.rs_path = os.path.join(os.path.dirname(upath(__file__)),
-                               '../data/rasters/raster.tif')
+        self.rs_path = os.path.join(os.path.dirname(upath(__file__)), '../data/rasters/raster.tif')
         rs = GDALRaster(self.rs_path)
         self.band = rs.bands[0]
 
@@ -318,6 +320,13 @@ class GDALBandTests(SimpleTestCase):
         self.assertEqual(self.band.datatype(), 1)
         self.assertEqual(self.band.datatype(as_string=True), 'GDT_Byte')
         self.assertEqual(self.band.nodata_value, 15)
+        if numpy:
+            data = self.band.data()
+            assert_array = numpy.loadtxt(
+                os.path.join(os.path.dirname(upath(__file__)), '../data/rasters/raster.numpy.txt')
+            )
+            numpy.testing.assert_equal(data, assert_array)
+            self.assertEqual(data.shape, (self.band.height, self.band.width))
         try:
             smin, smax, smean, sstd = self.band.statistics(approximate=True)
             self.assertEqual(smin, 0)

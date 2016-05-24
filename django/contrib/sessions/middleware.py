@@ -5,11 +5,13 @@ from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
 from django.shortcuts import redirect
 from django.utils.cache import patch_vary_headers
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import cookie_date
 
 
-class SessionMiddleware(object):
-    def __init__(self):
+class SessionMiddleware(MiddlewareMixin):
+    def __init__(self, get_response=None):
+        self.get_response = get_response
         engine = import_module(settings.SESSION_ENGINE)
         self.SessionStore = engine.SessionStore
 
@@ -33,8 +35,7 @@ class SessionMiddleware(object):
             # First check if we need to delete this cookie.
             # The session should be deleted only if the session is entirely empty
             if settings.SESSION_COOKIE_NAME in request.COOKIES and empty:
-                response.delete_cookie(settings.SESSION_COOKIE_NAME,
-                    domain=settings.SESSION_COOKIE_DOMAIN)
+                response.delete_cookie(settings.SESSION_COOKIE_NAME, domain=settings.SESSION_COOKIE_DOMAIN)
             else:
                 if accessed:
                     patch_vary_headers(response, ('Cookie',))
@@ -56,10 +57,12 @@ class SessionMiddleware(object):
                             # page will result in a redirect to the login page
                             # if required.
                             return redirect(request.path)
-                        response.set_cookie(settings.SESSION_COOKIE_NAME,
-                                request.session.session_key, max_age=max_age,
-                                expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
-                                path=settings.SESSION_COOKIE_PATH,
-                                secure=settings.SESSION_COOKIE_SECURE or None,
-                                httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+                        response.set_cookie(
+                            settings.SESSION_COOKIE_NAME,
+                            request.session.session_key, max_age=max_age,
+                            expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                            path=settings.SESSION_COOKIE_PATH,
+                            secure=settings.SESSION_COOKIE_SECURE or None,
+                            httponly=settings.SESSION_COOKIE_HTTPONLY or None,
+                        )
         return response

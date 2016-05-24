@@ -1122,12 +1122,6 @@ blue.
         >>> rst.bands[0].data()
         array([[0, 1]], dtype=int8)
 
-    .. versionchanged:: 1.9
-
-        ``GDALRaster`` objects can now be instantiated directly from raw data.
-        Setters have been added for the following properties: ``srs``,
-        ``geotransform``, ``origin``, ``scale``, and ``skew``.
-
     .. attribute:: name
 
         The name of the source which is equivalent to the input file path or the name
@@ -1291,8 +1285,6 @@ blue.
 
     .. method:: warp(ds_input, resampling='NearestNeighbour', max_error=0.0)
 
-        .. versionadded:: 1.9
-
         Returns a warped version of this raster.
 
         The warping parameters can be specified through the ``ds_input``
@@ -1341,8 +1333,6 @@ blue.
                    [ 31.,  33.,  35.]], dtype=float32)
 
     .. method:: transform(srid, driver=None, name=None, resampling='NearestNeighbour', max_error=0.0)
-
-        .. versionadded:: 1.9
 
         Returns a transformed version of this raster with the specified SRID.
 
@@ -1394,8 +1384,6 @@ blue.
         The height of the band in pixels (Y-axis).
 
     .. attribute:: pixel_count
-
-        .. versionadded:: 1.9
 
         The total number of pixels in this band. Is equal to ``width * height``.
 
@@ -1459,10 +1447,6 @@ blue.
         To delete an existing "no data" value, set this property to ``None``
         (requires GDAL ≥ 2.1).
 
-        .. versionchanged:: 1.9
-
-            This property can now be set as well.
-
         .. versionchanged:: 1.10
 
             The "no data" value can now be deleted by setting the
@@ -1478,8 +1462,6 @@ blue.
         ``GDT_CInt16``, ``GDT_CInt32``, ``GDT_CFloat32``, and ``GDT_CFloat64``.
 
     .. method:: data(data=None, offset=None, size=None, shape=None)
-
-        .. versionadded:: 1.9
 
         The accessor to the pixel values of the ``GDALBand``. Returns the complete
         data array if no parameters are provided. A subset of the pixel array can

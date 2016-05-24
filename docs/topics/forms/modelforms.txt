@@ -560,10 +560,6 @@ the field declaratively and setting its ``validators`` parameter::
             model = Article
             fields = ['pub_date', 'headline', 'content', 'reporter', 'slug']
 
-.. versionadded:: 1.9
-
-    The ``Meta.field_classes`` attribute was added.
-
 .. note::
 
     When you explicitly instantiate a form field like this, it is important to

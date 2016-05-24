@@ -140,10 +140,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
       Tags and filters from built-in libraries can be used without first calling
       the :ttag:`{% load %}<load>` tag.
 
-.. versionadded:: 1.9
-
-    The ``libraries`` and ``builtins`` arguments were added.
-
 .. staticmethod:: Engine.get_default()
 
     When a Django project configures one and only one
@@ -449,8 +445,6 @@ dictionary syntax::
 
 .. method:: Context.setdefault(key, default=None)
 
-    .. versionadded:: 1.9
-
     If ``key`` is in the context, returns its value. Otherwise inserts ``key``
     with a value of ``default`` and returns ``default``.
 
@@ -532,10 +526,6 @@ matching ``pop()`` is called.
     'second level'
     >>> c['foo']
     'first level'
-
-.. versionadded:: 1.9
-
-    The ability to use ``update()`` as a context manager was added.
 
 Using a ``Context`` as a stack comes in handy in :ref:`some custom template
 tags <howto-writing-custom-template-tags>`.
@@ -699,8 +689,13 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
   you're in :setting:`DEBUG` mode.
 * ``sql_queries`` -- A list of ``{'sql': ..., 'time': ...}`` dictionaries,
   representing every SQL query that has happened so far during the request
-  and how long it took. The list is in order by query and lazily generated
-  on access.
+  and how long it took. The list is in order by database alias and then by
+  query. It's lazily generated on access.
+
+.. versionchanged:: 1.10
+
+    In older versions, only the queries for the default database alias were
+    included.
 
 ``django.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -969,11 +964,6 @@ loaders. Custom ``Loader`` classes should inherit from
 ``django.template.loaders.base.Loader`` and define the ``get_contents()`` and
 ``get_template_sources()`` methods.
 
-.. versionchanged:: 1.9
-
-    In previous versions of Django, custom loaders defined a single method:
-    ``load_template_source()``.
-
 Loader methods
 --------------
 
@@ -1067,13 +1057,6 @@ Template origin
 
 Templates have an ``origin`` containing attributes depending on the source
 they are loaded from.
-
-.. versionchanged:: 1.9
-
-    Django used to create an origin based on
-    ``django.template.loader.LoaderOrigin`` or
-    ``django.template.base.StringOrigin``. These have been replaced by
-    ``django.template.base.Origin``.
 
 .. class:: Origin
 

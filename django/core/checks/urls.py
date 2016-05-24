@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.utils import six
 
-from . import Tags, Warning, register
+from . import Error, Tags, Warning, register
 
 
 @register(Tags.urls)
@@ -27,10 +28,39 @@ def check_resolver(resolver):
             warnings.extend(check_resolver(pattern))
         elif isinstance(pattern, RegexURLPattern):
             warnings.extend(check_pattern_name(pattern))
+        else:
+            # This is not a url() instance
+            warnings.extend(get_warning_for_invalid_pattern(pattern))
 
-        warnings.extend(check_pattern_startswith_slash(pattern))
+        if not warnings:
+            warnings.extend(check_pattern_startswith_slash(pattern))
 
     return warnings
+
+
+def get_warning_for_invalid_pattern(pattern):
+    """
+    Return a list containing a warning that the pattern is invalid.
+
+    describe_pattern() cannot be used here, because we cannot rely on the
+    urlpattern having regex or name attributes.
+    """
+    if isinstance(pattern, six.string_types):
+        hint = (
+            "Try removing the string '{}'. The list of urlpatterns should not "
+            "have a prefix string as the first element.".format(pattern)
+        )
+    elif isinstance(pattern, tuple):
+        hint = "Try using url() instead of a tuple."
+    else:
+        hint = None
+
+    return [Error(
+        "Your URL pattern {!r} is invalid. Ensure that urlpatterns is a list "
+        "of url() instances.".format(pattern),
+        hint=hint,
+        id="urls.E004",
+    )]
 
 
 def describe_pattern(pattern):

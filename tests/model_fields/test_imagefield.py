@@ -17,8 +17,10 @@ except ImproperlyConfigured:
     Image = None
 
 if Image:
-    from .models import (Person, PersonWithHeight, PersonWithHeightAndWidth,
-        PersonDimensionsFirst, PersonTwoImages, TestImageFieldFile)
+    from .models import (
+        Person, PersonWithHeight, PersonWithHeightAndWidth,
+        PersonDimensionsFirst, PersonTwoImages, TestImageFieldFile,
+    )
     from .models import temp_storage_dir
 else:
     # Pillow not available, create dummy classes (tests will be skipped anyway)
@@ -52,10 +54,10 @@ class ImageFieldTestMixin(SerializeMixin):
         os.mkdir(temp_storage_dir)
 
         file_path1 = os.path.join(os.path.dirname(upath(__file__)), "4x8.png")
-        self.file1 = self.File(open(file_path1, 'rb'))
+        self.file1 = self.File(open(file_path1, 'rb'), name='4x8.png')
 
         file_path2 = os.path.join(os.path.dirname(upath(__file__)), "8x4.png")
-        self.file2 = self.File(open(file_path2, 'rb'))
+        self.file2 = self.File(open(file_path2, 'rb'), name='8x4.png')
 
     def tearDown(self):
         """

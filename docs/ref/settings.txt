@@ -65,9 +65,8 @@ See :doc:`/howto/error-reporting` for more information.
 Default: ``[]`` (Empty list)
 
 A list of strings representing the host/domain names that this Django site can
-serve. This is a security measure to prevent an attacker from poisoning caches
-and triggering password reset emails with links to malicious hosts by submitting
-requests with a fake HTTP ``Host`` header, which is possible even under many
+serve. This is a security measure to prevent :ref:`HTTP Host header attacks
+<host-headers-virtual-hosting>`, which are possible even under many
 seemingly-safe web server configurations.
 
 Values in this list can be fully qualified names (e.g. ``'www.example.com'``),
@@ -78,7 +77,7 @@ can be used as a subdomain wildcard: ``'.example.com'`` will match
 ``example.com``. A value of ``'*'`` will match anything; in this case you are
 responsible to provide your own validation of the ``Host`` header (perhaps in a
 middleware; if so this middleware must be listed first in
-:setting:`MIDDLEWARE_CLASSES`).
+:setting:`MIDDLEWARE`).
 
 Django also allows the `fully qualified domain name (FQDN)`_ of any entries.
 Some browsers include a trailing dot in the ``Host`` header which Django
@@ -400,8 +399,6 @@ exists, it will be used to render the page.
 ``CSRF_HEADER_NAME``
 --------------------
 
-.. versionadded:: 1.9
-
 Default: ``'HTTP_X_CSRFTOKEN'``
 
 The name of the request header used for CSRF authentication.
@@ -416,8 +413,6 @@ should be ``'HTTP_X_XSRF_TOKEN'``.
 
 ``CSRF_TRUSTED_ORIGINS``
 ------------------------
-
-.. versionadded:: 1.9
 
 Default: ``[]`` (Empty list)
 
@@ -511,12 +506,6 @@ The database backend to use. The built-in database backends are:
 You can use a database backend that doesn't ship with Django by setting
 ``ENGINE`` to a fully-qualified path (i.e. ``mypackage.backends.whatever``).
 
-.. versionchanged:: 1.9
-
-    The ``django.db.backends.postgresql`` backend is named
-    ``django.db.backends.postgresql_psycopg2`` in older releases. For backwards
-    compatibility, the old name still works in newer versions.
-
 .. setting:: HOST
 
 ``HOST``
@@ -604,8 +593,6 @@ default port. Not used with SQLite.
 ``TIME_ZONE``
 ~~~~~~~~~~~~~
 
-.. versionadded:: 1.9
-
 Default: ``None``
 
 A string representing the time zone for datetimes stored in this database
@@ -624,11 +611,6 @@ according to this option if it is set and in UTC if it isn't.
 
 When :setting:`USE_TZ` is ``True`` and the database supports time zones (e.g.
 PostgreSQL), it is an error to set this option.
-
-.. versionchanged:: 1.9
-
-    Before Django 1.9, the PostgreSQL database backend accepted an
-    undocumented ``TIME_ZONE`` option, which caused data corruption.
 
 When :setting:`USE_TZ` is ``False``, it is an error to set this option.
 
@@ -881,6 +863,51 @@ This is an Oracle-specific setting.
 
 The maximum size that the DATAFILE_TMP is allowed to grow to.
 
+.. setting:: DATA_UPLOAD_MAX_MEMORY_SIZE
+
+DATA_UPLOAD_MAX_MEMORY_SIZE
+---------------------------
+
+.. versionadded:: 1.10
+
+Default: ``2621440`` (i.e. 2.5 MB).
+
+The maximum size in bytes that a request body may be before a
+:exc:`~django.core.exceptions.SuspiciousOperation` (``RequestDataTooBig``) is
+raised. The check is done when accessing ``request.body`` or ``request.POST``
+and is calculated against the total request size excluding any file upload
+data. You can set this to ``None`` to disable the check. Applications that are
+expected to receive unusually large form posts should tune this setting.
+
+The amount of request data is correlated to the amount of memory needed to
+process the request and populate the GET and POST dictionaries. Large requests
+could be used as a denial-of-service attack vector if left unchecked. Since web
+servers don't typically perform deep request inspection, it's not possible to
+perform a similar check at that level.
+
+See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
+
+.. setting:: DATA_UPLOAD_MAX_NUMBER_FIELDS
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS
+-----------------------------
+
+.. versionadded:: 1.10
+
+Default: ``1000``
+
+The maximum number of parameters that may be received via GET or POST before a
+:exc:`~django.core.exceptions.SuspiciousOperation` (``TooManyFields``) is
+raised. You can set this to ``None`` to disable the check. Applications that
+are expected to receive an unusually large number of form fields should tune
+this setting.
+
+The number of request parameters is correlated to the amount of time needed to
+process the request and populate the GET and POST dictionaries. Large requests
+could be used as a denial-of-service attack vector if left unchecked. Since web
+servers don't typically perform deep request inspection, it's not possible to
+perform a similar check at that level.
+
 .. setting:: DATABASE_ROUTERS
 
 ``DATABASE_ROUTERS``
@@ -925,15 +952,14 @@ Default::
 
 A list of formats that will be accepted when inputting data on a date field.
 Formats will be tried in order, using the first valid one. Note that these
-format strings use Python's datetime_ module syntax, not the format strings
-from the ``date`` Django template tag.
+format strings use Python's :ref:`datetime module syntax
+<strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
+template filter.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
-
-.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: DATETIME_FORMAT
 
@@ -973,15 +999,14 @@ Default::
 
 A list of formats that will be accepted when inputting data on a datetime
 field. Formats will be tried in order, using the first valid one. Note that
-these format strings use Python's datetime_ module syntax, not the format
-strings from the ``date`` Django template tag.
+these format strings use Python's :ref:`datetime module syntax
+<strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
+template filter.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
-
-.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: DEBUG
 
@@ -1327,6 +1352,8 @@ Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size (in bytes) that an upload will be before it gets streamed to
 the file system. See :doc:`/topics/files` for details.
+
+See also :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`.
 
 .. setting:: FILE_UPLOAD_DIRECTORY_PERMISSIONS
 
@@ -1731,13 +1758,11 @@ __ https://github.com/django/django/blob/master/django/utils/log.py
 Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
-Django project. Points at a instance of Python's `dictConfig`_
-configuration method by default.
+Django project. Points at a instance of Python's :ref:`dictConfig
+<logging-config-dictschema>` configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
-
-.. _dictConfig: https://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
 .. setting:: MANAGERS
 
@@ -1802,10 +1827,27 @@ Example: ``"http://media.example.com/"``
     :setting:`MEDIA_URL` and :setting:`STATIC_URL` must have different
     values. See :setting:`MEDIA_ROOT` for more details.
 
+.. setting:: MIDDLEWARE
+
+``MIDDLEWARE``
+--------------
+
+.. versionadded:: 1.10
+
+Default:: ``None``
+
+A list of middleware to use. See :doc:`/topics/http/middleware`.
+
 .. setting:: MIDDLEWARE_CLASSES
 
 ``MIDDLEWARE_CLASSES``
 ----------------------
+
+.. deprecated:: 1.10
+
+    Old-style middleware that uses  ``settings.MIDDLEWARE_CLASSES`` are
+    deprecated. :ref:`Adapt old, custom middleware <upgrading-middleware>` and
+    use the :setting:`MIDDLEWARE` setting.
 
 Default::
 
@@ -1814,7 +1856,11 @@ Default::
         'django.middleware.csrf.CsrfViewMiddleware',
     ]
 
-A list of middleware classes to use. See :doc:`/topics/http/middleware`.
+A list of middleware classes to use. This was the default setting used in
+Django 1.9 and earlier. Django 1.10 introduced a new style of middleware. If
+you have an older project using this setting you should :ref:`update any
+middleware you've written yourself <upgrading-middleware>` to the new style
+and then use the :setting:`MIDDLEWARE` setting.
 
 .. setting:: MIGRATION_MODULES
 
@@ -1836,8 +1882,6 @@ the ``blog.db_migrations`` package.
 
 If you provide the ``app_label`` argument, :djadmin:`makemigrations` will
 automatically create the package if it doesn't already exist.
-
-.. versionadded:: 1.9
 
 When you supply ``None`` as a value for an app, Django will consider the app as
 an app without migrations regardless of an existing ``migrations`` submodule.
@@ -2196,11 +2240,6 @@ A list of identifiers of messages generated by the system check framework
 (i.e. ``["models.W001"]``) that you wish to permanently acknowledge and ignore.
 Silenced checks will not be output to the console.
 
-.. versionchanged:: 1.9
-
-    In older versions, silenced messages of ``ERROR`` level or higher were
-    printed to the console.
-
 See also the :doc:`/ref/checks` documentation.
 
 .. setting:: TEMPLATES
@@ -2369,15 +2408,14 @@ Default::
 
 A list of formats that will be accepted when inputting data on a time field.
 Formats will be tried in order, using the first valid one. Note that these
-format strings use Python's datetime_ module syntax, not the format strings
-from the ``date`` Django template tag.
+format strings use Python's :ref:`datetime module syntax
+<strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
+template filter.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
-
-.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: TIME_ZONE
 
@@ -2520,22 +2558,26 @@ See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
 Default: ``False``
 
-A boolean that specifies whether to use the X-Forwarded-Host header in
-preference to the Host header. This should only be enabled if a proxy
+A boolean that specifies whether to use the ``X-Forwarded-Host`` header in
+preference to the ``Host`` header. This should only be enabled if a proxy
 which sets this header is in use.
+
+This setting takes priority over :setting:`USE_X_FORWARDED_PORT`. Per
+:rfc:`7239#page-7`, the ``X-Forwarded-Host`` header can include the port
+number, in which case you shouldn't use :setting:`USE_X_FORWARDED_PORT`.
 
 .. setting:: USE_X_FORWARDED_PORT
 
 ``USE_X_FORWARDED_PORT``
 ------------------------
 
-.. versionadded:: 1.9
-
 Default: ``False``
 
-A boolean that specifies whether to use the X-Forwarded-Port header in
+A boolean that specifies whether to use the ``X-Forwarded-Port`` header in
 preference to the ``SERVER_PORT`` ``META`` variable. This should only be
 enabled if a proxy which sets this header is in use.
+
+:setting:`USE_X_FORWARDED_HOST` takes priority over this setting.
 
 .. setting:: WSGI_APPLICATION
 
@@ -2720,8 +2762,6 @@ Default::
 
 ``AUTH_PASSWORD_VALIDATORS``
 ----------------------------
-
-.. versionadded:: 1.9
 
 Default: ``[]`` (Empty list)
 
@@ -3258,11 +3298,14 @@ Globalization (``i18n``/``l10n``)
 
 HTTP
 ----
+* :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`
+* :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS`
 * :setting:`DEFAULT_CHARSET`
 * :setting:`DEFAULT_CONTENT_TYPE`
 * :setting:`DISALLOWED_USER_AGENTS`
 * :setting:`FORCE_SCRIPT_NAME`
 * :setting:`INTERNAL_IPS`
+* :setting:`MIDDLEWARE`
 * :setting:`MIDDLEWARE_CLASSES`
 * Security
 

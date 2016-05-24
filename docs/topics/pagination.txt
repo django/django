@@ -146,6 +146,13 @@ Required arguments
     clause or with a default :attr:`~django.db.models.Options.ordering` on the
     model.
 
+    .. admonition:: Performance issues paginating large ``QuerySet``\s
+
+        If you're using a ``QuerySet`` with a very large number of items,
+        requesting high page numbers might be slow on some databases, because
+        the resulting ``LIMIT``/``OFFSET`` query needs to count the number of
+        ``OFFSET`` records which takes longer as the page number gets higher.
+
 ``per_page``
     The maximum number of items to include on a page, not including orphans
     (see the ``orphans`` optional argument below).
@@ -198,11 +205,6 @@ Attributes
 .. attribute:: Paginator.page_range
 
     A 1-based range iterator of page numbers, e.g. yielding ``[1, 2, 3, 4]``.
-
-    .. versionchanged:: 1.9
-
-        In older versions, ``page_range`` returned a list instead of an
-        iterator.
 
 ``InvalidPage`` exceptions
 ==========================

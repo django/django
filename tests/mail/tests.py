@@ -9,6 +9,7 @@ import smtpd
 import sys
 import tempfile
 import threading
+from email.header import Header
 from email.mime.text import MIMEText
 from smtplib import SMTP, SMTPException
 from ssl import SSLError
@@ -19,7 +20,7 @@ from django.core.mail import (
     send_mail, send_mass_mail,
 )
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
-from django.core.mail.message import BadHeaderError
+from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
@@ -31,8 +32,10 @@ if PY3:
     from email import message_from_bytes, message_from_binary_file
 else:
     from email.Utils import parseaddr
-    from email import (message_from_string as message_from_bytes,
-        message_from_file as message_from_binary_file)
+    from email import (
+        message_from_string as message_from_bytes,
+        message_from_file as message_from_binary_file,
+    )
 
 
 class HeadersCheckMixin(object):
@@ -565,6 +568,42 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         # Verify that the child message header is not base64 encoded
         self.assertIn(str('Child Subject'), parent_s)
 
+    def test_sanitize_address(self):
+        """
+        Email addresses are properly sanitized.
+        """
+        # Simple ASCII address - string form
+        self.assertEqual(sanitize_address('to@example.com', 'ascii'), 'to@example.com')
+        self.assertEqual(sanitize_address('to@example.com', 'utf-8'), 'to@example.com')
+        # Bytestrings are transformed to normal strings.
+        self.assertEqual(sanitize_address(b'to@example.com', 'utf-8'), 'to@example.com')
+
+        # Simple ASCII address - tuple form
+        self.assertEqual(
+            sanitize_address(('A name', 'to@example.com'), 'ascii'),
+            'A name <to@example.com>'
+        )
+        if PY3:
+            self.assertEqual(
+                sanitize_address(('A name', 'to@example.com'), 'utf-8'),
+                '=?utf-8?q?A_name?= <to@example.com>'
+            )
+        else:
+            self.assertEqual(
+                sanitize_address(('A name', 'to@example.com'), 'utf-8'),
+                'A name <to@example.com>'
+            )
+
+        # Unicode characters are are supported in RFC-6532.
+        self.assertEqual(
+            sanitize_address('tó@example.com', 'utf-8'),
+            '=?utf-8?b?dMOz?=@example.com'
+        )
+        self.assertEqual(
+            sanitize_address(('Tó Example', 'tó@example.com'), 'utf-8'),
+            '=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>'
+        )
+
 
 class PythonGlobalState(SimpleTestCase):
     """
@@ -613,9 +652,10 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
 
     def get_the_message(self):
         mailbox = self.get_mailbox_content()
-        self.assertEqual(len(mailbox), 1,
-            "Expected exactly one message, got %d.\n%r" % (len(mailbox), [
-                m.as_string() for m in mailbox]))
+        self.assertEqual(
+            len(mailbox), 1,
+            "Expected exactly one message, got %d.\n%r" % (len(mailbox), [m.as_string() for m in mailbox])
+        )
         return mailbox[0]
 
     def test_send(self):
@@ -635,6 +675,22 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         message = self.get_the_message()
         self.assertEqual(message["subject"], '=?utf-8?q?Ch=C3=A8re_maman?=')
         self.assertEqual(force_text(message.get_payload(decode=True)), 'Je t\'aime très fort')
+
+    def test_send_long_lines(self):
+        """
+        Email line length is limited to 998 chars by the RFC:
+        https://tools.ietf.org/html/rfc5322#section-2.1.1
+        Message body containing longer lines are converted to Quoted-Printable
+        to avoid having to insert newlines, which could be hairy to do properly.
+        """
+        email = EmailMessage('Subject', "Comment ça va? " * 100, 'from@example.com', ['to@example.com'])
+        email.send()
+        message = self.get_the_message()
+        self.assertMessageHasHeaders(message, {
+            ('MIME-Version', '1.0'),
+            ('Content-Type', 'text/plain; charset="utf-8"'),
+            ('Content-Transfer-Encoding', 'quoted-printable'),
+        })
 
     def test_send_many(self):
         email1 = EmailMessage('Subject', 'Content1', 'from@example.com', ['to@example.com'])
@@ -769,8 +825,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         self.assertEqual(message.get('to'), 'to@xn--4ca9at.com')
 
         self.flush_mailbox()
-        m = EmailMessage('Subject', 'Content', 'from@öäü.com',
-                     ['to@öäü.com'], cc=['cc@öäü.com'])
+        m = EmailMessage('Subject', 'Content', 'from@öäü.com', ['to@öäü.com'], cc=['cc@öäü.com'])
         m.send()
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')
@@ -1008,6 +1063,15 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
             data = data.encode('utf-8')
         m = message_from_bytes(data)
         maddr = parseaddr(m.get('from'))[1]
+
+        if mailfrom != maddr:
+            # According to the spec, mailfrom does not necessarily match the
+            # From header - on Python 3 this is the case where the local part
+            # isn't encoded, so try to correct that.
+            lp, domain = mailfrom.split('@', 1)
+            lp = Header(lp, 'utf-8').encode()
+            mailfrom = '@'.join([lp, domain])
+
         if mailfrom != maddr:
             return "553 '%s' != '%s'" % (mailfrom, maddr)
         with self.sink_lock:

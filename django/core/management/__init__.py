@@ -76,7 +76,7 @@ def get_commands():
     return commands
 
 
-def call_command(name, *args, **options):
+def call_command(command_name, *args, **options):
     """
     Calls the given command, with the given options and args/kwargs.
 
@@ -95,25 +95,25 @@ def call_command(name, *args, **options):
         call_command(cmd, verbosity=0, interactive=False)
         # Do something with cmd ...
     """
-    if isinstance(name, BaseCommand):
+    if isinstance(command_name, BaseCommand):
         # Command object passed in.
-        command = name
-        name = command.__class__.__module__.split('.')[-1]
+        command = command_name
+        command_name = command.__class__.__module__.split('.')[-1]
     else:
         # Load the command object by name.
         try:
-            app_name = get_commands()[name]
+            app_name = get_commands()[command_name]
         except KeyError:
-            raise CommandError("Unknown command: %r" % name)
+            raise CommandError("Unknown command: %r" % command_name)
 
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.
             command = app_name
         else:
-            command = load_command_class(app_name, name)
+            command = load_command_class(app_name, command_name)
 
     # Simulate argument parsing to get the option defaults (see #10080 for details).
-    parser = command.create_parser('', name)
+    parser = command.create_parser('', command_name)
     # Use the `dest` option name from the parser option
     opt_mapping = {
         sorted(s_opt.option_strings)[0].lstrip('-').replace('-', '_'): s_opt.dest
@@ -196,8 +196,10 @@ class ManagementUtility(object):
                 settings.INSTALLED_APPS
             else:
                 sys.stderr.write("No Django settings specified.\n")
-            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" %
-                (subcommand, self.prog_name))
+            sys.stderr.write(
+                "Unknown command: %r\nType '%s help' for usage.\n"
+                % (subcommand, self.prog_name)
+            )
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.
@@ -276,7 +278,10 @@ class ManagementUtility(object):
                 if option[1]:
                     opt_label += '='
                 print(opt_label)
-        sys.exit(1)
+        # Exit code of the bash completion function is never passed back to
+        # the user, so it's safe to always exit with 0.
+        # For more details see #25420.
+        sys.exit(0)
 
     def execute(self):
         """

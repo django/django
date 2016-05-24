@@ -13,13 +13,14 @@ from django.db import (
     DJANGO_VERSION_PICKLE_KEY, IntegrityError, connections, router,
     transaction,
 )
-from django.db.models import sql
+from django.db.models import DateField, DateTimeField, sql
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Date, DateTime, F
+from django.db.models.expressions import F
 from django.db.models.fields import AutoField
+from django.db.models.functions import Trunc
 from django.db.models.query_utils import (
-    InvalidQuery, Q, check_rel_lookup_compatibility, deferred_class_factory,
+    InvalidQuery, Q, check_rel_lookup_compatibility,
 )
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
@@ -60,11 +61,6 @@ class ModelIterable(BaseIterable):
         model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
         init_list = [f[0].target.attname
                      for f in select[model_fields_start:model_fields_end]]
-        if len(init_list) != len(model_cls._meta.concrete_fields):
-            init_set = set(init_list)
-            skip = [f.attname for f in model_cls._meta.concrete_fields
-                    if f.attname not in init_set]
-            model_cls = deferred_class_factory(model_cls, skip)
         related_populators = get_related_populators(klass_info, select, db)
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
@@ -220,9 +216,10 @@ class QuerySet(object):
         if pickled_version:
             current_version = get_version()
             if current_version != pickled_version:
-                msg = ("Pickled queryset instance's Django version %s does"
-                    " not match the current version %s."
-                    % (pickled_version, current_version))
+                msg = (
+                    "Pickled queryset instance's Django version %s does not "
+                    "match the current version %s." % (pickled_version, current_version)
+                )
         else:
             msg = "Pickled queryset instance's Django version is not specified."
 
@@ -443,8 +440,8 @@ class QuerySet(object):
         objs = list(objs)
         self._populate_pk_values(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
-                    and self.model._meta.has_auto_field):
+            if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk and
+                    self.model._meta.has_auto_field):
                 self._batched_insert(objs, fields, batch_size)
             else:
                 objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
@@ -673,9 +670,7 @@ class QuerySet(object):
     def raw(self, raw_query, params=None, translations=None, using=None):
         if using is None:
             using = self.db
-        return RawQuerySet(raw_query, model=self.model,
-                params=params, translations=translations,
-                using=using)
+        return RawQuerySet(raw_query, model=self.model, params=params, translations=translations, using=using)
 
     def _values(self, *fields):
         clone = self._clone()
@@ -726,8 +721,7 @@ class QuerySet(object):
     def values_list(self, *fields, **kwargs):
         flat = kwargs.pop('flat', False)
         if kwargs:
-            raise TypeError('Unexpected keyword arguments to values_list: %s'
-                    % (list(kwargs),))
+            raise TypeError('Unexpected keyword arguments to values_list: %s' % (list(kwargs),))
 
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
@@ -746,7 +740,7 @@ class QuerySet(object):
         assert order in ('ASC', 'DESC'), \
             "'order' must be either 'ASC' or 'DESC'."
         return self.annotate(
-            datefield=Date(field_name, kind),
+            datefield=Trunc(field_name, kind, output_field=DateField()),
             plain_field=F(field_name)
         ).values_list(
             'datefield', flat=True
@@ -767,7 +761,7 @@ class QuerySet(object):
         else:
             tzinfo = None
         return self.annotate(
-            datetimefield=DateTime(field_name, kind, tzinfo),
+            datetimefield=Trunc(field_name, kind, output_field=DateTimeField(), tzinfo=tzinfo),
             plain_field=F(field_name)
         ).values_list(
             'datetimefield', flat=True
@@ -1063,15 +1057,13 @@ class QuerySet(object):
         inserted_ids = []
         for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
             if connections[self.db].features.can_return_ids_from_bulk_insert:
-                inserted_id = self.model._base_manager._insert(
-                    item, fields=fields, using=self.db, return_id=True
-                )
+                inserted_id = self._insert(item, fields=fields, using=self.db, return_id=True)
                 if len(objs) > 1:
                     inserted_ids.extend(inserted_id)
                 if len(objs) == 1:
                     inserted_ids.append(inserted_id)
             else:
-                self.model._base_manager._insert(item, fields=fields, using=self.db)
+                self._insert(item, fields=fields, using=self.db)
         return inserted_ids
 
     def _clone(self, **kwargs):
@@ -1116,8 +1108,10 @@ class QuerySet(object):
                 set(self.query.values_select) != set(other.query.values_select) or
                 set(self.query.extra_select) != set(other.query.extra_select) or
                 set(self.query.annotation_select) != set(other.query.annotation_select)):
-            raise TypeError("Merging '%s' classes must involve the same values in each case."
-                    % self.__class__.__name__)
+            raise TypeError(
+                "Merging '%s' classes must involve the same values in each case."
+                % self.__class__.__name__
+            )
 
     def _merge_known_related_objects(self, other):
         """
@@ -1214,7 +1208,7 @@ class RawQuerySet(object):
     annotated model instances.
     """
     def __init__(self, raw_query, model=None, query=None, params=None,
-            translations=None, using=None, hints=None):
+                 translations=None, using=None, hints=None):
         self.raw_query = raw_query
         self.model = model
         self._db = using
@@ -1254,9 +1248,7 @@ class RawQuerySet(object):
             if skip:
                 if self.model._meta.pk.attname in skip:
                     raise InvalidQuery('Raw query must include the primary key')
-                model_cls = deferred_class_factory(self.model, skip)
-            else:
-                model_cls = self.model
+            model_cls = self.model
             fields = [self.model_fields.get(c) for c in self.columns]
             converters = compiler.get_converters([
                 f.get_col(f.model._meta.db_table) if f else None for f in fields
@@ -1291,10 +1283,12 @@ class RawQuerySet(object):
         """
         Selects which database this Raw QuerySet should execute its query against.
         """
-        return RawQuerySet(self.raw_query, model=self.model,
-                query=self.query.clone(using=alias),
-                params=self.params, translations=self.translations,
-                using=alias)
+        return RawQuerySet(
+            self.raw_query, model=self.model,
+            query=self.query.clone(using=alias),
+            params=self.params, translations=self.translations,
+            using=alias,
+        )
 
     @property
     def columns(self):
@@ -1336,6 +1330,8 @@ class Prefetch(object):
         self.prefetch_through = lookup
         # `prefetch_to` is the path to the attribute that stores the result.
         self.prefetch_to = lookup
+        if queryset is not None and queryset._iterable_class is not ModelIterable:
+            raise ValueError('Prefetch querysets cannot use values().')
         if to_attr:
             self.prefetch_to = LOOKUP_SEP.join(lookup.split(LOOKUP_SEP)[:-1] + [to_attr])
 
@@ -1716,7 +1712,7 @@ class RelatedPopulator(object):
                 return [row[row_pos] for row_pos in pos_list]
             self.reorder_for_init = reorder_for_init
 
-        self.model_cls = self.get_deferred_cls(klass_info, self.init_list)
+        self.model_cls = klass_info['model']
         self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
         self.related_populators = get_related_populators(klass_info, select, self.db)
         field = klass_info['field']
@@ -1729,17 +1725,6 @@ class RelatedPopulator(object):
             self.cache_name = field.get_cache_name()
             if field.unique:
                 self.reverse_cache_name = field.remote_field.get_cache_name()
-
-    def get_deferred_cls(self, klass_info, init_list):
-        model_cls = klass_info['model']
-        if len(init_list) != len(model_cls._meta.concrete_fields):
-            init_set = set(init_list)
-            skip = [
-                f.attname for f in model_cls._meta.concrete_fields
-                if f.attname not in init_set
-            ]
-            model_cls = deferred_class_factory(model_cls, skip)
-        return model_cls
 
     def populate(self, row, from_obj):
         if self.reorder_for_init:

@@ -188,7 +188,7 @@ If the ``source`` command is not available, you can try using a dot instead:
 You have to activate the virtualenv whenever you open a new terminal window.
 virtualenvwrapper__ is a useful tool for making this more convenient.
 
-__ https://virtualenvwrapper.readthedocs.org/en/latest/
+__ https://virtualenvwrapper.readthedocs.io/en/latest/
 
 Anything you install through ``pip`` from now on will be installed in your new
 virtualenv, isolated from other environments and system-wide packages. Also, the
@@ -273,7 +273,10 @@ passing tests.
 Skipped tests are typically due to missing external libraries required to run
 the test; see :ref:`running-unit-tests-dependencies` for a list of dependencies
 and be sure to install any for tests related to the changes you are making (we
-won't need any for this tutorial).
+won't need any for this tutorial). Some tests are specific to a particular
+database backend and will be skipped if not testing with that backend. SQLite
+is the database backend for the default settings. To run the tests using a
+different backend, see :ref:`running-unit-tests-settings`.
 
 Once the tests complete, you should be greeted with a message informing you
 whether the test suite passed or failed. Since you haven't yet made any changes
@@ -370,10 +373,9 @@ that passing a ``prefix`` parameter when creating an instance still works too.
     * Dive Into Python (a free online book for beginning Python developers)
       includes a great `introduction to Unit Testing`__.
     * After reading those, if you want something a little meatier to sink
-      your teeth into, there's always the `Python unittest documentation`__.
+      your teeth into, there's always the Python :mod:`unittest` documentation.
 
 __ http://www.diveintopython.net/unit_testing/index.html
-__ https://docs.python.org/library/unittest.html
 
 Running your new test
 ---------------------

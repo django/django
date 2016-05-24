@@ -233,7 +233,7 @@ See :doc:`/howto/error-reporting` for details on error reporting by email.
     Consider using an error monitoring system such as Sentry_ before your
     inbox is flooded by reports. Sentry can also aggregate logs.
 
-    .. _Sentry: https://sentry.readthedocs.org/en/latest/
+    .. _Sentry: https://docs.getsentry.com/
 
 Customize the default error views
 ---------------------------------
@@ -264,4 +264,4 @@ drastically increase CPU usage by causing worst-case performance when
 creating ``dict`` instances. See `oCERT advisory #2011-003
 <http://www.ocert.org/advisories/ocert-2011-003.html>`_ for more information.
 
-.. _-r: https://docs.python.org/using/cmdline.html#cmdoption-R
+.. _-r: https://docs.python.org/2/using/cmdline.html#cmdoption-R

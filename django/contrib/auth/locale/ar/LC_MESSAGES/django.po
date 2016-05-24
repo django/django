@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmad Khayyat <akhayyat@gmail.com>, 2013
-# Bashar Al-Abdulhadi, 2015
+# Bashar Al-Abdulhadi, 2015-2016
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-11-27 21:15+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-04-02 11:55+0000\n"
+"Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,13 +66,15 @@ msgid "Password confirmation"
 msgstr "تأكيد كلمة المرور"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "أدخل كلمة المرور أعلاه مرة أخرى لتأكيدها."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"../password/"
 "\">this form</a>."
 msgstr ""
+"لا يتم حفظ كلمات المرور كما هي، لذلك لا يمكن عرض كلمة السر هذه، ولكن يمكن "
+"تغييرها باستخدام <a href=\"../password/\">هذا النموذج</a>."
 
 #, python-format
 msgid ""
@@ -172,7 +174,7 @@ msgid ""
 "Enter a valid username. This value may contain only letters, numbers and @/./"
 "+/-/_ characters."
 msgstr ""
-"أدخل اسم مستخدم صحيح. هذه القيمة يمكن ان تتضمن على الأحرف, الأرقام و رموز "
+"أدخل اسم مستخدم صحيح. اسم المستخدم يمكن ان يتضمن على الأحرف, الأرقام و رموز "
 "@/./+/-/_"
 
 msgid "A user with that username already exists."
@@ -220,40 +222,49 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرف على الأقل."
 msgstr[1] ""
+"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرف واحد على الأقل."
 msgstr[2] ""
+"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرفين على الأقل."
 msgstr[3] ""
+"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حروف على الأقل."
 msgstr[4] ""
+"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرف على الأقل."
 msgstr[5] ""
+"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرف على الأقل."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
+msgstr[0] "كلمة المرور الخاصة بك يجب أن تتضمن %(min_length)d حرف على الأقل."
 msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+"كلمة المرور الخاصة بك يجب أن تتضمن %(min_length)d حرف واحد على الأقل."
+msgstr[2] "كلمة المرور الخاصة بك يجب أن تتضمن %(min_length)d حرفين على الأقل."
+msgstr[3] "كلمة المرور الخاصة بك يجب أن تتضمن %(min_length)d حروف على الأقل."
+msgstr[4] "كلمة المرور الخاصة بك يجب أن تتضمن %(min_length)d أحرف على الأقل."
+msgstr[5] "كلمة المرور الخاصة بك يجب أن تتضمن %(min_length)d حرف على الأقل."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "كلمة المرور هذه مشابة جدا لـ %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
 msgstr ""
+"كلمة المرور الخاصة بكم لا يمكن أن تكون مشابة لأي من المعلومات الشخصية الأخرى "
+"الخاصة بك."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "كلمة المرور هذه شائعة جدا."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "كلمة المرور الخاصة بك لا يمكن أن تكون كلمة مرور مستخدمة بشكل شائع."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "كلمة المرور هذه تتكون من أرقام فقط."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "كلمة المرور الخاصة بك لا يمكن أن تكون أرقام فقط."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

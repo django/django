@@ -863,7 +863,7 @@ TEST_RESULTS = {
             'm2m_concrete_rel',
         ],
     },
-    'virtual_fields': {
+    'private_fields': {
         AbstractPerson: [
             'generic_relation_abstract',
             'content_object_abstract',

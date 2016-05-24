@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-import datetime
+import functools
 import re
 from itertools import chain
 
@@ -11,7 +11,9 @@ from django.db.migrations.migration import Migration
 from django.db.migrations.operations.models import AlterModelOptions
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import MigrationQuestioner
-from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
+from django.db.migrations.utils import (
+    COMPILED_REGEX_TYPE, RegexObject, get_migration_name_timestamp,
+)
 from django.utils import six
 
 from .topological_sort import stable_topological_sort
@@ -63,6 +65,8 @@ class MigrationAutodetector(object):
                 key: self.deep_deconstruct(value)
                 for key, value in obj.items()
             }
+        elif isinstance(obj, functools.partial):
+            return (obj.func, self.deep_deconstruct(obj.args), self.deep_deconstruct(obj.keywords))
         elif isinstance(obj, COMPILED_REGEX_TYPE):
             return RegexObject(obj)
         elif isinstance(obj, type):
@@ -215,8 +219,8 @@ class MigrationAutodetector(object):
             old_model_state = self.from_state.models[app_label, old_model_name]
             for field_name, field in old_model_state.fields:
                 old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(field_name)
-                if (hasattr(old_field, "remote_field") and getattr(old_field.remote_field, "through", None)
-                        and not old_field.remote_field.through._meta.auto_created):
+                if (hasattr(old_field, "remote_field") and getattr(old_field.remote_field, "through", None) and
+                        not old_field.remote_field.through._meta.auto_created):
                     through_key = (
                         old_field.remote_field.through._meta.app_label,
                         old_field.remote_field.through._meta.model_name,
@@ -509,8 +513,8 @@ class MigrationAutodetector(object):
                             related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
-                    if (getattr(field.remote_field, "through", None)
-                            and not field.remote_field.through._meta.auto_created):
+                    if (getattr(field.remote_field, "through", None) and
+                            not field.remote_field.through._meta.auto_created):
                         related_fields[field.name] = field
             for field in model_opts.local_many_to_many:
                 if field.remote_field.model:
@@ -671,8 +675,8 @@ class MigrationAutodetector(object):
                         related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
-                    if (getattr(field.remote_field, "through", None)
-                            and not field.remote_field.through._meta.auto_created):
+                    if (getattr(field.remote_field, "through", None) and
+                            not field.remote_field.through._meta.auto_created):
                         related_fields[field.name] = field
             for field in model._meta.local_many_to_many:
                 if field.remote_field.model:
@@ -799,10 +803,16 @@ class MigrationAutodetector(object):
         # You can't just add NOT NULL fields with no default or fields
         # which don't allow empty strings as default.
         preserve_default = True
-        if (not field.null and not field.has_default() and not field.many_to_many and
-                not (field.blank and field.empty_strings_allowed)):
+        time_fields = (models.DateField, models.DateTimeField, models.TimeField)
+        if (not field.null and not field.has_default() and
+                not field.many_to_many and
+                not (field.blank and field.empty_strings_allowed) and
+                not (isinstance(field, time_fields) and field.auto_now)):
             field = field.clone()
-            field.default = self.questioner.ask_not_null_addition(field_name, model_name)
+            if isinstance(field, time_fields) and field.auto_now_add:
+                field.default = self.questioner.ask_auto_now_add_addition(field_name, model_name)
+            else:
+                field.default = self.questioner.ask_not_null_addition(field_name, model_name)
             preserve_default = False
         self.add_operation(
             app_label,
@@ -1145,7 +1155,7 @@ class MigrationAutodetector(object):
         elif len(ops) > 1:
             if all(isinstance(o, operations.CreateModel) for o in ops):
                 return "_".join(sorted(o.name_lower for o in ops))
-        return "auto_%s" % datetime.datetime.now().strftime("%Y%m%d_%H%M")
+        return "auto_%s" % get_migration_name_timestamp()
 
     @classmethod
     def parse_number(cls, name):

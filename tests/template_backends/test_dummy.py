@@ -2,9 +2,13 @@
 
 from __future__ import unicode_literals
 
+import re
+
 from django.forms import CharField, Form, Media
 from django.http import HttpRequest
-from django.middleware.csrf import CsrfViewMiddleware, get_token
+from django.middleware.csrf import (
+    CsrfViewMiddleware, _compare_salted_tokens as equivalent_tokens, get_token,
+)
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.backends.dummy import TemplateStrings
 from django.test import SimpleTestCase
@@ -81,11 +85,10 @@ class TemplateStringsTests(SimpleTestCase):
         template = self.engine.get_template('template_backends/csrf.html')
         content = template.render(request=request)
 
-        expected = (
-            '<input type="hidden" name="csrfmiddlewaretoken" '
-            'value="{}" />'.format(get_token(request)))
-
-        self.assertHTMLEqual(content, expected)
+        expected = '<input type="hidden" name="csrfmiddlewaretoken" value="([^"]+)" />'
+        match = re.match(expected, content) or re.match(expected.replace('"', "'"), content)
+        self.assertTrue(match, "hidden csrftoken field not found in output")
+        self.assertTrue(equivalent_tokens(match.group(1), get_token(request)))
 
     def test_no_directory_traversal(self):
         with self.assertRaises(TemplateDoesNotExist):

@@ -144,8 +144,6 @@ If the URL does not resolve, the function raises a
 
     .. attribute:: ResolverMatch.app_names
 
-        .. versionadded:: 1.9
-
         The list of individual namespace components in the full
         application namespace for the URL pattern that matches the URL.
         For example, if the ``app_name`` is ``'foo:bar'``, then ``app_names``

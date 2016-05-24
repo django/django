@@ -29,11 +29,19 @@ Available ``Meta`` options
 
         app_label = 'myapp'
 
-    .. versionadded:: 1.9
-
     If you want to represent a model with the format ``app_label.object_name``
     or ``app_label.model_name`` you can use ``model._meta.label``
     or ``model._meta.label_lower`` respectively.
+
+``base_manager_name``
+---------------------
+
+.. attribute:: Options.base_manager_name
+
+.. versionadded:: 1.10
+
+The name of the manager to use for the model's
+:attr:`~django.db.models.Model._base_manager`.
 
 ``db_table``
 ------------
@@ -94,6 +102,16 @@ Django quotes column and table names behind the scenes.
     for this model. The default is the project's :setting:`DEFAULT_TABLESPACE`
     setting, if set. If the backend doesn't support tablespaces, this option is
     ignored.
+
+``default_manager_name``
+------------------------
+
+.. attribute:: Options.default_manager_name
+
+.. versionadded:: 1.10
+
+The name of the manager to use for the model's
+:attr:`~django.db.models.Model._default_manager`.
 
 ``default_related_name``
 ------------------------
@@ -332,8 +350,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.required_db_features
 
-    .. versionadded:: 1.9
-
     List of database features that the current connection should have so that
     the model is considered during the migration phase. For example, if you set
     this list to ``['gis_enabled']``, the model will only be synchronized on
@@ -345,8 +361,6 @@ Django quotes column and table names behind the scenes.
 ----------------------
 
 .. attribute:: Options.required_db_vendor
-
-    .. versionadded:: 1.9
 
     Name of a supported database vendor that this model is specific to. Current
     built-in vendor names are: ``sqlite``, ``postgresql``, ``mysql``,
@@ -451,8 +465,6 @@ Read-only ``Meta`` attributes
 
 .. attribute:: Options.label
 
-    .. versionadded:: 1.9
-
     Representation of the object, returns ``app_label.object_name``, e.g.
     ``'polls.Question'``.
 
@@ -460,8 +472,6 @@ Read-only ``Meta`` attributes
 ---------------
 
 .. attribute:: Options.label_lower
-
-    .. versionadded:: 1.9
 
     Representation of the model, returns ``app_label.model_name``, e.g.
     ``'polls.question'``.

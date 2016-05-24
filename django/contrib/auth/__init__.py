@@ -82,8 +82,7 @@ def authenticate(**credentials):
         return user
 
     # The credentials supplied are invalid to all backends, fire signal
-    user_login_failed.send(sender=__name__,
-            credentials=_clean_credentials(credentials))
+    user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials))
 
 
 def login(request, user, backend=None):
@@ -101,7 +100,7 @@ def login(request, user, backend=None):
     if SESSION_KEY in request.session:
         if _get_user_session_key(request) != user.pk or (
                 session_auth_hash and
-                request.session.get(HASH_SESSION_KEY) != session_auth_hash):
+                not constant_time_compare(request.session.get(HASH_SESSION_KEY, ''), session_auth_hash)):
             # To avoid reusing another user's session, create a new, empty
             # session if the existing session corresponds to a different
             # authenticated user.
@@ -139,7 +138,7 @@ def logout(request):
     # Dispatch the signal before the user is logged out so the receivers have a
     # chance to find out *who* logged out.
     user = getattr(request, 'user', None)
-    if hasattr(user, 'is_authenticated') and not user.is_authenticated():
+    if hasattr(user, 'is_authenticated') and not user.is_authenticated:
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
 

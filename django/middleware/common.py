@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
 from django.urls import is_valid_path
 from django.utils.cache import get_conditional_response, set_response_etag
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_text
 from django.utils.http import unquote_etag
 from django.utils.six.moves.urllib.parse import urlparse
@@ -14,7 +15,7 @@ from django.utils.six.moves.urllib.parse import urlparse
 logger = logging.getLogger('django.request')
 
 
-class CommonMiddleware(object):
+class CommonMiddleware(MiddlewareMixin):
     """
     "Common" middleware for taking care of some basic operations:
 
@@ -76,8 +77,8 @@ class CommonMiddleware(object):
         if settings.APPEND_SLASH and not request.get_full_path().endswith('/'):
             urlconf = getattr(request, 'urlconf', None)
             return (
-                not is_valid_path(request.path_info, urlconf)
-                and is_valid_path('%s/' % request.path_info, urlconf)
+                not is_valid_path(request.path_info, urlconf) and
+                is_valid_path('%s/' % request.path_info, urlconf)
             )
         return False
 
@@ -129,7 +130,7 @@ class CommonMiddleware(object):
         return response
 
 
-class BrokenLinkEmailsMiddleware(object):
+class BrokenLinkEmailsMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         """

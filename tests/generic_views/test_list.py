@@ -238,8 +238,7 @@ class ListViewTests(TestCase):
         self._make_authors(1)
         res = self.client.get('/list/authors/paginated/2/')
         self.assertEqual(res.status_code, 404)
-        self.assertEqual(force_str(res.context.get('reason')),
-                "Invalid page (2): That page contains no results")
+        self.assertEqual(force_str(res.context.get('reason')), "Invalid page (2): That page contains no results")
 
     def _make_authors(self, n):
         Author.objects.all().delete()

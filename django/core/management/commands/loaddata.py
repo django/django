@@ -32,21 +32,26 @@ except ImportError:
 
 class Command(BaseCommand):
     help = 'Installs the named fixture(s) in the database.'
-    missing_args_message = ("No database fixture specified. Please provide the "
-                            "path of at least one fixture in the command line.")
+    missing_args_message = (
+        "No database fixture specified. Please provide the path of at least "
+        "one fixture in the command line."
+    )
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='fixture', nargs='+',
-            help='Fixture labels.')
-        parser.add_argument('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
-            'fixtures into. Defaults to the "default" database.')
-        parser.add_argument('--app', action='store', dest='app_label',
-            default=None, help='Only look for fixtures in the specified app.')
-        parser.add_argument('--ignorenonexistent', '-i', action='store_true',
-            dest='ignore', default=False,
+        parser.add_argument('args', metavar='fixture', nargs='+', help='Fixture labels.')
+        parser.add_argument(
+            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a specific database to load fixtures into. Defaults to the "default" database.',
+        )
+        parser.add_argument(
+            '--app', action='store', dest='app_label', default=None,
+            help='Only look for fixtures in the specified app.',
+        )
+        parser.add_argument(
+            '--ignorenonexistent', '-i', action='store_true', dest='ignore', default=False,
             help='Ignores entries in the serialized data for fields that do not '
-            'currently exist on the model.')
+                 'currently exist on the model.',
+        )
 
     def handle(self, *fixture_labels, **options):
 
@@ -120,11 +125,15 @@ class Command(BaseCommand):
 
         if self.verbosity >= 1:
             if self.fixture_object_count == self.loaded_object_count:
-                self.stdout.write("Installed %d object(s) from %d fixture(s)" %
-                    (self.loaded_object_count, self.fixture_count))
+                self.stdout.write(
+                    "Installed %d object(s) from %d fixture(s)"
+                    % (self.loaded_object_count, self.fixture_count)
+                )
             else:
-                self.stdout.write("Installed %d object(s) (of %d) from %d fixture(s)" %
-                    (self.loaded_object_count, self.fixture_object_count, self.fixture_count))
+                self.stdout.write(
+                    "Installed %d object(s) (of %d) from %d fixture(s)"
+                    % (self.loaded_object_count, self.fixture_object_count, self.fixture_count)
+                )
 
     def load_label(self, fixture_label):
         """
@@ -140,11 +149,14 @@ class Command(BaseCommand):
                 objects_in_fixture = 0
                 loaded_objects_in_fixture = 0
                 if self.verbosity >= 2:
-                    self.stdout.write("Installing %s fixture '%s' from %s." %
-                        (ser_fmt, fixture_name, humanize(fixture_dir)))
+                    self.stdout.write(
+                        "Installing %s fixture '%s' from %s."
+                        % (ser_fmt, fixture_name, humanize(fixture_dir))
+                    )
 
-                objects = serializers.deserialize(ser_fmt, fixture,
-                    using=self.using, ignorenonexistent=self.ignore)
+                objects = serializers.deserialize(
+                    ser_fmt, fixture, using=self.using, ignorenonexistent=self.ignore,
+                )
 
                 for obj in objects:
                     objects_in_fixture += 1
@@ -208,8 +220,10 @@ class Command(BaseCommand):
                                 for dir_ in fixture_dirs]
                 fixture_name = os.path.basename(fixture_name)
 
-        suffixes = ('.'.join(ext for ext in combo if ext)
-                for combo in product(databases, ser_fmts, cmp_fmts))
+        suffixes = (
+            '.'.join(ext for ext in combo if ext)
+            for combo in product(databases, ser_fmts, cmp_fmts)
+        )
         targets = set('.'.join((fixture_name, suffix)) for suffix in suffixes)
 
         fixture_files = []

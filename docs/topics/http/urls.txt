@@ -41,8 +41,8 @@ algorithm the system follows to determine which Python code to execute:
 1. Django determines the root URLconf module to use. Ordinarily,
    this is the value of the :setting:`ROOT_URLCONF` setting, but if the incoming
    ``HttpRequest`` object has a :attr:`~django.http.HttpRequest.urlconf`
-   attribute (set by middleware :ref:`request processing <request-middleware>`),
-   its value will be used in place of the :setting:`ROOT_URLCONF` setting.
+   attribute (set by middleware), its value will be used in place of the
+   :setting:`ROOT_URLCONF` setting.
 
 2. Django loads that Python module and looks for the variable
    ``urlpatterns``. This should be a Python list of :func:`django.conf.urls.url`
@@ -626,7 +626,7 @@ way to tell these named URLs apart.
 Django applications that make proper use of URL namespacing can be deployed more
 than once for a particular site. For example :mod:`django.contrib.admin` has an
 :class:`~django.contrib.admin.AdminSite` class which allows you to easily
-:ref:`deploy more than once instance of the admin <multiple-admin-sites>`.
+:ref:`deploy more than one instance of the admin <multiple-admin-sites>`.
 In a later example, we'll discuss the idea of deploying the polls application
 from the tutorial in two different locations so we can serve the same
 functionality to two different audiences (authors and publishers).
@@ -678,12 +678,6 @@ the fully qualified name into parts and then tries the following lookup:
    :class:`~django.template.RequestContext`. You can override this default by
    setting the current application on the :attr:`request.current_app
    <django.http.HttpRequest.current_app>` attribute.
-
-   .. versionchanged:: 1.9
-
-      Previously, the :ttag:`url` template tag did not use the namespace of the
-      currently resolved view and you had to set the ``current_app`` attribute
-      on the request.
 
 3. If there is no current application. Django looks for a default
    application instance. The default application instance is the instance
@@ -831,11 +825,3 @@ The instance namespace can be specified using the ``namespace`` argument to
 :func:`~django.conf.urls.include`. If the instance namespace is not specified,
 it will default to the included URLconf's application namespace. This means
 it will also be the default instance for that namespace.
-
-.. versionchanged:: 1.9
-
-    In previous versions, you had to specify both the application namespace
-    and the instance namespace in a single place, either by passing them as
-    parameters to :func:`~django.conf.urls.include` or by including a 3-tuple
-    containing
-    ``(<list of url() instances>, <application namespace>, <instance namespace>)``.

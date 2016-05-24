@@ -9,7 +9,7 @@ import warnings
 from django.template import Origin, Template, TemplateDoesNotExist
 from django.template.backends.django import copy_exception
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_text
 from django.utils.inspect import func_supports_parameter
 
 from .base import Loader as BaseLoader
@@ -100,7 +100,7 @@ class Loader(BaseLoader):
         if template_dirs:
             dirs_prefix = self.generate_hash(template_dirs)
 
-        return ("%s-%s-%s" % (template_name, skip_prefix, dirs_prefix)).strip('-')
+        return '-'.join(filter(bool, [force_text(template_name), skip_prefix, dirs_prefix]))
 
     def generate_hash(self, values):
         return hashlib.sha1(force_bytes('|'.join(values))).hexdigest()

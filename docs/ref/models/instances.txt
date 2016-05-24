@@ -73,13 +73,12 @@ when loading from the database.
 The ``db`` argument contains the database alias for the database the model
 is loaded from, ``field_names`` contains the names of all loaded fields, and
 ``values`` contains the loaded values for each field in ``field_names``. The
-``field_names`` are in the same order as the ``values``, so it is possible to
-use ``cls(**(zip(field_names, values)))`` to instantiate the object. If all
-of the model's fields are present, then ``values`` are guaranteed to be in
-the order ``__init__()`` expects them. That is, the instance can be created
-by ``cls(*values)``. It is possible to check if all fields are present by
-consulting ``cls._deferred`` - if ``False``, then all fields have been loaded
-from the database.
+``field_names`` are in the same order as the ``values``. If all of the model's
+fields are present, then ``values`` are guaranteed to be in the order
+``__init__()`` expects them. That is, the instance can be created by
+``cls(*values)``. If any fields are deferred, they won't appear in
+``field_names``. In that case, assign a value of ``django.db.models.DEFERRED``
+to each of the missing fields.
 
 In addition to creating the new model, the ``from_db()`` method must set the
 ``adding`` and ``db`` flags in the new instance's ``_state`` attribute.
@@ -87,14 +86,20 @@ In addition to creating the new model, the ``from_db()`` method must set the
 Below is an example showing how to record the initial values of fields that
 are loaded from the database::
 
+    from django.db.models import DEFERRED
+
     @classmethod
     def from_db(cls, db, field_names, values):
-        # default implementation of from_db() (could be replaced
-        # with super())
-        if cls._deferred:
-            instance = cls(**zip(field_names, values))
-        else:
-            instance = cls(*values)
+        # Default implementation of from_db() (subject to change and could
+        # be replaced with super()).
+        if len(values) != len(cls._meta.concrete_fields):
+            values = list(values)
+            values.reverse()
+            values = [
+                values.pop() if f.attname in field_names else DEFERRED
+                for f in cls._meta.concrete_fields
+            ]
+        new = cls(*values)
         instance._state.adding = False
         instance._state.db = db
         # customization to store the original field values on the instance
@@ -114,10 +119,16 @@ The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would of course be possible to just use ``super()`` call
 in the ``from_db()`` method.
 
+.. versionchanged:: 1.10
+
+    In older versions, you could check if all fields were loaded by consulting
+    ``cls._deferred``. This attribute is removed and
+    ``django.db.models.DEFERRED`` is new.
+
 Refreshing objects from database
 ================================
 
-.. method:: Model.refresh_from_db(using=None, fields=None, **kwargs)
+.. method:: Model.refresh_from_db(using=None, fields=None)
 
 If you need to reload a model's values from the database, you can use the
 ``refresh_from_db()`` method. When this method is called without arguments the
@@ -553,14 +564,6 @@ Sometimes with :ref:`multi-table inheritance <multi-table-inheritance>` you may
 want to delete only a child model's data. Specifying ``keep_parents=True`` will
 keep the parent model's data.
 
-.. versionchanged:: 1.9
-
-    The ``keep_parents`` parameter was added.
-
-.. versionchanged:: 1.9
-
-    The return value describing the number of objects deleted was added.
-
 Pickling objects
 ================
 
@@ -588,8 +591,8 @@ Other model instance methods
 
 A few object methods have special purposes.
 
-``__str__``
------------
+``__str__()``
+-------------
 
 .. method:: Model.__str__()
 
@@ -615,8 +618,8 @@ For example::
 If you'd like compatibility with Python 2, you can decorate your model class
 with :func:`~django.utils.encoding.python_2_unicode_compatible` as shown above.
 
-``__eq__``
-----------
+``__eq__()``
+------------
 
 .. method:: Model.__eq__()
 
@@ -644,22 +647,20 @@ For example::
     MyModel(id=1) != MultitableInherited(id=1)
     MyModel(id=1) != MyModel(id=2)
 
-``__hash__``
-------------
+``__hash__()``
+--------------
 
 .. method:: Model.__hash__()
 
-The ``__hash__`` method is based on the instance's primary key value. It
-is effectively hash(obj.pk). If the instance doesn't have a primary key
-value then a ``TypeError`` will be raised (otherwise the ``__hash__``
+The ``__hash__()`` method is based on the instance's primary key value. It
+is effectively ``hash(obj.pk)``. If the instance doesn't have a primary key
+value then a ``TypeError`` will be raised (otherwise the ``__hash__()``
 method would return different values before and after the instance is
-saved, but changing the ``__hash__`` value of an instance `is forbidden
-in Python`_).
+saved, but changing the :meth:`~object.__hash__` value of an instance is
+forbidden in Python.
 
-.. _is forbidden in Python: https://docs.python.org/reference/datamodel.html#object.__hash__
-
-``get_absolute_url``
---------------------
+``get_absolute_url()``
+----------------------
 
 .. method:: Model.get_absolute_url()
 

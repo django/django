@@ -24,7 +24,7 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
         # and that they are part of a GenericForeignKey.
 
         gfks = [
-            f for f in obj.model._meta.virtual_fields
+            f for f in obj.model._meta.private_fields
             if isinstance(f, GenericForeignKey)
         ]
         if len(gfks) == 0:

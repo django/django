@@ -56,13 +56,13 @@ except ImportError as e:
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
 # Some of these import cx_Oracle, so import them after checking if it's installed.
-from .client import DatabaseClient                          # isort:skip
-from .creation import DatabaseCreation                      # isort:skip
-from .features import DatabaseFeatures                      # isort:skip
-from .introspection import DatabaseIntrospection            # isort:skip
-from .operations import DatabaseOperations                  # isort:skip
-from .schema import DatabaseSchemaEditor                    # isort:skip
-from .utils import Oracle_datetime, convert_unicode         # isort:skip
+from .client import DatabaseClient                          # NOQA isort:skip
+from .creation import DatabaseCreation                      # NOQA isort:skip
+from .features import DatabaseFeatures                      # NOQA isort:skip
+from .introspection import DatabaseIntrospection            # NOQA isort:skip
+from .operations import DatabaseOperations                  # NOQA isort:skip
+from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
+from .utils import Oracle_datetime, convert_unicode         # NOQA isort:skip
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -228,8 +228,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # TO_CHAR().
         cursor.execute(
             "ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'"
-            " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'"
-            + (" TIME_ZONE = 'UTC'" if settings.USE_TZ else ''))
+            " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'" +
+            (" TIME_ZONE = 'UTC'" if settings.USE_TZ else '')
+        )
         cursor.close()
         if 'operators' not in self.__dict__:
             # Ticket #14149: Check whether our LIKE implementation will
@@ -366,8 +367,7 @@ class OracleParam(object):
         else:
             # To transmit to the database, we need Unicode if supported
             # To get size right, we must consider bytes.
-            self.force_bytes = convert_unicode(param, cursor.charset,
-                                             strings_only)
+            self.force_bytes = convert_unicode(param, cursor.charset, strings_only)
             if isinstance(self.force_bytes, six.string_types):
                 # We could optimize by only converting up to 4000 bytes here
                 string_size = len(force_bytes(param, cursor.charset, strings_only))
@@ -497,8 +497,7 @@ class FormatStylePlaceholderCursor(object):
         formatted = [firstparams] + [self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)
         try:
-            return self.cursor.executemany(query,
-                                [self._param_generator(p) for p in formatted])
+            return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
         except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):

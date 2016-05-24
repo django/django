@@ -70,8 +70,6 @@ MRO is an acronym for Method Resolution Order.
 
             response = MyView.as_view()(request)
 
-        .. versionadded:: 1.9
-
         The returned view has ``view_class`` and ``view_initkwargs``
         attributes.
 
@@ -231,11 +229,6 @@ MRO is an acronym for Method Resolution Order.
         the HTTP status code returned. If ``True``, then the redirect will use
         status code 301. If ``False``, then the redirect will use status code
         302. By default, ``permanent`` is ``False``.
-
-        .. versionchanged:: 1.9
-
-            The default value of the ``permanent`` attribute changed from
-            ``True`` to ``False``.
 
     .. attribute:: query_string
 

@@ -15,13 +15,16 @@ from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.utils._os import upath
 
 if HAS_GEOS and HAS_GDAL:
-    from django.contrib.gis.utils.layermapping import (LayerMapping,
-        LayerMapError, InvalidDecimal, InvalidString, MissingForeignKey)
+    from django.contrib.gis.utils.layermapping import (
+        LayerMapping, LayerMapError, InvalidDecimal, InvalidString,
+        MissingForeignKey,
+    )
     from django.contrib.gis.gdal import DataSource
 
     from .models import (
         City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
-        city_mapping, co_mapping, cofeat_mapping, inter_mapping)
+        city_mapping, co_mapping, cofeat_mapping, inter_mapping,
+    )
 
 
 shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), os.pardir, 'data'))

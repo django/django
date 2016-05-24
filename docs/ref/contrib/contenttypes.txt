@@ -391,8 +391,16 @@ Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 This enables filtering, ordering, and other query operations on ``Bookmark``
 from ``TaggedItem``::
 
-    >>> # Get all tags belonging to books containing `django` in the url
+    >>> # Get all tags belonging to bookmarks containing `django` in the url
     >>> TaggedItem.objects.filter(bookmarks__url__contains='django')
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
+
+Of course, if you don't add the reverse relationship, you can do the
+same types of lookups manually::
+
+    >>> b = Bookmark.objects.get(url='https://www.djangoproject.com/')
+    >>> bookmark_type = ContentType.objects.get_for_model(b)
+    >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id, object_id=b.id)
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
 Just as :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
@@ -406,30 +414,11 @@ referred to above used fields named ``content_type_fk`` and
 ``object_primary_key`` to create its generic foreign key, then a
 :class:`.GenericRelation` back to it would need to be defined like so::
 
-    tags = GenericRelation(TaggedItem,
-                           content_type_field='content_type_fk',
-                           object_id_field='object_primary_key')
-
-Of course, if you don't add the reverse relationship, you can do the
-same types of lookups manually::
-
-    >>> b = Bookmark.objects.get(url='https://www.djangoproject.com/')
-    >>> bookmark_type = ContentType.objects.get_for_model(b)
-    >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id,
-    ...                           object_id=b.id)
-    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
-
-Note that if the model in a
-:class:`~django.contrib.contenttypes.fields.GenericRelation` uses a
-non-default value for ``ct_field`` or ``fk_field`` in its
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey` (for example, if
-you had a ``Comment`` model that uses ``ct_field="object_pk"``),
-you'll need to set ``content_type_field`` and/or ``object_id_field`` in
-the :class:`~django.contrib.contenttypes.fields.GenericRelation` to
-match the ``ct_field`` and ``fk_field``, respectively, in the
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey`::
-
-    comments = fields.GenericRelation(Comment, object_id_field="object_pk")
+    tags = GenericRelation(
+        TaggedItem,
+        content_type_field='content_type_fk',
+        object_id_field='object_primary_key',
+    )
 
 Note also, that if you delete an object that has a
 :class:`~django.contrib.contenttypes.fields.GenericRelation`, any objects

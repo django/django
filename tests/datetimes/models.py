@@ -8,6 +8,7 @@ from django.utils.encoding import python_2_unicode_compatible
 class Article(models.Model):
     title = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
+    published_on = models.DateField(null=True)
 
     categories = models.ManyToManyField("Category", related_name="articles")
 

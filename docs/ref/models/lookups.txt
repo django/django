@@ -50,10 +50,6 @@ register lookups on itself. The two prominent examples are
         the same name. ``lookup_name`` will be used for this lookup if
         provided, otherwise ``lookup.lookup_name`` will be used.
 
-        .. versionchanged:: 1.9
-
-            The ``lookup_name`` parameter was added.
-
     .. method:: get_lookup(lookup_name)
 
         Returns the :class:`Lookup` named ``lookup_name`` registered in the class.
@@ -139,10 +135,6 @@ following methods:
     a specialized :ref:`Func() expression <func-expressions>` that only accepts
     one argument.  It can also be used on the right hand side of a filter or
     directly as an annotation.
-
-    .. versionchanged:: 1.9
-
-        ``Transform`` is now a subclass of ``Func``.
 
     .. attribute:: bilateral
 

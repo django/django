@@ -9,7 +9,6 @@ from copy import copy
 from importlib import import_module
 from io import BytesIO
 
-from django.apps import apps
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8, WSGIRequest
@@ -27,7 +26,7 @@ from django.utils.encoding import force_bytes, force_str, uri_to_iri
 from django.utils.functional import SimpleLazyObject, curry
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
-from django.utils.six.moves.urllib.parse import urlparse, urlsplit
+from django.utils.six.moves.urllib.parse import urljoin, urlparse, urlsplit
 
 __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'encode_multipart')
 
@@ -93,6 +92,26 @@ def closing_iterator_wrapper(iterable, close):
         request_finished.connect(close_old_connections)
 
 
+def conditional_content_removal(request, response):
+    """
+    Simulate the behavior of most Web servers by removing the content of
+    responses for HEAD requests, 1xx, 204, and 304 responses. Ensures
+    compliance with RFC 7230, section 3.3.3.
+    """
+    if 100 <= response.status_code < 200 or response.status_code in (204, 304):
+        if response.streaming:
+            response.streaming_content = []
+        else:
+            response.content = b''
+        response['Content-Length'] = '0'
+    if request.method == 'HEAD':
+        if response.streaming:
+            response.streaming_content = []
+        else:
+            response.content = b''
+    return response
+
+
 class ClientHandler(BaseHandler):
     """
     A HTTP Handler that can be used for testing purposes. Uses the WSGI
@@ -106,7 +125,7 @@ class ClientHandler(BaseHandler):
     def __call__(self, environ):
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
-        if self._request_middleware is None:
+        if self._middleware_chain is None:
             self.load_middleware()
 
         request_started.disconnect(close_old_connections)
@@ -121,6 +140,10 @@ class ClientHandler(BaseHandler):
 
         # Request goes through middleware.
         response = self.get_response(request)
+
+        # Simulate behaviors of most Web servers.
+        conditional_content_removal(request, response)
+
         # Attach the originating request to the response so that it could be
         # later retrieved.
         response.wsgi_request = request
@@ -419,17 +442,15 @@ class Client(RequestFactory):
         """
         Obtains the current session variables.
         """
-        if apps.is_installed('django.contrib.sessions'):
-            engine = import_module(settings.SESSION_ENGINE)
-            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
-            if cookie:
-                return engine.SessionStore(cookie.value)
-            else:
-                s = engine.SessionStore()
-                s.save()
-                self.cookies[settings.SESSION_COOKIE_NAME] = s.session_key
-                return s
-        return {}
+        engine = import_module(settings.SESSION_ENGINE)
+        cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
+        if cookie:
+            return engine.SessionStore(cookie.value)
+
+        session = engine.SessionStore()
+        session.save()
+        self.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+        return session
     session = property(_session)
 
     def request(self, **request):
@@ -594,12 +615,11 @@ class Client(RequestFactory):
         Sets the Factory to appear as if it has successfully logged into a site.
 
         Returns True if login is possible; False if the provided credentials
-        are incorrect, or the user is inactive, or if the sessions framework is
-        not available.
+        are incorrect.
         """
         from django.contrib.auth import authenticate
         user = authenticate(**credentials)
-        if user and apps.is_installed('django.contrib.sessions'):
+        if user:
             self._login(user)
             return True
         else:
@@ -679,7 +699,12 @@ class Client(RequestFactory):
             if url.port:
                 extra['SERVER_PORT'] = str(url.port)
 
-            response = self.get(url.path, QueryDict(url.query), follow=False, **extra)
+            # Prepend the request path to handle relative path redirects
+            path = url.path
+            if not path.startswith('/'):
+                path = urljoin(response.request['PATH_INFO'], path)
+
+            response = self.get(path, QueryDict(url.query), follow=False, **extra)
             response.redirect_chain = redirect_chain
 
             if redirect_chain[-1] in redirect_chain[:-1]:

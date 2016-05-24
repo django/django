@@ -38,8 +38,7 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
         current_fields.sort(key=lambda x: x[1].creation_counter)
         attrs['declared_fields'] = OrderedDict(current_fields)
 
-        new_class = (super(DeclarativeFieldsMetaclass, mcs)
-            .__new__(mcs, name, bases, attrs))
+        new_class = super(DeclarativeFieldsMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
         # Walk through the MRO.
         declared_fields = OrderedDict()
@@ -68,10 +67,11 @@ class BaseForm(object):
     # class, not to the Form class.
     field_order = None
     prefix = None
+    use_required_attribute = True
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
-                 empty_permitted=False, field_order=None):
+                 empty_permitted=False, field_order=None, use_required_attribute=None):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -93,6 +93,9 @@ class BaseForm(object):
         self.fields = copy.deepcopy(self.base_fields)
         self._bound_fields_cache = {}
         self.order_fields(self.field_order if field_order is None else field_order)
+
+        if use_required_attribute is not None:
+            self.use_required_attribute = use_required_attribute
 
     def order_fields(self, field_order):
         """
@@ -141,7 +144,12 @@ class BaseForm(object):
             field = self.fields[name]
         except KeyError:
             raise KeyError(
-                "Key %r not found in '%s'" % (name, self.__class__.__name__))
+                "Key '%s' not found in '%s'. Choices are: %s." % (
+                    name,
+                    self.__class__.__name__,
+                    ', '.join(sorted(f for f in self.fields)),
+                )
+            )
         if name not in self._bound_fields_cache:
             self._bound_fields_cache[name] = field.get_bound_field(self, name)
         return self._bound_fields_cache[name]

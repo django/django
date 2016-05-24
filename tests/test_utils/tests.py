@@ -440,8 +440,10 @@ class HTMLEqualTests(SimpleTestCase):
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
     def test_self_closing_tags(self):
-        self_closing_tags = ('br', 'hr', 'input', 'img', 'meta', 'spacer',
-            'link', 'frame', 'base', 'col')
+        self_closing_tags = (
+            'br', 'hr', 'input', 'img', 'meta', 'spacer', 'link', 'frame',
+            'base', 'col',
+        )
         for tag in self_closing_tags:
             dom = parse_html('<p>Hello <%s> world</p>' % tag)
             self.assertEqual(len(dom.children), 3)

@@ -87,12 +87,6 @@ Three things to note about 404 views:
   your 404 view will never be used, and your URLconf will be displayed
   instead, with some debug information.
 
-.. versionchanged:: 1.9
-
-    The signature of ``page_not_found()`` changed. The function now accepts a
-    second parameter, the exception that triggered the error. A useful
-    representation of the exception is also passed in the template context.
-
 .. versionchanged:: 1.10
 
     Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.
@@ -134,9 +128,9 @@ default, call the view ``django.views.defaults.permission_denied``.
 
 This view loads and renders the template ``403.html`` in your root template
 directory, or if this file does not exist, instead serves the text
-"403 Forbidden", as per :rfc:`2616` (the HTTP 1.1 Specification). The template
-context contains ``exception``, which is the unicode representation of the
-exception that triggered the view.
+"403 Forbidden", as per :rfc:`7231#section-6.5.3` (the HTTP 1.1 Specification).
+The template context contains ``exception``, which is the unicode
+representation of the exception that triggered the view.
 
 ``django.views.defaults.permission_denied`` is triggered by a
 :exc:`~django.core.exceptions.PermissionDenied` exception. To deny access in a
@@ -148,13 +142,6 @@ view you can use code like this::
         if not request.user.is_staff:
             raise PermissionDenied
         # ...
-
-.. versionchanged:: 1.9
-
-    The signature of ``permission_denied()`` changed in Django 1.9. The function
-    now accepts a second parameter, the exception that triggered the error. The
-    unicode representation of the exception is also passed in the template
-    context.
 
 .. versionchanged:: 1.10
 
@@ -180,11 +167,6 @@ context, as the exception message might contain sensitive information like
 filesystem paths.
 
 ``bad_request`` views are also only used when :setting:`DEBUG` is ``False``.
-
-.. versionchanged:: 1.9
-
-    The signature of ``bad_request()`` changed in Django 1.9. The function
-    now accepts a second parameter, the exception that triggered the error.
 
 .. versionchanged:: 1.10
 

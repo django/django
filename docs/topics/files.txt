@@ -77,10 +77,7 @@ The ``File`` object
 ===================
 
 Internally, Django uses a :class:`django.core.files.File` instance any time it
-needs to represent a file. This object is a thin wrapper around Python's
-`built-in file object`_ with some Django-specific additions.
-
-.. _built-in file object: https://docs.python.org/library/stdtypes.html#bltin-file-objects
+needs to represent a file.
 
 Most of the time you'll simply use a ``File`` that Django's given you (i.e. a
 file attached to a model as above, or perhaps an uploaded file).

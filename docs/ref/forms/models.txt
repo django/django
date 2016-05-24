@@ -49,10 +49,6 @@ Model Form API reference. For introductory material about model forms, see the
     information. Omitting any definition of the fields to use will result in
     an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
-    .. versionadded:: 1.9
-
-        The ``field_classes`` keyword argument was added.
-
 ``modelformset_factory``
 ========================
 
@@ -72,10 +68,6 @@ Model Form API reference. For introductory material about model forms, see the
 
     See :ref:`model-formsets` for example usage.
 
-    .. versionadded:: 1.9
-
-        The ``field_classes`` keyword argument was added.
-
 ``inlineformset_factory``
 =========================
 
@@ -89,7 +81,3 @@ Model Form API reference. For introductory material about model forms, see the
     the ``parent_model``, you must specify a ``fk_name``.
 
     See :ref:`inline-formsets` for example usage.
-
-    .. versionadded:: 1.9
-
-        The ``field_classes`` keyword argument was added.

@@ -161,9 +161,9 @@ Creating your own settings
 ==========================
 
 There's nothing stopping you from creating your own settings, for your own
-Django apps. Just follow these conventions:
+Django apps. Just follow these guidelines:
 
-* Setting names are in all uppercase.
+* Setting names must be all uppercase.
 * Don't reinvent an already-existing setting.
 
 For settings that are sequences, Django itself uses lists, but this is only

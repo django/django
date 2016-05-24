@@ -14,9 +14,10 @@ class Command(BaseCommand):
     requires_system_checks = False
 
     def add_arguments(self, parser):
-        parser.add_argument('--all', action='store_true', dest='all', default=False,
-            help='Display all settings, regardless of their value. '
-            'Default values are prefixed by "###".')
+        parser.add_argument(
+            '--all', action='store_true', dest='all', default=False,
+            help='Display all settings, regardless of their value. Default values are prefixed by "###".',
+        )
 
     def handle(self, **options):
         # Inspired by Postfix's "postconf -n".

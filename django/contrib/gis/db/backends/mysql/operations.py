@@ -67,7 +67,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     def unsupported_functions(self):
         unsupported = {
             'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG', 'BoundingCircle',
-            'ForceRHR', 'GeoHash', 'MemSize',
+            'ForceRHR', 'GeoHash', 'IsValid', 'MakeValid', 'MemSize',
             'Perimeter', 'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid',
             'Transform', 'Translate',
         }

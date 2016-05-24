@@ -235,7 +235,7 @@ We'll demonstrate this with the ``Author`` model we used in the
         model = Author
 
         def post(self, request, *args, **kwargs):
-            if not request.user.is_authenticated():
+            if not request.user.is_authenticated:
                 return HttpResponseForbidden()
 
             # Look up the author we're interested in.
@@ -400,7 +400,7 @@ To show what happens when you try to get more sophisticated, we show
 an example that sacrifices readability and maintainability when there
 is a simpler solution. First, let's look at a naive attempt to combine
 :class:`~django.views.generic.detail.DetailView` with
-:class:`~django.views.generic.edit.FormMixin` to enable use to
+:class:`~django.views.generic.edit.FormMixin` to enable us to
 ``POST`` a Django :class:`~django.forms.Form` to the same URL as we're
 displaying an object using :class:`DetailView`.
 
@@ -466,7 +466,7 @@ Our new ``AuthorDetail`` looks like this::
             return context
 
         def post(self, request, *args, **kwargs):
-            if not request.user.is_authenticated():
+            if not request.user.is_authenticated:
                 return HttpResponseForbidden()
             self.object = self.get_object()
             form = self.get_form()
@@ -552,7 +552,7 @@ template as ``AuthorDisplay`` is using on ``GET``::
         model = Author
 
         def post(self, request, *args, **kwargs):
-            if not request.user.is_authenticated():
+            if not request.user.is_authenticated:
                 return HttpResponseForbidden()
             self.object = self.get_object()
             return super(AuthorInterest, self).post(request, *args, **kwargs)
