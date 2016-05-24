@@ -290,7 +290,11 @@ but all in one process)*
 
 Let's try out the Redis backend - Redis runs on pretty much every machine, and
 has a very small overhead, which makes it perfect for this kind of thing. Install
-the ``asgi_redis`` package using ``pip``, and set up your channel layer like this::
+the ``asgi_redis`` package using ``pip``. ::
+
+    pip install asgi_redis
+
+and set up your channel layer like this::
 
     # In settings.py
     CHANNEL_LAYERS = {
