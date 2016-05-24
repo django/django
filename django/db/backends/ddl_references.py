@@ -19,6 +19,18 @@ class Reference:
         """
         return False
 
+    def rename_table_references(self, old_table, new_table):
+        """
+        Rename all references to the old_name to the new_table.
+        """
+        pass
+
+    def rename_column_references(self, table, old_column, new_column):
+        """
+        Rename all references to the old_column to the new_column.
+        """
+        pass
+
     def __repr__(self):
         return '<%s %r>' % (self.__class__.__name__, str(self))
 
@@ -36,6 +48,10 @@ class Table(Reference):
     def references_table(self, table):
         return self.table == table
 
+    def rename_table_references(self, old_table, new_table):
+        if self.table == old_table:
+            self.table = new_table
+
     def __str__(self):
         return self.quote_name(self.table)
 
@@ -49,6 +65,12 @@ class TableColumns(Table):
 
     def references_column(self, table, column):
         return self.table == table and column in self.columns
+
+    def rename_column_references(self, table, old_column, new_column):
+        if self.table == table:
+            for index, column in enumerate(self.columns):
+                if column == old_column:
+                    self.columns[index] = new_column
 
 
 class Columns(TableColumns):
@@ -92,6 +114,14 @@ class ForeignKeyName(TableColumns):
             self.to_reference.references_column(table, column)
         )
 
+    def rename_table_references(self, old_table, new_table):
+        super().rename_table_references(old_table, new_table)
+        self.to_reference.rename_table_references(old_table, new_table)
+
+    def rename_column_references(self, table, old_column, new_column):
+        super().rename_column_references(table, old_column, new_column)
+        self.to_reference.rename_column_references(table, old_column, new_column)
+
     def __str__(self):
         suffix = self.suffix_template % {
             'to_table': self.to_reference.table,
@@ -123,6 +153,16 @@ class Statement(Reference):
             hasattr(part, 'references_column') and part.references_column(table, column)
             for part in self.parts.values()
         )
+
+    def rename_table_references(self, old_table, new_table):
+        for part in self.parts.values():
+            if hasattr(part, 'rename_table_references'):
+                part.rename_table_references(old_table, new_table)
+
+    def rename_column_references(self, table, old_column, new_column):
+        for part in self.parts.values():
+            if hasattr(part, 'rename_column_references'):
+                part.rename_column_references(table, old_column, new_column)
 
     def __str__(self):
         return self.template % self.parts
