@@ -42,13 +42,11 @@ def serve(request, path, document_root=None, show_indexes=False):
     if newpath and path != newpath:
         return HttpResponseRedirect(newpath)
     fullpath = os.path.join(document_root, newpath)
-    if os.path.isdir(fullpath):
-        if show_indexes:
-            return directory_index(newpath, fullpath)
-        raise Http404(_("Directory indexes are not allowed here."))
-    if not os.path.exists(fullpath):
-        raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
-    return _make_response(request, fullpath)
+    is_dir = _check_path(fullpath, show_indexes)
+    if is_dir and show_indexes:
+        return directory_index(newpath, fullpath)
+    else:
+        return _make_response(request, fullpath)
 
 
 def _normalize_path(path):
@@ -67,6 +65,18 @@ def _normalize_path(path):
         newpath = os.path.join(newpath, part).replace('\\', '/')
 
     return newpath
+
+
+def _check_path(fullpath, show_indexes):
+    is_dir = os.path.isdir(fullpath)
+
+    if is_dir and not show_indexes:
+        raise Http404(_("Directory indexes are not allowed here."))
+
+    if not os.path.exists(fullpath):
+        raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
+
+    return is_dir
 
 
 def _make_response(request, fullpath):
