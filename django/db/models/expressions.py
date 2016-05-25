@@ -1,7 +1,7 @@
 import copy
 import datetime
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.query_utils import Q
@@ -843,7 +843,6 @@ class Case(Expression):
         template_params.update(extra_context)
         case_parts = []
         sql_params = []
-        from django.db.models.sql.datastructures import EmptyResultSet
         for case in self.cases:
             try:
                 case_sql, case_params = compiler.compile(case)

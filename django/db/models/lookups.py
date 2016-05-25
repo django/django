@@ -2,6 +2,7 @@ import math
 import warnings
 from copy import copy
 
+from django.core.exceptions import EmptyResultSet
 from django.db.models.expressions import Func, Value
 from django.db.models.fields import DateTimeField, Field, IntegerField
 from django.db.models.query_utils import RegisterLookupMixin
@@ -276,7 +277,6 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
                 rhs = self.rhs
 
             if not rhs:
-                from django.db.models.sql.datastructures import EmptyResultSet
                 raise EmptyResultSet
 
             # rhs should be an iterable; use batch_process_rhs() to
