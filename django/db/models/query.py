@@ -500,6 +500,7 @@ class QuerySet(object):
         """
         try:
             with transaction.atomic(using=self.db):
+                params = {k: v() if callable(v) else v for k, v in params.items()}
                 obj = self.create(**params)
             return obj, True
         except IntegrityError:

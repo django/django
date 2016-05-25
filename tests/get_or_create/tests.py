@@ -146,6 +146,26 @@ class GetOrCreateTests(TestCase):
         self.assertFalse(created)
         self.assertEqual(obj, obj2)
 
+    def test_callable_defaults(self):
+        """
+        If you pass a callable in the `defaults` kwarg, it should evaluate it
+        if the instance is created.
+        """
+        obj, created = Person.objects.get_or_create(
+            first_name="George",
+            defaults={"last_name": "Harrison",
+                      "birthday": lambda: date(1943, 2, 25)})
+        self.assertTrue(created)
+        self.assertEqual(date(1943, 2, 25), obj.birthday)
+
+    def test_callable_defaults_not_called(self):
+        def throwError():
+            raise AssertionError()
+        obj, created = Person.objects.get_or_create(first_name="John",
+                                                    last_name="Lennon",
+                                                    defaults={
+                                                        "birthday": lambda: throwError()})
+
 
 class GetOrCreateTestsWithManualPKs(TestCase):
 
@@ -387,3 +407,11 @@ class UpdateOrCreateTests(TestCase):
         )
         self.assertFalse(created)
         self.assertEqual(obj.defaults, 'another testing')
+
+    def test_update_callable_default(self):
+        obj, created = Person.objects.update_or_create(
+            first_name='George', last_name='Harrison', defaults={
+                'birthday': lambda: date(1943, 2, 25),
+            }
+        )
+        self.assertEqual(obj.birthday, date(1943, 2, 25))
