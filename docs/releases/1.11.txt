@@ -175,7 +175,10 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* Added support for callable values in the ``defaults`` argument of
+  :meth:`QuerySet.update_or_create()
+  <django.db.models.query.QuerySet.update_or_create>` and
+  :meth:`~django.db.models.query.QuerySet.get_or_create`.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

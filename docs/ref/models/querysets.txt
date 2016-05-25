@@ -1687,18 +1687,18 @@ tuple of the new object and ``True``. The new object will be created roughly
 according to this algorithm::
 
     params = {k: v for k, v in kwargs.items() if '__' not in k}
-    params.update(defaults)
+    params.update(({k: v() if callable(v) else v for k, v in defaults.items()})
     obj = self.model(**params)
     obj.save()
 
 In English, that means start with any non-``'defaults'`` keyword argument that
 doesn't contain a double underscore (which would indicate a non-exact lookup).
 Then add the contents of ``defaults``, overriding any keys if necessary, and
-use the result as the keyword arguments to the model class. As hinted at
-above, this is a simplification of the algorithm that is used, but it contains
-all the pertinent details. The internal implementation has some more
-error-checking than this and handles some extra edge-conditions; if you're
-interested, read the code.
+use the result as the keyword arguments to the model class. If there are any
+callables in ``defaults``, evaluate them. As hinted at above, this is a
+simplification of the algorithm that is used, but it contains all the pertinent
+details. The internal implementation has some more error-checking than this and
+handles some extra edge-conditions; if you're interested, read the code.
 
 If you have a field named ``defaults`` and want to use it as an exact lookup in
 ``get_or_create()``, just use ``'defaults__exact'``, like so::
@@ -1764,6 +1764,10 @@ whenever a request to a page has a side effect on your data. For more, see
   chapter because it isn't related to that book, but it can't create it either
   because ``title`` field should be unique.
 
+.. versionchanged:: 1.11
+
+    Added support for callable values in ``defaults``.
+
 ``update_or_create()``
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1771,7 +1775,7 @@ whenever a request to a page has a side effect on your data. For more, see
 
 A convenience method for updating an object with the given ``kwargs``, creating
 a new one if necessary. The ``defaults`` is a dictionary of (field, value)
-pairs used to update the object.
+pairs used to update the object. The values in ``defaults`` can be callables.
 
 Returns a tuple of ``(object, created)``, where ``object`` is the created or
 updated object and ``created`` is a boolean specifying whether a new object was
@@ -1805,6 +1809,10 @@ For detailed description how names passed in ``kwargs`` are resolved see
 As described above in :meth:`get_or_create`, this method is prone to a
 race-condition which can result in multiple rows being inserted simultaneously
 if uniqueness is not enforced at the database level.
+
+.. versionchanged:: 1.11
+
+    Added support for callable values in ``defaults``.
 
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
