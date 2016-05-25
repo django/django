@@ -1,7 +1,7 @@
 import copy
 import datetime
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.query_utils import Q
@@ -836,7 +836,6 @@ class Case(Expression):
         return c
 
     def as_sql(self, compiler, connection, template=None, case_joiner=None, **extra_context):
-        from django.db.models.sql.datastructures import EmptyResultSet
         connection.ops.check_expression_support(self)
         if not self.cases:
             return compiler.compile(self.default)

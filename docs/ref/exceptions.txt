@@ -24,6 +24,19 @@ Django core exception classes are defined in ``django.core.exceptions``.
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
     on :exc:`ObjectDoesNotExist` and :exc:`~django.db.models.Model.DoesNotExist`.
 
+``EmptyResultSet``
+------------------
+
+.. exception:: EmptyResultSet
+
+    ``EmptyResultSet`` may be raised during query generation if a query won't
+    return any results. Most Django projects won't encounter this exception,
+    but it might be useful for implementing custom lookups and expressions.
+
+    .. versionchanged:: 1.11
+
+        In older versions, it's only importable from ``django.db.models.sql``.
+
 ``FieldDoesNotExist``
 ---------------------
 

@@ -2,11 +2,9 @@
 Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
+# for backwards-compatibility in Django 1.11
+from django.core.exceptions import EmptyResultSet  # NOQA: F401
 from django.db.models.sql.constants import INNER, LOUTER
-
-
-class EmptyResultSet(Exception):
-    pass
 
 
 class MultiJoin(Exception):
