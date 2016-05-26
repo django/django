@@ -45,7 +45,7 @@ serializable types, and stay under a certain size limit - but these are
 implementation details you won't need to worry about until you get to more
 advanced usage.
 
-The channels have capacity, so a load of producers can write lots of messages
+The channels have capacity, so a lot of producers can write lots of messages
 into a channel with no consumers and then a consumer can come along later and
 will start getting served those queued messages.
 
