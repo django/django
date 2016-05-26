@@ -195,6 +195,10 @@ Serialization
 * The new ``django.core.serializers.base.Serializer.stream_class`` attribute
   allows subclasses to customize the default stream.
 
+* The ``django.core.serializers.json.DjangoJSONEncoder`` now knows how to
+  serialize :class:`~datetime.timedelta` objects (used by
+  :class:`~django.db.models.DurationField`).
+
 Signals
 ~~~~~~~
 
