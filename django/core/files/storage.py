@@ -380,15 +380,13 @@ class FileSystemStorage(Storage):
         assert name, "The name argument is not allowed to be empty."
         name = self.path(name)
         # If the file exists, delete it from the filesystem.
-        # Note that there is a race between os.path.exists and os.remove:
-        # if os.remove fails with ENOENT, the file was removed
-        # concurrently, and we can continue normally.
-        if os.path.exists(name):
-            try:
-                os.remove(name)
-            except OSError as e:
-                if e.errno != errno.ENOENT:
-                    raise
+        # If os.remove() fails with ENOENT, the file may have been removed
+        # concurrently, and it's safe to continue normally.
+        try:
+            os.remove(name)
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
 
     def exists(self, name):
         return os.path.exists(self.path(name))

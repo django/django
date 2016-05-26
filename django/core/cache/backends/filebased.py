@@ -35,14 +35,13 @@ class FileBasedCache(BaseCache):
 
     def get(self, key, default=None, version=None):
         fname = self._key_to_file(key, version)
-        if os.path.exists(fname):
-            try:
-                with io.open(fname, 'rb') as f:
-                    if not self._is_expired(f):
-                        return pickle.loads(zlib.decompress(f.read()))
-            except IOError as e:
-                if e.errno == errno.ENOENT:
-                    pass  # Cache file was removed after the exists check
+        try:
+            with io.open(fname, 'rb') as f:
+                if not self._is_expired(f):
+                    return pickle.loads(zlib.decompress(f.read()))
+        except IOError as e:
+            if e.errno == errno.ENOENT:
+                pass  # Cache file doesn't exist.
         return default
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
