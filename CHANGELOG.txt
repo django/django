@@ -1,3 +1,13 @@
+0.14.0 (2016-05-25)
+-------------------
+
+* Class-based consumer pattern and WebSocket consumer now come with Channels
+  (see docs for more details)
+
+* Better testing utilities including a higher-level Client abstraction with
+  optional HTTP/WebSocket HttpClient variant.
+
+
 0.13.1 (2016-05-13)
 -------------------
 
