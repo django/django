@@ -74,3 +74,8 @@ strips off the ``/liveblog`` part it matches before passing it inside::
     routing = [
         include(inner_routes, path=r'^/liveblog')
     ]
+
+You can also include named capture groups in the filters on an include and
+they'll be passed to the consumer just like those on ``route``; note, though,
+that if the keyword argument names from the ``include`` and the ``route``
+clash, the values from ``route`` will take precedence.

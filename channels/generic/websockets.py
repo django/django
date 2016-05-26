@@ -92,7 +92,7 @@ class WebsocketConsumer(BaseConsumer):
         else:
             raise ValueError("You must pass text or bytes")
 
-    def disconnect(self, message, **kwargs):
+    def raw_disconnect(self, message, **kwargs):
         """
         Called when a WebSocket connection is closed. Base level so you don't
         need to call super() all the time.

@@ -10,7 +10,7 @@ We recommend you use them if you find them valuable; normal function-based
 consumers are also entirely valid, however, and may result in more readable
 code for simpler tasks.
 
-There is one base class-based consumer class, ``BaseConsumer``, that provides
+There is one base generic consumer class, ``BaseConsumer``, that provides
 the pattern for method dispatch and is the thing you can build entirely
 custom consumers on top of, and then protocol-specific subclasses that provide
 extra utility - for example, the ``WebsocketConsumer`` provides automatic
@@ -104,6 +104,8 @@ are used to add the socket to when it connects and to remove it from when it
 disconnects; you get keyword arguments too if your URL path, say, affects
 which group to talk to.
 
+Additionally, the property ``self.path`` is always set to the current URL path.
+
 The JSON-enabled consumer looks slightly different::
 
     from channels.generic.websockets import JsonWebsocketConsumer
@@ -140,7 +142,7 @@ The JSON-enabled consumer looks slightly different::
             """
             pass
 
-For this subclass, ``receive`` only gets a ``content`` parameter that is the
+For this subclass, ``receive`` only gets a ``content`` argument that is the
 already-decoded JSON as Python datastructures; similarly, ``send`` now only
 takes a single argument, which it JSON-encodes before sending down to the
 client.

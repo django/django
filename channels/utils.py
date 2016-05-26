@@ -1,5 +1,6 @@
 import types
 
+
 def name_that_thing(thing):
     """
     Returns either the function/class path or just the object's repr

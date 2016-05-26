@@ -1,1 +1,1 @@
-from .base import BaseConsumer
+from .base import BaseConsumer  # NOQA isort:skip
