@@ -16,6 +16,7 @@ from django.core.serializers.python import (
     Deserializer as PythonDeserializer, Serializer as PythonSerializer,
 )
 from django.utils import six
+from django.utils.duration import duration_iso_string
 from django.utils.functional import Promise
 from django.utils.timezone import is_aware
 
@@ -108,6 +109,8 @@ class DjangoJSONEncoder(json.JSONEncoder):
             if o.microsecond:
                 r = r[:12]
             return r
+        elif isinstance(o, datetime.timedelta):
+            return duration_iso_string(o)
         elif isinstance(o, decimal.Decimal):
             return str(o)
         elif isinstance(o, uuid.UUID):

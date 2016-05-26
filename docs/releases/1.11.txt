@@ -223,6 +223,10 @@ Serialization
   can now be customized by passing a ``cls`` keyword argument to the
   ``serializers.serialize()`` function.
 
+* :class:`~django.core.serializers.json.DjangoJSONEncoder` now serializes
+  :class:`~datetime.timedelta` objects (used by
+  :class:`~django.db.models.DurationField`).
+
 Signals
 ~~~~~~~
 
