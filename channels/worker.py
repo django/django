@@ -72,7 +72,7 @@ class Worker(object):
         if self.signal_handlers:
             self.install_signal_handler()
         channels = self.apply_channel_filters(self.channel_layer.router.channels)
-        logger.info("Listening on channels %s", ", ".join(channels))
+        logger.info("Listening on channels %s", ", ".join(sorted(channels)))
         while not self.termed:
             self.in_job = False
             channel, content = self.channel_layer.receive_many(channels, block=True)
@@ -82,7 +82,7 @@ class Worker(object):
                 time.sleep(0.01)
                 continue
             # Create message wrapper
-            logger.debug("Worker got message on %s: repl %s", channel, content.get("reply_channel", "none"))
+            logger.debug("Got message on %s (reply %s)", channel, content.get("reply_channel", "none"))
             message = Message(
                 content=content,
                 channel_name=channel,
@@ -103,6 +103,7 @@ class Worker(object):
             if self.callback:
                 self.callback(channel, message)
             try:
+                logger.debug("Dispatching message on %s to %s", channel, name_that_thing(consumer))
                 consumer(message, **kwargs)
             except ConsumeLater:
                 # They want to not handle it yet. Re-inject it with a number-of-tries marker.

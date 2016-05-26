@@ -1,0 +1,150 @@
+Generic Consumers
+=================
+
+Much like Django's class-based views, Channels has class-based consumers.
+They provide a way for you to arrange code so it's highly modifiable and
+inheritable, at the slight cost of it being harder to figure out the execution
+path.
+
+We recommend you use them if you find them valuable; normal function-based
+consumers are also entirely valid, however, and may result in more readable
+code for simpler tasks.
+
+There is one base class-based consumer class, ``BaseConsumer``, that provides
+the pattern for method dispatch and is the thing you can build entirely
+custom consumers on top of, and then protocol-specific subclasses that provide
+extra utility - for example, the ``WebsocketConsumer`` provides automatic
+group management for the connection.
+
+When you use class-based consumers in :doc:`routing <routing>`, you need
+to use ``route_class`` rather than ``route``; ``route_class`` knows how to
+talk to the class-based consumer and extract the list of channels it needs
+to listen on from it directly, rather than making you pass it in explicitly.
+
+Class-based consumers are instantiated once for each message they consume,
+so it's safe to store things on ``self`` (in fact, ``self.message`` is the
+current message by default).
+
+Base
+----
+
+The ``BaseConsumer`` class is the foundation of class-based consumers, and what
+you can inherit from if you wish to build your own entirely from scratch.
+
+You use it like this::
+
+    from channels.generic import BaseConsumer
+
+    class MyConsumer(BaseConsumer):
+
+        method_mapping = {
+            "channel.name.here": "method_name",
+        }
+
+        def method_name(self, message, **kwargs):
+            pass
+
+All you need to define is the ``method_mapping`` dictionary, which maps
+channel names to method names. The base code will take care of the dispatching
+for you, and set ``self.message`` to the current message as well.
+
+If you want to perfom more complicated routing, you'll need to override the
+``dispatch()`` and ``channel_names()`` methods in order to do the right thing;
+remember, though, your channel names cannot change during runtime and must
+always be the same for as long as your process runs.
+
+
+WebSockets
+----------
+
+There are two WebSockets generic consumers; one that provides group management,
+simpler send/receive methods, and basic method routing, and a subclass which
+additionally automatically serializes all messages sent and receives using JSON.
+
+The basic WebSocket generic consumer is used like this::
+
+    from channels.generic.websockets import WebsocketConsumer
+
+    class MyConsumer(WebsocketConsumer):
+
+        # Set to True if you want them, else leave out
+        strict_ordering = False
+        slight_ordering = False
+
+        def connection_groups(self, **kwargs):
+            """
+            Called to return the list of groups to automatically add/remove
+            this connection to/from.
+            """
+            return ["test"]
+
+        def connect(self, message, **kwargs):
+            """
+            Perform things on connection start
+            """
+            pass
+
+        def receive(self, text=None, bytes=None, **kwargs):
+            """
+            Called when a message is received with either text or bytes
+            filled out.
+            """
+            # Simple echo
+            self.send(text=text, bytes=bytes)
+
+        def disconnect(self, message, **kwargs):
+            """
+            Perform things on connection close
+            """
+            pass
+
+You can call ``self.send`` inside the class to send things to the connection's
+``reply_channel`` automatically. Any group names returned from ``connection_groups``
+are used to add the socket to when it connects and to remove it from when it
+disconnects; you get keyword arguments too if your URL path, say, affects
+which group to talk to.
+
+The JSON-enabled consumer looks slightly different::
+
+    from channels.generic.websockets import JsonWebsocketConsumer
+
+    class MyConsumer(JsonWebsocketConsumer):
+
+        # Set to True if you want them, else leave out
+        strict_ordering = False
+        slight_ordering = False
+
+        def connection_groups(self, **kwargs):
+            """
+            Called to return the list of groups to automatically add/remove
+            this connection to/from.
+            """
+            return ["test"]
+
+        def connect(self, message, **kwargs):
+            """
+            Perform things on connection start
+            """
+            pass
+
+        def receive(self, content, **kwargs):
+            """
+            Called when a message is received with decoded JSON content
+            """
+            # Simple echo
+            self.send(content)
+
+        def disconnect(self, message, **kwargs):
+            """
+            Perform things on connection close
+            """
+            pass
+
+For this subclass, ``receive`` only gets a ``content`` parameter that is the
+already-decoded JSON as Python datastructures; similarly, ``send`` now only
+takes a single argument, which it JSON-encodes before sending down to the
+client.
+
+Note that this subclass still can't intercept ``Group.send()`` calls to make
+them into JSON automatically, but it does provide ``self.group_send(name, content)``
+that will do this for you if you call it explicitly.

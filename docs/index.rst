@@ -29,6 +29,8 @@ Contents:
    installation
    getting-started
    deploying
+   generics
+   routing
    backends
    testing
    cross-compat

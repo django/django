@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 from django.test import SimpleTestCase
 
-from channels.routing import Router, route, include
+from channels.routing import Router, route, route_class, include
 from channels.message import Message
 from channels.utils import name_that_thing
+from channels.generic import BaseConsumer
 
 
 # Fake consumers and routing sets that can be imported by string
@@ -19,6 +20,16 @@ def consumer_3():
     pass
 
 
+class TestClassConsumer(BaseConsumer):
+
+    method_mapping = {
+        "test.channel": "some_method",
+    }
+
+    def some_method(self, message, **kwargs):
+        pass
+
+
 chatroom_routing = [
     route("websocket.connect", consumer_2, path=r"^/chat/(?P<room>[^/]+)/$"),
     route("websocket.connect", consumer_3, path=r"^/mentions/$"),
@@ -27,6 +38,10 @@ chatroom_routing = [
 chatroom_routing_nolinestart = [
     route("websocket.connect", consumer_2, path=r"/chat/(?P<room>[^/]+)/$"),
     route("websocket.connect", consumer_3, path=r"/mentions/$"),
+]
+
+class_routing = [
+    route_class(TestClassConsumer, path=r"^/foobar/$"),
 ]
 
 
@@ -175,6 +190,32 @@ class RoutingTests(SimpleTestCase):
             kwargs={},
         )
 
+    def test_route_class(self):
+        """
+        Tests route_class with/without prefix
+        """
+        router = Router([
+            include("channels.tests.test_routing.class_routing"),
+        ])
+        self.assertRoute(
+            router,
+            channel="websocket.connect",
+            content={"path": "/foobar/"},
+            consumer=None,
+        )
+        self.assertRoute(
+            router,
+            channel="test.channel",
+            content={"path": "/foobar/"},
+            consumer=TestClassConsumer,
+        )
+        self.assertRoute(
+            router,
+            channel="test.channel",
+            content={"path": "/"},
+            consumer=None,
+        )
+
     def test_include_prefix(self):
         """
         Tests inclusion with a prefix
@@ -291,15 +332,16 @@ class RoutingTests(SimpleTestCase):
             route("http.request", consumer_1, path=r"^/chat/$"),
             route("http.disconnect", consumer_2),
             route("http.request", consumer_3),
+            route_class(TestClassConsumer),
         ])
         # Initial check
         self.assertEqual(
             router.channels,
-            {"http.request", "http.disconnect"},
+            {"http.request", "http.disconnect", "test.channel"},
         )
         # Dynamically add route, recheck
         router.add_route(route("websocket.receive", consumer_1))
         self.assertEqual(
             router.channels,
-            {"http.request", "http.disconnect", "websocket.receive"},
+            {"http.request", "http.disconnect", "websocket.receive", "test.channel"},
         )

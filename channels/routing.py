@@ -15,6 +15,9 @@ class Router(object):
     listen to.
 
     Generally this is attached to a backend instance as ".router"
+
+    Anything can be a routable object as long as it provides a match()
+    method that either returns (callable, kwargs) or None.
     """
 
     def __init__(self, routing):
@@ -89,19 +92,16 @@ class Route(object):
     and optional message parameter matching.
     """
 
-    def __init__(self, channel, consumer, **kwargs):
-        # Get channel, make sure it's a unicode string
-        self.channel = channel
-        if isinstance(self.channel, six.binary_type):
-            self.channel = self.channel.decode("ascii")
+    def __init__(self, channels, consumer, **kwargs):
+        # Get channels, make sure it's a list of unicode strings
+        if isinstance(channels, six.string_types):
+            channels = [channels]
+        self.channels = [
+            channel.decode("ascii") if isinstance(channel, six.binary_type) else channel
+            for channel in channels
+        ]
         # Get consumer, optionally importing it
-        if isinstance(consumer, six.string_types):
-            module_name, variable_name = consumer.rsplit(".", 1)
-            try:
-                consumer = getattr(importlib.import_module(module_name), variable_name)
-            except (ImportError, AttributeError):
-                raise ImproperlyConfigured("Cannot import consumer %r" % consumer)
-        self.consumer = consumer
+        self.consumer = self._resolve_consumer(consumer)
         # Compile filter regexes up front
         self.filters = {
             name: re.compile(Router.normalise_re_arg(value))
@@ -118,13 +118,26 @@ class Route(object):
                     )
                 )
 
+    def _resolve_consumer(self, consumer):
+        """
+        Turns the consumer from a string into an object if it's a string,
+        passes it through otherwise.
+        """
+        if isinstance(consumer, six.string_types):
+            module_name, variable_name = consumer.rsplit(".", 1)
+            try:
+                consumer = getattr(importlib.import_module(module_name), variable_name)
+            except (ImportError, AttributeError):
+                raise ImproperlyConfigured("Cannot import consumer %r" % consumer)
+        return consumer
+
     def match(self, message):
         """
         Checks to see if we match the Message object. Returns
         (consumer, kwargs dict) if it matches, None otherwise
         """
         # Check for channel match first of all
-        if message.channel.name != self.channel:
+        if message.channel.name not in self.channels:
             return None
         # Check each message filter and build consumer kwargs as we go
         call_args = {}
@@ -143,16 +156,32 @@ class Route(object):
         """
         Returns the channel names this route listens on
         """
-        return {self.channel, }
+        return set(self.channels)
 
     def __str__(self):
         return "%s %s -> %s" % (
-            self.channel,
+            "/".join(self.channels),
             "" if not self.filters else "(%s)" % (
                 ", ".join("%s=%s" % (n, v.pattern) for n, v in self.filters.items())
             ),
             name_that_thing(self.consumer),
         )
+
+
+class RouteClass(Route):
+    """
+    Like Route, but targets a class-based consumer rather than a functional
+    one, meaning it looks for a (class) method called "channels()" on the
+    object rather than having a single channel passed in.
+    """
+
+    def __init__(self, consumer, **kwargs):
+        # Check the consumer provides a method_channels
+        consumer = self._resolve_consumer(consumer)
+        if not hasattr(consumer, "channel_names") or not callable(consumer.channel_names):
+            raise ValueError("The consumer passed to RouteClass has no valid channel_names method")
+        # Call super with list of channels
+        super(RouteClass, self).__init__(consumer.channel_names(), consumer, **kwargs)
 
 
 class Include(object):
@@ -212,4 +241,5 @@ class Include(object):
 
 # Lowercase standard to match urls.py
 route = Route
+route_class = RouteClass
 include = Include
