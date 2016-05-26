@@ -48,12 +48,11 @@ class PathNotImplementedStorage(storage.Storage):
 
     def delete(self, name):
         name = self._path(name)
-        if os.path.exists(name):
-            try:
-                os.remove(name)
-            except OSError as e:
-                if e.errno != errno.ENOENT:
-                    raise
+        try:
+            os.remove(name)
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
 
     def path(self, name):
         raise NotImplementedError
