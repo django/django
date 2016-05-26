@@ -21,6 +21,15 @@ to use ``route_class`` rather than ``route``; ``route_class`` knows how to
 talk to the class-based consumer and extract the list of channels it needs
 to listen on from it directly, rather than making you pass it in explicitly.
 
+Here's a routing example::
+
+    from channels import route, route_class
+
+    channel_routing = [
+        route_class(consumers.ChatServer, path=r"^/chat/"),
+        route("websocket.connect", consumers.ws_connect, path=r"^/$"),
+    ]
+
 Class-based consumers are instantiated once for each message they consume,
 so it's safe to store things on ``self`` (in fact, ``self.message`` is the
 current message by default).
