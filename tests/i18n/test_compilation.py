@@ -171,7 +171,7 @@ class CompilationErrorHandling(MessageCompilationTests):
         self.addCleanup(self.rmfile, os.path.join(self.test_dir, mo_file))
         # Make sure the output of msgfmt is unaffected by the current locale.
         env = os.environ.copy()
-        env.update({'LANG': 'C'})
+        env.update({str('LANG'): str('C')})
         with mock.patch('django.core.management.utils.Popen', lambda *args, **kwargs: Popen(*args, env=env, **kwargs)):
             if six.PY2:
                 # Various assertRaises on PY2 don't support unicode error messages.
