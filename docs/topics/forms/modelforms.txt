@@ -645,7 +645,7 @@ This creates a form that behaves identically to ``ArticleForm``, except there's
 some extra validation and cleaning for the ``pub_date`` field.
 
 You can also subclass the parent's ``Meta`` inner class if you want to change
-the ``Meta.fields`` or ``Meta.excludes`` lists::
+the ``Meta.fields`` or ``Meta.exclude`` lists::
 
     >>> class RestrictedArticleForm(EnhancedArticleForm):
     ...     class Meta(ArticleForm.Meta):
