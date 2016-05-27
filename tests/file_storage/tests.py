@@ -10,6 +10,7 @@ import threading
 import time
 import unittest
 from datetime import datetime, timedelta
+from tempfile import NamedTemporaryFile
 
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation, SuspiciousOperation
@@ -451,6 +452,14 @@ class FileStorageTests(TestCase):
             self.storage.exists('..')
         with self.assertRaises(SuspiciousOperation):
             self.storage.exists('/etc/passwd')
+
+    def test_save_temporary_file(self):
+        """Saving a python tempfile should not fail"""
+        storage = Storage()
+        with NamedTemporaryFile(suffix='.pdf') as file_:
+            file_.write(b'Imagine some external lib wrote to this file')
+            storage.normal = File(file_)
+            storage.save()
 
     def test_file_storage_preserves_filename_case(self):
         """The storage backend should preserve case of filenames."""
