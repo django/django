@@ -95,7 +95,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.EmailField: {'widget': widgets.AdminEmailInputWidget},
 }
 if HStoreField is not None:
-    FORMFIELD_FOR_DBFIELD_DEFAULTS[HStoreField] = {'widget': widgets.AdminHstoreField}
+    FORMFIELD_FOR_DBFIELD_DEFAULTS[HStoreField] = {'widget': widgets.AdminHstoreWidget}
 
 csrf_protect_m = method_decorator(csrf_protect)
 
