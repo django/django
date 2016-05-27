@@ -308,6 +308,7 @@ class ModelBase(type):
 
         new_class._prepare()
         new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+        signals.class_prepared.send(sender=new_class)
         return new_class
 
     def add_to_class(cls, name, value):
@@ -355,8 +356,6 @@ class ModelBase(type):
             manager = Manager()
             manager.auto_created = True
             cls.add_to_class('objects', manager)
-
-        signals.class_prepared.send(sender=cls)
 
     def _requires_legacy_default_manager(cls):  # RemovedInDjango20Warning
         opts = cls._meta
