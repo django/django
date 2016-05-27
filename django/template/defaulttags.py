@@ -969,7 +969,8 @@ def do_if(parser, token):
         token = parser.next_token()
 
     # {% endif %}
-    assert token.contents == 'endif'
+    if token.contents != 'endif':
+        raise TemplateSyntaxError('Malformed template tag at line {0}: "{1}"'.format(token.lineno, token.contents))
 
     return IfNode(conditions_nodelists)
 
