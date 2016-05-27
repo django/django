@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 
+from unittest import skipUnless
+
 from django.contrib.gis.db.models import fields
+from django.contrib.gis.gdal import HAS_GDAL
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, migrations, models
 from django.db.migrations.migration import Migration
@@ -114,6 +117,7 @@ class OperationTests(TransactionTestCase):
             self.assertSpatialIndexExists('gis_neighborhood', 'heatmap')
 
     @skipIfDBFeature('supports_raster')
+    @skipUnless(HAS_GDAL, 'A different error is raised if GDAL is not installed.')
     def test_create_raster_model_on_db_without_raster_support(self):
         """
         Test creating a model with a raster field on a db without raster support.
@@ -123,6 +127,7 @@ class OperationTests(TransactionTestCase):
             self.set_up_test_model(True)
 
     @skipIfDBFeature('supports_raster')
+    @skipUnless(HAS_GDAL, 'A different error is raised if GDAL is not installed.')
     def test_add_raster_field_on_db_without_raster_support(self):
         """
         Test adding a raster field on a db without raster support.
