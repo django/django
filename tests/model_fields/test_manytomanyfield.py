@@ -6,6 +6,14 @@ from django.test.utils import isolate_apps
 
 class ManyToManyFieldTests(SimpleTestCase):
 
+    @isolate_apps('model_fields')
+    def test_value_from_object_instance_without_pk(self):
+        class ManyToManyModel(models.Model):
+            m2m = models.ManyToManyField('self', models.CASCADE)
+
+        instance = ManyToManyModel()
+        self.assertEqual(instance._meta.get_field('m2m').value_from_object(instance), [])
+
     def test_abstract_model_pending_operations(self):
         """
         Many-to-many fields declared on abstract models should not add lazy
