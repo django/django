@@ -6,8 +6,8 @@ from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import (
     Bar, Director, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
-    Place, Pointer, RelatedModel, Restaurant, School, Target, UndergroundBar,
-    Waiter,
+    Place, Pointer, RelatedModel, Restaurant, School, Target, ToFieldPointer,
+    UndergroundBar, Waiter,
 )
 
 
@@ -530,3 +530,9 @@ class OneToOneTests(TestCase):
         r = Restaurant.objects.first()
         r2 = Restaurant.objects.filter(pk__exact=r).first()
         self.assertEqual(r, r2)
+
+    def test_primary_key_to_field_filter(self):
+        target = Target.objects.create(name='foo')
+        pointer = ToFieldPointer.objects.create(target=target)
+        self.assertQuerysetEqual(ToFieldPointer.objects.filter(target=target), [pointer], lambda x: x)
+        self.assertQuerysetEqual(ToFieldPointer.objects.filter(pk__exact=pointer), [pointer], lambda x: x)
