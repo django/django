@@ -1565,6 +1565,8 @@ class ManyToManyField(RelatedField):
         """
         Return the value of this field in the given model instance.
         """
+        if obj.pk is None:
+            return []
         qs = getattr(obj, self.attname).all()
         if qs._result_cache is not None:
             return [item.pk for item in qs]
