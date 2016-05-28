@@ -83,7 +83,7 @@ class MultiModel(models.Model):
 
 
 class Target(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
 
 
 class Pointer(models.Model):
@@ -96,6 +96,10 @@ class Pointer2(models.Model):
 
 class HiddenPointer(models.Model):
     target = models.OneToOneField(Target, models.CASCADE, related_name='hidden+')
+
+
+class ToFieldPointer(models.Model):
+    target = models.OneToOneField(Target, models.CASCADE, to_field='name', primary_key=True)
 
 
 # Test related objects visibility.
