@@ -214,9 +214,9 @@ class BasicExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            po_contents = force_text(fp.read())
-            self.assertMsgId("Non-breaking space\xa0:", po_contents)
+        with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
+            po_contents = fp.read()
+            self.assertMsgId("Non-breaking space\u00a0:", po_contents)
 
     def test_blocktrans_trimmed(self):
         os.chdir(self.test_dir)
