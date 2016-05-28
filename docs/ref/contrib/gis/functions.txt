@@ -263,7 +263,7 @@ right-hand rule.
 
 .. class:: GeoHash(expression, **extra)
 
-*Availability*: PostGIS, SpatiaLite (≥ 4.0, LWGEOM)
+*Availability*: PostGIS, SpatiaLite (LWGEOM)
 
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
@@ -367,7 +367,7 @@ in the first linestring in the geometry field; otherwise returns ``None``.
 
 .. class:: Perimeter(expression, **extra)
 
-*Availability*: PostGIS, Oracle, SpatiaLite (≥ 4.0)
+*Availability*: PostGIS, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns the perimeter of the
 geometry field as a :class:`~django.contrib.gis.measure.Distance` object. On
@@ -389,7 +389,7 @@ guaranteed to lie on the surface of the field; otherwise returns ``None``.
 
 .. class:: Reverse(expression, **extra)
 
-*Availability*: PostGIS, Oracle, SpatiaLite (≥ 4.0)
+*Availability*: PostGIS, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns a geometry with
 reversed coordinates.
@@ -410,7 +410,7 @@ scaled coordinates by multiplying them with the ``x``, ``y``, and optionally
 
 .. class:: SnapToGrid(expression, *args, **extra)
 
-*Availability*: PostGIS, SpatiaLite (≥ 3.1)
+*Availability*: PostGIS, SpatiaLite
 
 Accepts a single geographic field or expression and returns a geometry with all
 points snapped to the given grid.  How the geometry is snapped to the grid
