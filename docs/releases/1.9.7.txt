@@ -20,3 +20,6 @@ Bugfixes
 
 * Fixed ``on_commit`` callbacks execution order when callbacks make
   transactions (:ticket:`26627`).
+
+* Raised ValidationError if non-dict-like JSON is passed to HStoreField
+  (:ticket: `26672`).
