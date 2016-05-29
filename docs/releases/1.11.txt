@@ -204,6 +204,15 @@ Database backend API
 
 * ...
 
+Dropped support for PostgreSQL 9.2 and PostGIS 2.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream support for PostgreSQL 9.2 ends in September 2017. As a consequence,
+Django 1.11 sets PostgreSQL 9.3 as the minimum version it officially supports.
+
+Support for PostGIS 2.0 is also removed as PostgreSQL 9.2 is the last version
+to support it.
+
 Miscellaneous
 -------------
 

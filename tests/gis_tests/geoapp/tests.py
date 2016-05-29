@@ -22,11 +22,6 @@ from .models import (
 )
 
 
-def postgis_bug_version():
-    spatial_version = getattr(connection.ops, "spatial_version", (0, 0, 0))
-    return spatial_version and (2, 0, 0) <= spatial_version <= (2, 0, 1)
-
-
 @skipUnlessDBFeature("gis_enabled")
 class GeoModelTest(TestCase):
     fixtures = ['initial']
@@ -313,11 +308,6 @@ class GeoLookupTest(TestCase):
         # Left: A << B => true if xmax(A) < xmin(B)
         # Right: A >> B => true if xmin(A) > xmax(B)
         # See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in PostGIS source.
-
-        # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
-        # http://trac.osgeo.org/postgis/ticket/2035
-        if postgis_bug_version():
-            self.skipTest("PostGIS 2.0/2.0.1 left and right lookups are known to be buggy.")
 
         # Getting the borders for Colorado & Kansas
         co_border = State.objects.get(name='Colorado').poly
