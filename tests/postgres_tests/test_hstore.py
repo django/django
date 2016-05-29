@@ -183,6 +183,13 @@ class TestFormField(PostgreSQLTestCase):
         self.assertEqual(cm.exception.messages[0], 'Could not load JSON data.')
         self.assertEqual(cm.exception.code, 'invalid_json')
 
+    def test_non_dict_json(self):
+        field = forms.HStoreField()
+        msg = 'Input must be a JSON dictionary.'
+        with self.assertRaisesMessage(exceptions.ValidationError, msg) as cm:
+            field.clean('["a", "b", 1]')
+        self.assertEqual(cm.exception.code, 'invalid_format')
+
     def test_not_string_values(self):
         field = forms.HStoreField()
         value = field.clean('{"a": 1}')
