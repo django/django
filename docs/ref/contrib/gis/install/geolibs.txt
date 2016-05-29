@@ -12,7 +12,7 @@ Program                   Description                           Required        
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.9, 4.8, 4.7, 4.6, 4.5, 4.4
 :doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes (SQLite only)                 2.1, 2.0, 1.11, 1.10, 1.9, 1.8, 1.7
 :doc:`GeoIP <../geoip>`   IP-based geolocation library          No                                1.4
-`PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.1, 2.0
+`PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.2, 2.1, 2.0
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.3, 4.2, 4.1, 4.0, 3.0
 ========================  ====================================  ================================  ===================================
 
@@ -32,6 +32,7 @@ totally fine with GeoDjango. Your mileage may vary.
     GDAL 2.1.0 2016-04
     PostGIS 2.0.0 2012-04-03
     PostGIS 2.1.0 2013-08-17
+    PostGIS 2.2.0 2015-10-17
     Spatialite 3.0.0 2011-12-30
     Spatialite 4.0.0 2012-11-25
     Spatialite 4.1.0 2013-06-04
