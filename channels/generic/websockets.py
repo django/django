@@ -22,18 +22,19 @@ class WebsocketConsumer(BaseConsumer):
     slight_ordering = False
     strict_ordering = False
 
-    def dispatch(self, message, **kwargs):
+    def get_handler(self, message, **kwargs):
         """
         Pulls out the path onto an instance variable, and optionally
         adds the ordering decorator.
         """
         self.path = message['path']
+        handler = super(WebsocketConsumer, self).get_handler(message, **kwargs)
         if self.strict_ordering:
-            return enforce_ordering(super(WebsocketConsumer, self).dispatch(message, **kwargs), slight=False)
+            return enforce_ordering(handler, slight=False)
         elif self.slight_ordering:
-            return enforce_ordering(super(WebsocketConsumer, self).dispatch(message, **kwargs), slight=True)
+            return enforce_ordering(handler, slight=True)
         else:
-            return super(WebsocketConsumer, self).dispatch(message, **kwargs)
+            return handler
 
     def connection_groups(self, **kwargs):
         """
