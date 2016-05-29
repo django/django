@@ -101,21 +101,27 @@ class Client(object):
         content.setdefault('reply_channel', self.reply_channel)
         self.channel_layer.send(to, content)
 
-    def consume(self, channel):
+    def consume(self, channel, fail_on_none=True):
         """
         Get next message for channel name and run appointed consumer
         """
         message = self.get_next_message(channel)
         if message:
-            consumer, kwargs = self.channel_layer.router.match(message)
-            return consumer(message, **kwargs)
+            match = self.channel_layer.router.match(message)
+            if match:
+                consumer, kwargs = match
+                return consumer(message, **kwargs)
+            elif fail_on_none:
+                raise AssertionError("Can't find consumer for message %s" % message)
+        elif fail_on_none:
+            raise AssertionError("No message for channel %s" % channel)
 
-    def send_and_consume(self, channel, content={}):
+    def send_and_consume(self, channel, content={}, fail_on_none=True):
         """
         Reproduce full live cycle of the message
         """
         self.send(channel, content)
-        return self.consume(channel)
+        return self.consume(channel, fail_on_none=fail_on_none)
 
     def receive(self):
         """self.get_next_message(self.reply_channel)
