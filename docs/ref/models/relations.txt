@@ -128,7 +128,7 @@ Related objects reference
         :data:`~django.db.models.signals.post_save` signals and comes at the
         expense of performance.
 
-        Similary to :meth:`add()`, the ``remove()`` method also accepts primary
+        Similarly to :meth:`add()`, the ``remove()`` method also accepts primary
         keys as arguments, so the above example can be rewritten as
         ``b.entry_set.remove(234)``.
 
