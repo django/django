@@ -20,3 +20,6 @@ Bugfixes
 
 * Fixed ``on_commit`` callbacks execution order when callbacks make
   transactions (:ticket:`26627`).
+
+* Fixed ``HStoreField`` to raise a ``ValidationError`` instead of crashing on
+  non-dictionary JSON input (:ticket:`26672`).

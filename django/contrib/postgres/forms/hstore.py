@@ -9,10 +9,13 @@ __all__ = ['HStoreField']
 
 
 class HStoreField(forms.CharField):
-    """A field for HStore data which accepts JSON input."""
+    """
+    A field for HStore data which accepts dictionary JSON input.
+    """
     widget = forms.Textarea
     default_error_messages = {
         'invalid_json': _('Could not load JSON data.'),
+        'invalid_format': _('Input must be a JSON dictionary.'),
     }
 
     def prepare_value(self, value):
@@ -31,6 +34,13 @@ class HStoreField(forms.CharField):
                     self.error_messages['invalid_json'],
                     code='invalid_json',
                 )
+
+        if not isinstance(value, dict):
+            raise ValidationError(
+                self.error_messages['invalid_format'],
+                code='invalid_format',
+            )
+
         # Cast everything to strings for ease.
         for key, val in value.items():
             value[key] = six.text_type(val)
