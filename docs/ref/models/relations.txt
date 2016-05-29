@@ -61,6 +61,9 @@ Related objects reference
         <django.db.models.query.QuerySet.bulk_create>`. If you need to execute
         some custom logic when a relationship is created, listen to the
         :data:`~django.db.models.signals.m2m_changed` signal.
+        
+        The ``add()`` method also accepts primary keys as arguments, so the
+        above example can be written directly as ``b.entry_set.add(234)``.
 
     .. method:: create(**kwargs)
 
