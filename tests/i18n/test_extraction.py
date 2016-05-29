@@ -5,6 +5,7 @@ import io
 import os
 import re
 import shutil
+import tempfile
 import time
 import warnings
 from unittest import SkipTest, skipUnless
@@ -17,7 +18,6 @@ from django.core.management.commands.makemessages import \
     Command as MakeMessagesCommand
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase, mock, override_settings
-from django.test.testcases import SerializeMixin
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import six
 from django.utils._os import upath
@@ -27,23 +27,36 @@ from django.utils.translation import TranslatorCommentWarning
 
 LOCALE = 'de'
 has_xgettext = find_command('xgettext')
-this_directory = os.path.dirname(upath(__file__))
+source_code_dir = os.path.dirname(upath(__file__))
+
+
+class POFileAssertionMixin(object):
+
+    def _assertPoKeyword(self, keyword, expected_value, haystack, use_quotes=True):
+        q = '"'
+        if use_quotes:
+            expected_value = '"%s"' % expected_value
+            q = "'"
+        needle = '%s %s' % (keyword, expected_value)
+        expected_value = re.escape(expected_value)
+        return self.assertTrue(re.search('^%s %s' % (keyword, expected_value), haystack, re.MULTILINE),
+                               'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q})
+
+    def assertMsgId(self, msgid, haystack, use_quotes=True):
+        return self._assertPoKeyword('msgid', msgid, haystack, use_quotes=use_quotes)
 
 
 @skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
-class ExtractorTests(SerializeMixin, SimpleTestCase):
+class ExtractorTests(POFileAssertionMixin, SimpleTestCase):
 
-    # makemessages scans the current working directory and writes in the
-    # locale subdirectory. There aren't any options to control this. As a
-    # consequence tests can't run in parallel. Since i18n tests run in less
-    # than 4 seconds, serializing them with SerializeMixin is acceptable.
-    lockfile = __file__
-
-    test_dir = os.path.abspath(os.path.join(this_directory, 'commands'))
+    work_subdir = 'commands'
 
     PO_FILE = 'locale/%s/LC_MESSAGES/django.po' % LOCALE
 
     def setUp(self):
+        self.work_dir = tempfile.mkdtemp(prefix='i18n_')
+        self.test_dir = os.path.abspath(os.path.join(self.work_dir, self.work_subdir))
+        shutil.copytree(os.path.join(source_code_dir, self.work_subdir), self.test_dir)
         self._cwd = os.getcwd()
 
     def _rmrf(self, dname):
@@ -72,19 +85,6 @@ class ExtractorTests(SerializeMixin, SimpleTestCase):
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
         return output, po_contents
-
-    def _assertPoKeyword(self, keyword, expected_value, haystack, use_quotes=True):
-        q = '"'
-        if use_quotes:
-            expected_value = '"%s"' % expected_value
-            q = "'"
-        needle = '%s %s' % (keyword, expected_value)
-        expected_value = re.escape(expected_value)
-        return self.assertTrue(re.search('^%s %s' % (keyword, expected_value), haystack, re.MULTILINE),
-                               'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q})
-
-    def assertMsgId(self, msgid, haystack, use_quotes=True):
-        return self._assertPoKeyword('msgid', msgid, haystack, use_quotes=use_quotes)
 
     def assertMsgIdPlural(self, msgid, haystack, use_quotes=True):
         return self._assertPoKeyword('msgid_plural', msgid, haystack, use_quotes=use_quotes)
@@ -464,16 +464,15 @@ class JavascriptExtractorTests(ExtractorTests):
         self.assertMsgId("quz", po_contents)
         self.assertMsgId("foobar", po_contents)
 
-    @override_settings(
-        STATIC_ROOT=os.path.join(this_directory, 'commands', 'static/'),
-        MEDIA_ROOT=os.path.join(this_directory, 'commands', 'media_root/'))
     def test_media_static_dirs_ignored(self):
         """
         Regression test for #23583.
         """
-        _, po_contents = self._run_makemessages(domain='djangojs')
-        self.assertMsgId("Static content inside app should be included.", po_contents)
-        self.assertNotMsgId("Content from STATIC_ROOT should not be included", po_contents)
+        with override_settings(STATIC_ROOT=os.path.join(self.test_dir, 'static/'),
+                               MEDIA_ROOT=os.path.join(self.test_dir, 'media_root/')):
+            _, po_contents = self._run_makemessages(domain='djangojs')
+            self.assertMsgId("Static content inside app should be included.", po_contents)
+            self.assertNotMsgId("Content from STATIC_ROOT should not be included", po_contents)
 
     @override_settings(STATIC_ROOT=None, MEDIA_ROOT='')
     def test_default_root_settings(self):
@@ -509,13 +508,12 @@ class IgnoredExtractorTests(ExtractorTests):
         self.assertIn("ignoring file xxx_ignored.html", out)
         self.assertNotMsgId('This should be ignored too.', po_contents)
 
-    @override_settings(
-        STATIC_ROOT=os.path.join(this_directory, 'commands', 'static/'),
-        MEDIA_ROOT=os.path.join(this_directory, 'commands', 'media_root/'))
     def test_media_static_dirs_ignored(self):
-        out, _ = self._run_makemessages()
-        self.assertIn("ignoring directory static", out)
-        self.assertIn("ignoring directory media_root", out)
+        with override_settings(STATIC_ROOT=os.path.join(self.test_dir, 'static/'),
+                               MEDIA_ROOT=os.path.join(self.test_dir, 'media_root/')):
+            out, _ = self._run_makemessages()
+            self.assertIn("ignoring directory static", out)
+            self.assertIn("ignoring directory media_root", out)
 
 
 class SymlinkExtractorTests(ExtractorTests):
@@ -719,10 +717,10 @@ class MultipleLocaleExtractionTests(ExtractorTests):
 
 class ExcludedLocaleExtractionTests(ExtractorTests):
 
+    work_subdir = 'exclude'
+
     LOCALES = ['en', 'fr', 'it']
     PO_FILE = 'locale/%s/LC_MESSAGES/django.po'
-
-    test_dir = os.path.abspath(os.path.join(this_directory, 'exclude'))
 
     def _set_times_for_all_po_files(self):
         """
@@ -773,9 +771,7 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
 
 class CustomLayoutExtractionTests(ExtractorTests):
 
-    def setUp(self):
-        super(CustomLayoutExtractionTests, self).setUp()
-        self.test_dir = os.path.join(this_directory, 'project_dir')
+    work_subdir = 'project_dir'
 
     def test_no_locale_raises(self):
         os.chdir(self.test_dir)
@@ -783,31 +779,29 @@ class CustomLayoutExtractionTests(ExtractorTests):
         with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command('makemessages', locale=LOCALE, verbosity=0)
 
-    @override_settings(
-        LOCALE_PATHS=[os.path.join(this_directory, 'project_dir', 'project_locale')],
-    )
     def test_project_locale_paths(self):
         """
         Test that:
           * translations for an app containing a locale folder are stored in that folder
           * translations outside of that app are in LOCALE_PATHS[0]
         """
-        os.chdir(self.test_dir)
-        self.addCleanup(shutil.rmtree, os.path.join(settings.LOCALE_PATHS[0], LOCALE), True)
-        self.addCleanup(shutil.rmtree, os.path.join(self.test_dir, 'app_with_locale', 'locale', LOCALE), True)
+        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'project_locale')]):
+            os.chdir(self.test_dir)
+            self.addCleanup(shutil.rmtree, os.path.join(settings.LOCALE_PATHS[0], LOCALE), True)
+            self.addCleanup(shutil.rmtree, os.path.join(self.test_dir, 'app_with_locale', 'locale', LOCALE), True)
 
-        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
-        project_de_locale = os.path.join(
-            self.test_dir, 'project_locale', 'de', 'LC_MESSAGES', 'django.po')
-        app_de_locale = os.path.join(
-            self.test_dir, 'app_with_locale', 'locale', 'de', 'LC_MESSAGES', 'django.po')
-        self.assertTrue(os.path.exists(project_de_locale))
-        self.assertTrue(os.path.exists(app_de_locale))
+            management.call_command('makemessages', locale=[LOCALE], verbosity=0)
+            project_de_locale = os.path.join(
+                self.test_dir, 'project_locale', 'de', 'LC_MESSAGES', 'django.po')
+            app_de_locale = os.path.join(
+                self.test_dir, 'app_with_locale', 'locale', 'de', 'LC_MESSAGES', 'django.po')
+            self.assertTrue(os.path.exists(project_de_locale))
+            self.assertTrue(os.path.exists(app_de_locale))
 
-        with open(project_de_locale, 'r') as fp:
-            po_contents = force_text(fp.read())
-            self.assertMsgId('This app has no locale directory', po_contents)
-            self.assertMsgId('This is a project-level string', po_contents)
-        with open(app_de_locale, 'r') as fp:
-            po_contents = force_text(fp.read())
-            self.assertMsgId('This app has a locale directory', po_contents)
+            with open(project_de_locale, 'r') as fp:
+                po_contents = force_text(fp.read())
+                self.assertMsgId('This app has no locale directory', po_contents)
+                self.assertMsgId('This is a project-level string', po_contents)
+            with open(app_de_locale, 'r') as fp:
+                po_contents = force_text(fp.read())
+                self.assertMsgId('This app has a locale directory', po_contents)

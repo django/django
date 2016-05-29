@@ -9,7 +9,7 @@ from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.translation import activate, get_language, trans_real
 
-from .test_extraction import ExtractorTests
+from .test_extraction import POFileAssertionMixin
 
 SAMPLEPROJECT_DIR = os.path.join(os.path.dirname(os.path.abspath(upath(__file__))), 'sampleproject')
 SAMPLEPROJECT_LOCALE = os.path.join(SAMPLEPROJECT_DIR, 'locale')
@@ -31,7 +31,7 @@ class FrenchTestCase(SimpleTestCase):
         activate(self._language)
 
 
-class ExtractingStringsWithPercentSigns(FrenchTestCase, ExtractorTests):
+class ExtractingStringsWithPercentSigns(POFileAssertionMixin, FrenchTestCase):
     """
     Tests the extracted string found in the gettext catalog.
 
