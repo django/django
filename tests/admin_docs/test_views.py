@@ -335,6 +335,11 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'^a', '/a'),
             (r'^(?P<a>\w+)/b/(?P<c>\w+)/$', '/<a>/b/<c>/'),
             (r'^(?P<a>\w+)/b/(?P<c>\w+)$', '/<a>/b/<c>'),
+            (r'^(?P<a>\w+)/b/(\w+)$', '/<a>/b/<var>'),
+            (r'^(?P<a>\w+)/b/((x|y)\w+)$', '/<a>/b/<var>'),
+            (r'^(?P<a>(x|y))/b/(?P<c>\w+)$', '/<a>/b/<c>'),
+            (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
+            (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
         )
         for pattern, output in tests:
             self.assertEqual(simplify_regex(pattern), output)

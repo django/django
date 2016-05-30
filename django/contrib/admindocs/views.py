@@ -1,6 +1,5 @@
 import inspect
 import os
-import re
 from importlib import import_module
 
 from django.apps import apps
@@ -8,6 +7,9 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
+from django.contrib.admindocs.utils import (
+    replace_named_groups, replace_unnamed_groups,
+)
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
 from django.http import Http404
@@ -426,24 +428,16 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
     return views
 
 
-named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')
-non_named_group_matcher = re.compile(r'\(.*?\)')
-
-
 def simplify_regex(pattern):
     r"""
     Clean up urlpattern regexes into something more readable by humans. For
     example, turn "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
     into "/<sport_slug>/athletes/<athlete_slug>/".
     """
-    # handle named groups first
-    pattern = named_group_matcher.sub(lambda m: m.group(1), pattern)
-
-    # handle non-named groups
-    pattern = non_named_group_matcher.sub("<var>", pattern)
-
+    pattern = replace_named_groups(pattern)
+    pattern = replace_unnamed_groups(pattern)
     # clean up any outstanding regex-y characters.
-    pattern = pattern.replace('^', '').replace('$', '').replace('?', '').replace('//', '/').replace('\\', '')
+    pattern = pattern.replace('^', '').replace('$', '')
     if not pattern.startswith('/'):
         pattern = '/' + pattern
     return pattern
