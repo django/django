@@ -3,7 +3,7 @@ import unittest
 
 from django.conf import settings
 from django.contrib.admindocs import utils
-from django.contrib.admindocs.views import get_return_data_type
+from django.contrib.admindocs.views import get_return_data_type, simplify_regex
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.test import TestCase, modify_settings, override_settings
@@ -122,6 +122,15 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
             self.assertContains(response, '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>')
         finally:
             utils.docutils_is_available = True
+
+    def test_simplify_regex(self):
+        tests = (
+            ('^a', '/a'),
+            ('^(?P<a>\w+)/b/(?P<c>\w+)/$', '/<a>/b/<c>/'),
+            ('^(?P<a>\w+)/b/(?P<c>\w+)$', '/<a>/b/<c>'),
+        )
+        for pattern, output in tests:
+            self.assertEqual(simplify_regex(pattern), output)
 
 
 @override_settings(TEMPLATES=[{

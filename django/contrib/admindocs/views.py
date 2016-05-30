@@ -394,9 +394,9 @@ non_named_group_matcher = re.compile(r'\(.*?\)')
 
 def simplify_regex(pattern):
     """
-    Clean up urlpattern regexes into something somewhat readable by Mere Humans:
-    turns something like "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
-    into "<sport_slug>/athletes/<athlete_slug>/"
+    Clean up urlpattern regexes into something more readable by humans. For
+    example, turn "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
+    into "/<sport_slug>/athletes/<athlete_slug>/".
     """
     # handle named groups first
     pattern = named_group_matcher.sub(lambda m: m.group(1), pattern)
