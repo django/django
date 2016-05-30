@@ -867,6 +867,13 @@ class MigrationAutodetector(object):
                 )
                 if rename_key in self.renamed_models:
                     new_field.remote_field.model = old_field.remote_field.model
+            if hasattr(new_field, "remote_field") and getattr(new_field.remote_field, "through", None):
+                rename_key = (
+                    new_field.remote_field.through._meta.app_label,
+                    new_field.remote_field.through._meta.model_name,
+                )
+                if rename_key in self.renamed_models:
+                    new_field.remote_field.through = old_field.remote_field.through
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:
