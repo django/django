@@ -134,7 +134,7 @@ need to change the socket address if you're using a development VM or similar)::
 
     // Note that the path doesn't matter for routing; any WebSocket
     // connection gets bumped over to WebSocket consumers
-    socket = new WebSocket("ws://127.0.0.1:8000/chat/");
+    socket = new WebSocket("ws://" + window.location.host + "/chat/");
     socket.onmessage = function(e) {
         alert(e.data);
     }
@@ -228,7 +228,7 @@ code in the developer console as before::
 
     // Note that the path doesn't matter right now; any WebSocket
     // connection gets bumped over to WebSocket consumers
-    socket = new WebSocket("ws://127.0.0.1:8000/chat/");
+    socket = new WebSocket("ws://" + window.location.host + "/chat/");
     socket.onmessage = function(e) {
         alert(e.data);
     }
