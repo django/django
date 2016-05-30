@@ -74,7 +74,7 @@ class Signal(object):
 
             sender
                 The sender to which the receiver should respond. Must either be
-                of type Signal, or None to receive events from any sender.
+                a Python object, or None to receive events from any sender.
 
             weak
                 Whether to use weak references to the receiver. By default, the
