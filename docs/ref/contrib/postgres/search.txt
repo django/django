@@ -165,14 +165,9 @@ than comparing the size of an integer, for example.
 
 In the event that all the fields you're querying on are contained within one
 particular model, you can create a functional index which matches the search
-vector you wish to use. For example:
-
-.. code-block:: sql
-
-    CREATE INDEX body_text_search ON blog_entry (to_tsvector(body_text));
-
-This index will then be used by subsequent queries. In many cases this will be
-sufficient.
+vector you wish to use. You can consult the PostgreSQL documentation for
+details on `creating indexes for full text search
+<http://www.postgresql.org/docs/current/static/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
 
 ``SearchVectorField``
 ---------------------
