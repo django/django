@@ -207,7 +207,11 @@ Database backend API
 Miscellaneous
 -------------
 
-* ...
+* The :meth:`SyndicationFeed.latest_post_date
+  <django.utils.feedgenerator.SyndicationFeed.latest_post_date>` now returns
+  current UTC date/time, instead of a datetime without any timezone
+  information, if no items have either of the ``pubdate`` or
+  ``updateddate`` attributes.
 
 .. _deprecated-features-1.11:
 

@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 import datetime
 import unittest
 
+from django.test import override_settings
 from django.utils import feedgenerator
-from django.utils.timezone import get_fixed_timezone
+from django.utils.timezone import get_fixed_timezone, utc
 
 
 class FeedgeneratorTest(unittest.TestCase):
@@ -121,3 +122,13 @@ class FeedgeneratorTest(unittest.TestCase):
         self.assertIn('<atom:link', feed_content)
         self.assertIn('href="/feed/"', feed_content)
         self.assertIn('rel="self"', feed_content)
+
+    @override_settings(USE_TZ=True)
+    def test_latest_post_date_returns_utc_time_with_use_tz(self):
+        rss_feed = feedgenerator.Rss201rev2Feed('title', 'link', 'description')
+        self.assertEqual(rss_feed.latest_post_date().tzinfo, utc)
+
+    @override_settings(USE_TZ=False)
+    def test_latest_post_date_returns_utc_time_without_use_tz(self):
+        rss_feed = feedgenerator.Rss201rev2Feed('title', 'link', 'description')
+        self.assertEqual(rss_feed.latest_post_date().tzinfo, utc)
