@@ -5,7 +5,7 @@ import warnings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
-from django.db.models import Prefetch
+from django.db.models import Prefetch, QuerySet
 from django.db.models.query import get_prefetcher
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
@@ -737,6 +737,12 @@ class CustomPrefetchTests(TestCase):
         with self.assertRaisesMessage(ValueError, 'Prefetch querysets cannot use values().'):
             Prefetch('houses', House.objects.values('pk'))
 
+    def test_to_attr_doesnt_cache_through_attr_as_list(self):
+        house = House.objects.prefetch_related(
+            Prefetch('rooms', queryset=Room.objects.all(), to_attr='to_rooms'),
+        ).get(pk=self.house3.pk)
+        self.assertIsInstance(house.rooms.all(), QuerySet)
+
 
 class DefaultManagerTests(TestCase):
 
@@ -1268,7 +1274,7 @@ class Ticket21760Tests(TestCase):
             house.save()
 
     def test_bug(self):
-        prefetcher = get_prefetcher(self.rooms[0], 'house')[0]
+        prefetcher = get_prefetcher(self.rooms[0], 'house', 'house')[0]
         queryset = prefetcher.get_prefetch_queryset(list(Room.objects.all()))[0]
         self.assertNotIn(' JOIN ', force_text(queryset.query))
 
