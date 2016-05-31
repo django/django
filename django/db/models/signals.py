@@ -3,6 +3,7 @@ from functools import partial
 
 from django.db.models.utils import make_model_tuple
 from django.dispatch import Signal
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 
@@ -15,15 +16,15 @@ class ModelSignal(Signal):
     of the `app_label.ModelName` form.
     """
     def _lazy_method(self, method, apps, receiver, sender, **kwargs):
+        from django.db.models.options import Options
+
         # This partial takes a single optional argument named "sender".
         partial_method = partial(method, receiver, **kwargs)
-        # import models here to avoid a circular import
-        from django.db import models
-        if isinstance(sender, models.Model) or sender is None:
-            # Skip lazy_model_operation to get a return value for disconnect()
+        if isinstance(sender, six.string_types):
+            apps = apps or Options.default_apps
+            apps.lazy_model_operation(partial_method, make_model_tuple(sender))
+        else:
             return partial_method(sender)
-        apps = apps or models.base.Options.default_apps
-        apps.lazy_model_operation(partial_method, make_model_tuple(sender))
 
     def connect(self, receiver, sender=None, weak=True, dispatch_uid=None, apps=None):
         self._lazy_method(super(ModelSignal, self).connect, apps, receiver, sender, dispatch_uid=dispatch_uid)
