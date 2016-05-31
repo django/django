@@ -977,7 +977,7 @@ You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
 
     class Restaurant(models.Model):
-        pizzas = models.ManyToMany(Pizza, related_name='restaurants')
+        pizzas = models.ManyToManyField(Pizza, related_name='restaurants')
         best_pizza = models.ForeignKey(Pizza, related_name='championed_by')
 
 The following are all legal:
