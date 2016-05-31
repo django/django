@@ -506,15 +506,6 @@ An API is available to manipulate session data outside of a view::
     >>> s['last_login']
     1376587691
 
-In order to mitigate session fixation attacks, sessions keys that don't exist
-are regenerated::
-
-    >>> from django.contrib.sessions.backends.db import SessionStore
-    >>> s = SessionStore(session_key='no-such-session-here')
-    >>> s.save()
-    >>> s.session_key
-    'ff882814010ccbc3c870523934fee5a2'
-
 If you're using the ``django.contrib.sessions.backends.db`` backend, each
 session is just a normal Django model. The ``Session`` model is defined in
 ``django/contrib/sessions/models.py``. Because it's a normal model, you can
