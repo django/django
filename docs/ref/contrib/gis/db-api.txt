@@ -388,7 +388,7 @@ Function                              PostGIS  Oracle  MySQL        SpatiaLite
 :class:`Distance`                     X        X       X (≥ 5.6.1)  X
 :class:`Envelope`                     X                X            X
 :class:`ForceRHR`                     X
-:class:`GeoHash`                      X                             X (≥ 4.0, LWGEOM)
+:class:`GeoHash`                      X                             X (LWGEOM)
 :class:`Intersection`                 X        X       X (≥ 5.6.1)  X
 :class:`IsValid`                      X
 :class:`Length`                       X        X       X            X
@@ -396,11 +396,11 @@ Function                              PostGIS  Oracle  MySQL        SpatiaLite
 :class:`MemSize`                      X
 :class:`NumGeometries`                X        X       X            X
 :class:`NumPoints`                    X        X       X            X
-:class:`Perimeter`                    X        X                    X (≥ 4.0)
+:class:`Perimeter`                    X        X                    X
 :class:`PointOnSurface`               X        X                    X
-:class:`Reverse`                      X        X                    X (≥ 4.0)
+:class:`Reverse`                      X        X                    X
 :class:`Scale`                        X                             X
-:class:`SnapToGrid`                   X                             X (≥ 3.1)
+:class:`SnapToGrid`                   X                             X
 :class:`SymDifference`                X        X       X (≥ 5.6.1)  X
 :class:`Transform`                    X        X                    X
 :class:`Translate`                    X                             X

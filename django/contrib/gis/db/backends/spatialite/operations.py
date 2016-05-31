@@ -1,6 +1,5 @@
 """
 SQL functions reference lists:
-http://www.gaia-gis.it/spatialite-3.0.0-BETA/spatialite-sql-3.0.0.html
 https://web.archive.org/web/20130407175746/http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.0.0.html
 http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
 """
@@ -90,18 +89,14 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
             'Length': 'ST_Length',
             'Reverse': 'ST_Reverse',
             'Scale': 'ScaleCoords',
-            'Translate': 'ST_Translate' if self.spatial_version >= (3, 1, 0) else 'ShiftCoords',
+            'Translate': 'ST_Translate',
             'Union': 'ST_Union',
         }
 
     @cached_property
     def unsupported_functions(self):
         unsupported = {'BoundingCircle', 'ForceRHR', 'IsValid', 'MakeValid', 'MemSize'}
-        if self.spatial_version < (3, 1, 0):
-            unsupported.add('SnapToGrid')
-        if self.spatial_version < (4, 0, 0):
-            unsupported.update({'Perimeter', 'Reverse'})
-        elif not self.lwgeom_version():
+        if not self.lwgeom_version():
             unsupported.add('GeoHash')
         return unsupported
 
@@ -116,8 +111,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
                 'database (error was "%s").  Was the SpatiaLite initialization '
                 'SQL loaded on this database?') % (self.connection.settings_dict['NAME'], msg)
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
-        if version < (3, 0, 0):
-            raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions 3.0.0 and above.')
+        if version < (4, 0, 0):
+            raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions 4.0.0 and above.')
         return version
 
     def convert_extent(self, box, srid):

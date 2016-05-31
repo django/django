@@ -213,6 +213,8 @@ Miscellaneous
   the current UTC date/time, instead of a datetime without any timezone
   information.
 
+* Support for SpatiaLite < 4.0 is dropped.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

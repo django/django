@@ -2,7 +2,6 @@ import re
 import unittest
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.db import connection
 from django.test import mock, skipUnlessDBFeature
 from django.utils import six
 
@@ -110,9 +109,7 @@ class SpatialRefSysTest(unittest.TestCase):
             if postgis or spatialite:
                 srs = sr.srs
                 six.assertRegex(self, srs.proj4, sd['proj4_re'])
-                # No `srtext` field in the `spatial_ref_sys` table in SpatiaLite < 4
-                if not spatialite or connection.ops.spatial_version[0] >= 4:
-                    self.assertTrue(srs.wkt.startswith(sd['srtext']))
+                self.assertTrue(srs.wkt.startswith(sd['srtext']))
 
     def test_ellipsoid(self):
         """
