@@ -40,8 +40,8 @@ class FileBasedCache(BaseCache):
                 if not self._is_expired(f):
                     return pickle.loads(zlib.decompress(f.read()))
         except IOError as e:
-            if e.errno == errno.ENOENT:
-                pass  # Cache file doesn't exist.
+            if e.errno != errno.ENOENT:
+                raise
         return default
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):

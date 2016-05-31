@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 
 import copy
+import io
 import os
 import re
 import shutil
@@ -1260,6 +1261,17 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     def test_cache_write_unpicklable_type(self):
         # This fails if not using the highest pickling protocol on Python 2.
         cache.set('unpicklable', UnpicklableType())
+
+    def test_get_ignores_enoent(self):
+        cache.set('foo', 'bar')
+        os.unlink(cache._key_to_file('foo'))
+        # Returns the default instead of erroring.
+        self.assertEqual(cache.get('foo', 'baz'), 'baz')
+
+    def test_get_does_not_ignore_non_enoent_errno_values(self):
+        with mock.patch.object(io, 'open', side_effect=IOError):
+            with self.assertRaises(IOError):
+                cache.get('foo')
 
 
 @override_settings(CACHES={
