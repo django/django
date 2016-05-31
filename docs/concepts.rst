@@ -184,10 +184,10 @@ set of channels (here, using Redis) to send updates to::
     def send_update(sender, instance, **kwargs):
         # Loop through all response channels and send the update
         for reply_channel in redis_conn.smembers("readers"):
-            Channel(reply_channel).send(
-                id=instance.id,
-                content=instance.content,
-            )
+            Channel(reply_channel).send({
+                "id": instance.id,
+                "content": instance.content,
+            })
 
     # Connected to websocket.connect
     def ws_connect(message):
@@ -222,10 +222,10 @@ abstraction as a core concept called Groups::
 
     @receiver(post_save, sender=BlogUpdate)
     def send_update(sender, instance, **kwargs):
-        Group("liveblog").send(
-            id=instance.id,
-            content=instance.content,
-        )
+        Group("liveblog").send({
+            "id": instance.id,
+            "content": instance.content,
+        })
 
     # Connected to websocket.connect
     def ws_connect(message):
