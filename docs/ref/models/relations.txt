@@ -166,8 +166,10 @@ Related objects reference
        on either end of the relationship.
 
        Also, if you are using :ref:`an intermediate model
-       <intermediary-manytomany>` for a many-to-many relationship, some of the
-       related manager's methods are disabled.
+       <intermediary-manytomany>` for a many-to-many relationship, then
+       ``add()``, ``create()``, ``remove()``, and ``set()`` methods are
+       disabled, as mentioned in the documentation for :ref:`extra fields
+       on many-to-many relationships <intermediary-manytomany>`
 
 Direct Assignment
 =================
