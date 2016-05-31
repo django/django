@@ -523,7 +523,9 @@ class SymlinkExtractorTests(ExtractorTests):
             with open(self.PO_FILE, 'r') as fp:
                 po_contents = force_text(fp.read())
                 self.assertMsgId('This literal should be included.', po_contents)
-                self.assertIn('templates_symlinked/test.html', po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, None, 'templates_symlinked', 'test.html')
+        else:
+            raise SkipTest("os.symlink() not available on this OS + Python version combination.")
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
