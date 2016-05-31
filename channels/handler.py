@@ -212,6 +212,8 @@ class AsgiHandler(base.BaseHandler):
         for message in self.encode_response(response):
             # TODO: file_to_stream
             yield message
+        # Close the response now we're done with it
+        response.close()
 
     def process_exception_by_middleware(self, exception, request):
         """
