@@ -94,8 +94,10 @@ MRO is an acronym for Method Resolution Order.
 
     .. method:: options(request, *args, **kwargs)
 
-        Handles responding to requests for the OPTIONS HTTP verb.  Returns a
-        list of the allowed HTTP method names for the view.
+        Handles responding to requests for the OPTIONS HTTP verb. Returns a
+        response with the ``Allow`` header containing a list of the view's
+        allowed HTTP method names.
+
 
 ``TemplateView``
 ================
