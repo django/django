@@ -98,9 +98,7 @@ class MultiPartParser(object):
 
         # For compatibility with low-level network APIs (with 32-bit integers),
         # the chunk size should be < 2^31, but still divisible by 4.
-        possible_sizes = [
-            x.chunk_size for x in upload_handlers if x.chunk_size
-        ]
+        possible_sizes = [x.chunk_size for x in upload_handlers if x.chunk_size]
         self._chunk_size = min([2 ** 31 - 4] + possible_sizes)
 
         self._meta = META
@@ -134,7 +132,7 @@ class MultiPartParser(object):
                 self._meta,
                 self._content_length,
                 self._boundary,
-                encoding
+                encoding,
             )
             # Check to see if it was handled
             if result is not None:
@@ -209,37 +207,26 @@ class MultiPartParser(object):
                     num_bytes_read += len(field_name) + 2
                     if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
                             num_bytes_read > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
-                        raise RequestDataTooBig(
-                            'Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'
-                        )
+                        raise RequestDataTooBig('Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.')
 
                     self._post.appendlist(
-                        field_name,
-                        force_text(data, encoding, errors='replace')
+                        field_name, force_text(data, encoding, errors='replace')
                     )
                 elif item_type == FILE:
                     # This is a file, use the handler...
                     file_name = disposition.get('filename')
                     if file_name:
-                        file_name = force_text(
-                            file_name, encoding, errors='replace'
-                        )
-                        file_name = self.IE_sanitize(
-                            unescape_entities(file_name)
-                        )
+                        file_name = force_text(file_name, encoding, errors='replace')
+                        file_name = self.IE_sanitize(unescape_entities(file_name))
                     if not file_name:
                         continue
 
-                    content_type, content_type_extra = meta_data.get(
-                        'content-type', ('', {})
-                    )
+                    content_type, content_type_extra = meta_data.get('content-type', ('', {}))
                     content_type = content_type.strip()
                     charset = content_type_extra.get('charset')
 
                     try:
-                        content_length = int(
-                            meta_data.get('content-length')[0]
-                        )
+                        content_length = int(meta_data.get('content-length')[0])
                     except (IndexError, TypeError, ValueError):
                         content_length = None
 
@@ -277,14 +264,13 @@ class MultiPartParser(object):
                                     six.reraise(
                                         MultiPartParserError,
                                         MultiPartParserError(msg),
-                                        sys.exc_info()[2]
+                                        sys.exc_info()[2],
                                     )
 
                             for i, handler in enumerate(handlers):
                                 chunk_length = len(chunk)
                                 chunk = handler.receive_data_chunk(
-                                    chunk,
-                                    counters[i]
+                                    chunk, counters[i]
                                 )
                                 counters[i] += chunk_length
                                 if chunk is None:
@@ -331,7 +317,7 @@ class MultiPartParser(object):
                     force_text(
                         old_field_name,
                         self._encoding,
-                        errors='replace'
+                        errors='replace',
                     ),
                     file_obj
                 )
@@ -454,10 +440,10 @@ class LazyStream(six.Iterator):
         maliciously-malformed MIME request.
         """
         self._unget_history = [num_bytes] + self._unget_history[:49]
-        number_equal = len(
-            [current_number for current_number in self._unget_history
-                if current_number == num_bytes]
-        )
+        number_equal = len([
+            current_number for current_number in self._unget_history
+            if current_number == num_bytes
+        ])
 
         if number_equal > 40:
             raise SuspiciousMultipartForm(
