@@ -23,6 +23,12 @@ class CreateExtension(Operation):
         return "Creates extension %s" % self.name
 
 
+class CITextExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'citext'
+
+
 class HStoreExtension(CreateExtension):
 
     def __init__(self):
