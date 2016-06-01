@@ -60,8 +60,8 @@ class MultiPartParser(object):
         :input_data:
             The raw post data, as a file-like object.
         :upload_handlers:
-            A list of UploadHandler instances that perform operations on the uploaded
-            data.
+            A list of UploadHandler instances that perform operations on the
+            uploaded data.
         :encoding:
             The encoding with which to treat the incoming data.
         """
@@ -78,9 +78,7 @@ class MultiPartParser(object):
         ctypes, opts = parse_header(content_type.encode('ascii'))
         boundary = opts.get('boundary')
         if not boundary or not cgi.valid_boundary(boundary):
-            raise MultiPartParserError(
-                'Invalid boundary in multipart: %s' % boundary
-            )
+            raise MultiPartParserError('Invalid boundary in multipart: %s' % boundary)
 
         # Content-Length should contain the length of the body we are about
         # to receive.
@@ -91,9 +89,7 @@ class MultiPartParser(object):
 
         if content_length < 0:
             # This means we shouldn't continue...raise an error.
-            raise MultiPartParserError(
-                "Invalid content length: %r" % content_length
-            )
+            raise MultiPartParserError("Invalid content length: %r" % content_length)
 
         if isinstance(boundary, six.text_type):
             boundary = boundary.encode('ascii')
@@ -133,11 +129,13 @@ class MultiPartParser(object):
         # See if any of the handlers take care of the parsing.
         # This allows overriding everything if need be.
         for handler in handlers:
-            result = handler.handle_raw_input(self._input_data,
-                                              self._meta,
-                                              self._content_length,
-                                              self._boundary,
-                                              encoding)
+            result = handler.handle_raw_input(
+                self._input_data,
+                self._meta,
+                self._content_length,
+                self._boundary,
+                encoding
+            )
             # Check to see if it was handled
             if result is not None:
                 return result[0], result[1]
@@ -268,9 +266,7 @@ class MultiPartParser(object):
                                 remaining = len(stripped_chunk) % 4
                                 while remaining != 0:
                                     over_chunk = field_stream.read(4 - remaining)
-                                    stripped_chunk += b"".join(
-                                        over_chunk.split()
-                                    )
+                                    stripped_chunk += b"".join(over_chunk.split())
                                     remaining = len(stripped_chunk) % 4
 
                                 try:
@@ -286,8 +282,10 @@ class MultiPartParser(object):
 
                             for i, handler in enumerate(handlers):
                                 chunk_length = len(chunk)
-                                chunk = handler.receive_data_chunk(chunk,
-                                                                   counters[i])
+                                chunk = handler.receive_data_chunk(
+                                    chunk,
+                                    counters[i]
+                                )
                                 counters[i] += chunk_length
                                 if chunk is None:
                                     # If the chunk received by the handler
@@ -346,7 +344,7 @@ class MultiPartParser(object):
     def _close_files(self):
         # Free up all file handles.
         # FIXME: this currently assumes that upload handlers store the file as 'file'
-        # We should document that... (Maybe add handler.free_file to complement new_file)
+        # We should document that..(Maybe add handler.free_file to complement new_file)
         for handler in self._upload_handlers:
             if hasattr(handler, 'file'):
                 handler.file.close()
@@ -623,9 +621,7 @@ def exhaust(stream_or_iterable):
         iterator = ChunkIter(stream_or_iterable, 16384)
 
     if iterator is None:
-        raise MultiPartParserError(
-            'multipartparser.exhaust() was passed a non-iterable or stream parameter'
-        )
+        raise MultiPartParserError('multipartparser.exhaust() was passed a non-iterable or stream parameter')
 
     for __ in iterator:
         pass
