@@ -178,12 +178,12 @@ class CompilationErrorHandling(MessageCompilationTests):
                 try:
                     call_command('compilemessages', locale=['ko'], verbosity=0)
                 except CommandError as err:
-                    self.assertIn("'�' cannot start a field name", six.text_type(err))
+                    self.assertIn("' cannot start a field name", six.text_type(err))
             else:
                 cmd = MakeMessagesCommand()
                 if cmd.gettext_version < (0, 18, 3):
                     raise unittest.SkipTest("python-brace-format is a recent gettext addition.")
-                with self.assertRaisesMessage(CommandError, "'�' cannot start a field name"):
+                with self.assertRaisesMessage(CommandError, "' cannot start a field name"):
                     call_command('compilemessages', locale=['ko'], verbosity=0)
 
 
