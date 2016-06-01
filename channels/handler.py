@@ -277,7 +277,9 @@ class AsgiHandler(base.BaseHandler):
         }
         # Streaming responses need to be pinned to their iterator
         if response.streaming:
-            for part in response.streaming_content:
+            # Access `__iter__` and not `streaming_content` directly in case
+            # it has been overridden in a subclass.
+            for part in response:
                 for chunk, more in cls.chunk_bytes(part):
                     message['content'] = chunk
                     # We ignore "more" as there may be more parts; instead,
