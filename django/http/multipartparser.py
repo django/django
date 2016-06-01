@@ -286,8 +286,7 @@ class MultiPartParser(object):
                         # Handle file upload completions on next iteration.
                         old_field_name = field_name
                 else:
-                    # If this is neither a FIELD or a FILE,
-                    # just exhaust the stream.
+                    # If this is neither a FIELD or a FILE, just exhaust the stream.
                     exhaust(stream)
         except StopUpload as e:
             self._close_files()
@@ -315,9 +314,7 @@ class MultiPartParser(object):
                 # If it returns a file object, then set the files dict.
                 self._files.appendlist(
                     force_text(
-                        old_field_name,
-                        self._encoding,
-                        errors='replace',
+                        old_field_name, self._encoding, errors='replace',
                     ),
                     file_obj
                 )
@@ -330,7 +327,7 @@ class MultiPartParser(object):
     def _close_files(self):
         # Free up all file handles.
         # FIXME: this currently assumes that upload handlers store the file as 'file'
-        # We should document that..(Maybe add handler.free_file to complement new_file)
+        # We should document that...(Maybe add handler.free_file to complement new_file)
         for handler in self._upload_handlers:
             if hasattr(handler, 'file'):
                 handler.file.close()
@@ -570,9 +567,8 @@ class BoundaryIter(six.Iterator):
         """
         Finds a multipart boundary in data.
 
-        Should no boundary exist in the data None is returned instead.
-        Otherwise a tuple containing the indices of the following are
-        returned:
+        Should no boundary exist in the data None is returned instead.Otherwise
+        a tuple containing the indices of the following are returned:
 
          * the end of current encapsulation
          * the start of the next encapsulation
@@ -595,10 +591,8 @@ class BoundaryIter(six.Iterator):
 
 def exhaust(stream_or_iterable):
     """
-    Completely exhausts an iterator or stream.
-
-    Raise a MultiPartParserError if the argument is
-    not a stream or an iterable.
+    Completely exhausts an iterator or stream. Raise a MultiPartParserError
+    if the argument is not a stream or an iterable.
     """
     iterator = None
     try:
@@ -685,9 +679,9 @@ class Parser(object):
 
 
 def parse_header(line):
-    """ Parse the header into a key-value.
-        Input (line): bytes, output: unicode for key/name,
-        bytes for value which will be decoded later
+    """ 
+    Parse the header into a key-value. Input (line): bytes, output: unicode for key/name,
+    bytes for value which will be decoded later.
     """
     plist = _parse_header_params(b';' + line)
     key = plist.pop(0).lower().decode('ascii')
