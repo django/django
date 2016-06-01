@@ -52,3 +52,9 @@ class BtreeGinExtension(CreateExtension):
 
     def __init__(self):
         self.name = 'btree_gin'
+
+
+class CITextExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'citext'
