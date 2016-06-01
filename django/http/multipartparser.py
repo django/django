@@ -60,16 +60,12 @@ class MultiPartParser(object):
         :input_data:
             The raw post data, as a file-like object.
         :upload_handlers:
-            A list of UploadHandler instances that perform operations on the uploaded
-            data.
+            A list of UploadHandler instances that perform operations on the
+            uploaded data.
         :encoding:
             The encoding with which to treat the incoming data.
         """
-
-        #
         # Content-Type should contain multipart and the boundary information.
-        #
-
         content_type = META.get('CONTENT_TYPE', '')
         if not content_type.startswith('multipart/'):
             raise MultiPartParserError('Invalid Content-Type: %s' % content_type)
@@ -111,9 +107,8 @@ class MultiPartParser(object):
         Parse the POST data and break it into a FILES MultiValueDict and a POST
         MultiValueDict.
 
-        Returns a tuple containing the POST and FILES dictionary, respectively.
+        Return a tuple containing the POST and FILES dictionary, respectively.
         """
-        # We have to import QueryDict down here to avoid a circular import.
         from django.http import QueryDict
 
         encoding = self._encoding
@@ -127,11 +122,13 @@ class MultiPartParser(object):
         # See if any of the handlers take care of the parsing.
         # This allows overriding everything if need be.
         for handler in handlers:
-            result = handler.handle_raw_input(self._input_data,
-                                              self._meta,
-                                              self._content_length,
-                                              self._boundary,
-                                              encoding)
+            result = handler.handle_raw_input(
+                self._input_data,
+                self._meta,
+                self._content_length,
+                self._boundary,
+                encoding,
+            )
             # Check to see if it was handled
             if result is not None:
                 return result[0], result[1]
@@ -207,8 +204,7 @@ class MultiPartParser(object):
                             num_bytes_read > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
                         raise RequestDataTooBig('Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.')
 
-                    self._post.appendlist(field_name,
-                                          force_text(data, encoding, errors='replace'))
+                    self._post.appendlist(field_name, force_text(data, encoding, errors='replace'))
                 elif item_type == FILE:
                     # This is a file, use the handler...
                     file_name = disposition.get('filename')
@@ -231,9 +227,10 @@ class MultiPartParser(object):
                     try:
                         for handler in handlers:
                             try:
-                                handler.new_file(field_name, file_name,
-                                                 content_type, content_length,
-                                                 charset, content_type_extra)
+                                handler.new_file(
+                                    field_name, file_name, content_type,
+                                    content_length, charset, content_type_extra,
+                                )
                             except StopFutureHandlers:
                                 break
 
@@ -260,11 +257,11 @@ class MultiPartParser(object):
 
                             for i, handler in enumerate(handlers):
                                 chunk_length = len(chunk)
-                                chunk = handler.receive_data_chunk(chunk,
-                                                                   counters[i])
+                                chunk = handler.receive_data_chunk(chunk, counters[i])
                                 counters[i] += chunk_length
                                 if chunk is None:
-                                    # If the chunk received by the handler is None, then don't continue.
+                                    # Don't continue if the chunk received by
+                                    # the handler qis None.
                                     break
 
                     except SkipFile:
@@ -301,9 +298,7 @@ class MultiPartParser(object):
             file_obj = handler.file_complete(counters[i])
             if file_obj:
                 # If it returns a file object, then set the files dict.
-                self._files.appendlist(
-                    force_text(old_field_name, self._encoding, errors='replace'),
-                    file_obj)
+                self._files.appendlist(force_text(old_field_name, self._encoding, errors='replace'), file_obj)
                 break
 
     def IE_sanitize(self, filename):
@@ -423,8 +418,10 @@ class LazyStream(six.Iterator):
         maliciously-malformed MIME request.
         """
         self._unget_history = [num_bytes] + self._unget_history[:49]
-        number_equal = len([current_number for current_number in self._unget_history
-                            if current_number == num_bytes])
+        number_equal = len([
+            current_number for current_number in self._unget_history
+            if current_number == num_bytes
+        ])
 
         if number_equal > 40:
             raise SuspiciousMultipartForm(
@@ -664,9 +661,11 @@ class Parser(object):
 
 
 def parse_header(line):
-    """ Parse the header into a key-value.
-        Input (line): bytes, output: unicode for key/name, bytes for value which
-        will be decoded later
+    """
+    Parse the header into a key-value.
+
+    Input (line): bytes, output: unicode for key/name, bytes for value which
+    will be decoded later.
     """
     plist = _parse_header_params(b';' + line)
     key = plist.pop(0).lower().decode('ascii')
