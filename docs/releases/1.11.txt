@@ -27,6 +27,21 @@ recommend** and only officially support the latest release of each series.
 The Django 1.11.x series is the last to support Python 2. The next major
 release, Django 2.0, will only support Python 3.5+.
 
+Deprecating warnings are no longer loud by default
+==================================================
+
+Unlike older versions of Django, Django's own deprecation warnings are no
+longer displayed by default. This is consistent with Python's default behavior.
+
+This change allows third-party apps to support both Django 1.11 LTS and Django
+1.8 LTS without having to add code to avoid deprecation warnings.
+
+Following the release of Django 2.0, we suggest that third-party app authors
+drop support for all versions of Django prior to 1.11. At that time, you should
+be able run your package's tests using ``python -Wd`` so that deprecation
+warnings do appear. After making the deprecation warning fixes, your app should
+be compatible with Django 2.0.
+
 What's new in Django 1.11
 =========================
 
