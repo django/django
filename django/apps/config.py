@@ -139,7 +139,14 @@ class AppConfig(object):
                 "'%s' must supply a name attribute." % entry)
 
         # Ensure app_name points to a valid module.
-        app_module = import_module(app_name)
+        try:
+            app_module = import_module(app_name)
+        except ImportError:
+            raise ImproperlyConfigured(
+                "Cannot import '%s'. Check that '%s.%s.name' is correct." % (
+                    app_name, mod_path, cls_name,
+                )
+            )
 
         # Entry is a path to an app config class.
         return cls(app_name, app_module)
