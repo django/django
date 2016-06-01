@@ -72,13 +72,17 @@ class MultiPartParser(object):
 
         content_type = META.get('CONTENT_TYPE', '')
         if not content_type.startswith('multipart/'):
-            raise MultiPartParserError('Invalid Content-Type: %s' % content_type)
+            raise MultiPartParserError(
+                'Invalid Content-Type: %s' % content_type
+            )
 
         # Parse the header to get the boundary to split the parts.
         ctypes, opts = parse_header(content_type.encode('ascii'))
         boundary = opts.get('boundary')
         if not boundary or not cgi.valid_boundary(boundary):
-            raise MultiPartParserError('Invalid boundary in multipart: %s' % boundary)
+            raise MultiPartParserError(
+                'Invalid boundary in multipart: %s' % boundary
+            )
 
         # Content-Length should contain the length of the body we are about
         # to receive.
@@ -89,7 +93,9 @@ class MultiPartParser(object):
 
         if content_length < 0:
             # This means we shouldn't continue...raise an error.
-            raise MultiPartParserError("Invalid content length: %r" % content_length)
+            raise MultiPartParserError(
+                "Invalid content length: %r" % content_length
+            )
 
         if isinstance(boundary, six.text_type):
             boundary = boundary.encode('ascii')
@@ -98,7 +104,9 @@ class MultiPartParser(object):
 
         # For compatibility with low-level network APIs (with 32-bit integers),
         # the chunk size should be < 2^31, but still divisible by 4.
-        possible_sizes = [x.chunk_size for x in upload_handlers if x.chunk_size]
+        possible_sizes = [
+            x.chunk_size for x in upload_handlers if x.chunk_size
+        ]
         self._chunk_size = min([2 ** 31 - 4] + possible_sizes)
 
         self._meta = META
