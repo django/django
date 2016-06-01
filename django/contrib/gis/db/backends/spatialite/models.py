@@ -58,10 +58,7 @@ class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
 
     @property
     def wkt(self):
-        if hasattr(self, 'srtext'):
-            return self.srtext
-        from django.contrib.gis.gdal import SpatialReference
-        return SpatialReference(self.proj4text).wkt
+        return self.srtext
 
     class Meta:
         app_label = 'gis'
