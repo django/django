@@ -145,6 +145,9 @@ intersphinx_mapping = {
 # Python's docs don't change every week.
 intersphinx_cache_limit = 90  # days
 
+# The 'versionadded' and 'versionchanged' directives are overridden.
+suppress_warnings = ['app.add_directive']
+
 # -- Options for HTML output ---------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
