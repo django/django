@@ -679,7 +679,7 @@ class Parser(object):
 
 
 def parse_header(line):
-    """ 
+    """
     Parse the header into a key-value. Input (line): bytes, output: unicode for key/name,
     bytes for value which will be decoded later.
     """
