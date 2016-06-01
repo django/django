@@ -72,9 +72,7 @@ class MultiPartParser(object):
 
         content_type = META.get('CONTENT_TYPE', '')
         if not content_type.startswith('multipart/'):
-            raise MultiPartParserError(
-                'Invalid Content-Type: %s' % content_type
-            )
+            raise MultiPartParserError('Invalid Content-Type: %s' % content_type)
 
         # Parse the header to get the boundary to split the parts.
         ctypes, opts = parse_header(content_type.encode('ascii'))
