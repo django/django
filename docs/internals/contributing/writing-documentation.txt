@@ -56,6 +56,10 @@ Primer <sphinx:rst-primer>`. After that, you'll want to read about the
 :ref:`Sphinx-specific markup <sphinx:sphinxmarkup>` that's used to manage
 metadata, indexing, and cross-references.
 
+Your locally-built documentation will be themed differently than the
+documentation on the server. This is OK! If your changes look good on your
+local machine, they will look good on the server.
+
 How the documentation is organized
 ==================================
 
