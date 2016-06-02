@@ -166,7 +166,8 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Number formatting and the :setting:`NUMBER_GROUPING` setting support
+  non-uniform digit grouping.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
