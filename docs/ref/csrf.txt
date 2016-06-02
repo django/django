@@ -148,24 +148,16 @@ If you're using AngularJS 1.1.3 and newer, it's sufficient to configure the
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 
-Other template engines
-----------------------
+Using CSRF in Jinja2 templates
+------------------------------
 
-When using a different template engine than Django's built-in engine, you can
-set the token in your forms manually after making sure it's available in the
-template context.
+Django's :class:`~django.template.backends.jinja2.Jinja2` template backend
+adds ``{{ csrf_input }}`` to the context of all templates which is equivalent
+to ``{% csrf_token %}`` in the Django template language. For example:
 
-For example, in the Jinja2 template language, your form could contain the
-following:
+.. code-block:: html+jinja
 
-.. code-block:: html
-
-    <div style="display:none">
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    </div>
-
-You can use JavaScript similar to the :ref:`AJAX code <csrf-ajax>` above to get
-the value of the CSRF token.
+    <form action="" method="post">{{ csrf_input }}
 
 The decorator method
 --------------------
