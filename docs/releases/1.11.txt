@@ -81,7 +81,9 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.postgres.aggregates.StringAgg` accepts an optional
+  boolean ``distinct`` argument that determines if concatenated values
+  will be distinct. Defaults to ``False``.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
