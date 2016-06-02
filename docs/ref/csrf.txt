@@ -211,6 +211,9 @@ The error page, however, is not very friendly, so you may want to provide your
 own view for handling this condition.  To do this, simply set the
 :setting:`CSRF_FAILURE_VIEW` setting.
 
+CSRF failures are logged as warnings to the :ref:`django-request-logger`
+logger.
+
 .. _how-csrf-works:
 
 How it works
