@@ -139,7 +139,7 @@ Regardless of the way you submit your work, follow these steps.
   checked. This makes the ticket appear in the "Patches needing review" queue
   on the `Development dashboard`_.
 
-.. _ticket tracker: https://code.djangoproject.com/newticket
+.. _ticket tracker: https://code.djangoproject.com/
 .. _Development dashboard: https://dashboard.djangoproject.com/
 
 Non-trivial patches

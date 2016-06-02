@@ -243,4 +243,4 @@ When a mistaken commit is discovered, please follow these guidelines:
   For instance, if you did: ``git push upstream feature_antigravity``,
   just do a reverse push: ``git push upstream :feature_antigravity``.
 
-.. _ticket tracker: https://code.djangoproject.com/newticket
+.. _ticket tracker: https://code.djangoproject.com/
