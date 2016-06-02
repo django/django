@@ -37,7 +37,9 @@ To take advantage of CSRF protection in your views, follow these steps:
    you want to protect (see below).
 
 2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
-   the ``<form>`` element if the form is for an internal URL, e.g.::
+   the ``<form>`` element if the form is for an internal URL, e.g.:
+
+   .. code-block:: html+django
 
        <form action="" method="post">{% csrf_token %}
 
