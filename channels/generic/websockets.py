@@ -49,7 +49,7 @@ class WebsocketConsumer(BaseConsumer):
         need to call super() all the time.
         """
         for group in self.connection_groups(**kwargs):
-            Group(group, channel_layer=message.channel_layer).add(message.channel)
+            Group(group, channel_layer=message.channel_layer).add(message.reply_channel)
         self.connect(message, **kwargs)
 
     def connect(self, message, **kwargs):
@@ -99,7 +99,7 @@ class WebsocketConsumer(BaseConsumer):
         need to call super() all the time.
         """
         for group in self.connection_groups(**kwargs):
-            Group(group, channel_layer=message.channel_layer).discard(message.channel)
+            Group(group, channel_layer=message.channel_layer).discard(message.reply_channel)
         self.disconnect(message, **kwargs)
 
     def disconnect(self, message, **kwargs):
