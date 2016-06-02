@@ -117,7 +117,7 @@ raster models::
 
     >>> from django.contrib.gis.gdal import GDALRaster
     >>> rast = GDALRaster({'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
-    ...                    'scale': [0.1, -0.1]'bands': [{"data": range(100)}]}
+    ...                    'scale': [0.1, -0.1], 'bands': [{"data": range(100)}]})
     >>> dem = Elevation(name='Canyon', rast=rast)
     >>> dem.save()
 
@@ -126,7 +126,7 @@ Note that this equivalent to::
     >>> dem = Elevation.objects.create(
     ...     name='Canyon',
     ...     rast={'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
-    ...           'scale': [0.1, -0.1]'bands': [{"data": range(100)}]}
+    ...           'scale': [0.1, -0.1], 'bands': [{"data": range(100)}]},
     ... )
 
 .. _spatial-lookups-intro:

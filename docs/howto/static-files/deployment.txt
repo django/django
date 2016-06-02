@@ -104,9 +104,9 @@ Here's how this might look in a fabfile::
     def deploy_static():
         local('./manage.py collectstatic')
         project.rsync_project(
-            remote_dir = env.remote_static_root,
-            local_dir = env.local_static_root,
-            delete = True
+            remote_dir=env.remote_static_root,
+            local_dir=env.local_static_root,
+            delete=True,
         )
 
 .. _staticfiles-from-cdn:

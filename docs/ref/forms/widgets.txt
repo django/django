@@ -62,8 +62,11 @@ widget on the field. In the following example, the
 
     class SimpleForm(forms.Form):
         birth_year = forms.DateField(widget=forms.SelectDateWidget(years=BIRTH_YEAR_CHOICES))
-        favorite_colors = forms.MultipleChoiceField(required=False,
-            widget=forms.CheckboxSelectMultiple, choices=FAVORITE_COLORS_CHOICES)
+        favorite_colors = forms.MultipleChoiceField(
+            required=False,
+            widget=forms.CheckboxSelectMultiple,
+            choices=FAVORITE_COLORS_CHOICES,
+        )
 
 See the :ref:`built-in widgets` for more information about which widgets
 are available and which arguments they accept.

@@ -193,8 +193,10 @@ we'll discuss in a moment.)::
 
     class AuthorForm(forms.Form):
         name = forms.CharField(max_length=100)
-        title = forms.CharField(max_length=3,
-                    widget=forms.Select(choices=TITLE_CHOICES))
+        title = forms.CharField(
+            max_length=3,
+            widget=forms.Select(choices=TITLE_CHOICES),
+        )
         birth_date = forms.DateField(required=False)
 
     class BookForm(forms.Form):
@@ -593,8 +595,12 @@ the field declaratively and setting its ``validators`` parameter::
     For example, if the ``Article`` model looks like this::
 
         class Article(models.Model):
-            headline = models.CharField(max_length=200, null=True, blank=True,
-                                        help_text="Use puns liberally")
+            headline = models.CharField(
+                max_length=200,
+                null=True,
+                blank=True,
+                help_text='Use puns liberally',
+            )
             content = models.TextField()
 
     and you want to do some custom validation for ``headline``, while keeping
@@ -602,8 +608,11 @@ the field declaratively and setting its ``validators`` parameter::
     ``ArticleForm`` like this::
 
         class ArticleForm(ModelForm):
-            headline = MyFormField(max_length=200, required=False,
-                                   help_text="Use puns liberally")
+            headline = MyFormField(
+                max_length=200,
+                required=False,
+                help_text='Use puns liberally',
+            )
 
             class Meta:
                 model = Article
@@ -1032,8 +1041,10 @@ formset::
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
         if request.method == "POST":
-            formset = AuthorFormSet(request.POST, request.FILES,
-                                    queryset=Author.objects.filter(name__startswith='O'))
+            formset = AuthorFormSet(
+                request.POST, request.FILES,
+                queryset=Author.objects.filter(name__startswith='O'),
+            )
             if formset.is_valid():
                 formset.save()
                 # Do something.

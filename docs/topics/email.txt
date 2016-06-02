@@ -20,8 +20,13 @@ In two lines::
 
     from django.core.mail import send_mail
 
-    send_mail('Subject here', 'Here is the message.', 'from@example.com',
-        ['to@example.com'], fail_silently=False)
+    send_mail(
+        'Subject here',
+        'Here is the message.',
+        'from@example.com',
+        ['to@example.com'],
+        fail_silently=False,
+    )
 
 Mail is sent using the SMTP host and port specified in the
 :setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
@@ -149,8 +154,12 @@ Examples
 This sends a single email to john@example.com and jane@example.com, with them
 both appearing in the "To:"::
 
-    send_mail('Subject', 'Message.', 'from@example.com',
-        ['john@example.com', 'jane@example.com'])
+    send_mail(
+        'Subject',
+        'Message.',
+        'from@example.com',
+        ['john@example.com', 'jane@example.com'],
+    )
 
 This sends a message to john@example.com and jane@example.com, with them both
 receiving a separate email::
@@ -285,9 +294,15 @@ For example::
 
     from django.core.mail import EmailMessage
 
-    email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
-                ['to1@example.com', 'to2@example.com'], ['bcc@example.com'],
-                reply_to=['another@example.com'], headers={'Message-ID': 'foo'})
+    email = EmailMessage(
+        'Hello',
+        'Body goes here',
+        'from@example.com',
+        ['to1@example.com', 'to2@example.com'],
+        ['bcc@example.com'],
+        reply_to=['another@example.com'],
+        headers={'Message-ID': 'foo'},
+    )
 
 The class has the following methods:
 
@@ -409,10 +424,14 @@ It can also be used as a context manager, which will automatically call
     from django.core import mail
 
     with mail.get_connection() as connection:
-        mail.EmailMessage(subject1, body1, from1, [to1],
-                          connection=connection).send()
-        mail.EmailMessage(subject2, body2, from2, [to2],
-                          connection=connection).send()
+        mail.EmailMessage(
+            subject1, body1, from1, [to1],
+            connection=connection,
+        ).send()
+        mail.EmailMessage(
+            subject2, body2, from2, [to2],
+            connection=connection,
+        ).send()
 
 .. versionadded:: 1.8
 
@@ -606,15 +625,28 @@ manually open the connection, you can control when it is closed. For example::
     connection.open()
 
     # Construct an email message that uses the connection
-    email1 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
-                              ['to1@example.com'], connection=connection)
+    email1 = mail.EmailMessage(
+        'Hello',
+        'Body goes here',
+        'from@example.com',
+        ['to1@example.com'],
+        connection=connection,
+    )
     email1.send() # Send the email
 
     # Construct two more messages
-    email2 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
-                              ['to2@example.com'])
-    email3 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
-                              ['to3@example.com'])
+    email2 = mail.EmailMessage(
+        'Hello',
+        'Body goes here',
+        'from@example.com',
+        ['to2@example.com'],
+    )
+    email3 = mail.EmailMessage(
+        'Hello',
+        'Body goes here',
+        'from@example.com',
+        ['to3@example.com'],
+    )
 
     # Send the two emails in a single call -
     connection.send_messages([email2, email3])

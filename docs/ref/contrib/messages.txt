@@ -320,8 +320,7 @@ Adding extra message tags
 For more direct control over message tags, you can optionally provide a string
 containing extra tags to any of the add methods::
 
-    messages.add_message(request, messages.INFO, 'Over 9000!',
-                         extra_tags='dragonball')
+    messages.add_message(request, messages.INFO, 'Over 9000!', extra_tags='dragonball')
     messages.error(request, 'Email box full', extra_tags='email')
 
 Extra tags are added before the default tag for that level and are space
@@ -336,8 +335,10 @@ if they don't want to, you may pass an additional keyword argument
 ``fail_silently=True`` to any of the ``add_message`` family of methods. For
 example::
 
-    messages.add_message(request, messages.SUCCESS, 'Profile details updated.',
-                         fail_silently=True)
+    messages.add_message(
+        request, messages.SUCCESS, 'Profile details updated.',
+        fail_silently=True,
+    )
     messages.info(request, 'Hello world.', fail_silently=True)
 
 .. note::
