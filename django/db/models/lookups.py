@@ -1,3 +1,4 @@
+import itertools
 import math
 import warnings
 from copy import copy
@@ -170,6 +171,12 @@ class FieldGetDbPrepValueMixin(object):
     """
     get_db_prep_lookup_value_is_iterable = False
 
+    @classmethod
+    def get_prep_lookup_value(cls, value, output_field):
+        if hasattr(value, '_prepare'):
+            return value._prepare(output_field)
+        return output_field.get_prep_value(value)
+
     def get_db_prep_lookup(self, value, connection):
         # For relational fields, use the output_field of the 'field' attribute.
         field = getattr(self.lhs.output_field, 'field', None)
@@ -190,6 +197,51 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     in an iterable.
     """
     get_db_prep_lookup_value_is_iterable = True
+
+    def get_prep_lookup(self):
+        prepared_values = []
+        if hasattr(self.rhs, '_prepare'):
+            # A subquery is like an iterable but its items shouldn't be
+            # prepared independently.
+            return self.rhs._prepare(self.lhs.output_field)
+        for rhs_value in self.rhs:
+            if hasattr(rhs_value, 'resolve_expression'):
+                # An expression will be handled by the database but can coexist
+                # alongside real values.
+                pass
+            elif self.prepare_rhs and hasattr(self.lhs.output_field, 'get_prep_value'):
+                rhs_value = self.lhs.output_field.get_prep_value(rhs_value)
+            prepared_values.append(rhs_value)
+        return prepared_values
+
+    def process_rhs(self, compiler, connection):
+        if self.rhs_is_direct_value():
+            # rhs should be an iterable of values. Use batch_process_rhs()
+            # to prepare/transform those values.
+            return self.batch_process_rhs(compiler, connection)
+        else:
+            return super(FieldGetDbPrepValueIterableMixin, self).process_rhs(compiler, connection)
+
+    def resolve_expression_parameter(self, compiler, connection, sql, param):
+        params = [param]
+        if hasattr(param, 'resolve_expression'):
+            param = param.resolve_expression(compiler.query)
+        if hasattr(param, 'as_sql'):
+            sql, params = param.as_sql(compiler, connection)
+        return sql, params
+
+    def batch_process_rhs(self, compiler, connection, rhs=None):
+        pre_processed = super(FieldGetDbPrepValueIterableMixin, self).batch_process_rhs(compiler, connection, rhs)
+        # The params list may contain expressions which compile to a
+        # sql/param pair. Zip them to get sql and param pairs that refer to the
+        # same argument and attempt to replace them with the result of
+        # compiling the param step.
+        sql, params = zip(*(
+            self.resolve_expression_parameter(compiler, connection, sql, param)
+            for sql, param in zip(*pre_processed)
+        ))
+        params = itertools.chain.from_iterable(params)
+        return sql, tuple(params)
 
 
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
@@ -254,13 +306,6 @@ IntegerField.register_lookup(IntegerLessThan)
 
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = 'in'
-
-    def get_prep_lookup(self):
-        if hasattr(self.rhs, '_prepare'):
-            return self.rhs._prepare(self.lhs.output_field)
-        if hasattr(self.lhs.output_field, 'get_prep_value'):
-            return [self.lhs.output_field.get_prep_value(v) for v in self.rhs]
-        return self.rhs
 
     def process_rhs(self, compiler, connection):
         db_rhs = getattr(self.rhs, '_db', None)
@@ -409,21 +454,9 @@ Field.register_lookup(IEndsWith)
 class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = 'range'
 
-    def get_prep_lookup(self):
-        if hasattr(self.rhs, '_prepare'):
-            return self.rhs._prepare(self.lhs.output_field)
-        return [self.lhs.output_field.get_prep_value(v) for v in self.rhs]
-
     def get_rhs_op(self, connection, rhs):
         return "BETWEEN %s AND %s" % (rhs[0], rhs[1])
 
-    def process_rhs(self, compiler, connection):
-        if self.rhs_is_direct_value():
-            # rhs should be an iterable of 2 values, we use batch_process_rhs
-            # to prepare/transform those values
-            return self.batch_process_rhs(compiler, connection)
-        else:
-            return super(Range, self).process_rhs(compiler, connection)
 Field.register_lookup(Range)
 
 
