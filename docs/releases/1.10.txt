@@ -467,6 +467,18 @@ Templates
 * Added relative path support for string arguments of the :ttag:`extends` and
   :ttag:`include` template tags.
 
+* To keep similar functionality from Django 1.8-9: add a :setting:`TEMPLATES` dict e.g.::
+
+      TEMPLATES = [
+          {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+            'OPTIONS': {'context_processors': 
+                        ['django.contrib.auth.context_processors.auth']},
+          },
+      ]
+
+
 Tests
 ~~~~~
 
