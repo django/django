@@ -4,22 +4,20 @@ Django 1.10 release notes - UNDER DEVELOPMENT
 
 Welcome to Django 1.10!
 
-These release notes cover the `new features`_, as well as some `backwards
-incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.9 or older versions. We've :ref:`dropped some features<removed-features-1.10>`
-that have reached the end of their deprecation cycle, and we've `begun the
-deprecation process for some features`_.
-
-.. _`new features`: `What's new in Django 1.10`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.10`_
-.. _`dropped some features`: `Features removed in 1.10`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.10`_
+These release notes cover the :ref:`new features <whats-new-1.10>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.10>` you'll
+want to be aware of when upgrading from Django 1.9 or older versions. We've
+:ref:`dropped some features <removed-features-1.10>` that have reached the end
+of their deprecation cycle, and we've :ref:`begun the deprecation process for
+some features <deprecated-features-1.10>`.
 
 Python compatibility
 ====================
 
 Like Django 1.9, Django 1.10 requires Python 2.7, 3.4, or 3.5. We **highly
 recommend** and only officially support the latest release of each series.
+
+.. _whats-new-1.10:
 
 What's new in Django 1.10
 =========================
@@ -503,6 +501,8 @@ Validators
 * :func:`~django.core.validators.int_list_validator` now accepts an optional
   ``allow_negative`` boolean parameter, defaulting to ``False``, to allow
   negative integers.
+
+.. _backwards-incompatible-1.10:
 
 Backwards incompatible changes in 1.10
 ======================================
