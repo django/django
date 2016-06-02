@@ -249,9 +249,11 @@ in ``myapp``::
     from django.contrib.contenttypes.models import ContentType
 
     content_type = ContentType.objects.get_for_model(BlogPost)
-    permission = Permission.objects.create(codename='can_publish',
-                                           name='Can Publish Posts',
-                                           content_type=content_type)
+    permission = Permission.objects.create(
+        codename='can_publish',
+        name='Can Publish Posts',
+        content_type=content_type,
+    )
 
 The permission can then be assigned to a
 :class:`~django.contrib.auth.models.User` via its ``user_permissions``

@@ -202,10 +202,14 @@ Here's an example of what the form-handling view looks like::
         # ...
 
         current_site = get_current_site(request)
-        send_mail('Thanks for subscribing to %s alerts' % current_site.name,
-            'Thanks for your subscription. We appreciate it.\n\n-The %s team.' % current_site.name,
+        send_mail(
+            'Thanks for subscribing to %s alerts' % current_site.name,
+            'Thanks for your subscription. We appreciate it.\n\n-The %s team.' % (
+                current_site.name,
+            ),
             'editor@%s' % current_site.domain,
-            [user.email])
+            [user.email],
+        )
 
         # ...
 

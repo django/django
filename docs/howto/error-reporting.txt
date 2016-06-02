@@ -207,10 +207,12 @@ filtered out of error reports in a production environment (that is, where
 
         @sensitive_post_parameters('pass_word', 'credit_card_number')
         def record_user_profile(request):
-            UserProfile.create(user=request.user,
-                               password=request.POST['pass_word'],
-                               credit_card=request.POST['credit_card_number'],
-                               name=request.POST['name'])
+            UserProfile.create(
+                user=request.user,
+                password=request.POST['pass_word'],
+                credit_card=request.POST['credit_card_number'],
+                name=request.POST['name'],
+            )
             ...
 
     In the above example, the values for the ``pass_word`` and

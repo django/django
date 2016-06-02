@@ -849,14 +849,16 @@ precede the definition of any keyword arguments. For example::
 
     Poll.objects.get(
         Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
-        question__startswith='Who')
+        question__startswith='Who',
+    )
 
 ... would be a valid query, equivalent to the previous example; but::
 
     # INVALID QUERY
     Poll.objects.get(
         question__startswith='Who',
-        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)))
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+    )
 
 ... would not be valid.
 
