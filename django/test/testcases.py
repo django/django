@@ -303,7 +303,10 @@ class SimpleTestCase(unittest.TestCase):
                 path = urljoin(response.request['PATH_INFO'], path)
 
             if fetch_redirect_response:
-                if netloc:
+                # netloc might be empty, or in cases where Django tests the
+                # HTTP scheme, the convention is for netloc to be 'testserver'.
+                # Trust both as "internal" URLs here.
+                if netloc and netloc != 'testserver':
                     raise ValueError(
                         "The Django test client is unable to fetch remote URLs (got %s). "
                         "Use assertRedirects(..., fetch_redirect_response=False) instead." % url
