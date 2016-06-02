@@ -1251,6 +1251,18 @@ Subject-line prefix for email messages sent with ``django.core.mail.mail_admins`
 or ``django.core.mail.mail_managers``. You'll probably want to include the
 trailing space.
 
+.. setting:: EMAIL_USE_LOCALTIME
+
+``EMAIL_USE_LOCALTIME``
+-----------------------
+
+.. versionadded:: 1.11
+
+Default: ``False``
+
+Whether to send the SMTP ``Date`` header of email messages in the local time
+zone (``True``) or in UTC (``False``).
+
 .. setting:: EMAIL_USE_TLS
 
 ``EMAIL_USE_TLS``
@@ -3242,6 +3254,7 @@ Email
 * :setting:`EMAIL_SSL_KEYFILE`
 * :setting:`EMAIL_SUBJECT_PREFIX`
 * :setting:`EMAIL_TIMEOUT`
+* :setting:`EMAIL_USE_LOCALTIME`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`
