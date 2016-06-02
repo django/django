@@ -452,12 +452,15 @@ with the following code::
         'mpoly' : 'MULTIPOLYGON',
     }
 
-    world_shp = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data', 'TM_WORLD_BORDERS-0.3.shp'))
+    world_shp = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), 'data', 'TM_WORLD_BORDERS-0.3.shp'),
+    )
 
     def run(verbose=True):
-        lm = LayerMapping(WorldBorder, world_shp, world_mapping,
-                          transform=False, encoding='iso-8859-1')
-
+        lm = LayerMapping(
+            WorldBorder, world_shp, world_mapping,
+            transform=False, encoding='iso-8859-1',
+        )
         lm.save(strict=True, verbose=verbose)
 
 A few notes about what's going on:

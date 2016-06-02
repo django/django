@@ -106,11 +106,13 @@ options can be added in the :meth:`~BaseCommand.add_arguments` method like this:
             parser.add_argument('poll_id', nargs='+', type=int)
 
             # Named (optional) arguments
-            parser.add_argument('--delete',
+            parser.add_argument(
+                '--delete',
                 action='store_true',
                 dest='delete',
                 default=False,
-                help='Delete poll instead of closing it')
+                help='Delete poll instead of closing it',
+            )
 
         def handle(self, *args, **options):
             # ...
