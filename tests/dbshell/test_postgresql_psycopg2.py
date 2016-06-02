@@ -37,11 +37,11 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
     def test_basic(self):
         self.assertEqual(
             self._run_it({
-                'NAME': 'dbname',
-                'USER': 'someuser',
-                'PASSWORD': 'somepassword',
-                'HOST': 'somehost',
-                'PORT': 444,
+                'database': 'dbname',
+                'user': 'someuser',
+                'password': 'somepassword',
+                'host': 'somehost',
+                'port': '444',
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
                 b'somehost:444:dbname:someuser:somepassword',
@@ -51,10 +51,10 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
     def test_nopass(self):
         self.assertEqual(
             self._run_it({
-                'NAME': 'dbname',
-                'USER': 'someuser',
-                'HOST': 'somehost',
-                'PORT': 444,
+                'database': 'dbname',
+                'user': 'someuser',
+                'host': 'somehost',
+                'port': '444',
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
                 None,
@@ -64,11 +64,11 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
     def test_column(self):
         self.assertEqual(
             self._run_it({
-                'NAME': 'dbname',
-                'USER': 'some:user',
-                'PASSWORD': 'some:password',
-                'HOST': '::1',
-                'PORT': 444,
+                'database': 'dbname',
+                'user': 'some:user',
+                'password': 'some:password',
+                'host': '::1',
+                'port': '444',
             }), (
                 ['psql', '-U', 'some:user', '-h', '::1', '-p', '444', 'dbname'],
                 b'\\:\\:1:444:dbname:some\\:user:some\\:password',
@@ -78,11 +78,11 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
     def test_escape_characters(self):
         self.assertEqual(
             self._run_it({
-                'NAME': 'dbname',
-                'USER': 'some\\user',
-                'PASSWORD': 'some\\password',
-                'HOST': 'somehost',
-                'PORT': 444,
+                'database': 'dbname',
+                'user': 'some\\user',
+                'password': 'some\\password',
+                'host': 'somehost',
+                'port': '444',
             }), (
                 ['psql', '-U', 'some\\user', '-h', 'somehost', '-p', '444', 'dbname'],
                 b'somehost:444:dbname:some\\\\user:some\\\\password',
@@ -106,11 +106,11 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 self.skipTest("Your locale can't run this test.")
         self.assertEqual(
             self._run_it({
-                'NAME': 'dbname',
-                'USER': username_str,
-                'PASSWORD': password_str,
-                'HOST': 'somehost',
-                'PORT': 444,
+                'database': 'dbname',
+                'user': username_str,
+                'password': password_str,
+                'host': 'somehost',
+                'port': '444',
             }), (
                 ['psql', '-U', username_str, '-h', 'somehost', '-p', '444', 'dbname'],
                 pgpass_bytes,
