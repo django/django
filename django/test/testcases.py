@@ -303,6 +303,11 @@ class SimpleTestCase(unittest.TestCase):
                 path = urljoin(response.request['PATH_INFO'], path)
 
             if fetch_redirect_response:
+                if netloc:
+                    raise ValueError(
+                        "The Django test client is unable to fetch remote URLs (got %s). "
+                        "Use assertRedirects(..., fetch_redirect_response=False) instead." % url
+                    )
                 redirect_response = response.client.get(path, QueryDict(query), secure=(scheme == 'https'))
 
                 # Get the redirection page, using the same client that was used
