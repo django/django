@@ -17,14 +17,14 @@ class DatabaseClient(BaseDatabaseClient):
     executable_name = 'psql'
 
     @classmethod
-    def runshell_db(cls, settings_dict):
+    def runshell_db(cls, conn_params):
         args = [cls.executable_name]
 
-        host = settings_dict.get('HOST', '')
-        port = settings_dict.get('PORT', '')
-        name = settings_dict.get('NAME', '')
-        user = settings_dict.get('USER', '')
-        passwd = settings_dict.get('PASSWORD', '')
+        host = conn_params.get('host', '')
+        port = conn_params.get('port', '')
+        dbname = conn_params.get('database', '')
+        user = conn_params.get('user', '')
+        passwd = conn_params.get('password', '')
 
         if user:
             args += ['-U', user]
@@ -32,7 +32,7 @@ class DatabaseClient(BaseDatabaseClient):
             args += ['-h', host]
         if port:
             args += ['-p', str(port)]
-        args += [name]
+        args += [dbname]
 
         temp_pgpass = None
         try:
@@ -43,7 +43,7 @@ class DatabaseClient(BaseDatabaseClient):
                     print_(
                         _escape_pgpass(host) or '*',
                         str(port) or '*',
-                        _escape_pgpass(name) or '*',
+                        _escape_pgpass(dbname) or '*',
                         _escape_pgpass(user) or '*',
                         _escape_pgpass(passwd),
                         file=temp_pgpass,
@@ -63,4 +63,4 @@ class DatabaseClient(BaseDatabaseClient):
                     del os.environ['PGPASSFILE']
 
     def runshell(self):
-        DatabaseClient.runshell_db(self.connection.settings_dict)
+        DatabaseClient.runshell_db(self.connection.get_connection_params())

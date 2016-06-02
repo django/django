@@ -23,3 +23,6 @@ Bugfixes
 
 * Fixed ``HStoreField`` to raise a ``ValidationError`` instead of crashing on
   non-dictionary JSON input (:ticket:`26672`).
+
+* Fixed ``dbshell`` crash on PostgreSQL with an empty database name
+  (:ticket:`26698`).
