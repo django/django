@@ -6,16 +6,12 @@ Django 1.9 release notes
 
 Welcome to Django 1.9!
 
-These release notes cover the `new features`_, as well as some `backwards
-incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.8 or older versions. We've :ref:`dropped some features<removed-features-1.9>`
-that have reached the end of their deprecation cycle, and we've `begun the
-deprecation process for some features`_.
-
-.. _`new features`: `What's new in Django 1.9`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.9`_
-.. _`dropped some features`: `Features removed in 1.9`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.9`_
+These release notes cover the :ref:`new features <whats-new-1.9>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.9>` you'll
+want to be aware of when upgrading from Django 1.8 or older versions. We've
+:ref:`dropped some features<removed-features-1.9>` that have reached the end of
+their deprecation cycle, and we've :ref:`begun the deprecation process for some
+features <deprecated-features-1.9>`.
 
 Python compatibility
 ====================
@@ -24,6 +20,8 @@ Django 1.9 requires Python 2.7, 3.4, or 3.5. We **highly recommend** and only
 officially support the latest release of each series.
 
 The Django 1.8 series is the last to support Python 3.2 and 3.3.
+
+.. _whats-new-1.9:
 
 What's new in Django 1.9
 ========================
@@ -671,6 +669,8 @@ Validators
 
 * Added :func:`~django.core.validators.validate_unicode_slug` to validate slugs
   that may contain Unicode characters.
+
+.. _backwards-incompatible-1.9:
 
 Backwards incompatible changes in 1.9
 =====================================

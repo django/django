@@ -4,14 +4,11 @@ Django 1.11 release notes - UNDER DEVELOPMENT
 
 Welcome to Django 1.11!
 
-These release notes cover the `new features`_, as well as some `backwards
-incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.10 or older versions. We've `begun the deprecation process for some
-features`_.
-
-.. _`new features`: `What's new in Django 1.11`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.11`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.11`_
+These release notes cover the :ref:`new features <whats-new-1.11>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.11>` you'll
+want to be aware of when upgrading from Django 1.10 or older versions. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-1.11>`.
 
 Django 1.11 is designated as a :term:`long-term support release`. It will
 receive security updates for at least three years after its release. Support
@@ -41,6 +38,8 @@ drop support for all versions of Django prior to 1.11. At that time, you should
 be able run your package's tests using ``python -Wd`` so that deprecation
 warnings do appear. After making the deprecation warning fixes, your app should
 be compatible with Django 2.0.
+
+.. _whats-new-1.11:
 
 What's new in Django 1.11
 =========================
@@ -210,6 +209,8 @@ Validators
 ~~~~~~~~~~
 
 * ...
+
+.. _backwards-incompatible-1.11:
 
 Backwards incompatible changes in 1.11
 ======================================
