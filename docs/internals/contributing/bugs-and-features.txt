@@ -28,6 +28,11 @@ Otherwise, before reporting a bug or requesting a new feature on the
   likely to get lost. If a particular ticket is controversial, please move the
   discussion to |django-developers|.
 
+.. Note::
+
+    Django does not use GitHub for bug reports or feature requests.
+    All bug reports or feature requests should go through the `issue tracker`_.
+
 .. _reporting-bugs:
 
 Reporting bugs
@@ -170,4 +175,5 @@ Votes on technical matters should be announced and held in public on the
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
+.. _issue tracker: https://code.djangoproject.com/query
 .. _#django: irc://irc.freenode.net/django
