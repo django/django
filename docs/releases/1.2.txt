@@ -6,12 +6,10 @@ Django 1.2 release notes
 
 Welcome to Django 1.2!
 
-Nearly a year in the making, Django 1.2 packs an impressive list of `new
-features`_ and lots of bug fixes. These release notes cover the new features,
-as well as important changes you'll want to be aware of when upgrading from
-Django 1.1 or older versions.
-
-.. _new features: `What's new in Django 1.2`_
+Nearly a year in the making, Django 1.2 packs an impressive list of :ref:`new
+features <whats-new-1.2>` and lots of bug fixes. These release notes cover
+the new features, as well as important changes you'll want to be aware of when
+upgrading from Django 1.1 or older versions.
 
 Overview
 ========
@@ -114,6 +112,8 @@ continue to receive security support until the release of Django 1.3.
 A roadmap for Django's overall 2.x Python support, and eventual
 transition to Python 3.x, is currently being developed, and will be
 announced prior to the release of Django 1.3.
+
+.. _whats-new-1.2:
 
 What's new in Django 1.2
 ========================
@@ -1073,10 +1073,10 @@ to provide localizers the possibility to translate date and time formats. They
 were translatable :term:`translation strings <translation string>` that could
 be recognized because they were all upper case (for example
 :setting:`DATETIME_FORMAT`, :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`).
-They have been deprecated in favor of the new :ref:`Format localization
-<format-localization>` infrastructure that allows localizers to specify that
-information in a ``formats.py`` file in the corresponding
-``django/conf/locale/<locale name>/`` directory.
+They have been deprecated in favor of the new :doc:`/topics/i18n/formatting`
+infrastructure that allows localizers to specify that information in a
+``formats.py`` file in the corresponding ``django/conf/locale/<locale name>/``
+directory.
 
 GeoDjango
 ---------

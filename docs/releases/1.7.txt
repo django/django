@@ -6,16 +6,12 @@ Django 1.7 release notes
 
 Welcome to Django 1.7!
 
-These release notes cover the `new features`_, as well as some `backwards
-incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.6 or older versions. We've `begun the deprecation process for some features`_,
-and some features have reached the end of their deprecation process and
-`have been removed`_.
-
-.. _`new features`: `What's new in Django 1.7`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.7`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.7`_
-.. _`have been removed`: `Features removed in 1.7`_
+These release notes cover the :ref:`new features <whats-new-1.7>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.7>` you'll
+want to be aware of when upgrading from Django 1.6 or older versions. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-1.7>`, and some features have reached the end of their
+deprecation process and :ref:`have been removed <removed-features-1.7>`.
 
 Python compatibility
 ====================
@@ -32,6 +28,8 @@ version. If you're still using Python 2.6, however, you'll need to stick to
 Django 1.6 until you can upgrade your Python version. Per :doc:`our support
 policy </internals/release-process>`, Django 1.6 will continue to receive
 security support until the release of Django 1.8.
+
+.. _whats-new-1.7:
 
 What's new in Django 1.7
 ========================
@@ -944,6 +942,8 @@ Validators
 * :func:`~django.core.validators.validate_email` now accepts addresses with
   IPv6 literals, like ``example@[2001:db8::1]``, as specified in RFC 5321.
 
+.. _backwards-incompatible-1.7:
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -1810,7 +1810,7 @@ Private APIs ``django.db.models.sql.where.WhereNode.make_atom()`` and
 ``django.db.models.sql.where.Constraint`` are deprecated in favor of the new
 :doc:`custom lookups API </ref/models/lookups>`.
 
-.. removed-features-1.7:
+.. _removed-features-1.7:
 
 Features removed in 1.7
 =======================

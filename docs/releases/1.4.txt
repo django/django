@@ -6,16 +6,12 @@ Django 1.4 release notes
 
 Welcome to Django 1.4!
 
-These release notes cover the `new features`_, as well
-as some `backwards incompatible changes`_ you'll want to be aware of
-when upgrading from Django 1.3 or older versions. We've also dropped some
-features, which are detailed in :ref:`our deprecation plan
-<deprecation-removed-in-1.4>`, and we've `begun the deprecation process for
-some features`_.
-
-.. _`new features`: `What's new in Django 1.4`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.4`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.4`_
+These release notes cover the :ref:`new features <whats-new-1.4>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.4>` you'll
+want to be aware of when upgrading from Django 1.3 or older versions. We've
+also dropped some features, which are detailed in :ref:`our deprecation plan
+<deprecation-removed-in-1.4>`, and we've :ref:`begun the deprecation process
+for some features <deprecated-features-1.4>`.
 
 Overview
 ========
@@ -56,8 +52,8 @@ Other notable new features in Django 1.4 include:
 Wherever possible we try to introduce new features in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>` policy.
 However, as with previous releases, Django 1.4 ships with some minor
-`backwards incompatible changes`_; people upgrading from previous versions
-of Django should read that list carefully.
+:ref:`backwards incompatible changes <backwards-incompatible-1.4>`; people
+upgrading from previous versions of Django should read that list carefully.
 
 Python compatibility
 ====================
@@ -76,6 +72,8 @@ support until the release of Django 1.5.
 Django does not support Python 3.x at this time. At some point before the
 release of Django 1.4, we plan to publish a document outlining our full
 timeline for deprecating Python 2.x and moving to Python 3.x.
+
+.. _whats-new-1.4:
 
 What's new in Django 1.4
 ========================
@@ -664,6 +662,8 @@ Django 1.4 also includes several smaller improvements worth noting:
   that's lighter than :class:`django.test.TestCase` and company. It can be
   useful in tests that don't need to hit a database. See
   :ref:`testcase_hierarchy_diagram`.
+
+.. _backwards-incompatible-1.4:
 
 Backwards incompatible changes in 1.4
 =====================================

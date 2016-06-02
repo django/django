@@ -6,21 +6,17 @@ Django 1.8 release notes
 
 Welcome to Django 1.8!
 
-These release notes cover the `new features`_, as well as some `backwards
-incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.7 or older versions. We've also `begun the deprecation process for some
-features`_, and some features have reached the end of their deprecation process
-and `have been removed`_.
+These release notes cover the :ref:`new features <whats-new-1.8>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.8>` you'll
+want to be aware of when upgrading from Django 1.7 or older versions. We've
+also :ref:`begun the deprecation process for some features
+<deprecated-features-1.8>`, and some features have reached the end of their
+deprecation process and :ref:`have been removed <removed-features-1.8>`.
 
 Django 1.8 has been designated as Django's second :ref:`"Long-Term Support"
 (LTS) <lts-releases>` release. It will receive security updates for at least
 three years after its release. Support for the previous LTS, Django 1.4, will
 end 6 months from the release date of Django 1.8.
-
-.. _`new features`: `What's new in Django 1.8`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.8`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.8`_
-.. _`have been removed`: `Features removed in 1.8`_
 
 Python compatibility
 ====================
@@ -32,6 +28,8 @@ Django 1.8 is the first release to support Python 3.5.
 
 Due to the end of upstream support for Python 3.2 in February 2016, we won't
 test Django 1.8.x on Python 3.2 after the end of 2016.
+
+.. _whats-new-1.8:
 
 What's new in Django 1.8
 ========================
@@ -661,6 +659,8 @@ Validators
 
 * :class:`~django.core.validators.URLValidator` now supports IPv6 addresses,
   unicode domains, and URLs containing authentication data.
+
+.. _backwards-incompatible-1.8:
 
 Backwards incompatible changes in 1.8
 =====================================
@@ -1724,7 +1724,7 @@ After switching to the new signature the router will also be called by the
 :class:`~django.db.migrations.operations.RunPython` and
 :class:`~django.db.migrations.operations.RunSQL` operations.
 
-.. removed-features-1.8:
+.. _removed-features-1.8:
 
 Features removed in 1.8
 =======================

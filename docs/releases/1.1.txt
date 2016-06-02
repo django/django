@@ -2,15 +2,12 @@
 Django 1.1 release notes
 ========================
 
-
 July 29, 2009
 
 Welcome to Django 1.1!
 
-Django 1.1 includes a number of nifty `new features`_, lots of bug
-fixes, and an easy upgrade path from Django 1.0.
-
-.. _new features: `What's new in Django 1.1`_
+Django 1.1 includes a number of nifty :ref:`new features <whats-new-1.1>`, lots
+of bug fixes, and an easy upgrade path from Django 1.0.
 
 .. _backwards-incompatible-changes-1.1:
 
@@ -174,6 +171,8 @@ be upgraded to a ``DeprecationWarning``, which will be displayed loudly. Django
 
 For more details on our deprecation policies and strategy, see
 :doc:`/internals/release-process`.
+
+.. _whats-new-1.1:
 
 What's new in Django 1.1
 ========================

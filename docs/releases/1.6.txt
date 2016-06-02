@@ -24,15 +24,12 @@
 
 Welcome to Django 1.6!
 
-These release notes cover the `new features`_, as well as some `backwards
-incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.5 or older versions. We've also dropped some features, which are detailed in
-:ref:`our deprecation plan <deprecation-removed-in-1.6>`, and we've `begun the
-deprecation process for some features`_.
-
-.. _`new features`: `What's new in Django 1.6`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.6`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.6`_
+These release notes cover the :ref:`new features <whats-new-1.6>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.6>` you'll
+want to be aware of when upgrading from Django 1.5 or older versions. We've
+also dropped some features, which are detailed in :ref:`our deprecation plan
+<deprecation-removed-in-1.6>`, and we've :ref:`begun the deprecation process
+for some features <deprecated-features-1.6>`.
 
 Python compatibility
 ====================
@@ -45,6 +42,8 @@ Django 1.6 will be the final release series to support Python 2.6; beginning
 with Django 1.7, the minimum supported Python version will be 2.7.
 
 Python 3.4 is not supported, but support will be added in Django 1.7.
+
+.. _whats-new-1.6:
 
 What's new in Django 1.6
 ========================
@@ -369,6 +368,8 @@ Minor features
   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
   default value. Passwords :ref:`will be upgraded <password-upgrades>` to use
   the new iteration count as necessary.
+
+.. _backwards-incompatible-1.6:
 
 Backwards incompatible changes in 1.6
 =====================================
