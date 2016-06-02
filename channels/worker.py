@@ -96,7 +96,7 @@ class Worker(object):
             # Handle the message
             match = self.channel_layer.router.match(message)
             if match is None:
-                logger.exception("Could not find match for message on %s! Check your routing.", channel)
+                logger.error("Could not find match for message on %s! Check your routing.", channel)
                 continue
             else:
                 consumer, kwargs = match
