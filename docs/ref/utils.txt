@@ -667,7 +667,7 @@ escaping HTML.
 
         format_html_join(
             '\n', "<li>{} {}</li>",
-            ((u.first_name, u.last_name) for u in users)
+            ((u.first_name, u.last_name) for u in users),
         )
 
 .. function:: strip_tags(value)

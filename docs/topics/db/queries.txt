@@ -856,7 +856,8 @@ precede the definition of any keyword arguments. For example::
     # INVALID QUERY
     Poll.objects.get(
         question__startswith='Who',
-        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)))
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
+    )
 
 ... would not be valid.
 

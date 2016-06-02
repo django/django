@@ -468,8 +468,10 @@ If the string contains exactly one unnamed placeholder, you can interpolate
 directly with the ``number`` argument::
 
     class MyForm(forms.Form):
-        error_message = ungettext_lazy("You provided %d argument",
-            "You provided %d arguments")
+        error_message = ungettext_lazy(
+            "You provided %d argument",
+            "You provided %d arguments",
+        )
 
         def clean(self):
             # ...
@@ -1817,8 +1819,11 @@ If you need more flexibility, you could also add a new argument to your custom
 
         def add_arguments(self, parser):
             super(Command, self).add_arguments(parser)
-            parser.add_argument('--extra-keyword', dest='xgettext_keywords',
-                                action='append')
+            parser.add_argument(
+                '--extra-keyword',
+                dest='xgettext_keywords',
+                action='append',
+            )
 
         def handle(self, *args, **options):
             xgettext_keywords = options.pop('xgettext_keywords')

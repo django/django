@@ -615,10 +615,12 @@ subclass::
               color_code = models.CharField(max_length=6)
 
               def colored_name(self):
-                  return format_html('<span style="color: #{};">{} {}</span>',
-                                     self.color_code,
-                                     self.first_name,
-                                     self.last_name)
+                  return format_html(
+                      '<span style="color: #{};">{} {}</span>',
+                      self.color_code,
+                      self.first_name,
+                      self.last_name,
+                  )
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
@@ -700,9 +702,11 @@ subclass::
             color_code = models.CharField(max_length=6)
 
             def colored_first_name(self):
-                return format_html('<span style="color: #{};">{}</span>',
-                                   self.color_code,
-                                   self.first_name)
+                return format_html(
+                    '<span style="color: #{};">{}</span>',
+                    self.color_code,
+                    self.first_name,
+                )
 
             colored_first_name.admin_order_field = 'first_name'
 
@@ -906,13 +910,11 @@ subclass::
 
                   def lookups(self, request, model_admin):
                       if request.user.is_superuser:
-                          return super(AuthDecadeBornListFilter,
-                              self).lookups(request, model_admin)
+                          return super(AuthDecadeBornListFilter, self).lookups(request, model_admin)
 
                   def queryset(self, request, queryset):
                       if request.user.is_superuser:
-                          return super(AuthDecadeBornListFilter,
-                              self).queryset(request, queryset)
+                          return super(AuthDecadeBornListFilter, self).queryset(request, queryset)
 
           Also as a convenience, the ``ModelAdmin`` object is passed to
           the ``lookups`` method, for example if you want to base the
@@ -1268,8 +1270,10 @@ subclass::
 
         class PersonAdmin(admin.ModelAdmin):
             def view_on_site(self, obj):
-                return 'https://example.com' + reverse('person-detail',
-                                                       kwargs={'slug': obj.slug})
+                return 'https://example.com' + reverse(
+                    'person-detail',
+                    kwargs={'slug': obj.slug},
+                )
 
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1875,8 +1879,12 @@ provided some extra mapping data that would not otherwise be available::
         def change_view(self, request, object_id, form_url='', extra_context=None):
             extra_context = extra_context or {}
             extra_context['osm_data'] = self.get_osm_info()
-            return super(MyModelAdmin, self).change_view(request, object_id,
-                form_url, extra_context=extra_context)
+            return super(MyModelAdmin, self).change_view(
+                request,
+                object_id,
+                form_url,
+                extra_context=extra_context,
+            )
 
 These views return :class:`~django.template.response.TemplateResponse`
 instances which allow you to easily customize the response data before
