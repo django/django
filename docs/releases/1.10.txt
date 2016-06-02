@@ -1217,7 +1217,8 @@ removed in Django 1.10 (please see the :ref:`deprecation timeline
 * The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
   defined with no default value for its ``form_class`` argument is removed.
 
-* The following settings are removed:
+* The following settings are removed, and :doc:`you must upgrade
+  </ref/templates/upgrading>` to the :setting:`TEMPLATES` setting:
 
   * ``ALLOWED_INCLUDE_ROOTS``
   * ``TEMPLATE_CONTEXT_PROCESSORS``
