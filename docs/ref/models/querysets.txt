@@ -1954,6 +1954,17 @@ given parameters.
 Note that ``earliest()`` and ``latest()`` exist purely for convenience and
 readability.
 
+.. admonition:: ``earliest()`` and ``latest()`` may return instances with null dates.
+
+    Since ordering is delegated to the database, results on fields that allow
+    null values may be ordered differently if you use different databases. For
+    example, PostgreSQL and MySQL sort null values as if they are higher than
+    non-null values, while SQLite does the opposite.
+
+    You may want to filter out null values::
+
+        Entry.objects.filter(pub_date__isnull=False).latest('pub_date')
+
 ``earliest()``
 ~~~~~~~~~~~~~~
 
