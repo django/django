@@ -109,3 +109,33 @@ class SafeStringTest(SimpleTestCase):
         s = text.slugify(lazystr('a'))
         s += mark_safe('&b')
         self.assertRenderEqual('{{ s }}', 'a&b', s=s)
+
+    def test_mark_safe_as_decorator(self):
+        """
+        mark_safe used as a decorator leaves the result of a function
+        unchanged.
+        """
+        def clean_string_provider():
+            return '<html><body>dummy</body></html>'
+
+        self.assertEqual(mark_safe(clean_string_provider)(), clean_string_provider())
+
+    def test_mark_safe_decorator_does_not_affect_dunder_html(self):
+        """
+        mark_safe doesn't affect a callable that has an __html__() method.
+        """
+        class SafeStringContainer:
+            def __html__(self):
+                return '<html></html>'
+
+        self.assertIs(mark_safe(SafeStringContainer), SafeStringContainer)
+
+    def test_mark_safe_decorator_does_not_affect_promises(self):
+        """
+        mark_safe doesn't affect lazy strings (Promise objects).
+        """
+        def html_str():
+            return '<html></html>'
+
+        lazy_str = lazy(html_str, str)()
+        self.assertEqual(mark_safe(lazy_str), html_str())

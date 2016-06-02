@@ -13,6 +13,7 @@ from django.utils.decorators import method_decorator
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.functional import allow_lazy, keep_lazy, keep_lazy_text, lazy
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy
 from django.views.decorators.cache import (
     cache_control, cache_page, never_cache,
@@ -74,6 +75,9 @@ full_decorator = compose(
     keep_lazy(HttpResponse),
     keep_lazy_text,
     lazy,
+
+    # django.utils.safestring
+    mark_safe,
 )
 
 fully_decorated = full_decorator(fully_decorated)

@@ -202,7 +202,7 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* :meth:`~django.utils.safestring.mark_safe` can now be used as a decorator.
 
 Tests
 ~~~~~
