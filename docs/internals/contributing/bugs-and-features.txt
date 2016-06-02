@@ -10,9 +10,8 @@ Reporting bugs and requesting features
     not public. For further details, please see :doc:`our security
     policies </internals/security>`.
 
-
-Otherwise, before reporting a bug or requesting a new feature, please consider these
-general points:
+Otherwise, before reporting a bug or requesting a new feature on the
+`ticket tracker <https://code.djangoproject.com/>`_, consider these points:
 
 * Check that someone hasn't already filed the bug or feature request by
   `searching`_ or running `custom queries`_ in the ticket tracker.
