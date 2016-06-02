@@ -6,16 +6,12 @@ Django 1.5 release notes
 
 Welcome to Django 1.5!
 
-These release notes cover the `new features`_, as well
-as some `backwards incompatible changes`_ you'll want to be aware of
-when upgrading from Django 1.4 or older versions. We've also dropped some
-features, which are detailed in :ref:`our deprecation plan
-<deprecation-removed-in-1.5>`, and we've `begun the deprecation process for
-some features`_.
-
-.. _`new features`: `What's new in Django 1.5`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.5`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.5`_
+These release notes cover the :ref:`new features <whats-new-1.5>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.5>` you'll
+want to be aware of when upgrading from Django 1.4 or older versions. We've
+also dropped some features, which are detailed in :ref:`our deprecation plan
+<deprecation-removed-in-1.5>`, and we've :ref:`begun the deprecation process
+for some features <deprecated-features-1.5>`.
 
 Overview
 ========
@@ -51,8 +47,8 @@ Other notable new features in Django 1.5 include:
 Wherever possible we try to introduce new features in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>`.
 However, as with previous releases, Django 1.5 ships with some minor
-`backwards incompatible changes`_; people upgrading from previous versions
-of Django should read that list carefully.
+:ref:`backwards incompatible changes <backwards-incompatible-1.5>`; people
+upgrading from previous versions of Django should read that list carefully.
 
 One deprecated feature worth noting is the shift to "new-style" :ttag:`url` tag.
 Prior to Django 1.3, syntax like ``{% url myview %}`` was interpreted
@@ -117,6 +113,8 @@ to start porting now.
 
 We plan to offer first-class, production-ready support for Python 3 in our next
 release, Django 1.6.
+
+.. _whats-new-1.5:
 
 What's new in Django 1.5
 ========================
@@ -347,6 +345,8 @@ Django 1.5 also includes several smaller improvements worth noting:
 
 * The admin's list filters can now be customized per-request thanks to the new
   :meth:`django.contrib.admin.ModelAdmin.get_list_filter` method.
+
+.. _backwards-incompatible-1.5:
 
 Backwards incompatible changes in 1.5
 =====================================

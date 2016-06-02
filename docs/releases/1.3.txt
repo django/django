@@ -6,11 +6,11 @@ Django 1.3 release notes
 
 Welcome to Django 1.3!
 
-Nearly a year in the making, Django 1.3 includes quite a few `new
-features`_ and plenty of bug fixes and improvements to existing
-features. These release notes cover the new features in 1.3, as well
-as some `backwards-incompatible changes`_ you'll want to be aware of
-when upgrading from Django 1.2 or older versions.
+Nearly a year in the making, Django 1.3 includes quite a few :ref:`new features
+<whats-new-1.3>` and plenty of bug fixes and improvements to existing features.
+These release notes cover the new features in 1.3, as well as some
+:ref:`backwards-incompatible changes <backwards-incompatible-changes-1.3>`
+you'll want to be aware of when upgrading from Django 1.2 or older versions.
 
 Overview
 ========
@@ -28,27 +28,15 @@ new features from landing, including:
 * Django's testing framework now supports (and ships with a copy of)
   `the unittest2 library`_.
 
-There's plenty more, of course; see the coverage of `new features`_
-below for a full rundown and details.
-
 Wherever possible, of course, new features are introduced in a
 backwards-compatible manner per :doc:`our API stability policy
 </misc/api-stability>` policy. As a result of this policy, Django 1.3
-`begins the deprecation process for some features`_.
+:ref:`begins the deprecation process for some features
+<deprecated-features-1.3>`.
 
-Some changes, unfortunately, are genuinely backwards-incompatible; in
-most cases these are due to security issues or bugs which simply
-couldn't be fixed any other way. Django 1.3 includes a few of these,
-and descriptions of them -- along with the (minor) modifications
-you'll need to make to handle them -- are documented in the list of
-`backwards-incompatible changes`_ below.
-
-.. _new features: `What's new in Django 1.3`_
-.. _backwards-incompatible changes: backwards-incompatible-changes-1.3_
 .. _using Python's logging facilities: `Logging`_
 .. _easy handling of static files: `Extended static files handling`_
 .. _the unittest2 library: `unittest2 support`_
-.. _begins the deprecation process for some features: `deprecated-features-1.3`_
 
 Python compatibility
 ====================
@@ -63,6 +51,8 @@ Django release series to do so; beginning with Django 1.4, the minimum
 supported Python version will be 2.5. A document outlining our full
 timeline for deprecating Python 2.x and moving to Python 3.x will be
 published shortly after the release of Django 1.3.
+
+.. _whats-new-1.3:
 
 What's new in Django 1.3
 ========================
