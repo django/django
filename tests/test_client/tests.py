@@ -595,6 +595,15 @@ class ClientTest(TestCase):
         response = self.client.get('/django_project_redirect/')
         self.assertRedirects(response, 'https://www.djangoproject.com/', fetch_redirect_response=False)
 
+    def test_external_redirect_with_fetch_error_msg(self):
+        """
+        Check that assertRedirects without fetch_redirect_response=False raises
+        a relevant ValueError rather than a non-descript AssertionError.
+        """
+        response = self.client.get('/django_project_redirect/')
+        with self.assertRaisesMessage(ValueError, 'unable to fetch'):
+            self.assertRedirects(response, 'https://www.djangoproject.com/')
+
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
         # Session value isn't set initially
