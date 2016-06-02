@@ -157,7 +157,8 @@ class apply_routes(object):
                     routes = list(map(include, self.routes))
                 else:
                     routes = self.routes
-
+            else:
+                routes = [self.routes]
             channel_layer.routing = routes
             channel_layer.router = Router(routes)
 
