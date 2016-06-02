@@ -56,14 +56,14 @@ class HttpClient(Client):
             self._session = session_for_reply_channel(self.reply_channel)
         return self._session
 
-    def send(self, to, content={}):
+    def send(self, to, content={}, path='/'):
         """
         Send a message to a channel.
         Adds reply_channel name and channel_session to the message.
         """
         content = copy.deepcopy(content)
         content.setdefault('reply_channel', self.reply_channel)
-        content.setdefault('path', '/')
+        content.setdefault('path', path)
         content.setdefault('headers', self.headers)
         self.channel_layer.send(to, content)
 
