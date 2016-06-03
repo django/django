@@ -21,8 +21,9 @@ from django.utils.version import get_docs_version
 
 from . import Field
 from .related_descriptors import (
-    ForwardManyToOneDescriptor, ManyToManyDescriptor,
-    ReverseManyToOneDescriptor, ReverseOneToOneDescriptor,
+    ForwardManyToOneDescriptor, ForwardOneToOneDescriptor,
+    ManyToManyDescriptor, ReverseManyToOneDescriptor,
+    ReverseOneToOneDescriptor,
 )
 from .related_lookups import (
     RelatedExact, RelatedGreaterThan, RelatedGreaterThanOrEqual, RelatedIn,
@@ -437,6 +438,7 @@ class ForeignObject(RelatedField):
 
     requires_unique_target = True
     related_accessor_class = ReverseManyToOneDescriptor
+    forward_related_accessor_class = ForwardManyToOneDescriptor
     rel_class = ForeignObjectRel
 
     def __init__(self, to, on_delete, from_fields, to_fields, rel=None, related_name=None,
@@ -698,7 +700,7 @@ class ForeignObject(RelatedField):
 
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
         super(ForeignObject, self).contribute_to_class(cls, name, private_only=private_only, **kwargs)
-        setattr(cls, self.name, ForwardManyToOneDescriptor(self))
+        setattr(cls, self.name, self.forward_related_accessor_class(self))
 
     def contribute_to_related_class(self, cls, related):
         # Internal FK's - i.e., those with a related name ending with '+' -
@@ -969,6 +971,7 @@ class OneToOneField(ForeignKey):
     one_to_one = True
 
     related_accessor_class = ReverseOneToOneDescriptor
+    forward_related_accessor_class = ForwardOneToOneDescriptor
     rel_class = OneToOneRel
 
     description = _("One-to-one relationship")
