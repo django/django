@@ -275,7 +275,8 @@ The ``Func`` API is as follows:
 
                 def as_mysql(self, compiler, connection):
                     return super(ConcatPair, self).as_sql(
-                        compiler, connection,
+                        compiler,
+                        connection,
                         function='CONCAT_WS',
                         template="%(function)s('', %(expressions)s)",
                     )
@@ -371,7 +372,8 @@ SQL that is generated. Here's a brief example::
                 expression,
                 distinct='DISTINCT ' if distinct else '',
                 output_field=IntegerField(),
-                **extra)
+                **extra
+            )
 
 
 ``Value()`` expressions
