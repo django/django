@@ -1447,14 +1447,6 @@ to explicitly import each model class, rather than using
     from .person import Person
     from .robot import Robot
 
-You can then import classes directly from the ``models`` module as you normally
-would.
-
-``myapp/views.py``::
-
-    from .models import Person
-    from .models import Robot
-
 .. seealso::
 
     :doc:`The Models Reference </ref/models/index>`
