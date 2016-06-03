@@ -1418,9 +1418,9 @@ The :djadmin:`manage.py startapp <startapp>` script creates a package structure
 for an application that includes a file called ``models.py``, but you may
 also define multiple files containing models, contained in a module. For example,
 you can remove the ``models.py`` and create a ``myproject/myapp/models/`` with
-two files (besides an ``__init__.py``), ``person_models.py`` and ``robot_models.py``:
+two files (besides an ``__init__.py``), ``person.py`` and ``robot.py``:
 
-``person_models.py``::
+``person.py``::
 
     from django.db import models
 
@@ -1429,7 +1429,7 @@ two files (besides an ``__init__.py``), ``person_models.py`` and ``robot_models.
         last_name = models.CharField(max_length=30)
 
 
-``robot_models.py``::
+``robot.py``::
 
     from django.db import models
 
@@ -1444,8 +1444,8 @@ to explicitly import each model class, rather than using
 
 ``myapp/models/__init__.py``::
 
-    from .person_models import Person
-    from .robot_models import Robot
+    from .person import Person
+    from .robot import Robot
 
 You can then import classes directly from the ``models`` module as you normally
 would.
