@@ -1194,6 +1194,7 @@ class ManyToManyField(RelatedField):
         errors.extend(self._check_unique(**kwargs))
         errors.extend(self._check_relationship_model(**kwargs))
         errors.extend(self._check_ignored_options(**kwargs))
+        errors.extend(self._check_table_uniqueness(**kwargs))
         return errors
 
     def _check_unique(self, **kwargs):
@@ -1428,6 +1429,36 @@ class ManyToManyField(RelatedField):
                             )
 
         return errors
+
+    def _check_table_uniqueness(self, **kwargs):
+        if isinstance(self.remote_field.through, six.string_types):
+            return []
+        registered_tables = {
+            model._meta.db_table: model
+            for model in self.opts.apps.get_models(include_auto_created=True)
+            if model != self.remote_field.through
+        }
+        m2m_db_table = self.m2m_db_table()
+        if m2m_db_table in registered_tables:
+            model = registered_tables[m2m_db_table]
+            if model._meta.auto_created:
+                def _get_field_name(model):
+                    for field in model._meta.auto_created._meta.many_to_many:
+                        if field.remote_field.through is model:
+                            return field.name
+                opts = model._meta.auto_created._meta
+                clashing_obj = '%s.%s' % (opts.label, _get_field_name(model))
+            else:
+                clashing_obj = '%s' % model._meta.label
+            return [
+                checks.Error(
+                    "The field's intermediary table '%s' clashes with the "
+                    "table name of '%s'." % (m2m_db_table, clashing_obj),
+                    obj=self,
+                    id='fields.E340',
+                )
+            ]
+        return []
 
     def deconstruct(self):
         name, path, args, kwargs = super(ManyToManyField, self).deconstruct()
