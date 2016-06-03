@@ -422,6 +422,16 @@ a subclass of dictionary. Exceptions are outlined here:
     Strings for setting both keys and values will be converted from ``encoding``
     to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
 
+.. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
+
+    .. versionadded:: 1.11
+
+    Creates a new ``QueryDict`` with keys from ``iterable`` and each value
+    equal to ``value``. For example::
+
+        >>> QueryDict.fromkeys(['a', 'a', 'b'], value='val')
+        <QueryDict: {'a': ['val', 'val'], 'b': ['val']}>
+
 .. method:: QueryDict.__getitem__(key)
 
     Returns the value for the given key. If the key has more than one value,
