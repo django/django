@@ -1420,29 +1420,8 @@ also define multiple files containing models, contained in a module. For example
 you can remove the ``models.py`` and create a ``myproject/myapp/models/`` with
 two files (besides an ``__init__.py``), ``person.py`` and ``robot.py``:
 
-``person.py``::
-
-    from django.db import models
-
-    class Person(models.Model):
-        first_name = models.CharField(max_length=30)
-        last_name = models.CharField(max_length=30)
-
-
-``robot.py``::
-
-    from django.db import models
-
-    class Robot(models.Model):
-        model_number = models.CharField(max_length=30)
-        unit_number = models.CharField(max_length=30)
-
-
-Then import your model classes into ``models/__init__.py``. It is recommended
-to explicitly import each model class, rather than using
-``from .models import *``.
-
-``myapp/models/__init__.py``::
+.. snippet::
+    :filename: myapp/models/__init__.py
 
     from .person import Person
     from .robot import Robot
