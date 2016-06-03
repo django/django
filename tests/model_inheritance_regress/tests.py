@@ -507,7 +507,7 @@ class ModelInheritanceTest(TestCase):
             serves_gnocchi=True
         )
 
-        italian_restaurant =  ItalianRestaurant.objects.get(pk=italian_restaurant.pk)
+        italian_restaurant = ItalianRestaurant.objects.get(pk=italian_restaurant.pk)
 
         # no extra queries should be made when accessing
         # the parent objects in a multi-table inheritance scenario.
