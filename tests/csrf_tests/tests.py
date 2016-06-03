@@ -8,12 +8,14 @@ import warnings
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import (
-    CSRF_TOKEN_LENGTH, CsrfViewMiddleware,
+    CSRF_TOKEN_LENGTH, REASON_BAD_TOKEN, REASON_INSECURE_REFERER,
+    REASON_MALFORMED_REFERER, REASON_NO_CSRF_COOKIE, CsrfViewMiddleware,
     _compare_salted_tokens as equivalent_tokens, get_token,
 )
 from django.template import RequestContext, Template
 from django.template.context_processors import csrf
 from django.test import SimpleTestCase, override_settings
+from django.test.utils import patch_logger
 from django.utils.encoding import force_bytes
 from django.utils.six import text_type
 from django.views.decorators.csrf import (
@@ -203,18 +205,28 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         Check that if no CSRF cookies is present, the middleware rejects the
         incoming request.  This will stop login CSRF.
         """
-        req = self._get_POST_no_csrf_cookie_request()
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(403, req2.status_code)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            req = self._get_POST_no_csrf_cookie_request()
+            req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertEqual(403, req2.status_code)
+            self.assertEqual(
+                logger_calls[0],
+                'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE
+            )
 
     def test_process_request_csrf_cookie_no_token(self):
         """
         Check that if a CSRF cookie is present but no token, the middleware
         rejects the incoming request.
         """
-        req = self._get_POST_csrf_cookie_request()
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(403, req2.status_code)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            req = self._get_POST_csrf_cookie_request()
+            req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertEqual(403, req2.status_code)
+            self.assertEqual(
+                logger_calls[0],
+                'Forbidden (%s): ' % REASON_BAD_TOKEN
+            )
 
     def test_process_request_csrf_cookie_and_token(self):
         """
@@ -258,13 +270,23 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         """
         req = TestingHttpRequest()
         req.method = 'PUT'
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(403, req2.status_code)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertEqual(403, req2.status_code)
+            self.assertEqual(
+                logger_calls[0],
+                'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE
+            )
 
         req = TestingHttpRequest()
         req.method = 'DELETE'
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(403, req2.status_code)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertEqual(403, req2.status_code)
+            self.assertEqual(
+                logger_calls[0],
+                'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE
+            )
 
     def test_put_and_delete_allowed(self):
         """
@@ -387,13 +409,19 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://www.evil.org/somepage'
         req.META['SERVER_PORT'] = '443'
-        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertContains(
-            response,
-            'Referer checking failed - https://www.evil.org/somepage does not '
-            'match any trusted origins.',
-            status_code=403,
-        )
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertContains(
+                response,
+                'Referer checking failed - https://www.evil.org/somepage does not '
+                'match any trusted origins.',
+                status_code=403,
+            )
+            self.assertEqual(
+                logger_calls[0],
+                'Forbidden (Referer checking failed - https://www.evil.org/somepage '
+                'does not match any trusted origins.): '
+            )
 
     @override_settings(DEBUG=True)
     def test_https_malformed_referer(self):
@@ -404,32 +432,46 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
         req.META['HTTP_REFERER'] = 'http://http://www.example.com/'
-        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertContains(
-            response,
-            'Referer checking failed - Referer is insecure while host is secure.',
-            status_code=403,
-        )
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertContains(
+                response,
+                'Referer checking failed - Referer is insecure while host is secure.',
+                status_code=403,
+            )
+            self.assertEqual(
+                logger_calls[0],
+                'Forbidden (%s): ' % REASON_INSECURE_REFERER
+            )
+
         # Empty
         req.META['HTTP_REFERER'] = ''
-        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertContains(response, malformed_referer_msg, status_code=403)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertContains(response, malformed_referer_msg, status_code=403)
+            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_MALFORMED_REFERER)
         # Non-ASCII
         req.META['HTTP_REFERER'] = b'\xd8B\xf6I\xdf'
-        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertContains(response, malformed_referer_msg, status_code=403)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertContains(response, malformed_referer_msg, status_code=403)
+            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_MALFORMED_REFERER)
         # missing scheme
         # >>> urlparse('//example.com/')
         # ParseResult(scheme='', netloc='example.com', path='/', params='', query='', fragment='')
         req.META['HTTP_REFERER'] = '//example.com/'
-        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertContains(response, malformed_referer_msg, status_code=403)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertContains(response, malformed_referer_msg, status_code=403)
+            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_MALFORMED_REFERER)
         # missing netloc
         # >>> urlparse('https://')
         # ParseResult(scheme='https', netloc='', path='', params='', query='', fragment='')
         req.META['HTTP_REFERER'] = 'https://'
-        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertContains(response, malformed_referer_msg, status_code=403)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertContains(response, malformed_referer_msg, status_code=403)
+            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_MALFORMED_REFERER)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer(self):
@@ -536,12 +578,17 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req._is_secure_override = True
         req.META['HTTP_REFERER'] = 'http://example.com/'
         req.META['SERVER_PORT'] = '443'
-        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertContains(
-            response,
-            'Referer checking failed - Referer is insecure while host is secure.',
-            status_code=403,
-        )
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertContains(
+                response,
+                'Referer checking failed - Referer is insecure while host is secure.',
+                status_code=403,
+            )
+            self.assertEqual(
+                logger_calls[0],
+                'Forbidden (%s): ' % REASON_INSECURE_REFERER
+            )
 
     def test_ensures_csrf_cookie_no_middleware(self):
         """
@@ -681,5 +728,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         self.assertIsNone(resp)
 
         req = CsrfPostRequest(token, raise_error=True)
-        resp = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(resp.status_code, 403)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            resp = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertEqual(resp.status_code, 403)
+            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_BAD_TOKEN)
