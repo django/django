@@ -499,28 +499,17 @@ class ModelInheritanceTest(TestCase):
 
     def test_no_query_on_parent_access(self):
         # Refs #15250
-        place1 = Place(
+        italian_restaurant = ItalianRestaurant.objects.create(
             name="Guido's House of Pasta",
-            address='944 W. Fullerton')
-        place1.save_base(raw=True)
-        restaurant = Restaurant(
-            place_ptr=place1,
+            address='944 W. Fullerton',
             serves_hot_dogs=True,
-            serves_pizza=False)
-        restaurant.save_base(raw=True)
-        italian_restaurant = ItalianRestaurant(
-            restaurant_ptr=restaurant,
-            serves_gnocchi=True)
-        italian_restaurant.save_base(raw=True)
-
-        italian_restaurant = (
-            ItalianRestaurant
-            .objects
-            .filter(pk=italian_restaurant.pk)
-            .get()
+            serves_pizza=False,
+            serves_gnocchi=True
         )
 
-        # assert that no extra queries are made when accessing
+        italian_restaurant =  ItalianRestaurant.objects.get(pk=italian_restaurant.pk)
+
+        # no extra queries should be made when accessing
         # the parent objects in a multi-table inheritance scenario.
         with self.assertNumQueries(0):
             restaurant = italian_restaurant.restaurant_ptr
@@ -536,7 +525,7 @@ class ModelInheritanceTest(TestCase):
             .get()
         )
 
-        # assert that only one extra query is made when accessing
+        # one extra query is made when accessing
         # the parent objects in a multi-table inheritance scenario
         # when the instance is deferred.
         with self.assertNumQueries(1):
@@ -553,7 +542,7 @@ class ModelInheritanceTest(TestCase):
             .get()
         )
 
-        # assert that no extra queries are made when accessing
+        # no extra queries should be made when accessing
         # the parent objects in a multi-table inheritance scenario
         # when the instance has deferred a field not present in the parent
         # table.

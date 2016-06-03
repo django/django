@@ -23,7 +23,7 @@ reverse many-to-one relation.
 There are three types of relations (many-to-one, one-to-one, and many-to-many)
 and two directions (forward and reverse) for a total of six combinations.
 
-1. Related instance on the forward side of a many-to-one or one-to-one
+1. Related instance on the forward side of a many-to-one
    relation: ``ForwardManyToOneDescriptor``.
 
    Uniqueness of foreign key values is irrelevant to accessing the related
@@ -31,7 +31,14 @@ and two directions (forward and reverse) for a total of six combinations.
    the descriptor is concerned. The constraint is checked upstream (unicity
    validation in forms) or downstream (unique indexes in the database).
 
-2. Related instance on the reverse side of a one-to-one relation:
+2. Related instance on the forward side of a one-to-one
+   relation: ``ForwardOneToOneDescriptor``.
+
+   ``ForwardOneToOneDescriptor`` implements custom behavior to avoid
+   querying the database when accessing the parent link field in
+   a multi-table inheritance scenario.
+
+3. Related instance on the reverse side of a one-to-one relation:
    ``ReverseOneToOneDescriptor``.
 
    One-to-one relations are asymmetrical, despite the apparent symmetry of the
@@ -39,13 +46,13 @@ and two directions (forward and reverse) for a total of six combinations.
    one table to another. As a consequence ``ReverseOneToOneDescriptor`` is
    slightly different from ``ForwardManyToOneDescriptor``.
 
-3. Related objects manager for related instances on the reverse side of a
+4. Related objects manager for related instances on the reverse side of a
    many-to-one relation: ``ReverseManyToOneDescriptor``.
 
    Unlike the previous two classes, this one provides access to a collection
    of objects. It returns a manager rather than an instance.
 
-4. Related objects manager for related instances on the forward or reverse
+5. Related objects manager for related instances on the forward or reverse
    sides of a many-to-many relation: ``ManyToManyDescriptor``.
 
    Many-to-many relations are symmetrical. The syntax of Django models
@@ -264,9 +271,9 @@ class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
     def get_object(self, instance):
         if self.field.remote_field.parent_link:
             deferred = instance.get_deferred_fields()
-            # Because it's a parent link, we have all the data
-            # available in instance, so simply populate the parent
-            # model with this data.
+            # Because it's a parent link,
+            # all the data is available in the instance,
+            # so simply populate the parent model with this data.
             rel_model = self.field.remote_field.model
             fields = [field.attname for field in rel_model._meta.concrete_fields]
 
