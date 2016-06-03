@@ -496,3 +496,69 @@ class ModelInheritanceTest(TestCase):
                 r.supplier_set.all(),
                 [s], lambda x: x,
             )
+
+    def test_no_query_on_parent_access(self):
+        # Refs #15250
+        place1 = Place(
+            name="Guido's House of Pasta",
+            address='944 W. Fullerton')
+        place1.save_base(raw=True)
+        restaurant = Restaurant(
+            place_ptr=place1,
+            serves_hot_dogs=True,
+            serves_pizza=False)
+        restaurant.save_base(raw=True)
+        italian_restaurant = ItalianRestaurant(
+            restaurant_ptr=restaurant,
+            serves_gnocchi=True)
+        italian_restaurant.save_base(raw=True)
+
+        italian_restaurant = (
+            ItalianRestaurant
+            .objects
+            .filter(pk=italian_restaurant.pk)
+            .get()
+        )
+
+        # assert that no extra queries are made when accessing
+        # the parent objects in a multi-table inheritance scenario.
+        with self.assertNumQueries(0):
+            restaurant = italian_restaurant.restaurant_ptr
+            place = restaurant.place_ptr
+            self.assertEqual(place.restaurant, restaurant)
+            self.assertEqual(restaurant.italianrestaurant, italian_restaurant)
+
+        italian_restaurant = (
+            ItalianRestaurant
+            .objects
+            .filter(pk=italian_restaurant.pk)
+            .only('serves_gnocchi')
+            .get()
+        )
+
+        # assert that only one extra query is made when accessing
+        # the parent objects in a multi-table inheritance scenario
+        # when the instance is deferred.
+        with self.assertNumQueries(1):
+            restaurant = italian_restaurant.restaurant_ptr
+            place = restaurant.place_ptr
+            self.assertEqual(place.restaurant, restaurant)
+            self.assertEqual(restaurant.italianrestaurant, italian_restaurant)
+
+        italian_restaurant = (
+            ItalianRestaurant
+            .objects
+            .filter(pk=italian_restaurant.pk)
+            .defer('serves_gnocchi')
+            .get()
+        )
+
+        # assert that no extra queries are made when accessing
+        # the parent objects in a multi-table inheritance scenario
+        # when the instance has deferred a field not present in the parent
+        # table.
+        with self.assertNumQueries(0):
+            restaurant = italian_restaurant.restaurant_ptr
+            place = restaurant.place_ptr
+            self.assertEqual(place.restaurant, restaurant)
+            self.assertEqual(restaurant.italianrestaurant, italian_restaurant)
