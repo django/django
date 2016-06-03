@@ -6,7 +6,7 @@ from django.contrib.sites.models import Site
 from django.http import Http404
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, TestCase
-from django.test.utils import override_settings
+from django.test.utils import LoggingCaptureMixin, override_settings
 from django.views.defaults import (
     bad_request, page_not_found, permission_denied, server_error,
 )
@@ -15,7 +15,7 @@ from ..models import Article, Author, UrlArticle
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class DefaultsTests(TestCase):
+class DefaultsTests(LoggingCaptureMixin, TestCase):
     """Test django views in django/views/defaults.py"""
     non_existing_urls = ['/non_existing_url/',  # this is in urls.py
                          '/other_non_existing_url/']  # this NOT in urls.py

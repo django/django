@@ -7,6 +7,7 @@ from os import path
 from django.conf.urls.static import static
 from django.http import FileResponse, HttpResponseNotModified
 from django.test import SimpleTestCase, override_settings
+from django.test.utils import LoggingCaptureMixin
 from django.utils.http import http_date
 from django.views.static import was_modified_since
 
@@ -15,7 +16,7 @@ from ..urls import media_dir
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
-class StaticTests(SimpleTestCase):
+class StaticTests(LoggingCaptureMixin, SimpleTestCase):
     """Tests django views in django/views/static.py"""
 
     prefix = 'site_media'

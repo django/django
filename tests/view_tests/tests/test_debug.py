@@ -257,7 +257,7 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
         'BACKEND': 'django.template.backends.dummy.TemplateStrings',
     }],
 )
-class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
+class NonDjangoTemplatesDebugViewTests(LoggingCaptureMixin, SimpleTestCase):
 
     def test_400(self):
         # Ensure that when DEBUG=True, technical_500_template() is called.

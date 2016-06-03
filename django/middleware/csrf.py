@@ -17,10 +17,12 @@ from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_text
 from django.utils.http import is_same_domain
+from django.utils.log import log_response
 from django.utils.six.moves import zip
 from django.utils.six.moves.urllib.parse import urlparse
 
 logger = logging.getLogger('django.security.csrf')
+
 
 REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match any trusted origins."
@@ -151,14 +153,14 @@ class CsrfViewMiddleware(MiddlewareMixin):
         return None
 
     def _reject(self, request, reason):
-        logger.warning(
+        response = _get_failure_view()(request, reason=reason)
+        log_response(
             'Forbidden (%s): %s', reason, request.path,
-            extra={
-                'status_code': 403,
-                'request': request,
-            }
+            response=response,
+            request=request,
+            logger=logger,
         )
-        return _get_failure_view()(request, reason=reason)
+        return response
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
         if getattr(request, 'csrf_processing_done', False):

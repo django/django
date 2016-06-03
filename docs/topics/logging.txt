@@ -466,7 +466,8 @@ this logger.
 
 Log messages related to the handling of requests. 5XX responses are
 raised as ``ERROR`` messages; 4XX responses are raised as ``WARNING``
-messages.
+messages. Messages logged to ``django.security`` are not logged to
+``django.requests``.
 
 Messages to this logger have the following extra context:
 

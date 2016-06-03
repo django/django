@@ -11,6 +11,8 @@ from django.core.management.color import color_style
 from django.utils.module_loading import import_string
 from django.views.debug import ExceptionReporter
 
+request_logger = logging.getLogger('django.request')
+
 # Default logging for Django. This sends an email to the site admins on every
 # HTTP 500 error. Depending on DEBUG, all other log records are either sent to
 # the console (DEBUG=True) or discarded (DEBUG=False) by means of the
@@ -193,3 +195,41 @@ class ServerFormatter(logging.Formatter):
 
     def uses_server_time(self):
         return self._fmt.find('%(server_time)') >= 0
+
+
+def log_response(message, *args, **kwargs):
+    """Log errors based on response status.
+
+    Log 5xx responses in error level and 4xx in warning level (unless level
+    is explicitly given as a keyword argument). The Response status_code and
+    the entire request are passed to logger extra parameter. This function
+    also avoid duplicated logs.
+
+    """
+
+    response = kwargs.get('response')
+    request = kwargs.get('request', None)
+    logger = kwargs.get('logger', request_logger)
+    level = kwargs.get('level', None)
+    exc_info = kwargs.get('exc_info', None)
+
+    # Check if the response has already been logged
+    if getattr(response, '_has_been_logged', False):
+        return
+
+    # Append the relevant data to extra info
+    extra = {
+        'status_code': response.status_code,
+        'request': request,
+    }
+
+    if not level:
+        if response.status_code >= 500:
+            level = 'error'
+        elif response.status_code >= 400:
+            level = 'warning'
+        else:
+            level = 'info'
+
+    getattr(logger, level)(message, *args, extra=extra, exc_info=exc_info)
+    response._has_been_logged = True
