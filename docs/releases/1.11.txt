@@ -183,7 +183,7 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added :meth:`QueryDict.fromkeys()<django.http.QueryDict.fromkeys>`.
 
 Serialization
 ~~~~~~~~~~~~~

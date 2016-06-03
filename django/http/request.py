@@ -402,6 +402,19 @@ class QueryDict(MultiValueDict):
                                 value)
         self._mutable = mutable
 
+    @classmethod
+    def fromkeys(cls, iterable, value='', mutable=False, encoding=None):
+        """
+        Return a new QueryDict with keys from iterable and values equal to value.
+        Note: repeated keys are allowed.
+        """
+        q = cls('', mutable=True, encoding=encoding)
+        for key in iterable:
+            q.appendlist(key, value)
+        if not mutable:
+            q._mutable = False
+        return q
+
     @property
     def encoding(self):
         if self._encoding is None:
