@@ -496,3 +496,46 @@ class ModelInheritanceTest(TestCase):
                 r.supplier_set.all(),
                 [s], lambda x: x,
             )
+
+    def test_no_query_on_parent_access(self):
+        # Refs #15250
+        italian_restaurant = ItalianRestaurant.objects.create(
+            name="Guido's House of Pasta",
+            address='944 W. Fullerton',
+            serves_hot_dogs=True,
+            serves_pizza=False,
+            serves_gnocchi=True
+        )
+
+        italian_restaurant = ItalianRestaurant.objects.get(pk=italian_restaurant.pk)
+
+        # no extra queries should be made when accessing
+        # the parent objects in a multi-table inheritance scenario.
+        with self.assertNumQueries(0):
+            restaurant = italian_restaurant.restaurant_ptr
+            place = restaurant.place_ptr
+            self.assertEqual(place.restaurant, restaurant)
+            self.assertEqual(restaurant.italianrestaurant, italian_restaurant)
+
+        italian_restaurant = ItalianRestaurant.objects.only('serves_gnocchi').get(pk=italian_restaurant.pk)
+
+        # one extra query is made when accessing
+        # the parent objects in a multi-table inheritance scenario
+        # when the instance is deferred.
+        with self.assertNumQueries(1):
+            restaurant = italian_restaurant.restaurant_ptr
+            place = restaurant.place_ptr
+            self.assertEqual(place.restaurant, restaurant)
+            self.assertEqual(restaurant.italianrestaurant, italian_restaurant)
+
+        italian_restaurant = ItalianRestaurant.objects.defer('serves_gnocchi').get(pk=italian_restaurant.pk)
+
+        # no extra queries should be made when accessing
+        # the parent objects in a multi-table inheritance scenario
+        # when the instance has deferred a field not present in the parent
+        # table.
+        with self.assertNumQueries(0):
+            restaurant = italian_restaurant.restaurant_ptr
+            place = restaurant.place_ptr
+            self.assertEqual(place.restaurant, restaurant)
+            self.assertEqual(restaurant.italianrestaurant, italian_restaurant)
