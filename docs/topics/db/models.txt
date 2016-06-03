@@ -1418,13 +1418,13 @@ The :djadmin:`manage.py startapp <startapp>` script creates a package structure
 for an application that includes a file called ``models.py``, but you may
 also define a ``models`` package. For example, if you remove the ``models.py`` and
 create a ``myproject/myapp/models/`` with two files (besides an ``__init__.py``),
-``person.py`` and ``robot.py``:
+``organic.py`` and ``synthetic.py``:
 
 .. snippet::
     :filename: myapp/models/__init__.py
 
-    from .person import Person
-    from .robot import Robot
+    from .organic import Person
+    from .synthetic import Robot
 
 .. note::
 
