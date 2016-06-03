@@ -31,9 +31,6 @@ and two directions (forward and reverse) for a total of six combinations.
    the descriptor is concerned. The constraint is checked upstream (unicity
    validation in forms) or downstream (unique indexes in the database).
 
-   If you're looking for ``ForwardOneToOneDescriptor``, use
-   ``ForwardManyToOneDescriptor`` instead.
-
 2. Related instance on the reverse side of a one-to-one relation:
    ``ReverseOneToOneDescriptor``.
 
@@ -151,6 +148,12 @@ class ForwardManyToOneDescriptor(object):
                 setattr(rel_obj, rel_obj_cache_name, instance)
         return queryset, rel_obj_attr, instance_attr, True, self.cache_name
 
+    def get_object(self, instance):
+        qs = self.get_queryset(instance=instance)
+        qs = qs.filter(self.field.get_reverse_related_filter(instance))
+        # Assuming the database enforces foreign keys, this won't fail.
+        return qs.get()
+
     def __get__(self, instance, cls=None):
         """
         Get the related instance through the forward relation.
@@ -174,10 +177,7 @@ class ForwardManyToOneDescriptor(object):
             if None in val:
                 rel_obj = None
             else:
-                qs = self.get_queryset(instance=instance)
-                qs = qs.filter(self.field.get_reverse_related_filter(instance))
-                # Assuming the database enforces foreign keys, this won't fail.
-                rel_obj = qs.get()
+                rel_obj = self.get_object(instance)
                 # If this is a one-to-one relation, set the reverse accessor
                 # cache on the related object to the current instance to avoid
                 # an extra SQL query if it's accessed later on.
@@ -257,6 +257,27 @@ class ForwardManyToOneDescriptor(object):
         # query if it's accessed later on.
         if value is not None and not self.field.remote_field.multiple:
             setattr(value, self.field.remote_field.get_cache_name(), instance)
+
+
+class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
+
+    def get_object(self, instance):
+        if self.field.remote_field.parent_link:
+            deferred = instance.get_deferred_fields()
+            # Because it's a parent link, we have all the data
+            # available in instance, so simply populate the parent
+            # model with this data.
+            rel_model = self.field.remote_field.model
+            fields = [field.attname for field in rel_model._meta.concrete_fields]
+
+            # If any of the related model's fields is deferred
+            # then fallback to fetching all fields from related model.
+            # This avoids a query on the related model for every
+            # deferred field.
+            if not any(field in fields for field in deferred):
+                kwargs = {field: getattr(instance, field) for field in fields}
+                return rel_model(**kwargs)
+        return super(ForwardOneToOneDescriptor, self).get_object(instance)
 
 
 class ReverseOneToOneDescriptor(object):
