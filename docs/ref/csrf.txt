@@ -37,7 +37,9 @@ To take advantage of CSRF protection in your views, follow these steps:
    you want to protect (see below).
 
 2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
-   the ``<form>`` element if the form is for an internal URL, e.g.::
+   the ``<form>`` element if the form is for an internal URL, e.g.:
+
+    .. code-block:: html+django
 
        <form action="" method="post">{% csrf_token %}
 
@@ -146,24 +148,16 @@ If you're using AngularJS 1.1.3 and newer, it's sufficient to configure the
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 
-Other template engines
-----------------------
+CSRF token in Jinja2 templates
+------------------------------
 
-When using a different template engine than Django's built-in engine, you can
-set the token in your forms manually after making sure it's available in the
-template context.
+Django's Jinja2 template engine exposes ``{{ csrf_input }}`` which is
+equivalent to ``{% csrf_token %}`` in the Django template language. For
+example:
 
-For example, in the Jinja2 template language, your form could contain the
-following:
+.. code-block:: html+jinja
 
-.. code-block:: html
-
-    <div style="display:none">
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    </div>
-
-You can use JavaScript similar to the :ref:`AJAX code <csrf-ajax>` above to get
-the value of the CSRF token.
+    <form action="" method="post">{{ csrf_input }}
 
 The decorator method
 --------------------
