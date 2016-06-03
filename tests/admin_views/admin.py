@@ -36,7 +36,7 @@ from .models import (
     MainPrepopulated, ModelWithStringPrimaryKey, NotReferenced, OldSubscriber,
     OtherStory, Paper, Parent, ParentWithDependentChildren, ParentWithUUIDPK,
     Person, Persona, Picture, Pizza, Plot, PlotDetails, PlotProxy,
-    PluggableSearchPerson, Podcast, PodcastInfo, Post, PrePopulatedPost,
+    PluggableSearchPerson, Podcast, Post, PrePopulatedPost,
     PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo, Question, Recipe,
     Recommendation, Recommender, ReferencedByGenRel, ReferencedByInline,
     ReferencedByParent, RelatedPrepopulated, RelatedWithUUIDPKModel, Report,
@@ -282,10 +282,6 @@ class PodcastAdmin(admin.ModelAdmin):
     list_editable = ('release_date',)
     date_hierarchy = 'release_date'
     ordering = ('name',)
-
-
-class PodcastInfoAdmin(admin.ModelAdmin):
-    date_hierarchy = 'podcast__release_date'
 
 
 class VodcastAdmin(admin.ModelAdmin):
@@ -910,7 +906,6 @@ site.register(Subscriber, SubscriberAdmin)
 site.register(ExternalSubscriber, ExternalSubscriberAdmin)
 site.register(OldSubscriber, OldSubscriberAdmin)
 site.register(Podcast, PodcastAdmin)
-site.register(PodcastInfo, PodcastInfoAdmin)
 site.register(Vodcast, VodcastAdmin)
 site.register(Parent, ParentAdmin)
 site.register(EmptyModel, EmptyModelAdmin)
@@ -978,7 +973,7 @@ site.register(Pizza, PizzaAdmin)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Question)
-site.register(Answer)
+site.register(Answer, date_hierarchy='question__posted')
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)
 site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)
 site.register(FilteredManager, CustomManagerAdmin)

@@ -330,10 +330,6 @@ class Podcast(Media):
         ordering = ('release_date',)  # overridden in PodcastAdmin
 
 
-class PodcastInfo(models.Model):
-    podcast = models.ForeignKey(Podcast, models.CASCADE, related_name='info')
-
-
 class Vodcast(Media):
     media = models.OneToOneField(Media, models.CASCADE, primary_key=True, parent_link=True)
     released = models.BooleanField(default=False)
@@ -625,6 +621,7 @@ class WorkHour(models.Model):
 
 class Question(models.Model):
     question = models.CharField(max_length=20)
+    posted = models.DateField(default=datetime.date.today)
 
 
 @python_2_unicode_compatible
