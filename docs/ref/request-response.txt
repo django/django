@@ -946,7 +946,7 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     JSON-serializable object.
 
     The ``encoder``, which defaults to
-    ``django.core.serializers.json.DjangoJSONEncoder``, will be used to
+    :class:`django.core.serializers.json.DjangoJSONEncoder`, will be used to
     serialize the data. See :ref:`JSON serialization
     <serialization-formats-json>` for more details about this serializer.
 
