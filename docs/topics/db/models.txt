@@ -1415,3 +1415,47 @@ any model field in any ancestor model.
     :doc:`The Models Reference </ref/models/index>`
         Covers all the model related APIs including model fields, related
         objects, and ``QuerySet``.
+
+Organizing models
+=================
+
+The :djadmin:`manage.py startapp <startapp>` script creates a package structure
+for an application that includes a file called ``models.py``, but you may
+also define multiple files containing models, contained in a module. For example,
+you can remove the ``models.py`` and create a ``myproject/myapp/models/`` with
+two files (besides an ``__init__.py``), ``person_models.py`` and ``robot_models.py``:
+
+``person_models.py``::
+
+    from django.db import models
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=30)
+        last_name = models.CharField(max_length=30)
+
+
+``robot_models.py``::
+
+    from django.db import models
+
+    class Robot(models.Model):
+        model_number = models.CharField(max_length=30)
+        unit_number = models.CharField(max_length=30)
+
+
+Then import your model classes into ``models/__init__.py``. It is recommended
+to explicitly import each model class, rather than using
+``from .models import *``.
+
+``myapp/models/__init__.py``::
+
+    from .person_models import Person
+    from .robot_models import Robot
+
+You can then import classes directly from the ``models`` module as you normally
+would.
+
+``myapp/views.py``::
+
+    from .models import Person
+    from .models import Robot
