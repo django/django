@@ -1426,6 +1426,12 @@ two files (besides an ``__init__.py``), ``person.py`` and ``robot.py``:
     from .person import Person
     from .robot import Robot
 
+.. note::
+
+    It is recommended to explicitly import each model class, rather than using
+    ``from .models import *``, which may clutter your namespace, make code less
+    readable, and limit the reliability of code analysis tools.
+
 .. seealso::
 
     :doc:`The Models Reference </ref/models/index>`
