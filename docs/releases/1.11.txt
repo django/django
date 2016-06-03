@@ -262,6 +262,11 @@ Miscellaneous
 * CSRF failures are logged to the ``django.security.csrf ``` logger instead of
   ``django.request``.
 
+* :setting:`ALLOWED_HOSTS` validation is no longer disabled when running tests.
+  If your application includes tests with custom host names, you must include
+  those host names in :setting:`ALLOWED_HOSTS`. See
+  :ref:`topics-testing-advanced-multiple-hosts`.
+
 * Using a foreign key's id (e.g. ``'field_id'``) in ``ModelAdmin.list_display``
   displays the related object's ID. Remove the ``_id`` suffix if you want the
   old behavior of the string representation of the object.

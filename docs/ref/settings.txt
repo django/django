@@ -90,13 +90,17 @@ If the ``Host`` header (or ``X-Forwarded-Host`` if
 list, the :meth:`django.http.HttpRequest.get_host()` method will raise
 :exc:`~django.core.exceptions.SuspiciousOperation`.
 
-When :setting:`DEBUG` is ``True`` or when running tests, host validation is
-disabled; any host will be accepted. Thus it's usually only necessary to set it
-in production.
+When :setting:`DEBUG` is ``True``, host validation is disabled; any host will
+be accepted. ``ALLOWED_HOSTS`` is :ref:`checked when running tests
+<topics-testing-advanced-multiple-hosts>`.
 
 This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
+
+.. versionchanged:: 1.11
+
+    In older versions, ``ALLOWED_HOSTS`` wasn't checked when running tests.
 
 .. setting:: APPEND_SLASH
 

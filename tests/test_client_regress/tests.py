@@ -15,7 +15,8 @@ from django.template import (
 )
 from django.template.response import SimpleTemplateResponse
 from django.test import (
-    Client, SimpleTestCase, TestCase, ignore_warnings, override_settings,
+    Client, SimpleTestCase, TestCase, ignore_warnings, modify_settings,
+    override_settings,
 )
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
@@ -455,6 +456,7 @@ class AssertRedirectsTests(SimpleTestCase):
         self.assertRedirects(response, '/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
+    @modify_settings(ALLOWED_HOSTS={'append': 'otherserver'})
     def test_redirect_to_different_host(self):
         "The test client will preserve scheme, host and port changes"
         response = self.client.get('/redirect_other_host/', follow=True)
@@ -467,6 +469,12 @@ class AssertRedirectsTests(SimpleTestCase):
         self.assertEqual(response.request.get('wsgi.url_scheme'), 'https')
         self.assertEqual(response.request.get('SERVER_NAME'), 'otherserver')
         self.assertEqual(response.request.get('SERVER_PORT'), '8443')
+        # assertRedirects() can follow redirect to 'otherserver' too.
+        response = self.client.get('/redirect_other_host/', follow=False)
+        self.assertRedirects(
+            response, 'https://otherserver:8443/no_template_view/',
+            status_code=302, target_status_code=200
+        )
 
     def test_redirect_chain_on_non_redirect_page(self):
         "An assertion is raised if the original page couldn't be retrieved as expected"

@@ -29,6 +29,7 @@ from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
+from django.http.request import split_domain_port, validate_host
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import setting_changed, template_rendered
@@ -306,10 +307,13 @@ class SimpleTestCase(unittest.TestCase):
                 # netloc might be empty, or in cases where Django tests the
                 # HTTP scheme, the convention is for netloc to be 'testserver'.
                 # Trust both as "internal" URLs here.
-                if netloc and netloc != 'testserver':
+                domain, port = split_domain_port(netloc)
+                if domain and not validate_host(domain, settings.ALLOWED_HOSTS):
                     raise ValueError(
-                        "The Django test client is unable to fetch remote URLs (got %s). "
-                        "Use assertRedirects(..., fetch_redirect_response=False) instead." % url
+                        "The test client is unable to fetch remote URLs (got %s). "
+                        "If the host is served by Django, add '%s' to ALLOWED_HOSTS. "
+                        "Otherwise, use assertRedirects(..., fetch_redirect_response=False)."
+                        % (url, domain)
                     )
                 redirect_response = response.client.get(path, QueryDict(query), secure=(scheme == 'https'))
 
@@ -1324,9 +1328,12 @@ class LiveServerTestCase(TransactionTestCase):
                 conn.allow_thread_sharing = True
                 connections_override[conn.alias] = conn
 
-        # Launch the live server's thread
         specified_address = os.environ.get(
             'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081-8179')
+        cls._live_server_modified_settings = modify_settings(
+            ALLOWED_HOSTS={'append': specified_address.split(':')[0]},
+        )
+        cls._live_server_modified_settings.enable()
 
         # The specified ports may be of the form '8000-8010,8080,9200-9300'
         # i.e. a comma-separated list of ports or ranges of ports, so we break
@@ -1348,6 +1355,7 @@ class LiveServerTestCase(TransactionTestCase):
         except Exception:
             msg = 'Invalid address ("%s") for live server.' % specified_address
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
+        # Launch the live server's thread
         cls.server_thread = cls._create_server_thread(host, possible_ports, connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
@@ -1386,6 +1394,7 @@ class LiveServerTestCase(TransactionTestCase):
     @classmethod
     def tearDownClass(cls):
         cls._tearDownClassInternal()
+        cls._live_server_modified_settings.disable()
         super(LiveServerTestCase, cls).tearDownClass()
 
 

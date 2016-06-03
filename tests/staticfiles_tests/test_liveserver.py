@@ -35,9 +35,9 @@ class LiveServerBase(StaticLiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super(LiveServerBase, cls).tearDownClass()
         # Restore original settings
         cls.settings_override.disable()
-        super(LiveServerBase, cls).tearDownClass()
 
 
 class StaticLiveServerChecks(LiveServerBase):

@@ -67,6 +67,61 @@ The following is a simple unit test using the request factory::
             response = MyView.as_view()(request)
             self.assertEqual(response.status_code, 200)
 
+.. _topics-testing-advanced-multiple-hosts:
+
+Tests and multiple host names
+=============================
+
+The :setting:`ALLOWED_HOSTS` setting is validated when running tests. This
+allows the test client to differentiate between internal and external URLs.
+
+Projects that support multitenancy or otherwise alter business logic based on
+the request's host and use custom host names in tests must include those hosts
+in :setting:`ALLOWED_HOSTS`.
+
+The first and simplest option to do so is to add the hosts to your settings
+file. For example, the test suite for docs.djangoproject.com includes the
+following::
+
+    from django.test import TestCase
+
+    class SearchFormTestCase(TestCase):
+        def test_empty_get(self):
+            response = self.client.get('/en/dev/search/', HTTP_HOST='docs.djangoproject.dev:8000')
+            self.assertEqual(response.status_code, 200)
+
+and the settings file includes a list of the domains supported by the project::
+
+    ALLOWED_HOSTS = [
+        'www.djangoproject.dev',
+        'docs.djangoproject.dev',
+        ...
+    ]
+
+Another option is to add the required hosts to :setting:`ALLOWED_HOSTS` using
+:meth:`~django.test.override_settings()` or
+:attr:`~django.test.SimpleTestCase.modify_settings()`. This option may be
+preferable in standalone apps that can't package their own settings file or
+for projects where the list of domains is not static (e.g., subdomains for
+multitenancy). For example, you could write a test for the domain
+``http://otherserver/`` as follows::
+
+    from django.test import TestCase, override_settings
+
+    class MultiDomainTestCase(TestCase):
+        @override_settings(ALLOWED_HOSTS=['otherserver'])
+        def test_other_domain(self):
+            response = self.client.get('http://otherserver/foo/bar/')
+
+Disabling :setting:`ALLOWED_HOSTS` checking (``ALLOWED_HOSTS = ['*']``) when
+running tests prevents the test client from raising a helpful error message if
+you follow a redirect to an external URL.
+
+.. versionchanged:: 1.11
+
+    Older versions didn't validate ``ALLOWED_HOSTS`` while testing so these
+    techniques weren't necessary.
+
 .. _topics-testing-advanced-multidb:
 
 Tests and multiple databases

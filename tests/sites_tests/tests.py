@@ -142,6 +142,7 @@ class SitesFrameworkTests(TestCase):
         with self.assertRaises(ValidationError):
             site.full_clean()
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_clear_site_cache(self):
         request = HttpRequest()
         request.META = {
@@ -162,7 +163,7 @@ class SitesFrameworkTests(TestCase):
         clear_site_cache(Site, instance=self.site, using='default')
         self.assertEqual(models.SITE_CACHE, {})
 
-    @override_settings(SITE_ID='')
+    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example2.com'])
     def test_clear_site_cache_domain(self):
         site = Site.objects.create(name='example2.com', domain='example2.com')
         request = HttpRequest()
@@ -191,6 +192,7 @@ class SitesFrameworkTests(TestCase):
         self.assertEqual(Site.objects.get_by_natural_key(self.site.domain), self.site)
         self.assertEqual(self.site.natural_key(), (self.site.domain,))
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_requestsite_save_notimplemented_msg(self):
         # Test response msg for RequestSite.save NotImplementedError
         request = HttpRequest()
@@ -201,6 +203,7 @@ class SitesFrameworkTests(TestCase):
         with self.assertRaisesMessage(NotImplementedError, msg):
             RequestSite(request).save()
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_requestsite_delete_notimplemented_msg(self):
         # Test response msg for RequestSite.delete NotImplementedError
         request = HttpRequest()
