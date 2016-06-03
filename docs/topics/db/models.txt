@@ -1410,11 +1410,6 @@ different database tables).
 Django will raise a :exc:`~django.core.exceptions.FieldError` if you override
 any model field in any ancestor model.
 
-.. seealso::
-
-    :doc:`The Models Reference </ref/models/index>`
-        Covers all the model related APIs including model fields, related
-        objects, and ``QuerySet``.
 
 Organizing models
 =================
@@ -1459,3 +1454,9 @@ would.
 
     from .models import Person
     from .models import Robot
+
+.. seealso::
+
+    :doc:`The Models Reference </ref/models/index>`
+        Covers all the model related APIs including model fields, related
+        objects, and ``QuerySet``.
