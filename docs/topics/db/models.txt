@@ -1416,9 +1416,9 @@ Organizing models
 
 The :djadmin:`manage.py startapp <startapp>` script creates a package structure
 for an application that includes a file called ``models.py``, but you may
-also define multiple files containing models, contained in a module. For example,
-you can remove the ``models.py`` and create a ``myproject/myapp/models/`` with
-two files (besides an ``__init__.py``), ``person.py`` and ``robot.py``:
+also define a ``models`` package. For example, if you remove the ``models.py`` and
+create a ``myproject/myapp/models/`` with two files (besides an ``__init__.py``),
+``person.py`` and ``robot.py``:
 
 .. snippet::
     :filename: myapp/models/__init__.py
