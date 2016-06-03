@@ -1069,6 +1069,18 @@ class DisallowedDatabaseQueriesTests(SimpleTestCase):
             Car.objects.first()
 
 
+class DisallowedDatabaseQueriesChunkedCursorsTests(SimpleTestCase):
+    def test_disallowed_database_queries(self):
+        expected_message = (
+            "Database queries aren't allowed in SimpleTestCase. Either use "
+            "TestCase or TransactionTestCase to ensure proper test isolation or "
+            "set DisallowedDatabaseQueriesChunkedCursorsTests.allow_database_queries "
+            "to True to silence this failure."
+        )
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            next(Car.objects.iterator())
+
+
 class AllowedDatabaseQueriesTests(SimpleTestCase):
     allow_database_queries = True
 

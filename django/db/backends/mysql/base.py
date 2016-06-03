@@ -271,7 +271,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 # with SQL standards.
                 cursor.execute('SET SQL_AUTO_IS_NULL = 0')
 
-    def create_cursor(self):
+    def create_cursor(self, name=None):
         cursor = self.connection.cursor()
         return CursorWrapper(cursor)
 

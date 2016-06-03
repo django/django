@@ -799,7 +799,7 @@ class SQLCompiler(object):
         self.query.set_extra_mask(['a'])
         return bool(self.execute_sql(SINGLE))
 
-    def execute_sql(self, result_type=MULTI):
+    def execute_sql(self, result_type=MULTI, chunked_fetch=False):
         """
         Run the query against the database and returns the result(s). The
         return value is a single data item if result_type is SINGLE, or an
@@ -823,12 +823,16 @@ class SQLCompiler(object):
                 return iter([])
             else:
                 return
-
-        cursor = self.connection.cursor()
+        if chunked_fetch:
+            cursor = self.connection.chunked_cursor()
+        else:
+            cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
         except Exception:
-            cursor.close()
+            with self.connection.wrap_database_errors:
+                # Closing a server-side cursor could yield an error
+                cursor.close()
             raise
 
         if result_type == CURSOR:
@@ -852,11 +856,11 @@ class SQLCompiler(object):
             cursor, self.connection.features.empty_fetchmany_value,
             self.col_count
         )
-        if not self.connection.features.can_use_chunked_reads:
+        if not chunked_fetch and not self.connection.features.can_use_chunked_reads:
             try:
                 # If we are using non-chunked reads, we return the same data
                 # structure as normally, but ensure it is all read into memory
-                # before going any further.
+                # before going any further. Use chunked_fetch if requested.
                 return list(result)
             finally:
                 # done with the cursor

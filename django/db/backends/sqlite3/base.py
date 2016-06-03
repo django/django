@@ -215,7 +215,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def init_connection_state(self):
         pass
 
-    def create_cursor(self):
+    def create_cursor(self, name=None):
         return self.connection.cursor(factory=SQLiteCursorWrapper)
 
     def close(self):

@@ -249,7 +249,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if not self.get_autocommit():
             self.commit()
 
-    def create_cursor(self):
+    def create_cursor(self, name=None):
         return FormatStylePlaceholderCursor(self.connection)
 
     def _commit(self):

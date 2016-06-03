@@ -175,6 +175,7 @@ class SimpleTestCase(unittest.TestCase):
             for alias in connections:
                 connection = connections[alias]
                 connection.cursor = _CursorFailure(cls.__name__, connection.cursor)
+                connection.chunked_cursor = _CursorFailure(cls.__name__, connection.chunked_cursor)
 
     @classmethod
     def tearDownClass(cls):
@@ -182,6 +183,7 @@ class SimpleTestCase(unittest.TestCase):
             for alias in connections:
                 connection = connections[alias]
                 connection.cursor = connection.cursor.wrapped
+                connection.chunked_cursor = connection.chunked_cursor.wrapped
         if hasattr(cls, '_cls_modified_context'):
             cls._cls_modified_context.disable()
             delattr(cls, '_cls_modified_context')

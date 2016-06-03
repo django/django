@@ -165,7 +165,7 @@ class BaseDatabaseWrapper(object):
         """Initializes the database connection settings."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require an init_connection_state() method')
 
-    def create_cursor(self):
+    def create_cursor(self, name=None):
         """Creates a cursor. Assumes that a connection is established."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a create_cursor() method')
 
@@ -214,10 +214,21 @@ class BaseDatabaseWrapper(object):
 
     # ##### Backend-specific wrappers for PEP-249 connection methods #####
 
-    def _cursor(self):
+    def _prepare_cursor(self, cursor):
+        """
+        Validate the connection is usable and perform database cursor wrapping.
+        """
+        self.validate_thread_sharing()
+        if self.queries_logged:
+            wrapped_cursor = self.make_debug_cursor(cursor)
+        else:
+            wrapped_cursor = self.make_cursor(cursor)
+        return wrapped_cursor
+
+    def _cursor(self, name=None):
         self.ensure_connection()
         with self.wrap_database_errors:
-            return self.create_cursor()
+            return self.create_cursor(name)
 
     def _commit(self):
         if self.connection is not None:
@@ -240,12 +251,7 @@ class BaseDatabaseWrapper(object):
         """
         Creates a cursor, opening a connection if necessary.
         """
-        self.validate_thread_sharing()
-        if self.queries_logged:
-            cursor = self.make_debug_cursor(self._cursor())
-        else:
-            cursor = self.make_cursor(self._cursor())
-        return cursor
+        return self._prepare_cursor(self._cursor())
 
     def commit(self):
         """
@@ -552,6 +558,13 @@ class BaseDatabaseWrapper(object):
         exceptions using Django's common wrappers.
         """
         return DatabaseErrorWrapper(self)
+
+    def chunked_cursor(self):
+        """
+        Return a cursor that tries to avoid caching in the database (if
+        supported by the database), otherwise return a regular cursor.
+        """
+        return self.cursor()
 
     def make_debug_cursor(self, cursor):
         """

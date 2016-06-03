@@ -34,8 +34,9 @@ EmptyResultSet = sql.EmptyResultSet
 
 
 class BaseIterable(object):
-    def __init__(self, queryset):
+    def __init__(self, queryset, chunked_fetch=False):
         self.queryset = queryset
+        self.chunked_fetch = chunked_fetch
 
 
 class ModelIterable(BaseIterable):
@@ -49,7 +50,7 @@ class ModelIterable(BaseIterable):
         compiler = queryset.query.get_compiler(using=db)
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
-        results = compiler.execute_sql()
+        results = compiler.execute_sql(chunked_fetch=self.chunked_fetch)
         select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info,
                                                   compiler.annotation_col_map)
         model_cls = klass_info['model']
@@ -318,7 +319,7 @@ class QuerySet(object):
         An iterator over the results from applying this QuerySet to the
         database.
         """
-        return iter(self._iterable_class(self))
+        return iter(self._iterable_class(self, chunked_fetch=True))
 
     def aggregate(self, *args, **kwargs):
         """
@@ -1071,7 +1072,7 @@ class QuerySet(object):
 
     def _fetch_all(self):
         if self._result_cache is None:
-            self._result_cache = list(self.iterator())
+            self._result_cache = list(self._iterable_class(self))
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
 

@@ -171,6 +171,24 @@ If you need to add a PostgreSQL extension (like ``hstore``, ``postgis``, etc.)
 using a migration, use the
 :class:`~django.contrib.postgres.operations.CreateExtension` operation.
 
+.. _postgresql-server-side-cursors:
+
+Server-side cursors
+-------------------
+
+.. versionadded:: 1.11
+
+When using :meth:`QuerySet.iterator()
+<django.db.models.query.QuerySet.iterator>`, Django opens a :ref:`server-side
+cursor <psycopg2:server-side-cursors>`. By default, PostgreSQL assumes that
+only the first 10% of the results of cursor queries will be fetched. The query
+planner spends less time planning the query and starts returning results
+faster, but this could diminish performance if more than 10% of the results are
+retrieved. PostgreSQL's assumptions on the number of rows retrieved for a
+cursor query is controlled with the `cursor_tuple_fraction`_ option.
+
+.. _cursor_tuple_fraction: https://www.postgresql.org/docs/current/static/runtime-config-query.html#GUC-CURSOR-TUPLE-FRACTION
+
 Test database templates
 -----------------------
 
