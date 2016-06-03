@@ -19,9 +19,11 @@ and in memory, and how to customize the default behavior.
 Basic file uploads
 ==================
 
-Consider a simple form containing a :class:`~django.forms.FileField`::
+Consider a simple form containing a :class:`~django.forms.FileField`:
 
-    # In forms.py...
+.. snippet::
+    :filename: forms.py
+
     from django import forms
 
     class UploadFileForm(forms.Form):
@@ -42,7 +44,10 @@ the request has the attribute ``enctype="multipart/form-data"``. Otherwise,
 
 Most of the time, you'll simply pass the file data from ``request`` into the
 form as described in :ref:`binding-uploaded-files`. This would look
-something like::
+something like:
+
+.. snippet::
+    :filename: views.py
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
