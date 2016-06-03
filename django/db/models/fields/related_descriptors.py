@@ -157,9 +157,8 @@ class ForwardManyToOneDescriptor(object):
 
     def get_object(self, instance):
         qs = self.get_queryset(instance=instance)
-        qs = qs.filter(self.field.get_reverse_related_filter(instance))
         # Assuming the database enforces foreign keys, this won't fail.
-        return qs.get()
+        return qs.get(self.field.get_reverse_related_filter(instance))
 
     def __get__(self, instance, cls=None):
         """

@@ -517,13 +517,7 @@ class ModelInheritanceTest(TestCase):
             self.assertEqual(place.restaurant, restaurant)
             self.assertEqual(restaurant.italianrestaurant, italian_restaurant)
 
-        italian_restaurant = (
-            ItalianRestaurant
-            .objects
-            .filter(pk=italian_restaurant.pk)
-            .only('serves_gnocchi')
-            .get()
-        )
+        italian_restaurant = ItalianRestaurant.objects.only('serves_gnocchi').get(pk=italian_restaurant.pk)
 
         # one extra query is made when accessing
         # the parent objects in a multi-table inheritance scenario
@@ -534,13 +528,7 @@ class ModelInheritanceTest(TestCase):
             self.assertEqual(place.restaurant, restaurant)
             self.assertEqual(restaurant.italianrestaurant, italian_restaurant)
 
-        italian_restaurant = (
-            ItalianRestaurant
-            .objects
-            .filter(pk=italian_restaurant.pk)
-            .defer('serves_gnocchi')
-            .get()
-        )
+        italian_restaurant = ItalianRestaurant.objects.defer('serves_gnocchi').get(pk=italian_restaurant.pk)
 
         # no extra queries should be made when accessing
         # the parent objects in a multi-table inheritance scenario
