@@ -532,20 +532,23 @@ This logging does not include framework-level initialization (e.g.
 ``COMMIT``, and ``ROLLBACK``). Turn on query logging in your database if you
 wish to view all database queries.
 
+.. _django-security-logger:
+
 ``django.security.*``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The security loggers will receive messages on any occurrence of
-:exc:`~django.core.exceptions.SuspiciousOperation`. There is a sub-logger for
-each sub-type of SuspiciousOperation. The level of the log event depends on
-where the exception is handled.  Most occurrences are logged as a warning, while
+:exc:`~django.core.exceptions.SuspiciousOperation` and other security-related
+errors. There is a sub-logger for each subtype of security error, including all
+``SuspiciousOperation``\s. The level of the log event depends on where the
+exception is handled.  Most occurrences are logged as a warning, while
 any ``SuspiciousOperation`` that reaches the WSGI handler will be logged as an
 error. For example, when an HTTP ``Host`` header is included in a request from
 a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400
 response, and an error message will be logged to the
 ``django.security.DisallowedHost`` logger.
 
-These log events will reach the 'django' logger by default, which mails error
+These log events will reach the ``django`` logger by default, which mails error
 events to admins when ``DEBUG=False``. Requests resulting in a 400 response due
 to a ``SuspiciousOperation`` will not be logged to the ``django.request``
 logger, but only to the ``django.security`` logger.
@@ -566,6 +569,10 @@ specific logger following this example:
             'propagate': False,
         },
     },
+
+Other ``django.security`` loggers not based on ``SuspiciousOperation`` are:
+
+* ``django.security.csrf``: For :ref:`CSRF failures <csrf-rejected-requests>`.
 
 ``django.db.backends.schema``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

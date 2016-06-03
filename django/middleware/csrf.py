@@ -20,7 +20,7 @@ from django.utils.http import is_same_domain
 from django.utils.six.moves import zip
 from django.utils.six.moves.urllib.parse import urlparse
 
-logger = logging.getLogger('django.request')
+logger = logging.getLogger('django.security.csrf')
 
 REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match any trusted origins."

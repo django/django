@@ -8,12 +8,13 @@ import warnings
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import (
-    CSRF_TOKEN_LENGTH, CsrfViewMiddleware,
-    _compare_salted_tokens as equivalent_tokens, get_token,
+    CSRF_TOKEN_LENGTH, REASON_BAD_TOKEN, REASON_NO_CSRF_COOKIE,
+    CsrfViewMiddleware, _compare_salted_tokens as equivalent_tokens, get_token,
 )
 from django.template import RequestContext, Template
 from django.template.context_processors import csrf
 from django.test import SimpleTestCase, override_settings
+from django.test.utils import patch_logger
 from django.utils.encoding import force_bytes
 from django.utils.six import text_type
 from django.views.decorators.csrf import (
@@ -203,18 +204,22 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         Check that if no CSRF cookies is present, the middleware rejects the
         incoming request.  This will stop login CSRF.
         """
-        req = self._get_POST_no_csrf_cookie_request()
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(403, req2.status_code)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            req = self._get_POST_no_csrf_cookie_request()
+            req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertEqual(403, req2.status_code)
+            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
 
     def test_process_request_csrf_cookie_no_token(self):
         """
         Check that if a CSRF cookie is present but no token, the middleware
         rejects the incoming request.
         """
-        req = self._get_POST_csrf_cookie_request()
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(403, req2.status_code)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            req = self._get_POST_csrf_cookie_request()
+            req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertEqual(403, req2.status_code)
+            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_BAD_TOKEN)
 
     def test_process_request_csrf_cookie_and_token(self):
         """
@@ -258,13 +263,17 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         """
         req = TestingHttpRequest()
         req.method = 'PUT'
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(403, req2.status_code)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertEqual(403, req2.status_code)
+            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
 
         req = TestingHttpRequest()
         req.method = 'DELETE'
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(403, req2.status_code)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertEqual(403, req2.status_code)
+            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
 
     def test_put_and_delete_allowed(self):
         """
@@ -681,5 +690,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         self.assertIsNone(resp)
 
         req = CsrfPostRequest(token, raise_error=True)
-        resp = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(resp.status_code, 403)
+        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            resp = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+            self.assertEqual(resp.status_code, 403)
+            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_BAD_TOKEN)

@@ -192,6 +192,8 @@ both is fine, and will incur minimal overhead.
     If you are using class-based views, you can refer to
     :ref:`Decorating class-based views<decorating-class-based-views>`.
 
+.. _csrf-rejected-requests:
+
 Rejected requests
 =================
 
@@ -205,8 +207,13 @@ The error page, however, is not very friendly, so you may want to provide your
 own view for handling this condition.  To do this, simply set the
 :setting:`CSRF_FAILURE_VIEW` setting.
 
-CSRF failures are logged as warnings to the :ref:`django-request-logger`
-logger.
+CSRF failures are logged as warnings to the :ref:`django.security.csrf
+<django-security-logger>` logger.
+
+.. versionchanged:: 1.11
+
+    In older versions, CSRF failures are logged to the ``django.request``
+    logger.
 
 .. _how-csrf-works:
 
