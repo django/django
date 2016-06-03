@@ -467,18 +467,6 @@ Templates
 * Added relative path support for string arguments of the :ttag:`extends` and
   :ttag:`include` template tags.
 
-* To keep similar functionality from Django 1.8-9: add a :setting:`TEMPLATES` dict e.g.::
-
-      TEMPLATES = [
-          {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'APP_DIRS': True,
-            'OPTIONS': {'context_processors': 
-                        ['django.contrib.auth.context_processors.auth']},
-          },
-      ]
-
-
 Tests
 ~~~~~
 
@@ -1237,6 +1225,9 @@ removed in Django 1.10 (please see the :ref:`deprecation timeline
   * ``TEMPLATE_DIRS``
   * ``TEMPLATE_LOADERS``
   * ``TEMPLATE_STRING_IF_INVALID``
+
+* To migrate keeping similar functionality from Django 1.8-9: add a :setting:`TEMPLATES` setting. Fore more info 
+  :doc:`/ref/templates/upgrading`
 
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` is
   removed.
