@@ -5,6 +5,7 @@ import unittest
 
 from django.utils import six
 from django.utils.functional import cached_property, lazy, lazy_property
+from django.utils.translation import ugettext_lazy
 
 
 class FunctionalTestCase(unittest.TestCase):
@@ -130,3 +131,11 @@ class FunctionalTestCase(unittest.TestCase):
 
         self.assertEqual(lazy_a(), lazy_b())
         self.assertNotEqual(lazy_b(), lazy_c())
+
+    def test_lazy_repr(self):
+        """
+        Tests that a proxy of lazy object's repr equals to the object's value
+        """
+        original_object = 'Lazy translation text'
+        lazy_obj = ugettext_lazy(original_object)
+        self.assertEquals(original_object, repr(lazy_obj))
