@@ -111,7 +111,10 @@ def setup_test_environment():
     settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
     request._original_allowed_hosts = settings.ALLOWED_HOSTS
-    settings.ALLOWED_HOSTS = ['*']
+    # In addition to hosts defined in settings, support the one default host
+    # for unit tests here. If others are needed, they must be manually added
+    # for the relevant test with override_settings().
+    settings.ALLOWED_HOSTS = settings.ALLOWED_HOSTS + ['testserver']
 
     mail.outbox = []
 

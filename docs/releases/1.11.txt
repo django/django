@@ -253,6 +253,10 @@ Miscellaneous
 
 * CSRF failures are logged to the ``django.security.csrf ``` logger instead of
   ``django.request``.
+* :setting:`ALLOWED_HOSTS` no longer defaults to ``['*']`` when running unit
+  tests. If your application includes unit tests with custom host names, you
+  must include those host names in :setting:`ALLOWED_HOSTS`. Please, see
+  :ref:`topics-testing-advanced-multiple-hosts`.
 
 * Using a foreign key's id (e.g. ``'field_id'``) in ``ModelAdmin.list_display``
   displays the related object's ID. Remove the ``_id`` suffix if you want the
