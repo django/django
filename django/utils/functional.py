@@ -76,8 +76,7 @@ def lazy(func, *resultclasses):
             )
 
         def __repr__(self):
-            """ Make sure the lazy object's display is useful when debugging """
-            return self.__cast()
+            return repr(self.__cast())
 
         @classmethod
         def __prepare_class__(cls):
