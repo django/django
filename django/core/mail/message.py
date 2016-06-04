@@ -316,7 +316,11 @@ class EmailMessage(object):
         # accommodate that when doing comparisons.
         header_names = [key.lower() for key in self.extra_headers]
         if 'date' not in header_names:
-            msg['Date'] = formatdate()
+            # formatdate uses stdlib methods to format the date, which use
+            # the stdlib / os concept of a timezone. However, Django sets the
+            # TZ environment variable based on the TIME_ZONE setting, which
+            # will get picked up by formatdate.
+            msg['Date'] = formatdate(localtime=settings.EMAIL_USE_LOCALTIME)
         if 'message-id' not in header_names:
             # Use cached DNS_NAME for performance
             msg['Message-ID'] = make_msgid(domain=DNS_NAME)
