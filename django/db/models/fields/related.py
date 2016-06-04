@@ -16,6 +16,7 @@ from django.utils.functional import cached_property, curry
 from django.utils.translation import gettext_lazy as _
 
 from . import Field
+from .mixins import FieldCacheMixin
 from .related_descriptors import (
     ForwardManyToOneDescriptor, ForwardOneToOneDescriptor,
     ManyToManyDescriptor, ReverseManyToOneDescriptor,
@@ -78,7 +79,7 @@ def lazy_related_operation(function, model, *related_models, **kwargs):
     return apps.lazy_model_operation(partial(function, **kwargs), *model_keys)
 
 
-class RelatedField(Field):
+class RelatedField(FieldCacheMixin, Field):
     """Base class that all relational fields inherit from."""
 
     # Field flags
@@ -437,6 +438,9 @@ class RelatedField(Field):
             raise exceptions.FieldError(
                 "The relation has multiple target fields, but only single target field was asked for")
         return target_fields[0]
+
+    def get_cache_name(self):
+        return self.name
 
 
 class ForeignObject(RelatedField):

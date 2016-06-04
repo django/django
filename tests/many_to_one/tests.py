@@ -461,7 +461,7 @@ class ManyToOneTests(TestCase):
         self.assertIs(c.parent, p)
 
         # But if we kill the cache, we get a new object.
-        del c._parent_cache
+        del c._state.fields_cache['parent']
         self.assertIsNot(c.parent, p)
 
         # Assigning a new object results in that object getting cached immediately.

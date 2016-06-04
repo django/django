@@ -72,7 +72,7 @@ class ModelIterable(BaseIterable):
             if queryset._known_related_objects:
                 for field, rel_objs in queryset._known_related_objects.items():
                     # Avoid overwriting objects loaded e.g. by select_related
-                    if hasattr(obj, field.get_cache_name()):
+                    if field.is_cached(obj):
                         continue
                     pk = getattr(obj, field.get_attname())
                     try:
@@ -1544,12 +1544,13 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     #  callable that gets value to be matched for returned instances,
     #  callable that gets value to be matched for passed in instances,
     #  boolean that is True for singly related objects,
-    #  cache name to assign to).
+    #  cache or field name to assign to,
+    #  boolean that is True when the previous argument is a cache name vs a field name).
 
     # The 'values to be matched' must be hashable as they will be used
     # in a dictionary.
 
-    rel_qs, rel_obj_attr, instance_attr, single, cache_name = (
+    rel_qs, rel_obj_attr, instance_attr, single, cache_name, is_descriptor = (
         prefetcher.get_prefetch_queryset(instances, lookup.get_current_queryset(level)))
     # We have to handle the possibility that the QuerySet we just got back
     # contains some prefetch_related lookups. We don't want to trigger the
@@ -1597,8 +1598,18 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
 
         if single:
             val = vals[0] if vals else None
-            to_attr = to_attr if as_attr else cache_name
-            setattr(obj, to_attr, val)
+            if as_attr:
+                # A to_attr has been given for the prefetch.
+                setattr(obj, to_attr, val)
+            elif is_descriptor:
+                # cache_name points to a field name in obj.
+                # This field is a descriptor for a related object.
+                setattr(obj, cache_name, val)
+            else:
+                # No to_attr has been given for this prefetch operation and the
+                # cache_name does not point to a descriptor. Store the value of
+                # the field in the object's field cache.
+                obj._state.fields_cache[cache_name] = val
         else:
             if as_attr:
                 setattr(obj, to_attr, vals)
@@ -1653,9 +1664,9 @@ class RelatedPopulator:
         #    model's fields.
         #  - related_populators: a list of RelatedPopulator instances if
         #    select_related() descends to related models from this model.
-        #  - cache_name, reverse_cache_name: the names to use for setattr
-        #    when assigning the fetched object to the from_obj. If the
-        #    reverse_cache_name is set, then we also set the reverse link.
+        #  - field, remote_field: the fields to use for populating the
+        #    internal fields cache. If remote_field is set then we also
+        #    set the reverse link.
         select_fields = klass_info['select_fields']
         from_parent = klass_info['from_parent']
         if not from_parent:
@@ -1674,16 +1685,16 @@ class RelatedPopulator:
         self.model_cls = klass_info['model']
         self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
         self.related_populators = get_related_populators(klass_info, select, self.db)
-        field = klass_info['field']
         reverse = klass_info['reverse']
-        self.reverse_cache_name = None
+        field = klass_info['field']
+        self.remote_field = None
         if reverse:
-            self.cache_name = field.remote_field.get_cache_name()
-            self.reverse_cache_name = field.get_cache_name()
+            self.field = field.remote_field
+            self.remote_field = field
         else:
-            self.cache_name = field.get_cache_name()
+            self.field = field
             if field.unique:
-                self.reverse_cache_name = field.remote_field.get_cache_name()
+                self.remote_field = field.remote_field
 
     def populate(self, row, from_obj):
         if self.reorder_for_init:
@@ -1697,9 +1708,9 @@ class RelatedPopulator:
         if obj and self.related_populators:
             for rel_iter in self.related_populators:
                 rel_iter.populate(row, obj)
-        setattr(from_obj, self.cache_name, obj)
-        if obj and self.reverse_cache_name:
-            setattr(obj, self.reverse_cache_name, from_obj)
+        self.field.set_cached_value(from_obj, obj)
+        if obj and self.remote_field:
+            self.remote_field.set_cached_value(obj, from_obj)
 
 
 def get_related_populators(klass_info, select, db):

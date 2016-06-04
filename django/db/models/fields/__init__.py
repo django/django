@@ -734,9 +734,6 @@ class Field(RegisterLookupMixin):
         column = self.db_column or attname
         return attname, column
 
-    def get_cache_name(self):
-        return '_%s_cache' % self.name
-
     def get_internal_type(self):
         return self.__class__.__name__
 

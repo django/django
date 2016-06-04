@@ -207,7 +207,7 @@ class OneToOneTests(TestCase):
         self.assertIs(p.restaurant, r)
 
         # But if we kill the cache, we get a new object
-        del p._restaurant_cache
+        del p._state.fields_cache['restaurant']
         self.assertIsNot(p.restaurant, r)
 
         # Reassigning the Restaurant object results in an immediate cache update
