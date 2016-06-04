@@ -1,0 +1,94 @@
+====================
+Overriding templates
+====================
+
+In your project, you might want to override a template in another Django
+application, whether it be a third-party application or a contrib application
+such as ``django.contrib.admin``. You can either put template overrides in your
+project's templates directory or in an application's templates directory.
+
+If you have app and project templates directories that both contain overrides,
+the default Django template loader will try to load the template from the
+project-level directory first. In other words, :setting:`DIRS <TEMPLATES-DIRS>`
+is searched before :setting:`APP_DIRS <TEMPLATES-APP_DIRS>`.
+
+Overriding from the project's templates directory
+=================================================
+
+First, we'll explore overriding templates by creating replacement templates in
+your project's templates directory.
+
+Let's say you're trying to override the templates for a third-party application
+called ``blog``, which provides the templates ``blog/post.html`` and
+``blog/list.html``. The relevant settings for your project would look like::
+
+    import os
+
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    INSTALLED_APPS = [
+        ...,
+        'blog',
+        ...,
+    ]
+
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+            'APP_DIRS': True,
+            ...
+        },
+    ]
+
+The :setting:`TEMPLATES` setting and ``BASE_DIR`` will already exist if you
+created your project using the default project template. The setting that needs
+to be modified is :setting:`DIRS<TEMPLATES-DIRS>`.
+
+These settings assume you have a ``templates`` directory in the root of your
+project. To override the templates for the ``blog`` app, create a folder
+in the ``templates`` directory, and add the template files to that folder:
+
+.. code-block:: none
+
+    templates/
+        blog/
+            list.html
+            post.html
+
+The template loader first looks for templates in the ``DIRS`` directory. When
+the views in the ``blog`` app ask for the ``blog/post.html`` and
+``blog/list.html`` templates, the loader will return the files you just created.
+
+Overriding from an app's template directory
+===========================================
+
+Since you're overriding templates located outside of one of your project's
+apps, it's more common to use the first method and put template overrides in a
+project's templates folder. If you prefer, however, it's also possible to put
+the overrides in an app's template directory.
+
+First, make sure your template settings are checking inside app directories::
+
+    TEMPLATES = [
+        {
+            ...,
+            'APP_DIRS': True,
+            ...
+        },
+    ]
+
+If you want to put the template overrides in an app called ``myapp`` and the
+templates to override are named ``blog/list.html`` and ``blog/post.html``,
+then your directory structure will look like:
+
+.. code-block:: none
+
+    myapp/
+        templates/
+            blog/
+                list.html
+                post.html
+
+With :setting:`APP_DIRS<TEMPLATES-APP_DIRS>` set to ``True``, the template
+loader will look in the app's templates directory and find the templates.
