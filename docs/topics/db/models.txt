@@ -1410,6 +1410,28 @@ different database tables).
 Django will raise a :exc:`~django.core.exceptions.FieldError` if you override
 any model field in any ancestor model.
 
+
+Organizing models
+=================
+
+The :djadmin:`manage.py startapp <startapp>` script creates a package structure
+for an application that includes a file called ``models.py``, but you may
+also define a ``models`` package. For example, if you remove the ``models.py`` and
+create a ``myproject/myapp/models/`` with two files (besides an ``__init__.py``),
+``organic.py`` and ``synthetic.py``:
+
+.. snippet::
+    :filename: myapp/models/__init__.py
+
+    from .organic import Person
+    from .synthetic import Robot
+
+.. note::
+
+    It is recommended to explicitly import each model class, rather than using
+    ``from .models import *``, which may clutter your namespace, make code less
+    readable, and limit the reliability of code analysis tools.
+
 .. seealso::
 
     :doc:`The Models Reference </ref/models/index>`
