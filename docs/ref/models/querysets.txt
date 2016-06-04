@@ -1687,7 +1687,7 @@ tuple of the new object and ``True``. The new object will be created roughly
 according to this algorithm::
 
     params = {k: v for k, v in kwargs.items() if '__' not in k}
-    params.update(({k: v() if callable(v) else v for k, v in defaults.items()})
+    params.update({k: v() if callable(v) else v for k, v in defaults.items()})
     obj = self.model(**params)
     obj.save()
 
