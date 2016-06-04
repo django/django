@@ -75,6 +75,9 @@ def lazy(func, *resultclasses):
                 (func, self.__args, self.__kw) + resultclasses
             )
 
+        def __repr__(self):
+            return repr(self.__cast())
+
         @classmethod
         def __prepare_class__(cls):
             for resultclass in resultclasses:
