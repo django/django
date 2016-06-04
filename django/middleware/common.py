@@ -1,4 +1,3 @@
-import logging
 import re
 
 from django import http
@@ -11,8 +10,6 @@ from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_text
 from django.utils.http import unquote_etag
 from django.utils.six.moves.urllib.parse import urlparse
-
-logger = logging.getLogger('django.request')
 
 
 class CommonMiddleware(MiddlewareMixin):
