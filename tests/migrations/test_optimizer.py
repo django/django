@@ -271,6 +271,25 @@ class OptimizerTests(SimpleTestCase):
             app_label="testapp",
         )
 
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel('Book', [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel('Person', [("name", models.CharField(max_length=255))]),
+                migrations.AddField('book', 'author', models.ForeignKey('test_app.Person', models.CASCADE)),
+                migrations.CreateModel('Review', [('book', models.ForeignKey('test_app.Book', models.CASCADE))]),
+                migrations.CreateModel('Reviewer', [("name", models.CharField(max_length=255))]),
+                migrations.AddField('review', 'reviewer', models.ForeignKey('test_app.Reviewer', models.CASCADE)),
+                migrations.RemoveField('book', 'author'),
+                migrations.DeleteModel('Person'),
+            ],
+            [
+                migrations.CreateModel('Book', [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel('Review', [('book', models.ForeignKey('test_app.Book', models.CASCADE))]),
+                migrations.CreateModel('Reviewer', [("name", models.CharField(max_length=255))]),
+                migrations.AddField('review', 'reviewer', models.ForeignKey('test_app.Reviewer', models.CASCADE)),
+            ],
+        )
+
     def test_create_model_add_field(self):
         """
         AddField should optimize into CreateModel.

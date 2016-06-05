@@ -136,6 +136,9 @@ class CreateModel(ModelOperation):
         if (isinstance(operation, DeleteModel) and
                 self.name_lower == operation.name_lower and
                 not self.options.get("proxy", False)):
+            for between in in_between:
+                if between.references_model(self.name, app_label):
+                    return False
             return []
         elif isinstance(operation, RenameModel) and self.name_lower == operation.old_name_lower:
             return [
@@ -147,6 +150,8 @@ class CreateModel(ModelOperation):
                     managers=self.managers,
                 ),
             ]
+        elif isinstance(operation, CreateModel):
+            return True
         elif isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
             if isinstance(operation, AddField):
                 # Don't allow optimizations of FKs through models they reference
