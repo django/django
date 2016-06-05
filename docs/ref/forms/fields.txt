@@ -414,7 +414,7 @@ For each field, we describe the default widget used if you don't specify
     extra arguments, ``coerce`` and ``empty_value``.
 
     * Default widget: :class:`Select`
-    * Empty value: Whatever you've given as ``empty_value``
+    * Empty value: Whatever you've given as :attr:`empty_value`.
     * Normalizes to: A value of the type provided by the ``coerce`` argument.
     * Validates that the given value exists in the list of choices and can be
       coerced.
