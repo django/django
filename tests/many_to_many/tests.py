@@ -509,6 +509,40 @@ class ManyToManyTests(TestCase):
         self.assertQuerysetEqual(self.a4.publications.all(), [])
         self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA finds intelligent life on Earth>'])
 
+    def test_clear_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
+        a4.publications.clear()
+        self.assertQuerysetEqual(a4.publications.all(), [])
+
+    def test_remove_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
+        a4.publications.remove(self.p2)
+        self.assertQuerysetEqual(a4.publications.all(), [])
+
+    def test_add_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertEqual(a4.publications.count(), 1)
+        a4.publications.add(self.p1)
+        self.assertEqual(a4.publications.count(), 2)
+
+    def test_set_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertEqual(a4.publications.count(), 1)
+        a4.publications.set([self.p2, self.p1])
+        self.assertEqual(a4.publications.count(), 2)
+        a4.publications.set([self.p1])
+        self.assertEqual(a4.publications.count(), 1)
+
+    def test_add_then_remove_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertEqual(a4.publications.count(), 1)
+        a4.publications.add(self.p1)
+        self.assertEqual(a4.publications.count(), 2)
+        a4.publications.remove(self.p1)
+        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
+
     def test_inherited_models_selects(self):
         """
         #24156 - Objects from child models where the parent's m2m field uses

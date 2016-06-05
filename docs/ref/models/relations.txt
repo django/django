@@ -170,6 +170,12 @@ Related objects reference
        ``add()``, ``create()``, ``remove()``, and ``set()`` methods are
        disabled.
 
+    .. versionchanged:: 1.11
+
+       If you use :meth:`~django.db.models.query.QuerySet.prefetch_related`,
+       note that the ``add()``, ``remove()``, ``clear()``, and ``set()`` will
+       clear the cache, so further queries will hit the database.
+
 Direct Assignment
 =================
 
