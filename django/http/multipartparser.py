@@ -261,7 +261,7 @@ class MultiPartParser(object):
                                 counters[i] += chunk_length
                                 if chunk is None:
                                     # Don't continue if the chunk received by
-                                    # the handler qis None.
+                                    # the handler is None.
                                     break
 
                     except SkipFile:
