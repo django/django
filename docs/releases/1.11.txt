@@ -357,6 +357,13 @@ Miscellaneous
 * The ``checked`` attribute rendered by form widgets now uses HTML5 boolean
   syntax rather than XHTML's ``checked='checked'``.
 
+* :meth:`RelatedManager.add()
+  <django.db.models.fields.related.RelatedManager.add>`,
+  :meth:`~django.db.models.fields.related.RelatedManager.remove`,
+  :meth:`~django.db.models.fields.related.RelatedManager.clear`, and
+  :meth:`~django.db.models.fields.related.RelatedManager.set` now
+  clear the ``prefetch_related()`` cache.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
