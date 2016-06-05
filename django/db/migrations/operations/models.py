@@ -104,20 +104,22 @@ class CreateModel(ModelOperation):
         return "Create %smodel %s" % ("proxy " if self.options.get("proxy", False) else "", self.name)
 
     def references_model(self, name, app_label=None):
-        strings_to_check = [self.name]
+        name_lower = name.lower()
+        if name_lower == self.name_lower:
+            return True
+
         # Check we didn't inherit from the model
-        for base in self.bases:
-            if isinstance(base, six.string_types):
-                strings_to_check.append(base.split(".")[-1])
+        models_to_check = [base for base in self.bases if base is not models.Model]
         # Check we have no FKs/M2Ms with it
         for fname, field in self.fields:
             if field.remote_field:
-                if isinstance(field.remote_field.model, six.string_types):
-                    strings_to_check.append(field.remote_field.model.split(".")[-1])
-        # Now go over all the strings and compare them
-        for string in strings_to_check:
-            if string.lower() == name.lower():
-                return True
+                models_to_check.append(field.remote_field.model)
+        # Now go over all the models and check against them
+        for model in models_to_check:
+            model_app_label, model_name = self.model_to_key(model)
+            if model_name.lower() == name_lower:
+                if app_label is None or not model_app_label or model_app_label == app_label:
+                    return True
         return False
 
     def model_to_key(self, model):

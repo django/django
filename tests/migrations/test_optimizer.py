@@ -13,15 +13,15 @@ class OptimizerTests(SimpleTestCase):
     Tests the migration autodetector.
     """
 
-    def optimize(self, operations):
+    def optimize(self, operations, app_label):
         """
         Handy shortcut for getting results + number of loops
         """
         optimizer = MigrationOptimizer()
-        return optimizer.optimize(operations), optimizer._iterations
+        return optimizer.optimize(operations, app_label), optimizer._iterations
 
-    def assertOptimizesTo(self, operations, expected, exact=None, less_than=None):
-        result, iterations = self.optimize(operations)
+    def assertOptimizesTo(self, operations, expected, exact=None, less_than=None, app_label=None):
+        result, iterations = self.optimize(operations, app_label)
         result = [repr(f.deconstruct()) for f in result]
         expected = [repr(f.deconstruct()) for f in expected]
         self.assertEqual(expected, result)
@@ -34,8 +34,8 @@ class OptimizerTests(SimpleTestCase):
                 "Optimization did not take less than %s iterations (it took %s)" % (less_than, iterations)
             )
 
-    def assertDoesNotOptimize(self, operations):
-        self.assertOptimizesTo(operations, operations)
+    def assertDoesNotOptimize(self, operations, **kwargs):
+        self.assertOptimizesTo(operations, operations, **kwargs)
 
     def test_single(self):
         """
@@ -212,6 +212,29 @@ class OptimizerTests(SimpleTestCase):
                 migrations.DeleteModel("Foo"),
             ],
         )
+        # The same operations should be optimized if app_label is specified and
+        # a FK references a model from the other app.
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
+                migrations.DeleteModel("Foo"),
+            ],
+            [
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
+            ],
+            app_label="otherapp",
+        )
+        # But it shouldn't work if a FK references a model with the same
+        # app_label.
+        self.assertDoesNotOptimize(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
+                migrations.DeleteModel("Foo"),
+            ],
+            app_label="testapp",
+        )
         # This should not work - bases should block it
         self.assertOptimizesTo(
             [
@@ -224,6 +247,28 @@ class OptimizerTests(SimpleTestCase):
                 migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
                 migrations.DeleteModel("Foo"),
             ],
+        )
+        # The same operations should be optimized if app_label and none of
+        # bases belong to that app.
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+                migrations.DeleteModel("Foo"),
+            ],
+            [
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+            ],
+            app_label="otherapp",
+        )
+        # But it shouldn't work if some of bases belongs to the specified app.
+        self.assertDoesNotOptimize(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+                migrations.DeleteModel("Foo"),
+            ],
+            app_label="testapp",
         )
 
     def test_create_model_add_field(self):
