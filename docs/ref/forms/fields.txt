@@ -425,11 +425,12 @@ For each field, we describe the default widget used if you don't specify
 .. class:: TypedChoiceField(**kwargs)
 
     Just like a :class:`ChoiceField`, except :class:`TypedChoiceField` takes two
-    extra arguments, ``coerce`` and ``empty_value``.
+    extra arguments, :attr:`coerce` and :attr:`empty_value`.
 
     * Default widget: :class:`Select`
-    * Empty value: Whatever you've given as ``empty_value``
-    * Normalizes to: A value of the type provided by the ``coerce`` argument.
+    * Empty value: Whatever you've given as :attr:`empty_value`.
+    * Normalizes to: A value of the type provided by the :attr:`coerce`
+      argument.
     * Validates that the given value exists in the list of choices and can be
       coerced.
     * Error message keys: ``required``, ``invalid_choice``
