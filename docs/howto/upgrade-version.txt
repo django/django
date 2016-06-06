@@ -42,6 +42,37 @@ released or if some of your dependencies are not well-maintained, some of your
 dependencies may not yet support the new Django version. In these cases you may
 have to wait until new versions of your dependencies are released.
 
+Resolving deprecation warnings
+==============================
+
+Before starting an upgrade it's important to resolve any existing deprecation
+warnings that are raised by your project. Working through these warnings prior
+to upgrading ensures that you're fully informed about areas of the code that
+need altering.
+
+Deprecation warnings are silenced by default. It's important to turn the
+warnings on so they are shown in the test output.
+
+.. code-block:: console
+
+    $ python -Wall manage.py test
+
+If you're not using the Django test runner, you may need to also ensure that
+any console output is not captured, in order to see any deprecation warnings.
+
+.. code-block:: console
+
+    $ PYTHONWARNINGS=all py.test tests --capture=no
+
+Make sure to resolve any deprecation warnings against your existing version
+of Django, before you follow the rest of the upgrade process.
+
+Note that some third party applications might use deprecated APIs in order to
+better support multiple versions of Django, so deprecation warnings that are
+raised by packages you have installed may not neccessarily indicate a problem.
+However, if a package doesn't appear to support the latest version of Django,
+consider raising an issue or pull request against that package, if needed.
+
 Installation
 ============
 
@@ -69,10 +100,9 @@ Testing
 =======
 
 When the new environment is set up, :doc:`run the full test suite
-</topics/testing/overview>` for your application. In Python 2.7+, deprecation
-warnings are silenced by default. It is useful to turn the warnings on so they
-are shown in the test output (you can also use the flag if you test your app
-manually using ``manage.py runserver``):
+</topics/testing/overview>` for your application. Again, it's useful to turn
+on deprecation warnings on so they are shown in the test output (you can also
+use the flag if you test your app manually using ``manage.py runserver``):
 
 .. code-block:: console
 
