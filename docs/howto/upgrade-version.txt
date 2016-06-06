@@ -50,8 +50,8 @@ warnings that are raised by your project. Working through these warnings prior
 to upgrading ensures that you're fully informed about areas of the code that
 need altering.
 
-In Python 2.7+, deprecation warnings are silenced by default. It is important
-to turn the warnings on so they are shown in the test output.
+Deprecation warnings are silenced by default. It's important to turn the
+warnings on so they are shown in the test output.
 
 .. code-block:: console
 
@@ -94,10 +94,9 @@ Testing
 =======
 
 When the new environment is set up, :doc:`run the full test suite
-</topics/testing/overview>` for your application. Again, it is useful to turn
-deprecation warnings on so they are shown in the test output
-(you can also use the flag if you test your app
-manually using ``manage.py runserver``):
+</topics/testing/overview>` for your application. Again, it's useful to turn
+on deprecation warnings on so they are shown in the test output (you can also
+use the flag if you test your app manually using ``manage.py runserver``):
 
 .. code-block:: console
 
