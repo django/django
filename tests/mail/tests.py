@@ -21,7 +21,7 @@ from django.core.mail import (
 )
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError, sanitize_address
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
@@ -607,9 +607,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
 
 @requires_tz_support
-class MailTimeZoneTests(TestCase):
+class MailTimeZoneTests(SimpleTestCase):
 
-    # setting the timezone requires a database query on PostgreSQL.
     @override_settings(EMAIL_USE_LOCALTIME=False, USE_TZ=True, TIME_ZONE='Africa/Algiers')
     def test_date_header_utc(self):
         """

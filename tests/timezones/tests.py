@@ -840,7 +840,7 @@ class SerializationTests(SimpleTestCase):
 
 
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True)
-class TemplateTests(TestCase):
+class TemplateTests(SimpleTestCase):
 
     @requires_tz_support
     def test_localtime_templatetag_and_filters(self):

@@ -94,9 +94,7 @@ class FileStorageDeconstructionTests(unittest.TestCase):
 requires_pytz = unittest.skipIf(pytz is None, "this test requires pytz")
 
 
-class FileStorageTests(TestCase):
-    # Changing TIME_ZONE may issue a query to set the database's timezone,
-    # hence TestCase.
+class FileStorageTests(SimpleTestCase):
     storage_class = FileSystemStorage
 
     def setUp(self):
