@@ -25,7 +25,7 @@ from django.utils.encoding import force_str
 from django.utils.functional import lazystr
 
 
-class QueryDictTests(unittest.TestCase):
+class QueryDictTests(SimpleTestCase):
     def test_create_with_no_args(self):
         self.assertEqual(QueryDict(), QueryDict(str('')))
 
@@ -270,6 +270,51 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q.urlencode(), 'cur=%A4')
         self.assertEqual(copy.copy(q).encoding, 'iso-8859-15')
         self.assertEqual(copy.deepcopy(q).encoding, 'iso-8859-15')
+
+    def test_querydict_fromkeys(self):
+        actual = QueryDict.fromkeys(['key1', 'key2', 'key3'])
+        expected = QueryDict('key1&key2&key3')
+        self.assertEqual(actual, expected)
+
+    def test_fromkeys_with_nonempty_value(self):
+        actual = QueryDict.fromkeys(['key1', 'key2', 'key3'], value='val')
+        expected = QueryDict('key1=val&key2=val&key3=val')
+        self.assertEqual(actual, expected)
+
+    def test_fromkeys_is_immutable_by_default(self):
+        # To match behaviour of __init__, which is also immutable by default
+        q = QueryDict.fromkeys(['key1', 'key2', 'key3'])
+        expected_msg = 'This QueryDict instance is immutable'
+        with self.assertRaisesMessage(AttributeError, expected_msg):
+            q['key4'] = 'nope'
+
+    def test_fromkeys_mutable_override(self):
+        q = QueryDict.fromkeys(['key1', 'key2', 'key3'], mutable=True)
+        q['key4'] = 'yep'
+        expected = QueryDict('key1&key2&key3&key4=yep')
+        self.assertEqual(q, expected)
+
+    def test_duplicates_in_fromkeys_iterable(self):
+        q = QueryDict.fromkeys('xyzzy')
+        expected = QueryDict('x&y&z&z&y')
+        self.assertEqual(q, expected)
+
+    def test_fromkeys_with_nondefault_encoding(self):
+        key_utf16 = b'\xff\xfe\x8e\x02\xdd\x01\x9e\x02'
+        value_utf16 = b'\xff\xfe\xdd\x01n\x00l\x00P\x02\x8c\x02'
+        q = QueryDict.fromkeys([key_utf16], value=value_utf16, encoding='utf-16')
+        expected = QueryDict('', mutable=True)
+        expected['ʎǝʞ'] = 'ǝnlɐʌ'
+        self.assertEqual(q, expected)
+
+    def test_fromkeys_empty_iterable(self):
+        actual = QueryDict.fromkeys([])
+        expected = QueryDict('')
+        self.assertEqual(actual, expected)
+
+    def test_fromkeys_noniterable(self):
+        with self.assertRaises(TypeError):
+            QueryDict.fromkeys(0)
 
 
 class HttpResponseTests(unittest.TestCase):
