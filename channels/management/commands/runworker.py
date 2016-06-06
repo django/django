@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.core.management import BaseCommand, CommandError
 
 from channels import DEFAULT_CHANNEL_LAYER, channel_layers
 from channels.log import setup_logger
 from channels.worker import Worker
+from channels.staticfiles import StaticFilesConsumer
 
 
 class Command(BaseCommand):
@@ -38,7 +40,11 @@ class Command(BaseCommand):
                 "Change your settings to use a cross-process channel layer."
             )
         # Check a handler is registered for http reqs
-        self.channel_layer.router.check_default()
+        # Serve static files if Django in debug mode
+        if settings.DEBUG:
+            self.channel_layer.router.check_default(http_consumer=StaticFilesConsumer())
+        else:
+            self.channel_layer.router.check_default()
         # Launch a worker
         self.logger.info("Running worker against channel layer %s", self.channel_layer)
         # Optionally provide an output callback
