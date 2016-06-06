@@ -78,7 +78,7 @@ from django.utils.functional import cached_property
 class ForwardManyToOneDescriptor(object):
     """
     Accessor to the related object on the forward side of a many-to-one or
-    one-to-one relation.
+    one-to-one (via ForwardOneToOneDescriptor subclass) relation.
 
     In the example::
 
@@ -265,6 +265,16 @@ class ForwardManyToOneDescriptor(object):
 
 
 class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
+    """
+    Accessor to the related object on the forward side of a one-to-one relation.
+
+    In the example::
+
+        class Restaurant(Model):
+            place = OneToOneField(Place, related_name='restaurant')
+
+    ``restaurant.place`` is a ``ForwardOneToOneDescriptor`` instance.
+    """
 
     def get_object(self, instance):
         if self.field.remote_field.parent_link:
