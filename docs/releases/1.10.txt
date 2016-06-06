@@ -11,6 +11,9 @@ want to be aware of when upgrading from Django 1.9 or older versions. We've
 of their deprecation cycle, and we've :ref:`begun the deprecation process for
 some features <deprecated-features-1.10>`.
 
+For a full guide on moving an existing project to the latest version, please
+see the documentation on :doc:`upgrading Django </howto/upgrade-version>`.
+
 Python compatibility
 ====================
 
