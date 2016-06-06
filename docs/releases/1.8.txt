@@ -13,6 +13,9 @@ also :ref:`begun the deprecation process for some features
 <deprecated-features-1.8>`, and some features have reached the end of their
 deprecation process and :ref:`have been removed <removed-features-1.8>`.
 
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
 Django 1.8 has been designated as Django's second :term:`long-term support
 release`. It will receive security updates for at least three years after its
 release. Support for the previous LTS, Django 1.4, will end 6 months from the
