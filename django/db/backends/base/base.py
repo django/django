@@ -88,6 +88,13 @@ class BaseDatabaseWrapper(object):
         # is called?
         self.run_commit_hooks_on_set_autocommit_on = False
 
+    def ensure_timezone(self):
+        """
+        Ensure the connection's timezone is set to `self.timezone_name` and
+        return whether it changed or not.
+        """
+        return False
+
     @cached_property
     def timezone(self):
         """

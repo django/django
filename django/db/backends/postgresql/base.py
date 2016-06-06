@@ -192,17 +192,21 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         return connection
 
+    def ensure_timezone(self):
+        self.ensure_connection()
+        conn_timezone_name = self.connection.get_parameter_status('TimeZone')
+        timezone_name = self.timezone_name
+        if timezone_name and conn_timezone_name != timezone_name:
+            with self.connection.cursor() as cursor:
+                cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
+            return True
+        return False
+
     def init_connection_state(self):
         self.connection.set_client_encoding('UTF8')
 
-        conn_timezone_name = self.connection.get_parameter_status('TimeZone')
-
-        if self.timezone_name and conn_timezone_name != self.timezone_name:
-            cursor = self.connection.cursor()
-            try:
-                cursor.execute(self.ops.set_time_zone_sql(), [self.timezone_name])
-            finally:
-                cursor.close()
+        timezone_changed = self.ensure_timezone()
+        if timezone_changed:
             # Commit after setting the time zone (see #17062)
             if not self.get_autocommit():
                 self.connection.commit()
