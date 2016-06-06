@@ -67,6 +67,12 @@ any console output is not captured, in order to see any deprecation warnings.
 Make sure to resolve any deprecation warnings against your existing version
 of Django, before you follow the rest of the upgrade process.
 
+Note that some third party applications might use deprecated APIs in order to
+better support multiple versions of Django, so deprecation warnings that are
+raised by packages you have installed may not neccessarily indicate a problem.
+However, if a package doesn't appear to support the latest version of Django,
+consider raising an issue or pull request against that package, if needed.
+
 Installation
 ============
 
