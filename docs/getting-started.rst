@@ -320,7 +320,9 @@ As you can probably guess, this disables the worker threads in ``runserver``
 and handles them in a separate process. You can pass ``-v 2`` to ``runworker``
 if you want to see logging as it runs the consumers.
 
-If Django in debug mode(`DEBUG=True`), it'll serve static files as Django default behavior.
+If Django is in debug mode (``DEBUG=True``), then ``runworker`` will serve
+static files, as ``runserver`` does. Just like a normal Django setup, you'll
+have to set up your static file serving for when ``DEBUG`` is turned off.
 
 Persisting Data
 ---------------
