@@ -42,6 +42,38 @@ released or if some of your dependencies are not well-maintained, some of your
 dependencies may not yet support the new Django version. In these cases you may
 have to wait until new versions of your dependencies are released.
 
+Resolving deprecation warnings
+==============================
+
+Before upgrading, it's a good idea to resolve any deprecation warnings raised
+by your project while using your current version of Django. Fixing these
+warnings before upgrading ensures that you're informed about areas of the code
+that need altering.
+
+In Python, deprecation warnings are silenced by default. You must turn them on
+using the ``-Wall`` Python command line option or the :envvar:`PYTHONWARNINGS`
+environment variable. For example, to show warnings while running tests:
+
+.. code-block:: console
+
+    $ python -Wall manage.py test
+
+If you're not using the Django test runner, you may need to also ensure that
+any console output is not captured which would hide deprecation warnings. For
+example, if you use `py.test`:
+
+.. code-block:: console
+
+    $ PYTHONWARNINGS=all py.test tests --capture=no
+
+Resolve any deprecation warnings with your current version of Django before
+continuing the upgrade process.
+
+Third party applications might use deprecated APIs in order to support multiple
+versions of Django, so deprecation warnings in packages you've installed don't
+necessarily indicate a problem. If a package doesn't support the latest version
+of Django, consider raising an issue or sending a pull request for it.
+
 Installation
 ============
 
@@ -69,10 +101,9 @@ Testing
 =======
 
 When the new environment is set up, :doc:`run the full test suite
-</topics/testing/overview>` for your application. In Python 2.7+, deprecation
-warnings are silenced by default. It is useful to turn the warnings on so they
-are shown in the test output (you can also use the flag if you test your app
-manually using ``manage.py runserver``):
+</topics/testing/overview>` for your application. Again, it's useful to turn
+on deprecation warnings on so they're shown in the test output (you can also
+use the flag if you test your app manually using ``manage.py runserver``):
 
 .. code-block:: console
 
