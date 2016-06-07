@@ -313,10 +313,10 @@ class MiddlewareTest(TestCase):
         self.assertEqual(request.site.id, settings.SITE_ID)
 
     def test_middleware_takes_callable(self):
-        """ 
+        """
         #26716 - Makes sure the sites conforms to 1.10 style middleware and
         takes a get_response callable
         """
         def get_response(request):
             return
-        middleware = CurrentSiteMiddleware(get_response)
+        CurrentSiteMiddleware(get_response)
