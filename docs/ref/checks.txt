@@ -211,6 +211,8 @@ Related Fields
   add at least a subset of them to a unique_together constraint.
 * **fields.E311**: ``<model>`` must set ``unique=True`` because it is
   referenced by a ``ForeignKey``.
+* **fields.E312**: The 'to_field' ``<field name>`` doesn't exist on the
+  related model ``<app label>.<model>``.
 * **fields.E320**: Field specifies ``on_delete=SET_NULL``, but cannot be null.
 * **fields.E321**: The field specifies ``on_delete=SET_DEFAULT``, but has no
   default value.
