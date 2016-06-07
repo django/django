@@ -265,6 +265,33 @@ work::
                 return force_text(obj)
             return super(LazyEncoder, self).default(obj)
 
+.. _DjangoJSONEncoder:
+
+By default, :ref:`DjangoJSONEncoder <DjangoJSONEncoder>` is used for JSON
+encoding. It may also be used as a parent class when creating your own encoding
+class, as in the example above. :ref:`DjangoJSONEncoder <DjangoJSONEncoder>`
+handles the following types of objects in addition to all the things that
+:class:`~json.JSONEncoder` provides:
+
+:class:`~datetime.datetime`
+   A string of the form ``YYYY-MM-DDTHH:mm:ss.sssZ`` or
+   ``YYYY-MM-DDTHH:mm:ss.sss+HH:MM`` as defined in `ECMA-262`_.
+
+:class:`~datetime.date`
+   A string of the form ``YYYY-MM-DD`` as defined in `ECMA-262`_.
+
+:class:`~datetime.time`
+   A string of the form ``HH:MM:ss.sss`` as defined in `ECMA-262`_.
+
+:class:`~decimal.Decimal`
+   A string representation of the object.
+
+:class:`~uuid.UUID`
+   A string representation of the object.
+
+``Promise``
+   A string representation of the object.
+
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
