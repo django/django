@@ -27,7 +27,7 @@ class SimpleI18nSitemap(Sitemap):
     i18n = True
 
     def items(self):
-        return I18nTestModel.objects.all()
+        return I18nTestModel.objects.order_by('pk').all()
 
 
 class EmptySitemap(Sitemap):
@@ -115,7 +115,7 @@ sitemaps_lastmod_descending = OrderedDict([
 ])
 
 generic_sitemaps = {
-    'generic': GenericSitemap({'queryset': TestModel.objects.all()}),
+    'generic': GenericSitemap({'queryset': TestModel.objects.order_by('pk').all()}),
 }
 
 

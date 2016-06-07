@@ -1,3 +1,20 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Gist
+ @EmadMokhtar
+ Unwatch 1
+  Star 0
+ Fork 7,981 EmadMokhtar/django
+forked from django/django
+ Code  Pull requests 0  Pulse  Graphs  Settings
+Tree: 0e571e909e Find file Copy pathdjango/tests/pagination/tests.py
+5cbb1f9  13 days ago
+@EmadMokhtar EmadMokhtar Solve flask8 and isort errors
+12 contributors @EmadMokhtar @alasdairnicol @timgraham @apollo13 @hramezani @mmardini @rhcarvalho @claudep @berkerpeksag @aaugustin @zedr @andrewjesaitis
+RawBlameHistory     329 lines (301 sloc)  13.4 KB
 from __future__ import unicode_literals
 
 import unittest
@@ -5,6 +22,7 @@ from datetime import datetime
 
 from django.core.paginator import (
     EmptyPage, InvalidPage, PageNotAnInteger, Paginator,
+    UnorderedQuerysetWarning,
 )
 from django.test import TestCase
 from django.utils import six
@@ -256,7 +274,7 @@ class ModelPaginationTests(TestCase):
             a.save()
 
     def test_first_page(self):
-        paginator = Paginator(Article.objects.all(), 5)
+        paginator = Paginator(Article.objects.order_by('id'), 5)
         p = paginator.page(1)
         self.assertEqual("<Page 1 of 2>", six.text_type(p))
         self.assertQuerysetEqual(p.object_list, [
@@ -265,9 +283,7 @@ class ModelPaginationTests(TestCase):
             "<Article: Article 3>",
             "<Article: Article 4>",
             "<Article: Article 5>"
-        ],
-            ordered=False
-        )
+        ])
         self.assertTrue(p.has_next())
         self.assertFalse(p.has_previous())
         self.assertTrue(p.has_other_pages())
@@ -278,7 +294,8 @@ class ModelPaginationTests(TestCase):
         self.assertEqual(5, p.end_index())
 
     def test_last_page(self):
-        paginator = Paginator(Article.objects.all(), 5)
+        paginator = Paginator(Article.objects.order_by('id'), 5)
+
         p = paginator.page(2)
         self.assertEqual("<Page 2 of 2>", six.text_type(p))
         self.assertQuerysetEqual(p.object_list, [
@@ -286,9 +303,7 @@ class ModelPaginationTests(TestCase):
             "<Article: Article 7>",
             "<Article: Article 8>",
             "<Article: Article 9>"
-        ],
-            ordered=False
-        )
+        ])
         self.assertFalse(p.has_next())
         self.assertTrue(p.has_previous())
         self.assertTrue(p.has_other_pages())
@@ -303,7 +318,7 @@ class ModelPaginationTests(TestCase):
         Tests proper behavior of a paginator page __getitem__ (queryset
         evaluation, slicing, exception raised).
         """
-        paginator = Paginator(Article.objects.all(), 5)
+        paginator = Paginator(Article.objects.order_by('id'), 5)
         p = paginator.page(1)
 
         # Make sure object_list queryset is not evaluated by an invalid __getitem__ call.
@@ -323,3 +338,7 @@ class ModelPaginationTests(TestCase):
         )
         # After __getitem__ is called, object_list is a list
         self.assertIsInstance(p.object_list, list)
+
+    def test_paginating_not_order_QuerySet_should_raise_RuntimeWarning(self):
+        with self.assertRaises(UnorderedQuerysetWarning):
+            Paginator(Article.objects.all(), 5)
