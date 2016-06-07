@@ -832,6 +832,12 @@ appropriate entities.
 
     Can be called multiple times on a single string.
 
+    Can also be used as a decorator.
+
+    .. versionchanged:: 1.11
+
+        Added support for decorator usage.
+
     For building up fragments of HTML, you should normally be using
     :func:`django.utils.html.format_html` instead.
 
