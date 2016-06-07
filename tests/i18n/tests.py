@@ -1918,8 +1918,6 @@ class NonDjangoLanguageTests(SimpleTestCase):
         LANGUAGES=[
             ('en-us', 'English'),
             ('xxx', 'Somelanguage'),
-            # xyz language has no locale files
-            ('xyz', 'XYZ'),
         ],
         LANGUAGE_CODE='xxx',
         LOCALE_PATHS=[os.path.join(here, 'commands', 'locale')],
@@ -1928,6 +1926,15 @@ class NonDjangoLanguageTests(SimpleTestCase):
         self.assertEqual(get_language(), 'xxx')
         self.assertEqual(ugettext("year"), "reay")
 
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGES=[
+            ('en-us', 'English'),
+            # xyz language has no locale files
+            ('xyz', 'XYZ'),
+        ],
+    )
+    def test_plural_non_django_language(self):
         activate('xyz')
         try:
             self.assertEqual(get_language(), 'xyz')
