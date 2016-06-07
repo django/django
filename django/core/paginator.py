@@ -1,8 +1,13 @@
 import collections
+import warnings
 from math import ceil
 
 from django.utils import six
 from django.utils.functional import cached_property
+
+
+class UnorderedObjectListWarning(RuntimeWarning):
+    pass
 
 
 class InvalidPage(Exception):
@@ -22,6 +27,7 @@ class Paginator(object):
     def __init__(self, object_list, per_page, orphans=0,
                  allow_empty_first_page=True):
         self.object_list = object_list
+        self._check_object_list_is_ordered()
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
@@ -93,6 +99,17 @@ class Paginator(object):
         a template for loop.
         """
         return six.moves.range(1, self.num_pages + 1)
+
+    def _check_object_list_is_ordered(self):
+        """
+        Warn if self.object_list is unordered (typically a QuerySet).
+        """
+        if hasattr(self.object_list, 'ordered') and not self.object_list.ordered:
+            warnings.warn(
+                'Pagination may yield inconsistent results with an unordered '
+                'object_list: {!r}'.format(self.object_list),
+                UnorderedObjectListWarning
+            )
 
 
 QuerySetPaginator = Paginator   # For backwards-compatibility.

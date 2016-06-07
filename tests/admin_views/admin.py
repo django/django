@@ -481,7 +481,7 @@ class FieldOverridePostAdmin(PostAdmin):
 
 class CustomChangeList(ChangeList):
     def get_queryset(self, request):
-        return self.root_queryset.filter(pk=9999)  # Does not exist
+        return self.root_queryset.order_by('pk').filter(pk=9999)  # Doesn't exist
 
 
 class GadgetAdmin(admin.ModelAdmin):
