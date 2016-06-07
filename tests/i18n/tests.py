@@ -1918,6 +1918,8 @@ class NonDjangoLanguageTests(SimpleTestCase):
         LANGUAGES=[
             ('en-us', 'English'),
             ('xxx', 'Somelanguage'),
+            # xyz language has no locale files
+            ('xyz', 'XYZ'),
         ],
         LANGUAGE_CODE='xxx',
         LOCALE_PATHS=[os.path.join(here, 'commands', 'locale')],
@@ -1925,3 +1927,10 @@ class NonDjangoLanguageTests(SimpleTestCase):
     def test_non_django_language(self):
         self.assertEqual(get_language(), 'xxx')
         self.assertEqual(ugettext("year"), "reay")
+
+        activate('xyz')
+        try:
+            self.assertEqual(get_language(), 'xyz')
+            self.assertEqual(ungettext("year", "years", 2), "years")
+        finally:
+            deactivate()
