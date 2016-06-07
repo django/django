@@ -370,7 +370,7 @@ class ReverseOneToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``restaurant`` attribute
         - ``instance`` is the ``place`` instance
-        - ``instance_type`` in the ``Place`` class (we don't need it)
+        - ``cls`` is the ``Place`` class (unused)
 
         Keep in mind that ``Restaurant`` holds the foreign key to ``Place``.
         """
