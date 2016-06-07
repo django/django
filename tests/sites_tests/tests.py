@@ -11,7 +11,7 @@ from django.contrib.sites.requests import RequestSite
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.signals import post_migrate
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.test import TestCase, modify_settings, override_settings
 from django.test.utils import captured_stdout
 
@@ -305,9 +305,15 @@ class CreateDefaultSiteTests(TestCase):
 
 class MiddlewareTest(TestCase):
 
-    def test_request(self):
+    def test_old_style_request(self):
         """ Makes sure that the request has correct `site` attribute. """
         middleware = CurrentSiteMiddleware()
         request = HttpRequest()
         middleware.process_request(request)
         self.assertEqual(request.site.id, settings.SITE_ID)
+
+    def test_request(self):
+        def get_response(request):
+            return HttpResponse(str(request.site.id))
+        response = CurrentSiteMiddleware(get_response)(HttpRequest())
+        self.assertContains(response, settings.SITE_ID)
