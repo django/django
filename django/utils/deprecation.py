@@ -3,6 +3,8 @@ from __future__ import absolute_import
 import inspect
 import warnings
 
+from django.middleware.exception import ExceptionMiddleware
+
 
 class RemovedInDjango20Warning(DeprecationWarning):
     pass
@@ -114,10 +116,10 @@ CallableFalse = CallableBool(False)
 CallableTrue = CallableBool(True)
 
 
-class MiddlewareMixin(object):
+class MiddlewareMixin(ExceptionMiddleware):
     def __init__(self, get_response=None):
         self.get_response = get_response
-        super(MiddlewareMixin, self).__init__()
+        super(MiddlewareMixin, self).__init__(get_response)
 
     def __call__(self, request):
         response = None
@@ -125,10 +127,12 @@ class MiddlewareMixin(object):
             response = self.process_request(request)
         if not response:
             try:
-                response = self.get_response(request)
+                response = super(MiddlewareMixin, self).__call__(request)
             except Exception as e:
                 if hasattr(self, 'process_exception'):
-                    return self.process_exception(request, e)
+                    response = self.process_exception(request, e)
+                    if response:
+                        return response
                 else:
                     raise
         if hasattr(self, 'process_response'):
