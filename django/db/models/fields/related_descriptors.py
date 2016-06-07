@@ -200,7 +200,7 @@ class ForwardManyToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``parent`` attribute
         - ``instance`` is the ``child`` instance
-        - ``value`` in the ``parent`` instance on the right of the equal sign
+        - ``value`` is the ``parent`` instance on the right of the equal sign
         """
         # An object must be an instance of the related class.
         if value is not None and not isinstance(value, self.field.remote_field.model._meta.concrete_model):
@@ -336,7 +336,7 @@ class ReverseOneToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``restaurant`` attribute
         - ``instance`` is the ``place`` instance
-        - ``instance_type`` in the ``Place`` class (we don't need it)
+        - ``cls`` is the ``Place`` class (unused)
 
         Keep in mind that ``Restaurant`` holds the foreign key to ``Place``.
         """
@@ -383,7 +383,7 @@ class ReverseOneToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``restaurant`` attribute
         - ``instance`` is the ``place`` instance
-        - ``value`` in the ``restaurant`` instance on the right of the equal sign
+        - ``value`` is the ``restaurant`` instance on the right of the equal sign
 
         Keep in mind that ``Restaurant`` holds the foreign key to ``Place``.
         """
@@ -470,7 +470,7 @@ class ReverseManyToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``children`` attribute
         - ``instance`` is the ``parent`` instance
-        - ``instance_type`` in the ``Parent`` class (we don't need it)
+        - ``cls`` is the ``Parent`` class (unused)
         """
         if instance is None:
             return self
@@ -485,7 +485,7 @@ class ReverseManyToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``children`` attribute
         - ``instance`` is the ``parent`` instance
-        - ``value`` in the ``children`` sequence on the right of the equal sign
+        - ``value`` is the ``children`` sequence on the right of the equal sign
         """
         warnings.warn(
             'Direct assignment to the reverse side of a related set is '
