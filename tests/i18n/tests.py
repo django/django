@@ -1925,3 +1925,16 @@ class NonDjangoLanguageTests(SimpleTestCase):
     def test_non_django_language(self):
         self.assertEqual(get_language(), 'xxx')
         self.assertEqual(ugettext("year"), "reay")
+
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGES=[
+            ('en-us', 'English'),
+            # xyz language has no locale files
+            ('xyz', 'XYZ'),
+        ],
+    )
+    @translation.override('xyz')
+    def test_plural_non_django_language(self):
+        self.assertEqual(get_language(), 'xyz')
+        self.assertEqual(ungettext('year', 'years', 2), 'years')

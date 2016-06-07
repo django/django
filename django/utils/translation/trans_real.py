@@ -113,6 +113,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.__to_language = to_language(language)
         self.__locale = to_locale(language)
         self._catalog = None
+        # If a language doesn't have a catalog, use the Germanic default for
+        # pluralization: anything except one is pluralized.
+        self.plural = lambda n: int(n != 1)
 
         if self.domain == 'django':
             if localedirs is not None:
