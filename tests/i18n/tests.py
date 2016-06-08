@@ -1934,10 +1934,7 @@ class NonDjangoLanguageTests(SimpleTestCase):
             ('xyz', 'XYZ'),
         ],
     )
+    @translation.override('xyz')
     def test_plural_non_django_language(self):
-        activate('xyz')
-        try:
-            self.assertEqual(get_language(), 'xyz')
-            self.assertEqual(ungettext("year", "years", 2), "years")
-        finally:
-            deactivate()
+        self.assertEqual(get_language(), 'xyz')
+        self.assertEqual(ungettext("year", "years", 2), "years")
