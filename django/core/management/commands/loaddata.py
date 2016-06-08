@@ -13,6 +13,7 @@ from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
+from django.core.management.utils import parse_apps_and_model_labels
 from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connections, router,
     transaction,
@@ -52,13 +53,17 @@ class Command(BaseCommand):
             help='Ignores entries in the serialized data for fields that do not '
                  'currently exist on the model.',
         )
+        parser.add_argument(
+            '-e', '--exclude', dest='exclude', action='append', default=[],
+            help='An app_label or app_label.ModelName to exclude. Can be used multiple times.',
+        )
 
     def handle(self, *fixture_labels, **options):
-
         self.ignore = options['ignore']
         self.using = options['database']
         self.app_label = options['app_label']
         self.verbosity = options['verbosity']
+        self.excluded_models, self.excluded_apps = parse_apps_and_model_labels(options['exclude'])
 
         with transaction.atomic(using=self.using):
             self.loaddata(fixture_labels)
@@ -160,6 +165,9 @@ class Command(BaseCommand):
 
                 for obj in objects:
                     objects_in_fixture += 1
+                    if (obj.object._meta.app_config in self.excluded_apps or
+                            type(obj.object) in self.excluded_models):
+                        continue
                     if router.allow_migrate_model(self.using, obj.object.__class__):
                         loaded_objects_in_fixture += 1
                         self.models.add(obj.object.__class__)
