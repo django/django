@@ -192,7 +192,8 @@ Requests and Responses
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* The new ``django.core.serializers.base.Serializer.stream_class`` attribute
+  allows subclasses to customize the default stream.
 
 Signals
 ~~~~~~~
