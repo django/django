@@ -714,7 +714,7 @@ class RelativeFieldTests(SimpleTestCase):
             pass
 
         for invalid_related_name in invalid_related_names:
-            Child = type(str('Child_%s') % str(invalid_related_name), (models.Model,), {
+            Child = type(str('Child%s') % str(invalid_related_name), (models.Model,), {
                 'parent': models.ForeignKey('Parent', models.CASCADE, related_name=invalid_related_name),
                 '__module__': Parent.__module__,
             })
@@ -723,7 +723,7 @@ class RelativeFieldTests(SimpleTestCase):
             errors = Child.check()
             expected = [
                 Error(
-                    "The name '%s' is invalid related_name for field Child_%s.parent"
+                    "The name '%s' is invalid related_name for field Child%s.parent"
                     % (invalid_related_name, invalid_related_name),
                     hint="Related name must be a valid Python identifier or end with a '+'",
                     obj=field,
@@ -743,7 +743,6 @@ class RelativeFieldTests(SimpleTestCase):
             '_starts_with_underscore',
             'contains_%s_digit' % digit,
             'ends_with_plus+',
-            '_',
             '_+',
             '+',
         ]
@@ -762,6 +761,33 @@ class RelativeFieldTests(SimpleTestCase):
 
             errors = Child.check()
             self.assertFalse(errors)
+
+    def test_invalid_related_query_name(self):
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            first = models.ForeignKey(Target, models.CASCADE, related_name="contains__double")
+            second = models.ForeignKey(Target, models.CASCADE, related_query_name="ends_underscore_")
+
+        errors = Model.check()
+        expected = [
+            Error(
+                "Reverse query name for 'Model.first' ('contains__double') contains '__'.",
+                hint=("Add or change a related_name or related_query_name "
+                      "argument to the definition for field 'Model.first'."),
+                obj=Model._meta.get_field('first'),
+                id='fields.E309',
+            ),
+            Error(
+                "Reverse query name for 'Model.second' ('ends_underscore_') ends with an underscore.",
+                hint=("Add or change a related_name or related_query_name "
+                      "argument to the definition for field 'Model.second'."),
+                obj=Model._meta.get_field('second'),
+                id='fields.E308',
+            ),
+        ]
+        self.assertEqual(errors, expected)
 
 
 @isolate_apps('invalid_models_tests')
