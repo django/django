@@ -958,14 +958,17 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         response = self.client.get(reverse('admin:admin_views_section_add'))
         self.assertContains(response, 'bodyclass_consistency_check ')
 
-    def test_extended_bodyclass_template_change_password(self):
-        """
-        Ensure that the auth/user/change_password.html template uses block
-        super in the bodyclass block.
-        """
+    def test_change_password_template(self):
         user = User.objects.get(username='super')
         response = self.client.get(reverse('admin:auth_user_password_change', args=(user.id,)))
+        # The auth/user/change_password.html template uses super in the
+        # bodyclass block.
         self.assertContains(response, 'bodyclass_consistency_check ')
+
+        # When a site has multiple passwords in the browser's password manager,
+        # a browser pop up asks which user the new password is for. To prevent
+        # this, the username is added to the change password form.
+        self.assertContains(response, '<input type="text" name="username" value="super" style="display: none" />')
 
     def test_extended_bodyclass_template_index(self):
         """
