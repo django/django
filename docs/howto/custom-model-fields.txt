@@ -311,6 +311,45 @@ and reconstructing the field::
     new_instance = MyField(*args, **kwargs)
     self.assertEqual(my_field_instance.some_attribute, new_instance.some_attribute)
 
+Updating your custom field's base class
+---------------------------------------
+
+Note that you cannot update the base class of your custom field. For example,
+if you start with::
+
+    class CustomCharField(models.CharField):
+        def foo(self):
+            pass
+
+    class Author(models.Model):
+        name = CustomCharField(max_length=255)
+
+and then decide that you need a longer ``TextField``, you cannot update your custom
+class in the following way::
+
+    class CustomCharField(models.TextField):
+        def foo(self):
+            pass
+
+    class Author(models.Model):
+        name = CustomCharField(max_length=255)
+
+Django will not detect this change or make a migration for it. Instead, you
+should create a new custom field class.::
+
+    class CustomCharField(models.CharField):
+        pass
+
+    class CustomTextField(models.TextField):
+        pass
+
+    class Author(models.Model):
+        name = CustomTextField(max_length=255)
+
+Note that you must retain the original ``CustomCharField`` class definition so
+that migrations will continue to work as discussed in
+:ref:`removing fields <migrations-removing-model-fields>`.
+
 Documenting your custom field
 -----------------------------
 
