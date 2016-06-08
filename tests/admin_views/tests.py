@@ -818,6 +818,17 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             msg_prefix='The "change password" link should not be displayed if a user does not have a usable password.'
         )
 
+    def test_template_change_password(self):
+        """
+        Ensure that the auth/user/change_password.html template has
+        username input field which is not displayed.
+
+        Refs: #4548
+        """
+        user = User.objects.get(username='super')
+        response = self.client.get(reverse('admin:auth_user_password_change', args=(user.id,)))
+        self.assertContains(response, '<input type="text" name="username" value="super" style="display: none" />')
+
     def test_change_view_with_show_delete_extra_context(self):
         """
         Ensured that the 'show_delete' context variable in the admin's change
