@@ -1128,6 +1128,7 @@ class ModelChoiceField(ChoiceField):
         'invalid_choice': _('Select a valid choice. That choice is not one of'
                             ' the available choices.'),
     }
+    iterator = ModelChoiceIterator
 
     def __init__(self, queryset, empty_label="---------",
                  required=True, widget=None, label=None, initial=None,
@@ -1195,7 +1196,7 @@ class ModelChoiceField(ChoiceField):
         # accessed) so that we can ensure the QuerySet has not been consumed. This
         # construct might look complicated but it allows for lazy evaluation of
         # the queryset.
-        return ModelChoiceIterator(self)
+        return self.iterator(self)
 
     choices = property(_get_choices, ChoiceField._set_choices)
 
