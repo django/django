@@ -763,6 +763,50 @@ class RelativeFieldTests(SimpleTestCase):
             errors = Child.check()
             self.assertFalse(errors)
 
+    def test_to_fields_exist(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            parent = ForeignObject(
+                Parent,
+                on_delete=models.SET_NULL,
+                from_fields=('a', 'b'),
+                to_fields=('a', 'b'),
+            )
+
+        field = Child._meta.get_field('parent')
+        expected = [
+            Error(
+                "The 'to_field' 'a' doesn't exist on the related model 'invalid_models_tests.Parent'.",
+                obj=field,
+                id='fields.E312',
+            ),
+            Error(
+                "The 'to_field' 'b' doesn't exist on the related model 'invalid_models_tests.Parent'.",
+                obj=field,
+                id='fields.E312',
+            ),
+        ]
+        self.assertEqual(field.check(), expected)
+
+    def test_to_fields_not_checked_if_related_model_not_exists(self):
+        class Child(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            parent = ForeignObject(
+                'invalid_models_tests.Parent',
+                on_delete=models.SET_NULL,
+                from_fields=('a', 'b'),
+                to_fields=('a', 'b'),
+            )
+
+        field = Child._meta.get_field('parent')
+        for error in field.check():
+            self.assertNotEqual(error.id, 'fields.E312')
+
 
 @isolate_apps('invalid_models_tests')
 class AccessorClashTests(SimpleTestCase):

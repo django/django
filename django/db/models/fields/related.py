@@ -463,7 +463,29 @@ class ForeignObject(RelatedField):
 
     def check(self, **kwargs):
         errors = super(ForeignObject, self).check(**kwargs)
+        errors.extend(self._check_to_fields_exist())
         errors.extend(self._check_unique_target())
+        return errors
+
+    def _check_to_fields_exist(self):
+        if isinstance(self.remote_field.model, six.string_types):
+            return []
+
+        errors = []
+        for to_field in self.to_fields:
+            if to_field:
+                try:
+                    self.remote_field.model._meta.get_field(to_field)
+                except exceptions.FieldDoesNotExist:
+                    errors.append(
+                        checks.Error(
+                            "The 'to_field' '%s' doesn't exist on the related "
+                            "model '%s'."
+                            % (to_field, self.remote_field.model._meta.label),
+                            obj=self,
+                            id='fields.E312',
+                        )
+                    )
         return errors
 
     def _check_unique_target(self):
