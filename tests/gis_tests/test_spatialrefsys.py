@@ -1,7 +1,7 @@
 import re
 import unittest
 
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal import HAS_GDAL, SpatialReference, GDALException
 from django.test import mock, skipUnlessDBFeature
 from django.utils import six
 
@@ -143,3 +143,36 @@ class SpatialRefSysTest(unittest.TestCase):
         self.assertTrue(
             SpatialRefSys.get_spheroid(srs.wkt).startswith('SPHEROID[')
         )
+
+    def test_fallbacks(self):
+        attrs = [
+            'ellipsoid',
+            'projected',
+            'local',
+            'geographic',
+            'linear_name',
+            'linear_units',
+            'angular_name',
+            'angular_units',
+        ]
+        for db_srs in SpatialRefSys.objects.all():
+            # Make sure that we have valid wkt.
+            try:
+                SpatialReference(db_srs.wkt)
+            except Exception:
+                continue
+
+            for attr in attrs:
+                try:
+                    gdal_val = getattr(db_srs, attr)
+                except GDALException:
+                    continue
+
+                with mock.patch('django.contrib.gis.gdal.HAS_GDAL', False):
+                    non_gdal_val = getattr(db_srs, attr)
+
+                self.assertEqual(
+                    non_gdal_val,
+                    gdal_val,
+                    'value of `%s` attribute differs for %s\n%s != %s' % (attr, db_srs.wkt, non_gdal_val, gdal_val),
+                )
