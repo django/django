@@ -820,10 +820,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_template_change_password(self):
         """
-        Ensure that the auth/user/change_password.html template has
-        username input field which is not displayed.
-
-        Refs: #4548
+        When more than one password is stored in the password manager of browser
+        of one single site, a confirm password dialog pops up when changing password.
+        To prevent this username needs to be part of the change password submit form.
         """
         user = User.objects.get(username='super')
         response = self.client.get(reverse('admin:auth_user_password_change', args=(user.id,)))
