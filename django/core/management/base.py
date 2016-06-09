@@ -91,7 +91,7 @@ class OutputWrapper(object):
         else:
             self._style_func = lambda x: x
 
-    def __init__(self, out, style_func=None, ending='\n'):
+    def __init__(self, out, style_func=None, ending=str('\n')):
         self._out = out
         self.style_func = None
         self.ending = ending
