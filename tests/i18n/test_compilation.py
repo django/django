@@ -3,9 +3,7 @@ from __future__ import unicode_literals
 
 import gettext as gettext_module
 import os
-import shutil
 import stat
-import tempfile
 import unittest
 from subprocess import Popen
 
@@ -18,42 +16,19 @@ from django.core.management.utils import find_command
 from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import six, translation
-from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 from django.utils.translation import ugettext
 
+from .utils import RunInTmpDirMixin, copytree
+
 has_msgfmt = find_command('msgfmt')
-source_code_dir = os.path.dirname(upath(__file__))
 
 
 @unittest.skipUnless(has_msgfmt, 'msgfmt is mandatory for compilation tests')
-class MessageCompilationTests(SimpleTestCase):
+class MessageCompilationTests(RunInTmpDirMixin, SimpleTestCase):
 
     work_subdir = 'commands'
-
-    def setUp(self):
-        self._cwd = os.getcwd()
-        self.work_dir = tempfile.mkdtemp(prefix='i18n_')
-        self.test_dir = os.path.abspath(os.path.join(self.work_dir, self.work_subdir))
-        shutil.copytree(os.path.join(source_code_dir, self.work_subdir), self.test_dir)
-        # Make sure we step out of the temporary working tree before we
-        # remove it as we might be pulling the rug from under our own feet
-        # othewise. Rhis is especially true on Windows.
-        # Remember cleanup actions registered with addCleanup() are called in
-        # reverse so this ordering is important:
-        self.addCleanup(self._rmrf, self.test_dir)
-        self.addCleanup(os.chdir, self._cwd)
-        os.chdir(self.test_dir)
-
-    def _rmrf(self, dname):
-        if os.path.commonprefix([self.test_dir, os.path.abspath(dname)]) != self.test_dir:
-            return
-        shutil.rmtree(dname)
-
-    def rmfile(self, filepath):
-        if os.path.exists(filepath):
-            os.remove(filepath)
 
 
 class PoFileTests(MessageCompilationTests):
@@ -87,10 +62,6 @@ class PoFileContentsTests(MessageCompilationTests):
     LOCALE = 'fr'
     MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
-    def setUp(self):
-        super(PoFileContentsTests, self).setUp()
-        self.addCleanup(os.unlink, os.path.join(self.test_dir, self.MO_FILE))
-
     def test_percent_symbol_in_po_file(self):
         call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
         self.assertTrue(os.path.exists(self.MO_FILE))
@@ -106,8 +77,6 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
         localedir = os.path.join(self.test_dir, 'locale')
         self.MO_FILE_HR = os.path.join(localedir, 'hr/LC_MESSAGES/django.mo')
         self.MO_FILE_FR = os.path.join(localedir, 'fr/LC_MESSAGES/django.mo')
-        self.addCleanup(self.rmfile, os.path.join(localedir, self.MO_FILE_HR))
-        self.addCleanup(self.rmfile, os.path.join(localedir, self.MO_FILE_FR))
 
     def test_one_locale(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
@@ -131,8 +100,7 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
 
     def setUp(self):
         super(ExcludedLocaleCompilationTests, self).setUp()
-        shutil.copytree('canned_locale', 'locale')
-        self.addCleanup(self._rmrf, os.path.join(self.test_dir, 'locale'))
+        copytree('canned_locale', 'locale')
 
     def test_command_help(self):
         with captured_stdout(), captured_stderr():
@@ -170,15 +138,11 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
 class CompilationErrorHandling(MessageCompilationTests):
     def test_error_reported_by_msgfmt(self):
         # po file contains wrong po formatting.
-        mo_file = 'locale/ja/LC_MESSAGES/django.mo'
-        self.addCleanup(self.rmfile, os.path.join(self.test_dir, mo_file))
         with self.assertRaises(CommandError):
             call_command('compilemessages', locale=['ja'], verbosity=0)
 
     def test_msgfmt_error_including_non_ascii(self):
         # po file contains invalid msgstr content (triggers non-ascii error content).
-        mo_file = 'locale/ko/LC_MESSAGES/django.mo'
-        self.addCleanup(self.rmfile, os.path.join(self.test_dir, mo_file))
         # Make sure the output of msgfmt is unaffected by the current locale.
         env = os.environ.copy()
         env.update({str('LANG'): str('C')})
@@ -201,11 +165,6 @@ class ProjectAndAppTests(MessageCompilationTests):
     LOCALE = 'ru'
     PROJECT_MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
     APP_MO_FILE = 'app_with_locale/locale/%s/LC_MESSAGES/django.mo' % LOCALE
-
-    def setUp(self):
-        super(ProjectAndAppTests, self).setUp()
-        self.addCleanup(self.rmfile, os.path.join(self.test_dir, self.PROJECT_MO_FILE))
-        self.addCleanup(self.rmfile, os.path.join(self.test_dir, self.APP_MO_FILE))
 
 
 class FuzzyTranslationTest(ProjectAndAppTests):

@@ -9,7 +9,8 @@ from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.translation import activate, get_language, trans_real
 
-from .test_extraction import POFileAssertionMixin
+from .utils import POFileAssertionMixin
+
 
 SAMPLEPROJECT_DIR = os.path.join(os.path.dirname(os.path.abspath(upath(__file__))), 'sampleproject')
 SAMPLEPROJECT_LOCALE = os.path.join(SAMPLEPROJECT_DIR, 'locale')
