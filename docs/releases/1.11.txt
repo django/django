@@ -255,8 +255,8 @@ Miscellaneous
   ``django.request``.
 
 * Using a foreign key's id (e.g. ``'field_id'``) in ``ModelAdmin.list_display``
-  displays the related object's ID instead of ``repr(object)``. Remove the
-  ``_id`` suffix if you want the ``repr()``.
+  displays the related object's ID. Remove the ``_id`` suffix if you want the
+  old behavior of the string representation of the object.
 
 .. _deprecated-features-1.11:
 
