@@ -198,6 +198,12 @@ WKB / EWKB               ``buffer``
 GeoJSON                  ``str`` or ``unicode``
 =======================  ======================
 
+.. classmethod:: GEOSGeometry.from_gml(gml_string)
+
+    .. versionadded:: 1.11
+
+    Constructs a :class:`GEOSGeometry` from the given GML string.
+
 Properties
 ~~~~~~~~~~
 

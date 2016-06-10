@@ -74,7 +74,9 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new class methods :meth:`GEOSGeometry.from_gml()
+  <django.contrib.gis.geos.GEOSGeometry.from_gml>` and :meth:`OGRGeometry.from_gml()
+  <django.contrib.gis.gdal.OGRGeometry.from_gml>` allow to import geometries from GML.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
