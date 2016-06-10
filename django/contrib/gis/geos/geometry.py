@@ -166,6 +166,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
         self.ptr = ptr
         self._post_init(srid)
 
+    @classmethod
+    def from_gml(cls, gml_string):
+        return gdal.OGRGeometry.from_gml(gml_string).geos
+
     # Comparison operators
     def __eq__(self, other):
         """
