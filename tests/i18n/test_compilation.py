@@ -5,6 +5,7 @@ import gettext as gettext_module
 import os
 import shutil
 import stat
+import tempfile
 import unittest
 from subprocess import Popen
 
@@ -23,16 +24,20 @@ from django.utils.six import StringIO
 from django.utils.translation import ugettext
 
 has_msgfmt = find_command('msgfmt')
+source_code_dir = os.path.dirname(upath(__file__))
 
 
 @unittest.skipUnless(has_msgfmt, 'msgfmt is mandatory for compilation tests')
 class MessageCompilationTests(SimpleTestCase):
 
-    test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'commands'))
+    work_subdir = 'commands'
 
     def setUp(self):
         self._cwd = os.getcwd()
         self.addCleanup(os.chdir, self._cwd)
+        self.work_dir = tempfile.mkdtemp(prefix='i18n_')
+        self.test_dir = os.path.abspath(os.path.join(self.work_dir, self.work_subdir))
+        shutil.copytree(os.path.join(source_code_dir, self.work_subdir), self.test_dir)
         os.chdir(self.test_dir)
 
     def _rmrf(self, dname):
@@ -114,13 +119,12 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
 
 class ExcludedLocaleCompilationTests(MessageCompilationTests):
 
-    test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'exclude'))
+    work_subdir = 'exclude'
 
     MO_FILE = 'locale/%s/LC_MESSAGES/django.mo'
 
     def setUp(self):
         super(ExcludedLocaleCompilationTests, self).setUp()
-
         shutil.copytree('canned_locale', 'locale')
         self.addCleanup(self._rmrf, os.path.join(self.test_dir, 'locale'))
 
