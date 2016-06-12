@@ -474,7 +474,7 @@ class Func(Expression):
     An SQL function call.
     """
     function = None
-    template = '%(function)s(%(expressions)s)'
+    template = '(%(function)s(%(expressions)s))'
     arg_joiner = ', '
     arity = None  # The number of arguments the function accepts.
 
