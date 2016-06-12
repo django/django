@@ -1317,6 +1317,7 @@ class MiscTests(SimpleTestCase):
         self.assertEqual([('*', 1.0)], p('*'))
         self.assertEqual([('de', 1.0)], p('de;q=0.'))
         self.assertEqual([('en', 1.0), ('*', 0.5)], p('en; q=1.0, * ; q=0.5'))
+        self.assertEqual([('en', 1.0)], p('en; q=1,'))
         self.assertEqual([], p(''))
 
         # Bad headers; should always return [].
@@ -1336,7 +1337,7 @@ class MiscTests(SimpleTestCase):
         self.assertEqual([], p('de;q=0.a'))
         self.assertEqual([], p('12-345'))
         self.assertEqual([], p(''))
-        self.assertEqual([], p('en; q=1,'))
+        self.assertEqual([], p('en;q=1e0'))
 
     def test_parse_literal_http_header(self):
         """
