@@ -1315,7 +1315,7 @@ class MiscTests(SimpleTestCase):
             p('de,en-au;q=0.75,en-us;q=0.5,en;q=0.25,es;q=0.125,fa;q=0.125')
         )
         self.assertEqual([('*', 1.0)], p('*'))
-        self.assertEqual([('de', 1.0)], p('de;q=0.'))
+        self.assertEqual([('de', 0.0)], p('de;q=0.'))
         self.assertEqual([('en', 1.0), ('*', 0.5)], p('en; q=1.0, * ; q=0.5'))
         self.assertEqual([('en', 1.0)], p('en; q=1,'))
         self.assertEqual([], p(''))

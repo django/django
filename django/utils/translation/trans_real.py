@@ -791,7 +791,7 @@ def parse_accept_lang_header(lang_string):
             return []
         if priority:
             priority = float(priority)
-        if not priority:        # if priority is 0.0 at this point make it 1.0
+        else:
             priority = 1.0
         result.append((lang, priority))
     result.sort(key=lambda k: k[1], reverse=True)
