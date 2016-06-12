@@ -89,7 +89,7 @@ class BasicTestCase(TestCase):
     def test_anonymous_user(self):
         "Check the properties of the anonymous user"
         a = AnonymousUser()
-        self.assertEqual(a.pk, None)
+        self.assertIsNone(a.pk)
         self.assertEqual(a.username, '')
         self.assertEqual(a.get_username(), '')
         self.assertTrue(a.is_anonymous)

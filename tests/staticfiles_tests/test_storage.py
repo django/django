@@ -214,7 +214,7 @@ class TestCollectionCachedStorage(TestHashedFiles, CollectionTestCase):
         # clearing the cache to make sure we re-set it correctly in the url method
         storage.staticfiles_storage.hashed_files.clear()
         cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertEqual(cached_name, None)
+        self.assertIsNone(cached_name)
         self.assertEqual(self.hashed_file_path(name), hashed_name)
         cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
         self.assertEqual(cached_name, hashed_name)

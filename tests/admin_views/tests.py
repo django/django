@@ -545,10 +545,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse('admin:admin_views_city_changelist'), {})
 
         response.context['cl'].list_display = ['id', 'name', 'state']
-        self.assertEqual(response.context['cl'].has_related_field_in_list_display(), True)
+        self.assertIs(response.context['cl'].has_related_field_in_list_display(), True)
 
         response.context['cl'].list_display = ['id', 'name', 'state_id']
-        self.assertEqual(response.context['cl'].has_related_field_in_list_display(), False)
+        self.assertIs(response.context['cl'].has_related_field_in_list_display(), False)
 
     def test_limited_filter(self):
         """Ensure admin changelist filters do not contain objects excluded via limit_choices_to.
@@ -1569,7 +1569,7 @@ class AdminViewPermissionsTest(TestCase):
         # Change User should not have access to add articles
         self.client.force_login(self.changeuser)
         # make sure the view removes test cookie
-        self.assertEqual(self.client.session.test_cookie_worked(), False)
+        self.assertIs(self.client.session.test_cookie_worked(), False)
         response = self.client.get(reverse('admin:admin_views_article_add'))
         self.assertEqual(response.status_code, 403)
         # Try POST just to make sure
@@ -1622,7 +1622,7 @@ class AdminViewPermissionsTest(TestCase):
         # Check and make sure that if user expires, data still persists
         self.client.force_login(self.superuser)
         # make sure the view removes test cookie
-        self.assertEqual(self.client.session.test_cookie_worked(), False)
+        self.assertIs(self.client.session.test_cookie_worked(), False)
 
     def test_change_view(self):
         """Change view should restrict access and allow users to edit items."""
@@ -2602,7 +2602,7 @@ class AdminViewListEditable(TestCase):
         }
         self.client.post(reverse('admin:admin_views_person_changelist'), data)
 
-        self.assertEqual(Person.objects.get(name="John Mauchly").alive, False)
+        self.assertIs(Person.objects.get(name="John Mauchly").alive, False)
         self.assertEqual(Person.objects.get(name="Grace Hopper").gender, 2)
 
         # test a filtered page
@@ -2623,7 +2623,7 @@ class AdminViewListEditable(TestCase):
         }
         self.client.post(reverse('admin:admin_views_person_changelist') + '?gender__exact=1', data)
 
-        self.assertEqual(Person.objects.get(name="John Mauchly").alive, True)
+        self.assertIs(Person.objects.get(name="John Mauchly").alive, True)
 
         # test a searched page
         data = {
@@ -2638,7 +2638,7 @@ class AdminViewListEditable(TestCase):
         }
         self.client.post(reverse('admin:admin_views_person_changelist') + '?q=john', data)
 
-        self.assertEqual(Person.objects.get(name="John Mauchly").alive, False)
+        self.assertIs(Person.objects.get(name="John Mauchly").alive, False)
 
     def test_non_field_errors(self):
         ''' Ensure that non field errors are displayed for each of the
@@ -2834,7 +2834,7 @@ class AdminViewListEditable(TestCase):
         }
         self.client.post(reverse('admin:admin_views_person_changelist'), data)
 
-        self.assertEqual(Person.objects.get(name="John Mauchly").alive, True)
+        self.assertIs(Person.objects.get(name="John Mauchly").alive, True)
         self.assertEqual(Person.objects.get(name="Grace Hopper").gender, 1)
 
     def test_list_editable_action_choices(self):
@@ -2861,7 +2861,7 @@ class AdminViewListEditable(TestCase):
         }
         self.client.post(reverse('admin:admin_views_person_changelist'), data)
 
-        self.assertEqual(Person.objects.get(name="John Mauchly").alive, False)
+        self.assertIs(Person.objects.get(name="John Mauchly").alive, False)
         self.assertEqual(Person.objects.get(name="Grace Hopper").gender, 2)
 
     def test_list_editable_popup(self):
@@ -3333,7 +3333,7 @@ action)</option>
     def test_model_without_action(self):
         "Tests a ModelAdmin without any action"
         response = self.client.get(reverse('admin:admin_views_oldsubscriber_changelist'))
-        self.assertEqual(response.context["action_form"], None)
+        self.assertIsNone(response.context["action_form"])
         self.assertNotContains(
             response, '<input type="checkbox" class="action-select"',
             msg_prefix="Found an unexpected action toggle checkboxbox in response"
@@ -3343,7 +3343,7 @@ action)</option>
     def test_model_without_action_still_has_jquery(self):
         "Tests that a ModelAdmin without any actions still gets jQuery included in page"
         response = self.client.get(reverse('admin:admin_views_oldsubscriber_changelist'))
-        self.assertEqual(response.context["action_form"], None)
+        self.assertIsNone(response.context["action_form"])
         self.assertContains(
             response, 'jquery.min.js',
             msg_prefix="jQuery missing from admin pages for model with no admin actions"
@@ -3352,7 +3352,7 @@ action)</option>
     def test_action_column_class(self):
         "Tests that the checkbox column class is present in the response"
         response = self.client.get(reverse('admin:admin_views_subscriber_changelist'))
-        self.assertNotEqual(response.context["action_form"], None)
+        self.assertIsNotNone(response.context["action_form"])
         self.assertContains(response, 'action-checkbox-column')
 
     def test_multiple_actions_form(self):
@@ -3410,10 +3410,10 @@ action)</option>
     def test_popup_actions(self):
         """ Actions should not be shown in popups. """
         response = self.client.get(reverse('admin:admin_views_subscriber_changelist'))
-        self.assertNotEqual(response.context["action_form"], None)
+        self.assertIsNotNone(response.context["action_form"])
         response = self.client.get(
             reverse('admin:admin_views_subscriber_changelist') + '?%s' % IS_POPUP_VAR)
-        self.assertEqual(response.context["action_form"], None)
+        self.assertIsNone(response.context["action_form"])
 
     def test_popup_template_response(self):
         """
@@ -4174,17 +4174,17 @@ class NeverCacheTests(TestCase):
         "Check the never-cache status of the password change view"
         self.client.logout()
         response = self.client.get(reverse('admin:password_change'))
-        self.assertEqual(get_max_age(response), None)
+        self.assertIsNone(get_max_age(response))
 
     def test_password_change_done(self):
         "Check the never-cache status of the password change done view"
         response = self.client.get(reverse('admin:password_change_done'))
-        self.assertEqual(get_max_age(response), None)
+        self.assertIsNone(get_max_age(response))
 
     def test_JS_i18n(self):
         "Check the never-cache status of the JavaScript i18n view"
         response = self.client.get(reverse('admin:jsi18n'))
-        self.assertEqual(get_max_age(response), None)
+        self.assertIsNone(get_max_age(response))
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')

@@ -14,7 +14,7 @@ class TermColorTests(unittest.TestCase):
     def test_simple_palette(self):
         self.assertEqual(parse_color_setting('light'), PALETTES[LIGHT_PALETTE])
         self.assertEqual(parse_color_setting('dark'), PALETTES[DARK_PALETTE])
-        self.assertEqual(parse_color_setting('nocolor'), None)
+        self.assertIsNone(parse_color_setting('nocolor'))
 
     def test_fg(self):
         self.assertEqual(
@@ -76,9 +76,9 @@ class TermColorTests(unittest.TestCase):
         )
 
     def test_empty_definition(self):
-        self.assertEqual(parse_color_setting(';'), None)
+        self.assertIsNone(parse_color_setting(';'))
         self.assertEqual(parse_color_setting('light;'), PALETTES[LIGHT_PALETTE])
-        self.assertEqual(parse_color_setting(';;;'), None)
+        self.assertIsNone(parse_color_setting(';;;'))
 
     def test_empty_options(self):
         self.assertEqual(
@@ -95,23 +95,23 @@ class TermColorTests(unittest.TestCase):
         )
 
     def test_bad_palette(self):
-        self.assertEqual(parse_color_setting('unknown'), None)
+        self.assertIsNone(parse_color_setting('unknown'))
 
     def test_bad_role(self):
-        self.assertEqual(parse_color_setting('unknown='), None)
-        self.assertEqual(parse_color_setting('unknown=green'), None)
+        self.assertIsNone(parse_color_setting('unknown='))
+        self.assertIsNone(parse_color_setting('unknown=green'))
         self.assertEqual(
             parse_color_setting('unknown=green;sql_field=blue'),
             dict(PALETTES[NOCOLOR_PALETTE], SQL_FIELD={'fg': 'blue'})
         )
 
     def test_bad_color(self):
-        self.assertEqual(parse_color_setting('error='), None)
+        self.assertIsNone(parse_color_setting('error='))
         self.assertEqual(
             parse_color_setting('error=;sql_field=blue'),
             dict(PALETTES[NOCOLOR_PALETTE], SQL_FIELD={'fg': 'blue'})
         )
-        self.assertEqual(parse_color_setting('error=unknown'), None)
+        self.assertIsNone(parse_color_setting('error=unknown'))
         self.assertEqual(
             parse_color_setting('error=unknown;sql_field=blue'),
             dict(PALETTES[NOCOLOR_PALETTE], SQL_FIELD={'fg': 'blue'})

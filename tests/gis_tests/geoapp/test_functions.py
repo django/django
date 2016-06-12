@@ -241,8 +241,8 @@ class GISFunctionsTests(TestCase):
         State.objects.create(name='invalid', poly=invalid_geom)
         valid = State.objects.filter(name='valid').annotate(isvalid=functions.IsValid('poly')).first()
         invalid = State.objects.filter(name='invalid').annotate(isvalid=functions.IsValid('poly')).first()
-        self.assertEqual(valid.isvalid, True)
-        self.assertEqual(invalid.isvalid, False)
+        self.assertIs(valid.isvalid, True)
+        self.assertIs(invalid.isvalid, False)
 
     @skipUnlessDBFeature("has_Area_function")
     def test_area_with_regular_aggregate(self):
@@ -265,7 +265,7 @@ class GISFunctionsTests(TestCase):
         invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
         State.objects.create(name='invalid', poly=invalid_geom)
         invalid = State.objects.filter(name='invalid').annotate(repaired=functions.MakeValid('poly')).first()
-        self.assertEqual(invalid.repaired.valid, True)
+        self.assertIs(invalid.repaired.valid, True)
         self.assertEqual(invalid.repaired, fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))'))
 
     @skipUnlessDBFeature("has_MemSize_function")

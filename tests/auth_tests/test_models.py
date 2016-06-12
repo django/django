@@ -220,7 +220,7 @@ class IsActiveTestCase(TestCase):
     def test_builtin_user_isactive(self):
         user = User.objects.create(username='foo', email='foo@bar.com')
         # is_active is true by default
-        self.assertEqual(user.is_active, True)
+        self.assertIs(user.is_active, True)
         user.is_active = False
         user.save()
         user_fetched = User.objects.get(pk=user.pk)
@@ -234,14 +234,14 @@ class IsActiveTestCase(TestCase):
         """
         UserModel = get_user_model()
         user = UserModel(username='foo')
-        self.assertEqual(user.is_active, True)
+        self.assertIs(user.is_active, True)
         # you can set the attribute - but it will not save
         user.is_active = False
         # there should be no problem saving - but the attribute is not saved
         user.save()
         user_fetched = UserModel._default_manager.get(pk=user.pk)
         # the attribute is always true for newly retrieved instance
-        self.assertEqual(user_fetched.is_active, True)
+        self.assertIs(user_fetched.is_active, True)
 
 
 class TestCreateSuperUserSignals(TestCase):

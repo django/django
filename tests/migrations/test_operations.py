@@ -1210,8 +1210,8 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.describe(), "Alter field pink on Pony")
         new_state = project_state.clone()
         operation.state_forwards("test_alfl", new_state)
-        self.assertEqual(project_state.models["test_alfl", "pony"].get_field_by_name("pink").null, False)
-        self.assertEqual(new_state.models["test_alfl", "pony"].get_field_by_name("pink").null, True)
+        self.assertIs(project_state.models["test_alfl", "pony"].get_field_by_name("pink").null, False)
+        self.assertIs(new_state.models["test_alfl", "pony"].get_field_by_name("pink").null, True)
         # Test the database alteration
         self.assertColumnNotNull("test_alfl_pony", "pink")
         with connection.schema_editor() as editor:
@@ -2063,7 +2063,7 @@ class OperationTests(OperationTestBase):
 
         state = new_state.clone()
         blog = state.apps.get_model("test_blog.Blog")
-        self.assertTrue(isinstance(blog._meta.pk, models.BigAutoField))
+        self.assertIsInstance(blog._meta.pk, models.BigAutoField)
 
         project_state = new_state
         new_state = new_state.clone()

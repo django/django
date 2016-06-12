@@ -667,8 +667,8 @@ class QueryTestCase(TestCase):
         charlie.set_unusable_password()
 
         # initially, no db assigned
-        self.assertEqual(new_bob_profile._state.db, None)
-        self.assertEqual(charlie._state.db, None)
+        self.assertIsNone(new_bob_profile._state.db)
+        self.assertIsNone(charlie._state.db)
 
         # old object comes from 'other', so the new object is set to use 'other'...
         new_bob_profile.user = bob
@@ -820,7 +820,7 @@ class QueryTestCase(TestCase):
         # base object.
         review3 = Review(source="Python Daily")
         # initially, no db assigned
-        self.assertEqual(review3._state.db, None)
+        self.assertIsNone(review3._state.db)
 
         # Dive comes from 'other', so review3 is set to use 'other'...
         review3.content_object = dive
@@ -1178,8 +1178,8 @@ class RouterTestCase(TestCase):
         chris = Person(name="Chris Mills")
         html5 = Book(title="Dive into HTML5", published=datetime.date(2010, 3, 15))
         # initially, no db assigned
-        self.assertEqual(chris._state.db, None)
-        self.assertEqual(html5._state.db, None)
+        self.assertIsNone(chris._state.db)
+        self.assertIsNone(html5._state.db)
 
         # old object comes from 'other', so the new object is set to use the
         # source of 'other'...
@@ -1432,7 +1432,7 @@ class RouterTestCase(TestCase):
         # base object.
         review3 = Review(source="Python Daily")
         # initially, no db assigned
-        self.assertEqual(review3._state.db, None)
+        self.assertIsNone(review3._state.db)
 
         # Dive comes from 'other', so review3 is set to use the source of 'other'...
         review3.content_object = dive

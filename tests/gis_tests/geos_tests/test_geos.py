@@ -112,7 +112,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         # garbage into 3D coordinate if there is none.
         self.assertEqual(hexewkb_2d, pnt_2d.hexewkb)
         self.assertEqual(hexewkb_3d, pnt_3d.hexewkb)
-        self.assertEqual(True, GEOSGeometry(hexewkb_3d).hasz)
+        self.assertIs(GEOSGeometry(hexewkb_3d).hasz, True)
 
         # Same for EWKB.
         self.assertEqual(six.memoryview(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
@@ -247,14 +247,14 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
             # Testing the third dimension, and getting the tuple arguments
             if hasattr(p, 'z'):
-                self.assertEqual(True, pnt.hasz)
+                self.assertIs(pnt.hasz, True)
                 self.assertEqual(p.z, pnt.z)
                 self.assertEqual(p.z, pnt.tuple[2], 9)
                 tup_args = (p.x, p.y, p.z)
                 set_tup1 = (2.71, 3.14, 5.23)
                 set_tup2 = (5.23, 2.71, 3.14)
             else:
-                self.assertEqual(False, pnt.hasz)
+                self.assertIs(pnt.hasz, False)
                 self.assertIsNone(pnt.z)
                 tup_args = (p.x, p.y)
                 set_tup1 = (2.71, 3.14)
@@ -301,8 +301,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             for p in mpnt:
                 self.assertEqual(p.geom_type, 'Point')
                 self.assertEqual(p.geom_typeid, 0)
-                self.assertEqual(p.empty, False)
-                self.assertEqual(p.valid, True)
+                self.assertIs(p.empty, False)
+                self.assertIs(p.valid, True)
 
     def test_linestring(self):
         "Testing LineString objects."
@@ -312,8 +312,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(ls.geom_type, 'LineString')
             self.assertEqual(ls.geom_typeid, 1)
             self.assertEqual(ls.dims, 1)
-            self.assertEqual(ls.empty, False)
-            self.assertEqual(ls.ring, False)
+            self.assertIs(ls.empty, False)
+            self.assertIs(ls.ring, False)
             if hasattr(l, 'centroid'):
                 self.assertEqual(l.centroid, ls.centroid.tuple)
             if hasattr(l, 'tup'):
@@ -367,7 +367,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             for ls in ml:
                 self.assertEqual(ls.geom_type, 'LineString')
                 self.assertEqual(ls.geom_typeid, 1)
-                self.assertEqual(ls.empty, False)
+                self.assertIs(ls.empty, False)
 
             with self.assertRaises(IndexError):
                 ml.__getitem__(len(ml))
@@ -382,8 +382,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(lr.geom_typeid, 2)
             self.assertEqual(lr.dims, 1)
             self.assertEqual(rr.n_p, len(lr))
-            self.assertEqual(True, lr.valid)
-            self.assertEqual(False, lr.empty)
+            self.assertIs(lr.valid, True)
+            self.assertIs(lr.empty, False)
 
             # Creating a LinearRing from a tuple, list, and numpy array
             self.assertEqual(lr, LinearRing(lr.tuple))
@@ -425,8 +425,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(poly.geom_type, 'Polygon')
             self.assertEqual(poly.geom_typeid, 3)
             self.assertEqual(poly.dims, 2)
-            self.assertEqual(poly.empty, False)
-            self.assertEqual(poly.ring, False)
+            self.assertIs(poly.empty, False)
+            self.assertIs(poly.ring, False)
             self.assertEqual(p.n_i, poly.num_interior_rings)
             self.assertEqual(p.n_i + 1, len(poly))  # Testing __len__
             self.assertEqual(p.n_p, poly.num_points)
@@ -519,7 +519,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 for p in mpoly:
                     self.assertEqual(p.geom_type, 'Polygon')
                     self.assertEqual(p.geom_typeid, 3)
-                    self.assertEqual(p.valid, True)
+                    self.assertIs(p.valid, True)
                 self.assertEqual(mpoly.wkt, MultiPolygon(*tuple(poly.clone() for poly in mpoly)).wkt)
 
     def test_memory_hijinks(self):
@@ -592,7 +592,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             i1 = fromstr(self.geometries.intersect_geoms[i].wkt)
-            self.assertEqual(True, a.intersects(b))
+            self.assertIs(a.intersects(b), True)
             i2 = a.intersection(b)
             self.assertEqual(i1, i2)
             self.assertEqual(i1, a & b)  # __and__ is intersection operator
@@ -957,7 +957,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             geoms.append(LineString(numpy.array([])))
 
         for g in geoms:
-            self.assertEqual(True, g.empty)
+            self.assertIs(g.empty, True)
 
             # Testing len() and num_geom.
             if isinstance(g, Polygon):
@@ -979,7 +979,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 lr = g.shell
                 self.assertEqual('LINEARRING EMPTY', lr.wkt)
                 self.assertEqual(0, len(lr))
-                self.assertEqual(True, lr.empty)
+                self.assertIs(lr.empty, True)
                 with self.assertRaises(IndexError):
                     lr.__getitem__(0)
             else:

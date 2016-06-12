@@ -1700,7 +1700,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Author)
         # Create a row
         Author.objects.create(name='Anonymous1')
-        self.assertEqual(Author.objects.get().height, None)
+        self.assertIsNone(Author.objects.get().height)
         old_field = Author._meta.get_field('height')
         # The default from the new field is used in updating existing rows.
         new_field = IntegerField(blank=True, default=42)
