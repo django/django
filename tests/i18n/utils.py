@@ -5,7 +5,6 @@ import tempfile
 
 from django.utils._os import upath
 
-
 source_code_dir = os.path.dirname(upath(__file__))
 
 
