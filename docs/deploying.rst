@@ -44,7 +44,7 @@ a backend has to follow).
 
 Typically a channel backend will connect to one or more central servers that
 serve as the communication layer - for example, the Redis backend connects
-to a Redis server. All this goes into the ``CHANNEL_BACKENDS`` setting;
+to a Redis server. All this goes into the ``CHANNEL_LAYERS`` setting;
 here's an example for a remote Redis server::
 
     CHANNEL_LAYERS = {
