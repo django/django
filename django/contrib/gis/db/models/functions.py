@@ -435,12 +435,9 @@ class Transform(GeoFunc):
 
 class Translate(Scale):
     def as_sqlite(self, compiler, connection):
-        func_name = connection.ops.spatial_function_name(self.name)
-        if func_name == 'ST_Translate' and len(self.source_expressions) < 4:
-            # Always provide the z parameter for ST_Translate (Spatialite >= 3.1)
+        if len(self.source_expressions) < 4:
+            # Always provide the z parameter for ST_Translate
             self.source_expressions.append(Value(0))
-        elif func_name == 'ShiftCoords' and len(self.source_expressions) > 3:
-            raise ValueError("This version of Spatialite doesn't support 3D")
         return super(Translate, self).as_sqlite(compiler, connection)
 
 
