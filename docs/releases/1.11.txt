@@ -154,7 +154,8 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The new :attr:`CharField.empty_value <django.forms.CharField.empty_value>`
+  attribute allows specifying the Python value to use to represent "empty".
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -229,7 +230,9 @@ Backwards incompatible changes in 1.11
 Database backend API
 --------------------
 
-* ...
+* On Oracle, :meth:`Model.validate_unique()
+  <django.db.models.Model.validate_unique>` no longer checks empty strings for
+  uniqueness as the database interprets the value as ``NULL``.
 
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -257,6 +260,9 @@ Miscellaneous
 * Using a foreign key's id (e.g. ``'field_id'``) in ``ModelAdmin.list_display``
   displays the related object's ID. Remove the ``_id`` suffix if you want the
   old behavior of the string representation of the object.
+
+* :class:`~django.db.models.CharField` with ``null=True`` will now save
+  ``NULL`` for blank values through model forms and the admin.
 
 .. _deprecated-features-1.11:
 

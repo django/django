@@ -214,10 +214,11 @@ class Field(object):
 
 
 class CharField(Field):
-    def __init__(self, max_length=None, min_length=None, strip=True, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, strip=True, empty_value='', *args, **kwargs):
         self.max_length = max_length
         self.min_length = min_length
         self.strip = strip
+        self.empty_value = empty_value
         super(CharField, self).__init__(*args, **kwargs)
         if min_length is not None:
             self.validators.append(validators.MinLengthValidator(int(min_length)))
@@ -227,7 +228,7 @@ class CharField(Field):
     def to_python(self, value):
         "Returns a Unicode object."
         if value in self.empty_values:
-            return ''
+            return self.empty_value
         value = force_text(value)
         if self.strip:
             value = value.strip()

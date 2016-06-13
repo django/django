@@ -361,7 +361,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: CharField(**kwargs)
 
     * Default widget: :class:`TextInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: Whatever you've given as :attr:`empty_value`.
     * Normalizes to: A Unicode object.
     * Validates ``max_length`` or ``min_length``, if they are provided.
       Otherwise, all inputs are valid.
@@ -379,6 +379,12 @@ For each field, we describe the default widget used if you don't specify
 
        If ``True`` (default), the value will be stripped of leading and
        trailing whitespace.
+
+    .. attribute:: empty_value
+
+       .. versionadded:: 1.11
+
+       The value to use to represent "empty". Defaults to an empty string.
 
 ``ChoiceField``
 ---------------

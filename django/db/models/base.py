@@ -13,8 +13,8 @@ from django.core.exceptions import (
     ObjectDoesNotExist, ValidationError,
 )
 from django.db import (
-    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, DatabaseError, connections,
-    router, transaction,
+    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, DatabaseError, connection,
+    connections, router, transaction,
 )
 from django.db.models import signals
 from django.db.models.constants import LOOKUP_SEP
@@ -1087,7 +1087,9 @@ class Model(six.with_metaclass(ModelBase)):
             for field_name in unique_check:
                 f = self._meta.get_field(field_name)
                 lookup_value = getattr(self, f.attname)
-                if lookup_value is None:
+                # TODO: Handle multiple backends with different feature flags.
+                if (lookup_value is None or
+                        lookup_value == '' and connection.features.interprets_empty_strings_as_nulls):
                     # no value, skip the lookup
                     continue
                 if f.primary_key and not self._state.adding:
