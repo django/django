@@ -72,20 +72,14 @@ class GeomValue(Value):
         return self.value.srid
 
     def as_sql(self, compiler, connection):
+        return '%s(%%s, %s)' % (connection.ops.from_text, self.srid), [connection.ops.Adapter(self.value)]
+
+    def as_postgresql(self, compiler, connection):
         if self.geography:
             self.value = connection.ops.Adapter(self.value, geography=self.geography)
         else:
             self.value = connection.ops.Adapter(self.value)
         return super(GeomValue, self).as_sql(compiler, connection)
-
-    def as_mysql(self, compiler, connection):
-        return 'GeomFromText(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
-
-    def as_sqlite(self, compiler, connection):
-        return 'GeomFromText(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
-
-    def as_oracle(self, compiler, connection):
-        return 'SDO_GEOMETRY(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
 
 
 class GeoFuncWithGeoParam(GeoFunc):
