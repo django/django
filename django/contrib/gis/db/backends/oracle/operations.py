@@ -78,6 +78,8 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     union = 'SDO_GEOM.SDO_UNION'
     unionagg = 'SDO_AGGR_UNION'
 
+    from_text = 'SDO_GEOMETRY'
+
     function_names = {
         'Area': 'SDO_GEOM.SDO_AREA',
         'Centroid': 'SDO_GEOM.SDO_CENTROID',
