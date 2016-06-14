@@ -291,7 +291,7 @@ class EmailMessage(object):
         self.subject = subject
         self.body = body
         self.attachments = attachments or []
-        self.extra_headers = headers or {}
+        self.extra_headers = headers or settings.DEFAULT_EXTRA_HEADERS
         self.connection = connection
 
     def get_connection(self, fail_silently=False):
