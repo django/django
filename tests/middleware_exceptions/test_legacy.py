@@ -1,14 +1,14 @@
 import sys
 
-from django.conf import settings
-from django.core.exceptions import MiddlewareNotUsed
 from django.core.signals import got_request_exception
 from django.http import HttpResponse
 from django.template import engines
 from django.template.response import TemplateResponse
-from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import ignore_warnings, patch_logger
+from django.test import SimpleTestCase, override_settings
+from django.test.utils import ignore_warnings
 from django.utils.deprecation import MiddlewareMixin, RemovedInDjango20Warning
+
+from .tests import MiddlewareNotUsedTests
 
 
 class TestException(Exception):
@@ -512,14 +512,6 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         # Check that the right middleware methods have been invoked
         self.assert_middleware_usage(middleware, True, True, True, True, False)
 
-    @override_settings(MIDDLEWARE=['middleware_exceptions.middleware.ProcessExceptionMiddleware'])
-    def test_exception_in_render_passed_to_process_exception(self):
-        # Repopulate the list of middlewares since it's already been populated
-        # by setUp() before the MIDDLEWARE setting got overridden.
-        self.client.handler.load_middleware()
-        response = self.client.get('/middleware_exceptions/exception_in_render/')
-        self.assertEqual(response.content, b'Exception caught')
-
 
 class BadMiddlewareTests(BaseMiddlewareExceptionTest):
 
@@ -868,79 +860,6 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
         self.assert_middleware_usage(middleware, True, True, True, True, False)
         self.assert_middleware_usage(post_middleware, True, True, True, True, False)
-
-_missing = object()
-
-
-@override_settings(ROOT_URLCONF='middleware_exceptions.urls')
-class RootUrlconfTests(SimpleTestCase):
-
-    @override_settings(ROOT_URLCONF=None)
-    def test_missing_root_urlconf(self):
-        # Removing ROOT_URLCONF is safe, as override_settings will restore
-        # the previously defined settings.
-        del settings.ROOT_URLCONF
-        with self.assertRaises(AttributeError):
-            self.client.get("/middleware_exceptions/view/")
-
-
-class MyMiddleware(object):
-
-    def __init__(self, get_response=None):
-        raise MiddlewareNotUsed
-
-    def process_request(self, request):
-        pass
-
-
-class MyMiddlewareWithExceptionMessage(object):
-
-    def __init__(self, get_response=None):
-        raise MiddlewareNotUsed('spam eggs')
-
-    def process_request(self, request):
-        pass
-
-
-@override_settings(
-    DEBUG=True,
-    ROOT_URLCONF='middleware_exceptions.urls',
-    MIDDLEWARE=['django.middleware.common.CommonMiddleware'],
-)
-class MiddlewareNotUsedTests(SimpleTestCase):
-
-    rf = RequestFactory()
-
-    def test_raise_exception(self):
-        request = self.rf.get('middleware_exceptions/view/')
-        with self.assertRaises(MiddlewareNotUsed):
-            MyMiddleware().process_request(request)
-
-    @override_settings(MIDDLEWARE=['middleware_exceptions.test_legacy.MyMiddleware'])
-    def test_log(self):
-        with patch_logger('django.request', 'debug') as calls:
-            self.client.get('/middleware_exceptions/view/')
-        self.assertEqual(len(calls), 1)
-        self.assertEqual(
-            calls[0],
-            "MiddlewareNotUsed: 'middleware_exceptions.test_legacy.MyMiddleware'"
-        )
-
-    @override_settings(MIDDLEWARE=['middleware_exceptions.test_legacy.MyMiddlewareWithExceptionMessage'])
-    def test_log_custom_message(self):
-        with patch_logger('django.request', 'debug') as calls:
-            self.client.get('/middleware_exceptions/view/')
-        self.assertEqual(len(calls), 1)
-        self.assertEqual(
-            calls[0],
-            "MiddlewareNotUsed('middleware_exceptions.test_legacy.MyMiddlewareWithExceptionMessage'): spam eggs"
-        )
-
-    @override_settings(DEBUG=False)
-    def test_do_not_log_when_debug_is_false(self):
-        with patch_logger('django.request', 'debug') as calls:
-            self.client.get('/middleware_exceptions/view/')
-        self.assertEqual(len(calls), 0)
 
 
 @ignore_warnings(category=RemovedInDjango20Warning)
