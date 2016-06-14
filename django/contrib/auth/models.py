@@ -1,15 +1,14 @@
 from __future__ import unicode_literals
 
 from django.contrib import auth
+from django.contrib.auth.base_user import AnonymousUser  # NOQA
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.db import models
-from django.db.models.manager import EmptyManager
 from django.utils import six, timezone
-from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -371,79 +370,3 @@ class User(AbstractUser):
     """
     class Meta(AbstractUser.Meta):
         swappable = 'AUTH_USER_MODEL'
-
-
-@python_2_unicode_compatible
-class AnonymousUser(object):
-    id = None
-    pk = None
-    username = ''
-    is_staff = False
-    is_active = False
-    is_superuser = False
-    _groups = EmptyManager(Group)
-    _user_permissions = EmptyManager(Permission)
-
-    def __init__(self):
-        pass
-
-    def __str__(self):
-        return 'AnonymousUser'
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__)
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return 1  # instances always return the same hash value
-
-    def save(self):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def delete(self):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def set_password(self, raw_password):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def check_password(self, raw_password):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def _get_groups(self):
-        return self._groups
-    groups = property(_get_groups)
-
-    def _get_user_permissions(self):
-        return self._user_permissions
-    user_permissions = property(_get_user_permissions)
-
-    def get_group_permissions(self, obj=None):
-        return set()
-
-    def get_all_permissions(self, obj=None):
-        return _user_get_all_permissions(self, obj=obj)
-
-    def has_perm(self, perm, obj=None):
-        return _user_has_perm(self, perm, obj=obj)
-
-    def has_perms(self, perm_list, obj=None):
-        for perm in perm_list:
-            if not self.has_perm(perm, obj):
-                return False
-        return True
-
-    def has_module_perms(self, module):
-        return _user_has_module_perms(self, module)
-
-    @property
-    def is_anonymous(self):
-        return CallableTrue
-
-    @property
-    def is_authenticated(self):
-        return CallableFalse
-
-    def get_username(self):
-        return self.username

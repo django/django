@@ -151,7 +151,7 @@ def logout(request):
         request.session[LANGUAGE_SESSION_KEY] = language
 
     if hasattr(request, 'user'):
-        from django.contrib.auth.models import AnonymousUser
+        from django.contrib.auth.base_user import AnonymousUser
         request.user = AnonymousUser()
 
 
@@ -174,7 +174,7 @@ def get_user(request):
     Returns the user model instance associated with the given request session.
     If no user is retrieved an instance of `AnonymousUser` is returned.
     """
-    from .models import AnonymousUser
+    from .base_user import AnonymousUser
     user = None
     try:
         user_id = _get_user_session_key(request)
