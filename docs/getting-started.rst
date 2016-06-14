@@ -571,8 +571,9 @@ have a ChatMessage model with ``message`` and ``room`` fields::
     # Connected to chat-messages
     def msg_consumer(message):
         # Save to model
+        room = message.content['room']
         ChatMessage.objects.create(
-            room=message.content['room'],
+            room=room,
             message=message.content['message'],
         )
         # Broadcast to listening sockets
