@@ -148,8 +148,6 @@ class AnonymousUser(object):
     is_staff = False
     is_active = False
     is_superuser = False
-    _groups = EmptyManager(Group)
-    _user_permissions = EmptyManager(Permission)
 
     def __init__(self):
         pass
@@ -179,20 +177,24 @@ class AnonymousUser(object):
         raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
     def _get_groups(self):
-        return self._groups
+        from .models import Group
+        return EmptyManager(Group)
     groups = property(_get_groups)
 
     def _get_user_permissions(self):
-        return self._user_permissions
+        from .models import Permission
+        return EmptyManager(Permission)
     user_permissions = property(_get_user_permissions)
 
     def get_group_permissions(self, obj=None):
         return set()
 
     def get_all_permissions(self, obj=None):
+        from .models import _user_get_all_permissions
         return _user_get_all_permissions(self, obj=obj)
 
     def has_perm(self, perm, obj=None):
+        from .models import _user_has_perm
         return _user_has_perm(self, perm, obj=obj)
 
     def has_perms(self, perm_list, obj=None):
@@ -202,6 +204,7 @@ class AnonymousUser(object):
         return True
 
     def has_module_perms(self, module):
+        from .models import _user_has_module_perms
         return _user_has_module_perms(self, module)
 
     @property
