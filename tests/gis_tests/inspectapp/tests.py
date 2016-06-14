@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import os
 import re
-from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.core.management import call_command
@@ -20,9 +19,8 @@ if HAS_GDAL:
     from .models import AllOGRFields
 
 
-@skipUnless(HAS_GDAL, "InspectDbTests needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class InspectDbTests(TestCase):
-    @skipUnlessDBFeature("gis_enabled")
     def test_geom_columns(self):
         """
         Test the geo-enabled inspectdb command.
@@ -60,7 +58,7 @@ class InspectDbTests(TestCase):
             self.assertIn('poly = models.GeometryField(', output)
 
 
-@skipUnless(HAS_GDAL, "OGRInspectTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 @modify_settings(
     INSTALLED_APPS={'append': 'django.contrib.gis'},
 )

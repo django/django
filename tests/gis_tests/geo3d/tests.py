@@ -2,13 +2,11 @@ from __future__ import unicode_literals
 
 import os
 import re
-from unittest import skipUnless
 
 from django.contrib.gis.db.models import Extent3D, Union
 from django.contrib.gis.db.models.functions import (
     AsGeoJSON, AsKML, Length, Perimeter, Scale, Translate,
 )
-from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils._os import upath
@@ -18,10 +16,6 @@ from .models import (
     City3D, Interstate2D, Interstate3D, InterstateProj2D, InterstateProj3D,
     MultiPoint3D, Point2D, Point3D, Polygon2D, Polygon3D,
 )
-
-if HAS_GDAL:
-    from django.contrib.gis.utils import LayerMapping, LayerMapError
-
 
 data_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
 city_file = os.path.join(data_path, 'cities', 'cities.shp')
@@ -101,7 +95,6 @@ class Geo3DLoadingHelper(object):
         Polygon3D.objects.create(name='3D BBox', poly=bbox_3d)
 
 
-@skipUnless(HAS_GDAL, "GDAL is required for Geo3DTest.")
 @skipUnlessDBFeature("gis_enabled", "supports_3d_storage")
 class Geo3DTest(Geo3DLoadingHelper, TestCase):
     """
@@ -147,6 +140,9 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         """
         Testing LayerMapping on 3D models.
         """
+        # Import here as GDAL is required for those imports
+        from django.contrib.gis.utils import LayerMapping, LayerMapError
+
         point_mapping = {'point': 'POINT'}
         mpoint_mapping = {'mpoint': 'MULTIPOINT'}
 
@@ -310,7 +306,6 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
                 self.assertEqual(city_dict[city.name][2] + ztrans, city.translate.z)
 
 
-@skipUnless(HAS_GDAL, "GDAL is required for Geo3DTest.")
 @skipUnlessDBFeature("gis_enabled", "supports_3d_functions")
 class Geo3DFunctionsTests(Geo3DLoadingHelper, TestCase):
     def test_kml(self):

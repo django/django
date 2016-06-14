@@ -91,6 +91,7 @@ class OSMWidget(BaseGeometryWidget):
     template_name = 'gis/openlayers-osm.html'
     default_lon = 5
     default_lat = 47
+    map_srid = 3857
 
     class Media:
         js = (
@@ -104,12 +105,3 @@ class OSMWidget(BaseGeometryWidget):
             self.attrs[key] = getattr(self, key)
         if attrs:
             self.attrs.update(attrs)
-
-    @property
-    def map_srid(self):
-        # Use the official spherical mercator projection SRID when GDAL is
-        # available; otherwise, fallback to 900913.
-        if gdal.HAS_GDAL:
-            return 3857
-        else:
-            return 900913

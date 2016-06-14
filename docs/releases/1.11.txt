@@ -227,6 +227,13 @@ Validators
 Backwards incompatible changes in 1.11
 ======================================
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* To simplify the codebase and because it's easier to install than when
+  ``contrib.gis`` was first released, :ref:`gdalbuild` is now a required
+  dependency for GeoDjango. In older versions, it's only required for SQLite.
+
 Database backend API
 --------------------
 

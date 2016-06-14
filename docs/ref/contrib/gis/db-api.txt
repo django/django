@@ -91,9 +91,9 @@ transform procedure::
 
 Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object, WKT
 (Well Known Text [#fnwkt]_), HEXEWKB (PostGIS specific -- a WKB geometry in
-hexadecimal [#fnewkb]_), and GeoJSON [#fngeojson]_ (requires GDAL). Essentially,
-if the input is not a ``GEOSGeometry`` object, the geometry field will attempt to
-create a ``GEOSGeometry`` instance from the input.
+hexadecimal [#fnewkb]_), and GeoJSON [#fngeojson]_. Essentially, if the input is
+not a ``GEOSGeometry`` object, the geometry field will attempt to create a
+``GEOSGeometry`` instance from the input.
 
 For more information creating :class:`~django.contrib.gis.geos.GEOSGeometry`
 objects, refer to the :ref:`GEOS tutorial <geos-tutorial>`.

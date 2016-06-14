@@ -7,18 +7,14 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
-from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
-from django.test import (
-    TestCase, TransactionTestCase, mock, skipUnlessDBFeature,
-)
+from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from ..data.rasters.textrasters import JSON_RASTER
-from ..models import models
-from .models import RasterModel, RasterRelatedModel
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import GDALRaster
+    from .models import RasterModel, RasterRelatedModel
 
 
 @skipUnlessDBFeature('supports_raster')
@@ -330,12 +326,3 @@ class RasterFieldTest(TransactionTestCase):
         msg = "Couldn't create spatial object from lookup value '%s'." % obj
         with self.assertRaisesMessage(ValueError, msg):
             RasterModel.objects.filter(geom__intersects=obj)
-
-
-@mock.patch('django.contrib.gis.db.models.fields.HAS_GDAL', False)
-class RasterFieldWithoutGDALTest(TestCase):
-
-    def test_raster_field_without_gdal_exception(self):
-        msg = 'RasterField requires GDAL.'
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            models.OriginalRasterField()

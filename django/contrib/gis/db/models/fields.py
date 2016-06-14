@@ -1,9 +1,8 @@
-from django.contrib.gis import forms
+from django.contrib.gis import forms, gdal
 from django.contrib.gis.db.models.lookups import (
     RasterBandTransform, gis_lookups,
 )
 from django.contrib.gis.db.models.proxy import SpatialProxy
-from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.core.exceptions import ImproperlyConfigured
@@ -186,18 +185,16 @@ class BaseSpatialField(Field):
         """
         Return a GDALRaster if conversion is successful, otherwise return None.
         """
-        from django.contrib.gis.gdal import GDALRaster
-
-        if isinstance(value, GDALRaster):
+        if isinstance(value, gdal.GDALRaster):
             return value
         elif is_candidate:
             try:
-                return GDALRaster(value)
+                return gdal.GDALRaster(value)
             except GDALException:
                 pass
         elif isinstance(value, dict):
             try:
-                return GDALRaster(value)
+                return gdal.GDALRaster(value)
             except GDALException:
                 raise ValueError("Couldn't create spatial object from lookup value '%s'." % value)
 
@@ -228,10 +225,8 @@ class BaseSpatialField(Field):
         else:
             # Check if input is a candidate for conversion to raster or geometry.
             is_candidate = isinstance(obj, (bytes, six.string_types)) or hasattr(obj, '__geo_interface__')
-            # With GDAL installed, try to convert the input to raster.
-            raster = False
-            if HAS_GDAL:
-                raster = self.get_raster_prep_value(obj, is_candidate)
+            # Try to convert the input to raster.
+            raster = self.get_raster_prep_value(obj, is_candidate)
 
             if raster:
                 obj = raster
@@ -425,11 +420,6 @@ class RasterField(BaseSpatialField):
     geom_type = 'RASTER'
     geography = False
 
-    def __init__(self, *args, **kwargs):
-        if not HAS_GDAL:
-            raise ImproperlyConfigured('RasterField requires GDAL.')
-        super(RasterField, self).__init__(*args, **kwargs)
-
     def _check_connection(self, connection):
         # Make sure raster fields are used only on backends with raster support.
         if not connection.features.gis_enabled or not connection.features.supports_raster:
@@ -451,13 +441,11 @@ class RasterField(BaseSpatialField):
 
     def contribute_to_class(self, cls, name, **kwargs):
         super(RasterField, self).contribute_to_class(cls, name, **kwargs)
-        # Importing GDALRaster raises an exception on systems without gdal.
-        from django.contrib.gis.gdal import GDALRaster
         # Setup for lazy-instantiated Raster object. For large querysets, the
         # instantiation of all GDALRasters can potentially be expensive. This
         # delays the instantiation of the objects to the moment of evaluation
         # of the raster attribute.
-        setattr(cls, self.attname, SpatialProxy(GDALRaster, self))
+        setattr(cls, self.attname, SpatialProxy(gdal.GDALRaster, self))
 
     def get_transform(self, name):
         try:

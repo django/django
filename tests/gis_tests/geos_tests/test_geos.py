@@ -1092,19 +1092,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(g1.srid, 4326)
         self.assertIsNot(g1, g, "Clone didn't happen")
 
-        with mock.patch('django.contrib.gis.gdal.HAS_GDAL', False):
-            g = GEOSGeometry('POINT (-104.609 38.255)', 4326)
-            gt = g.tuple
-            g.transform(4326)
-            self.assertEqual(g.tuple, gt)
-            self.assertEqual(g.srid, 4326)
-
-            g = GEOSGeometry('POINT (-104.609 38.255)', 4326)
-            g1 = g.transform(4326, clone=True)
-            self.assertEqual(g1.tuple, g.tuple)
-            self.assertEqual(g1.srid, 4326)
-            self.assertIsNot(g1, g, "Clone didn't happen")
-
     @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_transform_nosrid(self):
         """ Testing `transform` method (no SRID or negative SRID) """
@@ -1122,17 +1109,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             g.transform(2774)
 
         g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
-        with self.assertRaises(GEOSException):
-            g.transform(2774, clone=True)
-
-    @mock.patch('django.contrib.gis.gdal.HAS_GDAL', False)
-    def test_transform_nogdal(self):
-        """ Testing `transform` method (GDAL not available) """
-        g = GEOSGeometry('POINT (-104.609 38.255)', 4326)
-        with self.assertRaises(GEOSException):
-            g.transform(2774)
-
-        g = GEOSGeometry('POINT (-104.609 38.255)', 4326)
         with self.assertRaises(GEOSException):
             g.transform(2774, clone=True)
 

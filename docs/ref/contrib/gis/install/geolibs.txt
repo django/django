@@ -10,7 +10,7 @@ Program                   Description                           Required        
 ========================  ====================================  ================================  ===================================
 :doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.4, 3.3
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.9, 4.8, 4.7, 4.6, 4.5, 4.4
-:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes (SQLite only)                 2.1, 2.0, 1.11, 1.10, 1.9, 1.8, 1.7
+:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               2.1, 2.0, 1.11, 1.10, 1.9, 1.8, 1.7
 :doc:`GeoIP <../geoip>`   IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.2, 2.1
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.3, 4.2, 4.1, 4.0
@@ -18,6 +18,11 @@ Program                   Description                           Required        
 
 Note that older or more recent versions of these libraries *may* also work
 totally fine with GeoDjango. Your mileage may vary.
+
+.. versionchanged:: 1.11
+
+    In older versions, GDAL is required only for SQLite. Now it's required for
+    all databases.
 
 ..
     Libs release dates:
@@ -36,13 +41,6 @@ totally fine with GeoDjango. Your mileage may vary.
     Spatialite 4.1.0 2013-06-04
     Spatialite 4.2.0 2014-07-25
     Spatialite 4.3.0 2015-09-07
-
-.. admonition::  Install GDAL
-
-    While :ref:`gdalbuild` is technically not required, it is *recommended*.
-    Important features of GeoDjango (including the :doc:`../layermapping`,
-    geometry reprojection, and the geographic admin) depend on its
-    functionality.
 
 .. note::
 

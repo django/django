@@ -98,8 +98,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         data_source, model_name = options.pop('data_source'), options.pop('model_name')
-        if not gdal.HAS_GDAL:
-            raise CommandError('GDAL is required to inspect geospatial data sources.')
 
         # Getting the OGR DataSource from the string parameter.
         try:
