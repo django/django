@@ -9,12 +9,15 @@ from django.conf import settings
 from django.core import signals
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.db import connections, transaction
-from django.middleware.exception import ExceptionMiddleware
 from django.urls import get_resolver, get_urlconf, set_urlconf
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.module_loading import import_string
-from django.views import debug
+
+from .exception import (
+    convert_exception_to_response, get_exception_response,
+    handle_uncaught_exception,
+)
 
 logger = logging.getLogger('django.request')
 
@@ -48,7 +51,7 @@ class BaseHandler(object):
                 "deprecated. Update your middleware and use settings.MIDDLEWARE "
                 "instead.", RemovedInDjango20Warning
             )
-            handler = self._legacy_get_response
+            handler = convert_exception_to_response(self._legacy_get_response)
             for middleware_path in settings.MIDDLEWARE_CLASSES:
                 mw_class = import_string(middleware_path)
                 try:
@@ -72,7 +75,7 @@ class BaseHandler(object):
                 if hasattr(mw_instance, 'process_exception'):
                     self._exception_middleware.insert(0, mw_instance.process_exception)
         else:
-            handler = self._get_response
+            handler = convert_exception_to_response(self._get_response)
             for middleware_path in reversed(settings.MIDDLEWARE):
                 middleware = import_string(middleware_path)
                 try:
@@ -94,10 +97,10 @@ class BaseHandler(object):
                     self._view_middleware.insert(0, mw_instance.process_view)
                 if hasattr(mw_instance, 'process_template_response'):
                     self._template_response_middleware.append(mw_instance.process_template_response)
+                if hasattr(mw_instance, 'process_exception'):
+                    self._exception_middleware.append(mw_instance.process_exception)
 
-                handler = mw_instance
-
-        handler = ExceptionMiddleware(handler, self)
+                handler = convert_exception_to_response(mw_instance)
 
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
@@ -111,25 +114,7 @@ class BaseHandler(object):
         return view
 
     def get_exception_response(self, request, resolver, status_code, exception):
-        try:
-            callback, param_dict = resolver.resolve_error_handler(status_code)
-            # Unfortunately, inspect.getargspec result is not trustable enough
-            # depending on the callback wrapping in decorators (frequent for handlers).
-            # Falling back on try/except:
-            try:
-                response = callback(request, **dict(param_dict, exception=exception))
-            except TypeError:
-                warnings.warn(
-                    "Error handlers should accept an exception parameter. Update "
-                    "your code as this parameter will be required in Django 2.0",
-                    RemovedInDjango20Warning, stacklevel=2
-                )
-                response = callback(request, **param_dict)
-        except Exception:
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
-
-        return response
+        return get_exception_response(request, resolver, status_code, exception, self.__class__)
 
     def get_response(self, request):
         """Return an HttpResponse object for the given HttpRequest."""
@@ -138,6 +123,8 @@ class BaseHandler(object):
 
         response = self._middleware_chain(request)
 
+        # This block is only needed for legacy MIDDLEWARE_CLASSES; if
+        # MIDDLEWARE is used, self._response_middleware will be empty.
         try:
             # Apply response middleware, regardless of the response
             for middleware_method in self._response_middleware:
@@ -168,6 +155,11 @@ class BaseHandler(object):
         return response
 
     def _get_response(self, request):
+        """
+        Resolve and call the view, then apply view, exception, and
+        template_response middleware. This method is everything that happens
+        inside the request/response middleware.
+        """
         response = None
 
         if hasattr(request, 'urlconf'):
@@ -237,35 +229,14 @@ class BaseHandler(object):
         raise
 
     def handle_uncaught_exception(self, request, resolver, exc_info):
-        """
-        Processing for any otherwise uncaught exceptions (those that will
-        generate HTTP 500 responses). Can be overridden by subclasses who want
-        customised 500 handling.
-
-        Be *very* careful when overriding this because the error could be
-        caused by anything, so assuming something like the database is always
-        available would be an error.
-        """
-        if settings.DEBUG_PROPAGATE_EXCEPTIONS:
-            raise
-
-        logger.error(
-            'Internal Server Error: %s', request.path,
-            exc_info=exc_info,
-            extra={'status_code': 500, 'request': request},
-        )
-
-        if settings.DEBUG:
-            return debug.technical_500_response(request, *exc_info)
-
-        # If Http500 handler is not installed, re-raise last exception
-        if resolver.urlconf_module is None:
-            six.reraise(*exc_info)
-        # Return an HttpResponse that displays a friendly error message.
-        callback, param_dict = resolver.resolve_error_handler(500)
-        return callback(request, **param_dict)
+        """Allow subclasses to override uncaught exception handling."""
+        return handle_uncaught_exception(request, resolver, exc_info)
 
     def _legacy_get_response(self, request):
+        """
+        Apply process_request() middleware and call the main _get_response(),
+        if needed. Used only for legacy MIDDLEWARE_CLASSES.
+        """
         response = None
         # Apply request middleware
         for middleware_method in self._request_middleware:
