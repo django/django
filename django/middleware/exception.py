@@ -3,15 +3,6 @@ from __future__ import unicode_literals
 import logging
 import sys
 
-from django.conf import settings
-from django.core import signals
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
-from django.http import Http404
-from django.http.multipartparser import MultiPartParserError
-from django.urls import get_resolver, get_urlconf
-from django.utils.encoding import force_text
-from django.views import debug
-
 logger = logging.getLogger('django.request')
 
 
@@ -31,6 +22,16 @@ class ExceptionMiddleware(object):
         self.handler = handler or BaseHandler()
 
     def __call__(self, request):
+        # Can move these inner imports when MiddlewareMixin is removed.
+        from django.conf import settings
+        from django.core import signals
+        from django.core.exceptions import PermissionDenied, SuspiciousOperation
+        from django.http import Http404
+        from django.http.multipartparser import MultiPartParserError
+        from django.urls import get_resolver, get_urlconf
+        from django.utils.encoding import force_text
+        from django.views import debug
+
         try:
             response = self.get_response(request)
         except Http404 as exc:

@@ -3,6 +3,8 @@ from __future__ import absolute_import
 import inspect
 import warnings
 
+from django.middleware.exception import ExceptionMiddleware
+
 
 class RemovedInDjango20Warning(DeprecationWarning):
     pass
@@ -114,10 +116,10 @@ CallableFalse = CallableBool(False)
 CallableTrue = CallableBool(True)
 
 
-class MiddlewareMixin(object):
+class MiddlewareMixin(ExceptionMiddleware):
     def __init__(self, get_response=None):
         self.get_response = get_response
-        super(MiddlewareMixin, self).__init__()
+        super(MiddlewareMixin, self).__init__(get_response)
 
     def __call__(self, request):
         response = None
@@ -127,10 +129,17 @@ class MiddlewareMixin(object):
             try:
                 response = self.get_response(request)
             except Exception as e:
+                # Only the last middleware is likely to see this because other
+                # middleware will transform the exception into a response with
+                # the super() call below.
                 if hasattr(self, 'process_exception'):
-                    return self.process_exception(request, e)
-                else:
-                    raise
+                    response = self.process_exception(request, e)
+                    if response:
+                        return response
+                # This rerenders the response but transforming any exceptions
+                # to a response. We could refactor it to avoid the second render.
+                if not response:
+                    response = super(MiddlewareMixin, self).__call__(request)
         if hasattr(self, 'process_response'):
             response = self.process_response(request, response)
         return response

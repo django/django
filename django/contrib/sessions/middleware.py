@@ -14,6 +14,7 @@ class SessionMiddleware(MiddlewareMixin):
         self.get_response = get_response
         engine = import_module(settings.SESSION_ENGINE)
         self.SessionStore = engine.SessionStore
+        super(SessionMiddleware, self).__init__(get_response)
 
     def process_request(self, request):
         session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
