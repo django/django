@@ -72,7 +72,6 @@ Keep in mind that each of these values can be an expression.
     :class:`~django.db.models.Model` has a field named ``then``. This can be
     resolved in two ways::
 
-        >>> from django.db.models import Value
         >>> When(then__exact=0, then=1)
         >>> When(Q(then=0), then=1)
 
@@ -118,8 +117,8 @@ A simple example::
 ``Case()`` accepts any number of ``When()`` objects as individual arguments.
 Other options are provided using keyword arguments. If none of the conditions
 evaluate to ``TRUE``, then the expression given with the ``default`` keyword
-argument is returned. If no ``default`` argument is provided, ``Value(None)``
-is used.
+argument is returned. If a ``default`` argument isn't provided, ``None`` is
+used.
 
 If we wanted to change our previous query to get the discount based on how long
 the ``Client`` has been with us, we could do so using lookups::
