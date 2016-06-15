@@ -248,7 +248,6 @@ subclass::
             def view_birth_date(self, obj):
                 return obj.birth_date
 
-            view_birth_date.short_name = 'birth_date'
             view_birth_date.empty_value_display = '???'
 
 .. attribute:: ModelAdmin.exclude
