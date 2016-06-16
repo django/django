@@ -344,6 +344,10 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
         abstract = True
 
+    def clean(self):
+        super(AbstractUser, self).clean()
+        self.email = self.__class__.objects.normalize_email(self.email)
+
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.

@@ -293,6 +293,11 @@ Miscellaneous
   <django.db.models.Model.validate_unique>` no longer checks empty strings for
   uniqueness as the database interprets the value as ``NULL``.
 
+* If you subclass :class:`.AbstractUser` and override ``clean()``, be sure it
+  calls ``super()``. :meth:`.BaseUserManager.normalize_email` is called in a
+  new :meth:`.AbstractUser.clean` method so that normalization is applied in
+  cases like model form validation.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

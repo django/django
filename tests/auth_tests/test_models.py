@@ -194,6 +194,11 @@ class AbstractUserTestCase(TestCase):
         user2 = User.objects.create_user(username='user2')
         self.assertIsNone(user2.last_login)
 
+    def test_user_clean_normalize_email(self):
+        user = User(username='user', password='foo', email='foo@BAR.com')
+        user.clean()
+        self.assertEqual(user.email, 'foo@bar.com')
+
     def test_user_double_save(self):
         """
         Calling user.save() twice should trigger password_changed() once.
