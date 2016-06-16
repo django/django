@@ -242,7 +242,7 @@ WHEN (new.%(col_name)s IS NULL)
             return "%s"
 
     def last_executed_query(self, cursor, sql, params):
-        # http://cx-oracle.sourceforge.net/html/cursor.html#Cursor.statement
+        # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
         if statement and six.PY2 and not isinstance(statement, unicode):  # NOQA: unicode undefined on PY3
