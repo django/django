@@ -361,6 +361,10 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         """
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+    def clean(self):
+        super(AbstractUser, self).clean()
+        self.email = self.__class__.objects.normalize_email(self.email)
+
 
 class User(AbstractUser):
     """
