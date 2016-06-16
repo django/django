@@ -58,7 +58,7 @@ class TestSaveLoad(PostgreSQLTestCase):
         instance.save()
         loaded = RangesModel.objects.get()
         self.assertEqual(r, loaded.floats)
-        self.assertTrue(10 in loaded.floats)
+        self.assertIn(10, loaded.floats)
 
     def test_unbounded(self):
         r = NumericRange(None, None, '()')
@@ -313,7 +313,7 @@ class TestSerialization(PostgreSQLTestCase):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.ints, NumericRange(0, 10))
         self.assertEqual(instance.floats, NumericRange(empty=True))
-        self.assertEqual(instance.bigints, None)
+        self.assertIsNone(instance.bigints)
         self.assertEqual(instance.dates, DateRange(self.lower_date, self.upper_date))
         self.assertEqual(instance.timestamps, DateTimeTZRange(self.lower_dt, self.upper_dt))
 
@@ -409,7 +409,7 @@ class TestFormField(PostgreSQLTestCase):
     def test_none(self):
         field = pg_forms.IntegerRangeField(required=False)
         value = field.clean(['', ''])
-        self.assertEqual(value, None)
+        self.assertIsNone(value)
 
     def test_rendering(self):
         class RangeForm(forms.Form):

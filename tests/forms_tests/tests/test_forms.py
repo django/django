@@ -323,7 +323,7 @@ class FormsTestCase(SimpleTestCase):
         data = {'first_name': 'John', 'last_name': 'Lennon'}
         f = OptionalPersonForm(data)
         self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data['birth_date'], None)
+        self.assertIsNone(f.cleaned_data['birth_date'])
         self.assertEqual(f.cleaned_data['first_name'], 'John')
         self.assertEqual(f.cleaned_data['last_name'], 'Lennon')
 
@@ -1926,10 +1926,10 @@ Password: <input type="password" name="password" required /></li>
 
         unbound = UserRegistration()
         bound = UserRegistration({'password': 'foo'})
-        self.assertEqual(bound['username'].value(), None)
+        self.assertIsNone(bound['username'].value())
         self.assertEqual(unbound['username'].value(), 'djangonaut')
         self.assertEqual(bound['password'].value(), 'foo')
-        self.assertEqual(unbound['password'].value(), None)
+        self.assertIsNone(unbound['password'].value())
 
     def test_boundfield_initial_called_once(self):
         """
@@ -3089,7 +3089,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
                 raise ValidationError('Non-field error.', code='secret', params={'a': 1, 'b': 2})
 
         form = MyForm({})
-        self.assertEqual(form.is_valid(), False)
+        self.assertIs(form.is_valid(), False)
 
         errors = form.errors.as_text()
         control = [

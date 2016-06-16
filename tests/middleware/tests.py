@@ -38,7 +38,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         URLs with slashes should go unmolested.
         """
         request = self.rf.get('/slash/')
-        self.assertEqual(CommonMiddleware().process_request(request), None)
+        self.assertIsNone(CommonMiddleware().process_request(request))
         response = HttpResponseNotFound()
         self.assertEqual(CommonMiddleware().process_response(request, response), response)
 
@@ -48,7 +48,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         Matches to explicit slashless URLs should go unmolested.
         """
         request = self.rf.get('/noslash')
-        self.assertEqual(CommonMiddleware().process_request(request), None)
+        self.assertIsNone(CommonMiddleware().process_request(request))
         response = HttpResponse("Here's the text of the Web page.")
         self.assertEqual(CommonMiddleware().process_response(request, response), response)
 
@@ -153,7 +153,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         """
         request = self.rf.get('/customurlconf/slash/')
         request.urlconf = 'middleware.extra_urls'
-        self.assertEqual(CommonMiddleware().process_request(request), None)
+        self.assertIsNone(CommonMiddleware().process_request(request))
         response = HttpResponseNotFound()
         self.assertEqual(CommonMiddleware().process_response(request, response), response)
 
@@ -164,7 +164,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         """
         request = self.rf.get('/customurlconf/noslash')
         request.urlconf = 'middleware.extra_urls'
-        self.assertEqual(CommonMiddleware().process_request(request), None)
+        self.assertIsNone(CommonMiddleware().process_request(request))
         response = HttpResponse("Here's the text of the Web page.")
         self.assertEqual(CommonMiddleware().process_response(request, response), response)
 
@@ -175,7 +175,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         """
         request = self.rf.get('/customurlconf/unknown')
         request.urlconf = 'middleware.extra_urls'
-        self.assertEqual(CommonMiddleware().process_request(request), None)
+        self.assertIsNone(CommonMiddleware().process_request(request))
         response = HttpResponseNotFound()
         self.assertEqual(CommonMiddleware().process_response(request, response), response)
 
@@ -213,7 +213,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         """
         request = self.rf.get('/customurlconf/slash')
         request.urlconf = 'middleware.extra_urls'
-        self.assertEqual(CommonMiddleware().process_request(request), None)
+        self.assertIsNone(CommonMiddleware().process_request(request))
         response = HttpResponseNotFound()
         self.assertEqual(CommonMiddleware().process_response(request, response), response)
 

@@ -85,7 +85,7 @@ class ModelInstanceCreationTests(TestCase):
         a = Article(headline='Article 5', pub_date=datetime(2005, 7, 31))
         a.save()
         self.assertEqual(a.headline, 'Article 5')
-        self.assertNotEqual(a.id, None)
+        self.assertIsNotNone(a.id)
 
     def test_leaving_off_a_field_with_default_set_the_default_will_be_saved(self):
         a = Article(pub_date=datetime(2005, 7, 31))
@@ -358,7 +358,7 @@ class ModelTest(TestCase):
         with self.assertRaises(TypeError):
             EmptyQuerySet()
         self.assertIsInstance(Article.objects.none(), EmptyQuerySet)
-        self.assertFalse(isinstance('', EmptyQuerySet))
+        self.assertNotIsInstance('', EmptyQuerySet)
 
     def test_emptyqs_values(self):
         # test for #15959

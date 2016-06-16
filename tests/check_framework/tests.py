@@ -156,7 +156,7 @@ class CheckCommandTests(SimpleTestCase):
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_given_tag(self):
         call_command('check', tags=['simpletag'])
-        self.assertEqual(simple_system_check.kwargs, None)
+        self.assertIsNone(simple_system_check.kwargs)
         self.assertEqual(tagged_system_check.kwargs, {'app_configs': None})
 
     @override_system_checks([simple_system_check, tagged_system_check])

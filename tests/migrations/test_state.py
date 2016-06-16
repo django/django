@@ -121,8 +121,8 @@ class StateTests(SimpleTestCase):
         self.assertEqual(author_state.name, "Author")
         self.assertEqual([x for x, y in author_state.fields], ["id", "name", "bio", "age"])
         self.assertEqual(author_state.fields[1][1].max_length, 255)
-        self.assertEqual(author_state.fields[2][1].null, False)
-        self.assertEqual(author_state.fields[3][1].null, True)
+        self.assertIs(author_state.fields[2][1].null, False)
+        self.assertIs(author_state.fields[3][1].null, True)
         self.assertEqual(
             author_state.options,
             {"unique_together": {("name", "bio")}, "index_together": {("bio", "age")}}
@@ -133,7 +133,7 @@ class StateTests(SimpleTestCase):
         self.assertEqual(book_state.name, "Book")
         self.assertEqual([x for x, y in book_state.fields], ["id", "title", "author", "contributors"])
         self.assertEqual(book_state.fields[1][1].max_length, 1000)
-        self.assertEqual(book_state.fields[2][1].null, False)
+        self.assertIs(book_state.fields[2][1].null, False)
         self.assertEqual(book_state.fields[3][1].__class__.__name__, "ManyToManyField")
         self.assertEqual(book_state.options, {"verbose_name": "tome", "db_table": "test_tome"})
         self.assertEqual(book_state.bases, (models.Model, ))
@@ -257,7 +257,7 @@ class StateTests(SimpleTestCase):
 
         new_apps = project_state.apps
         self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field("name").max_length, 100)
-        self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field("hidden").null, False)
+        self.assertIs(new_apps.get_model("migrations", "Tag")._meta.get_field("hidden").null, False)
 
         self.assertEqual(len(new_apps.get_model("migrations", "SubTag")._meta.local_fields), 2)
 
@@ -597,8 +597,8 @@ class StateTests(SimpleTestCase):
         other_state = project_state.clone()
         self.assertEqual(project_state, project_state)
         self.assertEqual(project_state, other_state)
-        self.assertEqual(project_state != project_state, False)
-        self.assertEqual(project_state != other_state, False)
+        self.assertIs(project_state != project_state, False)
+        self.assertIs(project_state != other_state, False)
         self.assertNotEqual(project_state.apps, other_state.apps)
 
         # Make a very small change (max_len 99) and see if that affects it
@@ -615,7 +615,7 @@ class StateTests(SimpleTestCase):
             None,
         ))
         self.assertNotEqual(project_state, other_state)
-        self.assertEqual(project_state == other_state, False)
+        self.assertIs(project_state == other_state, False)
 
     def test_dangling_references_throw_error(self):
         new_apps = Apps()
@@ -886,8 +886,8 @@ class ModelStateTests(SimpleTestCase):
         self.assertEqual(author_state.name, 'Author')
         self.assertEqual([x for x, y in author_state.fields], ['id', 'name', 'bio', 'age'])
         self.assertEqual(author_state.fields[1][1].max_length, 255)
-        self.assertEqual(author_state.fields[2][1].null, False)
-        self.assertEqual(author_state.fields[3][1].null, True)
+        self.assertIs(author_state.fields[2][1].null, False)
+        self.assertIs(author_state.fields[3][1].null, True)
         self.assertEqual(author_state.options, {'swappable': 'TEST_SWAPPABLE_MODEL'})
         self.assertEqual(author_state.bases, (models.Model, ))
         self.assertEqual(author_state.managers, [])

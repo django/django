@@ -215,9 +215,9 @@ class RawQueryTests(TestCase):
     def test_missing_fields(self):
         query = "SELECT id, first_name, dob FROM raw_query_author"
         for author in Author.objects.raw(query):
-            self.assertNotEqual(author.first_name, None)
+            self.assertIsNotNone(author.first_name)
             # last_name isn't given, but it will be retrieved on demand
-            self.assertNotEqual(author.last_name, None)
+            self.assertIsNotNone(author.last_name)
 
     def test_missing_fields_without_PK(self):
         query = "SELECT first_name, dob FROM raw_query_author"

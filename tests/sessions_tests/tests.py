@@ -59,7 +59,7 @@ class SessionTestsMixin(object):
         self.assertFalse(self.session.accessed)
 
     def test_get_empty(self):
-        self.assertEqual(self.session.get('cat'), None)
+        self.assertIsNone(self.session.get('cat'))
 
     def test_store(self):
         self.session['cat'] = "dog"
@@ -75,7 +75,7 @@ class SessionTestsMixin(object):
         self.assertEqual(self.session.pop('some key'), 'exists')
         self.assertTrue(self.session.accessed)
         self.assertTrue(self.session.modified)
-        self.assertEqual(self.session.get('some key'), None)
+        self.assertIsNone(self.session.get('some key'))
 
     def test_pop_default(self):
         self.assertEqual(self.session.pop('some key', 'does not exist'),
@@ -206,7 +206,7 @@ class SessionTestsMixin(object):
                     "Middleware may be saving cache items without namespaces."
                 )
             self.assertNotEqual(session.session_key, '1')
-            self.assertEqual(session.get('cat'), None)
+            self.assertIsNone(session.get('cat'))
             session.delete()
         finally:
             # Some backends leave a stale cache entry for the invalid
@@ -479,7 +479,7 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
 
         # Make sure that save() on an existing session did the right job.
         s = self.model.objects.get(session_key=self.session.session_key)
-        self.assertEqual(s.account_id, None)
+        self.assertIsNone(s.account_id)
 
 
 class CacheDBSessionTests(SessionTestsMixin, TestCase):
@@ -605,7 +605,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
     def test_default_cache(self):
         self.session.save()
-        self.assertNotEqual(caches['default'].get(self.session.cache_key), None)
+        self.assertIsNotNone(caches['default'].get(self.session.cache_key))
 
     @override_settings(CACHES={
         'default': {
@@ -621,8 +621,8 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         self.session = self.backend()
 
         self.session.save()
-        self.assertEqual(caches['default'].get(self.session.cache_key), None)
-        self.assertNotEqual(caches['sessions'].get(self.session.cache_key), None)
+        self.assertIsNone(caches['default'].get(self.session.cache_key))
+        self.assertIsNotNone(caches['sessions'].get(self.session.cache_key))
 
     def test_create_and_save(self):
         self.session = self.backend()

@@ -44,14 +44,14 @@ class DeletionTests(TestCase):
         }
         formset = PoemFormSet(data, instance=poet)
         # Make sure this form doesn't pass validation.
-        self.assertEqual(formset.is_valid(), False)
+        self.assertIs(formset.is_valid(), False)
         self.assertEqual(Poem.objects.count(), 0)
 
         # Then make sure that it *does* pass validation and delete the object,
         # even though the data isn't actually valid.
         data['poem_set-0-DELETE'] = 'on'
         formset = PoemFormSet(data, instance=poet)
-        self.assertEqual(formset.is_valid(), True)
+        self.assertIs(formset.is_valid(), True)
         formset.save()
         self.assertEqual(Poem.objects.count(), 0)
 
@@ -73,14 +73,14 @@ class DeletionTests(TestCase):
         }
         formset = PoemFormSet(data, instance=poet)
         # Make sure this form doesn't pass validation.
-        self.assertEqual(formset.is_valid(), False)
+        self.assertIs(formset.is_valid(), False)
         self.assertEqual(Poem.objects.count(), 1)
 
         # Then make sure that it *does* pass validation and delete the object,
         # even though the data isn't actually valid.
         data['poem_set-0-DELETE'] = 'on'
         formset = PoemFormSet(data, instance=poet)
-        self.assertEqual(formset.is_valid(), True)
+        self.assertIs(formset.is_valid(), True)
         formset.save()
         self.assertEqual(Poem.objects.count(), 0)
 
@@ -101,7 +101,7 @@ class DeletionTests(TestCase):
             'child_set-0-name': 'child',
         }
         formset = ChildFormSet(data, instance=school)
-        self.assertEqual(formset.is_valid(), True)
+        self.assertIs(formset.is_valid(), True)
         objects = formset.save(commit=False)
         for obj in objects:
             obj.mother = mother
