@@ -327,7 +327,7 @@ Fink
 of the `Fink`__ package system. `Different packages are available`__ (starting
 with "django-gis"), depending on which version of Python you want to use.
 
-__ http://schwehr.org/blog/
+__ https://schwehr.blogspot.com/
 __ http://www.finkproject.org/
 __ http://pdb.finkproject.org/pdb/browse.php?summary=django-gis
 

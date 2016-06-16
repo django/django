@@ -975,7 +975,7 @@ Python interpreter, use ``python`` as the interface name, like so::
    In older versions, use the ``--plain`` option instead of ``-i python``. This
    is deprecated and will be removed in Django 2.0.
 
-.. _IPython: http://ipython.scipy.org/
+.. _IPython: https://ipython.org/
 .. _bpython: http://bpython-interpreter.org/
 
 .. django-admin-option:: --nostartup
