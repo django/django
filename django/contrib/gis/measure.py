@@ -32,7 +32,7 @@ and conversions.
 
 Authors: Robert Coup, Justin Bronn, Riccardo Di Virgilio
 
-Inspired by GeoPy (http://exogen.case.edu/projects/geopy/)
+Inspired by GeoPy (https://github.com/geopy/geopy)
 and Geoff Biggs' PhD work on dimensioned units for robotics.
 """
 __all__ = ['A', 'Area', 'D', 'Distance']

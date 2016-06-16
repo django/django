@@ -46,7 +46,7 @@ from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr/ogr__api_8h.html
+#  http://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):

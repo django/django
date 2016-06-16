@@ -295,7 +295,7 @@ def compare_xml(want, got):
     ordering should not be important. Comment nodes are not considered in the
     comparison.
 
-    Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
+    Based on https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
     """
     _norm_whitespace_re = re.compile(r'[ \t\n][ \t\n]+')
 

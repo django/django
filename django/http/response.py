@@ -238,7 +238,7 @@ class HttpResponseBase(six.Iterator):
         return force_bytes(value, self.charset)
 
     # These methods partially implement the file-like object interface.
-    # See http://docs.python.org/lib/bltin-file-objects.html
+    # See https://docs.python.org/3/library/io.html#io.IOBase
 
     # The WSGI server must call this method upon completion of the request.
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html

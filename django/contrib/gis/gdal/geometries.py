@@ -1,6 +1,6 @@
 """
  The OGRGeometry is a wrapper for using the OGR Geometry class
- (see http://www.gdal.org/ogr/classOGRGeometry.html).  OGRGeometry
+ (see http://www.gdal.org/classOGRGeometry.html).  OGRGeometry
  may be instantiated when reading geometries from OGR Data Sources
  (e.g. SHP files), or when given OGC WKT (a string).
 
@@ -56,7 +56,7 @@ from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr/ogr__api_8h.html
+#  http://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_G_* routines are relevant here.
 class OGRGeometry(GDALBase):

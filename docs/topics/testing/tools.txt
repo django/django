@@ -971,7 +971,7 @@ out the `full reference`_ for more details.
     use cases. Please refer to the `Selenium FAQ`_ and
     `Selenium documentation`_ for more information.
 
-    .. _Selenium FAQ: https://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
+    .. _Selenium FAQ: https://web.archive.org/web/20160129132110/http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
     .. _Selenium documentation: http://seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
 
 Test cases features

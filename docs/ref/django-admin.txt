@@ -967,7 +967,7 @@ interpreter, use the ``--plain`` option, like so::
 
     django-admin shell --plain
 
-.. _IPython: http://ipython.scipy.org/
+.. _IPython: https://ipython.org/
 .. _bpython: http://bpython-interpreter.org/
 
 .. django-admin-option:: --nostartup
