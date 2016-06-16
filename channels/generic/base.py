@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+from channels.sessions import channel_session
+from channels.auth import channel_session_user
 
 
 class BaseConsumer(object):
@@ -15,6 +17,8 @@ class BaseConsumer(object):
     """
 
     method_mapping = {}
+    channel_session = False
+    channel_session_user = False
 
     def __init__(self, message, **kwargs):
         """
@@ -36,7 +40,13 @@ class BaseConsumer(object):
         """
         Return handler uses method_mapping to return the right method to call.
         """
-        return getattr(self, self.method_mapping[message.channel.name])
+        handler = getattr(self, self.method_mapping[message.channel.name])
+        if self.channel_session_user:
+            return channel_session_user(handler)
+        elif self.channel_session:
+            return channel_session(handler)
+        else:
+            return handler
 
     def dispatch(self, message, **kwargs):
         """

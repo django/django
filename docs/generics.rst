@@ -159,3 +159,35 @@ client.
 Note that this subclass still can't intercept ``Group.send()`` calls to make
 them into JSON automatically, but it does provide ``self.group_send(name, content)``
 that will do this for you if you call it explicitly.
+
+Sessions and Users
+------------------
+
+If you wish to use ``channel_session`` or ``channel_session_user`` with a
+class-based consumer, simply set one of the variables in the class body::
+
+    class MyConsumer(WebsocketConsumer):
+
+        channel_session_user = True
+
+This will run the appropriate decorator around your handler methods, and provide
+``message.channel_session`` and ``message.user`` on the message object - both
+the one passed in to your handler as an argument as well as ``self.message``,
+as they point to the same instance.
+
+Applying Decorators
+-------------------
+
+To apply decorators to a class-based consumer, you'll have to wrap a functional
+part of the consumer; in this case, ``get_handler`` is likely the place you
+want to override; like so::
+
+    class MyConsumer(WebsocketConsumer):
+
+        def get_handler(self, *args, **kwargs):
+            handler = super(MyConsumer, self).get_handler(*args, **kwargs)
+            return your_decorator(handler)
+
+You can also use the Django ``method_decorator`` utility to wrap methods that
+have ``message`` as their first positional argument - note that it won't work
+for more high-level methods, like ``WebsocketConsumer.receive``.
