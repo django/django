@@ -1,3 +1,10 @@
+0.14.2 (2016-06-16)
+-------------------
+
+* Class based consumers now have built-in channel_session and
+  channel_session_user support
+
+
 0.14.1 (2016-06-09)
 -------------------
 
