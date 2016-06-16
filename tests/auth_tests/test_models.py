@@ -176,6 +176,24 @@ class AbstractUserTestCase(TestCase):
         user2 = User.objects.create_user(username='user2')
         self.assertIsNone(user2.last_login)
 
+    def test_user_save_normalize_email(self):
+        """
+        Calling user.save() will call normalize_email()
+        """
+        with mock.patch('django.contrib.auth.models.UserManager.normalize_email') as normalize_email:
+            normalize_email.side_effect = lambda x: x
+            User(username='user', password='foo', email='foo@bar.com').save()
+            self.assertEqual(normalize_email.call_count, 1)
+
+    def test_user_sace_normalize_username(self):
+        """
+        Calling user.save() will call normalize_username()
+        """
+        with mock.patch('django.contrib.auth.models.UserManager.normalize_username') as normalize_username:
+            normalize_username.side_effect = lambda x: x
+            User(username='user', password='foo').save()
+            self.assertEqual(normalize_username.call_count, 1)
+
     def test_user_double_save(self):
         """
         Calling user.save() twice should trigger password_changed() once.
