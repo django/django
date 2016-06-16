@@ -15,13 +15,13 @@ class SpatialRefSysMixin(object):
     # regular expression is used only if the user does not have GDAL installed.
     # TODO: Flattening not used in all ellipsoids, could also be a minor axis,
     # or 'b' parameter.
-    spheroid_regex = re.compile(r'.+SPHEROID\[\"(?P<name>.+)\",(?P<major>\d+(\.\d+)?),(?P<flattening>\d{3}\.\d+),')
+    spheroid_regex = re.compile(r'.+SPHEROID *\[ *\"(?P<name>.+)\", *(?P<major>\d+(\.\d+)?), *(?P<flattening>\d+(\.\d+)?)(,|\])')
 
     # For pulling out the units on platforms w/o GDAL installed.
     # TODO: Figure out how to pull out angular units of projected coordinate system and
     # fix for LOCAL_CS types.  GDAL should be highly recommended for performing
     # distance queries.
-    units_regex = re.compile(r'.+UNIT ?\["(?P<unit_name>[\w \.\'\(\)]+)", ?(?P<unit>[^ ,\]]+)', re.DOTALL)
+    units_regex = re.compile(r'.*UNIT ?\["(?P<unit_name>[\w \.\'\(\)]+)", ?(?P<unit>[^ ,\]]+)', re.DOTALL)
 
     @property
     def srs(self):
@@ -62,9 +62,14 @@ class SpatialRefSysMixin(object):
         if gdal.HAS_GDAL:
             return self.srs.ellipsoid
         else:
-            m = self.spheroid_regex.match(self.wkt)
+            wkt = self.wkt.replace('\n', '')
+            m = self.spheroid_regex.match(wkt)
             if m:
-                return (float(m.group('major')), float(m.group('flattening')))
+                major = float(m.group('major'))
+                flattening = float(m.group('flattening'))
+                # This is how semiminor calculated by GDAL.
+                minor = major if abs(flattening) < 0.000000000001 else major*(1-1./flattening)
+                return (major, minor, flattening)
             else:
                 return None
 
@@ -84,12 +89,16 @@ class SpatialRefSysMixin(object):
         return self.srs['datum']
 
     @property
+    def compound(self):
+        return self.wkt.startswith('COMPD_CS')
+
+    @property
     def projected(self):
         "Is this Spatial Reference projected?"
         if gdal.HAS_GDAL:
             return self.srs.projected
         else:
-            return self.wkt.startswith('PROJCS')
+            return self.wkt.startswith('PROJCS') or self.compound and 'PROJCS' in self.wkt
 
     @property
     def local(self):
@@ -105,15 +114,15 @@ class SpatialRefSysMixin(object):
         if gdal.HAS_GDAL:
             return self.srs.geographic
         else:
-            return self.wkt.startswith('GEOGCS')
+            return self.wkt.startswith('GEOGCS') or self.compound and 'GEOGCS' in self.wkt and not 'PROJCS' in self.wkt
 
     @property
     def linear_name(self):
         "Returns the linear units name."
         if gdal.HAS_GDAL:
             return self.srs.linear_name
-        elif self.geographic:
-            return None
+        elif self.geographic and not self.compound:
+            return 'unknown'
         else:
             m = self.units_regex.match(self.wkt)
             return m.group('unit_name')
@@ -123,33 +132,38 @@ class SpatialRefSysMixin(object):
         "Returns the linear units."
         if gdal.HAS_GDAL:
             return self.srs.linear_units
-        elif self.geographic:
-            return None
+        elif self.geographic and not self.compound:
+            return 1.0
         else:
             m = self.units_regex.match(self.wkt)
-            return m.group('unit')
+            return float(m.group('unit'))
+
+    def _get_geogcs_units_match(self):
+        # We need only units declared under GEOGCS.
+        wkt = self.wkt
+        wkt = wkt[wkt.find('GEOGCS'):]
+        wkt = wkt[max(wkt.find('UNIT'), 0):]
+        wkt = wkt[:wkt[1:].find('UNIT')]
+        return self.units_regex.match(wkt)
 
     @property
     def angular_name(self):
         "Returns the name of the angular units."
         if gdal.HAS_GDAL:
             return self.srs.angular_name
-        elif self.projected:
-            return None
         else:
-            m = self.units_regex.match(self.wkt)
-            return m.group('unit_name')
+            m = self._get_geogcs_units_match()
+            return m.group('unit_name') if m else 'degree'
 
     @property
     def angular_units(self):
         "Returns the angular units."
         if gdal.HAS_GDAL:
             return self.srs.angular_units
-        elif self.projected:
-            return None
         else:
-            m = self.units_regex.match(self.wkt)
-            return m.group('unit')
+            m = self._get_geogcs_units_match()
+            DEGREE_IN_RAD = 0.0174532925199433 # constant used by GDAL
+            return float(m.group('unit')) if m else DEGREE_IN_RAD
 
     @property
     def units(self):
