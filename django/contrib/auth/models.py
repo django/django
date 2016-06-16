@@ -145,7 +145,6 @@ class UserManager(BaseUserManager):
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
-        username = self.normalize_username(username)
         user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -360,6 +359,13 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         """
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    def save(self, *args, **kwargs):
+        if self.email:
+            self.email = UserManager.normalize_email(self.email)
+        if self.username:
+            self.username = UserManager.normalize_username(self.username)
+        super(AbstractUser, self).save(*args, **kwargs)
 
 
 class User(AbstractUser):
