@@ -164,7 +164,7 @@ class CreateModel(ModelOperation):
                 return [
                     CreateModel(
                         self.name,
-                        fields=self.fields + [(operation.name, operation.field)],
+                        fields=self.fields + [(operation.name, operation.migrated_field)],
                         options=self.options,
                         bases=self.bases,
                         managers=self.managers,
@@ -175,7 +175,7 @@ class CreateModel(ModelOperation):
                     CreateModel(
                         self.name,
                         fields=[
-                            (n, operation.field if n == operation.name else v)
+                            (n, operation.migrated_field if n == operation.name else v)
                             for n, v in self.fields
                         ],
                         options=self.options,
