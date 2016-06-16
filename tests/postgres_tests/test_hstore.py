@@ -31,7 +31,7 @@ class SimpleTests(PostgreSQLTestCase):
         instance = HStoreModel(field=None)
         instance.save()
         reloaded = HStoreModel.objects.get()
-        self.assertEqual(reloaded.field, None)
+        self.assertIsNone(reloaded.field)
 
     def test_value_null(self):
         value = {'a': None}

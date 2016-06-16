@@ -37,7 +37,7 @@ class TestSaveLoad(TestCase):
     def test_null_handling(self):
         NullableUUIDModel.objects.create(field=None)
         loaded = NullableUUIDModel.objects.get()
-        self.assertEqual(loaded.field, None)
+        self.assertIsNone(loaded.field)
 
     def test_pk_validated(self):
         with self.assertRaisesMessage(TypeError, 'is not a valid UUID'):

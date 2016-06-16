@@ -76,10 +76,10 @@ class TranslationTests(SimpleTestCase):
                 self.assertEqual(get_language(), 'pl')
             self.assertEqual(get_language(), 'de')
             with translation.override(None):
-                self.assertEqual(get_language(), None)
+                self.assertIsNone(get_language())
                 with translation.override('pl'):
                     pass
-                self.assertEqual(get_language(), None)
+                self.assertIsNone(get_language())
             self.assertEqual(get_language(), 'de')
         finally:
             deactivate()
@@ -92,7 +92,7 @@ class TranslationTests(SimpleTestCase):
 
         @translation.override(None)
         def func_none():
-            self.assertEqual(get_language(), None)
+            self.assertIsNone(get_language())
 
         try:
             activate('de')
@@ -475,9 +475,9 @@ class TranslationTests(SimpleTestCase):
         self.assertEqual(trans_real.to_language('sr_Lat'), 'sr-lat')
 
     def test_language_bidi(self):
-        self.assertEqual(get_language_bidi(), False)
+        self.assertIs(get_language_bidi(), False)
         with translation.override(None):
-            self.assertEqual(get_language_bidi(), False)
+            self.assertIs(get_language_bidi(), False)
 
     @override_settings(LOCALE_PATHS=[os.path.join(here, 'other', 'locale')])
     def test_bad_placeholder_1(self):
@@ -1463,13 +1463,13 @@ class MiscTests(SimpleTestCase):
         g = trans_real.get_language_from_path
         self.assertEqual(g('/pl/'), 'pl')
         self.assertEqual(g('/pl'), 'pl')
-        self.assertEqual(g('/xyz/'), None)
+        self.assertIsNone(g('/xyz/'))
 
     def test_get_language_from_path_null(self):
         from django.utils.translation.trans_null import get_language_from_path as g
-        self.assertEqual(g('/pl/'), None)
-        self.assertEqual(g('/pl'), None)
-        self.assertEqual(g('/xyz/'), None)
+        self.assertIsNone(g('/pl/'))
+        self.assertIsNone(g('/pl'))
+        self.assertIsNone(g('/xyz/'))
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_percent_in_translatable_block(self):
@@ -1594,7 +1594,7 @@ class TestLanguageInfo(SimpleTestCase):
         self.assertEqual(li['code'], 'de')
         self.assertEqual(li['name_local'], 'Deutsch')
         self.assertEqual(li['name'], 'German')
-        self.assertEqual(li['bidi'], False)
+        self.assertIs(li['bidi'], False)
 
     def test_unknown_language_code(self):
         six.assertRaisesRegex(self, KeyError, r"Unknown language code xx\.", get_language_info, 'xx')
@@ -1608,7 +1608,7 @@ class TestLanguageInfo(SimpleTestCase):
         self.assertEqual(li['code'], 'de')
         self.assertEqual(li['name_local'], 'Deutsch')
         self.assertEqual(li['name'], 'German')
-        self.assertEqual(li['bidi'], False)
+        self.assertIs(li['bidi'], False)
 
     def test_unknown_language_code_and_country_code(self):
         six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')

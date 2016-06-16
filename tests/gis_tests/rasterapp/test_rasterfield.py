@@ -185,11 +185,11 @@ class RasterFieldTest(TransactionTestCase):
                 qs = RasterModel.objects.filter(**combo)
 
                 # Evaluate normal filter qs.
-                self.assertTrue(qs.count() in [0, 1])
+                self.assertIn(qs.count(), [0, 1])
 
             # Evaluate on conditional Q expressions.
             qs = RasterModel.objects.filter(Q(**combos[0]) & Q(**combos[1]))
-            self.assertTrue(qs.count() in [0, 1])
+            self.assertIn(qs.count(), [0, 1])
 
     def test_dwithin_gis_lookup_ouptut_with_rasters(self):
         """

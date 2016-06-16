@@ -84,4 +84,4 @@ class CheckboxInputTest(WidgetTest):
 
     def test_value_from_datadict_string_int(self):
         value = self.widget.value_from_datadict({'testing': '0'}, {}, 'testing')
-        self.assertEqual(value, True)
+        self.assertIs(value, True)

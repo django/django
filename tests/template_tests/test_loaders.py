@@ -112,7 +112,7 @@ class CachedLoaderTests(SimpleTestCase):
         """
         loader = self.engine.template_loaders[0]
 
-        self.assertFalse('missing.html' in loader.template_cache)
+        self.assertNotIn('missing.html', loader.template_cache)
 
         with self.assertRaises(TemplateDoesNotExist):
             loader.load_template("missing.html")

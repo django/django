@@ -146,7 +146,7 @@ class NoNameFileTestCase(unittest.TestCase):
     urllib.urlopen()
     """
     def test_noname_file_default_name(self):
-        self.assertEqual(File(BytesIO(b'A file with no name')).name, None)
+        self.assertIsNone(File(BytesIO(b'A file with no name')).name)
 
     def test_noname_file_get_size(self):
         self.assertEqual(File(BytesIO(b'A file with no name')).size, 19)
@@ -154,7 +154,7 @@ class NoNameFileTestCase(unittest.TestCase):
 
 class ContentFileTestCase(unittest.TestCase):
     def test_content_file_default_name(self):
-        self.assertEqual(ContentFile(b"content").name, None)
+        self.assertIsNone(ContentFile(b"content").name)
 
     def test_content_file_custom_name(self):
         """

@@ -70,7 +70,7 @@ class ChoicesTests(SimpleTestCase):
         self.assertEqual(Whiz(c=1).get_c_display(), 'First')    # A nested value
         self.assertEqual(Whiz(c=0).get_c_display(), 'Other')    # A top level value
         self.assertEqual(Whiz(c=9).get_c_display(), 9)          # Invalid value
-        self.assertEqual(Whiz(c=None).get_c_display(), None)    # Blank value
+        self.assertIsNone(Whiz(c=None).get_c_display())         # Blank value
         self.assertEqual(Whiz(c='').get_c_display(), '')        # Empty value
 
     def test_iterator_choices(self):
@@ -79,7 +79,7 @@ class ChoicesTests(SimpleTestCase):
         """
         self.assertEqual(WhizIter(c=1).c, 1)          # A nested value
         self.assertEqual(WhizIter(c=9).c, 9)          # Invalid value
-        self.assertEqual(WhizIter(c=None).c, None)    # Blank value
+        self.assertIsNone(WhizIter(c=None).c)         # Blank value
         self.assertEqual(WhizIter(c='').c, '')        # Empty value
 
     def test_empty_iterator_choices(self):
@@ -88,5 +88,5 @@ class ChoicesTests(SimpleTestCase):
         """
         self.assertEqual(WhizIterEmpty(c="a").c, "a")      # A nested value
         self.assertEqual(WhizIterEmpty(c="b").c, "b")      # Invalid value
-        self.assertEqual(WhizIterEmpty(c=None).c, None)    # Blank value
+        self.assertIsNone(WhizIterEmpty(c=None).c)         # Blank value
         self.assertEqual(WhizIterEmpty(c='').c, '')        # Empty value

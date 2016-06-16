@@ -65,7 +65,7 @@ class DeletionTests(TestCase):
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
         # Make sure this form doesn't pass validation.
-        self.assertEqual(formset.is_valid(), False)
+        self.assertIs(formset.is_valid(), False)
         self.assertEqual(Poet.objects.count(), 1)
 
         # Then make sure that it *does* pass validation and delete the object,
@@ -74,7 +74,7 @@ class DeletionTests(TestCase):
         data['form-1-DELETE'] = 'on'
         data['form-2-DELETE'] = 'on'
         formset = PoetFormSet(data, queryset=Poet.objects.all())
-        self.assertEqual(formset.is_valid(), True)
+        self.assertIs(formset.is_valid(), True)
         formset.save()
         self.assertEqual(Poet.objects.count(), 0)
 
@@ -94,14 +94,14 @@ class DeletionTests(TestCase):
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
         # Make sure this form doesn't pass validation.
-        self.assertEqual(formset.is_valid(), False)
+        self.assertIs(formset.is_valid(), False)
         self.assertEqual(Poet.objects.count(), 1)
 
         # Then make sure that it *does* pass validation and delete the object,
         # even though the data isn't actually valid.
         data['form-0-DELETE'] = 'on'
         formset = PoetFormSet(data, queryset=Poet.objects.all())
-        self.assertEqual(formset.is_valid(), True)
+        self.assertIs(formset.is_valid(), True)
         formset.save()
         self.assertEqual(Poet.objects.count(), 0)
 

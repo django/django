@@ -304,8 +304,8 @@ failed::
     ----------------------------------------------------------------------
     Traceback (most recent call last):
       File "/dev/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_poll
-        self.assertEqual(future_poll.was_published_recently(), False)
-    AssertionError: True != False
+        self.assertIs(future_poll.was_published_recently(), False)
+    AssertionError: True is not False
 
     ----------------------------------------------------------------------
     Ran 1 test in 0.003s

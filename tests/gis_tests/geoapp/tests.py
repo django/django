@@ -156,7 +156,7 @@ class GeoModelTest(TestCase):
     def test_createnull(self):
         "Testing creating a model instance and the geometry being None"
         c = City()
-        self.assertEqual(c.point, None)
+        self.assertIsNone(c.point)
 
     def test_geometryfield(self):
         "Testing the general GeometryField."
@@ -397,7 +397,7 @@ class GeoLookupTest(TestCase):
 
         # Saving another commonwealth w/a NULL geometry.
         nmi = State.objects.create(name='Northern Mariana Islands', poly=None)
-        self.assertEqual(nmi.poly, None)
+        self.assertIsNone(nmi.poly)
 
         # Assigning a geometry and saving -- then UPDATE back to NULL.
         nmi.poly = 'POLYGON((0 0,1 0,1 1,1 0,0 0))'

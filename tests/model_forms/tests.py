@@ -1840,12 +1840,12 @@ class ModelOneToOneFieldTests(TestCase):
         author = Author.objects.create(publication=publication, full_name='John Doe')
         form = AuthorForm({'publication': '', 'full_name': 'John Doe'}, instance=author)
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data['publication'], None)
+        self.assertIsNone(form.cleaned_data['publication'])
         author = form.save()
         # author object returned from form still retains original publication object
         # that's why we need to retrieve it from database again
         new_author = Author.objects.get(pk=author.pk)
-        self.assertEqual(new_author.publication, None)
+        self.assertIsNone(new_author.publication)
 
     def test_assignment_of_none_null_false(self):
         class AuthorForm(forms.ModelForm):
@@ -1867,8 +1867,8 @@ class FileAndImageFieldTests(TestCase):
         of the value of ``initial``.
         """
         f = forms.FileField(required=False)
-        self.assertEqual(f.clean(False), False)
-        self.assertEqual(f.clean(False, 'initial'), False)
+        self.assertIs(f.clean(False), False)
+        self.assertIs(f.clean(False, 'initial'), False)
 
     def test_clean_false_required(self):
         """
@@ -1902,7 +1902,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertIn('myfile-clear', six.text_type(form))
         form = DocumentForm(instance=doc, data={'myfile-clear': 'true'})
         doc = form.save(commit=False)
-        self.assertEqual(bool(doc.myfile), False)
+        self.assertFalse(doc.myfile)
 
     def test_clear_and_file_contradiction(self):
         """
@@ -2175,8 +2175,8 @@ class FileAndImageFieldTests(TestCase):
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.image.name, expected_null_imagefield_repr)
-        self.assertEqual(instance.width, None)
-        self.assertEqual(instance.height, None)
+        self.assertIsNone(instance.width)
+        self.assertIsNone(instance.height)
 
         f = OptionalImageFileForm(
             data={'description': 'And a final one'},

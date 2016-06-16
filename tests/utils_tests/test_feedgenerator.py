@@ -108,7 +108,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_feed_without_feed_url_gets_rendered_without_atom_link(self):
         feed = feedgenerator.Rss201rev2Feed('title', '/link/', 'descr')
-        self.assertEqual(feed.feed['feed_url'], None)
+        self.assertIsNone(feed.feed['feed_url'])
         feed_content = feed.writeString('utf-8')
         self.assertNotIn('<atom:link', feed_content)
         self.assertNotIn('href="/feed/"', feed_content)

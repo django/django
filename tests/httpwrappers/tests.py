@@ -59,8 +59,8 @@ class QueryDictTests(unittest.TestCase):
         q = QueryDict()
         self.assertEqual(q.getlist('foo'), [])
         if six.PY2:
-            self.assertEqual(q.has_key('foo'), False)
-        self.assertEqual('foo' in q, False)
+            self.assertIs(q.has_key('foo'), False)
+        self.assertNotIn('foo', q)
         self.assertEqual(list(six.iteritems(q)), [])
         self.assertEqual(list(six.iterlists(q)), [])
         self.assertEqual(list(six.iterkeys(q)), [])
@@ -203,11 +203,11 @@ class QueryDictTests(unittest.TestCase):
             q.appendlist('foo', ['bar'])
 
         if six.PY2:
-            self.assertEqual(q.has_key('vote'), True)
-        self.assertEqual('vote' in q, True)
+            self.assertIs(q.has_key('vote'), True)
+        self.assertIn('vote', q)
         if six.PY2:
-            self.assertEqual(q.has_key('foo'), False)
-        self.assertEqual('foo' in q, False)
+            self.assertIs(q.has_key('foo'), False)
+        self.assertNotIn('foo', q)
         self.assertEqual(list(six.iteritems(q)), [('vote', 'no')])
         self.assertEqual(list(six.iterlists(q)), [('vote', ['yes', 'no'])])
         self.assertEqual(list(six.iterkeys(q)), ['vote'])
@@ -243,13 +243,13 @@ class QueryDictTests(unittest.TestCase):
     def test_pickle(self):
         q = QueryDict()
         q1 = pickle.loads(pickle.dumps(q, 2))
-        self.assertEqual(q == q1, True)
+        self.assertEqual(q, q1)
         q = QueryDict(str('a=b&c=d'))
         q1 = pickle.loads(pickle.dumps(q, 2))
-        self.assertEqual(q == q1, True)
+        self.assertEqual(q, q1)
         q = QueryDict(str('a=b&c=d&a=1'))
         q1 = pickle.loads(pickle.dumps(q, 2))
-        self.assertEqual(q == q1, True)
+        self.assertEqual(q, q1)
 
     def test_update_from_querydict(self):
         """Regression test for #8278: QueryDict.update(QueryDict)"""
@@ -352,7 +352,7 @@ class HttpResponseTests(unittest.TestCase):
         Test for bug #14020: Make HttpResponse.get work like dict.get
         """
         r = HttpResponse()
-        self.assertEqual(r.get('test'), None)
+        self.assertIsNone(r.get('test'))
 
     def test_non_string_content(self):
         # Bug 16494: HttpResponse should behave consistently with non-strings
@@ -439,7 +439,7 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r.getvalue(), b'asdf')
 
         r = HttpResponse()
-        self.assertEqual(r.writable(), True)
+        self.assertIs(r.writable(), True)
         r.writelines(['foo\n', 'bar\n', 'baz\n'])
         self.assertEqual(r.content, b'foo\nbar\nbaz\n')
 

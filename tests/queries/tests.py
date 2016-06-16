@@ -1838,8 +1838,8 @@ class Queries6Tests(TestCase):
         self.assertEqual(repr(next(i1)), '<Tag: t3>')
 
         qs = X.objects.all()
-        self.assertEqual(bool(qs), False)
-        self.assertEqual(bool(qs), False)
+        self.assertFalse(qs)
+        self.assertFalse(qs)
 
     def test_nested_queries_sql(self):
         # Nested queries should not evaluate the inner query as part of constructing the
@@ -1992,22 +1992,22 @@ class QuerysetOrderedTests(unittest.TestCase):
     """
 
     def test_no_default_or_explicit_ordering(self):
-        self.assertEqual(Annotation.objects.all().ordered, False)
+        self.assertIs(Annotation.objects.all().ordered, False)
 
     def test_cleared_default_ordering(self):
-        self.assertEqual(Tag.objects.all().ordered, True)
-        self.assertEqual(Tag.objects.all().order_by().ordered, False)
+        self.assertIs(Tag.objects.all().ordered, True)
+        self.assertIs(Tag.objects.all().order_by().ordered, False)
 
     def test_explicit_ordering(self):
-        self.assertEqual(Annotation.objects.all().order_by('id').ordered, True)
+        self.assertIs(Annotation.objects.all().order_by('id').ordered, True)
 
     def test_order_by_extra(self):
-        self.assertEqual(Annotation.objects.all().extra(order_by=['id']).ordered, True)
+        self.assertIs(Annotation.objects.all().extra(order_by=['id']).ordered, True)
 
     def test_annotated_ordering(self):
         qs = Annotation.objects.annotate(num_notes=Count('notes'))
-        self.assertEqual(qs.ordered, False)
-        self.assertEqual(qs.order_by('num_notes').ordered, True)
+        self.assertIs(qs.ordered, False)
+        self.assertIs(qs.order_by('num_notes').ordered, True)
 
 
 @skipUnlessDBFeature('allow_sliced_subqueries')

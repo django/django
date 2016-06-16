@@ -162,8 +162,8 @@ class NonRecursiveLoaderExtendsTests(SimpleTestCase):
         self.assertEqual(output, 'base')
 
         cache = engine.template_loaders[0].template_cache
-        self.assertTrue('base.html' in cache)
-        self.assertTrue('index.html' in cache)
+        self.assertIn('base.html', cache)
+        self.assertIn('index.html', cache)
 
         # Render a second time from cache
         output = engine.render_to_string('index.html')

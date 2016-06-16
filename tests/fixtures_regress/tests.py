@@ -131,8 +131,8 @@ class TestFixtures(TestCase):
             'pretty.xml',
             verbosity=0,
         )
-        self.assertEqual(Stuff.objects.all()[0].name, None)
-        self.assertEqual(Stuff.objects.all()[0].owner, None)
+        self.assertIsNone(Stuff.objects.all()[0].name)
+        self.assertIsNone(Stuff.objects.all()[0].owner)
 
     @skipUnlessDBFeature('interprets_empty_strings_as_nulls')
     def test_pretty_print_xml_empty_strings(self):
@@ -147,7 +147,7 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
         self.assertEqual(Stuff.objects.all()[0].name, '')
-        self.assertEqual(Stuff.objects.all()[0].owner, None)
+        self.assertIsNone(Stuff.objects.all()[0].owner)
 
     def test_absolute_path(self):
         """

@@ -33,7 +33,7 @@ class TestSaveLoad(TestCase):
         instance = JSONModel()
         instance.save()
         loaded = JSONModel.objects.get()
-        self.assertEqual(loaded.field, None)
+        self.assertIsNone(loaded.field)
 
     def test_empty_object(self):
         instance = JSONModel(field={})
@@ -51,7 +51,7 @@ class TestSaveLoad(TestCase):
         instance = JSONModel(field=True)
         instance.save()
         loaded = JSONModel.objects.get()
-        self.assertEqual(loaded.field, True)
+        self.assertIs(loaded.field, True)
 
     def test_string(self):
         instance = JSONModel(field='why?')
@@ -247,7 +247,7 @@ class TestFormField(PostgreSQLTestCase):
     def test_valid_empty(self):
         field = forms.JSONField(required=False)
         value = field.clean('')
-        self.assertEqual(value, None)
+        self.assertIsNone(value)
 
     def test_invalid(self):
         field = forms.JSONField()

@@ -180,7 +180,7 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
             """
             time = timezone.now() + datetime.timedelta(days=30)
             future_question = Question(pub_date=time)
-            self.assertEqual(future_question.was_published_recently(), False)
+            self.assertIs(future_question.was_published_recently(), False)
 
 What we have done here is created a :class:`django.test.TestCase` subclass
 with a method that creates a ``Question`` instance with a ``pub_date`` in the
@@ -203,8 +203,8 @@ and you'll see something like::
     ----------------------------------------------------------------------
     Traceback (most recent call last):
       File "/path/to/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_question
-        self.assertEqual(future_question.was_published_recently(), False)
-    AssertionError: True != False
+        self.assertIs(future_question.was_published_recently(), False)
+    AssertionError: True is not False
 
     ----------------------------------------------------------------------
     Ran 1 test in 0.001s
@@ -285,7 +285,7 @@ more comprehensively:
         """
         time = timezone.now() - datetime.timedelta(days=30)
         old_question = Question(pub_date=time)
-        self.assertEqual(old_question.was_published_recently(), False)
+        self.assertIs(old_question.was_published_recently(), False)
 
     def test_was_published_recently_with_recent_question(self):
         """
@@ -294,7 +294,7 @@ more comprehensively:
         """
         time = timezone.now() - datetime.timedelta(hours=1)
         recent_question = Question(pub_date=time)
-        self.assertEqual(recent_question.was_published_recently(), True)
+        self.assertIs(recent_question.was_published_recently(), True)
 
 And now we have three tests that confirm that ``Question.was_published_recently()``
 returns sensible values for past, recent, and future questions.

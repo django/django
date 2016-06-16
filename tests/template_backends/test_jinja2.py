@@ -32,7 +32,7 @@ class Jinja2Tests(TemplateStringsTests):
     def test_origin_from_string(self):
         template = self.engine.from_string('Hello!\n')
         self.assertEqual(template.origin.name, '<template>')
-        self.assertEqual(template.origin.template_name, None)
+        self.assertIsNone(template.origin.template_name)
 
     def test_self_context(self):
         """
@@ -58,7 +58,7 @@ class Jinja2Tests(TemplateStringsTests):
         self.assertEqual(debug['total'], 1)
         self.assertEqual(len(debug['source_lines']), 1)
         self.assertTrue(debug['name'].endswith('syntax_error.html'))
-        self.assertTrue('message' in debug)
+        self.assertIn('message', debug)
 
     def test_exception_debug_info_max_context(self):
         with self.assertRaises(TemplateSyntaxError) as e:
@@ -73,4 +73,4 @@ class Jinja2Tests(TemplateStringsTests):
         self.assertEqual(debug['total'], 31)
         self.assertEqual(len(debug['source_lines']), 21)
         self.assertTrue(debug['name'].endswith('syntax_error2.html'))
-        self.assertTrue('message' in debug)
+        self.assertIn('message', debug)

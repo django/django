@@ -87,7 +87,7 @@ class ClearableFileInputTest(WidgetTest):
             files={},
             name='myfile',
         )
-        self.assertEqual(value, False)
+        self.assertIs(value, False)
 
     def test_clear_input_checked_returns_false_only_if_not_required(self):
         """

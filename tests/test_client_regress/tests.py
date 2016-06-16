@@ -1244,19 +1244,19 @@ class QueryStringTests(SimpleTestCase):
             self.assertEqual(response.context['get-foo'], 'bang')
 
             response = method("/request_data/?foo=whiz", data={'bar': 'bang'})
-            self.assertEqual(response.context['get-foo'], None)
+            self.assertIsNone(response.context['get-foo'])
             self.assertEqual(response.context['get-bar'], 'bang')
 
     def test_post_like_requests(self):
         # A POST-like request can pass a query string as data
         response = self.client.post("/request_data/", data={'foo': 'whiz'})
-        self.assertEqual(response.context['get-foo'], None)
+        self.assertIsNone(response.context['get-foo'])
         self.assertEqual(response.context['post-foo'], 'whiz')
 
         # A POST-like request can pass a query string as part of the URL
         response = self.client.post("/request_data/?foo=whiz")
         self.assertEqual(response.context['get-foo'], 'whiz')
-        self.assertEqual(response.context['post-foo'], None)
+        self.assertIsNone(response.context['post-foo'])
 
         # POST data provided in the URL augments actual form data
         response = self.client.post("/request_data/?foo=whiz", data={'foo': 'bang'})
@@ -1265,8 +1265,8 @@ class QueryStringTests(SimpleTestCase):
 
         response = self.client.post("/request_data/?foo=whiz", data={'bar': 'bang'})
         self.assertEqual(response.context['get-foo'], 'whiz')
-        self.assertEqual(response.context['get-bar'], None)
-        self.assertEqual(response.context['post-foo'], None)
+        self.assertIsNone(response.context['get-bar'])
+        self.assertIsNone(response.context['post-foo'])
         self.assertEqual(response.context['post-bar'], 'bang')
 
 

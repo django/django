@@ -168,7 +168,7 @@ class SecurityMiddlewareTest(SimpleTestCase):
         The middleware does not redirect secure requests.
         """
         ret = self.process_request("get", "/some/url", secure=True)
-        self.assertEqual(ret, None)
+        self.assertIsNone(ret)
 
     @override_settings(
         SECURE_SSL_REDIRECT=True, SECURE_REDIRECT_EXEMPT=["^insecure/"])
@@ -178,7 +178,7 @@ class SecurityMiddlewareTest(SimpleTestCase):
         exempt pattern.
         """
         ret = self.process_request("get", "/insecure/page")
-        self.assertEqual(ret, None)
+        self.assertIsNone(ret)
 
     @override_settings(
         SECURE_SSL_REDIRECT=True, SECURE_SSL_HOST="secure.example.com")
@@ -196,4 +196,4 @@ class SecurityMiddlewareTest(SimpleTestCase):
         With SSL_REDIRECT False, the middleware does no redirect.
         """
         ret = self.process_request("get", "/some/url")
-        self.assertEqual(ret, None)
+        self.assertIsNone(ret)

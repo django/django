@@ -721,7 +721,7 @@ class CustomTestClientTest(SimpleTestCase):
 
     def test_custom_test_client(self):
         """A test case can specify a custom class for self.client."""
-        self.assertEqual(hasattr(self.client, "i_am_customized"), True)
+        self.assertIs(hasattr(self.client, "i_am_customized"), True)
 
 
 def _generic_view(request):

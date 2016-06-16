@@ -170,10 +170,10 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
             resp = token_view(req)
             resp2 = CsrfViewMiddleware().process_response(req, resp)
         csrf_cookie = resp2.cookies.get('myname', False)
-        self.assertNotEqual(csrf_cookie, False)
+        self.assertIsNot(csrf_cookie, False)
         self.assertEqual(csrf_cookie['domain'], '.example.com')
-        self.assertEqual(csrf_cookie['secure'], True)
-        self.assertEqual(csrf_cookie['httponly'], True)
+        self.assertIs(csrf_cookie['secure'], True)
+        self.assertIs(csrf_cookie['httponly'], True)
         self.assertEqual(csrf_cookie['path'], '/test/')
         self.assertIn('Cookie', resp2.get('Vary', ''))
 
@@ -195,7 +195,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         resp2 = CsrfViewMiddleware().process_response(req, resp)
 
         csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False)
-        self.assertEqual(csrf_cookie, False)
+        self.assertIs(csrf_cookie, False)
 
     # Check the request processing
     def test_process_request_no_csrf_cookie(self):

@@ -138,7 +138,7 @@ class GEOSIOTest(SimpleTestCase):
 
     def test_wkt_writer_precision(self):
         wkt_w = WKTWriter()
-        self.assertEqual(wkt_w.precision, None)
+        self.assertIsNone(wkt_w.precision)
         self.assertEqual(wkt_w.write(Point(1. / 3, 2. / 3)), b'POINT (0.3333333333333333 0.6666666666666666)')
 
         wkt_w.precision = 1
@@ -150,7 +150,7 @@ class GEOSIOTest(SimpleTestCase):
         self.assertEqual(wkt_w.write(Point(1. / 3, 2. / 3)), b'POINT (0 1)')
 
         wkt_w.precision = None
-        self.assertEqual(wkt_w.precision, None)
+        self.assertIsNone(wkt_w.precision)
         self.assertEqual(wkt_w.write(Point(1. / 3, 2. / 3)), b'POINT (0.3333333333333333 0.6666666666666666)')
 
         with self.assertRaisesMessage(AttributeError, 'WKT output rounding precision must be '):

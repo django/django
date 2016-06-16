@@ -22,5 +22,5 @@ class AdminTemplateTagsTest(AdminViewBasicTestCase):
         extra_context = {'extra': True}
         response = admin.change_view(request, str(self.superuser.pk), extra_context=extra_context)
         template_context = submit_row(response.context_data)
-        self.assertEqual(template_context['extra'], True)
-        self.assertEqual(template_context['show_save'], True)
+        self.assertIs(template_context['extra'], True)
+        self.assertIs(template_context['show_save'], True)
