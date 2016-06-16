@@ -213,7 +213,7 @@ class Command(BaseCommand):
                 model_keys.append(model_key)
                 post_migrate_apps.unregister_model(*model_key)
         post_migrate_apps.render_multiple([
-            ModelState.from_model(apps.get_model(*model_key)) for model_key in model_keys
+            ModelState.from_model(apps.get_model(*model)) for model in model_keys
         ])
 
         # Send the post_migrate signal, so individual apps can do whatever they need
