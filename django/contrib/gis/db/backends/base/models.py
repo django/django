@@ -45,14 +45,14 @@ class SpatialRefSysMixin(object):
                 try:
                     self._srs = gdal.SpatialReference(self.wkt)
                     return self.srs
-                except Exception as msg:
-                    pass
+                except Exception as e:
+                    msg = e
 
                 try:
                     self._srs = gdal.SpatialReference(self.proj4text)
                     return self.srs
-                except Exception as msg:
-                    pass
+                except Exception as e:
+                    msg = e
 
                 raise Exception('Could not get OSR SpatialReference from WKT: %s\nError:\n%s' % (self.wkt, msg))
         else:

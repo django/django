@@ -99,12 +99,9 @@ class LiveServerViews(LiveServerBase):
         Ensure that the LiveServerTestCase serves 404s.
         Refs #2879.
         """
-        try:
+        with self.assertRaises(HTTPError) as err:
             self.urlopen('/')
-        except HTTPError as err:
-            self.assertEqual(err.code, 404, 'Expected 404 response')
-        else:
-            self.fail('Expected 404 response')
+        self.assertEqual(err.exception.code, 404, 'Expected 404 response')
 
     def test_view(self):
         """
@@ -128,12 +125,9 @@ class LiveServerViews(LiveServerBase):
         tries to access a static file that isn't explicitly put under
         STATIC_ROOT.
         """
-        try:
+        with self.assertRaises(HTTPError) as err:
             self.urlopen('/static/another_app/another_app_static_file.txt')
-        except HTTPError as err:
-            self.assertEqual(err.code, 404, 'Expected 404 response')
-        else:
-            self.fail('Expected 404 response (got %d)' % err.code)
+        self.assertEqual(err.exception.code, 404, 'Expected 404 response')
 
     def test_media_files(self):
         """
