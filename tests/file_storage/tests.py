@@ -752,7 +752,6 @@ class FileFieldStorageTests(TestCase):
         with obj.normal as normal:
             normal.open('wb')
             normal.write(b'updated')
-            normal.close()
         obj.normal.open('rb')
         obj.normal.file.seek(0)
 
