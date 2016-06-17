@@ -162,11 +162,24 @@ class BaseMiddlewareExceptionTest(SimpleTestCase):
             self.assertEqual(value.args, (error, ))
 
     def assert_middleware_usage(self, middleware, request, view, template_response, response, exception):
-        self.assertEqual(middleware.process_request_called, request)
-        self.assertEqual(middleware.process_view_called, view)
-        self.assertEqual(middleware.process_template_response_called, template_response)
-        self.assertEqual(middleware.process_response_called, response)
-        self.assertEqual(middleware.process_exception_called, exception)
+        # include the middleware name for easier debugging of failures
+        self.assertEqual(
+            (
+                middleware.__class__.__name__,
+                middleware.process_request_called,
+                middleware.process_view_called,
+                middleware.process_template_response_called,
+                middleware.process_response_called,
+                middleware.process_exception_called,
+            ), (
+                middleware.__class__.__name__,
+                request,
+                view,
+                template_response,
+                response,
+                exception,
+            )
+        )
 
 
 class MiddlewareTests(BaseMiddlewareExceptionTest):
