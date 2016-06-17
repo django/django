@@ -47,7 +47,7 @@ class FieldFile(File):
 
     def _get_file(self, mode='rb'):
         self._require_file()
-        if not hasattr(self, '_file') or self._file is None:
+        if not hasattr(self, '_file') or self._file is None or self._file.closed:
             self._file = self.storage.open(self.name, mode)
         return self._file
 
