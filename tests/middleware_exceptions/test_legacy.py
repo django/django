@@ -916,24 +916,24 @@ class MiddlewareNotUsedTests(SimpleTestCase):
         with self.assertRaises(MiddlewareNotUsed):
             MyMiddleware().process_request(request)
 
-    @override_settings(MIDDLEWARE=['middleware_exceptions.tests.MyMiddleware'])
+    @override_settings(MIDDLEWARE=['middleware_exceptions.test_legacy.MyMiddleware'])
     def test_log(self):
         with patch_logger('django.request', 'debug') as calls:
             self.client.get('/middleware_exceptions/view/')
         self.assertEqual(len(calls), 1)
         self.assertEqual(
             calls[0],
-            "MiddlewareNotUsed: 'middleware_exceptions.tests.MyMiddleware'"
+            "MiddlewareNotUsed: 'middleware_exceptions.test_legacy.MyMiddleware'"
         )
 
-    @override_settings(MIDDLEWARE=['middleware_exceptions.tests.MyMiddlewareWithExceptionMessage'])
+    @override_settings(MIDDLEWARE=['middleware_exceptions.test_legacy.MyMiddlewareWithExceptionMessage'])
     def test_log_custom_message(self):
         with patch_logger('django.request', 'debug') as calls:
             self.client.get('/middleware_exceptions/view/')
         self.assertEqual(len(calls), 1)
         self.assertEqual(
             calls[0],
-            "MiddlewareNotUsed('middleware_exceptions.tests.MyMiddlewareWithExceptionMessage'): spam eggs"
+            "MiddlewareNotUsed('middleware_exceptions.test_legacy.MyMiddlewareWithExceptionMessage'): spam eggs"
         )
 
     @override_settings(DEBUG=False)
