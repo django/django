@@ -249,6 +249,15 @@ Django 1.11 sets PostgreSQL 9.3 as the minimum version it officially supports.
 Support for PostGIS 2.0 is also removed as PostgreSQL 9.2 is the last version
 to support it.
 
+``LiveServerTestCase`` binds to port zero
+-----------------------------------------
+
+Rather than taking a port range and iterating to find a free port,
+``LiveServerTestCase`` binds to port zero and relies on the operating system
+to assign a free port. The ``DJANGO_LIVE_TEST_SERVER_ADDRESS`` environment
+variable is no longer used, and as it's also no longer used, the
+``manage.py test --liveserver`` option is removed.
+
 Miscellaneous
 -------------
 

@@ -418,12 +418,6 @@ if __name__ == "__main__":
              'test side effects not apparent with normal execution lineup.',
     )
     parser.add_argument(
-        '--liveserver',
-        help='Overrides the default address where the live server (used with '
-             'LiveServerTestCase) is expected to run from. The default value '
-             'is localhost:8081-8179.',
-    )
-    parser.add_argument(
         '--selenium', dest='selenium', action=ActionSelenium, metavar='BROWSERS',
         help='A comma-separated list of browsers to run the Selenium tests against.',
     )
@@ -466,9 +460,6 @@ if __name__ == "__main__":
         if "DJANGO_SETTINGS_MODULE" not in os.environ:
             os.environ['DJANGO_SETTINGS_MODULE'] = 'test_sqlite'
         options.settings = os.environ['DJANGO_SETTINGS_MODULE']
-
-    if options.liveserver is not None:
-        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options.liveserver
 
     if options.selenium:
         if not options.tags:

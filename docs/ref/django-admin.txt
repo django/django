@@ -1227,12 +1227,6 @@ Stops running tests and reports the failure immediately after a test fails.
 Controls the test runner class that is used to execute tests. This value
 overrides the value provided by the :setting:`TEST_RUNNER` setting.
 
-.. django-admin-option:: --liveserver LIVESERVER
-
-Overrides the default address where the live server (used with
-:class:`~django.test.LiveServerTestCase`) is expected to run from. The default
-value is ``localhost:8081-8179``.
-
 .. django-admin-option:: --noinput, --no-input
 
 Suppresses all user prompts. A typical prompt is a warning about deleting an
