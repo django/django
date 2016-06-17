@@ -11,8 +11,7 @@ import re
 import stat
 
 from django.http import (
-    FileResponse, Http404, HttpResponse, HttpResponseNotModified,
-    HttpResponseRedirect,
+    FileResponse, Http404, HttpResponse, HttpResponseNotModified, HttpResponseRedirect
 )
 from django.template import Context, Engine, TemplateDoesNotExist, loader
 from django.utils.http import http_date, parse_http_date
@@ -51,7 +50,8 @@ def nginx_serve(request, path, location=None, alias=None, show_indexes=False):
     """
     Serve files with nginx "X-Accel-Redirect" header (you might know it as "X-Sendfile").
 
-    It works similarly as django.views.static.serve view. You have to specify 'location' and 'alias' keyword arguments
+    It works similarly as django.views.static.serve view.
+    You have to specify 'location' and 'alias' keyword arguments
     in the urlconf (which are corresponging to the appropriate nginx configuration directives)::
 
         from django.views.static import nginx_serve
