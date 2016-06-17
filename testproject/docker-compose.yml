@@ -1,7 +1,7 @@
 version: '2'
 services:
     redis:
-        image: redis
+        image: redis:alpine
     daphne:
         image: channels-test
         build: .

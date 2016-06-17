@@ -2,10 +2,10 @@ FROM ubuntu:16.04
 
 MAINTAINER Andrew Godwin <andrew@aeracode.org>
 
+# python-dev \
 RUN apt-get update && \
     apt-get install -y \
         git \
-        python-dev \
         python-setuptools \
         python-pip && \
     pip install -U pip
