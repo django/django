@@ -20,7 +20,7 @@ GeoDjango's admin site
 
    .. attribute:: default_zoom
 
-   The default zoom level to use.  Defaults to 18.
+   The default zoom level to use.  Defaults to 4.
 
    .. attribute:: extra_js
 
