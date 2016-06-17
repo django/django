@@ -37,6 +37,15 @@ class Message(object):
     def __contains__(self, key):
         return key in self.content
 
+    def keys(self):
+        return self.content.keys()
+
+    def values(self):
+        return self.content.values()
+
+    def items(self):
+        return self.content.items()
+
     def get(self, key, default=None):
         return self.content.get(key, default)
 
