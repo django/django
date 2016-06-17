@@ -164,6 +164,7 @@ class RegexURLResolver(LocaleRegexProvider):
         # urlpatterns
         self._callback_strs = set()
         self._populated = False
+        self._populating = False
 
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
@@ -177,6 +178,9 @@ class RegexURLResolver(LocaleRegexProvider):
         )
 
     def _populate(self):
+        if self._populating:
+            return
+        self._populating = True
         lookups = MultiValueDict()
         namespaces = {}
         apps = {}
@@ -209,7 +213,9 @@ class RegexURLResolver(LocaleRegexProvider):
                         namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                     for app_name, namespace_list in pattern.app_dict.items():
                         apps.setdefault(app_name, []).extend(namespace_list)
-                    self._callback_strs.update(pattern._callback_strs)
+                if not pattern._populating:
+                    pattern._populate()
+                self._callback_strs.update(pattern._callback_strs)
             else:
                 bits = normalize(p_pattern)
                 lookups.appendlist(pattern.callback, (bits, p_pattern, pattern.default_args))
@@ -219,6 +225,7 @@ class RegexURLResolver(LocaleRegexProvider):
         self._namespace_dict[language_code] = namespaces
         self._app_dict[language_code] = apps
         self._populated = True
+        self._populating = False
 
     @property
     def reverse_dict(self):
