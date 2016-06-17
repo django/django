@@ -177,10 +177,10 @@ class BaseSpatialField(Field):
         """
         Prepare the value for saving in the database.
         """
-        if not value:
-            return None
-        else:
+        if isinstance(value, Geometry) or value:
             return connection.ops.Adapter(self.get_prep_value(value))
+        else:
+            return None
 
     def get_raster_prep_value(self, value, is_candidate):
         """
