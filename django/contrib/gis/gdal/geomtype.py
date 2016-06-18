@@ -18,6 +18,7 @@ class OGRGeomType(object):
               7: 'GeometryCollection',
               100: 'None',
               101: 'LinearRing',
+              102: 'PointZ',
               1 + wkb25bit: 'Point25D',
               2 + wkb25bit: 'LineString25D',
               3 + wkb25bit: 'Polygon25D',
@@ -84,6 +85,8 @@ class OGRGeomType(object):
             return None
         elif s == 'Unknown':
             s = 'Geometry'
+        elif s == 'PointZ':
+            s = 'Point'
         return s + 'Field'
 
     def to_multi(self):

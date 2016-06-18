@@ -19,6 +19,7 @@ class AllOGRFields(models.Model):
 
 class Fields3D(models.Model):
     point = models.PointField(dim=3)
+    pointg = models.PointField(dim=3, geography=True)
     line = models.LineStringField(dim=3)
     poly = models.PolygonField(dim=3)
 

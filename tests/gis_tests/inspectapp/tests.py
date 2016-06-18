@@ -11,6 +11,7 @@ from django.test.utils import modify_settings
 from django.utils.six import StringIO
 
 from ..test_data import TEST_DATA
+from ..utils import postgis
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import Driver, GDALException, GDAL_VERSION
@@ -50,10 +51,14 @@ class InspectDbTests(TestCase):
         output = out.getvalue()
         if connection.features.supports_geometry_field_introspection:
             self.assertIn('point = models.PointField(dim=3)', output)
+            if postgis:
+                # Geography type is specific to PostGIS
+                self.assertIn('pointg = models.PointField(geography=True, dim=3)', output)
             self.assertIn('line = models.LineStringField(dim=3)', output)
             self.assertIn('poly = models.PolygonField(dim=3)', output)
         else:
             self.assertIn('point = models.GeometryField(', output)
+            self.assertIn('pointg = models.GeometryField(', output)
             self.assertIn('line = models.GeometryField(', output)
             self.assertIn('poly = models.GeometryField(', output)
 
