@@ -26,12 +26,6 @@ else:
 
 
 class FileTests(unittest.TestCase):
-
-    def test_file_truncates_namedtemporaryfile_name(self):
-        named_file = NamedTemporaryFile()
-        f = File(named_file)
-        self.assertEqual(f.name, os.path.basename(named_file.name))
-
     def test_unicode_uploadedfile_name(self):
         uf = UploadedFile(name='¿Cómo?', content_type='text')
         self.assertIs(type(repr(uf)), str)

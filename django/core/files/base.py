@@ -18,10 +18,6 @@ class File(FileProxyMixin):
         self.file = file
         if name is None:
             name = getattr(file, 'name', None)
-        # Use only the basename from a file's name if it's an absolute path,
-        # e.g. from NamedTemporaryFile.
-        if isinstance(name, six.string_types) and os.path.isabs(name):
-            name = os.path.basename(name)
         self.name = name
         if hasattr(file, 'mode'):
             self.mode = file.mode
