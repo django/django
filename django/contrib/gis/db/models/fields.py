@@ -366,6 +366,10 @@ class PointField(GeometryField):
     description = _("Point")
 
 
+class PointZField(PointField):
+    geom_type = 'POINTZ'
+
+
 class LineStringField(GeometryField):
     geom_type = 'LINESTRING'
     form_class = forms.LineStringField

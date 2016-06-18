@@ -18,6 +18,7 @@ class OGRGeomType(object):
               7: 'GeometryCollection',
               100: 'None',
               101: 'LinearRing',
+              102: 'Pointz',
               1 + wkb25bit: 'Point25D',
               2 + wkb25bit: 'LineString25D',
               3 + wkb25bit: 'Polygon25D',
