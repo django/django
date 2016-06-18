@@ -41,6 +41,7 @@ class TestStartProjectSettings(TestCase):
             response = self.client.get('/empty/')
             headers = sorted(response.serialize_headers().split(b'\r\n'))
             self.assertEqual(headers, [
+                b'Content-Length: 0',
                 b'Content-Type: text/html; charset=utf-8',
                 b'X-Frame-Options: SAMEORIGIN',
             ])

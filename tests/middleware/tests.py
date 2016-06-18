@@ -285,6 +285,27 @@ class CommonMiddlewareTest(SimpleTestCase):
         second_res = CommonMiddleware().process_response(second_req, HttpResponse('content'))
         self.assertEqual(second_res.status_code, 304)
 
+    # Tests for the Content-Length header
+
+    def test_content_length_header_added(self):
+        response = HttpResponse('content')
+        self.assertNotIn('Content-Length', response)
+        response = CommonMiddleware().process_response(HttpRequest(), response)
+        self.assertEqual(int(response['Content-Length']), len(response.content))
+
+    def test_content_length_header_not_added_for_streaming_response(self):
+        response = StreamingHttpResponse('content')
+        self.assertNotIn('Content-Length', response)
+        response = CommonMiddleware().process_response(HttpRequest(), response)
+        self.assertNotIn('Content-Length', response)
+
+    def test_content_length_header_not_changed(self):
+        response = HttpResponse()
+        bad_content_length = len(response.content) + 10
+        response['Content-Length'] = bad_content_length
+        response = CommonMiddleware().process_response(HttpRequest(), response)
+        self.assertEqual(int(response['Content-Length']), bad_content_length)
+
     # Other tests
 
     @override_settings(DISALLOWED_USER_AGENTS=[re.compile(r'foo')])
@@ -445,6 +466,9 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
 
     def test_content_length_header_added(self):
         content_length = len(self.resp.content)
+        # Already set by CommonMiddleware, remove it to check that
+        # ConditionalGetMiddleware readds it.
+        del self.resp['Content-Length']
         self.assertNotIn('Content-Length', self.resp)
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertIn('Content-Length', self.resp)

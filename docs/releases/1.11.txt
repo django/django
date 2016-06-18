@@ -197,6 +197,9 @@ Requests and Responses
 
 * Added :meth:`QueryDict.fromkeys() <django.http.QueryDict.fromkeys>`.
 
+* :class:`~django.middleware.common.CommonMiddleware` now sets the
+  ``Content-Length`` response header for non-streaming responses.
+
 Serialization
 ~~~~~~~~~~~~~
 

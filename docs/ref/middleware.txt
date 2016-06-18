@@ -66,6 +66,12 @@ Adds a few conveniences for perfectionists:
   for each request by MD5-hashing the page content, and it'll take care of
   sending ``Not Modified`` responses, if appropriate.
 
+* Sets the ``Content-Length`` header for non-streaming responses.
+
+.. versionchanged: 1.11
+
+    Older versions didn't set the ``Content-Length`` header.
+
 .. attribute:: CommonMiddleware.response_redirect_class
 
 Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
