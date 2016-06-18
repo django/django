@@ -665,6 +665,8 @@ class AlterModelOptions(ModelOptionOperation):
 
     # Model options we want to compare and preserve in an AlterModelOptions op
     ALTER_OPTION_KEYS = [
+        "base_manager_name",
+        "default_manager_name",
         "get_latest_by",
         "managed",
         "ordering",

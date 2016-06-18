@@ -191,6 +191,78 @@ class StateTests(SimpleTestCase):
         author_state = project_state.models['migrations', 'author']
         self.assertEqual(author_state.managers, [('authors', custom_manager)])
 
+    def test_custom_default_manager_named_objects_with_false_migration_flag(self):
+        """
+        When a manager is added with a name of 'objects' but it does not
+        have `use_in_migrations = True`, no migration should be added to the
+        model state (#26643).
+        """
+        new_apps = Apps(['migrations'])
+
+        class Author(models.Model):
+            objects = models.Manager()
+
+            class Meta:
+                app_label = 'migrations'
+                apps = new_apps
+
+        project_state = ProjectState.from_apps(new_apps)
+        author_state = project_state.models['migrations', 'author']
+        self.assertEqual(author_state.managers, [])
+
+    def test_custom_default_manager(self):
+        new_apps = Apps(['migrations'])
+
+        class Author(models.Model):
+            manager1 = models.Manager()
+            manager2 = models.Manager()
+
+            class Meta:
+                app_label = 'migrations'
+                apps = new_apps
+                default_manager_name = 'manager2'
+
+        project_state = ProjectState.from_apps(new_apps)
+        author_state = project_state.models['migrations', 'author']
+        self.assertEqual(author_state.options['default_manager_name'], 'manager2')
+        self.assertEqual(author_state.managers, [('manager2', Author.manager1)])
+
+    def test_custom_base_manager(self):
+        new_apps = Apps(['migrations'])
+
+        class Author(models.Model):
+            manager1 = models.Manager()
+            manager2 = models.Manager()
+
+            class Meta:
+                app_label = 'migrations'
+                apps = new_apps
+                base_manager_name = 'manager2'
+
+        class Author2(models.Model):
+            manager1 = models.Manager()
+            manager2 = models.Manager()
+
+            class Meta:
+                app_label = 'migrations'
+                apps = new_apps
+                base_manager_name = 'manager1'
+
+        project_state = ProjectState.from_apps(new_apps)
+
+        author_state = project_state.models['migrations', 'author']
+        self.assertEqual(author_state.options['base_manager_name'], 'manager2')
+        self.assertEqual(author_state.managers, [
+            ('manager1', Author.manager1),
+            ('manager2', Author.manager2),
+        ])
+
+        author2_state = project_state.models['migrations', 'author2']
+        self.assertEqual(author2_state.options['base_manager_name'], 'manager1')
+        self.assertEqual(author2_state.managers, [
+            ('manager1', Author2.manager1),
+        ])
+
     def test_apps_bulk_update(self):
         """
         StateApps.bulk_update() should update apps.ready to False and reset
