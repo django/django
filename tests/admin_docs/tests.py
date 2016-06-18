@@ -88,6 +88,12 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         # View docstring
         self.assertContains(response, 'Base view for admindocs views.')
 
+    @override_settings(ROOT_URLCONF='admin_docs.namespace_urls')
+    def test_namespaced_view_detail(self):
+        url = reverse('django-admindocs-views-detail', args=['admin_docs.views.XViewClass'])
+        response = self.client.get(url)
+        self.assertContains(response, '<h1>admin_docs.views.XViewClass</h1>')
+
     def test_view_detail_illegal_import(self):
         """
         #23601 - Ensure the view exists in the URLconf.
