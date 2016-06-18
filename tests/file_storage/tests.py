@@ -10,7 +10,6 @@ import threading
 import time
 import unittest
 from datetime import datetime, timedelta
-from tempfile import NamedTemporaryFile
 
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation, SuspiciousOperation
@@ -859,13 +858,6 @@ class FileFieldStorageTests(TestCase):
         self.assertTrue(temp_storage.exists('tests/stringio'))
         with temp_storage.open('tests/stringio') as f:
             self.assertEqual(f.read(), b'content')
-
-    def test_save_temporary_file(self):
-        storage = Storage()
-        with NamedTemporaryFile() as f:
-            f.write(b'content')
-            storage.normal = File(f)
-            storage.save()  # no crash
 
 
 # Tests for a race condition on file saving (#4948).
