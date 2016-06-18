@@ -428,6 +428,13 @@ class ResolverTests(unittest.TestCase):
                                 'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name)
                             )
 
+    def test_namespaced_view_detail(self):
+        resolver = get_resolver('urlpatterns_reverse.nested_urls')
+        self.assertTrue(resolver._is_callback('urlpatterns_reverse.nested_urls.view1'))
+        self.assertTrue(resolver._is_callback('urlpatterns_reverse.nested_urls.view2'))
+        self.assertTrue(resolver._is_callback('urlpatterns_reverse.nested_urls.View3'))
+        self.assertFalse(resolver._is_callback('urlpatterns_reverse.nested_urls.blub'))
+
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.reverse_lazy_urls')
 class ReverseLazyTest(TestCase):
