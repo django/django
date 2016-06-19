@@ -201,6 +201,10 @@ Models
 * Added support for time truncation to
   :class:`~django.db.models.functions.datetime.Trunc` functions.
 
+* Added the :class:`~django.db.models.functions.datetime.TruncTime` function
+  to truncate :class:`~django.db.models.DateTimeField` to its time component
+  and exposed it through the :lookup:`time` lookup.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -272,6 +276,10 @@ Database backend API
   ``field_name`` to a time object with only the given specificity. The
   ``lookup_type`` argument can be either ``'hour'``, ``'minute'``, or
   ``'second'``.
+
+* The ``DatabaseOperations.datetime_cast_time_sql()`` method is added to
+  support the :lookup:`time` lookup. It accepts a ``field_name`` and ``tzname``
+  arguments and returns the SQL necessary to cast a datetime value to time value.
 
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
 --------------------------------------------------

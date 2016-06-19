@@ -210,6 +210,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_date_extract", 2, _sqlite_date_extract)
         conn.create_function("django_date_trunc", 2, _sqlite_date_trunc)
         conn.create_function("django_datetime_cast_date", 2, _sqlite_datetime_cast_date)
+        conn.create_function("django_datetime_cast_time", 2, _sqlite_datetime_cast_time)
         conn.create_function("django_datetime_extract", 3, _sqlite_datetime_extract)
         conn.create_function("django_datetime_trunc", 3, _sqlite_datetime_trunc)
         conn.create_function("django_time_extract", 2, _sqlite_time_extract)
@@ -401,6 +402,13 @@ def _sqlite_datetime_cast_date(dt, tzname):
     if dt is None:
         return None
     return dt.date().isoformat()
+
+
+def _sqlite_datetime_cast_time(dt, tzname):
+    dt = _sqlite_datetime_parse(dt, tzname)
+    if dt is None:
+        return None
+    return dt.time().isoformat()
 
 
 def _sqlite_datetime_extract(lookup_type, dt, tzname):

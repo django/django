@@ -2674,6 +2674,27 @@ When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering. This requires :ref:`time zone definitions
 in the database <database-time-zone-definitions>`.
 
+.. fieldlookup:: time
+
+``time``
+~~~~~~~~
+
+.. versionadded:: 1.11
+
+For datetime fields, casts the value as time. Allows chaining additional field
+lookups. Takes a :class:`datetime.time` value.
+
+Example::
+
+    Entry.objects.filter(pub_date__time=datetime.time(14, 30))
+    Entry.objects.filter(pub_date__time__between=(datetime.time(8), datetime.time(17)))
+
+(No equivalent SQL code fragment is included for this lookup because
+implementation of the relevant query varies among different database engines.)
+
+When :setting:`USE_TZ` is ``True``, fields are converted to the current time
+zone before filtering.
+
 .. fieldlookup:: hour
 
 ``hour``

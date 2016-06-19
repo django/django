@@ -85,6 +85,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         self._require_pytz()
         return "django_datetime_cast_date(%s, %%s)" % field_name, [tzname]
 
+    def datetime_cast_time_sql(self, field_name, tzname):
+        self._require_pytz()
+        return "django_datetime_cast_time(%s, %%s)" % field_name, [tzname]
+
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_extract_sql.
         self._require_pytz()

@@ -239,6 +239,23 @@ class TruncDate(TruncBase):
         return sql, lhs_params
 
 
+class TruncTime(TruncBase):
+    kind = 'time'
+    lookup_name = 'time'
+
+    @cached_property
+    def output_field(self):
+        return TimeField()
+
+    def as_sql(self, compiler, connection):
+        # Cast to date rather than truncate to date.
+        lhs, lhs_params = compiler.compile(self.lhs)
+        tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
+        sql, tz_params = connection.ops.datetime_cast_time_sql(lhs, tzname)
+        lhs_params.extend(tz_params)
+        return sql, lhs_params
+
+
 class TruncHour(TruncBase):
     kind = 'hour'
 
@@ -252,3 +269,4 @@ class TruncSecond(TruncBase):
 
 
 DateTimeField.register_lookup(TruncDate)
+DateTimeField.register_lookup(TruncTime)

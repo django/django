@@ -128,6 +128,12 @@ WHEN (new.%(col_name)s IS NULL)
         sql = 'TRUNC(%s)' % field_name
         return sql, []
 
+    def datetime_cast_time_sql(self, field_name, tzname):
+        # Since `TimeField` values are stored as TIMESTAMP where only the date
+        # part is ignored, convert the field to the specified timezone.
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return field_name, []
+
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
         sql = self.date_extract_sql(lookup_type, field_name)

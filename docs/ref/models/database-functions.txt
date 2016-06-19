@@ -686,6 +686,17 @@ that deal with time-parts can be used with ``TimeField``::
 truncate function. It's also registered as a transform on  ``DateTimeField`` as
 ``__date``.
 
+.. class:: TruncTime(expression, **extra)
+
+.. versionadded:: 1.11
+
+    .. attribute:: lookup_name = 'time'
+    .. attribute:: output_field = TimeField()
+
+``TruncTime`` casts ``expression`` to a time rather than using the built-in SQL
+truncate function. It's also registered as a transform on ``DateTimeField`` as
+``__time``.
+
 .. class:: TruncDay(expression, output_field=None, tzinfo=None, **extra)
 
     .. attribute:: kind = 'day'

@@ -96,6 +96,12 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_date() method')
 
+    def datetime_cast_time_sql(self, field_name, tzname):
+        """
+        Returns the SQL necessary to cast a datetime value to time value.
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_time_sql() method')
+
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         """
         Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
