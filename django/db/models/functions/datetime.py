@@ -151,26 +151,38 @@ class TruncBase(TimezoneMixin, Transform):
         elif isinstance(self.output_field, DateField):
             sql = connection.ops.date_trunc_sql(self.kind, inner_sql)
             params = []
+        elif isinstance(self.output_field, TimeField):
+            sql = connection.ops.time_trunc_sql(self.kind, inner_sql)
+            params = []
         else:
-            raise ValueError('Trunc only valid on DateField or DateTimeField.')
+            raise ValueError('Trunc only valid on DateField, TimeField, or DateTimeField.')
         return sql, inner_params + params
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         copy = super(TruncBase, self).resolve_expression(query, allow_joins, reuse, summarize, for_save)
         field = copy.lhs.output_field
         # DateTimeField is a subclass of DateField so this works for both.
-        assert isinstance(field, DateField), (
-            "%r isn't a DateField or DateTimeField." % field.name
+        assert isinstance(field, (DateField, TimeField)), (
+            "%r isn't a DateField, TimeField, or DateTimeField." % field.name
         )
         # If self.output_field was None, then accessing the field will trigger
         # the resolver to assign it to self.lhs.output_field.
-        if not isinstance(copy.output_field, (DateField, DateTimeField)):
-            raise ValueError('output_field must be either DateField or DateTimeField')
-        # Passing dates to functions expecting datetimes is most likely a
-        # mistake.
+        if not isinstance(copy.output_field, (DateField, DateTimeField, TimeField)):
+            raise ValueError('output_field must be either DateField, TimeField, or DateTimeField')
+        # Passing dates or times to functions expecting datetimes is most
+        # likely a mistake.
+        output_field = copy.output_field
+        explicit_output_field = field.__class__ != copy.output_field.__class__
         if type(field) == DateField and (
-                isinstance(copy.output_field, DateTimeField) or copy.kind in ('hour', 'minute', 'second')):
-            raise ValueError("Cannot truncate DateField '%s' to DateTimeField. " % field.name)
+                isinstance(output_field, DateTimeField) or copy.kind in ('hour', 'minute', 'second', 'time')):
+            raise ValueError("Cannot truncate DateField '%s' to %s. " % (
+                field.name, output_field.__class__.__name__ if explicit_output_field else 'DateTimeField'
+            ))
+        elif isinstance(field, TimeField) and (
+                isinstance(output_field, DateTimeField) or copy.kind in ('year', 'month', 'day', 'date')):
+            raise ValueError("Cannot truncate TimeField '%s' to %s. " % (
+                field.name, output_field.__class__.__name__ if explicit_output_field else 'DateTimeField'
+            ))
         return copy
 
     def convert_value(self, value, expression, connection, context):
@@ -184,8 +196,10 @@ class TruncBase(TimezoneMixin, Transform):
                 value = value.replace(tzinfo=None)
                 value = timezone.make_aware(value, self.tzinfo)
         elif isinstance(value, datetime):
-            # self.output_field is definitely a DateField here.
-            value = value.date()
+            if isinstance(self.output_field, DateField):
+                value = value.date()
+            elif isinstance(self.output_field, TimeField):
+                value = value.time()
         return value
 
 
@@ -209,6 +223,7 @@ class TruncDay(TruncBase):
 
 
 class TruncDate(TruncBase):
+    kind = 'date'
     lookup_name = 'date'
 
     @cached_property
@@ -227,25 +242,13 @@ class TruncDate(TruncBase):
 class TruncHour(TruncBase):
     kind = 'hour'
 
-    @cached_property
-    def output_field(self):
-        return DateTimeField()
-
 
 class TruncMinute(TruncBase):
     kind = 'minute'
 
-    @cached_property
-    def output_field(self):
-        return DateTimeField()
-
 
 class TruncSecond(TruncBase):
     kind = 'second'
-
-    @cached_property
-    def output_field(self):
-        return DateTimeField()
 
 
 DateTimeField.register_lookup(TruncDate)

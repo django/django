@@ -198,6 +198,9 @@ Models
 * :class:`~django.db.models.ImageField` now has a default
   :data:`~django.core.validators.validate_image_file_extension` validator.
 
+* Added support for time truncation to
+  :class:`~django.db.models.functions.datetime.Trunc` functions.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -263,7 +266,12 @@ Backwards incompatible changes in 1.11
 Database backend API
 --------------------
 
-* ...
+* The ``DatabaseOperations.time_trunc_sql()`` method is added to support
+  ``TimeField`` truncation. It accepts a ``lookup_type`` and ``field_name``
+  arguments and returns the appropriate SQL to truncate the given time field
+  ``field_name`` to a time object with only the given specificity. The
+  ``lookup_type`` argument can be either ``'hour'``, ``'minute'``, or
+  ``'second'``.
 
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
 --------------------------------------------------

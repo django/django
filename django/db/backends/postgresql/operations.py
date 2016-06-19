@@ -56,6 +56,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         sql = "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
         return sql, params
 
+    def time_trunc_sql(self, lookup_type, field_name):
+        return "DATE_TRUNC('%s', %s)::time" % (lookup_type, field_name)
+
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
