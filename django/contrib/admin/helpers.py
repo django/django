@@ -279,7 +279,7 @@ class InlineAdminFormSet(object):
                     'help_text': help_text_for_field(field_name, self.opts.model),
                 }
             else:
-                form_field = self.formset.form.base_fields[field_name]
+                form_field = self.formset.empty_form.fields[field_name]
                 label = form_field.label
                 if label is None:
                     label = label_for_field(field_name, self.opts.model, self.opts)
