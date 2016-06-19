@@ -314,9 +314,10 @@ class AdminSite(object):
         request.current_app = self.name
         return password_change_done(request, **defaults)
 
-    def i18n_javascript(self, request):
+    def i18n_javascript(self, request, extra_context=None):
         """
         Displays the i18n JavaScript that the Django admin requires.
+        extra_context is not required here, but added for consistency with rest of admin views.
         """
         return JavaScriptCatalog.as_view(packages=['django.contrib.admin'])(request)
 
