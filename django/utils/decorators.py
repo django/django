@@ -196,3 +196,32 @@ class classproperty(object):
     def getter(self, method):
         self.fget = method
         return self
+
+
+def middleware_decorator(middleware_factory):
+    """
+    Return decorator that causes given middleware instance to run on decorated view.
+
+    The returned decorator only annotates the view function with the middleware
+    instance; the application of the middleware is managed by BaseHandler. This
+    allows wrapping the middleware outside rendering of TemplateResponse, and
+    generally consolidates middleware-application code in one place.
+    """
+    return middleware_decorator_with_args(middleware_factory)()
+
+
+def middleware_decorator_with_args(middleware_factory):
+    """
+    Like middleware_decorator, but returns a decorator factory which takes
+    args/kwargs that will be passed on to the middleware factory (after the
+    initial get_response argument).
+    """
+    def _decorator_factory(*args, **kwargs):
+        def _middleware_decorator(view_func):
+            extra_middleware = getattr(view_func, '_extra_middleware', [])
+            extra_middleware.append((middleware_factory, args, kwargs))
+            view_func._extra_middleware = extra_middleware
+            return view_func
+
+        return _middleware_decorator
+    return _decorator_factory
