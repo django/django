@@ -38,9 +38,9 @@ def set_language(request):
     """
     next = request.POST.get('next', request.GET.get('next'))
     if (next or not request.is_ajax()) and not is_safe_url(url=next, host=request.get_host()):
-        next = request.META.get('HTTP_REFERER')
+        next = request.headers.get('referer')
         if next:
-            next = urlunquote(next)  # HTTP_REFERER may be encoded.
+            next = urlunquote(next)  # referer may be encoded.
         if not is_safe_url(url=next, host=request.get_host()):
             next = '/'
     response = http.HttpResponseRedirect(next) if next else http.HttpResponse(status=204)

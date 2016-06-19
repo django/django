@@ -209,7 +209,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 # same-domain requests in only about 0.2% of cases or less, so
                 # we can use strict Referer checking.
                 referer = force_text(
-                    request.META.get('HTTP_REFERER'),
+                    request.headers.get('referer'),
                     strings_only=True,
                     errors='replace'
                 )

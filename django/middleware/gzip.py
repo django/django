@@ -24,7 +24,7 @@ class GZipMiddleware(MiddlewareMixin):
 
         patch_vary_headers(response, ('Accept-Encoding',))
 
-        ae = request.META.get('HTTP_ACCEPT_ENCODING', '')
+        ae = request.headers.get('accept-encoding', '')
         if not re_accepts_gzip.search(ae):
             return response
 

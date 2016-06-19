@@ -81,10 +81,10 @@ class HttpRequest(object):
         """
         # We try three options, in order of decreasing preference.
         if settings.USE_X_FORWARDED_HOST and (
-                'HTTP_X_FORWARDED_HOST' in self.META):
-            host = self.META['HTTP_X_FORWARDED_HOST']
-        elif 'HTTP_HOST' in self.META:
-            host = self.META['HTTP_HOST']
+                'x-forwarded-host' in self.headers):
+            host = self.headers['x-forwarded-host']
+        elif 'host' in self.headers:
+            host = self.headers['host']
         else:
             # Reconstruct the host using the algorithm from PEP 333.
             host = self.META['SERVER_NAME']
@@ -114,8 +114,8 @@ class HttpRequest(object):
 
     def get_port(self):
         """Return the port number for the request as a string."""
-        if settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META:
-            port = self.META['HTTP_X_FORWARDED_PORT']
+        if settings.USE_X_FORWARDED_PORT and 'x-forwarded-port' in self.headers:
+            port = self.headers['x-forwarded-port']
         else:
             port = self.META['SERVER_PORT']
         return str(port)
@@ -221,7 +221,7 @@ class HttpRequest(object):
         return self.scheme == 'https'
 
     def is_ajax(self):
-        return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+        return self.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     @property
     def encoding(self):

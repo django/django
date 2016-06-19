@@ -132,14 +132,14 @@ def _not_modified(request, response=None):
 
 def get_conditional_response(request, etag=None, last_modified=None, response=None):
     # Get HTTP request headers
-    if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
+    if_modified_since = request.headers.get('if-modified-since')
     if if_modified_since:
         if_modified_since = parse_http_date_safe(if_modified_since)
-    if_unmodified_since = request.META.get('HTTP_IF_UNMODIFIED_SINCE')
+    if_unmodified_since = request.headers.get('if-unmodified-since')
     if if_unmodified_since:
         if_unmodified_since = parse_http_date_safe(if_unmodified_since)
-    if_none_match = request.META.get('HTTP_IF_NONE_MATCH')
-    if_match = request.META.get('HTTP_IF_MATCH')
+    if_none_match = request.headers.get('if-none-match')
+    if_match = request.headers.get('if-match')
     etags = []
     if if_none_match or if_match:
         # There can be more than one ETag in the request, so we
