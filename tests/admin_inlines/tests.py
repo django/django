@@ -95,6 +95,16 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.get(reverse('admin:admin_inlines_titlecollection_add'))
         self.assertContains(response, '<th class="required">Title1</th>', html=True)
 
+    def test_custom_form_tabular_inline_overridden_label(self):
+        """
+        SomeChildModelForm.__init__() overrides the label of a form field.
+        That label is displayed in the TabularInline.
+        """
+        response = self.client.get(reverse('admin:admin_inlines_someparentmodel_add'))
+        field = list(response.context['inline_admin_formset'].fields())[0]
+        self.assertEqual(field['label'], 'new label')
+        self.assertContains(response, '<th class="required">New label</th>', html=True)
+
     def test_tabular_non_field_errors(self):
         """
         Ensure that non_field_errors are displayed correctly, including the
