@@ -115,19 +115,13 @@ WHEN (new.%(col_name)s IS NULL)
     _tzname_re = re.compile(r'^[\w/:+-]+$')
 
     def _convert_field_to_tz(self, field_name, tzname):
-        if settings.USE_TZ:
-            if not self._tzname_re.match(tzname):
-                raise ValueError("Invalid time zone name: %s" % tzname)
-            # Convert from UTC to local time, returning TIMESTAMP WITH TIME ZONE.
-            field_name = "(FROM_TZ(%s, '0:00') AT TIME ZONE '%s')" % (field_name, tzname)
-        # Extracting from a TIMESTAMP WITH TIME ZONE ignore the time zone.
-        # Convert to a DATETIME, which is called DATE by Oracle. There's no
-        # built-in function to do that; the easiest is to go through a string.
-        field_name = "TO_CHAR(%s, 'YYYY-MM-DD HH24:MI:SS')" % field_name
-        field_name = "TO_DATE(%s, 'YYYY-MM-DD HH24:MI:SS')" % field_name
-        # Re-convert to a TIMESTAMP because EXTRACT only handles the date part
-        # on DATE values, even though they actually store the time part.
-        return "CAST(%s AS TIMESTAMP)" % field_name
+        if not settings.USE_TZ:
+            return field_name
+        if not self._tzname_re.match(tzname):
+            raise ValueError("Invalid time zone name: %s" % tzname)
+        # Convert from UTC to local time, returning TIMESTAMP WITH TIME ZONE
+        # and cast it back to TIMESTAMP to strip the TIME ZONE details.
+        return "CAST((FROM_TZ(%s, '0:00') AT TIME ZONE '%s') AS TIMESTAMP)" % (field_name, tzname)
 
     def datetime_cast_date_sql(self, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
@@ -151,7 +145,7 @@ WHEN (new.%(col_name)s IS NULL)
         elif lookup_type == 'minute':
             sql = "TRUNC(%s, 'MI')" % field_name
         else:
-            sql = field_name    # Cast to DATE removes sub-second precision.
+            sql = "CAST(%s AS DATE)" % field_name  # Cast to DATE removes sub-second precision.
         return sql, []
 
     def get_db_converters(self, expression):
