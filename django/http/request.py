@@ -18,6 +18,7 @@ from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.encoding import (
     escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
 )
+from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, limited_parse_qsl
 from django.utils.six.moves.urllib.parse import (
     quote, urlencode, urljoin, urlsplit,
@@ -161,6 +162,15 @@ class HttpRequest(object):
             host=self._get_raw_host(),
             path=self.get_full_path(),
         )
+
+    @cached_property
+    def headers(self):
+        headers = {}
+        for key, value in self.META.items():
+            if key.startswith('HTTP_'):
+                key = key[len('HTTP_'):].lower().replace('_', '-')
+                headers[key] = value
+        return headers
 
     def build_absolute_uri(self, location=None):
         """
