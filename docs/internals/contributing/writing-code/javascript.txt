@@ -60,6 +60,8 @@ Closure Compiler library requires `Java`_ 7 or higher.
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
 minified scripts when submitting patches for Django's JavaScript.
 
+.. _javascript-tests:
+
 JavaScript tests
 ================
 
