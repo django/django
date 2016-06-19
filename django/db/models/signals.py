@@ -27,7 +27,10 @@ class ModelSignal(Signal):
             return partial_method(sender)
 
     def connect(self, receiver, sender=None, weak=True, dispatch_uid=None, apps=None):
-        self._lazy_method(super(ModelSignal, self).connect, apps, receiver, sender, dispatch_uid=dispatch_uid)
+        self._lazy_method(
+            super(ModelSignal, self).connect, apps, receiver, sender,
+            weak=weak, dispatch_uid=dispatch_uid,
+        )
 
     def disconnect(self, receiver=None, sender=None, weak=None, dispatch_uid=None, apps=None):
         if weak is not None:

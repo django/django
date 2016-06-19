@@ -4,7 +4,7 @@ from django.apps.registry import Apps
 from django.db import models
 from django.db.models import signals
 from django.dispatch import receiver
-from django.test import TestCase
+from django.test import TestCase, mock
 from django.test.utils import isolate_apps
 from django.utils import six
 
@@ -257,6 +257,19 @@ class SignalTests(BaseSignalTest):
         self.assertTrue(a._run)
         self.assertTrue(b._run)
         self.assertEqual(signals.post_save.receivers, [])
+
+    @mock.patch('weakref.ref')
+    def test_lazy_model_signal(self, ref):
+        def callback(sender, args, **kwargs):
+            pass
+        signals.pre_init.connect(callback)
+        signals.pre_init.disconnect(callback)
+        self.assertTrue(ref.called)
+        ref.reset_mock()
+
+        signals.pre_init.connect(callback, weak=False)
+        signals.pre_init.disconnect(callback)
+        ref.assert_not_called()
 
 
 class LazyModelRefTest(BaseSignalTest):
