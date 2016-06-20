@@ -586,6 +586,17 @@ class QueryTestCase(TestCase):
         pluto = Pet.objects.using('other').create(name="Pluto", owner=mickey)
         self.assertIsNone(pluto.full_clean())
 
+    # Any router that accesses `model` in db_for_read() works here.
+    @override_settings(DATABASE_ROUTERS=[AuthRouter()])
+    def test_foreign_key_validation_with_router(self):
+        """
+        ForeignKey.validate() passes `model` to db_for_read() even if
+        model_instance=None.
+        """
+        mickey = Person.objects.create(name="Mickey")
+        owner_field = Pet._meta.get_field('owner')
+        self.assertEqual(owner_field.clean(mickey.pk, None), mickey.pk)
+
     def test_o2o_separation(self):
         "OneToOne fields are constrained to a single database"
         # Create a user and profile on the default database
