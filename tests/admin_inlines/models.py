@@ -5,6 +5,7 @@ Testing of admin inline formsets.
 from __future__ import unicode_literals
 
 import random
+import uuid
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -174,6 +175,25 @@ class FootNote(models.Model):
     chapter = models.ForeignKey(Chapter, models.PROTECT)
     note = models.CharField(max_length=40)
 
+
+# Models for #15665
+
+class Holder15665(models.Model):
+    class Meta:
+        verbose_name = 'Holder'
+    dummy = models.IntegerField()
+
+class Inner15665(models.Model):
+    class Meta:
+        verbose_name = 'Inner'
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    dummy = models.IntegerField()
+    holder = models.ForeignKey(Holder15665, models.CASCADE)
+
+class SubInner15665(Inner15665):
+    pass
+
+
 # Models for #16838
 
 
@@ -251,6 +271,8 @@ class SomeChildModel(models.Model):
     name = models.CharField(max_length=1)
     position = models.PositiveIntegerField()
     parent = models.ForeignKey(SomeParentModel, models.CASCADE)
+
+
 
 # Other models
 
