@@ -51,7 +51,7 @@ class OperationTestBase(MigrationTestBase):
         return project_state, new_state
 
     def set_up_test_model(
-            self, app_label, second_model=False, third_model=False, multicol_index=False,
+            self, app_label, second_model=False, third_model=False, index=False, multicol_index=False,
             related_model=False, mti_model=False, proxy_model=False, manager_model=False,
             unique_together=False, options=False, db_table=None, index_together=False):
         """
@@ -96,6 +96,11 @@ class OperationTestBase(MigrationTestBase):
             ],
             options=model_options,
         )]
+        if index:
+            operations.append(migrations.AddIndex(
+                "Pony",
+                models.Index(fields=["pink"], name="pony_pink_idx")
+            ))
         if multicol_index:
             operations.append(migrations.AddIndex(
                 "Pony",
@@ -1446,6 +1451,43 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RemoveIndex")
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'model_name': "Pony", 'name': "pony_test_idx"})
+
+        # Also test a field dropped with index - sqlite remake issue
+        operations = [
+            migrations.RemoveIndex("Pony", "pony_test_idx"),
+            migrations.RemoveField("Pony", "pink"),
+        ]
+        self.assertColumnExists("test_rmin_pony", "pink")
+        self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
+        # Test database alteration
+        new_state = project_state.clone()
+        self.apply_operations('test_rmin', new_state, operations=operations)
+        self.assertColumnNotExists("test_rmin_pony", "pink")
+        self.assertIndexNotExists("test_rmin_pony", ["pink", "weight"])
+        # And test reversal
+        self.unapply_operations("test_rmin", project_state, operations=operations)
+        self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
+
+    def test_alter_field_with_index(self):
+        """
+        Test AlterField operation with an index to ensure indexes created via
+        Meta.indexes don't get dropped with sqlite3 remake.
+        """
+        project_state = self.set_up_test_model("test_alflin", index=True)
+        operation = migrations.AlterField("Pony", "pink", models.IntegerField(null=True))
+        new_state = project_state.clone()
+        operation.state_forwards("test_alflin", new_state)
+        # Test the database alteration
+        self.assertColumnNotNull("test_alflin_pony", "pink")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alflin", editor, project_state, new_state)
+        # Ensure that index hasn't been dropped
+        self.assertIndexExists("test_alflin_pony", ["pink"])
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alflin", editor, new_state, project_state)
+        # Ensure the index is still there
+        self.assertIndexExists("test_alflin_pony", ["pink"])
 
     def test_alter_index_together(self):
         """

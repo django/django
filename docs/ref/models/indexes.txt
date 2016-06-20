@@ -8,8 +8,10 @@ Model index reference
 
 .. versionadded:: 1.11
 
-Index classes ease creating database indexes. This document explains the API
-references of :class:`Index` which includes the `index options`_.
+Index classes ease creating database indexes. They can be added using the
+:attr:`Meta.indexes <django.db.models.Options.indexes>` option. This document
+explains the API references of :class:`Index` which includes the `index
+options`_.
 
 .. admonition:: Referencing built-in indexes
 
@@ -40,9 +42,3 @@ A list of the name of the fields on which the index is desired.
 The name of the index. If ``name`` isn't provided Django will auto-generate a
 name. For compatibility with different databases, index names cannot be longer
 than 30 characters and shouldn't start with a number (0-9) or underscore (_).
-
-.. seealso::
-
-    Use the :class:`~django.db.migrations.operations.AddIndex` and
-    :class:`~django.db.migrations.operations.RemoveIndex` operations to add
-    and remove indexes.

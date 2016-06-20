@@ -16,6 +16,9 @@ class IndexesTests(TestCase):
         index = models.Index(fields=['title'])
         same_index = models.Index(fields=['title'])
         another_index = models.Index(fields=['title', 'author'])
+        index.model = Book
+        same_index.model = Book
+        another_index.model = Book
         self.assertEqual(index, same_index)
         self.assertNotEqual(index, another_index)
 
@@ -56,7 +59,8 @@ class IndexesTests(TestCase):
 
     def test_deconstruction(self):
         index = models.Index(fields=['title'])
+        index.set_name_with_model(Book)
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, 'django.db.models.Index')
         self.assertEqual(args, ())
-        self.assertEqual(kwargs, {'fields': ['title']})
+        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'model_index_title_196f42_idx'})
