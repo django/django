@@ -35,9 +35,11 @@ class LiveServerBase(StaticLiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        # Allow parent tearDown to run first set it was setUp last, so that
+        # nested settings modification works appropriately
+        super(LiveServerBase, cls).tearDownClass()
         # Restore original settings
         cls.settings_override.disable()
-        super(LiveServerBase, cls).tearDownClass()
 
 
 class StaticLiveServerChecks(LiveServerBase):
