@@ -323,6 +323,9 @@ class RegexURLResolver(LocaleRegexProvider):
             callback = getattr(urls, 'handler%s' % view_type)
         return get_callable(callback), {}
 
+    def reverse(self, lookup_view, *args, **kwargs):
+        return self._reverse_with_prefix(lookup_view, '', *args, **kwargs)
+
     def _reverse_with_prefix(self, lookup_view, _prefix, *args, **kwargs):
         if args and kwargs:
             raise ValueError("Don't mix *args and **kwargs in call to reverse()!")

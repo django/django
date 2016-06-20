@@ -364,6 +364,12 @@ class ResolverTests(unittest.TestCase):
         except TypeError:
             self.fail('Failed to coerce lazy object to text')
 
+    def test_resolver_reverse(self):
+        resolver = get_resolver('urlpatterns_reverse.named_urls')
+        self.assertEqual(resolver.reverse('named-url1'), '')
+        self.assertEqual(resolver.reverse('named-url2', 'arg'), 'extra/arg/')
+        self.assertEqual(resolver.reverse('named-url2', extra='arg'), 'extra/arg/')
+
     def test_non_regex(self):
         """
         Verifies that we raise a Resolver404 if what we are resolving doesn't
