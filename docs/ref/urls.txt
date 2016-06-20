@@ -30,6 +30,14 @@ Helper function to return a URL pattern for serving files in debug mode::
         ...
     ]
 
+The ``view`` parameter can be:
+
+* view function name.
+
+* list or tuple containing 3 arguments: ``urlconf_module``, ``app_name`` and ``namespace``.
+
+* ``include(...)`` which is returning such tuple.
+
 The ``kwargs`` parameter allows you to pass additional arguments to the view
 function or method. See :ref:`views-extra-options` for an example.
 
