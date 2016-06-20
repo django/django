@@ -185,8 +185,8 @@ result, it's a good idea to be careful in your choice of default manager in
 order to avoid a situation where overriding ``get_queryset()`` results in an
 inability to retrieve objects you'd like to work with.
 
-You can specify a custom default manager using :attr:`Meta.base_manager_name
-<django.db.models.Options.base_manager_name>`.
+You can specify a custom default manager using :attr:`Meta.default_manager_name
+<django.db.models.Options.default_manager_name>`.
 
 If you're writing some code that must handle an unknown model, for example, in
 a third-party app that implements a generic view, use this manager (or
