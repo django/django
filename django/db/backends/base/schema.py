@@ -363,7 +363,9 @@ class BaseDatabaseSchemaEditor(object):
         """
         Renames the table a model points to.
         """
-        if old_db_table == new_db_table:
+        if (old_db_table == new_db_table or
+            (self.connection.features.ignores_quoted_identifier_case and
+                old_db_table.lower() == new_db_table.lower())):
             return
         self.execute(self.sql_rename_table % {
             "old_table": self.quote_name(old_db_table),
