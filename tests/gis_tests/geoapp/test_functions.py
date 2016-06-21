@@ -223,12 +223,9 @@ class GISFunctionsTests(TestCase):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(inter=functions.Intersection('mpoly', geom))
         for c in qs:
-            if spatialite or mysql:
-                # When the intersection is empty, Spatialite and MySQL return None
+            if spatialite or mysql or oracle:
+                # When the intersection is empty, Spatialite, MySQL and Oracle return None
                 expected = None
-            elif oracle:
-                # When the intersection is empty, Oracle returns an empty string
-                expected = ''
             else:
                 expected = c.mpoly.intersection(geom)
             self.assertEqual(c.inter, expected)
