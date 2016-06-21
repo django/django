@@ -33,10 +33,6 @@ class BaseUserManager(models.Manager):
             email = '@'.join([email_name, domain_part.lower()])
         return email
 
-    @classmethod
-    def normalize_username(cls, username):
-        return unicodedata.normalize('NFKC', force_text(username))
-
     def make_random_password(self, length=10,
                              allowed_chars='abcdefghjkmnpqrstuvwxyz'
                                            'ABCDEFGHJKLMNPQRSTUVWXYZ'
@@ -76,6 +72,9 @@ class AbstractBaseUser(models.Model):
 
     def __str__(self):
         return self.get_username()
+
+    def clean(self):
+        setattr(self, self.USERNAME_FIELD, self.normalize_username(self.get_username()))
 
     def save(self, *args, **kwargs):
         super(AbstractBaseUser, self).save(*args, **kwargs)
@@ -137,3 +136,7 @@ class AbstractBaseUser(models.Model):
         """
         key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
         return salted_hmac(key_salt, self.password).hexdigest()
+
+    @classmethod
+    def normalize_username(cls, username):
+        return unicodedata.normalize('NFKC', force_text(username))
