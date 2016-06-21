@@ -79,6 +79,7 @@ class BaseSpatialField(Field):
     of the spatial reference system of the field.
     """
     description = _("The base GIS field.")
+    empty_strings_allowed = False
     # Geodetic units.
     geodetic_units = ('decimal degree', 'degree')
 
