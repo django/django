@@ -182,7 +182,7 @@ class SightingInline(admin.TabularInline):
     model = Sighting
 
 
-# admin and form for #18263
+# admin and form for #18263 & #26729
 class SomeChildModelForm(forms.ModelForm):
 
     class Meta:
@@ -191,6 +191,10 @@ class SomeChildModelForm(forms.ModelForm):
         widgets = {
             'position': forms.HiddenInput,
         }
+
+    def __init__(self, *args, **kwargs):
+        super(SomeChildModelForm, self).__init__(*args, **kwargs)
+        self.fields['name'].label = 'new label'
 
 
 class SomeChildModelInline(admin.TabularInline):
