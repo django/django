@@ -693,11 +693,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_jsi18n_with_context(self):
         """
-        Make sure that jsi18n works when the context is applied to all adin urls
+        Make sure that jsi18n works when the context is applied to all admin urls
         """
         response = self.client.get(reverse('admin8:jsi18n'))
         self.assertEqual(response.status_code, 200)
-
 
     def test_L10N_deactivated(self):
         """
