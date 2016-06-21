@@ -884,6 +884,9 @@ Miscellaneous
 * The ``_base_manager`` and ``_default_manager`` attributes are removed from
   model instances. They remain accessible on the model class.
 
+* Accessing a deleted field on a model instance, e.g. after ``del obj.field``,
+  reloads the field's value instead of raising ``AttributeError``.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
