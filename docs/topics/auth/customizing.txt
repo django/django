@@ -612,6 +612,22 @@ The following attributes and methods are available on any subclass of
 
         Returns the value of the field nominated by ``USERNAME_FIELD``.
 
+    .. method:: clean()
+
+        .. versionadded:: 1.10
+
+        Normalizes the username by calling :meth:`normalize_username`. If you
+        override this method, be sure to call ``super()`` to retain the
+        normalization.
+
+    .. classmethod:: normalize_username(username)
+
+        .. versionadded:: 1.10
+
+        Applies NFKC Unicode normalization to usernames so that visually
+        identical characters with different Unicode code points are considered
+        identical.
+
     .. attribute:: models.AbstractBaseUser.is_authenticated
 
         Read-only attribute which is always ``True`` (as opposed to
@@ -725,14 +741,6 @@ utility methods:
 
         Normalizes email addresses by lowercasing the domain portion of the
         email address.
-
-    .. classmethod:: models.BaseUserManager.normalize_username(email)
-
-        .. versionadded:: 1.10
-
-        Applies NFKC Unicode normalization to usernames so that visually
-        identical characters with different Unicode code points are considered
-        identical.
 
     .. method:: models.BaseUserManager.get_by_natural_key(username)
 

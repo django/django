@@ -887,6 +887,10 @@ Miscellaneous
 * Accessing a deleted field on a model instance, e.g. after ``del obj.field``,
   reloads the field's value instead of raising ``AttributeError``.
 
+* If you subclass ``AbstractBaseUser`` and override ``clean()``, be sure it
+  calls ``super()``. :meth:`.AbstractBaseUser.normalize_username` is called in
+  a new :meth:`.AbstractBaseUser.clean` method.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
