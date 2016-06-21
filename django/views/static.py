@@ -60,7 +60,7 @@ def serve(request, path, document_root=None, show_indexes=False):
         raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
     # Respect the If-Modified-Since header.
     statobj = os.stat(fullpath)
-    if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
+    if not was_modified_since(request.headers.get('if-modified-since'),
                               statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified()
     content_type, encoding = mimetypes.guess_type(fullpath)

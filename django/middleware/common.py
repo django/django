@@ -45,9 +45,9 @@ class CommonMiddleware(MiddlewareMixin):
         """
 
         # Check for denied User-Agents
-        if 'HTTP_USER_AGENT' in request.META:
+        if 'user-agent' in request.headers:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
-                if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
+                if user_agent_regex.search(request.headers['user-agent']):
                     raise PermissionDenied('Forbidden user agent')
 
         # Check for a redirect based on settings.PREPEND_WWW
@@ -136,10 +136,10 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
         if response.status_code == 404 and not settings.DEBUG:
             domain = request.get_host()
             path = request.get_full_path()
-            referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
+            referer = force_text(request.headers.get('referer', ''), errors='replace')
 
             if not self.is_ignorable_request(request, path, domain, referer):
-                ua = force_text(request.META.get('HTTP_USER_AGENT', '<none>'), errors='replace')
+                ua = force_text(request.headers.get('user-agent', '<none>'), errors='replace')
                 ip = request.META.get('REMOTE_ADDR', '<none>')
                 mail_managers(
                     "Broken %slink on %s" % (
