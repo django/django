@@ -1300,6 +1300,16 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(m.group('version'), v_geos)
             self.assertEqual(m.group('capi_version'), v_capi)
 
+    def test_from_gml(self):
+        self.assertEqual(
+            GEOSGeometry('POINT(0 0)'),
+            GEOSGeometry.from_gml(
+                '<gml:Point gml:id="p21" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">'
+                '    <gml:pos srsDimension="2">0 0</gml:pos>'
+                '</gml:Point>'
+            ),
+        )
+
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_deprecated_srid_getters_setters(self):
         p = Point(1, 2, srid=123)
