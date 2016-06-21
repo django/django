@@ -223,7 +223,7 @@ class GISFunctionsTests(TestCase):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(inter=functions.Intersection('mpoly', geom))
         for c in qs:
-            if spatialite or mysql or oracle:
+            if spatialite or mysql and not connection.ops.returns_invalid_geometry_collection or oracle:
                 # When the intersection is empty, some databases return None.
                 expected = None
             else:
