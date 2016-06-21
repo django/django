@@ -221,6 +221,10 @@ class BaseDatabaseFeatures(object):
     # Defaults to False to allow third-party backends to opt-in.
     can_clone_databases = False
 
+    # Does the backend consider quoted identifiers with different casing to
+    # be equal?
+    ignores_quoted_identifier_case = False
+
     def __init__(self, connection):
         self.connection = connection
 
