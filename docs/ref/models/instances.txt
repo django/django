@@ -128,6 +128,18 @@ in the ``from_db()`` method.
 Refreshing objects from database
 ================================
 
+If you delete a field from a model instance, accessing it again reloads the
+value from the database::
+
+    >>> obj = MyModel.objects.first()
+    >>> del obj.field
+    >>> obj.field  # Loads the field from the database
+
+.. versionchanged:: 1.10
+
+    In older versions, accessing a deleted field raised ``AttributeError``
+    instead of reloading it.
+
 .. method:: Model.refresh_from_db(using=None, fields=None)
 
 If you need to reload a model's values from the database, you can use the
