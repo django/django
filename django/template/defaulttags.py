@@ -745,7 +745,7 @@ def do_filter(parser, token):
 @register.tag
 def firstof(parser, token):
     """
-    Outputs the first variable passed that is not False, without escaping.
+    Outputs the first variable passed that is not False.
 
     Outputs nothing if all the passed variables are False.
 
@@ -756,11 +756,11 @@ def firstof(parser, token):
     This is equivalent to::
 
         {% if var1 %}
-            {{ var1|safe }}
+            {{ var1 }}
         {% elif var2 %}
-            {{ var2|safe }}
+            {{ var2 }}
         {% elif var3 %}
-            {{ var3|safe }}
+            {{ var3 }}
         {% endif %}
 
     but obviously much cleaner!
