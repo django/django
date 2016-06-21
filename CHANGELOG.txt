@@ -1,3 +1,11 @@
+0.14.3 (2016-06-21)
+-------------------
+
+* + signs in query strings are no longer double-decoded
+
+* Message now has .values(), .keys() and .items() to match dict
+
+
 0.14.2 (2016-06-16)
 -------------------
 
