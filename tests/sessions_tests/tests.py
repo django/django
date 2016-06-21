@@ -746,8 +746,8 @@ class SessionMiddlewareTests(TestCase):
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
-    @override_settings(SESSION_COOKIE_DOMAIN='.example.local')
-    def test_session_delete_on_end_with_custom_domain(self):
+    @override_settings(SESSION_COOKIE_DOMAIN='.example.local', SESSION_COOKIE_PATH='/example/')
+    def test_session_delete_on_end_with_custom_domain_and_path(self):
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
@@ -763,12 +763,13 @@ class SessionMiddlewareTests(TestCase):
         response = middleware.process_response(request, response)
 
         # Check that the cookie was deleted, not recreated.
-        # A deleted cookie header with a custom domain looks like:
+        # A deleted cookie header with a custom domain and path looks like:
         #  Set-Cookie: sessionid=; Domain=.example.local;
-        #              expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
+        #              expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0;
+        #              Path=/example/
         self.assertEqual(
             'Set-Cookie: {}={}; Domain=.example.local; expires=Thu, '
-            '01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'.format(
+            '01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/example/'.format(
                 settings.SESSION_COOKIE_NAME,
                 '""' if sys.version_info >= (3, 5) else '',
             ),
