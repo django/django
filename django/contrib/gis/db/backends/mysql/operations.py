@@ -2,7 +2,7 @@ from django.contrib.gis.db.backends.base.adapter import WKTAdapter
 from django.contrib.gis.db.backends.base.operations import \
     BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.db.models import aggregates
+from django.contrib.gis.db.models import GeometryField, aggregates
 from django.db.backends.mysql.operations import DatabaseOperations
 from django.utils.functional import cached_property
 
@@ -21,6 +21,10 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     @cached_property
     def is_mysql_5_6(self):
         return self.connection.mysql_version < (5, 7, 6)
+
+    @cached_property
+    def uses_invalid_empty_geometry_collection(self):
+        return self.connection.mysql_version >= (5, 7, 5)
 
     @cached_property
     def select(self):
@@ -105,3 +109,16 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         else:
             placeholder = '%s(%%s)' % self.from_text
         return placeholder
+
+    def get_db_converters(self, expression):
+        converters = super(MySQLOperations, self).get_db_converters(expression)
+        if isinstance(expression.output_field, GeometryField) and self.uses_invalid_empty_geometry_collection:
+            converters.append(self.convert_invalid_empty_geometry_collection)
+        return converters
+
+    # https://dev.mysql.com/doc/refman/5.7/en/spatial-function-argument-handling.html
+    # MySQL 5.7.5 adds support for the empty geometry collections, but they are represented with invalid WKT.
+    def convert_invalid_empty_geometry_collection(self, value, expression, connection, context):
+        if value == b'GEOMETRYCOLLECTION()':
+            return b'GEOMETRYCOLLECTION EMPTY'
+        return value
