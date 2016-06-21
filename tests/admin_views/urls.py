@@ -12,5 +12,7 @@ urlpatterns = [
     url(r'^test_admin/admin4/', customadmin.simple_site.urls),
     url(r'^test_admin/admin5/', admin.site2.urls),
     url(r'^test_admin/admin7/', admin.site7.urls),
+    url(r'^test_admin/admin8/', (admin.site.get_urls(), 'admin', 'admin8'),
+        {"extra_context": dict(foo="bar")}),
     url(r'^test_admin/has_permission_admin/', custom_has_permission_admin.site.urls),
 ]
