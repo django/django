@@ -230,23 +230,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         if value is None:
             return 'NULL'
 
-        def transform_value(val, srid):
-            return val.srid != srid
-
-        if hasattr(value, 'as_sql'):
-            if transform_value(value, f.srid):
-                placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
-            else:
-                placeholder = '%s'
-            # No geometry value used for F expression, substitute in
-            # the column name instead.
-            sql, _ = compiler.compile(value)
-            return placeholder % sql
-        else:
-            if transform_value(value, f.srid):
-                return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (self.transform, value.srid, f.srid)
-            else:
-                return 'SDO_GEOMETRY(%%s, %s)' % f.srid
+        return super(OracleOperations, self).get_geom_placeholder(f, value, compiler)
 
     def spatial_aggregate_name(self, agg_name):
         """
