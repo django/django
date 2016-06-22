@@ -1,3 +1,10 @@
+0.15.0 (2016-06-22)
+-------------------
+
+* Query strings are now decoded entirely by Django. Must be used with Daphne
+  0.13 or higher.
+
+
 0.14.3 (2016-06-21)
 -------------------
 
