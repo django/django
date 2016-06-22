@@ -135,11 +135,9 @@ class AsgiRequest(http.HttpRequest):
 
     @cached_property
     def GET(self):
-        # Django will try and re-urldecode the string and interpret + as space;
-        # we re-encode + here to fix this.
-        return http.QueryDict(
-            self.message.get('query_string', '').replace("+", "%2b").encode("utf8"),
-        )
+        # Django will try and re-urldecode the query string and interpret + as space;
+        # we re-encode it here to fix this.
+        return http.QueryDict(self.message.get('query_string', ''))
 
     def _get_post(self):
         if not hasattr(self, '_post'):

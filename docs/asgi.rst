@@ -526,10 +526,7 @@ Keys:
 * ``path``: Unicode string HTTP path from URL, with percent escapes decoded
   and UTF8 byte sequences decoded into characters.
 
-* ``query_string``: Unicode string URL portion after the ``?``, already
-  url-decoded, like ``path``. Optional, default is ``""``. ``+`` characters in
-  this portion should be interpreted by the application to be literal pluses,
-  not spaces.
+* ``query_string``: Byte string URL portion after the ``?``, not url-decoded.
 
 * ``root_path``: Unicode string that indicates the root path this application
   is mounted at; same as ``SCRIPT_NAME`` in WSGI. Optional, defaults

@@ -46,7 +46,7 @@ class RequestTests(ChannelTestCase):
             "http_version": "1.1",
             "method": "GET",
             "path": "/test2/",
-            "query_string": "x=1&y=foo bar+baz",
+            "query_string": b"x=1&y=%26foo+bar%2Bbaz",
             "headers": {
                 "host": b"example.com",
                 "cookie": b"test-time=1448995585123; test-value=yeah",
@@ -65,7 +65,7 @@ class RequestTests(ChannelTestCase):
         self.assertEqual(request.META["SERVER_NAME"], "10.0.0.2")
         self.assertEqual(request.META["SERVER_PORT"], 80)
         self.assertEqual(request.GET["x"], "1")
-        self.assertEqual(request.GET["y"], "foo bar+baz")
+        self.assertEqual(request.GET["y"], "&foo bar+baz")
         self.assertEqual(request.COOKIES["test-time"], "1448995585123")
         self.assertEqual(request.COOKIES["test-value"], "yeah")
         self.assertFalse(request.POST)
