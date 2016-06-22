@@ -147,7 +147,7 @@ class BaseCache(object):
                 d[k] = val
         return d
 
-    def get_or_set(self, key, default=None, timeout=DEFAULT_TIMEOUT, version=None):
+    def get_or_set(self, key, default, timeout=DEFAULT_TIMEOUT, version=None):
         """
         Fetch a given key from the cache. If the key does not exist,
         the key is added and set to the default value. The default value can
@@ -156,10 +156,8 @@ class BaseCache(object):
 
         Return the value of the key stored or retrieved.
         """
-        if default is None:
-            raise ValueError('You need to specify a value.')
         val = self.get(key, version=version)
-        if val is None:
+        if val is None and default is not None:
             if callable(default):
                 default = default()
             self.add(key, default, timeout=timeout, version=version)
