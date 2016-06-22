@@ -260,7 +260,7 @@ Miscellaneous
 
 * Support for SpatiaLite < 4.0 is dropped.
 
-* CSRF failures are logged to the ``django.security.csrf ``` logger instead of
+* CSRF failures are logged to the ``django.security.csrf`` logger instead of
   ``django.request``.
 
 * :setting:`ALLOWED_HOSTS` validation is no longer disabled when running tests.
