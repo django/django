@@ -1943,11 +1943,27 @@ no grouping will be applied to the number. If this setting is greater than
 ``0``, then :setting:`THOUSAND_SEPARATOR` will be used as the separator between
 those groups.
 
+Some locales use non-uniform digit grouping, e.g. ``10,00,00,000`` in
+``en_IN``. For this case, you can provide a sequence with the number of digit
+group sizes to be applied. The first number defines the size of the group
+preceding the decimal delimiter and each number that follows defines the size
+of preceding groups. If the sequence is terminated with ``-1``, no further
+grouping is performed. If the sequence terminates with a ``0``, the last group
+size is used for the remainder of the number.
+
+Example tuple for ``en_IN``::
+
+    NUMBER_GROUPING = (3, 2, 0)
+
 Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
 format has higher precedence and will be applied instead.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
+
+.. versionchanged:: 1.11
+
+    Support for non-uniform digit grouping was added.
 
 .. setting:: PREPEND_WWW
 
