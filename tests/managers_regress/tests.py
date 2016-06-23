@@ -334,11 +334,26 @@ class TestManagerDeprecations(TestCase):
         self.assertEqual(len(warns), 0)
 
     def test_use_for_related_fields_for_many_to_one(self):
+        # Common objects
+        class MyManagerQuerySet(models.QuerySet):
+            pass
+
+        class MyLegacyManagerQuerySet(models.QuerySet):
+            pass
+
         class MyManager(models.Manager):
+            def get_queryset(self):
+                return MyManagerQuerySet(model=self.model, using=self._db, hints=self._hints)
+
+        class MyLegacyManager(models.Manager):
             use_for_related_fields = True
 
+            def get_queryset(self):
+                return MyLegacyManagerQuerySet(model=self.model, using=self._db, hints=self._hints)
+
+        # With legacy config there should be a deprecation warning
         class MyRelModel(models.Model):
-            objects = MyManager()
+            objects = MyLegacyManager()
 
         class MyModel(models.Model):
             fk = models.ForeignKey(MyRelModel, on_delete=models.DO_NOTHING)
@@ -375,16 +390,61 @@ class TestManagerDeprecations(TestCase):
                 pass
         self.assertEqual(len(warns), 0)
 
+        # When mixing the new base_manager_name API and
+        # use_for_related_fields, there should be warnings.
+        class MyRelModel3(models.Model):
+            my_base_manager = MyManager()
+            my_default_manager = MyLegacyManager()
+
+            class Meta:
+                base_manager_name = 'my_base_manager'
+                default_manager_name = 'my_default_manager'
+
+        class MyModel3(models.Model):
+            fk = models.ForeignKey(MyRelModel3, on_delete=models.DO_NOTHING)
+
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always', RemovedInDjango20Warning)
+            try:
+                MyModel3(fk_id=42).fk
+            except DatabaseError:
+                pass
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            "use_for_related_fields is deprecated, "
+            "instead set Meta.base_manager_name on "
+            "'managers_regress.MyRelModel3'.",
+        )
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter('always', RemovedInDjango20Warning)
+            self.assertIsInstance(MyModel3.fk.get_queryset(), MyLegacyManagerQuerySet)
+
     def test_use_for_related_fields_for_one_to_one(self):
+        # Common objects
+        class MyManagerQuerySet(models.QuerySet):
+            pass
+
+        class MyLegacyManagerQuerySet(models.QuerySet):
+            pass
+
         class MyManager(models.Manager):
+            def get_queryset(self):
+                return MyManagerQuerySet(model=self.model, using=self._db, hints=self._hints)
+
+        class MyLegacyManager(models.Manager):
             use_for_related_fields = True
 
+            def get_queryset(self):
+                return MyLegacyManagerQuerySet(model=self.model, using=self._db, hints=self._hints)
+
+        # With legacy config there should be a deprecation warning
         class MyRelModel(models.Model):
-            objects = MyManager()
+            objects = MyLegacyManager()
 
         class MyModel(models.Model):
             o2o = models.OneToOneField(MyRelModel, on_delete=models.DO_NOTHING)
-            objects = MyManager()
+            objects = MyLegacyManager()
 
         with warnings.catch_warnings(record=True) as warns:
             warnings.simplefilter('always', RemovedInDjango20Warning)
@@ -439,6 +499,36 @@ class TestManagerDeprecations(TestCase):
             except DatabaseError:
                 pass
         self.assertEqual(len(warns), 0)
+
+        # When mixing the new base_manager_name API and use_for_related_fields, there should be warnings.
+        class MyRelModel3(models.Model):
+            my_base_manager = MyManager()
+            my_default_manager = MyLegacyManager()
+
+            class Meta:
+                base_manager_name = 'my_base_manager'
+                default_manager_name = 'my_default_manager'
+
+        class MyModel3(models.Model):
+            o2o = models.OneToOneField(MyRelModel3, on_delete=models.DO_NOTHING)
+
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always', RemovedInDjango20Warning)
+            try:
+                MyModel3(o2o_id=42).o2o
+            except DatabaseError:
+                pass
+
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            "use_for_related_fields is deprecated, "
+            "instead set Meta.base_manager_name on "
+            "'managers_regress.MyRelModel3'.",
+        )
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter('always', RemovedInDjango20Warning)
+            self.assertIsInstance(MyModel3.o2o.get_queryset(), MyLegacyManagerQuerySet)
 
     def test_legacy_objects_is_created(self):
         class ConcreteParentWithoutManager(models.Model):

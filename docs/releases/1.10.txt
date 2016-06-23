@@ -1091,6 +1091,12 @@ class to override the manager from the concrete model, or you'll set the
 model's ``Meta.manager_inheritance_from_future=True`` option to opt-in to the
 new inheritance behavior.
 
+During the deprecation period, ``use_for_related_fields`` will be
+honored and raise a warning, even if a ``base_manager_name`` is set. This
+allows third-party code to preserve legacy behavior while transitioning
+to the new API. The warning can be silenced by setting
+``silence_use_for_related_fields_deprecation = True`` on the manager.
+
 Miscellaneous
 -------------
 
