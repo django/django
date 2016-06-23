@@ -90,6 +90,54 @@ class IntegerFieldTests(TestCase):
             instance.value = max_value
             instance.full_clean()
 
+    def test_redundant_backend_range_validators(self):
+        """
+        If there are stricter validators than ones from backend
+        then backend validators are not added
+        (#26786)
+        """
+        min_backend_value, max_backend_value = self.backend_range
+        ranged_field = self.model._meta.get_field('ranged_value')
+
+        if min_backend_value is not None:
+            min_field_value = min(
+                [validator.limit_value for validator in ranged_field.validators
+                 if isinstance(validator, validators.MinValueValidator)]
+            )
+            instance = self.model(
+                value=0, ranged_value=min_backend_value - 1
+            )
+            field_range_message = validators.MinValueValidator.message % {
+                'limit_value': min_field_value,
+            }
+            backend_range_message = validators.MinValueValidator.message % {
+                'limit_value': min_backend_value
+            }
+
+            with self.assertRaises(ValidationError) as cm:
+                instance.full_clean()
+            self.assertIn(field_range_message, str(cm.exception))
+            self.assertNotIn(backend_range_message, str(cm.exception))
+
+        if max_backend_value is not None:
+            max_field_value = max(
+                [validator.limit_value for validator in ranged_field.validators
+                 if isinstance(validator, validators.MaxValueValidator)]
+            )
+            instance = self.model(
+                value=0, ranged_value=max_backend_value + 1
+            )
+            field_range_message = validators.MaxValueValidator.message % {
+                'limit_value': max_field_value,
+            }
+            backend_range_message = validators.MaxValueValidator.message % {
+                'limit_value': max_backend_value
+            }
+            with self.assertRaises(ValidationError) as cm:
+                instance.full_clean()
+            self.assertIn(field_range_message, str(cm.exception))
+            self.assertNotIn(backend_range_message, str(cm.exception))
+
     def test_types(self):
         instance = self.model(value=0)
         self.assertIsInstance(instance.value, six.integer_types)
