@@ -11,7 +11,6 @@ from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import Http404
 from django.http.multipartparser import MultiPartParserError
 from django.urls import get_resolver, get_urlconf
-from django.utils import six
 from django.utils.decorators import available_attrs
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -127,9 +126,6 @@ def handle_uncaught_exception(request, resolver, exc_info):
     if settings.DEBUG:
         return debug.technical_500_response(request, *exc_info)
 
-    # If Http500 handler is not installed, reraise the last exception.
-    if resolver.urlconf_module is None:
-        six.reraise(*exc_info)
     # Return an HttpResponse that displays a friendly error message.
     callback, param_dict = resolver.resolve_error_handler(500)
     return callback(request, **param_dict)
