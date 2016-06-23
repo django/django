@@ -167,6 +167,7 @@ class Query(object):
         self.distinct_fields = []
         self.select_for_update = False
         self.select_for_update_nowait = False
+        self.select_for_update_skip_locked = False
 
         self.select_related = False
         # Arbitrary limit for select_related to prevents infinite recursion.
@@ -286,6 +287,7 @@ class Query(object):
         obj.distinct_fields = self.distinct_fields[:]
         obj.select_for_update = self.select_for_update
         obj.select_for_update_nowait = self.select_for_update_nowait
+        obj.select_for_update_skip_locked = self.select_for_update_skip_locked
         obj.select_related = self.select_related
         obj.values_select = self.values_select[:]
         obj._annotations = self._annotations.copy() if self._annotations is not None else None

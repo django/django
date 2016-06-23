@@ -150,7 +150,9 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the ``skip_locked`` argument to :meth:`.QuerySet.select_for_update()`
+  on PostgreSQL 9.5+ and Oracle to execute queries with
+  ``FOR UPDATE SKIP LOCKED``.
 
 Email
 ~~~~~
@@ -296,6 +298,9 @@ Database backend API
 * The ``DatabaseOperations.datetime_cast_time_sql()`` method is added to
   support the :lookup:`time` lookup. It accepts a ``field_name`` and ``tzname``
   arguments and returns the SQL necessary to cast a datetime value to time value.
+
+* To enable ``FOR UPDATE SKIP LOCKED`` support, set
+  ``DatabaseFeatures.has_select_for_update_skip_locked = True``.
 
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
 --------------------------------------------------

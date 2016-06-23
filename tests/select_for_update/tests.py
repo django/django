@@ -52,10 +52,10 @@ class SelectForUpdateTests(TransactionTestCase):
         self.new_connection.rollback()
         self.new_connection.set_autocommit(True)
 
-    def has_for_update_sql(self, queries, nowait=False):
+    def has_for_update_sql(self, queries, **kwargs):
         # Examine the SQL that was executed to determine whether it
         # contains the 'SELECT..FOR UPDATE' stanza.
-        for_update_sql = connection.ops.for_update_sql(nowait)
+        for_update_sql = connection.ops.for_update_sql(**kwargs)
         return any(for_update_sql in query['sql'] for query in queries)
 
     @skipUnlessDBFeature('has_select_for_update')
@@ -78,6 +78,16 @@ class SelectForUpdateTests(TransactionTestCase):
             list(Person.objects.all().select_for_update(nowait=True))
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, nowait=True))
 
+    @skipUnlessDBFeature('has_select_for_update_skip_locked')
+    def test_for_update_sql_generated_skip_locked(self):
+        """
+        Test that the backend's FOR UPDATE SKIP LOCKED variant appears in
+        generated SQL when select_for_update is invoked.
+        """
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            list(Person.objects.all().select_for_update(skip_locked=True))
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, skip_locked=True))
+
     @skipUnlessDBFeature('has_select_for_update_nowait')
     def test_nowait_raises_error_on_block(self):
         """
@@ -99,6 +109,25 @@ class SelectForUpdateTests(TransactionTestCase):
         self.end_blocking_transaction()
         self.assertIsInstance(status[-1], DatabaseError)
 
+    @skipUnlessDBFeature('has_select_for_update_skip_locked')
+    def test_skip_locked_skips_locked_rows(self):
+        """
+        If skip_locked is specified, the locked row is skipped resulting in
+        Person.DoesNotExist.
+        """
+        self.start_blocking_transaction()
+        status = []
+        thread = threading.Thread(
+            target=self.run_select_for_update,
+            args=(status,),
+            kwargs={'skip_locked': True},
+        )
+        thread.start()
+        time.sleep(1)
+        thread.join()
+        self.end_blocking_transaction()
+        self.assertIsInstance(status[-1], Person.DoesNotExist)
+
     @skipIfDBFeature('has_select_for_update_nowait')
     @skipUnlessDBFeature('has_select_for_update')
     def test_unsupported_nowait_raises_error(self):
@@ -109,6 +138,17 @@ class SelectForUpdateTests(TransactionTestCase):
         """
         with self.assertRaises(DatabaseError):
             list(Person.objects.all().select_for_update(nowait=True))
+
+    @skipIfDBFeature('has_select_for_update_skip_locked')
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_unsupported_skip_locked_raises_error(self):
+        """
+        DatabaseError is raised if a SELECT...FOR UPDATE SKIP LOCKED is run on
+        a database backend that supports FOR UPDATE but not SKIP LOCKED.
+        """
+        with self.assertRaisesMessage(DatabaseError, 'SKIP LOCKED is not supported on this database backend.'):
+            with transaction.atomic():
+                Person.objects.select_for_update(skip_locked=True).get()
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_requires_transaction(self):
@@ -130,7 +170,7 @@ class SelectForUpdateTests(TransactionTestCase):
         with self.assertRaises(transaction.TransactionManagementError):
             list(people)
 
-    def run_select_for_update(self, status, nowait=False):
+    def run_select_for_update(self, status, **kwargs):
         """
         Utility method that runs a SELECT FOR UPDATE against all
         Person instances. After the select_for_update, it attempts
@@ -143,12 +183,10 @@ class SelectForUpdateTests(TransactionTestCase):
             # We need to enter transaction management again, as this is done on
             # per-thread basis
             with transaction.atomic():
-                people = list(
-                    Person.objects.all().select_for_update(nowait=nowait)
-                )
-                people[0].name = 'Fred'
-                people[0].save()
-        except DatabaseError as e:
+                person = Person.objects.select_for_update(**kwargs).get()
+                person.name = 'Fred'
+                person.save()
+        except (DatabaseError, Person.DoesNotExist) as e:
             status.append(e)
         finally:
             # This method is run in a separate thread. It uses its own
@@ -248,3 +286,7 @@ class SelectForUpdateTests(TransactionTestCase):
         with transaction.atomic():
             person = Person.objects.select_for_update().get(name='Reinhardt')
         self.assertEqual(person.name, 'Reinhardt')
+
+    def test_nowait_and_skip_locked(self):
+        with self.assertRaisesMessage(ValueError, 'The nowait option cannot be used with skip_locked.'):
+            Person.objects.select_for_update(nowait=True, skip_locked=True)

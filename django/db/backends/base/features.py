@@ -36,6 +36,7 @@ class BaseDatabaseFeatures(object):
     allow_sliced_subqueries = True
     has_select_for_update = False
     has_select_for_update_nowait = False
+    has_select_for_update_skip_locked = False
 
     supports_select_related = True
 
