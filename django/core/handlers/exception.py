@@ -85,6 +85,10 @@ def response_for_exception(request, exc):
         signals.got_request_exception.send(sender=None, request=request)
         response = handle_uncaught_exception(request, get_resolver(get_urlconf()), sys.exc_info())
 
+    # Force a TemplateResponse to be rendered.
+    if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
+        response = response.render()
+
     return response
 
 
