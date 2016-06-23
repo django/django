@@ -814,39 +814,16 @@ This allows the use of automated test clients other than the
 client, to execute a series of functional tests inside a browser and simulate a
 real user's actions.
 
-By default the live server listens on ``localhost`` and picks the first
-available port in the ``8081-8179`` range. Its full URL can be accessed with
+The live server listens on ``localhost`` and binds to port 0 which uses a free
+port assigned by the operating system. The server's URL can be accessed with
 ``self.live_server_url`` during the tests.
 
-If you'd like to select another address, you may pass a different one using the
-:option:`test --liveserver` option, for example:
+.. versionchanged:: 1.11
 
-.. code-block:: console
-
-    $ ./manage.py test --liveserver=localhost:8082
-
-Another way of changing the default server address is by setting the
-`DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable somewhere in your
-code (for example, in a :ref:`custom test runner<topics-testing-test_runner>`)::
-
-    import os
-    os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8082'
-
-In the case where the tests are run by multiple processes in parallel (for
-example, in the context of several simultaneous `continuous integration`_
-builds), the processes will compete for the same address, and therefore your
-tests might randomly fail with an "Address already in use" error. To avoid this
-problem, you can pass a comma-separated list of ports or ranges of ports (at
-least as many as the number of potential parallel processes). For example:
-
-.. code-block:: console
-
-    $ ./manage.py test --liveserver=localhost:8082,8090-8100,9000-9200,7041
-
-Then, during test execution, each new live test server will try every specified
-port until it finds one that is free and takes it.
-
-.. _continuous integration: https://en.wikipedia.org/wiki/Continuous_integration
+    In older versions, Django tried a predefined port range which could be
+    customized in various ways including the ``DJANGO_LIVE_TEST_SERVER_ADDRESS``
+    environment variable. This is removed in favor of the simpler "bind to port
+    0" technique.
 
 To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
 test. First of all, you need to install the `selenium package`_ into your
