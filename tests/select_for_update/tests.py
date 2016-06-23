@@ -10,13 +10,11 @@ from django.test import (
     TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
+from django.test.utils import CaptureQueriesContext
 
 from .models import Person
 
 
-# We need to set settings.DEBUG to True so we can capture the output SQL
-# to examine.
-@override_settings(DEBUG=True)
 class SelectForUpdateTests(TransactionTestCase):
 
     available_apps = ['select_for_update']
@@ -54,12 +52,11 @@ class SelectForUpdateTests(TransactionTestCase):
         self.new_connection.rollback()
         self.new_connection.set_autocommit(True)
 
-    def has_for_update_sql(self, tested_connection, nowait=False):
+    def has_for_update_sql(self, queries, nowait=False):
         # Examine the SQL that was executed to determine whether it
         # contains the 'SELECT..FOR UPDATE' stanza.
-        for_update_sql = tested_connection.ops.for_update_sql(nowait)
-        sql = tested_connection.queries[-1]['sql']
-        return bool(sql.find(for_update_sql) > -1)
+        for_update_sql = connection.ops.for_update_sql(nowait)
+        return any(for_update_sql in query['sql'] for query in queries)
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_sql_generated(self):
@@ -67,9 +64,9 @@ class SelectForUpdateTests(TransactionTestCase):
         Test that the backend's FOR UPDATE variant appears in
         generated SQL when select_for_update is invoked.
         """
-        with transaction.atomic():
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(Person.objects.all().select_for_update())
-        self.assertTrue(self.has_for_update_sql(connection))
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries))
 
     @skipUnlessDBFeature('has_select_for_update_nowait')
     def test_for_update_sql_generated_nowait(self):
@@ -77,9 +74,9 @@ class SelectForUpdateTests(TransactionTestCase):
         Test that the backend's FOR UPDATE NOWAIT variant appears in
         generated SQL when select_for_update is invoked.
         """
-        with transaction.atomic():
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(Person.objects.all().select_for_update(nowait=True))
-        self.assertTrue(self.has_for_update_sql(connection, nowait=True))
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, nowait=True))
 
     @skipUnlessDBFeature('has_select_for_update_nowait')
     def test_nowait_raises_error_on_block(self):
