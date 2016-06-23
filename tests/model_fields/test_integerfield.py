@@ -90,6 +90,35 @@ class IntegerFieldTests(TestCase):
             instance.value = max_value
             instance.full_clean()
 
+    def test_redundant_backend_range_validators(self):
+        """
+        If there are stricter validators than the ones from the database
+        backend then the backend validators aren't added.
+        """
+        min_backend_value, max_backend_value = self.backend_range
+
+        if min_backend_value is not None:
+            min_custom_value = min_backend_value + 1
+            ranged_value_field = self.model._meta.get_field('value').__class__(
+                validators=[validators.MinValueValidator(min_custom_value)]
+            )
+            field_range_message = validators.MinValueValidator.message % {
+                'limit_value': min_custom_value,
+            }
+            with self.assertRaisesMessage(ValidationError, "[%r]" % field_range_message):
+                ranged_value_field.run_validators(min_backend_value - 1)
+
+        if max_backend_value is not None:
+            max_custom_value = max_backend_value - 1
+            ranged_value_field = self.model._meta.get_field('value').__class__(
+                validators=[validators.MaxValueValidator(max_custom_value)]
+            )
+            field_range_message = validators.MaxValueValidator.message % {
+                'limit_value': max_custom_value,
+            }
+            with self.assertRaisesMessage(ValidationError, "[%r]" % field_range_message):
+                ranged_value_field.run_validators(max_backend_value + 1)
+
     def test_types(self):
         instance = self.model(value=0)
         self.assertIsInstance(instance.value, six.integer_types)
