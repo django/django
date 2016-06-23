@@ -547,9 +547,16 @@ class BaseDatabaseSchemaEditor(object):
                 for fk_name in rel_fk_names:
                     self.execute(self._delete_constraint_sql(self.sql_delete_fk, new_rel.related_model, fk_name))
         # Removed an index? (no strict check, as multiple indexes are possible)
-        if (old_field.db_index and not new_field.db_index and
-                not old_field.unique and not
-                (not new_field.unique and old_field.unique)):
+        # Remove indexes if db_index switched to False or a unique constraint
+        # will now be used in lieu of an index. The following lines from the
+        # truth table show all True cases; the rest are False:
+        #
+        # old_field.db_index | old_field.unique | new_field.db_index | new_field.unique
+        # ------------------------------------------------------------------------------
+        # True               | False            | False              | False
+        # True               | False            | False              | True
+        # True               | False            | True               | True
+        if old_field.db_index and not old_field.unique and (not new_field.db_index or new_field.unique):
             # Find the index for this field
             index_names = self._constraint_names(model, [old_field.column], index=True)
             for index_name in index_names:
@@ -688,10 +695,16 @@ class BaseDatabaseSchemaEditor(object):
             old_field.primary_key and not new_field.primary_key and new_field.unique
         ):
             self.execute(self._create_unique_sql(model, [new_field.column]))
-        # Added an index?
-        if (not old_field.db_index and new_field.db_index and
-                not new_field.unique and not
-                (not old_field.unique and new_field.unique)):
+        # Added an index? Add an index if db_index switched to True or a unique
+        # constraint will no longer be used in lieu of an index. The following
+        # lines from the truth table show all True cases; the rest are False:
+        #
+        # old_field.db_index | old_field.unique | new_field.db_index | new_field.unique
+        # ------------------------------------------------------------------------------
+        # False              | False            | True               | False
+        # False              | True             | True               | False
+        # True               | True             | True               | False
+        if (not old_field.db_index or old_field.unique) and new_field.db_index and not new_field.unique:
             self.execute(self._create_index_sql(model, [new_field]))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
