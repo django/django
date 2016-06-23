@@ -109,8 +109,7 @@ class ForwardManyToOneDescriptor(object):
     def get_queryset(self, **hints):
         related_model = self.field.remote_field.model
 
-        if (not related_model._meta.base_manager_name and
-                getattr(related_model._default_manager, 'use_for_related_fields', False)):
+        if (getattr(related_model._default_manager, 'use_for_related_fields', False)):
             if not getattr(related_model._default_manager, 'silence_use_for_related_fields_deprecation', False):
                 warnings.warn(
                     "use_for_related_fields is deprecated, instead "
@@ -326,8 +325,7 @@ class ReverseOneToOneDescriptor(object):
     def get_queryset(self, **hints):
         related_model = self.related.related_model
 
-        if (not related_model._meta.base_manager_name and
-                getattr(related_model._default_manager, 'use_for_related_fields', False)):
+        if (getattr(related_model._default_manager, 'use_for_related_fields', False)):
             if not getattr(related_model._default_manager, 'silence_use_for_related_fields_deprecation', False):
                 warnings.warn(
                     "use_for_related_fields is deprecated, instead "
