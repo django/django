@@ -42,7 +42,6 @@ from django.utils.cache import (
 )
 from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
-
 from .models import Poll, expensive_calculation
 
 try:    # Use the same idiom as in cache backends
@@ -219,6 +218,7 @@ class DummyCacheTests(SimpleTestCase):
             return 'default'
 
         self.assertEqual(cache.get_or_set('mykey', my_callable), 'default')
+        self.assertEqual(cache.get_or_set('mykey', my_callable()), 'default')
 
 
 def custom_key_func(key, key_prefix, version):
@@ -927,9 +927,15 @@ class BaseCacheTests(object):
 
     def test_get_or_set_version(self):
         cache.get_or_set('brian', 1979, version=2)
-        with self.assertRaisesMessage(ValueError, 'You need to specify a value.'):
+        with self.assertRaisesMessage(TypeError,
+                                      "get_or_set() missing 1 required positional argument: 'default'"
+                                      if six.PY3
+                                      else 'get_or_set() takes at least 3 arguments (2 given)'):
             cache.get_or_set('brian')
-        with self.assertRaisesMessage(ValueError, 'You need to specify a value.'):
+        with self.assertRaisesMessage(TypeError,
+                                      "get_or_set() missing 1 required positional argument: 'default'"
+                                      if six.PY3
+                                      else 'get_or_set() takes at least 3 arguments (3 given)'):
             cache.get_or_set('brian', version=1)
         self.assertIsNone(cache.get('brian', version=1))
         self.assertEqual(cache.get_or_set('brian', 42, version=1), 42)
