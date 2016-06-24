@@ -1,10 +1,14 @@
 from __future__ import unicode_literals
 
+import time
 import traceback
-from datetime import date
+from datetime import date, datetime, timedelta
+from threading import Thread
 
 from django.db import DatabaseError, IntegrityError
-from django.test import TestCase, TransactionTestCase, ignore_warnings
+from django.test import (
+    TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
+)
 from django.utils.encoding import DjangoUnicodeDecodeError
 
 from .models import (
@@ -422,3 +426,48 @@ class UpdateOrCreateTests(TestCase):
         )
         self.assertIs(created, False)
         self.assertEqual(obj.last_name, 'NotHarrison')
+
+
+class UpdateOrCreateTransactionTests(TransactionTestCase):
+    available_apps = ['get_or_create']
+
+    @skipUnlessDBFeature('has_select_for_update')
+    @skipUnlessDBFeature('supports_transactions')
+    def test_updates_in_transaction(self):
+        """
+        Objects are selected and updated in a transaction to avoid race
+        conditions. This test forces update_or_create() to hold the lock
+        in another thread for a relatively long time so that it can update
+        while it holds the lock. The updated field isn't a field in 'defaults',
+        so update_or_create() shouldn't have an effect on it.
+        """
+        def birthday_sleep():
+            time.sleep(0.3)
+            return date(1940, 10, 10)
+
+        def update_birthday_slowly():
+            Person.objects.update_or_create(
+                first_name='John', defaults={'birthday': birthday_sleep}
+            )
+
+        Person.objects.create(first_name='John', last_name='Lennon', birthday=date(1940, 10, 9))
+
+        # update_or_create in a separate thread
+        t = Thread(target=update_birthday_slowly)
+        before_start = datetime.now()
+        t.start()
+
+        # Wait for lock to begin
+        time.sleep(0.05)
+
+        # Update during lock
+        Person.objects.filter(first_name='John').update(last_name='NotLennon')
+        after_update = datetime.now()
+
+        # Wait for thread to finish
+        t.join()
+
+        # The update remains and it blocked.
+        updated_person = Person.objects.get(first_name='John')
+        self.assertGreater(after_update - before_start, timedelta(seconds=0.3))
+        self.assertEqual(updated_person.last_name, 'NotLennon')
