@@ -74,6 +74,9 @@ class GeomValue(Value):
     def as_sql(self, compiler, connection):
         return '%s(%%s, %s)' % (connection.ops.from_text, self.srid), [connection.ops.Adapter(self.value)]
 
+    def as_mysql(self, compiler, connection):
+        return '%s(%%s)' % (connection.ops.from_text), [connection.ops.Adapter(self.value)]
+
     def as_postgresql(self, compiler, connection):
         if self.geography:
             self.value = connection.ops.Adapter(self.value, geography=self.geography)
