@@ -7,7 +7,6 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import FileSystemStorage
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.fields.files import ImageField, ImageFieldFile
 from django.db.models.fields.related import (
@@ -93,43 +92,23 @@ class UnicodeSlugField(models.Model):
 
 class SmallIntegerModel(models.Model):
     value = models.SmallIntegerField()
-    ranged_value = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(3)],
-        default=2
-    )
 
 
 class IntegerModel(models.Model):
     value = models.IntegerField()
-    ranged_value = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(3)],
-        default=2
-    )
 
 
 class BigIntegerModel(models.Model):
     value = models.BigIntegerField()
     null_value = models.BigIntegerField(null=True, blank=True)
-    ranged_value = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(3)],
-        default=2
-    )
 
 
 class PositiveSmallIntegerModel(models.Model):
     value = models.PositiveSmallIntegerField()
-    ranged_value = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(3)],
-        default=2
-    )
 
 
 class PositiveIntegerModel(models.Model):
     value = models.PositiveIntegerField()
-    ranged_value = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(3)],
-        default=2
-    )
 
 
 class Post(models.Model):

@@ -1812,27 +1812,22 @@ class IntegerField(Field):
     def validators(self):
         # These validators can't be added at field initialization time since
         # they're based on values retrieved from `connection`.
-        validators_existed = super(IntegerField, self).validators
-        range_validators = []
+        _validators = super(IntegerField, self).validators
         internal_type = self.get_internal_type()
         min_value, max_value = connection.ops.integer_field_range(internal_type)
         if min_value is not None:
-            min_value_existed = (min(
-                [validator.limit_value for validator in validators_existed
-                 if isinstance(validator, validators.MinValueValidator)] or
-                [float("-inf")]
-            ))
-            if min_value > min_value_existed:
-                range_validators.append(validators.MinValueValidator(min_value))
+            for validator in _validators:
+                if isinstance(validator, validators.MinValueValidator) and validator.limit_value >= min_value:
+                    break
+            else:
+                _validators.append(validators.MinValueValidator(min_value))
         if max_value is not None:
-            max_value_existed = (max(
-                [validator.limit_value for validator in validators_existed
-                 if isinstance(validator, validators.MaxValueValidator)] or
-                [float("+inf")]
-            ))
-            if max_value < max_value_existed:
-                range_validators.append(validators.MaxValueValidator(max_value))
-        return validators_existed + range_validators
+            for validator in _validators:
+                if isinstance(validator, validators.MaxValueValidator) and validator.limit_value <= max_value:
+                    break
+            else:
+                _validators.append(validators.MaxValueValidator(max_value))
+        return _validators
 
     def get_prep_value(self, value):
         value = super(IntegerField, self).get_prep_value(value)

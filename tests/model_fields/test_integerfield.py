@@ -97,44 +97,44 @@ class IntegerFieldTests(TestCase):
         (#26786)
         """
         min_backend_value, max_backend_value = self.backend_range
-        ranged_field = self.model._meta.get_field('ranged_value')
 
         if min_backend_value is not None:
-            min_field_value = min(
-                [validator.limit_value for validator in ranged_field.validators
-                 if isinstance(validator, validators.MinValueValidator)]
+            min_custom_value = min_backend_value + 1
+            ranged_value_field = self.model._meta.get_field('value').__class__(
+                validators=[validators.MinValueValidator(min_custom_value)]
             )
-            instance = self.model(
-                value=0, ranged_value=min_backend_value - 1
-            )
+
             field_range_message = validators.MinValueValidator.message % {
-                'limit_value': min_field_value,
+                'limit_value': min_custom_value,
             }
             backend_range_message = validators.MinValueValidator.message % {
                 'limit_value': min_backend_value
             }
 
+            # assertRaisesMessage method is not used because we also need to check
+            # that there is no error message concerning backend limits on IntegerField value
             with self.assertRaises(ValidationError) as cm:
-                instance.full_clean()
+                ranged_value_field.run_validators(min_backend_value - 1)
             self.assertIn(field_range_message, str(cm.exception))
             self.assertNotIn(backend_range_message, str(cm.exception))
 
         if max_backend_value is not None:
-            max_field_value = max(
-                [validator.limit_value for validator in ranged_field.validators
-                 if isinstance(validator, validators.MaxValueValidator)]
+            max_custom_value = max_backend_value - 1
+            ranged_value_field = self.model._meta.get_field('value').__class__(
+                validators=[validators.MaxValueValidator(max_custom_value)]
             )
-            instance = self.model(
-                value=0, ranged_value=max_backend_value + 1
-            )
+
             field_range_message = validators.MaxValueValidator.message % {
-                'limit_value': max_field_value,
+                'limit_value': max_custom_value,
             }
             backend_range_message = validators.MaxValueValidator.message % {
                 'limit_value': max_backend_value
             }
+
+            # assertRaisesMessage method is not used because we also need to check
+            # that there is no error message concerning backend limits on IntegerField value
             with self.assertRaises(ValidationError) as cm:
-                instance.full_clean()
+                ranged_value_field.run_validators(max_backend_value + 1)
             self.assertIn(field_range_message, str(cm.exception))
             self.assertNotIn(backend_range_message, str(cm.exception))
 
