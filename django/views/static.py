@@ -11,7 +11,8 @@ import re
 import stat
 
 from django.http import (
-    FileResponse, Http404, HttpResponse, HttpResponseNotModified, HttpResponseRedirect
+    FileResponse, Http404, HttpResponse, HttpResponseNotModified,
+    HttpResponseRedirect,
 )
 from django.template import Context, Engine, TemplateDoesNotExist, loader
 from django.utils.http import http_date, parse_http_date
