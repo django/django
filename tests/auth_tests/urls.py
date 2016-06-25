@@ -63,31 +63,67 @@ def userpage(request):
 
 # special urls for auth test cases
 urlpatterns = auth_urlpatterns + [
-    url(r'^logout/custom_query/$', views.LogoutView.as_view(redirect_field_name='follow')),
-    url(r'^logout/next_page/$', views.LogoutView.as_view(next_page='/somewhere/')),
-    url(r'^logout/next_page/named/$', views.LogoutView.as_view(next_page='password_reset')),
+    url(
+        r'^logout/custom_query/$',
+        views.LogoutView.as_view(redirect_field_name='follow')
+    ),
+    url(
+        r'^logout/next_page/$',
+        views.LogoutView.as_view(next_page='/somewhere/')
+    ),
+    url(
+        r'^logout/next_page/named/$',
+        views.LogoutView.as_view(next_page='password_reset')
+    ),
     url(r'^remote_user/$', remote_user_auth_view),
     url(
         r'^password_reset_from_email/$',
         views.PasswordResetView.as_view(),
         dict(from_email='staffmember@example.com')
     ),
-    url(r'^password_reset_extra_email_context/$', views.PasswordResetView.as_view(),
-        dict(extra_email_context=dict(greeting='Hello!'))),
-    url(r'^password_reset/custom_redirect/$', views.PasswordResetView.as_view(), dict(post_reset_redirect='/custom/')),
-    url(r'^password_reset/custom_redirect/named/$', views.PasswordResetView.as_view(), dict(post_reset_redirect='password_reset')),
-    url(r'^password_reset/html_email_template/$', views.PasswordResetView.as_view(),
-        dict(html_email_template_name='registration/html_password_reset_email.html')),
-    url(r'^reset/custom/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+    url(r'^password_reset_extra_email_context/$',
+        views.PasswordResetView.as_view(),
+        dict(extra_email_context=dict(greeting='Hello!'))
+        ),
+    url(
+        r'^password_reset/custom_redirect/$',
+        views.PasswordResetView.as_view(),
+        dict(post_reset_redirect='/custom/')
+    ),
+    url(
+        r'^password_reset/custom_redirect/named/$',
+        views.PasswordResetView.as_view(),
+        dict(post_reset_redirect='password_reset')
+    ),
+    url(
+        r'^password_reset/html_email_template/$',
+        views.PasswordResetView.as_view(),
+        dict(html_email_template_name='registration/html_password_reset_email.html')
+    ),
+    url(
+        r'^reset/custom/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         views.password_reset_confirm,
-        dict(post_reset_redirect='/custom/')),
-    url(r'^reset/custom/named/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        dict(post_reset_redirect='/custom/')
+    ),
+    url(
+        r'^reset/custom/named/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         views.password_reset_confirm,
         dict(post_reset_redirect='password_reset')),
-    url(r'^password_change/custom/$', views.password_change, dict(post_change_redirect='/custom/')),
-    url(r'^password_change/custom/named/$', views.password_change, dict(post_change_redirect='password_reset')),
+    url(
+        r'^password_change/custom/$',
+        views.password_change,
+        dict(post_change_redirect='/custom/')
+    ),
+    url(
+        r'^password_change/custom/named/$',
+        views.password_change,
+        dict(post_change_redirect='password_reset')
+    ),
     url(r'^login_required/$', login_required(views.password_reset)),
-    url(r'^login_required_login_url/$', login_required(views.password_reset, login_url='/somewhere/')),
+    url(
+        r'^login_required_login_url/$',
+        login_required(views.password_reset, login_url='/somewhere/')
+    ),
 
     url(r'^auth_processor_no_attr_access/$', auth_processor_no_attr_access),
     url(r'^auth_processor_attr_access/$', auth_processor_attr_access),
@@ -95,10 +131,15 @@ urlpatterns = auth_urlpatterns + [
     url(r'^auth_processor_perms/$', auth_processor_perms),
     url(r'^auth_processor_perm_in_perms/$', auth_processor_perm_in_perms),
     url(r'^auth_processor_messages/$', auth_processor_messages),
-    url(r'^custom_request_auth_login/$',
-        views.LoginView.as_view(authentication_form=CustomRequestAuthenticationForm)),
+    url(
+        r'^custom_request_auth_login/$',
+        views.LoginView.as_view(authentication_form=CustomRequestAuthenticationForm)
+    ),
     url(r'^userpage/(.+)/$', userpage, name="userpage"),
-    url(r'^login/redirect_authenticated_user_default/$', views.LoginView.as_view()),
+    url(
+        r'^login/redirect_authenticated_user_default/$',
+        views.LoginView.as_view()
+    ),
     url(r'^login/redirect_authenticated_user/$',
         views.LoginView.as_view(redirect_authenticated_user=True)),
 
