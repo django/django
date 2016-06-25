@@ -67,7 +67,11 @@ urlpatterns = auth_urlpatterns + [
     url(r'^logout/next_page/$', views.LogoutView.as_view(next_page='/somewhere/')),
     url(r'^logout/next_page/named/$', views.LogoutView.as_view(next_page='password_reset')),
     url(r'^remote_user/$', remote_user_auth_view),
-    url(r'^password_reset_from_email/$', views.PasswordResetView.as_view(), dict(from_email='staffmember@example.com')),
+    url(
+        r'^password_reset_from_email/$',
+        views.PasswordResetView.as_view(),
+        dict(from_email='staffmember@example.com')
+    ),
     url(r'^password_reset_extra_email_context/$', views.PasswordResetView.as_view(),
         dict(extra_email_context=dict(greeting='Hello!'))),
     url(r'^password_reset/custom_redirect/$', views.PasswordResetView.as_view(), dict(post_reset_redirect='/custom/')),

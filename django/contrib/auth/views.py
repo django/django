@@ -262,12 +262,10 @@ class PasswordResetView(FormView):
 @deprecate_current_app
 def password_reset(request, *args, **kwargs):
     warnings.warn(
-        'password_reset() view is superseded by the class-based LoginView().',
+        'password_reset() view is superseded by the class-based PasswordResetView().',
         RemovedInDjango21Warning, stacklevel=2
     )
     return PasswordResetView.as_view(**kwargs)(request, *args, **kwargs)
-
-
 
 
 @deprecate_current_app
