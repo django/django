@@ -692,7 +692,7 @@ class BaseDatabaseSchemaEditor(object):
         if (not old_field.db_index and new_field.db_index and
                 not new_field.unique and not
                 (not old_field.unique and new_field.unique)):
-            self.execute(self._create_index_sql(model, [new_field], suffix="_uniq"))
+            self.execute(self._create_index_sql(model, [new_field]))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []

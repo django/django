@@ -12,6 +12,7 @@ new_apps = Apps()
 class Author(models.Model):
     name = models.CharField(max_length=255)
     height = models.PositiveIntegerField(null=True, blank=True)
+    weight = models.IntegerField(null=True, blank=True)
 
     class Meta:
         apps = new_apps
