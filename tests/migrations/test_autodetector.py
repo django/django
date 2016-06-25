@@ -1263,7 +1263,9 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="AuthorProxy", options={"proxy": True})
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="AuthorProxy", options={"proxy": True, "indexes": []}
+        )
         # Now, we test turning a proxy model into a non-proxy model
         # It should delete the proxy then make the real one
         changes = self.get_changes(
@@ -1273,7 +1275,7 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["DeleteModel", "CreateModel"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="AuthorProxy")
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="AuthorProxy", options={})
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="AuthorProxy", options={"indexes": []})
 
     def test_proxy_custom_pk(self):
         """
@@ -1296,7 +1298,9 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
-        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged", options={"managed": False})
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 0, name="AuthorUnmanaged", options={"managed": False, "indexes": []}
+        )
 
     def test_unmanaged_to_managed(self):
         # Now, we test turning an unmanaged model into a managed model
