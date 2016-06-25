@@ -211,48 +211,61 @@ def redirect_to_login(next, login_url=None,
 #   prompts for a new password
 # - password_reset_complete shows a success message for the above
 
-@deprecate_current_app
-@csrf_protect
-def password_reset(request,
-                   template_name='registration/password_reset_form.html',
-                   email_template_name='registration/password_reset_email.html',
-                   subject_template_name='registration/password_reset_subject.txt',
-                   password_reset_form=PasswordResetForm,
-                   token_generator=default_token_generator,
-                   post_reset_redirect=None,
-                   from_email=None,
-                   extra_context=None,
-                   html_email_template_name=None,
-                   extra_email_context=None):
-    if post_reset_redirect is None:
-        post_reset_redirect = reverse('password_reset_done')
-    else:
-        post_reset_redirect = resolve_url(post_reset_redirect)
-    if request.method == "POST":
-        form = password_reset_form(request.POST)
-        if form.is_valid():
-            opts = {
-                'use_https': request.is_secure(),
-                'token_generator': token_generator,
-                'from_email': from_email,
-                'email_template_name': email_template_name,
-                'subject_template_name': subject_template_name,
-                'request': request,
-                'html_email_template_name': html_email_template_name,
-                'extra_email_context': extra_email_context,
-            }
-            form.save(**opts)
-            return HttpResponseRedirect(post_reset_redirect)
-    else:
-        form = password_reset_form()
-    context = {
-        'form': form,
-        'title': _('Password reset'),
-    }
-    if extra_context is not None:
-        context.update(extra_context)
 
-    return TemplateResponse(request, template_name, context)
+class PasswordResetView(FormView):
+    template_name = 'registration/password_reset_form.html'
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    password_reset_form = PasswordResetForm
+    token_generator = default_token_generator
+    post_reset_redirect = None
+    from_email = None
+    extra_context = None
+    html_email_template_name = None
+
+    @method_decorator(csrf_protect)
+    def dispatch(self, request, *args, **kwargs):
+        return super(PasswordResetView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        if self.post_reset_redirect is None:
+            self.post_reset_redirect = reverse('password_reset_done')
+        else:
+            self.post_reset_redirect = resolve_url(self.post_reset_redirect)
+        return self.post_reset_redirect
+
+    def form_valid(self, form):
+        opts = {
+            'use_https': self.request.is_secure(),
+            'token_generator': self.token_generator,
+            'from_email': self.from_email,
+            'email_template_name': self.email_template_name,
+            'subject_template_name': self.subject_template_name,
+            'request': self.request,
+            'html_email_template_name': self.html_email_template_name,
+        }
+
+        form.save(**opts)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_form_class(self):
+        return self.password_reset_form
+
+    def get_context_data(self, **kwargs):
+        context = super(PasswordResetView, self).get_context_data(**kwargs)
+        context.update({'title': _('Password reset')})
+        if self.extra_context is not None:
+            context.update(self.extra_context)
+        return context
+
+
+@deprecate_current_app
+def password_reset(request, *args, **kwargs):
+    warnings.warn(
+        'password_reset() view is superseded by the class-based PasswordResetView().',
+        RemovedInDjango21Warning, stacklevel=2
+    )
+    return PasswordResetView.as_view(**kwargs)(request, *args, **kwargs)
 
 
 @deprecate_current_app
