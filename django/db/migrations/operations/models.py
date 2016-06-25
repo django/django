@@ -742,3 +742,80 @@ class AlterModelManagers(ModelOptionOperation):
 
     def describe(self):
         return "Change managers on %s" % (self.name, )
+
+
+class AddIndex(Operation):
+    """
+    Add an index on a model.
+    """
+
+    def __init__(self, model_name, index):
+        self.model_name = model_name
+        self.index = index
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.model_name.lower()]
+        self.index.model = state.apps.get_model(app_label, self.model_name)
+        model_state.options['indexes'].append(self.index)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        schema_editor.add_index(self.index)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        schema_editor.remove_index(self.index)
+
+    def deconstruct(self):
+        kwargs = {
+            'model_name': self.model_name,
+            'index': self.index,
+        }
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs,
+        )
+
+    def describe(self):
+        return 'Create index on field(s) %s of model %s' % (
+            ', '.join(self.index.fields),
+            self.model_name,
+        )
+
+
+class RemoveIndex(Operation):
+    """
+    Remove an index from a model.
+    """
+
+    def __init__(self, model_name, name):
+        self.model_name = model_name
+        self.name = name
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.model_name.lower()]
+        indexes = model_state.options['indexes']
+        model_state.options['indexes'] = [idx for idx in indexes if idx.name != self.name]
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        from_model_state = from_state.models[app_label, self.model_name.lower()]
+        index = from_model_state.get_index_by_name(self.name)
+        schema_editor.remove_index(index)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        to_model_state = to_state.models[app_label, self.model_name.lower()]
+        index = to_model_state.get_index_by_name(self.name)
+        schema_editor.add_index(index)
+
+    def deconstruct(self):
+        kwargs = {
+            'model_name': self.model_name,
+            'name': self.name,
+        }
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs,
+        )
+
+    def describe(self):
+        return 'Remove index %s from %s' % (self.name, self.model_name)

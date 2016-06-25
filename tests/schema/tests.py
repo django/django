@@ -16,6 +16,7 @@ from django.db.models.fields import (
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
+from django.db.models.indexes import Index
 from django.db.transaction import atomic
 from django.test import (
     TransactionTestCase, mock, skipIfDBFeature, skipUnlessDBFeature,
@@ -1442,6 +1443,26 @@ class SchemaTests(TransactionTestCase):
         Author._meta.db_table = "schema_author"
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
+
+    def test_add_remove_index(self):
+        """
+        Tests index addition and removal
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Ensure the table is there and has no index
+        self.assertNotIn('title', self.get_indexes(Author._meta.db_table))
+        # Add the index
+        index = Index(fields=['name'], name='author_title_idx')
+        index.model = Author
+        with connection.schema_editor() as editor:
+            editor.add_index(index)
+        self.assertIn('name', self.get_indexes(Author._meta.db_table))
+        # Drop the index
+        with connection.schema_editor() as editor:
+            editor.remove_index(index)
+        self.assertNotIn('name', self.get_indexes(Author._meta.db_table))
 
     def test_indexes(self):
         """

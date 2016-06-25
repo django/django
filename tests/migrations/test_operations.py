@@ -51,7 +51,7 @@ class OperationTestBase(MigrationTestBase):
         return project_state, new_state
 
     def set_up_test_model(
-            self, app_label, second_model=False, third_model=False,
+            self, app_label, second_model=False, third_model=False, multicol_index=False,
             related_model=False, mti_model=False, proxy_model=False, manager_model=False,
             unique_together=False, options=False, db_table=None, index_together=False):
         """
@@ -96,6 +96,11 @@ class OperationTestBase(MigrationTestBase):
             ],
             options=model_options,
         )]
+        if multicol_index:
+            operations.append(migrations.AddIndex(
+                "Pony",
+                models.Index(fields=["pink", "weight"], name="pony_test_idx")
+            ))
         if second_model:
             operations.append(migrations.CreateModel(
                 "Stable",
@@ -1374,6 +1379,60 @@ class OperationTests(OperationTestBase):
     def test_alter_unique_together_remove(self):
         operation = migrations.AlterUniqueTogether("Pony", None)
         self.assertEqual(operation.describe(), "Alter unique_together for Pony (0 constraint(s))")
+
+    def test_add_index(self):
+        """
+        Test the AddIndex operation.
+        """
+        project_state = self.set_up_test_model("test_adin")
+        index = models.Index(fields=["pink"])
+        operation = migrations.AddIndex("Pony", index)
+        self.assertEqual(operation.describe(), "Create index on field(s) pink of model Pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_adin", new_state)
+        # Test the database alteration
+        self.assertEqual(len(new_state.models["test_adin", "pony"].options['indexes']), 1)
+        self.assertIndexNotExists("test_adin_pony", ["pink"])
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_adin", editor, project_state, new_state)
+        self.assertIndexExists("test_adin_pony", ["pink"])
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_adin", editor, new_state, project_state)
+        self.assertIndexNotExists("test_adin_pony", ["pink"])
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AddIndex")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'index': index})
+
+    def test_remove_index(self):
+        """
+        Test the RemoveIndex operation.
+        """
+        project_state = self.set_up_test_model("test_rmin", multicol_index=True)
+        self.assertTableExists("test_rmin_pony")
+        self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
+        operation = migrations.RemoveIndex("Pony", "pony_test_idx")
+        self.assertEqual(operation.describe(), "Remove index pony_test_idx from Pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rmin", new_state)
+        # Test the state alteration
+        self.assertEqual(len(new_state.models["test_rmin", "pony"].options['indexes']), 0)
+        self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_rmin", editor, project_state, new_state)
+        self.assertIndexNotExists("test_rmin_pony", ["pink", "weight"])
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_rmin", editor, new_state, project_state)
+        self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RemoveIndex")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'name': "pony_test_idx"})
 
     def test_alter_index_together(self):
         """

@@ -82,6 +82,7 @@ manipulating the data of your Web application. Learn more about it below:
 * **Models:**
   :doc:`Introduction to models <topics/db/models>` |
   :doc:`Field types <ref/models/fields>` |
+  :doc:`Indexes <ref/models/indexes>` |
   :doc:`Meta options <ref/models/options>` |
   :doc:`Model class <ref/models/class>`
 

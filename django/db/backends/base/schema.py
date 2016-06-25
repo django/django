@@ -316,6 +316,18 @@ class BaseDatabaseSchemaEditor(object):
             "table": self.quote_name(model._meta.db_table),
         })
 
+    def add_index(self, index):
+        """
+        Add an index on a model.
+        """
+        self.execute(index.create_sql(self))
+
+    def remove_index(self, index):
+        """
+        Remove an index from a model.
+        """
+        self.execute(index.remove_sql(self))
+
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
         """
         Deals with a model changing its unique_together.
@@ -836,12 +848,7 @@ class BaseDatabaseSchemaEditor(object):
             index_name = "D%s" % index_name[:-1]
         return index_name
 
-    def _create_index_sql(self, model, fields, suffix="", sql=None):
-        """
-        Return the SQL statement to create the index for one or several fields.
-        `sql` can be specified if the syntax differs from the standard (GIS
-        indexes, ...).
-        """
+    def _get_index_tablespace_sql(self, model, fields):
         if len(fields) == 1 and fields[0].db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
         elif model._meta.db_tablespace:
@@ -850,7 +857,15 @@ class BaseDatabaseSchemaEditor(object):
             tablespace_sql = ""
         if tablespace_sql:
             tablespace_sql = " " + tablespace_sql
+        return tablespace_sql
 
+    def _create_index_sql(self, model, fields, suffix="", sql=None):
+        """
+        Return the SQL statement to create the index for one or several fields.
+        `sql` can be specified if the syntax differs from the standard (GIS
+        indexes, ...).
+        """
+        tablespace_sql = self._get_index_tablespace_sql(model, fields)
         columns = [field.column for field in fields]
         sql_create_index = sql or self.sql_create_index
         return sql_create_index % {
