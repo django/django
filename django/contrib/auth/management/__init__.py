@@ -9,7 +9,8 @@ import unicodedata
 from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.core import exceptions
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, router, transaction
+from django.db.migrations import AlterModelOptions
 from django.utils import six
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 
@@ -35,6 +36,51 @@ def _get_builtin_permissions(opts):
             'Can %s %s' % (action, opts.verbose_name_raw)
         ))
     return perms
+
+
+def rename_permissions(app_config, plan=None, verbosity=2, interactive=True,
+                       using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
+    if not app_config.models_module:
+        return
+
+    if plan is None:
+        return
+
+    try:
+        app_label = app_config.label
+        apps.get_app_config(app_label)
+        ContentType = apps.get_model('contenttypes', 'ContentType')
+        Permission = apps.get_model('auth', 'Permission')
+    except LookupError:
+        return
+
+    changed_models = []
+    modifications = []
+    for migration, backward in plan:
+        for index, operation in enumerate(migration.operations):
+            if isinstance(operation, AlterModelOptions):
+                if 'verbose_name' in operation.options:
+                    changed_models.append((migration.app_label, operation.name))
+
+    if len(changed_models):
+        for app_label, model in changed_models:
+            try:
+                klass = apps.get_model(app_label=app_label, model_name=model)
+                ct = ContentType.objects.db_manager(using).filter(
+                    app_label=app_label, model=model.lower())
+
+                for codename, name in _get_all_permissions(klass._meta):
+                    p = Permission.objects.db_manager(using).filter(
+                        content_type=ct, codename=codename)
+                    if p.exists():
+                        modifications.append((p.get(), name))
+            except LookupError:
+                continue
+
+    with transaction.atomic(using):
+        for permission, name in modifications:
+            permission.name = name
+            permission.save()
 
 
 def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
