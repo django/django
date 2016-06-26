@@ -1,0 +1,41 @@
+==============================
+Serving files with a webserver
+==============================
+
+When you need to serve protected static files (e.g. user generated content, protected PDF files or other content) which
+requires Django's permission system to control who can download what, you still can efficiently serve them with your
+webserver. In this case Django would decide if the user can download the file (e.g. based on the user's permission,
+subscription or other means) and just tell the webserver at the end of the view or just simply forbid it. This feature
+is called more commonly as ``X-Sendfile`` feature.
+
+
+Configuring nginx for serving MEDIA files
+=========================================
+
+You can configure nginx to serve ``MEDIA`` files for only authenticated users. First you need a Django view which
+instructs nginx which file to send or just forbid if the user is not authenticated:
+
+.. code-block:: python
+
+    # urls.py
+    from django.conf.urls import url
+    from django.views.static import nginx_serve
+    from django.contrib.auth.decorators import login_required
+
+    urlpatterns = [
+        url(r'^admin/', admin.site.urls),
+        url(r'^protected-media/(?P<path>.*)$', login_required(nginx_serve),
+            {'location': '/protected/', alias': '/path/to/my/files/'})
+    ]
+
+
+Next, you need to configure nginx to serve the files Django tells it to::
+
+    location /protected/ {
+        internal;
+        alias   /path/to/my/files/;  # note the trailing slash
+    }
+
+The ``nginx_serve`` view does the same as ``django.views.static.serve`` expcept it sets the ``X-Accel-Redirect``
+header. For more explanation of this nginx feature, see it's documentation:
+https://www.nginx.com/resources/wiki/start/topics/examples/xsendfile/
