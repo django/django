@@ -691,6 +691,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             response = self.client.get(reverse('admin:jsi18n'))
             self.assertContains(response, 'Choisir une heure')
 
+    def test_jsi18n_with_context(self):
+        """
+        Make sure that jsi18n works when the context is applied to all admin urls
+        """
+        response = self.client.get(reverse('admin8:jsi18n'))
+        self.assertEqual(response.status_code, 200)
+
     def test_L10N_deactivated(self):
         """
         Check if L10N is deactivated, the JavaScript i18n view doesn't
