@@ -54,7 +54,7 @@ You can have multiple filters::
 Multiple filters are always combined with logical AND; that is, you need to
 match every filter to have the consumer called.
 
-Filters can capture keyword arguments to be passed to your function::
+Filters can capture keyword arguments to be passed to your function or your class based consumers member function as a ``kwarg``::
     
     route("websocket.connect", connect_blog, path=r'^/liveblog/(?P<slug>[^/]+)/stream/$')
 
