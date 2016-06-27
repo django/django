@@ -26,6 +26,7 @@ class BaseConsumer(object):
         the uninstantiated class, so calling it creates it)
         """
         self.message = message
+        self.kwargs = kwargs
         self.dispatch(message, **kwargs)
 
     @classmethod

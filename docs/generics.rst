@@ -32,7 +32,8 @@ Here's a routing example::
 
 Class-based consumers are instantiated once for each message they consume,
 so it's safe to store things on ``self`` (in fact, ``self.message`` is the
-current message by default).
+current message by default, and ``self.kwargs`` are the keyword arguments
+passed in from the routing).
 
 Base
 ----
@@ -61,6 +62,13 @@ If you want to perfom more complicated routing, you'll need to override the
 ``dispatch()`` and ``channel_names()`` methods in order to do the right thing;
 remember, though, your channel names cannot change during runtime and must
 always be the same for as long as your process runs.
+
+``BaseConsumer`` and all other generic consumers than inherit from it provide
+two instance variables on the class:
+
+* ``self.message``, the :ref:`Message object <ref-message>` representing the
+  message the consumer was called for.
+* ``self.kwargs``, keyword arguments from the :doc:`routing`
 
 
 WebSockets
