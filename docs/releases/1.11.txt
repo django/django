@@ -216,6 +216,10 @@ Templates
 
 * :meth:`~django.utils.safestring.mark_safe` can now be used as a decorator.
 
+* The :class:`~django.template.backends.jinja2.Jinja2` template backend can now
+  supports context processors by setting the ``'context_processors'`` option in
+  :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
 Tests
 ~~~~~
 
