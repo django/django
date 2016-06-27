@@ -1,0 +1,63 @@
+=====================
+Model index reference
+=====================
+
+.. module:: django.db.models.indexes
+
+.. currentmodule:: django.db.models
+
+.. versionadded:: 1.11
+
+Index classes ease creating database indexes. This document explains the API
+references of :class:`Index` which includes the `index options`_.
+
+.. note::
+
+    Indexes are defined in ``django.db.models.indexes``, but for convenience
+    they're imported into :mod:`django.db.models`. The standard convention is
+    to use ``from django.db import models`` and refer to the indexes as
+    ``models.<IndexClass>``.
+
+``Index`` options
+=================
+
+.. class:: Index(fields=[], name=None)
+
+    Creates an index (B-Tree) in the database.
+
+``fields``
+-----------
+
+.. attribute:: Index.fields
+
+A list of the name of the fields on which the index is desired.
+
+``name``
+--------
+
+.. attribute:: Index.name
+
+The name of the index. If ``name`` isn't provided Django will auto-generate a
+name. For compatibility with different databases, index names cannot be longer
+than 30 characters and should not start with a number (0-9) or underscore (_).
+
+Creating an index
+=================
+
+Indexes can be created in the database using the
+:class:`~django.db.migrations.operations.AddIndex` operation. For example, to
+add an index on the ``title`` and ``author`` fields of the ``Book`` model::
+
+    from django.db import migrations
+
+    class Migration(migrations.Migration):
+
+        operations = [
+            migrations.AddIndex(
+                'Book',
+                models.Index(fields=['title', 'author'], name='my_index_name'),
+            ),
+        ]
+
+Use the :class:`~django.db.migrations.operations.RemoveIndex` operation to
+remove an index.

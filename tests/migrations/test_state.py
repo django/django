@@ -125,7 +125,7 @@ class StateTests(SimpleTestCase):
         self.assertIs(author_state.fields[3][1].null, True)
         self.assertEqual(
             author_state.options,
-            {"unique_together": {("name", "bio")}, "index_together": {("bio", "age")}}
+            {"unique_together": {("name", "bio")}, "index_together": {("bio", "age")}, "indexes": []}
         )
         self.assertEqual(author_state.bases, (models.Model, ))
 
@@ -135,13 +135,13 @@ class StateTests(SimpleTestCase):
         self.assertEqual(book_state.fields[1][1].max_length, 1000)
         self.assertIs(book_state.fields[2][1].null, False)
         self.assertEqual(book_state.fields[3][1].__class__.__name__, "ManyToManyField")
-        self.assertEqual(book_state.options, {"verbose_name": "tome", "db_table": "test_tome"})
+        self.assertEqual(book_state.options, {"verbose_name": "tome", "db_table": "test_tome", "indexes": []})
         self.assertEqual(book_state.bases, (models.Model, ))
 
         self.assertEqual(author_proxy_state.app_label, "migrations")
         self.assertEqual(author_proxy_state.name, "AuthorProxy")
         self.assertEqual(author_proxy_state.fields, [])
-        self.assertEqual(author_proxy_state.options, {"proxy": True, "ordering": ["name"]})
+        self.assertEqual(author_proxy_state.options, {"proxy": True, "ordering": ["name"], "indexes": []})
         self.assertEqual(author_proxy_state.bases, ("migrations.author", ))
 
         self.assertEqual(sub_author_state.app_label, "migrations")
@@ -960,7 +960,7 @@ class ModelStateTests(SimpleTestCase):
         self.assertEqual(author_state.fields[1][1].max_length, 255)
         self.assertIs(author_state.fields[2][1].null, False)
         self.assertIs(author_state.fields[3][1].null, True)
-        self.assertEqual(author_state.options, {'swappable': 'TEST_SWAPPABLE_MODEL'})
+        self.assertEqual(author_state.options, {'swappable': 'TEST_SWAPPABLE_MODEL', 'indexes': []})
         self.assertEqual(author_state.bases, (models.Model, ))
         self.assertEqual(author_state.managers, [])
 
