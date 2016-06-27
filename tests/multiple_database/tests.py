@@ -17,6 +17,21 @@ from .models import Book, Person, Pet, Review, UserProfile
 from .routers import AuthRouter, TestRouter, WriteRouter
 
 
+class OtherRouter(object):
+    """
+    A router that sends reads and writes for this app to the other database
+    """
+    def db_for_read(self, model, **hints):
+        if model._meta.app_label == 'multiple_database':
+            return 'other'
+        return None
+
+    def db_for_write(self, model, **hints):
+        if model._meta.app_label == 'multiple_database':
+            return 'other'
+        return None
+
+
 class QueryTestCase(TestCase):
     multi_db = True
 
@@ -585,6 +600,12 @@ class QueryTestCase(TestCase):
         mickey = Person.objects.using('other').create(name="Mickey")
         pluto = Pet.objects.using('other').create(name="Pluto", owner=mickey)
         self.assertIsNone(pluto.full_clean())
+
+    @override_settings(DATABASE_ROUTERS=[OtherRouter()])
+    def test_foreign_key_validation_with_router(self):
+        mickey = Person.objects.create(name="Mickey")
+        owner_field = Pet._meta.get_field('owner')
+        self.assertEqual(owner_field.clean(mickey.pk, None), mickey.pk)
 
     def test_o2o_separation(self):
         "OneToOne fields are constrained to a single database"
