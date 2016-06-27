@@ -917,7 +917,7 @@ your URLconf::
     from django.contrib.auth import views as auth_views
 
     urlpatterns = [
-        url('^change-password/', auth_views.password_change)
+        url('^change-password/$', auth_views.password_change)
     ]
 
 The views have optional arguments you can use to alter the behavior of the
