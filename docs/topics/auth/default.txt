@@ -894,7 +894,7 @@ easiest way is to include the provided URLconf in ``django.contrib.auth.urls``
 in your own URLconf, for example::
 
     urlpatterns = [
-        url('^', include('django.contrib.auth.urls'))
+        url('^', include('django.contrib.auth.urls')),
     ]
 
 This will include the following URL patterns::
@@ -917,7 +917,7 @@ your URLconf::
     from django.contrib.auth import views as auth_views
 
     urlpatterns = [
-        url('^change-password/', auth_views.password_change)
+        url('^change-password/$', auth_views.password_change),
     ]
 
 The views have optional arguments you can use to alter the behavior of the
@@ -927,10 +927,10 @@ arguments in the URLconf, these will be passed on to the view. For example::
 
     urlpatterns = [
         url(
-            '^change-password/',
+            '^change-password/$',
             auth_views.password_change,
             {'template_name': 'change-password.html'}
-        )
+        ),
     ]
 
 All views return a :class:`~django.template.response.TemplateResponse`
