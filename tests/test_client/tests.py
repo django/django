@@ -613,14 +613,10 @@ class ClientTest(TestCase):
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
         # Session value isn't set initially
-        try:
+        with self.assertRaises(KeyError):
             self.client.session['tobacconist']
-            self.fail("Shouldn't have a session value")
-        except KeyError:
-            pass
 
         self.client.post('/session_view/')
-
         # Check that the session was modified
         self.assertEqual(self.client.session['tobacconist'], 'hovercraft')
 
@@ -643,13 +639,6 @@ class ClientTest(TestCase):
         "Request a page that is known to throw an error"
         with self.assertRaises(KeyError):
             self.client.get("/broken_view/")
-
-        # Try the same assertion, a different way
-        try:
-            self.client.get('/broken_view/')
-            self.fail('Should raise an error')
-        except KeyError:
-            pass
 
     def test_mail_sending(self):
         "Test that mail is redirected to a dummy outbox during test setup"

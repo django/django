@@ -16,11 +16,9 @@ from django.utils.safestring import mark_safe
 
 class AssertFormErrorsMixin(object):
     def assertFormErrors(self, expected, the_callable, *args, **kwargs):
-        try:
+        with self.assertRaises(ValidationError) as cm:
             the_callable(*args, **kwargs)
-            self.fail("Testing the 'clean' method on %s failed to raise a ValidationError.")
-        except ValidationError as e:
-            self.assertEqual(e.messages, expected)
+        self.assertEqual(cm.exception.messages, expected)
 
 
 class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
