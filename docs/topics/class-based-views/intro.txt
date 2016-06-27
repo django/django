@@ -93,7 +93,7 @@ request to a matching method if one is defined, or raises
     from myapp.views import MyView
 
     urlpatterns = [
-        url(r'^about/', MyView.as_view()),
+        url(r'^about/$', MyView.as_view()),
     ]
 
 
@@ -130,7 +130,7 @@ Another option is to configure class attributes as keyword arguments to the
 :meth:`~django.views.generic.base.View.as_view` call in the URLconf::
 
     urlpatterns = [
-        url(r'^about/', GreetingView.as_view(greeting="G'day")),
+        url(r'^about/$', GreetingView.as_view(greeting="G'day")),
     ]
 
 .. note::
@@ -245,8 +245,8 @@ The easiest place to do this is in the URLconf where you deploy your view::
     from .views import VoteView
 
     urlpatterns = [
-        url(r'^about/', login_required(TemplateView.as_view(template_name="secret.html"))),
-        url(r'^vote/', permission_required('polls.can_vote')(VoteView.as_view())),
+        url(r'^about/$', login_required(TemplateView.as_view(template_name="secret.html"))),
+        url(r'^vote/$', permission_required('polls.can_vote')(VoteView.as_view())),
     ]
 
 This approach applies the decorator on a per-instance basis. If you
