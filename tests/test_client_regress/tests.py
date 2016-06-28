@@ -875,21 +875,15 @@ class ExceptionTests(TestDataMixin, TestCase):
 
         login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
-        try:
+        with self.assertRaises(CustomTestException):
             self.client.get("/staff_only/")
-            self.fail("General users should not be able to visit this page")
-        except CustomTestException:
-            pass
 
         # At this point, an exception has been raised, and should be cleared.
 
         # This next operation should be successful; if it isn't we have a problem.
         login = self.client.login(username='staff', password='password')
         self.assertTrue(login, 'Could not log in')
-        try:
-            self.client.get("/staff_only/")
-        except CustomTestException:
-            self.fail("Staff should be able to visit this page")
+        self.client.get("/staff_only/")
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
@@ -901,12 +895,8 @@ class TemplateExceptionTests(SimpleTestCase):
     }])
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"
-        try:
+        with self.assertRaises(TemplateSyntaxError):
             self.client.get("/no_such_view/")
-        except TemplateSyntaxError:
-            pass
-        else:
-            self.fail("Should get error about syntax error in template")
 
 
 # We need two different tests to check URLconf substitution -  one to check
@@ -945,11 +935,8 @@ class ContextTests(TestDataMixin, TestCase):
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'sausage')
 
-        try:
+        with self.assertRaisesMessage(KeyError, 'does-not-exist'):
             response.context['does-not-exist']
-            self.fail('Should not be able to retrieve non-existent key')
-        except KeyError as e:
-            self.assertEqual(e.args[0], 'does-not-exist')
 
     def test_inherited_context(self):
         "Context variables can be retrieved from a list of contexts"

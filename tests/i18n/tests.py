@@ -526,11 +526,8 @@ class TranslationThreadSafetyTests(SimpleTestCase):
 
     def test_bug14894_translation_activate_thread_safety(self):
         translation_count = len(trans_real._translations)
-        try:
-            translation.activate('pl')
-        except RuntimeError:
-            self.fail('translation.activate() is not thread-safe')
-
+        # May raise RuntimeError if translation.activate() isn't thread-safe.
+        translation.activate('pl')
         # make sure sideeffect_str actually added a new translation
         self.assertLess(translation_count, len(trans_real._translations))
 

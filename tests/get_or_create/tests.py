@@ -212,13 +212,10 @@ class GetOrCreateTestsWithManualPKs(TestCase):
 
     def test_get_or_create_empty(self):
         """
-        Regression test for #16137: get_or_create does not require kwargs.
+        If all the attributes on a model have defaults, get_or_create() doesn't
+        require any arguments.
         """
-        try:
-            DefaultPerson.objects.get_or_create()
-        except AssertionError:
-            self.fail("If all the attributes on a model have defaults, we "
-                      "shouldn't need to pass any arguments.")
+        DefaultPerson.objects.get_or_create()
 
 
 class GetOrCreateTransactionTests(TransactionTestCase):

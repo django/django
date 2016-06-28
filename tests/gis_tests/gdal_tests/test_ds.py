@@ -80,12 +80,8 @@ class DataSourceTest(unittest.TestCase):
             self.assertEqual(source.driver, str(ds.driver))
 
             # Making sure indexing works
-            try:
+            with self.assertRaises(OGRIndexError):
                 ds[len(ds)]
-            except OGRIndexError:
-                pass
-            else:
-                self.fail('Expected an IndexError!')
 
     def test02_invalid_shp(self):
         "Testing invalid SHP files for the Data Source."

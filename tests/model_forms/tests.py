@@ -305,7 +305,7 @@ class ModelFormBaseTest(TestCase):
                          ['name', 'slug', 'url', 'some_extra_field'])
 
     def test_extra_field_model_form(self):
-        try:
+        with self.assertRaisesMessage(FieldError, 'no-field'):
             class ExtraPersonForm(forms.ModelForm):
                 """ ModelForm with an extra field """
                 age = forms.IntegerField()
@@ -313,24 +313,15 @@ class ModelFormBaseTest(TestCase):
                 class Meta:
                     model = Person
                     fields = ('name', 'no-field')
-        except FieldError as e:
-            # Make sure the exception contains some reference to the
-            # field responsible for the problem.
-            self.assertIn('no-field', e.args[0])
-        else:
-            self.fail('Invalid "no-field" field not caught')
 
     def test_extra_declared_field_model_form(self):
-        try:
-            class ExtraPersonForm(forms.ModelForm):
-                """ ModelForm with an extra field """
-                age = forms.IntegerField()
+        class ExtraPersonForm(forms.ModelForm):
+            """ ModelForm with an extra field """
+            age = forms.IntegerField()
 
-                class Meta:
-                    model = Person
-                    fields = ('name', 'age')
-        except FieldError:
-            self.fail('Declarative field raised FieldError incorrectly')
+            class Meta:
+                model = Person
+                fields = ('name', 'age')
 
     def test_extra_field_modelform_factory(self):
         with self.assertRaises(FieldError):
