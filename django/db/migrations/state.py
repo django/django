@@ -434,7 +434,7 @@ class ModelState(object):
             name = force_text(mgr.name)
             managers_mapping[name] = (mgr.creation_counter, instance)
 
-        if hasattr(model, "_default_manager"):
+        if getattr(model, "_default_manager", None):
             default_manager_name = force_text(model._default_manager.name)
             # Make sure the default manager is always the first
             if model._default_manager.use_in_migrations:
