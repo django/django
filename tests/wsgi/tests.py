@@ -43,7 +43,7 @@ class WSGITest(SimpleTestCase):
         self.assertEqual(
             set(response_data["headers"]),
             {('Content-Length', '12'), ('Content-Type', 'text/html; charset=utf-8')})
-        self.assertTrue(bytes(response) in [
+        self.assertIn(bytes(response), [
             b"Content-Length: 12\r\nContent-Type: text/html; charset=utf-8\r\n\r\nHello World!",
             b"Content-Type: text/html; charset=utf-8\r\nContent-Length: 12\r\n\r\nHello World!"
         ])
