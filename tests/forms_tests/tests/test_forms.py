@@ -173,11 +173,9 @@ class FormsTestCase(SimpleTestCase):
         self.assertFalse(p.is_bound)
         self.assertEqual(p.errors, {})
         self.assertFalse(p.is_valid())
-        try:
+        with self.assertRaises(AttributeError):
             p.cleaned_data
-            self.fail('Attempts to access cleaned_data when validation fails should fail.')
-        except AttributeError:
-            pass
+
         self.assertHTMLEqual(
             str(p),
             """<tr><th><label for="id_first_name">First name:</label></th><td>
@@ -2168,11 +2166,9 @@ Password: <input type="password" name="password" required />
         self.assertEqual(p.errors['last_name'], ['This field is required.'])
         self.assertEqual(p.errors['birthday'], ['This field is required.'])
         self.assertEqual(p['first_name'].errors, ['This field is required.'])
-        try:
+        # Accessing a nonexistent field.
+        with self.assertRaises(KeyError):
             p['person1-first_name'].errors
-            self.fail('Attempts to access non-existent fields should fail.')
-        except KeyError:
-            pass
 
         # In this example, the data doesn't have a prefix, but the form requires it, so
         # the form doesn't "see" the fields.

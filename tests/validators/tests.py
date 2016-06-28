@@ -308,12 +308,8 @@ class TestSimpleValidators(SimpleTestCase):
         self.assertEqual(repr(v), str_prefix("ValidationError({%(_)s'first': [%(_)s'First Problem']})"))
 
     def test_regex_validator_flags(self):
-        try:
+        with self.assertRaises(TypeError):
             RegexValidator(re.compile('a'), flags=re.IGNORECASE)
-        except TypeError:
-            pass
-        else:
-            self.fail("TypeError not raised when flags and pre-compiled regex in RegexValidator")
 
     def test_max_length_validator_message(self):
         v = MaxLengthValidator(16, message='"%(value)s" has more than %(limit_value)d characters.')

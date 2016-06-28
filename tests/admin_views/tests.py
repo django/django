@@ -1224,10 +1224,7 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertContains(response, 'Hello from a custom logout template')
 
     def test_custom_admin_site_index_view_and_template(self):
-        try:
-            response = self.client.get(reverse('admin2:index'))
-        except TypeError:
-            self.fail('AdminSite.index_template should accept a list of template paths')
+        response = self.client.get(reverse('admin2:index'))
         self.assertIsInstance(response, TemplateResponse)
         self.assertTemplateUsed(response, 'custom_admin/index.html')
         self.assertContains(response, 'Hello from a custom index template *bar*')
@@ -1264,12 +1261,7 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
     def test_pwd_change_custom_template(self):
         self.client.force_login(self.superuser)
         su = User.objects.get(username='super')
-        try:
-            response = self.client.get(
-                reverse('admin4:auth_user_password_change', args=(su.pk,))
-            )
-        except TypeError:
-            self.fail('ModelAdmin.change_user_password_template should accept a list of template paths')
+        response = self.client.get(reverse('admin4:auth_user_password_change', args=(su.pk,)))
         self.assertEqual(response.status_code, 200)
 
 

@@ -442,15 +442,9 @@ class ExceptionReporterTests(SimpleTestCase):
         except BrokenEvaluation:
             exc_type, exc_value, tb = sys.exc_info()
 
-        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
-        try:
-            html = reporter.get_traceback_html()
-        except BrokenEvaluation:
-            self.fail("Broken evaluation in traceback is not caught.")
-
         self.assertIn(
             "BrokenEvaluation",
-            html,
+            ExceptionReporter(request, exc_type, exc_value, tb).get_traceback_html(),
             "Evaluation exception reason not mentioned in traceback"
         )
 

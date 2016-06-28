@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import shutil
+import sys
 import tempfile as sys_tempfile
 import unittest
 from io import BytesIO
@@ -564,16 +565,14 @@ class DirectoryCreationTests(SimpleTestCase):
     def setUp(self):
         self.obj = FileModel()
 
+    @unittest.skipIf(sys.platform == 'win32', "Python on Windows doesn't have working os.chmod().")
     def test_readonly_root(self):
         """Permission errors are not swallowed"""
         os.chmod(MEDIA_ROOT, 0o500)
         self.addCleanup(os.chmod, MEDIA_ROOT, 0o700)
-        try:
+        with self.assertRaises(OSError) as cm:
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'), save=False)
-        except OSError as err:
-            self.assertEqual(err.errno, errno.EACCES)
-        except Exception:
-            self.fail("OSError [Errno %s] not raised." % errno.EACCES)
+        self.assertEqual(cm.exception.errno, errno.EACCES)
 
     def test_not_a_directory(self):
         """The correct IOError is raised when the upload directory name exists but isn't a directory"""

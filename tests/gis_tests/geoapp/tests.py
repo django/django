@@ -48,12 +48,8 @@ class GeoModelTest(TestCase):
         # Making sure TypeError is thrown when trying to set with an
         #  incompatible type.
         for bad in [5, 2.0, LineString((0, 0), (1, 1))]:
-            try:
+            with self.assertRaisesMessage(TypeError, 'Cannot set'):
                 nullcity.point = bad
-            except TypeError:
-                pass
-            else:
-                self.fail('Should throw a TypeError')
 
         # Now setting with a compatible GEOS Geometry, saving, and ensuring
         #  the save took, notice no SRID is explicitly set.

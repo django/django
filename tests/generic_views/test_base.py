@@ -78,21 +78,15 @@ class ViewTest(unittest.TestCase):
         """
         Test that a view can't be accidentally instantiated before deployment
         """
-        try:
+        with self.assertRaises(AttributeError):
             SimpleView(key='value').as_view()
-            self.fail('Should not be able to instantiate a view')
-        except AttributeError:
-            pass
 
     def test_no_init_args(self):
         """
         Test that a view can't be accidentally instantiated before deployment
         """
-        try:
+        with self.assertRaises(TypeError):
             SimpleView.as_view('value')
-            self.fail('Should not be able to use non-keyword arguments instantiating a view')
-        except TypeError:
-            pass
 
     def test_pathological_http_method(self):
         """

@@ -2621,14 +2621,10 @@ class UnionTests(unittest.TestCase):
 
 class DefaultValuesInsertTest(TestCase):
     def test_no_extra_params(self):
-        # Ticket #17056 -- affects Oracle
-        try:
-            DumbCategory.objects.create()
-        except TypeError:
-            self.fail(
-                "Creation of an instance of a model with only the PK field "
-                "shouldn't error out after bulk insert refactoring (#17056)"
-            )
+        """
+        Can create an instance of a model with only the PK field (#17056)."
+        """
+        DumbCategory.objects.create()
 
 
 class ExcludeTests(TestCase):

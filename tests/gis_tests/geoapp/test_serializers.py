@@ -26,10 +26,7 @@ class GeoJSONSerializerTests(TestCase):
 
     def test_serialization_base(self):
         geojson = serializers.serialize('geojson', City.objects.all().order_by('name'))
-        try:
-            geodata = json.loads(geojson)
-        except Exception:
-            self.fail("Serialized output is not valid JSON")
+        geodata = json.loads(geojson)
         self.assertEqual(len(geodata['features']), len(City.objects.all()))
         self.assertEqual(geodata['features'][0]['geometry']['type'], 'Point')
         self.assertEqual(geodata['features'][0]['properties']['name'], 'Chicago')

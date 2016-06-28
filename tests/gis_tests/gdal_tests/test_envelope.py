@@ -39,10 +39,8 @@ class EnvelopeTest(unittest.TestCase):
             Envelope('foo')
         with self.assertRaises(GDALException):
             Envelope((1, 1, 0, 0))
-        try:
-            Envelope(0, 0, 0, 0)
-        except GDALException:
-            self.fail("shouldn't raise an exception for min_x == max_x or min_y == max_y")
+        # Shouldn't raise an exception for min_x == max_x or min_y == max_y
+        Envelope(0, 0, 0, 0)
 
     def test02_properties(self):
         "Testing Envelope properties."

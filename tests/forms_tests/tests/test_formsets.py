@@ -1012,11 +1012,8 @@ class FormsFormsetTestCase(SimpleTestCase):
 
         # confirm indexing of formset
         self.assertEqual(formset[0], forms[0])
-        try:
+        with self.assertRaises(IndexError):
             formset[3]
-            self.fail('Requesting an invalid formset index should raise an exception')
-        except IndexError:
-            pass
 
         # Formsets can override the default iteration order
         class BaseReverseFormSet(BaseFormSet):

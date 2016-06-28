@@ -115,16 +115,12 @@ class GenericRelationTests(TestCase):
             note.save()
 
     def test_target_model_len_zero(self):
-        """Test for #13085 -- __len__() returns 0"""
+        """
+        Saving a model with a GenericForeignKey to a model instance whose
+        __len__ method returns 0 (Team.__len__() here) shouldn't fail (#13085).
+        """
         team1 = Team.objects.create(name='Backend devs')
-        try:
-            note = Note(note='Deserve a bonus', content_object=team1)
-        except Exception as e:
-            if (issubclass(type(e), Exception) and
-                    str(e) == 'Impossible arguments to GFK.get_content_type!'):
-                self.fail("Saving model with GenericForeignKey to model instance whose "
-                          "__len__ method returns 0 shouldn't fail.")
-            raise e
+        note = Note(note='Deserve a bonus', content_object=team1)
         note.save()
 
     def test_target_model_nonzero_false(self):
