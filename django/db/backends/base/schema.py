@@ -869,13 +869,16 @@ class BaseDatabaseSchemaEditor(object):
             return []
         output = []
         for field in model._meta.local_fields:
-            if field.db_index and not field.unique:
+            if self._field_should_be_indexed(model, field):
                 output.append(self._create_index_sql(model, [field], suffix=""))
 
         for field_names in model._meta.index_together:
             fields = [model._meta.get_field(field) for field in field_names]
             output.append(self._create_index_sql(model, fields, suffix="_idx"))
         return output
+
+    def _field_should_be_indexed(self, model, field):
+        return field.db_index and not field.unique
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         return self.sql_rename_column % {
