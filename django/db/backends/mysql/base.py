@@ -25,7 +25,7 @@ try:
     import MySQLdb as Database
 except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
+    raise ImproperlyConfigured("Error loading MySQLdb or mysqlclient module: %s" % e)
 
 from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
 from MySQLdb.converters import Thing2Literal, conversions       # isort:skip
