@@ -19,6 +19,7 @@ class CurrentTranslation(models.ForeignObject):
 class ArticleTranslation(models.Model):
 
     article = models.ForeignKey('indexes.Article', models.CASCADE)
+    article_no_constraint = models.ForeignKey('indexes.Article', models.CASCADE, db_constraint=False)
     language = models.CharField(max_length=10, unique=True)
     content = models.TextField()
 
