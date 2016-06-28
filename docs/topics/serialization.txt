@@ -265,6 +265,19 @@ work::
                 return force_text(obj)
             return super(LazyEncoder, self).default(obj)
 
+You can then pass ``cls=LazyEncoder`` to the ``serializers.serialize()``
+function::
+
+    from django.core.serializers import serialize
+    from my_app.models import City
+
+    serialize('json', City.objects.all(), cls=LazyEncoder)
+
+.. versionchanged:: 1.11
+
+    Previously, it was impossible to use a custom encoder without having to
+    subclass the JSON encoder.
+
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 

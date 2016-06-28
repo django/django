@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import decimal
 import json
 import re
 
 from django.core import serializers
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
+from django.test.utils import isolate_apps
 from django.utils.translation import override, ugettext_lazy
 
 from .models import Score
@@ -79,6 +82,23 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         for line in json_data.splitlines():
             if re.search(r'.+,\s*$', line):
                 self.assertEqual(line, line.rstrip())
+
+    @isolate_apps('serializers')
+    def test_custom_encoder(self):
+        class ScoreDecimal(models.Model):
+            score = models.DecimalField()
+
+        class CustomJSONEncoder(json.JSONEncoder):
+            def default(self, o):
+                if isinstance(o, decimal.Decimal):
+                    return str(o)
+                return super(CustomJSONEncoder, self).default(o)
+
+        s = serializers.json.Serializer()
+        json_data = s.serialize(
+            [ScoreDecimal(score=decimal.Decimal(1.0))], cls=CustomJSONEncoder
+        )
+        self.assertIn('"fields": {"score": "1"}', json_data)
 
     def test_json_deserializer_exception(self):
         with self.assertRaises(DeserializationError):
