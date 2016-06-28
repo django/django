@@ -206,6 +206,10 @@ Serialization
 * The new ``django.core.serializers.base.Serializer.stream_class`` attribute
   allows subclasses to customize the default stream.
 
+* The encoder used by the :ref:`JSON serializer <serialization-formats-json>`
+  can now be customized by passing a ``cls`` keyword argument to the
+  ``serializers.serialize()`` function.
+
 Signals
 ~~~~~~~
 
