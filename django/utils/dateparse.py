@@ -40,7 +40,8 @@ standard_duration_re = re.compile(
 # Support the sections of ISO 8601 date representation that are accepted by
 # timedelta
 iso8601_duration_re = re.compile(
-    r'^P'
+    r'^(?P<sign>[-+]?)'
+    r'P'
     r'(?:(?P<days>\d+(.\d+)?)D)?'
     r'(?:T'
     r'(?:(?P<hours>\d+(.\d+)?)H)?'
@@ -121,7 +122,8 @@ def parse_duration(value):
         match = iso8601_duration_re.match(value)
     if match:
         kw = match.groupdict()
+        sign = -1 if kw.pop('sign', '+') == '-' else 1
         if kw.get('microseconds'):
             kw['microseconds'] = kw['microseconds'].ljust(6, '0')
         kw = {k: float(v) for k, v in six.iteritems(kw) if v is not None}
-        return datetime.timedelta(**kw)
+        return sign * datetime.timedelta(**kw)
