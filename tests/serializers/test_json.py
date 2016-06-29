@@ -73,12 +73,8 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         return ret_list
 
     def test_indentation_whitespace(self):
-        Score.objects.create(score=5.0)
-        Score.objects.create(score=6.0)
-        qset = Score.objects.all()
-
         s = serializers.json.Serializer()
-        json_data = s.serialize(qset, indent=2)
+        json_data = s.serialize([Score(score=5.0), Score(score=6.0)], indent=2)
         for line in json_data.splitlines():
             if re.search(r'.+,\s*$', line):
                 self.assertEqual(line, line.rstrip())
