@@ -2,6 +2,7 @@ import datetime
 import sys
 import threading
 
+from daphne.server import Server
 from django.conf import settings
 from django.core.management.commands.runserver import \
     Command as RunserverCommand
@@ -72,7 +73,6 @@ class Command(RunserverCommand):
         # actually a subthread under the autoreloader.
         self.logger.debug("Daphne running, listening on %s:%s", self.addr, self.port)
         try:
-            from daphne.server import Server
             Server(
                 channel_layer=self.channel_layer,
                 host=self.addr,

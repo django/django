@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = channels, django.http.response
+source = channels
 omit = channels/tests/*
 
 [report]
