@@ -1,3 +1,11 @@
+0.15.1 (2016-06-29)
+-------------------
+
+* Class based consumers now have a self.kwargs
+
+* Fixed bug where empty streaming responses did not send headers or status code
+
+
 0.15.0 (2016-06-22)
 -------------------
 
