@@ -95,6 +95,12 @@ LANG_INFO = {
         'name': 'German',
         'name_local': 'Deutsch',
     },
+    'dsb': {
+        'bidi': False,
+        'code': 'dsb',
+        'name': 'Lower Sorbian',
+        'name_local': 'dolnoserbski',
+    },
     'el': {
         'bidi': False,
         'code': 'el',
@@ -232,6 +238,12 @@ LANG_INFO = {
         'code': 'hr',
         'name': 'Croatian',
         'name_local': 'Hrvatski',
+    },
+    'hsb': {
+        'bidi': False,
+        'code': 'hsb',
+        'name': 'Upper Sorbian',
+        'name_local': 'hornjoserbsce',
     },
     'hu': {
         'bidi': False,
