@@ -288,9 +288,8 @@ class AsgiHandler(base.BaseHandler):
                     yield message
                     message = {}
             # Final closing message
-            yield {
-                "more_content": False,
-            }
+            message["more_content"] = False
+            yield message
         # Other responses just need chunking
         else:
             # Yield chunks of response

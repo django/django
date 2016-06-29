@@ -143,6 +143,54 @@ class HandlerTests(ChannelTestCase):
         self.assertEqual(reply_messages[1]["content"], b"andhereistherest")
         self.assertEqual(reply_messages[1].get("more_content", False), False)
 
+    def test_empty(self):
+        """
+        Tests an empty response
+        """
+        # Make stub request and desired response
+        Channel("test").send({
+            "reply_channel": "test",
+            "http_version": "1.1",
+            "method": "GET",
+            "path": b"/test/",
+        })
+        response = HttpResponse(b"", status=304)
+        # Run the handler
+        handler = FakeAsgiHandler(response)
+        reply_messages = list(
+            handler(self.get_next_message("test", require=True))
+        )
+        # Make sure we got the right number of messages
+        self.assertEqual(len(reply_messages), 1)
+        # Make sure the messages look correct
+        self.assertEqual(reply_messages[0].get("content", b""), b"")
+        self.assertEqual(reply_messages[0]["status"], 304)
+        self.assertEqual(reply_messages[0]["more_content"], False)
+
+    def test_empty_streaming(self):
+        """
+        Tests an empty streaming response
+        """
+        # Make stub request and desired response
+        Channel("test").send({
+            "reply_channel": "test",
+            "http_version": "1.1",
+            "method": "GET",
+            "path": b"/test/",
+        })
+        response = StreamingHttpResponse([], status=304)
+        # Run the handler
+        handler = FakeAsgiHandler(response)
+        reply_messages = list(
+            handler(self.get_next_message("test", require=True))
+        )
+        # Make sure we got the right number of messages
+        self.assertEqual(len(reply_messages), 1)
+        # Make sure the messages look correct
+        self.assertEqual(reply_messages[0].get("content", b""), b"")
+        self.assertEqual(reply_messages[0]["status"], 304)
+        self.assertEqual(reply_messages[0]["more_content"], False)
+
     def test_chunk_bytes(self):
         """
         Makes sure chunk_bytes works correctly
