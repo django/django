@@ -1,0 +1,271 @@
+# This file is distributed under the same license as the Django package.
+# 
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-12 13:24+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Lower Sorbian (http://www.transifex.com/django/django/language/dsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: dsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:47
+#, javascript-format
+msgid "Available %s"
+msgstr "K dispoziciji stojece %s"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:53
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr "To jo lisćina k dispoziciji stojecych %s. Klikniśo na šypku „Wubraś“ mjazy kašćikoma, aby někotare z nich w slědujucem kašćiku wubrał.  "
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:69
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Zapišćo do toś togo póla, aby zapiski z lisćiny k dispoziciji stojecych %s wufiltrował. "
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:74
+msgid "Filter"
+msgstr "Filtrowaś"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:78
+msgid "Choose all"
+msgstr "Wšykne wubraś"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:78
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "Klikniśo, aby wšykne %s naraz wubrał."
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:84
+msgid "Choose"
+msgstr "Wubraś"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:86
+msgid "Remove"
+msgstr "Wótpóraś"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:92
+#, javascript-format
+msgid "Chosen %s"
+msgstr "Wubrane %s"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:98
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr "To jo lisćina wubranych %s. Klikniśo na šypku „Wótpóraś“ mjazy kašćikoma, aby někotare z nich w slědujucem kašćiku wótpórał."
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:108
+msgid "Remove all"
+msgstr "Wšykne wótpóraś"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:108
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Klikniśo, aby wšykne wubrane %s naraz wótpórał."
+
+#: contrib/admin/static/admin/js/actions.js:47
+#: contrib/admin/static/admin/js/actions.min.js:2
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s z %(cnt)s wubrany"
+msgstr[1] "%(sel)s z %(cnt)s wubranej"
+msgstr[2] "%(sel)s z %(cnt)s wubrane"
+msgstr[3] "%(sel)s z %(cnt)s wubranych"
+
+#: contrib/admin/static/admin/js/actions.js:116
+#: contrib/admin/static/admin/js/actions.min.js:4
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr "Maśo njeskładowane změny za jadnotliwe wobźěłujobne póla. Jolic akciju wuwjeźośo, se waše njeskładowane změny zgubiju."
+
+#: contrib/admin/static/admin/js/actions.js:128
+#: contrib/admin/static/admin/js/actions.min.js:5
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr "Sćo akciju wubrał, ale njejsćo hyšći swóje změny za jadnotliwe póla składował, Pšosym klikniśo na W pórěźe, aby składował. Musyśo akciju znowego wuwjasć."
+
+#: contrib/admin/static/admin/js/actions.js:130
+#: contrib/admin/static/admin/js/actions.min.js:5
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr "Sćo akciju wubrał, ale njejsćo jadnotliwe póla změnił. Nejskerjej pytaśo skerjej za tłocaškom Start ako za tłocaškom Składowaś."
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:74
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Glědajśo: Waš cas jo wó %s góźinu pśéd serwerowym casom."
+msgstr[1] "Glědajśo: Waš cas jo wó %s góźinje pśéd serwerowym casom."
+msgstr[2] "Glědajśo: Waš cas jo wó %s góźiny pśéd serwerowym casom."
+msgstr[3] "Glědajśo: Waš cas jo wó %s góźin pśéd serwerowym casom."
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:82
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Glědajśo: Waš cas jo wó %s góźinu za serwerowym casom."
+msgstr[1] "Glědajśo: Waš cas jo wó %s góźinje za serwerowym casom."
+msgstr[2] "Glědajśo: Waš cas jo wó %s góźiny za serwerowym casom."
+msgstr[3] "Glědajśo: Waš cas jo wó %s góźin za serwerowym casom."
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:109
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
+msgid "Now"
+msgstr "Něnto"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:116
+msgid "Choose a Time"
+msgstr "Wubjeŕśo cas"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
+msgid "Choose a time"
+msgstr "Wubjeŕśo cas"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
+msgid "Midnight"
+msgstr "Połnoc"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
+msgid "6 a.m."
+msgstr "6:00 góź. dopołdnja"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
+msgid "Noon"
+msgstr "Połdnjo"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:153
+msgid "6 p.m."
+msgstr "6:00 wótpołdnja"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:157
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:281
+msgid "Cancel"
+msgstr "Pśetergnuś"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:217
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:274
+msgid "Today"
+msgstr "Źinsa"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:224
+msgid "Choose a Date"
+msgstr "Wubjeŕśo datum"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:272
+msgid "Yesterday"
+msgstr "Cora"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
+msgid "Tomorrow"
+msgstr "Witśe"
+
+#: contrib/admin/static/admin/js/calendar.js:12
+msgid "January"
+msgstr "Januar"
+
+#: contrib/admin/static/admin/js/calendar.js:13
+msgid "February"
+msgstr "Februar"
+
+#: contrib/admin/static/admin/js/calendar.js:14
+msgid "March"
+msgstr "Měrc"
+
+#: contrib/admin/static/admin/js/calendar.js:15
+msgid "April"
+msgstr "Apryl"
+
+#: contrib/admin/static/admin/js/calendar.js:16
+msgid "May"
+msgstr "Maj"
+
+#: contrib/admin/static/admin/js/calendar.js:17
+msgid "June"
+msgstr "Junij"
+
+#: contrib/admin/static/admin/js/calendar.js:18
+msgid "July"
+msgstr "Julij"
+
+#: contrib/admin/static/admin/js/calendar.js:19
+msgid "August"
+msgstr "Awgust"
+
+#: contrib/admin/static/admin/js/calendar.js:20
+msgid "September"
+msgstr "September"
+
+#: contrib/admin/static/admin/js/calendar.js:21
+msgid "October"
+msgstr "Oktober"
+
+#: contrib/admin/static/admin/js/calendar.js:22
+msgid "November"
+msgstr "Nowember"
+
+#: contrib/admin/static/admin/js/calendar.js:23
+msgid "December"
+msgstr "December"
+
+#: contrib/admin/static/admin/js/calendar.js:26
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Nj"
+
+#: contrib/admin/static/admin/js/calendar.js:27
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "Pó"
+
+#: contrib/admin/static/admin/js/calendar.js:28
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Wa"
+
+#: contrib/admin/static/admin/js/calendar.js:29
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Sr"
+
+#: contrib/admin/static/admin/js/calendar.js:30
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "St"
+
+#: contrib/admin/static/admin/js/calendar.js:31
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "Pě"
+
+#: contrib/admin/static/admin/js/calendar.js:32
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "So"
+
+#: contrib/admin/static/admin/js/collapse.js:10
+#: contrib/admin/static/admin/js/collapse.js:21
+#: contrib/admin/static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "Pokazaś"
+
+#: contrib/admin/static/admin/js/collapse.js:18
+#: contrib/admin/static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Schowaś"

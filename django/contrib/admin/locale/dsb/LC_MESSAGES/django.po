@@ -1,0 +1,858 @@
+# This file is distributed under the same license as the Django package.
+# 
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-12 16:37+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Lower Sorbian (http://www.transifex.com/django/django/language/dsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: dsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#: contrib/admin/actions.py:50
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s su se wulašowali."
+
+#: contrib/admin/actions.py:62 contrib/admin/options.py:1707
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "%(name)s njedajo se lašowaś"
+
+#: contrib/admin/actions.py:64 contrib/admin/options.py:1709
+msgid "Are you sure?"
+msgstr "Sćo se wěsty?"
+
+#: contrib/admin/actions.py:89
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Wubrane %(verbose_name_plural)s lašowaś"
+
+#: contrib/admin/apps.py:11
+msgid "Administration"
+msgstr "Administracija"
+
+#: contrib/admin/filters.py:107 contrib/admin/filters.py:205
+#: contrib/admin/filters.py:241 contrib/admin/filters.py:278
+#: contrib/admin/filters.py:384
+msgid "All"
+msgstr "Wšykne"
+
+#: contrib/admin/filters.py:242
+msgid "Yes"
+msgstr "Jo"
+
+#: contrib/admin/filters.py:243
+msgid "No"
+msgstr "Ně"
+
+#: contrib/admin/filters.py:257
+msgid "Unknown"
+msgstr "Njeznaty"
+
+#: contrib/admin/filters.py:316
+msgid "Any date"
+msgstr "Někaki datum"
+
+#: contrib/admin/filters.py:317
+msgid "Today"
+msgstr "Źinsa"
+
+#: contrib/admin/filters.py:321
+msgid "Past 7 days"
+msgstr "Zachadne 7 dnjow"
+
+#: contrib/admin/filters.py:325
+msgid "This month"
+msgstr "Toś ten mjasec"
+
+#: contrib/admin/filters.py:329
+msgid "This year"
+msgstr "W tom lěśe"
+
+#: contrib/admin/filters.py:359
+msgid "No date"
+msgstr "Žeden datum"
+
+#: contrib/admin/filters.py:360
+msgid "Has date"
+msgstr "Ma datum"
+
+#: contrib/admin/forms.py:14
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note"
+" that both fields may be case-sensitive."
+msgstr "Pšosym zapódajśo korektne %(username)s a gronidło za personalne konto. Źiwajśo na to, až wobej póli móžotej mjazy wjeliko- a małopisanim rozeznawaś."
+
+#: contrib/admin/helpers.py:27
+msgid "Action:"
+msgstr "Akcija:"
+
+#: contrib/admin/helpers.py:286
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Dalšne %(verbose_name)s pśidaś"
+
+#: contrib/admin/helpers.py:289
+msgid "Remove"
+msgstr "Wótpóraś"
+
+#: contrib/admin/models.py:39
+msgid "action time"
+msgstr "akciski cas"
+
+#: contrib/admin/models.py:46
+msgid "user"
+msgstr "wužywaŕ"
+
+#: contrib/admin/models.py:51
+msgid "content type"
+msgstr "wopśimjeśowy typ"
+
+#: contrib/admin/models.py:54
+msgid "object id"
+msgstr "objektowy id"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
+#: contrib/admin/models.py:56
+msgid "object repr"
+msgstr "objektowa reprezentacija"
+
+#: contrib/admin/models.py:57
+msgid "action flag"
+msgstr "akciske markěrowanje"
+
+#: contrib/admin/models.py:59
+msgid "change message"
+msgstr "změnowa powěźeńka"
+
+#: contrib/admin/models.py:64
+msgid "log entry"
+msgstr "protokolowy zapisk"
+
+#: contrib/admin/models.py:65
+msgid "log entries"
+msgstr "protokolowe zapiski"
+
+#: contrib/admin/models.py:74
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr "„%(object)s“ pśidane."
+
+#: contrib/admin/models.py:76
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr "„%(object)s“ změnjone - %(changes)s"
+
+#: contrib/admin/models.py:81
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr "„%(object)s“ wulašowane."
+
+#: contrib/admin/models.py:83
+msgid "LogEntry Object"
+msgstr "Objekt LogEntry"
+
+#: contrib/admin/models.py:109
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "{name} „{object} pśidany."
+
+#: contrib/admin/models.py:111
+msgid "Added."
+msgstr "Pśidany."
+
+#: contrib/admin/models.py:115 contrib/admin/options.py:1917
+msgid "and"
+msgstr "a"
+
+#: contrib/admin/models.py:119
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "{fields} za {name} „{object} změnjone."
+
+#: contrib/admin/models.py:123
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} změnjone."
+
+#: contrib/admin/models.py:127
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Deleted {name} „{object} wulašowane."
+
+#: contrib/admin/models.py:130
+msgid "No fields changed."
+msgstr "Žedne póla změnjone."
+
+#: contrib/admin/options.py:196 contrib/admin/options.py:225
+msgid "None"
+msgstr "Žeden"
+
+#: contrib/admin/options.py:261
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "´Źaržćo „ctrl“ abo „cmd“ na Mac tłocony, aby wusej jadnogo wubrał."
+
+#: contrib/admin/options.py:1115 contrib/admin/options.py:1186
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" jo se wuspěšnje pśidał. Móžośo jen dołojce znowego wobźěłowaś."
+
+#: contrib/admin/options.py:1129
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"below."
+msgstr "{name} \"{obj}\" jo se wuspěšnje pśidał. Móžośo dołojce dalšne {name} pśidaś."
+
+#: contrib/admin/options.py:1139
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" jo se wuspěšnje pśidał."
+
+#: contrib/admin/options.py:1176
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" jo se wuspěšnje změnił. Móžośo jen dołojce znowego wobźěłowaś."
+
+#: contrib/admin/options.py:1199
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr "{name} \"{obj}\" jo se wuspěšnje změnił. Móžośo dołojce dalšne {name} pśidaś."
+
+#: contrib/admin/options.py:1211
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" jo se wuspěšnje změnił."
+
+#: contrib/admin/options.py:1296 contrib/admin/options.py:1564
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr "Zapiski muse se wubraś, aby akcije na nje nałožowało. Zapiski njejsu se změnili."
+
+#: contrib/admin/options.py:1315
+msgid "No action selected."
+msgstr "Žedna akcija wubrana."
+
+#: contrib/admin/options.py:1336
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" jo se wuspěšnje wulašował."
+
+#: contrib/admin/options.py:1424 contrib/admin/options.py:1682
+#: contrib/admin/options.py:1738
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objekt %(name)s z primarnym klucom %(key)r njeeksistěrujo."
+
+#: contrib/admin/options.py:1475
+#, python-format
+msgid "Add %s"
+msgstr "%s pśidaś"
+
+#: contrib/admin/options.py:1475
+#, python-format
+msgid "Change %s"
+msgstr "%s změniś"
+
+#: contrib/admin/options.py:1543
+msgid "Database error"
+msgstr "Zmólka datoweje banki"
+
+#: contrib/admin/options.py:1606
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s jo se wuspěšnje změnił."
+msgstr[1] "%(count)s %(name)s stej se wuspěšnje změniłej."
+msgstr[2] "%(count)s %(name)s su se wuspěšnje změnili."
+msgstr[3] "%(count)s %(name)s jo se wuspěšnje změniło."
+
+#: contrib/admin/options.py:1633
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s wubrany"
+msgstr[1] "Wšykne %(total_count)s wubranej"
+msgstr[2] "Wšykne %(total_count)s wubrane"
+msgstr[3] "Wšykne %(total_count)s wubranych"
+
+#: contrib/admin/options.py:1639
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 z %(cnt)s wubranych"
+
+#: contrib/admin/options.py:1755
+#, python-format
+msgid "Change history: %s"
+msgstr "Změnowa historija: %s"
+
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#: contrib/admin/options.py:1911
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#: contrib/admin/options.py:1918
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr "Aby se %(class_name)s %(instance)s lašowało, muse se slědujuce šćitane objekty lašowaś: %(related_objects)s"
+
+#: contrib/admin/sites.py:40 contrib/admin/templates/admin/base_site.html:3
+msgid "Django site admin"
+msgstr "Administrator sedła Django"
+
+#: contrib/admin/sites.py:43 contrib/admin/templates/admin/base_site.html:6
+msgid "Django administration"
+msgstr "Administracija Django"
+
+#: contrib/admin/sites.py:46
+msgid "Site administration"
+msgstr "Sedłowa administracija"
+
+#: contrib/admin/sites.py:398 contrib/admin/templates/admin/login.html.py:61
+#: contrib/admin/templates/registration/password_reset_complete.html:18
+#: contrib/admin/tests.py:131
+msgid "Log in"
+msgstr "Pśizjawiś"
+
+#: contrib/admin/sites.py:525
+#, python-format
+msgid "%(app)s administration"
+msgstr "Administracija %(app)s"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Bok njejo se namakał"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Jo nam luto, ale pominany bok njedajo se namakaś."
+
+#: contrib/admin/templates/admin/500.html:6
+#: contrib/admin/templates/admin/app_index.html:9
+#: contrib/admin/templates/admin/auth/user/change_password.html:13
+#: contrib/admin/templates/admin/base.html:56
+#: contrib/admin/templates/admin/change_form.html:18
+#: contrib/admin/templates/admin/change_list.html:31
+#: contrib/admin/templates/admin/delete_confirmation.html:13
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:13
+#: contrib/admin/templates/admin/invalid_setup.html:6
+#: contrib/admin/templates/admin/object_history.html:6
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_form.html:7
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_confirm.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:6
+msgid "Home"
+msgstr "Startowy bok"
+
+#: contrib/admin/templates/admin/500.html:7
+msgid "Server error"
+msgstr "Serwerowa zmólka"
+
+#: contrib/admin/templates/admin/500.html:11
+msgid "Server error (500)"
+msgstr "Serwerowa zmólka (500)"
+
+#: contrib/admin/templates/admin/500.html:14
+msgid "Server Error <em>(500)</em>"
+msgstr "Serwerowa zmólka <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr "Zmólka jo nastała. Jo se sedłowym administratoram pśez e-mail k wěsći dała a by dejała se skóro wótpóraś. Źěkujomse za wašu sćerpmosć."
+
+#: contrib/admin/templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Wubranu akciju wuwjasć"
+
+#: contrib/admin/templates/admin/actions.html:4
+msgid "Go"
+msgstr "Start"
+
+#: contrib/admin/templates/admin/actions.html:10
+msgid "Click here to select the objects across all pages"
+msgstr "Klikniśo how, aby objekty wšych bokow wubrał"
+
+#: contrib/admin/templates/admin/actions.html:10
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Wubjeŕśo wšykne %(total_count)s %(module_name)s"
+
+#: contrib/admin/templates/admin/actions.html:12
+msgid "Clear selection"
+msgstr "Wuběrk lašowaś"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user"
+" options."
+msgstr "Zapódajśo nejpjerwjej wužywarske mě a gronidło. Pótom móžośo dalšne wužywarske nastajenja wobźěłowaś."
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Zapódajśo wužywarske mě a gronidło."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:17
+#: contrib/admin/templates/admin/auth/user/change_password.html:54
+#: contrib/admin/templates/admin/base.html:44
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Change password"
+msgstr "Gronidło změniś"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#: contrib/admin/templates/admin/change_form.html:47
+#: contrib/admin/templates/admin/change_list.html:58
+#: contrib/admin/templates/admin/login.html:21
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Please correct the error below."
+msgstr "Pšosym skorigěrujśo slědujucu zmólku."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#: contrib/admin/templates/admin/change_form.html:47
+#: contrib/admin/templates/admin/change_list.html:58
+#: contrib/admin/templates/admin/login.html:21
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Please correct the errors below."
+msgstr "Pšosym skorigěrujśo slědujuce zmólki."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Zapódajśo nowe gronidło za wužywarja <strong>%(username)s</strong>."
+
+#: contrib/admin/templates/admin/base.html:30
+msgid "Welcome,"
+msgstr "Witajśo,"
+
+#: contrib/admin/templates/admin/base.html:35
+msgid "View site"
+msgstr "Sedło pokazaś"
+
+#: contrib/admin/templates/admin/base.html:40
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Documentation"
+msgstr "Dokumentacija"
+
+#: contrib/admin/templates/admin/base.html:46
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Log out"
+msgstr "Wótzjawiś"
+
+#: contrib/admin/templates/admin/change_form.html:21
+#: contrib/admin/templates/admin/change_list.html:49
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s pśidaś"
+
+#: contrib/admin/templates/admin/change_form.html:33
+#: contrib/admin/templates/admin/object_history.html:10
+msgid "History"
+msgstr "Historija"
+
+#: contrib/admin/templates/admin/change_form.html:35
+#: contrib/admin/templates/admin/edit_inline/stacked.html:14
+#: contrib/admin/templates/admin/edit_inline/tabular.html:36
+msgid "View on site"
+msgstr "Na sedle pokazaś"
+
+#: contrib/admin/templates/admin/change_list.html:69
+msgid "Filter"
+msgstr "Filtrowaś"
+
+#: contrib/admin/templates/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr "Ze sortěrowanja wótpóraś"
+
+#: contrib/admin/templates/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Sortěrowański rěd: %(priority_number)s"
+
+#: contrib/admin/templates/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr "Sortěrowanje pśešaltowaś"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:17
+#: contrib/admin/templates/admin/related_widget_wrapper.html:23
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Delete"
+msgstr "Lašowaś"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr "Gaž se %(object_name)s '%(escaped_object)s' lašujo, se pśisłušne objekty wulašuju, ale wašo konto njama pšawo slědujuce typy objektow lašowaś: "
+
+#: contrib/admin/templates/admin/delete_confirmation.html:30
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
+" following protected related objects:"
+msgstr "Aby se %(object_name)s '%(escaped_object)s' lašujo, muse se slědujuce šćitane pśisłušne objekty lašowaś:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:37
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr "Cośo napšawdu %(object_name)s „%(escaped_object)s“ lašowaś? Wšykne slědujuce pśisłušne zapiski se wulašuju: "
+
+#: contrib/admin/templates/admin/delete_confirmation.html:39
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:38
+msgid "Objects"
+msgstr "Objekty"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:46
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:49
+msgid "Yes, I'm sure"
+msgstr "Jo, som se wěsty"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:47
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:50
+msgid "No, take me back"
+msgstr "Ně, pšosym slědk"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:16
+msgid "Delete multiple objects"
+msgstr "Někotare objekty lašowaś"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr "Gaž lašujośo wubrany %(objects_name)s, se pśisłušne objekty wulašuju, ale wašo konto njama pšawo slědujuce typy objektow lašowaś: "
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:29
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr "Aby wubrany %(objects_name)s lašowało, muse se slědujuce šćitane pśisłušne objekty lašowaś:"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:36
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr "Cośo napšawdu wubrany %(objects_name)s lašowaś? Wšykne slědujuce objekty a jich pśisłušne zapiski se wulašuju:"
+
+#: contrib/admin/templates/admin/edit_inline/stacked.html:12
+#: contrib/admin/templates/admin/edit_inline/tabular.html:34
+#: contrib/admin/templates/admin/index.html:37
+#: contrib/admin/templates/admin/related_widget_wrapper.html:9
+msgid "Change"
+msgstr "Změniś"
+
+#: contrib/admin/templates/admin/edit_inline/tabular.html:20
+msgid "Delete?"
+msgstr "Lašowaś?"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Pó %(filter_title)s "
+
+#: contrib/admin/templates/admin/includes/object_delete_summary.html:2
+msgid "Summary"
+msgstr "Zespominanje"
+
+#: contrib/admin/templates/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modele w nałoženju %(name)s"
+
+#: contrib/admin/templates/admin/index.html:31
+#: contrib/admin/templates/admin/related_widget_wrapper.html:16
+msgid "Add"
+msgstr "Pśidaś"
+
+#: contrib/admin/templates/admin/index.html:47
+msgid "You don't have permission to edit anything."
+msgstr "Njejsćo pšawo něco wobźěłowaś."
+
+#: contrib/admin/templates/admin/index.html:55
+msgid "Recent actions"
+msgstr "Nejnowše akcije"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "My actions"
+msgstr "Móje akcije"
+
+#: contrib/admin/templates/admin/index.html:60
+msgid "None available"
+msgstr "Žeden k dispoziciji"
+
+#: contrib/admin/templates/admin/index.html:74
+msgid "Unknown content"
+msgstr "Njeznate wopśimjeśe"
+
+#: contrib/admin/templates/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate"
+" database tables have been created, and make sure the database is readable "
+"by the appropriate user."
+msgstr "Něco jo z wašeju instalaciju datoweje banki kśiwje šło. Pśeznańśo se, až wótpowědne tabele datoweje banki su se napórali a pótom, až datowa banka dajo se wót wótpówědnego wužywarja cytaś."
+
+#: contrib/admin/templates/admin/login.html:37
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this"
+" page. Would you like to login to a different account?"
+msgstr "Sćo ako %(username)s awtentificěrowany, ale njamaśo pśistup na toś ten bok. Cośo se pla drugego konta pśizjawiś?"
+
+#: contrib/admin/templates/admin/login.html:57
+msgid "Forgotten your password or username?"
+msgstr "Sćo swójo gronidło abo wužywarske mě zabył?"
+
+#: contrib/admin/templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "Datum/cas"
+
+#: contrib/admin/templates/admin/object_history.html:23
+msgid "User"
+msgstr "Wužywaŕ"
+
+#: contrib/admin/templates/admin/object_history.html:24
+msgid "Action"
+msgstr "Akcija"
+
+#: contrib/admin/templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this"
+" admin site."
+msgstr "Toś ten objekt njama změnowu historiju. Jo se nejskerjej pśez toś to administratorowe sedło pśidał."
+
+#: contrib/admin/templates/admin/pagination.html:10
+#: contrib/admin/templates/admin/search_form.html:9
+msgid "Show all"
+msgstr "Wšykne pokazaś"
+
+#: contrib/admin/templates/admin/pagination.html:11
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Składowaś"
+
+#: contrib/admin/templates/admin/popup_response.html:3
+msgid "Popup closing..."
+msgstr "Wuskokujuce wokno se zacynja..."
+
+#: contrib/admin/templates/admin/related_widget_wrapper.html:8
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Wubrane %(model)s změniś"
+
+#: contrib/admin/templates/admin/related_widget_wrapper.html:15
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Dalšny %(model)s pśidaś"
+
+#: contrib/admin/templates/admin/related_widget_wrapper.html:22
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Wubrane %(model)s lašowaś"
+
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Search"
+msgstr "Pytaś"
+
+#: contrib/admin/templates/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s wuslědk"
+msgstr[1] "%(counter)s wuslědka"
+msgstr[2] "%(counter)s wuslědki"
+msgstr[3] "%(counter)s wuslědkow"
+
+#: contrib/admin/templates/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s dogromady"
+
+#: contrib/admin/templates/admin/submit_line.html:8
+msgid "Save as new"
+msgstr "Ako nowy składowaś"
+
+#: contrib/admin/templates/admin/submit_line.html:9
+msgid "Save and add another"
+msgstr "Składowaś a dalšny pśidaś"
+
+#: contrib/admin/templates/admin/submit_line.html:10
+msgid "Save and continue editing"
+msgstr "Składowaś a dalej wobźěłowaś"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Źěkujomy se, až sćo źinsa wěsty cas na websedle pśebywał."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Hyšći raz pśizjawiś"
+
+#: contrib/admin/templates/registration/password_change_done.html:7
+#: contrib/admin/templates/registration/password_change_form.html:8
+msgid "Password change"
+msgstr "Gronidło změniś"
+
+#: contrib/admin/templates/registration/password_change_done.html:14
+msgid "Your password was changed."
+msgstr "Wašo gronidło jo se změniło."
+
+#: contrib/admin/templates/registration/password_change_form.html:26
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new"
+" password twice so we can verify you typed it in correctly."
+msgstr "Pšosym zapódajśo k swójej wěstośe swójo stare gronidło a pótom swójo nowe gronidło dwójcy, aby my mógli pśeglědowaś, lěc sćo jo korektnje zapisał."
+
+#: contrib/admin/templates/registration/password_change_form.html:54
+#: contrib/admin/templates/registration/password_reset_confirm.html:24
+msgid "Change my password"
+msgstr "Mójo gronidło změniś"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:7
+#: contrib/admin/templates/registration/password_reset_done.html:7
+#: contrib/admin/templates/registration/password_reset_form.html:7
+msgid "Password reset"
+msgstr "Gronidło jo se slědk stajiło"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:16
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Wašo gronidło jo se póstajiło. Móžośo pókšacowaś a se něnto pśizjawiś."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:7
+msgid "Password reset confirmation"
+msgstr "Wobkšuśenje slědkstajenja gronidła"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:17
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr "Pšosym zapódajśo swójo nowe gronidło dwójcy, aby my mógli pśeglědowaś, lěc sći jo korektnje zapisał."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:21
+msgid "New password:"
+msgstr "Nowe gronidło:"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:23
+msgid "Confirm password:"
+msgstr "Gronidło wobkšuśiś:"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:29
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr "Wótkaz za slědkstajenje gronidła jo njepłaśiwy był, snaź dokulaž jo se južo wužył. Pšosym pšosćo wó nowe slědkstajenje gronidła."
+
+#: contrib/admin/templates/registration/password_reset_done.html:15
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr "Smy wam instrukcije za nastajenje wašogo gronidła pśez e-mail pósłali, jolic konto ze zapódaneju e-mailoweju adresu eksistěrujo. Wy by dejał ju skóro dostaś."
+
+#: contrib/admin/templates/registration/password_reset_done.html:17
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr "Jolic mejlku njedostawaśo, pśeznańśo se, až sćo adresu zapódał, z kótarejuž sćo zregistrěrował, a pśeglědajśo swój spamowy zarědnik."
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr "Dostawaśo toś tu mejlku, dokulaž sćo za swójo wužywarske konto na %(site_name)s wó slědkstajenje gronidła  pšosył."
+
+#: contrib/admin/templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr "Pšosym źiśo k slědujucemu bokoju a wubjeŕśo nowe gronidło:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:8
+msgid "Your username, in case you've forgotten:"
+msgstr "Wašo wužywarske mě, jolic sćo jo zabył:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:10
+msgid "Thanks for using our site!"
+msgstr "Wjeliki źěk za wužywanje našogo sedła!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:12
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Team %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_form.html:15
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr "Sćo swójo gronidło zabył? Zapódajśo dołojce swóju e-mailowu adresu a pósćelomy wam instrukcije za nastajenje nowego gronidła pśez e-mail."
+
+#: contrib/admin/templates/registration/password_reset_form.html:19
+msgid "Email address:"
+msgstr "E-mailowa adresa:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:19
+msgid "Reset my password"
+msgstr "Mójo gronidło slědk stajiś"
+
+#: contrib/admin/templatetags/admin_list.py:387
+msgid "All dates"
+msgstr "Wšykne daty"
+
+#: contrib/admin/views/main.py:81
+#, python-format
+msgid "Select %s"
+msgstr "%s wubraś"
+
+#: contrib/admin/views/main.py:83
+#, python-format
+msgid "Select %s to change"
+msgstr "%s wubraś, aby se změniło"
+
+#: contrib/admin/widgets.py:92
+msgid "Date:"
+msgstr "Datum:"
+
+#: contrib/admin/widgets.py:93
+msgid "Time:"
+msgstr "Cas:"
+
+#: contrib/admin/widgets.py:175
+msgid "Lookup"
+msgstr "Pytanje"
+
+#: contrib/admin/widgets.py:363
+msgid "Currently:"
+msgstr "Tuchylu:"
+
+#: contrib/admin/widgets.py:364
+msgid "Change:"
+msgstr "Změniś:"
