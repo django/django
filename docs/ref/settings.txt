@@ -377,6 +377,22 @@ Whether to use a secure cookie for the CSRF cookie. If this is set to ``True``,
 the cookie will be marked as "secure," which means browsers may ensure that the
 cookie is only sent with an HTTPS connection.
 
+.. setting:: CSRF_USE_SESSIONS
+
+``CSRF_USE_SESSIONS``
+---------------------
+
+.. versionadded:: 1.11
+
+Default: ``False``
+
+Whether to store the CSRF token in the user's session instead of in a cookie.
+This requires the use of :mod:`django.contrib.sessions`.
+
+Storing the CSRF inside a cookie (Django's default) is considered safe, but
+storing it inside the session is common practice with other web frameworks
+and therefore sometimes demanded by security auditors.
+
 .. setting:: CSRF_FAILURE_VIEW
 
 ``CSRF_FAILURE_VIEW``
@@ -3407,6 +3423,7 @@ Security
   * :setting:`CSRF_FAILURE_VIEW`
   * :setting:`CSRF_HEADER_NAME`
   * :setting:`CSRF_TRUSTED_ORIGINS`
+  * :setting:`CSRF_USE_SESSIONS`
 
 * :setting:`SECRET_KEY`
 * :setting:`X_FRAME_OPTIONS`
