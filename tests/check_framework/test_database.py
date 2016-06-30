@@ -1,9 +1,9 @@
 import unittest
 
-from django.core.checks import Tags, run_checks
+from django.core.checks import Tags, Warning, run_checks
 from django.core.checks.registry import CheckRegistry
 from django.db import connection
-from django.test import TestCase, mock
+from django.test import TestCase, mock, override_settings
 
 
 class DatabaseCheckTests(TestCase):
@@ -56,3 +56,22 @@ class DatabaseCheckTests(TestCase):
                 result = self.func(None)
                 self.assertEqual(len(result), 2)
                 self.assertEqual([r.id for r in result], ['mysql.W002', 'mysql.W002'])
+
+
+class MigrationsCheckTests(TestCase):
+    @property
+    def func(self):
+        from django.core.checks.database import check_migration_modules
+        return check_migration_modules
+
+    @override_settings(MIGRATION_MODULES={'app_label': 'invalid.migrations.path'})
+    def test_check_migration_modules(self):
+        self.assertEqual(
+            self.func(None),
+            [
+                Warning(
+                    "'invalid.migrations.path' for 'app_label' could not be imported.",
+                    id='migrations.W001',
+                ),
+            ]
+        )
