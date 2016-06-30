@@ -307,6 +307,25 @@ class RelativeFieldTests(SimpleTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_missing_relationship_model_on_model_check(self):
+        class Person(models.Model):
+            pass
+
+        class Group(models.Model):
+            members = models.ManyToManyField('Person', through="MissingM2MModel")
+
+        model = Group
+        errors = model.check()
+        expected = [
+            Error(
+                "Field specifies a many-to-many relation through model "
+                "'MissingM2MModel', which has not been installed.",
+                obj=Group._meta.get_field('members'),
+                id='fields.E331',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
     @isolate_apps('invalid_models_tests')
     def test_many_to_many_through_isolate_apps_model(self):
         """

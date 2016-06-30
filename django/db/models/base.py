@@ -1689,6 +1689,11 @@ class Model(six.with_metaclass(ModelBase)):
         for f in cls._meta.local_many_to_many:
             # Check if auto-generated name for the M2M field is too long
             # for the database.
+
+            # Skip nonexistent models.
+            if isinstance(f.remote_field.through, six.string_types):
+                continue
+
             for m2m in f.remote_field.through._meta.local_fields:
                 _, rel_name = m2m.get_attname_column()
                 if m2m.db_column is None and rel_name is not None and len(rel_name) > allowed_len:
