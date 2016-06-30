@@ -1,7 +1,9 @@
 from django.contrib.auth import signals
 from django.contrib.auth.models import User
+from django.db import models
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
+from django.test.utils import isolate_apps
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
@@ -11,6 +13,7 @@ class SignalTestCase(TestCase):
     def setUpTestData(cls):
         cls.u1 = User.objects.create_user(username='testclient', password='password')
         cls.u3 = User.objects.create_user(username='staff', password='password')
+
 
     def listener_login(self, user, **kwargs):
         self.logged_in.append(user)
@@ -77,3 +80,18 @@ class SignalTestCase(TestCase):
         user.refresh_from_db()
         self.assertEqual(user.username, 'staff')
         self.assertNotEqual(user.last_login, old_last_login)
+
+    @isolate_apps('signal_custom_user')
+    def test_update_last_login_handles_custom_user_with_no_last_login_field(self):
+        """Ensure that only `last_login` is updated in `update_last_login`"""
+
+        class MinimalUser(models.Model):
+            email = models.EmailField(primary_key=True)
+            REQUIRED_FIELDS = ()
+            USERNAME_FIELD = 'email'
+
+        user = MinimalUser.objects.create(email='hello@example.com')
+        request = RequestFactory().get('/login')
+        # should not raise:
+        signals.user_logged_in.send(sender=user.__class__, request=request, user=user)
+
