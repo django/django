@@ -192,6 +192,9 @@ Models
   <django.db.models.query.QuerySet.update_or_create>` and
   :meth:`~django.db.models.query.QuerySet.get_or_create`.
 
+* :class:`~django.db.models.ImageField` now has a default
+  :data:`~django.core.validators.validate_image_file_extension` validator.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -237,7 +240,10 @@ URLs
 Validators
 ~~~~~~~~~~
 
-* ...
+* Added :class:`~django.core.validators.FileExtensionValidator` to validate
+  file extensions and
+  :data:`~django.core.validators.validate_image_file_extension` to validate
+  image files.
 
 .. _backwards-incompatible-1.11:
 
