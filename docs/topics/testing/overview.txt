@@ -324,6 +324,17 @@ need to test for success or failure at that level.
 Speeding up the tests
 ---------------------
 
+Parallel Tests
+~~~~~~~~~~~~~
+
+Your tests should ideally be isolated instances. Assuming this is true you
+should be able to run them in parallel and gain a speed up on multicore hardware.
+See `--parallel <https://docs.djangoproject.com/en/1.9/ref/django-admin/#cmdoption-test--parallel>`.
+
+
+Password Hasing
+~~~~~~~~~~~~~~
+
 In recent versions of Django, the default password hasher is rather slow by
 design. If during your tests you are authenticating many users, you may want
 to use a custom settings file and set the :setting:`PASSWORD_HASHERS` setting
