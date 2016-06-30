@@ -324,10 +324,18 @@ need to test for success or failure at that level.
 Speeding up the tests
 ---------------------
 
-In recent versions of Django, the default password hasher is rather slow by
-design. If during your tests you are authenticating many users, you may want
-to use a custom settings file and set the :setting:`PASSWORD_HASHERS` setting
-to a faster hashing algorithm::
+Running tests in parallel
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As long as your tests are properly isolated, you can run them in parallel to
+gain a speed up on multi-core hardware. See :option:`test --parallel`.
+
+Password hashing
+~~~~~~~~~~~~~~~~
+
+The default password hasher is rather slow by design. If you're authenticating
+many users in your tests, you may want to use a custom settings file and set
+the :setting:`PASSWORD_HASHERS` setting to a faster hashing algorithm::
 
     PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.MD5PasswordHasher',
