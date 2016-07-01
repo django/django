@@ -390,6 +390,14 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 msgs_sent_num = email.send()
                 self.assertEqual(msgs_sent_num, 1)
 
+    def test_attach_text_as_bytes(self):
+        msg = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
+        file_path = os.path.join(os.path.dirname(upath(__file__)), 'attachments', 'file.txt')
+        with open(file_path, mode='rb') as fh:
+            msg.attach('file.txt', fh.read())
+        sent_num = msg.send()
+        self.assertEqual(sent_num, 1)
+
     def test_dummy_backend(self):
         """
         Make sure that dummy backends returns correct number of sent messages

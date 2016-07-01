@@ -212,9 +212,13 @@ class SafeMIMEText(MIMEMixin, MIMEText):
     def __init__(self, _text, _subtype='plain', _charset=None):
         self.encoding = _charset
         if _charset == 'utf-8':
-            # Unfortunately, Python < 3.5 doesn't support setting a Charset instance
-            # as MIMEText init parameter (http://bugs.python.org/issue16324).
+            # Unfortunately, Python doesn't yet pass a Charset instance as
+            # MIMEText init parameter to set_payload().
+            # http://bugs.python.org/issue27445
             # We do it manually and trigger re-encoding of the payload.
+            if six.PY3 and isinstance(_text, bytes):
+                # Sniffing encoding would fail with bytes content in MIMEText.__init__.
+                _text = _text.decode('utf-8')
             MIMEText.__init__(self, _text, _subtype, None)
             del self['Content-Transfer-Encoding']
             has_long_lines = any(len(l) > RFC5322_EMAIL_LINE_LENGTH_LIMIT for l in _text.splitlines())
