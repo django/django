@@ -62,6 +62,27 @@ and post the square of it to the ``"result"`` channel::
             self.assertEqual(result['value'], 1089)
 
 
+Groups
+------
+
+You can test Groups in the same way as Channels inside a ``ChannelTestCase``;
+the entire channel layer is flushed each time a test is run, so it's safe to
+do group adds and sends during a test. For example::
+
+    from channels import Channel
+    from channels.tests import ChannelTestCase
+
+    class MyTests(ChannelTestCase):
+        def test_a_thing(self):
+            # Add a test channel to a test group
+            Group("test-group").add("test-channel")
+            # Send to the group
+            Group("test-group").send({"value": 42})
+            # Verify the message got into the destination channel
+            result = self.get_next_message("test-channel", require=True)
+            self.assertEqual(result['value'], 42)
+
+
 Multiple Channel Layers
 -----------------------
 
