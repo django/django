@@ -26,11 +26,11 @@ class ChannelTestCase(TestCase):
     # Customizable so users can test multi-layer setups
     test_channel_aliases = [DEFAULT_CHANNEL_LAYER]
 
-    def setUp(self):
+    def _pre_setup(self):
         """
         Initialises in memory channel layer for the duration of the test
         """
-        super(ChannelTestCase, self).setUp()
+        super(ChannelTestCase, self)._pre_setup()
         self._old_layers = {}
         for alias in self.test_channel_aliases:
             # Swap in an in memory layer wrapper and keep the old one around
@@ -43,7 +43,7 @@ class ChannelTestCase(TestCase):
                 )
             )
 
-    def tearDown(self):
+    def _post_teardown(self):
         """
         Undoes the channel rerouting
         """
@@ -51,7 +51,7 @@ class ChannelTestCase(TestCase):
             # Swap in an in memory layer wrapper and keep the old one around
             channel_layers.set(alias, self._old_layers[alias])
         del self._old_layers
-        super(ChannelTestCase, self).tearDown()
+        super(ChannelTestCase, self)._post_teardown()
 
     def get_next_message(self, channel, alias=DEFAULT_CHANNEL_LAYER, require=False):
         """
