@@ -396,7 +396,7 @@ class ResolverTests(SimpleTestCase):
             [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': None}],
             [{'type': RegexURLResolver}, {'type': RegexURLResolver}],
         ]
-        with self.assertRaisesMessage(Resolver404, "tried") as cm:
+        with self.assertRaisesMessage(Resolver404, b'tried' if six.PY2 else 'tried') as cm:
             resolve('/included/non-existent-url', urlconf=urls)
         e = cm.exception
         # make sure we at least matched the root ('/') url resolver:
