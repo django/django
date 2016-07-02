@@ -17,7 +17,7 @@ tell Django is installed and which version by running the following command:
 
 .. code-block:: console
 
-    $ python -c "import django; print(django.get_version())"
+    $ python -m django --version
 
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
