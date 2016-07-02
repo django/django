@@ -6,7 +6,7 @@ import os
 import re
 import types
 from datetime import datetime, timedelta
-from unittest import TestCase
+from unittest import TestCase, skipUnless
 
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -22,6 +22,13 @@ from django.core.validators import (
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
 from django.utils._os import upath
+
+try:
+    from PIL import Image  # noqa
+except ImportError:
+    PILLOW_IS_INSTALLED = False
+else:
+    PILLOW_IS_INSTALLED = True
 
 NOW = datetime.now()
 EXTENDED_SCHEMES = ['http', 'https', 'ftp', 'ftps', 'git', 'file', 'git+ssh']
@@ -299,6 +306,9 @@ def create_simple_test_method(validator, expected, value, num):
     else:
         val_name = validator.__class__.__name__
     test_name = test_mask % (val_name, num)
+    if validator is validate_image_file_extension:
+        SKIP_MSG = "Pillow is required to test validate_image_file_extension"
+        test_func = skipUnless(PILLOW_IS_INSTALLED, SKIP_MSG)(test_func)
     return test_name, test_func
 
 # Dynamically assemble a test class with the contents of TEST_DATA
