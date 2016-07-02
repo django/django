@@ -275,6 +275,10 @@ Tests
 * Added the :option:`test --debug-mode` option to help troubleshoot test
   failures by setting the :setting:`DEBUG` setting to ``True``.
 
+* The new :func:`django.test.utils.setup_databases` (moved from
+  ``django.test.runner``) and :func:`~django.test.utils.teardown_databases`
+  functions make it easier to build custom test runners.
+
 URLs
 ~~~~
 
@@ -425,3 +429,6 @@ Miscellaneous
   :class:`~django.contrib.auth.views.PasswordResetDoneView`,
   :class:`~django.contrib.auth.views.PasswordResetConfirmView`, and
   :class:`~django.contrib.auth.views.PasswordResetCompleteView`.
+
+* ``django.test.runner.setup_databases()`` is moved to
+  :func:`django.test.utils.setup_databases`. The old location is deprecated.

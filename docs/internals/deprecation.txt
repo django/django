@@ -23,6 +23,8 @@ details on these changes.
 * The ``extra_context`` parameter of ``contrib.auth.views.logout_then_login()``
   will be removed.
 
+* ``django.test.runner.setup_databases()`` will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

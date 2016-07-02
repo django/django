@@ -563,11 +563,8 @@ Methods
 
 .. method:: DiscoverRunner.setup_databases(**kwargs)
 
-    Creates the test databases.
-
-    Returns a data structure that provides enough detail to undo the changes
-    that have been made. This data will be provided to the ``teardown_databases()``
-    function at the conclusion of testing.
+    Creates the test databases by calling
+    :func:`~django.test.utils.setup_databases`.
 
 .. method:: DiscoverRunner.run_suite(suite, **kwargs)
 
@@ -584,11 +581,8 @@ Methods
 
 .. method:: DiscoverRunner.teardown_databases(old_config, **kwargs)
 
-    Destroys the test databases, restoring pre-test conditions.
-
-    ``old_config`` is a data structure defining the changes in the
-    database configuration that need to be reversed. It is the return
-    value of the ``setup_databases()`` method.
+    Destroys the test databases, restoring pre-test conditions by calling
+    :func:`~django.test.utils.teardown_databases`.
 
 .. method:: DiscoverRunner.teardown_test_environment(**kwargs)
 
@@ -628,6 +622,26 @@ utility methods in the ``django.test.utils`` module.
 
     Performs global post-test teardown, such as removing instrumentation from
     the template system and restoring normal email services.
+
+.. function:: setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs)
+
+    .. versionadded:: 1.11
+
+    Creates the test databases.
+
+    Returns a data structure that provides enough detail to undo the changes
+    that have been made. This data will be provided to the
+    :func:`teardown_databases` function at the conclusion of testing.
+
+.. function:: teardown_databases(old_config, parallel=0, keepdb=False)
+
+    .. versionadded:: 1.11
+
+    Destroys the test databases, restoring pre-test conditions.
+
+    ``old_config`` is a data structure defining the changes in the database
+    configuration that need to be reversed. It's the return value of the
+    :meth:`setup_databases` method.
 
 ``django.db.connection.creation``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
