@@ -525,17 +525,23 @@ Localized names of languages
 The ``get_language_info()`` function provides detailed information about
 languages::
 
-    >>> from django.utils.translation import get_language_info
+    >>> from django.utils.translation import activate, get_language_info
+    >>> activate('fr')
     >>> li = get_language_info('de')
-    >>> print(li['name'], li['name_local'], li['bidi'])
-    German Deutsch False
+    >>> print(li['name'], li['name_local'], li['name_translated'], li['bidi'])
+    German Deutsch Allemand False
 
-The ``name`` and ``name_local`` attributes of the dictionary contain the name of
-the language in English and in the language itself, respectively.  The ``bidi``
+The ``name``, ``name_local``, and ``name_translated`` attributes of the
+dictionary contain the name of the language in English, in the language
+itself, and in your current active language respectively.  The ``bidi``
 attribute is True only for bi-directional languages.
 
 The source of the language information is the ``django.conf.locale`` module.
 Similar access to this information is available for template code. See below.
+
+.. versionchanged:: 1.9
+
+    The ``'name_translated'`` attribute was added.
 
 .. _specifying-translation-strings-in-template-code:
 
