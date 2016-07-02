@@ -64,6 +64,11 @@ class MigrationQuestioner(object):
         # None means quit
         return None
 
+    def ask_not_null_removal(self, field_name, model_name):
+        "Removing a NOT NULL field from a model"
+        # None means quit
+        return None
+
     def ask_rename(self, model_name, old_name, new_name, field_instance):
         "Was this field really renamed?"
         return self.defaults.get("ask_rename", False)
@@ -190,6 +195,27 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 return self._ask_default()
         return None
 
+    def ask_not_null_removal(self, field_name, model_name):
+        "Removing a NOT NULL field from a model"
+        if not self.dry_run:
+            choice = self._choice_input(
+                "You are trying to remove a non-nullable field '%s' from %s without a default; "
+                "we can't do that (the database needs something to populate existing rows when migrating backwards).\n"
+                "Please select a fix:" % (field_name, model_name),
+                [
+                    "Provide a one-off default now (will be set on all existing rows)",
+                    "Ignore for now, and make this migration potentially non-reversible",
+                    "Quit, and keep the field",
+                ]
+            )
+            if choice == 2:
+                return NOT_PROVIDED
+            elif choice == 3:
+                sys.exit(3)
+            else:
+                return self._ask_default()
+        return None
+
     def ask_rename(self, model_name, old_name, new_name, field_instance):
         "Was this field really renamed?"
         msg = "Did you rename %s.%s to %s.%s (a %s)? [y/N]"
@@ -237,6 +263,10 @@ class NonInteractiveMigrationQuestioner(MigrationQuestioner):
         sys.exit(3)
 
     def ask_not_null_alteration(self, field_name, model_name):
+        # We can't ask the user, so set as not provided.
+        return NOT_PROVIDED
+
+    def ask_not_null_removal(self, field_name, model_name):
         # We can't ask the user, so set as not provided.
         return NOT_PROVIDED
 

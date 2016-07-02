@@ -1091,6 +1091,8 @@ class OperationTests(OperationTestBase):
         operation = migrations.RemoveField("Pony", "pink")
         self.assertEqual(operation.describe(), "Remove field pink from Pony")
         new_state = project_state.clone()
+        Pony = project_state.apps.get_model('test_rmfl.Pony')
+        Pony.objects.create(pink=1, weight=1337)  # Ensures that reverse operation has a record
         operation.state_forwards("test_rmfl", new_state)
         self.assertEqual(len(new_state.models["test_rmfl", "pony"].fields), 2)
         # Test the database alteration
@@ -1107,6 +1109,35 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RemoveField")
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'model_name': "Pony", 'name': 'pink'})
+
+    def test_remove_field_non_nullable(self):
+        """
+        Tests the RemoveField operation with explicit default
+        """
+        project_state = self.set_up_test_model("test_rmflnn")
+        # Test the state alteration
+        operation = migrations.RemoveField("Pony", "weight")
+        new_state = project_state.clone()
+        Pony = project_state.apps.get_model('test_rmflnn.Pony')
+        Pony.objects.create(pink=1, weight=1337)
+        operation.state_forwards("test_rmflnn", new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_rmflnn", editor, project_state, new_state)
+
+        # And test reversal
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                with connection.schema_editor() as editor:
+                    operation.database_backwards("test_rmflnn", editor, new_state, project_state)
+        operation.default = 42
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_rmflnn", editor, new_state, project_state)
+        self.assertEqual(Pony.objects.get().weight, 42)
+
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[2], {'model_name': "Pony", 'name': 'weight', 'default': 42})
 
     def test_remove_fk(self):
         """
