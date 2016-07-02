@@ -342,17 +342,6 @@ class ModelState(object):
                 raise ValueError(
                     'ModelState.fields cannot be bound to a model - "%s" is.' % name
                 )
-            # Sanity-check that relation fields are NOT referring to a model class.
-            if field.is_relation and hasattr(field.related_model, '_meta'):
-                raise ValueError(
-                    'ModelState.fields cannot refer to a model class - "%s.to" does. '
-                    'Use a string reference instead.' % name
-                )
-            if field.many_to_many and hasattr(field.remote_field.through, '_meta'):
-                raise ValueError(
-                    'ModelState.fields cannot refer to a model class - "%s.through" does. '
-                    'Use a string reference instead.' % name
-                )
 
     @cached_property
     def name_lower(self):
