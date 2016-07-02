@@ -20,7 +20,7 @@ from django.test.utils import captured_stdout, isolate_apps
 from django.utils.encoding import force_str, force_text
 
 from .models import (
-    Article, Author, ModelWithNullFKToSite, SchemeIncludedURL,
+    Article, Author, ModelWithNullFKToSite, Post, SchemeIncludedURL,
     Site as MockSite,
 )
 
@@ -383,13 +383,27 @@ class GenericRelationshipTests(SimpleTestCase):
 class UpdateContentTypesTests(TestCase):
     def setUp(self):
         self.before_count = ContentType.objects.count()
-        ContentType.objects.create(app_label='contenttypes_tests', model='Fake')
+        self.content_type = ContentType.objects.create(app_label='contenttypes_tests', model='Fake')
         self.app_config = apps.get_app_config('contenttypes_tests')
 
-    def test_interactive_true(self):
+    def test_interactive_true_with_dependent_objects(self):
         """
         interactive mode of update_contenttypes() (the default) should delete
-        stale contenttypes.
+        stale contenttypes and warn of dependent objects
+        """
+        Post.objects.create(title='post', content_type=self.content_type)
+        contenttypes_management.input = lambda x: force_str("yes")
+        with captured_stdout() as stdout:
+            contenttypes_management.update_contenttypes(self.app_config)
+        self.assertEqual(Post.objects.count(), 0)
+        self.assertIn("1 object of type contenttypes_tests.post:", stdout.getvalue())
+        self.assertIn("Deleting stale content type", stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count)
+
+    def test_interactive_true_without_dependent_objects(self):
+        """
+        interactive mode of update_contenttypes() (the default) should delete
+        stale contenttypes and inform there are no dependent objects
         """
         contenttypes_management.input = lambda x: force_str("yes")
         with captured_stdout() as stdout:
