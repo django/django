@@ -178,8 +178,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         def altered_table_name(model, temporary_table_name):
             original_table_name = model._meta.db_table
             model._meta.db_table = temporary_table_name
-            yield
-            model._meta.db_table = original_table_name
+            try:
+                yield
+            finally:
+                model._meta.db_table = original_table_name
 
         with altered_table_name(model, model._meta.db_table + "__old"):
             # Rename the old table to make way for the new
