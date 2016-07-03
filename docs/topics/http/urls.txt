@@ -231,8 +231,11 @@ default argument for ``num``, ``"1"``. If the second pattern matches,
 Performance
 ===========
 
-Each regular expression in a ``urlpatterns`` is compiled the first time it's
-accessed. This makes the system blazingly fast.
+The URL function processes regular expressions in the ``urlpatterns`` list
+which is compiled upon the first http request. Subsequent requests use the
+cached configuration via the url resolver. Reversing URLs tends to be
+slower compared to routing depending on the complexity of the regular
+expressions in the URL patterns.
 
 Syntax of the ``urlpatterns`` variable
 ======================================
