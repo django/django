@@ -73,7 +73,10 @@ Minor features
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* When stale content types are detected during a management command, there is
+  now an expansive list of objects that will be deleted. Previously, only
+  the content type objects themselves were listed, even if there were objects
+  with foreign keys towards the content types that would be deleted also.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,5 +1,6 @@
 from django.apps import apps as global_apps
 from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
+from django.db.models.deletion import Collector
 from django.db.utils import IntegrityError
 from django.utils import six
 from django.utils.six.moves import input
@@ -141,21 +142,39 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
             print("Adding content type '%s | %s'" % (ct.app_label, ct.model))
 
     # Confirm that the content type is stale before deletion.
+    using = router.db_for_write(ContentType)
     if to_remove:
         if interactive:
-            content_type_display = '\n'.join(
-                '    %s | %s' % (ct.app_label, ct.model)
-                for ct in to_remove
-            )
-            ok_to_delete = input("""The following content types are stale and need to be deleted:
+            ct_info = []
+            for ct in to_remove:
+                ct_info.append('    - Content type for %s.%s' % (ct.app_label, ct.model))
+                collector = NoFastDeleteCollector(using=using)
+                collector.collect([ct])
+
+                for obj_type, objs in collector.data.items():
+                    if objs == {ct}:
+                        continue
+                    ct_info.append('    - %s object%s of type %s.%s:' % (
+                        len(objs),
+                        's' if len(objs) != 1 else '',
+                        obj_type._meta.app_label,
+                        obj_type._meta.model_name)
+                    )
+
+            content_type_display = '\n'.join(ct_info)
+            print("""Some content types in your database are stale and can be deleted.
+Any objects that depend on these content types will then also be deleted.
+The content types, and the dependent objects that would be deleted, are:
 
 %s
 
-Any objects related to these content types by a foreign key will also
-be deleted. Are you sure you want to delete these content types?
-If you're unsure, answer 'no'.
+This list does not include data that might be in your database
+outside of Django's models.
 
-    Type 'yes' to continue, or 'no' to cancel: """ % content_type_display)
+Are you sure you want to delete these content types?
+If you're unsure, answer 'no'.
+    """ % content_type_display)
+            ok_to_delete = input("Type 'yes' to continue, or 'no' to cancel: ")
         else:
             ok_to_delete = False
 
@@ -167,3 +186,12 @@ If you're unsure, answer 'no'.
         else:
             if verbosity >= 2:
                 print("Stale content types remain.")
+
+
+class NoFastDeleteCollector(Collector):
+    def can_fast_delete(self, *args, **kwargs):
+        """
+        We always want to load the objects into memory so that we can display
+        them to the user when asking confirmation.
+        """
+        return False
