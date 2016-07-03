@@ -151,3 +151,13 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
     def test_urlfield_normalization(self):
         f = URLField()
         self.assertEqual(f.clean('http://example.com/     '), 'http://example.com/')
+
+    def test_urlfield_strip_false(self):
+        f = URLField(strip=False)
+        with self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'"):
+            f.clean('http://example.com ')
+
+    def test_urlfield_strip_on_none_value(self):
+        """URLField 'correctly' strips None value instead of raising error (Refs #26821)"""
+        f = URLField(strip=True, required=False, empty_value=None)
+        self.assertIsNone(f.clean(None))

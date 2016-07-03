@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import warnings
+
 from django.forms import EmailField, ValidationError
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango21Warning
 
 from . import FormFieldAssertionsMixin
 
@@ -51,3 +54,18 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual('alf@foo.com', f.clean('alf@foo.com'))
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 15 characters (it has 20).'"):
             f.clean('alf123456788@foo.com')
+
+    def test_emailfield_strip_on_none_value(self):
+        """EmailField 'correctly' strips None value instead of raising error (Refs #26821)"""
+        f = EmailField(required=False, empty_value=None)
+        self.assertIsNone(f.clean(None))
+
+    def test_emailfield_strip_kwarg_deprecation(self):
+        msg = (
+            "Passing `strip` as keyword argument is deprecated. "
+            "For setting `strip` yourself, use a `CharField` instead."
+        )
+        warnings.simplefilter('error', RemovedInDjango21Warning)
+        with self.assertRaisesMessage(RemovedInDjango21Warning, msg):
+            EmailField(strip=False)
+        warnings.resetwarnings()
