@@ -348,7 +348,7 @@ Bundled serializers
         >>> request.session['0']
         'bar'
 
-    By default your serialiser in Django does not allow non-UTF8 bytes to be stored in session values, note that using non unicode values for ``request.session`` won't work as expected::
+    By default your serializer in Django does not allow non-UTF8 bytes to be stored in session values, note that using non unicode values for ``request.session`` won't work as expected::
     
     >>> from django.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore()
