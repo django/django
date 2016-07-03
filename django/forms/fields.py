@@ -539,7 +539,7 @@ class EmailField(CharField):
         if strip is not None:
             warnings.warn(
                 "Passing `strip` as keyword argument is deprecated. "
-                "For setting `strip` yourself, use a `CharField` instead.",
+                "EmailField values will always be stripped of leading and trailing whitespace.",
                 RemovedInDjango21Warning, stacklevel=2
             )
         super(EmailField, self).__init__(*args, strip=True, **kwargs)
@@ -676,6 +676,16 @@ class URLField(CharField):
         'invalid': _('Enter a valid URL.'),
     }
     default_validators = [validators.URLValidator()]
+
+    def __init__(self, *args, **kwargs):
+        strip = kwargs.pop('strip', None)
+        if strip is not None:
+            warnings.warn(
+                "Passing `strip` as keyword argument is deprecated. "
+                "URLField values will always be stripped of leading and trailing whitespace.",
+                RemovedInDjango21Warning, stacklevel=2
+            )
+        super(URLField, self).__init__(*args, strip=True, **kwargs)
 
     def to_python(self, value):
 

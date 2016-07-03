@@ -63,7 +63,7 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
     def test_emailfield_strip_kwarg_deprecation(self):
         msg = (
             "Passing `strip` as keyword argument is deprecated. "
-            "For setting `strip` yourself, use a `CharField` instead."
+            "EmailField values will always be stripped of leading and trailing whitespace."
         )
         warnings.simplefilter('error', RemovedInDjango21Warning)
         with self.assertRaisesMessage(RemovedInDjango21Warning, msg):
