@@ -591,6 +591,17 @@ subclass::
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'decade_born_in')
 
+    .. note::
+
+        You can set a ``help_text`` property to any callable used in
+        ``list_display``. This property will be shown as a tooltip in
+        the changelist view. For example::
+
+            def decade_born_in(self):
+                return self.birthday.strftime('%Y')[:3] + "0's"
+            decade_born_in.short_description = 'Birth decade'
+            decade_born_in.help_text = 'This is a tooltip.'
+
     A few special cases to note about ``list_display``:
 
     * If the field is a ``ForeignKey``, Django will display the

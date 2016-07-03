@@ -551,6 +551,53 @@ class ChangeListTests(TestCase):
         cl.get_results(request)
         self.assertEqual(len(cl.result_list), 10)
 
+    def test_set_model_admin_field_help_text(self):
+        """
+        Ensure that a help_text property can be set to a custom field
+        defined in ModelAdmin.list_display.
+        Refs #26761
+        """
+        class ParentAdmin(admin.ModelAdmin):
+            list_display = ('name', 'foo',)
+
+            def foo(self, obj):
+                return 'foo'
+            foo.help_text = 'This is a foo custom field.'
+
+        parent_admin = ParentAdmin(Parent, custom_site)
+
+        self.assertEqual(
+            parent_admin.get_field_help_text('foo'),
+            'This is a foo custom field.'
+        )
+
+    def test_display_model_admin_field_help_text(self):
+        """
+        Ensure that a help text set for a custom field defined
+        in ModelAdmin.list_display is displayed as a header tooltip
+        in the changelist view.
+        Refs #26761
+        """
+        class ParentAdmin(admin.ModelAdmin):
+            list_display = ('name', 'foo',)
+
+            def foo(self, obj):
+                return 'foo'
+            foo.help_text = 'This is a foo custom field.'
+
+        parent_admin = ParentAdmin(Parent, custom_site)
+        Parent.objects.create(name='parent')
+
+        superuser = self._create_superuser('superuser')
+        request = self._mocked_authenticated_request('/parent/', superuser)
+
+        response = parent_admin.changelist_view(request)
+
+        self.assertContains(
+            response,
+            '<th scope="col"  class="column-foo" title="This is a foo custom field.">'
+        )
+
     def test_dynamic_list_display_links(self):
         """
         Regression tests for #16257: dynamic list_display_links support.
