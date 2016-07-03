@@ -585,6 +585,11 @@ For each field, we describe the default widget used if you don't specify
     If provided, these arguments ensure that the string is at most or at least the
     given length.
 
+    .. deprecated:: 1.10
+
+        The `strip` keyword argument is deprecated. An `EmailField` automatically
+        strips the given value of leading and trailing whitespace by forcing `strip=True`.
+
 ``FileField``
 -------------
 
