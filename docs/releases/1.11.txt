@@ -334,6 +334,10 @@ Miscellaneous
   new :meth:`.AbstractUser.clean` method so that normalization is applied in
   cases like model form validation.
 
+* ``EmailField`` and ``URLField`` no longer accept the ``strip`` keyword
+  argument. Remove it because it doesn't have an effect in older versions of
+  Django as these fields alway strip whitespace.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
