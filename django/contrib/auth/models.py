@@ -21,6 +21,8 @@ def update_last_login(sender, user, **kwargs):
     A signal receiver which updates the last_login date for
     the user logging in.
     """
+    if not hasattr(user, 'last_login'):
+        return
     user.last_login = timezone.now()
     user.save(update_fields=['last_login'])
 user_logged_in.connect(update_last_login)
