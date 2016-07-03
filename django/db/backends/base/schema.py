@@ -941,7 +941,11 @@ class BaseDatabaseSchemaEditor(object):
         """
         Returns all constraint names matching the columns and conditions
         """
-        column_names = list(column_names) if column_names else None
+        if column_names is not None:
+            column_names = [
+                self.connection.introspection.column_name_converter(name)
+                for name in column_names
+            ]
         with self.connection.cursor() as cursor:
             constraints = self.connection.introspection.get_constraints(cursor, model._meta.db_table)
         result = []
