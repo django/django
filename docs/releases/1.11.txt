@@ -313,6 +313,9 @@ Templates
   so you can unpack the group object directly in a loop, e.g.
   ``{% for grouper, list in regrouped %}``.
 
+* Added a :ttag:`resetcycle` template tag to allow resetting the sequence of
+  the :ttag:`cycle` template tag.
+
 Tests
 ~~~~~
 
