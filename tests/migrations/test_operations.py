@@ -1126,10 +1126,14 @@ class OperationTests(OperationTestBase):
             operation.database_forwards("test_rmflnn", editor, project_state, new_state)
 
         # And test reversal
-        with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                with connection.schema_editor() as editor:
-                    operation.database_backwards("test_rmflnn", editor, new_state, project_state)
+
+        # MySQL populates NOT NULL cols with implicit defaults instead of raising an error.
+        if connection.vendor != 'mysql':
+            with self.assertRaises(IntegrityError):
+                with transaction.atomic():
+                    with connection.schema_editor() as editor:
+                        operation.database_backwards("test_rmflnn", editor, new_state, project_state)
+
         operation.default = 42
         with connection.schema_editor() as editor:
             operation.database_backwards("test_rmflnn", editor, new_state, project_state)
