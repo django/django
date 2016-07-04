@@ -3,7 +3,7 @@ import json
 
 from django import forms
 from django.core import exceptions, serializers
-from django.db.models import F
+from django.db.models import DateField, DateTimeField, F, Func, Value
 from django.test import override_settings
 from django.utils import timezone
 
@@ -91,13 +91,75 @@ class TestQuerying(PostgreSQLTestCase):
 
     @classmethod
     def setUpTestData(cls):
+        cls.timestamps = [
+            datetime.datetime(year=2016, month=1, day=1),
+            datetime.datetime(year=2016, month=1, day=2, hour=1),
+            datetime.datetime(year=2016, month=1, day=2, hour=12),
+            datetime.datetime(year=2016, month=1, day=3),
+        ]
+
+        cls.dates = [
+            datetime.date(year=2016, month=1, day=1),
+            datetime.date(year=2016, month=1, day=2),
+            datetime.date(year=2016, month=1, day=3),
+            datetime.date(year=2016, month=1, day=4),
+        ]
+
         cls.objs = [
             RangesModel.objects.create(ints=NumericRange(0, 10)),
             RangesModel.objects.create(ints=NumericRange(5, 15)),
             RangesModel.objects.create(ints=NumericRange(None, 0)),
             RangesModel.objects.create(ints=NumericRange(empty=True)),
-            RangesModel.objects.create(ints=None),
+            RangesModel.objects.create(
+                ints=None, dates=(cls.dates[0], cls.dates[3]), timestamps=(cls.timestamps[0], cls.timestamps[3])
+            ),
         ]
+
+    def test_datetime_range_contains_date(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(timestamps__contains=self.timestamps[1]),
+            [self.objs[4]],
+        )
+
+    def test_datetime_range_contains_range(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(timestamps__contains=(self.timestamps[1], self.timestamps[2])),
+            [self.objs[4]],
+        )
+
+    def test_datetime_range_contains_with_expression(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(timestamps__contains=Value(self.dates[0], output_field=DateTimeField())),
+            [self.objs[4]],
+        )
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(timestamps__contains=Func(
+                F('dates'), function='lower', output_field=DateTimeField())),
+            [self.objs[4]],
+        )
+
+    def test_date_range_contains_date(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(dates__contains=self.timestamps[1]),
+            [self.objs[4]],
+        )
+
+    def test_date_range_contains_range(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(dates__contains=(self.dates[1], self.dates[2])),
+            [self.objs[4]],
+        )
+
+    def test_date_range_contains_with_expression(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(dates__contains=Value(self.dates[0], output_field=DateField())),
+            [self.objs[4]],
+        )
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(dates__contains=Func(
+                F('timestamps'), function='lower', output_field=DateField())),
+            [self.objs[4]],
+        )
 
     def test_exact(self):
         self.assertSequenceEqual(

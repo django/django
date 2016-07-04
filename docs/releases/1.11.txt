@@ -106,6 +106,12 @@ Minor features
   :class:`~django.contrib.postgres.aggregates.StringAgg` determines if
   concatenated values will be distinct.
 
+* Added support for date and timestamp containment within postgres
+  :class:`~django.contrib.postgres.fields.DateTimeRangeField` and
+  :class:`~django.contrib.postgres.fields.DateRangeField` fields.
+  E.g., ``MyModel.objects.filter(datetime_range__contains=timezone.now())``
+  Previously a lookup like that had generated incorrect SQL.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

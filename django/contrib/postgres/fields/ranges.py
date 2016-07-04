@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
@@ -130,6 +131,45 @@ class DateRangeField(RangeField):
 RangeField.register_lookup(lookups.DataContains)
 RangeField.register_lookup(lookups.ContainedBy)
 RangeField.register_lookup(lookups.Overlap)
+
+
+class DateTimeRangeContains(models.Lookup):
+    lookup_name = 'contains'
+    internal_type = 'DateTimeField'
+
+    def as_sql(self, compiler, connection):
+        self._pre_process_rhs(compiler)
+        cast_type = self._get_rhs_cast_type(connection)
+        if cast_type:
+            sql = '%s @> %s::{}'.format(cast_type)
+        else:
+            sql = '%s @> %s'
+
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = lhs_params + rhs_params
+        return sql % (lhs, rhs), params
+
+    def _get_rhs_cast_type(self, connection):
+        if isinstance(self.rhs, models.Expression) and self.rhs._output_field_or_none:
+            internal_type = self.rhs.output_field.get_internal_type()
+            cast_internal_type = self.lhs.output_field.base_field.get_internal_type()
+            return internal_type and connection.data_types.get(cast_internal_type)
+
+    def _pre_process_rhs(self, compiler):
+        value = self.rhs
+        if isinstance(value, datetime.datetime):
+            value = models.Value(value, output_field=models.DateTimeField())
+        elif isinstance(value, datetime.date):
+            value = models.Value(value, output_field=models.DateField())
+        else:
+            return
+
+        self.rhs = value.resolve_expression(compiler.query)
+
+
+DateRangeField.register_lookup(DateTimeRangeContains)
+DateTimeRangeField.register_lookup(DateTimeRangeContains)
 
 
 class RangeContainedBy(models.Lookup):
