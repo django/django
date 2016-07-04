@@ -383,9 +383,10 @@ aren't going to use this feature of Django in the tutorial.
 :func:`~django.conf.urls.url` argument: name
 ---------------------------------------------
 
-Naming your URL lets you refer to it unambiguously from elsewhere in Django
-especially templates. This powerful feature allows you to make  global changes
-to the url patterns of your project while only touching a single file.
+Naming your URL lets you refer to it unambiguously from elsewhere in Django, 
+especially from within templates. This powerful feature allows you to make 
+global changes to the url patterns of your project while only touching a single
+file.
 
 When you're comfortable with the basic request and response flow, read
 :doc:`part 2 of this tutorial </intro/tutorial02>` to start working with the
