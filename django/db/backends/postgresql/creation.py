@@ -28,8 +28,6 @@ class DatabaseCreation(BaseDatabaseCreation):
                 cursor.execute("CREATE DATABASE %s WITH TEMPLATE %s" % (
                     qn(target_database_name), qn(source_database_name)))
             except Exception as e:
-                if keepdb:
-                    return
                 try:
                     if verbosity >= 1:
                         print("Destroying old test database for alias %s..." % (

@@ -70,8 +70,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         if not self.connection.is_in_memory_db(source_database_name):
             # Erase the old test database
             if os.access(target_database_name, os.F_OK):
-                if keepdb:
-                    return
                 if verbosity >= 1:
                     print("Destroying old test database for alias %s..." % (
                         self._get_database_display_str(verbosity, target_database_name),
