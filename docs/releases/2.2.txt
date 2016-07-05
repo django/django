@@ -70,7 +70,10 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``ordering`` argument for
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~django.contrib.postgres.aggregates.StringAgg` determines the
+  ordering of the aggregated elements.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

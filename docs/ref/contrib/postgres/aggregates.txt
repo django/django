@@ -22,7 +22,7 @@ General-purpose aggregation functions
 ``ArrayAgg``
 ------------
 
-.. class:: ArrayAgg(expression, distinct=False, filter=None, **extra)
+.. class:: ArrayAgg(expression, distinct=False, filter=None, ordering=(), **extra)
 
     Returns a list of values, including nulls, concatenated into an array.
 
@@ -30,6 +30,22 @@ General-purpose aggregation functions
 
         An optional boolean argument that determines if array values
         will be distinct. Defaults to ``False``.
+
+    .. attribute:: ordering
+
+        .. versionadded:: 2.2
+
+        An optional string of a field name (with an optional ``"-"`` prefix
+        which indicates descending order) or an expression (or a tuple or list
+        of strings and/or expressions) that specifies the ordering of the
+        elements in the result list.
+
+        Examples::
+
+            'some_field'
+            '-some_field'
+            from django.db.models import F
+            F('some_field').desc()
 
 ``BitAnd``
 ----------
@@ -73,7 +89,7 @@ General-purpose aggregation functions
 ``StringAgg``
 -------------
 
-.. class:: StringAgg(expression, delimiter, distinct=False, filter=None)
+.. class:: StringAgg(expression, delimiter, distinct=False, filter=None, ordering=())
 
     Returns the input values concatenated into a string, separated by
     the ``delimiter`` string.
@@ -86,6 +102,17 @@ General-purpose aggregation functions
 
         An optional boolean argument that determines if concatenated values
         will be distinct. Defaults to ``False``.
+
+    .. attribute:: ordering
+
+        .. versionadded:: 2.2
+
+        An optional string of a field name (with an optional ``"-"`` prefix
+        which indicates descending order) or an expression (or a tuple or list
+        of strings and/or expressions) that specifies the ordering of the
+        elements in the result string.
+
+        Examples are the same as for :attr:`ArrayAgg.ordering`.
 
 Aggregate functions for statistics
 ==================================
