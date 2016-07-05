@@ -15,20 +15,50 @@ class TestGeneralAggregate(PostgreSQLTestCase):
     def setUpTestData(cls):
         AggregateTestModel.objects.create(boolean_field=True, char_field='Foo1', integer_field=0)
         AggregateTestModel.objects.create(boolean_field=False, char_field='Foo2', integer_field=1)
-        AggregateTestModel.objects.create(boolean_field=False, char_field='Foo3', integer_field=2)
-        AggregateTestModel.objects.create(boolean_field=True, char_field='Foo4', integer_field=0)
+        AggregateTestModel.objects.create(boolean_field=False, char_field='Foo4', integer_field=2)
+        AggregateTestModel.objects.create(boolean_field=True, char_field='Foo3', integer_field=0)
 
     def test_array_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field'))
+        self.assertEqual(values, {'arrayagg': ['Foo1', 'Foo2', 'Foo4', 'Foo3']})
+
+    def test_array_agg_charfield_descending(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg('char_field', F('char_field').desc())
+        )
+        self.assertEqual(values, {'arrayagg': ['Foo4', 'Foo3', 'Foo2', 'Foo1']})
+
+    def test_array_agg_charfield_ascending(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg('char_field', F('char_field').asc())
+        )
         self.assertEqual(values, {'arrayagg': ['Foo1', 'Foo2', 'Foo3', 'Foo4']})
 
     def test_array_agg_integerfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('integer_field'))
         self.assertEqual(values, {'arrayagg': [0, 1, 2, 0]})
 
+    def test_array_agg_integerfield_ordering(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg('integer_field', ordering=F('integer_field').desc())
+        )
+        self.assertEqual(values, {'arrayagg': [2, 1, 0, 0]})
+
     def test_array_agg_booleanfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('boolean_field'))
         self.assertEqual(values, {'arrayagg': [True, False, False, True]})
+
+    def test_array_agg_booleanfield_ascending(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg('boolean_field', ordering='boolean_field')
+        )
+        self.assertEqual(values, {'arrayagg': [False, False, True, True]})
+
+    def test_array_agg_booleanfield_descending(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg('boolean_field', ordering=F('boolean_field').desc())
+        )
+        self.assertEqual(values, {'arrayagg': [True, True, False, False]})
 
     def test_array_agg_empty_result(self):
         AggregateTestModel.objects.all().delete()
@@ -103,12 +133,32 @@ class TestGeneralAggregate(PostgreSQLTestCase):
 
     def test_string_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=';'))
+        self.assertEqual(values, {'stringagg': 'Foo1;Foo2;Foo4;Foo3'})
+
+    def test_string_agg_charfield_descending(self):
+        values = AggregateTestModel.objects.aggregate(
+            stringagg=StringAgg('char_field', delimiter=';', ordering=F('char_field').desc())
+        )
+        self.assertEqual(values, {'stringagg': 'Foo4;Foo3;Foo2;Foo1'})
+
+    def test_string_agg_charfield_ascending(self):
+        values = AggregateTestModel.objects.aggregate(
+            stringagg=StringAgg('char_field', delimiter=';', ordering=F('char_field').asc())
+        )
         self.assertEqual(values, {'stringagg': 'Foo1;Foo2;Foo3;Foo4'})
 
     def test_string_agg_empty_result(self):
         AggregateTestModel.objects.all().delete()
         values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=';'))
         self.assertEqual(values, {'stringagg': ''})
+
+    def test_orderable_agg_alternative_fields(self):
+        aggregate_field = 'integer_field'
+        ordering_field = 'char_field'
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg(aggregate_field, ordering=F(ordering_field).asc())
+        )
+        self.assertEqual(values, {'arrayagg': [0, 1, 0, 2]})
 
 
 class TestStringAggregateDistinct(PostgreSQLTestCase):

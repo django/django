@@ -18,13 +18,40 @@ These functions are described in more detail in the `PostgreSQL docs
 
 General-purpose aggregation functions
 =====================================
+``OrderableAgg``
+----------------
+
+.. class: OrderableAgg(expression, ordering=None, **extra)
+
+    .. versionadded:: 1.11
+
+    Base class for aggregates that are orderable. Some aggregates, such as
+    ``ArrayAgg``, return all elements in aggregation. When the ``ordering``
+    parameter is specified, the elements are returned after ordering.
+
+    .. attribute:: ordering
+
+        When an ``ordering`` expression, e.g. ``F('some_field').desc()``, is
+        specified, the elements composing the aggregation are ordered before
+        composition.
 
 ``ArrayAgg``
 ------------
 
-.. class:: ArrayAgg(expression, **extra)
+.. class:: ArrayAgg(expression, ordering=None, **extra)
 
     Returns a list of values, including nulls, concatenated into an array.
+    Ordering within the array is unspecified by default. Has one optional
+    parameter:
+
+    .. attribute:: ordering
+
+        .. versionadded:: 1.11
+
+        By default the ordering of elements within the returned list is
+        unspecified.  When an ``ordering`` expression
+        (``F('some_field).asc()``) is provided, the elements in the returned
+        list are ordered by expression.
 
 ``BitAnd``
 ----------
@@ -61,10 +88,12 @@ General-purpose aggregation functions
 ``StringAgg``
 -------------
 
-.. class:: StringAgg(expression, delimiter, distinct=False)
+.. class:: StringAgg(expression, delimiter, distinct=False, ordering=None)
 
-    Returns the input values concatenated into a string, separated by
-    the ``delimiter`` string.
+    Returns the input values concatenated into a string, separated by the
+    ``delimiter`` string. Ordering of the elements in the aggregation is
+    unspecified by default:
+
 
     .. attribute:: delimiter
 
@@ -76,6 +105,16 @@ General-purpose aggregation functions
 
         An optional boolean argument that determines if concatenated values
         will be distinct. Defaults to ``False``.
+
+    .. attribute:: ordering
+
+        .. versionadded:: 1.11
+
+        By default the ordering of the elements that form the string is
+        unspecified. When an ``ordering`` expression (e.g.
+        ``F('some_field').desc()``) is provided, these elements are
+        concatenated in the specified order.
+
 
 Aggregate functions for statistics
 ==================================
