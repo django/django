@@ -53,6 +53,10 @@ class Router(object):
         # called once, thankfully.
         from .handler import ViewConsumer
         self.add_route(Route("http.request", http_consumer or ViewConsumer()))
+        # We also add a no-op websocket.connect consumer to the bottom, as the
+        # spec requires that this is consumed, but Channels does not. Any user
+        # consumer will override this one.
+        self.add_route(Route("websocket.connect", null_consumer))
 
     @classmethod
     def resolve_routing(cls, routing):
@@ -237,6 +241,12 @@ class Include(object):
         for entry in self.routing:
             result.update(entry.channel_names())
         return result
+
+
+def null_consumer(*args, **kwargs):
+    """
+    Standard no-op consumer.
+    """
 
 
 # Lowercase standard to match urls.py
