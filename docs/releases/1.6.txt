@@ -787,7 +787,7 @@ the ``name`` argument so it doesn't conflict with the new url::
     url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         'django.contrib.auth.views.password_reset_confirm_uidb36'),
 
-You can remove this url pattern after your app has been deployed with Django
+You can remove this URL pattern after your app has been deployed with Django
 1.6 for :setting:`PASSWORD_RESET_TIMEOUT_DAYS`.
 
 Default session serialization switched to JSON

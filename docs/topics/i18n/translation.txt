@@ -1438,7 +1438,7 @@ Language prefix in URL patterns
 .. function:: i18n_patterns(*urls, prefix_default_language=True)
 
 This function can be used in a root URLconf and Django will automatically
-prepend the current active language code to all url patterns defined within
+prepend the current active language code to all URL patterns defined within
 :func:`~django.conf.urls.i18n.i18n_patterns`.
 
 Setting ``prefix_default_language`` to ``False`` removes the prefix from the
