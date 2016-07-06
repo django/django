@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import warnings
-
 from django.forms import URLField, ValidationError
 from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedInDjango21Warning
@@ -165,7 +163,5 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             "Passing `strip` as keyword argument is deprecated. "
             "URLField values will always be stripped of leading and trailing whitespace."
         )
-        warnings.simplefilter('error', RemovedInDjango21Warning)
         with self.assertRaisesMessage(RemovedInDjango21Warning, msg):
             URLField(strip=False)
-        warnings.resetwarnings()
