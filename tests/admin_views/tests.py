@@ -4475,11 +4475,11 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_for_text('#content h1', 'Change section')
         name_input = self.selenium.find_element_by_id('id_name')
         name_input.clear()
-        name_input.send_keys('edited section')
+        name_input.send_keys('<i>edited section</i>')
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element_by_id('id_form-0-section'))
-        self.assertEqual(select.first_selected_option.text, 'edited section')
+        self.assertEqual(select.first_selected_option.text, '<i>edited section</i>')
 
         # Add popup
         self.selenium.find_element_by_id('add_id_form-0-section').click()
