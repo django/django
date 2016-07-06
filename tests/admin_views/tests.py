@@ -4625,8 +4625,10 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         """
         list_editable foreign keys have add/change popups.
         """
+        from selenium.webdriver.support.ui import Select
         s1 = Section.objects.create(name='Test section')
         Article.objects.create(
+            title='foo',
             content='<p>Middle content</p>',
             date=datetime.datetime(2008, 3, 18, 11, 54, 58),
             section=s1,
@@ -4638,8 +4640,13 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.wait_for_popup()
         self.selenium.switch_to.window(self.selenium.window_handles[-1])
         self.wait_for_text('#content h1', 'Change section')
-        self.selenium.close()
+        name_input = self.selenium.find_element_by_id('id_name')
+        name_input.clear()
+        name_input.send_keys('<i>edited section</i>')
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
+        select = Select(self.selenium.find_element_by_id('id_form-0-section'))
+        self.assertEqual(select.first_selected_option.text, '<i>edited section</i>')
 
         # Add popup
         self.selenium.find_element_by_id('add_id_form-0-section').click()

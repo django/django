@@ -120,7 +120,7 @@
         var selects = django.jQuery(selectsSelector);
         selects.find('option').each(function() {
             if (this.value === objId) {
-                this.innerHTML = newRepr;
+                this.textContent = newRepr;
                 this.value = newId;
             }
         });
