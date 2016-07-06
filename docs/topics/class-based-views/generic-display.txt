@@ -292,7 +292,7 @@ technique::
     class AcmeBookList(ListView):
 
         context_object_name = 'book_list'
-        queryset = Book.objects.filter(publisher__name='Acme Publishing')
+        queryset = Book.objects.filter(publisher__name='ACME Publishing')
         template_name = 'books/acme_list.html'
 
 Notice that along with a filtered ``queryset``, we're also using a custom
