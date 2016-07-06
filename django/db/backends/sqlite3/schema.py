@@ -67,8 +67,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
-    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], override_uniques=None,
-                      override_indexes=None):
+    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[]):
         """
         Shortcut to transform a model from old_model into new_model
 
@@ -143,26 +142,24 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
         # Work out the new value of unique_together, taking renames into
         # account
-        if override_uniques is None:
-            override_uniques = [
-                [rename_mapping.get(n, n) for n in unique]
-                for unique in model._meta.unique_together
-            ]
+        unique_together = [
+            [rename_mapping.get(n, n) for n in unique]
+            for unique in model._meta.unique_together
+        ]
 
         # Work out the new value for index_together, taking renames into
         # account
-        if override_indexes is None:
-            override_indexes = [
-                [rename_mapping.get(n, n) for n in index]
-                for index in model._meta.index_together
-            ]
+        index_together = [
+            [rename_mapping.get(n, n) for n in index]
+            for index in model._meta.index_together
+        ]
 
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
             'db_table': model._meta.db_table,
-            'unique_together': override_uniques,
-            'index_together': override_indexes,
+            'unique_together': unique_together,
+            'index_together': index_together,
             'apps': apps,
         }
         meta = type("Meta", tuple(), meta_contents)
@@ -254,22 +251,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Alter by remaking table
         self._remake_table(model, alter_fields=[(old_field, new_field)])
 
-    def alter_index_together(self, model, old_index_together, new_index_together):
-        """
-        Deals with a model changing its index_together.
-        Note: The input index_togethers must be doubly-nested, not the single-
-        nested ["foo", "bar"] format.
-        """
-        self._remake_table(model, override_indexes=new_index_together)
-
-    def alter_unique_together(self, model, old_unique_together, new_unique_together):
-        """
-        Deals with a model changing its unique_together.
-        Note: The input unique_togethers must be doubly-nested, not the single-
-        nested ["foo", "bar"] format.
-        """
-        self._remake_table(model, override_uniques=new_unique_together)
-
     def _alter_many_to_many(self, model, old_field, new_field, strict):
         """
         Alters M2Ms to repoint their to= endpoints.
@@ -284,7 +265,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     old_field.remote_field.through._meta.get_field(old_field.m2m_reverse_field_name()),
                     new_field.remote_field.through._meta.get_field(new_field.m2m_reverse_field_name()),
                 )],
-                override_uniques=(new_field.m2m_field_name(), new_field.m2m_reverse_field_name()),
             )
             return
 
