@@ -45,23 +45,23 @@ class Index(object):
             self._name = 'D%s' % self._name[1:]
         return errors
 
-    def create_sql(self, schema_editor):
-        fields = [self.model._meta.get_field(field) for field in self.fields]
-        tablespace_sql = schema_editor._get_index_tablespace_sql(self.model, fields)
+    def create_sql(self, model, schema_editor):
+        fields = [model._meta.get_field(field) for field in self.fields]
+        tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields)
         columns = [field.column for field in fields]
 
         quote_name = schema_editor.quote_name
         return schema_editor.sql_create_index % {
-            'table': quote_name(self.model._meta.db_table),
+            'table': quote_name(model._meta.db_table),
             'name': quote_name(self.name),
             'columns': ', '.join(quote_name(column) for column in columns),
             'extra': tablespace_sql,
         }
 
-    def remove_sql(self, schema_editor):
+    def remove_sql(self, model, schema_editor):
         quote_name = schema_editor.quote_name
         return schema_editor.sql_delete_index % {
-            'table': quote_name(self.model._meta.db_table),
+            'table': quote_name(model._meta.db_table),
             'name': quote_name(self.name),
         }
 

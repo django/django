@@ -316,17 +316,17 @@ class BaseDatabaseSchemaEditor(object):
             "table": self.quote_name(model._meta.db_table),
         })
 
-    def add_index(self, index):
+    def add_index(self, model, index):
         """
         Add an index on a model.
         """
-        self.execute(index.create_sql(self))
+        self.execute(index.create_sql(model, self))
 
-    def remove_index(self, index):
+    def remove_index(self, model, index):
         """
         Remove an index from a model.
         """
-        self.execute(index.remove_sql(self))
+        self.execute(index.remove_sql(model, self))
 
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
         """
