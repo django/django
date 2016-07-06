@@ -240,7 +240,8 @@ can be made to convert your code to the new API:
 
       [
           f for f in MyModel._meta.get_fields()
-          if (f.one_to_many or f.one_to_one) and f.auto_created
+          if (f.one_to_many or f.one_to_one)
+          and f.auto_created and not f.concrete
       ]
 
 * ``MyModel._meta.get_all_related_objects_with_model()``::
@@ -248,7 +249,8 @@ can be made to convert your code to the new API:
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
-          if (f.one_to_many or f.one_to_one) and f.auto_created
+          if (f.one_to_many or f.one_to_one)
+          and f.auto_created and not f.concrete
       ]
 
 * ``MyModel._meta.get_all_related_many_to_many_objects()``::
