@@ -1347,7 +1347,7 @@ Language prefix in URL patterns
     :func:`django.conf.urls.url` instances instead.
 
 This function can be used in your root URLconf and Django will automatically
-prepend the current active language code to all url patterns defined within
+prepend the current active language code to all URL patterns defined within
 :func:`~django.conf.urls.i18n.i18n_patterns`. Example URL patterns::
 
     from django.conf.urls import include, url

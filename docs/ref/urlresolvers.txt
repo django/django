@@ -60,7 +60,7 @@ This ``current_app`` argument is used as a hint to resolve application
 namespaces into URLs on specific application instances, according to the
 :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
 
-The ``urlconf`` argument is the URLconf module containing the url patterns to
+The ``urlconf`` argument is the URLconf module containing the URL patterns to
 use for reversing. By default, the root URLconf for the current thread is used.
 
 .. deprecated:: 1.8
