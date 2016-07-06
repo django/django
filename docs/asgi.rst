@@ -507,7 +507,9 @@ the response ``headers`` must be sent as a list of tuples, which matches WSGI.
 Request
 '''''''
 
-Sent once for each request that comes into the protocol server.
+Sent once for each request that comes into the protocol server. If sending
+this raises ``ChannelFull``, the interface server must respond with a
+500-range error, preferably ``503 Service Unavailable``, and close the connection.
 
 Channel: ``http.request``
 
@@ -561,7 +563,10 @@ Keys:
 Request Body Chunk
 ''''''''''''''''''
 
-Must be sent after an initial Response.
+Must be sent after an initial Response. If trying to send this raises
+``ChannelFull``, the interface server should wait and try again until it is
+accepted (the consumer at the other end of the channel may not be as fast
+consuming the data as the client is at sending it).
 
 Channel: ``http.request.body?``
 
@@ -584,7 +589,9 @@ Keys:
 Response
 ''''''''
 
-Send after any server pushes, and before any response chunks.
+Send after any server pushes, and before any response chunks. If ``ChannelFull``
+is encountered, wait and try again later, optionally giving up after a
+predetermined timeout.
 
 Channel: ``http.response!``
 
@@ -609,7 +616,8 @@ Keys:
 Response Chunk
 ''''''''''''''
 
-Must be sent after an initial Response.
+Must be sent after an initial Response. If ``ChannelFull``
+is encountered, wait and try again later.
 
 Channel: ``http.response!``
 
@@ -627,7 +635,10 @@ Keys:
 Server Push
 '''''''''''
 
-Must be sent before any Response or Response Chunk messages.
+Must be sent before any Response or Response Chunk messages. If ``ChannelFull``
+is encountered, wait and try again later, optionally giving up after a
+predetermined timeout, and give up on the entire response this push is
+connected to.
 
 When a server receives this message, it must treat the Request message in the
 ``request`` field of the Server Push as though it were a new HTTP request being
@@ -664,6 +675,9 @@ Sent when a HTTP connection is closed. This is mainly useful for long-polling,
 where you may have added the response channel to a Group or other set of
 channels you want to trigger a reply to when data arrives.
 
+If ``ChannelFull`` is raised, then give up attempting to send the message;
+consumption is not required.
+
 Channel: ``http.disconnect``
 
 Keys:
@@ -683,12 +697,18 @@ should store them in a cache or database.
 WebSocket protocol servers should handle PING/PONG requests themselves, and
 send PING frames as necessary to ensure the connection is alive.
 
+Note that you **must** ensure that websocket.connect is consumed; if an
+interface server gets ``ChannelFull`` on this channel it will drop the
+connection. Django Channels ships with a no-op consumer attached by default;
+we recommend other implementations do the same.
+
 
 Connection
 ''''''''''
 
 Sent when the client initially opens a connection and completes the
-WebSocket handshake.
+WebSocket handshake. If sending this raises ``ChannelFull``, the interface
+server must drop the WebSocket connection and send no more messages about it.
 
 Channel: ``websocket.connect``
 
@@ -728,7 +748,8 @@ Keys:
 Receive
 '''''''
 
-Sent when a data frame is received from the client.
+Sent when a data frame is received from the client. If ``ChannelFull`` is
+raised, wait and try again.
 
 Channel: ``websocket.receive``
 
@@ -755,6 +776,9 @@ Sent when either connection to the client is lost, either from the client
 closing the connection, the server closing the connection, or loss of the
 socket.
 
+If ``ChannelFull`` is raised, then give up attempting to send the message;
+consumption is not required.
+
 Channel: ``websocket.disconnect``
 
 Keys:
@@ -773,7 +797,7 @@ Send/Close
 ''''''''''
 
 Sends a data frame to the client and/or closes the connection from the
-server end.
+server end. If ``ChannelFull`` is raised, wait and try again.
 
 Channel: ``websocket.send!``
 
