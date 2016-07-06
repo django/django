@@ -1,4 +1,4 @@
-__version__ = "0.15.1"
+__version__ = "0.16.0"
 
 default_app_config = 'channels.apps.ChannelsConfig'
 DEFAULT_CHANNEL_LAYER = 'default'

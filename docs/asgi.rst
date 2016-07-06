@@ -708,7 +708,7 @@ Connection
 
 Sent when the client initially opens a connection and completes the
 WebSocket handshake. If sending this raises ``ChannelFull``, the interface
-server must drop the WebSocket connection and send no more messages about it.
+server must close the WebSocket connection with error code 1013.
 
 Channel: ``websocket.connect``
 
@@ -749,7 +749,8 @@ Receive
 '''''''
 
 Sent when a data frame is received from the client. If ``ChannelFull`` is
-raised, wait and try again.
+raised, you may retry sending it but if it does not send the socket must
+be closed with websocket error code 1013.
 
 Channel: ``websocket.receive``
 
