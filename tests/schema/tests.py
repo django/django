@@ -1622,7 +1622,6 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(DatabaseError):
             list(Thing.objects.all())
 
-    @skipUnlessDBFeature('supports_foreign_keys')
     def test_remove_constraints_capital_letters(self):
         """
         #23065 - Constraint names must be quoted if they contain capital letters.
@@ -1642,36 +1641,52 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(model)
             editor.add_field(model, field)
 
+            constraint_name = "CamelCaseIndex"
             editor.execute(
                 editor.sql_create_index % {
                     "table": editor.quote_name(table),
-                    "name": editor.quote_name("CamelCaseIndex"),
+                    "name": editor.quote_name(constraint_name),
                     "columns": editor.quote_name(column),
                     "extra": "",
                 }
             )
-            editor.alter_field(model, get_field(db_index=True), field)
+            if connection.features.uppercases_column_names:
+                constraint_name = constraint_name.upper()
+            self.assertIn(constraint_name, self.get_constraints(model._meta.db_table))
+            editor.alter_field(model, get_field(db_index=True), field, strict=True)
+            self.assertNotIn(constraint_name, self.get_constraints(model._meta.db_table))
 
+            constraint_name = "CamelCaseUniqConstraint"
             editor.execute(
                 editor.sql_create_unique % {
                     "table": editor.quote_name(table),
-                    "name": editor.quote_name("CamelCaseUniqConstraint"),
+                    "name": editor.quote_name(constraint_name),
                     "columns": editor.quote_name(field.column),
                 }
             )
-            editor.alter_field(model, get_field(unique=True), field)
+            if connection.features.uppercases_column_names:
+                constraint_name = constraint_name.upper()
+            self.assertIn(constraint_name, self.get_constraints(model._meta.db_table))
+            editor.alter_field(model, get_field(unique=True), field, strict=True)
+            self.assertNotIn(constraint_name, self.get_constraints(model._meta.db_table))
 
-            editor.execute(
-                editor.sql_create_fk % {
-                    "table": editor.quote_name(table),
-                    "name": editor.quote_name("CamelCaseFKConstraint"),
-                    "column": editor.quote_name(column),
-                    "to_table": editor.quote_name(table),
-                    "to_column": editor.quote_name(model._meta.auto_field.column),
-                    "deferrable": connection.ops.deferrable_sql(),
-                }
-            )
-            editor.alter_field(model, get_field(Author, CASCADE, field_class=ForeignKey), field)
+            if connection.features.supports_foreign_keys:
+                constraint_name = "CamelCaseFKConstraint"
+                editor.execute(
+                    editor.sql_create_fk % {
+                        "table": editor.quote_name(table),
+                        "name": editor.quote_name(constraint_name),
+                        "column": editor.quote_name(column),
+                        "to_table": editor.quote_name(table),
+                        "to_column": editor.quote_name(model._meta.auto_field.column),
+                        "deferrable": connection.ops.deferrable_sql(),
+                    }
+                )
+                if connection.features.uppercases_column_names:
+                    constraint_name = constraint_name.upper()
+                self.assertIn(constraint_name, self.get_constraints(model._meta.db_table))
+                editor.alter_field(model, get_field(Author, CASCADE, field_class=ForeignKey), field, strict=True)
+                self.assertNotIn(constraint_name, self.get_constraints(model._meta.db_table))
 
     def test_add_field_use_effective_default(self):
         """
