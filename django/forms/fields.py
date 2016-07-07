@@ -544,10 +544,6 @@ class EmailField(CharField):
             )
         super(EmailField, self).__init__(*args, strip=True, **kwargs)
 
-    def clean(self, value):
-        value = self.to_python(value)
-        return super(EmailField, self).clean(value)
-
 
 class FileField(Field):
     widget = ClearableFileInput
@@ -717,10 +713,6 @@ class URLField(CharField):
                 url_fields = split_url(urlunsplit(url_fields))
             value = urlunsplit(url_fields)
         return value
-
-    def clean(self, value):
-        value = self.to_python(value)
-        return super(URLField, self).clean(value)
 
 
 class BooleanField(Field):
