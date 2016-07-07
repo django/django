@@ -128,7 +128,7 @@ a different language parsers and dictionaries as defined by the database::
 
 The value of ``config`` could also be stored in another column::
 
-    >>> from djanog.db.models import F
+    >>> from django.db.models import F
     >>> Entry.objects.annotate(
     ...     search=SearchVector('body_text', config=F('blog__language')),
     ... ).filter(search=SearchQuery('œuf', config=F('blog__language')))
