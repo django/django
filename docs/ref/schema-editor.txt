@@ -67,6 +67,24 @@ unique constraints or indexes it requires.
 Drops the model's table in the database along with any unique constraints
 or indexes it has.
 
+``add_index()``
+---------------
+
+.. method:: BaseDatabaseSchemaEditor.add_index(model, index)
+
+.. versionadded:: 1.11
+
+Adds the index defined by the ``index`` argument to the table defined by ``model``.
+
+``remove_index()``
+------------------
+
+.. method:: BaseDatabaseSchemaEditor.remove_index(model, index)
+
+.. versionadded:: 1.11
+
+Removes the index defined by the ``index`` argument from the table defined by ``model``.
+
 ``alter_unique_together()``
 ---------------------------
 
