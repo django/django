@@ -7,7 +7,7 @@ from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
 )
 from django.db.models import Model
-from django.db.models.deletion import CASCADE
+from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
     DateField, DateTimeField, IntegerField, PositiveIntegerField, SlugField,
@@ -135,6 +135,29 @@ class SchemaTests(TransactionTestCase):
             if cast_function and not type(database_default) == type(expected_default):
                 database_default = cast_function(database_default)
             self.assertEqual(database_default, expected_default)
+
+    def get_constraints_count(self, table, column, fk_to):
+        """
+        Return a dict with the number of foreign keys, unique constraints, and
+        indexes on table.column.
+
+          fk_to -- A 2-tuple specifying the expected foreign key relationship's
+                   (table, column).
+
+        Returned dict has keys 'fks', 'uniques', and 'indexes'.
+        """
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, table)
+        counts = {'fks': 0, 'uniques': 0, 'indexes': 0}
+        for c in constraints.values():
+            if c['columns'] == [column]:
+                if c['foreign_key'] == fk_to:
+                    counts['fks'] += 1
+                if c['unique']:
+                    counts['uniques'] += 1
+                elif c['index']:
+                    counts['indexes'] += 1
+        return counts
 
     # Tests
     def test_creation_deletion(self):
@@ -825,6 +848,120 @@ class SchemaTests(TransactionTestCase):
                 if details['foreign_key'] and details['foreign_key'] == ('schema_author', 'id'):
                     author_is_fk = True
         self.assertTrue(author_is_fk, "No FK constraint for author_id found")
+
+    def test_alter_field_fk_to_o2o(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        expected_fks = 1 if connection.features.supports_foreign_keys else 0
+
+        # Check the index is right to begin with.
+        counts = self.get_constraints_count(
+            Book._meta.db_table,
+            Book._meta.get_field('author').column,
+            (Author._meta.db_table, Author._meta.pk.column),
+        )
+        self.assertEqual(counts, {'fks': expected_fks, 'uniques': 0, 'indexes': 1})
+
+        old_field = Book._meta.get_field('author')
+        new_field = OneToOneField(Author, CASCADE)
+        new_field.set_attributes_from_name('author')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Book, old_field, new_field, strict=True)
+
+        counts = self.get_constraints_count(
+            Book._meta.db_table,
+            Book._meta.get_field('author').column,
+            (Author._meta.db_table, Author._meta.pk.column),
+        )
+        # The index on ForeignKey is replaced with a unique constraint for OneToOneField.
+        self.assertEqual(counts, {'fks': expected_fks, 'uniques': 1, 'indexes': 0})
+
+    def test_alter_field_fk_keeps_index(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        expected_fks = 1 if connection.features.supports_foreign_keys else 0
+
+        # Check the index is right to begin with.
+        counts = self.get_constraints_count(
+            Book._meta.db_table,
+            Book._meta.get_field('author').column,
+            (Author._meta.db_table, Author._meta.pk.column),
+        )
+        self.assertEqual(counts, {'fks': expected_fks, 'uniques': 0, 'indexes': 1})
+
+        old_field = Book._meta.get_field('author')
+        # on_delete changed from CASCADE.
+        new_field = ForeignKey(Author, PROTECT)
+        new_field.set_attributes_from_name('author')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Book, old_field, new_field, strict=True)
+
+        counts = self.get_constraints_count(
+            Book._meta.db_table,
+            Book._meta.get_field('author').column,
+            (Author._meta.db_table, Author._meta.pk.column),
+        )
+        # The index remains.
+        self.assertEqual(counts, {'fks': expected_fks, 'uniques': 0, 'indexes': 1})
+
+    def test_alter_field_o2o_to_fk(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWithO2O)
+        expected_fks = 1 if connection.features.supports_foreign_keys else 0
+
+        # Check the unique constraint is right to begin with.
+        counts = self.get_constraints_count(
+            BookWithO2O._meta.db_table,
+            BookWithO2O._meta.get_field('author').column,
+            (Author._meta.db_table, Author._meta.pk.column),
+        )
+        self.assertEqual(counts, {'fks': expected_fks, 'uniques': 1, 'indexes': 0})
+
+        old_field = BookWithO2O._meta.get_field('author')
+        new_field = ForeignKey(Author, CASCADE)
+        new_field.set_attributes_from_name('author')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithO2O, old_field, new_field, strict=True)
+
+        counts = self.get_constraints_count(
+            BookWithO2O._meta.db_table,
+            BookWithO2O._meta.get_field('author').column,
+            (Author._meta.db_table, Author._meta.pk.column),
+        )
+        # The unique constraint on OneToOneField is replaced with an index for ForeignKey.
+        self.assertEqual(counts, {'fks': expected_fks, 'uniques': 0, 'indexes': 1})
+
+    def test_alter_field_o2o_keeps_unique(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWithO2O)
+        expected_fks = 1 if connection.features.supports_foreign_keys else 0
+
+        # Check the unique constraint is right to begin with.
+        counts = self.get_constraints_count(
+            BookWithO2O._meta.db_table,
+            BookWithO2O._meta.get_field('author').column,
+            (Author._meta.db_table, Author._meta.pk.column),
+        )
+        self.assertEqual(counts, {'fks': expected_fks, 'uniques': 1, 'indexes': 0})
+
+        old_field = BookWithO2O._meta.get_field('author')
+        # on_delete changed from CASCADE.
+        new_field = OneToOneField(Author, PROTECT)
+        new_field.set_attributes_from_name('author')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithO2O, old_field, new_field, strict=True)
+
+        counts = self.get_constraints_count(
+            BookWithO2O._meta.db_table,
+            BookWithO2O._meta.get_field('author').column,
+            (Author._meta.db_table, Author._meta.pk.column),
+        )
+        # The unique constraint remains.
+        self.assertEqual(counts, {'fks': expected_fks, 'uniques': 1, 'indexes': 0})
 
     def test_alter_db_table_case(self):
         # Create the table
@@ -1795,6 +1932,27 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(self.get_constraints_for_column(Author, 'name'), [])
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_alter_field_add_unique_to_charfield(self):
+        # Create the table and verify no initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        self.assertEqual(self.get_constraints_for_column(Author, 'name'), [])
+        # Alter to add unique=True and create 2 indexes.
+        old_field = Author._meta.get_field('name')
+        new_field = CharField(max_length=255, unique=True)
+        new_field.set_attributes_from_name('name')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(Author, 'name'),
+            ['schema_author_name_1fbc5617_like', 'schema_author_name_1fbc5617_uniq']
+        )
+        # Remove unique=True to drop both indexes.
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field, old_field, strict=True)
+        self.assertEqual(self.get_constraints_for_column(Author, 'name'), [])
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_add_index_to_textfield(self):
         # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
@@ -1824,7 +1982,7 @@ class SchemaTests(TransactionTestCase):
             self.get_constraints_for_column(BookWithoutAuthor, 'title'),
             ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like']
         )
-        # Alter to add unique=True (should add 1 index)
+        # Alter to add unique=True (should replace the index)
         old_field = BookWithoutAuthor._meta.get_field('title')
         new_field = CharField(max_length=100, db_index=True, unique=True)
         new_field.set_attributes_from_name('title')
@@ -1832,9 +1990,64 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, 'title'),
-            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like', 'schema_book_title_2dfb2dff_uniq']
+            ['schema_book_title_2dfb2dff_like', 'schema_book_title_2dfb2dff_uniq']
         )
         # Alter to remove unique=True (should drop unique index)
+        new_field2 = CharField(max_length=100, db_index=True)
+        new_field2.set_attributes_from_name('title')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithoutAuthor, new_field, new_field2, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(BookWithoutAuthor, 'title'),
+            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like']
+        )
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_alter_field_remove_unique_and_db_index_from_charfield(self):
+        # Create the table and verify initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(BookWithoutAuthor)
+        self.assertEqual(
+            self.get_constraints_for_column(BookWithoutAuthor, 'title'),
+            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like']
+        )
+        # Alter to add unique=True (should replace the index)
+        old_field = BookWithoutAuthor._meta.get_field('title')
+        new_field = CharField(max_length=100, db_index=True, unique=True)
+        new_field.set_attributes_from_name('title')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(BookWithoutAuthor, 'title'),
+            ['schema_book_title_2dfb2dff_like', 'schema_book_title_2dfb2dff_uniq']
+        )
+        # Alter to remove both unique=True and db_index=True (should drop all indexes)
+        new_field2 = CharField(max_length=100)
+        new_field2.set_attributes_from_name('title')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithoutAuthor, new_field, new_field2, strict=True)
+        self.assertEqual(self.get_constraints_for_column(BookWithoutAuthor, 'title'), [])
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_alter_field_swap_unique_and_db_index_with_charfield(self):
+        # Create the table and verify initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(BookWithoutAuthor)
+        self.assertEqual(
+            self.get_constraints_for_column(BookWithoutAuthor, 'title'),
+            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like']
+        )
+        # Alter to set unique=True and remove db_index=True (should replace the index)
+        old_field = BookWithoutAuthor._meta.get_field('title')
+        new_field = CharField(max_length=100, unique=True)
+        new_field.set_attributes_from_name('title')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(BookWithoutAuthor, 'title'),
+            ['schema_book_title_2dfb2dff_like', 'schema_book_title_2dfb2dff_uniq']
+        )
+        # Alter to set db_index=True and remove unique=True (should restore index)
         new_field2 = CharField(max_length=100, db_index=True)
         new_field2.set_attributes_from_name('title')
         with connection.schema_editor() as editor:
