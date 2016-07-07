@@ -251,6 +251,8 @@ Related Fields
 * **fields.W341**: ``ManyToManyField`` does not support ``validators``.
 * **fields.W342**: Setting ``unique=True`` on a ``ForeignKey`` has the same
   effect as using a ``OneToOneField``.
+* **fields.W343**: ``limit_choices_to`` has no effect on ``ManyToManyField``
+  with a ``through`` model.
 
 Signals
 ~~~~~~~
