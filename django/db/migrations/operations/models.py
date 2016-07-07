@@ -772,10 +772,14 @@ class AddIndex(IndexOperation):
         model_state.options[self.option_name].append(self.index)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.add_index(self.index)
+        model = to_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            schema_editor.add_index(self.index)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.remove_index(self.index)
+        model = from_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            schema_editor.remove_index(self.index)
 
     def deconstruct(self):
         kwargs = {
@@ -810,14 +814,18 @@ class RemoveIndex(IndexOperation):
         model_state.options[self.option_name] = [idx for idx in indexes if idx.name != self.name]
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        from_model_state = from_state.models[app_label, self.model_name_lower]
-        index = from_model_state.get_index_by_name(self.name)
-        schema_editor.remove_index(index)
+        model = from_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            from_model_state = from_state.models[app_label, self.model_name_lower]
+            index = from_model_state.get_index_by_name(self.name)
+            schema_editor.remove_index(index)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        to_model_state = to_state.models[app_label, self.model_name_lower]
-        index = to_model_state.get_index_by_name(self.name)
-        schema_editor.add_index(index)
+        model = to_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            to_model_state = to_state.models[app_label, self.model_name_lower]
+            index = to_model_state.get_index_by_name(self.name)
+            schema_editor.add_index(index)
 
     def deconstruct(self):
         kwargs = {
