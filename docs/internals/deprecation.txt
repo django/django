@@ -17,8 +17,6 @@ details on these changes.
 
 * ``contrib.auth.views.login()`` and ``logout()`` will be removed.
 
-* ``strip`` keyword argument for ``django.forms.fields.EmailField`` and ``URLField`` will be removed.
-
 .. _deprecation-removed-in-2.0:
 
 2.0

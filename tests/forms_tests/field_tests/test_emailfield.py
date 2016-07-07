@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.forms import EmailField, ValidationError
 from django.test import SimpleTestCase
-from django.utils.deprecation import RemovedInDjango21Warning
 
 from . import FormFieldAssertionsMixin
 
@@ -58,10 +57,7 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = EmailField(required=False, empty_value=None)
         self.assertIsNone(f.clean(None))
 
-    def test_emailfield_strip_kwarg_deprecation(self):
-        msg = (
-            "Passing `strip` as keyword argument is deprecated. "
-            "EmailField values will always be stripped of leading and trailing whitespace."
-        )
-        with self.assertRaisesMessage(RemovedInDjango21Warning, msg):
+    def test_emailfield_unable_to_set_strip_kwarg(self):
+        msg = ("__init__() got multiple values for keyword argument 'strip'")
+        with self.assertRaisesMessage(TypeError, msg):
             EmailField(strip=False)

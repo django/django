@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.forms import URLField, ValidationError
 from django.test import SimpleTestCase
-from django.utils.deprecation import RemovedInDjango21Warning
 
 from . import FormFieldAssertionsMixin
 
@@ -158,10 +157,7 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = URLField(required=False, empty_value=None)
         self.assertIsNone(f.clean(None))
 
-    def test_urlfield_strip_kwarg_deprecation(self):
-        msg = (
-            "Passing `strip` as keyword argument is deprecated. "
-            "URLField values will always be stripped of leading and trailing whitespace."
-        )
-        with self.assertRaisesMessage(RemovedInDjango21Warning, msg):
+    def test_urlfield_unable_to_set_strip_kwarg(self):
+        msg = ("__init__() got multiple values for keyword argument 'strip'")
+        with self.assertRaisesMessage(TypeError, msg):
             URLField(strip=False)

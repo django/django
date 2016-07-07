@@ -11,7 +11,6 @@ import os
 import re
 import sys
 import uuid
-import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
 
@@ -30,7 +29,6 @@ from django.forms.widgets import (
 )
 from django.utils import formats, six
 from django.utils.dateparse import parse_duration
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.duration import duration_string
 from django.utils.encoding import force_str, force_text, smart_text
 from django.utils.ipv6 import clean_ipv6_address
@@ -535,13 +533,6 @@ class EmailField(CharField):
     default_validators = [validators.validate_email]
 
     def __init__(self, *args, **kwargs):
-        strip = kwargs.pop('strip', None)
-        if strip is not None:
-            warnings.warn(
-                "Passing `strip` as keyword argument is deprecated. "
-                "EmailField values will always be stripped of leading and trailing whitespace.",
-                RemovedInDjango21Warning, stacklevel=2
-            )
         super(EmailField, self).__init__(*args, strip=True, **kwargs)
 
 
@@ -674,13 +665,6 @@ class URLField(CharField):
     default_validators = [validators.URLValidator()]
 
     def __init__(self, *args, **kwargs):
-        strip = kwargs.pop('strip', None)
-        if strip is not None:
-            warnings.warn(
-                "Passing `strip` as keyword argument is deprecated. "
-                "URLField values will always be stripped of leading and trailing whitespace.",
-                RemovedInDjango21Warning, stacklevel=2
-            )
         super(URLField, self).__init__(*args, strip=True, **kwargs)
 
     def to_python(self, value):
