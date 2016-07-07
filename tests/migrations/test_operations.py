@@ -1385,7 +1385,13 @@ class OperationTests(OperationTestBase):
         Test the AddIndex operation.
         """
         project_state = self.set_up_test_model("test_adin")
-        index = models.Index(fields=["pink"])
+        msg = (
+            "Indexes passed to AddIndex operations require a name argument. "
+            "<Index: fields='pink'> doesn't have one."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            migrations.AddIndex("Pony", models.Index(fields=["pink"]))
+        index = models.Index(fields=["pink"], name="test_adin_pony_pink_idx")
         operation = migrations.AddIndex("Pony", index)
         self.assertEqual(operation.describe(), "Create index on field(s) pink of model Pony")
         new_state = project_state.clone()
