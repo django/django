@@ -664,8 +664,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "field 'choices' option named group."
         )
         self.assertContains(response, '<div id="changelist-filter">')
-        self.assertContains(response, '<a href="?surface__exact=x" title="Horizontal">Horizontal</a>', msg_prefix=fail_msg, html=True)
-        self.assertContains(response, '<a href="?surface__exact=y" title="Vertical">Vertical</a>', msg_prefix=fail_msg, html=True)
+        self.assertContains(response, '<a href="?surface__exact=x" title="Horizontal">Horizontal</a>',
+                            msg_prefix=fail_msg, html=True)
+        self.assertContains(response, '<a href="?surface__exact=y" title="Vertical">Vertical</a>',
+                            msg_prefix=fail_msg, html=True)
 
     def test_change_list_null_boolean_display(self):
         Post.objects.create(public=None)
