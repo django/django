@@ -74,7 +74,7 @@ class Signal(object):
 
             sender
                 The sender to which the receiver should respond. Must either be
-                of type Signal, or None to receive events from any sender.
+                a Python object, or None to receive events from any sender.
 
             weak
                 Whether to use weak references to the receiver. By default, the
@@ -144,8 +144,7 @@ class Signal(object):
                 the unique identifier of the receiver to disconnect
         """
         if weak is not None:
-            warnings.warn("Passing `weak` to disconnect has no effect.",
-                RemovedInDjango20Warning, stacklevel=2)
+            warnings.warn("Passing `weak` to disconnect has no effect.", RemovedInDjango20Warning, stacklevel=2)
         if dispatch_uid:
             lookup_key = (dispatch_uid, _make_id(sender))
         else:
@@ -171,13 +170,13 @@ class Signal(object):
         Send signal from sender to all connected receivers.
 
         If any receiver raises an error, the error propagates back through send,
-        terminating the dispatch loop, so it is quite possible to not have all
-        receivers called if a raises an error.
+        terminating the dispatch loop. So it's possible that all receivers
+        won't be called if an error is raised.
 
         Arguments:
 
             sender
-                The sender of the signal Either a specific object or None.
+                The sender of the signal. Either a specific object or None.
 
             named
                 Named arguments which will be passed to receivers.
@@ -306,7 +305,6 @@ def receiver(signal, **kwargs):
         @receiver([post_save, post_delete], sender=MyModel)
         def signals_receiver(sender, **kwargs):
             ...
-
     """
     def _decorator(func):
         if isinstance(signal, (list, tuple)):

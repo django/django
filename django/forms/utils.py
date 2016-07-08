@@ -16,6 +16,13 @@ except ImportError:  # Python 2
     from UserList import UserList
 
 
+def pretty_name(name):
+    """Converts 'first_name' to 'First name'"""
+    if not name:
+        return ''
+    return name.replace('_', ' ').capitalize()
+
+
 def flatatt(attrs):
     """
     Convert a dictionary of attributes to a single string.
@@ -178,7 +185,7 @@ def from_current_timezone(value):
 def to_current_timezone(value):
     """
     When time zone support is enabled, convert aware datetimes
-    to naive dateimes in the current time zone for display.
+    to naive datetimes in the current time zone for display.
     """
     if settings.USE_TZ and value is not None and timezone.is_aware(value):
         current_timezone = timezone.get_current_timezone()

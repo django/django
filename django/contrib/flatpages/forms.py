@@ -5,12 +5,16 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 
 class FlatpageForm(forms.ModelForm):
-    url = forms.RegexField(label=_("URL"), max_length=100, regex=r'^[-\w/\.~]+$',
-        help_text=_("Example: '/about/contact/'. Make sure to have leading"
-                    " and trailing slashes."),
+    url = forms.RegexField(
+        label=_("URL"),
+        max_length=100,
+        regex=r'^[-\w/\.~]+$',
+        help_text=_("Example: '/about/contact/'. Make sure to have leading and trailing slashes."),
         error_messages={
-            "invalid": _("This value must contain only letters, numbers,"
-                         " dots, underscores, dashes, slashes or tildes."),
+            "invalid": _(
+                "This value must contain only letters, numbers, dots, "
+                "underscores, dashes, slashes or tildes."
+            ),
         },
     )
 
@@ -25,8 +29,9 @@ class FlatpageForm(forms.ModelForm):
                 ugettext("URL is missing a leading slash."),
                 code='missing_leading_slash',
             )
-        if (settings.APPEND_SLASH and
-                'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE_CLASSES and
+        if (settings.APPEND_SLASH and (
+                (settings.MIDDLEWARE and 'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE) or
+                'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE_CLASSES) and
                 not url.endswith('/')):
             raise forms.ValidationError(
                 ugettext("URL is missing a trailing slash."),

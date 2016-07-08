@@ -1,5 +1,9 @@
-{% load i18n admin_urls admin_static %}
-<div class="inline-group" id="{{ inline_admin_formset.formset.prefix }}-group">
+{% load i18n admin_urls static %}
+<div class="js-inline-admin-formset inline-group"
+     id="{{ inline_admin_formset.formset.prefix }}-group"
+     data-inline-type="stacked"
+     data-inline-formset="{{ inline_admin_formset.inline_formset_data }}">
+<fieldset class="module {{ inline_admin_formset.classes }}">
   <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
 {{ inline_admin_formset.formset.management_form }}
 {{ inline_admin_formset.formset.non_form_errors }}
@@ -17,14 +21,5 @@
   {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
   {{ inline_admin_form.fk_field.field }}
 </div>{% endfor %}
+</fieldset>
 </div>
-
-<script type="text/javascript">
-(function($) {
-  $("#{{ inline_admin_formset.formset.prefix|escapejs }}-group .inline-related").stackedFormset({
-    prefix: "{{ inline_admin_formset.formset.prefix|escapejs }}",
-    deleteText: "{% filter escapejs %}{% trans "Remove" %}{% endfilter %}",
-    addText: "{% filter escapejs %}{% blocktrans with verbose_name=inline_admin_formset.opts.verbose_name|capfirst %}Add another {{ verbose_name }}{% endblocktrans %}{% endfilter %}"
-  });
-})(django.jQuery);
-</script>

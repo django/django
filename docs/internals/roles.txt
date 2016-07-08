@@ -7,13 +7,13 @@ Roles
 Technical board
 ===============
 
-The technical board for the 1.9 release cycle is:
+The technical board for the 1.10 release cycle is:
 
-* Aymeric Augustin
+* James Bennett
 * Andrew Godwin
 * Russell Keith-Magee
-* Jannis Leidel
 * Carl Meyer
+* Marc Tamlyn
 
 .. _committers:
 

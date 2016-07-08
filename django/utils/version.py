@@ -8,13 +8,13 @@ from django.utils.lru_cache import lru_cache
 
 
 def get_version(version=None):
-    "Returns a PEP 386-compliant version number from VERSION."
+    "Returns a PEP 440-compliant version number from VERSION."
     version = get_complete_version(version)
 
     # Now build the two parts of the version number:
     # main = X.Y[.Z]
     # sub = .devN - for pre-alpha releases
-    #     | {a|b|c}N - for alpha, beta and rc releases
+    #     | {a|b|rc}N - for alpha, beta, and rc releases
 
     main = get_main_version(version)
 
@@ -25,7 +25,7 @@ def get_version(version=None):
             sub = '.dev%s' % git_changeset
 
     elif version[3] != 'final':
-        mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'c'}
+        mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'rc'}
         sub = mapping[version[3]] + str(version[4])
 
     return str(main + sub)
@@ -68,9 +68,11 @@ def get_git_changeset():
     so it's sufficient for generating the development version numbers.
     """
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    git_log = subprocess.Popen('git log --pretty=format:%ct --quiet -1 HEAD',
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            shell=True, cwd=repo_dir, universal_newlines=True)
+    git_log = subprocess.Popen(
+        'git log --pretty=format:%ct --quiet -1 HEAD',
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        shell=True, cwd=repo_dir, universal_newlines=True,
+    )
     timestamp = git_log.communicate()[0]
     try:
         timestamp = datetime.datetime.utcfromtimestamp(int(timestamp))

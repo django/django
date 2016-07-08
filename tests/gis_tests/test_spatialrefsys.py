@@ -1,7 +1,6 @@
+import re
 import unittest
 
-from django.contrib.gis.gdal import HAS_GDAL
-from django.db import connection
 from django.test import skipUnlessDBFeature
 from django.utils import six
 
@@ -20,6 +19,18 @@ test_srs = ({
     # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
     'ellipsoid': (6378137.0, 6356752.3, 298.257223563),
     'eprec': (1, 1, 9),
+    'wkt': re.sub('[\s+]', '', """
+        GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.01745329251994328,
+        AUTHORITY["EPSG","9122"]],
+    AUTHORITY["EPSG","4326"]]
+    """)
 }, {
     'srid': 32140,
     'auth_name': ('EPSG', False),
@@ -39,9 +50,14 @@ test_srs = ({
 })
 
 
-@unittest.skipUnless(HAS_GDAL, "SpatialRefSysTest needs gdal support")
 @skipUnlessDBFeature("has_spatialrefsys_table")
 class SpatialRefSysTest(unittest.TestCase):
+
+    def test_get_units(self):
+        epsg_4326 = next(f for f in test_srs if f['srid'] == 4326)
+        unit, unit_name = SpatialRefSys().get_units(epsg_4326['wkt'])
+        self.assertEqual(unit_name, 'degree')
+        self.assertAlmostEqual(unit, 0.01745329251994328)
 
     def test_retrieve(self):
         """
@@ -84,9 +100,7 @@ class SpatialRefSysTest(unittest.TestCase):
             if postgis or spatialite:
                 srs = sr.srs
                 six.assertRegex(self, srs.proj4, sd['proj4_re'])
-                # No `srtext` field in the `spatial_ref_sys` table in SpatiaLite < 4
-                if not spatialite or connection.ops.spatial_version[0] >= 4:
-                    self.assertTrue(srs.wkt.startswith(sd['srtext']))
+                self.assertTrue(srs.wkt.startswith(sd['srtext']))
 
     def test_ellipsoid(self):
         """

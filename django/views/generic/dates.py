@@ -658,11 +658,11 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         if not self.get_allow_future() and date > datetime.date.today():
             raise Http404(_(
                 "Future %(verbose_name_plural)s not available because "
-                "%(class_name)s.allow_future is False.") % {
+                "%(class_name)s.allow_future is False."
+            ) % {
                 'verbose_name_plural': qs.model._meta.verbose_name_plural,
                 'class_name': self.__class__.__name__,
-                },
-            )
+            })
 
         # Filter down a queryset from self.queryset using the date from the
         # URL. This'll get passed as the queryset to DetailView.get_object,
@@ -722,7 +722,6 @@ def _get_next_prev(generic_view, date, is_previous, period):
         * If allow_empty is false and allow_future is false, return the next
           date that contains a valid object. If that date is in the future, or
           if there are no next objects, return None.
-
     """
     date_field = generic_view.get_date_field()
     allow_empty = generic_view.get_allow_empty()

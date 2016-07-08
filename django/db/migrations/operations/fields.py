@@ -1,30 +1,52 @@
 from __future__ import unicode_literals
 
 from django.db.models.fields import NOT_PROVIDED
-from django.utils import six
 from django.utils.functional import cached_property
 
 from .base import Operation
 
 
-class AddField(Operation):
-    """
-    Adds a field to a model.
-    """
-
-    def __init__(self, model_name, name, field, preserve_default=True):
+class FieldOperation(Operation):
+    def __init__(self, model_name, name):
         self.model_name = model_name
         self.name = name
-        self.field = field
-        self.preserve_default = preserve_default
+
+    @cached_property
+    def model_name_lower(self):
+        return self.model_name.lower()
 
     @cached_property
     def name_lower(self):
         return self.name.lower()
 
-    @cached_property
-    def model_name_lower(self):
-        return self.model_name.lower()
+    def is_same_model_operation(self, operation):
+        return self.model_name_lower == operation.model_name_lower
+
+    def is_same_field_operation(self, operation):
+        return self.is_same_model_operation(operation) and self.name_lower == operation.name_lower
+
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.model_name_lower
+
+    def references_field(self, model_name, name, app_label=None):
+        return self.references_model(model_name) and name.lower() == self.name_lower
+
+    def reduce(self, operation, in_between, app_label=None):
+        return (
+            super(FieldOperation, self).reduce(operation, in_between, app_label=app_label) or
+            not operation.references_field(self.model_name, self.name, app_label)
+        )
+
+
+class AddField(FieldOperation):
+    """
+    Adds a field to a model.
+    """
+
+    def __init__(self, model_name, name, field, preserve_default=True):
+        self.field = field
+        self.preserve_default = preserve_default
+        super(AddField, self).__init__(model_name, name)
 
     def deconstruct(self):
         kwargs = {
@@ -72,29 +94,33 @@ class AddField(Operation):
     def describe(self):
         return "Add field %s to %s" % (self.name, self.model_name)
 
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name_lower
+    def reduce(self, operation, in_between, app_label=None):
+        if isinstance(operation, FieldOperation) and self.is_same_field_operation(operation):
+            if isinstance(operation, AlterField):
+                return [
+                    AddField(
+                        model_name=self.model_name,
+                        name=operation.name,
+                        field=operation.field,
+                    ),
+                ]
+            elif isinstance(operation, RemoveField):
+                return []
+            elif isinstance(operation, RenameField):
+                return [
+                    AddField(
+                        model_name=self.model_name,
+                        name=operation.new_name,
+                        field=self.field,
+                    ),
+                ]
+        return super(AddField, self).reduce(operation, in_between, app_label=app_label)
 
-    def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name_lower
 
-
-class RemoveField(Operation):
+class RemoveField(FieldOperation):
     """
     Removes a field from a model.
     """
-
-    def __init__(self, model_name, name):
-        self.model_name = model_name
-        self.name = name
-
-    @cached_property
-    def name_lower(self):
-        return self.name.lower()
-
-    @cached_property
-    def model_name_lower(self):
-        return self.model_name.lower()
 
     def deconstruct(self):
         kwargs = {
@@ -129,31 +155,16 @@ class RemoveField(Operation):
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)
 
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name_lower
 
-    def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name_lower
-
-
-class AlterField(Operation):
+class AlterField(FieldOperation):
     """
     Alters a field's database column (e.g. null, max_length) to the provided new field
     """
 
     def __init__(self, model_name, name, field, preserve_default=True):
-        self.model_name = model_name
-        self.name = name
         self.field = field
         self.preserve_default = preserve_default
-
-    @cached_property
-    def name_lower(self):
-        return self.name.lower()
-
-    @cached_property
-    def model_name_lower(self):
-        return self.model_name.lower()
+        super(AlterField, self).__init__(model_name, name)
 
     def deconstruct(self):
         kwargs = {
@@ -188,14 +199,6 @@ class AlterField(Operation):
             from_model = from_state.apps.get_model(app_label, self.model_name)
             from_field = from_model._meta.get_field(self.name)
             to_field = to_model._meta.get_field(self.name)
-            # If the field is a relatedfield with an unresolved rel.to, just
-            # set it equal to the other field side. Bandaid fix for AlterField
-            # migrations that are part of a RenameModel change.
-            if from_field.remote_field and from_field.remote_field.model:
-                if isinstance(from_field.remote_field.model, six.string_types):
-                    from_field.remote_field.model = to_field.remote_field.model
-                elif to_field.remote_field and isinstance(to_field.remote_field.model, six.string_types):
-                    to_field.remote_field.model = from_field.remote_field.model
             if not self.preserve_default:
                 to_field.default = self.field.default
             schema_editor.alter_field(from_model, from_field, to_field)
@@ -208,22 +211,30 @@ class AlterField(Operation):
     def describe(self):
         return "Alter field %s on %s" % (self.name, self.model_name)
 
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name_lower
+    def reduce(self, operation, in_between, app_label=None):
+        if isinstance(operation, RemoveField) and self.is_same_field_operation(operation):
+            return [operation]
+        elif isinstance(operation, RenameField) and self.is_same_field_operation(operation):
+            return [
+                operation,
+                AlterField(
+                    model_name=self.model_name,
+                    name=operation.new_name,
+                    field=self.field,
+                ),
+            ]
+        return super(AlterField, self).reduce(operation, in_between, app_label=app_label)
 
-    def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name_lower
 
-
-class RenameField(Operation):
+class RenameField(FieldOperation):
     """
     Renames a field on the model. Might affect db_column too.
     """
 
     def __init__(self, model_name, old_name, new_name):
-        self.model_name = model_name
         self.old_name = old_name
         self.new_name = new_name
+        super(RenameField, self).__init__(model_name, old_name)
 
     @cached_property
     def old_name_lower(self):
@@ -232,10 +243,6 @@ class RenameField(Operation):
     @cached_property
     def new_name_lower(self):
         return self.new_name.lower()
-
-    @cached_property
-    def model_name_lower(self):
-        return self.model_name.lower()
 
     def deconstruct(self):
         kwargs = {
@@ -288,11 +295,26 @@ class RenameField(Operation):
     def describe(self):
         return "Rename field %s on %s to %s" % (self.old_name, self.model_name, self.new_name)
 
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name_lower
-
     def references_field(self, model_name, name, app_label=None):
         return self.references_model(model_name) and (
             name.lower() == self.old_name_lower or
             name.lower() == self.new_name_lower
+        )
+
+    def reduce(self, operation, in_between, app_label=None):
+        if (isinstance(operation, RenameField) and
+                self.is_same_model_operation(operation) and
+                self.new_name_lower == operation.old_name_lower):
+            return [
+                RenameField(
+                    self.model_name,
+                    self.old_name,
+                    operation.new_name,
+                ),
+            ]
+        # Skip `FieldOperation.reduce` as we want to run `references_field`
+        # against self.new_name.
+        return (
+            super(FieldOperation, self).reduce(operation, in_between, app_label=app_label) or
+            not operation.references_field(self.model_name, self.new_name, app_label)
         )

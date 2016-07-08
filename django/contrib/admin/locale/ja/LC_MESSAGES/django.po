@@ -4,14 +4,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Shinya Okano <tokibito@gmail.com>, 2012-2015
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
+# 上田慶祐 <kei.mokusyun@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-02-05 17:59+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-28 03:04+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
-"Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -78,6 +79,12 @@ msgstr "操作:"
 msgid "action time"
 msgstr "操作時刻"
 
+msgid "user"
+msgstr "ユーザー"
+
+msgid "content type"
+msgstr "コンテンツタイプ"
+
 msgid "object id"
 msgstr "オブジェクト ID"
 
@@ -119,6 +126,9 @@ msgid ""
 msgstr ""
 "複数選択するときには Control キーを押したまま選択してください。Mac では "
 "Command キーを使ってください"
+
+msgid "Added."
+msgstr "追加されました。"
 
 #, python-format
 msgid "Changed %s."
@@ -467,6 +477,14 @@ msgstr ""
 "データベースの設定に問題があるようです。適切なテーブルが作られていること、適"
 "切なユーザーでデータベースのデータを読み込めることを確認してください。"
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"あなたは %(username)s として認証されましたが、このページへのアクセス許可があ"
+"りません。他のアカウントでログインしますか?"
+
 msgid "Forgotten your password or username?"
 msgstr "パスワードまたはユーザー名を忘れましたか？"
 
@@ -491,6 +509,9 @@ msgstr "全件表示"
 
 msgid "Save"
 msgstr "保存"
+
+msgid "Popup closing..."
+msgstr "ポップアップを閉じています..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -624,9 +645,6 @@ msgstr "パスワードをリセット"
 
 msgid "All dates"
 msgstr "いつでも"
-
-msgid "(None)"
-msgstr "(なし)"
 
 #, python-format
 msgid "Select %s"

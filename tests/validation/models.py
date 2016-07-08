@@ -16,11 +16,23 @@ class ModelToValidate(models.Model):
     name = models.CharField(max_length=100)
     created = models.DateTimeField(default=datetime.now)
     number = models.IntegerField(db_column='number_val')
-    parent = models.ForeignKey('self', blank=True, null=True, limit_choices_to={'number': 10})
+    parent = models.ForeignKey(
+        'self',
+        models.SET_NULL,
+        blank=True, null=True,
+        limit_choices_to={'number': 10},
+    )
     email = models.EmailField(blank=True)
-    ufm = models.ForeignKey('UniqueFieldsModel', to_field='unique_charfield', blank=True, null=True)
+    ufm = models.ForeignKey(
+        'UniqueFieldsModel',
+        models.SET_NULL,
+        to_field='unique_charfield',
+        blank=True, null=True,
+    )
     url = models.URLField(blank=True)
     f_with_custom_validator = models.IntegerField(blank=True, null=True, validators=[validate_answer_to_universe])
+    f_with_iterable_of_validators = models.IntegerField(blank=True, null=True,
+                                                        validators=(validate_answer_to_universe,))
     slug = models.SlugField(blank=True)
 
     def clean(self):
@@ -58,7 +70,8 @@ class UniqueForDateModel(models.Model):
 
 class CustomMessagesModel(models.Model):
     other = models.IntegerField(blank=True, null=True)
-    number = models.IntegerField(db_column='number_val',
+    number = models.IntegerField(
+        db_column='number_val',
         error_messages={'null': 'NULL', 'not42': 'AAARGH', 'not_equal': '%s != me'},
         validators=[validate_answer_to_universe]
     )
@@ -70,7 +83,7 @@ class Author(models.Model):
 
 class Article(models.Model):
     title = models.CharField(max_length=100)
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(Author, models.CASCADE)
     pub_date = models.DateTimeField(blank=True)
 
     def clean(self):
@@ -105,8 +118,7 @@ class GenericIPAddressTestModel(models.Model):
     generic_ip = models.GenericIPAddressField(blank=True, null=True, unique=True)
     v4_ip = models.GenericIPAddressField(blank=True, null=True, protocol="ipv4")
     v6_ip = models.GenericIPAddressField(blank=True, null=True, protocol="ipv6")
-    ip_verbose_name = models.GenericIPAddressField("IP Address Verbose",
-            blank=True, null=True)
+    ip_verbose_name = models.GenericIPAddressField("IP Address Verbose", blank=True, null=True)
 
 
 class GenericIPAddrUnpackUniqueTest(models.Model):

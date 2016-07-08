@@ -17,7 +17,7 @@ tell Django is installed and which version by running the following command:
 
 .. code-block:: console
 
-    $ python -c "import django; print(django.get_version())"
+    $ python -m django --version
 
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
@@ -102,8 +102,8 @@ These files are:
   anything inside it (e.g. ``mysite.urls``).
 
 * :file:`mysite/__init__.py`: An empty file that tells Python that this
-  directory should be considered a Python package. (Read `more about
-  packages`_ in the official Python docs if you're a Python beginner.)
+  directory should be considered a Python package. If you're a Python beginner,
+  read :ref:`more about packages <tut-packages>` in the official Python docs.
 
 * :file:`mysite/settings.py`: Settings/configuration for this Django
   project.  :doc:`/topics/settings` will tell you all about how settings
@@ -115,8 +115,6 @@ These files are:
 
 * :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
-
-.. _more about packages: https://docs.python.org/tutorial/modules.html#packages
 
 The development server
 ======================
@@ -208,12 +206,13 @@ rather than creating directories.
     What's the difference between a project and an app? An app is a Web
     application that does something -- e.g., a Weblog system, a database of
     public records or a simple poll app. A project is a collection of
-    configuration and apps for a particular Web site. A project can contain
+    configuration and apps for a particular website. A project can contain
     multiple apps. An app can be in multiple projects.
 
-Your apps can live anywhere on your `Python path`_. In this tutorial, we'll
-create our poll app right next to your :file:`manage.py` file so that it can be
-imported as its own top-level module, rather than a submodule of ``mysite``.
+Your apps can live anywhere on your :ref:`Python path <tut-searchpath>`. In
+this tutorial, we'll create our poll app right next to your :file:`manage.py`
+file so that it can be imported as its own top-level module, rather than a
+submodule of ``mysite``.
 
 To create your app, make sure you're in the same directory as :file:`manage.py`
 and type this command:
@@ -227,6 +226,7 @@ That'll create a directory :file:`polls`, which is laid out like this::
     polls/
         __init__.py
         admin.py
+        apps.py
         migrations/
             __init__.py
         models.py
@@ -234,8 +234,6 @@ That'll create a directory :file:`polls`, which is laid out like this::
         views.py
 
 This directory structure will house the poll application.
-
-.. _`Python path`: https://docs.python.org/tutorial/modules.html#the-module-search-path
 
 Write your first view
 =====================
@@ -261,6 +259,7 @@ Your app directory should now look like::
     polls/
         __init__.py
         admin.py
+        apps.py
         migrations/
             __init__.py
         models.py
@@ -282,8 +281,8 @@ In the ``polls/urls.py`` file include the following code:
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py`` insert an :func:`~django.conf.urls.include`, leaving you
-with:
+``mysite/urls.py``, add an import for ``django.conf.urls.include`` and insert
+an :func:`~django.conf.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. snippet::
     :filename: mysite/urls.py
@@ -295,6 +294,25 @@ with:
         url(r'^polls/', include('polls.urls')),
         url(r'^admin/', admin.site.urls),
     ]
+
+The :func:`~django.conf.urls.include` function allows referencing other
+URLconfs. Note that the regular expressions for the
+:func:`~django.conf.urls.include` function doesn't have a ``$`` (end-of-string
+match character) but rather a trailing slash. Whenever Django encounters
+:func:`~django.conf.urls.include`, it chops off whatever part of the URL
+matched up to that point and sends the remaining string to the included URLconf
+for further processing.
+
+The idea behind :func:`~django.conf.urls.include` is to make it easy to
+plug-and-play URLs. Since polls are in their own URLconf
+(``polls/urls.py``), they can be placed under "/polls/", or under
+"/fun_polls/", or under "/content/polls/", or any other path root, and the
+app will still work.
+
+.. admonition:: When to use :func:`~django.conf.urls.include()`
+
+    You should always use ``include()`` when you include other URL patterns.
+    ``admin.site.urls`` is the only exception to this.
 
 .. admonition:: Doesn't match what you see?
 
@@ -329,8 +347,8 @@ finds one that matches.
 
 Note that these regular expressions do not search GET and POST parameters, or
 the domain name. For example, in a request to
-``http://www.example.com/myapp/``, the URLconf will look for ``myapp/``. In a
-request to ``http://www.example.com/myapp/?page=3``, the URLconf will also
+``https://www.example.com/myapp/``, the URLconf will look for ``myapp/``. In a
+request to ``https://www.example.com/myapp/?page=3``, the URLconf will also
 look for ``myapp/``.
 
 If you need help with regular expressions, see `Wikipedia's entry`_ and the
@@ -344,7 +362,7 @@ Finally, a performance note: these regular expressions are compiled the first
 time the URLconf module is loaded. They're super fast (as long as the lookups
 aren't too complex as noted above).
 
-.. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
+.. _Wikipedia's entry: https://en.wikipedia.org/wiki/Regular_expression
 
 :func:`~django.conf.urls.url` argument: view
 --------------------------------------------
@@ -365,9 +383,10 @@ aren't going to use this feature of Django in the tutorial.
 :func:`~django.conf.urls.url` argument: name
 ---------------------------------------------
 
-Naming your URL lets you refer to it unambiguously from elsewhere in Django
-especially templates. This powerful feature allows you to make  global changes
-to the url patterns of your project while only touching a single file.
+Naming your URL lets you refer to it unambiguously from elsewhere in Django,
+especially from within templates. This powerful feature allows you to make
+global changes to the URL patterns of your project while only touching a single
+file.
 
 When you're comfortable with the basic request and response flow, read
 :doc:`part 2 of this tutorial </intro/tutorial02>` to start working with the

@@ -31,7 +31,7 @@ A lookup expression consists of three parts:
 .. _lookup-registration-api:
 
 Registration API
-~~~~~~~~~~~~~~~~
+================
 
 Django uses :class:`~lookups.RegisterLookupMixin` to give a class the interface to
 register lookups on itself. The two prominent examples are
@@ -42,12 +42,13 @@ register lookups on itself. The two prominent examples are
 
     A mixin that implements the lookup API on a class.
 
-    .. classmethod:: register_lookup(lookup)
+    .. classmethod:: register_lookup(lookup, lookup_name=None)
 
         Registers a new lookup in the class. For example
         ``DateField.register_lookup(YearExact)`` will register ``YearExact``
         lookup on ``DateField``. It overrides a lookup that already exists with
-        the same name.
+        the same name. ``lookup_name`` will be used for this lookup if
+        provided, otherwise ``lookup.lookup_name`` will be used.
 
     .. method:: get_lookup(lookup_name)
 
@@ -70,7 +71,7 @@ follow this API.
 .. _query-expression:
 
 The Query Expression API
-~~~~~~~~~~~~~~~~~~~~~~~~
+========================
 
 The query expression API is a common set of methods that classes define to be
 usable in query expressions to translate themselves into SQL expressions. Direct
@@ -88,6 +89,11 @@ following methods:
     Calling ``expression.as_sql()`` is usually incorrect - instead
     ``compiler.compile(expression)`` should be used. The ``compiler.compile()``
     method will take care of calling vendor-specific methods of the expression.
+
+    Custom keyword arguments may be defined on this method if it's likely that
+    ``as_vendorname()`` methods or subclasses will need to supply data to
+    override the generation of the SQL string. See :meth:`Func.as_sql` for
+    example usage.
 
 .. method:: as_vendorname(self, compiler, connection)
 
@@ -112,8 +118,8 @@ following methods:
     Defines the type of class returned by the ``get_lookup()`` method. It must
     be a :class:`~django.db.models.Field` instance.
 
-Transform reference
-~~~~~~~~~~~~~~~~~~~
+``Transform`` reference
+=======================
 
 .. class:: Transform
 
@@ -125,11 +131,12 @@ Transform reference
     ``<expression>__<transformation>`` (e.g. ``date__year``).
 
     This class follows the :ref:`Query Expression API <query-expression>`, which
-    implies that you can use ``<expression>__<transform1>__<transform2>``.
+    implies that you can use ``<expression>__<transform1>__<transform2>``. It's
+    a specialized :ref:`Func() expression <func-expressions>` that only accepts
+    one argument.  It can also be used on the right hand side of a filter or
+    directly as an annotation.
 
     .. attribute:: bilateral
-
-        .. versionadded:: 1.8
 
         A boolean indicating whether this transformation should apply to both
         ``lhs`` and ``rhs``. Bilateral transformations will be applied to ``rhs`` in
@@ -152,20 +159,8 @@ Transform reference
         :class:`~django.db.models.Field` instance. By default is the same as
         its ``lhs.output_field``.
 
-    .. method:: as_sql
-
-        To be overridden; raises :exc:`NotImplementedError`.
-
-    .. method:: get_lookup(lookup_name)
-
-        Same as :meth:`~lookups.RegisterLookupMixin.get_lookup()`.
-
-    .. method:: get_transform(transform_name)
-
-        Same as :meth:`~lookups.RegisterLookupMixin.get_transform()`.
-
-Lookup reference
-~~~~~~~~~~~~~~~~
+``Lookup`` reference
+====================
 
 .. class:: Lookup
 
@@ -198,7 +193,7 @@ Lookup reference
         The name of this lookup, used to identify it on parsing query
         expressions. It cannot contain the string ``"__"``.
 
-    .. method:: process_lhs(compiler, connection[, lhs=None])
+    .. method:: process_lhs(compiler, connection, lhs=None)
 
         Returns a tuple ``(lhs_string, lhs_params)``, as returned by
         ``compiler.compile(lhs)``. This method can be overridden to tune how

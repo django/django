@@ -6,7 +6,7 @@ Django 1.5 is the first version of Django to support Python 3. The same code
 runs both on Python 2 (≥ 2.6.5) and Python 3 (≥ 3.2), thanks to the six_
 compatibility layer.
 
-.. _six: http://pythonhosted.org/six/
+.. _six: https://pythonhosted.org/six/
 
 This document is primarily targeted at authors of pluggable applications
 who want to support both Python 2 and 3. It also describes guidelines that
@@ -16,9 +16,10 @@ Philosophy
 ==========
 
 This document assumes that you are familiar with the changes between Python 2
-and Python 3. If you aren't, read `Python's official porting guide`_ first.
-Refreshing your knowledge of unicode handling on Python 2 and 3 will help; the
-`Pragmatic Unicode`_ presentation is a good resource.
+and Python 3. If you aren't, read :ref:`Python's official porting guide
+<pyporting-howto>` first. Refreshing your knowledge of unicode handling on
+Python 2 and 3 will help; the `Pragmatic Unicode`_ presentation is a good
+resource.
 
 Django uses the *Python 2/3 Compatible Source* strategy. Of course, you're
 free to chose another strategy for your own code, especially if you don't need
@@ -42,7 +43,6 @@ developers are used to dealing with such constraints.
 Porting tools provided by Django are inspired by this philosophy, and it's
 reflected throughout this guide.
 
-.. _Python's official porting guide: https://docs.python.org/3/howto/pyporting.html
 .. _Pragmatic Unicode: http://nedbatchelder.com/text/unipain.html
 
 Porting tips
@@ -131,8 +131,8 @@ and ``SafeText`` respectively.
 
 For forwards compatibility, the new names work as of Django 1.4.2.
 
-:meth:`~object.__str__` and ` __unicode__()`_ methods
------------------------------------------------------
+``__str__()`` and ``__unicode__()`` methods
+-------------------------------------------
 
 In Python 2, the object model specifies :meth:`~object.__str__` and
 ` __unicode__()`_ methods. If these methods exist, they must return
@@ -245,7 +245,7 @@ consequence, the following pattern is sometimes necessary::
 
 Be cautious if you have to `index bytestrings`_.
 
-.. _index bytestrings: https://docs.python.org/3/howto/pyporting.html#indexing-bytes-objects
+.. _index bytestrings: https://docs.python.org/3/howto/pyporting.html#text-versus-binary-data
 
 Exceptions
 ~~~~~~~~~~
@@ -370,8 +370,8 @@ Some modules were renamed in Python 3. The ``django.utils.six.moves``
 module (based on the :mod:`six.moves module <six.moves>`) provides a
 compatible location to import them.
 
-PY2
-~~~
+``PY2``
+~~~~~~~
 
 If you need different code in Python 2 and Python 3, check :data:`six.PY2`::
 
@@ -383,8 +383,8 @@ function.
 
 .. module:: django.utils.six
 
-Django customized version of six
---------------------------------
+Django customized version of ``six``
+------------------------------------
 
 The version of six bundled with Django (``django.utils.six``) includes a few
 customizations for internal use only.

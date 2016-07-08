@@ -115,19 +115,20 @@ Either way, ``authenticate`` should check the credentials it gets, and it
 should return a ``User`` object that matches those credentials, if the
 credentials are valid. If they're not valid, it should return ``None``.
 
-The Django admin system is tightly coupled to the Django ``User`` object
-described at the beginning of this document. For now, the best way to deal with
-this is to create a Django ``User`` object for each user that exists for your
-backend (e.g., in your LDAP directory, your external SQL database, etc.) You
-can either write a script to do this in advance, or your ``authenticate``
-method can do it the first time a user logs in.
+The Django admin is tightly coupled to the Django :ref:`User object
+<user-objects>`. The best way to deal with this is to create a Django ``User``
+object for each user that exists for your backend (e.g., in your LDAP
+directory, your external SQL database, etc.) You can either write a script to
+do this in advance, or your ``authenticate`` method can do it the first time a
+user logs in.
 
 Here's an example backend that authenticates against a username and password
 variable defined in your ``settings.py`` file and creates a Django ``User``
 object the first time a user authenticates::
 
     from django.conf import settings
-    from django.contrib.auth.models import User, check_password
+    from django.contrib.auth.hashers import check_password
+    from django.contrib.auth.models import User
 
     class SettingsBackend(object):
         """
@@ -136,7 +137,7 @@ object the first time a user authenticates::
         Use the login name, and a hash of the password. For example:
 
         ADMIN_LOGIN = 'admin'
-        ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
+        ADMIN_PASSWORD = 'pbkdf2_sha256$30000$Vo0VlMnkR4Bk$qEvtdyZRWTcOsCnI/oQ7fVOu1XAURIZYoOZ3iq8Dr4M='
         """
 
         def authenticate(self, username=None, password=None):
@@ -180,13 +181,10 @@ The permissions given to the user will be the superset of all permissions
 returned by all backends. That is, Django grants a permission to a user that
 any one backend grants.
 
-.. versionadded:: 1.8
-
-    If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
-    exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
-    :meth:`~django.contrib.auth.models.User.has_module_perms()`,
-    the authorization will immediately fail and Django
-    won't check the backends that follow.
+If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
+exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
+:meth:`~django.contrib.auth.models.User.has_module_perms()`, the authorization
+will immediately fail and Django won't check the backends that follow.
 
 The simple backend above could implement permissions for the magic admin
 fairly simply::
@@ -220,7 +218,7 @@ Authorization for anonymous users
 
 An anonymous user is one that is not authenticated i.e. they have provided no
 valid authentication details. However, that does not necessarily mean they are
-not authorized to do anything. At the most basic level, most Web sites
+not authorized to do anything. At the most basic level, most websites
 authorize anonymous users to browse most of the site, and many allow anonymous
 posting of comments etc.
 
@@ -237,10 +235,17 @@ for example, to control anonymous access.
 Authorization for inactive users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-An inactive user is a one that is authenticated but has its attribute
-``is_active`` set to ``False``. However this does not mean they are not
-authorized to do anything. For example they are allowed to activate their
-account.
+An inactive user is a one that has its
+:attr:`~django.contrib.auth.models.User.is_active` field set to ``False``. The
+:class:`~django.contrib.auth.backends.ModelBackend` and
+:class:`~django.contrib.auth.backends.RemoteUserBackend` authentication
+backends prohibits these users from authenticating. If a custom user model
+doesn't have an :attr:`~django.contrib.auth.models.CustomUser.is_active` field,
+all users will be allowed to authenticate.
+
+You can use :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend`
+or :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if you
+want to allow inactive users to authenticate.
 
 The support for anonymous users in the permission system allows for a scenario
 where anonymous users have permissions to do something while inactive
@@ -249,6 +254,10 @@ authenticated users do not.
 Do not forget to test for the ``is_active`` attribute of the user in your own
 backend permission methods.
 
+.. versionchanged:: 1.10
+
+    In older versions, the :class:`~django.contrib.auth.backends.ModelBackend`
+    allowed inactive users to authenticate.
 
 Handling object permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -281,18 +290,19 @@ can or cannot do with Task instances, specific to your application::
             )
 
 The only thing this does is create those extra permissions when you run
-:djadmin:`manage.py migrate <migrate>`. Your code is in charge of checking the
-value of these permissions when a user is trying to access the functionality
-provided by the application (viewing tasks, changing the status of tasks,
-closing tasks.) Continuing the above example, the following checks if a user may
-view tasks::
+:djadmin:`manage.py migrate <migrate>` (the function that creates permissions
+is connected to the :data:`~django.db.models.signals.post_migrate` signal).
+Your code is in charge of checking the value of these permissions when a user
+is trying to access the functionality provided by the application (viewing
+tasks, changing the status of tasks, closing tasks.) Continuing the above
+example, the following checks if a user may view tasks::
 
     user.has_perm('app.view_task')
 
 .. _extending-user:
 
-Extending the existing User model
-=================================
+Extending the existing ``User`` model
+=====================================
 
 There are two ways to extend the default
 :class:`~django.contrib.auth.models.User` model without substituting your own
@@ -302,8 +312,8 @@ change to what is stored in the database, you can create a :ref:`proxy model
 allows for any of the features offered by proxy models including default
 ordering, custom managers, or custom model methods.
 
-If you wish to store information related to ``User``, you can use a :ref:`one-to-one
-relationship <ref-onetoone>` to a model containing the fields for
+If you wish to store information related to ``User``, you can use a
+:class:`~django.db.models.OneToOneField` to a model containing the fields for
 additional information. This one-to-one model is often called a profile model,
 as it might store non-auth related information about a site user. For example
 you might create an Employee model::
@@ -311,7 +321,7 @@ you might create an Employee model::
     from django.contrib.auth.models import User
 
     class Employee(models.Model):
-        user = models.OneToOneField(User)
+        user = models.OneToOneField(User, on_delete=models.CASCADE)
         department = models.CharField(max_length=100)
 
 Assuming an existing Employee Fred Smith who has both a User and Employee
@@ -328,7 +338,7 @@ add it to a ``UserAdmin`` class which is registered with the
 :class:`~django.contrib.auth.models.User` class::
 
     from django.contrib import admin
-    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.models import User
 
     from my_user_profile_app.models import Employee
@@ -341,7 +351,7 @@ add it to a ``UserAdmin`` class which is registered with the
         verbose_name_plural = 'employee'
 
     # Define a new User admin
-    class UserAdmin(UserAdmin):
+    class UserAdmin(BaseUserAdmin):
         inlines = (EmployeeInline, )
 
     # Re-register UserAdmin
@@ -362,8 +372,8 @@ the extra database load.
 
 .. _auth-custom-user:
 
-Substituting a custom User model
-================================
+Substituting a custom ``User`` model
+====================================
 
 Some kinds of projects may have authentication requirements for which Django's
 built-in :class:`~django.contrib.auth.models.User` model is not always
@@ -416,8 +426,8 @@ use as your User model.
    :class:`~django.db.models.OneToOneField` to ``settings.AUTH_USER_MODEL``
    as described below.
 
-Referencing the User model
---------------------------
+Referencing the ``User`` model
+------------------------------
 
 .. currentmodule:: django.contrib.auth
 
@@ -442,7 +452,10 @@ different User model.
         from django.db import models
 
         class Article(models.Model):
-            author = models.ForeignKey(settings.AUTH_USER_MODEL)
+            author = models.ForeignKey(
+                settings.AUTH_USER_MODEL,
+                on_delete=models.CASCADE,
+            )
 
     When connecting to signals sent by the ``User`` model, you should specify
     the custom model using the :setting:`AUTH_USER_MODEL` setting. For example::
@@ -461,8 +474,8 @@ different User model.
 
 .. _specifying-custom-user-model:
 
-Specifying a custom User model
-------------------------------
+Specifying a custom ``User`` model
+----------------------------------
 
 .. admonition:: Model design considerations
 
@@ -490,11 +503,6 @@ Django expects your custom User model to meet some minimum requirements.
    what these two methods return - if you want, they can return exactly
    the same value.
 
-.. versionchanged:: 1.8
-
-    Older versions of Django required your model to have an integer primary
-    key as well.
-
 The easiest way to construct a compliant custom User model is to inherit from
 :class:`~django.contrib.auth.models.AbstractBaseUser`.
 :class:`~django.contrib.auth.models.AbstractBaseUser` provides the core
@@ -521,8 +529,6 @@ password resets. You must then provide some key implementation details:
                 identifier = models.CharField(max_length=40, unique=True)
                 ...
                 USERNAME_FIELD = 'identifier'
-
-        .. versionadded:: 1.8
 
         :attr:`USERNAME_FIELD` now supports
         :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
@@ -558,8 +564,6 @@ password resets. You must then provide some key implementation details:
             ``User`` model, but should *not* contain the ``USERNAME_FIELD`` or
             ``password`` as these fields will always be prompted for.
 
-        .. versionadded:: 1.8
-
         :attr:`REQUIRED_FIELDS` now supports
         :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
         model instances during the :djadmin:`createsuperuser` prompt, expect the
@@ -591,15 +595,11 @@ password resets. You must then provide some key implementation details:
 
     .. admonition:: Importing ``AbstractBaseUser``
 
-        .. versionadded:: 1.9
-
         ``AbstractBaseUser`` and ``BaseUserManager`` are importable from
         ``django.contrib.auth.base_user`` so that they can be imported without
-        including ``django.contrib.auth`` in :setting:`INSTALLED_APPS` (this
-        raised a deprecation warning in older versions and is no longer
-        supported in Django 1.9).
+        including ``django.contrib.auth`` in :setting:`INSTALLED_APPS`.
 
-The following methods are available on any subclass of
+The following attributes and methods are available on any subclass of
 :class:`~django.contrib.auth.models.AbstractBaseUser`:
 
 .. class:: models.AbstractBaseUser
@@ -608,20 +608,50 @@ The following methods are available on any subclass of
 
         Returns the value of the field nominated by ``USERNAME_FIELD``.
 
-    .. method:: models.AbstractBaseUser.is_anonymous()
+    .. method:: clean()
 
-        Always returns ``False``. This is a way of differentiating
-        from  :class:`~django.contrib.auth.models.AnonymousUser` objects.
-        Generally, you should prefer using
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_authenticated()` to this
-        method.
+        .. versionadded:: 1.10
 
-    .. method:: models.AbstractBaseUser.is_authenticated()
+        Normalizes the username by calling :meth:`normalize_username`. If you
+        override this method, be sure to call ``super()`` to retain the
+        normalization.
 
-        Always returns ``True``. This is a way to tell if the user has been
-        authenticated. This does not imply any permissions, and doesn't check
-        if the user is active - it only indicates that the user has provided a
-        valid username and password.
+    .. classmethod:: normalize_username(username)
+
+        .. versionadded:: 1.10
+
+        Applies NFKC Unicode normalization to usernames so that visually
+        identical characters with different Unicode code points are considered
+        identical.
+
+    .. attribute:: models.AbstractBaseUser.is_authenticated
+
+        Read-only attribute which is always ``True`` (as opposed to
+        ``AnonymousUser.is_authenticated`` which is always ``False``).
+        This is a way to tell if the user has been authenticated. This does not
+        imply any permissions and doesn't check if the user is active or has
+        a valid session. Even though normally you will check this attribute on
+        ``request.user`` to find out whether it has been populated by the
+        :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+        (representing the currently logged-in user), you should know this
+        attribute is ``True`` for any :class:`~models.User` instance.
+
+        .. versionchanged:: 1.10
+
+            In older versions, this was a method. Backwards-compatibility
+            support for using it as a method will be removed in Django 2.0.
+
+    .. attribute:: models.AbstractBaseUser.is_anonymous
+
+        Read-only attribute which is always ``False``. This is a way of
+        differentiating :class:`~models.User` and :class:`~models.AnonymousUser`
+        objects. Generally, you should prefer using
+        :attr:`~models.User.is_authenticated` to this attribute.
+
+        .. versionchanged:: 1.10
+
+            In older versions, this was a method. Backwards-compatibility
+            support for using it as a method will be removed in Django 2.0.
 
     .. method:: models.AbstractBaseUser.set_password(raw_password)
 
@@ -661,6 +691,18 @@ The following methods are available on any subclass of
 
         Returns an HMAC of the password field. Used for
         :ref:`session-invalidation-on-password-change`.
+
+:class:`~models.AbstractUser` subclasses :class:`~models.AbstractBaseUser`:
+
+.. class:: models.AbstractUser
+
+    .. method:: clean()
+
+        .. versionadded:: 1.11
+
+        Normalizes the email by calling
+        :meth:`.BaseUserManager.normalize_email`. If you override this method,
+        be sure to call ``super()`` to retain the normalization.
 
 You should also define a custom manager for your ``User`` model. If your
 ``User`` model defines ``username``, ``email``, ``is_staff``, ``is_active``,
@@ -703,10 +745,10 @@ utility methods:
 
 .. class:: models.BaseUserManager
 
-    .. method:: models.BaseUserManager.normalize_email(email)
+    .. classmethod:: models.BaseUserManager.normalize_email(email)
 
-        A ``classmethod`` that normalizes email addresses by lowercasing
-        the domain portion of the email address.
+        Normalizes email addresses by lowercasing the domain portion of the
+        email address.
 
     .. method:: models.BaseUserManager.get_by_natural_key(username)
 
@@ -724,12 +766,12 @@ utility methods:
         * ``o``, ``O``, and ``0`` (lowercase letter o, uppercase letter o,
           and zero)
 
-Extending Django's default User
--------------------------------
+Extending Django's default ``User``
+-----------------------------------
 
 If you're entirely happy with Django's :class:`~django.contrib.auth.models.User`
 model and you just want to add some additional profile information, you could
-simply subclass ``django.contrib.auth.models.AbstractUser`` and add your
+simply subclass :class:`django.contrib.auth.models.AbstractUser` and add your
 custom profile fields, although we'd recommend a separate model as described in
 the "Model design considerations" note of :ref:`specifying-custom-user-model`.
 ``AbstractUser`` provides the full implementation of the default
@@ -741,47 +783,45 @@ the "Model design considerations" note of :ref:`specifying-custom-user-model`.
 Custom users and the built-in auth forms
 ----------------------------------------
 
-As you may expect, built-in Django's :ref:`forms <built-in-auth-forms>` and
-:ref:`views <built-in-auth-views>` make certain assumptions about the user
-model that they are working with.
+Django's built-in :ref:`forms <built-in-auth-forms>` and :ref:`views
+<built-in-auth-views>` make certain assumptions about the user model that they
+are working with.
 
-If your user model doesn't follow the same assumptions, it may be necessary to define
-a replacement form, and pass that form in as part of the configuration of the
-auth views.
+The following forms are compatible with any subclass of
+:class:`~django.contrib.auth.models.AbstractBaseUser`:
 
-* :class:`~django.contrib.auth.forms.UserCreationForm`
-
-  Depends on the :class:`~django.contrib.auth.models.User` model.
-  Must be re-written for any custom user model.
-
-* :class:`~django.contrib.auth.forms.UserChangeForm`
-
-  Depends on the :class:`~django.contrib.auth.models.User` model.
-  Must be re-written for any custom user model.
-
-* :class:`~django.contrib.auth.forms.AuthenticationForm`
-
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`,
-  and will adapt to use the field defined in ``USERNAME_FIELD``.
-
-* :class:`~django.contrib.auth.forms.PasswordResetForm`
-
-  Assumes that the user model has a field named ``email`` that can be used to
-  identify the user and a boolean field named ``is_active`` to prevent
-  password resets for inactive users.
-
+* :class:`~django.contrib.auth.forms.AuthenticationForm`: Uses the username
+  field specified by :attr:`~models.CustomUser.USERNAME_FIELD`.
 * :class:`~django.contrib.auth.forms.SetPasswordForm`
-
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
-
 * :class:`~django.contrib.auth.forms.PasswordChangeForm`
-
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
-
 * :class:`~django.contrib.auth.forms.AdminPasswordChangeForm`
 
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+The following forms make assumptions about the user model and can be used as-is
+if those assumptions are met:
 
+* :class:`~django.contrib.auth.forms.PasswordResetForm`: Assumes that the user
+  model has a field named ``email`` that can be used to identify the user and a
+  boolean field named ``is_active`` to prevent password resets for inactive
+  users.
+
+Finally, the following forms are tied to
+:class:`~django.contrib.auth.models.User` and need to be rewritten or extended
+to work with a custom user model:
+
+* :class:`~django.contrib.auth.forms.UserCreationForm`
+* :class:`~django.contrib.auth.forms.UserChangeForm`
+
+If your custom user model is a simple subclass of ``AbstractUser``, then you
+can extend these forms in this manner::
+
+    from django.contrib.auth.forms import UserCreationForm
+    from myapp.models import CustomUser
+
+    class CustomUserCreationForm(UserCreationForm):
+
+        class Meta(UserCreationForm.Meta):
+            model = CustomUser
+            fields = UserCreationForm.Meta.fields + ('custom_field',)
 
 Custom users and :mod:`django.contrib.admin`
 --------------------------------------------
@@ -883,16 +923,16 @@ methods and attributes:
         (the Django app label). If the user is inactive, this method will
         always return ``False``.
 
-.. admonition:: ModelBackend
+.. admonition:: ``PermissionsMixin`` and ``ModelBackend``
 
     If you don't include the
     :class:`~django.contrib.auth.models.PermissionsMixin`, you must ensure you
     don't invoke the permissions methods on ``ModelBackend``. ``ModelBackend``
-    assumes that certain fields are available on your user model. If your User
-    model doesn't provide  those fields, you will receive database errors when
-    you check permissions.
+    assumes that certain fields are available on your user model. If your
+    ``User`` model doesn't provide  those fields, you will receive database
+    errors when you check permissions.
 
-Custom users and Proxy models
+Custom users and proxy models
 -----------------------------
 
 One limitation of custom User models is that installing a custom User model
@@ -903,69 +943,6 @@ model, you remove the ability of Django to reliably identify the base class.
 If your project uses proxy models, you must either modify the proxy to extend
 the User model that is currently in use in your project, or merge your proxy's
 behavior into your User subclass.
-
-Custom users and testing/fixtures
----------------------------------
-
-If you are writing an application that interacts with the User model, you must
-take some precautions to ensure that your test suite will run regardless of
-the User model that is being used by a project. Any test that instantiates an
-instance of User will fail if the User model has been swapped out. This
-includes any attempt to create an instance of User with a fixture.
-
-To ensure that your test suite will pass in any project configuration,
-``django.contrib.auth.tests.utils`` defines a ``@skipIfCustomUser`` decorator.
-This decorator will cause a test case to be skipped if any User model other
-than the default Django user is in use. This decorator can be applied to a
-single test, or to an entire test class.
-
-.. deprecated:: 1.9
-
-    With the test discovery changes in Django 1.6, the tests for
-    ``django.contrib`` apps are no longer run as part of the user's project.
-    Therefore, the ``@skipIfCustomUser`` decorator is no longer needed to
-    decorate tests in ``django.contrib.auth``.
-
-Depending on your application, tests may also be needed to be added to ensure
-that the application works with *any* user model, not just the default User
-model. To assist with this, Django provides two substitute user models that
-can be used in test suites:
-
-.. class:: tests.custom_user.CustomUser
-
-  A custom user model that uses an ``email`` field as the username, and has a basic
-  admin-compliant permissions setup
-
-.. class:: tests.custom_user.ExtensionUser
-
-  A custom user model that extends ``django.contrib.auth.models.AbstractUser``,
-  adding a ``date_of_birth`` field.
-
-You can then use the ``@override_settings`` decorator to make that test run
-with the custom User model. For example, here is a skeleton for a test that
-would test three possible User models -- the default, plus the two User
-models provided by ``auth`` app::
-
-    from django.contrib.auth.tests.utils import skipIfCustomUser
-    from django.contrib.auth.tests.custom_user import CustomUser, ExtensionUser
-    from django.test import TestCase, override_settings
-
-
-    class ApplicationTestCase(TestCase):
-        @skipIfCustomUser
-        def test_normal_user(self):
-            "Run tests for the normal user model"
-            self.assertSomething()
-
-        @override_settings(AUTH_USER_MODEL='auth.CustomUser')
-        def test_custom_user(self):
-            "Run tests for a custom user model with email-based authentication"
-            self.assertSomething()
-
-        @override_settings(AUTH_USER_MODEL='auth.ExtensionUser')
-        def test_extension_user(self):
-            "Run tests for a simple extension of the built-in User."
-            self.assertSomething()
 
 A full example
 --------------
@@ -1010,9 +987,10 @@ authentication app::
             Creates and saves a superuser with the given email, date of
             birth and password.
             """
-            user = self.create_user(email,
+            user = self.create_user(
+                email,
                 password=password,
-                date_of_birth=date_of_birth
+                date_of_birth=date_of_birth,
             )
             user.is_admin = True
             user.save(using=self._db)
@@ -1067,7 +1045,7 @@ code would be required in the app's ``admin.py`` file::
     from django import forms
     from django.contrib import admin
     from django.contrib.auth.models import Group
-    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
     from customauth.models import MyUser
@@ -1118,7 +1096,7 @@ code would be required in the app's ``admin.py`` file::
             return self.initial["password"]
 
 
-    class MyUserAdmin(UserAdmin):
+    class UserAdmin(BaseUserAdmin):
         # The forms to add and change user instances
         form = UserChangeForm
         add_form = UserCreationForm
@@ -1146,7 +1124,7 @@ code would be required in the app's ``admin.py`` file::
         filter_horizontal = ()
 
     # Now register the new UserAdmin...
-    admin.site.register(MyUser, MyUserAdmin)
+    admin.site.register(MyUser, UserAdmin)
     # ... and, since we're not using Django's built-in permissions,
     # unregister the Group model from admin.
     admin.site.unregister(Group)

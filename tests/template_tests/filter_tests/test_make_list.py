@@ -22,8 +22,7 @@ class MakeListTests(SimpleTestCase):
         output = self.engine.render_to_string('make_list02', {"a": mark_safe("&")})
         self.assertEqual(output, str_prefix("[%(_)s&#39;&amp;&#39;]"))
 
-    @setup({'make_list03':
-        '{% autoescape off %}{{ a|make_list|stringformat:"s"|safe }}{% endautoescape %}'})
+    @setup({'make_list03': '{% autoescape off %}{{ a|make_list|stringformat:"s"|safe }}{% endautoescape %}'})
     def test_make_list03(self):
         output = self.engine.render_to_string('make_list03', {"a": mark_safe("&")})
         self.assertEqual(output, str_prefix("[%(_)s'&']"))

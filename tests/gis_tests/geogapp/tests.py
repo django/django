@@ -6,9 +6,11 @@ from __future__ import unicode_literals
 import os
 from unittest import skipUnless
 
+from django.contrib.gis.db import models
 from django.contrib.gis.db.models.functions import Area, Distance
-from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.measure import D
+from django.db import connection
+from django.db.models.functions import Cast
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -56,15 +58,17 @@ class GeographyTest(TestCase):
         # http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_GeographyFunctions
         z = Zipcode.objects.get(code='77002')
         # ST_Within not available.
-        self.assertRaises(ValueError, City.objects.filter(point__within=z.poly).count)
+        with self.assertRaises(ValueError):
+            City.objects.filter(point__within=z.poly).count()
         # `@` operator not available.
-        self.assertRaises(ValueError, City.objects.filter(point__contained=z.poly).count)
+        with self.assertRaises(ValueError):
+            City.objects.filter(point__contained=z.poly).count()
 
         # Regression test for #14060, `~=` was never really implemented for PostGIS.
         htown = City.objects.get(name='Houston')
-        self.assertRaises(ValueError, City.objects.get, point__exact=htown.point)
+        with self.assertRaises(ValueError):
+            City.objects.get(point__exact=htown.point)
 
-    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test05_geography_layermapping(self):
         "Testing LayerMapping support on models with geography fields."
         # There is a similar test in `layermap` that uses the same data set,
@@ -98,22 +102,42 @@ class GeographyTest(TestCase):
     def test06_geography_area(self):
         "Testing that Area calculations work on geography columns."
         # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
-        ref_area = 5439100.95415646 if oracle else 5439084.70637573
-        tol = 5
         z = Zipcode.objects.area().get(code='77002')
-        self.assertAlmostEqual(z.area.sq_m, ref_area, tol)
+        # Round to the nearest thousand as possible values (depending on
+        # the database and geolib) include 5439084, 5439100, 5439101.
+        rounded_value = z.area.sq_m
+        rounded_value -= z.area.sq_m % 1000
+        self.assertEqual(rounded_value, 5439000)
 
 
 @skipUnlessDBFeature("gis_enabled")
 class GeographyFunctionTests(TestCase):
     fixtures = ['initial']
 
+    @skipUnlessDBFeature("supports_extent_aggr")
+    def test_cast_aggregate(self):
+        """
+        Cast a geography to a geometry field for an aggregate function that
+        expects a geometry input.
+        """
+        if not connection.ops.geography:
+            self.skipTest("This test needs geography support")
+        expected = (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
+        res = City.objects.filter(
+            name__in=('Houston', 'Dallas')
+        ).aggregate(extent=models.Extent(Cast('point', models.PointField())))
+        for val, exp in zip(res['extent'], expected):
+            self.assertAlmostEqual(exp, val, 4)
+
     @skipUnlessDBFeature("has_Distance_function", "supports_distance_geodetic")
     def test_distance_function(self):
         """
         Testing Distance() support on non-point geography fields.
         """
-        ref_dists = [0, 4891.20, 8071.64, 9123.95]
+        if oracle:
+            ref_dists = [0, 4899.68, 8081.30, 9115.15]
+        else:
+            ref_dists = [0, 4891.20, 8071.64, 9123.95]
         htown = City.objects.get(name='Houston')
         qs = Zipcode.objects.annotate(distance=Distance('poly', htown.point))
         for z, ref in zip(qs, ref_dists):
@@ -125,7 +149,9 @@ class GeographyFunctionTests(TestCase):
         Testing that Area calculations work on geography columns.
         """
         # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
-        ref_area = 5439100.95415646 if oracle else 5439084.70637573
-        tol = 5
         z = Zipcode.objects.annotate(area=Area('poly')).get(code='77002')
-        self.assertAlmostEqual(z.area.sq_m, ref_area, tol)
+        # Round to the nearest thousand as possible values (depending on
+        # the database and geolib) include 5439084, 5439100, 5439101.
+        rounded_value = z.area.sq_m
+        rounded_value -= z.area.sq_m % 1000
+        self.assertEqual(rounded_value, 5439000)

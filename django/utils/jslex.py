@@ -25,7 +25,6 @@ def literals(choices, prefix="", suffix=""):
 
     If provided, `prefix` and `suffix` will be attached to each choice
     individually.
-
     """
     return "|".join(prefix + re.escape(c) + suffix for c in choices.split())
 

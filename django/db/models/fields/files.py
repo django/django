@@ -1,5 +1,6 @@
 import datetime
 import os
+import posixpath
 import warnings
 
 from django import forms
@@ -7,12 +8,12 @@ from django.core import checks
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
+from django.core.validators import validate_image_file_extension
 from django.db.models import signals
 from django.db.models.fields import Field
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str, force_text
-from django.utils.inspect import func_supports_parameter
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -88,22 +89,8 @@ class FieldFile(File):
 
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
-
-        if func_supports_parameter(self.storage.save, 'max_length'):
-            self.name = self.storage.save(name, content, max_length=self.field.max_length)
-        else:
-            warnings.warn(
-                'Backwards compatibility for storage backends without '
-                'support for the `max_length` argument in '
-                'Storage.save() will be removed in Django 1.10.',
-                RemovedInDjango110Warning, stacklevel=2
-            )
-            self.name = self.storage.save(name, content)
-
+        self.name = self.storage.save(name, content, max_length=self.field.max_length)
         setattr(self.instance, self.field.name, self.name)
-
-        # Update the filesize cache
-        self._size = content.size
         self._committed = True
 
         # Save the object because it has changed, unless save is False
@@ -124,10 +111,6 @@ class FieldFile(File):
 
         self.name = None
         setattr(self.instance, self.field.name, self.name)
-
-        # Delete the filesize cache
-        if hasattr(self, '_size'):
-            del self._size
         self._committed = False
 
         if save:
@@ -163,18 +146,15 @@ class FileDescriptor(object):
 
     Assigns a file object on assignment so you can do::
 
-        >>> with open('/tmp/hello.world', 'r') as f:
+        >>> with open('/path/to/hello.world', 'r') as f:
         ...     instance.file = File(f)
-
     """
     def __init__(self, field):
         self.field = field
 
-    def __get__(self, instance=None, owner=None):
+    def __get__(self, instance, cls=None):
         if instance is None:
-            raise AttributeError(
-                "The '%s' attribute can only be accessed from %s instances."
-                % (self.field.name, owner.__name__))
+            return self
 
         # This is slightly complicated, so worth an explanation.
         # instance.file`needs to ultimately return some instance of `File`,
@@ -219,6 +199,10 @@ class FileDescriptor(object):
             file.field = self.field
             file.storage = self.field.storage
 
+        # Make sure that the instance is correct.
+        elif isinstance(file, FieldFile) and instance is not file.instance:
+            file.instance = instance
+
         # That was fun, wasn't it?
         return instance.__dict__[self.field.name]
 
@@ -258,7 +242,6 @@ class FileField(Field):
             return [
                 checks.Error(
                     "'unique' is not a valid argument for a %s." % self.__class__.__name__,
-                    hint=None,
                     obj=self,
                     id='fields.E200',
                 )
@@ -271,7 +254,6 @@ class FileField(Field):
             return [
                 checks.Error(
                     "'primary_key' is not a valid argument for a %s." % self.__class__.__name__,
-                    hint=None,
                     obj=self,
                     id='fields.E201',
                 )
@@ -290,11 +272,6 @@ class FileField(Field):
 
     def get_internal_type(self):
         return "FileField"
-
-    def get_prep_lookup(self, lookup_type, value):
-        if hasattr(value, 'name'):
-            value = value.name
-        return super(FileField, self).get_prep_lookup(lookup_type, value)
 
     def get_prep_value(self, value):
         "Returns field's value prepared for saving into a database."
@@ -317,20 +294,34 @@ class FileField(Field):
         setattr(cls, self.name, self.descriptor_class(self))
 
     def get_directory_name(self):
+        warnings.warn(
+            'FileField now delegates file name and folder processing to the '
+            'storage. get_directory_name() will be removed in Django 2.0.',
+            RemovedInDjango20Warning, stacklevel=2
+        )
         return os.path.normpath(force_text(datetime.datetime.now().strftime(force_str(self.upload_to))))
 
     def get_filename(self, filename):
+        warnings.warn(
+            'FileField now delegates file name and folder processing to the '
+            'storage. get_filename() will be removed in Django 2.0.',
+            RemovedInDjango20Warning, stacklevel=2
+        )
         return os.path.normpath(self.storage.get_valid_name(os.path.basename(filename)))
 
     def generate_filename(self, instance, filename):
-        # If upload_to is a callable, make sure that the path it returns is
-        # passed through get_valid_name() of the underlying storage.
+        """
+        Apply (if callable) or prepend (if a string) upload_to to the filename,
+        then delegate further processing of the name to the storage backend.
+        Until the storage layer, all file paths are expected to be Unix style
+        (with forward slashes).
+        """
         if callable(self.upload_to):
-            directory_name, filename = os.path.split(self.upload_to(instance, filename))
-            filename = self.storage.get_valid_name(filename)
-            return os.path.normpath(os.path.join(directory_name, filename))
-
-        return os.path.join(self.get_directory_name(), self.get_filename(filename))
+            filename = self.upload_to(instance, filename)
+        else:
+            dirname = force_text(datetime.datetime.now().strftime(force_str(self.upload_to)))
+            filename = posixpath.join(dirname, filename)
+        return self.storage.generate_filename(filename)
 
     def save_form_data(self, instance, data):
         # Important: None means "no change", other false value means "clear"
@@ -388,12 +379,12 @@ class ImageFieldFile(ImageFile, FieldFile):
 
 
 class ImageField(FileField):
+    default_validators = [validate_image_file_extension]
     attr_class = ImageFieldFile
     descriptor_class = ImageFileDescriptor
     description = _("Image")
 
-    def __init__(self, verbose_name=None, name=None, width_field=None,
-            height_field=None, **kwargs):
+    def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
         super(ImageField, self).__init__(verbose_name, name, **kwargs)
 
@@ -463,8 +454,8 @@ class ImageField(FileField):
             return
 
         dimension_fields_filled = not(
-            (self.width_field and not getattr(instance, self.width_field))
-            or (self.height_field and not getattr(instance, self.height_field))
+            (self.width_field and not getattr(instance, self.width_field)) or
+            (self.height_field and not getattr(instance, self.height_field))
         )
         # When both dimension fields have values, we are most likely loading
         # data from the database or updating an image field that already had

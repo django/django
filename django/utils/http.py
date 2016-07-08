@@ -9,10 +9,11 @@ import unicodedata
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 
+from django.core.exceptions import TooManyFieldsSent
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, force_str, force_text
-from django.utils.functional import allow_lazy
+from django.utils.functional import keep_lazy_text
 from django.utils.six.moves.urllib.parse import (
     quote, quote_plus, unquote, unquote_plus, urlencode as original_urlencode,
     urlparse,
@@ -34,12 +35,10 @@ ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 RFC3986_GENDELIMS = str(":/?#[]@")
 RFC3986_SUBDELIMS = str("!$&'()*+,;=")
 
-PROTOCOL_TO_PORT = {
-    'http': 80,
-    'https': 443,
-}
+FIELDS_MATCH = re.compile('[&;]')
 
 
+@keep_lazy_text
 def urlquote(url, safe='/'):
     """
     A version of Python's urllib.quote() function that can operate on unicode
@@ -48,9 +47,9 @@ def urlquote(url, safe='/'):
     without double-quoting occurring.
     """
     return force_text(quote(force_str(url), force_str(safe)))
-urlquote = allow_lazy(urlquote, six.text_type)
 
 
+@keep_lazy_text
 def urlquote_plus(url, safe=''):
     """
     A version of Python's urllib.quote_plus() function that can operate on
@@ -59,25 +58,24 @@ def urlquote_plus(url, safe=''):
     iri_to_uri() call without double-quoting occurring.
     """
     return force_text(quote_plus(force_str(url), force_str(safe)))
-urlquote_plus = allow_lazy(urlquote_plus, six.text_type)
 
 
+@keep_lazy_text
 def urlunquote(quoted_url):
     """
     A wrapper for Python's urllib.unquote() function that can operate on
     the result of django.utils.http.urlquote().
     """
     return force_text(unquote(force_str(quoted_url)))
-urlunquote = allow_lazy(urlunquote, six.text_type)
 
 
+@keep_lazy_text
 def urlunquote_plus(quoted_url):
     """
     A wrapper for Python's urllib.unquote_plus() function that can operate on
     the result of django.utils.http.urlquote_plus().
     """
     return force_text(unquote_plus(force_str(quoted_url)))
-urlunquote_plus = allow_lazy(urlunquote_plus, six.text_type)
 
 
 def urlencode(query, doseq=0):
@@ -114,7 +112,7 @@ def cookie_date(epoch_seconds=None):
 def http_date(epoch_seconds=None):
     """
     Formats the time to match the RFC1123 date format as specified by HTTP
-    RFC2616 section 3.3.1.
+    RFC7231 section 7.1.1.1.
 
     Accepts a floating point number expressed in seconds since the epoch, in
     UTC - such as that outputted by time.time(). If set to None, defaults to
@@ -127,7 +125,7 @@ def http_date(epoch_seconds=None):
 
 def parse_http_date(date):
     """
-    Parses a date format as specified by HTTP RFC2616 section 3.3.1.
+    Parses a date format as specified by HTTP RFC7231 section 7.1.1.1.
 
     The three formats allowed by the RFC are accepted, even if only the first
     one is still in widespread use.
@@ -135,7 +133,7 @@ def parse_http_date(date):
     Returns an integer expressed in seconds since the epoch, in UTC.
     """
     # emails.Util.parsedate does the job for RFC1123 dates; unfortunately
-    # RFC2616 makes it mandatory to support RFC850 dates too. So we roll
+    # RFC7231 makes it mandatory to support RFC850 dates too. So we roll
     # our own RFC-compliant parsing.
     for regex in RFC1123_DATE, RFC850_DATE, ASCTIME_DATE:
         m = regex.match(date)
@@ -253,17 +251,30 @@ def quote_etag(etag):
     return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
 
 
-def same_origin(url1, url2):
+def unquote_etag(etag):
     """
-    Checks if two URLs are 'same-origin'
+    Unquote an ETag string; i.e. revert quote_etag().
     """
-    p1, p2 = urlparse(url1), urlparse(url2)
-    try:
-        o1 = (p1.scheme, p1.hostname, p1.port or PROTOCOL_TO_PORT[p1.scheme])
-        o2 = (p2.scheme, p2.hostname, p2.port or PROTOCOL_TO_PORT[p2.scheme])
-        return o1 == o2
-    except (ValueError, KeyError):
+    return etag.strip('"').replace('\\"', '"').replace('\\\\', '\\') if etag else etag
+
+
+def is_same_domain(host, pattern):
+    """
+    Return ``True`` if the host is either an exact match or a match
+    to the wildcard pattern.
+
+    Any pattern beginning with a period matches a domain and all of its
+    subdomains. (e.g. ``.example.com`` matches ``example.com`` and
+    ``foo.example.com``). Anything else is an exact string match.
+    """
+    if not pattern:
         return False
+
+    pattern = pattern.lower()
+    return (
+        pattern[0] == '.' and (host.endswith(pattern) or host == pattern[1:]) or
+        pattern == host
+    )
 
 
 def is_safe_url(url, host=None):
@@ -277,8 +288,17 @@ def is_safe_url(url, host=None):
         url = url.strip()
     if not url:
         return False
-    # Chrome treats \ completely as /
-    url = url.replace('\\', '/')
+    if six.PY2:
+        try:
+            url = force_text(url)
+        except UnicodeDecodeError:
+            return False
+    # Chrome treats \ completely as / in paths but it could be part of some
+    # basic auth credentials so we need to check both URLs.
+    return _is_safe_url(url, host) and _is_safe_url(url.replace('\\', '/'), host)
+
+
+def _is_safe_url(url, host):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith('///'):
@@ -297,3 +317,60 @@ def is_safe_url(url, host=None):
         return False
     return ((not url_info.netloc or url_info.netloc == host) and
             (not url_info.scheme or url_info.scheme in ['http', 'https']))
+
+
+def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
+                      errors='replace', fields_limit=None):
+    """
+    Return a list of key/value tuples parsed from query string.
+
+    Copied from urlparse with an additional "fields_limit" argument.
+    Copyright (C) 2013 Python Software Foundation (see LICENSE.python).
+
+    Arguments:
+
+    qs: percent-encoded query string to be parsed
+
+    keep_blank_values: flag indicating whether blank values in
+        percent-encoded queries should be treated as blank strings. A
+        true value indicates that blanks should be retained as blank
+        strings. The default false value indicates that blank values
+        are to be ignored and treated as if they were  not included.
+
+    encoding and errors: specify how to decode percent-encoded sequences
+        into Unicode characters, as accepted by the bytes.decode() method.
+
+    fields_limit: maximum number of fields parsed or an exception
+        is raised. None means no limit and is the default.
+    """
+    if fields_limit:
+        pairs = FIELDS_MATCH.split(qs, fields_limit)
+        if len(pairs) > fields_limit:
+            raise TooManyFieldsSent(
+                'The number of GET/POST parameters exceeded '
+                'settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+            )
+    else:
+        pairs = FIELDS_MATCH.split(qs)
+    r = []
+    for name_value in pairs:
+        if not name_value:
+            continue
+        nv = name_value.split(str('='), 1)
+        if len(nv) != 2:
+            # Handle case of a control-name with no equal sign
+            if keep_blank_values:
+                nv.append('')
+            else:
+                continue
+        if len(nv[1]) or keep_blank_values:
+            if six.PY3:
+                name = nv[0].replace('+', ' ')
+                name = unquote(name, encoding=encoding, errors=errors)
+                value = nv[1].replace('+', ' ')
+                value = unquote(value, encoding=encoding, errors=errors)
+            else:
+                name = unquote(nv[0].replace(b'+', b' '))
+                value = unquote(nv[1].replace(b'+', b' '))
+            r.append((name, value))
+    return r

@@ -77,8 +77,7 @@ mention:
 
 * The response gets an additional ``Content-Disposition`` header, which
   contains the name of the PDF file. This filename is arbitrary: Call it
-  whatever you want. It'll be used by browsers in the "Save as..."
-  dialogue, etc.
+  whatever you want. It'll be used by browsers in the "Save as..." dialog, etc.
 
 * The ``Content-Disposition`` header starts with ``'attachment; '`` in this
   example. This forces Web browsers to pop-up a dialog box
@@ -147,15 +146,15 @@ Further resources
 
 * PDFlib_ is another PDF-generation library that has Python bindings. To
   use it with Django, just use the same concepts explained in this article.
-* `Pisa XHTML2PDF`_ is yet another PDF-generation library. Pisa ships with
-  an example of how to integrate Pisa with Django.
+* `XHTML2PDF`_ is yet another PDF-generation library. It ships with an example
+  of how to integrate it with Django.
 * HTMLdoc_ is a command-line script that can convert HTML to PDF. It
   doesn't have a Python interface, but you can escape out to the shell
   using ``system`` or ``popen`` and retrieve the output in Python.
 
 .. _PDFlib: http://www.pdflib.org/
-.. _`Pisa XHTML2PDF`: http://www.xhtml2pdf.com/
-.. _HTMLdoc: http://www.htmldoc.org/
+.. _XHTML2PDF: https://github.com/xhtml2pdf/xhtml2pdf
+.. _HTMLdoc: https://www.msweet.org/projects.php?Z1
 
 Other formats
 =============

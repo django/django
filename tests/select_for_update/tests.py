@@ -5,9 +5,7 @@ import time
 
 from multiple_database.routers import TestRouter
 
-from django.conf import settings
-from django.db import connection, router, transaction
-from django.db.utils import DEFAULT_DB_ALIAS, ConnectionHandler, DatabaseError
+from django.db import DatabaseError, connection, router, transaction
 from django.test import (
     TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
@@ -30,8 +28,7 @@ class SelectForUpdateTests(TransactionTestCase):
 
         # We need another database connection in transaction to test that one
         # connection issuing a SELECT ... FOR UPDATE will block.
-        new_connections = ConnectionHandler(settings.DATABASES)
-        self.new_connection = new_connections[DEFAULT_DB_ALIAS]
+        self.new_connection = connection.copy()
 
     def tearDown(self):
         try:
@@ -113,11 +110,8 @@ class SelectForUpdateTests(TransactionTestCase):
         that supports FOR UPDATE but not NOWAIT, then we should find
         that a DatabaseError is raised.
         """
-        self.assertRaises(
-            DatabaseError,
-            list,
-            Person.objects.all().select_for_update(nowait=True)
-        )
+        with self.assertRaises(DatabaseError):
+            list(Person.objects.all().select_for_update(nowait=True))
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_requires_transaction(self):

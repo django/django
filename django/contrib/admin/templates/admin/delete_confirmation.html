@@ -1,5 +1,10 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+    {{ media }}
+    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
+{% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
 
@@ -33,13 +38,13 @@
     {% include "admin/includes/object_delete_summary.html" %}
     <h2>{% trans "Objects" %}</h2>
     <ul>{{ deleted_objects|unordered_list }}</ul>
-    <form action="" method="post">{% csrf_token %}
+    <form method="post">{% csrf_token %}
     <div>
     <input type="hidden" name="post" value="yes" />
     {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1" />{% endif %}
     {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}" />{% endif %}
     <input type="submit" value="{% trans "Yes, I'm sure" %}" />
-    <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "No, take me back" %}</a>
+    <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
     </div>
     </form>
 {% endif %}

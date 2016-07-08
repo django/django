@@ -8,8 +8,8 @@ from __future__ import unicode_literals
 DATE_FORMAT = 'Y년 n월 j일'
 TIME_FORMAT = 'A g:i'
 DATETIME_FORMAT = 'Y년 n월 j일 g:i A'
-YEAR_MONTH_FORMAT = 'Y년 F월'
-MONTH_DAY_FORMAT = 'F월 j일'
+YEAR_MONTH_FORMAT = 'Y년 n월'
+MONTH_DAY_FORMAT = 'n월 j일'
 SHORT_DATE_FORMAT = 'Y-n-j.'
 SHORT_DATETIME_FORMAT = 'Y-n-j H:i'
 # FIRST_DAY_OF_WEEK =

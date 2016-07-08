@@ -30,16 +30,21 @@ th {
     text-align: right;
 }
 
+.module ul, .module ol {
+    margin-left: 0;
+    margin-right: 1.5em;
+}
+
 .addlink, .changelink {
-    padding-left: 0px;
-    padding-right: 12px;
-    background-position: 100% 0.2em;
+    padding-left: 0;
+    padding-right: 16px;
+    background-position: 100% 1px;
 }
 
 .deletelink {
-    padding-left: 0px;
-    padding-right: 12px;
-    background-position: 100% 0.25em;
+    padding-left: 0;
+    padding-right: 16px;
+    background-position: 100% 1px;
 }
 
 .object-tools {
@@ -48,7 +53,7 @@ th {
 
 thead th:first-child,
 tfoot td:first-child {
-    border-left: 1px solid #ddd !important;
+    border-left: none;
 }
 
 /* LAYOUT */
@@ -69,13 +74,13 @@ div.breadcrumbs {
 
 #content-related {
     float: left;
-    margin-left: -19em;
+    margin-left: -300px;
     margin-right: auto;
 }
 
 .colMS {
-    margin-left: 20em !important;
-    margin-right: 10px !important;
+    margin-left: 300px;
+    margin-right: 0;
 }
 
 /* SORTABLE TABLES */
@@ -93,51 +98,45 @@ thead th.sorted .text {
 
 .dashboard .module table td a {
     padding-left: .6em;
-    padding-right: 12px;
+    padding-right: 16px;
 }
 
 /* changelists styles */
 
-.change-list .filtered {
-    background: white url(../img/changelist-bg_rtl.gif) top left repeat-y !important;
-}
-
 .change-list .filtered table {
-    border-left: 1px solid #ddd;
+    border-left: none;
     border-right: 0px none;
 }
 
 #changelist-filter {
     right: auto;
     left: 0;
-    border-left: 0px none;
-    border-right: 1px solid #ddd;
+    border-left: none;
+    border-right: none;
 }
 
 .change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
-    margin-right: 0px !important;
-    margin-left: 160px !important;
+    margin-right: 0;
+    margin-left: 280px;
 }
 
 #changelist-filter li.selected {
-    border-left: 0px none;
-    padding-left: 0px;
+    border-left: none;
+    padding-left: 10px;
     margin-left: 0;
-    border-right: 5px solid #ccc;
-    padding-right: 5px;
-    margin-right: -10px;
+    border-right: 5px solid #eaeaea;
+    padding-right: 10px;
+    margin-right: -15px;
 }
 
 .filtered .actions {
-    border-left:1px solid #DDDDDD;
-    margin-left:160px !important;
-    border-right: 0 none;
-    margin-right:0 !important;
+    margin-left: 280px;
+    margin-right: 0;
 }
 
 #changelist table tbody td:first-child, #changelist table tbody th:first-child {
-    border-right: 0;
-    border-left: 1px solid #ddd;
+    border-right: none;
+    border-left: none;
 }
 
 /* FORMS */
@@ -155,13 +154,16 @@ thead th.sorted .text {
     float: right;
 }
 
-.submit-row .deletelink {
-    background: url(../img/icon_deletelink.gif) 0 50% no-repeat;
-    padding-right: 14px;
+.submit-row input.default {
+    margin-left: 0;
 }
 
 .vDateField, .vTimeField {
     margin-left: 2px;
+}
+
+.aligned .form-row input {
+    margin-left: 5px;
 }
 
 form ul.inline li {
@@ -181,13 +183,13 @@ fieldset .field-box {
 }
 
 .errorlist li {
-    background-position: 100% .3em;
-    padding: 4px 25px 4px 5px;
+    background-position: 100% 12px;
+    padding: 0;
 }
 
 .errornote {
-    background-position: 100% .3em;
-    padding: 4px 25px 4px 5px;
+    background-position: 100% 12px;
+    padding: 10px 12px;
 }
 
 /* WIDGETS */
@@ -195,13 +197,13 @@ fieldset .field-box {
 .calendarnav-previous {
     top: 0;
     left: auto;
-    right: 0;
+    right: 10px;
 }
 
 .calendarnav-next {
     top: 0;
     right: auto;
-    left: 0;
+    left: 10px;
 }
 
 .calendar caption, .calendarbox h2 {
@@ -218,6 +220,10 @@ fieldset .field-box {
 
 .inline-deletelink {
     float: left;
+}
+
+form .form-row p.datetime {
+    overflow: hidden;
 }
 
 /* MISC */

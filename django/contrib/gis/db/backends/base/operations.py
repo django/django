@@ -56,12 +56,12 @@ class BaseSpatialOperations(object):
 
     # Blacklist/set of known unsupported functions of the backend
     unsupported_functions = {
-        'Area', 'AsGeoHash', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
+        'Area', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
         'BoundingCircle', 'Centroid', 'Difference', 'Distance', 'Envelope',
-        'ForceRHR', 'Intersection', 'Length', 'MemSize', 'NumGeometries',
-        'NumPoints', 'Perimeter', 'PointOnSurface', 'Reverse', 'Scale',
-        'SnapToGrid', 'SymDifference', 'Transform', 'Translate',
-        'Union',
+        'ForceRHR', 'GeoHash', 'Intersection', 'IsValid', 'Length', 'MakeValid',
+        'MemSize', 'NumGeometries', 'NumPoints', 'Perimeter', 'PointOnSurface',
+        'Reverse', 'Scale', 'SnapToGrid', 'SymDifference', 'Transform',
+        'Translate', 'Union',
     }
 
     # Serialization

@@ -35,7 +35,7 @@ built-in handling for user-uploaded files, but you can have Django serve your
             url(r'^media/(?P<path>.*)$', serve, {
                 'document_root': settings.MEDIA_ROOT,
             }),
-       ]
+        ]
 
 Note, the snippet assumes your :setting:`MEDIA_URL` has a value of
 ``'/media/'``. This will call the :func:`~django.views.static.serve` view,
@@ -87,11 +87,9 @@ Three things to note about 404 views:
   your 404 view will never be used, and your URLconf will be displayed
   instead, with some debug information.
 
-.. versionchanged:: 1.9
+.. versionchanged:: 1.10
 
-    The signature of ``page_not_found()`` changed. The function now accepts a
-    second parameter, the exception that triggered the error. A useful
-    representation of the exception is also passed in the template context.
+    Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.
 
 .. _http_internal_server_error_view:
 
@@ -113,6 +111,10 @@ If :setting:`DEBUG` is set to ``True`` (in your settings module), then
 your 500 view will never be used, and the traceback will be displayed
 instead, with some debug information.
 
+.. versionchanged:: 1.10
+
+    Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.
+
 .. _http_forbidden_view:
 
 The 403 (HTTP Forbidden) view
@@ -126,9 +128,9 @@ default, call the view ``django.views.defaults.permission_denied``.
 
 This view loads and renders the template ``403.html`` in your root template
 directory, or if this file does not exist, instead serves the text
-"403 Forbidden", as per :rfc:`2616` (the HTTP 1.1 Specification). The template
-context contains ``exception``, which is the unicode representation of the
-exception that triggered the view.
+"403 Forbidden", as per :rfc:`7231#section-6.5.3` (the HTTP 1.1 Specification).
+The template context contains ``exception``, which is the unicode
+representation of the exception that triggered the view.
 
 ``django.views.defaults.permission_denied`` is triggered by a
 :exc:`~django.core.exceptions.PermissionDenied` exception. To deny access in a
@@ -141,12 +143,9 @@ view you can use code like this::
             raise PermissionDenied
         # ...
 
-.. versionchanged:: 1.9
+.. versionchanged:: 1.10
 
-    The signature of ``permission_denied()`` changed in Django 1.9. The function
-    now accepts a second parameter, the exception that triggered the error. The
-    unicode representation of the exception is also passed in the template
-    context.
+    Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.
 
 .. _http_bad_request_view:
 
@@ -169,7 +168,6 @@ filesystem paths.
 
 ``bad_request`` views are also only used when :setting:`DEBUG` is ``False``.
 
-.. versionchanged:: 1.9
+.. versionchanged:: 1.10
 
-    The signature of ``bad_request()`` changed in Django 1.9. The function
-    now accepts a second parameter, the exception that triggered the error.
+    Passing a nonexistent ``template_name`` will raise ``TemplateDoesNotExist``.

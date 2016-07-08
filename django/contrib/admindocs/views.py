@@ -8,13 +8,16 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
-from django.core import urlresolvers
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
+from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
 from django.utils.decorators import method_decorator
-from django.utils.inspect import func_has_no_args
+from django.utils.inspect import (
+    func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
+    get_func_full_args,
+)
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 
@@ -35,7 +38,7 @@ class BaseAdminDocsView(TemplateView):
         return super(BaseAdminDocsView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs.update({'root_path': urlresolvers.reverse('admin:index')})
+        kwargs.update({'root_path': reverse('admin:index')})
         kwargs.update(admin.site.each_context(self.request))
         return super(BaseAdminDocsView, self).get_context_data(**kwargs)
 
@@ -144,9 +147,9 @@ class ViewDetailView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
-        urlconf = urlresolvers.get_urlconf()
-        if urlresolvers.get_resolver(urlconf)._is_callback(view):
-            mod, func = urlresolvers.get_mod_func(view)
+        urlconf = get_urlconf()
+        if get_resolver(urlconf)._is_callback(view):
+            mod, func = get_mod_func(view)
             view_func = getattr(import_module(mod), func)
         else:
             raise Http404
@@ -219,7 +222,7 @@ class ModelDetailView(BaseAdminDocsView):
             fields.append({
                 'name': field.name,
                 'data_type': data_type,
-                'verbose': verbose,
+                'verbose': verbose or '',
                 'help_text': field.help_text,
             })
 
@@ -242,9 +245,10 @@ class ModelDetailView(BaseAdminDocsView):
                 'verbose': utils.parse_rst(_("number of %s") % verbose, 'model', _('model:') + opts.model_name),
             })
 
+        methods = []
         # Gather model methods.
         for func_name, func in model.__dict__.items():
-            if inspect.isfunction(func) and func_has_no_args(func):
+            if inspect.isfunction(func):
                 try:
                     for exclude in MODEL_METHODS_EXCLUDE:
                         if func_name.startswith(exclude):
@@ -254,11 +258,29 @@ class ModelDetailView(BaseAdminDocsView):
                 verbose = func.__doc__
                 if verbose:
                     verbose = utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.model_name)
-                fields.append({
-                    'name': func_name,
-                    'data_type': get_return_data_type(func_name),
-                    'verbose': verbose,
-                })
+                # If a method has no arguments, show it as a 'field', otherwise
+                # as a 'method with arguments'.
+                if func_has_no_args(func) and not func_accepts_kwargs(func) and not func_accepts_var_args(func):
+                    fields.append({
+                        'name': func_name,
+                        'data_type': get_return_data_type(func_name),
+                        'verbose': verbose or '',
+                    })
+                else:
+                    arguments = get_func_full_args(func)
+                    print_arguments = arguments
+                    # Join arguments with ', ' and in case of default value,
+                    # join it with '='. Use repr() so that strings will be
+                    # correctly displayed.
+                    print_arguments = ', '.join([
+                        '='.join(list(arg_el[:1]) + [repr(el) for el in arg_el[1:]])
+                        for arg_el in arguments
+                    ])
+                    methods.append({
+                        'name': func_name,
+                        'arguments': print_arguments,
+                        'verbose': verbose or '',
+                    })
 
         # Gather related objects
         for rel in opts.related_objects:
@@ -282,6 +304,7 @@ class ModelDetailView(BaseAdminDocsView):
             'summary': title,
             'description': body,
             'fields': fields,
+            'methods': methods,
         })
         return super(ModelDetailView, self).get_context_data(**kwargs)
 
@@ -371,9 +394,9 @@ non_named_group_matcher = re.compile(r'\(.*?\)')
 
 def simplify_regex(pattern):
     """
-    Clean up urlpattern regexes into something somewhat readable by Mere Humans:
-    turns something like "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
-    into "<sport_slug>/athletes/<athlete_slug>/"
+    Clean up urlpattern regexes into something more readable by humans. For
+    example, turn "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
+    into "/<sport_slug>/athletes/<athlete_slug>/".
     """
     # handle named groups first
     pattern = named_group_matcher.sub(lambda m: m.group(1), pattern)

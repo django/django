@@ -1,19 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Denis Darii <sinednx@gmail.com>, 2011
+# Denis Darii <denis.darii@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Marco Bonetti, 2014
 # Nicola Larosa <transifex@teknico.net>, 2011-2012
+# palmux <palmux@gmail.com>, 2015
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-03-29 15:25+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-18 18:22+0000\n"
 "Last-Translator: palmux <palmux@gmail.com>\n"
-"Language-Team: Italian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -117,8 +118,8 @@ msgstr[1] "Nota: Sei %s ore in ritardo rispetto al server."
 msgid "Now"
 msgstr "Adesso"
 
-msgid "Clock"
-msgstr "Orologio"
+msgid "Choose a Time"
+msgstr "Scegli un orario"
 
 msgid "Choose a time"
 msgstr "Scegli un orario"
@@ -132,14 +133,17 @@ msgstr "6 del mattino"
 msgid "Noon"
 msgstr "Mezzogiorno"
 
+msgid "6 p.m."
+msgstr "6 del pomeriggio"
+
 msgid "Cancel"
 msgstr "Annulla"
 
 msgid "Today"
 msgstr "Oggi"
 
-msgid "Calendar"
-msgstr "Calendario"
+msgid "Choose a Date"
+msgstr "Scegli una data"
 
 msgid "Yesterday"
 msgstr "Ieri"

@@ -1,6 +1,6 @@
-========================
-django.contrib.humanize
-========================
+===========================
+``django.contrib.humanize``
+===========================
 
 .. module:: django.contrib.humanize
    :synopsis: A set of Django template filters useful for adding a "human
@@ -15,8 +15,8 @@ filters.
 
 .. templatefilter:: apnumber
 
-apnumber
---------
+``apnumber``
+============
 
 For numbers 1-9, returns the number spelled out. Otherwise, returns the
 number. This follows Associated Press style.
@@ -31,8 +31,8 @@ You can pass in either an integer or a string representation of an integer.
 
 .. templatefilter:: intcomma
 
-intcomma
---------
+``intcomma``
+============
 
 Converts an integer to a string containing commas every three digits.
 
@@ -43,7 +43,7 @@ Examples:
 * ``450000`` becomes ``450,000``.
 * ``4500000`` becomes ``4,500,000``.
 
-:ref:`Format localization <format-localization>` will be respected if enabled,
+:doc:`/topics/i18n/formatting` will be respected if enabled,
 e.g. with the ``'de'`` language:
 
 * ``45000`` becomes ``'45.000'``.
@@ -53,8 +53,8 @@ You can pass in either an integer or a string representation of an integer.
 
 .. templatefilter:: intword
 
-intword
--------
+``intword``
+===========
 
 Converts a large integer to a friendly text representation. Works best for
 numbers over 1 million.
@@ -67,7 +67,7 @@ Examples:
 
 Values up to 10^100 (Googol) are supported.
 
-:ref:`Format localization <format-localization>` will be respected if enabled,
+:doc:`/topics/i18n/formatting` will be respected if enabled,
 e.g. with the ``'de'`` language:
 
 * ``1000000`` becomes ``'1,0 Million'``.
@@ -78,8 +78,8 @@ You can pass in either an integer or a string representation of an integer.
 
 .. templatefilter:: naturalday
 
-naturalday
-----------
+``naturalday``
+==============
 
 For dates that are the current day or within one day, return "today",
 "tomorrow" or "yesterday", as appropriate. Otherwise, format the date using
@@ -97,8 +97,8 @@ Examples (when 'today' is 17 Feb 2007):
 
 .. templatefilter:: naturaltime
 
-naturaltime
------------
+``naturaltime``
+===============
 
 For datetime values, returns a string representing how many seconds,
 minutes or hours ago it was -- falling back to the :tfilter:`timesince`
@@ -129,8 +129,8 @@ Examples (when 'now' is 17 Feb 2007 16:30:00):
 
 .. templatefilter:: ordinal
 
-ordinal
--------
+``ordinal``
+===========
 
 Converts an integer to its ordinal as a string.
 

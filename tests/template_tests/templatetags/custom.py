@@ -80,7 +80,9 @@ simple_one_default.anything = "Expected simple_one_default __dict__"
 @register.simple_tag
 def simple_unlimited_args(one, two='hi', *args):
     """Expected simple_unlimited_args __doc__"""
-    return "simple_unlimited_args - Expected result: %s" % (', '.join(six.text_type(arg) for arg in [one, two] + list(args)))
+    return "simple_unlimited_args - Expected result: %s" % (
+        ', '.join(six.text_type(arg) for arg in [one, two] + list(args))
+    )
 simple_unlimited_args.anything = "Expected simple_unlimited_args __dict__"
 
 

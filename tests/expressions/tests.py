@@ -11,8 +11,8 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    F, Case, Col, Date, DateTime, ExpressionWrapper, Func, OrderBy, Random,
-    RawSQL, Ref, Value, When,
+    Case, Col, ExpressionWrapper, F, Func, OrderBy, Random, RawSQL, Ref, Value,
+    When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -20,7 +20,6 @@ from django.db.models.functions import (
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
-from django.utils.timezone import utc
 
 from .models import UUID, Company, Employee, Experiment, Number, Time
 
@@ -52,10 +51,24 @@ class BasicExpressionsTests(TestCase):
         companies = Company.objects.annotate(
             salaries=F('ceo__salary'),
         ).values('num_employees', 'salaries').aggregate(
-            result=Sum(F('salaries') + F('num_employees'),
-            output_field=models.IntegerField()),
+            result=Sum(
+                F('salaries') + F('num_employees'),
+                output_field=models.IntegerField()
+            ),
         )
         self.assertEqual(companies['result'], 2395)
+
+    def test_annotate_values_filter(self):
+        companies = Company.objects.annotate(
+            foo=RawSQL('%s', ['value']),
+        ).filter(foo='value').order_by('name')
+        self.assertQuerysetEqual(
+            companies, [
+                '<Company: Example Inc.>',
+                '<Company: Foobar Ltd.>',
+                '<Company: Test GmbH>',
+            ],
+        )
 
     def test_filter_inter_attribute(self):
         # We can filter on attribute relationships on same model obj, e.g.
@@ -249,6 +262,32 @@ class BasicExpressionsTests(TestCase):
         test_gmbh = Company.objects.get(pk=test_gmbh.pk)
         self.assertEqual(test_gmbh.num_employees, 36)
 
+    def test_new_object_save(self):
+        # We should be able to use Funcs when inserting new data
+        test_co = Company(
+            name=Lower(Value("UPPER")), num_employees=32, num_chairs=1,
+            ceo=Employee.objects.create(firstname="Just", lastname="Doit", salary=30),
+        )
+        test_co.save()
+        test_co.refresh_from_db()
+        self.assertEqual(test_co.name, "upper")
+
+    def test_new_object_create(self):
+        test_co = Company.objects.create(
+            name=Lower(Value("UPPER")), num_employees=32, num_chairs=1,
+            ceo=Employee.objects.create(firstname="Just", lastname="Doit", salary=30),
+        )
+        test_co.refresh_from_db()
+        self.assertEqual(test_co.name, "upper")
+
+    def test_object_create_with_aggregate(self):
+        # Aggregates are not allowed when inserting new data
+        with self.assertRaisesMessage(FieldError, 'Aggregate functions are not allowed in this query'):
+            Company.objects.create(
+                name='Company', num_employees=Max(Value(1)), num_chairs=1,
+                ceo=Employee.objects.create(firstname="Just", lastname="Doit", salary=30),
+            )
+
     def test_object_update_fk(self):
         # F expressions cannot be used to update attributes which are foreign
         # keys, or attributes which involve joins.
@@ -256,12 +295,14 @@ class BasicExpressionsTests(TestCase):
 
         def test():
             test_gmbh.point_of_contact = F("ceo")
-        self.assertRaises(ValueError, test)
+        with self.assertRaises(ValueError):
+            test()
 
         test_gmbh.point_of_contact = test_gmbh.ceo
         test_gmbh.save()
         test_gmbh.name = F("ceo__last_name")
-        self.assertRaises(FieldError, test_gmbh.save)
+        with self.assertRaises(FieldError):
+            test_gmbh.save()
 
     def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do
@@ -272,7 +313,24 @@ class BasicExpressionsTests(TestCase):
             ceo=test_gmbh.ceo
         )
         acme.num_employees = F("num_employees") + 16
-        self.assertRaises(TypeError, acme.save)
+        msg = (
+            'Failed to insert expression "Col(expressions_company, '
+            'expressions.Company.num_employees) + Value(16)" on '
+            'expressions.Company.num_employees. F() expressions can only be '
+            'used to update, not to insert.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            acme.save()
+
+        acme.num_employees = 12
+        acme.name = Lower(F('name'))
+        msg = (
+            'Failed to insert expression "Lower(Col(expressions_company, '
+            'expressions.Company.name))" on expressions.Company.name. F() '
+            'expressions can only be used to update, not to insert.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            acme.save()
 
     def test_ticket_11722_iexact_lookup(self):
         Employee.objects.create(firstname="John", lastname="Doe")
@@ -515,24 +573,21 @@ class ExpressionOperatorTests(TestCase):
 
     def test_lefthand_subtraction(self):
         # LH Subtraction of floats and integers
-        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') - 15,
-                                              float=F('float') - 42.7)
+        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') - 15, float=F('float') - 42.7)
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 27)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(-27.200, places=3))
 
     def test_lefthand_multiplication(self):
         # Multiplication of floats and integers
-        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') * 15,
-                                              float=F('float') * 42.7)
+        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') * 15, float=F('float') * 42.7)
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 630)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(661.850, places=3))
 
     def test_lefthand_division(self):
         # LH Division of floats and integers
-        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') / 2,
-                                              float=F('float') / 42.7)
+        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') / 2, float=F('float') / 42.7)
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 21)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(0.363, places=3))
@@ -561,23 +616,20 @@ class ExpressionOperatorTests(TestCase):
 
     def test_lefthand_power(self):
         # LH Powert arithmetic operation on floats and integers
-        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') ** 2,
-                                                float=F('float') ** 1.5)
+        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') ** 2, float=F('float') ** 1.5)
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 1764)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(61.02, places=2))
 
     def test_right_hand_addition(self):
         # Right hand operators
-        Number.objects.filter(pk=self.n.pk).update(integer=15 + F('integer'),
-                                              float=42.7 + F('float'))
+        Number.objects.filter(pk=self.n.pk).update(integer=15 + F('integer'), float=42.7 + F('float'))
 
         # RH Addition of floats and integers
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 57)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(58.200, places=3))
 
     def test_right_hand_subtraction(self):
-        Number.objects.filter(pk=self.n.pk).update(integer=15 - F('integer'),
-                                              float=42.7 - F('float'))
+        Number.objects.filter(pk=self.n.pk).update(integer=15 - F('integer'), float=42.7 - F('float'))
 
         # RH Subtraction of floats and integers
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, -27)
@@ -585,16 +637,14 @@ class ExpressionOperatorTests(TestCase):
 
     def test_right_hand_multiplication(self):
         # RH Multiplication of floats and integers
-        Number.objects.filter(pk=self.n.pk).update(integer=15 * F('integer'),
-                                              float=42.7 * F('float'))
+        Number.objects.filter(pk=self.n.pk).update(integer=15 * F('integer'), float=42.7 * F('float'))
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 630)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(661.850, places=3))
 
     def test_right_hand_division(self):
         # RH Division of floats and integers
-        Number.objects.filter(pk=self.n.pk).update(integer=640 / F('integer'),
-                                              float=42.7 / F('float'))
+        Number.objects.filter(pk=self.n.pk).update(integer=640 / F('integer'), float=42.7 / F('float'))
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 15)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(2.755, places=3))
@@ -608,17 +658,17 @@ class ExpressionOperatorTests(TestCase):
 
     def test_righthand_power(self):
         # RH Powert arithmetic operation on floats and integers
-        Number.objects.filter(pk=self.n.pk).update(integer=2 ** F('integer'),
-                                                float=1.5 ** F('float'))
+        Number.objects.filter(pk=self.n.pk).update(integer=2 ** F('integer'), float=1.5 ** F('float'))
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 4398046511104)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(536.308, places=3))
 
 
 class FTimeDeltaTests(TestCase):
 
-    def setUp(self):
-        self.sday = sday = datetime.date(2010, 6, 25)
-        self.stime = stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
+    @classmethod
+    def setUpTestData(cls):
+        cls.sday = sday = datetime.date(2010, 6, 25)
+        cls.stime = stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
         midnight = datetime.time(0)
 
         delta0 = datetime.timedelta(0)
@@ -629,18 +679,19 @@ class FTimeDeltaTests(TestCase):
 
         # Test data is set so that deltas and delays will be
         # strictly increasing.
-        self.deltas = []
-        self.delays = []
-        self.days_long = []
+        cls.deltas = []
+        cls.delays = []
+        cls.days_long = []
 
         # e0: started same day as assigned, zero duration
         end = stime + delta0
-        e0 = Experiment.objects.create(name='e0', assigned=sday, start=stime,
-            end=end, completed=end.date(), estimated_time=delta0)
-        self.deltas.append(delta0)
-        self.delays.append(e0.start -
-            datetime.datetime.combine(e0.assigned, midnight))
-        self.days_long.append(e0.completed - e0.assigned)
+        e0 = Experiment.objects.create(
+            name='e0', assigned=sday, start=stime, end=end,
+            completed=end.date(), estimated_time=delta0,
+        )
+        cls.deltas.append(delta0)
+        cls.delays.append(e0.start - datetime.datetime.combine(e0.assigned, midnight))
+        cls.days_long.append(e0.completed - e0.assigned)
 
         # e1: started one day after assigned, tiny duration, data
         # set so that end time has no fractional seconds, which
@@ -650,43 +701,45 @@ class FTimeDeltaTests(TestCase):
         if connection.features.supports_microsecond_precision:
             delay = datetime.timedelta(1)
             end = stime + delay + delta1
-            e1 = Experiment.objects.create(name='e1', assigned=sday,
-                start=stime + delay, end=end, completed=end.date(), estimated_time=delta1)
-            self.deltas.append(delta1)
-            self.delays.append(e1.start -
-                datetime.datetime.combine(e1.assigned, midnight))
-            self.days_long.append(e1.completed - e1.assigned)
+            e1 = Experiment.objects.create(
+                name='e1', assigned=sday, start=stime + delay, end=end,
+                completed=end.date(), estimated_time=delta1,
+            )
+            cls.deltas.append(delta1)
+            cls.delays.append(e1.start - datetime.datetime.combine(e1.assigned, midnight))
+            cls.days_long.append(e1.completed - e1.assigned)
 
         # e2: started three days after assigned, small duration
         end = stime + delta2
-        e2 = Experiment.objects.create(name='e2',
-            assigned=sday - datetime.timedelta(3), start=stime, end=end,
-            completed=end.date(), estimated_time=datetime.timedelta(hours=1))
-        self.deltas.append(delta2)
-        self.delays.append(e2.start -
-            datetime.datetime.combine(e2.assigned, midnight))
-        self.days_long.append(e2.completed - e2.assigned)
+        e2 = Experiment.objects.create(
+            name='e2', assigned=sday - datetime.timedelta(3), start=stime,
+            end=end, completed=end.date(), estimated_time=datetime.timedelta(hours=1),
+        )
+        cls.deltas.append(delta2)
+        cls.delays.append(e2.start - datetime.datetime.combine(e2.assigned, midnight))
+        cls.days_long.append(e2.completed - e2.assigned)
 
         # e3: started four days after assigned, medium duration
         delay = datetime.timedelta(4)
         end = stime + delay + delta3
-        e3 = Experiment.objects.create(name='e3',
-            assigned=sday, start=stime + delay, end=end, completed=end.date(), estimated_time=delta3)
-        self.deltas.append(delta3)
-        self.delays.append(e3.start -
-            datetime.datetime.combine(e3.assigned, midnight))
-        self.days_long.append(e3.completed - e3.assigned)
+        e3 = Experiment.objects.create(
+            name='e3', assigned=sday, start=stime + delay, end=end,
+            completed=end.date(), estimated_time=delta3,
+        )
+        cls.deltas.append(delta3)
+        cls.delays.append(e3.start - datetime.datetime.combine(e3.assigned, midnight))
+        cls.days_long.append(e3.completed - e3.assigned)
 
         # e4: started 10 days after assignment, long duration
         end = stime + delta4
-        e4 = Experiment.objects.create(name='e4',
-            assigned=sday - datetime.timedelta(10), start=stime, end=end,
-            completed=end.date(), estimated_time=delta4 - datetime.timedelta(1))
-        self.deltas.append(delta4)
-        self.delays.append(e4.start -
-            datetime.datetime.combine(e4.assigned, midnight))
-        self.days_long.append(e4.completed - e4.assigned)
-        self.expnames = [e.name for e in Experiment.objects.all()]
+        e4 = Experiment.objects.create(
+            name='e4', assigned=sday - datetime.timedelta(10), start=stime,
+            end=end, completed=end.date(), estimated_time=delta4 - datetime.timedelta(1),
+        )
+        cls.deltas.append(delta4)
+        cls.delays.append(e4.start - datetime.datetime.combine(e4.assigned, midnight))
+        cls.days_long.append(e4.completed - e4.assigned)
+        cls.expnames = [e.name for e in Experiment.objects.all()]
 
     def test_multiple_query_compilation(self):
         # Ticket #21643
@@ -706,49 +759,40 @@ class FTimeDeltaTests(TestCase):
     def test_delta_add(self):
         for i in range(len(self.deltas)):
             delta = self.deltas[i]
-            test_set = [e.name for e in
-                Experiment.objects.filter(end__lt=F('start') + delta)]
+            test_set = [e.name for e in Experiment.objects.filter(end__lt=F('start') + delta)]
             self.assertEqual(test_set, self.expnames[:i])
 
-            test_set = [e.name for e in
-                Experiment.objects.filter(end__lt=delta + F('start'))]
+            test_set = [e.name for e in Experiment.objects.filter(end__lt=delta + F('start'))]
             self.assertEqual(test_set, self.expnames[:i])
 
-            test_set = [e.name for e in
-                Experiment.objects.filter(end__lte=F('start') + delta)]
+            test_set = [e.name for e in Experiment.objects.filter(end__lte=F('start') + delta)]
             self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_delta_subtract(self):
         for i in range(len(self.deltas)):
             delta = self.deltas[i]
-            test_set = [e.name for e in
-                Experiment.objects.filter(start__gt=F('end') - delta)]
+            test_set = [e.name for e in Experiment.objects.filter(start__gt=F('end') - delta)]
             self.assertEqual(test_set, self.expnames[:i])
 
-            test_set = [e.name for e in
-                Experiment.objects.filter(start__gte=F('end') - delta)]
+            test_set = [e.name for e in Experiment.objects.filter(start__gte=F('end') - delta)]
             self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_exclude(self):
         for i in range(len(self.deltas)):
             delta = self.deltas[i]
-            test_set = [e.name for e in
-                Experiment.objects.exclude(end__lt=F('start') + delta)]
+            test_set = [e.name for e in Experiment.objects.exclude(end__lt=F('start') + delta)]
             self.assertEqual(test_set, self.expnames[i:])
 
-            test_set = [e.name for e in
-                Experiment.objects.exclude(end__lte=F('start') + delta)]
+            test_set = [e.name for e in Experiment.objects.exclude(end__lte=F('start') + delta)]
             self.assertEqual(test_set, self.expnames[i + 1:])
 
     def test_date_comparison(self):
         for i in range(len(self.days_long)):
             days = self.days_long[i]
-            test_set = [e.name for e in
-                Experiment.objects.filter(completed__lt=F('assigned') + days)]
+            test_set = [e.name for e in Experiment.objects.filter(completed__lt=F('assigned') + days)]
             self.assertEqual(test_set, self.expnames[:i])
 
-            test_set = [e.name for e in
-                Experiment.objects.filter(completed__lte=F('assigned') + days)]
+            test_set = [e.name for e in Experiment.objects.filter(completed__lte=F('assigned') + days)]
             self.assertEqual(test_set, self.expnames[:i + 1])
 
     @skipUnlessDBFeature("supports_mixed_date_datetime_comparisons")
@@ -757,25 +801,22 @@ class FTimeDeltaTests(TestCase):
             delay = self.delays[i]
             if not connection.features.supports_microsecond_precision:
                 delay = datetime.timedelta(delay.days, delay.seconds)
-            test_set = [e.name for e in
-                Experiment.objects.filter(assigned__gt=F('start') - delay)]
+            test_set = [e.name for e in Experiment.objects.filter(assigned__gt=F('start') - delay)]
             self.assertEqual(test_set, self.expnames[:i])
 
-            test_set = [e.name for e in
-                Experiment.objects.filter(assigned__gte=F('start') - delay)]
+            test_set = [e.name for e in Experiment.objects.filter(assigned__gte=F('start') - delay)]
             self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_mixed_comparisons2(self):
         delays = [datetime.timedelta(delay.days) for delay in self.delays]
         for i in range(len(delays)):
             delay = delays[i]
-            test_set = [e.name for e in
-                Experiment.objects.filter(start__lt=F('assigned') + delay)]
+            test_set = [e.name for e in Experiment.objects.filter(start__lt=F('assigned') + delay)]
             self.assertEqual(test_set, self.expnames[:i])
 
-            test_set = [e.name for e in
-                Experiment.objects.filter(start__lte=F('assigned') + delay +
-                    datetime.timedelta(1))]
+            test_set = [
+                e.name for e in Experiment.objects.filter(start__lte=F('assigned') + delay + datetime.timedelta(1))
+            ]
             self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_delta_update(self):
@@ -800,26 +841,62 @@ class FTimeDeltaTests(TestCase):
             list(Experiment.objects.filter(start=F('start') * datetime.timedelta(0)))
 
     def test_durationfield_add(self):
-        zeros = [e.name for e in
-            Experiment.objects.filter(start=F('start') + F('estimated_time'))]
+        zeros = [e.name for e in Experiment.objects.filter(start=F('start') + F('estimated_time'))]
         self.assertEqual(zeros, ['e0'])
 
-        end_less = [e.name for e in
-            Experiment.objects.filter(end__lt=F('start') + F('estimated_time'))]
+        end_less = [e.name for e in Experiment.objects.filter(end__lt=F('start') + F('estimated_time'))]
         self.assertEqual(end_less, ['e2'])
 
-        delta_math = [e.name for e in
-            Experiment.objects.filter(end__gte=F('start') + F('estimated_time') + datetime.timedelta(hours=1))]
+        delta_math = [
+            e.name for e in
+            Experiment.objects.filter(end__gte=F('start') + F('estimated_time') + datetime.timedelta(hours=1))
+        ]
         self.assertEqual(delta_math, ['e4'])
 
-    @skipUnlessDBFeature("has_native_duration_field")
+    @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_date_subtraction(self):
-        under_estimate = [e.name for e in
-            Experiment.objects.filter(estimated_time__gt=F('end') - F('start'))]
+        queryset = Experiment.objects.annotate(
+            completion_duration=ExpressionWrapper(
+                F('completed') - F('assigned'), output_field=models.DurationField()
+            )
+        )
+
+        at_least_5_days = {e.name for e in queryset.filter(completion_duration__gte=datetime.timedelta(days=5))}
+        self.assertEqual(at_least_5_days, {'e3', 'e4'})
+
+        less_than_5_days = {e.name for e in queryset.filter(completion_duration__lt=datetime.timedelta(days=5))}
+        expected = {'e0', 'e2'}
+        if connection.features.supports_microsecond_precision:
+            expected.add('e1')
+        self.assertEqual(less_than_5_days, expected)
+
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_time_subtraction(self):
+        if connection.features.supports_microsecond_precision:
+            time = datetime.time(12, 30, 15, 2345)
+            timedelta = datetime.timedelta(hours=1, minutes=15, seconds=15, microseconds=2345)
+        else:
+            time = datetime.time(12, 30, 15)
+            timedelta = datetime.timedelta(hours=1, minutes=15, seconds=15)
+        Time.objects.create(time=time)
+        queryset = Time.objects.annotate(
+            difference=ExpressionWrapper(
+                F('time') - Value(datetime.time(11, 15, 0), output_field=models.TimeField()),
+                output_field=models.DurationField(),
+            )
+        )
+        self.assertEqual(queryset.get().difference, timedelta)
+
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_datetime_subtraction(self):
+        under_estimate = [
+            e.name for e in Experiment.objects.filter(estimated_time__gt=F('end') - F('start'))
+        ]
         self.assertEqual(under_estimate, ['e2'])
 
-        over_estimate = [e.name for e in
-            Experiment.objects.filter(estimated_time__lt=F('end') - F('start'))]
+        over_estimate = [
+            e.name for e in Experiment.objects.filter(estimated_time__lt=F('end') - F('start'))
+        ]
         self.assertEqual(over_estimate, ['e4'])
 
     def test_duration_with_datetime(self):
@@ -852,8 +929,6 @@ class ReprTests(TestCase):
             "<Case: CASE WHEN <Q: (AND: ('a', 1))> THEN Value(None), ELSE Value(None)>"
         )
         self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
-        self.assertEqual(repr(Date('published', 'exact')), "Date(published, exact)")
-        self.assertEqual(repr(DateTime('published', 'exact', utc)), "DateTime(published, exact, %s)" % utc)
         self.assertEqual(repr(F('published')), "F(published)")
         self.assertEqual(repr(F('cost') + F('tax')), "<CombinedExpression: F(cost) + F(tax)>")
         self.assertEqual(
@@ -878,6 +953,7 @@ class ReprTests(TestCase):
     def test_aggregates(self):
         self.assertEqual(repr(Avg('a')), "Avg(F(a))")
         self.assertEqual(repr(Count('a')), "Count(F(a), distinct=False)")
+        self.assertEqual(repr(Count('*')), "Count('*', distinct=False)")
         self.assertEqual(repr(Max('a')), "Max(F(a))")
         self.assertEqual(repr(Min('a')), "Min(F(a))")
         self.assertEqual(repr(StdDev('a')), "StdDev(F(a), sample=False)")

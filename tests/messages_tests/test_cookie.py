@@ -70,8 +70,8 @@ class CookieTest(BaseTests, SimpleTestCase):
         self.assertIn('test', response.cookies['messages'].value)
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], '')
-        self.assertEqual(response.cookies['messages']['secure'], True)
-        self.assertEqual(response.cookies['messages']['httponly'], True)
+        self.assertIs(response.cookies['messages']['secure'], True)
+        self.assertIs(response.cookies['messages']['httponly'], True)
 
         # Test deletion of the cookie (storing with an empty value) after the messages have been consumed
         storage = self.get_storage()
@@ -127,9 +127,9 @@ class CookieTest(BaseTests, SimpleTestCase):
         messages = [
             {
                 'message': Message(constants.INFO, 'Test message'),
-                'message_list': [Message(constants.INFO, 'message %s')
-                                 for x in range(5)] + [{'another-message':
-                                 Message(constants.ERROR, 'error')}],
+                'message_list': [
+                    Message(constants.INFO, 'message %s') for x in range(5)
+                ] + [{'another-message': Message(constants.ERROR, 'error')}],
             },
             Message(constants.INFO, 'message %s'),
         ]

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.apps import apps
+from django.apps.registry import Apps
 from django.conf import settings
 from django.contrib.sites import models
 from django.contrib.sites.management import create_default_site
@@ -10,7 +11,7 @@ from django.contrib.sites.requests import RequestSite
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.signals import post_migrate
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.test import TestCase, modify_settings, override_settings
 from django.test.utils import captured_stdout
 
@@ -35,7 +36,8 @@ class SitesFrameworkTests(TestCase):
         s = Site.objects.get_current()
         self.assertIsInstance(s, Site)
         s.delete()
-        self.assertRaises(ObjectDoesNotExist, Site.objects.get_current)
+        with self.assertRaises(ObjectDoesNotExist):
+            Site.objects.get_current()
 
     def test_site_cache(self):
         # After updating a Site object (e.g. via the admin), we shouldn't return a
@@ -53,7 +55,8 @@ class SitesFrameworkTests(TestCase):
         # be cleared and get_current() should raise a DoesNotExist.
         self.assertIsInstance(Site.objects.get_current(), Site)
         Site.objects.all().delete()
-        self.assertRaises(Site.DoesNotExist, Site.objects.get_current)
+        with self.assertRaises(Site.DoesNotExist):
+            Site.objects.get_current()
 
     @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_get_current_site(self):
@@ -70,7 +73,8 @@ class SitesFrameworkTests(TestCase):
         # Test that an exception is raised if the sites framework is installed
         # but there is no matching Site
         site.delete()
-        self.assertRaises(ObjectDoesNotExist, get_current_site, request)
+        with self.assertRaises(ObjectDoesNotExist):
+            get_current_site(request)
 
         # A RequestSite is returned if the sites framework is not installed
         with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
@@ -112,7 +116,8 @@ class SitesFrameworkTests(TestCase):
 
         # Host header with non-matching domain
         request.META = {'HTTP_HOST': 'example.net'}
-        self.assertRaises(ObjectDoesNotExist, get_current_site, request)
+        with self.assertRaises(ObjectDoesNotExist):
+            get_current_site(request)
 
         # Ensure domain for RequestSite always matches host header
         with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
@@ -128,12 +133,16 @@ class SitesFrameworkTests(TestCase):
         # Regression for #17320
         # Domain names are not allowed contain whitespace characters
         site = Site(name="test name", domain="test test")
-        self.assertRaises(ValidationError, site.full_clean)
+        with self.assertRaises(ValidationError):
+            site.full_clean()
         site.domain = "test\ttest"
-        self.assertRaises(ValidationError, site.full_clean)
+        with self.assertRaises(ValidationError):
+            site.full_clean()
         site.domain = "test\ntest"
-        self.assertRaises(ValidationError, site.full_clean)
+        with self.assertRaises(ValidationError):
+            site.full_clean()
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_clear_site_cache(self):
         request = HttpRequest()
         request.META = {
@@ -154,7 +163,7 @@ class SitesFrameworkTests(TestCase):
         clear_site_cache(Site, instance=self.site, using='default')
         self.assertEqual(models.SITE_CACHE, {})
 
-    @override_settings(SITE_ID='')
+    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example2.com'])
     def test_clear_site_cache_domain(self):
         site = Site.objects.create(name='example2.com', domain='example2.com')
         request = HttpRequest()
@@ -178,6 +187,32 @@ class SitesFrameworkTests(TestCase):
         msg = 'Site with this Domain name already exists.'
         with self.assertRaisesMessage(ValidationError, msg):
             site.validate_unique()
+
+    def test_site_natural_key(self):
+        self.assertEqual(Site.objects.get_by_natural_key(self.site.domain), self.site)
+        self.assertEqual(self.site.natural_key(), (self.site.domain,))
+
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_requestsite_save_notimplemented_msg(self):
+        # Test response msg for RequestSite.save NotImplementedError
+        request = HttpRequest()
+        request.META = {
+            "HTTP_HOST": "example.com",
+        }
+        msg = 'RequestSite cannot be saved.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            RequestSite(request).save()
+
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_requestsite_delete_notimplemented_msg(self):
+        # Test response msg for RequestSite.delete NotImplementedError
+        request = HttpRequest()
+        request.META = {
+            "HTTP_HOST": "example.com",
+        }
+        msg = 'RequestSite cannot be deleted.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            RequestSite(request).delete()
 
 
 class JustOtherRouter(object):
@@ -262,12 +297,26 @@ class CreateDefaultSiteTests(TestCase):
         create_default_site(self.app_config, verbosity=0)
         self.assertEqual(Site.objects.get().pk, 1)
 
+    def test_unavailable_site_model(self):
+        """
+        #24075 - A Site shouldn't be created if the model isn't available.
+        """
+        apps = Apps()
+        create_default_site(self.app_config, verbosity=0, apps=apps)
+        self.assertFalse(Site.objects.exists())
+
 
 class MiddlewareTest(TestCase):
 
-    def test_request(self):
+    def test_old_style_request(self):
         """ Makes sure that the request has correct `site` attribute. """
         middleware = CurrentSiteMiddleware()
         request = HttpRequest()
         middleware.process_request(request)
         self.assertEqual(request.site.id, settings.SITE_ID)
+
+    def test_request(self):
+        def get_response(request):
+            return HttpResponse(str(request.site.id))
+        response = CurrentSiteMiddleware(get_response)(HttpRequest())
+        self.assertContains(response, settings.SITE_ID)

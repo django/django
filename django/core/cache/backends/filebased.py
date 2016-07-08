@@ -35,14 +35,13 @@ class FileBasedCache(BaseCache):
 
     def get(self, key, default=None, version=None):
         fname = self._key_to_file(key, version)
-        if os.path.exists(fname):
-            try:
-                with io.open(fname, 'rb') as f:
-                    if not self._is_expired(f):
-                        return pickle.loads(zlib.decompress(f.read()))
-            except IOError as e:
-                if e.errno == errno.ENOENT:
-                    pass  # Cache file was removed after the exists check
+        try:
+            with io.open(fname, 'rb') as f:
+                if not self._is_expired(f):
+                    return pickle.loads(zlib.decompress(f.read()))
+        except IOError as e:
+            if e.errno != errno.ENOENT:
+                raise
         return default
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
@@ -54,8 +53,8 @@ class FileBasedCache(BaseCache):
         try:
             with io.open(fd, 'wb') as f:
                 expiry = self.get_backend_timeout(timeout)
-                f.write(pickle.dumps(expiry, -1))
-                f.write(zlib.compress(pickle.dumps(value), -1))
+                f.write(pickle.dumps(expiry, pickle.HIGHEST_PROTOCOL))
+                f.write(zlib.compress(pickle.dumps(value, pickle.HIGHEST_PROTOCOL)))
             file_move_safe(tmp_path, fname, allow_overwrite=True)
             renamed = True
         finally:

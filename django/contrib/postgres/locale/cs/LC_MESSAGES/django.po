@@ -7,11 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-19 08:43+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-15 18:06+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
-"Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
-"cs/)\n"
+"Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,8 +34,18 @@ msgstr "Asociativní pole řetězcových klíčů na řetězcové hodnoty"
 msgid "The value of \"%(key)s\" is not a string."
 msgstr "Hodnota klíče \"%(key)s\" není řetězec."
 
+msgid "A JSON object"
+msgstr "Objekt typu JSON"
+
+msgid "Value must be valid JSON."
+msgstr "Musí být v platném formátu JSON."
+
 msgid "Could not load JSON data."
 msgstr "Data typu JSON nelze načíst."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "Hodnota '%(value)s' musí být v platném formátu JSON."
 
 msgid "Enter two valid values."
 msgstr "Zadejte dvě platné hodnoty."

@@ -34,6 +34,11 @@ class Formatter(object):
         pieces = []
         for i, piece in enumerate(re_formatchars.split(force_text(formatstr))):
             if i % 2:
+                if type(self.data) is datetime.date and hasattr(TimeFormat, piece):
+                    raise TypeError(
+                        "The format for date objects may not contain "
+                        "time-related format specifiers (found '%s')." % piece
+                    )
                 pieces.append(force_text(getattr(self, piece)()))
             elif piece:
                 pieces.append(re_escaped.sub(r'\1', piece))
@@ -136,6 +141,8 @@ class TimeFormat(Formatter):
             return ""
 
         seconds = self.Z()
+        if seconds == "":
+            return ""
         sign = '-' if seconds < 0 else '+'
         seconds = abs(seconds)
         return "%s%02d%02d" % (sign, seconds // 3600, (seconds // 60) % 60)
@@ -167,7 +174,14 @@ class TimeFormat(Formatter):
         if not self.timezone:
             return ""
 
-        name = self.timezone.tzname(self.data) if self.timezone else None
+        name = None
+        try:
+            name = self.timezone.tzname(self.data)
+        except Exception:
+            # pytz raises AmbiguousTimeError during the autumn DST change.
+            # This happens mainly when __init__ receives a naive datetime
+            # and sets self.timezone = get_default_timezone().
+            pass
         if name is None:
             name = self.format('O')
         return six.text_type(name)
@@ -188,7 +202,14 @@ class TimeFormat(Formatter):
         if not self.timezone:
             return ""
 
-        offset = self.timezone.utcoffset(self.data)
+        try:
+            offset = self.timezone.utcoffset(self.data)
+        except Exception:
+            # pytz raises AmbiguousTimeError during the autumn DST change.
+            # This happens mainly when __init__ receives a naive datetime
+            # and sets self.timezone = get_default_timezone().
+            return ""
+
         # `offset` is a datetime.timedelta. For negative values (to the west of
         # UTC) only days can be negative (days=-1) and seconds are always
         # positive. e.g. UTC-1 -> timedelta(days=-1, seconds=82800, microseconds=0)
@@ -228,10 +249,16 @@ class DateFormat(TimeFormat):
 
     def I(self):
         "'1' if Daylight Savings Time, '0' otherwise."
-        if self.timezone and self.timezone.dst(self.data):
-            return '1'
-        else:
-            return '0'
+        try:
+            if self.timezone and self.timezone.dst(self.data):
+                return '1'
+            else:
+                return '0'
+        except Exception:
+            # pytz raises AmbiguousTimeError during the autumn DST change.
+            # This happens mainly when __init__ receives a naive datetime
+            # and sets self.timezone = get_default_timezone().
+            return ''
 
     def j(self):
         "Day of the month without leading zeros; i.e. '1' to '31'"
@@ -266,7 +293,7 @@ class DateFormat(TimeFormat):
         return self.data.isocalendar()[0]
 
     def r(self):
-        "RFC 2822 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
+        "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
         return self.format('D, j M Y H:i:s O')
 
     def S(self):

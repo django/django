@@ -9,7 +9,7 @@ from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr/ogr__api_8h.html
+#  http://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_F_* routines are relevant here.
 class Feature(GDALBase):
@@ -29,8 +29,10 @@ class Feature(GDALBase):
 
     def __del__(self):
         "Releases a reference to this object."
-        if self._ptr and capi:
+        try:
             capi.destroy_feature(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     def __getitem__(self, index):
         """

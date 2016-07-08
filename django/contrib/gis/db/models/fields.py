@@ -1,7 +1,9 @@
-from django.contrib.gis import forms
-from django.contrib.gis.db.models.lookups import gis_lookups
+from django.contrib.gis import forms, gdal
+from django.contrib.gis.db.models.lookups import (
+    RasterBandTransform, gis_lookups,
+)
 from django.contrib.gis.db.models.proxy import SpatialProxy
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.expressions import Expression
@@ -76,6 +78,7 @@ class BaseSpatialField(Field):
     of the spatial reference system of the field.
     """
     description = _("The base GIS field.")
+    empty_strings_allowed = False
     # Geodetic units.
     geodetic_units = ('decimal degree', 'degree')
 
@@ -157,6 +160,98 @@ class BaseSpatialField(Field):
         """
         return connection.ops.get_geom_placeholder(self, value, compiler)
 
+    def get_srid(self, obj):
+        """
+        Return the default SRID for the given geometry or raster, taking into
+        account the SRID set for the field. For example, if the input geometry
+        or raster doesn't have an SRID, then the SRID of the field will be
+        returned.
+        """
+        srid = obj.srid  # SRID of given geometry.
+        if srid is None or self.srid == -1 or (srid == -1 and self.srid != -1):
+            return self.srid
+        else:
+            return srid
+
+    def get_db_prep_save(self, value, connection):
+        """
+        Prepare the value for saving in the database.
+        """
+        if not value:
+            return None
+        else:
+            return connection.ops.Adapter(self.get_prep_value(value))
+
+    def get_raster_prep_value(self, value, is_candidate):
+        """
+        Return a GDALRaster if conversion is successful, otherwise return None.
+        """
+        if isinstance(value, gdal.GDALRaster):
+            return value
+        elif is_candidate:
+            try:
+                return gdal.GDALRaster(value)
+            except GDALException:
+                pass
+        elif isinstance(value, dict):
+            try:
+                return gdal.GDALRaster(value)
+            except GDALException:
+                raise ValueError("Couldn't create spatial object from lookup value '%s'." % value)
+
+    def get_prep_value(self, value):
+        """
+        Spatial lookup values are either a parameter that is (or may be
+        converted to) a geometry or raster, or a sequence of lookup values
+        that begins with a geometry or raster. This routine sets up the
+        geometry or raster value properly and preserves any other lookup
+        parameters.
+        """
+        value = super(BaseSpatialField, self).get_prep_value(value)
+
+        # For IsValid lookups, boolean values are allowed.
+        if isinstance(value, (Expression, bool)):
+            return value
+        elif isinstance(value, (tuple, list)):
+            obj = value[0]
+            seq_value = True
+        else:
+            obj = value
+            seq_value = False
+
+        # When the input is not a geometry or raster, attempt to construct one
+        # from the given string input.
+        if isinstance(obj, Geometry):
+            pass
+        else:
+            # Check if input is a candidate for conversion to raster or geometry.
+            is_candidate = isinstance(obj, (bytes, six.string_types)) or hasattr(obj, '__geo_interface__')
+            # Try to convert the input to raster.
+            raster = self.get_raster_prep_value(obj, is_candidate)
+
+            if raster:
+                obj = raster
+            elif is_candidate:
+                try:
+                    obj = Geometry(obj)
+                except (GeometryException, GDALException):
+                    raise ValueError("Couldn't create spatial object from lookup value '%s'." % obj)
+            else:
+                raise ValueError('Cannot use object with type %s for a spatial lookup parameter.' % type(obj).__name__)
+
+        # Assigning the SRID value.
+        obj.srid = self.get_srid(obj)
+
+        if seq_value:
+            lookup_val = [obj]
+            lookup_val.extend(value[1:])
+            return tuple(lookup_val)
+        else:
+            return obj
+
+for klass in gis_lookups.values():
+    BaseSpatialField.register_lookup(klass)
+
 
 class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
     """
@@ -216,62 +311,14 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
         """
         return connection.ops.get_distance(self, value, lookup_type)
 
-    def get_prep_value(self, value):
-        """
-        Spatial lookup values are either a parameter that is (or may be
-        converted to) a geometry, or a sequence of lookup values that
-        begins with a geometry.  This routine will setup the geometry
-        value properly, and preserve any other lookup parameters before
-        returning to the caller.
-        """
-        value = super(GeometryField, self).get_prep_value(value)
-        if isinstance(value, Expression):
-            return value
-        elif isinstance(value, (tuple, list)):
-            geom = value[0]
-            seq_value = True
-        else:
-            geom = value
-            seq_value = False
-
-        # When the input is not a GEOS geometry, attempt to construct one
-        # from the given string input.
-        if isinstance(geom, Geometry):
-            pass
-        elif isinstance(geom, (bytes, six.string_types)) or hasattr(geom, '__geo_interface__'):
-            try:
-                geom = Geometry(geom)
-            except GeometryException:
-                raise ValueError('Could not create geometry from lookup value.')
-        else:
-            raise ValueError('Cannot use object with type %s for a geometry lookup parameter.' % type(geom).__name__)
-
-        # Assigning the SRID value.
-        geom.srid = self.get_srid(geom)
-
-        if seq_value:
-            lookup_val = [geom]
-            lookup_val.extend(value[1:])
-            return tuple(lookup_val)
-        else:
-            return geom
-
     def from_db_value(self, value, expression, connection, context):
-        if value and not isinstance(value, Geometry):
-            value = Geometry(value)
+        if value:
+            if not isinstance(value, Geometry):
+                value = Geometry(value)
+            srid = value.srid
+            if not srid and self.srid != -1:
+                value.srid = self.srid
         return value
-
-    def get_srid(self, geom):
-        """
-        Returns the default SRID for the given geometry, taking into account
-        the SRID set for the field.  For example, if the input geometry
-        has no SRID, then that of the field will be returned.
-        """
-        gsrid = geom.srid  # SRID of given geometry.
-        if gsrid is None or self.srid == -1 or (gsrid == -1 and self.srid != -1):
-            return self.srid
-        else:
-            return gsrid
 
     # ### Routines overloaded from Field ###
     def contribute_to_class(self, cls, name, **kwargs):
@@ -291,58 +338,26 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             defaults['widget'] = forms.Textarea
         return super(GeometryField, self).formfield(**defaults)
 
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
+    def _get_db_prep_lookup(self, lookup_type, value, connection):
         """
         Prepare for the database lookup, and return any spatial parameters
         necessary for the query.  This includes wrapping any geometry
         parameters with a backend-specific adapter and formatting any distance
         parameters into the correct units for the coordinate system of the
         field.
+
+        Only used by the deprecated GeoQuerySet and to be
+        RemovedInDjango20Warning.
         """
-        # special case for isnull lookup
-        if lookup_type == 'isnull':
-            return []
-        elif lookup_type in self.class_lookups:
-            # Populating the parameters list, and wrapping the Geometry
-            # with the Adapter of the spatial backend.
-            if isinstance(value, (tuple, list)):
-                params = [connection.ops.Adapter(value[0])]
-                if self.class_lookups[lookup_type].distance:
-                    # Getting the distance parameter in the units of the field.
-                    params += self.get_distance(value[1:], lookup_type, connection)
-                elif lookup_type in connection.ops.truncate_params:
-                    # Lookup is one where SQL parameters aren't needed from the
-                    # given lookup value.
-                    pass
-                else:
-                    params += value[1:]
-            elif isinstance(value, Expression):
-                params = []
-            else:
-                params = [connection.ops.Adapter(value)]
-
-            return params
+        # Populating the parameters list, and wrapping the Geometry
+        # with the Adapter of the spatial backend.
+        if isinstance(value, (tuple, list)):
+            params = [connection.ops.Adapter(value[0])]
+            # Getting the distance parameter in the units of the field.
+            params += self.get_distance(value[1:], lookup_type, connection)
         else:
-            raise ValueError('%s is not a valid spatial lookup for %s.' %
-                             (lookup_type, self.__class__.__name__))
-
-    def get_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'contains':
-            # 'contains' name might conflict with the "normal" contains lookup,
-            # for which the value is not prepared, but left as-is.
-            return self.get_prep_value(value)
-        return super(GeometryField, self).get_prep_lookup(lookup_type, value)
-
-    def get_db_prep_save(self, value, connection):
-        "Prepares the value for saving in the database."
-        if not value:
-            return None
-        else:
-            return connection.ops.Adapter(self.get_prep_value(value))
-
-
-for klass in gis_lookups.values():
-    GeometryField.register_lookup(klass)
+            params = [connection.ops.Adapter(value)]
+        return params
 
 
 # The OpenGIS Geometry Type Fields
@@ -404,11 +419,7 @@ class RasterField(BaseSpatialField):
 
     description = _("Raster Field")
     geom_type = 'RASTER'
-
-    def __init__(self, *args, **kwargs):
-        if not HAS_GDAL:
-            raise ImproperlyConfigured('RasterField requires GDAL.')
-        super(RasterField, self).__init__(*args, **kwargs)
+    geography = False
 
     def _check_connection(self, connection):
         # Make sure raster fields are used only on backends with raster support.
@@ -431,10 +442,20 @@ class RasterField(BaseSpatialField):
 
     def contribute_to_class(self, cls, name, **kwargs):
         super(RasterField, self).contribute_to_class(cls, name, **kwargs)
-        # Importing GDALRaster raises an exception on systems without gdal.
-        from django.contrib.gis.gdal import GDALRaster
         # Setup for lazy-instantiated Raster object. For large querysets, the
         # instantiation of all GDALRasters can potentially be expensive. This
         # delays the instantiation of the objects to the moment of evaluation
         # of the raster attribute.
-        setattr(cls, self.attname, SpatialProxy(GDALRaster, self))
+        setattr(cls, self.attname, SpatialProxy(gdal.GDALRaster, self))
+
+    def get_transform(self, name):
+        try:
+            band_index = int(name)
+            return type(
+                'SpecificRasterBandTransform',
+                (RasterBandTransform, ),
+                {'band_index': band_index}
+            )
+        except ValueError:
+            pass
+        return super(RasterField, self).get_transform(name)

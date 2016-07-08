@@ -2,8 +2,8 @@
 Single object mixins
 ====================
 
-SingleObjectMixin
------------------
+``SingleObjectMixin``
+=====================
 
 .. class:: django.views.generic.detail.SingleObjectMixin
 
@@ -53,8 +53,6 @@ SingleObjectMixin
 
     .. attribute:: query_pk_and_slug
 
-        .. versionadded:: 1.8
-
         If ``True``, causes :meth:`get_object()` to perform its lookup using
         both the primary key and the slug. Defaults to ``False``.
 
@@ -81,10 +79,8 @@ SingleObjectMixin
         :attr:`slug_url_kwarg` argument, and performs a slug lookup using the
         :attr:`slug_field`.
 
-        .. versionchanged:: 1.8
-
-            When :attr:`query_pk_and_slug` is ``True``, ``get_object()`` will
-            perform its lookup using both the primary key and the slug.
+        When :attr:`query_pk_and_slug` is ``True``, ``get_object()`` will
+        perform its lookup using both the primary key and the slug.
 
     .. method:: get_queryset()
 
@@ -106,23 +102,37 @@ SingleObjectMixin
 
         Returns context data for displaying the list of objects.
 
-        The base implementation of this method requires that the ``object``
+        The base implementation of this method requires that the ``self.object``
         attribute be set by the view (even if ``None``). Be sure to do this if
         you are using this mixin without one of the built-in views that does so.
+
+        It returns a dictionary with these contents:
+
+        * ``object``: The object that this view is displaying
+          (``self.object``).
+        * ``context_object_name``: ``self.object`` will also be stored under
+          the name returned by :meth:`get_context_object_name`, which defaults
+          to the lowercased version of the model name.
+
+        .. admonition:: Context variables override values from template context processors
+
+            Any variables from :meth:`get_context_data` take precedence over
+            context variables from :ref:`context processors
+            <subclassing-context-requestcontext>`. For example, if your view
+            sets the :attr:`model` attribute to
+            :class:`~django.contrib.auth.models.User`, the default context
+            object name of ``user`` would override the ``user`` variable from
+            the :func:`django.contrib.auth.context_processors.auth` context
+            processor. Use :meth:`get_context_object_name` to avoid a clash.
 
     .. method:: get_slug_field()
 
         Returns the name of a slug field to be used to look up by slug. By
         default this simply returns the value of :attr:`slug_field`.
 
-    **Context**
 
-    * ``object``: The object that this view is displaying. If
-      ``context_object_name`` is specified, that variable will also be
-      set in the context, with the same value as ``object``.
-
-SingleObjectTemplateResponseMixin
----------------------------------
+``SingleObjectTemplateResponseMixin``
+=====================================
 
 .. class:: django.views.generic.detail.SingleObjectTemplateResponseMixin
 

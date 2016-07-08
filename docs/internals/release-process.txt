@@ -92,15 +92,15 @@ So, for example, if we decided to start the deprecation of a function in
 Django 4.2:
 
 * Django 4.2 will contain a backwards-compatible replica of the function which
-  will raise a ``RemovedInDjango51Warning``. This warning is silent by
-  default; you can turn on display of these warnings with the ``-Wd`` option
-  of Python.
+  will raise a ``RemovedInDjango51Warning``.
 
 * Django 5.0 (the version that follows 4.2) will still contain the
-  backwards-compatible replica. This warning becomes *loud* by default and
-  will likely be quite annoying.
+  backwards-compatible replica.
 
 * Django 5.1 will remove the feature outright.
+
+The warnings are silent by default. You can turn on display of these warnings
+with the ``python -Wd`` option.
 
 A more generic example:
 
@@ -120,8 +120,9 @@ Supported versions
 ==================
 
 At any moment in time, Django's developer team will support a set of releases to
-varying levels. See `the download page`_ for the current state of support for
-each version.
+varying levels. See `the supported versions section
+<https://www.djangoproject.com/download/#supported-versions>`_ of the download
+page for the current state of support for each version.
 
 * The current development master will get new features and bug fixes
   requiring non-trivial refactoring.
@@ -137,6 +138,8 @@ each version.
   * Crashing bugs.
 
   * Major functionality bugs in newly-introduced features.
+
+  * Regressions from older versions of Django.
 
   The rule of thumb is that fixes will be backported to the last feature
   release for bugs that would have prevented a release in the first place
@@ -160,8 +163,9 @@ Django 5.1 and 5.2. At this point in time:
   released as 5.1.1, 5.1.2, etc.
 
 * Security fixes and bug fixes for data loss issues will be applied to
-  ``master`` and to the ``stable/5.1.x``, and ``stable/4.2.x`` (LTS) branches.
-  They will trigger the release of ``5.1.1``, ``4.2.1``, etc.
+  ``master`` and to the ``stable/5.1.x``, ``stable/5.0.x``, and
+  ``stable/4.2.x`` (LTS) branches. They will trigger the release of ``5.1.1``,
+  ``5.0.5``, ``4.2.8``, etc.
 
 * Documentation fixes will be applied to master, and, if easily backported, to
   the latest stable branch, ``5.1.x``.

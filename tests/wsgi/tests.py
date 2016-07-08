@@ -1,19 +1,16 @@
 from __future__ import unicode_literals
 
-import unittest
-
 from django.core.exceptions import ImproperlyConfigured
 from django.core.servers.basehttp import get_internal_wsgi_application
 from django.core.signals import request_started
 from django.core.wsgi import get_wsgi_application
 from django.db import close_old_connections
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.client import RequestFactory
-from django.utils import six
 
 
-@override_settings(ROOT_URLCONF="wsgi.urls")
-class WSGITest(TestCase):
+@override_settings(ROOT_URLCONF='wsgi.urls')
+class WSGITest(SimpleTestCase):
 
     def setUp(self):
         request_started.disconnect(close_old_connections)
@@ -25,7 +22,6 @@ class WSGITest(TestCase):
         """
         Verify that ``get_wsgi_application`` returns a functioning WSGI
         callable.
-
         """
         application = get_wsgi_application()
 
@@ -45,11 +41,12 @@ class WSGITest(TestCase):
 
         self.assertEqual(response_data["status"], "200 OK")
         self.assertEqual(
-            response_data["headers"],
-            [('Content-Type', 'text/html; charset=utf-8')])
-        self.assertEqual(
-            bytes(response),
-            b"Content-Type: text/html; charset=utf-8\r\n\r\nHello World!")
+            set(response_data["headers"]),
+            {('Content-Length', '12'), ('Content-Type', 'text/html; charset=utf-8')})
+        self.assertIn(bytes(response), [
+            b"Content-Length: 12\r\nContent-Type: text/html; charset=utf-8\r\n\r\nHello World!",
+            b"Content-Type: text/html; charset=utf-8\r\nContent-Length: 12\r\n\r\nHello World!"
+        ])
 
     def test_file_wrapper(self):
         """
@@ -74,13 +71,12 @@ class WSGITest(TestCase):
         self.assertIsInstance(response, FileWrapper)
 
 
-class GetInternalWSGIApplicationTest(unittest.TestCase):
+class GetInternalWSGIApplicationTest(SimpleTestCase):
     @override_settings(WSGI_APPLICATION="wsgi.wsgi.application")
     def test_success(self):
         """
         If ``WSGI_APPLICATION`` is a dotted path, the referenced object is
         returned.
-
         """
         app = get_internal_wsgi_application()
 
@@ -93,7 +89,6 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
         """
         If ``WSGI_APPLICATION`` is ``None``, the return value of
         ``get_wsgi_application`` is returned.
-
         """
         # Mock out get_wsgi_application so we know its return value is used
         fake_app = object()
@@ -113,16 +108,12 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
 
     @override_settings(WSGI_APPLICATION="wsgi.noexist.app")
     def test_bad_module(self):
-        with six.assertRaisesRegex(self,
-                ImproperlyConfigured,
-                r"^WSGI application 'wsgi.noexist.app' could not be loaded; Error importing.*"):
-
+        msg = "WSGI application 'wsgi.noexist.app' could not be loaded; Error importing"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_internal_wsgi_application()
 
     @override_settings(WSGI_APPLICATION="wsgi.wsgi.noexist")
     def test_bad_name(self):
-        with six.assertRaisesRegex(self,
-                ImproperlyConfigured,
-                r"^WSGI application 'wsgi.wsgi.noexist' could not be loaded; Error importing.*"):
-
+        msg = "WSGI application 'wsgi.wsgi.noexist' could not be loaded; Error importing"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_internal_wsgi_application()

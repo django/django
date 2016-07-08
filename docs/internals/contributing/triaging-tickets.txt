@@ -32,7 +32,7 @@ Django is a community project, and every contribution helps. We can't do this
 without **you**!
 
 Triage workflow
----------------
+===============
 
 Unfortunately, not all bug reports and feature requests in the ticket tracker
 provide all the :doc:`required details<bugs-and-features>`. A number of
@@ -96,20 +96,20 @@ require much much more.
 .. _triage-stages:
 
 Triage stages
--------------
+=============
 
 Below we describe in more detail the various stages that a ticket may flow
 through during its lifetime.
 
 Unreviewed
-~~~~~~~~~~
+----------
 
 The ticket has not been reviewed by anyone who felt qualified to make a
 judgment about whether the ticket contained a valid issue, a viable feature,
 or ought to be closed for any of the various reasons.
 
 Accepted
-~~~~~~~~
+--------
 
 The big gray area! The absolute meaning of "accepted" is that the issue
 described in the ticket is valid and is in some stage of being worked on.
@@ -142,7 +142,7 @@ Beyond that there are several considerations:
   explaining what is needed to improve the code.
 
 Ready For Checkin
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The ticket was reviewed by any member of the community other than the person
 who supplied the patch and found to meet all the requirements for a
@@ -152,7 +152,7 @@ review prior to being committed. See the
 RFC forever! What should I do?"
 
 Someday/Maybe
-~~~~~~~~~~~~~
+-------------
 
 This stage isn't shown on the diagram. It's only used by core developers to
 keep track of high-level ideas or long term feature requests.
@@ -163,12 +163,12 @@ consider adding someday to the framework if an excellent patch is submitted.
 They are not a high priority.
 
 Other triage attributes
------------------------
+=======================
 
 A number of flags, appearing as checkboxes in Trac, can be set on a ticket:
 
 Has patch
-~~~~~~~~~
+---------
 
 This means the ticket has an associated
 :doc:`patch<writing-code/submitting-patches>`. These will be reviewed
@@ -178,20 +178,20 @@ The following three fields (Needs documentation, Needs tests,
 Patch needs improvement) apply only if a patch has been supplied.
 
 Needs documentation
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 This flag is used for tickets with patches that need associated
 documentation. Complete documentation of features is a prerequisite
 before we can check them into the codebase.
 
 Needs tests
-~~~~~~~~~~~
+-----------
 
 This flags the patch as needing associated unit tests. Again, this
 is a required part of a valid patch.
 
 Patch needs improvement
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 This flag means that although the ticket *has* a patch, it's not quite
 ready for checkin. This could mean the patch no longer applies
@@ -199,12 +199,12 @@ cleanly, there is a flaw in the implementation, or that the code
 doesn't meet our standards.
 
 Easy pickings
-~~~~~~~~~~~~~
+-------------
 
 Tickets that would require small, easy, patches.
 
 Type
-~~~~
+----
 
 Tickets should be categorized by *type* between:
 
@@ -219,14 +219,14 @@ Tickets should be categorized by *type* between:
     better, faster, stronger.
 
 Component
-~~~~~~~~~
+---------
 
 Tickets should be classified into *components* indicating which area of
 the Django codebase they belong to. This makes tickets better organized and
 easier to find.
 
 Severity
-~~~~~~~~
+--------
 
 The *severity* attribute is used to identify blockers, that is, issues which
 should get fixed before releasing the next version of Django. Typically those
@@ -235,26 +235,26 @@ causing severe data losses. This attribute is quite rarely used and the vast
 majority of tickets have a severity of "Normal".
 
 Version
-~~~~~~~
+-------
 
 It is possible to use the *version* attribute to indicate in which
 version the reported bug was identified.
 
 UI/UX
-~~~~~
+-----
 
 This flag is used for tickets that relate to User Interface and User
 Experiences questions. For example, this flag would be appropriate for
 user-facing features in forms or the admin interface.
 
 Cc
-~~
+--
 
 You may add your username or email address to this field to be notified when
 new contributions are made to the ticket.
 
 Keywords
-~~~~~~~~
+--------
 
 With this field you may label a ticket with multiple keywords. This can be
 useful, for example, to group several tickets of a same theme. Keywords can
@@ -266,7 +266,7 @@ as "formset", "modelformset", and "ManagementForm".
 .. _closing-tickets:
 
 Closing Tickets
----------------
+===============
 
 When a ticket has completed its useful lifecycle, it's time for it to be
 closed. Closing a ticket is a big responsibility, though. You have to be sure
@@ -338,7 +338,7 @@ developers and bring the issue to |django-developers| instead.
 .. _how-can-i-help-with-triaging:
 
 How can I help with triaging?
------------------------------
+=============================
 
 The triage process is primarily driven by community members. Really,
 **ANYONE** can help.
@@ -422,7 +422,7 @@ the ticket database:
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
 
 Bisecting a regression
-----------------------
+======================
 
 .. highlight:: console
 

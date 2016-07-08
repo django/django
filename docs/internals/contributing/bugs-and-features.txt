@@ -10,9 +10,8 @@ Reporting bugs and requesting features
     not public. For further details, please see :doc:`our security
     policies </internals/security>`.
 
-
-Otherwise, before reporting a bug or requesting a new feature, please consider these
-general points:
+Otherwise, before reporting a bug or requesting a new feature on the
+`ticket tracker <https://code.djangoproject.com/>`_, consider these points:
 
 * Check that someone hasn't already filed the bug or feature request by
   `searching`_ or running `custom queries`_ in the ticket tracker.
@@ -32,7 +31,7 @@ general points:
 .. _reporting-bugs:
 
 Reporting bugs
---------------
+==============
 
 Well-written bug reports are *incredibly* helpful. However, there's a certain
 amount of overhead involved in working with any bug tracking system so your
@@ -61,7 +60,7 @@ To understand the lifecycle of your ticket once you have created it, refer to
 :doc:`triaging-tickets`.
 
 Reporting user interface bugs and features
-------------------------------------------
+==========================================
 
 If your bug or feature request touches on anything visual in nature, there
 are a few additional guidelines to follow:
@@ -87,7 +86,7 @@ are a few additional guidelines to follow:
   find your ticket.
 
 Requesting features
--------------------
+===================
 
 We're always trying to make Django better, and your feature requests are a key
 part of that. Here are some tips on how to make a request most effectively:
@@ -128,7 +127,7 @@ See also: :ref:`documenting-new-features`.
 .. _how-we-make-decisions:
 
 How we make decisions
----------------------
+=====================
 
 Whenever possible, we strive for a rough consensus. To that end, we'll often
 have informal votes on |django-developers| about a feature. In these votes we

@@ -1,10 +1,14 @@
+/* global module, test, SelectBox */
+/* eslint global-strict: 0, strict: 0 */
+'use strict';
+
 module('admin.SelectBox');
 
 test('init: no options', function(assert) {
     var $ = django.jQuery;
     $('<select id="id"></select>').appendTo('#qunit-fixture');
     SelectBox.init('id');
-    assert.equal(SelectBox.cache['id'].length, 0);
+    assert.equal(SelectBox.cache.id.length, 0);
 });
 
 test('filter', function(assert) {

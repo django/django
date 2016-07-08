@@ -73,7 +73,7 @@ class OperationTests(TransactionTestCase):
         self.assertIn(column, indexes)
 
     def alter_gis_model(self, migration_class, model_name, field_name,
-            blank=False, field_class=None):
+                        blank=False, field_class=None):
         project_state = self.set_up_test_model()
         self.current_state = project_state
         args = [model_name, field_name]
@@ -82,16 +82,15 @@ class OperationTests(TransactionTestCase):
         operation = migration_class(*args)
         new_state = project_state.clone()
         operation.state_forwards('gis', new_state)
+        self.current_state = new_state
         with connection.schema_editor() as editor:
             operation.database_forwards('gis', editor, project_state, new_state)
-        self.current_state = new_state
 
     def test_add_geom_field(self):
         """
         Test the AddField operation with a geometry-enabled column.
         """
-        self.alter_gis_model(migrations.AddField, 'Neighborhood',
-            'path', False, fields.LineStringField)
+        self.alter_gis_model(migrations.AddField, 'Neighborhood', 'path', False, fields.LineStringField)
         self.assertColumnExists('gis_neighborhood', 'path')
 
         # Test GeometryColumns when available
@@ -107,8 +106,7 @@ class OperationTests(TransactionTestCase):
         """
         Test the AddField operation with a raster-enabled column.
         """
-        self.alter_gis_model(migrations.AddField, 'Neighborhood',
-            'heatmap', False, fields.RasterField)
+        self.alter_gis_model(migrations.AddField, 'Neighborhood', 'heatmap', False, fields.RasterField)
         self.assertColumnExists('gis_neighborhood', 'heatmap')
 
         # Test spatial indices when available
@@ -140,8 +138,7 @@ class OperationTests(TransactionTestCase):
         """
         Should be able to add a GeometryField with blank=True.
         """
-        self.alter_gis_model(migrations.AddField, 'Neighborhood',
-            'path', True, fields.LineStringField)
+        self.alter_gis_model(migrations.AddField, 'Neighborhood', 'path', True, fields.LineStringField)
         self.assertColumnExists('gis_neighborhood', 'path')
 
         # Test GeometryColumns when available
@@ -157,8 +154,7 @@ class OperationTests(TransactionTestCase):
         """
         Should be able to add a RasterField with blank=True.
         """
-        self.alter_gis_model(migrations.AddField, 'Neighborhood',
-            'heatmap', True, fields.RasterField)
+        self.alter_gis_model(migrations.AddField, 'Neighborhood', 'heatmap', True, fields.RasterField)
         self.assertColumnExists('gis_neighborhood', 'heatmap')
 
         # Test spatial indices when available

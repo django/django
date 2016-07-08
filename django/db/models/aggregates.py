@@ -2,8 +2,8 @@
 Classes to represent the definitions of aggregate functions.
 """
 from django.core.exceptions import FieldError
-from django.db.models.expressions import Func, Value
-from django.db.models.fields import FloatField, IntegerField
+from django.db.models.expressions import Func, Star
+from django.db.models.fields import DecimalField, FloatField, IntegerField
 
 __all__ = [
     'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',
@@ -24,12 +24,7 @@ class Aggregate(Func):
                     before_resolved = self.get_source_expressions()[index]
                     name = before_resolved.name if hasattr(before_resolved, 'name') else repr(before_resolved)
                     raise FieldError("Cannot compute %s('%s'): '%s' is an aggregate" % (c.name, name, name))
-        c._patch_aggregate(query)  # backward-compatibility support
         return c
-
-    @property
-    def input_field(self):
-        return self.source_expressions[0]
 
     @property
     def default_alias(self):
@@ -41,45 +36,16 @@ class Aggregate(Func):
     def get_group_by_cols(self):
         return []
 
-    def _patch_aggregate(self, query):
-        """
-        Helper method for patching 3rd party aggregates that do not yet support
-        the new way of subclassing. This method will be removed in Django 1.10.
-
-        add_to_query(query, alias, col, source, is_summary) will be defined on
-        legacy aggregates which, in turn, instantiates the SQL implementation of
-        the aggregate. In all the cases found, the general implementation of
-        add_to_query looks like:
-
-        def add_to_query(self, query, alias, col, source, is_summary):
-            klass = SQLImplementationAggregate
-            aggregate = klass(col, source=source, is_summary=is_summary, **self.extra)
-            query.aggregates[alias] = aggregate
-
-        By supplying a known alias, we can get the SQLAggregate out of the
-        aggregates dict, and use the sql_function and sql_template attributes
-        to patch *this* aggregate.
-        """
-        if not hasattr(self, 'add_to_query') or self.function is not None:
-            return
-
-        placeholder_alias = "_XXXXXXXX_"
-        self.add_to_query(query, placeholder_alias, None, None, None)
-        sql_aggregate = query.aggregates.pop(placeholder_alias)
-        if 'sql_function' not in self.extra and hasattr(sql_aggregate, 'sql_function'):
-            self.extra['function'] = sql_aggregate.sql_function
-
-        if hasattr(sql_aggregate, 'sql_template'):
-            self.extra['template'] = sql_aggregate.sql_template
-
 
 class Avg(Aggregate):
     function = 'AVG'
     name = 'Avg'
 
-    def __init__(self, expression, **extra):
-        output_field = extra.pop('output_field', FloatField())
-        super(Avg, self).__init__(expression, output_field=output_field, **extra)
+    def _resolve_output_field(self):
+        source_field = self.get_source_fields()[0]
+        if isinstance(source_field, (IntegerField, DecimalField)):
+            self._output_field = FloatField()
+        super(Avg, self)._resolve_output_field()
 
     def as_oracle(self, compiler, connection):
         if self.output_field.get_internal_type() == 'DurationField':
@@ -98,7 +64,7 @@ class Count(Aggregate):
 
     def __init__(self, expression, distinct=False, **extra):
         if expression == '*':
-            expression = Value(expression)
+            expression = Star()
         super(Count, self).__init__(
             expression, distinct='DISTINCT ' if distinct else '', output_field=IntegerField(), **extra)
 

@@ -173,7 +173,6 @@ class HttpResponseBase(six.Iterator):
         - a naive ``datetime.datetime`` object in UTC,
         - an aware ``datetime.datetime`` object in any time zone.
         If it is a ``datetime.datetime`` object then ``max_age`` will be calculated.
-
         """
         value = force_str(value)
         self.cookies[key] = value
@@ -191,6 +190,8 @@ class HttpResponseBase(six.Iterator):
                 max_age = max(0, delta.days * 86400 + delta.seconds)
             else:
                 self.cookies[key]['expires'] = expires
+        else:
+            self.cookies[key]['expires'] = ''
         if max_age is not None:
             self.cookies[key]['max-age'] = max_age
             # IE requires expires, so set it if hasn't been already.
@@ -239,7 +240,7 @@ class HttpResponseBase(six.Iterator):
         return force_bytes(value, self.charset)
 
     # These methods partially implement the file-like object interface.
-    # See http://docs.python.org/lib/bltin-file-objects.html
+    # See https://docs.python.org/3/library/io.html#io.IOBase
 
     # The WSGI server must call this method upon completion of the request.
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
@@ -264,6 +265,12 @@ class HttpResponseBase(six.Iterator):
     # These methods partially implement a stream-like object interface.
     # See https://docs.python.org/library/io.html#io.IOBase
 
+    def readable(self):
+        return False
+
+    def seekable(self):
+        return False
+
     def writable(self):
         return False
 
@@ -285,6 +292,13 @@ class HttpResponse(HttpResponseBase):
         # Content is a bytestring. See the `content` property methods.
         self.content = content
 
+    def __repr__(self):
+        return '<%(cls)s status_code=%(status_code)d, "%(content_type)s">' % {
+            'cls': self.__class__.__name__,
+            'status_code': self.status_code,
+            'content_type': self['Content-Type'],
+        }
+
     def serialize(self):
         """Full HTTP message, including headers, as a bytestring."""
         return self.serialize_headers() + b'\r\n\r\n' + self.content
@@ -302,13 +316,16 @@ class HttpResponse(HttpResponseBase):
     def content(self, value):
         # Consume iterators upon assignment to allow repeated iteration.
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
+            content = b''.join(self.make_bytes(chunk) for chunk in value)
             if hasattr(value, 'close'):
-                self._closable_objects.append(value)
-            value = b''.join(self.make_bytes(chunk) for chunk in value)
+                try:
+                    value.close()
+                except Exception:
+                    pass
         else:
-            value = self.make_bytes(value)
+            content = self.make_bytes(value)
         # Create a list of properly encoded bytestrings to support write().
-        self._container = [value]
+        self._container = [content]
 
     def __iter__(self):
         return iter(self._container)
@@ -349,8 +366,10 @@ class StreamingHttpResponse(HttpResponseBase):
 
     @property
     def content(self):
-        raise AttributeError("This %s instance has no `content` attribute. "
-            "Use `streaming_content` instead." % self.__class__.__name__)
+        raise AttributeError(
+            "This %s instance has no `content` attribute. Use "
+            "`streaming_content` instead." % self.__class__.__name__
+        )
 
     @property
     def streaming_content(self):
@@ -403,6 +422,14 @@ class HttpResponseRedirectBase(HttpResponse):
 
     url = property(lambda self: self['Location'])
 
+    def __repr__(self):
+        return '<%(cls)s status_code=%(status_code)d, "%(content_type)s", url="%(url)s">' % {
+            'cls': self.__class__.__name__,
+            'status_code': self.status_code,
+            'content_type': self['Content-Type'],
+            'url': self.url,
+        }
+
 
 class HttpResponseRedirect(HttpResponseRedirectBase):
     status_code = 302
@@ -445,6 +472,14 @@ class HttpResponseNotAllowed(HttpResponse):
         super(HttpResponseNotAllowed, self).__init__(*args, **kwargs)
         self['Allow'] = ', '.join(permitted_methods)
 
+    def __repr__(self):
+        return '<%(cls)s [%(methods)s] status_code=%(status_code)d, "%(content_type)s">' % {
+            'cls': self.__class__.__name__,
+            'status_code': self.status_code,
+            'content_type': self['Content-Type'],
+            'methods': self['Allow'],
+        }
+
 
 class HttpResponseGone(HttpResponse):
     status_code = 410
@@ -469,12 +504,18 @@ class JsonResponse(HttpResponse):
       ``django.core.serializers.json.DjangoJSONEncoder``.
     :param safe: Controls if only ``dict`` objects may be serialized. Defaults
       to ``True``.
+    :param json_dumps_params: A dictionary of kwargs passed to json.dumps().
     """
 
-    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, **kwargs):
+    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True,
+                 json_dumps_params=None, **kwargs):
         if safe and not isinstance(data, dict):
-            raise TypeError('In order to allow non-dict objects to be '
-                'serialized set the safe parameter to False')
+            raise TypeError(
+                'In order to allow non-dict objects to be serialized set the '
+                'safe parameter to False.'
+            )
+        if json_dumps_params is None:
+            json_dumps_params = {}
         kwargs.setdefault('content_type', 'application/json')
-        data = json.dumps(data, cls=encoder)
+        data = json.dumps(data, cls=encoder, **json_dumps_params)
         super(JsonResponse, self).__init__(content=data, **kwargs)

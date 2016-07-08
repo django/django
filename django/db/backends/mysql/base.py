@@ -25,7 +25,10 @@ try:
     import MySQLdb as Database
 except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
+    raise ImproperlyConfigured(
+        'Error loading MySQLdb module: %s.\n'
+        'Did you install mysqlclient or MySQL-python?' % e
+    )
 
 from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
 from MySQLdb.converters import Thing2Literal, conversions       # isort:skip
@@ -43,8 +46,8 @@ from .validation import DatabaseValidation                  # isort:skip
 # lexicographic ordering in this check because then (1, 2, 1, 'gamma')
 # inadvertently passes the version test.
 version = Database.version_info
-if (version < (1, 2, 1) or (version[:3] == (1, 2, 1) and
-        (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
+if (version < (1, 2, 1) or (
+        version[:3] == (1, 2, 1) and (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
@@ -153,6 +156,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # If a column type is set to None, it won't be included in the output.
     _data_types = {
         'AutoField': 'integer AUTO_INCREMENT',
+        'BigAutoField': 'bigint AUTO_INCREMENT',
         'BinaryField': 'longblob',
         'BooleanField': 'bool',
         'CharField': 'varchar(%(max_length)s)',
@@ -267,12 +271,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn
 
     def init_connection_state(self):
-        with self.cursor() as cursor:
-            # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
-            # on a recently-inserted row will return when the field is tested for
-            # NULL.  Disabling this value brings this aspect of MySQL in line with
-            # SQL standards.
-            cursor.execute('SET SQL_AUTO_IS_NULL = 0')
+        if self.features.is_sql_auto_is_null_enabled:
+            with self.cursor() as cursor:
+                # SQL_AUTO_IS_NULL controls whether an AUTO_INCREMENT column on
+                # a recently inserted row will return when the field is tested
+                # for NULL. Disabling this brings this aspect of MySQL in line
+                # with SQL standards.
+                cursor.execute('SET SQL_AUTO_IS_NULL = 0')
 
     def create_cursor(self):
         cursor = self.connection.cursor()
@@ -332,19 +337,27 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 continue
             key_columns = self.introspection.get_key_columns(cursor, table_name)
             for column_name, referenced_table_name, referenced_column_name in key_columns:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT REFERRING.`%s`, REFERRING.`%s` FROM `%s` as REFERRING
                     LEFT JOIN `%s` as REFERRED
                     ON (REFERRING.`%s` = REFERRED.`%s`)
-                    WHERE REFERRING.`%s` IS NOT NULL AND REFERRED.`%s` IS NULL"""
-                    % (primary_key_column_name, column_name, table_name, referenced_table_name,
-                    column_name, referenced_column_name, column_name, referenced_column_name))
+                    WHERE REFERRING.`%s` IS NOT NULL AND REFERRED.`%s` IS NULL
+                    """ % (
+                        primary_key_column_name, column_name, table_name,
+                        referenced_table_name, column_name, referenced_column_name,
+                        column_name, referenced_column_name,
+                    )
+                )
                 for bad_row in cursor.fetchall():
-                    raise utils.IntegrityError("The row in table '%s' with primary key '%s' has an invalid "
+                    raise utils.IntegrityError(
+                        "The row in table '%s' with primary key '%s' has an invalid "
                         "foreign key: %s.%s contains a value '%s' that does not have a corresponding value in %s.%s."
-                        % (table_name, bad_row[0],
-                        table_name, column_name, bad_row[1],
-                        referenced_table_name, referenced_column_name))
+                        % (
+                            table_name, bad_row[0], table_name, column_name,
+                            bad_row[1], referenced_table_name, referenced_column_name,
+                        )
+                    )
 
     def is_usable(self):
         try:

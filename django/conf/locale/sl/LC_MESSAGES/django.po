@@ -10,11 +10,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-27 09:35+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
-"language/sl/)\n"
+"Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
+"sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -85,6 +85,9 @@ msgstr "Španščina"
 msgid "Argentinian Spanish"
 msgstr "Argentinska španščina"
 
+msgid "Colombian Spanish"
+msgstr ""
+
 msgid "Mexican Spanish"
 msgstr "Mehiška španščina"
 
@@ -114,6 +117,9 @@ msgstr "Frizijščina"
 
 msgid "Irish"
 msgstr "Irščina"
+
+msgid "Scottish Gaelic"
+msgstr ""
 
 msgid "Galician"
 msgstr "Galičanski jezik"
@@ -307,6 +313,11 @@ msgstr ""
 "Vnesite veljavno URL okrajšavo. Vrednost sme vsebovati le črke, števila, "
 "podčrtaje ali pomišljaje."
 
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+
 msgid "Enter a valid IPv4 address."
 msgstr "Vnesite veljaven IPv4 naslov."
 
@@ -371,6 +382,36 @@ msgstr[2] ""
 msgstr[3] ""
 "Preverite, da ima ta vrednost največ %(limit_value)d znakov (trenutno ima "
 "%(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Poskrbite, da skupno ne bo več kot %(max)s števka."
+msgstr[1] "Poskrbite, da skupno ne bosta več kot %(max)s števki."
+msgstr[2] "Poskrbite, da skupno ne bojo več kot %(max)s števke."
+msgstr[3] "Poskrbite, da skupno ne bo več kot %(max)s števk."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Poskrbite, da skupno ne bo več kot %(max)s decimalnih mesto."
+msgstr[1] "Poskrbite, da skupno ne bosta več kot %(max)s decimalnih mesti."
+msgstr[2] "Poskrbite, da skupno ne bo več kot %(max)s decimalnih mest."
+msgstr[3] "Poskrbite, da skupno ne bo več kot %(max)s decimalnih mest."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Poskrbite, da skupno ne bo več kot %(max)s števka pred decimalno vejico."
+msgstr[1] ""
+"Poskrbite, da skupno ne bosta več kot %(max)s števki pred decimalno vejico."
+msgstr[2] ""
+"Poskrbite, da skupno ne bo več kot %(max)s števk pred decimalno vejico."
+msgstr[3] ""
+"Poskrbite, da skupno ne bo več kot %(max)s števk pred decimalno vejico."
 
 msgid "and"
 msgstr "in"
@@ -560,6 +601,12 @@ msgstr "Relacija ena-na-ena"
 msgid "Many-to-many relationship"
 msgstr "Relacija več-na-več"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "To polje je obvezno."
 
@@ -568,36 +615,6 @@ msgstr "Vnesite celo število."
 
 msgid "Enter a number."
 msgstr "Vnesite število."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Poskrbite, da skupno ne bo več kot %(max)s števka."
-msgstr[1] "Poskrbite, da skupno ne bosta več kot %(max)s števki."
-msgstr[2] "Poskrbite, da skupno ne bojo več kot %(max)s števke."
-msgstr[3] "Poskrbite, da skupno ne bo več kot %(max)s števk."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Poskrbite, da skupno ne bo več kot %(max)s decimalnih mesto."
-msgstr[1] "Poskrbite, da skupno ne bosta več kot %(max)s decimalnih mesti."
-msgstr[2] "Poskrbite, da skupno ne bo več kot %(max)s decimalnih mest."
-msgstr[3] "Poskrbite, da skupno ne bo več kot %(max)s decimalnih mest."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Poskrbite, da skupno ne bo več kot %(max)s števka pred decimalno vejico."
-msgstr[1] ""
-"Poskrbite, da skupno ne bosta več kot %(max)s števki pred decimalno vejico."
-msgstr[2] ""
-"Poskrbite, da skupno ne bo več kot %(max)s števk pred decimalno vejico."
-msgstr[3] ""
-"Poskrbite, da skupno ne bo več kot %(max)s števk pred decimalno vejico."
 
 msgid "Enter a valid date."
 msgstr "Vnesite veljaven datum."
@@ -667,12 +684,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Skrito polje %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""

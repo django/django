@@ -1,0 +1,107 @@
+==========================
+Django 1.9.3 release notes
+==========================
+
+*March 1, 2016*
+
+Django 1.9.3 fixes two security issues and several bugs in 1.9.2.
+
+CVE-2016-2512: Malicious redirect and possible XSS attack via user-supplied redirect URLs containing basic auth
+===============================================================================================================
+
+Django relies on user input in some cases (e.g.
+:func:`django.contrib.auth.views.login` and :doc:`i18n </topics/i18n/index>`)
+to redirect the user to an "on success" URL. The security check for these
+redirects (namely ``django.utils.http.is_safe_url()``) considered some URLs
+with basic authentication credentials "safe" when they shouldn't be.
+
+For example, a URL like ``http://mysite.example.com\@attacker.com`` would be
+considered safe if the request's host is ``http://mysite.example.com``, but
+redirecting to this URL sends the user to ``attacker.com``.
+
+Also, if a developer relies on ``is_safe_url()`` to provide safe redirect
+targets and puts such a URL into a link, they could suffer from an XSS attack.
+
+CVE-2016-2513: User enumeration through timing difference on password hasher work factor upgrade
+================================================================================================
+
+In each major version of Django since 1.6, the default number of iterations for
+the ``PBKDF2PasswordHasher`` and its subclasses has increased. This improves
+the security of the password as the speed of hardware increases, however, it
+also creates a timing difference between a login request for a user with a
+password encoded in an older number of iterations and login request for a
+nonexistent user (which runs the default hasher's default number of iterations
+since Django 1.6).
+
+This only affects users who haven't logged in since the iterations were
+increased. The first time a user logs in after an iterations increase, their
+password is updated with the new iterations and there is no longer a timing
+difference.
+
+The new ``BasePasswordHasher.harden_runtime()`` method allows hashers to bridge
+the runtime gap between the work factor (e.g. iterations) supplied in existing
+encoded passwords and the default work factor of the hasher. This method
+is implemented for ``PBKDF2PasswordHasher``  and ``BCryptPasswordHasher``.
+The number of rounds for the latter hasher hasn't changed since Django 1.4, but
+some projects may subclass it and increase the work factor as needed.
+
+A warning will be emitted for any :ref:`third-party password hashers that don't
+implement <write-your-own-password-hasher>` a ``harden_runtime()`` method.
+
+If you have different password hashes in your database (such as SHA1 hashes
+from users who haven't logged in since the default hasher switched to PBKDF2
+in Django 1.4), the timing difference on a login request for these users may be
+even greater and this fix doesn't remedy that difference (or any difference
+when changing hashers). You may be able to :ref:`upgrade those hashes
+<wrapping-password-hashers>` to prevent a timing attack for that case.
+
+Bugfixes
+========
+
+* Skipped URL checks (new in 1.9) if the ``ROOT_URLCONF`` setting isn't defined
+  (:ticket:`26155`).
+
+* Fixed a crash on PostgreSQL that prevented using ``TIME_ZONE=None`` and
+  ``USE_TZ=False`` (:ticket:`26177`).
+
+* Added system checks for query name clashes of hidden relationships
+  (:ticket:`26162`).
+
+* Fixed a regression for cases where
+  ``ForeignObject.get_extra_descriptor_filter()`` returned a ``Q`` object
+  (:ticket:`26153`).
+
+* Fixed regression with an ``__in=qs`` lookup for a ``ForeignKey`` with
+  ``to_field`` set (:ticket:`26196`).
+
+* Made ``forms.FileField`` and ``utils.translation.lazy_number()`` picklable
+  (:ticket:`26212`).
+
+* Fixed :class:`~django.contrib.postgres.fields.RangeField` and
+  :class:`~django.contrib.postgres.fields.ArrayField` serialization with
+  ``None`` values (:ticket:`26215`).
+
+* Fixed a crash when filtering by a ``Decimal`` in ``RawQuery``
+  (:ticket:`26219`).
+
+* Reallowed dashes in top-level domain names of URLs checked by
+  ``URLValidator`` to fix a regression in Django 1.8 (:ticket:`26204`).
+
+* Fixed some crashing deprecation shims in ``SimpleTemplateResponse`` that
+  regressed in Django 1.9 (:ticket:`26253`).
+
+* Fixed ``BoundField`` to reallow slices of subwidgets (:ticket:`26267`).
+
+* Changed the admin's "permission denied" message in the login template to use
+  ``get_username`` instead of ``username`` to support custom user models
+  (:ticket:`26231`).
+
+* Fixed a crash when passing a nonexistent template name to the cached template
+  loader's ``load_template()`` method (:ticket:`26280`).
+
+* Prevented ``ContentTypeManager`` instances from sharing their cache
+  (:ticket:`26286`).
+
+* Reverted a change in Django 1.9.2 (:ticket:`25858`) that prevented relative
+  lazy relationships defined on abstract models to be resolved according to
+  their concrete model's ``app_label`` (:ticket:`26186`).

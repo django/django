@@ -7,7 +7,7 @@ import tempfile
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
-    VALID_KEY_CHARS, CreateError, SessionBase,
+    VALID_KEY_CHARS, CreateError, SessionBase, UpdateError,
 )
 from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
@@ -71,6 +71,15 @@ class SessionStore(SessionBase):
             modification = datetime.datetime.fromtimestamp(modification)
         return modification
 
+    def _expiry_date(self, session_data):
+        """
+        Return the expiry time of the file storing the session's content.
+        """
+        expiry = session_data.get('_session_expiry')
+        if not expiry:
+            expiry = self._last_modification() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)
+        return expiry
+
     def load(self):
         session_data = {}
         try:
@@ -83,21 +92,18 @@ class SessionStore(SessionBase):
                     session_data = self.decode(file_data)
                 except (EOFError, SuspiciousOperation) as e:
                     if isinstance(e, SuspiciousOperation):
-                        logger = logging.getLogger('django.security.%s' %
-                                e.__class__.__name__)
+                        logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
                         logger.warning(force_text(e))
                     self.create()
 
                 # Remove expired sessions.
-                expiry_age = self.get_expiry_age(
-                    modification=self._last_modification(),
-                    expiry=session_data.get('_session_expiry'))
-                if expiry_age < 0:
+                expiry_age = self.get_expiry_age(expiry=self._expiry_date(session_data))
+                if expiry_age <= 0:
                     session_data = {}
                     self.delete()
                     self.create()
         except (IOError, SuspiciousOperation):
-            self.create()
+            self._session_key = None
         return session_data
 
     def create(self):
@@ -108,10 +114,11 @@ class SessionStore(SessionBase):
             except CreateError:
                 continue
             self.modified = True
-            self._session_cache = {}
             return
 
     def save(self, must_create=False):
+        if self.session_key is None:
+            return self.create()
         # Get the session data now, before we start messing
         # with the file it is stored within.
         session_data = self._get_session(no_load=must_create)
@@ -121,15 +128,17 @@ class SessionStore(SessionBase):
         try:
             # Make sure the file exists.  If it does not already exist, an
             # empty placeholder file is created.
-            flags = os.O_WRONLY | os.O_CREAT | getattr(os, 'O_BINARY', 0)
+            flags = os.O_WRONLY | getattr(os, 'O_BINARY', 0)
             if must_create:
-                flags |= os.O_EXCL
+                flags |= os.O_EXCL | os.O_CREAT
             fd = os.open(session_file_name, flags)
             os.close(fd)
 
         except OSError as e:
             if must_create and e.errno == errno.EEXIST:
                 raise CreateError
+            if not must_create and e.errno == errno.ENOENT:
+                raise UpdateError
             raise
 
         # Write the session file without interfering with other threads
@@ -150,8 +159,7 @@ class SessionStore(SessionBase):
         dir, prefix = os.path.split(session_file_name)
 
         try:
-            output_file_fd, output_file_name = tempfile.mkstemp(dir=dir,
-                prefix=prefix + '_out_')
+            output_file_fd, output_file_name = tempfile.mkstemp(dir=dir, prefix=prefix + '_out_')
             renamed = False
             try:
                 try:

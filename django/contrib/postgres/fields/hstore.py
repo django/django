@@ -5,6 +5,7 @@ from django.contrib.postgres.fields.array import ArrayField
 from django.core import exceptions
 from django.db.models import Field, TextField, Transform
 from django.utils import six
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 __all__ = ['HStoreField']
@@ -42,8 +43,7 @@ class HStoreField(Field):
         return value
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
-        return json.dumps(value)
+        return json.dumps(self.value_from_object(obj))
 
     def formfield(self, **kwargs):
         defaults = {
@@ -52,6 +52,22 @@ class HStoreField(Field):
         defaults.update(kwargs)
         return super(HStoreField, self).formfield(**defaults)
 
+    def get_prep_value(self, value):
+        value = super(HStoreField, self).get_prep_value(value)
+
+        if isinstance(value, dict):
+            prep_value = {}
+            for key, val in value.items():
+                key = force_text(key)
+                if val is not None:
+                    val = force_text(val)
+                prep_value[key] = val
+            value = prep_value
+
+        if isinstance(value, list):
+            value = [force_text(item) for item in value]
+
+        return value
 
 HStoreField.register_lookup(lookups.DataContains)
 HStoreField.register_lookup(lookups.ContainedBy)
@@ -82,14 +98,14 @@ class KeyTransformFactory(object):
 
 
 @HStoreField.register_lookup
-class KeysTransform(lookups.FunctionTransform):
+class KeysTransform(Transform):
     lookup_name = 'keys'
     function = 'akeys'
     output_field = ArrayField(TextField())
 
 
 @HStoreField.register_lookup
-class ValuesTransform(lookups.FunctionTransform):
+class ValuesTransform(Transform):
     lookup_name = 'values'
     function = 'avals'
     output_field = ArrayField(TextField())

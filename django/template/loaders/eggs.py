@@ -15,6 +15,8 @@ try:
 except ImportError:
     resource_string = None
 
+warnings.warn('The egg template loader is deprecated.', RemovedInDjango20Warning)
+
 
 class EggOrigin(Origin):
 
@@ -34,7 +36,7 @@ class Loader(BaseLoader):
     def get_contents(self, origin):
         try:
             source = resource_string(origin.app_name, origin.pkg_name)
-        except:
+        except Exception:
             raise TemplateDoesNotExist(origin)
 
         if six.PY2:

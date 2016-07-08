@@ -10,7 +10,7 @@ This document will get you up and running with Django on top of Jython.
 Installing Jython
 =================
 
-Django works with Jython versions 2.7b2 and higher. See the Jython_ Web site for
+Django works with Jython versions 2.7b2 and higher. See the Jython_ website for
 download and installation instructions.
 
 .. _jython: http://www.jython.org/
@@ -26,9 +26,9 @@ If you want to use Django on a production site, use a Java servlet container,
 such as `Apache Tomcat`_. Full JavaEE applications servers such as `GlassFish`_
 or `JBoss`_ are also OK, if you need the extra features they include.
 
-.. _`Apache Tomcat`: http://tomcat.apache.org/
+.. _`Apache Tomcat`: https://tomcat.apache.org/
 .. _GlassFish: https://glassfish.java.net/
-.. _JBoss: http://www.jboss.org/
+.. _JBoss: https://www.jboss.org/
 
 Installing Django
 =================
@@ -45,10 +45,10 @@ The `django-jython`_ project contains database backends and management commands
 for Django/Jython development. Note that the builtin Django backends won't work
 on top of Jython.
 
-.. _`django-jython`: http://code.google.com/p/django-jython/
+.. _`django-jython`: https://github.com/beachmachine/django-jython
 
 To install it, follow the `installation instructions`_ detailed on the project
-Web site. Also, read the `database backends`_ documentation there.
+website. Also, read the `database backends`_ documentation there.
 
 .. _`installation instructions`: https://pythonhosted.org/django-jython/quickstart.html#install
 .. _`database backends`: https://pythonhosted.org/django-jython/database-backends.html
@@ -71,4 +71,4 @@ running on standard Python. However, are a few differences to keep in mind:
 
 * Any part of Django that requires `Pillow`_ will not work.
 
-.. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Pillow: https://pillow.readthedocs.io/en/latest/

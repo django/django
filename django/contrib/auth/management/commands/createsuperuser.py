@@ -8,6 +8,7 @@ import sys
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management import get_default_username
+from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
@@ -22,6 +23,7 @@ class NotRunningInTTYException(Exception):
 
 class Command(BaseCommand):
     help = 'Used to create a superuser.'
+    requires_migrations_checks = True
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
@@ -29,44 +31,57 @@ class Command(BaseCommand):
         self.username_field = self.UserModel._meta.get_field(self.UserModel.USERNAME_FIELD)
 
     def add_arguments(self, parser):
-        parser.add_argument('--%s' % self.UserModel.USERNAME_FIELD,
+        parser.add_argument(
+            '--%s' % self.UserModel.USERNAME_FIELD,
             dest=self.UserModel.USERNAME_FIELD, default=None,
-            help='Specifies the login for the superuser.')
-        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
-            help=('Tells Django to NOT prompt the user for input of any kind. '
-                  'You must use --%s with --noinput, along with an option for '
-                  'any other required field. Superusers created with --noinput will '
-                  ' not be able to log in until they\'re given a valid password.' %
-                  self.UserModel.USERNAME_FIELD))
-        parser.add_argument('--database', action='store', dest='database',
-                default=DEFAULT_DB_ALIAS,
-                help='Specifies the database to use. Default is "default".')
+            help='Specifies the login for the superuser.',
+        )
+        parser.add_argument(
+            '--noinput', '--no-input',
+            action='store_false', dest='interactive', default=True,
+            help=(
+                'Tells Django to NOT prompt the user for input of any kind. '
+                'You must use --%s with --noinput, along with an option for '
+                'any other required field. Superusers created with --noinput will '
+                'not be able to log in until they\'re given a valid password.' %
+                self.UserModel.USERNAME_FIELD
+            ),
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS,
+            help='Specifies the database to use. Default is "default".',
+        )
         for field in self.UserModel.REQUIRED_FIELDS:
-            parser.add_argument('--%s' % field, dest=field, default=None,
-                help='Specifies the %s for the superuser.' % field)
+            parser.add_argument(
+                '--%s' % field, dest=field, default=None,
+                help='Specifies the %s for the superuser.' % field,
+            )
 
     def execute(self, *args, **options):
         self.stdin = options.get('stdin', sys.stdin)  # Used for testing
         return super(Command, self).execute(*args, **options)
 
     def handle(self, *args, **options):
-        username = options.get(self.UserModel.USERNAME_FIELD)
-        database = options.get('database')
+        username = options[self.UserModel.USERNAME_FIELD]
+        database = options['database']
 
         # If not provided, create the user with an unusable password
         password = None
         user_data = {}
+        # Same as user_data but with foreign keys as fake model instances
+        # instead of raw IDs.
+        fake_user_data = {}
 
         # Do quick and dirty validation if --noinput
         if not options['interactive']:
             try:
                 if not username:
-                    raise CommandError("You must use --%s with --noinput." %
-                            self.UserModel.USERNAME_FIELD)
+                    raise CommandError("You must use --%s with --noinput." % self.UserModel.USERNAME_FIELD)
                 username = self.username_field.clean(username, None)
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
-                    if options.get(field_name):
+                    if options[field_name]:
                         field = self.UserModel._meta.get_field(field_name)
                         user_data[field_name] = field.clean(options[field_name], None)
                     else:
@@ -112,7 +127,7 @@ class Command(BaseCommand):
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)
-                    user_data[field_name] = options.get(field_name)
+                    user_data[field_name] = options[field_name]
                     while user_data[field_name] is None:
                         message = force_str('%s%s: ' % (
                             capfirst(field.verbose_name),
@@ -121,21 +136,35 @@ class Command(BaseCommand):
                                 field.remote_field.field_name,
                             ) if field.remote_field else '',
                         ))
-                        user_data[field_name] = self.get_input_data(field, message)
+                        input_value = self.get_input_data(field, message)
+                        user_data[field_name] = input_value
+                        fake_user_data[field_name] = input_value
+
+                        # Wrap any foreign keys in fake model instances
+                        if field.remote_field:
+                            fake_user_data[field_name] = field.remote_field.model(input_value)
 
                 # Get a password
                 while password is None:
-                    if not password:
-                        password = getpass.getpass()
-                        password2 = getpass.getpass(force_str('Password (again): '))
-                        if password != password2:
-                            self.stderr.write("Error: Your passwords didn't match.")
-                            password = None
-                            continue
+                    password = getpass.getpass()
+                    password2 = getpass.getpass(force_str('Password (again): '))
+                    if password != password2:
+                        self.stderr.write("Error: Your passwords didn't match.")
+                        password = None
+                        # Don't validate passwords that don't match.
+                        continue
+
                     if password.strip() == '':
                         self.stderr.write("Error: Blank passwords aren't allowed.")
                         password = None
+                        # Don't validate blank passwords.
                         continue
+
+                    try:
+                        validate_password(password2, self.UserModel(**fake_user_data))
+                    except exceptions.ValidationError as err:
+                        self.stderr.write('\n'.join(err.messages))
+                        password = None
 
             except KeyboardInterrupt:
                 self.stderr.write("\nOperation cancelled.")

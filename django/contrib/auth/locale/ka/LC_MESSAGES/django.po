@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-19 07:56+0000\n"
-"Last-Translator: André Bouatchidzé <a@anbz.net>\n"
-"Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-10-11 08:53+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Georgian (http://www.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,7 +29,7 @@ msgstr "მნიშვნელოვანი თარიღები"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s ობიექტი პირველადი გასაღებით %(key)r არ არსებობს."
 
 msgid "Password changed successfully."
 msgstr "პაროლი წარმატებით შეიცვალა."
@@ -39,7 +39,13 @@ msgid "Change password: %s"
 msgstr "შევცვალოთ პაროლი: %s"
 
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "იდენტიფიკაცია და ავტორიზაცია"
+
+msgid "password"
+msgstr "პაროლი"
+
+msgid "last login"
+msgstr "ბოლო შესვლა"
 
 msgid "No password set."
 msgstr "არ არის დაყენებული პაროლი."
@@ -56,17 +62,14 @@ msgstr "პაროლი"
 msgid "Password confirmation"
 msgstr "პაროლის დამოწმება"
 
-msgid "Enter the same password as above, for verification."
-msgstr "შეიყვანეთ იგივე პაროლი, დამოწმებისათვის."
+msgid "Enter the same password as before, for verification."
+msgstr ""
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"დაუმუშავებელი პაროლები არ ინახება, ასე რომ, არ არსებობს ამ მომხმარებლის "
-"პაროლის ნახვის საშუალება, მაგრამ თქვენ შეგიძლიათ შეცვალოთ პაროლი <a href="
-"\"password/\">ამ ფორმის</a> მეშვეობით."
 
 #, python-format
 msgid ""
@@ -118,6 +121,9 @@ msgstr "საკონტროლო ჯამი"
 msgid "name"
 msgstr "სახელი"
 
+msgid "content type"
+msgstr ""
+
 msgid "codename"
 msgstr "კოდური სახელი"
 
@@ -133,12 +139,6 @@ msgstr "ჯგუფი"
 msgid "groups"
 msgstr "ჯგუფები"
 
-msgid "password"
-msgstr "პაროლი"
-
-msgid "last login"
-msgstr "ბოლო შესვლა"
-
 msgid "superuser status"
 msgstr "სუპერმომხმარებლის სტატუსი"
 
@@ -151,6 +151,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"ჯგუფები, რომლებსაც მიეკუთვნება ეს მომხმარებელი. მომხმარებელი მიიღებს ყველა "
+"უფლებას, რომელიც მინიჭებული აქვს მის თითოეულ ჯგუფს."
 
 msgid "user permissions"
 msgstr "მომხმარებლის უფლებები"
@@ -170,6 +172,8 @@ msgid ""
 "Enter a valid username. This value may contain only letters, numbers and @/./"
 "+/-/_ characters."
 msgstr ""
+"შეიყვანეთ სწორი მომხმარებლის სახელი. ეს მნიშვნელობა შეიძლება შედგებოდეს "
+"მხოლოდ ასოებისგან, რიცხვებისგან და  @/./+/-/_ სიმბოლოებისგან."
 
 msgid "A user with that username already exists."
 msgstr "მომხმარებელი ამ სახელით უკვე არსებობს."
@@ -210,6 +214,39 @@ msgid "users"
 msgstr "მომხმარებლები"
 
 #, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr ""
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+
+msgid "This password is too common."
+msgstr ""
+
+msgid "Your password can't be a commonly used password."
+msgstr ""
+
+msgid "This password is entirely numeric."
+msgstr ""
+
+msgid "Your password can't be entirely numeric."
+msgstr ""
+
+#, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "პაროლის თავიდან დაყენება %(site_name)s-ზე"
 
@@ -217,19 +254,19 @@ msgid "Logged out"
 msgstr "გამოსული ხართ"
 
 msgid "Password reset"
-msgstr ""
+msgstr "პაროლის აღდგენა"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "პაროლის აღდგენა გაგზავნილია"
 
 msgid "Enter new password"
 msgstr "შეიყვანეთ ახალი პაროლი"
 
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "პაროლის აღდგენა წარუმატებლად დასრულდა"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "პაროლის აღდგენა დასრულებულია"
 
 msgid "Password change"
 msgstr "პაროლის შეცვლა"

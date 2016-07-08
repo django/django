@@ -1,4 +1,5 @@
 from django import template
+from django.apps import apps
 from django.utils.encoding import iri_to_uri
 from django.utils.six.moves.urllib.parse import urljoin
 
@@ -65,7 +66,6 @@ def get_static_prefix(parser, token):
 
         {% get_static_prefix %}
         {% get_static_prefix as static_prefix %}
-
     """
     return PrefixNode.handle_token(parser, token, "STATIC_URL")
 
@@ -84,7 +84,6 @@ def get_media_prefix(parser, token):
 
         {% get_media_prefix %}
         {% get_media_prefix as media_prefix %}
-
     """
     return PrefixNode.handle_token(parser, token, "MEDIA_URL")
 
@@ -110,7 +109,11 @@ class StaticNode(template.Node):
 
     @classmethod
     def handle_simple(cls, path):
-        return urljoin(PrefixNode.handle_simple("STATIC_URL"), path)
+        if apps.is_installed('django.contrib.staticfiles'):
+            from django.contrib.staticfiles.storage import staticfiles_storage
+            return staticfiles_storage.url(path)
+        else:
+            return urljoin(PrefixNode.handle_simple("STATIC_URL"), path)
 
     @classmethod
     def handle_token(cls, parser, token):
@@ -148,10 +151,13 @@ def do_static(parser, token):
         {% static variable_with_path %}
         {% static "myapp/css/base.css" as admin_base_css %}
         {% static variable_with_path as varname %}
-
     """
     return StaticNode.handle_token(parser, token)
 
 
 def static(path):
+    """
+    Given a relative path to a static asset, return the absolute path to the
+    asset.
+    """
     return StaticNode.handle_simple(path)

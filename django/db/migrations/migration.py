@@ -41,6 +41,17 @@ class Migration(object):
     # are not applied.
     replaces = []
 
+    # Is this an initial migration? Initial migrations are skipped on
+    # --fake-initial if the table or fields already exist. If None, check if
+    # the migration has any dependencies to determine if there are dependencies
+    # to tell if db introspection needs to be done. If True, always perform
+    # introspection. If False, never perform introspection.
+    initial = None
+
+    # Whether to wrap the whole migration in a transaction. Only has an effect
+    # on database backends which support transactional DDL.
+    atomic = True
+
     def __init__(self, name, app_label):
         self.name = name
         self.app_label = app_label
@@ -107,8 +118,10 @@ class Migration(object):
             old_state = project_state.clone()
             operation.state_forwards(self.app_label, project_state)
             # Run the operation
-            if not schema_editor.connection.features.can_rollback_ddl and operation.atomic:
-                # We're forcing a transaction on a non-transactional-DDL backend
+            atomic_operation = operation.atomic or (self.atomic and operation.atomic is not False)
+            if not schema_editor.atomic_migration and atomic_operation:
+                # Force a transaction on a non-transactional-DDL backend or an
+                # atomic operation inside a non-atomic migration.
                 with atomic(schema_editor.connection.alias):
                     operation.database_forwards(self.app_label, schema_editor, old_state, project_state)
             else:

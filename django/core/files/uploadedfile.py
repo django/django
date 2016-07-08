@@ -61,11 +61,7 @@ class TemporaryUploadedFile(UploadedFile):
     A file uploaded to a temporary location (i.e. stream-to-disk).
     """
     def __init__(self, name, content_type, size, charset, content_type_extra=None):
-        if settings.FILE_UPLOAD_TEMP_DIR:
-            file = tempfile.NamedTemporaryFile(suffix='.upload',
-                dir=settings.FILE_UPLOAD_TEMP_DIR)
-        else:
-            file = tempfile.NamedTemporaryFile(suffix='.upload')
+        file = tempfile.NamedTemporaryFile(suffix='.upload', dir=settings.FILE_UPLOAD_TEMP_DIR)
         super(TemporaryUploadedFile, self).__init__(file, name, content_type, size, charset, content_type_extra)
 
     def temporary_file_path(self):

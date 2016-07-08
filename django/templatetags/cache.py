@@ -86,8 +86,8 @@ def do_cache(parser, token):
         tokens = tokens[:-1]
     else:
         cache_name = None
-    return CacheNode(nodelist,
-        parser.compile_filter(tokens[1]),
+    return CacheNode(
+        nodelist, parser.compile_filter(tokens[1]),
         tokens[2],  # fragment_name can't be a variable.
         [parser.compile_filter(t) for t in tokens[3:]],
         cache_name,

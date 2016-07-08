@@ -62,10 +62,8 @@ class GetOrCreateTests(TestCase):
         If you don't specify a value or default value for all required
         fields, you will get an error.
         """
-        self.assertRaises(
-            IntegrityError,
-            Person.objects.get_or_create, first_name="Tom", last_name="Smith"
-        )
+        with self.assertRaises(IntegrityError):
+            Person.objects.get_or_create(first_name="Tom", last_name="Smith")
 
     def test_get_or_create_on_related_manager(self):
         p = Publisher.objects.create(name="Acme Publishing")
@@ -148,6 +146,25 @@ class GetOrCreateTests(TestCase):
         self.assertFalse(created)
         self.assertEqual(obj, obj2)
 
+    def test_callable_defaults(self):
+        """
+        Callables in `defaults` are evaluated if the instance is created.
+        """
+        obj, created = Person.objects.get_or_create(
+            first_name="George",
+            defaults={"last_name": "Harrison", "birthday": lambda: date(1943, 2, 25)},
+        )
+        self.assertTrue(created)
+        self.assertEqual(date(1943, 2, 25), obj.birthday)
+
+    def test_callable_defaults_not_called(self):
+        def raise_exception():
+            raise AssertionError
+        obj, created = Person.objects.get_or_create(
+            first_name="John", last_name="Lennon",
+            defaults={"birthday": lambda: raise_exception()},
+        )
+
 
 class GetOrCreateTestsWithManualPKs(TestCase):
 
@@ -159,10 +176,8 @@ class GetOrCreateTestsWithManualPKs(TestCase):
         If you specify an existing primary key, but different other fields,
         then you will get an error and data will not be updated.
         """
-        self.assertRaises(
-            IntegrityError,
-            ManualPrimaryKeyTest.objects.get_or_create, id=1, data="Different"
-        )
+        with self.assertRaises(IntegrityError):
+            ManualPrimaryKeyTest.objects.get_or_create(id=1, data="Different")
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")
 
     def test_get_or_create_raises_IntegrityError_plus_traceback(self):
@@ -197,13 +212,10 @@ class GetOrCreateTestsWithManualPKs(TestCase):
 
     def test_get_or_create_empty(self):
         """
-        Regression test for #16137: get_or_create does not require kwargs.
+        If all the attributes on a model have defaults, get_or_create() doesn't
+        require any arguments.
         """
-        try:
-            DefaultPerson.objects.get_or_create()
-        except AssertionError:
-            self.fail("If all the attributes on a model have defaults, we "
-                      "shouldn't need to pass any arguments.")
+        DefaultPerson.objects.get_or_create()
 
 
 class GetOrCreateTransactionTests(TransactionTestCase):
@@ -246,7 +258,8 @@ class GetOrCreateThroughManyToMany(TestCase):
     def test_something(self):
         Tag.objects.create(text='foo')
         a_thing = Thing.objects.create(name='a')
-        self.assertRaises(IntegrityError, a_thing.tags.get_or_create, text='foo')
+        with self.assertRaises(IntegrityError):
+            a_thing.tags.get_or_create(text='foo')
 
 
 class UpdateOrCreateTests(TestCase):
@@ -292,8 +305,8 @@ class UpdateOrCreateTests(TestCase):
         If you don't specify a value or default value for all required
         fields, you will get an error.
         """
-        self.assertRaises(IntegrityError,
-            Person.objects.update_or_create, first_name="Tom", last_name="Smith")
+        with self.assertRaises(IntegrityError):
+            Person.objects.update_or_create(first_name="Tom", last_name="Smith")
 
     def test_manual_primary_key_test(self):
         """
@@ -301,10 +314,8 @@ class UpdateOrCreateTests(TestCase):
         then you will get an error and data will not be updated.
         """
         ManualPrimaryKeyTest.objects.create(id=1, data="Original")
-        self.assertRaises(
-            IntegrityError,
-            ManualPrimaryKeyTest.objects.update_or_create, id=1, data="Different"
-        )
+        with self.assertRaises(IntegrityError):
+            ManualPrimaryKeyTest.objects.update_or_create(id=1, data="Different")
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")
 
     def test_error_contains_full_traceback(self):
@@ -392,3 +403,10 @@ class UpdateOrCreateTests(TestCase):
         )
         self.assertFalse(created)
         self.assertEqual(obj.defaults, 'another testing')
+
+    def test_update_callable_default(self):
+        obj, created = Person.objects.update_or_create(
+            first_name='George', last_name='Harrison',
+            defaults={'birthday': lambda: date(1943, 2, 25)},
+        )
+        self.assertEqual(obj.birthday, date(1943, 2, 25))

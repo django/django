@@ -21,29 +21,35 @@ from django.http import (
 from django.test import SimpleTestCase
 from django.utils import six
 from django.utils._os import upath
-from django.utils.encoding import force_text, smart_str
-from django.utils.functional import lazy
-
-lazystr = lazy(force_text, six.text_type)
+from django.utils.encoding import force_str
+from django.utils.functional import lazystr
 
 
-class QueryDictTests(unittest.TestCase):
+class QueryDictTests(SimpleTestCase):
     def test_create_with_no_args(self):
         self.assertEqual(QueryDict(), QueryDict(str('')))
 
     def test_missing_key(self):
         q = QueryDict()
-        self.assertRaises(KeyError, q.__getitem__, 'foo')
+        with self.assertRaises(KeyError):
+            q.__getitem__('foo')
 
     def test_immutability(self):
         q = QueryDict()
-        self.assertRaises(AttributeError, q.__setitem__, 'something', 'bar')
-        self.assertRaises(AttributeError, q.setlist, 'foo', ['bar'])
-        self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
-        self.assertRaises(AttributeError, q.update, {'foo': 'bar'})
-        self.assertRaises(AttributeError, q.pop, 'foo')
-        self.assertRaises(AttributeError, q.popitem)
-        self.assertRaises(AttributeError, q.clear)
+        with self.assertRaises(AttributeError):
+            q.__setitem__('something', 'bar')
+        with self.assertRaises(AttributeError):
+            q.setlist('foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.appendlist('foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.update({'foo': 'bar'})
+        with self.assertRaises(AttributeError):
+            q.pop('foo')
+        with self.assertRaises(AttributeError):
+            q.popitem()
+        with self.assertRaises(AttributeError):
+            q.clear()
 
     def test_immutable_get_with_default(self):
         q = QueryDict()
@@ -53,8 +59,8 @@ class QueryDictTests(unittest.TestCase):
         q = QueryDict()
         self.assertEqual(q.getlist('foo'), [])
         if six.PY2:
-            self.assertEqual(q.has_key('foo'), False)
-        self.assertEqual('foo' in q, False)
+            self.assertIs(q.has_key('foo'), False)
+        self.assertNotIn('foo', q)
         self.assertEqual(list(six.iteritems(q)), [])
         self.assertEqual(list(six.iterlists(q)), [])
         self.assertEqual(list(six.iterkeys(q)), [])
@@ -67,16 +73,20 @@ class QueryDictTests(unittest.TestCase):
 
         q = QueryDict(str('foo=bar'))
         self.assertEqual(q['foo'], 'bar')
-        self.assertRaises(KeyError, q.__getitem__, 'bar')
-        self.assertRaises(AttributeError, q.__setitem__, 'something', 'bar')
+        with self.assertRaises(KeyError):
+            q.__getitem__('bar')
+        with self.assertRaises(AttributeError):
+            q.__setitem__('something', 'bar')
 
         self.assertEqual(q.get('foo', 'default'), 'bar')
         self.assertEqual(q.get('bar', 'default'), 'default')
         self.assertEqual(q.getlist('foo'), ['bar'])
         self.assertEqual(q.getlist('bar'), [])
 
-        self.assertRaises(AttributeError, q.setlist, 'foo', ['bar'])
-        self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.setlist('foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.appendlist('foo', ['bar'])
 
         if six.PY2:
             self.assertTrue(q.has_key('foo'))
@@ -91,11 +101,16 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(list(six.itervalues(q)), ['bar'])
         self.assertEqual(len(q), 1)
 
-        self.assertRaises(AttributeError, q.update, {'foo': 'bar'})
-        self.assertRaises(AttributeError, q.pop, 'foo')
-        self.assertRaises(AttributeError, q.popitem)
-        self.assertRaises(AttributeError, q.clear)
-        self.assertRaises(AttributeError, q.setdefault, 'foo', 'bar')
+        with self.assertRaises(AttributeError):
+            q.update({'foo': 'bar'})
+        with self.assertRaises(AttributeError):
+            q.pop('foo')
+        with self.assertRaises(AttributeError):
+            q.popitem()
+        with self.assertRaises(AttributeError):
+            q.clear()
+        with self.assertRaises(AttributeError):
+            q.setdefault('foo', 'bar')
 
         self.assertEqual(q.urlencode(), 'foo=bar')
 
@@ -112,7 +127,8 @@ class QueryDictTests(unittest.TestCase):
     def test_mutable_copy(self):
         """A copy of a QueryDict is mutable."""
         q = QueryDict().copy()
-        self.assertRaises(KeyError, q.__getitem__, "foo")
+        with self.assertRaises(KeyError):
+            q.__getitem__("foo")
         q['name'] = 'john'
         self.assertEqual(q['name'], 'john')
 
@@ -171,35 +187,45 @@ class QueryDictTests(unittest.TestCase):
         q = QueryDict(str('vote=yes&vote=no'))
 
         self.assertEqual(q['vote'], 'no')
-        self.assertRaises(AttributeError, q.__setitem__, 'something', 'bar')
+        with self.assertRaises(AttributeError):
+            q.__setitem__('something', 'bar')
 
         self.assertEqual(q.get('vote', 'default'), 'no')
         self.assertEqual(q.get('foo', 'default'), 'default')
         self.assertEqual(q.getlist('vote'), ['yes', 'no'])
         self.assertEqual(q.getlist('foo'), [])
 
-        self.assertRaises(AttributeError, q.setlist, 'foo', ['bar', 'baz'])
-        self.assertRaises(AttributeError, q.setlist, 'foo', ['bar', 'baz'])
-        self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.setlist('foo', ['bar', 'baz'])
+        with self.assertRaises(AttributeError):
+            q.setlist('foo', ['bar', 'baz'])
+        with self.assertRaises(AttributeError):
+            q.appendlist('foo', ['bar'])
 
         if six.PY2:
-            self.assertEqual(q.has_key('vote'), True)
-        self.assertEqual('vote' in q, True)
+            self.assertIs(q.has_key('vote'), True)
+        self.assertIn('vote', q)
         if six.PY2:
-            self.assertEqual(q.has_key('foo'), False)
-        self.assertEqual('foo' in q, False)
+            self.assertIs(q.has_key('foo'), False)
+        self.assertNotIn('foo', q)
         self.assertEqual(list(six.iteritems(q)), [('vote', 'no')])
         self.assertEqual(list(six.iterlists(q)), [('vote', ['yes', 'no'])])
         self.assertEqual(list(six.iterkeys(q)), ['vote'])
         self.assertEqual(list(six.itervalues(q)), ['no'])
         self.assertEqual(len(q), 1)
 
-        self.assertRaises(AttributeError, q.update, {'foo': 'bar'})
-        self.assertRaises(AttributeError, q.pop, 'foo')
-        self.assertRaises(AttributeError, q.popitem)
-        self.assertRaises(AttributeError, q.clear)
-        self.assertRaises(AttributeError, q.setdefault, 'foo', 'bar')
-        self.assertRaises(AttributeError, q.__delitem__, 'vote')
+        with self.assertRaises(AttributeError):
+            q.update({'foo': 'bar'})
+        with self.assertRaises(AttributeError):
+            q.pop('foo')
+        with self.assertRaises(AttributeError):
+            q.popitem()
+        with self.assertRaises(AttributeError):
+            q.clear()
+        with self.assertRaises(AttributeError):
+            q.setdefault('foo', 'bar')
+        with self.assertRaises(AttributeError):
+            q.__delitem__('vote')
 
     if six.PY2:
         def test_invalid_input_encoding(self):
@@ -217,13 +243,13 @@ class QueryDictTests(unittest.TestCase):
     def test_pickle(self):
         q = QueryDict()
         q1 = pickle.loads(pickle.dumps(q, 2))
-        self.assertEqual(q == q1, True)
+        self.assertEqual(q, q1)
         q = QueryDict(str('a=b&c=d'))
         q1 = pickle.loads(pickle.dumps(q, 2))
-        self.assertEqual(q == q1, True)
+        self.assertEqual(q, q1)
         q = QueryDict(str('a=b&c=d&a=1'))
         q1 = pickle.loads(pickle.dumps(q, 2))
-        self.assertEqual(q == q1, True)
+        self.assertEqual(q, q1)
 
     def test_update_from_querydict(self):
         """Regression test for #8278: QueryDict.update(QueryDict)"""
@@ -245,6 +271,44 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(copy.copy(q).encoding, 'iso-8859-15')
         self.assertEqual(copy.deepcopy(q).encoding, 'iso-8859-15')
 
+    def test_querydict_fromkeys(self):
+        self.assertEqual(QueryDict.fromkeys(['key1', 'key2', 'key3']), QueryDict('key1&key2&key3'))
+
+    def test_fromkeys_with_nonempty_value(self):
+        self.assertEqual(
+            QueryDict.fromkeys(['key1', 'key2', 'key3'], value='val'),
+            QueryDict('key1=val&key2=val&key3=val')
+        )
+
+    def test_fromkeys_is_immutable_by_default(self):
+        # Match behavior of __init__() which is also immutable by default.
+        q = QueryDict.fromkeys(['key1', 'key2', 'key3'])
+        with self.assertRaisesMessage(AttributeError, 'This QueryDict instance is immutable'):
+            q['key4'] = 'nope'
+
+    def test_fromkeys_mutable_override(self):
+        q = QueryDict.fromkeys(['key1', 'key2', 'key3'], mutable=True)
+        q['key4'] = 'yep'
+        self.assertEqual(q, QueryDict('key1&key2&key3&key4=yep'))
+
+    def test_duplicates_in_fromkeys_iterable(self):
+        self.assertEqual(QueryDict.fromkeys('xyzzy'), QueryDict('x&y&z&z&y'))
+
+    def test_fromkeys_with_nondefault_encoding(self):
+        key_utf16 = b'\xff\xfe\x8e\x02\xdd\x01\x9e\x02'
+        value_utf16 = b'\xff\xfe\xdd\x01n\x00l\x00P\x02\x8c\x02'
+        q = QueryDict.fromkeys([key_utf16], value=value_utf16, encoding='utf-16')
+        expected = QueryDict('', mutable=True)
+        expected['ʎǝʞ'] = 'ǝnlɐʌ'
+        self.assertEqual(q, expected)
+
+    def test_fromkeys_empty_iterable(self):
+        self.assertEqual(QueryDict.fromkeys([]), QueryDict(''))
+
+    def test_fromkeys_noniterable(self):
+        with self.assertRaises(TypeError):
+            QueryDict.fromkeys(0)
+
 
 class HttpResponseTests(unittest.TestCase):
 
@@ -265,10 +329,10 @@ class HttpResponseTests(unittest.TestCase):
 
         # Latin-1 unicode or bytes values are also converted to native strings.
         r['key'] = 'café'
-        self.assertEqual(r['key'], smart_str('café', 'latin-1'))
+        self.assertEqual(r['key'], force_str('café', 'latin-1'))
         self.assertIsInstance(r['key'], str)
         r['key'] = 'café'.encode('latin-1')
-        self.assertEqual(r['key'], smart_str('café', 'latin-1'))
+        self.assertEqual(r['key'], force_str('café', 'latin-1'))
         self.assertIsInstance(r['key'], str)
         self.assertIn('café'.encode('latin-1'), r.serialize_headers())
 
@@ -297,8 +361,10 @@ class HttpResponseTests(unittest.TestCase):
         self.assertIsInstance(l[0][0], str)
 
         r = HttpResponse()
-        self.assertRaises(UnicodeError, r.__setitem__, 'føø', 'bar')
-        self.assertRaises(UnicodeError, r.__setitem__, 'føø'.encode('utf-8'), 'bar')
+        with self.assertRaises(UnicodeError):
+            r.__setitem__('føø', 'bar')
+        with self.assertRaises(UnicodeError):
+            r.__setitem__('føø'.encode('utf-8'), 'bar')
 
     def test_long_line(self):
         # Bug #20889: long lines trigger newlines to be added to headers
@@ -309,20 +375,22 @@ class HttpResponseTests(unittest.TestCase):
         h['Content-Disposition'] = 'attachment; filename="%s"' % f
         # This one is triggering http://bugs.python.org/issue20747, that is Python
         # will itself insert a newline in the header
-        h['Content-Disposition'] = 'attachement; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
+        h['Content-Disposition'] = 'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
         r = HttpResponse()
-        self.assertRaises(BadHeaderError, r.__setitem__, 'test\rstr', 'test')
-        self.assertRaises(BadHeaderError, r.__setitem__, 'test\nstr', 'test')
+        with self.assertRaises(BadHeaderError):
+            r.__setitem__('test\rstr', 'test')
+        with self.assertRaises(BadHeaderError):
+            r.__setitem__('test\nstr', 'test')
 
     def test_dict_behavior(self):
         """
         Test for bug #14020: Make HttpResponse.get work like dict.get
         """
         r = HttpResponse()
-        self.assertEqual(r.get('test'), None)
+        self.assertIsNone(r.get('test'))
 
     def test_non_string_content(self):
         # Bug 16494: HttpResponse should behave consistently with non-strings
@@ -409,7 +477,7 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r.getvalue(), b'asdf')
 
         r = HttpResponse()
-        self.assertEqual(r.writable(), True)
+        self.assertIs(r.writable(), True)
         r.writelines(['foo\n', 'bar\n', 'baz\n'])
         self.assertEqual(r.content, b'foo\nbar\nbaz\n')
 
@@ -420,10 +488,10 @@ class HttpResponseTests(unittest.TestCase):
             'file:///etc/passwd',
         ]
         for url in bad_urls:
-            self.assertRaises(SuspiciousOperation,
-                              HttpResponseRedirect, url)
-            self.assertRaises(SuspiciousOperation,
-                              HttpResponsePermanentRedirect, url)
+            with self.assertRaises(SuspiciousOperation):
+                HttpResponseRedirect(url)
+            with self.assertRaises(SuspiciousOperation):
+                HttpResponsePermanentRedirect(url)
 
 
 class HttpResponseSubclassesTests(SimpleTestCase):
@@ -431,9 +499,11 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         response = HttpResponseRedirect('/redirected/')
         self.assertEqual(response.status_code, 302)
         # Test that standard HttpResponse init args can be used
-        response = HttpResponseRedirect('/redirected/',
+        response = HttpResponseRedirect(
+            '/redirected/',
             content='The resource has temporarily moved',
-            content_type='text/html')
+            content_type='text/html',
+        )
         self.assertContains(response, 'The resource has temporarily moved', status_code=302)
         # Test that url attribute is right
         self.assertEqual(response.url, response['Location'])
@@ -442,6 +512,11 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         """Make sure HttpResponseRedirect works with lazy strings."""
         r = HttpResponseRedirect(lazystr('/redirected/'))
         self.assertEqual(r.url, '/redirected/')
+
+    def test_redirect_repr(self):
+        response = HttpResponseRedirect('/redirected/')
+        expected = '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", url="/redirected/">'
+        self.assertEqual(repr(response), expected)
 
     def test_not_modified(self):
         response = HttpResponseNotModified()
@@ -455,10 +530,13 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         response = HttpResponseNotAllowed(['GET'])
         self.assertEqual(response.status_code, 405)
         # Test that standard HttpResponse init args can be used
-        response = HttpResponseNotAllowed(['GET'],
-            content='Only the GET method is allowed',
-            content_type='text/html')
+        response = HttpResponseNotAllowed(['GET'], content='Only the GET method is allowed', content_type='text/html')
         self.assertContains(response, 'Only the GET method is allowed', status_code=405)
+
+    def test_not_allowed_repr(self):
+        response = HttpResponseNotAllowed(['GET', 'OPTIONS'], content_type='text/plain')
+        expected = '<HttpResponseNotAllowed [GET, OPTIONS] status_code=405, "text/plain">'
+        self.assertEqual(repr(response), expected)
 
 
 class JsonResponseTests(SimpleTestCase):
@@ -468,9 +546,11 @@ class JsonResponseTests(SimpleTestCase):
         self.assertEqual(json.loads(response.content.decode()), data)
 
     def test_json_response_raises_type_error_with_default_setting(self):
-        with self.assertRaisesMessage(TypeError,
-                'In order to allow non-dict objects to be serialized set the '
-                'safe parameter to False'):
+        with self.assertRaisesMessage(
+            TypeError,
+            'In order to allow non-dict objects to be serialized set the '
+            'safe parameter to False'
+        ):
             JsonResponse([1, 2, 3])
 
     def test_json_response_text(self):
@@ -493,6 +573,10 @@ class JsonResponseTests(SimpleTestCase):
 
         response = JsonResponse({}, encoder=CustomDjangoJSONEncoder)
         self.assertEqual(json.loads(response.content.decode()), {'foo': 'bar'})
+
+    def test_json_response_passing_arguments_to_json_dumps(self):
+        response = JsonResponse({'foo': 'bar'}, json_dumps_params={'indent': 2})
+        self.assertEqual(response.content.decode(), '{\n  "foo": "bar"\n}')
 
 
 class StreamingHttpResponseTests(SimpleTestCase):
@@ -576,18 +660,8 @@ class FileCloseTests(SimpleTestCase):
         # file isn't closed until we close the response.
         file1 = open(filename)
         r = HttpResponse(file1)
-        self.assertFalse(file1.closed)
-        r.close()
         self.assertTrue(file1.closed)
-
-        # don't automatically close file when we finish iterating the response.
-        file1 = open(filename)
-        r = HttpResponse(file1)
-        self.assertFalse(file1.closed)
-        list(r)
-        self.assertFalse(file1.closed)
         r.close()
-        self.assertTrue(file1.closed)
 
         # when multiple file are assigned as content, make sure they are all
         # closed with the response.
@@ -595,9 +669,6 @@ class FileCloseTests(SimpleTestCase):
         file2 = open(filename)
         r = HttpResponse(file1)
         r.content = file2
-        self.assertFalse(file1.closed)
-        self.assertFalse(file2.closed)
-        r.close()
         self.assertTrue(file1.closed)
         self.assertTrue(file2.closed)
 
@@ -643,6 +714,8 @@ class CookieTests(unittest.TestCase):
         c2 = SimpleCookie()
         c2.load(c.output()[12:])
         self.assertEqual(c['test'].value, c2['test'].value)
+        c3 = parse_cookie(c.output()[12:])
+        self.assertEqual(c['test'].value, c3['test'])
 
     def test_decode_2(self):
         """
@@ -653,6 +726,8 @@ class CookieTests(unittest.TestCase):
         c2 = SimpleCookie()
         c2.load(c.output()[12:])
         self.assertEqual(c['test'].value, c2['test'].value)
+        c3 = parse_cookie(c.output()[12:])
+        self.assertEqual(c['test'].value, c3['test'])
 
     def test_nonstandard_keys(self):
         """
@@ -665,6 +740,52 @@ class CookieTests(unittest.TestCase):
         Test that a repeated non-standard name doesn't affect all cookies. Ticket #15852
         """
         self.assertIn('good_cookie', parse_cookie('a:=b; a:=c; good_cookie=yes').keys())
+
+    def test_python_cookies(self):
+        """
+        Test cases copied from Python's Lib/test/test_http_cookies.py
+        """
+        self.assertEqual(parse_cookie('chips=ahoy; vienna=finger'), {'chips': 'ahoy', 'vienna': 'finger'})
+        # Here parse_cookie() differs from Python's cookie parsing in that it
+        # treats all semicolons as delimiters, even within quotes.
+        self.assertEqual(
+            parse_cookie('keebler="E=mc2; L=\\"Loves\\"; fudge=\\012;"'),
+            {'keebler': '"E=mc2', 'L': '\\"Loves\\"', 'fudge': '\\012', '': '"'}
+        )
+        # Illegal cookies that have an '=' char in an unquoted value.
+        self.assertEqual(parse_cookie('keebler=E=mc2'), {'keebler': 'E=mc2'})
+        # Cookies with ':' character in their name.
+        self.assertEqual(parse_cookie('key:term=value:term'), {'key:term': 'value:term'})
+        # Cookies with '[' and ']'.
+        self.assertEqual(parse_cookie('a=b; c=[; d=r; f=h'), {'a': 'b', 'c': '[', 'd': 'r', 'f': 'h'})
+
+    def test_cookie_edgecases(self):
+        # Cookies that RFC6265 allows.
+        self.assertEqual(parse_cookie('a=b; Domain=example.com'), {'a': 'b', 'Domain': 'example.com'})
+        # parse_cookie() has historically kept only the last cookie with the
+        # same name.
+        self.assertEqual(parse_cookie('a=b; h=i; a=c'), {'a': 'c', 'h': 'i'})
+
+    def test_invalid_cookies(self):
+        """
+        Cookie strings that go against RFC6265 but browsers will send if set
+        via document.cookie.
+        """
+        # Chunks without an equals sign appear as unnamed values per
+        # https://bugzilla.mozilla.org/show_bug.cgi?id=169091
+        self.assertIn('django_language', parse_cookie('abc=def; unnamed; django_language=en').keys())
+        # Even a double quote may be an unamed value.
+        self.assertEqual(parse_cookie('a=b; "; c=d'), {'a': 'b', '': '"', 'c': 'd'})
+        # Spaces in names and values, and an equals sign in values.
+        self.assertEqual(parse_cookie('a b c=d e = f; gh=i'), {'a b c': 'd e = f', 'gh': 'i'})
+        # More characters the spec forbids.
+        self.assertEqual(parse_cookie('a   b,c<>@:/[]?{}=d  "  =e,f g'), {'a   b,c<>@:/[]?{}': 'd  "  =e,f g'})
+        # Unicode characters. The spec only allows ASCII.
+        self.assertEqual(parse_cookie('saint=André Bessette'), {'saint': force_str('André Bessette')})
+        # Browsers don't send extra whitespace or semicolons in Cookie headers,
+        # but parse_cookie() should parse whitespace the same way
+        # document.cookie parses whitespace.
+        self.assertEqual(parse_cookie('  =  b  ;  ;  =  ;   c  =  ;  '), {'': 'b', 'c': ''})
 
     def test_httponly_after_load(self):
         """

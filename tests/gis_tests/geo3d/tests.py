@@ -2,28 +2,20 @@ from __future__ import unicode_literals
 
 import os
 import re
-from unittest import skipUnless
 
 from django.contrib.gis.db.models import Extent3D, Union
 from django.contrib.gis.db.models.functions import (
     AsGeoJSON, AsKML, Length, Perimeter, Scale, Translate,
 )
-from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils._os import upath
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import (
     City3D, Interstate2D, Interstate3D, InterstateProj2D, InterstateProj3D,
     MultiPoint3D, Point2D, Point3D, Polygon2D, Polygon3D,
 )
-
-if HAS_GDAL:
-    from django.contrib.gis.utils import LayerMapping, LayerMapError
-
 
 data_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
 city_file = os.path.join(data_path, 'cities', 'cities.shp')
@@ -93,7 +85,9 @@ class Geo3DLoadingHelper(object):
 
     def _load_city_data(self):
         for name, pnt_data in city_data:
-            City3D.objects.create(name=name, point=Point(*pnt_data, srid=4326))
+            City3D.objects.create(
+                name=name, point=Point(*pnt_data, srid=4326), pointg=Point(*pnt_data, srid=4326),
+            )
 
     def _load_polygon_data(self):
         bbox_wkt, bbox_z = bbox_data
@@ -103,7 +97,6 @@ class Geo3DLoadingHelper(object):
         Polygon3D.objects.create(name='3D BBox', poly=bbox_3d)
 
 
-@skipUnless(HAS_GDAL, "GDAL is required for Geo3DTest.")
 @skipUnlessDBFeature("gis_enabled", "supports_3d_storage")
 class Geo3DTest(Geo3DLoadingHelper, TestCase):
     """
@@ -131,9 +124,11 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         self._load_city_data()
         for name, pnt_data in city_data:
             city = City3D.objects.get(name=name)
-            z = pnt_data[2]
+            # Testing both geometry and geography fields
             self.assertTrue(city.point.hasz)
-            self.assertEqual(z, city.point.z)
+            self.assertTrue(city.pointg.hasz)
+            self.assertEqual(city.point.z, pnt_data[2])
+            self.assertEqual(city.pointg.z, pnt_data[2])
 
     def test_3d_polygons(self):
         """
@@ -149,6 +144,9 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         """
         Testing LayerMapping on 3D models.
         """
+        # Import here as GDAL is required for those imports
+        from django.contrib.gis.utils import LayerMapping, LayerMapError
+
         point_mapping = {'point': 'POINT'}
         mpoint_mapping = {'mpoint': 'MULTIPOINT'}
 
@@ -159,8 +157,8 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
 
         # The city shapefile is 2D, and won't be able to fill the coordinates
         # in the 3D model -- thus, a LayerMapError is raised.
-        self.assertRaises(LayerMapError, LayerMapping,
-                          Point3D, city_file, point_mapping, transform=False)
+        with self.assertRaises(LayerMapError):
+            LayerMapping(Point3D, city_file, point_mapping, transform=False)
 
         # 3D model should take 3D data just fine.
         lm = LayerMapping(Point3D, vrt_file, point_mapping, transform=False)
@@ -217,7 +215,6 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         self.assertSetEqual({p.ewkt for p in ref_union}, {p.ewkt for p in union})
 
     @skipUnlessDBFeature("supports_3d_functions")
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_extent(self):
         """
         Testing the Extent3D aggregate for 3D models.
@@ -225,16 +222,13 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         self._load_city_data()
         # `SELECT ST_Extent3D(point) FROM geo3d_city3d;`
         ref_extent3d = (-123.305196, -41.315268, 14, 174.783117, 48.462611, 1433)
-        extent1 = City3D.objects.aggregate(Extent3D('point'))['point__extent3d']
-        extent2 = City3D.objects.extent3d()
+        extent = City3D.objects.aggregate(Extent3D('point'))['point__extent3d']
 
         def check_extent3d(extent3d, tol=6):
             for ref_val, ext_val in zip(ref_extent3d, extent3d):
                 self.assertAlmostEqual(ref_val, ext_val, tol)
 
-        for e3d in [extent1, extent2]:
-            check_extent3d(e3d)
-        self.assertIsNone(City3D.objects.none().extent3d())
+        check_extent3d(extent)
         self.assertIsNone(City3D.objects.none().aggregate(Extent3D('point'))['point__extent3d'])
 
     @ignore_warnings(category=RemovedInDjango20Warning)
@@ -316,7 +310,6 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
                 self.assertEqual(city_dict[city.name][2] + ztrans, city.translate.z)
 
 
-@skipUnless(HAS_GDAL, "GDAL is required for Geo3DTest.")
 @skipUnlessDBFeature("gis_enabled", "supports_3d_functions")
 class Geo3DFunctionsTests(Geo3DLoadingHelper, TestCase):
     def test_kml(self):

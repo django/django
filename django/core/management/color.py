@@ -23,14 +23,16 @@ def supports_color():
     return True
 
 
+class Style(object):
+    pass
+
+
 def make_style(config_string=''):
     """
     Create a Style object from the given config_string.
 
     If config_string is empty django.utils.termcolors.DEFAULT_PALETTE is used.
     """
-    class Style(object):
-        pass
 
     style = Style()
 
@@ -44,7 +46,8 @@ def make_style(config_string=''):
             format = color_settings.get(role, {})
             style_func = termcolors.make_style(**format)
         else:
-            style_func = lambda x: x
+            def style_func(x):
+                return x
         setattr(style, role, style_func)
 
     # For backwards compatibility,

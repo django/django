@@ -2,16 +2,15 @@
 #
 # Translators:
 # Jannis Vajen, 2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2014
+# Jannis Leidel <jannis@leidel.info>, 2013-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2015-10-12 12:23+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: German (http://www.transifex.com/projects/p/django/language/"
-"de/)\n"
+"Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,23 +33,14 @@ msgid "Documentation bookmarklets"
 msgstr "Dokumentations-Bookmarklets"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">Um Bookmarklets zu installieren, müssen diese Links in "
-"die\n"
-"Browser-Werkzeugleiste gezogen werden oder mittels rechter Maustaste in die\n"
-"Bookmarks gespeichert werden. Danach können die Bookmarklets von jeder "
-"Seite\n"
-"aufgerufen werden. Einige Bookmarklets sind auf den Zugriff von 'internen'\n"
-"Rechnern beschränkt. Falls nicht klar ist, ob ein Rechner als 'intern'\n"
-"bewertet wird, bitte den Administrator fragen.</p>\n"
+"Um Bookmarklets zu installieren, muss dieser Link in die Browser-"
+"Werkzeugleiste gezogen werden oder mittels rechter Maustaste in die "
+"Bookmarks gespeichert werden. Danach können die Bookmarklets von jeder Seite "
+"aufgerufen werden."
 
 msgid "Documentation for this page"
 msgstr "Dokumentation für diese Seite"
@@ -61,31 +51,6 @@ msgid ""
 msgstr ""
 "Springt von jeder Seite zu der Dokumentation für den View, der diese Seite "
 "erzeugt."
-
-msgid "Show object ID"
-msgstr "Objekt-ID anzeigen"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Zeigt den Content-Type und die eindeutige ID für Seiten, die ein einzelnes "
-"Objekt repräsentieren."
-
-msgid "Edit this object (current window)"
-msgstr "Dieses Objekt ändern (Aktives Fenster)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Springt zu der Administrationsseite für dieses Objekt, wenn diese Seite ein "
-"Objekt repräsentiert."
-
-msgid "Edit this object (new window)"
-msgstr "Dieses Objekt ändern (Neues Fenster)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr ""
-"Wie zuvor, aber öffnet die Administrationsseite in einem neuen Fenster."
 
 msgid "Tags"
 msgstr "Tags"
@@ -154,6 +119,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
+msgid "Fields"
+msgstr "Felder"
+
 msgid "Field"
 msgstr "Feld"
 
@@ -162,6 +130,15 @@ msgstr "Klasse"
 
 msgid "Description"
 msgstr "Beschreibung"
+
+msgid "Methods with arguments"
+msgstr "Methode mit Argumenten"
+
+msgid "Method"
+msgstr "Methode"
+
+msgid "Arguments"
+msgstr "Argumente"
 
 msgid "Back to Model Documentation"
 msgstr "Zurück zur Modell-Dokumentation"

@@ -56,12 +56,16 @@ Post-installation
 Creating a spatial database
 ---------------------------
 
-PostGIS 2 includes an extension for Postgres 9.1+ that can be used to enable
-spatial functionality::
+PostGIS 2 includes an extension for PostgreSQL that's used to enable spatial
+functionality::
 
     $ createdb  <db name>
     $ psql <db name>
     > CREATE EXTENSION postgis;
+
+The database user must be a superuser in order to run
+``CREATE EXTENSION postgis;``. The command is run during the :djadmin:`migrate`
+process.
 
 GeoDjango does not currently leverage any `PostGIS topology functionality`__.
 If you plan to use those features at some point, you can also install the
@@ -69,12 +73,6 @@ If you plan to use those features at some point, you can also install the
 postgis_topology;``.
 
 __ http://postgis.net/docs/Topology.html
-
-.. versionchanged:: 1.8
-
-    The ``CREATE EXTENSION postgis`` command is now automatically run during
-    the :djadmin:`migrate` process. You can still create it manually if you
-    wish.
 
 Managing the database
 ---------------------

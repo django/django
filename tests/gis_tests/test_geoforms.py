@@ -1,15 +1,10 @@
-from unittest import skipUnless
-
 from django.contrib.gis import forms
-from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry
 from django.forms import ValidationError
-from django.test import SimpleTestCase, skipUnlessDBFeature
-from django.utils import six
+from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 from django.utils.html import escape
 
 
-@skipUnless(HAS_GDAL, "GeometryFieldTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 class GeometryFieldTest(SimpleTestCase):
 
@@ -17,7 +12,8 @@ class GeometryFieldTest(SimpleTestCase):
         "Testing GeometryField initialization with defaults."
         fld = forms.GeometryField()
         for bad_default in ('blah', 3, 'FoO', None, 0):
-            self.assertRaises(ValidationError, fld.clean, bad_default)
+            with self.assertRaises(ValidationError):
+                fld.clean(bad_default)
 
     def test_srid(self):
         "Testing GeometryField with a SRID set."
@@ -39,8 +35,7 @@ class GeometryFieldTest(SimpleTestCase):
         "Testing GeometryField's handling of null (None) geometries."
         # Form fields, by default, are required (`required=True`)
         fld = forms.GeometryField()
-        with six.assertRaisesRegex(self, forms.ValidationError,
-                "No geometry value provided."):
+        with self.assertRaisesMessage(forms.ValidationError, "No geometry value provided."):
             fld.clean(None)
 
         # This will clean None as a geometry (See #10660).
@@ -59,7 +54,8 @@ class GeometryFieldTest(SimpleTestCase):
         # a WKT for any other geom_type will be properly transformed by `to_python`
         self.assertEqual(GEOSGeometry('LINESTRING(0 0, 1 1)'), pnt_fld.to_python('LINESTRING(0 0, 1 1)'))
         # but rejected by `clean`
-        self.assertRaises(forms.ValidationError, pnt_fld.clean, 'LINESTRING(0 0, 1 1)')
+        with self.assertRaises(forms.ValidationError):
+            pnt_fld.clean('LINESTRING(0 0, 1 1)')
 
     def test_to_python(self):
         """
@@ -72,7 +68,8 @@ class GeometryFieldTest(SimpleTestCase):
             self.assertEqual(GEOSGeometry(wkt), fld.to_python(wkt))
         # but raises a ValidationError for any other string
         for wkt in ('POINT(5)', 'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'BLAH(0 0, 1 1)'):
-            self.assertRaises(forms.ValidationError, fld.to_python, wkt)
+            with self.assertRaises(forms.ValidationError):
+                fld.to_python(wkt)
 
     def test_field_with_text_widget(self):
         class PointForm(forms.Form):
@@ -88,7 +85,6 @@ class GeometryFieldTest(SimpleTestCase):
         self.assertFalse(form.has_changed())
 
 
-@skipUnless(HAS_GDAL, "SpecializedFieldTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 class SpecializedFieldTest(SimpleTestCase):
     def setUp(self):
@@ -152,6 +148,7 @@ class SpecializedFieldTest(SimpleTestCase):
         self.assertTrue(form_instance.is_valid())
         rendered = form_instance.as_p()
         self.assertIn('new MapWidget(options);', rendered)
+        self.assertIn('map_srid: 4326,', rendered)
         self.assertIn('gis/js/OLMapWidget.js', str(form_instance.media))
 
     def assertTextarea(self, geom, rendered):
@@ -161,6 +158,8 @@ class SpecializedFieldTest(SimpleTestCase):
         self.assertIn('required', rendered)
         self.assertIn(geom.wkt, rendered)
 
+    # map_srid in operlayers.html template must not be localized.
+    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_pointfield(self):
         class PointForm(forms.Form):
             p = forms.PointField()
@@ -256,7 +255,6 @@ class SpecializedFieldTest(SimpleTestCase):
             self.assertFalse(GeometryForm(data={'g': invalid.wkt}).is_valid())
 
 
-@skipUnless(HAS_GDAL, "OSMWidgetTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 class OSMWidgetTest(SimpleTestCase):
     def setUp(self):
@@ -298,7 +296,6 @@ class OSMWidgetTest(SimpleTestCase):
                 rendered)
 
 
-@skipUnless(HAS_GDAL, "CustomGeometryWidgetTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 class CustomGeometryWidgetTest(SimpleTestCase):
 

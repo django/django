@@ -1,5 +1,4 @@
 from collections import Counter, OrderedDict
-from itertools import chain
 from operator import attrgetter
 
 from django.db import IntegrityError, connections, transaction
@@ -21,8 +20,9 @@ def CASCADE(collector, field, sub_objs, using):
 
 
 def PROTECT(collector, field, sub_objs, using):
-    raise ProtectedError("Cannot delete some instances of model '%s' because "
-        "they are referenced through a protected foreign key: '%s.%s'" % (
+    raise ProtectedError(
+        "Cannot delete some instances of model '%s' because they are "
+        "referenced through a protected foreign key: '%s.%s'" % (
             field.remote_field.model.__name__, sub_objs[0].__class__.__name__, field.name
         ),
         sub_objs
@@ -53,18 +53,10 @@ def DO_NOTHING(collector, field, sub_objs, using):
 
 
 def get_candidate_relations_to_delete(opts):
-    # Collect models that contain candidate relations to delete. This may include
-    # relations coming from proxy models.
-    candidate_models = {opts}
-    candidate_models = candidate_models.union(opts.concrete_model._meta.proxied_children)
-    # For each model, get all candidate fields.
-    candidate_model_fields = chain.from_iterable(
-        opts.get_fields(include_hidden=True) for opts in candidate_models
-    )
     # The candidate relations are the ones that come from N-1 and 1-1 relations.
     # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
     return (
-        f for f in candidate_model_fields
+        f for f in opts.get_fields(include_hidden=True)
         if f.auto_created and not f.concrete and (f.one_to_one or f.one_to_many)
     )
 
@@ -73,7 +65,7 @@ class Collector(object):
     def __init__(self, using):
         self.using = using
         # Initially, {model: {instances}}, later values become lists.
-        self.data = {}
+        self.data = OrderedDict()
         self.field_updates = {}  # {model: {(field, value): {instances}}}
         # fast_deletes is a list of queryset-likes that can be deleted without
         # fetching the objects into memory.
@@ -141,9 +133,9 @@ class Collector(object):
         if not (hasattr(objs, 'model') and hasattr(objs, '_raw_delete')):
             return False
         model = objs.model
-        if (signals.pre_delete.has_listeners(model)
-                or signals.post_delete.has_listeners(model)
-                or signals.m2m_changed.has_listeners(model)):
+        if (signals.pre_delete.has_listeners(model) or
+                signals.post_delete.has_listeners(model) or
+                signals.m2m_changed.has_listeners(model)):
             return False
         # The use of from_field comes from the need to avoid cascade back to
         # parent when parent delete is cascading to child.
@@ -155,7 +147,7 @@ class Collector(object):
         for related in get_candidate_relations_to_delete(opts):
             if related.field.remote_field.on_delete is not DO_NOTHING:
                 return False
-        for field in model._meta.virtual_fields:
+        for field in model._meta.private_fields:
             if hasattr(field, 'bulk_related_objects'):
                 # It's something like generic foreign key.
                 return False
@@ -174,7 +166,7 @@ class Collector(object):
             return [objs]
 
     def collect(self, objs, source=None, nullable=False, collect_related=True,
-            source_attr=None, reverse_dependency=False, keep_parents=False):
+                source_attr=None, reverse_dependency=False, keep_parents=False):
         """
         Adds 'objs' to the collection of objects to be deleted as well as all
         parent instances.  'objs' must be a homogeneous iterable collection of
@@ -229,19 +221,15 @@ class Collector(object):
                         self.fast_deletes.append(sub_objs)
                     elif sub_objs:
                         field.remote_field.on_delete(self, field, sub_objs, self.using)
-            for field in model._meta.virtual_fields:
+            for field in model._meta.private_fields:
                 if hasattr(field, 'bulk_related_objects'):
-                    # Its something like generic foreign key.
+                    # It's something like generic foreign key.
                     sub_objs = field.bulk_related_objects(new_objs, self.using)
-                    self.collect(sub_objs,
-                                 source=model,
-                                 source_attr=field.remote_field.related_name,
-                                 nullable=True)
+                    self.collect(sub_objs, source=model, nullable=True)
 
     def related_objects(self, related, objs):
         """
         Gets a QuerySet of objects related to ``objs`` via the relation ``related``.
-
         """
         return related.related_model._base_manager.using(self.using).filter(
             **{"%s__in" % related.field.name: objs}

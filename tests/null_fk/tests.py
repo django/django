@@ -24,7 +24,7 @@ class NullFkTests(TestCase):
         # test for #7369.
         c = Comment.objects.select_related().get(id=c1.id)
         self.assertEqual(c.post, p)
-        self.assertEqual(Comment.objects.select_related().get(id=c2.id).post, None)
+        self.assertIsNone(Comment.objects.select_related().get(id=c2.id).post)
 
         self.assertQuerysetEqual(
             Comment.objects.select_related('post__forum__system_info').all(),

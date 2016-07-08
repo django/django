@@ -39,7 +39,7 @@ class CaseTestModel(models.Model):
     time = models.TimeField(null=True, db_column='time_field')
     url = models.URLField(default='')
     uuid = models.UUIDField(null=True)
-    fk = models.ForeignKey('self', null=True)
+    fk = models.ForeignKey('self', models.CASCADE, null=True)
 
     def __str__(self):
         return "%i, %s" % (self.integer, self.string)
@@ -47,7 +47,7 @@ class CaseTestModel(models.Model):
 
 @python_2_unicode_compatible
 class O2OCaseTestModel(models.Model):
-    o2o = models.OneToOneField(CaseTestModel, related_name='o2o_rel')
+    o2o = models.OneToOneField(CaseTestModel, models.CASCADE, related_name='o2o_rel')
     integer = models.IntegerField()
 
     def __str__(self):
@@ -56,7 +56,7 @@ class O2OCaseTestModel(models.Model):
 
 @python_2_unicode_compatible
 class FKCaseTestModel(models.Model):
-    fk = models.ForeignKey(CaseTestModel, related_name='fk_rel')
+    fk = models.ForeignKey(CaseTestModel, models.CASCADE, related_name='fk_rel')
     integer = models.IntegerField()
 
     def __str__(self):

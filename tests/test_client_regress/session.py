@@ -26,6 +26,6 @@ class SessionStore(SessionBase):
     def load(self):
         try:
             return self.decode(self.session_key)
-        except:
+        except Exception:
             self.modified = True
             return {}

@@ -1,6 +1,3 @@
-from django.utils import six
-
-
 class FileProxyMixin(object):
     """
     A mixin class used to forward file methods to an underlaying file
@@ -27,8 +24,31 @@ class FileProxyMixin(object):
     write = property(lambda self: self.file.write)
     writelines = property(lambda self: self.file.writelines)
     xreadlines = property(lambda self: self.file.xreadlines)
-    if six.PY3:
-        seekable = property(lambda self: self.file.seekable)
+
+    @property
+    def closed(self):
+        return not self.file or self.file.closed
+
+    def readable(self):
+        if self.closed:
+            return False
+        if hasattr(self.file, 'readable'):
+            return self.file.readable()
+        return True
+
+    def writable(self):
+        if self.closed:
+            return False
+        if hasattr(self.file, 'writable'):
+            return self.file.writable()
+        return 'w' in getattr(self.file, 'mode', '')
+
+    def seekable(self):
+        if self.closed:
+            return False
+        if hasattr(self.file, 'seekable'):
+            return self.file.seekable()
+        return True
 
     def __iter__(self):
         return iter(self.file)

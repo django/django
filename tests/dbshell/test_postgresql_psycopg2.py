@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import locale
 import os
 
-from django.db.backends.postgresql_psycopg2.client import DatabaseClient
+from django.db.backends.postgresql.client import DatabaseClient
 from django.test import SimpleTestCase, mock
 from django.utils import six
 from django.utils.encoding import force_bytes, force_str
@@ -23,7 +23,8 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         def _mock_subprocess_call(*args):
             self.subprocess_args = list(*args)
             if 'PGPASSFILE' in os.environ:
-                self.pgpass = open(os.environ['PGPASSFILE'], 'rb').read()
+                with open(os.environ['PGPASSFILE'], 'rb') as f:
+                    self.pgpass = f.read().strip()  # ignore line endings
             else:
                 self.pgpass = None
             return 0
@@ -36,24 +37,24 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
     def test_basic(self):
         self.assertEqual(
             self._run_it({
-                'NAME': 'dbname',
-                'USER': 'someuser',
-                'PASSWORD': 'somepassword',
-                'HOST': 'somehost',
-                'PORT': 444,
+                'database': 'dbname',
+                'user': 'someuser',
+                'password': 'somepassword',
+                'host': 'somehost',
+                'port': '444',
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
-                b'somehost:444:dbname:someuser:somepassword\n',
+                b'somehost:444:dbname:someuser:somepassword',
             )
         )
 
     def test_nopass(self):
         self.assertEqual(
             self._run_it({
-                'NAME': 'dbname',
-                'USER': 'someuser',
-                'HOST': 'somehost',
-                'PORT': 444,
+                'database': 'dbname',
+                'user': 'someuser',
+                'host': 'somehost',
+                'port': '444',
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
                 None,
@@ -63,28 +64,28 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
     def test_column(self):
         self.assertEqual(
             self._run_it({
-                'NAME': 'dbname',
-                'USER': 'some:user',
-                'PASSWORD': 'some:password',
-                'HOST': '::1',
-                'PORT': 444,
+                'database': 'dbname',
+                'user': 'some:user',
+                'password': 'some:password',
+                'host': '::1',
+                'port': '444',
             }), (
                 ['psql', '-U', 'some:user', '-h', '::1', '-p', '444', 'dbname'],
-                b'\\:\\:1:444:dbname:some\\:user:some\\:password\n',
+                b'\\:\\:1:444:dbname:some\\:user:some\\:password',
             )
         )
 
     def test_escape_characters(self):
         self.assertEqual(
             self._run_it({
-                'NAME': 'dbname',
-                'USER': 'some\\user',
-                'PASSWORD': 'some\\password',
-                'HOST': 'somehost',
-                'PORT': 444,
+                'database': 'dbname',
+                'user': 'some\\user',
+                'password': 'some\\password',
+                'host': 'somehost',
+                'port': '444',
             }), (
                 ['psql', '-U', 'some\\user', '-h', 'somehost', '-p', '444', 'dbname'],
-                b'somehost:444:dbname:some\\\\user:some\\\\password\n',
+                b'somehost:444:dbname:some\\\\user:some\\\\password',
             )
         )
 
@@ -97,7 +98,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
             username_str = force_str(username, encoding)
             password_str = force_str(password, encoding)
             pgpass_bytes = force_bytes(
-                'somehost:444:dbname:%s:%s\n' % (username, password),
+                'somehost:444:dbname:%s:%s' % (username, password),
                 encoding=encoding,
             )
         except UnicodeEncodeError:
@@ -105,11 +106,11 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 self.skipTest("Your locale can't run this test.")
         self.assertEqual(
             self._run_it({
-                'NAME': 'dbname',
-                'USER': username_str,
-                'PASSWORD': password_str,
-                'HOST': 'somehost',
-                'PORT': 444,
+                'database': 'dbname',
+                'user': username_str,
+                'password': password_str,
+                'host': 'somehost',
+                'port': '444',
             }), (
                 ['psql', '-U', username_str, '-h', 'somehost', '-p', '444', 'dbname'],
                 pgpass_bytes,

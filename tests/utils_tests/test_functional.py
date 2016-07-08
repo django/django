@@ -55,7 +55,8 @@ class FunctionalTestCase(unittest.TestCase):
             def _get_do(self):
                 return "DO IT"
 
-        self.assertRaises(NotImplementedError, lambda: A().do)
+        with self.assertRaises(NotImplementedError):
+            A().do
         self.assertEqual(B().do, 'DO IT')
 
     def test_lazy_object_to_string(self):
@@ -129,3 +130,18 @@ class FunctionalTestCase(unittest.TestCase):
 
         self.assertEqual(lazy_a(), lazy_b())
         self.assertNotEqual(lazy_b(), lazy_c())
+
+    def test_lazy_repr_text(self):
+        original_object = 'Lazy translation text'
+        lazy_obj = lazy(lambda: original_object, six.text_type)
+        self.assertEqual(repr(original_object), repr(lazy_obj()))
+
+    def test_lazy_repr_int(self):
+        original_object = 15
+        lazy_obj = lazy(lambda: original_object, int)
+        self.assertEqual(repr(original_object), repr(lazy_obj()))
+
+    def test_lazy_repr_bytes(self):
+        original_object = b'J\xc3\xbcst a str\xc3\xadng'
+        lazy_obj = lazy(lambda: original_object, bytes)
+        self.assertEqual(repr(original_object), repr(lazy_obj()))

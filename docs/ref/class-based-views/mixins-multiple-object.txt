@@ -2,8 +2,8 @@
 Multiple object mixins
 ======================
 
-MultipleObjectMixin
--------------------
+``MultipleObjectMixin``
+=======================
 
 .. class:: django.views.generic.list.MultipleObjectMixin
 
@@ -74,8 +74,6 @@ MultipleObjectMixin
 
     .. attribute:: ordering
 
-        .. versionadded:: 1.8
-
         A string or list of strings specifying the ordering to apply to the ``queryset``.
         Valid values are the same as those for :meth:`~django.db.models.query.QuerySet.order_by`.
 
@@ -119,8 +117,6 @@ MultipleObjectMixin
         be a queryset (in which queryset-specific behavior will be enabled).
 
     .. method:: get_ordering()
-
-        .. versionadded:: 1.8
 
         Returns a string (or iterable of strings) that defines the ordering that
         will be applied to the ``queryset``.
@@ -196,8 +192,8 @@ MultipleObjectMixin
       this context variable will be ``None``.
 
 
-MultipleObjectTemplateResponseMixin
------------------------------------
+``MultipleObjectTemplateResponseMixin``
+=======================================
 
 .. class:: django.views.generic.list.MultipleObjectTemplateResponseMixin
 

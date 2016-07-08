@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# BouRock, 2015
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -13,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 09:26+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 09:36+0000\n"
 "Last-Translator: BouRock\n"
-"Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,6 +84,12 @@ msgstr "Eylem:"
 msgid "action time"
 msgstr "eylem zamanı"
 
+msgid "user"
+msgstr "kullanıcı"
+
+msgid "content type"
+msgstr "içerik türü"
+
 msgid "object id"
 msgstr "nesne kimliği"
 
@@ -124,6 +131,9 @@ msgid ""
 msgstr ""
 "Birden fazla seçmek için \"Control (Ctrl)\" veya Mac'deki \"Command\" tuşuna "
 "basılı tutun."
+
+msgid "Added."
+msgstr "Eklendi."
 
 #, python-format
 msgid "Changed %s."
@@ -482,6 +492,14 @@ msgstr ""
 "tablolarının oluşturulduğundan ve veritabanının uygun kullanıcı tarafından "
 "okunabilir olduğundan emin olun."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"%(username)s olarak kimlik doğrulamanız yapıldı, ancak bu sayfaya erişmek "
+"için yetkili değilsiniz. Farklı bir hesapla oturum açmak ister misiniz?"
+
 msgid "Forgotten your password or username?"
 msgstr "Kullanıcı adınızı veya parolanızı mı unuttunuz?"
 
@@ -506,6 +524,9 @@ msgstr "Tümünü göster"
 
 msgid "Save"
 msgstr "Kaydet"
+
+msgid "Popup closing..."
+msgstr "Açılır pencere kapanıyor..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -643,9 +664,6 @@ msgstr "Parolamı sıfırla"
 
 msgid "All dates"
 msgstr "Tüm tarihler"
-
-msgid "(None)"
-msgstr "(Yok)"
 
 #, python-format
 msgid "Select %s"

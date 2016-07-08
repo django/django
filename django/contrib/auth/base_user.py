@@ -4,12 +4,16 @@ not in INSTALLED_APPS.
 """
 from __future__ import unicode_literals
 
+import unicodedata
+
+from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
     check_password, is_password_usable, make_password,
 )
 from django.db import models
 from django.utils.crypto import get_random_string, salted_hmac
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.deprecation import CallableFalse, CallableTrue
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -18,7 +22,7 @@ class BaseUserManager(models.Manager):
     @classmethod
     def normalize_email(cls, email):
         """
-        Normalize the email address by lowercasing the domain part of the it.
+        Normalize the email address by lowercasing the domain part of it.
         """
         email = email or ''
         try:
@@ -60,28 +64,46 @@ class AbstractBaseUser(models.Model):
         "Return the identifying username for this User"
         return getattr(self, self.USERNAME_FIELD)
 
+    def __init__(self, *args, **kwargs):
+        super(AbstractBaseUser, self).__init__(*args, **kwargs)
+        # Stores the raw password if set_password() is called so that it can
+        # be passed to password_changed() after the model is saved.
+        self._password = None
+
     def __str__(self):
         return self.get_username()
+
+    def clean(self):
+        setattr(self, self.USERNAME_FIELD, self.normalize_username(self.get_username()))
+
+    def save(self, *args, **kwargs):
+        super(AbstractBaseUser, self).save(*args, **kwargs)
+        if self._password is not None:
+            password_validation.password_changed(self._password, self)
+            self._password = None
 
     def natural_key(self):
         return (self.get_username(),)
 
+    @property
     def is_anonymous(self):
         """
         Always return False. This is a way of comparing User objects to
         anonymous users.
         """
-        return False
+        return CallableFalse
 
+    @property
     def is_authenticated(self):
         """
         Always return True. This is a way to tell if the user has been
         authenticated in templates.
         """
-        return True
+        return CallableTrue
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
+        self._password = raw_password
 
     def check_password(self, raw_password):
         """
@@ -90,6 +112,8 @@ class AbstractBaseUser(models.Model):
         """
         def setter(raw_password):
             self.set_password(raw_password)
+            # Password hash upgrades shouldn't be considered password changes.
+            self._password = None
             self.save(update_fields=["password"])
         return check_password(raw_password, self.password, setter)
 
@@ -112,3 +136,7 @@ class AbstractBaseUser(models.Model):
         """
         key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
         return salted_hmac(key_salt, self.password).hexdigest()
+
+    @classmethod
+    def normalize_username(cls, username):
+        return unicodedata.normalize('NFKC', force_text(username))

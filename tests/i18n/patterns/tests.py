@@ -2,13 +2,15 @@ from __future__ import unicode_literals
 
 import os
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import clear_url_caches, reverse, translate_url
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
+from django.test.client import RequestFactory
 from django.test.utils import override_script_prefix
+from django.urls import clear_url_caches, reverse, translate_url
 from django.utils import translation
 from django.utils._os import upath
 
@@ -28,7 +30,7 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
         ('en', 'English'),
         ('pt-br', 'Brazilian Portuguese'),
     ],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ],
@@ -74,10 +76,13 @@ class URLPrefixTests(URLTestCaseBase):
             self.assertEqual(reverse('prefixed'), '/en/prefixed/')
         with translation.override('nl'):
             self.assertEqual(reverse('prefixed'), '/nl/prefixed/')
+        with translation.override(None):
+            self.assertEqual(reverse('prefixed'), '/%s/prefixed/' % settings.LANGUAGE_CODE)
 
     @override_settings(ROOT_URLCONF='i18n.patterns.urls.wrong')
     def test_invalid_prefix_use(self):
-        self.assertRaises(ImproperlyConfigured, lambda: reverse('account:register'))
+        with self.assertRaises(ImproperlyConfigured):
+            reverse('account:register')
 
 
 @override_settings(ROOT_URLCONF='i18n.patterns.urls.disabled')
@@ -91,10 +96,22 @@ class URLDisabledTests(URLTestCaseBase):
             self.assertEqual(reverse('prefixed'), '/prefixed/')
 
 
+class RequestURLConfTests(SimpleTestCase):
+
+    @override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
+    def test_request_urlconf_considered(self):
+        request = RequestFactory().get('/nl/')
+        request.urlconf = 'i18n.patterns.urls.default'
+        middleware = LocaleMiddleware()
+        with translation.override('nl'):
+            middleware.process_request(request)
+        self.assertEqual(request.LANGUAGE_CODE, 'nl')
+
+
 @override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
 class PathUnusedTests(URLTestCaseBase):
     """
-    Check that if no i18n_patterns is used in root urlconfs, then no
+    Check that if no i18n_patterns is used in root URLconfs, then no
     language activation happens based on url prefix.
     """
 
@@ -206,7 +223,7 @@ class URLRedirectTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
 
     @override_settings(
-        MIDDLEWARE_CLASSES=[
+        MIDDLEWARE=[
             'i18n.patterns.tests.PermanentRedirectLocaleMiddleWare',
             'django.middleware.common.CommonMiddleware',
         ],

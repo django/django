@@ -2,15 +2,16 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
+# Emin Mastizada <emin@mastizada.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:30+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Azerbaijani (http://www.transifex.com/projects/p/django/"
-"language/az/)\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2016-02-17 21:41+0000\n"
+"Last-Translator: Emin Mastizada <emin@mastizada.com>\n"
+"Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
+"az/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,7 +29,7 @@ msgstr "Vacib tarixlər"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Əsas %(key)r açarı ilə %(name)s obyekti mövcud deyil."
 
 msgid "Password changed successfully."
 msgstr "Parol uğurla dəyişdirildi"
@@ -38,10 +39,16 @@ msgid "Change password: %s"
 msgstr "Parolu dəyiş: %s"
 
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Təsdiqləmə və Səlahiyyət"
+
+msgid "password"
+msgstr "parol"
+
+msgid "last login"
+msgstr "son dəfə daxil olub"
 
 msgid "No password set."
-msgstr ""
+msgstr "Parol qurulmayıb."
 
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
@@ -55,13 +62,13 @@ msgstr "Parol"
 msgid "Password confirmation"
 msgstr "Parolun təsdiqi"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Yuxarıdakı parolu daxil edin ki, dəqiqliyinə əmin olaq."
+msgid "Enter the same password as before, for verification."
+msgstr ""
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
 
 #, python-format
@@ -74,7 +81,7 @@ msgid "This account is inactive."
 msgstr "Bu hesab qeyri-aktivdir."
 
 msgid "Email"
-msgstr ""
+msgstr "E-poçt"
 
 msgid "New password"
 msgstr "Yeni parol"
@@ -93,7 +100,7 @@ msgid "Password (again)"
 msgstr "Parol (bir daha)"
 
 msgid "algorithm"
-msgstr ""
+msgstr "alqoritm"
 
 msgid "iterations"
 msgstr ""
@@ -113,6 +120,9 @@ msgstr ""
 msgid "name"
 msgstr "ad"
 
+msgid "content type"
+msgstr "məzmun növü"
+
 msgid "codename"
 msgstr "kod adı"
 
@@ -127,12 +137,6 @@ msgstr "qrup"
 
 msgid "groups"
 msgstr "qruplar"
-
-msgid "password"
-msgstr "parol"
-
-msgid "last login"
-msgstr "son dəfə daxil olub"
 
 msgid "superuser status"
 msgstr "superistifadəçi statusu"
@@ -176,7 +180,7 @@ msgid "last name"
 msgstr "soyad"
 
 msgid "email address"
-msgstr ""
+msgstr "e-poçt ünvanı"
 
 msgid "staff status"
 msgstr "admin statusu"
@@ -204,6 +208,41 @@ msgid "users"
 msgstr "istifadəçilər"
 
 #, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] "Bu parol çox qısadır. Ən az %(min_length)d işarə olmalıdır."
+msgstr[1] "Bu parol çox qısadır. Ən az %(min_length)d işarə olmalıdır."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Parolunuz ən az %(min_length)d işarə olmalıdır."
+msgstr[1] "Parolunuz ən az %(min_length)d işarə olmalıdır."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Parolunuz %(verbose_name)s ilə çox bənzərdir."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr "Parolunuz digər şəxsi məlumatlarınıza çox bənzərdir."
+
+msgid "This password is too common."
+msgstr "Bu parol çox ümumidir."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Parolunuz çox istifadə edilən ümumişlək olmamalıdır."
+
+msgid "This password is entirely numeric."
+msgstr "Bu parol ancaq rəqəmlərlədir."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Parolunuz ancaq rəqəmlərlə ola bilməz."
+
+#, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s, parolun sıfırlanması"
 
@@ -211,22 +250,22 @@ msgid "Logged out"
 msgstr "Çıxdınız"
 
 msgid "Password reset"
-msgstr ""
+msgstr "Parol sıfırlama"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Parol sıfırlama göndərildi"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Yeni parolu daxil edin"
 
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Parol müvəffəqiyyətlə sıfırlandı"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Parol sıfırlama tamamlandı"
 
 msgid "Password change"
-msgstr ""
+msgstr "Parol dəyişdirmə"
 
 msgid "Password change successful"
-msgstr ""
+msgstr "Parol müvəffəqiyyətlə dəyişdirildi"

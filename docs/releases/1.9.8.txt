@@ -1,0 +1,12 @@
+==========================
+Django 1.9.8 release notes
+==========================
+
+*Under development*
+
+Django 1.9.8 fixes several bugs in 1.9.7.
+
+Bugfixes
+========
+
+* ...

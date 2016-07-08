@@ -79,6 +79,7 @@ Boersma
 boilerplatish
 Bokmål
 bolded
+bookmarklet
 bookmarklets
 Bookmarklets
 boolean
@@ -229,6 +230,7 @@ dumpdata
 Dunck
 dwithin
 editability
+elidable
 encodings
 Endian
 endswith
@@ -304,7 +306,7 @@ Gettext
 GiB
 gid
 gis
-github
+GitHub
 globalization
 Godwin
 google
@@ -349,8 +351,6 @@ iendswith
 ies
 iexact
 ifchanged
-ifequal
-ifnotequal
 iframe
 inbox
 Incompliance
@@ -422,6 +422,7 @@ linebreaks
 linebreaksbr
 linenumbers
 linestring
+linework
 Livni
 ljust
 loaddata
@@ -454,6 +455,7 @@ Magee
 makemessages
 makemigrations
 Mako
+manouche
 Mapnik
 Marczewski
 Marino
@@ -496,6 +498,7 @@ multiline
 multilinestring
 multipart
 multipolygon
+multitenancy
 multithreaded
 multithreading
 Mumbai
@@ -521,6 +524,7 @@ nestable
 neuroscientist
 newforms
 nginx
+noding
 nonspatial
 nullable
 OAuth
@@ -555,9 +559,10 @@ pessimization
 Petri
 Peucker
 pgAdmin
+PGRaster
 phishing
 php
-pickleable
+picklable
 picosecond
 PIL
 pingback
@@ -581,9 +586,11 @@ postgresql
 pq
 pre
 precisions
+precomputation
 preconfigured
 prefetch
 prefetched
+prefetches
 prefetching
 prefork
 preforked
@@ -605,6 +612,7 @@ proxied
 proxying
 pseudocode
 psycopg
+Punycode
 Puthraya
 py
 pyformat
@@ -626,6 +634,8 @@ quo
 quoteless
 Radziej
 rc
+readded
+reallow
 reallowed
 rebase
 rebased
@@ -644,6 +654,7 @@ refactoring
 refactorings
 refactors
 referer
+referers
 reflow
 regex
 regexes
@@ -708,6 +719,7 @@ sharding
 showmigrations
 sid
 simultaneously
+Sitarska
 sitemap
 sitemaps
 sitewide
@@ -769,6 +781,7 @@ submodule
 submodules
 subpackage
 subpackages
+subpath
 subqueries
 subquery
 subselect
@@ -777,6 +790,7 @@ substring
 Substring
 subtemplate
 subtemplates
+subtransactions
 subtree
 subtype
 subviews
@@ -867,10 +881,12 @@ unglamorous
 ungrouped
 unhandled
 unharmful
+unhashable
 unicode
 uninstall
 uninstalling
 uninstalls
+unioning
 uniterated
 unittest
 unittests
@@ -932,7 +948,6 @@ virtualenvs
 virtualized
 Votizen
 webapps
-webdesign
 webkit
 WebKit
 Weblog
@@ -958,6 +973,7 @@ wordcount
 wordwrap
 workflow
 worksforme
+wrappable
 wsgi
 www
 xe

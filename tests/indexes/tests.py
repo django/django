@@ -40,8 +40,7 @@ class SchemaIndexesTests(TestCase):
         index_sql = connection.schema_editor()._model_indexes_sql(IndexTogetherSingleList)
         self.assertEqual(len(index_sql), 1)
 
-    @skipUnless(connection.vendor == 'postgresql',
-        "This is a postgresql-specific issue")
+    @skipUnless(connection.vendor == 'postgresql', "This is a postgresql-specific issue")
     def test_postgresql_text_indexes(self):
         """Test creation of PostgreSQL-specific text indexes (#12234)"""
         from .models import IndexedArticle
@@ -53,8 +52,7 @@ class SchemaIndexesTests(TestCase):
         # index (#19441).
         self.assertIn('("slug" varchar_pattern_ops)', index_sql[4])
 
-    @skipUnless(connection.vendor == 'postgresql',
-        "This is a postgresql-specific issue")
+    @skipUnless(connection.vendor == 'postgresql', "This is a postgresql-specific issue")
     def test_postgresql_virtual_relation_indexes(self):
         """Test indexes are not created for related objects"""
         index_sql = connection.schema_editor()._model_indexes_sql(Article)
@@ -64,7 +62,7 @@ class SchemaIndexesTests(TestCase):
     def test_no_index_for_foreignkey(self):
         """
         MySQL on InnoDB already creates indexes automatically for foreign keys.
-        (#14180).
+        (#14180). An index should be created if db_constraint=False (#26171).
         """
         storage = connection.introspection.get_storage_engine(
             connection.cursor(), ArticleTranslation._meta.db_table
@@ -72,4 +70,7 @@ class SchemaIndexesTests(TestCase):
         if storage != "InnoDB":
             self.skip("This test only applies to the InnoDB storage engine")
         index_sql = connection.schema_editor()._model_indexes_sql(ArticleTranslation)
-        self.assertEqual(index_sql, [])
+        self.assertEqual(index_sql, [
+            'CREATE INDEX `indexes_articletranslation_99fb53c2` '
+            'ON `indexes_articletranslation` (`article_no_constraint_id`)'
+        ])

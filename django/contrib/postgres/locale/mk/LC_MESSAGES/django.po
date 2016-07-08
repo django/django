@@ -1,16 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# dekomote <dr.mote@gmail.com>, 2015
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2015-2016
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:21+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
-"language/mk/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-02-15 10:33+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
+"mk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -32,10 +34,20 @@ msgstr "Асоцијативна низа на текстуален подато
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string."
-msgstr "Вредноста за \"%(key)s\" не е нишка од знаци."
+msgstr "Вредноста за \"%(key)s\" не е низа од знаци."
+
+msgid "A JSON object"
+msgstr "JSON објект"
+
+msgid "Value must be valid JSON."
+msgstr "Вредноста мора да биде валиден JSON."
 
 msgid "Could not load JSON data."
 msgstr "Не можеа да се вчитаат JSON податоци."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' вредност мора да биде валиден JSON."
 
 msgid "Enter two valid values."
 msgstr "Внесете две валидни вредности."
@@ -44,16 +56,16 @@ msgid "The start of the range must not exceed the end of the range."
 msgstr "Почетокот на опсегот не смее да го надминува крајот на опсегот."
 
 msgid "Enter two whole numbers."
-msgstr ""
+msgstr "Внесете два цели броеви."
 
 msgid "Enter two numbers."
-msgstr ""
+msgstr "Внесете два броја."
 
 msgid "Enter two valid date/times."
-msgstr ""
+msgstr "Внесете две валидни датуми/времиња"
 
 msgid "Enter two valid dates."
-msgstr ""
+msgstr "Внесете два валидни датуми."
 
 #, python-format
 msgid ""

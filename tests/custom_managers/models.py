@@ -94,8 +94,8 @@ class Person(models.Model):
     last_name = models.CharField(max_length=30)
     fun = models.BooleanField(default=False)
 
-    favorite_book = models.ForeignKey('Book', null=True, related_name='favorite_books')
-    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
+    favorite_book = models.ForeignKey('Book', models.SET_NULL, null=True, related_name='favorite_books')
+    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', models.SET_NULL, null=True)
     favorite_thing_id = models.IntegerField(null=True)
     favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
 
@@ -116,9 +116,13 @@ class FunPerson(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     fun = models.BooleanField(default=True)
-
-    favorite_book = models.ForeignKey('Book', null=True, related_name='fun_people_favorite_books')
-    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
+    favorite_book = models.ForeignKey(
+        'Book',
+        models.SET_NULL,
+        null=True,
+        related_name='fun_people_favorite_books',
+    )
+    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', models.SET_NULL, null=True)
     favorite_thing_id = models.IntegerField(null=True)
     favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
 
@@ -136,12 +140,16 @@ class Book(models.Model):
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
     fun_authors = models.ManyToManyField(FunPerson, related_name='books')
-
-    favorite_things = GenericRelation(Person,
-        content_type_field='favorite_thing_type', object_id_field='favorite_thing_id')
-
-    fun_people_favorite_things = GenericRelation(FunPerson,
-        content_type_field='favorite_thing_type', object_id_field='favorite_thing_id')
+    favorite_things = GenericRelation(
+        Person,
+        content_type_field='favorite_thing_type',
+        object_id_field='favorite_thing_id',
+    )
+    fun_people_favorite_things = GenericRelation(
+        FunPerson,
+        content_type_field='favorite_thing_type',
+        object_id_field='favorite_thing_id',
+    )
 
     def __str__(self):
         return self.title
@@ -164,6 +172,18 @@ class Car(models.Model):
         return self.name
 
 
+class FastCarAsBase(Car):
+    class Meta:
+        proxy = True
+        base_manager_name = 'fast_cars'
+
+
+class FastCarAsDefault(Car):
+    class Meta:
+        proxy = True
+        default_manager_name = 'fast_cars'
+
+
 class RestrictedManager(models.Manager):
     def get_queryset(self):
         return super(RestrictedManager, self).get_queryset().filter(is_public=True)
@@ -181,7 +201,7 @@ class RelatedModel(models.Model):
 class RestrictedModel(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)
-    related = models.ForeignKey(RelatedModel)
+    related = models.ForeignKey(RelatedModel, models.CASCADE)
 
     objects = RestrictedManager()
     plain_manager = models.Manager()
@@ -194,7 +214,7 @@ class RestrictedModel(models.Model):
 class OneToOneRestrictedModel(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)
-    related = models.OneToOneField(RelatedModel)
+    related = models.OneToOneField(RelatedModel, models.CASCADE)
 
     objects = RestrictedManager()
     plain_manager = models.Manager()

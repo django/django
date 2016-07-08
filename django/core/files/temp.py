@@ -12,7 +12,7 @@ processes in a manner that works across platforms.
 Also note that the custom version of NamedTemporaryFile does not support the
 full range of keyword arguments available in Python 2.6+ and 3.0+.
 
-1: https://mail.python.org/pipermail/python-list/2005-December/336958.html
+1: https://mail.python.org/pipermail/python-list/2005-December/336957.html
 2: http://bugs.python.org/issue14243
 """
 
@@ -35,8 +35,7 @@ if os.name == 'nt':
         Python 2.6+, or the 'delete', 'buffering', 'encoding', or 'newline'
         keyword arguments in Python 3.0+.
         """
-        def __init__(self, mode='w+b', bufsize=-1, suffix='', prefix='',
-                dir=None):
+        def __init__(self, mode='w+b', bufsize=-1, suffix='', prefix='', dir=None):
             fd, name = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=dir)
             self.name = name
             self.file = os.fdopen(fd, mode, bufsize)
@@ -58,15 +57,6 @@ if os.name == 'nt':
                     self.unlink(self.name)
                 except (OSError):
                     pass
-
-        @property
-        def closed(self):
-            """
-            This attribute needs to be accessible in certain situations,
-            because this class is supposed to mock the API of the class
-            tempfile.NamedTemporaryFile in the Python standard library.
-            """
-            return self.file.closed
 
         def __del__(self):
             self.close()

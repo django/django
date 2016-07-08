@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Nepali (http://www.transifex.com/projects/p/django/language/"
-"ne/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2016-01-14 08:59+0000\n"
+"Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
+"Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -76,6 +75,12 @@ msgstr "कार्य:"
 msgid "action time"
 msgstr "कार्य समय"
 
+msgid "user"
+msgstr "प्रयोग कर्ता"
+
+msgid "content type"
+msgstr ""
+
 msgid "object id"
 msgstr "वस्तु परिचय"
 
@@ -115,6 +120,9 @@ msgstr "शुन्य"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+
+msgid "Added."
+msgstr "थपिएको छ ।"
 
 #, python-format
 msgid "Changed %s."
@@ -318,7 +326,7 @@ msgid "Welcome,"
 msgstr "स्वागतम्"
 
 msgid "View site"
-msgstr ""
+msgstr "साइट हेर्नु होस ।"
 
 msgid "Documentation"
 msgstr "विस्तृत विवरण"
@@ -452,6 +460,12 @@ msgstr ""
 "डाटाबेस स्थापनामा केही त्रुटी छ । सम्वद्ध टेबल बनाएको र प्रयोगकर्तालाई डाटाबेसमा अनुमति "
 "भएको छ छैन जाच्नुहोस ।"
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
 msgid "Forgotten your password or username?"
 msgstr "पासवर्ड अथवा प्रयोगकर्ता नाम भुल्नुभयो ।"
 
@@ -474,6 +488,9 @@ msgstr "सबै देखाउनुहोस"
 
 msgid "Save"
 msgstr "बचत गर्नुहोस"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -602,9 +619,6 @@ msgstr "मेरो पासवर्ड पुन: राख्नुहो�
 
 msgid "All dates"
 msgstr "सबै मिति"
-
-msgid "(None)"
-msgstr "(शुन्य)"
 
 #, python-format
 msgid "Select %s"

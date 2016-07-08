@@ -2,6 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
+# BouRock, 2015
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Murat Çorlu <muratcorlu@gmail.com>, 2012
@@ -9,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2015-10-11 10:40+0000\n"
+"Last-Translator: BouRock\n"
+"Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,26 +37,13 @@ msgid "Documentation bookmarklets"
 msgstr "Belge bookmarklet'leri"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">Bookmarklet'leri yüklemek için, bağlantıyı yer imleri "
-"araç \n"
-"çubuğuna sürükleyin ya da bağlantıya sağ tıklayın ve yer imlerinize "
-"ekleyin. \n"
-"Artık sitedeki herhangi bir sayfadan bookmarklet seçebilirsiniz. Bu "
-"bookmarklet'lerin \n"
-"bazılarının, \"dahili\" (bilgisayarınızın \"dahili\" olduğundan emin "
-"değilseniz sistem \n"
-"yöneticinizle konuşun) olarak ayarlanmış bir bilgisayardan siteyi "
-"görüntülüyor \n"
-"olmasını gerektirdiğini unutmayın.</p>\n"
+"Bookmarklet'leri yüklemek için, bağlantıyı yer imleri araç çubuğuna "
+"sürükleyin ya da bağlantıya sağ tıklayın ve yer imlerinize ekleyin. Artık "
+"sitedeki herhangi bir sayfadan bookmarklet seçebilirsiniz."
 
 msgid "Documentation for this page"
 msgstr "Bu sayfa için belgeler"
@@ -66,28 +54,6 @@ msgid ""
 msgstr ""
 "Sizi, bu sayfayı oluşturan görünüm için herhangi bir sayfadan  belgelere "
 "atlatır."
-
-msgid "Show object ID"
-msgstr "Nesne kimliğini göster"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Tek bir nesneyi temsil eden sayfalar için içerik türünü ve benzersiz kimliği "
-"gösterir."
-
-msgid "Edit this object (current window)"
-msgstr "Bu nesneyi düzenle (şu anki pencerede)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Tek bir nesneyi temsil eden sayfalar için yönetici sayfasına atlatır."
-
-msgid "Edit this object (new window)"
-msgstr "Bu nesneyi düzenle (yeni pencerede)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "Yukarıdaki gibi, ancak yönetici sayfasını yeni bir pencerede açar."
 
 msgid "Tags"
 msgstr "Etiketler"
@@ -155,6 +121,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
+msgid "Fields"
+msgstr "Alanlar"
+
 msgid "Field"
 msgstr "Alan"
 
@@ -163,6 +132,15 @@ msgstr "Tür"
 
 msgid "Description"
 msgstr "Açıklama"
+
+msgid "Methods with arguments"
+msgstr "Bağımsız değişkenleri olan yöntemler"
+
+msgid "Method"
+msgstr "Yöntem"
+
+msgid "Arguments"
+msgstr "Bağımsız değişkenler"
 
 msgid "Back to Model Documentation"
 msgstr "Model Belgelerine Geri Dön"

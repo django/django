@@ -12,8 +12,7 @@ from django.utils._os import npath, upath
 def has_bom(fn):
     with open(fn, 'rb') as f:
         sample = f.read(4)
-    return (sample[:3] == b'\xef\xbb\xbf' or
-        sample.startswith((codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE)))
+    return sample.startswith((codecs.BOM_UTF8, codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE))
 
 
 def is_writable(path):
@@ -37,19 +36,25 @@ class Command(BaseCommand):
     program_options = ['--check-format']
 
     def add_arguments(self, parser):
-        parser.add_argument('--locale', '-l', dest='locale', action='append', default=[],
+        parser.add_argument(
+            '--locale', '-l', dest='locale', action='append', default=[],
             help='Locale(s) to process (e.g. de_AT). Default is to process all. '
-            'Can be used multiple times.')
-        parser.add_argument('--exclude', '-x', dest='exclude', action='append', default=[],
-            help='Locales to exclude. Default is none. Can be used multiple times.')
-        parser.add_argument('--use-fuzzy', '-f', dest='fuzzy', action='store_true', default=False,
-            help='Use fuzzy translations.')
+                 'Can be used multiple times.',
+        )
+        parser.add_argument(
+            '--exclude', '-x', dest='exclude', action='append', default=[],
+            help='Locales to exclude. Default is none. Can be used multiple times.',
+        )
+        parser.add_argument(
+            '--use-fuzzy', '-f', dest='fuzzy', action='store_true', default=False,
+            help='Use fuzzy translations.',
+        )
 
     def handle(self, **options):
-        locale = options.get('locale')
-        exclude = options.get('exclude')
-        self.verbosity = int(options.get('verbosity'))
-        if options.get('fuzzy'):
+        locale = options['locale']
+        exclude = options['exclude']
+        self.verbosity = options['verbosity']
+        if options['fuzzy']:
             self.program_options = self.program_options + ['-f']
 
         if find_command(self.program) is None:
@@ -117,8 +122,9 @@ class Command(BaseCommand):
                                   "mo files will not be updated/created." % dirpath)
                 return
 
-            args = [self.program] + self.program_options + ['-o',
-                    npath(base_path + '.mo'), npath(base_path + '.po')]
+            args = [self.program] + self.program_options + [
+                '-o', npath(base_path + '.mo'), npath(base_path + '.po')
+            ]
             output, errors, status = popen_wrapper(args)
             if status:
                 if errors:

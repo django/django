@@ -2,15 +2,13 @@ import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import (
+from django.urls import (
     LocaleRegexURLResolver, RegexURLPattern, RegexURLResolver,
 )
 from django.utils import six
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 
-__all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'patterns', 'url']
+__all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'url']
 
 handler400 = 'django.views.defaults.bad_request'
 handler403 = 'django.views.defaults.permission_denied'
@@ -76,38 +74,12 @@ def include(arg, namespace=None, app_name=None):
     return (urlconf_module, app_name, namespace)
 
 
-def patterns(prefix, *args):
-    warnings.warn(
-        'django.conf.urls.patterns() is deprecated and will be removed in '
-        'Django 1.10. Update your urlpatterns to be a list of '
-        'django.conf.urls.url() instances instead.',
-        RemovedInDjango110Warning, stacklevel=2
-    )
-    pattern_list = []
-    for t in args:
-        if isinstance(t, (list, tuple)):
-            t = url(prefix=prefix, *t)
-        elif isinstance(t, RegexURLPattern):
-            t.add_prefix(prefix)
-        pattern_list.append(t)
-    return pattern_list
-
-
-def url(regex, view, kwargs=None, name=None, prefix=''):
+def url(regex, view, kwargs=None, name=None):
     if isinstance(view, (list, tuple)):
         # For include(...) processing.
         urlconf_module, app_name, namespace = view
         return RegexURLResolver(regex, urlconf_module, kwargs, app_name=app_name, namespace=namespace)
-    else:
-        if isinstance(view, six.string_types):
-            warnings.warn(
-                'Support for string view arguments to url() is deprecated and '
-                'will be removed in Django 1.10 (got %s). Pass the callable '
-                'instead.' % view,
-                RemovedInDjango110Warning, stacklevel=2
-            )
-            if not view:
-                raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % regex)
-            if prefix:
-                view = prefix + '.' + view
+    elif callable(view):
         return RegexURLPattern(regex, view, kwargs, name)
+    else:
+        raise TypeError('view must be a callable or a list/tuple in the case of include().')

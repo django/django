@@ -16,10 +16,10 @@ how to write new tests.
 .. _running-unit-tests:
 
 Running the unit tests
-----------------------
+======================
 
 Quickstart
-~~~~~~~~~~
+----------
 
 If you are on Python 2, you'll first need to install a backport of the
 ``unittest.mock`` module that's available in Python 3. See
@@ -48,12 +48,13 @@ Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 .. _running-unit-tests-settings:
 
 Using another ``settings`` module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
-The included settings module allows you to run the test suite using
-SQLite. If you want to test behavior using a different database (and
-if you're proposing patches for Django, it's a good idea to test
-across databases), you may need to define your own settings file.
+The included settings module (``tests/test_sqlite.py``) allows you to run the
+test suite using SQLite. If you want to run the tests using a different
+database, you'll need to define your own settings file. Some tests, such as
+those for ``contrib.postgres``, are specific to a particular database backend
+and will be skipped if run with a different backend.
 
 To run the tests with different settings, ensure that the module is on your
 ``PYTHONPATH`` and pass the module with ``--settings``.
@@ -62,13 +63,11 @@ The :setting:`DATABASES` setting in any test settings module needs to define
 two databases:
 
 * A ``default`` database. This database should use the backend that
-  you want to use for primary testing
+  you want to use for primary testing.
 
-* A database with the alias ``other``. The ``other`` database is used to
-  establish that queries can be directed to different databases. As a result,
-  this database can use any backend you want. It doesn't need to use the same
-  backend as the ``default`` database (although it can use the same backend if
-  you want to). It cannot be the same database as the ``default``.
+* A database with the alias ``other``. The ``other`` database is used to test
+  that queries can be directed to different databases. This database should use
+  the same backend as the ``default``, and it must have a different name.
 
 If you're using a backend that isn't SQLite, you will need to provide other
 details for each database:
@@ -86,13 +85,13 @@ These test databases are deleted when the tests are finished.
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
-you will need to include a value for :setting:`TEST_CHARSET` in the settings
-dictionary for the applicable database.
+you will need to include a value for :setting:`CHARSET <TEST_CHARSET>` in the
+test settings dictionary for the applicable database.
 
 .. _runtests-specifying-labels:
 
 Running only some of the tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Django's entire test suite takes a while to run, and running every single test
 could be redundant if, say, you just added a test to Django that you want to
@@ -119,32 +118,43 @@ Going beyond that, you can specify an individual test method like this::
    $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
 
 Running the Selenium tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
-Some tests require Selenium and a Web browser (Firefox, Google Chrome, or
-Internet Explorer). To allow those tests to be run rather than skipped, you must
-install the selenium_ package into your Python path and run the tests with the
-``--selenium`` option::
+Some tests require Selenium and a Web browser. To run these tests, you must
+install the selenium_ package and run the tests with the
+``--selenium=<BROWSERS>`` option. For example, if you have Firefox and Google
+Chrome installed::
 
-   $ ./runtests.py --settings=test_sqlite --selenium admin_inlines
+   $ ./runtests.py --selenium=firefox,chrome
+
+See the `selenium.webdriver`_ package for the list of available browsers.
+
+Specifying ``--selenium`` automatically sets ``--tags=selenium`` to run only
+the tests that require selenium.
+
+.. _selenium.webdriver: https://github.com/SeleniumHQ/selenium/tree/master/py/selenium/webdriver
 
 .. _running-unit-tests-dependencies:
 
 Running all the tests
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
+*  argon2-cffi_ 16.1.0+
 *  bcrypt_
 *  docutils_
+*  enum34_ (Python 2 only)
+*  geoip2_
+*  jinja2_ 2.7+
 *  numpy_
 *  Pillow_
 *  PyYAML_
 *  pytz_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
-*  mock_ (for Python < 3.3)
+*  mock_ (for Python 2)
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
 *  sqlparse_
@@ -167,8 +177,12 @@ and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
+.. _argon2-cffi: https://pypi.python.org/pypi/argon2_cffi
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
+.. _enum34: https://pypi.python.org/pypi/enum34
+.. _geoip2: https://pypi.python.org/pypi/geoip2
+.. _jinja2: https://pypi.python.org/pypi/jinja2
 .. _numpy: https://pypi.python.org/pypi/numpy
 .. _Pillow: https://pypi.python.org/pypi/Pillow/
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
@@ -176,21 +190,22 @@ associated tests will be skipped.
 .. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
 .. _mock: https://pypi.python.org/pypi/mock
-.. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
+.. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: https://pypi.python.org/pypi/selenium
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
-.. _pip requirements files: http://www.pip-installer.org/en/latest/user_guide.html#requirements-files
+.. _pip requirements files: https://pip.pypa.io/en/latest/user_guide.html#requirements-files
 
 Code coverage
-~~~~~~~~~~~~~
+-------------
 
 Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
 in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
-To run coverage on the Django test suite using the standard test settings::
+Coverage should be run in a single process to obtain accurate statistics. To
+run coverage on the Django test suite using the standard test settings::
 
-   $ coverage run ./runtests.py --settings=test_sqlite
+   $ coverage run ./runtests.py --settings=test_sqlite --parallel=1
 
 After running coverage, generate the html report by running::
 
@@ -204,7 +219,7 @@ and also excludes several directories not relevant to the results
 .. _contrib-apps:
 
 Contrib apps
-------------
+============
 
 Tests for contrib apps can be found in the ``tests/`` directory, typically
 under ``<app_name>_tests``. For example, tests for ``contrib.auth`` are located
@@ -213,10 +228,10 @@ in ``tests/auth_tests``.
 .. _troubleshooting-unit-tests:
 
 Troubleshooting
----------------
+===============
 
 Many test failures with ``UnicodeEncodeError``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 If the ``locales`` package is not installed, some tests will fail with a
 ``UnicodeEncodeError``.
@@ -227,7 +242,7 @@ You can resolve this on Debian-based systems, for example, by running::
     $ dpkg-reconfigure locales
 
 Tests that only fail in combination
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 In case a test passes when run in isolation but fails within the whole suite,
 we have some tools to help analyze the problem.
@@ -271,12 +286,137 @@ cause any trouble::
 
     $ ./runtests.py basic --reverse
 
+Seeing the SQL queries run during a test
+----------------------------------------
+
 If you wish to examine the SQL being run in failing tests, you can turn on
 :ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
 combine this with ``--verbosity=2``, all SQL queries will be output::
 
     $ ./runtests.py basic --debug-sql
 
-.. versionadded:: 1.8
+Seeing the full traceback of a test failure
+-------------------------------------------
 
-    The ``--reverse`` and ``--debug-sql`` options were added.
+By default tests are run in parallel with one process per core. When the tests
+are run in parallel, however, you'll only see a truncated traceback for any
+test failures. You can adjust this behavior with the ``--parallel`` option::
+
+    $ ./runtests.py basic --parallel=1
+
+You can also use the ``DJANGO_TEST_PROCESSES`` environment variable for this
+purpose.
+
+Tips for writing tests
+----------------------
+
+.. highlight:: python
+
+Isolating model registration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To avoid polluting the global :attr:`~django.apps.apps` registry and prevent
+unnecessary table creation, models defined in a test method should be bound to
+a temporary ``Apps`` instance::
+
+    from django.apps.registry import Apps
+    from django.db import models
+    from django.test import SimpleTestCase
+
+    class TestModelDefinition(SimpleTestCase):
+        def test_model_definition(self):
+            test_apps = Apps(['app_label'])
+
+            class TestModel(models.Model):
+                class Meta:
+                    apps = test_apps
+            ...
+
+.. function:: django.test.utils.isolate_apps(*app_labels, attr_name=None, kwarg_name=None)
+
+.. versionadded:: 1.10
+
+Since this pattern involves a lot of boilerplate, Django provides the
+:func:`~django.test.utils.isolate_apps` decorator. It's used like this::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    class TestModelDefinition(SimpleTestCase):
+        @isolate_apps('app_label')
+        def test_model_definition(self):
+            class TestModel(models.Model):
+                pass
+            ...
+
+.. admonition:: Setting ``app_label``
+
+    Models defined in a test method with no explicit
+    :attr:`~django.db.models.Options.app_label` are automatically assigned the
+    label of the app in which their test class is located.
+
+    In order to make sure the models defined within the context of
+    :func:`~django.test.utils.isolate_apps` instances are correctly
+    installed, you should pass the set of targeted ``app_label`` as arguments:
+
+    .. snippet::
+        :filename: tests/app_label/tests.py
+
+        from django.db import models
+        from django.test import SimpleTestCase
+        from django.test.utils import isolate_apps
+
+        class TestModelDefinition(SimpleTestCase):
+            @isolate_apps('app_label', 'other_app_label')
+            def test_model_definition(self):
+                # This model automatically receives app_label='app_label'
+                class TestModel(models.Model):
+                    pass
+
+                class OtherAppModel(models.Model):
+                    class Meta:
+                        app_label = 'other_app_label'
+                ...
+
+The decorator can also be applied to classes::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    @isolate_apps('app_label')
+    class TestModelDefinition(SimpleTestCase):
+        def test_model_definition(self):
+            class TestModel(models.Model):
+                pass
+            ...
+
+The temporary ``Apps`` instance used to isolate model registration can be
+retrieved as an attribute when used as a class decorator by using the
+``attr_name`` parameter::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    @isolate_apps('app_label', attr_name='apps')
+    class TestModelDefinition(SimpleTestCase):
+        def test_model_definition(self):
+            class TestModel(models.Model):
+                pass
+            self.assertIs(self.apps.get_model('app_label', 'TestModel'), TestModel)
+
+Or as an argument on the test method when used as a method decorator by using
+the ``kwarg_name`` parameter::
+
+    from django.db import models
+    from django.test import SimpleTestCase
+    from django.test.utils import isolate_apps
+
+    class TestModelDefinition(SimpleTestCase):
+        @isolate_apps('app_label', kwarg_name='apps')
+        def test_model_definition(self, apps):
+            class TestModel(models.Model):
+                pass
+            self.assertIs(apps.get_model('app_label', 'TestModel'), TestModel)

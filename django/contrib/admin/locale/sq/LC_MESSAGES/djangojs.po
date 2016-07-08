@@ -2,14 +2,15 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011-2012
+# Besnik <besnik@programeshqip.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-12-16 14:10+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-25 08:55+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
-"Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,15 +20,15 @@ msgstr ""
 
 #, javascript-format
 msgid "Available %s"
-msgstr "I mundshëm %s"
+msgstr "%s i gatshëm"
 
 #, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Kjo është lista e %s të passhme. Mund të zgjidhni disa duke i përzgjedhur te "
-"kutiza më poshtë e mandej duke klikuar mbi shigjetën \"Zgjidhe\" mes dy "
+"Kjo është lista e %s të gatshëm. Mund të zgjidhni disa duke i përzgjedhur te "
+"kutiza më poshtë dhe mandej duke klikuar mbi shigjetën \"Zgjidhe\" mes dy "
 "kutizave."
 
 #, javascript-format
@@ -48,7 +49,7 @@ msgid "Choose"
 msgstr "Zgjidhni"
 
 msgid "Remove"
-msgstr "Hiq"
+msgstr "Hiqe"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -59,7 +60,7 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"Kjo është lista e %s të passhme. Mund të hiqni disa duke i përzgjedhur te "
+"Kjo është lista e %s të gatshme. Mund të hiqni disa duke i përzgjedhur te "
 "kutiza më poshtë e mandej duke klikuar mbi shigjetën \"Hiqe\" mes dy "
 "kutizave."
 
@@ -88,7 +89,7 @@ msgid ""
 "action."
 msgstr ""
 "Keni përzgjedhur një veprim, por nuk keni ruajtur ende ndryshimet që bëtë te "
-"fusha individuale. Ju lutem, klikoni OK që të bëhet ruajtja. Do t’ju duhet "
+"fusha individuale. Ju lutemi, klikoni OK që të bëhet ruajtja. Do t’ju duhet "
 "ta ribëni veprimin."
 
 msgid ""
@@ -97,7 +98,7 @@ msgid ""
 "button."
 msgstr ""
 "Keni përzgjedhur një veprim, dhe nuk keni bërë ndonjë ndryshim te fusha "
-"individuale. Ndoshta po kërkonit për butonin Shko, në vend se të butonit "
+"individuale. Ndoshta po kërkonit për butonin Shko, në vend se për butonin "
 "Ruaje."
 
 #, javascript-format
@@ -115,8 +116,8 @@ msgstr[1] "Shënim: Jeni %s orë pas kohës së shërbyesit."
 msgid "Now"
 msgstr "Tani"
 
-msgid "Clock"
-msgstr "Orë"
+msgid "Choose a Time"
+msgstr "Zgjidhni një Kohë"
 
 msgid "Choose a time"
 msgstr "Zgjidhni një kohë"
@@ -130,14 +131,17 @@ msgstr "6 a.m."
 msgid "Noon"
 msgstr "Mesditë"
 
+msgid "6 p.m."
+msgstr "6 p.m."
+
 msgid "Cancel"
 msgstr "Anuloje"
 
 msgid "Today"
 msgstr "Sot"
 
-msgid "Calendar"
-msgstr "Kalendar"
+msgid "Choose a Date"
+msgstr "Zgjidhni një Datë"
 
 msgid "Yesterday"
 msgstr "Dje"

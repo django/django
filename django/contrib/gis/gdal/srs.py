@@ -55,9 +55,6 @@ class SpatialReference(GDALBase):
             self.import_wkt(srs_input)
             return
         elif isinstance(srs_input, six.string_types):
-            # Encoding to ASCII if unicode passed in.
-            if isinstance(srs_input, six.text_type):
-                srs_input = srs_input.encode('ascii')
             try:
                 # If SRID is a string, e.g., '4326', then make acceptable
                 # as user input.
@@ -96,8 +93,10 @@ class SpatialReference(GDALBase):
 
     def __del__(self):
         "Destroys this spatial reference."
-        if self._ptr and capi:
+        try:
             capi.release_srs(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     def __getitem__(self, target):
         """
@@ -295,7 +294,7 @@ class SpatialReference(GDALBase):
 
     def import_wkt(self, wkt):
         "Imports the Spatial Reference from OGC WKT (string)"
-        capi.from_wkt(self.ptr, byref(c_char_p(wkt)))
+        capi.from_wkt(self.ptr, byref(c_char_p(force_bytes(wkt))))
 
     def import_xml(self, xml):
         "Imports the Spatial Reference from an XML string."
@@ -325,7 +324,7 @@ class SpatialReference(GDALBase):
     @property
     def xml(self, dialect=''):
         "Returns the XML representation of this Spatial Reference."
-        return capi.to_xml(self.ptr, byref(c_char_p()), dialect)
+        return capi.to_xml(self.ptr, byref(c_char_p()), force_bytes(dialect))
 
 
 class CoordTransform(GDALBase):
@@ -341,8 +340,10 @@ class CoordTransform(GDALBase):
 
     def __del__(self):
         "Deletes this Coordinate Transformation object."
-        if self._ptr and capi:
+        try:
             capi.destroy_ct(self._ptr)
+        except (AttributeError, TypeError):
+            pass
 
     def __str__(self):
         return 'Transform from "%s" to "%s"' % (self._srs1_name, self._srs2_name)

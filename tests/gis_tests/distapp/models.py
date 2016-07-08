@@ -21,6 +21,7 @@ class NamedModel(models.Model):
 class SouthTexasCity(NamedModel):
     "City model on projected coordinate system for South Texas."
     point = models.PointField(srid=32140)
+    radius = models.IntegerField(default=10000)
 
 
 class SouthTexasCityFt(NamedModel):
@@ -31,6 +32,7 @@ class SouthTexasCityFt(NamedModel):
 class AustraliaCity(NamedModel):
     "City model for Australia, using WGS84."
     point = models.PointField()
+    radius = models.IntegerField(default=10000)
 
 
 class CensusZipcode(NamedModel):

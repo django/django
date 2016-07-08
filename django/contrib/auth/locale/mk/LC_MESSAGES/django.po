@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:30+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
-"language/mk/)\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2016-04-26 14:16+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
+"mk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -30,7 +32,7 @@ msgstr "Важни датуми"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Не постои %(name)s објект со примарен клуч %(key)r."
 
 msgid "Password changed successfully."
 msgstr "Успешна промена на лозинката."
@@ -41,6 +43,12 @@ msgstr "Промени лозинка: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Автентикација и авторизација"
+
+msgid "password"
+msgstr "лозинка"
+
+msgid "last login"
+msgstr "последна најава"
 
 msgid "No password set."
 msgstr "Нема зададена лозинка."
@@ -57,17 +65,17 @@ msgstr "Лозинка"
 msgid "Password confirmation"
 msgstr "Потврда на лозинка"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Заради верификација внесете ја истата лозинка како и горе."
+msgid "Enter the same password as before, for verification."
+msgstr "Внесете ја истата лозинка како претходно, за верификација."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"Лозинките не се чуваат во оригинална форма, така што не постои начин да ја "
-"видите лозинката на овој корисник, но можете да ја смените лозинката со "
-"користење на <a href=\"password/\">оваа форма</a> ."
+"Лозинките не се чуваат како што се внесени, па не постои начин да се види "
+"лозинката за даден корисник, но можете да ја промените лозинката со "
+"користење на <a href=\"../password/\">оваа форма</a>."
 
 #, python-format
 msgid ""
@@ -120,6 +128,9 @@ msgstr "проверка"
 msgid "name"
 msgstr "име"
 
+msgid "content type"
+msgstr "тип содржина"
+
 msgid "codename"
 msgstr "кодно име"
 
@@ -134,12 +145,6 @@ msgstr "група"
 
 msgid "groups"
 msgstr "групи"
-
-msgid "password"
-msgstr "лозинка"
-
-msgid "last login"
-msgstr "последна најава"
 
 msgid "superuser status"
 msgstr "статус на суперкорисник"
@@ -215,6 +220,46 @@ msgstr "корисник"
 
 msgid "users"
 msgstr "корисници"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Оваа лозинка е премногу кратка. Мора да содржи најмалку %(min_length)d "
+"карактер."
+msgstr[1] ""
+"Оваа лозинка е премногу кратка. Мора да содржи најмалку %(min_length)d "
+"карактери."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Вашата лозинка мора да содржи најмалку %(min_length)d карактер."
+msgstr[1] "Вашата лозинка мора да содржи најмалку %(min_length)d карактери."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Лозинката е премногу слична со %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"Вашата лозинка не смее да биде премногу слична со други лични информации."
+
+msgid "This password is too common."
+msgstr "Оваа лозинка е премногу често користена."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Вашата лозинка не смее да биде лозинка која се користи многу често."
+
+msgid "This password is entirely numeric."
+msgstr "Оваа лозинка содржи само цифри."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Вашата лозинка не може да содржи само цифри."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

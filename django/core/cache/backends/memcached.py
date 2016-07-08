@@ -53,10 +53,11 @@ class BaseMemcachedCache(BaseCache):
             timeout = -1
 
         if timeout > 2592000:  # 60*60*24*30, 30 days
-            # See http://code.google.com/p/memcached/wiki/FAQ
-            # "You can set expire times up to 30 days in the future. After that
-            # memcached interprets it as a date, and will expire the item after
-            # said date. This is a simple (but obscure) mechanic."
+            # See https://github.com/memcached/memcached/wiki/Programming#expiration
+            # "Expiration times can be set from 0, meaning "never expire", to
+            # 30 days. Any time higher than 30 days is interpreted as a Unix
+            # timestamp date. If you want to expire an object on January 1st of
+            # next year, this is how you do that."
             #
             # This means that we have to switch to absolute timestamps.
             timeout += int(time.time())
@@ -145,8 +146,7 @@ class BaseMemcachedCache(BaseCache):
         self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
 
     def delete_many(self, keys, version=None):
-        l = lambda x: self.make_key(x, version=version)
-        self._cache.delete_multi(map(l, keys))
+        self._cache.delete_multi(self.make_key(key, version=version) for key in keys)
 
     def clear(self):
         self._cache.flush_all()

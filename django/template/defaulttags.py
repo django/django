@@ -1,7 +1,6 @@
 """Default tags used by the template system, available to all templates."""
 from __future__ import unicode_literals
 
-import os
 import re
 import sys
 import warnings
@@ -10,16 +9,15 @@ from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
 from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, smart_text
-from django.utils.html import format_html
+from django.utils.html import conditional_escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
 
 from .base import (
     BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
     SINGLE_BRACE_END, SINGLE_BRACE_START, VARIABLE_ATTRIBUTE_SEPARATOR,
-    VARIABLE_TAG_END, VARIABLE_TAG_START, Context, Node, NodeList, Template,
+    VARIABLE_TAG_END, VARIABLE_TAG_START, Context, Node, NodeList,
     TemplateSyntaxError, VariableDoesNotExist, kwarg_re,
     render_value_in_context, token_kwargs,
 )
@@ -201,11 +199,10 @@ class ForNode(Node):
                         len_item = len(item)
                     # Check loop variable count before unpacking
                     if num_loopvars != len_item:
-                        warnings.warn(
+                        raise ValueError(
                             "Need {} values to unpack in for loop; got {}. "
-                            "This will raise an exception in Django 1.10."
                             .format(num_loopvars, len_item),
-                            RemovedInDjango110Warning)
+                        )
                     try:
                         unpacked_vars = dict(zip(self.loopvars, item))
                     except TypeError:
@@ -373,44 +370,6 @@ class RegroupNode(Node):
         return ''
 
 
-def include_is_allowed(filepath, allowed_include_roots):
-    filepath = os.path.abspath(filepath)
-    for root in allowed_include_roots:
-        if filepath.startswith(root):
-            return True
-    return False
-
-
-class SsiNode(Node):
-    def __init__(self, filepath, parsed):
-        self.filepath = filepath
-        self.parsed = parsed
-
-    def render(self, context):
-        filepath = self.filepath.resolve(context)
-
-        if not include_is_allowed(filepath, context.template.engine.allowed_include_roots):
-            if settings.DEBUG:
-                return "[Didn't have permission to include file]"
-            else:
-                return ''  # Fail silently for invalid includes.
-        try:
-            with open(filepath, 'r') as fp:
-                output = fp.read()
-        except IOError:
-            output = ''
-        if self.parsed:
-            try:
-                t = Template(output, name=filepath, engine=context.template.engine)
-                return t.render(context)
-            except TemplateSyntaxError as e:
-                if settings.DEBUG:
-                    return "[Included template had syntax error: %s]" % e
-                else:
-                    return ''  # Fail silently for invalid included templates.
-        return output
-
-
 class LoadNode(Node):
     def render(self, context):
         return ''
@@ -467,51 +426,35 @@ class URLNode(Node):
         self.asvar = asvar
 
     def render(self, context):
-        from django.core.urlresolvers import reverse, NoReverseMatch
+        from django.urls import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
         kwargs = {
             smart_text(k, 'ascii'): v.resolve(context)
             for k, v in self.kwargs.items()
         }
-
         view_name = self.view_name.resolve(context)
-
         try:
             current_app = context.request.current_app
         except AttributeError:
-            # Change the fallback value to None when the deprecation path for
-            # Context.current_app completes in Django 1.10.
-            current_app = context.current_app
-
-        # Try to look up the URL twice: once given the view name, and again
-        # relative to what we guess is the "main" app. If they both fail,
-        # re-raise the NoReverseMatch unless we're using the
-        # {% url ... as var %} construct in which case return nothing.
+            try:
+                current_app = context.request.resolver_match.namespace
+            except AttributeError:
+                current_app = None
+        # Try to look up the URL. If it fails, raise NoReverseMatch unless the
+        # {% url ... as var %} construct is used, in which case return nothing.
         url = ''
         try:
             url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
         except NoReverseMatch:
-            exc_info = sys.exc_info()
-            if settings.SETTINGS_MODULE:
-                project_name = settings.SETTINGS_MODULE.split('.')[0]
-                try:
-                    url = reverse(project_name + '.' + view_name,
-                              args=args, kwargs=kwargs,
-                              current_app=current_app)
-                except NoReverseMatch:
-                    if self.asvar is None:
-                        # Re-raise the original exception, not the one with
-                        # the path relative to the project. This makes a
-                        # better error message.
-                        six.reraise(*exc_info)
-            else:
-                if self.asvar is None:
-                    raise
+            if self.asvar is None:
+                raise
 
         if self.asvar:
             context[self.asvar] = url
             return ''
         else:
+            if context.autoescape:
+                url = conditional_escape(url)
             return url
 
 
@@ -633,7 +576,6 @@ def cycle(parser, token):
             {% cycle 'row1' 'row2' as rowcolors silent %}
             <tr class="{{ rowcolors }}">{% include "subtemplate.html " %}</tr>
         {% endfor %}
-
     """
     # Note: This returns the exact same node on each {% cycle name %} call;
     # that is, the node object returned from {% cycle a b c as name %} and the
@@ -649,15 +591,6 @@ def cycle(parser, token):
 
     if len(args) < 2:
         raise TemplateSyntaxError("'cycle' tag requires at least two arguments")
-
-    if ',' in args[1]:
-        warnings.warn(
-            "The old {% cycle %} syntax with comma-separated arguments is deprecated.",
-            RemovedInDjango110Warning,
-        )
-        # Backwards compatibility: {% cycle a,b %} or {% cycle a,b as foo %}
-        # case.
-        args[1:2] = ['"%s"' % arg for arg in args[1].split(",")]
 
     if len(args) == 2:
         # {% cycle foo %} case.
@@ -748,7 +681,7 @@ def do_filter(parser, token):
 @register.tag
 def firstof(parser, token):
     """
-    Outputs the first variable passed that is not False, without escaping.
+    Outputs the first variable passed that is not False.
 
     Outputs nothing if all the passed variables are False.
 
@@ -759,11 +692,11 @@ def firstof(parser, token):
     This is equivalent to::
 
         {% if var1 %}
-            {{ var1|safe }}
+            {{ var1 }}
         {% elif var2 %}
-            {{ var2|safe }}
+            {{ var2 }}
         {% elif var3 %}
-            {{ var3|safe }}
+            {{ var3 }}
         {% endif %}
 
     but obviously much cleaner!
@@ -782,7 +715,6 @@ def firstof(parser, token):
     Or if only some variables should be escaped, you can use::
 
         {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
-
     """
     bits = token.split_contents()[1:]
     asvar = None
@@ -832,7 +764,7 @@ def do_for(parser, token):
     than -- the following::
 
         <ul>
-          {% if althete_list %}
+          {% if athlete_list %}
             {% for athlete in athlete_list %}
               <li>{{ athlete.name }}</li>
             {% endfor %}
@@ -857,7 +789,6 @@ def do_for(parser, token):
         ``forloop.parentloop``      For nested loops, this is the loop "above" the
                                     current one
         ==========================  ================================================
-
     """
     bits = token.split_contents()
     if len(bits) < 4:
@@ -1038,7 +969,8 @@ def do_if(parser, token):
         token = parser.next_token()
 
     # {% endif %}
-    assert token.contents == 'endif'
+    if token.contents != 'endif':
+        raise TemplateSyntaxError('Malformed template tag at line {0}: "{1}"'.format(token.lineno, token.contents))
 
     return IfNode(conditions_nodelists)
 
@@ -1083,42 +1015,6 @@ def ifchanged(parser, token):
         nodelist_false = NodeList()
     values = [parser.compile_filter(bit) for bit in bits[1:]]
     return IfChangedNode(nodelist_true, nodelist_false, *values)
-
-
-@register.tag
-def ssi(parser, token):
-    """
-    Outputs the contents of a given file into the page.
-
-    Like a simple "include" tag, the ``ssi`` tag includes the contents
-    of another file -- which must be specified using an absolute path --
-    in the current page::
-
-        {% ssi "/home/html/ljworld.com/includes/right_generic.html" %}
-
-    If the optional "parsed" parameter is given, the contents of the included
-    file are evaluated as template code, with the current context::
-
-        {% ssi "/home/html/ljworld.com/includes/right_generic.html" parsed %}
-    """
-    warnings.warn(
-        "The {% ssi %} tag is deprecated. Use the {% include %} tag instead.",
-        RemovedInDjango110Warning,
-    )
-
-    bits = token.split_contents()
-    parsed = False
-    if len(bits) not in (2, 3):
-        raise TemplateSyntaxError("'ssi' tag takes one argument: the path to"
-                                  " the file to be included")
-    if len(bits) == 3:
-        if bits[2] == 'parsed':
-            parsed = True
-        else:
-            raise TemplateSyntaxError("Second (optional) argument to %s tag"
-                                      " must be 'parsed'" % bits[0])
-    filepath = parser.compile_filter(bits[1])
-    return SsiNode(filepath, parsed)
 
 
 def find_library(parser, name):
@@ -1168,7 +1064,6 @@ def load(parser, token):
     a library::
 
         {% load byline from news %}
-
     """
     # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     bits = token.contents.split()
@@ -1301,7 +1196,6 @@ def regroup(parser, token):
     before using it, i.e.::
 
         {% regroup people|dictsort:"gender" by gender as grouped %}
-
     """
     bits = token.split_contents()
     if len(bits) != 6:
@@ -1394,71 +1288,48 @@ def templatetag(parser, token):
 @register.tag
 def url(parser, token):
     """
-    Returns an absolute URL matching given view with its parameters.
+    Return an absolute URL matching the given view with its parameters.
 
     This is a way to define links that aren't tied to a particular URL
     configuration::
 
-        {% url "path.to.some_view" arg1 arg2 %}
+        {% url "url_name" arg1 arg2 %}
 
         or
 
-        {% url "path.to.some_view" name1=value1 name2=value2 %}
+        {% url "url_name" name1=value1 name2=value2 %}
 
-    The first argument is a path to a view. It can be an absolute Python path
-    or just ``app_name.view_name`` without the project name if the view is
-    located inside the project.
+    The first argument is a django.conf.urls.url() name. Other arguments are
+    space-separated values that will be filled in place of positional and
+    keyword arguments in the URL. Don't mix positional and keyword arguments.
+    All arguments for the URL must be present.
 
-    Other arguments are space-separated values that will be filled in place of
-    positional and keyword arguments in the URL. Don't mix positional and
-    keyword arguments.
+    For example, if you have a view ``app_name.views.client_details`` taking
+    the client's id and the corresponding line in a URLconf looks like this::
 
-    All arguments for the URL should be present.
-
-    For example if you have a view ``app_name.client`` taking client's id and
-    the corresponding line in a URLconf looks like this::
-
-        ('^client/(\d+)/$', 'app_name.client')
+        url('^client/(\d+)/$', views.client_details, name='client-detail-view')
 
     and this app's URLconf is included into the project's URLconf under some
     path::
 
-        ('^clients/', include('project_name.app_name.urls'))
+        url('^clients/', include('app_name.urls'))
 
     then in a template you can create a link for a certain client like this::
 
-        {% url "app_name.client" client.id %}
+        {% url "client-detail-view" client.id %}
 
     The URL will look like ``/clients/client/123/``.
 
-    The first argument can also be a named URL instead of the Python path to
-    the view callable. For example if the URLconf entry looks like this::
-
-        url('^client/(\d+)/$', name='client-detail-view')
-
-    then in the template you can use::
-
-        {% url "client-detail-view" client.id %}
-
-    There is even another possible value type for the first argument. It can be
-    the name of a template variable that will be evaluated to obtain the view
-    name or the URL name, e.g.::
-
-        {% with view_path="app_name.client" %}
-        {% url view_path client.id %}
-        {% endwith %}
-
-        or,
+    The first argument may also be the name of a template variable that will be
+    evaluated to obtain the view name or the URL name, e.g.::
 
         {% with url_name="client-detail-view" %}
         {% url url_name client.id %}
         {% endwith %}
-
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        raise TemplateSyntaxError("'%s' takes at least one argument"
-                                  " (path to a view)" % bits[0])
+        raise TemplateSyntaxError("'%s' takes at least one argument, the name of a url()." % bits[0])
     viewname = parser.compile_filter(bits[1])
     args = []
     kwargs = {}

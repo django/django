@@ -14,7 +14,6 @@ def xframe_options_deny(view_func):
     @xframe_options_deny
     def some_view(request):
         ...
-
     """
     def wrapped_view(*args, **kwargs):
         resp = view_func(*args, **kwargs)
@@ -35,7 +34,6 @@ def xframe_options_sameorigin(view_func):
     @xframe_options_sameorigin
     def some_view(request):
         ...
-
     """
     def wrapped_view(*args, **kwargs):
         resp = view_func(*args, **kwargs)
@@ -55,7 +53,6 @@ def xframe_options_exempt(view_func):
     @xframe_options_exempt
     def some_view(request):
         ...
-
     """
     def wrapped_view(*args, **kwargs):
         resp = view_func(*args, **kwargs)

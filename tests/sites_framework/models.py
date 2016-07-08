@@ -23,11 +23,11 @@ class SyndicatedArticle(AbstractArticle):
 
 
 class ExclusiveArticle(AbstractArticle):
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(Site, models.CASCADE)
 
 
 class CustomArticle(AbstractArticle):
-    places_this_article_should_appear = models.ForeignKey(Site)
+    places_this_article_should_appear = models.ForeignKey(Site, models.CASCADE)
 
     objects = models.Manager()
     on_site = CurrentSiteManager("places_this_article_should_appear")

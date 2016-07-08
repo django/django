@@ -35,7 +35,8 @@ if GDAL_VERSION >= (2, 0):
 else:
     close_ds = void_output(std_call('GDALClose'), [c_void_p])
 flush_ds = int_output(std_call('GDALFlushCache'), [c_void_p])
-copy_ds = voidptr_output(std_call('GDALCreateCopy'),
+copy_ds = voidptr_output(
+    std_call('GDALCreateCopy'),
     [c_void_p, c_char_p, c_void_p, c_int, POINTER(c_char_p), c_void_p, c_void_p]
 )
 add_band_ds = void_output(std_call('GDALAddBand'), [c_void_p, c_int])
@@ -51,7 +52,8 @@ get_ds_geotransform = void_output(std_call('GDALGetGeoTransform'), [c_void_p, PO
 set_ds_geotransform = void_output(std_call('GDALSetGeoTransform'), [c_void_p, POINTER(c_double * 6)])
 
 # Raster Band Routines
-band_io = void_output(std_call('GDALRasterIO'),
+band_io = void_output(
+    std_call('GDALRasterIO'),
     [c_void_p, c_int, c_int, c_int, c_int, c_int, c_void_p, c_int, c_int, c_int, c_int, c_int]
 )
 get_band_xsize = int_output(std_call('GDALGetRasterBandXSize'), [c_void_p])
@@ -62,13 +64,28 @@ get_band_ds = voidptr_output(std_call('GDALGetBandDataset'), [c_void_p])
 get_band_datatype = int_output(std_call('GDALGetRasterDataType'), [c_void_p])
 get_band_nodata_value = double_output(std_call('GDALGetRasterNoDataValue'), [c_void_p, POINTER(c_int)])
 set_band_nodata_value = void_output(std_call('GDALSetRasterNoDataValue'), [c_void_p, c_double])
-get_band_minimum = double_output(std_call('GDALGetRasterMinimum'), [c_void_p, POINTER(c_int)])
-get_band_maximum = double_output(std_call('GDALGetRasterMaximum'), [c_void_p, POINTER(c_int)])
+if GDAL_VERSION >= (2, 1):
+    delete_band_nodata_value = void_output(std_call('GDALDeleteRasterNoDataValue'), [c_void_p])
+else:
+    delete_band_nodata_value = None
+get_band_statistics = void_output(
+    std_call('GDALGetRasterStatistics'),
+    [
+        c_void_p, c_int, c_int, POINTER(c_double), POINTER(c_double),
+        POINTER(c_double), POINTER(c_double), c_void_p, c_void_p,
+    ],
+)
+compute_band_statistics = void_output(
+    std_call('GDALComputeRasterStatistics'),
+    [c_void_p, c_int, POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double), c_void_p, c_void_p],
+)
 
 # Reprojection routine
-reproject_image = void_output(std_call('GDALReprojectImage'),
+reproject_image = void_output(
+    std_call('GDALReprojectImage'),
     [c_void_p, c_char_p, c_void_p, c_char_p, c_int, c_double, c_double, c_void_p, c_void_p, c_void_p]
 )
-auto_create_warped_vrt = voidptr_output(std_call('GDALAutoCreateWarpedVRT'),
+auto_create_warped_vrt = voidptr_output(
+    std_call('GDALAutoCreateWarpedVRT'),
     [c_void_p, c_char_p, c_char_p, c_int, c_double, c_void_p]
 )

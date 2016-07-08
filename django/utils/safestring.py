@@ -4,8 +4,11 @@ without further escaping in HTML. Marking something as a "safe string" means
 that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
+import warnings
+
 from django.utils import six
-from django.utils.functional import Promise, curry
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.functional import Promise, curry, wraps
 
 
 class EscapeData(object):
@@ -114,10 +117,19 @@ else:
     SafeUnicode = SafeText
 
 
+def _safety_decorator(safety_marker, func):
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        return safety_marker(func(*args, **kwargs))
+    return wrapped
+
+
 def mark_safe(s):
     """
     Explicitly mark a string as safe for (HTML) output purposes. The returned
     object can be used everywhere a string or unicode object is appropriate.
+
+    If used on a method as a decorator, mark the returned data as safe.
 
     Can be called multiple times on a single string.
     """
@@ -127,6 +139,8 @@ def mark_safe(s):
         return SafeBytes(s)
     if isinstance(s, (six.text_type, Promise)):
         return SafeText(s)
+    if callable(s):
+        return _safety_decorator(mark_safe, s)
     return SafeString(str(s))
 
 
@@ -138,6 +152,7 @@ def mark_for_escaping(s):
     Can be called multiple times on a single string (the resulting escaping is
     only applied once).
     """
+    warnings.warn('mark_for_escaping() is deprecated.', RemovedInDjango20Warning)
     if hasattr(s, '__html__') or isinstance(s, EscapeData):
         return s
     if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):

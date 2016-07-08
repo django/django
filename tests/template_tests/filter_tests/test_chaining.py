@@ -1,4 +1,8 @@
-from django.test import SimpleTestCase
+import warnings
+
+from django.test import SimpleTestCase, ignore_warnings
+from django.test.utils import reset_warning_registry
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -14,8 +18,10 @@ class ChainingTests(SimpleTestCase):
         output = self.engine.render_to_string('chaining01', {'a': 'a < b', 'b': mark_safe('a < b')})
         self.assertEqual(output, ' A &lt; b . A < b ')
 
-    @setup({'chaining02':
-        '{% autoescape off %}{{ a|capfirst|center:"7" }}.{{ b|capfirst|center:"7" }}{% endautoescape %}'})
+    @setup({
+        'chaining02':
+        '{% autoescape off %}{{ a|capfirst|center:"7" }}.{{ b|capfirst|center:"7" }}{% endautoescape %}'
+    })
     def test_chaining02(self):
         output = self.engine.render_to_string('chaining02', {'a': 'a < b', 'b': mark_safe('a < b')})
         self.assertEqual(output, ' A < b . A < b ')
@@ -26,8 +32,9 @@ class ChainingTests(SimpleTestCase):
         output = self.engine.render_to_string('chaining03', {'a': 'a < b', 'b': mark_safe('a < b')})
         self.assertEqual(output, 'A &lt; .A < ')
 
-    @setup({'chaining04':
-        '{% autoescape off %}{{ a|cut:"b"|capfirst }}.{{ b|cut:"b"|capfirst }}{% endautoescape %}'})
+    @setup({
+        'chaining04': '{% autoescape off %}{{ a|cut:"b"|capfirst }}.{{ b|cut:"b"|capfirst }}{% endautoescape %}'
+    })
     def test_chaining04(self):
         output = self.engine.render_to_string('chaining04', {'a': 'a < b', 'b': mark_safe('a < b')})
         self.assertEqual(output, 'A < .A < ')
@@ -35,9 +42,20 @@ class ChainingTests(SimpleTestCase):
     # Using a filter that forces safeness does not lead to double-escaping
     @setup({'chaining05': '{{ a|escape|capfirst }}'})
     def test_chaining05(self):
-        output = self.engine.render_to_string('chaining05', {'a': 'a < b'})
-        self.assertEqual(output, 'A &lt; b')
+        reset_warning_registry()
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            output = self.engine.render_to_string('chaining05', {'a': 'a < b'})
+            self.assertEqual(output, 'A &lt; b')
 
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            "escape isn't the last filter in ['escape_filter', 'capfirst'] and "
+            "will be applied immediately in Django 2.0 so the output may change."
+        )
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'chaining06': '{% autoescape off %}{{ a|escape|capfirst }}{% endautoescape %}'})
     def test_chaining06(self):
         output = self.engine.render_to_string('chaining06', {'a': 'a < b'})

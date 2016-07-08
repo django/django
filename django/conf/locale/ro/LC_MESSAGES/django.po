@@ -3,17 +3,19 @@
 # Translators:
 # mihneasim <contact@mesimian.com>, 2011
 # Daniel Ursache-Dogariu <contact@danniel.net>, 2011
-# Denis Darii <sinednx@gmail.com>, 2011,2014
+# Denis Darii <denis.darii@gmail.com>, 2011,2014
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Răzvan Ionescu <ionescu77@gmail.com>, 2015
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-01-07 10:01+0000\n"
+"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,13 +25,13 @@ msgstr ""
 "2:1));\n"
 
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikaans"
 
 msgid "Arabic"
 msgstr "Arabă"
 
 msgid "Asturian"
-msgstr ""
+msgstr "Asturiană"
 
 msgid "Azerbaijani"
 msgstr "Azeră"
@@ -38,13 +40,13 @@ msgid "Bulgarian"
 msgstr "Bulgară"
 
 msgid "Belarusian"
-msgstr ""
+msgstr "Bielorusă"
 
 msgid "Bengali"
 msgstr "Bengaleză"
 
 msgid "Breton"
-msgstr ""
+msgstr "Bretonă"
 
 msgid "Bosnian"
 msgstr "Bosniacă"
@@ -71,19 +73,22 @@ msgid "English"
 msgstr "Engleză"
 
 msgid "Australian English"
-msgstr ""
+msgstr "Engleză australiană"
 
 msgid "British English"
 msgstr "Engleză britanică"
 
 msgid "Esperanto"
-msgstr ""
+msgstr "Esperanto"
 
 msgid "Spanish"
 msgstr "Spaniolă"
 
 msgid "Argentinian Spanish"
 msgstr "Spaniolă Argentiniană"
+
+msgid "Colombian Spanish"
+msgstr "Spaniolă Columbiană"
 
 msgid "Mexican Spanish"
 msgstr "Spaniolă Mexicană"
@@ -92,7 +97,7 @@ msgid "Nicaraguan Spanish"
 msgstr "Spaniolă Nicaragua"
 
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "Spaniolă venezueleană"
 
 msgid "Estonian"
 msgstr "Estonă"
@@ -115,6 +120,9 @@ msgstr "Frizian"
 msgid "Irish"
 msgstr "Irlandeză"
 
+msgid "Scottish Gaelic"
+msgstr "Galeză Scoțiană"
+
 msgid "Galician"
 msgstr "Galiciană"
 
@@ -131,13 +139,13 @@ msgid "Hungarian"
 msgstr "Ungară"
 
 msgid "Interlingua"
-msgstr ""
+msgstr "Interlingua"
 
 msgid "Indonesian"
 msgstr "Indoneză"
 
 msgid "Ido"
-msgstr ""
+msgstr "Ido"
 
 msgid "Icelandic"
 msgstr "Islandeză"
@@ -152,7 +160,7 @@ msgid "Georgian"
 msgstr "Georgiană"
 
 msgid "Kazakh"
-msgstr ""
+msgstr "Kazahă"
 
 msgid "Khmer"
 msgstr "Khmeră"
@@ -164,7 +172,7 @@ msgid "Korean"
 msgstr "Koreană"
 
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburgheză"
 
 msgid "Lithuanian"
 msgstr "Lituaniană"
@@ -182,16 +190,16 @@ msgid "Mongolian"
 msgstr "Mongolă"
 
 msgid "Marathi"
-msgstr ""
+msgstr "Marathi"
 
 msgid "Burmese"
-msgstr ""
+msgstr "Burmeză"
 
 msgid "Norwegian Bokmal"
 msgstr "Norvegiană Bokmal"
 
 msgid "Nepali"
-msgstr ""
+msgstr "Nepaleză"
 
 msgid "Dutch"
 msgstr "Olandeză"
@@ -200,7 +208,7 @@ msgid "Norwegian Nynorsk"
 msgstr "Norvegiană Nynorsk"
 
 msgid "Ossetic"
-msgstr ""
+msgstr "Osețiană"
 
 msgid "Punjabi"
 msgstr "Punjabi"
@@ -239,7 +247,7 @@ msgid "Swedish"
 msgstr "Suedeză"
 
 msgid "Swahili"
-msgstr ""
+msgstr "Swahili"
 
 msgid "Tamil"
 msgstr "Limba tamila"
@@ -254,10 +262,10 @@ msgid "Turkish"
 msgstr "Turcă"
 
 msgid "Tatar"
-msgstr ""
+msgstr "Tătară"
 
 msgid "Udmurt"
-msgstr ""
+msgstr "Udmurtă"
 
 msgid "Ukrainian"
 msgstr "Ucraineană"
@@ -275,19 +283,19 @@ msgid "Traditional Chinese"
 msgstr "Chineză tradițională"
 
 msgid "Messages"
-msgstr ""
+msgstr "Mesaje"
 
 msgid "Site Maps"
-msgstr ""
+msgstr "Harta sit-ului"
 
 msgid "Static Files"
-msgstr ""
+msgstr "Fișiere statice"
 
 msgid "Syndication"
-msgstr ""
+msgstr "Sindicalizare"
 
 msgid "Web Design"
-msgstr ""
+msgstr "Design web"
 
 msgid "Enter a valid value."
 msgstr "Introduceți o valoare validă."
@@ -296,16 +304,23 @@ msgid "Enter a valid URL."
 msgstr "Introduceți un URL valid."
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Introduceți un întreg valid."
 
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "Introduceți o adresă de email validaă."
 
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Introduceți un 'slug' valabil, compus numai din litere, numere, underscore "
 "sau cratime."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Introduceși un 'slug' valid, compus din caractere Unicode, numere, "
+"underscore sau cratime."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Introduceţi o adresă IPv4 validă."
@@ -342,8 +357,14 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"Asigurați-vă că această valoare are cel puțin %(limit_value)d caracter (are "
+"%(show_value)d)."
 msgstr[1] ""
+"Asigurați-vă că această valoare are cel puțin %(limit_value)d caractere (are "
+"%(show_value)d)."
 msgstr[2] ""
+"Asigurați-vă că această valoare are cel puțin %(limit_value)d caractere (are "
+"%(show_value)d)."
 
 #, python-format
 msgid ""
@@ -353,19 +374,51 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"Asigurați-vă că această valoare are cel mult %(limit_value)d caracter (are "
+"%(show_value)d)."
 msgstr[1] ""
+"Asigurați-vă că această valoare are cel mult %(limit_value)d caractere (are "
+"%(show_value)d)."
 msgstr[2] ""
+"Asigurați-vă că această valoare are cel mult %(limit_value)d caractere (are "
+"%(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Asigurați-vă că nu este mai mult de %(max)s cifră în total."
+msgstr[1] "Asigurați-vă că nu sunt mai mult de %(max)s cifre în total."
+msgstr[2] "Asigurați-vă că nu sunt mai mult de %(max)s cifre în total."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Asigurați-vă că nu este mai mult de %(max)s zecimală în total."
+msgstr[1] "Asigurați-vă că nu sunt mai mult de %(max)s zecimale în total."
+msgstr[2] "Asigurați-vă că nu sunt mai mult de %(max)s zecimale în total."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Asigurați-vă că nu este mai mult de %(max)s cifră înainte de punctul zecimal."
+msgstr[1] ""
+"Asigurați-vă că nu sunt mai mult de %(max)s cifre înainte de punctul zecimal."
+msgstr[2] ""
+"Asigurați-vă că nu sunt mai mult de %(max)s cifre înainte de punctul zecimal."
 
 msgid "and"
 msgstr "și"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s cu acest %(field_labels)s există deja."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Valoarea %(value)r nu este o opțiune validă."
 
 msgid "This field cannot be null."
 msgstr "Câmpul nu poate fi gol."
@@ -383,6 +436,8 @@ msgstr "%(model_name)s cu %(field_label)s deja există."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s trebuie să fie unic(e) pentru %(date_field_label)s "
+"%(lookup_type)s."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -393,11 +448,11 @@ msgstr "Întreg"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "'%(value)s' trebuie să fie un întreg."
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "'%(value)s' trebuie să fie True sau False."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (adevărat sau fals)"
@@ -414,12 +469,14 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' are un format de dată invalid. Trebuie să fie în formatul YYYY-"
+"MM-DD."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr ""
+msgstr "'%(value)s' are formatul corect (YYYY-MM-DD) dar este o dată invalidă."
 
 msgid "Date (without time)"
 msgstr "Dată (fară oră)"
@@ -429,19 +486,23 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' are un format invalid. Trebuie să fie în formatul YYYY-MM-DD HH:"
+"MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"'%(value)s' are formatul corect (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) dar "
+"este o dată/oră invalidă."
 
 msgid "Date (with time)"
 msgstr "Dată (cu oră)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "'%(value)s' trebuie să fie un număr zecimal."
 
 msgid "Decimal number"
 msgstr "Număr zecimal"
@@ -451,9 +512,11 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"'%(value)s' are un format invalid. Trebuie să fie în formatul [DD] [HH:"
+"[MM:]]ss[.uuuuuu]."
 
 msgid "Duration"
-msgstr ""
+msgstr "Durată"
 
 msgid "Email address"
 msgstr "Adresă e-mail"
@@ -463,7 +526,7 @@ msgstr "Calea fisierului"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' trebuie să fie un număr cu virgulă."
 
 msgid "Floating point number"
 msgstr "Număr cu virgulă"
@@ -479,7 +542,7 @@ msgstr "Adresă IP"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' trebuie să fie None, True sau False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (adevărat, fals sau niciuna)"
@@ -505,12 +568,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"'%(value)s' are un format invalid. Trebuie să fie în formatul HH:MM[:ss[."
+"uuuuuu]]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"'%(value)s' are formatul corect (HH:MM[:ss[.uuuuuu]]) dar este o oră "
+"invalidă."
 
 msgid "Time"
 msgstr "Timp"
@@ -523,7 +590,7 @@ msgstr "Date binare brute"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' nu este un UUID valid."
 
 msgid "File"
 msgstr "Fișier"
@@ -533,7 +600,7 @@ msgstr "Imagine"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "Instanța %(model)s cu %(field)s %(value)r inexistentă."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Foreign Key (tipul determinat de către câmpul relativ)"
@@ -544,6 +611,12 @@ msgstr "Relaţie unul-la-unul"
 msgid "Many-to-many relationship"
 msgstr "Relație multe-la-multe"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Acest câmp este obligatoriu."
 
@@ -552,29 +625,6 @@ msgstr "Introduceţi un număr întreg."
 
 msgid "Enter a number."
 msgstr "Introduceţi un număr."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
 
 msgid "Enter a valid date."
 msgstr "Introduceți o dată validă."
@@ -586,7 +636,7 @@ msgid "Enter a valid date/time."
 msgstr "Introduceți o dată/oră validă."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Introduceți o durată validă."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nici un fișier nu a fost trimis. Verificați tipul fișierului."
@@ -602,8 +652,14 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+"Verificați că numele fișierului are cel mult %(max)d caractere (are "
+"%(length)d)."
 msgstr[1] ""
+"Verificați că numele fișierului are cel mult %(max)d caractere (are "
+"%(length)d)."
 msgstr[2] ""
+"Verificați că numele fișierului are cel mult %(max)d caractere (are "
+"%(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "Fie indicați un fişier, fie bifaţi caseta de selectare, nu ambele."
@@ -625,10 +681,10 @@ msgid "Enter a list of values."
 msgstr "Introduceți o listă de valori."
 
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Introduceți o valoare completă."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Introduceți un UUID valid."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -636,30 +692,24 @@ msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
+msgstr "(Cămp ascuns %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "Datele pentru ManagementForm lipsesc sau au fost alterate"
 
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Trimiteți maxim %d formular."
+msgstr[1] "Trimiteți maxim %d formulare."
+msgstr[2] "Trimiteți maxim %d formulare."
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Trimiteți minim %d formular."
+msgstr[1] "Trimiteți minim %d formulare."
+msgstr[2] "Trimiteți minim %d formulare."
 
 msgid "Order"
 msgstr "Ordine"
@@ -688,7 +738,7 @@ msgstr "Corectaţi valorile duplicate de mai jos."
 
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
-"Foreign key-ul inline nu se potrivește cu cheia primară a istanței mamă."
+"Foreign key-ul inline nu se potrivește cu cheia primară a istanței părinte."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -697,7 +747,7 @@ msgstr ""
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%(pk)s\" nu este o cheie primară validă."
 
 #, python-format
 msgid ""
@@ -984,7 +1034,7 @@ msgid "December"
 msgstr "Decembrie"
 
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Aceasta nu este o adresă IPv6 validă."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1044,10 +1094,10 @@ msgid "0 minutes"
 msgstr "0 minute"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "Interzis"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "Verificarea CSRF nereușită. Cerere eșuată."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1055,45 +1105,62 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Vedeți acest mesaj deoarece acest site HTTPS solicită setarea unui 'Referer "
+"header' în browserul tău, dar acesta nu a fost setat. Acest header este "
+"necesar din motive de securitate, pentru a verifica faptul că browserul tău "
+"nu este folosit de terți."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Dacă ați configurat browserul pentru a dezactiva headerele 'Referer', vă "
+"rugăm să le reactivați, cel puțin pentru aceasta pagină web, sau pentru "
+"conexiunile HTTPS, sau pentru cererile 'same-origin'."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Vedeți acest mesaj deoarece această pagină web necesită un cookie CSRF la "
+"trimiterea formularelor. Acest cookie este necesar din motive de securitate, "
+"pentru a se asigura că browserul nu este deturnat de terți."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Dacă ați configurat browserul pentru dezactivarea cookie-urilor, vă rugăm să "
+"le reactivați, cel puțin pentru această pagină web, sau pentru cereri 'same-"
+"origin'."
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Mai multe informații sunt disponibile pentru DEBUG=True."
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "Bine ai venit la Django"
 
 msgid "It worked!"
-msgstr ""
+msgstr "A mers!"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "Felicitări pentru prima ta pagină Django."
 
 msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"Desigur, încă nu ați prestat nici o activiate. În continuare, inițiați prima "
+"aplicație executând <code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"Vedeți acest mesaj deoarece ați setat <code>DEBUG = True</code> în fișierul "
+"de setări Django și nu ați configurat nici un URL. La treabă!"
 
 msgid "No year specified"
 msgstr "Niciun an specificat"
@@ -1133,7 +1200,7 @@ msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Pagină invalidă (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."

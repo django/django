@@ -8,9 +8,4 @@ from django.db import models
 class ModelRaisingMessages(models.Model):
     @classmethod
     def check(self, **kwargs):
-        return [
-            checks.Warning(
-                'A warning',
-                hint=None,
-            ),
-        ]
+        return [checks.Warning('A warning')]

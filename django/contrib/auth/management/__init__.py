@@ -6,22 +6,20 @@ from __future__ import unicode_literals
 import getpass
 import unicodedata
 
-from django.apps import apps
+from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.core import exceptions
-from django.core.management.base import CommandError
 from django.db import DEFAULT_DB_ALIAS, router
 from django.utils import six
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 
 
-def _get_all_permissions(opts, ctype):
+def _get_all_permissions(opts):
     """
     Returns (codename, name) for all permissions in the given opts.
     """
     builtin = _get_builtin_permissions(opts)
     custom = list(opts.permissions)
-    _check_permission_clashing(custom, builtin, ctype)
     return builtin + custom
 
 
@@ -32,47 +30,27 @@ def _get_builtin_permissions(opts):
     """
     perms = []
     for action in opts.default_permissions:
-        perms.append((get_permission_codename(action, opts),
-            'Can %s %s' % (action, opts.verbose_name_raw)))
+        perms.append((
+            get_permission_codename(action, opts),
+            'Can %s %s' % (action, opts.verbose_name_raw)
+        ))
     return perms
 
 
-def _check_permission_clashing(custom, builtin, ctype):
-    """
-    Check that permissions for a model do not clash. Raises CommandError if
-    there are duplicate permissions.
-    """
-    pool = set()
-    builtin_codenames = set(p[0] for p in builtin)
-    for codename, _name in custom:
-        if codename in pool:
-            raise CommandError(
-                "The permission codename '%s' is duplicated for model '%s.%s'." %
-                (codename, ctype.app_label, ctype.model_class().__name__))
-        elif codename in builtin_codenames:
-            raise CommandError(
-                "The permission codename '%s' clashes with a builtin permission "
-                "for model '%s.%s'." %
-                (codename, ctype.app_label, ctype.model_class().__name__))
-        pool.add(codename)
-
-
-def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
+def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
     if not app_config.models_module:
         return
 
+    app_label = app_config.label
     try:
+        app_config = apps.get_app_config(app_label)
+        ContentType = apps.get_model('contenttypes', 'ContentType')
         Permission = apps.get_model('auth', 'Permission')
     except LookupError:
         return
 
     if not router.allow_migrate_model(using, Permission):
         return
-
-    from django.contrib.contenttypes.models import ContentType
-
-    permission_name_max_length = Permission._meta.get_field('name').max_length
-    verbose_name_max_length = permission_name_max_length - 11  # len('Can change ') prefix
 
     # This will hold the permissions we're looking for as
     # (content_type, (codename, name))
@@ -84,17 +62,8 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
         # before creating foreign keys to them.
         ctype = ContentType.objects.db_manager(using).get_for_model(klass)
 
-        if len(klass._meta.verbose_name) > verbose_name_max_length:
-            raise exceptions.ValidationError(
-                "The verbose_name of %s.%s is longer than %s characters" % (
-                    ctype.app_label,
-                    ctype.model,
-                    verbose_name_max_length,
-                )
-            )
-
         ctypes.add(ctype)
-        for perm in _get_all_permissions(klass._meta, ctype):
+        for perm in _get_all_permissions(klass._meta):
             searched_perms.append((ctype, perm))
 
     # Find all the Permissions that have a content_type for a model we're
@@ -111,18 +80,6 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
         for ct, (codename, name) in searched_perms
         if (ct.pk, codename) not in all_perms
     ]
-    # Validate the permissions before bulk_creation to avoid cryptic database
-    # error when the name is longer than 255 characters
-    for perm in perms:
-        if len(perm.name) > permission_name_max_length:
-            raise exceptions.ValidationError(
-                "The permission name %s of %s.%s is longer than %s characters" % (
-                    perm.name,
-                    perm.content_type.app_label,
-                    perm.content_type.model,
-                    permission_name_max_length,
-                )
-            )
     Permission.objects.using(using).bulk_create(perms)
     if verbosity >= 2:
         for perm in perms:
@@ -171,9 +128,11 @@ def get_default_username(check_db=True):
 
     default_username = get_system_username()
     try:
-        default_username = (unicodedata.normalize('NFKD', default_username)
-                .encode('ascii', 'ignore').decode('ascii')
-                .replace(' ', '').lower())
+        default_username = (
+            unicodedata.normalize('NFKD', default_username)
+            .encode('ascii', 'ignore').decode('ascii')
+            .replace(' ', '').lower()
+        )
     except UnicodeDecodeError:
         return ''
 

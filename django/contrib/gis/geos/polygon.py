@@ -29,7 +29,8 @@ class Polygon(GEOSGeometry):
         ...                ((4, 4), (4, 6), (6, 6), (6, 4), (4, 4)))
         """
         if not args:
-            raise TypeError('Must provide at least one LinearRing, or a tuple, to initialize a Polygon.')
+            super(Polygon, self).__init__(self._create_polygon(0, None), **kwargs)
+            return
 
         # Getting the ext_ring and init_holes parameters from the argument list
         ext_ring = args[0]
@@ -73,6 +74,9 @@ class Polygon(GEOSGeometry):
         # _construct_ring will throw a TypeError if a parameter isn't a valid ring
         # If we cloned the pointers here, we wouldn't be able to clean up
         # in case of error.
+        if not length:
+            return capi.create_empty_polygon()
+
         rings = []
         for r in items:
             if isinstance(r, GEOM_PTR):
@@ -172,6 +176,8 @@ class Polygon(GEOSGeometry):
     @property
     def kml(self):
         "Returns the KML representation of this Polygon."
-        inner_kml = ''.join("<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
-            for i in range(self.num_interior_rings))
+        inner_kml = ''.join(
+            "<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
+            for i in range(self.num_interior_rings)
+        )
         return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)

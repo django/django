@@ -21,7 +21,7 @@ class DataPoint(models.Model):
 @python_2_unicode_compatible
 class RelatedPoint(models.Model):
     name = models.CharField(max_length=20)
-    data = models.ForeignKey(DataPoint)
+    data = models.ForeignKey(DataPoint, models.CASCADE)
 
     def __str__(self):
         return six.text_type(self.name)
@@ -32,7 +32,7 @@ class A(models.Model):
 
 
 class B(models.Model):
-    a = models.ForeignKey(A)
+    a = models.ForeignKey(A, models.CASCADE)
     y = models.IntegerField(default=10)
 
 
@@ -41,7 +41,7 @@ class C(models.Model):
 
 
 class D(C):
-    a = models.ForeignKey(A)
+    a = models.ForeignKey(A, models.CASCADE)
 
 
 class Foo(models.Model):
@@ -49,4 +49,4 @@ class Foo(models.Model):
 
 
 class Bar(models.Model):
-    foo = models.ForeignKey(Foo, to_field='target')
+    foo = models.ForeignKey(Foo, models.CASCADE, to_field='target')

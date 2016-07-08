@@ -68,7 +68,7 @@ class DeleteQuery(Query):
                 # We can't do the delete using subquery.
                 values = list(query.values_list('pk', flat=True))
                 if not values:
-                    return
+                    return 0
                 return self.delete_batch(values, using)
             else:
                 innerq.clear_select_clause()
@@ -105,8 +105,7 @@ class UpdateQuery(Query):
             self.related_updates = {}
 
     def clone(self, klass=None, **kwargs):
-        return super(UpdateQuery, self).clone(klass,
-                related_updates=self.related_updates.copy(), **kwargs)
+        return super(UpdateQuery, self).clone(klass, related_updates=self.related_updates.copy(), **kwargs)
 
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)
@@ -139,11 +138,15 @@ class UpdateQuery(Query):
 
     def add_update_fields(self, values_seq):
         """
-        Turn a sequence of (field, model, value) triples into an update query.
-        Used by add_update_values() as well as the "fast" update path when
-        saving models.
+        Append a sequence of (field, model, value) triples to the internal list
+        that will be used to generate the UPDATE query. Might be more usefully
+        called add_update_targets() to hint at the extra information here.
         """
-        self.values.extend(values_seq)
+        for field, model, val in values_seq:
+            if hasattr(val, 'resolve_expression'):
+                # Resolve expressions here so that annotations are no longer needed
+                val = val.resolve_expression(self, allow_joins=False, for_save=True)
+            self.values.append((field, model, val))
 
     def add_related_update(self, model, field, value):
         """

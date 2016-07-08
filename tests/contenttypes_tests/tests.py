@@ -4,19 +4,25 @@ from __future__ import unicode_literals
 import datetime
 
 from django.apps.registry import Apps, apps
-from django.contrib.contenttypes import management
+from django.conf import settings
+from django.contrib.contenttypes import management as contenttypes_management
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core import checks
-from django.db import connections, models
-from django.test import TestCase, override_settings
-from django.test.utils import captured_stdout
+from django.core import checks, management
+from django.db import connections, migrations, models
+from django.test import (
+    SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
+)
+from django.test.utils import captured_stdout, isolate_apps
 from django.utils.encoding import force_str, force_text
 
-from .models import Article, Author, SchemeIncludedURL
+from .models import (
+    Article, Author, ModelWithNullFKToSite, Post, SchemeIncludedURL,
+    Site as MockSite,
+)
 
 
 @override_settings(ROOT_URLCONF='contenttypes_tests.urls')
@@ -44,6 +50,9 @@ class ContentTypesViewsTests(TestCase):
         cls.scheme1 = SchemeIncludedURL.objects.create(url='http://test_scheme_included_http/')
         cls.scheme2 = SchemeIncludedURL.objects.create(url='https://test_scheme_included_https/')
         cls.scheme3 = SchemeIncludedURL.objects.create(url='//test_default_scheme_kept/')
+
+    def setUp(self):
+        Site.objects.clear_cache()
 
     def test_shortcut_with_absolute_url(self):
         "Can view a shortcut for an Author object that has a get_absolute_url method"
@@ -94,6 +103,21 @@ class ContentTypesViewsTests(TestCase):
         response = self.client.get(short_url)
         self.assertEqual(response.status_code, 404)
 
+    @mock.patch('django.apps.apps.get_model')
+    def test_shortcut_view_with_null_site_fk(self, get_model):
+        """
+        The shortcut view works if a model's ForeignKey to site is None.
+        """
+        get_model.side_effect = lambda *args, **kwargs: MockSite if args[0] == 'sites.Site' else ModelWithNullFKToSite
+
+        obj = ModelWithNullFKToSite.objects.create(title='title')
+        url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(ModelWithNullFKToSite).id, obj.pk)
+        response = self.client.get(url)
+        self.assertRedirects(
+            response, '%s' % obj.get_absolute_url(),
+            fetch_redirect_response=False,
+        )
+
     def test_create_contenttype_on_the_spot(self):
         """
         Make sure ContentTypeManager.get_for_model creates the corresponding
@@ -114,20 +138,9 @@ class ContentTypesViewsTests(TestCase):
         self.assertEqual(force_text(ct), 'modelcreatedonthefly')
 
 
-class IsolatedModelsTestCase(TestCase):
-    def setUp(self):
-        # The unmanaged models need to be removed after the test in order to
-        # prevent bad interactions with the flush operation in other tests.
-        self._old_models = apps.app_configs['contenttypes_tests'].models.copy()
-
-    def tearDown(self):
-        apps.app_configs['contenttypes_tests'].models = self._old_models
-        apps.all_models['contenttypes_tests'] = self._old_models
-        apps.clear_cache()
-
-
 @override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
-class GenericForeignKeyTests(IsolatedModelsTestCase):
+@isolate_apps('contenttypes_tests', attr_name='apps')
+class GenericForeignKeyTests(SimpleTestCase):
 
     def test_str(self):
         class Model(models.Model):
@@ -146,7 +159,6 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 "The GenericForeignKey content type references the non-existent field 'TaggedItem.content_type'.",
-                hint=None,
                 obj=TaggedItem.content_object,
                 id='contenttypes.E002',
             )
@@ -164,7 +176,10 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 "'Model.content_type' is not a ForeignKey.",
-                hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                hint=(
+                    "GenericForeignKeys must use a ForeignKey to "
+                    "'contenttypes.ContentType' as the 'content_type' field."
+                ),
                 obj=Model.content_object,
                 id='contenttypes.E003',
             )
@@ -173,7 +188,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
 
     def test_content_type_field_pointing_to_wrong_model(self):
         class Model(models.Model):
-            content_type = models.ForeignKey('self')  # should point to ContentType
+            content_type = models.ForeignKey('self', models.CASCADE)  # should point to ContentType
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey(
                 'content_type', 'object_id')
@@ -182,7 +197,10 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 "'Model.content_type' is not a ForeignKey to 'contenttypes.ContentType'.",
-                hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                hint=(
+                    "GenericForeignKeys must use a ForeignKey to "
+                    "'contenttypes.ContentType' as the 'content_type' field."
+                ),
                 obj=Model.content_object,
                 id='contenttypes.E004',
             )
@@ -191,7 +209,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
 
     def test_missing_object_id_field(self):
         class TaggedItem(models.Model):
-            content_type = models.ForeignKey(ContentType)
+            content_type = models.ForeignKey(ContentType, models.CASCADE)
             # missing object_id field
             content_object = GenericForeignKey()
 
@@ -199,7 +217,6 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 "The GenericForeignKey object ID references the non-existent field 'object_id'.",
-                hint=None,
                 obj=TaggedItem.content_object,
                 id='contenttypes.E001',
             )
@@ -208,7 +225,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
 
     def test_field_name_ending_with_underscore(self):
         class Model(models.Model):
-            content_type = models.ForeignKey(ContentType)
+            content_type = models.ForeignKey(ContentType, models.CASCADE)
             object_id = models.PositiveIntegerField()
             content_object_ = GenericForeignKey(
                 'content_type', 'object_id')
@@ -217,7 +234,6 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 'Field names must not end with an underscore.',
-                hint=None,
                 obj=Model.content_object_,
                 id='fields.E001',
             )
@@ -233,63 +249,16 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         class Model(models.Model):
             content_object = MyGenericForeignKey()
 
-        errors = checks.run_checks()
+        errors = checks.run_checks(app_configs=self.apps.get_app_configs())
         self.assertEqual(errors, ['performed!'])
 
-    def test_unsaved_instance_on_generic_foreign_key(self):
-        """
-        #10811 -- Assigning an unsaved object to GenericForeignKey
-        should raise an exception.
-        """
-        class Model(models.Model):
-            content_type = models.ForeignKey(ContentType, null=True)
-            object_id = models.PositiveIntegerField(null=True)
-            content_object = GenericForeignKey('content_type', 'object_id')
 
-        author = Author(name='Author')
-        model = Model()
-        model.content_object = None   # no error here as content_type allows None
-        with self.assertRaisesMessage(ValueError,
-                                    'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                                    % (author, author._meta.object_name)):
-            model.content_object = author   # raised ValueError here as author is unsaved
-
-        author.save()
-        model.content_object = author   # no error because the instance is saved
-
-    def test_unsaved_instance_on_generic_foreign_key_allowed_when_wanted(self):
-        """
-        #24495 - Assigning an unsaved object to a GenericForeignKey
-        should be allowed when the allow_unsaved_instance_assignment
-        attribute has been set to True.
-        """
-        class UnsavedGenericForeignKey(GenericForeignKey):
-            # A GenericForeignKey which can point to an unsaved object
-            allow_unsaved_instance_assignment = True
-
-        class Band(models.Model):
-            name = models.CharField(max_length=50)
-
-        class BandMember(models.Model):
-            band_ct = models.ForeignKey(ContentType)
-            band_id = models.PositiveIntegerField()
-            band = UnsavedGenericForeignKey('band_ct', 'band_id')
-            first_name = models.CharField(max_length=50)
-            last_name = models.CharField(max_length=50)
-
-        beatles = Band(name='The Beatles')
-        john = BandMember(first_name='John', last_name='Lennon')
-        # This should not raise an exception as the GenericForeignKey between
-        # member and band has allow_unsaved_instance_assignment=True.
-        john.band = beatles
-        self.assertEqual(john.band, beatles)
-
-
-class GenericRelationshipTests(IsolatedModelsTestCase):
+@isolate_apps('contenttypes_tests')
+class GenericRelationshipTests(SimpleTestCase):
 
     def test_valid_generic_relationship(self):
         class TaggedItem(models.Model):
-            content_type = models.ForeignKey(ContentType)
+            content_type = models.ForeignKey(ContentType, models.CASCADE)
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey()
 
@@ -301,15 +270,17 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
 
     def test_valid_generic_relationship_with_explicit_fields(self):
         class TaggedItem(models.Model):
-            custom_content_type = models.ForeignKey(ContentType)
+            custom_content_type = models.ForeignKey(ContentType, models.CASCADE)
             custom_object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey(
                 'custom_content_type', 'custom_object_id')
 
         class Bookmark(models.Model):
-            tags = GenericRelation('TaggedItem',
+            tags = GenericRelation(
+                'TaggedItem',
                 content_type_field='custom_content_type',
-                object_id_field='custom_object_id')
+                object_id_field='custom_object_id',
+            )
 
         errors = Bookmark.tags.field.check()
         self.assertEqual(errors, [])
@@ -321,9 +292,8 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Model.rel.field.check()
         expected = [
             checks.Error(
-                ("Field defines a relation with model 'MissingModel', "
-                 "which is either not installed, or is abstract."),
-                hint=None,
+                "Field defines a relation with model 'MissingModel', "
+                "which is either not installed, or is abstract.",
                 obj=Model.rel.field,
                 id='fields.E300',
             )
@@ -333,7 +303,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
     def test_valid_self_referential_generic_relationship(self):
         class Model(models.Model):
             rel = GenericRelation('Model')
-            content_type = models.ForeignKey(ContentType)
+            content_type = models.ForeignKey(ContentType, models.CASCADE)
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey(
                 'content_type', 'object_id')
@@ -343,7 +313,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
 
     def test_missing_generic_foreign_key(self):
         class TaggedItem(models.Model):
-            content_type = models.ForeignKey(ContentType)
+            content_type = models.ForeignKey(ContentType, models.CASCADE)
             object_id = models.PositiveIntegerField()
 
         class Bookmark(models.Model):
@@ -352,10 +322,9 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Bookmark.tags.field.check()
         expected = [
             checks.Error(
-                ("The GenericRelation defines a relation with the model "
-                 "'contenttypes_tests.TaggedItem', but that model does not have a "
-                 "GenericForeignKey."),
-                hint=None,
+                "The GenericRelation defines a relation with the model "
+                "'contenttypes_tests.TaggedItem', but that model does not have a "
+                "GenericForeignKey.",
                 obj=Bookmark.tags.field,
                 id='contenttypes.E004',
             )
@@ -368,7 +337,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
             pass
 
         class SwappedModel(models.Model):
-            content_type = models.ForeignKey(ContentType)
+            content_type = models.ForeignKey(ContentType, models.CASCADE)
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey()
 
@@ -381,9 +350,9 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Model.rel.field.check()
         expected = [
             checks.Error(
-                ("Field defines a relation with the model "
-                 "'contenttypes_tests.SwappedModel', "
-                 "which has been swapped out."),
+                "Field defines a relation with the model "
+                "'contenttypes_tests.SwappedModel', "
+                "which has been swapped out.",
                 hint="Update the relation to point at 'settings.TEST_SWAPPED_MODEL'.",
                 obj=Model.rel.field,
                 id='fields.E301',
@@ -393,7 +362,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
 
     def test_field_name_ending_with_underscore(self):
         class TaggedItem(models.Model):
-            content_type = models.ForeignKey(ContentType)
+            content_type = models.ForeignKey(ContentType, models.CASCADE)
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey()
 
@@ -404,7 +373,6 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 'Field names must not end with an underscore.',
-                hint=None,
                 obj=InvalidBookmark.tags_.field,
                 id='fields.E001',
             )
@@ -415,17 +383,31 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
 class UpdateContentTypesTests(TestCase):
     def setUp(self):
         self.before_count = ContentType.objects.count()
-        ContentType.objects.create(app_label='contenttypes_tests', model='Fake')
+        self.content_type = ContentType.objects.create(app_label='contenttypes_tests', model='Fake')
         self.app_config = apps.get_app_config('contenttypes_tests')
 
-    def test_interactive_true(self):
+    def test_interactive_true_with_dependent_objects(self):
         """
         interactive mode of update_contenttypes() (the default) should delete
-        stale contenttypes.
+        stale contenttypes and warn of dependent objects
         """
-        management.input = lambda x: force_str("yes")
+        Post.objects.create(title='post', content_type=self.content_type)
+        contenttypes_management.input = lambda x: force_str("yes")
         with captured_stdout() as stdout:
-            management.update_contenttypes(self.app_config)
+            contenttypes_management.update_contenttypes(self.app_config)
+        self.assertEqual(Post.objects.count(), 0)
+        self.assertIn("1 object of type contenttypes_tests.post:", stdout.getvalue())
+        self.assertIn("Deleting stale content type", stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count)
+
+    def test_interactive_true_without_dependent_objects(self):
+        """
+        interactive mode of update_contenttypes() (the default) should delete
+        stale contenttypes and inform there are no dependent objects
+        """
+        contenttypes_management.input = lambda x: force_str("yes")
+        with captured_stdout() as stdout:
+            contenttypes_management.update_contenttypes(self.app_config)
         self.assertIn("Deleting stale content type", stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count)
 
@@ -435,8 +417,18 @@ class UpdateContentTypesTests(TestCase):
         content types.
         """
         with captured_stdout() as stdout:
-            management.update_contenttypes(self.app_config, interactive=False)
+            contenttypes_management.update_contenttypes(self.app_config, interactive=False)
         self.assertIn("Stale content types remain.", stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count + 1)
+
+    def test_unavailable_content_type_model(self):
+        """
+        #24075 - A ContentType shouldn't be created or deleted if the model
+        isn't available.
+        """
+        apps = Apps()
+        with self.assertNumQueries(0):
+            contenttypes_management.update_contenttypes(self.app_config, interactive=False, verbosity=0, apps=apps)
         self.assertEqual(ContentType.objects.count(), self.before_count + 1)
 
 
@@ -470,3 +462,72 @@ class ContentTypesMultidbTestCase(TestCase):
         with self.assertNumQueries(0, using='default'), \
                 self.assertNumQueries(1, using='other'):
             ContentType.objects.get_for_model(Author)
+
+
+@override_settings(
+    MIGRATION_MODULES=dict(settings.MIGRATION_MODULES, contenttypes_tests='contenttypes_tests.operations_migrations'),
+)
+class ContentTypeOperationsTests(TransactionTestCase):
+    available_apps = [
+        'contenttypes_tests',
+        'django.contrib.contenttypes',
+        'django.contrib.auth',
+    ]
+
+    def setUp(self):
+        app_config = apps.get_app_config('contenttypes_tests')
+        models.signals.post_migrate.connect(self.assertOperationsInjected, sender=app_config)
+
+    def tearDown(self):
+        app_config = apps.get_app_config('contenttypes_tests')
+        models.signals.post_migrate.disconnect(self.assertOperationsInjected, sender=app_config)
+
+    def assertOperationsInjected(self, plan, **kwargs):
+        for migration, _backward in plan:
+            operations = iter(migration.operations)
+            for operation in operations:
+                if isinstance(operation, migrations.RenameModel):
+                    next_operation = next(operations)
+                    self.assertIsInstance(next_operation, contenttypes_management.RenameContentType)
+                    self.assertEqual(next_operation.app_label, migration.app_label)
+                    self.assertEqual(next_operation.old_model, operation.old_name_lower)
+                    self.assertEqual(next_operation.new_model, operation.new_name_lower)
+
+    def test_existing_content_type_rename(self):
+        ContentType.objects.create(app_label='contenttypes_tests', model='foo')
+        management.call_command(
+            'migrate', 'contenttypes_tests', database='default', interactive=False, verbosity=0,
+        )
+        self.assertFalse(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
+        self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())
+        management.call_command(
+            'migrate', 'contenttypes_tests', 'zero', database='default', interactive=False, verbosity=0,
+        )
+        self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
+        self.assertFalse(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())
+
+    def test_missing_content_type_rename_ignore(self):
+        management.call_command(
+            'migrate', 'contenttypes_tests', database='default', interactive=False, verbosity=0,
+        )
+        self.assertFalse(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
+        self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())
+        management.call_command(
+            'migrate', 'contenttypes_tests', 'zero', database='default', interactive=False, verbosity=0,
+        )
+        self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
+        self.assertFalse(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())
+
+    def test_content_type_rename_conflict(self):
+        ContentType.objects.create(app_label='contenttypes_tests', model='foo')
+        ContentType.objects.create(app_label='contenttypes_tests', model='renamedfoo')
+        management.call_command(
+            'migrate', 'contenttypes_tests', database='default', interactive=False, verbosity=0,
+        )
+        self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
+        self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())
+        management.call_command(
+            'migrate', 'contenttypes_tests', 'zero', database='default', interactive=False, verbosity=0,
+        )
+        self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
+        self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())

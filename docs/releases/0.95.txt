@@ -98,9 +98,9 @@ Problem reports and getting help
 ================================
 
 Need help resolving a problem with Django? The documentation in the
-distribution is also available :doc:`online </index>` at the `Django Web
-site`_. The :doc:`FAQ </faq/index>` document is especially recommended, as it
-contains a number of issues that come up time and again.
+distribution is also available :doc:`online </index>` at the `Django website`_.
+The :doc:`FAQ </faq/index>` document is especially recommended, as it contains
+a number of issues that come up time and again.
 
 For more personalized help, the `django-users`_ mailing list is a very active
 list, with more than 2,000 subscribers who can help you solve any sort of
@@ -113,8 +113,8 @@ there's a #django channel on irc.freenode.net that is regularly populated by
 Django users and developers from around the world. Friendly people are usually
 available at any hour of the day -- to help, or just to chat.
 
-.. _Django Web site: https://www.djangoproject.com/
-.. _django-users: http://groups.google.com/group/django-users
+.. _Django website: https://www.djangoproject.com/
+.. _django-users: https://groups.google.com/group/django-users
 
 Thanks for using Django!
 

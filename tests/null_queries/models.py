@@ -14,7 +14,7 @@ class Poll(models.Model):
 
 @python_2_unicode_compatible
 class Choice(models.Model):
-    poll = models.ForeignKey(Poll)
+    poll = models.ForeignKey(Poll, models.CASCADE)
     choice = models.CharField(max_length=200)
 
     def __str__(self):
@@ -32,6 +32,6 @@ class OuterB(models.Model):
 
 
 class Inner(models.Model):
-    first = models.ForeignKey(OuterA)
+    first = models.ForeignKey(OuterA, models.CASCADE)
     # second would clash with the __second lookup.
-    third = models.ForeignKey(OuterB, null=True)
+    third = models.ForeignKey(OuterB, models.SET_NULL, null=True)

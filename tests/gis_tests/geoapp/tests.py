@@ -13,20 +13,13 @@ from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils import six
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import no_oracle, oracle, postgis, spatialite
+from ..utils import no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite
 from .models import (
     City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
     State, Track,
 )
-
-
-def postgis_bug_version():
-    spatial_version = getattr(connection.ops, "spatial_version", (0, 0, 0))
-    return spatial_version and (2, 0, 0) <= spatial_version <= (2, 0, 1)
 
 
 @skipUnlessDBFeature("gis_enabled")
@@ -50,12 +43,8 @@ class GeoModelTest(TestCase):
         # Making sure TypeError is thrown when trying to set with an
         #  incompatible type.
         for bad in [5, 2.0, LineString((0, 0), (1, 1))]:
-            try:
+            with self.assertRaisesMessage(TypeError, 'Cannot set'):
                 nullcity.point = bad
-            except TypeError:
-                pass
-            else:
-                self.fail('Should throw a TypeError')
 
         # Now setting with a compatible GEOS Geometry, saving, and ensuring
         #  the save took, notice no SRID is explicitly set.
@@ -151,9 +140,6 @@ class GeoModelTest(TestCase):
 
         # If the GeometryField SRID is -1, then we shouldn't perform any
         # transformation if the SRID of the input geometry is different.
-        if spatialite and connection.ops.spatial_version < (3, 0, 0):
-            # SpatiaLite < 3 does not support missing SRID values.
-            return
         m1 = MinusOneSRID(geom=Point(17, 23, srid=4326))
         m1.save()
         self.assertEqual(-1, m1.geom.srid)
@@ -161,7 +147,7 @@ class GeoModelTest(TestCase):
     def test_createnull(self):
         "Testing creating a model instance and the geometry being None"
         c = City()
-        self.assertEqual(c.point, None)
+        self.assertIsNone(c.point)
 
     def test_geometryfield(self):
         "Testing the general GeometryField."
@@ -274,10 +260,9 @@ class GeoLookupTest(TestCase):
         self.assertEqual('Texas', tx.name)
         self.assertEqual('New Zealand', nz.name)
 
-        # Spatialite 2.3 thinks that Lawrence is in Puerto Rico (a NULL geometry).
-        if not (spatialite and connection.ops.spatial_version < (3, 0, 0)):
-            ks = State.objects.get(poly__contains=lawrence.point)
-            self.assertEqual('Kansas', ks.name)
+        # Testing `contains` on the states using the point for Lawrence.
+        ks = State.objects.get(poly__contains=lawrence.point)
+        self.assertEqual('Kansas', ks.name)
 
         # Pueblo and Oklahoma City (even though OK City is within the bounding box of Texas)
         # are not contained in Texas or New Zealand.
@@ -306,17 +291,19 @@ class GeoLookupTest(TestCase):
             0
         )
 
+    @skipUnlessDBFeature("supports_isvalid_lookup")
+    def test_isvalid_lookup(self):
+        invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
+        State.objects.create(name='invalid', poly=invalid_geom)
+        self.assertEqual(State.objects.filter(poly__isvalid=False).count(), 1)
+        self.assertEqual(State.objects.filter(poly__isvalid=True).count(), State.objects.count() - 1)
+
     @skipUnlessDBFeature("supports_left_right_lookups")
     def test_left_right_lookups(self):
         "Testing the 'left' and 'right' lookup types."
         # Left: A << B => true if xmax(A) < xmin(B)
         # Right: A >> B => true if xmin(A) > xmax(B)
         # See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in PostGIS source.
-
-        # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
-        # http://trac.osgeo.org/postgis/ticket/2035
-        if postgis_bug_version():
-            self.skipTest("PostGIS 2.0/2.0.1 left and right lookups are known to be buggy.")
 
         # Getting the borders for Colorado & Kansas
         co_border = State.objects.get(name='Colorado').poly
@@ -351,6 +338,20 @@ class GeoLookupTest(TestCase):
         for c in qs:
             self.assertIn(c.name, cities)
 
+    @skipUnlessGISLookup("strictly_above", "strictly_below")
+    def test_strictly_above_below_lookups(self):
+        dallas = City.objects.get(name='Dallas')
+        self.assertQuerysetEqual(
+            City.objects.filter(point__strictly_above=dallas.point).order_by('name'),
+            ['Chicago', 'Lawrence', 'Oklahoma City', 'Pueblo', 'Victoria'],
+            lambda b: b.name
+        )
+        self.assertQuerysetEqual(
+            City.objects.filter(point__strictly_below=dallas.point).order_by('name'),
+            ['Houston', 'Wellington'],
+            lambda b: b.name
+        )
+
     def test_equals_lookups(self):
         "Testing the 'same_as' and 'equals' lookup types."
         pnt = fromstr('POINT (-95.363151 29.763374)', srid=4326)
@@ -382,7 +383,7 @@ class GeoLookupTest(TestCase):
 
         # Saving another commonwealth w/a NULL geometry.
         nmi = State.objects.create(name='Northern Mariana Islands', poly=None)
-        self.assertEqual(nmi.poly, None)
+        self.assertIsNone(nmi.poly)
 
         # Assigning a geometry and saving -- then UPDATE back to NULL.
         nmi.poly = 'POLYGON((0 0,1 0,1 1,1 0,0 0))'
@@ -400,13 +401,15 @@ class GeoLookupTest(TestCase):
 
         # Not passing in a geometry as first param should
         # raise a type error when initializing the GeoQuerySet
-        self.assertRaises(ValueError, Country.objects.filter, mpoly__relate=(23, 'foo'))
+        with self.assertRaises(ValueError):
+            Country.objects.filter(mpoly__relate=(23, 'foo'))
 
         # Making sure the right exception is raised for the given
         # bad arguments.
         for bad_args, e in [((pnt1, 0), ValueError), ((pnt2, 'T*T***FF*', 0), ValueError)]:
             qs = Country.objects.filter(mpoly__relate=bad_args)
-            self.assertRaises(e, qs.count)
+            with self.assertRaises(e):
+                qs.count()
 
         # Relate works differently for the different backends.
         if postgis or spatialite:
@@ -493,11 +496,9 @@ class GeoQuerySetTest(TestCase):
             self.assertIsInstance(country.envelope, Polygon)
 
     @skipUnlessDBFeature("supports_extent_aggr")
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_extent(self):
         """
-        Testing the (deprecated) `extent` GeoQuerySet method and the Extent
-        aggregate.
+        Testing the `Extent` aggregate.
         """
         # Reference query:
         # `SELECT ST_extent(point) FROM geoapp_city WHERE (name='Houston' or name='Dallas');`
@@ -505,13 +506,9 @@ class GeoQuerySetTest(TestCase):
         expected = (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
         qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-        extent1 = qs.extent()
-        extent2 = qs.aggregate(Extent('point'))['point__extent']
-
-        for extent in (extent1, extent2):
-            for val, exp in zip(extent, expected):
-                self.assertAlmostEqual(exp, val, 4)
-        self.assertIsNone(City.objects.filter(name=('Smalltown')).extent())
+        extent = qs.aggregate(Extent('point'))['point__extent']
+        for val, exp in zip(extent, expected):
+            self.assertAlmostEqual(exp, val, 4)
         self.assertIsNone(City.objects.filter(name=('Smalltown')).aggregate(Extent('point'))['point__extent'])
 
     @skipUnlessDBFeature("supports_extent_aggr")
@@ -552,9 +549,10 @@ class GeoQuerySetTest(TestCase):
 
     def test_geojson(self):
         "Testing GeoJSON output from the database using GeoQuerySet.geojson()."
-        # Only PostGIS and SpatiaLite 3.0+ support GeoJSON.
+        # Only PostGIS and SpatiaLite support GeoJSON.
         if not connection.ops.geojson:
-            self.assertRaises(NotImplementedError, Country.objects.all().geojson, field_name='mpoly')
+            with self.assertRaises(NotImplementedError):
+                Country.objects.all().geojson(field_name='mpoly')
             return
 
         pueblo_json = '{"type":"Point","coordinates":[-104.609252,38.255001]}'
@@ -577,7 +575,8 @@ class GeoQuerySetTest(TestCase):
             )
 
         # Precision argument should only be an integer
-        self.assertRaises(TypeError, City.objects.geojson, precision='foo')
+        with self.assertRaises(TypeError):
+            City.objects.geojson(precision='foo')
 
         # Reference queries and values.
         # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 0)
@@ -608,22 +607,17 @@ class GeoQuerySetTest(TestCase):
         # Should throw a TypeError when trying to obtain GML from a
         # non-geometry field.
         qs = City.objects.all()
-        self.assertRaises(TypeError, qs.gml, field_name='name')
+        with self.assertRaises(TypeError):
+            qs.gml(field_name='name')
         ptown1 = City.objects.gml(field_name='point', precision=9).get(name='Pueblo')
         ptown2 = City.objects.gml(precision=9).get(name='Pueblo')
 
         if oracle:
             # No precision parameter for Oracle :-/
             gml_regex = re.compile(
-                r'^<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml">'
+                r'^<gml:Point srsName="EPSG:4326" xmlns:gml="http://www.opengis.net/gml">'
                 r'<gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ '
                 r'</gml:coordinates></gml:Point>'
-            )
-        elif spatialite and connection.ops.spatial_version < (3, 0, 0):
-            # Spatialite before 3.0 has extra colon in SrsName
-            gml_regex = re.compile(
-                r'^<gml:Point SrsName="EPSG::4326"><gml:coordinates decimal="\." '
-                r'cs="," ts=" ">-104.609251\d+,38.255001</gml:coordinates></gml:Point>'
             )
         else:
             gml_regex = re.compile(
@@ -643,7 +637,8 @@ class GeoQuerySetTest(TestCase):
         # Should throw a TypeError when trying to obtain KML from a
         #  non-geometry field.
         qs = City.objects.all()
-        self.assertRaises(TypeError, qs.kml, 'name')
+        with self.assertRaises(TypeError):
+            qs.kml('name')
 
         # Ensuring the KML is as expected.
         ptown1 = City.objects.kml(field_name='point', precision=9).get(name='Pueblo')
@@ -651,24 +646,15 @@ class GeoQuerySetTest(TestCase):
         for ptown in [ptown1, ptown2]:
             self.assertEqual('<Point><coordinates>-104.609252,38.255001</coordinates></Point>', ptown.kml)
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_make_line(self):
         """
-        Testing the (deprecated) `make_line` GeoQuerySet method and the MakeLine
-        aggregate.
+        Testing the `MakeLine` aggregate.
         """
         if not connection.features.supports_make_line_aggr:
-            # Only PostGIS has support for the MakeLine aggregate. For other
-            # backends, test that NotImplementedError is raised
-            self.assertRaises(
-                NotImplementedError,
-                City.objects.all().aggregate, MakeLine('point')
-            )
+            with self.assertRaises(NotImplementedError):
+                City.objects.all().aggregate(MakeLine('point'))
             return
 
-        # Ensuring that a `TypeError` is raised on models without PointFields.
-        self.assertRaises(TypeError, State.objects.make_line)
-        self.assertRaises(TypeError, Country.objects.make_line)
         # MakeLine on an inappropriate field returns simply None
         self.assertIsNone(State.objects.aggregate(MakeLine('poly'))['poly__makeline'])
         # Reference query:
@@ -681,11 +667,11 @@ class GeoQuerySetTest(TestCase):
         )
         # We check for equality with a tolerance of 10e-5 which is a lower bound
         # of the precisions of ref_line coordinates
-        line1 = City.objects.make_line()
-        line2 = City.objects.aggregate(MakeLine('point'))['point__makeline']
-        for line in (line1, line2):
-            self.assertTrue(ref_line.equals_exact(line, tolerance=10e-5),
-                "%s != %s" % (ref_line, line))
+        line = City.objects.aggregate(MakeLine('point'))['point__makeline']
+        self.assertTrue(
+            ref_line.equals_exact(line, tolerance=10e-5),
+            "%s != %s" % (ref_line, line)
+        )
 
     @skipUnlessDBFeature("has_num_geom_method")
     def test_num_geom(self):
@@ -745,7 +731,8 @@ class GeoQuerySetTest(TestCase):
         coords.reverse()
         self.assertEqual(tuple(coords), t.reverse_geom.coords)
         if oracle:
-            self.assertRaises(TypeError, State.objects.reverse_geom)
+            with self.assertRaises(TypeError):
+                State.objects.reverse_geom()
 
     @skipUnlessDBFeature("has_scale_method")
     def test_scale(self):
@@ -765,9 +752,11 @@ class GeoQuerySetTest(TestCase):
         "Testing GeoQuerySet.snap_to_grid()."
         # Let's try and break snap_to_grid() with bad combinations of arguments.
         for bad_args in ((), range(3), range(5)):
-            self.assertRaises(ValueError, Country.objects.snap_to_grid, *bad_args)
+            with self.assertRaises(ValueError):
+                Country.objects.snap_to_grid(*bad_args)
         for bad_args in (('1.0',), (1.0, None), tuple(map(six.text_type, range(4)))):
-            self.assertRaises(TypeError, Country.objects.snap_to_grid, *bad_args)
+            with self.assertRaises(TypeError):
+                Country.objects.snap_to_grid(*bad_args)
 
         # Boundary for San Marino, courtesy of Bjorn Sandvik of thematicmapping.org
         # from the world borders dataset he provides.
@@ -813,7 +802,8 @@ class GeoQuerySetTest(TestCase):
     def test_svg(self):
         "Testing SVG output using GeoQuerySet.svg()."
 
-        self.assertRaises(TypeError, City.objects.svg, precision='foo')
+        with self.assertRaises(TypeError):
+            City.objects.svg(precision='foo')
         # SELECT AsSVG(geoapp_city.point, 0, 8) FROM geoapp_city WHERE name = 'Pueblo';
         svg1 = 'cx="-104.609252" cy="-38.255001"'
         # Even though relative, only one point so it's practically the same except for
@@ -863,33 +853,26 @@ class GeoQuerySetTest(TestCase):
     # but this seems unexpected and should be investigated to determine the cause.
     @skipUnlessDBFeature("has_unionagg_method")
     @no_oracle
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_unionagg(self):
         """
-        Testing the (deprecated) `unionagg` (aggregate union) GeoQuerySet method
-        and the Union aggregate.
+        Testing the `Union` aggregate.
         """
         tx = Country.objects.get(name='Texas').mpoly
         # Houston, Dallas -- Ordering may differ depending on backend or GEOS version.
         union1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
         union2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)')
         qs = City.objects.filter(point__within=tx)
-        self.assertRaises(TypeError, qs.unionagg, 'name')
-        self.assertRaises(ValueError, qs.aggregate, Union('name'))
+        with self.assertRaises(ValueError):
+            qs.aggregate(Union('name'))
         # Using `field_name` keyword argument in one query and specifying an
         # order in the other (which should not be used because this is
         # an aggregate method on a spatial column)
-        u1 = qs.unionagg(field_name='point')
-        u2 = qs.order_by('name').unionagg()
-        u3 = qs.aggregate(Union('point'))['point__union']
-        u4 = qs.order_by('name').aggregate(Union('point'))['point__union']
+        u1 = qs.aggregate(Union('point'))['point__union']
+        u2 = qs.order_by('name').aggregate(Union('point'))['point__union']
         tol = 0.00001
         self.assertTrue(union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
         self.assertTrue(union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
-        self.assertTrue(union1.equals_exact(u3, tol) or union2.equals_exact(u3, tol))
-        self.assertTrue(union1.equals_exact(u4, tol) or union2.equals_exact(u4, tol))
         qs = City.objects.filter(name='NotACity')
-        self.assertIsNone(qs.unionagg(field_name='point'))
         self.assertIsNone(qs.aggregate(Union('point'))['point__union'])
 
     def test_within_subquery(self):
@@ -910,3 +893,7 @@ class GeoQuerySetTest(TestCase):
     def test_non_concrete_field(self):
         NonConcreteModel.objects.create(point=Point(0, 0), name='name')
         list(NonConcreteModel.objects.all())
+
+    def test_values_srid(self):
+        for c, v in zip(City.objects.all(), City.objects.values()):
+            self.assertEqual(c.point.srid, v['point'].srid)

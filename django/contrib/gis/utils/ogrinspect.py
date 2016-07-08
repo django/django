@@ -232,7 +232,6 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
         srid_str = 'srid=%s' % srid
 
     yield '    %s = models.%s(%s)' % (geom_name, geom_field, srid_str)
-    yield '    objects = models.GeoManager()'
 
     if name_field:
         yield ''

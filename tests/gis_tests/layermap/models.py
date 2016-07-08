@@ -7,8 +7,6 @@ from ..models import models
 class NamedModel(models.Model):
     name = models.CharField(max_length=25)
 
-    objects = models.GeoManager()
-
     class Meta:
         abstract = True
         required_db_features = ['gis_enabled']
@@ -22,7 +20,7 @@ class State(NamedModel):
 
 
 class County(NamedModel):
-    state = models.ForeignKey(State)
+    state = models.ForeignKey(State, models.CASCADE)
     mpoly = models.MultiPolygonField(srid=4269)  # Multipolygon in NAD83
 
 

@@ -1,3 +1,4 @@
+===============================
 Writing a custom storage system
 ===============================
 
@@ -93,11 +94,6 @@ the server or, if ``upload_to`` is a callable, the filename returned by that
 method after any path information is removed. Override this to customize how
 non-standard characters are converted to safe filenames.
 
-.. versionchanged:: 1.9
-
-    In older versions, this method was not called when ``upload_to`` was a
-    callable.
-
 The code provided on ``Storage`` retains only alpha-numeric characters, periods
 and underscores from the original filename, removing everything else.
 
@@ -114,7 +110,3 @@ free unique filename cannot be found, a :exc:`SuspiciousFileOperation
 
 If a file with ``name`` already exists, an underscore plus a random 7 character
 alphanumeric string is appended to the filename before the extension.
-
-.. versionchanged:: 1.8
-
-    The ``max_length`` argument was added.

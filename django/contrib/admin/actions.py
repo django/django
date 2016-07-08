@@ -16,7 +16,7 @@ def delete_selected(modeladmin, request, queryset):
     """
     Default action which deletes the selected objects.
 
-    This action first displays a confirmation page whichs shows all the
+    This action first displays a confirmation page which shows all the
     deleteable objects, or, if the user has no permission one of the related
     childs (foreignkeys), a "permission denied" message.
 
@@ -38,7 +38,7 @@ def delete_selected(modeladmin, request, queryset):
 
     # The user has already confirmed the deletion.
     # Do the deletion and return a None to display the change list view again.
-    if request.POST.get('post'):
+    if request.POST.get('post') and not protected:
         if perms_needed:
             raise PermissionDenied
         n = queryset.count()
@@ -74,6 +74,7 @@ def delete_selected(modeladmin, request, queryset):
         protected=protected,
         opts=opts,
         action_checkbox_name=helpers.ACTION_CHECKBOX_NAME,
+        media=modeladmin.media,
     )
 
     request.current_app = modeladmin.admin_site.name

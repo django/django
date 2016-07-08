@@ -2,7 +2,7 @@ import os
 
 from django.utils._os import upath
 
-AUTH_MIDDLEWARE_CLASSES = [
+AUTH_MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 ]

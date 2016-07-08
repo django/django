@@ -46,7 +46,7 @@ from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr/ogr__api_8h.html
+#  http://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):
@@ -87,8 +87,10 @@ class DataSource(GDALBase):
 
     def __del__(self):
         "Destroys this DataStructure object."
-        if self._ptr and capi:
+        try:
             capi.destroy_ds(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     def __iter__(self):
         "Allows for iteration over the layers in a data source."

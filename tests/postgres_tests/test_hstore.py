@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import json
 
 from django.core import exceptions, serializers
@@ -28,7 +31,7 @@ class SimpleTests(PostgreSQLTestCase):
         instance = HStoreModel(field=None)
         instance.save()
         reloaded = HStoreModel.objects.get()
-        self.assertEqual(reloaded.field, None)
+        self.assertIsNone(reloaded.field)
 
     def test_value_null(self):
         value = {'a': None}
@@ -36,6 +39,20 @@ class SimpleTests(PostgreSQLTestCase):
         instance.save()
         reloaded = HStoreModel.objects.get()
         self.assertEqual(reloaded.field, value)
+
+    def test_key_val_cast_to_string(self):
+        value = {'a': 1, 'b': 'B', 2: 'c', 'ï': 'ê', b'x': b'test'}
+        expected_value = {'a': '1', 'b': 'B', '2': 'c', 'ï': 'ê', 'x': 'test'}
+
+        instance = HStoreModel.objects.create(field=value)
+        instance = HStoreModel.objects.get()
+        self.assertDictEqual(instance.field, expected_value)
+
+        instance = HStoreModel.objects.get(field__a=1)
+        self.assertDictEqual(instance.field, expected_value)
+
+        instance = HStoreModel.objects.get(field__has_keys=[2, 'a', 'ï'])
+        self.assertDictEqual(instance.field, expected_value)
 
 
 class TestQuerying(PostgreSQLTestCase):
@@ -65,6 +82,14 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__contains={'a': 'b'}),
             self.objs[:2]
+        )
+
+    def test_in_generator(self):
+        def search():
+            yield {'a': 'b'}
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__in=search()),
+            self.objs[:1]
         )
 
     def test_has_key(self):
@@ -140,7 +165,8 @@ class TestQuerying(PostgreSQLTestCase):
 
 
 class TestSerialization(PostgreSQLTestCase):
-    test_data = '[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, "model": "postgres_tests.hstoremodel", "pk": null}]'
+    test_data = ('[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, '
+                 '"model": "postgres_tests.hstoremodel", "pk": null}]')
 
     def test_dumping(self):
         instance = HStoreModel(field={'a': 'b'})
@@ -150,6 +176,12 @@ class TestSerialization(PostgreSQLTestCase):
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.field, {'a': 'b'})
+
+    def test_roundtrip_with_null(self):
+        instance = HStoreModel(field={'a': 'b', 'c': None})
+        data = serializers.serialize('json', [instance])
+        new_instance = list(serializers.deserialize('json', data))[0].object
+        self.assertEqual(instance.field, new_instance.field)
 
 
 class TestValidation(PostgreSQLTestCase):
@@ -176,6 +208,13 @@ class TestFormField(PostgreSQLTestCase):
         self.assertEqual(cm.exception.messages[0], 'Could not load JSON data.')
         self.assertEqual(cm.exception.code, 'invalid_json')
 
+    def test_non_dict_json(self):
+        field = forms.HStoreField()
+        msg = 'Input must be a JSON dictionary.'
+        with self.assertRaisesMessage(exceptions.ValidationError, msg) as cm:
+            field.clean('["a", "b", 1]')
+        self.assertEqual(cm.exception.code, 'invalid_format')
+
     def test_not_string_values(self):
         field = forms.HStoreField()
         value = field.clean('{"a": 1}')
@@ -191,11 +230,26 @@ class TestFormField(PostgreSQLTestCase):
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, forms.HStoreField)
 
-    def test_empty_field_has_not_changed(self):
+    def test_field_has_changed(self):
         class HStoreFormTest(Form):
-            f1 = HStoreField()
+            f1 = forms.HStoreField()
         form_w_hstore = HStoreFormTest()
         self.assertFalse(form_w_hstore.has_changed())
+
+        form_w_hstore = HStoreFormTest({'f1': '{"a": 1}'})
+        self.assertTrue(form_w_hstore.has_changed())
+
+        form_w_hstore = HStoreFormTest({'f1': '{"a": 1}'}, initial={'f1': '{"a": 1}'})
+        self.assertFalse(form_w_hstore.has_changed())
+
+        form_w_hstore = HStoreFormTest({'f1': '{"a": 2}'}, initial={'f1': '{"a": 1}'})
+        self.assertTrue(form_w_hstore.has_changed())
+
+        form_w_hstore = HStoreFormTest({'f1': '{"a": 1}'}, initial={'f1': {"a": 1}})
+        self.assertFalse(form_w_hstore.has_changed())
+
+        form_w_hstore = HStoreFormTest({'f1': '{"a": 2}'}, initial={'f1': {"a": 1}})
+        self.assertTrue(form_w_hstore.has_changed())
 
 
 class TestValidator(PostgreSQLTestCase):

@@ -78,12 +78,19 @@ class SiteManager(models.Manager):
         global SITE_CACHE
         SITE_CACHE = {}
 
+    def get_by_natural_key(self, domain):
+        return self.get(domain=domain)
+
 
 @python_2_unicode_compatible
 class Site(models.Model):
 
-    domain = models.CharField(_('domain name'), max_length=100,
-        validators=[_simple_domain_name_validator], unique=True)
+    domain = models.CharField(
+        _('domain name'),
+        max_length=100,
+        validators=[_simple_domain_name_validator],
+        unique=True,
+    )
     name = models.CharField(_('display name'), max_length=50)
     objects = SiteManager()
 
@@ -95,6 +102,9 @@ class Site(models.Model):
 
     def __str__(self):
         return self.domain
+
+    def natural_key(self):
+        return (self.domain,)
 
 
 def clear_site_cache(sender, **kwargs):

@@ -74,6 +74,8 @@ explained later in this document.
 
     Oh, and one more thing: making humans edit XML is sadistic!
 
+.. _template-variables:
+
 Variables
 =========
 
@@ -166,7 +168,7 @@ used template filters:
 
 :tfilter:`filesizeformat`
     Formats the value like a "human-readable" file size (i.e. ``'13 KB'``,
-    ``'4.1 MB'``, ``'102 bytes'``, etc). For example::
+    ``'4.1 MB'``, ``'102 bytes'``, etc.). For example::
 
         {{ value|filesizeformat }}
 
@@ -487,7 +489,7 @@ escaped:
 Again, we stress that this behavior is on by default. If you're using Django's
 template system, you're protected.
 
-.. _Cross Site Scripting: http://en.wikipedia.org/wiki/Cross-site_scripting
+.. _Cross Site Scripting: https://en.wikipedia.org/wiki/Cross-site_scripting
 
 How to turn it off
 ------------------

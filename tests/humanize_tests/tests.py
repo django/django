@@ -6,7 +6,7 @@ from unittest import skipIf
 
 from django.contrib.humanize.templatetags import humanize
 from django.template import Context, Template, defaultfilters
-from django.test import TestCase, modify_settings, override_settings
+from django.test import SimpleTestCase, modify_settings, override_settings
 from django.utils import translation
 from django.utils.html import escape
 from django.utils.timezone import get_fixed_timezone, utc
@@ -36,7 +36,7 @@ class MockDateTime(datetime.datetime):
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.humanize'})
-class HumanizeTests(TestCase):
+class HumanizeTests(SimpleTestCase):
 
     def humanize_tester(self, test_list, result_list, method, normalize_result_func=escape):
         for test_content, result in zip(test_list, result_list):
@@ -70,24 +70,30 @@ class HumanizeTests(TestCase):
             self.humanize_tester(test_list, result_list, 'ordinal', lambda x: x)
 
     def test_intcomma(self):
-        test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
-                     '100', '1000', '10123', '10311', '1000000', '1234567.1234567', Decimal('1234567.1234567'),
-                     None)
-        result_list = ('100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.25',
-                       '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567', '1,234,567.1234567',
-                     None)
-
+        test_list = (
+            100, 1000, 10123, 10311, 1000000, 1234567.25, '100', '1000',
+            '10123', '10311', '1000000', '1234567.1234567',
+            Decimal('1234567.1234567'), None,
+        )
+        result_list = (
+            '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.25',
+            '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567',
+            '1,234,567.1234567', None,
+        )
         with translation.override('en'):
             self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_l10n_intcomma(self):
-        test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
-                     '100', '1000', '10123', '10311', '1000000', '1234567.1234567', Decimal('1234567.1234567'),
-                     None)
-        result_list = ('100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.25',
-                       '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567', '1,234,567.1234567',
-                     None)
-
+        test_list = (
+            100, 1000, 10123, 10311, 1000000, 1234567.25, '100', '1000',
+            '10123', '10311', '1000000', '1234567.1234567',
+            Decimal('1234567.1234567'), None,
+        )
+        result_list = (
+            '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.25',
+            '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567',
+            '1,234,567.1234567', None,
+        )
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False):
             with translation.override('en'):
                 self.humanize_tester(test_list, result_list, 'intcomma')
@@ -98,14 +104,16 @@ class HumanizeTests(TestCase):
             self.humanize_tester([100], ['100'], 'intcomma')
 
     def test_intword(self):
-        test_list = ('100', '1000000', '1200000', '1290000',
-                     '1000000000', '2000000000', '6000000000000',
-                     '1300000000000000', '3500000000000000000000',
-                     '8100000000000000000000000000000000', None)
-        result_list = ('100', '1.0 million', '1.2 million', '1.3 million',
-                       '1.0 billion', '2.0 billion', '6.0 trillion',
-                       '1.3 quadrillion', '3.5 sextillion',
-                       '8.1 decillion', None)
+        test_list = (
+            '100', '1000000', '1200000', '1290000', '1000000000', '2000000000',
+            '6000000000000', '1300000000000000', '3500000000000000000000',
+            '8100000000000000000000000000000000', None,
+        )
+        result_list = (
+            '100', '1.0 million', '1.2 million', '1.3 million', '1.0 billion',
+            '2.0 billion', '6.0 trillion', '1.3 quadrillion', '3.5 sextillion',
+            '8.1 decillion', None,
+        )
         with translation.override('en'):
             self.humanize_tester(test_list, result_list, 'intword')
 
@@ -119,10 +127,14 @@ class HumanizeTests(TestCase):
                 self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_i18n_intword(self):
-        test_list = ('100', '1000000', '1200000', '1290000',
-                     '1000000000', '2000000000', '6000000000000')
-        result_list = ('100', '1,0 Million', '1,2 Millionen', '1,3 Millionen',
-                       '1,0 Milliarde', '2,0 Milliarden', '6,0 Billionen')
+        test_list = (
+            '100', '1000000', '1200000', '1290000', '1000000000', '2000000000',
+            '6000000000000',
+        )
+        result_list = (
+            '100', '1,0 Million', '1,2 Millionen', '1,3 Millionen',
+            '1,0 Milliarde', '2,0 Milliarden', '6,0 Billionen',
+        )
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
             with translation.override('de'):
                 self.humanize_tester(test_list, result_list, 'intword')
@@ -130,8 +142,7 @@ class HumanizeTests(TestCase):
     def test_apnumber(self):
         test_list = [str(x) for x in range(1, 11)]
         test_list.append(None)
-        result_list = ('one', 'two', 'three', 'four', 'five', 'six',
-                       'seven', 'eight', 'nine', '10', None)
+        result_list = ('one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', '10', None)
         with translation.override('en'):
             self.humanize_tester(test_list, result_list, 'apnumber')
 

@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='B2',
             fields=[
                 ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
-                ('a1', models.ForeignKey(to='lookuperror_a.A1')),
+                ('a1', models.ForeignKey('lookuperror_a.A1', models.CASCADE)),
             ],
         ),
     ]

@@ -1,15 +1,15 @@
 from __future__ import unicode_literals
 
 from django.template import Context, Template
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils import html, six, text
-from django.utils.encoding import force_bytes, force_text
-from django.utils.functional import lazy
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_bytes
+from django.utils.functional import lazy, lazystr
 from django.utils.safestring import (
     EscapeData, SafeData, mark_for_escaping, mark_safe,
 )
 
-lazystr = lazy(force_text, six.text_type)
 lazybytes = lazy(force_bytes, bytes)
 
 
@@ -63,11 +63,13 @@ class SafeStringTest(SimpleTestCase):
     def test_mark_safe_lazy_result_implements_dunder_html(self):
         self.assertEqual(mark_safe(lazystr('a&b')).__html__(), 'a&b')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_mark_for_escaping(self):
         s = mark_for_escaping('a&b')
         self.assertRenderEqual('{{ s }}', 'a&amp;b', s=s)
         self.assertRenderEqual('{{ s }}', 'a&amp;b', s=mark_for_escaping(s))
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_mark_for_escaping_object_implementing_dunder_html(self):
         e = customescape('<a&b>')
         s = mark_for_escaping(e)
@@ -76,6 +78,7 @@ class SafeStringTest(SimpleTestCase):
         self.assertRenderEqual('{{ s }}', '<<a&b>>', s=s)
         self.assertRenderEqual('{{ s|force_escape }}', '&lt;a&amp;b&gt;', s=s)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_mark_for_escaping_lazy(self):
         s = lazystr('a&b')
         b = lazybytes(b'a&b')
@@ -84,6 +87,7 @@ class SafeStringTest(SimpleTestCase):
         self.assertIsInstance(mark_for_escaping(b), EscapeData)
         self.assertRenderEqual('{% autoescape off %}{{ s }}{% endautoescape %}', 'a&amp;b', s=mark_for_escaping(s))
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_mark_for_escaping_object_implementing_dunder_str(self):
         class Obj(object):
             def __str__(self):
@@ -105,3 +109,33 @@ class SafeStringTest(SimpleTestCase):
         s = text.slugify(lazystr('a'))
         s += mark_safe('&b')
         self.assertRenderEqual('{{ s }}', 'a&b', s=s)
+
+    def test_mark_safe_as_decorator(self):
+        """
+        mark_safe used as a decorator leaves the result of a function
+        unchanged.
+        """
+        def clean_string_provider():
+            return '<html><body>dummy</body></html>'
+
+        self.assertEqual(mark_safe(clean_string_provider)(), clean_string_provider())
+
+    def test_mark_safe_decorator_does_not_affect_dunder_html(self):
+        """
+        mark_safe doesn't affect a callable that has an __html__() method.
+        """
+        class SafeStringContainer:
+            def __html__(self):
+                return '<html></html>'
+
+        self.assertIs(mark_safe(SafeStringContainer), SafeStringContainer)
+
+    def test_mark_safe_decorator_does_not_affect_promises(self):
+        """
+        mark_safe doesn't affect lazy strings (Promise objects).
+        """
+        def html_str():
+            return '<html></html>'
+
+        lazy_str = lazy(html_str, str)()
+        self.assertEqual(mark_safe(lazy_str), html_str())

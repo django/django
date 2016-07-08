@@ -3,15 +3,17 @@
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2014-2015
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014
+# duub qnnp, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-03-07 12:30+0000\n"
-"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
-"Language-Team: Catalan (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-21 12:00+0000\n"
+"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
+"Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -69,14 +71,20 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Si us plau, introduïu un %(username)s i clau correcta per un compte de "
-"personal. Observeu que ambdós camps són sensibles a majúscules."
+"Si us plau, introduïu un %(username)s i contrasenya correcta per un compte "
+"de personal. Observeu que ambdós camps són sensibles a majúscules."
 
 msgid "Action:"
 msgstr "Acció:"
 
 msgid "action time"
 msgstr "moment de l'acció"
+
+msgid "user"
+msgstr "usuari"
+
+msgid "content type"
+msgstr "tipus de contingut"
 
 msgid "object id"
 msgstr "id de l'objecte"
@@ -117,6 +125,9 @@ msgstr "cap"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "Premi \"Control\" o \"Command\" a un Mac per seleccionar-ne més d'un."
+
+msgid "Added."
+msgstr "Afegit."
 
 #, python-format
 msgid "Changed %s."
@@ -326,7 +337,7 @@ msgid "Welcome,"
 msgstr "Benvingut/da,"
 
 msgid "View site"
-msgstr "Veure al lloc"
+msgstr "Veure lloc"
 
 msgid "Documentation"
 msgstr "Documentació"
@@ -475,6 +486,14 @@ msgstr ""
 "vos que s'han creat les taules adients, i que la base de dades és llegible "
 "per l'usuari apropiat."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Esteu identificats com a %(username)s, però no esteu autoritzats a accedir a "
+"aquesta pàgina. Voleu identificar-vos amb un compte d'usuari diferent?"
+
 msgid "Forgotten your password or username?"
 msgstr "Heu oblidat la vostra contrasenya o nom d'usuari?"
 
@@ -499,6 +518,9 @@ msgstr "Mostrar tots"
 
 msgid "Save"
 msgstr "Desar"
+
+msgid "Popup closing..."
+msgstr "Tancant el contingut emergent..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -591,8 +613,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Li hem enviat instruccions per establir la seva clau, donat que hi hagi un "
-"compte associat al correu introduït. L'hauríeu de rebre en breu."
+"Li hem enviat instruccions per establir la seva contrasenya, donat que hi "
+"hagi un compte associat al correu introduït. L'hauríeu de rebre en breu."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -637,9 +659,6 @@ msgstr "Restablir la meva contrasenya"
 
 msgid "All dates"
 msgstr "Totes les dates"
-
-msgid "(None)"
-msgstr "(Cap)"
 
 #, python-format
 msgid "Select %s"

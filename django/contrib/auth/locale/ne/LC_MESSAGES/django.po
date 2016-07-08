@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:30+0000\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-10-11 08:53+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Nepali (http://www.transifex.com/projects/p/django/language/"
-"ne/)\n"
+"Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -40,6 +39,12 @@ msgstr "पासवर्ड फेर्नुहोस : %s"
 msgid "Authentication and Authorization"
 msgstr "प्रमाणीकरण तथा अनुमति"
 
+msgid "password"
+msgstr "पासवर्ड"
+
+msgid "last login"
+msgstr "पूर्व लगिन"
+
 msgid "No password set."
 msgstr "पासवर्ड राखिएको छैन ।"
 
@@ -55,16 +60,14 @@ msgstr "पासवर्ड"
 msgid "Password confirmation"
 msgstr "पासवर्ड पुष्टि"
 
-msgid "Enter the same password as above, for verification."
-msgstr "प्रमाणिकरणको लागि माथी कै पासवर्ड राख्नुहोस ।"
+msgid "Enter the same password as before, for verification."
+msgstr ""
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"पासवर्ड राखिएको हुँदैन, त्यसैले व्यक्तिको पासवर्ड हेर्न मिल्दैन, तर पासवर्ड फेर्न को लागि <a "
-"href=\"password/\">यो फारम</a> भर्नु होस । "
 
 #, python-format
 msgid ""
@@ -114,6 +117,9 @@ msgstr "चेकसम"
 msgid "name"
 msgstr "नाम"
 
+msgid "content type"
+msgstr ""
+
 msgid "codename"
 msgstr "कोडनेम"
 
@@ -128,12 +134,6 @@ msgstr "समुह"
 
 msgid "groups"
 msgstr "समुहहरु"
-
-msgid "password"
-msgstr "पासवर्ड"
-
-msgid "last login"
-msgstr "पूर्व लगिन"
 
 msgid "superuser status"
 msgstr "प्रधान प्रयोगकर्ता प्रतिष्ठा "
@@ -199,6 +199,41 @@ msgstr "प्रयोगकर्ता"
 
 msgid "users"
 msgstr "प्रयोगकर्ता"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr ""
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+
+msgid "This password is too common."
+msgstr ""
+
+msgid "Your password can't be a commonly used password."
+msgstr ""
+
+msgid "This password is entirely numeric."
+msgstr ""
+
+msgid "Your password can't be entirely numeric."
+msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"

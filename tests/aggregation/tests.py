@@ -7,13 +7,12 @@ from decimal import Decimal
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    F, Aggregate, Avg, Count, DecimalField, DurationField, FloatField, Func,
-    IntegerField, Max, Min, Sum, Value,
+    Avg, Count, DecimalField, DurationField, F, FloatField, Func, IntegerField,
+    Max, Min, Sum, Value,
 )
-from django.test import TestCase, ignore_warnings
+from django.test import TestCase
 from django.test.utils import Approximate, CaptureQueriesContext
-from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils import timezone
 
 from .models import Author, Book, Publisher, Store
 
@@ -104,6 +103,14 @@ class AggregateTestCase(TestCase):
 
     def test_empty_aggregate(self):
         self.assertEqual(Author.objects.all().aggregate(), {})
+
+    def test_aggregate_in_order_by(self):
+        msg = (
+            'Using an aggregate in order_by() without also including it in '
+            'annotate() is not allowed: Avg(F(book__rating)'
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Author.objects.values('age').order_by(Avg('book__rating'))
 
     def test_single_aggregate(self):
         vals = Author.objects.aggregate(Avg("age"))
@@ -299,7 +306,12 @@ class AggregateTestCase(TestCase):
             ]
         )
 
-        books = Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg('authors__age')).values('pk', 'isbn', 'mean_age')
+        books = (
+            Book.objects
+            .filter(pk=self.b1.pk)
+            .annotate(mean_age=Avg('authors__age'))
+            .values('pk', 'isbn', 'mean_age')
+        )
         self.assertEqual(
             list(books), [
                 {
@@ -337,7 +349,12 @@ class AggregateTestCase(TestCase):
             ]
         )
 
-        books = Book.objects.values("rating").annotate(n_authors=Count("authors__id"), mean_age=Avg("authors__age")).order_by("rating")
+        books = (
+            Book.objects
+            .values("rating")
+            .annotate(n_authors=Count("authors__id"), mean_age=Avg("authors__age"))
+            .order_by("rating")
+        )
         self.assertEqual(
             list(books), [
                 {
@@ -386,6 +403,43 @@ class AggregateTestCase(TestCase):
 
         vals = Book.objects.aggregate(Count("rating", distinct=True))
         self.assertEqual(vals, {"rating__count": 4})
+
+    def test_count_star(self):
+        with self.assertNumQueries(1) as ctx:
+            Book.objects.aggregate(n=Count("*"))
+        sql = ctx.captured_queries[0]['sql']
+        self.assertIn('SELECT COUNT(*) ', sql)
+
+    def test_non_grouped_annotation_not_in_group_by(self):
+        """
+        An annotation not included in values() before an aggregate should be
+        excluded from the group by clause.
+        """
+        qs = (
+            Book.objects.annotate(xprice=F('price')).filter(rating=4.0).values('rating')
+                .annotate(count=Count('publisher_id', distinct=True)).values('count', 'rating').order_by('count')
+        )
+        self.assertEqual(
+            list(qs), [
+                {'rating': 4.0, 'count': 2},
+            ]
+        )
+
+    def test_grouped_annotation_in_group_by(self):
+        """
+        An annotation included in values() before an aggregate should be
+        included in the group by clause.
+        """
+        qs = (
+            Book.objects.annotate(xprice=F('price')).filter(rating=4.0).values('rating', 'xprice')
+                .annotate(count=Count('publisher_id', distinct=True)).values('count', 'rating').order_by('count')
+        )
+        self.assertEqual(
+            list(qs), [
+                {'rating': 4.0, 'count': 1},
+                {'rating': 4.0, 'count': 2},
+            ]
+        )
 
     def test_fkey_aggregate(self):
         explicit = list(Author.objects.annotate(Count('book__id')))
@@ -442,8 +496,14 @@ class AggregateTestCase(TestCase):
         self.assertEqual(vals, {"num_authors__avg": Approximate(1.66, places=1)})
 
     def test_avg_duration_field(self):
+        # Explicit `output_field`.
         self.assertEqual(
             Publisher.objects.aggregate(Avg('duration', output_field=DurationField())),
+            {'duration__avg': datetime.timedelta(days=1, hours=12)}
+        )
+        # Implicit `output_field`.
+        self.assertEqual(
+            Publisher.objects.aggregate(Avg('duration')),
             {'duration__avg': datetime.timedelta(days=1, hours=12)}
         )
 
@@ -455,7 +515,7 @@ class AggregateTestCase(TestCase):
 
     def test_sum_distinct_aggregate(self):
         """
-        Sum on a distict() QuerySet should aggregate only the distinct items.
+        Sum on a distinct() QuerySet should aggregate only the distinct items.
         """
         authors = Author.objects.filter(book__in=[5, 6])
         self.assertEqual(authors.count(), 3)
@@ -522,7 +582,12 @@ class AggregateTestCase(TestCase):
             lambda p: p.name
         )
 
-        publishers = Publisher.objects.annotate(num_books=Count("book__id")).filter(num_books__gt=1, book__price__lt=Decimal("40.0")).order_by("pk")
+        publishers = (
+            Publisher.objects
+            .annotate(num_books=Count("book__id"))
+            .filter(num_books__gt=1, book__price__lt=Decimal("40.0"))
+            .order_by("pk")
+        )
         self.assertQuerysetEqual(
             publishers, [
                 "Apress",
@@ -532,7 +597,13 @@ class AggregateTestCase(TestCase):
             lambda p: p.name,
         )
 
-        publishers = Publisher.objects.filter(book__price__lt=Decimal("40.0")).annotate(num_books=Count("book__id")).filter(num_books__gt=1).order_by("pk")
+        publishers = (
+            Publisher.objects
+            .filter(book__price__lt=Decimal("40.0"))
+            .annotate(num_books=Count("book__id"))
+            .filter(num_books__gt=1)
+            .order_by("pk")
+        )
         self.assertQuerysetEqual(
             publishers, [
                 "Apress",
@@ -589,7 +660,12 @@ class AggregateTestCase(TestCase):
             lambda b: b.name
         )
 
-        authors = Author.objects.annotate(num_friends=Count("friends__id", distinct=True)).filter(num_friends=0).order_by("pk")
+        authors = (
+            Author.objects
+            .annotate(num_friends=Count("friends__id", distinct=True))
+            .filter(num_friends=0)
+            .order_by("pk")
+        )
         self.assertQuerysetEqual(
             authors, [
                 "Brad Dayley",
@@ -606,7 +682,12 @@ class AggregateTestCase(TestCase):
             lambda p: p.name
         )
 
-        publishers = Publisher.objects.filter(book__price__lt=Decimal("40.0")).annotate(num_books=Count("book__id")).filter(num_books__gt=1)
+        publishers = (
+            Publisher.objects
+            .filter(book__price__lt=Decimal("40.0"))
+            .annotate(num_books=Count("book__id"))
+            .filter(num_books__gt=1)
+        )
         self.assertQuerysetEqual(
             publishers, [
                 "Apress",
@@ -614,7 +695,11 @@ class AggregateTestCase(TestCase):
             lambda p: p.name
         )
 
-        books = Book.objects.annotate(num_authors=Count("authors__id")).filter(authors__name__contains="Norvig", num_authors__gt=1)
+        books = (
+            Book.objects
+            .annotate(num_authors=Count("authors__id"))
+            .filter(authors__name__contains="Norvig", num_authors__gt=1)
+        )
         self.assertQuerysetEqual(
             books, [
                 "Artificial Intelligence: A Modern Approach",
@@ -628,7 +713,12 @@ class AggregateTestCase(TestCase):
         b.authors.add(a)
         b.save()
 
-        vals = Book.objects.annotate(num_authors=Count("authors__id")).filter(authors__name__contains="Norvig", num_authors__gt=1).aggregate(Avg("rating"))
+        vals = (
+            Book.objects
+            .annotate(num_authors=Count("authors__id"))
+            .filter(authors__name__contains="Norvig", num_authors__gt=1)
+            .aggregate(Avg("rating"))
+        )
         self.assertEqual(vals, {"rating__avg": 4.25})
 
     def test_even_more_aggregate(self):
@@ -679,7 +769,12 @@ class AggregateTestCase(TestCase):
         )
 
     def test_annotate_values_list(self):
-        books = Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg("authors__age")).values_list("pk", "isbn", "mean_age")
+        books = (
+            Book.objects
+            .filter(pk=self.b1.pk)
+            .annotate(mean_age=Avg("authors__age"))
+            .values_list("pk", "isbn", "mean_age")
+        )
         self.assertEqual(
             list(books), [
                 (1, "159059725", 34.5),
@@ -700,7 +795,12 @@ class AggregateTestCase(TestCase):
             ]
         )
 
-        books = Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg("authors__age")).values_list("mean_age", flat=True)
+        books = (
+            Book.objects
+            .filter(pk=self.b1.pk)
+            .annotate(mean_age=Avg("authors__age"))
+            .values_list("mean_age", flat=True)
+        )
         self.assertEqual(list(books), [34.5])
 
         books = Book.objects.values_list("price").annotate(count=Count("price")).order_by("-count", "price")
@@ -812,7 +912,7 @@ class AggregateTestCase(TestCase):
         self.assertEqual(book['price_sum'], Decimal("99999.80"))
 
     def test_nonaggregate_aggregation_throws(self):
-        with six.assertRaisesRegex(self, TypeError, 'fail is not an aggregate expression'):
+        with self.assertRaisesMessage(TypeError, 'fail is not an aggregate expression'):
             Book.objects.aggregate(fail=F('price'))
 
     def test_nonfield_annotation(self):
@@ -824,7 +924,7 @@ class AggregateTestCase(TestCase):
         self.assertEqual(book.val, 2)
 
     def test_missing_output_field_raises_error(self):
-        with six.assertRaisesRegex(self, FieldError, 'Cannot resolve expression type, unknown output_field'):
+        with self.assertRaisesMessage(FieldError, 'Cannot resolve expression type, unknown output_field'):
             Book.objects.annotate(val=Max(2)).first()
 
     def test_annotation_expressions(self):
@@ -868,7 +968,7 @@ class AggregateTestCase(TestCase):
         self.assertEqual(p2, {'avg_price': Approximate(53.39, places=2)})
 
     def test_combine_different_types(self):
-        with six.assertRaisesRegex(self, FieldError, 'Expression contains mixed types. You must set output_field'):
+        with self.assertRaisesMessage(FieldError, 'Expression contains mixed types. You must set output_field'):
             Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price')).get(pk=self.b4.pk)
 
         b1 = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
@@ -884,11 +984,11 @@ class AggregateTestCase(TestCase):
         self.assertEqual(b3.sums, Approximate(Decimal("383.69"), places=2))
 
     def test_complex_aggregations_require_kwarg(self):
-        with six.assertRaisesRegex(self, TypeError, 'Complex annotations require an alias'):
+        with self.assertRaisesMessage(TypeError, 'Complex annotations require an alias'):
             Author.objects.annotate(Sum(F('age') + F('friends__age')))
-        with six.assertRaisesRegex(self, TypeError, 'Complex aggregates require an alias'):
+        with self.assertRaisesMessage(TypeError, 'Complex aggregates require an alias'):
             Author.objects.aggregate(Sum('age') / Count('age'))
-        with six.assertRaisesRegex(self, TypeError, 'Complex aggregates require an alias'):
+        with self.assertRaisesMessage(TypeError, 'Complex aggregates require an alias'):
             Author.objects.aggregate(Sum(1))
 
     def test_aggregate_over_complex_annotation(self):
@@ -1089,23 +1189,3 @@ class AggregateTestCase(TestCase):
         ).filter(rating_or_num_awards__gt=F('num_awards')).order_by('num_awards')
         self.assertQuerysetEqual(
             qs2, [1, 3], lambda v: v.num_awards)
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_backwards_compatibility(self):
-        from django.db.models.sql import aggregates as sql_aggregates
-
-        class SqlNewSum(sql_aggregates.Aggregate):
-            sql_function = 'SUM'
-
-        class NewSum(Aggregate):
-            name = 'Sum'
-
-            def add_to_query(self, query, alias, col, source, is_summary):
-                klass = SqlNewSum
-                aggregate = klass(
-                    col, source=source, is_summary=is_summary, **self.extra)
-                query.annotations[alias] = aggregate
-
-        qs = Author.objects.values('name').annotate(another_age=NewSum('age') + F('age'))
-        a = qs.get(name="Adrian Holovaty")
-        self.assertEqual(a['another_age'], 68)

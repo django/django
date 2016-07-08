@@ -13,7 +13,7 @@ from django.utils.encoding import python_2_unicode_compatible
 @python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    first_book = models.ForeignKey('Book', related_name='first_time_authors')
+    first_book = models.ForeignKey('Book', models.CASCADE, related_name='first_time_authors')
     favorite_authors = models.ManyToManyField(
         'self', through='FavoriteAuthors', symmetrical=False, related_name='favors_me')
 
@@ -25,13 +25,13 @@ class Author(models.Model):
 
 
 class AuthorWithAge(Author):
-    author = models.OneToOneField(Author, parent_link=True)
+    author = models.OneToOneField(Author, models.CASCADE, parent_link=True)
     age = models.IntegerField()
 
 
 class FavoriteAuthors(models.Model):
-    author = models.ForeignKey(Author, to_field='name', related_name='i_like')
-    likes_author = models.ForeignKey(Author, to_field='name', related_name='likes_me')
+    author = models.ForeignKey(Author, models.CASCADE, to_field='name', related_name='i_like')
+    likes_author = models.ForeignKey(Author, models.CASCADE, to_field='name', related_name='likes_me')
 
     class Meta:
         ordering = ['id']
@@ -39,7 +39,7 @@ class FavoriteAuthors(models.Model):
 
 @python_2_unicode_compatible
 class AuthorAddress(models.Model):
-    author = models.ForeignKey(Author, to_field='name', related_name='addresses')
+    author = models.ForeignKey(Author, models.CASCADE, to_field='name', related_name='addresses')
     address = models.TextField()
 
     class Meta:
@@ -62,14 +62,14 @@ class Book(models.Model):
 
 
 class BookWithYear(Book):
-    book = models.OneToOneField(Book, parent_link=True)
+    book = models.OneToOneField(Book, models.CASCADE, parent_link=True)
     published_year = models.IntegerField()
     aged_authors = models.ManyToManyField(
         AuthorWithAge, related_name='books_with_year')
 
 
 class Bio(models.Model):
-    author = models.OneToOneField(Author)
+    author = models.OneToOneField(Author, models.CASCADE)
     books = models.ManyToManyField(Book, blank=True)
 
 
@@ -86,7 +86,7 @@ class Reader(models.Model):
 
 
 class BookReview(models.Model):
-    book = models.ForeignKey(BookWithYear)
+    book = models.ForeignKey(BookWithYear, models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
 
@@ -131,15 +131,27 @@ class Department(models.Model):
 @python_2_unicode_compatible
 class TaggedItem(models.Model):
     tag = models.SlugField()
-    content_type = models.ForeignKey(ContentType, related_name="taggeditem_set2")
+    content_type = models.ForeignKey(
+        ContentType,
+        models.CASCADE,
+        related_name="taggeditem_set2",
+    )
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-    created_by_ct = models.ForeignKey(ContentType, null=True,
-                                      related_name='taggeditem_set3')
+    created_by_ct = models.ForeignKey(
+        ContentType,
+        models.SET_NULL,
+        null=True,
+        related_name='taggeditem_set3',
+    )
     created_by_fkey = models.PositiveIntegerField(null=True)
     created_by = GenericForeignKey('created_by_ct', 'created_by_fkey',)
-    favorite_ct = models.ForeignKey(ContentType, null=True,
-                                    related_name='taggeditem_set4')
+    favorite_ct = models.ForeignKey(
+        ContentType,
+        models.SET_NULL,
+        null=True,
+        related_name='taggeditem_set4',
+    )
     favorite_fkey = models.CharField(max_length=64, null=True)
     favorite = GenericForeignKey('favorite_ct', 'favorite_fkey')
 
@@ -166,7 +178,7 @@ class Comment(models.Model):
     comment = models.TextField()
 
     # Content-object field
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_pk = models.TextField()
     content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
@@ -179,8 +191,8 @@ class Comment(models.Model):
 class House(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=255)
-    owner = models.ForeignKey('Person', null=True)
-    main_room = models.OneToOneField('Room', related_name='main_room_of', null=True)
+    owner = models.ForeignKey('Person', models.SET_NULL, null=True)
+    main_room = models.OneToOneField('Room', models.SET_NULL, related_name='main_room_of', null=True)
 
     class Meta:
         ordering = ['id']
@@ -188,7 +200,7 @@ class House(models.Model):
 
 class Room(models.Model):
     name = models.CharField(max_length=50)
-    house = models.ForeignKey(House, related_name='rooms')
+    house = models.ForeignKey(House, models.CASCADE, related_name='rooms')
 
     class Meta:
         ordering = ['id']
@@ -216,8 +228,7 @@ class Person(models.Model):
 @python_2_unicode_compatible
 class Employee(models.Model):
     name = models.CharField(max_length=50)
-    boss = models.ForeignKey('self', null=True,
-                             related_name='serfs')
+    boss = models.ForeignKey('self', models.SET_NULL, null=True, related_name='serfs')
 
     def __str__(self):
         return self.name
@@ -239,7 +250,7 @@ class LessonEntry(models.Model):
 
 @python_2_unicode_compatible
 class WordEntry(models.Model):
-    lesson_entry = models.ForeignKey(LessonEntry)
+    lesson_entry = models.ForeignKey(LessonEntry, models.CASCADE)
     name = models.CharField(max_length=200)
 
     def __str__(self):
@@ -251,7 +262,7 @@ class WordEntry(models.Model):
 @python_2_unicode_compatible
 class Author2(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    first_book = models.ForeignKey('Book', related_name='first_time_authors+')
+    first_book = models.ForeignKey('Book', models.CASCADE, related_name='first_time_authors+')
     favorite_books = models.ManyToManyField('Book', related_name='+')
 
     def __str__(self):
@@ -271,6 +282,6 @@ class Pet(models.Model):
 
 class Flea(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    current_room = models.ForeignKey(Room, related_name='fleas', null=True)
+    current_room = models.ForeignKey(Room, models.SET_NULL, related_name='fleas', null=True)
     pets_visited = models.ManyToManyField(Pet, related_name='fleas_hosted')
     people_visited = models.ManyToManyField(Person, related_name='fleas_hosted')

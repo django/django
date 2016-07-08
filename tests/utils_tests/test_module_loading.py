@@ -5,7 +5,7 @@ import unittest
 from importlib import import_module
 from zipimport import zipimporter
 
-from django.test import SimpleTestCase, modify_settings
+from django.test import SimpleTestCase, TestCase, modify_settings
 from django.test.utils import extend_sys_path
 from django.utils import six
 from django.utils._os import upath
@@ -34,15 +34,18 @@ class DefaultLoader(unittest.TestCase):
 
         # A child that exists, but will generate an import error if loaded
         self.assertTrue(module_has_submodule(test_module, 'bad_module'))
-        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.bad_module')
+        with self.assertRaises(ImportError):
+            import_module('utils_tests.test_module.bad_module')
 
         # A child that doesn't exist
         self.assertFalse(module_has_submodule(test_module, 'no_such_module'))
-        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.no_such_module')
+        with self.assertRaises(ImportError):
+            import_module('utils_tests.test_module.no_such_module')
 
         # A child that doesn't exist, but is the name of a package on the path
         self.assertFalse(module_has_submodule(test_module, 'django'))
-        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.django')
+        with self.assertRaises(ImportError):
+            import_module('utils_tests.test_module.django')
 
         # Don't be confused by caching of import misses
         import types  # NOQA: causes attempted import of utils_tests.types
@@ -50,8 +53,8 @@ class DefaultLoader(unittest.TestCase):
 
         # A module which doesn't have a __path__ (so no submodules)
         self.assertFalse(module_has_submodule(test_no_submodule, 'anything'))
-        self.assertRaises(ImportError, import_module,
-            'utils_tests.test_no_submodule.anything')
+        with self.assertRaises(ImportError):
+            import_module('utils_tests.test_no_submodule.anything')
 
 
 class EggLoader(unittest.TestCase):
@@ -82,11 +85,13 @@ class EggLoader(unittest.TestCase):
 
             # A child that exists, but will generate an import error if loaded
             self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
-            self.assertRaises(ImportError, import_module, 'egg_module.bad_module')
+            with self.assertRaises(ImportError):
+                import_module('egg_module.bad_module')
 
             # A child that doesn't exist
             self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
-            self.assertRaises(ImportError, import_module, 'egg_module.no_such_module')
+            with self.assertRaises(ImportError):
+                import_module('egg_module.no_such_module')
 
     def test_deep_loader(self):
         "Modules deep inside an egg can still be tested for existence"
@@ -101,22 +106,25 @@ class EggLoader(unittest.TestCase):
 
             # A child that exists, but will generate an import error if loaded
             self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
-            self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.bad_module')
+            with self.assertRaises(ImportError):
+                import_module('egg_module.sub1.sub2.bad_module')
 
             # A child that doesn't exist
             self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
-            self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
+            with self.assertRaises(ImportError):
+                import_module('egg_module.sub1.sub2.no_such_module')
 
 
-class ModuleImportTestCase(unittest.TestCase):
+class ModuleImportTestCase(TestCase):
     def test_import_string(self):
         cls = import_string('django.utils.module_loading.import_string')
         self.assertEqual(cls, import_string)
 
         # Test exceptions raised
-        self.assertRaises(ImportError, import_string, 'no_dots_in_path')
+        with self.assertRaises(ImportError):
+            import_string('no_dots_in_path')
         msg = 'Module "utils_tests" does not define a "unexistent" attribute'
-        with six.assertRaisesRegex(self, ImportError, msg):
+        with self.assertRaisesMessage(ImportError, msg):
             import_string('utils_tests.unexistent')
 
 
@@ -156,13 +164,13 @@ class AutodiscoverModulesTestCase(SimpleTestCase):
 
     def test_validate_registry_keeps_intact(self):
         from .test_module import site
-        with six.assertRaisesRegex(self, Exception, "Some random exception."):
+        with self.assertRaisesMessage(Exception, "Some random exception."):
             autodiscover_modules('another_bad_module', register_to=site)
         self.assertEqual(site._registry, {})
 
     def test_validate_registry_resets_after_erroneous_module(self):
         from .test_module import site
-        with six.assertRaisesRegex(self, Exception, "Some random exception."):
+        with self.assertRaisesMessage(Exception, "Some random exception."):
             autodiscover_modules('another_good_module', 'another_bad_module', register_to=site)
         self.assertEqual(site._registry, {'lorem': 'ipsum'})
 

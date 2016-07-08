@@ -1,5 +1,6 @@
 from django.db.models.lookups import (
-    Exact, GreaterThan, GreaterThanOrEqual, In, LessThan, LessThanOrEqual,
+    Exact, GreaterThan, GreaterThanOrEqual, In, IsNull, LessThan,
+    LessThanOrEqual,
 )
 
 
@@ -23,15 +24,16 @@ def get_normalized_value(value, lhs):
     from django.db.models import Model
     if isinstance(value, Model):
         value_list = []
-        # A case like Restaurant.objects.filter(place=restaurant_instance),
-        # where place is a OneToOneField and the primary key of Restaurant.
-        if getattr(lhs.output_field, 'primary_key', False):
-            return (value.pk,)
         sources = lhs.output_field.get_path_info()[-1].target_fields
         for source in sources:
             while not isinstance(value, source.model) and source.remote_field:
                 source = source.remote_field.model._meta.get_field(source.remote_field.field_name)
-            value_list.append(getattr(value, source.attname))
+            try:
+                value_list.append(getattr(value, source.attname))
+            except AttributeError:
+                # A case like Restaurant.objects.filter(place=restaurant_instance),
+                # where place is a OneToOneField and the primary key of Restaurant.
+                return (value.pk,)
         return tuple(value_list)
     if not isinstance(value, tuple):
         return (value,)
@@ -43,15 +45,15 @@ class RelatedIn(In):
         if not isinstance(self.lhs, MultiColSource) and self.rhs_is_direct_value():
             # If we get here, we are dealing with single-column relations.
             self.rhs = [get_normalized_value(val, self.lhs)[0] for val in self.rhs]
-            # We need to run the related field's get_prep_lookup(). Consider case
+            # We need to run the related field's get_prep_value(). Consider case
             # ForeignKey to IntegerField given value 'abc'. The ForeignKey itself
             # doesn't have validation for non-integers, so we must run validation
             # using the target field.
             if hasattr(self.lhs.output_field, 'get_path_info'):
-                # Run the target field's get_prep_lookup. We can safely assume there is
+                # Run the target field's get_prep_value. We can safely assume there is
                 # only one as we don't get to the direct value branch otherwise.
-                self.rhs = self.lhs.output_field.get_path_info()[-1].target_fields[-1].get_prep_lookup(
-                    self.lookup_name, self.rhs)
+                target_field = self.lhs.output_field.get_path_info()[-1].target_fields[-1]
+                self.rhs = [target_field.get_prep_value(v) for v in self.rhs]
         return super(RelatedIn, self).get_prep_lookup()
 
     def as_sql(self, compiler, connection):
@@ -87,15 +89,15 @@ class RelatedLookupMixin(object):
         if not isinstance(self.lhs, MultiColSource) and self.rhs_is_direct_value():
             # If we get here, we are dealing with single-column relations.
             self.rhs = get_normalized_value(self.rhs, self.lhs)[0]
-            # We need to run the related field's get_prep_lookup(). Consider case
+            # We need to run the related field's get_prep_value(). Consider case
             # ForeignKey to IntegerField given value 'abc'. The ForeignKey itself
             # doesn't have validation for non-integers, so we must run validation
             # using the target field.
             if hasattr(self.lhs.output_field, 'get_path_info'):
                 # Get the target field. We can safely assume there is only one
                 # as we don't get to the direct value branch otherwise.
-                self.rhs = self.lhs.output_field.get_path_info()[-1].target_fields[-1].get_prep_lookup(
-                    self.lookup_name, self.rhs)
+                target_field = self.lhs.output_field.get_path_info()[-1].target_fields[-1]
+                self.rhs = target_field.get_prep_value(self.rhs)
 
         return super(RelatedLookupMixin, self).get_prep_lookup()
 
@@ -130,4 +132,8 @@ class RelatedGreaterThanOrEqual(RelatedLookupMixin, GreaterThanOrEqual):
 
 
 class RelatedLessThanOrEqual(RelatedLookupMixin, LessThanOrEqual):
+    pass
+
+
+class RelatedIsNull(RelatedLookupMixin, IsNull):
     pass

@@ -36,9 +36,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # The backend "mostly works" without this function and there are use
         # cases for compiling Python without the sqlite3 libraries (e.g.
         # security hardening).
-        import sqlite3
         try:
+            import sqlite3
             value = sqlite3.adapt(value)
+        except ImportError:
+            pass
         except sqlite3.ProgrammingError:
             pass
         # Manual emulation of SQLite parameter quoting
@@ -65,8 +67,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
-    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], override_uniques=None,
-                      override_indexes=None):
+    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[]):
         """
         Shortcut to transform a model from old_model into new_model
 
@@ -76,11 +77,19 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
           3. copy the data from the old renamed table to the new table
           4. delete the "app_model__old" table
         """
+        # Self-referential fields must be recreated rather than copied from
+        # the old model to ensure their remote_field.field_name doesn't refer
+        # to an altered field.
+        def is_self_referential(f):
+            return f.is_relation and f.remote_field.model is model
         # Work out the new fields dict / mapping
-        body = {f.name: f for f in model._meta.local_fields}
+        body = {
+            f.name: f.clone() if is_self_referential(f) else f
+            for f in model._meta.local_concrete_fields
+        }
         # Since mapping might mix column names and default values,
         # its values must be already quoted.
-        mapping = {f.column: self.quote_name(f.column) for f in model._meta.local_fields}
+        mapping = {f.column: self.quote_name(f.column) for f in model._meta.local_concrete_fields}
         # This maps field names (not columns) for things like unique_together
         rename_mapping = {}
         # If any of the new or altered fields is introducing a new PK,
@@ -98,7 +107,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         for field in create_fields:
             body[field.name] = field
             # Choose a default and insert it into the copy map
-            if not field.many_to_many:
+            if not field.many_to_many and field.concrete:
                 mapping[field.column] = self.quote_value(
                     self.effective_default(field)
                 )
@@ -133,26 +142,24 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
         # Work out the new value of unique_together, taking renames into
         # account
-        if override_uniques is None:
-            override_uniques = [
-                [rename_mapping.get(n, n) for n in unique]
-                for unique in model._meta.unique_together
-            ]
+        unique_together = [
+            [rename_mapping.get(n, n) for n in unique]
+            for unique in model._meta.unique_together
+        ]
 
         # Work out the new value for index_together, taking renames into
         # account
-        if override_indexes is None:
-            override_indexes = [
-                [rename_mapping.get(n, n) for n in index]
-                for index in model._meta.index_together
-            ]
+        index_together = [
+            [rename_mapping.get(n, n) for n in index]
+            for index in model._meta.index_together
+        ]
 
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
             'db_table': model._meta.db_table,
-            'unique_together': override_uniques,
-            'index_together': override_indexes,
+            'unique_together': unique_together,
+            'index_together': index_together,
             'apps': apps,
         }
         meta = type("Meta", tuple(), meta_contents)
@@ -244,22 +251,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Alter by remaking table
         self._remake_table(model, alter_fields=[(old_field, new_field)])
 
-    def alter_index_together(self, model, old_index_together, new_index_together):
-        """
-        Deals with a model changing its index_together.
-        Note: The input index_togethers must be doubly-nested, not the single-
-        nested ["foo", "bar"] format.
-        """
-        self._remake_table(model, override_indexes=new_index_together)
-
-    def alter_unique_together(self, model, old_unique_together, new_unique_together):
-        """
-        Deals with a model changing its unique_together.
-        Note: The input unique_togethers must be doubly-nested, not the single-
-        nested ["foo", "bar"] format.
-        """
-        self._remake_table(model, override_uniques=new_unique_together)
-
     def _alter_many_to_many(self, model, old_field, new_field, strict):
         """
         Alters M2Ms to repoint their to= endpoints.
@@ -274,7 +265,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     old_field.remote_field.through._meta.get_field(old_field.m2m_reverse_field_name()),
                     new_field.remote_field.through._meta.get_field(new_field.m2m_reverse_field_name()),
                 )],
-                override_uniques=(new_field.m2m_field_name(), new_field.m2m_reverse_field_name()),
             )
             return
 

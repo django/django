@@ -2,8 +2,10 @@ from __future__ import unicode_literals
 
 from unittest import skipIf
 
-from django.db import connection, connections
-from django.db.migrations.exceptions import AmbiguityError, NodeNotFoundError
+from django.db import ConnectionHandler, connection, connections
+from django.db.migrations.exceptions import (
+    AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
+)
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, modify_settings, override_settings
@@ -179,11 +181,52 @@ class LoaderTests(TestCase):
                 "App missing __init__.py in migrations module not in unmigrated apps."
             )
 
+    @override_settings(
+        INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+    )
+    def test_marked_as_migrated(self):
+        """
+        Undefined MIGRATION_MODULES implies default migration module.
+        """
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(migration_loader.migrated_apps, {'migrated_app'})
+        self.assertEqual(migration_loader.unmigrated_apps, set())
+
+    @override_settings(
+        INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+        MIGRATION_MODULES={"migrated_app": None},
+    )
+    def test_marked_as_unmigrated(self):
+        """
+        MIGRATION_MODULES allows disabling of migrations for a particular app.
+        """
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(migration_loader.migrated_apps, set())
+        self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
+
+    @override_settings(
+        INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+    )
+    def test_disable_migrations(self):
+        connections = ConnectionHandler({
+            'default': {
+                'NAME': ':memory:',
+                'ENGINE': 'django.db.backends.sqlite3',
+                'TEST': {
+                    'MIGRATE': False,
+                },
+            },
+        })
+        migration_loader = MigrationLoader(connections['default'])
+        self.assertEqual(migration_loader.migrated_apps, set())
+        self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_loading_squashed(self):
         "Tests loading a squashed migration"
         migration_loader = MigrationLoader(connection)
         recorder = MigrationRecorder(connection)
+        self.addCleanup(recorder.flush)
         # Loading with nothing applied should just give us the one node
         self.assertEqual(
             len([x for x in migration_loader.graph.nodes if x[0] == "migrations"]),
@@ -196,7 +239,6 @@ class LoaderTests(TestCase):
             len([x for x in migration_loader.graph.nodes if x[0] == "migrations"]),
             2,
         )
-        recorder.flush()
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_complex"})
     def test_loading_squashed_complex(self):
@@ -204,6 +246,7 @@ class LoaderTests(TestCase):
 
         loader = MigrationLoader(connection)
         recorder = MigrationRecorder(connection)
+        self.addCleanup(recorder.flush)
 
         def num_nodes():
             plan = set(loader.graph.forwards_plan(('migrations', '7_auto')))
@@ -244,8 +287,6 @@ class LoaderTests(TestCase):
         loader.build_graph()
         self.assertEqual(num_nodes(), 0)
 
-        recorder.flush()
-
     @override_settings(MIGRATION_MODULES={
         "app1": "migrations.test_migrations_squashed_complex_multi_apps.app1",
         "app2": "migrations.test_migrations_squashed_complex_multi_apps.app2",
@@ -260,10 +301,10 @@ class LoaderTests(TestCase):
 
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
         expected_plan = {
-            ('app1', '4_auto'),
-            ('app1', '2_squashed_3'),
+            ('app1', '1_auto'),
             ('app2', '1_squashed_2'),
-            ('app1', '1_auto')
+            ('app1', '2_squashed_3'),
+            ('app1', '4_auto'),
         }
         self.assertEqual(plan, expected_plan)
 
@@ -285,9 +326,9 @@ class LoaderTests(TestCase):
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
         plan = plan - loader.applied_migrations
         expected_plan = {
-            ('app1', '4_auto'),
-            ('app1', '3_auto'),
             ('app2', '1_squashed_2'),
+            ('app1', '3_auto'),
+            ('app1', '4_auto'),
         }
 
         self.assertEqual(plan, expected_plan)
@@ -298,6 +339,7 @@ class LoaderTests(TestCase):
 
         loader = MigrationLoader(connection)
         recorder = MigrationRecorder(connection)
+        self.addCleanup(recorder.flush)
 
         def num_nodes():
             plan = set(loader.graph.forwards_plan(('migrations', '7_auto')))
@@ -343,4 +385,82 @@ class LoaderTests(TestCase):
         loader.build_graph()
         self.assertEqual(num_nodes(), 0)
 
-        recorder.flush()
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations'},
+        INSTALLED_APPS=['migrations'],
+    )
+    def test_check_consistent_history(self):
+        loader = MigrationLoader(connection=None)
+        loader.check_consistent_history(connection)
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0002_second')
+        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
+            loader.check_consistent_history(connection)
+
+    @override_settings(MIGRATION_MODULES={
+        "app1": "migrations.test_migrations_squashed_ref_squashed.app1",
+        "app2": "migrations.test_migrations_squashed_ref_squashed.app2",
+    })
+    @modify_settings(INSTALLED_APPS={'append': [
+        "migrations.test_migrations_squashed_ref_squashed.app1",
+        "migrations.test_migrations_squashed_ref_squashed.app2",
+    ]})
+    def test_loading_squashed_ref_squashed(self):
+        "Tests loading a squashed migration with a new migration referencing it"
+        """
+        The sample migrations are structred like this:
+
+        app_1       1 --> 2 ---------------------*--> 3        *--> 4
+                     \                          /             /
+                      *-------------------*----/--> 2_sq_3 --*
+                       \                 /    /
+        =============== \ ============= / == / ======================
+        app_2            *--> 1_sq_2 --*    /
+                          \                /
+                           *--> 1 --> 2 --*
+
+        Where 2_sq_3 is a replacing migration for 2 and 3 in app_1,
+        as 1_sq_2 is a replacing migration for 1 and 2 in app_2.
+        """
+
+        loader = MigrationLoader(connection)
+        recorder = MigrationRecorder(connection)
+        self.addCleanup(recorder.flush)
+
+        # Load with nothing applied: both migrations squashed.
+        loader.build_graph()
+        plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
+        plan = plan - loader.applied_migrations
+        expected_plan = {
+            ('app1', '1_auto'),
+            ('app2', '1_squashed_2'),
+            ('app1', '2_squashed_3'),
+            ('app1', '4_auto'),
+        }
+        self.assertEqual(plan, expected_plan)
+
+        # Fake-apply a few from app1: unsquashes migration in app1.
+        recorder.record_applied('app1', '1_auto')
+        recorder.record_applied('app1', '2_auto')
+        loader.build_graph()
+        plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
+        plan = plan - loader.applied_migrations
+        expected_plan = {
+            ('app2', '1_squashed_2'),
+            ('app1', '3_auto'),
+            ('app1', '4_auto'),
+        }
+        self.assertEqual(plan, expected_plan)
+
+        # Fake-apply one from app2: unsquashes migration in app2 too.
+        recorder.record_applied('app2', '1_auto')
+        loader.build_graph()
+        plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
+        plan = plan - loader.applied_migrations
+        expected_plan = {
+            ('app2', '2_auto'),
+            ('app1', '3_auto'),
+            ('app1', '4_auto'),
+        }
+        self.assertEqual(plan, expected_plan)

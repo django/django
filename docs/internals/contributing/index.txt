@@ -65,5 +65,5 @@ Browse the following sections to find out how:
 .. _#django IRC channel: irc://irc.freenode.net/django
 .. _community page: https://www.djangoproject.com/community/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/
-.. _ticket tracker: https://code.djangoproject.com/newticket
+.. _ticket tracker: https://code.djangoproject.com/
 .. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1

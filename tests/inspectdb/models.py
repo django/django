@@ -6,20 +6,20 @@ from django.db import models
 
 class People(models.Model):
     name = models.CharField(max_length=255)
-    parent = models.ForeignKey('self')
+    parent = models.ForeignKey('self', models.CASCADE)
 
 
 class Message(models.Model):
-    from_field = models.ForeignKey(People, db_column='from_id')
+    from_field = models.ForeignKey(People, models.CASCADE, db_column='from_id')
 
 
 class PeopleData(models.Model):
-    people_pk = models.ForeignKey(People, primary_key=True)
+    people_pk = models.ForeignKey(People, models.CASCADE, primary_key=True)
     ssn = models.CharField(max_length=11)
 
 
 class PeopleMoreData(models.Model):
-    people_unique = models.ForeignKey(People, unique=True)
+    people_unique = models.ForeignKey(People, models.CASCADE, unique=True)
     license = models.CharField(max_length=255)
 
 
@@ -72,6 +72,13 @@ class ColumnTypes(models.Model):
 class UniqueTogether(models.Model):
     field1 = models.IntegerField()
     field2 = models.CharField(max_length=10)
+    from_field = models.IntegerField(db_column='from')
+    non_unique = models.IntegerField(db_column='non__unique_column')
+    non_unique_0 = models.IntegerField(db_column='non_unique__column')
 
     class Meta:
-        unique_together = ('field1', 'field2')
+        unique_together = [
+            ('field1', 'field2'),
+            ('from_field', 'field1'),
+            ('non_unique', 'non_unique_0'),
+        ]

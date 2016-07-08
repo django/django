@@ -4,11 +4,10 @@ Django permissions model. This allows us to check that the PermissionsMixin
 includes everything that is needed to interact with the ModelBackend.
 """
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.contrib.auth.tests.custom_user import (
-    CustomUserManager, RemoveGroupsAndPermissions,
-)
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+
+from .custom_user import CustomUserManager, RemoveGroupsAndPermissions
 
 
 class CustomPermissionsUserManager(CustomUserManager):
@@ -29,9 +28,6 @@ with RemoveGroupsAndPermissions():
 
         USERNAME_FIELD = 'email'
         REQUIRED_FIELDS = ['date_of_birth']
-
-        class Meta:
-            app_label = 'auth'
 
         def get_full_name(self):
             return self.email

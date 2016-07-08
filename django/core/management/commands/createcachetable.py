@@ -15,21 +15,25 @@ class Command(BaseCommand):
     requires_system_checks = False
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='table_name', nargs='*',
-            help='Optional table names. Otherwise, settings.CACHES is used to '
-            'find cache tables.')
-        parser.add_argument('--database', action='store', dest='database',
+        parser.add_argument(
+            'args', metavar='table_name', nargs='*',
+            help='Optional table names. Otherwise, settings.CACHES is used to find cache tables.',
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS,
             help='Nominates a database onto which the cache tables will be '
-            'installed. Defaults to the "default" database.')
-        parser.add_argument('--dry-run', action='store_true', dest='dry_run',
-            help='Does not create the table, just prints the SQL that would '
-            'be run.')
+                 'installed. Defaults to the "default" database.',
+        )
+        parser.add_argument(
+            '--dry-run', action='store_true', dest='dry_run',
+            help='Does not create the table, just prints the SQL that would be run.',
+        )
 
     def handle(self, *tablenames, **options):
-        db = options.get('database')
-        self.verbosity = int(options.get('verbosity'))
-        dry_run = options.get('dry_run')
+        db = options['database']
+        self.verbosity = options['verbosity']
+        dry_run = options['dry_run']
         if len(tablenames):
             # Legacy behavior, tablename specified as argument
             for tablename in tablenames:
@@ -61,17 +65,21 @@ class Command(BaseCommand):
         index_output = []
         qn = connection.ops.quote_name
         for f in fields:
-            field_output = [qn(f.name), f.db_type(connection=connection)]
-            field_output.append("%sNULL" % ("NOT " if not f.null else ""))
+            field_output = [
+                qn(f.name),
+                f.db_type(connection=connection),
+                '%sNULL' % ('NOT ' if not f.null else ''),
+            ]
             if f.primary_key:
                 field_output.append("PRIMARY KEY")
             elif f.unique:
                 field_output.append("UNIQUE")
             if f.db_index:
                 unique = "UNIQUE " if f.unique else ""
-                index_output.append("CREATE %sINDEX %s ON %s (%s);" %
-                    (unique, qn('%s_%s' % (tablename, f.name)), qn(tablename),
-                    qn(f.name)))
+                index_output.append(
+                    "CREATE %sINDEX %s ON %s (%s);" %
+                    (unique, qn('%s_%s' % (tablename, f.name)), qn(tablename), qn(f.name))
+                )
             table_output.append(" ".join(field_output))
         full_statement = ["CREATE TABLE %s (" % qn(tablename)]
         for i, line in enumerate(table_output):
@@ -86,8 +94,7 @@ class Command(BaseCommand):
                 self.stdout.write(statement)
             return
 
-        with transaction.atomic(using=database,
-                                savepoint=connection.features.can_rollback_ddl):
+        with transaction.atomic(using=database, savepoint=connection.features.can_rollback_ddl):
             with connection.cursor() as curs:
                 try:
                     curs.execute(full_statement)

@@ -1,0 +1,376 @@
+# This file is distributed under the same license as the Django package.
+# 
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-12 16:34+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Upper Sorbian (http://www.transifex.com/django/django/language/hsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#: contrib/auth/admin.py:49
+msgid "Personal info"
+msgstr "Wosobinske informacije"
+
+#: contrib/auth/admin.py:50
+msgid "Permissions"
+msgstr "Prawa"
+
+#: contrib/auth/admin.py:52
+msgid "Important dates"
+msgstr "Wažne daty"
+
+#: contrib/auth/admin.py:136
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objekt %(name)s z primarnym klučom %(key)r njeeksistuje."
+
+#: contrib/auth/admin.py:146
+msgid "Password changed successfully."
+msgstr "Hesło je so wuspěšnje změniło."
+
+#: contrib/auth/admin.py:165
+#, python-format
+msgid "Change password: %s"
+msgstr "Hesło změnić: %s"
+
+#: contrib/auth/apps.py:12
+msgid "Authentication and Authorization"
+msgstr "Awtentifikacija a awtorizacija"
+
+#: contrib/auth/base_user.py:50
+msgid "password"
+msgstr "hesło"
+
+#: contrib/auth/base_user.py:51
+msgid "last login"
+msgstr "poslednje přizjewjenje"
+
+#: contrib/auth/forms.py:30
+msgid "No password set."
+msgstr "Žane hesło nastajene."
+
+#: contrib/auth/forms.py:36
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Njepłaćiwy hesłowy format abo njeznaty kontrolny algoritmus."
+
+#: contrib/auth/forms.py:69 contrib/auth/forms.py:268
+#: contrib/auth/forms.py:332
+msgid "The two password fields didn't match."
+msgstr "Hesle jednak njejstej."
+
+#: contrib/auth/forms.py:71 contrib/auth/forms.py:102
+#: contrib/auth/forms.py:130 contrib/auth/forms.py:336
+msgid "Password"
+msgstr "Hesło"
+
+#: contrib/auth/forms.py:73
+msgid "Password confirmation"
+msgstr "Hesłowe wobkrućenje"
+
+#: contrib/auth/forms.py:75 contrib/auth/forms.py:343
+msgid "Enter the same password as before, for verification."
+msgstr "Zapodajće samsne hesło kaž do toho, za přepruwowanje."
+
+#: contrib/auth/forms.py:103
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a "
+"href=\"../password/\">this form</a>."
+msgstr "Hrube hesła so njeskładuja, tohodla njeje móžnosć, hesło tutoho wužiwarja widźeć, ale móžeće hesło z pomocu <a href=\"../password/\">tutoho formulara</a> změnić."
+
+#: contrib/auth/forms.py:133
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr "Prošu zapodajće korektne %(username)s a hesło. Dźiwajće na to, zo wobě poli móžetej mjez wulko- a małopisanjom rozeznawać."
+
+#: contrib/auth/forms.py:135
+msgid "This account is inactive."
+msgstr "Tute konto je inaktiwne."
+
+#: contrib/auth/forms.py:198
+msgid "Email"
+msgstr "E-mejl"
+
+#: contrib/auth/forms.py:270
+msgid "New password"
+msgstr "Nowe hesło"
+
+#: contrib/auth/forms.py:273
+msgid "New password confirmation"
+msgstr "Wobkrućenje noweho hesła"
+
+#: contrib/auth/forms.py:306
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Waše stare hesło je so wopak zapodało. Prošu zapodajće jo hišće raz."
+
+#: contrib/auth/forms.py:309
+msgid "Old password"
+msgstr "Stare hesło"
+
+#: contrib/auth/forms.py:341
+msgid "Password (again)"
+msgstr "Hesło (znowa)"
+
+#: contrib/auth/hashers.py:251 contrib/auth/hashers.py:334
+#: contrib/auth/hashers.py:386 contrib/auth/hashers.py:414
+#: contrib/auth/hashers.py:447 contrib/auth/hashers.py:480
+#: contrib/auth/hashers.py:514
+msgid "algorithm"
+msgstr "algoritmus"
+
+#: contrib/auth/hashers.py:252
+msgid "iterations"
+msgstr "wospjetowanja"
+
+#: contrib/auth/hashers.py:253 contrib/auth/hashers.py:336
+#: contrib/auth/hashers.py:387 contrib/auth/hashers.py:415
+#: contrib/auth/hashers.py:515
+msgid "salt"
+msgstr "sól"
+
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:388
+#: contrib/auth/hashers.py:416 contrib/auth/hashers.py:448
+#: contrib/auth/hashers.py:481 contrib/auth/hashers.py:516
+msgid "hash"
+msgstr "hash"
+
+#: contrib/auth/hashers.py:347
+msgid "variety"
+msgstr "warianta"
+
+#: contrib/auth/hashers.py:348
+msgid "version"
+msgstr "wersija"
+
+#: contrib/auth/hashers.py:349
+msgid "memory cost"
+msgstr "Składowa přetrjeba"
+
+#: contrib/auth/hashers.py:350
+msgid "time cost"
+msgstr "Časowa přetrjeba"
+
+#: contrib/auth/hashers.py:351
+msgid "parallelism"
+msgstr "paralelizm"
+
+#: contrib/auth/hashers.py:445
+msgid "work factor"
+msgstr "dźěłowy faktor"
+
+#: contrib/auth/hashers.py:337
+msgid "checksum"
+msgstr "pruwowanska suma"
+
+#: contrib/auth/models.py:61 contrib/auth/models.py:116
+msgid "name"
+msgstr "mjeno"
+
+#: contrib/auth/models.py:65
+msgid "content type"
+msgstr "wobsahowy typ"
+
+#: contrib/auth/models.py:67
+msgid "codename"
+msgstr "kodowe mjeno"
+
+#: contrib/auth/models.py:71
+msgid "permission"
+msgstr "prawo"
+
+#: contrib/auth/models.py:72 contrib/auth/models.py:119
+msgid "permissions"
+msgstr "prawa"
+
+#: contrib/auth/models.py:126
+msgid "group"
+msgstr "skupina"
+
+#: contrib/auth/models.py:127 contrib/auth/models.py:222
+msgid "groups"
+msgstr "skupiny"
+
+#: contrib/auth/models.py:213
+msgid "superuser status"
+msgstr "status superwužiwarja"
+
+#: contrib/auth/models.py:216
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "Woznamjenja, zo tutón wužiwar ma wšě prawa bjez toho, zo by móhł je eksplicitnje připokazać."
+
+#: contrib/auth/models.py:225
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr "Skupiny, ke kotrymž wužiwar słuša. Wužiwar dóstanje wšě prawa, kotrež jemu skupiny dawaja."
+
+#: contrib/auth/models.py:233
+msgid "user permissions"
+msgstr "wužiwarske prawa"
+
+#: contrib/auth/models.py:235
+msgid "Specific permissions for this user."
+msgstr "Wěste prawa za tutoho wužiwarja."
+
+#: contrib/auth/models.py:305
+msgid "username"
+msgstr "wužiwarske mjeno"
+
+#: contrib/auth/models.py:313
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Trěbne. 150 znamješkow abo mjenje. Jenož pismiki, cyfry a @/./+/-/_."
+
+#: contrib/auth/models.py:316
+msgid "A user with that username already exists."
+msgstr "Wužiwar z tutym mjenom hižo eksistuje."
+
+#: contrib/auth/models.py:320
+msgid "first name"
+msgstr "předmjeno"
+
+#: contrib/auth/models.py:321
+msgid "last name"
+msgstr "swójbne mjeno"
+
+#: contrib/auth/models.py:322
+msgid "email address"
+msgstr "e-mejlowa adresa"
+
+#: contrib/auth/models.py:324
+msgid "staff status"
+msgstr "personalny status"
+
+#: contrib/auth/models.py:326
+msgid "Designates whether the user can log into this admin site."
+msgstr "Woznamjenja, hač wužiwar móže so pola administratoroweho sydła přizjewić."
+
+#: contrib/auth/models.py:329
+msgid "active"
+msgstr "aktiwny"
+
+#: contrib/auth/models.py:332
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr "Woznamjenja, hač maja z wužiwarjom jako aktiwnym wobchadźeć. Znjemóžńće to město toho, zo byšće konto zhašał."
+
+#: contrib/auth/models.py:336
+msgid "date joined"
+msgstr "čłon wot"
+
+#: contrib/auth/models.py:344
+msgid "user"
+msgstr "wužiwar"
+
+#: contrib/auth/models.py:345
+msgid "users"
+msgstr "wužiwarjo"
+
+#: contrib/auth/password_validation.py:101
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] "Tute hesło je překrótke. Dyrbi znajmjeńša %(min_length)d znamješko wobsahować."
+msgstr[1] "Tute hesło je překrótke. Dyrbi znajmjeńša %(min_length)d znamješce wobsahować."
+msgstr[2] "Tute hesło je překrótke. Dyrbi znajmjeńša %(min_length)d znamješka wobsahować."
+msgstr[3] "Tute hesło je překrótke. Dyrbi znajmjeńša %(min_length)d znamješkow wobsahować."
+
+#: contrib/auth/password_validation.py:111
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Waše hesło dyrbi znajmjeńša %(min_length)d znamješko měć."
+msgstr[1] "Waše hesło dyrbi znajmjeńša %(min_length)d znamješce měć."
+msgstr[2] "Waše hesło dyrbi znajmjeńša %(min_length)d znamješka měć."
+msgstr[3] "Waše hesło dyrbi znajmjeńša %(min_length)d znamješkow měć."
+
+#: contrib/auth/password_validation.py:147
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Hesło je na %(verbose_name)s přepodobne."
+
+#: contrib/auth/password_validation.py:153
+msgid "Your password can't be too similar to your other personal information."
+msgstr "Waše hesło njesmě wašim druhim wosobinskim datam podobne być."
+
+#: contrib/auth/password_validation.py:180
+msgid "This password is too common."
+msgstr "Tute hesło je přehuste,"
+
+#: contrib/auth/password_validation.py:185
+msgid "Your password can't be a commonly used password."
+msgstr "Waše hesło njemóže husto wužiwane hesło być."
+
+#: contrib/auth/password_validation.py:195
+msgid "This password is entirely numeric."
+msgstr "Tute hesło je cyle numeriske."
+
+#: contrib/auth/password_validation.py:200
+msgid "Your password can't be entirely numeric."
+msgstr "Waše hesło njemóže cyle numeriske być."
+
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Hesło je so na %(site_name)s wróćo stajiło."
+
+#: contrib/auth/validators.py:13
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr "Zapodajće płaćiwe wužiwarske mjeno. Tuta hódnota smě jenož jendźelske pismiki, ličby a znamješka @/./+/-/_ wobsahować."
+
+#: contrib/auth/validators.py:23
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr "Zapodajće płaćiwe wužiwarske mjeno. Tuta hódnota smě jenož pismiki, ličby a znamješka @/./+/-/_ wobsahować."
+
+#: contrib/auth/views.py:133
+msgid "Logged out"
+msgstr "Wotzjewjeny"
+
+#: contrib/auth/views.py:211
+msgid "Password reset"
+msgstr "Wróćostajenje hesła"
+
+#: contrib/auth/views.py:224
+msgid "Password reset sent"
+msgstr "Wróćostajenje hesła jo se wotpósłało."
+
+#: contrib/auth/views.py:261
+msgid "Enter new password"
+msgstr "Zapodajće nowe hesło"
+
+#: contrib/auth/views.py:272
+msgid "Password reset unsuccessful"
+msgstr "Wróćostajenje hesła njeje so poradźiło"
+
+#: contrib/auth/views.py:290
+msgid "Password reset complete"
+msgstr "Wróćostajenje hesła je zakónčene"
+
+#: contrib/auth/views.py:325
+msgid "Password change"
+msgstr "Změnjenje hesła"
+
+#: contrib/auth/views.py:339
+msgid "Password change successful"
+msgstr "Hesło je so wuspěšnje změniło"

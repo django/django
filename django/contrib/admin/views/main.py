@@ -15,8 +15,8 @@ from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, SuspiciousOperation,
 )
 from django.core.paginator import InvalidPage
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
@@ -36,8 +36,8 @@ IGNORED_PARAMS = (
 
 class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links,
-            list_filter, date_hierarchy, search_fields, list_select_related,
-            list_per_page, list_max_show_all, list_editable, model_admin):
+                 list_filter, date_hierarchy, search_fields, list_select_related,
+                 list_per_page, list_max_show_all, list_editable, model_admin):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -111,8 +111,7 @@ class ChangeList(object):
             for list_filter in self.list_filter:
                 if callable(list_filter):
                     # This is simply a custom list filter class.
-                    spec = list_filter(request, lookup_params,
-                        self.model, self.model_admin)
+                    spec = list_filter(request, lookup_params, self.model, self.model_admin)
                 else:
                     field_path = None
                     if isinstance(list_filter, (tuple, list)):
@@ -126,12 +125,12 @@ class ChangeList(object):
                     if not isinstance(field, models.Field):
                         field_path = field
                         field = get_fields_from_path(self.model, field_path)[-1]
-                    spec = field_list_filter_class(field, request, lookup_params,
-                        self.model, self.model_admin, field_path=field_path)
+                    spec = field_list_filter_class(
+                        field, request, lookup_params,
+                        self.model, self.model_admin, field_path=field_path
+                    )
                     # Check if we need to use distinct()
-                    use_distinct = (use_distinct or
-                                    lookup_needs_distinct(self.lookup_opts,
-                                                          field_path))
+                    use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
                 if spec and spec.has_output():
                     filter_specs.append(spec)
 
@@ -144,8 +143,7 @@ class ChangeList(object):
         try:
             for key, value in lookup_params.items():
                 lookup_params[key] = prepare_lookup_value(key, value)
-                use_distinct = (use_distinct or
-                                lookup_needs_distinct(self.lookup_opts, key))
+                use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, key)
             return filter_specs, bool(filter_specs), lookup_params, use_distinct
         except FieldDoesNotExist as e:
             six.reraise(IncorrectLookupParameters, IncorrectLookupParameters(e), sys.exc_info()[2])
@@ -174,14 +172,8 @@ class ChangeList(object):
         result_count = paginator.count
 
         # Get the total number of objects, with no admin filters applied.
-        # Perform a slight optimization:
-        # full_result_count is equal to paginator.count if no filters
-        # were applied
         if self.model_admin.show_full_result_count:
-            if self.get_filters_params() or self.params.get(SEARCH_VAR):
-                full_result_count = self.root_queryset.count()
-            else:
-                full_result_count = result_count
+            full_result_count = self.root_queryset.count()
         else:
             full_result_count = None
         can_show_all = result_count <= self.list_max_show_all
@@ -247,8 +239,7 @@ class ChangeList(object):
         ordering field.
         """
         params = self.params
-        ordering = list(self.model_admin.get_ordering(request)
-                        or self._get_default_ordering())
+        ordering = list(self.model_admin.get_ordering(request) or self._get_default_ordering())
         if ORDER_VAR in params:
             # Clear ordering and used params
             ordering = []
@@ -352,8 +343,7 @@ class ChangeList(object):
         qs = qs.order_by(*ordering)
 
         # Apply search results
-        qs, search_use_distinct = self.model_admin.get_search_results(
-            request, qs, self.query)
+        qs, search_use_distinct = self.model_admin.get_search_results(request, qs, self.query)
 
         # Remove duplicates from results, if necessary
         if filters_use_distinct | search_use_distinct:
@@ -381,6 +371,9 @@ class ChangeList(object):
                 pass
             else:
                 if isinstance(field.remote_field, models.ManyToOneRel):
+                    # <FK>_id field names don't require a join.
+                    if field_name == field.get_attname():
+                        continue
                     return True
         return False
 

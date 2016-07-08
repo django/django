@@ -1,5 +1,3 @@
-.. _time-zones:
-
 ==========
 Time zones
 ==========
@@ -16,7 +14,7 @@ translates them to the end user's time zone in templates and forms.
 This is handy if your users live in more than one time zone and you want to
 display datetime information according to each user's wall clock.
 
-Even if your Web site is available in only one time zone, it's still good
+Even if your website is available in only one time zone, it's still good
 practice to store data in UTC in your database. The main reason is Daylight
 Saving Time (DST). Many countries have a system of DST, where clocks are moved
 forward in spring and backward in autumn. If you're working in local time,
@@ -168,7 +166,7 @@ time zone automatically. Instead, Django provides :ref:`time zone selection
 functions <time-zone-selection-functions>`. Use them to build the time zone
 selection logic that makes sense for you.
 
-Most Web sites that care about time zones just ask users in which time zone they
+Most websites that care about time zones just ask users in which time zone they
 live and store this information in the user's profile. For anonymous users,
 they use the time zone of their primary audience or UTC. pytz_ provides
 helpers_, like a list of time zones per country, that you can use to pre-select
@@ -177,13 +175,14 @@ the most likely choices.
 Here's an example that stores the current timezone in the session. (It skips
 error handling entirely for the sake of simplicity.)
 
-Add the following middleware to :setting:`MIDDLEWARE_CLASSES`::
+Add the following middleware to :setting:`MIDDLEWARE`::
 
     import pytz
 
     from django.utils import timezone
+    from django.django.utils.deprecation import MiddlewareMixin
 
-    class TimezoneMiddleware(object):
+    class TimezoneMiddleware(MiddlewareMixin):
         def process_request(self, request):
             tzname = request.session.get('django_timezone')
             if tzname:
@@ -259,8 +258,8 @@ Template tags
 
 .. templatetag:: localtime
 
-localtime
-~~~~~~~~~
+``localtime``
+~~~~~~~~~~~~~
 
 Enables or disables conversion of aware datetime objects to the current time
 zone in the contained block.
@@ -288,8 +287,8 @@ To activate or deactivate conversion for a template block, use::
 
 .. templatetag:: timezone
 
-timezone
-~~~~~~~~
+``timezone``
+~~~~~~~~~~~~
 
 Sets or unsets the current time zone in the contained block. When the current
 time zone is unset, the default time zone applies.
@@ -308,17 +307,17 @@ time zone is unset, the default time zone applies.
 
 .. templatetag:: get_current_timezone
 
-get_current_timezone
-~~~~~~~~~~~~~~~~~~~~
+``get_current_timezone``
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can get the name of the current time zone using the
 ``get_current_timezone`` tag::
 
     {% get_current_timezone as TIME_ZONE %}
 
-If you enable the ``django.template.context_processors.tz`` context processor,
-each :class:`~django.template.RequestContext` will contain a ``TIME_ZONE``
-variable with the value of ``get_current_timezone()``.
+Alternatively, you can activate the
+:func:`~django.template.context_processors.tz` context processor and
+use the ``TIME_ZONE`` context variable.
 
 Template filters
 ----------------
@@ -329,8 +328,8 @@ return aware datetimes.
 
 .. templatefilter:: localtime
 
-localtime
-~~~~~~~~~
+``localtime``
+~~~~~~~~~~~~~
 
 Forces conversion of a single value to the current time zone.
 
@@ -342,8 +341,8 @@ For example::
 
 .. templatefilter:: utc
 
-utc
-~~~
+``utc``
+~~~~~~~
 
 Forces conversion of a single value to UTC.
 
@@ -355,8 +354,8 @@ For example::
 
 .. templatefilter:: timezone
 
-timezone
-~~~~~~~~
+``timezone``
+~~~~~~~~~~~~
 
 Forces conversion of a single value to an arbitrary timezone.
 
@@ -435,8 +434,9 @@ traceback by adding the following to your settings file::
 
     import warnings
     warnings.filterwarnings(
-            'error', r"DateTimeField .* received a naive datetime",
-            RuntimeWarning, r'django\.db\.models\.fields')
+        'error', r"DateTimeField .* received a naive datetime",
+        RuntimeWarning, r'django\.db\.models\.fields',
+    )
 
 Fixtures
 --------
@@ -711,4 +711,4 @@ Usage
 .. _more examples: http://pytz.sourceforge.net/#example-usage
 .. _these issues: http://pytz.sourceforge.net/#problems-with-localtime
 .. _helpers: http://pytz.sourceforge.net/#helpers
-.. _tz database: http://en.wikipedia.org/wiki/Tz_database
+.. _tz database: https://en.wikipedia.org/wiki/Tz_database

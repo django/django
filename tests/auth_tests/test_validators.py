@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import os
 
+from django.contrib.auth import validators
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import (
     CommonPasswordValidator, MinimumLengthValidator, NumericPasswordValidator,
@@ -68,6 +70,10 @@ class PasswordValidationTest(TestCase):
         self.assertEqual(help_text.count('<li>'), 2)
         self.assertIn('12 characters', help_text)
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[])
+    def test_empty_password_validator_help_text_html(self):
+        self.assertEqual(password_validators_help_text_html(), '')
+
 
 class MinimumLengthValidatorTest(TestCase):
     def test_validate(self):
@@ -93,9 +99,9 @@ class MinimumLengthValidatorTest(TestCase):
 
 class UserAttributeSimilarityValidatorTest(TestCase):
     def test_validate(self):
-        user = User.objects.create(
-            username='testclient', first_name='Test', last_name='Client', email='testclient@example.com',
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+        user = User.objects.create_user(
+            username='testclient', password='password', email='testclient@example.com',
+            first_name='Test', last_name='Client',
         )
         expected_error = "The password is too similar to the %s."
 
@@ -170,3 +176,29 @@ class NumericPasswordValidatorTest(TestCase):
             NumericPasswordValidator().get_help_text(),
             "Your password can't be entirely numeric."
         )
+
+
+class UsernameValidatorsTests(TestCase):
+    def test_unicode_validator(self):
+        valid_usernames = ['joe', 'René', 'ᴮᴵᴳᴮᴵᴿᴰ', 'أحمد']
+        invalid_usernames = [
+            "o'connell", "عبد ال",
+            "zerowidth\u200Bspace", "nonbreaking\u00A0space",
+            "en\u2013dash",
+        ]
+        v = validators.UnicodeUsernameValidator()
+        for valid in valid_usernames:
+            v(valid)
+        for invalid in invalid_usernames:
+            with self.assertRaises(ValidationError):
+                v(invalid)
+
+    def test_ascii_validator(self):
+        valid_usernames = ['glenn', 'GLEnN', 'jean-marc']
+        invalid_usernames = ["o'connell", 'Éric', 'jean marc', "أحمد"]
+        v = validators.ASCIIUsernameValidator()
+        for valid in valid_usernames:
+            v(valid)
+        for invalid in invalid_usernames:
+            with self.assertRaises(ValidationError):
+                v(invalid)

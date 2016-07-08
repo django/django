@@ -62,6 +62,10 @@ class AppConfig(object):
             filename = getattr(module, '__file__', None)
             if filename is not None:
                 paths = [os.path.dirname(filename)]
+            else:
+                # For unknown reasons, sometimes the list returned by __path__
+                # contains duplicates that must be removed (#25246).
+                paths = list(set(paths))
         if len(paths) > 1:
             raise ImproperlyConfigured(
                 "The app module %r has multiple filesystem locations (%r); "
@@ -135,7 +139,14 @@ class AppConfig(object):
                 "'%s' must supply a name attribute." % entry)
 
         # Ensure app_name points to a valid module.
-        app_module = import_module(app_name)
+        try:
+            app_module = import_module(app_name)
+        except ImportError:
+            raise ImproperlyConfigured(
+                "Cannot import '%s'. Check that '%s.%s.name' is correct." % (
+                    app_name, mod_path, cls_name,
+                )
+            )
 
         # Entry is a path to an app config class.
         return cls(app_name, app_module)
@@ -161,8 +172,7 @@ class AppConfig(object):
             raise LookupError(
                 "App '%s' doesn't have a '%s' model." % (self.label, model_name))
 
-    def get_models(self, include_auto_created=False,
-                   include_deferred=False, include_swapped=False):
+    def get_models(self, include_auto_created=False, include_swapped=False):
         """
         Returns an iterable of models.
 
@@ -178,8 +188,6 @@ class AppConfig(object):
         """
         self.check_models_ready()
         for model in self.models.values():
-            if model._deferred and not include_deferred:
-                continue
             if model._meta.auto_created and not include_auto_created:
                 continue
             if model._meta.swapped and not include_swapped:

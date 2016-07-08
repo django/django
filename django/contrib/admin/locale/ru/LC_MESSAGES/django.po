@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ivan Ivaschenko <defuz.net@gmail.com>, 2013
-# Denis Darii <sinednx@gmail.com>, 2011
+# Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
@@ -10,17 +10,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-02-26 08:13+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-26 10:17+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -72,14 +73,20 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Пожалуйста, введите корректные %(username)s и пароль для аккаунта. Оба поля "
-"могут быть чувствительны к регистру."
+"Пожалуйста, введите корректные %(username)s и пароль учётной записи. Оба "
+"поля могут быть чувствительны к регистру."
 
 msgid "Action:"
 msgstr "Действие:"
 
 msgid "action time"
 msgstr "время действия"
+
+msgid "user"
+msgstr "пользователь"
+
+msgid "content type"
+msgstr "тип содержимого"
 
 msgid "object id"
 msgstr "идентификатор объекта"
@@ -122,6 +129,9 @@ msgid ""
 msgstr ""
 "Удерживайте \"Control\" (или \"Command\" на Mac), чтобы выбрать несколько "
 "значений."
+
+msgid "Added."
+msgstr "Добавлено."
 
 #, python-format
 msgid "Changed %s."
@@ -216,6 +226,7 @@ msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s был успешно изменен."
 msgstr[1] "%(count)s %(name)s были успешно изменены."
 msgstr[2] "%(count)s %(name)s были успешно изменены."
+msgstr[3] "%(count)s %(name)s были успешно изменены."
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -223,6 +234,7 @@ msgid_plural "All %(total_count)s selected"
 msgstr[0] "Выбран %(total_count)s"
 msgstr[1] "Выбраны все %(total_count)s"
 msgstr[2] "Выбраны все %(total_count)s"
+msgstr[3] "Выбраны все %(total_count)s"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -478,6 +490,15 @@ msgstr ""
 "таблицы были созданы, и что соответствующему пользователю разрешен к ним "
 "доступ."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Вы вошли в систему как %(username)s, однако у вас недостаточно прав для "
+"просмотра данной страницы. Возможно, вы хотели бы войти в систему, используя "
+"другую учётную запись?"
+
 msgid "Forgotten your password or username?"
 msgstr "Забыли свой пароль или имя пользователя?"
 
@@ -503,6 +524,9 @@ msgstr "Показать все"
 msgid "Save"
 msgstr "Сохранить"
 
+msgid "Popup closing..."
+msgstr "Всплывающее окно закрывается..."
+
 #, python-format
 msgid "Change selected %(model)s"
 msgstr "Изменить выбранный объект типа \"%(model)s\""
@@ -524,6 +548,7 @@ msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s результат"
 msgstr[1] "%(counter)s результата"
 msgstr[2] "%(counter)s результатов"
+msgstr[3] "%(counter)s результатов"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -641,9 +666,6 @@ msgstr "Восстановить мой пароль"
 
 msgid "All dates"
 msgstr "Все даты"
-
-msgid "(None)"
-msgstr "(Ничего)"
 
 #, python-format
 msgid "Select %s"

@@ -1,13 +1,12 @@
 from __future__ import unicode_literals
 
-from django.contrib.gis.db.models import F, Collect, Count, Extent, Union
+from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
 from django.db import connection
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango110Warning
 
 from ..utils import no_oracle
 from .models import (
@@ -63,18 +62,20 @@ class RelatedGeoModelTest(TestCase):
             qs = list(City.objects.filter(name=name).transform(srid, field_name='location__point'))
             check_pnt(GEOSGeometry(wkt, srid), qs[0].location.point)
 
+        # Relations more than one level deep can be queried.
+        self.assertEqual(list(Parcel.objects.transform(srid, field_name='city__location__point')), [])
+
     @skipUnlessDBFeature("supports_extent_aggr")
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_related_extent_aggregate(self):
-        "Testing the `extent` GeoQuerySet aggregates on related geographic models."
+        "Testing the `Extent` aggregate on related geographic models."
         # This combines the Extent and Union aggregates into one query
         aggs = City.objects.aggregate(Extent('location__point'))
 
         # One for all locations, one that excludes New Mexico (Roswell).
         all_extent = (-104.528056, 29.763374, -79.460734, 40.18476)
         txpa_extent = (-97.516111, 29.763374, -79.460734, 40.18476)
-        e1 = City.objects.extent(field_name='location__point')
-        e2 = City.objects.exclude(state='NM').extent(field_name='location__point')
+        e1 = City.objects.aggregate(Extent('location__point'))['location__point__extent']
+        e2 = City.objects.exclude(state='NM').aggregate(Extent('location__point'))['location__point__extent']
         e3 = aggs['location__point__extent']
 
         # The tolerance value is to four decimal places because of differences
@@ -98,9 +99,8 @@ class RelatedGeoModelTest(TestCase):
         )
 
     @skipUnlessDBFeature("has_unionagg_method")
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_related_union_aggregate(self):
-        "Testing the `unionagg` GeoQuerySet aggregates on related geographic models."
+        "Testing the `Union` aggregate on related geographic models."
         # This combines the Extent and Union aggregates into one query
         aggs = City.objects.aggregate(Union('location__point'))
 
@@ -114,14 +114,14 @@ class RelatedGeoModelTest(TestCase):
 
         # The second union aggregate is for a union
         # query that includes limiting information in the WHERE clause (in other
-        # words a `.filter()` precedes the call to `.unionagg()`).
+        # words a `.filter()` precedes the call to `.aggregate(Union()`).
         ref_u1 = MultiPoint(p1, p2, p4, p5, p3, srid=4326)
         ref_u2 = MultiPoint(p2, p3, srid=4326)
 
-        u1 = City.objects.unionagg(field_name='location__point')
+        u1 = City.objects.aggregate(Union('location__point'))['location__point__union']
         u2 = City.objects.exclude(
             name__in=('Roswell', 'Houston', 'Dallas', 'Fort Worth'),
-        ).unionagg(field_name='location__point')
+        ).aggregate(Union('location__point'))['location__point__union']
         u3 = aggs['location__point__union']
         self.assertEqual(type(u1), MultiPoint)
         self.assertEqual(type(u3), MultiPoint)
@@ -250,7 +250,7 @@ class RelatedGeoModelTest(TestCase):
     #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
     @no_oracle
     def test12a_count(self):
-        "Testing `Count` aggregate use with the `GeoManager` on geo-fields."
+        "Testing `Count` aggregate on geo-fields."
         # The City, 'Fort Worth' uses the same location as Dallas.
         dallas = City.objects.get(name='Dallas')
 
@@ -259,7 +259,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(2, loc.num_cities)
 
     def test12b_count(self):
-        "Testing `Count` aggregate use with the `GeoManager` on non geo-fields. See #11087."
+        "Testing `Count` aggregate on non geo-fields."
         # Should only be one author (Trevor Paglen) returned by this query, and
         # the annotation should have 3 for the number of books, see #11087.
         # Also testing with a values(), see #11489.
@@ -284,18 +284,16 @@ class RelatedGeoModelTest(TestCase):
     # TODO: The phantom model does appear on Oracle.
     @no_oracle
     def test13_select_related_null_fk(self):
-        "Testing `select_related` on a nullable ForeignKey via `GeoManager`. See #11381."
+        "Testing `select_related` on a nullable ForeignKey."
         Book.objects.create(title='Without Author')
         b = Book.objects.select_related('author').get(title='Without Author')
         # Should be `None`, and not a 'dummy' model.
         self.assertIsNone(b.author)
 
     @skipUnlessDBFeature("supports_collect_aggr")
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_collect(self):
         """
-        Testing the (deprecated) `collect` GeoQuerySet method and `Collect`
-        aggregate.
+        Testing the `Collect` aggregate.
         """
         # Reference query:
         # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN
@@ -306,14 +304,11 @@ class RelatedGeoModelTest(TestCase):
             '-95.363151 29.763374,-96.801611 32.782057)'
         )
 
-        c1 = City.objects.filter(state='TX').collect(field_name='location__point')
-        c2 = City.objects.filter(state='TX').aggregate(Collect('location__point'))['location__point__collect']
-
-        for coll in (c1, c2):
-            # Even though Dallas and Ft. Worth share same point, Collect doesn't
-            # consolidate -- that's why 4 points in MultiPoint.
-            self.assertEqual(4, len(coll))
-            self.assertTrue(ref_geom.equals(coll))
+        coll = City.objects.filter(state='TX').aggregate(Collect('location__point'))['location__point__collect']
+        # Even though Dallas and Ft. Worth share same point, Collect doesn't
+        # consolidate -- that's why 4 points in MultiPoint.
+        self.assertEqual(4, len(coll))
+        self.assertTrue(ref_geom.equals(coll))
 
     def test15_invalid_select_related(self):
         "Testing doing select_related on the related name manager of a unique FK. See #13934."

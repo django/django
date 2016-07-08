@@ -37,7 +37,22 @@ class Article(models.Model):
 class Fan(models.Model):
     name = models.CharField(max_length=50)
     age = models.PositiveSmallIntegerField(default=30)
-    author = models.ForeignKey(Author, related_name='fans')
+    author = models.ForeignKey(Author, models.CASCADE, related_name='fans')
 
     def __str__(self):
         return self.name
+
+
+@python_2_unicode_compatible
+class DTModel(models.Model):
+    name = models.CharField(max_length=32)
+    start_datetime = models.DateTimeField(null=True, blank=True)
+    end_datetime = models.DateTimeField(null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+    duration = models.DurationField(null=True, blank=True)
+
+    def __str__(self):
+        return 'DTModel({0})'.format(self.name)

@@ -4,8 +4,9 @@ from django.contrib.auth.handlers.modwsgi import (
     check_password, groups_for_user,
 )
 from django.contrib.auth.models import Group, User
-from django.contrib.auth.tests.custom_user import CustomUser
 from django.test import TransactionTestCase, override_settings
+
+from .models import CustomUser
 
 
 # This must be a TransactionTestCase because the WSGI auth handler performs
@@ -18,12 +19,13 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
     available_apps = [
         'django.contrib.auth',
         'django.contrib.contenttypes',
+        'auth_tests',
     ]
 
     def test_check_password(self):
         """
         Verify that check_password returns the correct values as per
-        http://code.google.com/p/modwsgi/wiki/AccessControlMechanisms#Apache_Authentication_Provider
+        https://modwsgi.readthedocs.io/en/develop/user-guides/access-control-mechanisms.html#apache-authentication-provider
         """
         User.objects.create_user('test', 'test@example.com', 'test')
 
@@ -40,12 +42,11 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         # Valid user with incorrect password
         self.assertFalse(check_password({}, 'test', 'incorrect'))
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_check_password_custom_user(self):
         """
         Verify that check_password returns the correct values as per
-        http://code.google.com/p/modwsgi/wiki/AccessControlMechanisms#Apache_Authentication_Provider
-
+        https://modwsgi.readthedocs.io/en/develop/user-guides/access-control-mechanisms.html#apache-authentication-provider
         with custom user installed
         """
 
@@ -63,7 +64,7 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
     def test_groups_for_user(self):
         """
         Check that groups_for_user returns correct values as per
-        http://code.google.com/p/modwsgi/wiki/AccessControlMechanisms#Apache_Group_Authorisation
+        https://modwsgi.readthedocs.io/en/develop/user-guides/access-control-mechanisms.html#apache-group-authorisation
         """
         user1 = User.objects.create_user('test', 'test@example.com', 'test')
         User.objects.create_user('test1', 'test1@example.com', 'test1')

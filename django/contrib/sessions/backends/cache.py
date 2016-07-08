@@ -1,5 +1,7 @@
 from django.conf import settings
-from django.contrib.sessions.backends.base import CreateError, SessionBase
+from django.contrib.sessions.backends.base import (
+    CreateError, SessionBase, UpdateError,
+)
 from django.core.cache import caches
 from django.utils.six.moves import range
 
@@ -10,13 +12,15 @@ class SessionStore(SessionBase):
     """
     A cache-based session store.
     """
+    cache_key_prefix = KEY_PREFIX
+
     def __init__(self, session_key=None):
         self._cache = caches[settings.SESSION_CACHE_ALIAS]
         super(SessionStore, self).__init__(session_key)
 
     @property
     def cache_key(self):
-        return KEY_PREFIX + self._get_or_create_session_key()
+        return self.cache_key_prefix + self._get_or_create_session_key()
 
     def load(self):
         try:
@@ -27,7 +31,7 @@ class SessionStore(SessionBase):
             session_data = None
         if session_data is not None:
             return session_data
-        self.create()
+        self._session_key = None
         return {}
 
     def create(self):
@@ -49,10 +53,14 @@ class SessionStore(SessionBase):
             "It is likely that the cache is unavailable.")
 
     def save(self, must_create=False):
+        if self.session_key is None:
+            return self.create()
         if must_create:
             func = self._cache.add
-        else:
+        elif self._cache.get(self.cache_key) is not None:
             func = self._cache.set
+        else:
+            raise UpdateError
         result = func(self.cache_key,
                       self._get_session(no_load=must_create),
                       self.get_expiry_age())
@@ -60,14 +68,14 @@ class SessionStore(SessionBase):
             raise CreateError
 
     def exists(self, session_key):
-        return (KEY_PREFIX + session_key) in self._cache
+        return session_key and (self.cache_key_prefix + session_key) in self._cache
 
     def delete(self, session_key=None):
         if session_key is None:
             if self.session_key is None:
                 return
             session_key = self.session_key
-        self._cache.delete(KEY_PREFIX + session_key)
+        self._cache.delete(self.cache_key_prefix + session_key)
 
     @classmethod
     def clear_expired(cls):

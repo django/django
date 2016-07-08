@@ -5,16 +5,16 @@ from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponseRedirect
-from django.template.engine import Engine
 from django.template.response import TemplateResponse
+from django.urls import NoReverseMatch, reverse
 from django.utils import six
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
+from django.views.i18n import JavaScriptCatalog
 
 system_check_errors = []
 
@@ -85,8 +85,9 @@ class AdminSite(object):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model._meta.abstract:
-                raise ImproperlyConfigured('The model %s is abstract, so it '
-                      'cannot be registered with admin.' % model.__name__)
+                raise ImproperlyConfigured(
+                    'The model %s is abstract, so it cannot be registered with admin.' % model.__name__
+                )
 
             if model in self._registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
@@ -103,11 +104,12 @@ class AdminSite(object):
                     options['__module__'] = __name__
                     admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
-                if admin_class is not ModelAdmin and settings.DEBUG:
-                    system_check_errors.extend(admin_class.check(model))
-
                 # Instantiate the admin class to save in the registry
-                self._registry[model] = admin_class(model, self)
+                admin_obj = admin_class(model, self)
+                if admin_class is not ModelAdmin and settings.DEBUG:
+                    system_check_errors.extend(admin_obj.check())
+
+                self._registry[model] = admin_obj
 
     def unregister(self, model_or_iterable):
         """
@@ -171,40 +173,6 @@ class AdminSite(object):
         """
         return request.user.is_active and request.user.is_staff
 
-    def check_dependencies(self):
-        """
-        Check that all things needed to run the admin have been correctly installed.
-
-        The default implementation checks that admin and contenttypes apps are
-        installed, as well as the auth context processor.
-        """
-        if not apps.is_installed('django.contrib.admin'):
-            raise ImproperlyConfigured(
-                "Put 'django.contrib.admin' in your INSTALLED_APPS "
-                "setting in order to use the admin application.")
-        if not apps.is_installed('django.contrib.contenttypes'):
-            raise ImproperlyConfigured(
-                "Put 'django.contrib.contenttypes' in your INSTALLED_APPS "
-                "setting in order to use the admin application.")
-        try:
-            default_template_engine = Engine.get_default()
-        except Exception:
-            # Skip this non-critical check:
-            # 1. if the user has a non-trivial TEMPLATES setting and Django
-            #    can't find a default template engine
-            # 2. if anything goes wrong while loading template engines, in
-            #    order to avoid raising an exception from a confusing location
-            # Catching ImproperlyConfigured suffices for 1. but 2. requires
-            # catching all exceptions.
-            pass
-        else:
-            if ('django.contrib.auth.context_processors.auth'
-                    not in default_template_engine.context_processors):
-                raise ImproperlyConfigured(
-                    "Enable 'django.contrib.auth.context_processors.auth' "
-                    "in your TEMPLATES setting in order to use the admin "
-                    "application.")
-
     def admin_view(self, view, cacheable=False):
         """
         Decorator to create an admin view attached to this ``AdminSite``. This
@@ -256,9 +224,6 @@ class AdminSite(object):
         # and django.contrib.contenttypes.views imports ContentType.
         from django.contrib.contenttypes import views as contenttype_views
 
-        if settings.DEBUG:
-            self.check_dependencies()
-
         def wrap(view, cacheable=False):
             def wrapper(*args, **kwargs):
                 return self.admin_view(view, cacheable)(*args, **kwargs)
@@ -305,11 +270,16 @@ class AdminSite(object):
         """
         Returns a dictionary of variables to put in the template context for
         *every* page in the admin site.
+
+        For sites running on a subpath, use the SCRIPT_NAME value if site_url
+        hasn't been customized.
         """
+        script_name = request.META['SCRIPT_NAME']
+        site_url = script_name if self.site_url == '/' and script_name else self.site_url
         return {
             'site_title': self.site_title,
             'site_header': self.site_header,
-            'site_url': self.site_url,
+            'site_url': site_url,
             'has_permission': self.has_permission(request),
             'available_apps': self.get_app_list(request),
         }
@@ -322,13 +292,13 @@ class AdminSite(object):
         from django.contrib.auth.views import password_change
         url = reverse('admin:password_change_done', current_app=self.name)
         defaults = {
-            'current_app': self.name,
             'password_change_form': AdminPasswordChangeForm,
             'post_change_redirect': url,
             'extra_context': dict(self.each_context(request), **(extra_context or {})),
         }
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
+        request.current_app = self.name
         return password_change(request, **defaults)
 
     def password_change_done(self, request, extra_context=None):
@@ -337,25 +307,21 @@ class AdminSite(object):
         """
         from django.contrib.auth.views import password_change_done
         defaults = {
-            'current_app': self.name,
             'extra_context': dict(self.each_context(request), **(extra_context or {})),
         }
         if self.password_change_done_template is not None:
             defaults['template_name'] = self.password_change_done_template
+        request.current_app = self.name
         return password_change_done(request, **defaults)
 
-    def i18n_javascript(self, request):
+    def i18n_javascript(self, request, extra_context=None):
         """
         Displays the i18n JavaScript that the Django admin requires.
 
-        This takes into account the USE_I18N setting. If it's set to False, the
-        generated JavaScript will be leaner and faster.
+        `extra_context` is unused but present for consistency with the other
+        admin views.
         """
-        if settings.USE_I18N:
-            from django.views.i18n import javascript_catalog
-        else:
-            from django.views.i18n import null_javascript_catalog as javascript_catalog
-        return javascript_catalog(request, packages=['django.conf', 'django.contrib.admin'])
+        return JavaScriptCatalog.as_view(packages=['django.contrib.admin'])(request)
 
     @never_cache
     def logout(self, request, extra_context=None):
@@ -364,14 +330,20 @@ class AdminSite(object):
 
         This should *not* assume the user is already logged in.
         """
-        from django.contrib.auth.views import logout
+        from django.contrib.auth.views import LogoutView
         defaults = {
-            'current_app': self.name,
-            'extra_context': dict(self.each_context(request), **(extra_context or {})),
+            'extra_context': dict(
+                self.each_context(request),
+                # Since the user isn't logged out at this point, the value of
+                # has_permission must be overridden.
+                has_permission=False,
+                **(extra_context or {})
+            ),
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
-        return logout(request, **defaults)
+        request.current_app = self.name
+        return LogoutView.as_view(**defaults)(request)
 
     @never_cache
     def login(self, request, extra_context=None):
@@ -383,27 +355,29 @@ class AdminSite(object):
             index_path = reverse('admin:index', current_app=self.name)
             return HttpResponseRedirect(index_path)
 
-        from django.contrib.auth.views import login
+        from django.contrib.auth.views import LoginView
         # Since this module gets imported in the application's root package,
         # it cannot import models from other applications at the module level,
         # and django.contrib.admin.forms eventually imports User.
         from django.contrib.admin.forms import AdminAuthenticationForm
-        context = dict(self.each_context(request),
+        context = dict(
+            self.each_context(request),
             title=_('Log in'),
             app_path=request.get_full_path(),
+            username=request.user.get_username(),
         )
         if (REDIRECT_FIELD_NAME not in request.GET and
                 REDIRECT_FIELD_NAME not in request.POST):
-            context[REDIRECT_FIELD_NAME] = request.get_full_path()
+            context[REDIRECT_FIELD_NAME] = reverse('admin:index', current_app=self.name)
         context.update(extra_context or {})
 
         defaults = {
             'extra_context': context,
-            'current_app': self.name,
             'authentication_form': self.login_form or AdminAuthenticationForm,
             'template_name': self.login_template or 'admin/login.html',
         }
-        return login(request, **defaults)
+        request.current_app = self.name
+        return LoginView.as_view(**defaults)(request)
 
     def _build_app_dict(self, request, label=None):
         """
@@ -505,8 +479,7 @@ class AdminSite(object):
 
         request.current_app = self.name
 
-        return TemplateResponse(request, self.index_template or
-                                'admin/index.html', context)
+        return TemplateResponse(request, self.index_template or 'admin/index.html', context)
 
     def app_index(self, request, app_label, extra_context=None):
         app_dict = self._build_app_dict(request, app_label)
@@ -515,7 +488,8 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         app_name = apps.get_app_config(app_label).verbose_name
-        context = dict(self.each_context(request),
+        context = dict(
+            self.each_context(request),
             title=_('%(app)s administration') % {'app': app_name},
             app_list=[app_dict],
             app_label=app_label,

@@ -82,13 +82,14 @@ class CookieStorage(BaseStorage):
         store, or deletes the cookie.
         """
         if encoded_data:
-            response.set_cookie(self.cookie_name, encoded_data,
+            response.set_cookie(
+                self.cookie_name, encoded_data,
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 secure=settings.SESSION_COOKIE_SECURE or None,
-                httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+                httponly=settings.SESSION_COOKIE_HTTPONLY or None,
+            )
         else:
-            response.delete_cookie(self.cookie_name,
-                domain=settings.SESSION_COOKIE_DOMAIN)
+            response.delete_cookie(self.cookie_name, domain=settings.SESSION_COOKIE_DOMAIN)
 
     def _store(self, messages, response, remove_oldest=True, *args, **kwargs):
         """

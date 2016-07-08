@@ -90,11 +90,8 @@ class DistinctOnTests(TestCase):
 
         # Combining queries with different distinct_fields is not allowed.
         base_qs = Celebrity.objects.all()
-        self.assertRaisesMessage(
-            AssertionError,
-            "Cannot combine queries with different distinct fields.",
-            lambda: (base_qs.distinct('id') & base_qs.distinct('name'))
-        )
+        with self.assertRaisesMessage(AssertionError, "Cannot combine queries with different distinct fields."):
+            base_qs.distinct('id') & base_qs.distinct('name')
 
         # Test join unreffing
         c1 = Celebrity.objects.distinct('greatest_fan__id', 'greatest_fan__fan_of')
@@ -129,3 +126,11 @@ class DistinctOnTests(TestCase):
             qs, [self.p1_o2, self.p2_o1, self.p3_o1],
             lambda x: x
         )
+
+    def test_distinct_on_get_ordering_preserved(self):
+        """
+        Ordering shouldn't be cleared when distinct on fields are specified.
+        refs #25081
+        """
+        staff = Staff.objects.distinct('name').order_by('name', '-organisation').get(name='p1')
+        self.assertEqual(staff.organisation, 'o2')

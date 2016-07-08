@@ -4,8 +4,8 @@ from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.contrib.messages.storage import base, default_storage
 from django.contrib.messages.storage.base import Message
-from django.core.urlresolvers import reverse
 from django.test import modify_settings, override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy
 
 
@@ -217,7 +217,7 @@ class BaseTests(object):
 
     @modify_settings(
         INSTALLED_APPS={'remove': 'django.contrib.messages'},
-        MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        MIDDLEWARE={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
     )
     @override_settings(
         MESSAGE_LEVEL=constants.DEBUG,
@@ -238,12 +238,12 @@ class BaseTests(object):
         reverse('show_message')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
             add_url = reverse('add_message', args=(level,))
-            self.assertRaises(MessageFailure, self.client.post, add_url,
-                              data, follow=True)
+            with self.assertRaises(MessageFailure):
+                self.client.post(add_url, data, follow=True)
 
     @modify_settings(
         INSTALLED_APPS={'remove': 'django.contrib.messages'},
-        MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        MIDDLEWARE={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
     )
     @override_settings(
         TEMPLATES=[{
@@ -353,18 +353,14 @@ class BaseTests(object):
         storage.level = 0
         add_level_messages(storage)
         tags = [msg.tags for msg in storage]
-        self.assertEqual(tags,
-                         ['info', '', 'extra-tag debug', 'warning', 'error',
-                          'success'])
+        self.assertEqual(tags, ['info', '', 'extra-tag debug', 'warning', 'error', 'success'])
 
     def test_level_tag(self):
         storage = self.get_storage()
         storage.level = 0
         add_level_messages(storage)
         tags = [msg.level_tag for msg in storage]
-        self.assertEqual(tags,
-                         ['info', '', 'debug', 'warning', 'error',
-                          'success'])
+        self.assertEqual(tags, ['info', '', 'debug', 'warning', 'error', 'success'])
 
     @override_settings_tags(MESSAGE_TAGS={
         constants.INFO: 'info',
@@ -379,5 +375,4 @@ class BaseTests(object):
         storage.level = 0
         add_level_messages(storage)
         tags = [msg.tags for msg in storage]
-        self.assertEqual(tags,
-                     ['info', 'custom', 'extra-tag', '', 'bad', 'success'])
+        self.assertEqual(tags, ['info', 'custom', 'extra-tag', '', 'bad', 'success'])

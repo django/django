@@ -47,14 +47,9 @@ class ModelAdminTests(TestCase):
     def test_default_fields(self):
         ma = ModelAdmin(Band, self.site)
 
-        self.assertEqual(list(ma.get_form(request).base_fields),
-            ['name', 'bio', 'sign_date'])
-
-        self.assertEqual(list(ma.get_fields(request)),
-            ['name', 'bio', 'sign_date'])
-
-        self.assertEqual(list(ma.get_fields(request, self.band)),
-            ['name', 'bio', 'sign_date'])
+        self.assertEqual(list(ma.get_form(request).base_fields), ['name', 'bio', 'sign_date'])
+        self.assertEqual(list(ma.get_fields(request)), ['name', 'bio', 'sign_date'])
+        self.assertEqual(list(ma.get_fields(request, self.band)), ['name', 'bio', 'sign_date'])
 
     def test_default_fieldsets(self):
         # fieldsets_add and fieldsets_change should return a special data structure that
@@ -64,11 +59,9 @@ class ModelAdminTests(TestCase):
         # Here's the default case. There are no custom form_add/form_change methods,
         # no fields argument, and no fieldsets argument.
         ma = ModelAdmin(Band, self.site)
-        self.assertEqual(ma.get_fieldsets(request),
-            [(None, {'fields': ['name', 'bio', 'sign_date']})])
+        self.assertEqual(ma.get_fieldsets(request), [(None, {'fields': ['name', 'bio', 'sign_date']})])
 
-        self.assertEqual(ma.get_fieldsets(request, self.band),
-            [(None, {'fields': ['name', 'bio', 'sign_date']})])
+        self.assertEqual(ma.get_fieldsets(request, self.band), [(None, {'fields': ['name', 'bio', 'sign_date']})])
 
     def test_get_fieldsets(self):
         # Test that get_fieldsets is called when figuring out form fields.
@@ -107,7 +100,7 @@ class ModelAdminTests(TestCase):
         self.assertTrue(ma.lookup_allowed('name__nonexistent', 'test_value'))
 
     def test_field_arguments(self):
-        # If we specify the fields argument, fieldsets_add and fielsets_change should
+        # If we specify the fields argument, fieldsets_add and fieldsets_change should
         # just stick the fields into a formsets structure and return it.
         class BandAdmin(ModelAdmin):
             fields = ['name']
@@ -115,14 +108,9 @@ class ModelAdminTests(TestCase):
         ma = BandAdmin(Band, self.site)
 
         self.assertEqual(list(ma.get_fields(request)), ['name'])
-
         self.assertEqual(list(ma.get_fields(request, self.band)), ['name'])
-
-        self.assertEqual(ma.get_fieldsets(request),
-            [(None, {'fields': ['name']})])
-
-        self.assertEqual(ma.get_fieldsets(request, self.band),
-            [(None, {'fields': ['name']})])
+        self.assertEqual(ma.get_fieldsets(request), [(None, {'fields': ['name']})])
+        self.assertEqual(ma.get_fieldsets(request, self.band), [(None, {'fields': ['name']})])
 
     def test_field_arguments_restricted_on_form(self):
         # If we specify fields or fieldsets, it should exclude fields on the Form class
@@ -137,8 +125,7 @@ class ModelAdminTests(TestCase):
 
         ma = BandAdmin(Band, self.site)
         self.assertEqual(list(ma.get_form(request).base_fields), ['name'])
-        self.assertEqual(list(ma.get_form(request, self.band).base_fields),
-            ['name'])
+        self.assertEqual(list(ma.get_form(request, self.band).base_fields), ['name'])
 
         # Using `fieldsets`.
         class BandAdmin(ModelAdmin):
@@ -146,24 +133,21 @@ class ModelAdminTests(TestCase):
 
         ma = BandAdmin(Band, self.site)
         self.assertEqual(list(ma.get_form(request).base_fields), ['name'])
-        self.assertEqual(list(ma.get_form(request, self.band).base_fields),
-            ['name'])
+        self.assertEqual(list(ma.get_form(request, self.band).base_fields), ['name'])
 
         # Using `exclude`.
         class BandAdmin(ModelAdmin):
             exclude = ['bio']
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(list(ma.get_form(request).base_fields),
-            ['name', 'sign_date'])
+        self.assertEqual(list(ma.get_form(request).base_fields), ['name', 'sign_date'])
 
         # You can also pass a tuple to `exclude`.
         class BandAdmin(ModelAdmin):
             exclude = ('bio',)
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(list(ma.get_form(request).base_fields),
-            ['name', 'sign_date'])
+        self.assertEqual(list(ma.get_form(request).base_fields), ['name', 'sign_date'])
 
         # Using `fields` and `exclude`.
         class BandAdmin(ModelAdmin):
@@ -171,8 +155,7 @@ class ModelAdminTests(TestCase):
             exclude = ['bio']
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(list(ma.get_form(request).base_fields),
-            ['name'])
+        self.assertEqual(list(ma.get_form(request).base_fields), ['name'])
 
     def test_custom_form_meta_exclude_with_readonly(self):
         """
@@ -184,7 +167,6 @@ class ModelAdminTests(TestCase):
         # First, with `ModelAdmin` -----------------------
 
         class AdminBandForm(forms.ModelForm):
-
             class Meta:
                 model = Band
                 exclude = ['bio']
@@ -194,13 +176,11 @@ class ModelAdminTests(TestCase):
             form = AdminBandForm
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(list(ma.get_form(request).base_fields),
-            ['sign_date'])
+        self.assertEqual(list(ma.get_form(request).base_fields), ['sign_date'])
 
         # Then, with `InlineModelAdmin`  -----------------
 
         class AdminConcertForm(forms.ModelForm):
-
             class Meta:
                 model = Concert
                 exclude = ['day']
@@ -221,6 +201,37 @@ class ModelAdminTests(TestCase):
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['main_band', 'opening_band', 'id', 'DELETE'])
 
+    def test_custom_formfield_override_readonly(self):
+        class AdminBandForm(forms.ModelForm):
+            name = forms.CharField()
+
+            class Meta:
+                exclude = tuple()
+                model = Band
+
+        class BandAdmin(ModelAdmin):
+            form = AdminBandForm
+            readonly_fields = ['name']
+
+        ma = BandAdmin(Band, self.site)
+
+        # `name` shouldn't appear in base_fields because it's part of
+        # readonly_fields.
+        self.assertEqual(
+            list(ma.get_form(request).base_fields),
+            ['bio', 'sign_date']
+        )
+        # But it should appear in get_fields()/fieldsets() so it can be
+        # displayed as read-only.
+        self.assertEqual(
+            list(ma.get_fields(request)),
+            ['bio', 'sign_date', 'name']
+        )
+        self.assertEqual(
+            list(ma.get_fieldsets(request)),
+            [(None, {'fields': ['bio', 'sign_date', 'name']})]
+        )
+
     def test_custom_form_meta_exclude(self):
         """
         Ensure that the custom ModelForm's `Meta.exclude` is overridden if
@@ -230,7 +241,6 @@ class ModelAdminTests(TestCase):
         # First, with `ModelAdmin` -----------------------
 
         class AdminBandForm(forms.ModelForm):
-
             class Meta:
                 model = Band
                 exclude = ['bio']
@@ -240,8 +250,7 @@ class ModelAdminTests(TestCase):
             form = AdminBandForm
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(list(ma.get_form(request).base_fields),
-            ['bio', 'sign_date'])
+        self.assertEqual(list(ma.get_form(request).base_fields), ['bio', 'sign_date'])
 
         # Then, with `InlineModelAdmin`  -----------------
 
@@ -265,7 +274,8 @@ class ModelAdminTests(TestCase):
         ma = BandAdmin(Band, self.site)
         self.assertEqual(
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
-            ['main_band', 'opening_band', 'day', 'id', 'DELETE'])
+            ['main_band', 'opening_band', 'day', 'id', 'DELETE']
+        )
 
     def test_custom_form_validation(self):
         # If we specify a form, it should use it allowing custom validation to work
@@ -278,12 +288,8 @@ class ModelAdminTests(TestCase):
             form = AdminBandForm
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(list(ma.get_form(request).base_fields),
-            ['name', 'bio', 'sign_date', 'delete'])
-
-        self.assertEqual(
-            type(ma.get_form(request).base_fields['sign_date'].widget),
-            AdminDateWidget)
+        self.assertEqual(list(ma.get_form(request).base_fields), ['name', 'bio', 'sign_date', 'delete'])
+        self.assertEqual(type(ma.get_form(request).base_fields['sign_date'].widget), AdminDateWidget)
 
     def test_form_exclude_kwarg_override(self):
         """
@@ -292,7 +298,6 @@ class ModelAdminTests(TestCase):
         """
 
         class AdminBandForm(forms.ModelForm):
-
             class Meta:
                 model = Band
                 exclude = ['name']
@@ -306,8 +311,7 @@ class ModelAdminTests(TestCase):
                 return super(BandAdmin, self).get_form(request, obj, **kwargs)
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(list(ma.get_form(request).base_fields),
-            ['name', 'sign_date'])
+        self.assertEqual(list(ma.get_form(request).base_fields), ['name', 'sign_date'])
 
     def test_formset_exclude_kwarg_override(self):
         """
@@ -316,7 +320,6 @@ class ModelAdminTests(TestCase):
         """
 
         class AdminConcertForm(forms.ModelForm):
-
             class Meta:
                 model = Concert
                 exclude = ['day']
@@ -353,13 +356,15 @@ class ModelAdminTests(TestCase):
         ma = ConcertAdmin(Concert, self.site)
         form = ma.get_form(request)()
 
-        self.assertHTMLEqual(str(form["main_band"]),
+        self.assertHTMLEqual(
+            str(form["main_band"]),
             '<div class="related-widget-wrapper">'
-            '<select name="main_band" id="id_main_band">'
+            '<select name="main_band" id="id_main_band" required>'
             '<option value="" selected="selected">---------</option>'
             '<option value="%d">The Beatles</option>'
             '<option value="%d">The Doors</option>'
-            '</select></div>' % (band2.id, self.band.id))
+            '</select></div>' % (band2.id, self.band.id)
+        )
 
         class AdminConcertForm(forms.ModelForm):
             def __init__(self, *args, **kwargs):
@@ -372,12 +377,14 @@ class ModelAdminTests(TestCase):
         ma = ConcertAdminWithForm(Concert, self.site)
         form = ma.get_form(request)()
 
-        self.assertHTMLEqual(str(form["main_band"]),
+        self.assertHTMLEqual(
+            str(form["main_band"]),
             '<div class="related-widget-wrapper">'
-            '<select name="main_band" id="id_main_band">'
+            '<select name="main_band" id="id_main_band" required>'
             '<option value="" selected="selected">---------</option>'
             '<option value="%d">The Doors</option>'
-            '</select></div>' % self.band.id)
+            '</select></div>' % self.band.id
+        )
 
     def test_regression_for_ticket_15820(self):
         """
@@ -424,24 +431,22 @@ class ModelAdminTests(TestCase):
         cma = ModelAdmin(Concert, self.site)
         cmafa = cma.get_form(request)
 
-        self.assertEqual(type(cmafa.base_fields['main_band'].widget.widget),
-            Select)
+        self.assertEqual(type(cmafa.base_fields['main_band'].widget.widget), Select)
         self.assertEqual(
             list(cmafa.base_fields['main_band'].widget.choices),
             [('', '---------'), (self.band.id, 'The Doors')])
 
-        self.assertEqual(
-            type(cmafa.base_fields['opening_band'].widget.widget), Select)
+        self.assertEqual(type(cmafa.base_fields['opening_band'].widget.widget), Select)
         self.assertEqual(
             list(cmafa.base_fields['opening_band'].widget.choices),
-            [('', '---------'), (self.band.id, 'The Doors')])
-
+            [('', '---------'), (self.band.id, 'The Doors')]
+        )
         self.assertEqual(type(cmafa.base_fields['day'].widget), Select)
-        self.assertEqual(list(cmafa.base_fields['day'].widget.choices),
-            [('', '---------'), (1, 'Fri'), (2, 'Sat')])
-
-        self.assertEqual(type(cmafa.base_fields['transport'].widget),
-            Select)
+        self.assertEqual(
+            list(cmafa.base_fields['day'].widget.choices),
+            [('', '---------'), (1, 'Fri'), (2, 'Sat')]
+        )
+        self.assertEqual(type(cmafa.base_fields['transport'].widget), Select)
         self.assertEqual(
             list(cmafa.base_fields['transport'].widget.choices),
             [('', '---------'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')])
@@ -463,35 +468,29 @@ class ModelAdminTests(TestCase):
         cma = ConcertAdmin(Concert, self.site)
         cmafa = cma.get_form(request)
 
-        self.assertEqual(type(cmafa.base_fields['main_band'].widget.widget),
-            AdminRadioSelect)
-        self.assertEqual(cmafa.base_fields['main_band'].widget.attrs,
-            {'class': 'radiolist inline'})
-        self.assertEqual(list(cmafa.base_fields['main_band'].widget.choices),
-            [(self.band.id, 'The Doors')])
-
+        self.assertEqual(type(cmafa.base_fields['main_band'].widget.widget), AdminRadioSelect)
+        self.assertEqual(cmafa.base_fields['main_band'].widget.attrs, {'class': 'radiolist inline'})
         self.assertEqual(
-            type(cmafa.base_fields['opening_band'].widget.widget),
-            AdminRadioSelect)
-        self.assertEqual(cmafa.base_fields['opening_band'].widget.attrs,
-            {'class': 'radiolist'})
+            list(cmafa.base_fields['main_band'].widget.choices),
+            [(self.band.id, 'The Doors')]
+        )
+
+        self.assertEqual(type(cmafa.base_fields['opening_band'].widget.widget), AdminRadioSelect)
+        self.assertEqual(cmafa.base_fields['opening_band'].widget.attrs, {'class': 'radiolist'})
         self.assertEqual(
             list(cmafa.base_fields['opening_band'].widget.choices),
-            [('', 'None'), (self.band.id, 'The Doors')])
+            [('', 'None'), (self.band.id, 'The Doors')]
+        )
+        self.assertEqual(type(cmafa.base_fields['day'].widget), AdminRadioSelect)
+        self.assertEqual(cmafa.base_fields['day'].widget.attrs, {'class': 'radiolist'})
+        self.assertEqual(list(cmafa.base_fields['day'].widget.choices), [(1, 'Fri'), (2, 'Sat')])
 
-        self.assertEqual(type(cmafa.base_fields['day'].widget),
-            AdminRadioSelect)
-        self.assertEqual(cmafa.base_fields['day'].widget.attrs,
-            {'class': 'radiolist'})
-        self.assertEqual(list(cmafa.base_fields['day'].widget.choices),
-            [(1, 'Fri'), (2, 'Sat')])
-
-        self.assertEqual(type(cmafa.base_fields['transport'].widget),
-            AdminRadioSelect)
-        self.assertEqual(cmafa.base_fields['transport'].widget.attrs,
-            {'class': 'radiolist inline'})
-        self.assertEqual(list(cmafa.base_fields['transport'].widget.choices),
-            [('', 'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')])
+        self.assertEqual(type(cmafa.base_fields['transport'].widget), AdminRadioSelect)
+        self.assertEqual(cmafa.base_fields['transport'].widget.attrs, {'class': 'radiolist inline'})
+        self.assertEqual(
+            list(cmafa.base_fields['transport'].widget.choices),
+            [('', 'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')]
+        )
 
         class AdminConcertForm(forms.ModelForm):
             class Meta:
@@ -502,8 +501,7 @@ class ModelAdminTests(TestCase):
             form = AdminConcertForm
 
         ma = ConcertAdmin(Concert, self.site)
-        self.assertEqual(list(ma.get_form(request).base_fields),
-            ['main_band', 'opening_band', 'day'])
+        self.assertEqual(list(ma.get_form(request).base_fields), ['main_band', 'opening_band', 'day'])
 
         class AdminConcertForm(forms.ModelForm):
             extra = forms.CharField()
@@ -516,8 +514,7 @@ class ModelAdminTests(TestCase):
             form = AdminConcertForm
 
         ma = ConcertAdmin(Concert, self.site)
-        self.assertEqual(list(ma.get_form(request).base_fields),
-            ['extra', 'transport'])
+        self.assertEqual(list(ma.get_form(request).base_fields), ['extra', 'transport'])
 
         class ConcertInline(TabularInline):
             form = AdminConcertForm
@@ -533,15 +530,16 @@ class ModelAdminTests(TestCase):
         ma = BandAdmin(Band, self.site)
         self.assertEqual(
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
-            ['extra', 'transport', 'id', 'DELETE', 'main_band'])
+            ['extra', 'transport', 'id', 'DELETE', 'main_band']
+        )
 
 
 class CheckTestCase(SimpleTestCase):
 
-    def assertIsInvalid(self, model_admin, model, msg,
-            id=None, hint=None, invalid_obj=None):
+    def assertIsInvalid(self, model_admin, model, msg, id=None, hint=None, invalid_obj=None):
         invalid_obj = invalid_obj or model_admin
-        errors = model_admin.check(model=model)
+        admin_obj = model_admin(model, AdminSite())
+        errors = admin_obj.check()
         expected = [
             Error(
                 msg,
@@ -552,13 +550,13 @@ class CheckTestCase(SimpleTestCase):
         ]
         self.assertEqual(errors, expected)
 
-    def assertIsInvalidRegexp(self, model_admin, model, msg,
-            id=None, hint=None, invalid_obj=None):
+    def assertIsInvalidRegexp(self, model_admin, model, msg, id=None, hint=None, invalid_obj=None):
         """
         Same as assertIsInvalid but treats the given msg as a regexp.
         """
         invalid_obj = invalid_obj or model_admin
-        errors = model_admin.check(model=model)
+        admin_obj = model_admin(model, AdminSite())
+        errors = admin_obj.check()
         self.assertEqual(len(errors), 1)
         error = errors[0]
         self.assertEqual(error.hint, hint)
@@ -567,7 +565,8 @@ class CheckTestCase(SimpleTestCase):
         six.assertRegex(self, error.msg, msg)
 
     def assertIsValid(self, model_admin, model):
-        errors = model_admin.check(model=model)
+        admin_obj = model_admin(model, AdminSite())
+        errors = admin_obj.check()
         expected = []
         self.assertEqual(errors, expected)
 
@@ -599,7 +598,7 @@ class RawIdCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'raw_id_fields[0]' must be a ForeignKey or ManyToManyField.",
+            "The value of 'raw_id_fields[0]' must be a foreign key or a many-to-many field.",
             'admin.E003')
 
     def test_valid_case(self):
@@ -792,7 +791,7 @@ class FilterVerticalCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'filter_vertical[0]' must be a ManyToManyField.",
+            "The value of 'filter_vertical[0]' must be a many-to-many field.",
             'admin.E020')
 
     def test_valid_case(self):
@@ -829,7 +828,7 @@ class FilterHorizontalCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'filter_horizontal[0]' must be a ManyToManyField.",
+            "The value of 'filter_horizontal[0]' must be a many-to-many field.",
             'admin.E020')
 
     def test_valid_case(self):
@@ -926,7 +925,7 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             ("The value of 'prepopulated_fields' refers to 'users', which must not be "
-             "a DateTimeField, ForeignKey or ManyToManyField."),
+             "a DateTimeField, a foreign key, or a many-to-many field."),
             'admin.E028')
 
     def test_valid_case(self):
@@ -964,7 +963,7 @@ class ListDisplayTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'list_display[0]' must not be a ManyToManyField.",
+            "The value of 'list_display[0]' must not be a many-to-many field.",
             'admin.E109')
 
     def test_valid_case(self):
@@ -995,9 +994,11 @@ class ListDisplayLinksCheckTests(CheckTestCase):
             list_display_links = ('non_existent_field',)
 
         self.assertIsInvalid(
-            ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'list_display_links[0]' refers to 'non_existent_field', which is not defined in 'list_display'.",
-            'admin.E111')
+            ValidationTestModelAdmin, ValidationTestModel, (
+                "The value of 'list_display_links[0]' refers to "
+                "'non_existent_field', which is not defined in 'list_display'."
+            ), 'admin.E111'
+        )
 
     def test_missing_in_list_display(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1174,9 +1175,10 @@ class DateHierarchyCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            ("The value of 'date_hierarchy' refers to 'non_existent_field', which "
-             "is not an attribute of 'modeladmin.ValidationTestModel'."),
-            'admin.E127')
+            "The value of 'date_hierarchy' refers to 'non_existent_field', which "
+            "does not refer to a Field.",
+            'admin.E127'
+        )
 
     def test_invalid_field_type(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1193,6 +1195,22 @@ class DateHierarchyCheckTests(CheckTestCase):
 
         self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
 
+    def test_related_valid_case(self):
+        class ValidationTestModelAdmin(ModelAdmin):
+            date_hierarchy = 'band__sign_date'
+
+        self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
+
+    def test_related_invalid_field_type(self):
+        class ValidationTestModelAdmin(ModelAdmin):
+            date_hierarchy = 'band__name'
+
+        self.assertIsInvalid(
+            ValidationTestModelAdmin, ValidationTestModel,
+            "The value of 'date_hierarchy' must be a DateField or DateTimeField.",
+            'admin.E128'
+        )
+
 
 class OrderingCheckTests(CheckTestCase):
 
@@ -1203,16 +1221,17 @@ class OrderingCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             "The value of 'ordering' must be a list or tuple.",
-            'admin.E031')
+            'admin.E031'
+        )
 
         class ValidationTestModelAdmin(ModelAdmin):
             ordering = ('non_existent_field',)
 
         self.assertIsInvalid(
-            ValidationTestModelAdmin,
-            ValidationTestModel,
-            "The value of 'ordering[0]' refers to 'non_existent_field', which is not an attribute of 'modeladmin.ValidationTestModel'.",
-            'admin.E033',
+            ValidationTestModelAdmin, ValidationTestModel,
+            "The value of 'ordering[0]' refers to 'non_existent_field', "
+            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            'admin.E033'
         )
 
     def test_random_marker_not_alone(self):
@@ -1221,10 +1240,11 @@ class OrderingCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            ("The value of 'ordering' has the random ordering marker '?', but contains "
-             "other fields as well."),
+            "The value of 'ordering' has the random ordering marker '?', but contains "
+            "other fields as well.",
             'admin.E032',
-            hint='Either remove the "?", or remove the other fields.')
+            hint='Either remove the "?", or remove the other fields.'
+        )
 
     def test_valid_random_marker_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1251,7 +1271,8 @@ class ListSelectRelatedCheckTests(CheckTestCase):
         class ValidationTestModelAdmin(ModelAdmin):
             list_select_related = 1
 
-        self.assertIsInvalid(ValidationTestModelAdmin, ValidationTestModel,
+        self.assertIsInvalid(
+            ValidationTestModelAdmin, ValidationTestModel,
             "The value of 'list_select_related' must be a boolean, tuple or list.",
             'admin.E117')
 
@@ -1514,16 +1535,59 @@ class ListDisplayEditableTests(CheckTestCase):
             list_display_links = None
         self.assertIsValid(ProductAdmin, ValidationTestModel)
 
-    def test_list_display_same_as_list_editable(self):
+    def test_list_display_first_item_same_as_list_editable_first_item(self):
         """
-        The first item in list_display can be the same as the first
-        in list_editable
+        The first item in list_display can be the same as the first in
+        list_editable.
         """
         class ProductAdmin(ModelAdmin):
             list_display = ['name', 'slug', 'pub_date']
             list_editable = ['name', 'slug']
             list_display_links = ['pub_date']
         self.assertIsValid(ProductAdmin, ValidationTestModel)
+
+    def test_list_display_first_item_in_list_editable(self):
+        """
+        The first item in list_display can be in list_editable as long as
+        list_display_links is defined.
+        """
+        class ProductAdmin(ModelAdmin):
+            list_display = ['name', 'slug', 'pub_date']
+            list_editable = ['slug', 'name']
+            list_display_links = ['pub_date']
+        self.assertIsValid(ProductAdmin, ValidationTestModel)
+
+    def test_list_display_first_item_same_as_list_editable_no_list_display_links(self):
+        """
+        The first item in list_display cannot be the same as the first item
+        in list_editable if list_display_links is not defined.
+        """
+        class ProductAdmin(ModelAdmin):
+            list_display = ['name']
+            list_editable = ['name']
+        self.assertIsInvalid(
+            ProductAdmin, ValidationTestModel,
+            "The value of 'list_editable[0]' refers to the first field "
+            "in 'list_display' ('name'), which cannot be used unless "
+            "'list_display_links' is set.",
+            id='admin.E124',
+        )
+
+    def test_list_display_first_item_in_list_editable_no_list_display_links(self):
+        """
+        The first item in list_display cannot be in list_editable if
+        list_display_links isn't defined.
+        """
+        class ProductAdmin(ModelAdmin):
+            list_display = ['name', 'slug', 'pub_date']
+            list_editable = ['slug', 'name']
+        self.assertIsInvalid(
+            ProductAdmin, ValidationTestModel,
+            "The value of 'list_editable[1]' refers to the first field "
+            "in 'list_display' ('name'), which cannot be used unless "
+            "'list_display_links' is set.",
+            id='admin.E124',
+        )
 
 
 class ModelAdminPermissionTests(SimpleTestCase):

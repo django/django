@@ -2,7 +2,7 @@
 GDAL - Constant definitions
 """
 from ctypes import (
-    c_byte, c_double, c_float, c_int16, c_int32, c_uint16, c_uint32,
+    c_double, c_float, c_int16, c_int32, c_ubyte, c_uint16, c_uint32,
 )
 
 # See http://www.gdal.org/gdal_8h.html#a22e22ce0a55036a96f652765793fb7a4
@@ -29,7 +29,7 @@ GDAL_INTEGER_TYPES = [1, 2, 3, 4, 5]
 # or to hold the space for data to be read into. The lookup below helps
 # selecting the right ctypes object for a given gdal pixel type.
 GDAL_TO_CTYPES = [
-    None, c_byte, c_uint16, c_int16, c_uint32, c_int32,
+    None, c_ubyte, c_uint16, c_int16, c_uint32, c_int32,
     c_float, c_double, None, None, None, None
 ]
 

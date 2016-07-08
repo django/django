@@ -22,7 +22,7 @@ dictionary that corresponds to the widget.
 .. _widget-to-field:
 
 Specifying widgets
-------------------
+==================
 
 Whenever you specify a field on a form, Django will use a default widget
 that is appropriate to the type of data that is to be displayed. To find
@@ -43,9 +43,8 @@ example::
 This would specify a form with a comment that uses a larger :class:`Textarea`
 widget, rather than the default :class:`TextInput` widget.
 
-
 Setting arguments for widgets
------------------------------
+=============================
 
 Many widgets have optional extra arguments; they can be set when defining the
 widget on the field. In the following example, the
@@ -63,15 +62,17 @@ widget on the field. In the following example, the
 
     class SimpleForm(forms.Form):
         birth_year = forms.DateField(widget=forms.SelectDateWidget(years=BIRTH_YEAR_CHOICES))
-        favorite_colors = forms.MultipleChoiceField(required=False,
-            widget=forms.CheckboxSelectMultiple, choices=FAVORITE_COLORS_CHOICES)
+        favorite_colors = forms.MultipleChoiceField(
+            required=False,
+            widget=forms.CheckboxSelectMultiple,
+            choices=FAVORITE_COLORS_CHOICES,
+        )
 
 See the :ref:`built-in widgets` for more information about which widgets
 are available and which arguments they accept.
 
-
-Widgets inheriting from the Select widget
------------------------------------------
+Widgets inheriting from the ``Select`` widget
+=============================================
 
 Widgets inheriting from the :class:`Select` widget deal with choices. They
 present the user with a list of options to choose from. The different widgets
@@ -96,14 +97,13 @@ example::
     >>> choice_field.widget.choices
     [('1', 'First and only')]
 
-
 Widgets which offer a :attr:`~Select.choices` attribute can however be used
 with fields which are not based on choice -- such as a :class:`CharField` --
 but it is recommended to use a :class:`ChoiceField`-based field when the
 choices are inherent to the model and not just the representational widget.
 
 Customizing widget instances
-----------------------------
+============================
 
 When Django renders a widget as HTML, it only renders very minimal markup -
 Django doesn't add class names, or any other widget-specific attributes. This
@@ -116,7 +116,7 @@ There are two ways to customize widgets: :ref:`per widget instance
 .. _styling-widget-instances:
 
 Styling widget instances
-^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------
 
 If you want to make one widget instance look different from another, you will
 need to specify additional attributes at the time when the widget object is
@@ -138,9 +138,9 @@ provided for each widget will be rendered exactly the same::
 
     >>> f = CommentForm(auto_id=False)
     >>> f.as_table()
-    <tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
-    <tr><th>Url:</th><td><input type="url" name="url"/></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+    <tr><th>Name:</th><td><input type="text" name="name" required /></td></tr>
+    <tr><th>Url:</th><td><input type="url" name="url" required /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" required /></td></tr>
 
 On a real Web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the
@@ -157,9 +157,9 @@ Django will then include the extra attributes in the rendered output:
 
     >>> f = CommentForm(auto_id=False)
     >>> f.as_table()
-    <tr><th>Name:</th><td><input type="text" name="name" class="special"/></td></tr>
-    <tr><th>Url:</th><td><input type="url" name="url"/></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
+    <tr><th>Name:</th><td><input type="text" name="name" class="special" required /></td></tr>
+    <tr><th>Url:</th><td><input type="url" name="url" required /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" size="40" required /></td></tr>
 
 You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
 :attr:`BoundField.id_for_label` for an example.
@@ -167,7 +167,7 @@ You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
 .. _styling-widget-classes:
 
 Styling widget classes
-^^^^^^^^^^^^^^^^^^^^^^
+----------------------
 
 With widgets, it is possible to add assets (``css`` and ``javascript``)
 and more deeply customize their appearance and behavior.
@@ -181,12 +181,15 @@ detail in the :doc:`Form Assets </topics/forms/media>` topic guide.
 
 .. _base-widget-classes:
 
-Base Widget classes
--------------------
+Base widget classes
+===================
 
 Base widget classes :class:`Widget` and :class:`MultiWidget` are subclassed by
 all the :ref:`built-in widgets <built-in widgets>` and may serve as a
 foundation for custom widgets.
+
+``Widget``
+----------
 
 .. class:: Widget(attrs=None)
 
@@ -204,20 +207,18 @@ foundation for custom widgets.
             >>> from django import forms
             >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
             >>> name.render('name', 'A name')
-            '<input title="Your name" type="text" name="name" value="A name" size="10" />'
+            '<input title="Your name" type="text" name="name" value="A name" size="10" required />'
 
-        .. versionchanged:: 1.8
+        If you assign a value of ``True`` or ``False`` to an attribute,
+        it will be rendered as an HTML5 boolean attribute::
 
-            If you assign a value of ``True`` or ``False`` to an attribute,
-            it will be rendered as an HTML5 boolean attribute::
-
-                >>> name = forms.TextInput(attrs={'required': True})
-                >>> name.render('name', 'A name')
-                '<input name="name" type="text" value="A name" required />'
-                >>>
-                >>> name = forms.TextInput(attrs={'required': False})
-                >>> name.render('name', 'A name')
-                '<input name="name" type="text" value="A name" />'
+            >>> name = forms.TextInput(attrs={'required': True})
+            >>> name.render('name', 'A name')
+            '<input name="name" type="text" value="A name" required />'
+            >>>
+            >>> name = forms.TextInput(attrs={'required': False})
+            >>> name.render('name', 'A name')
+            '<input name="name" type="text" value="A name" />'
 
     .. attribute:: Widget.supports_microseconds
 
@@ -225,10 +226,26 @@ foundation for custom widgets.
        microseconds part of :class:`~datetime.datetime` and
        :class:`~datetime.time` values will be set to ``0``.
 
-       .. versionadded:: 1.9
+    .. method:: format_value(value)
 
-           In older versions, this attribute was only defined on the date
-           and time widgets (as ``False``).
+        Cleans and returns a value for use in the widget template. ``value``
+        isn't guaranteed to be valid input, therefore subclass implementations
+        should program defensively.
+
+        .. versionchanged:: 1.10
+
+            In older versions, this method is a private API named
+            ``_format_value()``. The old name will work until Django 2.0.
+
+    .. method:: id_for_label(self, id_)
+
+        Returns the HTML ID attribute of this widget for use by a ``<label>``,
+        given the ID of the field. Returns ``None`` if an ID isn't available.
+
+        This hook is necessary because some widgets have multiple HTML
+        elements and, thus, multiple IDs. In that case, this method should
+        return an ID value that corresponds to the first ID in the widget's
+        tags.
 
     .. method:: render(name, value, attrs=None)
 
@@ -248,6 +265,9 @@ foundation for custom widgets.
         be called more than once during handling of form data, so if you
         customize it and add expensive processing, you should implement some
         caching mechanism yourself.
+
+``MultiWidget``
+---------------
 
 .. class:: MultiWidget(widgets, attrs=None)
 
@@ -402,7 +422,7 @@ foundation for custom widgets.
 .. _built-in widgets:
 
 Built-in widgets
-----------------
+================
 
 Django provides a representation of all the basic HTML widgets, plus some
 commonly used groups of widgets in the ``django.forms.widgets`` module,
@@ -413,7 +433,7 @@ and :ref:`handling of multi-valued input <composite-widgets>`.
 .. _text-widgets:
 
 Widgets handling input of text
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------
 
 These widgets make use of the HTML elements ``input`` and ``textarea``.
 
@@ -488,7 +508,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`DATE_INPUT_FORMATS` and respects
-    :ref:`format-localization`.
+    :doc:`/topics/i18n/formatting`.
 
 ``DateTimeInput``
 ~~~~~~~~~~~~~~~~~
@@ -505,7 +525,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`DATETIME_INPUT_FORMATS` and respects
-    :ref:`format-localization`.
+    :doc:`/topics/i18n/formatting`.
 
     By default, the microseconds part of the time value is always set to ``0``.
     If microseconds are required, use a subclass with the
@@ -526,7 +546,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`TIME_INPUT_FORMATS` and respects
-    :ref:`format-localization`.
+    :doc:`/topics/i18n/formatting`.
 
     For the treatment of microseconds, see :class:`DateTimeInput`.
 
@@ -540,7 +560,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. _selector-widgets:
 
 Selector and checkbox widgets
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------
 
 ``CheckboxInput``
 ~~~~~~~~~~~~~~~~~
@@ -616,16 +636,16 @@ Selector and checkbox widgets
     .. code-block:: html
 
         <div class="myradio">
-            <label for="id_beatles_0"><input id="id_beatles_0" name="beatles" type="radio" value="john" /> John</label>
+            <label for="id_beatles_0"><input id="id_beatles_0" name="beatles" type="radio" value="john" required /> John</label>
         </div>
         <div class="myradio">
-            <label for="id_beatles_1"><input id="id_beatles_1" name="beatles" type="radio" value="paul" /> Paul</label>
+            <label for="id_beatles_1"><input id="id_beatles_1" name="beatles" type="radio" value="paul" required /> Paul</label>
         </div>
         <div class="myradio">
-            <label for="id_beatles_2"><input id="id_beatles_2" name="beatles" type="radio" value="george" /> George</label>
+            <label for="id_beatles_2"><input id="id_beatles_2" name="beatles" type="radio" value="george" required /> George</label>
         </div>
         <div class="myradio">
-            <label for="id_beatles_3"><input id="id_beatles_3" name="beatles" type="radio" value="ringo" /> Ringo</label>
+            <label for="id_beatles_3"><input id="id_beatles_3" name="beatles" type="radio" value="ringo" required /> Ringo</label>
         </div>
 
     That included the ``<label>`` tags. To get more granular, you can use each
@@ -647,30 +667,30 @@ Selector and checkbox widgets
 
         <label for="id_beatles_0">
             John
-            <span class="radio"><input id="id_beatles_0" name="beatles" type="radio" value="john" /></span>
+            <span class="radio"><input id="id_beatles_0" name="beatles" type="radio" value="john" required /></span>
         </label>
 
         <label for="id_beatles_1">
             Paul
-            <span class="radio"><input id="id_beatles_1" name="beatles" type="radio" value="paul" /></span>
+            <span class="radio"><input id="id_beatles_1" name="beatles" type="radio" value="paul" required /></span>
         </label>
 
         <label for="id_beatles_2">
             George
-            <span class="radio"><input id="id_beatles_2" name="beatles" type="radio" value="george" /></span>
+            <span class="radio"><input id="id_beatles_2" name="beatles" type="radio" value="george" required /></span>
         </label>
 
         <label for="id_beatles_3">
             Ringo
-            <span class="radio"><input id="id_beatles_3" name="beatles" type="radio" value="ringo" /></span>
+            <span class="radio"><input id="id_beatles_3" name="beatles" type="radio" value="ringo" required /></span>
         </label>
 
     If you decide not to loop over the radio buttons -- e.g., if your template
     simply includes ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>``
     with ``<li>`` tags, as above.
 
-    The outer ``<ul>`` container will receive the ``id`` attribute defined on
-    the widget.
+    The outer ``<ul>`` container receives the ``id`` attribute of the widget,
+    if defined, or :attr:`BoundField.auto_id` otherwise.
 
     When looping over the radio buttons, the ``label`` and ``input`` tags include
     ``for`` and ``id`` attributes, respectively. Each radio button has an
@@ -691,8 +711,8 @@ Selector and checkbox widgets
           ...
         </ul>
 
-    The outer ``<ul>`` container will receive the ``id`` attribute defined on
-    the widget.
+    The outer ``<ul>`` container receives the ``id`` attribute of the widget,
+    if defined, or :attr:`BoundField.auto_id` otherwise.
 
 Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
 up the lists. See the documentation of :class:`RadioSelect` for more details.
@@ -704,7 +724,7 @@ When looping over the checkboxes, the ``label`` and ``input`` tags include
 .. _file-upload-widgets:
 
 File upload widgets
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 ``FileInput``
 ~~~~~~~~~~~~~
@@ -725,7 +745,7 @@ File upload widgets
 .. _composite-widgets:
 
 Composite widgets
-^^^^^^^^^^^^^^^^^
+-----------------
 
 ``MultipleHiddenInput``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -749,7 +769,8 @@ Composite widgets
 .. class:: SplitDateTimeWidget
 
     Wrapper (using :class:`MultiWidget`) around two widgets: :class:`DateInput`
-    for the date, and :class:`TimeInput` for the time.
+    for the date, and :class:`TimeInput` for the time. Must be used with
+    :class:`SplitDateTimeField` rather than :class:`DateTimeField`.
 
     ``SplitDateTimeWidget`` has two optional attributes:
 
@@ -775,10 +796,9 @@ Composite widgets
 .. class:: SelectDateWidget
 
     Wrapper around three :class:`~django.forms.Select` widgets: one each for
-    month, day, and year. Note that this widget lives in a separate file from
-    the standard widgets.
+    month, day, and year.
 
-    Takes one optional argument:
+    Takes several optional arguments:
 
     .. attribute:: SelectDateWidget.years
 
@@ -799,8 +819,6 @@ Composite widgets
             }
 
     .. attribute:: SelectDateWidget.empty_label
-
-        .. versionadded:: 1.8
 
         If the :class:`~django.forms.DateField` is not required,
         :class:`SelectDateWidget` will have an empty choice at the top of the
@@ -823,9 +841,3 @@ Composite widgets
                     empty_label=("Choose Year", "Choose Month", "Choose Day"),
                 ),
             )
-
-    .. versionchanged:: 1.9
-
-        This widget used to be located in the ``django.forms.extras.widgets``
-        package. It is now defined in ``django.forms.widgets`` and like the
-        other widgets it can be imported directly from ``django.forms``.

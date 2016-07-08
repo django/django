@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Fery Setiawan <gembelweb@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2013-2014
@@ -8,11 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
-"language/id/)\n"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2016-02-29 08:23+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
+"id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,22 +36,10 @@ msgid "Documentation bookmarklets"
 msgstr "Bookmarklet dokumentasi"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">Untuk memasang bookmarklet, seret tautan ini ke bilah\n"
-"markah Anda atau klik kanan pada tautan tersebut kemudian tambahkan ke\n"
-"markah Anda. Setelah itu Anda dapat memilih bookmarklet dari laman apapun\n"
-"pada situs. Jangan lupa, beberapa bookmarklet ini hanya bisa digunakan\n"
-"dari komputer yang terdaftar sebagai \"internal\" (hubungi administrator\n"
-"sistem Anda apabila tidak yakin apakah komputer Anda termasuk komputer\n"
-"\"internal\").</p>\n"
 
 msgid "Documentation for this page"
 msgstr "Dokumentasi untuk laman ini"
@@ -61,28 +50,6 @@ msgid ""
 msgstr ""
 "Buka dari laman apa saja ke laman dokumentasi untuk view yang menghasilkan "
 "laman tersebut."
-
-msgid "Show object ID"
-msgstr "Tampilkan ID objek"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Tampilkan tipe-konten dan ID unik untuk laman yang mewakili sebuah objek "
-"tunggal."
-
-msgid "Edit this object (current window)"
-msgstr "Edit objek ini (pada jendela ini)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Buka laman admin pada laman yang mewakili sebuah objek tunggal."
-
-msgid "Edit this object (new window)"
-msgstr "Edit objek ini (pada jendela baru)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "Sama seperti di atas, tetapi laman halaman admin di jendela baru."
 
 msgid "Tags"
 msgstr "Tag"
@@ -150,6 +117,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
+msgid "Fields"
+msgstr "Bidang"
+
 msgid "Field"
 msgstr "Bidang"
 
@@ -158,6 +128,15 @@ msgstr "Tipe"
 
 msgid "Description"
 msgstr "Deskripsi"
+
+msgid "Methods with arguments"
+msgstr "Cara dengan penjelasan"
+
+msgid "Method"
+msgstr "Cara"
+
+msgid "Arguments"
+msgstr "Penjelasan"
 
 msgid "Back to Model Documentation"
 msgstr "Kembali ke Dokumentasi Model"

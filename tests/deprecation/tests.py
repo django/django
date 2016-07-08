@@ -1,14 +1,13 @@
 from __future__ import unicode_literals
 
-import os
-import unittest
 import warnings
 
 from django.test import SimpleTestCase
 from django.test.utils import reset_warning_registry
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase
-from django.utils.encoding import force_text
+from django.utils.deprecation import (
+    DeprecationInstanceCheck, RemovedInNextVersionWarning, RenameMethodsBase,
+)
 
 
 class RenameManagerMethods(RenameMethodsBase):
@@ -37,8 +36,7 @@ class RenameMethodsTests(SimpleTestCase):
                     pass
             self.assertEqual(len(recorded), 1)
             msg = str(recorded[0].message)
-            self.assertEqual(msg,
-                '`Manager.old` method should be renamed `new`.')
+            self.assertEqual(msg, '`Manager.old` method should be renamed `new`.')
 
     def test_get_new_defined(self):
         """
@@ -57,8 +55,7 @@ class RenameMethodsTests(SimpleTestCase):
             manager.old()
             self.assertEqual(len(recorded), 1)
             msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                '`Manager.old` is deprecated, use `new` instead.')
+            self.assertEqual(msg, '`Manager.old` is deprecated, use `new` instead.')
 
     def test_get_old_defined(self):
         """
@@ -77,8 +74,7 @@ class RenameMethodsTests(SimpleTestCase):
             manager.old()
             self.assertEqual(len(recorded), 1)
             msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                '`Manager.old` is deprecated, use `new` instead.')
+            self.assertEqual(msg, '`Manager.old` is deprecated, use `new` instead.')
 
     def test_deprecated_subclass_renamed(self):
         """
@@ -100,8 +96,7 @@ class RenameMethodsTests(SimpleTestCase):
             deprecated.new()
             self.assertEqual(len(recorded), 1)
             msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                '`Renamed.old` is deprecated, use `new` instead.')
+            self.assertEqual(msg, '`Renamed.old` is deprecated, use `new` instead.')
             recorded[:] = []
             deprecated.old()
             self.assertEqual(len(recorded), 2)
@@ -133,8 +128,7 @@ class RenameMethodsTests(SimpleTestCase):
             renamed.old()
             self.assertEqual(len(recorded), 1)
             msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                '`Renamed.old` is deprecated, use `new` instead.')
+            self.assertEqual(msg, '`Renamed.old` is deprecated, use `new` instead.')
 
     def test_deprecated_subclass_renamed_and_mixins(self):
         """
@@ -164,8 +158,7 @@ class RenameMethodsTests(SimpleTestCase):
             deprecated.new()
             self.assertEqual(len(recorded), 1)
             msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                '`RenamedMixin.old` is deprecated, use `new` instead.')
+            self.assertEqual(msg, '`RenamedMixin.old` is deprecated, use `new` instead.')
             deprecated.old()
             self.assertEqual(len(recorded), 2)
             msgs = [str(warning.message) for warning in recorded]
@@ -175,25 +168,14 @@ class RenameMethodsTests(SimpleTestCase):
             ])
 
 
-class DeprecatingSimpleTestCaseUrls(unittest.TestCase):
+class DeprecationInstanceCheckTest(SimpleTestCase):
+    def test_warning(self):
+        class Manager(six.with_metaclass(DeprecationInstanceCheck)):
+            alternative = 'fake.path.Foo'
+            deprecation_warning = RemovedInNextVersionWarning
 
-    def test_deprecation(self):
-        """
-        Ensure the correct warning is raised when SimpleTestCase.urls is used.
-        """
-        class TempTestCase(SimpleTestCase):
-            urls = 'tests.urls'
-
-            def test(self):
-                pass
-
-        with warnings.catch_warnings(record=True) as recorded:
-            warnings.filterwarnings('always')
-            suite = unittest.TestLoader().loadTestsFromTestCase(TempTestCase)
-            with open(os.devnull, 'w') as devnull:
-                unittest.TextTestRunner(stream=devnull, verbosity=2).run(suite)
-                msg = force_text(recorded.pop().message)
-                self.assertEqual(msg,
-                    "SimpleTestCase.urls is deprecated and will be removed in "
-                    "Django 1.10. Use @override_settings(ROOT_URLCONF=...) "
-                    "in TempTestCase instead.")
+        msg = '`Manager` is deprecated, use `fake.path.Foo` instead.'
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', category=RemovedInNextVersionWarning)
+            with self.assertRaisesMessage(RemovedInNextVersionWarning, msg):
+                isinstance(object, Manager)

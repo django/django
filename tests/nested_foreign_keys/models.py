@@ -7,7 +7,7 @@ class Person(models.Model):
 
 class Movie(models.Model):
     title = models.CharField(max_length=200)
-    director = models.ForeignKey(Person)
+    director = models.ForeignKey(Person, models.CASCADE)
 
 
 class Event(models.Model):
@@ -15,16 +15,16 @@ class Event(models.Model):
 
 
 class Screening(Event):
-    movie = models.ForeignKey(Movie)
+    movie = models.ForeignKey(Movie, models.CASCADE)
 
 
 class ScreeningNullFK(Event):
-    movie = models.ForeignKey(Movie, null=True)
+    movie = models.ForeignKey(Movie, models.SET_NULL, null=True)
 
 
 class Package(models.Model):
-    screening = models.ForeignKey(Screening, null=True)
+    screening = models.ForeignKey(Screening, models.SET_NULL, null=True)
 
 
 class PackageNullFK(models.Model):
-    screening = models.ForeignKey(ScreeningNullFK, null=True)
+    screening = models.ForeignKey(ScreeningNullFK, models.SET_NULL, null=True)

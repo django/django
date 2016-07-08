@@ -17,10 +17,10 @@ class Organiser(models.Model):
 
 class Pool(models.Model):
     name = models.CharField(max_length=30)
-    tournament = models.ForeignKey(Tournament)
-    organiser = models.ForeignKey(Organiser)
+    tournament = models.ForeignKey(Tournament, models.CASCADE)
+    organiser = models.ForeignKey(Organiser, models.CASCADE)
 
 
 class PoolStyle(models.Model):
     name = models.CharField(max_length=30)
-    pool = models.OneToOneField(Pool)
+    pool = models.OneToOneField(Pool, models.CASCADE)

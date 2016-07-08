@@ -7,11 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:30+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
-"language/eo/)\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-11-20 13:36+0000\n"
+"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
+"Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
+"eo/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -29,7 +29,7 @@ msgstr "Gravaj datoj"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s objekto kun ĉefŝlosilo %(key)r ne ekzistas."
 
 msgid "Password changed successfully."
 msgstr "Pasvorto suksese ŝanĝita."
@@ -40,6 +40,12 @@ msgstr "Ŝanĝi pasvorton: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Aŭtentigo kaj rajtigo"
+
+msgid "password"
+msgstr "pasvorto"
+
+msgid "last login"
+msgstr "lasta ensaluto"
 
 msgid "No password set."
 msgstr "Neniu pasvorto agordita."
@@ -56,16 +62,16 @@ msgstr "Pasvorto"
 msgid "Password confirmation"
 msgstr "Pasvorta konfirmo"
 
-msgid "Enter the same password as above, for verification."
+msgid "Enter the same password as before, for verification."
 msgstr "Entajpu la saman pasvorton kiel supre, por konfirmo."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
 "Pasvortoj ne estas krude entenitaj, do ne eblas vidi la pasvorton de tiu "
-"uzanto, sed vi povas ŝanĝi la pasvorton uzante <a href=\"password/\">tiun "
+"uzanto, sed vi povas ŝanĝi la pasvorton uzante <a href=\"../password/\">tiun "
 "formalaron</a>."
 
 #, python-format
@@ -119,6 +125,9 @@ msgstr "kontrolsumo"
 msgid "name"
 msgstr "nomo"
 
+msgid "content type"
+msgstr "enhava tipo"
+
 msgid "codename"
 msgstr "kodnomo"
 
@@ -133,12 +142,6 @@ msgstr "grupo"
 
 msgid "groups"
 msgstr "grupoj"
-
-msgid "password"
-msgstr "pasvorto"
-
-msgid "last login"
-msgstr "lasta ensaluto"
 
 msgid "superuser status"
 msgstr "ĉefuzanta statuso"
@@ -211,6 +214,46 @@ msgstr "uzanto"
 
 msgid "users"
 msgstr "uzantoj"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Tiu pasvorto estas tro mallonga. Ĝi devas enhavi almenaŭ %(min_length)d "
+"signon."
+msgstr[1] ""
+"Tiu pasvorto estas tro mallonga. Ĝi devas enhavi almenaŭ %(min_length)d "
+"signojn."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Via pasvorto devas enhavi almenaŭ %(min_length)d signon."
+msgstr[1] "Via pasvorto devas enhavi almenaŭ %(min_length)d signojn."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "La pasvorto estas tro simila al la %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"Via pasvorto ne povas esti tro similaj al viaj aliaj personaj informoj."
+
+msgid "This password is too common."
+msgstr "Tiu pasvorto estas tro kutima."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Via pasvorto ne povas esti kutime uzata pasvorto."
+
+msgid "This password is entirely numeric."
+msgstr "Tiu pasvorto estas tute cefera."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Via pasvorto ne povas esti tute cifera."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

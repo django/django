@@ -3,14 +3,15 @@
 # Translators:
 # aljosa <aljosa.mohorovic@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Croatian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2015-12-08 12:24+0000\n"
+"Last-Translator: Mislav Cimperšak <mislav.cimpersak@gmail.com>\n"
+"Language-Team: Croatian (http://www.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,24 +36,10 @@ msgid "Documentation bookmarklets"
 msgstr "Dokumentacija bookmarklets-a"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">Da bi instalirali bookmarklet, povucite link na svoj "
-"bookmarks\n"
-"toolbar, ili desnim klikom na link dodajte u svoje bookmarke. Sada možete\n"
-"selektirati bookmarklet sa bilo koje stranice. Zapamtite da neki "
-"bookmarkleti\n"
-"zahtjevaju da gledate stranice sa računala označenog\n"
-"kao \"internal\" (razgovarajte sa svojim sistem administratorom ako niste "
-"sigurni\n"
-"je li vaše računalo \"internal\").</p>\n"
 
 msgid "Documentation for this page"
 msgstr "Dokumentacija za ovu stranicu"
@@ -63,30 +50,6 @@ msgid ""
 msgstr ""
 "Preusmjeri te sa bilo koje stranice na dokumentaciju za taj prikaz (view) "
 "koji generira stranicu."
-
-msgid "Show object ID"
-msgstr "Prikaži ID objekta"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Prikazuje tip sadržaja (content-type) i jedinstveni ID za stranice koje "
-"predstavljaju pojedinačan objekt."
-
-msgid "Edit this object (current window)"
-msgstr "Uredi objekt (u trenutnom prozoru)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Preusmjeri na admin stranicu za stranice koje predstavljaju pojedinačan "
-"objekt."
-
-msgid "Edit this object (new window)"
-msgstr "Uredi objekt (u novom prozoru)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "Isto kao prethodno, ali otvara admin stranicu u novom prozoru."
 
 msgid "Tags"
 msgstr "Tagovi"
@@ -124,7 +87,7 @@ msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
 
 msgid "Please install docutils"
-msgstr ""
+msgstr "Molimo instalirajte docutils"
 
 #, python-format
 msgid ""
@@ -141,13 +104,25 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr ""
 
+msgid "Fields"
+msgstr "Polja"
+
 msgid "Field"
-msgstr ""
+msgstr "Polje"
 
 msgid "Type"
 msgstr ""
 
 msgid "Description"
+msgstr "Opis"
+
+msgid "Methods with arguments"
+msgstr ""
+
+msgid "Method"
+msgstr ""
+
+msgid "Arguments"
 msgstr ""
 
 msgid "Back to Model Documentation"
@@ -164,21 +139,21 @@ msgstr "Predlošci"
 
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "Predložak: %(name)s"
 
 #, python-format
 msgid "Template: \"%(name)s\""
-msgstr ""
+msgstr "Predložak: \"%(name)s\""
 
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr ""
 
 msgid "(does not exist)"
-msgstr ""
+msgstr "(ne postoji)"
 
 msgid "Back to Documentation"
-msgstr ""
+msgstr "Povratak na dokumentaciju"
 
 msgid "Template filters"
 msgstr ""
@@ -218,7 +193,7 @@ msgid "Context:"
 msgstr ""
 
 msgid "Templates:"
-msgstr ""
+msgstr "Predlošci:"
 
 msgid "Back to Views Documentation"
 msgstr ""
@@ -264,7 +239,7 @@ msgstr "prikaz:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "Aplikacija %(app_label)r nije pronađena"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

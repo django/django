@@ -16,8 +16,9 @@ class DateParseTests(unittest.TestCase):
         self.assertEqual(parse_date('2012-04-23'), date(2012, 4, 23))
         self.assertEqual(parse_date('2012-4-9'), date(2012, 4, 9))
         # Invalid inputs
-        self.assertEqual(parse_date('20120423'), None)
-        self.assertRaises(ValueError, parse_date, '2012-04-56')
+        self.assertIsNone(parse_date('20120423'))
+        with self.assertRaises(ValueError):
+            parse_date('2012-04-56')
 
     def test_parse_time(self):
         # Valid inputs
@@ -26,28 +27,44 @@ class DateParseTests(unittest.TestCase):
         self.assertEqual(parse_time('10:20:30.400'), time(10, 20, 30, 400000))
         self.assertEqual(parse_time('4:8:16'), time(4, 8, 16))
         # Invalid inputs
-        self.assertEqual(parse_time('091500'), None)
-        self.assertRaises(ValueError, parse_time, '09:15:90')
+        self.assertIsNone(parse_time('091500'))
+        with self.assertRaises(ValueError):
+            parse_time('09:15:90')
 
     def test_parse_datetime(self):
         # Valid inputs
-        self.assertEqual(parse_datetime('2012-04-23T09:15:00'),
-            datetime(2012, 4, 23, 9, 15))
-        self.assertEqual(parse_datetime('2012-4-9 4:8:16'),
-            datetime(2012, 4, 9, 4, 8, 16))
-        self.assertEqual(parse_datetime('2012-04-23T09:15:00Z'),
-            datetime(2012, 4, 23, 9, 15, 0, 0, get_fixed_timezone(0)))
-        self.assertEqual(parse_datetime('2012-4-9 4:8:16-0320'),
-            datetime(2012, 4, 9, 4, 8, 16, 0, get_fixed_timezone(-200)))
-        self.assertEqual(parse_datetime('2012-04-23T10:20:30.400+02:30'),
-            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(150)))
-        self.assertEqual(parse_datetime('2012-04-23T10:20:30.400+02'),
-            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(120)))
-        self.assertEqual(parse_datetime('2012-04-23T10:20:30.400-02'),
-            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120)))
+        self.assertEqual(
+            parse_datetime('2012-04-23T09:15:00'),
+            datetime(2012, 4, 23, 9, 15)
+        )
+        self.assertEqual(
+            parse_datetime('2012-4-9 4:8:16'),
+            datetime(2012, 4, 9, 4, 8, 16)
+        )
+        self.assertEqual(
+            parse_datetime('2012-04-23T09:15:00Z'),
+            datetime(2012, 4, 23, 9, 15, 0, 0, get_fixed_timezone(0))
+        )
+        self.assertEqual(
+            parse_datetime('2012-4-9 4:8:16-0320'),
+            datetime(2012, 4, 9, 4, 8, 16, 0, get_fixed_timezone(-200))
+        )
+        self.assertEqual(
+            parse_datetime('2012-04-23T10:20:30.400+02:30'),
+            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(150))
+        )
+        self.assertEqual(
+            parse_datetime('2012-04-23T10:20:30.400+02'),
+            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(120))
+        )
+        self.assertEqual(
+            parse_datetime('2012-04-23T10:20:30.400-02'),
+            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120))
+        )
         # Invalid inputs
-        self.assertEqual(parse_datetime('20120423091500'), None)
-        self.assertRaises(ValueError, parse_datetime, '2012-04-56T09:15:90')
+        self.assertIsNone(parse_datetime('20120423091500'))
+        with self.assertRaises(ValueError):
+            parse_datetime('2012-04-56T09:15:90')
 
 
 class DurationParseTests(unittest.TestCase):
@@ -93,9 +110,9 @@ class DurationParseTests(unittest.TestCase):
         self.assertEqual(parse_duration('-4 15:30'), timedelta(days=-4, minutes=15, seconds=30))
 
     def test_iso_8601(self):
-        self.assertEqual(parse_duration('P4Y'), None)
-        self.assertEqual(parse_duration('P4M'), None)
-        self.assertEqual(parse_duration('P4W'), None)
+        self.assertIsNone(parse_duration('P4Y'))
+        self.assertIsNone(parse_duration('P4M'))
+        self.assertIsNone(parse_duration('P4W'))
         self.assertEqual(parse_duration('P4D'), timedelta(days=4))
         self.assertEqual(parse_duration('P0.5D'), timedelta(hours=12))
         self.assertEqual(parse_duration('PT5H'), timedelta(hours=5))

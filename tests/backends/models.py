@@ -33,10 +33,6 @@ class SchoolClass(models.Model):
 
 
 class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
-    class Meta:
-        # We need to use a short actual table name or
-        # we hit issue #8548 which we're not testing!
-        verbose_name = 'model_with_long_table_name'
     primary_key_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.AutoField(primary_key=True)
     charfield_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.CharField(max_length=100)
     m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.ManyToManyField(Person, blank=True)
@@ -44,7 +40,7 @@ class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=30)
-    content_type = models.ForeignKey(ContentType, related_name='backend_tags')
+    content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='backend_tags')
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -76,9 +72,13 @@ class ReporterProxy(Reporter):
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
-    reporter = models.ForeignKey(Reporter)
-    reporter_proxy = models.ForeignKey(ReporterProxy, null=True,
-                                       related_name='reporter_proxy')
+    reporter = models.ForeignKey(Reporter, models.CASCADE)
+    reporter_proxy = models.ForeignKey(
+        ReporterProxy,
+        models.SET_NULL,
+        null=True,
+        related_name='reporter_proxy',
+    )
 
     def __str__(self):
         return self.headline
@@ -105,7 +105,7 @@ class Object(models.Model):
 
 @python_2_unicode_compatible
 class ObjectReference(models.Model):
-    obj = models.ForeignKey(Object, db_constraint=False)
+    obj = models.ForeignKey(Object, models.CASCADE, db_constraint=False)
 
     def __str__(self):
         return str(self.obj_id)

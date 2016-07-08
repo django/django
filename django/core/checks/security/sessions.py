@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from .. import Tags, Warning, register
+from ..utils import patch_middleware_message
 
 
 def add_session_cookie_message(message):
@@ -20,7 +21,7 @@ W010 = Warning(
 W011 = Warning(
     add_session_cookie_message(
         "You have 'django.contrib.sessions.middleware.SessionMiddleware' "
-        "in your MIDDLEWARE_CLASSES, but you have not set "
+        "in your MIDDLEWARE, but you have not set "
         "SESSION_COOKIE_SECURE to True."
     ),
     id='security.W011',
@@ -50,7 +51,7 @@ W013 = Warning(
 W014 = Warning(
     add_httponly_message(
         "You have 'django.contrib.sessions.middleware.SessionMiddleware' "
-        "in your MIDDLEWARE_CLASSES, but you have not set "
+        "in your MIDDLEWARE, but you have not set "
         "SESSION_COOKIE_HTTPONLY to True."
     ),
     id='security.W014',
@@ -69,7 +70,7 @@ def check_session_cookie_secure(app_configs, **kwargs):
         if _session_app():
             errors.append(W010)
         if _session_middleware():
-            errors.append(W011)
+            errors.append(patch_middleware_message(W011))
         if len(errors) > 1:
             errors = [W012]
     return errors
@@ -82,15 +83,15 @@ def check_session_cookie_httponly(app_configs, **kwargs):
         if _session_app():
             errors.append(W013)
         if _session_middleware():
-            errors.append(W014)
+            errors.append(patch_middleware_message(W014))
         if len(errors) > 1:
             errors = [W015]
     return errors
 
 
 def _session_middleware():
-    return ("django.contrib.sessions.middleware.SessionMiddleware" in
-            settings.MIDDLEWARE_CLASSES)
+    return ("django.contrib.sessions.middleware.SessionMiddleware" in settings.MIDDLEWARE_CLASSES or
+            settings.MIDDLEWARE and "django.contrib.sessions.middleware.SessionMiddleware" in settings.MIDDLEWARE)
 
 
 def _session_app():

@@ -9,9 +9,8 @@ from django.conf import settings
 from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.test import ignore_warnings, modify_settings, override_settings
+from django.test import modify_settings, override_settings
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.formats import localize
 from django.utils.translation import activate, deactivate
 
@@ -21,15 +20,8 @@ from .models import TestModel
 
 class HTTPSitemapTests(SitemapTestsBase):
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_simple_sitemap_index(self):
         "A simple sitemap index can be rendered"
-        # The URL for views.sitemap in tests/urls/http.py has been updated
-        # with a name but since reversing by Python path is tried first
-        # before reversing by name and works since we're giving
-        # name='django.contrib.sitemaps.views.sitemap', we need to silence
-        # the erroneous warning until reversing by dotted path is removed.
-        # The test will work without modification when it's removed.
         response = self.client.get('/simple/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -38,19 +30,12 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % self.base_url
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
     }])
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
-        # The URL for views.sitemap in tests/urls/http.py has been updated
-        # with a name but since reversing by Python path is tried first
-        # before reversing by name and works since we're giving
-        # name='django.contrib.sitemaps.views.sitemap', we need to silence
-        # the erroneous warning until reversing by dotted path is removed.
-        # The test will work without modification when it's removed.
         response = self.client.get('/simple/custom-index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
@@ -125,6 +110,38 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/lastmod-mixed/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
 
+    def test_sitemaps_lastmod_mixed_ascending_last_modified_missing(self):
+        """
+        The Last-Modified header is omitted when lastmod isn't found in all
+        sitemaps. Test sitemaps are sorted by lastmod in ascending order.
+        """
+        response = self.client.get('/lastmod-sitemaps/mixed-ascending.xml')
+        self.assertFalse(response.has_header('Last-Modified'))
+
+    def test_sitemaps_lastmod_mixed_descending_last_modified_missing(self):
+        """
+        The Last-Modified header is omitted when lastmod isn't found in all
+        sitemaps. Test sitemaps are sorted by lastmod in descending order.
+        """
+        response = self.client.get('/lastmod-sitemaps/mixed-descending.xml')
+        self.assertFalse(response.has_header('Last-Modified'))
+
+    def test_sitemaps_lastmod_ascending(self):
+        """
+        The Last-Modified header is set to the most recent sitemap lastmod.
+        Test sitemaps are sorted by lastmod in ascending order.
+        """
+        response = self.client.get('/lastmod-sitemaps/ascending.xml')
+        self.assertEqual(response['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
+
+    def test_sitemaps_lastmod_descending(self):
+        """
+        The Last-Modified header is set to the most recent sitemap lastmod.
+        Test sitemaps are sorted by lastmod in descending order.
+        """
+        response = self.client.get('/lastmod-sitemaps/descending.xml')
+        self.assertEqual(response['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
+
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     @override_settings(USE_L10N=True)
     def test_localized_priority(self):
@@ -159,7 +176,8 @@ class HTTPSitemapTests(SitemapTestsBase):
         Sitemap.get_urls and no Site objects exist
         """
         Site.objects.all().delete()
-        self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
+        with self.assertRaises(ImproperlyConfigured):
+            Sitemap().get_urls()
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_sitemap_get_urls_no_site_2(self):
@@ -168,14 +186,15 @@ class HTTPSitemapTests(SitemapTestsBase):
         Sitemap.get_urls if Site objects exists, but the sites framework is not
         actually installed.
         """
-        self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
+        with self.assertRaises(ImproperlyConfigured):
+            Sitemap().get_urls()
 
     def test_sitemap_item(self):
         """
         Check to make sure that the raw item is included with each
         Sitemap.get_url() url result.
         """
-        test_sitemap = GenericSitemap({'queryset': TestModel.objects.all()})
+        test_sitemap = GenericSitemap({'queryset': TestModel.objects.order_by('pk').all()})
 
         def is_testmodel(url):
             return isinstance(url['item'], TestModel)
@@ -194,14 +213,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % self.base_url
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_x_robots_sitemap(self):
-        # The URL for views.sitemap in tests/urls/http.py has been updated
-        # with a name but since reversing by Python path is tried first
-        # before reversing by name and works since we're giving
-        # name='django.contrib.sitemaps.views.sitemap', we need to silence
-        # the erroneous warning until reversing by dotted path is removed.
-        # The test will work without modification when it's removed.
         response = self.client.get('/simple/index.xml')
         self.assertEqual(response['X-Robots-Tag'], 'noindex, noodp, noarchive')
 
@@ -221,4 +233,12 @@ class HTTPSitemapTests(SitemapTestsBase):
 <url><loc>{0}/en/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """.format(self.base_url, self.i18n_model.pk)
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+
+    def test_sitemap_without_entries(self):
+        response = self.client.get('/sitemap-without-entries/sitemap.xml')
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+</urlset>"""
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)

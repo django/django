@@ -1,5 +1,3 @@
-.. _glossary:
-
 ========
 Glossary
 ========
@@ -37,7 +35,7 @@ Glossary
         `Model-view-controller`__; a software pattern. Django :ref:`follows MVC
         to some extent <faq-mtv>`.
 
-        __ http://en.wikipedia.org/wiki/Model-view-controller
+        __ https://en.wikipedia.org/wiki/Model-view-controller
 
     project
         A Python package -- i.e. a directory of code -- that contains all the

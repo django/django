@@ -1,0 +1,110 @@
+# This file is distributed under the same license as the Django package.
+# 
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-06-13 15:07+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Upper Sorbian (http://www.transifex.com/django/django/language/hsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#: contrib/gis/apps.py:8
+msgid "GIS"
+msgstr "GIS"
+
+#: contrib/gis/db/models/fields.py:78
+msgid "The base GIS field."
+msgstr "Bazowe polo GIS."
+
+#: contrib/gis/db/models/fields.py:165
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr "Bazowe geometrijowe polo -- zarysowane do geometrijoweho typa specifikacije OpenGIS. "
+
+#: contrib/gis/db/models/fields.py:352
+msgid "Point"
+msgstr "Dypk"
+
+#: contrib/gis/db/models/fields.py:358
+msgid "Line string"
+msgstr "Čara"
+
+#: contrib/gis/db/models/fields.py:364
+msgid "Polygon"
+msgstr "Wjeleróžk"
+
+#: contrib/gis/db/models/fields.py:370
+msgid "Multi-point"
+msgstr "Wjacore dypki"
+
+#: contrib/gis/db/models/fields.py:376
+msgid "Multi-line string"
+msgstr "Wjacore čary"
+
+#: contrib/gis/db/models/fields.py:382
+msgid "Multi polygon"
+msgstr "Wjacore wjelróžki"
+
+#: contrib/gis/db/models/fields.py:388
+msgid "Geometry collection"
+msgstr "Geometrijowa zběrka"
+
+#: contrib/gis/db/models/fields.py:394
+msgid "Extent Aggregate Field"
+msgstr "Polo „extent aggregate“"
+
+#: contrib/gis/db/models/fields.py:405
+msgid "Raster Field"
+msgstr "Rasterowe polo"
+
+#: contrib/gis/forms/fields.py:20
+msgid "No geometry value provided."
+msgstr "Žana geometrijowa hódnota podata."
+
+#: contrib/gis/forms/fields.py:21
+msgid "Invalid geometry value."
+msgstr "Njepłaćiwa geometrijowa hódnota."
+
+#: contrib/gis/forms/fields.py:22
+msgid "Invalid geometry type."
+msgstr "Njepłaćiwy geometrijowy typ."
+
+#: contrib/gis/forms/fields.py:23
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry"
+" form field."
+msgstr "Zmylk je wustupił, hdyž so geometrija do SRID pola geometrijoweho formulara přetwori."
+
+#: contrib/gis/templates/gis/admin/openlayers.html:35
+#: contrib/gis/templates/gis/openlayers.html:18
+msgid "Delete all Features"
+msgstr "Wšě funkcije zhašeć"
+
+#: contrib/gis/templates/gis/admin/openlayers.html:37
+msgid "WKT debugging window:"
+msgstr "Wokno pytanja zmylkow WKT:"
+
+#: contrib/gis/templates/gis/google/google-map.html:4
+msgid "Google Maps via GeoDjango"
+msgstr "Google Maps přez GeoDjango"
+
+#: contrib/gis/templates/gis/openlayers.html:19
+msgid "Debugging window (serialized value)"
+msgstr "Wokno pytanja zmylkow (serijalizowana hódnota)"
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr "Žane kanale zregistrowane."
+
+#: contrib/gis/views.py:16
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Adresowe mjeno %r njeje zregistrowane."

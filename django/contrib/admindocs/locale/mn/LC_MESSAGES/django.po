@@ -4,17 +4,18 @@
 # Bayarkhuu Bataa, 2014
 # Claude Paroz <claude@2xlibre.net>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2013-2014
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2014
+# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2014-2015
+# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
-"language/mn/)\n"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2016-03-08 14:27+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
+"Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
+"mn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,7 +23,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Удирдлагын баримт"
 
 msgid "Home"
 msgstr "Админ эхлэл"
@@ -37,22 +38,13 @@ msgid "Documentation bookmarklets"
 msgstr "Мookmarklet-уудын баримтжуулалт"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">Bookmarklet суулгахын тулд холбоосыг bookmark-ийн\n"
-" хэрэгслийн мөрт аваачих буюу холбоосон дээр хулганы баруун\n"
-" товчлуураар дарж bookmark-даа нэмнэ. Ингэснээр та сайтын аль ч\n"
-" хуудаснаас bookmarklet-ээ сонгох боломжтой болно.  Зарим\n"
-" bookmarklet-ийн хувьд та \"дотоод\" гэж тодорхойлогдсон компьютерээс\n"
-" сайт руу орох шаардлагатай болдог (компьютер тань \"дотоод\" мөн\n"
-" эсэхийг мэдэхгүй байгаа бол системийн удирдлагаасаа асууна уу).</p>\n"
+"Bookmarklet тэмдэглэл суулгахын тулд холбоосыг өөрийн bookmark талбар руу "
+"чирэх эсвэл хулганы баруун даралт дарж bookmark -т нэмэх сонголтыг сонгоно. "
+"Ингэснээр аль ч хуудаснаас bookmarklet-ээ сонгох боломжтой болно."
 
 msgid "Documentation for this page"
 msgstr "Энэ хуудасны баримтжуулалт"
@@ -63,28 +55,6 @@ msgid ""
 msgstr ""
 "Таныг ямар ч хамаагүй хуудаснаас тухайн хуудсыг гаргаж байгаа "
 "баримтжуулалтанд аваачна."
-
-msgid "Show object ID"
-msgstr "Объектийн ID-ийг харуулах"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Нэг объект харуулж буй хуудаснуудын агуулгын төрөл болоод давтагдахгүй ID-"
-"ийг харуулна."
-
-msgid "Edit this object (current window)"
-msgstr "Энэ объектийг засварлах (одоо хэрэглэж буй цонх)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Нэг объект харуулж буй хуудаснуудын удирдлагын хуудсанд аваачна."
-
-msgid "Edit this object (new window)"
-msgstr "Энэ объектийг засварлах (шинэ цонх)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "Дээрхийн нэгэн адил ч удирдлагын хуудсыг шинэ цонхонд нээнэ."
 
 msgid "Tags"
 msgstr "Таг-ууд"
@@ -98,7 +68,7 @@ msgstr "Шүүлтүүрүүд"
 msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
-msgstr ""
+msgstr "Шүүлтүүр нь тэмплэйтийн илэрцэд хувисагчаар оролцох үйлдэл"
 
 msgid "Models"
 msgstr "Моделууд"
@@ -108,6 +78,8 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"Model-ууд бол системтэй холбоотой талбарууд бүхий объектуудын тайлбар, Model "
+"бүр тэмплэйт хувьсагч болох боломтой талбаруудтай "
 
 msgid "Views"
 msgstr "View-үүд"
@@ -117,9 +89,13 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
+"Нийтэд ил хуудас бүр view-ээс бүтнэ. View нь ямар объектийг, тухайн template-"
+"д  ашиглахыг тодорхойлно."
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
+"Админы ажиллагаанд хурдан нэвтрэхын тулд таны вэб хөтөчид зориулагдсан "
+"хэрэгсэл."
 
 msgid "Please install docutils"
 msgstr "docutils ийг суулгана уу"
@@ -143,6 +119,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "Модель: %(name)s"
 
+msgid "Fields"
+msgstr "Талбарууд"
+
 msgid "Field"
 msgstr "Талбар"
 
@@ -151,6 +130,15 @@ msgstr "Төрөл"
 
 msgid "Description"
 msgstr "Товчхон"
+
+msgid "Methods with arguments"
+msgstr "Аргументтэй функцүүд"
+
+msgid "Method"
+msgstr "Функц"
+
+msgid "Arguments"
+msgstr "Аргументүүд"
 
 msgid "Back to Model Documentation"
 msgstr "Моделийн баримтруу буцах"
@@ -251,6 +239,8 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"Функц харах: <code>%(full_name)s</code>. Нэр: <code>%(url_name)s</code>.\n"
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Үнэн худлын аль нэг нь)"

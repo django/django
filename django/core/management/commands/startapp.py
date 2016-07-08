@@ -5,9 +5,10 @@ from django.core.management.templates import TemplateCommand
 
 
 class Command(TemplateCommand):
-    help = ("Creates a Django app directory structure for the given app "
-            "name in the current directory or optionally in the given "
-            "directory.")
+    help = (
+        "Creates a Django app directory structure for the given app name in "
+        "the current directory or optionally in the given directory."
+    )
     missing_args_message = "You must provide an application name."
 
     def handle(self, **options):
@@ -20,8 +21,9 @@ class Command(TemplateCommand):
         except ImportError:
             pass
         else:
-            raise CommandError("%r conflicts with the name of an existing "
-                               "Python module and cannot be used as an app "
-                               "name. Please try another name." % app_name)
+            raise CommandError(
+                "%r conflicts with the name of an existing Python module and "
+                "cannot be used as an app name. Please try another name." % app_name
+            )
 
         super(Command, self).handle('app', app_name, target, **options)

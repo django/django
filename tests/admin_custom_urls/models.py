@@ -1,9 +1,9 @@
 from functools import update_wrapper
 
 from django.contrib import admin
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 
 

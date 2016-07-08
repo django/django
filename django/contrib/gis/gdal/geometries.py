@@ -1,6 +1,6 @@
 """
  The OGRGeometry is a wrapper for using the OGR Geometry class
- (see http://www.gdal.org/ogr/classOGRGeometry.html).  OGRGeometry
+ (see http://www.gdal.org/classOGRGeometry.html).  OGRGeometry
  may be instantiated when reading geometries from OGR Data Sources
  (e.g. SHP files), or when given OGC WKT (a string).
 
@@ -24,7 +24,7 @@
   WGS 84
   >>> print(mpnt.srs.proj)
   +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
-  >>> mpnt.transform_to(SpatialReference('NAD27'))
+  >>> mpnt.transform(SpatialReference('NAD27'))
   >>> print(mpnt.proj)
   +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
   >>> print(mpnt)
@@ -52,11 +52,12 @@ from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
 from django.utils import six
+from django.utils.encoding import force_bytes
 from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr/ogr__api_8h.html
+#  http://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_G_* routines are relevant here.
 class OGRGeometry(GDALBase):
@@ -121,8 +122,10 @@ class OGRGeometry(GDALBase):
 
     def __del__(self):
         "Deletes this Geometry."
-        if self._ptr and capi:
+        try:
             capi.destroy_geom(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     # Pickle routines
     def __getstate__(self):
@@ -147,6 +150,10 @@ class OGRGeometry(GDALBase):
         x0, y0, x1, y1 = bbox
         return OGRGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' % (
             x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
+
+    @classmethod
+    def from_gml(cls, gml_string):
+        return cls(capi.from_gml(force_bytes(gml_string)))
 
     # ### Geometry set-like operations ###
     # g = g1 | g2
@@ -270,6 +277,8 @@ class OGRGeometry(GDALBase):
         elif isinstance(srs, six.integer_types + six.string_types):
             sr = SpatialReference(srs)
             srs_ptr = sr.ptr
+        elif srs is None:
+            srs_ptr = None
         else:
             raise TypeError('Cannot assign spatial reference with object of type: %s' % type(srs))
         capi.assign_srs(self.ptr, srs_ptr)
@@ -284,7 +293,7 @@ class OGRGeometry(GDALBase):
         return None
 
     def _set_srid(self, srid):
-        if isinstance(srid, six.integer_types):
+        if isinstance(srid, six.integer_types) or srid is None:
             self.srs = srid
         else:
             raise TypeError('SRID must be set with an integer.')
@@ -394,10 +403,6 @@ class OGRGeometry(GDALBase):
         else:
             raise TypeError('Transform only accepts CoordTransform, '
                             'SpatialReference, string, and integer objects.')
-
-    def transform_to(self, srs):
-        "For backwards-compatibility."
-        self.transform(srs)
 
     # #### Topology Methods ####
     def _topology(self, func, other):

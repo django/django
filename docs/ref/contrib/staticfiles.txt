@@ -1,6 +1,6 @@
-===================
-The staticfiles app
-===================
+=======================
+The ``staticfiles`` app
+=======================
 
 .. module:: django.contrib.staticfiles
    :synopsis: An app for handling static files.
@@ -34,8 +34,8 @@ Management Commands
 
 ``django.contrib.staticfiles`` exposes three management commands.
 
-collectstatic
--------------
+``collectstatic``
+-----------------
 
 .. django-admin:: collectstatic
 
@@ -49,8 +49,8 @@ can help show you which files are found.
 On subsequent ``collectstatic`` runs (if ``STATIC_ROOT`` isn't empty), files
 are copied only if they have a modified timestamp greater than the timestamp of
 the file in ``STATIC_ROOT``. Therefore if you remove an application from
-:setting:`INSTALLED_APPS`, it's a good idea to use the :djadminopt:`--clear`
-option in order to remove stale static files.
+:setting:`INSTALLED_APPS`, it's a good idea to use the :option:`collectstatic
+--clear` option in order to remove stale static files.
 
 Files are searched by using the :setting:`enabled finders
 <STATICFILES_FINDERS>`. The default is to look in all locations defined in
@@ -88,28 +88,24 @@ Then set the :setting:`STATICFILES_STORAGE` setting to
 
 Some commonly used options are:
 
-.. django-admin-option:: --noinput
+.. django-admin-option:: --noinput, --no-input
 
     Do NOT prompt the user for input of any kind.
 
-.. django-admin-option:: -i <pattern>
-.. django-admin-option:: --ignore <pattern>
+.. django-admin-option:: --ignore PATTERN, -i PATTERN
 
     Ignore files or directories matching this glob-style pattern. Use multiple
     times to ignore more.
 
-.. django-admin-option:: -n
-.. django-admin-option:: --dry-run
+.. django-admin-option:: --dry-run, -n
 
     Do everything except modify the filesystem.
 
-.. django-admin-option:: -c
-.. django-admin-option:: --clear
+.. django-admin-option:: --clear, -c
 
     Clear the existing files before trying to copy or link the original file.
 
-.. django-admin-option:: -l
-.. django-admin-option:: --link
+.. django-admin-option:: --link, -l
 
     Create a symbolic link to each file instead of copying.
 
@@ -128,10 +124,28 @@ For a full list of options, refer to the commands own help by running::
 
    $ python manage.py collectstatic --help
 
-findstatic
-----------
+Customizing the ignored pattern list
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. django-admin:: findstatic
+.. versionadded:: 1.10
+
+The default ignored pattern list, ``['CVS', '.*', '*~']``, can be customized in
+a more persistent way than providing the ``--ignore`` command option at each
+``collectstatic`` invocation. Provide a custom :class:`~django.apps.AppConfig`
+class, override the ``ignore_patterns`` attribute of this class and specify
+that class path inside your :setting:`INSTALLED_APPS` setting:
+
+.. code-block:: python
+
+    from django.contrib.staticfiles.apps import StaticFilesConfig
+
+    class MyStaticFilesConfig(StaticFilesConfig):
+        ignore_patterns = [...]  # your custom ignore list
+
+``findstatic``
+--------------
+
+.. django-admin:: findstatic staticfile [staticfile ...]
 
 Searches for one or more relative paths with the enabled finders.
 
@@ -144,6 +158,8 @@ For example::
    Found 'admin/js/core.js' here:
      /home/polls.com/src/django/contrib/admin/media/js/core.js
 
+.. django-admin-option:: findstatic --first
+
 By default, all matching locations are found. To only return the first match
 for each relative path, use the ``--first`` option::
 
@@ -154,15 +170,15 @@ for each relative path, use the ``--first`` option::
 This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
 
-By setting the :djadminopt:`--verbosity` flag to 0, you can suppress the extra
-output and just get the path names::
+By setting the ``--verbosity`` flag to 0, you can suppress the extra output and
+just get the path names::
 
    $ python manage.py findstatic css/base.css --verbosity 0
    /home/special.polls.com/core/static/css/base.css
    /home/polls.com/core/static/css/base.css
 
-On the other hand, by setting the :djadminopt:`--verbosity` flag to 2, you can
-get all the directories which were searched::
+On the other hand, by setting the ``--verbosity`` flag to 2, you can get all
+the directories which were searched::
 
    $ python manage.py findstatic css/base.css --verbosity 2
    Found 'css/base.css' here:
@@ -175,10 +191,10 @@ get all the directories which were searched::
 
 .. _staticfiles-runserver:
 
-runserver
----------
+``runserver``
+-------------
 
-.. django-admin:: runserver
+.. django-admin:: runserver [addrport]
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
@@ -216,8 +232,8 @@ Example usage::
 Storages
 ========
 
-StaticFilesStorage
-------------------
+``StaticFilesStorage``
+----------------------
 
 .. class:: storage.StaticFilesStorage
 
@@ -236,8 +252,8 @@ The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
 uses this behind the scenes to replace the paths with their hashed
 counterparts and update the cache appropriately.
 
-ManifestStaticFilesStorage
---------------------------
+``ManifestStaticFilesStorage``
+------------------------------
 
 .. class:: storage.ManifestStaticFilesStorage
 
@@ -280,10 +296,15 @@ following requirements are met:
 * the :setting:`STATICFILES_STORAGE` setting is set to
   ``'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
 * the :setting:`DEBUG` setting is set to ``False``
-* you use the ``staticfiles`` :ttag:`static<staticfiles-static>` template
-  tag to refer to your static files in your templates
 * you've collected all your static files by using the
   :djadmin:`collectstatic` management command
+
+.. versionchanged:: 1.10
+
+    In older versions, you also had to use
+    ``{% load static from staticfiles %}`` in your template. The
+    :ttag:`static` template tag (``{% load static %}``) now uses
+    :mod:`django.contrib.staticfiles` if it's installed.
 
 Since creating the MD5 hash can be a performance burden to your website
 during runtime, ``staticfiles`` will automatically store the mapping with
@@ -310,8 +331,8 @@ hashing algorithm.
 .. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
 
-CachedStaticFilesStorage
-------------------------
+``CachedStaticFilesStorage``
+----------------------------
 
 .. class:: storage.CachedStaticFilesStorage
 
@@ -325,38 +346,6 @@ have access to the file system.
 If you want to override certain options of the cache backend the storage uses,
 simply specify a custom entry in the :setting:`CACHES` setting named
 ``'staticfiles'``. It falls back to using the ``'default'`` cache backend.
-
-.. currentmodule:: django.contrib.staticfiles.templatetags.staticfiles
-
-Template tags
-=============
-
-static
-------
-
-.. templatetag:: staticfiles-static
-
-Uses the configured :setting:`STATICFILES_STORAGE` storage to create the
-full URL for the given relative path, e.g.:
-
-.. code-block:: html+django
-
-    {% load static from staticfiles %}
-    <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
-
-The previous example is equal to calling the ``url`` method of an instance of
-:setting:`STATICFILES_STORAGE` with ``"images/hi.jpg"``. This is especially
-useful when using a non-local storage backend to deploy files as documented
-in :ref:`staticfiles-from-cdn`.
-
-If you'd like to retrieve a static URL without displaying it, you can use a
-slightly different call:
-
-.. code-block:: html+django
-
-    {% load static from staticfiles %}
-    {% static "images/hi.jpg" as myphoto %}
-    <img src="{{ myphoto }}" alt="Hi!" />
 
 Finders Module
 ==============
@@ -380,8 +369,10 @@ files:
   which adds :setting:`STATIC_URL` to every template context rendered
   with :class:`~django.template.RequestContext` contexts.
 
-- The builtin template tag :ttag:`static` which takes a path and
-  urljoins it with the static prefix :setting:`STATIC_URL`.
+- The builtin template tag :ttag:`static` which takes a path and urljoins it
+  with the static prefix :setting:`STATIC_URL`. If
+  ``django.contrib.staticfiles`` is installed, the tag uses the ``url()``
+  method of the :setting:`STATICFILES_STORAGE` instead.
 
 - The builtin template tag :ttag:`get_static_prefix` which populates a
   template variable with the static prefix :setting:`STATIC_URL` to be

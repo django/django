@@ -1,0 +1,332 @@
+=============================================
+Django 1.11 release notes - UNDER DEVELOPMENT
+=============================================
+
+Welcome to Django 1.11!
+
+These release notes cover the :ref:`new features <whats-new-1.11>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.11>` you'll
+want to be aware of when upgrading from Django 1.10 or older versions. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-1.11>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 1.11 is designated as a :term:`long-term support release`. It will
+receive security updates for at least three years after its release. Support
+for the previous LTS, Django 1.8, will end 6 months after the release date of
+Django 1.11.
+
+Python compatibility
+====================
+
+Like Django 1.10, Django 1.11 requires Python 2.7, 3.4, or 3.5. We **highly
+recommend** and only officially support the latest release of each series.
+
+The Django 1.11.x series is the last to support Python 2. The next major
+release, Django 2.0, will only support Python 3.5+.
+
+Deprecating warnings are no longer loud by default
+==================================================
+
+Unlike older versions of Django, Django's own deprecation warnings are no
+longer displayed by default. This is consistent with Python's default behavior.
+
+This change allows third-party apps to support both Django 1.11 LTS and Django
+1.8 LTS without having to add code to avoid deprecation warnings.
+
+Following the release of Django 2.0, we suggest that third-party app authors
+drop support for all versions of Django prior to 1.11. At that time, you should
+be able run your package's tests using ``python -Wd`` so that deprecation
+warnings do appear. After making the deprecation warning fixes, your app should
+be compatible with Django 2.0.
+
+.. _whats-new-1.11:
+
+What's new in Django 1.11
+=========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :attr:`.ModelAdmin.date_hierarchy` can now reference fields across relations.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased by
+  20%.
+
+* The :class:`~django.contrib.auth.views.LoginView` and
+  :class:`~django.contrib.auth.views.LogoutView` class-based views supersede the
+  deprecated ``login()`` and ``logout()`` function-based views.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* When stale content types are detected during a management command, there is
+  now an expansive list of objects that will be deleted. Previously, only
+  the content type objects themselves were listed, even if there were objects
+  with foreign keys towards the content types that would be deleted also.
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :meth:`.GEOSGeometry.from_gml` and :meth:`.OGRGeometry.from_gml`
+  methods allow creating geometries from GML.
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new ``distinct`` argument for
+  :class:`~django.contrib.postgres.aggregates.StringAgg` determines if
+  concatenated values will be distinct.
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* Added the :setting:`EMAIL_USE_LOCALTIME` setting to allow sending SMTP date
+  headers in the local time zone rather than in UTC.
+
+File Storage
+~~~~~~~~~~~~
+
+* To make it wrappable by :class:`io.TextIOWrapper`,
+  :class:`~django.core.files.File` now has the ``readable()``, ``writable()``,
+  and ``seekable()`` methods.
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* The new :attr:`CharField.empty_value <django.forms.CharField.empty_value>`
+  attribute allows specifying the Python value to use to represent "empty".
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* Number formatting and the :setting:`NUMBER_GROUPING` setting support
+  non-uniform digit grouping.
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* The new :option:`loaddata --exclude` option allows excluding models and apps
+  while loading data from fixtures.
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* Added support for callable values in the ``defaults`` argument of
+  :meth:`QuerySet.update_or_create()
+  <django.db.models.query.QuerySet.update_or_create>` and
+  :meth:`~django.db.models.query.QuerySet.get_or_create`.
+
+* :class:`~django.db.models.ImageField` now has a default
+  :data:`~django.core.validators.validate_image_file_extension` validator.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Added :meth:`QueryDict.fromkeys() <django.http.QueryDict.fromkeys>`.
+
+* :class:`~django.middleware.common.CommonMiddleware` now sets the
+  ``Content-Length`` response header for non-streaming responses.
+
+Serialization
+~~~~~~~~~~~~~
+
+* The new ``django.core.serializers.base.Serializer.stream_class`` attribute
+  allows subclasses to customize the default stream.
+
+* The encoder used by the :ref:`JSON serializer <serialization-formats-json>`
+  can now be customized by passing a ``cls`` keyword argument to the
+  ``serializers.serialize()`` function.
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* :meth:`~django.utils.safestring.mark_safe` can now be used as a decorator.
+
+* The :class:`~django.template.backends.jinja2.Jinja2` template backend now
+  supports context processors by setting the ``'context_processors'`` option in
+  :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* Added :class:`~django.core.validators.FileExtensionValidator` to validate
+  file extensions and
+  :data:`~django.core.validators.validate_image_file_extension` to validate
+  image files.
+
+.. _backwards-incompatible-1.11:
+
+Backwards incompatible changes in 1.11
+======================================
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* To simplify the codebase and because it's easier to install than when
+  ``contrib.gis`` was first released, :ref:`gdalbuild` is now a required
+  dependency for GeoDjango. In older versions, it's only required for SQLite.
+
+Database backend API
+--------------------
+
+* ...
+
+Dropped support for PostgreSQL 9.2 and PostGIS 2.0
+--------------------------------------------------
+
+Upstream support for PostgreSQL 9.2 ends in September 2017. As a consequence,
+Django 1.11 sets PostgreSQL 9.3 as the minimum version it officially supports.
+
+Support for PostGIS 2.0 is also removed as PostgreSQL 9.2 is the last version
+to support it.
+
+``LiveServerTestCase`` binds to port zero
+-----------------------------------------
+
+Rather than taking a port range and iterating to find a free port,
+``LiveServerTestCase`` binds to port zero and relies on the operating system
+to assign a free port. The ``DJANGO_LIVE_TEST_SERVER_ADDRESS`` environment
+variable is no longer used, and as it's also no longer used, the
+``manage.py test --liveserver`` option is removed.
+
+Miscellaneous
+-------------
+
+* If no items in the feed have a ``pubdate`` or ``updateddate`` attribute,
+  :meth:`SyndicationFeed.latest_post_date()
+  <django.utils.feedgenerator.SyndicationFeed.latest_post_date>` now returns
+  the current UTC date/time, instead of a datetime without any timezone
+  information.
+
+* Support for SpatiaLite < 4.0 is dropped.
+
+* CSRF failures are logged to the ``django.security.csrf`` logger instead of
+  ``django.request``.
+
+* :setting:`ALLOWED_HOSTS` validation is no longer disabled when running tests.
+  If your application includes tests with custom host names, you must include
+  those host names in :setting:`ALLOWED_HOSTS`. See
+  :ref:`topics-testing-advanced-multiple-hosts`.
+
+* Using a foreign key's id (e.g. ``'field_id'``) in ``ModelAdmin.list_display``
+  displays the related object's ID. Remove the ``_id`` suffix if you want the
+  old behavior of the string representation of the object.
+
+* In model forms, :class:`~django.db.models.CharField` with ``null=True`` now
+  saves ``NULL`` for blank values instead of empty strings.
+
+* On Oracle, :meth:`Model.validate_unique()
+  <django.db.models.Model.validate_unique>` no longer checks empty strings for
+  uniqueness as the database interprets the value as ``NULL``.
+
+* If you subclass :class:`.AbstractUser` and override ``clean()``, be sure it
+  calls ``super()``. :meth:`.BaseUserManager.normalize_email` is called in a
+  new :meth:`.AbstractUser.clean` method so that normalization is applied in
+  cases like model form validation.
+
+.. _deprecated-features-1.11:
+
+Features deprecated in 1.11
+===========================
+
+Miscellaneous
+-------------
+
+* ``contrib.auth``’s ``login()`` and ``logout()`` function-based views are
+  deprecated in favor of new class-based views
+  :class:`~django.contrib.auth.views.LoginView` and
+  :class:`~django.contrib.auth.views.LogoutView`.

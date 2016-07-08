@@ -13,6 +13,7 @@ from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
+from django.core.management.utils import parse_apps_and_model_labels
 from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connections, router,
     transaction,
@@ -32,29 +33,37 @@ except ImportError:
 
 class Command(BaseCommand):
     help = 'Installs the named fixture(s) in the database.'
-    missing_args_message = ("No database fixture specified. Please provide the "
-                            "path of at least one fixture in the command line.")
+    missing_args_message = (
+        "No database fixture specified. Please provide the path of at least "
+        "one fixture in the command line."
+    )
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='fixture', nargs='+',
-            help='Fixture labels.')
-        parser.add_argument('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
-            'fixtures into. Defaults to the "default" database.')
-        parser.add_argument('--app', action='store', dest='app_label',
-            default=None, help='Only look for fixtures in the specified app.')
-        parser.add_argument('--ignorenonexistent', '-i', action='store_true',
-            dest='ignore', default=False,
+        parser.add_argument('args', metavar='fixture', nargs='+', help='Fixture labels.')
+        parser.add_argument(
+            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a specific database to load fixtures into. Defaults to the "default" database.',
+        )
+        parser.add_argument(
+            '--app', action='store', dest='app_label', default=None,
+            help='Only look for fixtures in the specified app.',
+        )
+        parser.add_argument(
+            '--ignorenonexistent', '-i', action='store_true', dest='ignore', default=False,
             help='Ignores entries in the serialized data for fields that do not '
-            'currently exist on the model.')
+                 'currently exist on the model.',
+        )
+        parser.add_argument(
+            '-e', '--exclude', dest='exclude', action='append', default=[],
+            help='An app_label or app_label.ModelName to exclude. Can be used multiple times.',
+        )
 
     def handle(self, *fixture_labels, **options):
-
-        self.ignore = options.get('ignore')
-        self.using = options.get('database')
-        self.app_label = options.get('app_label')
-        self.hide_empty = options.get('hide_empty', False)
-        self.verbosity = options.get('verbosity')
+        self.ignore = options['ignore']
+        self.using = options['database']
+        self.app_label = options['app_label']
+        self.verbosity = options['verbosity']
+        self.excluded_models, self.excluded_apps = parse_apps_and_model_labels(options['exclude'])
 
         with transaction.atomic(using=self.using):
             self.loaddata(fixture_labels)
@@ -85,6 +94,16 @@ class Command(BaseCommand):
         if has_bz2:
             self.compression_formats['bz2'] = (bz2.BZ2File, 'r')
 
+        # Django's test suite repeatedly tries to load initial_data fixtures
+        # from apps that don't have any fixtures. Because disabling constraint
+        # checks can be expensive on some database (especially MSSQL), bail
+        # out early if no fixtures are found.
+        for fixture_label in fixture_labels:
+            if self.find_fixtures(fixture_label):
+                break
+        else:
+            return
+
         with connection.constraint_checks_disabled():
             for fixture_label in fixture_labels:
                 self.load_label(fixture_label)
@@ -110,14 +129,16 @@ class Command(BaseCommand):
                         cursor.execute(line)
 
         if self.verbosity >= 1:
-            if self.fixture_count == 0 and self.hide_empty:
-                pass
-            elif self.fixture_object_count == self.loaded_object_count:
-                self.stdout.write("Installed %d object(s) from %d fixture(s)" %
-                    (self.loaded_object_count, self.fixture_count))
+            if self.fixture_object_count == self.loaded_object_count:
+                self.stdout.write(
+                    "Installed %d object(s) from %d fixture(s)"
+                    % (self.loaded_object_count, self.fixture_count)
+                )
             else:
-                self.stdout.write("Installed %d object(s) (of %d) from %d fixture(s)" %
-                    (self.loaded_object_count, self.fixture_object_count, self.fixture_count))
+                self.stdout.write(
+                    "Installed %d object(s) (of %d) from %d fixture(s)"
+                    % (self.loaded_object_count, self.fixture_object_count, self.fixture_count)
+                )
 
     def load_label(self, fixture_label):
         """
@@ -133,14 +154,20 @@ class Command(BaseCommand):
                 objects_in_fixture = 0
                 loaded_objects_in_fixture = 0
                 if self.verbosity >= 2:
-                    self.stdout.write("Installing %s fixture '%s' from %s." %
-                        (ser_fmt, fixture_name, humanize(fixture_dir)))
+                    self.stdout.write(
+                        "Installing %s fixture '%s' from %s."
+                        % (ser_fmt, fixture_name, humanize(fixture_dir))
+                    )
 
-                objects = serializers.deserialize(ser_fmt, fixture,
-                    using=self.using, ignorenonexistent=self.ignore)
+                objects = serializers.deserialize(
+                    ser_fmt, fixture, using=self.using, ignorenonexistent=self.ignore,
+                )
 
                 for obj in objects:
                     objects_in_fixture += 1
+                    if (obj.object._meta.app_config in self.excluded_apps or
+                            type(obj.object) in self.excluded_models):
+                        continue
                     if router.allow_migrate_model(self.using, obj.object.__class__):
                         loaded_objects_in_fixture += 1
                         self.models.add(obj.object.__class__)
@@ -201,8 +228,10 @@ class Command(BaseCommand):
                                 for dir_ in fixture_dirs]
                 fixture_name = os.path.basename(fixture_name)
 
-        suffixes = ('.'.join(ext for ext in combo if ext)
-                for combo in product(databases, ser_fmts, cmp_fmts))
+        suffixes = (
+            '.'.join(ext for ext in combo if ext)
+            for combo in product(databases, ser_fmts, cmp_fmts)
+        )
         targets = set('.'.join((fixture_name, suffix)) for suffix in suffixes)
 
         fixture_files = []
@@ -229,8 +258,7 @@ class Command(BaseCommand):
             fixture_files.extend(fixture_files_in_dir)
 
         if not fixture_files:
-            # Warning kept for backwards-compatibility; why not an exception?
-            warnings.warn("No fixture named '%s' found." % fixture_name)
+            raise CommandError("No fixture named '%s' found." % fixture_name)
 
         return fixture_files
 

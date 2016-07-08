@@ -35,10 +35,7 @@ class OpenLayersWidget(Textarea):
             try:
                 value = GEOSGeometry(value)
             except (GEOSException, ValueError) as err:
-                logger.error(
-                    "Error creating geometry from value '%s' (%s)" % (
-                        value, err)
-                )
+                logger.error("Error creating geometry from value '%s' (%s)", value, err)
                 value = None
 
         if (value and value.geom_type.upper() != self.geom_type and
@@ -68,8 +65,8 @@ class OpenLayersWidget(Textarea):
                     wkt = ogr.wkt
                 except GDALException as err:
                     logger.error(
-                        "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
-                            value.srid, srid, err)
+                        "Error transforming geometry from srid '%s' to srid '%s' (%s)",
+                        value.srid, srid, err
                     )
                     wkt = ''
             else:

@@ -17,6 +17,24 @@ __all__ = [
 class RangeField(models.Field):
     empty_strings_allowed = False
 
+    def __init__(self, *args, **kwargs):
+        # Initializing base_field here ensures that its model matches the model for self.
+        if hasattr(self, 'base_field'):
+            self.base_field = self.base_field()
+        super(RangeField, self).__init__(*args, **kwargs)
+
+    @property
+    def model(self):
+        try:
+            return self.__dict__['model']
+        except KeyError:
+            raise AttributeError("'%s' object has no attribute 'model'" % self.__class__.__name__)
+
+    @model.setter
+    def model(self, model):
+        self.__dict__['model'] = model
+        self.base_field.model = model
+
     def get_prep_value(self, value):
         if value is None:
             return None
@@ -43,7 +61,7 @@ class RangeField(models.Field):
         self.base_field.set_attributes_from_name(name)
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
+        value = self.value_from_object(obj)
         if value is None:
             return None
         if value.isempty:
@@ -51,8 +69,12 @@ class RangeField(models.Field):
         base_field = self.base_field
         result = {"bounds": value._bounds}
         for end in ('lower', 'upper'):
-            obj = AttributeSetter(base_field.attname, getattr(value, end))
-            result[end] = base_field.value_to_string(obj)
+            val = getattr(value, end)
+            if val is None:
+                result[end] = None
+            else:
+                obj = AttributeSetter(base_field.attname, val)
+                result[end] = base_field.value_to_string(obj)
         return json.dumps(result)
 
     def formfield(self, **kwargs):
@@ -61,7 +83,7 @@ class RangeField(models.Field):
 
 
 class IntegerRangeField(RangeField):
-    base_field = models.IntegerField()
+    base_field = models.IntegerField
     range_type = NumericRange
     form_field = forms.IntegerRangeField
 
@@ -70,7 +92,7 @@ class IntegerRangeField(RangeField):
 
 
 class BigIntegerRangeField(RangeField):
-    base_field = models.BigIntegerField()
+    base_field = models.BigIntegerField
     range_type = NumericRange
     form_field = forms.IntegerRangeField
 
@@ -79,7 +101,7 @@ class BigIntegerRangeField(RangeField):
 
 
 class FloatRangeField(RangeField):
-    base_field = models.FloatField()
+    base_field = models.FloatField
     range_type = NumericRange
     form_field = forms.FloatRangeField
 
@@ -88,7 +110,7 @@ class FloatRangeField(RangeField):
 
 
 class DateTimeRangeField(RangeField):
-    base_field = models.DateTimeField()
+    base_field = models.DateTimeField
     range_type = DateTimeTZRange
     form_field = forms.DateTimeRangeField
 
@@ -97,7 +119,7 @@ class DateTimeRangeField(RangeField):
 
 
 class DateRangeField(RangeField):
-    base_field = models.DateField()
+    base_field = models.DateField
     range_type = DateRange
     form_field = forms.DateRangeField
 
@@ -132,7 +154,7 @@ class RangeContainedBy(models.Lookup):
         return sql % (lhs, rhs), params
 
     def get_prep_lookup(self):
-        return RangeField().get_prep_lookup(self.lookup_name, self.rhs)
+        return RangeField().get_prep_value(self.rhs)
 
 
 models.DateField.register_lookup(RangeContainedBy)
@@ -173,7 +195,7 @@ class AdjacentToLookup(lookups.PostgresSimpleLookup):
 
 
 @RangeField.register_lookup
-class RangeStartsWith(lookups.FunctionTransform):
+class RangeStartsWith(models.Transform):
     lookup_name = 'startswith'
     function = 'lower'
 
@@ -183,7 +205,7 @@ class RangeStartsWith(lookups.FunctionTransform):
 
 
 @RangeField.register_lookup
-class RangeEndsWith(lookups.FunctionTransform):
+class RangeEndsWith(models.Transform):
     lookup_name = 'endswith'
     function = 'upper'
 
@@ -193,7 +215,7 @@ class RangeEndsWith(lookups.FunctionTransform):
 
 
 @RangeField.register_lookup
-class IsEmpty(lookups.FunctionTransform):
+class IsEmpty(models.Transform):
     lookup_name = 'isempty'
     function = 'isempty'
     output_field = models.BooleanField()

@@ -39,7 +39,7 @@ CONTEXT_SEPARATOR = "\x04"
 # and RFC 3066, section 2.1
 accept_language_re = re.compile(r'''
         ([A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*|\*)      # "en", "en-au", "x-y-z", "es-419", "*"
-        (?:\s*;\s*q=(0(?:\.\d{,3})?|1(?:.0{,3})?))?   # Optional "q=1.00", "q=0.8"
+        (?:\s*;\s*q=(0(?:\.\d{,3})?|1(?:\.0{,3})?))?  # Optional "q=1.00", "q=0.8"
         (?:\s*,\s*|$)                                 # Multiple accepts per header.
         ''', re.VERBOSE)
 
@@ -100,18 +100,45 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     requested language and add a fallback to the default language, if it's
     different from the requested language.
     """
-    def __init__(self, language):
+    domain = 'django'
+
+    def __init__(self, language, domain=None, localedirs=None):
         """Create a GNUTranslations() using many locale directories"""
         gettext_module.GNUTranslations.__init__(self)
+        if domain is not None:
+            self.domain = domain
+        self.set_output_charset('utf-8')  # For Python 2 gettext() (#25720)
 
         self.__language = language
         self.__to_language = to_language(language)
         self.__locale = to_locale(language)
+        self._catalog = None
+        # If a language doesn't have a catalog, use the Germanic default for
+        # pluralization: anything except one is pluralized.
+        self.plural = lambda n: int(n != 1)
 
-        self._init_translation_catalog()
-        self._add_installed_apps_translations()
+        if self.domain == 'django':
+            if localedirs is not None:
+                # A module-level cache is used for caching 'django' translations
+                warnings.warn("localedirs is ignored when domain is 'django'.", RuntimeWarning)
+                localedirs = None
+            self._init_translation_catalog()
+
+        if localedirs:
+            for localedir in localedirs:
+                translation = self._new_gnu_trans(localedir)
+                self.merge(translation)
+        else:
+            self._add_installed_apps_translations()
+
         self._add_local_translations()
-        self._add_fallback()
+        if self.__language == settings.LANGUAGE_CODE and self.domain == 'django' and self._catalog is None:
+            # default lang should have at least one translation file available.
+            raise IOError("No translation files found for default language %s." % settings.LANGUAGE_CODE)
+        self._add_fallback(localedirs)
+        if self._catalog is None:
+            # No catalogs found for this language, set an empty catalog.
+            self._catalog = {}
 
     def __repr__(self):
         return "<DjangoTranslation lang:%s>" % self.__language
@@ -124,32 +151,19 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         Using param `use_null_fallback` to avoid confusion with any other
         references to 'fallback'.
         """
-        translation = gettext_module.translation(
-            domain='django',
+        return gettext_module.translation(
+            domain=self.domain,
             localedir=localedir,
             languages=[self.__locale],
             codeset='utf-8',
             fallback=use_null_fallback)
-        if not hasattr(translation, '_catalog'):
-            # provides merge support for NullTranslations()
-            translation._catalog = {}
-            translation._info = {}
-            translation.plural = lambda n: int(n != 1)
-        return translation
 
     def _init_translation_catalog(self):
         """Creates a base catalog using global django translations."""
         settingsfile = upath(sys.modules[settings.__module__].__file__)
         localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
-        use_null_fallback = True
-        if self.__language == settings.LANGUAGE_CODE:
-            # default lang should be present and parseable, if not
-            # gettext will raise an IOError (refs #18192).
-            use_null_fallback = False
-        translation = self._new_gnu_trans(localedir, use_null_fallback)
-        self.plural = translation.plural
-        self._info = translation._info.copy()
-        self._catalog = translation._catalog.copy()
+        translation = self._new_gnu_trans(localedir)
+        self.merge(translation)
 
     def _add_installed_apps_translations(self):
         """Merges translations from each installed app."""
@@ -171,18 +185,32 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             translation = self._new_gnu_trans(localedir)
             self.merge(translation)
 
-    def _add_fallback(self):
+    def _add_fallback(self, localedirs=None):
         """Sets the GNUTranslations() fallback with the default language."""
         # Don't set a fallback for the default language or any English variant
         # (as it's empty, so it'll ALWAYS fall back to the default language)
         if self.__language == settings.LANGUAGE_CODE or self.__language.startswith('en'):
             return
-        default_translation = translation(settings.LANGUAGE_CODE)
+        if self.domain == 'django':
+            # Get from cache
+            default_translation = translation(settings.LANGUAGE_CODE)
+        else:
+            default_translation = DjangoTranslation(
+                settings.LANGUAGE_CODE, domain=self.domain, localedirs=localedirs
+            )
         self.add_fallback(default_translation)
 
     def merge(self, other):
         """Merge another translation into this catalog."""
-        self._catalog.update(other._catalog)
+        if not getattr(other, '_catalog', None):
+            return  # NullTranslations() has no _catalog
+        if self._catalog is None:
+            # Take plural and _info from first catalog found (generally Django's).
+            self.plural = other.plural
+            self._info = other._info.copy()
+            self._catalog = other._catalog.copy()
+        else:
+            self._catalog.update(other._catalog)
 
     def language(self):
         """Returns the translation language."""
@@ -195,7 +223,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
 def translation(language):
     """
-    Returns a translation object.
+    Returns a translation object in the default 'django' domain.
     """
     global _translations
     if language not in _translations:
@@ -529,12 +557,18 @@ def blankout(src, char):
 
 
 context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
-inline_re = re.compile(r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*""")
+inline_re = re.compile(
+    # Match the trans 'some text' part
+    r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))"""
+    # Match and ignore optional filters
+    r"""(?:\s*\|\s*[^\s:]+(?::(?:[^\s'":]+|(?:"[^"]*?")|(?:'[^']*?')))?)*"""
+    # Match the optional context part
+    r"""(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*"""
+)
 block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
-one_percent_re = re.compile(r"""(?<!%)%(?!%)""")
 
 
 def templatize(src, origin=None):
@@ -543,8 +577,10 @@ def templatize(src, origin=None):
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    from django.template.base import (Lexer, TOKEN_TEXT, TOKEN_VAR,
-        TOKEN_BLOCK, TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
+    from django.template.base import (
+        Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK, TOKEN_COMMENT,
+        TRANSLATOR_COMMENT_MARK,
+    )
     src = force_text(src, settings.FILE_CHARSET)
     out = StringIO('')
     message_context = None
@@ -557,6 +593,9 @@ def templatize(src, origin=None):
     comment = []
     lineno_comment_map = {}
     comment_lineno_cache = None
+    # Adding the u prefix allows gettext to recognize the Unicode string
+    # (#26093).
+    raw_prefix = 'u' if six.PY3 else ''
 
     def join_tokens(tokens, trim=False):
         message = ''.join(tokens)
@@ -588,26 +627,34 @@ def templatize(src, origin=None):
                 if endbmatch:
                     if inplural:
                         if message_context:
-                            out.write(' npgettext(%r, %r, %r,count) ' % (
+                            out.write(' npgettext({p}{!r}, {p}{!r}, {p}{!r},count) '.format(
                                 message_context,
                                 join_tokens(singular, trimmed),
-                                join_tokens(plural, trimmed)))
+                                join_tokens(plural, trimmed),
+                                p=raw_prefix,
+                            ))
                         else:
-                            out.write(' ngettext(%r, %r, count) ' % (
+                            out.write(' ngettext({p}{!r}, {p}{!r}, count) '.format(
                                 join_tokens(singular, trimmed),
-                                join_tokens(plural, trimmed)))
+                                join_tokens(plural, trimmed),
+                                p=raw_prefix,
+                            ))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                         for part in plural:
                             out.write(blankout(part, 'P'))
                     else:
                         if message_context:
-                            out.write(' pgettext(%r, %r) ' % (
+                            out.write(' pgettext({p}{!r}, {p}{!r}) '.format(
                                 message_context,
-                                join_tokens(singular, trimmed)))
+                                join_tokens(singular, trimmed),
+                                p=raw_prefix,
+                            ))
                         else:
-                            out.write(' gettext(%r) ' % join_tokens(singular,
-                                                                    trimmed))
+                            out.write(' gettext({p}{!r}) '.format(
+                                join_tokens(singular, trimmed),
+                                p=raw_prefix,
+                            ))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                     message_context = None
@@ -631,7 +678,7 @@ def templatize(src, origin=None):
                 else:
                     singular.append('%%(%s)s' % t.contents)
             elif t.token_type == TOKEN_TEXT:
-                contents = one_percent_re.sub('%%', t.contents)
+                contents = t.contents.replace('%', '%%')
                 if inplural:
                     plural.append(contents)
                 else:
@@ -648,9 +695,11 @@ def templatize(src, origin=None):
                             filemsg = ''
                             if origin:
                                 filemsg = 'file %s, ' % origin
-                            warn_msg = ("The translator-targeted comment '%s' "
-                                "(%sline %d) was ignored, because it wasn't the last item "
-                                "on the line.") % (c, filemsg, comment_lineno_cache)
+                            warn_msg = (
+                                "The translator-targeted comment '%s' "
+                                "(%sline %d) was ignored, because it wasn't "
+                                "the last item on the line."
+                            ) % (c, filemsg, comment_lineno_cache)
                             warnings.warn(warn_msg, TranslatorCommentWarning)
                         lineno_comment_map[comment_lineno_cache] = []
                 else:
@@ -667,7 +716,7 @@ def templatize(src, origin=None):
                         g = g.strip('"')
                     elif g[0] == "'":
                         g = g.strip("'")
-                    g = one_percent_re.sub('%%', g)
+                    g = g.replace('%', '%%')
                     if imatch.group(2):
                         # A context is provided
                         context_match = context_re.match(imatch.group(2))
@@ -676,10 +725,12 @@ def templatize(src, origin=None):
                             message_context = message_context.strip('"')
                         elif message_context[0] == "'":
                             message_context = message_context.strip("'")
-                        out.write(' pgettext(%r, %r) ' % (message_context, g))
+                        out.write(' pgettext({p}{!r}, {p}{!r}) '.format(
+                            message_context, g, p=raw_prefix
+                        ))
                         message_context = None
                     else:
-                        out.write(' gettext(%r) ' % g)
+                        out.write(' gettext({p}{!r}) '.format(g, p=raw_prefix))
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(' _(%s) ' % fmatch)
@@ -739,11 +790,8 @@ def parse_accept_lang_header(lang_string):
         if first:
             return []
         if priority:
-            try:
-                priority = float(priority)
-            except ValueError:
-                return []
-        if not priority:        # if priority is 0.0 at this point make it 1.0
+            priority = float(priority)
+        else:
             priority = 1.0
         result.append((lang, priority))
     result.sort(key=lambda k: k[1], reverse=True)

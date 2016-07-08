@@ -18,7 +18,7 @@ class Item(models.Model):
 
 
 class RelatedItem(models.Model):
-    item = models.ForeignKey(Item)
+    item = models.ForeignKey(Item, models.CASCADE)
 
 
 class ProxyRelated(RelatedItem):
@@ -34,8 +34,8 @@ class Child(models.Model):
 @python_2_unicode_compatible
 class Leaf(models.Model):
     name = models.CharField(max_length=10)
-    child = models.ForeignKey(Child)
-    second_child = models.ForeignKey(Child, related_name="other", null=True)
+    child = models.ForeignKey(Child, models.CASCADE)
+    second_child = models.ForeignKey(Child, models.SET_NULL, related_name="other", null=True)
     value = models.IntegerField(default=42)
 
     def __str__(self):
@@ -62,21 +62,21 @@ class SimpleItem(models.Model):
 
 
 class Feature(models.Model):
-    item = models.ForeignKey(SimpleItem)
+    item = models.ForeignKey(SimpleItem, models.CASCADE)
 
 
 class SpecialFeature(models.Model):
-    feature = models.ForeignKey(Feature)
+    feature = models.ForeignKey(Feature, models.CASCADE)
 
 
 class OneToOneItem(models.Model):
-    item = models.OneToOneField(Item, related_name="one_to_one_item")
+    item = models.OneToOneField(Item, models.CASCADE, related_name="one_to_one_item")
     name = models.CharField(max_length=15)
 
 
 class ItemAndSimpleItem(models.Model):
-    item = models.ForeignKey(Item)
-    simple = models.ForeignKey(SimpleItem)
+    item = models.ForeignKey(Item, models.CASCADE)
+    simple = models.ForeignKey(SimpleItem, models.CASCADE)
 
 
 class Profile(models.Model):
@@ -88,8 +88,8 @@ class Location(models.Model):
 
 
 class Request(models.Model):
-    profile = models.ForeignKey(Profile, null=True, blank=True)
-    location = models.ForeignKey(Location)
+    profile = models.ForeignKey(Profile, models.SET_NULL, null=True, blank=True)
+    location = models.ForeignKey(Location, models.CASCADE)
     items = models.ManyToManyField(Item)
 
     request1 = models.CharField(default='request1', max_length=1000)

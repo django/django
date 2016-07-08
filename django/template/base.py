@@ -35,7 +35,7 @@ will be raised if the template doesn't have proper syntax.
 Sample code:
 
 >>> from django import template
->>> s = u'<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>'
+>>> s = '<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>'
 >>> t = template.Template(s)
 
 (t is now a compiled template, and its render() method can be called multiple
@@ -43,10 +43,10 @@ times with multiple contexts)
 
 >>> c = template.Context({'test':True, 'varvalue': 'Hello'})
 >>> t.render(c)
-u'<html><h1>Hello</h1></html>'
+'<html><h1>Hello</h1></html>'
 >>> c = template.Context({'test':False, 'varvalue': 'Hello'})
 >>> t.render(c)
-u'<html></html>'
+'<html></html>'
 """
 
 from __future__ import unicode_literals
@@ -60,7 +60,9 @@ from django.template.context import (  # NOQA: imported for backwards compatibil
     BaseContext, Context, ContextPopException, RequestContext,
 )
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils.deprecation import (
+    DeprecationInstanceCheck, RemovedInDjango20Warning,
+)
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
@@ -102,9 +104,6 @@ COMMENT_TAG_END = '#}'
 TRANSLATOR_COMMENT_MARK = 'Translators'
 SINGLE_BRACE_START = '{'
 SINGLE_BRACE_END = '}'
-
-ALLOWED_VARIABLE_CHARS = ('abcdefghijklmnopqrstuvwxyz'
-                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.')
 
 # what to report as the origin for templates that come from non-loader sources
 # (e.g. strings)
@@ -153,12 +152,20 @@ class Origin(object):
             self.loader == other.loader
         )
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @property
     def loader_name(self):
         if self.loader:
             return '%s.%s' % (
                 self.loader.__module__, self.loader.__class__.__name__,
             )
+
+
+class StringOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
+    alternative = 'django.template.Origin'
+    deprecation_warning = RemovedInDjango20Warning
 
 
 class Template(object):
@@ -219,6 +226,7 @@ class Template(object):
         tokens = lexer.tokenize()
         parser = Parser(
             tokens, self.engine.template_libraries, self.engine.template_builtins,
+            self.origin,
         )
 
         try:
@@ -351,9 +359,9 @@ class Token(object):
         for bit in bits:
             # Handle translation-marked template pieces
             if bit.startswith(('_("', "_('")):
-                sentinal = bit[2] + ')'
+                sentinel = bit[2] + ')'
                 trans_bit = [bit]
-                while not bit.endswith(sentinal):
+                while not bit.endswith(sentinel):
                     bit = next(bits)
                     trans_bit.append(bit)
                 bit = ' '.join(trans_bit)
@@ -439,7 +447,7 @@ class DebugLexer(Lexer):
 
 
 class Parser(object):
-    def __init__(self, tokens, libraries=None, builtins=None):
+    def __init__(self, tokens, libraries=None, builtins=None, origin=None):
         self.tokens = tokens
         self.tags = {}
         self.filters = {}
@@ -453,10 +461,11 @@ class Parser(object):
         self.libraries = libraries
         for builtin in builtins:
             self.add_library(builtin)
+        self.origin = origin
 
     def parse(self, parse_until=None):
         """
-        Iterate through the parser tokens and compils each one into a node.
+        Iterate through the parser tokens and compiles each one into a node.
 
         If parse_until is provided, parsing will stop once one of the
         specified tokens has been reached. This is formatted as a list of
@@ -473,7 +482,7 @@ class Parser(object):
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
             elif token.token_type == 1:  # TOKEN_VAR
                 if not token.contents:
-                    raise self.error(token, 'Empty variable tag')
+                    raise self.error(token, 'Empty variable tag on line %d' % token.lineno)
                 try:
                     filter_expression = self.compile_filter(token.contents)
                 except TemplateSyntaxError as e:
@@ -484,7 +493,7 @@ class Parser(object):
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
-                    raise self.error(token, 'Empty block tag')
+                    raise self.error(token, 'Empty block tag on line %d' % token.lineno)
                 if command in parse_until:
                     # A matching token has been reached. Return control to
                     # the caller. Put the token back on the token list so the
@@ -529,8 +538,10 @@ class Parser(object):
             )
         if isinstance(nodelist, NodeList) and not isinstance(node, TextNode):
             nodelist.contains_nontext = True
-        # Set token here since we can't modify the node __init__ method
+        # Set origin and token here since we can't modify the node __init__()
+        # method.
         node.token = token
+        node.origin = self.origin
         nodelist.append(node)
 
     def error(self, token, e):
@@ -548,13 +559,28 @@ class Parser(object):
 
     def invalid_block_tag(self, token, command, parse_until=None):
         if parse_until:
-            raise self.error(token, "Invalid block tag: '%s', expected %s" %
-                (command, get_text_list(["'%s'" % p for p in parse_until])))
-        raise self.error(token, "Invalid block tag: '%s'" % command)
+            raise self.error(
+                token,
+                "Invalid block tag on line %d: '%s', expected %s. Did you "
+                "forget to register or load this tag?" % (
+                    token.lineno,
+                    command,
+                    get_text_list(["'%s'" % p for p in parse_until], 'or'),
+                ),
+            )
+        raise self.error(
+            token,
+            "Invalid block tag on line %d: '%s'. Did you forget to register "
+            "or load this tag?" % (token.lineno, command)
+        )
 
     def unclosed_block_tag(self, parse_until):
         command, token = self.command_stack.pop()
-        msg = "Unclosed tag '%s'. Looking for one of: %s." % (command, ', '.join(parse_until))
+        msg = "Unclosed tag on line %d: '%s'. Looking for one of: %s." % (
+            token.lineno,
+            command,
+            ', '.join(parse_until),
+        )
         raise self.error(token, msg)
 
     def next_token(self):
@@ -697,6 +723,7 @@ class FilterExpression(object):
                         obj = string_if_invalid
         else:
             obj = self.var
+        escape_isnt_last_filter = True
         for func, args in self.filters:
             arg_vals = []
             for lookup, arg in args:
@@ -713,9 +740,21 @@ class FilterExpression(object):
             if getattr(func, 'is_safe', False) and isinstance(obj, SafeData):
                 obj = mark_safe(new_obj)
             elif isinstance(obj, EscapeData):
-                obj = mark_for_escaping(new_obj)
+                with warnings.catch_warnings():
+                    # Ignore mark_for_escaping deprecation as this will be
+                    # removed in Django 2.0.
+                    warnings.simplefilter('ignore', category=RemovedInDjango20Warning)
+                    obj = mark_for_escaping(new_obj)
+                    escape_isnt_last_filter = False
             else:
                 obj = new_obj
+        if not escape_isnt_last_filter:
+            warnings.warn(
+                "escape isn't the last filter in %s and will be applied "
+                "immediately in Django 2.0 so the output may change."
+                % [func.__name__ for func, _ in self.filters],
+                RemovedInDjango20Warning, stacklevel=2
+            )
         return obj
 
     def args_check(name, func, provided):
@@ -740,34 +779,21 @@ class FilterExpression(object):
         return self.token
 
 
-def resolve_variable(path, context):
-    """
-    Returns the resolved variable, which may contain attribute syntax, within
-    the given context.
-
-    Deprecated; use the Variable class instead.
-    """
-    warnings.warn("resolve_variable() is deprecated. Use django.template."
-                  "Variable(path).resolve(context) instead",
-                  RemovedInDjango110Warning, stacklevel=2)
-    return Variable(path).resolve(context)
-
-
 class Variable(object):
     """
     A template variable, resolvable against a given context. The variable may
     be a hard-coded string (if it begins and ends with single or double quote
     marks)::
 
-        >>> c = {'article': {'section':u'News'}}
+        >>> c = {'article': {'section':'News'}}
         >>> Variable('article.section').resolve(c)
-        u'News'
+        'News'
         >>> Variable('article').resolve(c)
-        {'section': u'News'}
+        {'section': 'News'}
         >>> class AClass: pass
         >>> c = AClass()
         >>> c.article = AClass()
-        >>> c.article.section = u'News'
+        >>> c.article.section = 'News'
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
@@ -828,10 +854,13 @@ class Variable(object):
             # We're dealing with a literal, so it's already been "resolved"
             value = self.literal
         if self.translate:
+            is_safe = isinstance(value, SafeData)
+            msgid = value.replace('%', '%%')
+            msgid = mark_safe(msgid) if is_safe else msgid
             if self.message_context:
-                return pgettext_lazy(self.message_context, value)
+                return pgettext_lazy(self.message_context, msgid)
             else:
-                return ugettext_lazy(value)
+                return ugettext_lazy(msgid)
         return value
 
     def __repr__(self):
@@ -892,8 +921,13 @@ class Variable(object):
                             else:
                                 raise
         except Exception as e:
-            template_name = getattr(context, 'template_name', 'unknown')
-            logger.debug('{} - {}'.format(template_name, e))
+            template_name = getattr(context, 'template_name', None) or 'unknown'
+            logger.debug(
+                "Exception while resolving variable '%s' in template '%s'.",
+                bit,
+                template_name,
+                exc_info=True,
+            )
 
             if getattr(e, 'silent_variable_failure', False):
                 current = context.template.engine.string_if_invalid
@@ -992,8 +1026,7 @@ def render_value_in_context(value, context):
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
     value = force_text(value)
-    if ((context.autoescape and not isinstance(value, SafeData)) or
-            isinstance(value, EscapeData)):
+    if context.autoescape or isinstance(value, EscapeData):
         return conditional_escape(value)
     else:
         return value

@@ -14,6 +14,9 @@ def register(*models, **kwargs):
     from django.contrib.admin.sites import site, AdminSite
 
     def _model_admin_wrapper(admin_class):
+        if not models:
+            raise ValueError('At least one model must be passed to register.')
+
         admin_site = kwargs.pop('site', site)
 
         if not isinstance(admin_site, AdminSite):

@@ -2,8 +2,10 @@
 #
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2014
+# Fery Setiawan <gembelweb@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011-2013
 # rodin <romihardiyanto@gmail.com>, 2013-2015
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
@@ -11,11 +13,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-04-04 15:40+0000\n"
-"Last-Translator: Sutrisno Efendi <kangfend@gmail.com>\n"
-"Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
-"language/id/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2016-04-17 19:50+0000\n"
+"Last-Translator: oon arfiandwi <oon.arfiandwi@gmail.com>\n"
+"Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
+"id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -81,6 +83,12 @@ msgstr "Aksi:"
 msgid "action time"
 msgstr "waktu aksi"
 
+msgid "user"
+msgstr "pengguna"
+
+msgid "content type"
+msgstr "jenis isi"
+
 msgid "object id"
 msgstr "id objek"
 
@@ -121,6 +129,9 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Tekan \"Control\", atau \"Command\" pada Mac, untuk memilih lebih dari satu."
+
+msgid "Added."
+msgstr "Ditambahkan."
 
 #, python-format
 msgid "Changed %s."
@@ -397,7 +408,7 @@ msgid "Yes, I'm sure"
 msgstr "Ya, tentu saja"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Tidak, bawa saya kembali"
 
 msgid "Delete multiple objects"
 msgstr "Hapus beberapa objek sekaligus"
@@ -475,6 +486,14 @@ msgstr ""
 "Ada masalah dengan instalasi basis data Anda. Pastikan tabel yang sesuai "
 "pada basis data telah dibuat dan dapat dibaca oleh pengguna yang benar."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Anda dikenali sebagai %(username)s, tapi tidak diperbolehkan untuk mengakses "
+"halaman ini. Anda ingin mencoba mengakses menggunakan akun yang lain?"
+
 msgid "Forgotten your password or username?"
 msgstr "Lupa nama pengguna atau sandi?"
 
@@ -499,6 +518,9 @@ msgstr "Tampilkan semua"
 
 msgid "Save"
 msgstr "Simpan"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -589,6 +611,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Kami mengirimi anda instruksi untuk pengubahan kata sandi, jika ada akun "
+"dengan alamat email yang sesuai. Anda seharusnya menerimanya sesaat lagi."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -633,9 +657,6 @@ msgstr "Setel ulang sandi saya"
 
 msgid "All dates"
 msgstr "Semua tanggal"
-
-msgid "(None)"
-msgstr "(Tidak ada)"
 
 #, python-format
 msgid "Select %s"

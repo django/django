@@ -6,6 +6,7 @@ http://.com
 http://invalid-.com
 http://-invalid.com
 http://invalid.com-
+http://invalid.-com
 http://inv-.alid-.com
 http://inv-.-alid.com
 file://localhost/path
@@ -32,8 +33,12 @@ http:// shouldfail.com
 :// should fail
 http://foo.bar/foo(bar)baz quux
 http://-error-.invalid/
+http://dashinpunytld.trailingdot.xn--.
+http://dashinpunytld.xn---
 http://-a.b.co
 http://a.b-.co
+http://a.-b.co
+http://a.b-.c.co
 http:/
 http://
 http://
@@ -46,3 +51,9 @@ http://.www.foo.bar./
 http://[::1:2::3]:8080/
 http://[]
 http://[]:8080
+http://example..com/
+http://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example.com
+http://example.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.com
+http://example.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+http://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaa
+https://test.[com

@@ -13,5 +13,5 @@ options['scale_text'] = true;
 options['mouse_position'] = true;
 options['default_lon'] = {{ default_lon|unlocalize }};
 options['default_lat'] = {{ default_lat|unlocalize }};
-options['base_layer'] = new OpenLayers.Layer.OSM.Mapnik("OpenStreetMap (Mapnik)");
+options['base_layer'] = new OpenLayers.Layer.OSM("OpenStreetMap (Mapnik)");
 {% endblock %}

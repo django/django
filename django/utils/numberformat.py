@@ -15,12 +15,15 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
 
     * decimal_sep: Decimal separator symbol (for example ".")
     * decimal_pos: Number of decimal positions
-    * grouping: Number of digits in every group limited by thousand separator
+    * grouping: Number of digits in every group limited by thousand separator.
+        For non-uniform digit grouping, it can be a sequence with the number
+        of digit group sizes following the format used by the Python locale
+        module in locale.localeconv() LC_NUMERIC grouping (e.g. (3, 2, 0)).
     * thousand_sep: Thousand separator symbol (for example ",")
     """
     use_grouping = settings.USE_L10N and settings.USE_THOUSAND_SEPARATOR
     use_grouping = use_grouping or force_grouping
-    use_grouping = use_grouping and grouping > 0
+    use_grouping = use_grouping and grouping != 0
     # Make the common case fast
     if isinstance(number, int) and not use_grouping and not decimal_pos:
         return mark_safe(six.text_type(number))
@@ -46,10 +49,22 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
         dec_part = decimal_sep + dec_part
     # grouping
     if use_grouping:
+        try:
+            # if grouping is a sequence
+            intervals = list(grouping)
+        except TypeError:
+            # grouping is a single value
+            intervals = [grouping, 0]
+        active_interval = intervals.pop(0)
         int_part_gd = ''
-        for cnt, digit in enumerate(int_part[::-1]):
-            if cnt and not cnt % grouping:
+        cnt = 0
+        for digit in int_part[::-1]:
+            if cnt and cnt == active_interval:
+                if intervals:
+                    active_interval = intervals.pop(0) or active_interval
                 int_part_gd += thousand_sep[::-1]
+                cnt = 0
             int_part_gd += digit
+            cnt += 1
         int_part = int_part_gd[::-1]
     return sign + int_part + dec_part

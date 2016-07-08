@@ -4,11 +4,11 @@ from __future__ import unicode_literals
 import os
 from datetime import datetime
 
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase
 from django.utils import html, safestring, six
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
+from django.utils.functional import lazystr
 
 
 class TestUtilsHtml(SimpleTestCase):
@@ -36,6 +36,7 @@ class TestUtilsHtml(SimpleTestCase):
         for value, output in items:
             for pattern in patterns:
                 self.check_output(f, pattern % value, pattern % output)
+                self.check_output(f, lazystr(pattern % value), pattern % output)
             # Check repeated values.
             self.check_output(f, value * 2, output * 2)
         # Verify it doesn't double replace &.
@@ -62,6 +63,7 @@ class TestUtilsHtml(SimpleTestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_strip_tags(self):
         f = html.strip_tags
@@ -87,6 +89,7 @@ class TestUtilsHtml(SimpleTestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
         # Some convoluted syntax for which parsing may differ between python versions
         output = html.strip_tags('<sc<!-- -->ript>test<<!-- -->/script>')
@@ -114,6 +117,7 @@ class TestUtilsHtml(SimpleTestCase):
         items = (' <adf>', '<adf> ', ' </adf> ', ' <f> x</f>')
         for value in items:
             self.check_output(f, value)
+            self.check_output(f, lazystr(value))
         # Strings that have spaces to strip.
         items = (
             ('<d> </d>', '<d></d>'),
@@ -122,47 +126,26 @@ class TestUtilsHtml(SimpleTestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_strip_entities(self):
-        f = html.strip_entities
-        # Strings that should come out untouched.
-        values = ("&", "&a", "&a", "a&#a")
-        for value in values:
-            self.check_output(f, value)
-        # Valid entities that should be stripped from the patterns.
-        entities = ("&#1;", "&#12;", "&a;", "&fdasdfasdfasdf;")
-        patterns = (
-            ("asdf %(entity)s ", "asdf  "),
-            ("%(entity)s%(entity)s", ""),
-            ("&%(entity)s%(entity)s", "&"),
-            ("%(entity)s3", "3"),
-        )
-        for entity in entities:
-            for in_pattern, output in patterns:
-                self.check_output(f, in_pattern % {'entity': entity}, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_escapejs(self):
         f = html.escapejs
         items = (
             ('"double quotes" and \'single quotes\'', '\\u0022double quotes\\u0022 and \\u0027single quotes\\u0027'),
             (r'\ : backslashes, too', '\\u005C : backslashes, too'),
-            ('and lots of whitespace: \r\n\t\v\f\b', 'and lots of whitespace: \\u000D\\u000A\\u0009\\u000B\\u000C\\u0008'),
+            (
+                'and lots of whitespace: \r\n\t\v\f\b',
+                'and lots of whitespace: \\u000D\\u000A\\u0009\\u000B\\u000C\\u0008'
+            ),
             (r'<script>and this</script>', '\\u003Cscript\\u003Eand this\\u003C/script\\u003E'),
-            ('paragraph separator:\u2029and line separator:\u2028', 'paragraph separator:\\u2029and line separator:\\u2028'),
+            (
+                'paragraph separator:\u2029and line separator:\u2028',
+                'paragraph separator:\\u2029and line separator:\\u2028'
+            ),
         )
         for value, output in items:
             self.check_output(f, value, output)
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_remove_tags(self):
-        f = html.remove_tags
-        items = (
-            ("<b><i>Yes</i></b>", "b i", "Yes"),
-            ("<a>x</a> <p><b>y</b></p>", "a b", "x <p>y</p>"),
-        )
-        for value, tags, output in items:
-            self.assertEqual(f(value, tags), output)
+            self.check_output(f, lazystr(value), output)
 
     def test_smart_urlquote(self):
         quote = html.smart_urlquote

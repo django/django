@@ -7,15 +7,14 @@ from __future__ import unicode_literals
 
 import os
 import sys
-import warnings
 from argparse import ArgumentParser
-from optparse import OptionParser
 
 import django
 from django.core import checks
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
-from django.db import connections
-from django.utils.deprecation import RemovedInDjango110Warning
+from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.migrations.exceptions import MigrationSchemaMissing
 from django.utils.encoding import force_str
 
 
@@ -30,7 +29,6 @@ class CommandError(Exception):
     result, raising this exception (with a sensible description of the
     error) is the preferred way to indicate that something has gone
     wrong in the execution of a command.
-
     """
     pass
 
@@ -71,7 +69,6 @@ def handle_default_options(options):
     Include any default options that all commands should accept here
     so that ManagementUtility can handle them before searching for
     user commands.
-
     """
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
@@ -89,7 +86,7 @@ class OutputWrapper(object):
 
     @style_func.setter
     def style_func(self, style_func):
-        if style_func and hasattr(self._out, 'isatty') and self._out.isatty():
+        if style_func and self.isatty():
             self._style_func = style_func
         else:
             self._style_func = lambda x: x
@@ -101,6 +98,9 @@ class OutputWrapper(object):
 
     def __getattr__(self, name):
         return getattr(self._out, name)
+
+    def isatty(self):
+        return hasattr(self._out, 'isatty') and self._out.isatty()
 
     def write(self, msg, style_func=None, ending=None):
         ending = self.ending if ending is None else ending
@@ -151,12 +151,6 @@ class BaseCommand(object):
 
     Several attributes affect behavior at various steps along the way:
 
-    ``args``
-        A string listing the arguments accepted by the command,
-        suitable for use in help messages; e.g., a command which takes
-        a list of application names might set this to '<app_label
-        app_label ...>'.
-
     ``can_import_settings``
         A boolean indicating whether the command needs to be able to
         import Django settings; if ``True``, ``execute()`` will verify
@@ -167,16 +161,15 @@ class BaseCommand(object):
         A short description of the command, which will be printed in
         help messages.
 
-    ``option_list``
-        This is the list of ``optparse`` options which will be fed
-        into the command's ``OptionParser`` for parsing arguments.
-        Deprecated and will be removed in Django 1.10.
-
     ``output_transaction``
         A boolean indicating whether the command outputs SQL
         statements; if ``True``, the output will automatically be
         wrapped with ``BEGIN;`` and ``COMMIT;``. Default value is
         ``False``.
+
+    ``requires_migrations_checks``
+        A boolean; if ``True``, the command prints a warning if the set of
+        migrations on disk don't match the migrations in the database.
 
     ``requires_system_checks``
         A boolean; if ``True``, entire Django project will be checked for errors
@@ -205,15 +198,14 @@ class BaseCommand(object):
         to settings. This condition will generate a CommandError.
     """
     # Metadata about this command.
-    option_list = ()
     help = ''
-    args = ''
 
     # Configuration shortcuts that alter various logic.
     _called_from_command_line = False
     can_import_settings = True
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     leave_locale_alone = False
+    requires_migrations_checks = False
     requires_system_checks = True
 
     def __init__(self, stdout=None, stderr=None, no_color=False):
@@ -225,16 +217,11 @@ class BaseCommand(object):
             self.style = color_style()
             self.stderr.style_func = self.style.ERROR
 
-    @property
-    def use_argparse(self):
-        return not bool(self.option_list)
-
     def get_version(self):
         """
-        Return the Django version, which should be correct for all
-        built-in Django commands. User-supplied commands should
-        override this method.
-
+        Return the Django version, which should be correct for all built-in
+        Django commands. User-supplied commands can override this method to
+        return their own version.
         """
         return django.get_version()
 
@@ -242,7 +229,6 @@ class BaseCommand(object):
         """
         Return a brief description of how to use this command, by
         default from the attribute ``self.help``.
-
         """
         usage = '%%prog %s [options] %s' % (subcommand, self.args)
         if self.help:
@@ -254,61 +240,35 @@ class BaseCommand(object):
         """
         Create and return the ``ArgumentParser`` which will be used to
         parse the arguments to this command.
-
         """
-        if not self.use_argparse:
-            def store_as_int(option, opt_str, value, parser):
-                setattr(parser.values, option.dest, int(value))
-
-            # Backwards compatibility: use deprecated optparse module
-            warnings.warn("OptionParser usage for Django management commands "
-                          "is deprecated, use ArgumentParser instead",
-                          RemovedInDjango110Warning)
-            parser = OptionParser(prog=prog_name,
-                                usage=self.usage(subcommand),
-                                version=self.get_version())
-            parser.add_option('-v', '--verbosity', action='callback', dest='verbosity', default=1,
-                type='choice', choices=['0', '1', '2', '3'], callback=store_as_int,
-                help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
-            parser.add_option('--settings',
-                help=(
-                    'The Python path to a settings module, e.g. '
-                    '"myproject.settings.main". If this isn\'t provided, the '
-                    'DJANGO_SETTINGS_MODULE environment variable will be used.'
-                ),
-            )
-            parser.add_option('--pythonpath',
-                help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
-            parser.add_option('--traceback', action='store_true',
-                help='Raise on CommandError exceptions')
-            parser.add_option('--no-color', action='store_true', dest='no_color', default=False,
-                help="Don't colorize the command output.")
-            for opt in self.option_list:
-                parser.add_option(opt)
-        else:
-            parser = CommandParser(self, prog="%s %s" % (os.path.basename(prog_name), subcommand),
-                description=self.help or None)
-            parser.add_argument('--version', action='version', version=self.get_version())
-            parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default='1',
-                type=int, choices=[0, 1, 2, 3],
-                help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
-            parser.add_argument('--settings',
-                help=(
-                    'The Python path to a settings module, e.g. '
-                    '"myproject.settings.main". If this isn\'t provided, the '
-                    'DJANGO_SETTINGS_MODULE environment variable will be used.'
-                ),
-            )
-            parser.add_argument('--pythonpath',
-                help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".')
-            parser.add_argument('--traceback', action='store_true',
-                help='Raise on CommandError exceptions')
-            parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
-                help="Don't colorize the command output.")
-            if self.args:
-                # Keep compatibility and always accept positional arguments, like optparse when args is set
-                parser.add_argument('args', nargs='*')
-            self.add_arguments(parser)
+        parser = CommandParser(
+            self, prog="%s %s" % (os.path.basename(prog_name), subcommand),
+            description=self.help or None,
+        )
+        parser.add_argument('--version', action='version', version=self.get_version())
+        parser.add_argument(
+            '-v', '--verbosity', action='store', dest='verbosity', default=1,
+            type=int, choices=[0, 1, 2, 3],
+            help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output',
+        )
+        parser.add_argument(
+            '--settings',
+            help=(
+                'The Python path to a settings module, e.g. '
+                '"myproject.settings.main". If this isn\'t provided, the '
+                'DJANGO_SETTINGS_MODULE environment variable will be used.'
+            ),
+        )
+        parser.add_argument(
+            '--pythonpath',
+            help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".',
+        )
+        parser.add_argument('--traceback', action='store_true', help='Raise on CommandError exceptions')
+        parser.add_argument(
+            '--no-color', action='store_true', dest='no_color', default=False,
+            help="Don't colorize the command output.",
+        )
+        self.add_arguments(parser)
         return parser
 
     def add_arguments(self, parser):
@@ -321,7 +281,6 @@ class BaseCommand(object):
         """
         Print the help message for this command, derived from
         ``self.usage()``.
-
         """
         parser = self.create_parser(prog_name, subcommand)
         parser.print_help()
@@ -337,14 +296,10 @@ class BaseCommand(object):
         self._called_from_command_line = True
         parser = self.create_parser(argv[0], argv[1])
 
-        if self.use_argparse:
-            options = parser.parse_args(argv[2:])
-            cmd_options = vars(options)
-            # Move positional args out of options to mimic legacy optparse
-            args = cmd_options.pop('args', ())
-        else:
-            options, args = parser.parse_args(argv[2:])
-            cmd_options = vars(options)
+        options = parser.parse_args(argv[2:])
+        cmd_options = vars(options)
+        # Move positional args out of options to mimic legacy optparse
+        args = cmd_options.pop('args', ())
         handle_default_options(options)
         try:
             self.execute(*args, **cmd_options)
@@ -367,13 +322,13 @@ class BaseCommand(object):
         controlled by the ``requires_system_checks`` attribute, except if
         force-skipped).
         """
-        if options.get('no_color'):
+        if options['no_color']:
             self.style = no_style()
             self.stderr.style_func = None
         if options.get('stdout'):
             self.stdout = OutputWrapper(options['stdout'])
         if options.get('stderr'):
-            self.stderr = OutputWrapper(options.get('stderr'), self.stderr.style_func)
+            self.stderr = OutputWrapper(options['stderr'], self.stderr.style_func)
 
         saved_locale = None
         if not self.leave_locale_alone:
@@ -394,35 +349,37 @@ class BaseCommand(object):
             translation.deactivate_all()
 
         try:
-            if (self.requires_system_checks and
-                    not options.get('skip_validation') and  # Remove at the end of deprecation for `skip_validation`.
-                    not options.get('skip_checks')):
+            if self.requires_system_checks and not options.get('skip_checks'):
                 self.check()
+            if self.requires_migrations_checks:
+                self.check_migrations()
             output = self.handle(*args, **options)
             if output:
                 if self.output_transaction:
-                    # This needs to be imported here, because it relies on
-                    # settings.
-                    from django.db import connections, DEFAULT_DB_ALIAS
                     connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
-                    if connection.ops.start_transaction_sql():
-                        self.stdout.write(self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()))
+                    output = '%s\n%s\n%s' % (
+                        self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()),
+                        output,
+                        self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()),
+                    )
                 self.stdout.write(output)
-                if self.output_transaction:
-                    self.stdout.write('\n' + self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()))
         finally:
             if saved_locale is not None:
                 translation.activate(saved_locale)
+        return output
+
+    def _run_checks(self, **kwargs):
+        return checks.run_checks(**kwargs)
 
     def check(self, app_configs=None, tags=None, display_num_errors=False,
-              include_deployment_checks=False):
+              include_deployment_checks=False, fail_level=checks.ERROR):
         """
         Uses the system check framework to validate entire Django project.
         Raises CommandError for any serious message (error or critical errors).
         If there are only light messages (like warnings), they are printed to
         stderr and no exception is raised.
         """
-        all_issues = checks.run_checks(
+        all_issues = self._run_checks(
             app_configs=app_configs,
             tags=tags,
             include_deployment_checks=include_deployment_checks,
@@ -435,8 +392,8 @@ class BaseCommand(object):
             debugs = [e for e in all_issues if e.level < checks.INFO and not e.is_silenced()]
             infos = [e for e in all_issues if checks.INFO <= e.level < checks.WARNING and not e.is_silenced()]
             warnings = [e for e in all_issues if checks.WARNING <= e.level < checks.ERROR and not e.is_silenced()]
-            errors = [e for e in all_issues if checks.ERROR <= e.level < checks.CRITICAL]
-            criticals = [e for e in all_issues if checks.CRITICAL <= e.level]
+            errors = [e for e in all_issues if checks.ERROR <= e.level < checks.CRITICAL and not e.is_silenced()]
+            criticals = [e for e in all_issues if checks.CRITICAL <= e.level and not e.is_silenced()]
             sorted_issues = [
                 (criticals, 'CRITICALS'),
                 (errors, 'ERRORS'),
@@ -469,7 +426,7 @@ class BaseCommand(object):
                 len(all_issues) - visible_issue_count,
             )
 
-        if any(e.is_serious() and not e.is_silenced() for e in all_issues):
+        if any(e.is_serious(fail_level) and not e.is_silenced() for e in all_issues):
             msg = self.style.ERROR("SystemCheckError: %s" % header) + body + footer
             raise SystemCheckError(msg)
         else:
@@ -481,11 +438,42 @@ class BaseCommand(object):
             else:
                 self.stdout.write(msg)
 
+    def check_migrations(self):
+        """
+        Print a warning if the set of migrations on disk don't match the
+        migrations in the database.
+        """
+        from django.db.migrations.executor import MigrationExecutor
+        try:
+            executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
+        except ImproperlyConfigured:
+            # No databases are configured (or the dummy one)
+            return
+        except MigrationSchemaMissing:
+            self.stdout.write(self.style.NOTICE(
+                "\nNot checking migrations as it is not possible to access/create the django_migrations table."
+            ))
+            return
+
+        plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
+        if plan:
+            apps_waiting_migration = sorted(set(migration.app_label for migration, backwards in plan))
+            self.stdout.write(
+                self.style.NOTICE(
+                    "\nYou have %(unpplied_migration_count)s unapplied migration(s). "
+                    "Your project may not work properly until you apply the "
+                    "migrations for app(s): %(apps_waiting_migration)s." % {
+                        "unpplied_migration_count": len(plan),
+                        "apps_waiting_migration": ", ".join(apps_waiting_migration),
+                    }
+                )
+            )
+            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
+
     def handle(self, *args, **options):
         """
         The actual logic of the command. Subclasses must implement
         this method.
-
         """
         raise NotImplementedError('subclasses of BaseCommand must provide a handle() method')
 
@@ -501,8 +489,7 @@ class AppCommand(BaseCommand):
     missing_args_message = "Enter at least one application label."
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='app_label', nargs='+',
-            help='One or more application label.')
+        parser.add_argument('args', metavar='app_label', nargs='+', help='One or more application label.')
 
     def handle(self, *app_labels, **options):
         from django.apps import apps
@@ -538,7 +525,6 @@ class LabelCommand(BaseCommand):
 
     If the arguments should be names of installed applications, use
     ``AppCommand`` instead.
-
     """
     label = 'label'
     missing_args_message = "Enter at least one %s." % label
@@ -558,40 +544,5 @@ class LabelCommand(BaseCommand):
         """
         Perform the command's actions for ``label``, which will be the
         string as given on the command line.
-
         """
         raise NotImplementedError('subclasses of LabelCommand must provide a handle_label() method')
-
-
-class NoArgsCommand(BaseCommand):
-    """
-    A command which takes no arguments on the command line.
-
-    Rather than implementing ``handle()``, subclasses must implement
-    ``handle_noargs()``; ``handle()`` itself is overridden to ensure
-    no arguments are passed to the command.
-
-    Attempting to pass arguments will raise ``CommandError``.
-
-    """
-    args = ''
-
-    def __init__(self):
-        warnings.warn(
-            "NoArgsCommand class is deprecated and will be removed in Django 1.10. "
-            "Use BaseCommand instead, which takes no arguments by default.",
-            RemovedInDjango110Warning
-        )
-        super(NoArgsCommand, self).__init__()
-
-    def handle(self, *args, **options):
-        if args:
-            raise CommandError("Command doesn't accept any arguments")
-        return self.handle_noargs(**options)
-
-    def handle_noargs(self, **options):
-        """
-        Perform this command's actions.
-
-        """
-        raise NotImplementedError('subclasses of NoArgsCommand must provide a handle_noargs() method')

@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 import datetime
+import decimal
+import functools
 import math
 import os
 import re
@@ -11,20 +13,36 @@ import unittest
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
 
+from django import get_version
 from django.conf import settings
 from django.core.validators import EmailValidator, RegexValidator
 from django.db import migrations, models
 from django.db.migrations.writer import (
     MigrationWriter, OperationWriter, SettingsReference,
 )
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase, ignore_warnings, mock
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.deconstruct import deconstructible
+from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import ugettext_lazy as _
 
 from .models import FoodManager, FoodQuerySet
+
+try:
+    import enum
+except ImportError:
+    enum = None
+
+
+class Money(decimal.Decimal):
+    def deconstruct(self):
+        return (
+            '%s.%s' % (self.__class__.__module__, self.__class__.__name__),
+            [six.text_type(self)],
+            {}
+        )
 
 
 class TestModel1(object):
@@ -192,6 +210,18 @@ class WriterTests(SimpleTestCase):
         self.assertTrue(math.isinf(self.serialize_round_trip(float("-inf"))))
         self.assertTrue(math.isnan(self.serialize_round_trip(float("nan"))))
 
+        self.assertSerializedEqual(decimal.Decimal('1.3'))
+        self.assertSerializedResultEqual(
+            decimal.Decimal('1.3'),
+            ("Decimal('1.3')", {'from decimal import Decimal'})
+        )
+
+        self.assertSerializedEqual(Money('1.3'))
+        self.assertSerializedResultEqual(
+            Money('1.3'),
+            ("migrations.test_writer.Money('1.3')", {'import migrations.test_writer'})
+        )
+
     def test_serialize_constants(self):
         self.assertSerializedEqual(None)
         self.assertSerializedEqual(True)
@@ -227,8 +257,68 @@ class WriterTests(SimpleTestCase):
             ("[list, tuple, dict, set, frozenset]", set())
         )
 
+    def test_serialize_lazy_objects(self):
+        pattern = re.compile(r'^foo$', re.UNICODE)
+        lazy_pattern = SimpleLazyObject(lambda: pattern)
+        self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
+
+    @unittest.skipUnless(enum, "enum34 is required on Python 2")
+    def test_serialize_enums(self):
+        class TextEnum(enum.Enum):
+            A = 'a-value'
+            B = 'value-b'
+
+        class BinaryEnum(enum.Enum):
+            A = b'a-value'
+            B = b'value-b'
+
+        class IntEnum(enum.IntEnum):
+            A = 1
+            B = 2
+
+        self.assertSerializedResultEqual(
+            TextEnum.A,
+            ("migrations.test_writer.TextEnum('a-value')", {'import migrations.test_writer'})
+        )
+        self.assertSerializedResultEqual(
+            BinaryEnum.A,
+            ("migrations.test_writer.BinaryEnum(b'a-value')", {'import migrations.test_writer'})
+        )
+        self.assertSerializedResultEqual(
+            IntEnum.B,
+            ("migrations.test_writer.IntEnum(2)", {'import migrations.test_writer'})
+        )
+
+        field = models.CharField(default=TextEnum.B, choices=[(m.value, m) for m in TextEnum])
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.CharField(choices=["
+            "('a-value', migrations.test_writer.TextEnum('a-value')), "
+            "('value-b', migrations.test_writer.TextEnum('value-b'))], "
+            "default=migrations.test_writer.TextEnum('value-b'))"
+        )
+        field = models.CharField(default=BinaryEnum.B, choices=[(m.value, m) for m in BinaryEnum])
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.CharField(choices=["
+            "(b'a-value', migrations.test_writer.BinaryEnum(b'a-value')), "
+            "(b'value-b', migrations.test_writer.BinaryEnum(b'value-b'))], "
+            "default=migrations.test_writer.BinaryEnum(b'value-b'))"
+        )
+        field = models.IntegerField(default=IntEnum.A, choices=[(m.value, m) for m in IntEnum])
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.IntegerField(choices=["
+            "(1, migrations.test_writer.IntEnum(1)), "
+            "(2, migrations.test_writer.IntEnum(2))], "
+            "default=migrations.test_writer.IntEnum(1))"
+        )
+
     def test_serialize_functions(self):
-        with six.assertRaisesRegex(self, ValueError, 'Cannot serialize function: lambda'):
+        with self.assertRaisesMessage(ValueError, 'Cannot serialize function: lambda'):
             self.assertSerializedEqual(lambda x: 42)
         self.assertSerializedEqual(models.SET_NULL)
         string, imports = MigrationWriter.serialize(models.SET(42))
@@ -289,6 +379,8 @@ class WriterTests(SimpleTestCase):
             SettingsReference("someapp.model", "AUTH_USER_MODEL"),
             ("settings.AUTH_USER_MODEL", {"from django.conf import settings"})
         )
+
+    def test_serialize_iterators(self):
         self.assertSerializedResultEqual(
             ((x, x * x) for x in range(3)),
             ("((0, 0), (1, 1), (2, 4))", set())
@@ -359,6 +451,11 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(one_item_tuple)
         self.assertSerializedEqual(many_items_tuple)
 
+    def test_serialize_builtins(self):
+        string, imports = MigrationWriter.serialize(range)
+        self.assertEqual(string, 'range')
+        self.assertEqual(imports, set())
+
     @unittest.skipUnless(six.PY2, "Only applies on Python 2")
     def test_serialize_direct_function_reference(self):
         """
@@ -388,8 +485,7 @@ class WriterTests(SimpleTestCase):
                 return "somewhere dynamic"
             thing = models.FileField(upload_to=upload_to)
 
-        with six.assertRaisesRegex(self, ValueError,
-                '^Could not find function upload_to in migrations.test_writer'):
+        with self.assertRaisesMessage(ValueError, 'Could not find function upload_to in migrations.test_writer'):
             self.serialize_round_trip(TestModel2.thing)
 
     def test_serialize_managers(self):
@@ -409,6 +505,13 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(datetime.timedelta())
         self.assertSerializedEqual(datetime.timedelta(minutes=42))
 
+    def test_serialize_functools_partial(self):
+        value = functools.partial(datetime.timedelta, 1, seconds=2)
+        result = self.serialize_round_trip(value)
+        self.assertEqual(result.func, value.func)
+        self.assertEqual(result.args, value.args)
+        self.assertEqual(result.keywords, value.keywords)
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.
@@ -427,7 +530,9 @@ class WriterTests(SimpleTestCase):
             "operations": [
                 migrations.CreateModel("MyModel", tuple(fields.items()), options, (models.Model,)),
                 migrations.CreateModel("MyModel2", tuple(fields.items()), bases=(models.Model,)),
-                migrations.CreateModel(name="MyModel3", fields=tuple(fields.items()), options=options, bases=(models.Model,)),
+                migrations.CreateModel(
+                    name="MyModel3", fields=tuple(fields.items()), options=options, bases=(models.Model,)
+                ),
                 migrations.DeleteModel("MyModel"),
                 migrations.AddField("OtherModel", "datetimefield", fields["datetimefield"]),
             ],
@@ -512,6 +617,27 @@ class WriterTests(SimpleTestCase):
             output
         )
 
+    def test_migration_file_header_comments(self):
+        """
+        Test comments at top of file.
+        """
+        migration = type(str("Migration"), (migrations.Migration,), {
+            "operations": []
+        })
+        dt = datetime.datetime(2015, 7, 31, 4, 40, 0, 0, tzinfo=utc)
+        with mock.patch('django.db.migrations.writer.now', lambda: dt):
+            writer = MigrationWriter(migration)
+            output = writer.as_string().decode('utf-8')
+
+        self.assertTrue(
+            output.startswith(
+                "# -*- coding: utf-8 -*-\n"
+                "# Generated by Django %(version)s on 2015-07-31 04:40\n" % {
+                    'version': get_version(),
+                }
+            )
+        )
+
     def test_models_import_omitted(self):
         """
         django.db.models shouldn't be imported if unused.
@@ -521,7 +647,7 @@ class WriterTests(SimpleTestCase):
                 migrations.AlterModelOptions(
                     name='model',
                     options={'verbose_name': 'model', 'verbose_name_plural': 'models'},
-                    ),
+                ),
             ]
         })
         writer = MigrationWriter(migration)
@@ -532,9 +658,9 @@ class WriterTests(SimpleTestCase):
         # Yes, it doesn't make sense to use a class as a default for a
         # CharField. It does make sense for custom fields though, for example
         # an enumfield that takes the enum class as an argument.
-        class DeconstructableInstances(object):
+        class DeconstructibleInstances(object):
             def deconstruct(self):
-                return ('DeconstructableInstances', [], {})
+                return ('DeconstructibleInstances', [], {})
 
-        string = MigrationWriter.serialize(models.CharField(default=DeconstructableInstances))[0]
-        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructableInstances)")
+        string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
+        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")

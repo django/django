@@ -4,18 +4,19 @@
 # Boris Chervenkov <office@sentido.bg>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
-# Todor Lubenov <tlubenov@gmail.com>, 2013-2014
+# Todor Lubenov <tgl.sysdev@gmail.com>, 2013-2015
+# Venelin Stoykov <vkstoykov@gmail.com>, 2015
 # vestimir <vestimir@gmail.com>, 2014
 # Alexander Atanasov <aatanasov@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
-"language/bg/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-27 16:05+0000\n"
+"Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
+"Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
+"bg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -85,6 +86,9 @@ msgstr "испански език"
 msgid "Argentinian Spanish"
 msgstr "кастилски"
 
+msgid "Colombian Spanish"
+msgstr ""
+
 msgid "Mexican Spanish"
 msgstr "Мексикански испански"
 
@@ -114,6 +118,9 @@ msgstr "фризийски език"
 
 msgid "Irish"
 msgstr "ирландски език"
+
+msgid "Scottish Gaelic"
+msgstr ""
 
 msgid "Galician"
 msgstr "галицейски език"
@@ -275,19 +282,19 @@ msgid "Traditional Chinese"
 msgstr "традиционен китайски"
 
 msgid "Messages"
-msgstr ""
+msgstr "Съобщения"
 
 msgid "Site Maps"
-msgstr ""
+msgstr "Бързи Maps"
 
 msgid "Static Files"
-msgstr ""
+msgstr "Статични файлове"
 
 msgid "Syndication"
-msgstr ""
+msgstr "Syndication"
 
 msgid "Web Design"
-msgstr ""
+msgstr "Web Design"
 
 msgid "Enter a valid value."
 msgstr "Въведете валидна стойност.  "
@@ -303,6 +310,12 @@ msgstr "Въведете валиден имейл адрес."
 
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Въведете валиден 'слъг', състоящ се от букви, цифри, тирета или долни тирета."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
 msgstr ""
 "Въведете валиден 'слъг', състоящ се от букви, цифри, тирета или долни тирета."
 
@@ -359,16 +372,40 @@ msgstr[1] ""
 "Уверете се, тази стойност има най-много %(limit_value)d знака (тя има "
 "%(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Уверете се, че има не повече от %(max)s цифри в общо."
+msgstr[1] "Уверете се, че има не повече от %(max)s цифри общо."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+"Уверете се, че има не повече от%(max)s знак след десетичната запетая."
+msgstr[1] ""
+"Уверете се, че има не повече от %(max)s знака след десетичната запетая."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Уверете се, че има не повече от %(max)s цифри преди десетичната запетая."
+msgstr[1] ""
+"Уверете се, че има не повече от %(max)s цифри преди десетичната запетая."
+
 msgid "and"
 msgstr "и"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s с тези %(field_labels)s вече съществува."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Стойността %(value)r не е валиден избор."
 
 msgid "This field cannot be null."
 msgstr "Това поле не може да има празна стойност."
@@ -386,6 +423,8 @@ msgstr "%(model_name)s с този %(field_label)s вече съществува
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s трябва да са уникални за %(date_field_label)s "
+"%(lookup_type)s."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -396,11 +435,11 @@ msgstr "Цяло число"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "'%(value)s' стойност трябва да е цяло число."
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "Стойността на '%(value)s' трябва да бъде или True или False."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (True или False)"
@@ -417,12 +456,16 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' стойност е с формат невалидна дата. Тя трябва да бъде в YYYY-MM-"
+"DD формат."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"Стойността на '%(value)s' е в правилния формат (ГГГГ-ММ-ДД), но тя е "
+"невалидна дата."
 
 msgid "Date (without time)"
 msgstr "Дата (без час)"
@@ -432,6 +475,9 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"Стойността на '%(value)s' е с невалиден формат. Трябва да бъде във формат "
+"ГГГГ-ММ-ДД ЧЧ:ММ[:сс[.uuuuuu]][TZ] (където u означава милисекунда, а TZ - "
+"часова зона)"
 
 #, python-format
 msgid ""
@@ -456,7 +502,7 @@ msgid ""
 msgstr ""
 
 msgid "Duration"
-msgstr ""
+msgstr "Продължителност"
 
 msgid "Email address"
 msgstr "Email адрес"
@@ -466,7 +512,7 @@ msgstr "Път към файл"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' стойност трябва да е число с плаваща запетая."
 
 msgid "Floating point number"
 msgstr "Число с плаваща запетая"
@@ -526,7 +572,7 @@ msgstr "сурови двоични данни"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' не е валиден UUID."
 
 msgid "File"
 msgstr "Файл"
@@ -547,6 +593,12 @@ msgstr "словенски език"
 msgid "Many-to-many relationship"
 msgstr "Много-към-много връзка"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Това поле е задължително."
 
@@ -555,30 +607,6 @@ msgstr "Въведете цяло число.  "
 
 msgid "Enter a number."
 msgstr "Въведете число."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Уверете се, че има не повече от %(max)s цифри в общо."
-msgstr[1] "Уверете се, че има не повече от %(max)s цифри общо."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-"Уверете се, че има не повече от%(max)s знак след десетичната запетая."
-msgstr[1] ""
-"Уверете се, че има не повече от %(max)s знака след десетичната запетая."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Уверете се, че има не повече от %(max)s цифри преди десетичната запетая."
-msgstr[1] ""
-"Уверете се, че има не повече от %(max)s цифри преди десетичната запетая."
 
 msgid "Enter a valid date."
 msgstr "Въведете валидна дата.  "
@@ -590,7 +618,7 @@ msgid "Enter a valid date/time."
 msgstr "Въведете валидна дата/час.  "
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Въведете валидна продължителност."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Не е получен файл.  Проверете типа кодиране на формата.  "
@@ -628,10 +656,10 @@ msgid "Enter a list of values."
 msgstr "Въведете списък от стойности"
 
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Въведете пълна стойност."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Въведете валиден UUID."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -641,14 +669,8 @@ msgstr ":"
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Скрито поле %(name)s) %(error)s"
 
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
-
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "Данни за мениджърската форма липсват или са били променени."
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -659,8 +681,8 @@ msgstr[1] "Моля, въведете %d по-малко форми."
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Моля, въведете %d или по-вече форми."
+msgstr[1] "Моля, въведете %d или по-вече форми."
 
 msgid "Order"
 msgstr "Ред"
@@ -1037,10 +1059,10 @@ msgid "0 minutes"
 msgstr "0 минути"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "Забранен"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "CSRF проверката се провали. Заявката прекратена."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1060,23 +1082,29 @@ msgid ""
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Вие виждате това съобщение, защото този сайт изисква CSRF бисквитка когато "
+"се подават формуляри. Тази бисквитка е задължителна от съображения за "
+"сигурност, за да се гарантира, че вашият браузър не е компрометиран от трети "
+"страни."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Ако сте конфигурирали вашия браузър, да забраните бисквитките, моля да ги "
+"активирате отново, поне за този сайт, или за'same-origin' заявки."
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Повече информация е на разположение с DEBUG=True."
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "Добре дошли в Django"
 
 msgid "It worked!"
-msgstr ""
+msgstr "Той работи!"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "Поздравления за първата си Django страница."
 
 msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "

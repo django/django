@@ -71,18 +71,18 @@ create a real version. Add the following to ``polls/views.py``:
 
     from django.shortcuts import get_object_or_404, render
     from django.http import HttpResponseRedirect, HttpResponse
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 
     from .models import Choice, Question
     # ...
     def vote(request, question_id):
-        p = get_object_or_404(Question, pk=question_id)
+        question = get_object_or_404(Question, pk=question_id)
         try:
-            selected_choice = p.choice_set.get(pk=request.POST['choice'])
+            selected_choice = question.choice_set.get(pk=request.POST['choice'])
         except (KeyError, Choice.DoesNotExist):
             # Redisplay the question voting form.
             return render(request, 'polls/detail.html', {
-                'question': p,
+                'question': question,
                 'error_message': "You didn't select a choice.",
             })
         else:
@@ -91,7 +91,7 @@ create a real version. Add the following to ``polls/views.py``:
             # Always return an HttpResponseRedirect after successfully dealing
             # with POST data. This prevents data from being posted twice if a
             # user hits the Back button.
-            return HttpResponseRedirect(reverse('polls:results', args=(p.id,)))
+            return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 This code includes a few things we haven't covered yet in this tutorial:
 
@@ -124,18 +124,18 @@ This code includes a few things we haven't covered yet in this tutorial:
   POST data. This tip isn't specific to Django; it's just good Web
   development practice.
 
-* We are using the :func:`~django.core.urlresolvers.reverse` function in the
+* We are using the :func:`~django.urls.reverse` function in the
   :class:`~django.http.HttpResponseRedirect` constructor in this example.
   This function helps avoid having to hardcode a URL in the view function.
   It is given the name of the view that we want to pass control to and the
   variable portion of the URL pattern that points to that view. In this
   case, using the URLconf we set up in :doc:`Tutorial 3 </intro/tutorial03>`,
-  this :func:`~django.core.urlresolvers.reverse` call will return a string like
+  this :func:`~django.urls.reverse` call will return a string like
   ::
 
     '/polls/3/results/'
 
-  where the ``3`` is the value of ``p.id``. This redirected URL will
+  where the ``3`` is the value of ``question.id``. This redirected URL will
   then call the ``'results'`` view to display the final page.
 
 As mentioned in :doc:`Tutorial 3 </intro/tutorial03>`, ``request`` is an
@@ -183,7 +183,7 @@ without having chosen a choice, you should see the error message.
     The code for our ``vote()`` view does have a small problem. It first gets
     the ``selected_choice`` object from the database, then computes the new
     value of ``votes``, and then saves it back to the database. If two users of
-    your Web site try to vote at *exactly the same time*, this might go wrong:
+    your website try to vote at *exactly the same time*, this might go wrong:
     The same value, let's say 42, will be retrieved for ``votes``. Then, for
     both users the new value of 43 is computed and saved, but 44 would be the
     expected value.
@@ -241,6 +241,7 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 
     from . import views
 
+    app_name = 'polls'
     urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
         url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name='detail'),
@@ -263,7 +264,7 @@ views and use Django's generic views instead. To do so, open the
 
     from django.shortcuts import get_object_or_404, render
     from django.http import HttpResponseRedirect
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.views import generic
 
     from .models import Choice, Question
@@ -289,7 +290,7 @@ views and use Django's generic views instead. To do so, open the
 
 
     def vote(request, question_id):
-        ... # same as above
+        ... # same as above, no changes needed.
 
 We're using two generic views here:
 :class:`~django.views.generic.list.ListView` and

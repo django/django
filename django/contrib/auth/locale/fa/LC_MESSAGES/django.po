@@ -1,17 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ali Nikneshan <ali@nikneshan.com>, 2015
 # Eric Hamiter <ehamiter@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# ka7eh, 2015
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:30+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-12-12 23:43+0000\n"
+"Last-Translator: ka7eh\n"
+"Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,7 +32,7 @@ msgstr "تاریخ‌های مهم"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "شیء %(name)s با کلید اصلی %(key)r وجود ندارد."
 
 msgid "Password changed successfully."
 msgstr "گذرواژه با موفقیت تغییر یافت."
@@ -41,6 +43,12 @@ msgstr "تغییر گذرواژه: %s"
 
 msgid "Authentication and Authorization"
 msgstr "بررسی اصالت و اجازه‌ها"
+
+msgid "password"
+msgstr "گذرواژه"
+
+msgid "last login"
+msgstr "آخرین ورود"
 
 msgid "No password set."
 msgstr "هیچ رمزی انتخاب نشده است."
@@ -57,17 +65,17 @@ msgstr "گذرواژه"
 msgid "Password confirmation"
 msgstr "تأیید گذرواژه"
 
-msgid "Enter the same password as above, for verification."
-msgstr "همان گذرواژهٔ بالایی را برای اطمینان دوباره وارد کنید."
+msgid "Enter the same password as before, for verification."
+msgstr "برای تائید، رمز عبور قبلی را وارد کنید."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"گذرواژه‌های خام نگهداری نمی‌شوند، لذا روشی برای مشاهدهٔ گذرواژهٔ این کاربر وجود "
-"ندارد. ولی شما می‌توانید این گذرواژه را از طریق <a href=\"password/\">این "
-"فرم</a> تغییر دهید."
+"رمزهای عبور خام ذخیره نمیشوند، بنابراین راهی برای دیدن رمز عبور این کاربر "
+"وجود ندارد، اما می‌توانید رمز عبور را با استفاده از <a href=\"../password/"
+"\">این فرم</a> تغییر دهید."
 
 #, python-format
 msgid ""
@@ -119,6 +127,9 @@ msgstr "جمع کنترلی"
 msgid "name"
 msgstr "نام"
 
+msgid "content type"
+msgstr "نوع محتوی"
+
 msgid "codename"
 msgstr "نام کد"
 
@@ -134,12 +145,6 @@ msgstr "گروه"
 msgid "groups"
 msgstr "گروه‌ها"
 
-msgid "password"
-msgstr "گذرواژه"
-
-msgid "last login"
-msgstr "آخرین ورود"
-
 msgid "superuser status"
 msgstr "ابرکاربر"
 
@@ -154,6 +159,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"گروه‌هایی که این کاربر به آنها تعلق دارد. کاربر تمام اجازه‌های مرتبط با این "
+"گروه‌ها را دریافت خواهد کرد."
 
 msgid "user permissions"
 msgstr "اجازه‌های کاربر"
@@ -171,6 +178,8 @@ msgid ""
 "Enter a valid username. This value may contain only letters, numbers and @/./"
 "+/-/_ characters."
 msgstr ""
+"یک نام کاربری معتبر وارد کنید. نام کاربری می‌تواند شامل حروف، اعداد، و "
+"کاراکترهای @/./+/-/_ باشد."
 
 msgid "A user with that username already exists."
 msgstr "کاربری با آن نام کاربری وجود دارد."
@@ -210,6 +219,41 @@ msgid "users"
 msgstr "کاربرها"
 
 #, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"این رمز عبور خیلی کوتاه است. رمز عبور می‌بایست حداقل از %(min_length)d حرف "
+"تشکیل شده باشد."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "رمز عبور شما می‌بایست حداقل از %(min_length)d حرف تشکیل شده باشد."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "این رمز عبور بسیار شبیه %(verbose_name)s می‌باشد."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr "رمز عبور شما نمی‌تواند شبیه سایر اطلاعات شخصی شما باشد."
+
+msgid "This password is too common."
+msgstr "این رمز عبور بسیار رایج است."
+
+msgid "Your password can't be a commonly used password."
+msgstr "رمز شما نمی تواند از عبارات معروف باشد."
+
+msgid "This password is entirely numeric."
+msgstr "رمز شما کلا عدد است"
+
+msgid "Your password can't be entirely numeric."
+msgstr "رمز شما نمی تواند کلا عدد باشد"
+
+#, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "بازیابی گذرواژه در %(site_name)s"
 
@@ -220,7 +264,7 @@ msgid "Password reset"
 msgstr "ایجاد گذرواژهٔ جدید"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "تقاضای ریست رمز فرستاده شد"
 
 msgid "Enter new password"
 msgstr "ورود گذرواژهٔ جدید"

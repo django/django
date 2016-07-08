@@ -1,0 +1,96 @@
+# This file is distributed under the same license as the Django package.
+# 
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-06-13 12:43+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Upper Sorbian (http://www.transifex.com/django/django/language/hsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#: contrib/flatpages/admin.py:12
+msgid "Advanced options"
+msgstr "Rozšěrjene nastajenja"
+
+#: contrib/flatpages/apps.py:7
+msgid "Flat Pages"
+msgstr "Statiske strony"
+
+#: contrib/flatpages/forms.py:8 contrib/flatpages/models.py:12
+msgid "URL"
+msgstr "URL"
+
+#: contrib/flatpages/forms.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "Přikład: '/about/contact/'. Přeswědčće so, zo sće wočinjace a začinjace nakósne smužki podał."
+
+#: contrib/flatpages/forms.py:12
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr "Tuta hódnota smě jenož pismiki, ličby, dypki, podsmužki, wjazawki, nakósne smužki abo tildy wobsahować."
+
+#: contrib/flatpages/forms.py:25
+msgid "URL is missing a leading slash."
+msgstr "URL wočinjacu nakósnu smužku nima."
+
+#: contrib/flatpages/forms.py:32
+msgid "URL is missing a trailing slash."
+msgstr "URL začinjacu nakósnu smužku nima."
+
+#: contrib/flatpages/forms.py:49
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "Statiska strona z url %(url)s hižo za sydło %(site)s eksistuje"
+
+#: contrib/flatpages/models.py:13
+msgid "title"
+msgstr "titul"
+
+#: contrib/flatpages/models.py:14
+msgid "content"
+msgstr "wobsah"
+
+#: contrib/flatpages/models.py:15
+msgid "enable comments"
+msgstr "komentary zmóžnić"
+
+#: contrib/flatpages/models.py:16
+msgid "template name"
+msgstr "mjeno předłohi"
+
+#: contrib/flatpages/models.py:18
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr "Přikład: 'flatpages/contact_page.html'. Jeli to njeje podate, budźe system 'flatpages/default.html' wužiwać."
+
+#: contrib/flatpages/models.py:22
+msgid "registration required"
+msgstr "registrowanje trěbne"
+
+#: contrib/flatpages/models.py:23
+msgid ""
+"If this is checked, only logged-in users will be able to view the page."
+msgstr "Jeli to je zmóžnjene, móža sej jenož přizjewjeni wužiwarjo stronu wobhladać."
+
+#: contrib/flatpages/models.py:25
+msgid "sites"
+msgstr "sydła"
+
+#: contrib/flatpages/models.py:29
+msgid "flat page"
+msgstr "statiska strona"
+
+#: contrib/flatpages/models.py:30
+msgid "flat pages"
+msgstr "statiske strony"

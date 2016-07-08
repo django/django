@@ -16,8 +16,6 @@ from django.test import (
 )
 from django.test.runner import DiscoverRunner, dependency_ordered
 from django.test.testcases import connections_support_transactions
-from django.utils import six
-from django.utils.encoding import force_text
 
 from .models import Person
 
@@ -109,7 +107,8 @@ class DependencyOrderingTests(unittest.TestCase):
             'alpha': ['bravo'],
         }
 
-        self.assertRaises(ImproperlyConfigured, dependency_ordered, raw, dependencies=dependencies)
+        with self.assertRaises(ImproperlyConfigured):
+            dependency_ordered(raw, dependencies=dependencies)
 
     def test_own_alias_dependency(self):
         raw = [
@@ -147,8 +146,7 @@ class ManageCommandTests(unittest.TestCase):
 
     def test_bad_test_runner(self):
         with self.assertRaises(AttributeError):
-            call_command('test', 'sites',
-                testrunner='test_runner.NonExistentRunner')
+            call_command('test', 'sites', testrunner='test_runner.NonExistentRunner')
 
 
 class CustomTestRunnerOptionsTests(AdminScriptTestCase):
@@ -240,14 +238,10 @@ class DummyBackendTest(unittest.TestCase):
         Test that setup_databases() doesn't fail with dummy database backend.
         """
         tested_connections = db.ConnectionHandler({})
-        with mock.patch('django.db.connections', new=tested_connections):
+        with mock.patch('django.test.runner.connections', new=tested_connections):
             runner_instance = DiscoverRunner(verbosity=0)
-            try:
-                old_config = runner_instance.setup_databases()
-                runner_instance.teardown_databases(old_config)
-            except Exception as e:
-                self.fail("setup_databases/teardown_databases unexpectedly raised "
-                          "an error: %s" % e)
+            old_config = runner_instance.setup_databases()
+            runner_instance.teardown_databases(old_config)
 
 
 class AliasedDefaultTestSetupTest(unittest.TestCase):
@@ -263,14 +257,10 @@ class AliasedDefaultTestSetupTest(unittest.TestCase):
                 'NAME': 'dummy'
             }
         })
-        with mock.patch('django.db.connections', new=tested_connections):
+        with mock.patch('django.test.runner.connections', new=tested_connections):
             runner_instance = DiscoverRunner(verbosity=0)
-            try:
-                old_config = runner_instance.setup_databases()
-                runner_instance.teardown_databases(old_config)
-            except Exception as e:
-                self.fail("setup_databases/teardown_databases unexpectedly raised "
-                          "an error: %s" % e)
+            old_config = runner_instance.setup_databases()
+            runner_instance.teardown_databases(old_config)
 
 
 class SetupDatabasesTests(unittest.TestCase):
@@ -291,7 +281,7 @@ class SetupDatabasesTests(unittest.TestCase):
         })
 
         with mock.patch('django.db.backends.dummy.base.DatabaseCreation') as mocked_db_creation:
-            with mock.patch('django.db.connections', new=tested_connections):
+            with mock.patch('django.test.runner.connections', new=tested_connections):
                 old_config = self.runner_instance.setup_databases()
                 self.runner_instance.teardown_databases(old_config)
         mocked_db_creation.return_value.destroy_test_db.assert_called_once_with('dbname', 0, False)
@@ -316,10 +306,10 @@ class SetupDatabasesTests(unittest.TestCase):
             },
         })
         with mock.patch('django.db.backends.dummy.base.DatabaseCreation') as mocked_db_creation:
-            with mock.patch('django.db.connections', new=tested_connections):
+            with mock.patch('django.test.runner.connections', new=tested_connections):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
-            0, autoclobber=False, serialize=True, keepdb=False
+            verbosity=0, autoclobber=False, serialize=True, keepdb=False
         )
 
     def test_serialized_off(self):
@@ -330,36 +320,11 @@ class SetupDatabasesTests(unittest.TestCase):
             },
         })
         with mock.patch('django.db.backends.dummy.base.DatabaseCreation') as mocked_db_creation:
-            with mock.patch('django.db.connections', new=tested_connections):
+            with mock.patch('django.test.runner.connections', new=tested_connections):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
-            0, autoclobber=False, serialize=False, keepdb=False
+            verbosity=0, autoclobber=False, serialize=False, keepdb=False
         )
-
-
-class DeprecationDisplayTest(AdminScriptTestCase):
-    # tests for 19546
-    def setUp(self):
-        settings = {
-            'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}'
-        }
-        self.write_settings('settings.py', sdict=settings)
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
-
-    def test_runner_deprecation_verbosity_default(self):
-        args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
-        out, err = self.run_django_admin(args)
-        self.assertIn("Ran 1 test", force_text(err))
-        six.assertRegex(self, err, r"RemovedInDjango\d+Warning: warning from test")
-        six.assertRegex(self, err, r"RemovedInDjango\d+Warning: module-level warning from deprecation_app")
-
-    def test_runner_deprecation_verbosity_zero(self):
-        args = ['test', '--settings=test_project.settings', '--verbosity=0', 'test_runner_deprecation_app']
-        out, err = self.run_django_admin(args)
-        self.assertIn("Ran 1 test", err)
-        self.assertNotIn("warning from test", err)
 
 
 class AutoIncrementResetTest(TransactionTestCase):
@@ -393,7 +358,4 @@ class EmptyDefaultDatabaseTest(unittest.TestCase):
         testcases.connections = db.ConnectionHandler({'default': {}})
         connection = testcases.connections[db.utils.DEFAULT_DB_ALIAS]
         self.assertEqual(connection.settings_dict['ENGINE'], 'django.db.backends.dummy')
-        try:
-            connections_support_transactions()
-        except Exception as e:
-            self.fail("connections_support_transactions() unexpectedly raised an error: %s" % e)
+        connections_support_transactions()

@@ -106,16 +106,25 @@ def lazy_number(func, resultclass, number=None, **kwargs):
         kwargs['number'] = number
         proxy = lazy(func, resultclass)(**kwargs)
     else:
+        original_kwargs = kwargs.copy()
+
         class NumberAwareString(resultclass):
+            def __bool__(self):
+                return bool(kwargs['singular'])
+
+            def __nonzero__(self):  # Python 2 compatibility
+                return type(self).__bool__(self)
+
             def __mod__(self, rhs):
                 if isinstance(rhs, dict) and number:
                     try:
                         number_value = rhs[number]
                     except KeyError:
-                        raise KeyError('Your dictionary lacks key \'%s\'. '
-                            'Please provide it, because it is required to '
-                            'determine whether string is singular or plural.'
-                            % number)
+                        raise KeyError(
+                            "Your dictionary lacks key '%s\'. Please provide "
+                            "it, because it is required to determine whether "
+                            "string is singular or plural." % number
+                        )
                 else:
                     number_value = rhs
                 kwargs['number'] = number_value
@@ -128,7 +137,12 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                 return translated
 
         proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
+        proxy.__reduce__ = lambda: (_lazy_number_unpickle, (func, resultclass, number, original_kwargs))
     return proxy
+
+
+def _lazy_number_unpickle(func, resultclass, number, kwargs):
+    return lazy_number(func, resultclass, number=number, **kwargs)
 
 
 def ngettext_lazy(singular, plural, number=None):
@@ -164,7 +178,9 @@ class override(ContextDecorator):
             deactivate_all()
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if self.deactivate:
+        if self.old_language is None:
+            deactivate_all()
+        elif self.deactivate:
             deactivate()
         else:
             activate(self.old_language)

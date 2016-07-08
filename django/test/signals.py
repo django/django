@@ -3,6 +3,7 @@ import threading
 import time
 import warnings
 
+from django.apps import apps
 from django.core.signals import setting_changed
 from django.db import connections, router
 from django.db.utils import ConnectionRouter
@@ -68,10 +69,7 @@ def update_connections_time_zone(**kwargs):
                 del conn.timezone_name
             except AttributeError:
                 pass
-            tz_sql = conn.ops.set_time_zone_sql()
-            if tz_sql:
-                with conn.cursor() as cursor:
-                    cursor.execute(tz_sql, [conn.timezone_name])
+            conn.ensure_timezone()
 
 
 @receiver(setting_changed)
@@ -84,12 +82,6 @@ def clear_routers_cache(**kwargs):
 def reset_template_engines(**kwargs):
     if kwargs['setting'] in {
         'TEMPLATES',
-        'TEMPLATE_DIRS',
-        'ALLOWED_INCLUDE_ROOTS',
-        'TEMPLATE_CONTEXT_PROCESSORS',
-        'TEMPLATE_DEBUG',
-        'TEMPLATE_LOADERS',
-        'TEMPLATE_STRING_IF_INVALID',
         'DEBUG',
         'FILE_CHARSET',
         'INSTALLED_APPS',
@@ -126,15 +118,7 @@ def language_changed(**kwargs):
 
 @receiver(setting_changed)
 def file_storage_changed(**kwargs):
-    file_storage_settings = {
-        'DEFAULT_FILE_STORAGE',
-        'FILE_UPLOAD_DIRECTORY_PERMISSIONS',
-        'FILE_UPLOAD_PERMISSIONS',
-        'MEDIA_ROOT',
-        'MEDIA_URL',
-    }
-
-    if kwargs['setting'] in file_storage_settings:
+    if kwargs['setting'] == 'DEFAULT_FILE_STORAGE':
         from django.core.files.storage import default_storage
         default_storage._wrapped = empty
 
@@ -151,7 +135,7 @@ def complex_setting_changed(**kwargs):
 @receiver(setting_changed)
 def root_urlconf_changed(**kwargs):
     if kwargs['setting'] == 'ROOT_URLCONF':
-        from django.core.urlresolvers import clear_url_caches, set_urlconf
+        from django.urls import clear_url_caches, set_urlconf
         clear_url_caches()
         set_urlconf(None)
 
@@ -182,3 +166,9 @@ def auth_password_validators_changed(**kwargs):
     if kwargs['setting'] == 'AUTH_PASSWORD_VALIDATORS':
         from django.contrib.auth.password_validation import get_default_password_validators
         get_default_password_validators.cache_clear()
+
+
+@receiver(setting_changed)
+def user_model_swapped(**kwargs):
+    if kwargs['setting'] == 'AUTH_USER_MODEL':
+        apps.clear_cache()

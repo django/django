@@ -32,3 +32,11 @@ def null_view(request):
 
 def permission_denied(request):
     raise PermissionDenied()
+
+
+def exception_in_render(request):
+    class CustomHttpResponse(http.HttpResponse):
+        def render(self):
+            raise Exception('Exception in HttpResponse.render()')
+
+    return CustomHttpResponse('Error')

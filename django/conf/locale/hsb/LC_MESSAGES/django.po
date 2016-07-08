@@ -1,0 +1,1470 @@
+# This file is distributed under the same license as the Django package.
+# 
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-08 18:52+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Upper Sorbian (http://www.transifex.com/django/django/language/hsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#: conf/global_settings.py:51
+msgid "Afrikaans"
+msgstr "Afrikaanšćina"
+
+#: conf/global_settings.py:52
+msgid "Arabic"
+msgstr "Arabšćina"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "Asturišćina"
+
+#: conf/global_settings.py:54
+msgid "Azerbaijani"
+msgstr "Azerbajdźanšćina"
+
+#: conf/global_settings.py:55
+msgid "Bulgarian"
+msgstr "Bołharšćina"
+
+#: conf/global_settings.py:56
+msgid "Belarusian"
+msgstr "Běłorušćina"
+
+#: conf/global_settings.py:57
+msgid "Bengali"
+msgstr "Bengalšćina"
+
+#: conf/global_settings.py:58
+msgid "Breton"
+msgstr "Bretonšćina"
+
+#: conf/global_settings.py:59
+msgid "Bosnian"
+msgstr "Bosnišćina"
+
+#: conf/global_settings.py:60
+msgid "Catalan"
+msgstr "Katalanšćina"
+
+#: conf/global_settings.py:61
+msgid "Czech"
+msgstr "Čěšćina"
+
+#: conf/global_settings.py:62
+msgid "Welsh"
+msgstr "Walizišćina"
+
+#: conf/global_settings.py:63
+msgid "Danish"
+msgstr "Danšćina"
+
+#: conf/global_settings.py:64
+msgid "German"
+msgstr "Němčina"
+
+#: conf/global_settings.py:65
+msgid "Greek"
+msgstr "Grjekšćina"
+
+#: conf/global_settings.py:66
+msgid "English"
+msgstr "Jendźelšćina"
+
+#: conf/global_settings.py:67
+msgid "Australian English"
+msgstr "Awstralska jendźelšćina"
+
+#: conf/global_settings.py:68
+msgid "British English"
+msgstr "Britiska jendźelšćina"
+
+#: conf/global_settings.py:69
+msgid "Esperanto"
+msgstr "Esperanto"
+
+#: conf/global_settings.py:70
+msgid "Spanish"
+msgstr "Španišćina"
+
+#: conf/global_settings.py:71
+msgid "Argentinian Spanish"
+msgstr "Argentinska španišćina"
+
+#: conf/global_settings.py:72
+msgid "Colombian Spanish"
+msgstr "Kolumbiska španišćina"
+
+#: conf/global_settings.py:72
+msgid "Mexican Spanish"
+msgstr "Mexiska španišćina"
+
+#: conf/global_settings.py:73
+msgid "Nicaraguan Spanish"
+msgstr "Nikaraguaska španišćina"
+
+#: conf/global_settings.py:74
+msgid "Venezuelan Spanish"
+msgstr "Venezuelska španišćina"
+
+#: conf/global_settings.py:75
+msgid "Estonian"
+msgstr "Estišćina"
+
+#: conf/global_settings.py:76
+msgid "Basque"
+msgstr "Baskišćina"
+
+#: conf/global_settings.py:77
+msgid "Persian"
+msgstr "Persišćina"
+
+#: conf/global_settings.py:78
+msgid "Finnish"
+msgstr "Finšćina"
+
+#: conf/global_settings.py:79
+msgid "French"
+msgstr "Francošćina"
+
+#: conf/global_settings.py:80
+msgid "Frisian"
+msgstr "Frizišćina"
+
+#: conf/global_settings.py:81
+msgid "Irish"
+msgstr "Irišćina"
+
+#: conf/global_settings.py:83
+msgid "Scottish Gaelic"
+msgstr "Šotiska gaelšćina"
+
+#: conf/global_settings.py:82
+msgid "Galician"
+msgstr "Galicišćina"
+
+#: conf/global_settings.py:83
+msgid "Hebrew"
+msgstr "Hebrejšćina"
+
+#: conf/global_settings.py:84
+msgid "Hindi"
+msgstr "Hindišćina"
+
+#: conf/global_settings.py:85
+msgid "Croatian"
+msgstr "Chorwatšćina"
+
+#: conf/global_settings.py:86
+msgid "Hungarian"
+msgstr "Madźaršćina"
+
+#: conf/global_settings.py:87
+msgid "Interlingua"
+msgstr "Interlingua"
+
+#: conf/global_settings.py:88
+msgid "Indonesian"
+msgstr "Indonezišćina"
+
+#: conf/global_settings.py:89
+msgid "Ido"
+msgstr "Ido"
+
+#: conf/global_settings.py:90
+msgid "Icelandic"
+msgstr "Islandšćina"
+
+#: conf/global_settings.py:91
+msgid "Italian"
+msgstr "Italšćina"
+
+#: conf/global_settings.py:92
+msgid "Japanese"
+msgstr "Japanšćina"
+
+#: conf/global_settings.py:93
+msgid "Georgian"
+msgstr "Georgišćina"
+
+#: conf/global_settings.py:94
+msgid "Kazakh"
+msgstr "Kazachšćina"
+
+#: conf/global_settings.py:95
+msgid "Khmer"
+msgstr "Khmeršćina"
+
+#: conf/global_settings.py:96
+msgid "Kannada"
+msgstr "Kannadšćina"
+
+#: conf/global_settings.py:97
+msgid "Korean"
+msgstr "Korejšćina"
+
+#: conf/global_settings.py:98
+msgid "Luxembourgish"
+msgstr "Luxemburgšćina"
+
+#: conf/global_settings.py:99
+msgid "Lithuanian"
+msgstr "Litawšćina"
+
+#: conf/global_settings.py:100
+msgid "Latvian"
+msgstr "Letišćina"
+
+#: conf/global_settings.py:101
+msgid "Macedonian"
+msgstr "Makedonšćina"
+
+#: conf/global_settings.py:102
+msgid "Malayalam"
+msgstr "Malajalam"
+
+#: conf/global_settings.py:103
+msgid "Mongolian"
+msgstr "Mongolšćina"
+
+#: conf/global_settings.py:104
+msgid "Marathi"
+msgstr "Marathišćina"
+
+#: conf/global_settings.py:105
+msgid "Burmese"
+msgstr "Myanmaršćina"
+
+#: conf/global_settings.py:113
+msgid "Norwegian Bokmål"
+msgstr "Norwegski bokmål"
+
+#: conf/global_settings.py:107
+msgid "Nepali"
+msgstr "Nepalšćina"
+
+#: conf/global_settings.py:108
+msgid "Dutch"
+msgstr "Nižozemšćina"
+
+#: conf/global_settings.py:109
+msgid "Norwegian Nynorsk"
+msgstr "Norwegski nynorsk"
+
+#: conf/global_settings.py:110
+msgid "Ossetic"
+msgstr "Osetšćina"
+
+#: conf/global_settings.py:111
+msgid "Punjabi"
+msgstr "Pundźabišćina"
+
+#: conf/global_settings.py:112
+msgid "Polish"
+msgstr "Pólšćina"
+
+#: conf/global_settings.py:113
+msgid "Portuguese"
+msgstr "Portugalšćina"
+
+#: conf/global_settings.py:114
+msgid "Brazilian Portuguese"
+msgstr "Brazilska portugalšćina"
+
+#: conf/global_settings.py:115
+msgid "Romanian"
+msgstr "Rumunšćina"
+
+#: conf/global_settings.py:116
+msgid "Russian"
+msgstr "Rušćina"
+
+#: conf/global_settings.py:117
+msgid "Slovak"
+msgstr "Słowakšćina"
+
+#: conf/global_settings.py:118
+msgid "Slovenian"
+msgstr "Słowjenšćina"
+
+#: conf/global_settings.py:119
+msgid "Albanian"
+msgstr "Albanšćina"
+
+#: conf/global_settings.py:120
+msgid "Serbian"
+msgstr "Serbišćina"
+
+#: conf/global_settings.py:121
+msgid "Serbian Latin"
+msgstr "Serbšćina, łaćonska"
+
+#: conf/global_settings.py:122
+msgid "Swedish"
+msgstr "Šwedšćina"
+
+#: conf/global_settings.py:123
+msgid "Swahili"
+msgstr "Suahelšćina"
+
+#: conf/global_settings.py:124
+msgid "Tamil"
+msgstr "Tamilšćina"
+
+#: conf/global_settings.py:125
+msgid "Telugu"
+msgstr "Telugušćina"
+
+#: conf/global_settings.py:126
+msgid "Thai"
+msgstr "Thaišćina"
+
+#: conf/global_settings.py:127
+msgid "Turkish"
+msgstr "Turkowšćina"
+
+#: conf/global_settings.py:128
+msgid "Tatar"
+msgstr "Tataršćina"
+
+#: conf/global_settings.py:129
+msgid "Udmurt"
+msgstr "Udmurtšćina"
+
+#: conf/global_settings.py:130
+msgid "Ukrainian"
+msgstr "Ukrainšćina"
+
+#: conf/global_settings.py:131
+msgid "Urdu"
+msgstr "Urdušćina"
+
+#: conf/global_settings.py:132
+msgid "Vietnamese"
+msgstr "Vietnamšćina"
+
+#: conf/global_settings.py:133
+msgid "Simplified Chinese"
+msgstr "Zjednorjene chinšćina"
+
+#: conf/global_settings.py:134
+msgid "Traditional Chinese"
+msgstr "Tradicionalna chinšćina"
+
+#: contrib/messages/apps.py:7
+msgid "Messages"
+msgstr "Powěsće"
+
+#: contrib/sitemaps/apps.py:7
+msgid "Site Maps"
+msgstr "Přehlady sydła"
+
+#: contrib/staticfiles/apps.py:7
+msgid "Static Files"
+msgstr "Statiske dataje"
+
+#: contrib/syndication/apps.py:7
+msgid "Syndication"
+msgstr "Syndikacija"
+
+#: core/validators.py:33
+msgid "Enter a valid value."
+msgstr "Zapodajće płaćiwu hódnotu."
+
+#: core/validators.py:98 forms/fields.py:677
+msgid "Enter a valid URL."
+msgstr "Zapodajće płaćiwy URL."
+
+#: core/validators.py:141
+msgid "Enter a valid integer."
+msgstr "Zapodajće płaćiwu cyłu ličbu."
+
+#: core/validators.py:152
+msgid "Enter a valid email address."
+msgstr "Zapodajće płaćiwu e-mejlowu adresu."
+
+#: core/validators.py:225
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr "Zapodajće płaćiwe adresowe mjeno, kotrež jenož pismiki, ličby, podsmužki abo wjazawki wobsahuje."
+
+#: core/validators.py:232
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or"
+" hyphens."
+msgstr "Zapodajće płaćiwe adresowe mjeno, kotrež jenož unikodowe pismiki, ličby, podsmužki abo wjazawki wobsahuje."
+
+#: core/validators.py:237 core/validators.py:256
+msgid "Enter a valid IPv4 address."
+msgstr "Zapodajće płaćiwu IPv4-adresu."
+
+#: core/validators.py:242 core/validators.py:257
+msgid "Enter a valid IPv6 address."
+msgstr "Zapodajće płaćiwu IPv6-adresu."
+
+#: core/validators.py:252 core/validators.py:255
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "Zapodajće płaćiwu IPv4- abo IPv6-adresu."
+
+#: core/validators.py:284 db/models/fields/__init__.py:1147
+msgid "Enter only digits separated by commas."
+msgstr "Zapodajće jenož přez komy dźělene cyfry,"
+
+#: core/validators.py:292
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "Zawěsćće, zo tuta hódnota je %(limit_value)s (je %(show_value)s)."
+
+#: core/validators.py:318
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Zawěsćće, zo hódnota je mjeńša hač abo runja %(limit_value)s."
+
+#: core/validators.py:325
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Zawěsćće, zo tuta hódnota je wjetša hač abo runja %(limit_value)s."
+
+#: core/validators.py:334
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] "Zawěsćće, zo tuta hódnota ma znajmjeńša %(limit_value)d znamješko (ma %(show_value)d)."
+msgstr[1] "Zawěsćće, zo tuta hódnota ma znajmjeńša %(limit_value)d znamješce (ma %(show_value)d)."
+msgstr[2] "Zawěsćće, zo tuta hódnota ma znajmjeńša %(limit_value)d znamješka (ma %(show_value)d)."
+msgstr[3] "Zawěsćće, zo tuta hódnota ma znajmjeńša %(limit_value)d znamješkow (ma %(show_value)d)."
+
+#: core/validators.py:345
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] "Zawěsćće, zo tuta hódnota ma maksimalnje %(limit_value)d znamješko (ima %(show_value)d)."
+msgstr[1] "Zawěsćće, zo tuta hódnota ma maksimalnje %(limit_value)d znamješce (ima %(show_value)d)."
+msgstr[2] "Zawěsćće, zo tuta hódnota ma maksimalnje %(limit_value)d znamješka (ima %(show_value)d)."
+msgstr[3] "Zawěsćće, zo tuta hódnota ma maksimalnje %(limit_value)d znamješkow (ima %(show_value)d)."
+
+#: core/validators.py:359
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Zawěsćće, zo njeje wjace hač %(max)s cyfry dohromady."
+msgstr[1] "Zawěsćće, zo njeje wjace hač %(max)s cyfrow dohromady."
+msgstr[2] "Zawěsćće, zo njeje wjace hač %(max)s cyfrow dohromady."
+msgstr[3] "Zawěsćće, zo njeje wjace hač %(max)s cyfrow dohromady."
+
+#: core/validators.py:364
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Zawěsćće, zo njeje wjace hač %(max)s decimalneho městna."
+msgstr[1] "Zawěsćće, zo njeje wjace hač %(max)s decimalneju městnow."
+msgstr[2] "Zawěsćće, zo njeje wjace hač %(max)s decimalnych městnow."
+msgstr[3] "Zawěsćće, zo njeje wjace hač %(max)s decimalnych městnow."
+
+#: core/validators.py:369
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Zawěsćće, zo njeje wjace hač %(max)s cyfry před decimalnej komu."
+msgstr[1] "Zawěsćće, zo njeje wjace hač %(max)s cyfrow před decimalnej komu."
+msgstr[2] "Zawěsćće, zo njeje wjace hač %(max)s cyfrow před decimalnej komu."
+msgstr[3] "Zawěsćće, zo njeje wjace hač %(max)s cyfrow před decimalnej komu."
+
+#: db/models/base.py:1095 forms/models.py:727
+msgid "and"
+msgstr "a"
+
+#: db/models/base.py:1097
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr "%(model_name)s z tutym %(field_labels)s hižo eksistuje."
+
+#: db/models/fields/__init__.py:110
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr "Hódnota %(value)r płaćiwa wólba njeje."
+
+#: db/models/fields/__init__.py:111
+msgid "This field cannot be null."
+msgstr "Tute polo njesmě nul być."
+
+#: db/models/fields/__init__.py:112
+msgid "This field cannot be blank."
+msgstr "Tute polo njesmě prózdne być."
+
+#: db/models/fields/__init__.py:113
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s z tutym %(field_label)s hižo eksistuje."
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+#. Eg: "Title must be unique for pub_date year"
+#: db/models/fields/__init__.py:117
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr "%(field_label)s dyrbi za %(date_field_label)s %(lookup_type)s jónkróćne być."
+
+#: db/models/fields/__init__.py:134
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Polo typa: %(field_type)s"
+
+#: db/models/fields/__init__.py:930 db/models/fields/__init__.py:1834
+msgid "Integer"
+msgstr "Integer"
+
+#: db/models/fields/__init__.py:934 db/models/fields/__init__.py:1832
+#, python-format
+msgid "'%(value)s' value must be an integer."
+msgstr "Hódnota '%(value)s' dyrbi integer być."
+
+#: db/models/fields/__init__.py:960 db/models/fields/__init__.py:1849
+msgid "Big (8 byte) integer"
+msgstr "Big (8 byte) integer"
+
+#: db/models/fields/__init__.py:972
+#, python-format
+msgid "'%(value)s' value must be either True or False."
+msgstr "Hódnota '%(value)s' dyrbi pak True pak False być."
+
+#: db/models/fields/__init__.py:1011
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (pak True pak False)"
+
+#: db/models/fields/__init__.py:1086
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Znamješkowy rjećazk (hač  %(max_length)s)"
+
+#: db/models/fields/__init__.py:1142
+msgid "Comma-separated integers"
+msgstr "Cyłe ličby dźělene přez komu"
+
+#: db/models/fields/__init__.py:1191
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr "Hódnota '%(value)s' ma njepłaćiwy datowy format. Dyrbi we formaće w DD.MM.YYYY być."
+
+#: db/models/fields/__init__.py:1193 db/models/fields/__init__.py:1336
+#, python-format
+msgid ""
+"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr "Hódnota '%(value)s' ma korektny format (DD.MM.YYYY), ale je njepłaćiwy datum."
+
+#: db/models/fields/__init__.py:1196
+msgid "Date (without time)"
+msgstr "Datum (bjez časa)"
+
+#: db/models/fields/__init__.py:1334
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
+msgstr "Hódnota '%(value)s' ma njepłaćiwy format. Dyrbi we formaće w DD.MM.YYYY HH:MM[:ss[.uuuuuu]][TZ] być."
+
+#: db/models/fields/__init__.py:1338
+#, python-format
+msgid ""
+"'%(value)s' value has the correct format (YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ]) but it is an invalid date/time."
+msgstr "Hódnota '%(value)s' ma korektny format (DD.MM.YYYY HH:MM[:ss[.uuuuuu]][TZ]), ale je njepłaćiwy datum/čas."
+
+#: db/models/fields/__init__.py:1342
+msgid "Date (with time)"
+msgstr "Datum (z časom)"
+
+#: db/models/fields/__init__.py:1494
+#, python-format
+msgid "'%(value)s' value must be a decimal number."
+msgstr "Hódnota '%(value)s' dyrbi decimalna ličba być."
+
+#: db/models/fields/__init__.py:1496
+msgid "Decimal number"
+msgstr "Decimalna ličba"
+
+#: db/models/fields/__init__.py:1653
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in [DD] "
+"[HH:[MM:]]ss[.uuuuuu] format."
+msgstr "Hódnota '%(value)s' ma njepłaćiwy format. Dyrbi w formaće [DD] [HH:[MM:]]ss[.uuuuuu] być."
+
+#: db/models/fields/__init__.py:1656
+msgid "Duration"
+msgstr "Traće"
+
+#: db/models/fields/__init__.py:1707
+msgid "Email address"
+msgstr "E-mejlowa adresa"
+
+#: db/models/fields/__init__.py:1731
+msgid "File path"
+msgstr "Datajowa šćežka"
+
+#: db/models/fields/__init__.py:1798
+#, python-format
+msgid "'%(value)s' value must be a float."
+msgstr "Hódnota '%(value)s' dyrbi typ float měć."
+
+#: db/models/fields/__init__.py:1800
+msgid "Floating point number"
+msgstr "Komowa ličba typa float"
+
+#: db/models/fields/__init__.py:1864
+msgid "IPv4 address"
+msgstr "IPv4-adresa"
+
+#: db/models/fields/__init__.py:1947
+msgid "IP address"
+msgstr "IP-adresa"
+
+#: db/models/fields/__init__.py:2031
+#, python-format
+msgid "'%(value)s' value must be either None, True or False."
+msgstr "Hódnota '%(value)s' dyrbi pak None, True pak False być."
+
+#: db/models/fields/__init__.py:2033
+msgid "Boolean (Either True, False or None)"
+msgstr "Boolean (pak True, False pak None)"
+
+#: db/models/fields/__init__.py:2093
+msgid "Positive integer"
+msgstr "Pozitiwna cyła ličba"
+
+#: db/models/fields/__init__.py:2105
+msgid "Positive small integer"
+msgstr "Pozitiwna mała cyła ličba"
+
+#: db/models/fields/__init__.py:2118
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "Adresowe mjeno (hač %(max_length)s)"
+
+#: db/models/fields/__init__.py:2152
+msgid "Small integer"
+msgstr "Mała cyła ličba"
+
+#: db/models/fields/__init__.py:2159
+msgid "Text"
+msgstr "Tekst"
+
+#: db/models/fields/__init__.py:2185
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr "Hódnota '%(value)s' ma njepłaćiwy format. Dyrbi we formaće HH:MM[:ss[.uuuuuu]] być."
+
+#: db/models/fields/__init__.py:2187
+#, python-format
+msgid ""
+"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr "Hódnota '%(value)s' ma korektny format (HH:MM[:ss[.uuuuuu]]), ale je njepłaćiwy čas."
+
+#: db/models/fields/__init__.py:2190
+msgid "Time"
+msgstr "Čas"
+
+#: db/models/fields/__init__.py:2318
+msgid "URL"
+msgstr "URL"
+
+#: db/models/fields/__init__.py:2341
+msgid "Raw binary data"
+msgstr "Hrube binarne daty"
+
+#: db/models/fields/__init__.py:2385
+#, python-format
+msgid "'%(value)s' is not a valid UUID."
+msgstr "'%(value)s' płaćiwy UUID njeje."
+
+#: db/models/fields/files.py:237
+msgid "File"
+msgstr "Dataja"
+
+#: db/models/fields/files.py:392
+msgid "Image"
+msgstr "Wobraz"
+
+#: db/models/fields/related.py:723
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr "Instanca %(model)s z %(field)s %(value)r njeeksistuje."
+
+#: db/models/fields/related.py:725
+msgid "Foreign Key (type determined by related field)"
+msgstr "Cuzy kluč (typ so přez wotpowědne polo postaja)"
+
+#: db/models/fields/related.py:983
+msgid "One-to-one relationship"
+msgstr "Poćah jedyn jedyn"
+
+#: db/models/fields/related.py:1049
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "Poćah %(from)s-%(to)s"
+
+#: db/models/fields/related.py:1050
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "Poćahi %(from)s-%(to)s"
+
+#: db/models/fields/related.py:1092
+msgid "Many-to-many relationship"
+msgstr "Poćah wjele wjele"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+#: forms/boundfield.py:167
+msgid ":?.!"
+msgstr ":?.!"
+
+#: forms/fields.py:65
+msgid "This field is required."
+msgstr "Tute polo je trěbne."
+
+#: forms/fields.py:254
+msgid "Enter a whole number."
+msgstr "Zapodajće cyłu ličbu."
+
+#: forms/fields.py:299 forms/fields.py:336
+msgid "Enter a number."
+msgstr "Zapodajće ličbu."
+
+#: forms/fields.py:414 forms/fields.py:1158
+msgid "Enter a valid date."
+msgstr "Zapodajće płaćiwy datum."
+
+#: forms/fields.py:438 forms/fields.py:1159
+msgid "Enter a valid time."
+msgstr "Zapodajće płaćiwy čas."
+
+#: forms/fields.py:460
+msgid "Enter a valid date/time."
+msgstr "Zapodajće płaćiwy datum/čas."
+
+#: forms/fields.py:489
+msgid "Enter a valid duration."
+msgstr "Zapodajće płaćiwe traće."
+
+#: forms/fields.py:556
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Žana dataja je so pósłała. Přepruwujće kodowanski typ we formularje."
+
+#: forms/fields.py:557
+msgid "No file was submitted."
+msgstr "Žana dataja je so pósłała."
+
+#: forms/fields.py:558
+msgid "The submitted file is empty."
+msgstr "Pósłana dataja je prózdna."
+
+#: forms/fields.py:560
+#, python-format
+msgid ""
+"Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] "Zawěsćće, zo tute datajowe mjeno ma maksimalnje %(max)d znamješko (ma %(length)d)."
+msgstr[1] "Zawěsćće, zo tute datajowe mjeno ma maksimalnje %(max)d znamješce (ma %(length)d)."
+msgstr[2] "Zawěsćće, zo tute datajowe mjeno ma maksimalnje %(max)d znamješka (ma %(length)d)."
+msgstr[3] "Zawěsćće, zo tute datajowe mjeno ma maksimalnje %(max)d znamješkow (ma %(length)d)."
+
+#: forms/fields.py:563
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr "Prošu zapodajće dataju abo stajće hóčku do kontrolneho kašćika, nic wobě."
+
+#: forms/fields.py:625
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr "Nahrajće płaćiwy wobraz. Dataja, kotruž sće nahrał, pak njebě wobraz pak bě wobškodźeny wobraz. "
+
+#: forms/fields.py:792 forms/fields.py:886 forms/models.py:1230
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "Wubjerće płaćiwu wolensku móžnosć.  %(value)s žana k dispoziciji stejacych wolenskich móžnosćow njeje. "
+
+#: forms/fields.py:887 forms/fields.py:1002 forms/models.py:1229
+msgid "Enter a list of values."
+msgstr "Zapodajće lisćinu hódnotow."
+
+#: forms/fields.py:1003
+msgid "Enter a complete value."
+msgstr "Zapodajće dospołnu hódnotu."
+
+#: forms/fields.py:1217
+msgid "Enter a valid UUID."
+msgstr "Zapodajće płaćiwy UUID."
+
+#. Translators: This is the default suffix added to form field labels
+#: forms/forms.py:84
+msgid ":"
+msgstr ":"
+
+#: forms/forms.py:191
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(Schowane polo field %(name)s) %(error)s"
+
+#: forms/formsets.py:97
+msgid "ManagementForm data is missing or has been tampered with"
+msgstr "Daty ManagementForm faluja abo su so sfalšowali"
+
+#: forms/formsets.py:345
+#, python-format
+msgid "Please submit %d or fewer forms."
+msgid_plural "Please submit %d or fewer forms."
+msgstr[0] "Prošu wotpósćelće %d formular"
+msgstr[1] "Prošu wotpósćelće %d formularaj abo mjenje"
+msgstr[2] "Prošu wotpósćelće %d formulary abo mjenje"
+msgstr[3] "Prošu wotpósćelće %d formularow abo mjenje"
+
+#: forms/formsets.py:352
+#, python-format
+msgid "Please submit %d or more forms."
+msgid_plural "Please submit %d or more forms."
+msgstr[0] "Prošu wotpósćelće %d formular abo wjace"
+msgstr[1] "Prošu wotpósćelće %d formularaj abo wjace"
+msgstr[2] "Prošu wotpósćelće %d formulary abo wjace"
+msgstr[3] "Prošu wotpósćelće %d formularow abo wjace"
+
+#: forms/formsets.py:380 forms/formsets.py:382
+msgid "Order"
+msgstr "Porjad"
+
+#: forms/formsets.py:384
+msgid "Delete"
+msgstr "Zhašeć"
+
+#: forms/models.py:721
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Prošu porjedźće dwójne daty za %(field)s."
+
+#: forms/models.py:725
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "Prošu porjedźće dwójne daty za %(field)s, kotrež dyrbja jónkróćne być."
+
+#: forms/models.py:731
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr "Prošu porjedźće dwójne daty za %(field_name)s, kotrež dyrbja za %(lookup)s w %(date_field)s jónkróćne być."
+
+#: forms/models.py:739
+msgid "Please correct the duplicate values below."
+msgstr "Prošu porjedźće slědowace dwójne hódnoty."
+
+#: forms/models.py:1063
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr "Nutřkowny cuzy kluč primarnemu klučej nadrjadowaneje instancy njewotpowěduje."
+
+#: forms/models.py:1123
+msgid ""
+"Select a valid choice. That choice is not one of the available choices."
+msgstr "Wubjerće płaćiwu wolensku móžnosć. Tuta wolenska móžnosć jedna z k dispoziciji stejacych wolenskich móžnosćow njeje."
+
+#: forms/models.py:1232
+#, python-format
+msgid "\"%(pk)s\" is not a valid value for a primary key."
+msgstr "\"%(pk)s\" płaćiwa hódnota za primarny kluč njeje."
+
+#: forms/utils.py:172
+#, python-format
+msgid ""
+"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr "%(datetime)s njeda so w časowym pasmje %(current_timezone)s interpretować; je snano dwuzmyslny abo njeeksistuje."
+
+#: forms/widgets.py:353
+msgid "Currently"
+msgstr "Tuchwilu"
+
+#: forms/widgets.py:354
+msgid "Change"
+msgstr "Změnić"
+
+#: forms/widgets.py:355
+msgid "Clear"
+msgstr "Zhašeć"
+
+#: forms/widgets.py:570
+msgid "Unknown"
+msgstr "Njeznaty"
+
+#: forms/widgets.py:571
+msgid "Yes"
+msgstr "Haj"
+
+#: forms/widgets.py:572
+msgid "No"
+msgstr "Ně"
+
+#: template/defaultfilters.py:867
+msgid "yes,no,maybe"
+msgstr "ha,ně,snano"
+
+#: template/defaultfilters.py:896 template/defaultfilters.py:908
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d bajt"
+msgstr[1] "%(size)d bajtaj"
+msgstr[2] "%(size)d bajty"
+msgstr[3] "%(size)d bajtow"
+
+#: template/defaultfilters.py:910
+#, python-format
+msgid "%s KB"
+msgstr "%s KB"
+
+#: template/defaultfilters.py:912
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#: template/defaultfilters.py:914
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#: template/defaultfilters.py:916
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
+
+#: template/defaultfilters.py:918
+#, python-format
+msgid "%s PB"
+msgstr "%s PB"
+
+#: utils/dateformat.py:61
+msgid "p.m."
+msgstr "popołdnju"
+
+#: utils/dateformat.py:62
+msgid "a.m."
+msgstr "dopołdnja"
+
+#: utils/dateformat.py:67
+msgid "PM"
+msgstr "popołdnju"
+
+#: utils/dateformat.py:68
+msgid "AM"
+msgstr "dopołdnja"
+
+#: utils/dateformat.py:151
+msgid "midnight"
+msgstr "połnoc"
+
+#: utils/dateformat.py:153
+msgid "noon"
+msgstr "připołdnjo"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "Póndźela"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "Wutora"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "Srjeda"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "Štwórtk"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "Pjatk"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "Sobota"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "Njedźela"
+
+#: utils/dates.py:10
+msgid "Mon"
+msgstr "Pón"
+
+#: utils/dates.py:10
+msgid "Tue"
+msgstr "Wut"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr "Srj"
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr "Štw"
+
+#: utils/dates.py:10
+msgid "Fri"
+msgstr "Pja"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr "Sob"
+
+#: utils/dates.py:11
+msgid "Sun"
+msgstr "Nje"
+
+#: utils/dates.py:18
+msgid "January"
+msgstr "Januar"
+
+#: utils/dates.py:18
+msgid "February"
+msgstr "Februar"
+
+#: utils/dates.py:18
+msgid "March"
+msgstr "Měrc"
+
+#: utils/dates.py:18
+msgid "April"
+msgstr "Apryl"
+
+#: utils/dates.py:18
+msgid "May"
+msgstr "Meja"
+
+#: utils/dates.py:18
+msgid "June"
+msgstr "Junij"
+
+#: utils/dates.py:19
+msgid "July"
+msgstr "Julij"
+
+#: utils/dates.py:19
+msgid "August"
+msgstr "Awgust"
+
+#: utils/dates.py:19
+msgid "September"
+msgstr "September"
+
+#: utils/dates.py:19
+msgid "October"
+msgstr "Oktober"
+
+#: utils/dates.py:19
+msgid "November"
+msgstr "Nowember"
+
+#: utils/dates.py:20
+msgid "December"
+msgstr "December"
+
+#: utils/dates.py:23
+msgid "jan"
+msgstr "jan."
+
+#: utils/dates.py:23
+msgid "feb"
+msgstr "feb."
+
+#: utils/dates.py:23
+msgid "mar"
+msgstr "měr."
+
+#: utils/dates.py:23
+msgid "apr"
+msgstr "apr."
+
+#: utils/dates.py:23
+msgid "may"
+msgstr "mej."
+
+#: utils/dates.py:23
+msgid "jun"
+msgstr "jun."
+
+#: utils/dates.py:24
+msgid "jul"
+msgstr "jul."
+
+#: utils/dates.py:24
+msgid "aug"
+msgstr "awg."
+
+#: utils/dates.py:24
+msgid "sep"
+msgstr "sep."
+
+#: utils/dates.py:24
+msgid "oct"
+msgstr "okt."
+
+#: utils/dates.py:24
+msgid "nov"
+msgstr "now."
+
+#: utils/dates.py:24
+msgid "dec"
+msgstr "dec."
+
+#: utils/dates.py:31
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "Jan."
+
+#: utils/dates.py:32
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "Feb."
+
+#: utils/dates.py:33
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Měrc"
+
+#: utils/dates.py:34
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Apryl"
+
+#: utils/dates.py:35
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "Meja"
+
+#: utils/dates.py:36
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Junij"
+
+#: utils/dates.py:37
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Julij"
+
+#: utils/dates.py:38
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "Awg."
+
+#: utils/dates.py:39
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "Sept."
+
+#: utils/dates.py:40
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "Okt."
+
+#: utils/dates.py:41
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "Now."
+
+#: utils/dates.py:42
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "Dec."
+
+#: utils/dates.py:45
+msgctxt "alt. month"
+msgid "January"
+msgstr "Januar"
+
+#: utils/dates.py:46
+msgctxt "alt. month"
+msgid "February"
+msgstr "Februar"
+
+#: utils/dates.py:47
+msgctxt "alt. month"
+msgid "March"
+msgstr "Měrc"
+
+#: utils/dates.py:48
+msgctxt "alt. month"
+msgid "April"
+msgstr "Apryl"
+
+#: utils/dates.py:49
+msgctxt "alt. month"
+msgid "May"
+msgstr "Meja"
+
+#: utils/dates.py:50
+msgctxt "alt. month"
+msgid "June"
+msgstr "Junij"
+
+#: utils/dates.py:51
+msgctxt "alt. month"
+msgid "July"
+msgstr "Julij"
+
+#: utils/dates.py:52
+msgctxt "alt. month"
+msgid "August"
+msgstr "Awgust"
+
+#: utils/dates.py:53
+msgctxt "alt. month"
+msgid "September"
+msgstr "September"
+
+#: utils/dates.py:54
+msgctxt "alt. month"
+msgid "October"
+msgstr "Oktober"
+
+#: utils/dates.py:55
+msgctxt "alt. month"
+msgid "November"
+msgstr "Nowember"
+
+#: utils/dates.py:56
+msgctxt "alt. month"
+msgid "December"
+msgstr "December"
+
+#: utils/ipv6.py:10
+msgid "This is not a valid IPv6 address."
+msgstr "To płaćiwa IPv6-adresa njeje."
+
+#: utils/text.py:77
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s..."
+msgstr "%(truncated_text)s..."
+
+#: utils/text.py:246
+msgid "or"
+msgstr "abo"
+
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:265 utils/timesince.py:63
+msgid ", "
+msgstr ", "
+
+#: utils/timesince.py:11
+#, python-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d lěto"
+msgstr[1] "%d lěće"
+msgstr[2] "%d lěta"
+msgstr[3] "%d lět"
+
+#: utils/timesince.py:12
+#, python-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d měsac"
+msgstr[1] "%d měsacaj"
+msgstr[2] "%d měsacy"
+msgstr[3] "%d měsacow"
+
+#: utils/timesince.py:13
+#, python-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d tydźeń"
+msgstr[1] "%d njedźeli"
+msgstr[2] "%d njedźele"
+msgstr[3] "%d njedźel"
+
+#: utils/timesince.py:14
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d dźeń"
+msgstr[1] "%d njej"
+msgstr[2] "%d dny"
+msgstr[3] "%d dnjow"
+
+#: utils/timesince.py:15
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d hodźina"
+msgstr[1] "%d hodźinje"
+msgstr[2] "%d hodźiny"
+msgstr[3] "%d hodźin"
+
+#: utils/timesince.py:16
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d mjeńšina"
+msgstr[1] "%d mjeńšinje"
+msgstr[2] "%d mjeńšiny"
+msgstr[3] "%d mjeńšin"
+
+#: utils/timesince.py:52
+msgid "0 minutes"
+msgstr "0 mjeńšin"
+
+#: views/csrf.py:107
+msgid "Forbidden"
+msgstr "Zakazany"
+
+#: views/csrf.py:108
+msgid "CSRF verification failed. Request aborted."
+msgstr "CSRF-přepruwowanje je so nimokuliło.  Naprašowanje je so přetorhnyło."
+
+#: views/csrf.py:112
+msgid ""
+"You are seeing this message because this HTTPS site requires a 'Referer "
+"header' to be sent by your Web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr "Widźiće tutu zdźělenku, dokelž HTTPS-sydło 'hłowu Referer' trjeba, zo by so do webwobhladowaka słało, ale njeje so pósłała. Tuta hłowa je z přičinow wěstoty trěbna, zo by so zawěsćiło, zo waš wobhladowak so wot třećich njekapruje."
+
+#: views/csrf.py:117
+msgid ""
+"If you have configured your browser to disable 'Referer' headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for 'same-"
+"origin' requests."
+msgstr "Jei sće swój wobhladowak tak konfigurował, zo su hłowy 'Referer' znjemóžnjene, zmóžńće je, znajmjeńša za tute sydło abo za HTTPS-zwiski abo za naprašowanja 'sameorigin'."
+
+#: views/csrf.py:122
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr "Widźiće tutu zdźělenku, dokelž tute sydło CSRF-plack trjeba, hdyž so formulary wotesyłaja. Tutón plack je z přičinow wěstoty trěbny, zo by so waš wobhladowak wot třećich njekapruje."
+
+#: views/csrf.py:127
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for 'same-origin' requests."
+msgstr "Jeli sće swój wobhladowak tak konfigurował, zo su placki znjemóžnjene, zmóžńće je zaso, znajmjeńša za tute sydło abo za naprašowanja 'same-origin'."
+
+#: views/csrf.py:132
+msgid "More information is available with DEBUG=True."
+msgstr "Z DEBUG=True su dalše informacije k dispoziciji."
+
+#: views/debug.py:508
+msgid "Welcome to Django"
+msgstr "Witajće k Django"
+
+#: views/debug.py:509
+msgid "It worked!"
+msgstr "Je so fungowało!"
+
+#: views/debug.py:510
+msgid "Congratulations on your first Django-powered page."
+msgstr "Zbožopřeće k wašej prěnjej stronje spěchowanej přez Django."
+
+#: views/debug.py:511
+msgid ""
+"Of course, you haven't actually done any work yet. Next, start your first "
+"app by running <code>python manage.py startapp [app_label]</code>."
+msgstr "Njejsće wězo hišće žane dźěło činił. Wuwjedźće tuž jako přichodne <code>python manage.py startapp [app_label]</code>, zo byšće swóje prěnje nałoženje startował."
+
+#: views/debug.py:513
+msgid ""
+"You're seeing this message because you have <code>DEBUG = True</code> in "
+"your Django settings file and you haven't configured any URLs. Get to work!"
+msgstr "Widźiće tutu zdźělenku, dokelž maće <code>DEBUG = True</code> w swojej dataji nastajenjow Django a njejsće URL skonfigurował. Dajće do dźěła!"
+
+#: views/generic/dates.py:48
+msgid "No year specified"
+msgstr "Žane lěto podate"
+
+#: views/generic/dates.py:104
+msgid "No month specified"
+msgstr "Žadyn měsac podaty"
+
+#: views/generic/dates.py:163
+msgid "No day specified"
+msgstr "Žadyn dźeń podaty"
+
+#: views/generic/dates.py:219
+msgid "No week specified"
+msgstr "Žadyn tydźeń podaty"
+
+#: views/generic/dates.py:378 views/generic/dates.py:406
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "Žadyn %(verbose_name_plural)s k dispoziciji njeje"
+
+#: views/generic/dates.py:660
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
+msgstr "Přichodowe %(verbose_name_plural)s k dispoziciji njejsu, dokelž hódnota %(class_name)s.allow_future je False."
+
+#: views/generic/dates.py:694
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr "Njepłaćiwy '%(format)s' za datumowy znamješkowy rjaćazk '%(datestr)s' podaty"
+
+#: views/generic/detail.py:55
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "Žane %(verbose_name)s namakane, kotrež naprašowanju wotpowěduje"
+
+#: views/generic/list.py:76
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr "Strona 'last' njeje, ani njeda so do int konwertować."
+
+#: views/generic/list.py:81
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "Njepłaćiwa strona (%(page_number)s): %(message)s"
+
+#: views/generic/list.py:172
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr "Prózdna lisćina a '%(class_name)s.allow_empty' je False."
+
+#: views/static.py:58
+msgid "Directory indexes are not allowed here."
+msgstr "Zapisowe indeksy tu dowolone njejsu."
+
+#: views/static.py:60
+#, python-format
+msgid "\"%(path)s\" does not exist"
+msgstr "\"%(path)s\" njeeksistuje"
+
+#: views/static.py:100
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "Indeks %(directory)s"

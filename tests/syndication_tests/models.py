@@ -21,7 +21,7 @@ class Entry(models.Model):
 @python_2_unicode_compatible
 class Article(models.Model):
     title = models.CharField(max_length=200)
-    entry = models.ForeignKey(Entry)
+    entry = models.ForeignKey(Entry, models.CASCADE)
 
     def __str__(self):
         return self.title

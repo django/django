@@ -57,7 +57,7 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
             except OperationalError:
                 logger.error(
                     "Couldn't remove spatial index: %s (may be expected "
-                    "if your storage engine doesn't support them)." % sql
+                    "if your storage engine doesn't support them).", sql
                 )
 
         super(MySQLGISSchemaEditor, self).remove_field(model, field)
@@ -72,6 +72,6 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
             except OperationalError:
                 logger.error(
                     "Cannot create SPATIAL INDEX %s. Only MyISAM and (as of "
-                    "MySQL 5.7.5) InnoDB support them." % sql
+                    "MySQL 5.7.5) InnoDB support them.", sql
                 )
         self.geometry_sql = []

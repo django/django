@@ -1,16 +1,12 @@
 from functools import partial, update_wrapper
 
 from django.contrib.auth.decorators import user_passes_test
-from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
+from django.urls import reverse_lazy
 from django.views.generic import RedirectView
 
 
 def empty_view(request, *args, **kwargs):
-    return HttpResponse('')
-
-
-def kwargs_view(request, arg1=1, arg2=2):
     return HttpResponse('')
 
 
@@ -49,7 +45,7 @@ class LazyRedirectView(RedirectView):
     url = reverse_lazy('named-lazy-url-redirected-to')
 
 
-@user_passes_test(lambda u: u.is_authenticated(), login_url=reverse_lazy('some-login-page'))
+@user_passes_test(lambda u: u.is_authenticated, login_url=reverse_lazy('some-login-page'))
 def login_required_view(request):
     return HttpResponse('Hello you')
 
@@ -59,8 +55,7 @@ def bad_view(request, *args, **kwargs):
 
 
 empty_view_partial = partial(empty_view, template_name="template.html")
-
-
+empty_view_nested_partial = partial(empty_view_partial, template_name="nested_partial.html")
 empty_view_wrapped = update_wrapper(
     partial(empty_view, template_name="template.html"), empty_view,
 )

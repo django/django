@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 import datetime
 import unittest
 
+from django.test import TestCase
 from django.utils import feedgenerator
-from django.utils.timezone import get_fixed_timezone
+from django.utils.timezone import get_fixed_timezone, utc
 
 
 class FeedgeneratorTest(unittest.TestCase):
@@ -26,7 +27,10 @@ class FeedgeneratorTest(unittest.TestCase):
         numbers.
         """
         self.assertEqual(
-            feedgenerator.get_tag_uri('http://www.example.org:8000/2008/11/14/django#headline', datetime.datetime(2008, 11, 14, 13, 37, 0)),
+            feedgenerator.get_tag_uri(
+                'http://www.example.org:8000/2008/11/14/django#headline',
+                datetime.datetime(2008, 11, 14, 13, 37, 0),
+            ),
             'tag:www.example.org,2008-11-14:/2008/11/14/django/headline')
 
     def test_rfc2822_date(self):
@@ -105,7 +109,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_feed_without_feed_url_gets_rendered_without_atom_link(self):
         feed = feedgenerator.Rss201rev2Feed('title', '/link/', 'descr')
-        self.assertEqual(feed.feed['feed_url'], None)
+        self.assertIsNone(feed.feed['feed_url'])
         feed_content = feed.writeString('utf-8')
         self.assertNotIn('<atom:link', feed_content)
         self.assertNotIn('href="/feed/"', feed_content)
@@ -118,3 +122,13 @@ class FeedgeneratorTest(unittest.TestCase):
         self.assertIn('<atom:link', feed_content)
         self.assertIn('href="/feed/"', feed_content)
         self.assertIn('rel="self"', feed_content)
+
+
+class FeedgeneratorDBTest(TestCase):
+
+    # setting the timezone requires a database query on PostgreSQL.
+    def test_latest_post_date_returns_utc_time(self):
+        for use_tz in (True, False):
+            with self.settings(USE_TZ=use_tz):
+                rss_feed = feedgenerator.Rss201rev2Feed('title', 'link', 'description')
+                self.assertEqual(rss_feed.latest_post_date().tzinfo, utc)

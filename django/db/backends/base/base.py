@@ -1,3 +1,4 @@
+import copy
 import time
 import warnings
 from collections import deque
@@ -86,6 +87,13 @@ class BaseDatabaseWrapper(object):
         # Should we run the on-commit hooks the next time set_autocommit(True)
         # is called?
         self.run_commit_hooks_on_set_autocommit_on = False
+
+    def ensure_timezone(self):
+        """
+        Ensure the connection's timezone is set to `self.timezone_name` and
+        return whether it changed or not.
+        """
+        return False
 
     @cached_property
     def timezone(self):
@@ -380,9 +388,8 @@ class BaseDatabaseWrapper(object):
         self.ensure_connection()
 
         start_transaction_under_autocommit = (
-            force_begin_transaction_with_broken_autocommit
-            and not autocommit
-            and self.features.autocommits_when_autocommit_is_off
+            force_begin_transaction_with_broken_autocommit and not autocommit and
+            self.features.autocommits_when_autocommit_is_off
         )
 
         if start_transaction_under_autocommit:
@@ -513,13 +520,14 @@ class BaseDatabaseWrapper(object):
         authorized to be shared between threads (via the `allow_thread_sharing`
         property). Raises an exception if the validation fails.
         """
-        if not (self.allow_thread_sharing
-                or self._thread_ident == thread.get_ident()):
-            raise DatabaseError("DatabaseWrapper objects created in a "
+        if not (self.allow_thread_sharing or self._thread_ident == thread.get_ident()):
+            raise DatabaseError(
+                "DatabaseWrapper objects created in a "
                 "thread can only be used in that same thread. The object "
                 "with alias '%s' was created in thread id %s and this is "
                 "thread id %s."
-                % (self.alias, self._thread_ident, thread.get_ident()))
+                % (self.alias, self._thread_ident, thread.get_ident())
+            )
 
     # ##### Miscellaneous #####
 
@@ -568,10 +576,10 @@ class BaseDatabaseWrapper(object):
             if must_close:
                 self.close()
 
-    @cached_property
+    @property
     def _nodb_connection(self):
         """
-        Alternative connection to be used when there is no need to access
+        Return an alternative connection to be used when there is no need to access
         the main database, specifically for test db creation/deletion.
         This also prevents the production database from being exposed to
         potential child threads while (or after) the test database is destroyed.
@@ -616,9 +624,21 @@ class BaseDatabaseWrapper(object):
 
     def run_and_clear_commit_hooks(self):
         self.validate_no_atomic_block()
-        try:
-            while self.run_on_commit:
-                sids, func = self.run_on_commit.pop(0)
-                func()
-        finally:
-            self.run_on_commit = []
+        current_run_on_commit = self.run_on_commit
+        self.run_on_commit = []
+        while current_run_on_commit:
+            sids, func = current_run_on_commit.pop(0)
+            func()
+
+    def copy(self, alias=None, allow_thread_sharing=None):
+        """
+        Return a copy of this connection.
+
+        For tests that require two connections to the same database.
+        """
+        settings_dict = copy.deepcopy(self.settings_dict)
+        if alias is None:
+            alias = self.alias
+        if allow_thread_sharing is None:
+            allow_thread_sharing = self.allow_thread_sharing
+        return type(self)(settings_dict, alias, allow_thread_sharing)

@@ -40,10 +40,7 @@ class BaseGeometryWidget(Widget):
         try:
             return GEOSGeometry(value, self.map_srid)
         except (GEOSException, ValueError) as err:
-            logger.error(
-                "Error creating geometry from value '%s' (%s)" % (
-                    value, err)
-            )
+            logger.error("Error creating geometry from value '%s' (%s)", value, err)
         return None
 
     def render(self, name, value, attrs=None):
@@ -61,8 +58,8 @@ class BaseGeometryWidget(Widget):
                     value = ogr
                 except gdal.GDALException as err:
                     logger.error(
-                        "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
-                            value.srid, self.map_srid, err)
+                        "Error transforming geometry from srid '%s' to srid '%s' (%s)",
+                        value.srid, self.map_srid, err
                     )
 
         context = self.build_attrs(
@@ -82,7 +79,7 @@ class OpenLayersWidget(BaseGeometryWidget):
 
     class Media:
         js = (
-            'http://openlayers.org/api/2.13/OpenLayers.js',
+            'http://openlayers.org/api/2.13.1/OpenLayers.js',
             'gis/js/OLMapWidget.js',
         )
 
@@ -94,11 +91,11 @@ class OSMWidget(BaseGeometryWidget):
     template_name = 'gis/openlayers-osm.html'
     default_lon = 5
     default_lat = 47
+    map_srid = 3857
 
     class Media:
         js = (
-            'http://openlayers.org/api/2.13/OpenLayers.js',
-            'http://www.openstreetmap.org/openlayers/OpenStreetMap.js',
+            'http://openlayers.org/api/2.13.1/OpenLayers.js',
             'gis/js/OLMapWidget.js',
         )
 
@@ -108,12 +105,3 @@ class OSMWidget(BaseGeometryWidget):
             self.attrs[key] = getattr(self, key)
         if attrs:
             self.attrs.update(attrs)
-
-    @property
-    def map_srid(self):
-        # Use the official spherical mercator projection SRID when GDAL is
-        # available; otherwise, fallback to 900913.
-        if gdal.HAS_GDAL:
-            return 3857
-        else:
-            return 900913

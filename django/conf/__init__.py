@@ -9,11 +9,9 @@ a list of all possible variables.
 import importlib
 import os
 import time
-import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -41,6 +39,14 @@ class LazySettings(LazyObject):
                 % (desc, ENVIRONMENT_VARIABLE))
 
         self._wrapped = Settings(settings_module)
+
+    def __repr__(self):
+        # Hardcode the class name as otherwise it yields 'Settings'.
+        if self._wrapped is empty:
+            return '<LazySettings [Unevaluated]>'
+        return '<LazySettings "%(settings_module)s">' % {
+            'settings_module': self._wrapped.SETTINGS_MODULE,
+        }
 
     def __getattr__(self, name):
         if self._wrapped is empty:
@@ -91,7 +97,6 @@ class Settings(BaseSettings):
         mod = importlib.import_module(self.SETTINGS_MODULE)
 
         tuple_settings = (
-            "ALLOWED_INCLUDE_ROOTS",
             "INSTALLED_APPS",
             "TEMPLATE_DIRS",
             "LOCALE_PATHS",
@@ -103,23 +108,12 @@ class Settings(BaseSettings):
 
                 if (setting in tuple_settings and
                         not isinstance(setting_value, (list, tuple))):
-                    raise ImproperlyConfigured("The %s setting must be a list or a tuple. "
-                            "Please fix your settings." % setting)
+                    raise ImproperlyConfigured("The %s setting must be a list or a tuple. " % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
-
-        if ('django.contrib.auth.middleware.AuthenticationMiddleware' in self.MIDDLEWARE_CLASSES and
-                'django.contrib.auth.middleware.SessionAuthenticationMiddleware' not in self.MIDDLEWARE_CLASSES):
-            warnings.warn(
-                "Session verification will become mandatory in Django 1.10. "
-                "Please add 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' "
-                "to your MIDDLEWARE_CLASSES setting when you are ready to opt-in after "
-                "reading the upgrade considerations in the 1.8 release notes.",
-                RemovedInDjango110Warning
-            )
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -135,6 +129,12 @@ class Settings(BaseSettings):
 
     def is_overridden(self, setting):
         return setting in self._explicit_settings
+
+    def __repr__(self):
+        return '<%(cls)s "%(settings_module)s">' % {
+            'cls': self.__class__.__name__,
+            'settings_module': self.SETTINGS_MODULE,
+        }
 
 
 class UserSettingsHolder(BaseSettings):
@@ -168,12 +168,20 @@ class UserSettingsHolder(BaseSettings):
             super(UserSettingsHolder, self).__delattr__(name)
 
     def __dir__(self):
-        return list(self.__dict__) + dir(self.default_settings)
+        return sorted(
+            s for s in list(self.__dict__) + dir(self.default_settings)
+            if s not in self._deleted
+        )
 
     def is_overridden(self, setting):
         deleted = (setting in self._deleted)
         set_locally = (setting in self.__dict__)
         set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
         return (deleted or set_locally or set_on_default)
+
+    def __repr__(self):
+        return '<%(cls)s>' % {
+            'cls': self.__class__.__name__,
+        }
 
 settings = LazySettings()

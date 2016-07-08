@@ -8,8 +8,8 @@ from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils.six.moves import range
 
 from .models import (
-    A, M, MR, R, S, T, Avatar, Base, Child, HiddenUser, HiddenUserProfile,
-    M2MFrom, M2MTo, MRNull, Parent, RChild, User, create_a, get_default_r,
+    MR, A, Avatar, Base, Child, HiddenUser, HiddenUserProfile, M, M2MFrom,
+    M2MTo, MRNull, Parent, R, RChild, S, T, User, create_a, get_default_r,
 )
 
 
@@ -31,7 +31,7 @@ class OnDeleteTests(TestCase):
         a = create_a('setvalue')
         a.setvalue.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(self.DEFAULT, a.setvalue)
+        self.assertEqual(self.DEFAULT, a.setvalue.pk)
 
     def test_setnull(self):
         a = create_a('setnull')
@@ -43,7 +43,7 @@ class OnDeleteTests(TestCase):
         a = create_a('setdefault')
         a.setdefault.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(self.DEFAULT, a.setdefault)
+        self.assertEqual(self.DEFAULT, a.setdefault.pk)
 
     def test_setdefault_none(self):
         a = create_a('setdefault_none')
@@ -63,7 +63,8 @@ class OnDeleteTests(TestCase):
 
     def test_protect(self):
         a = create_a('protect')
-        self.assertRaises(IntegrityError, a.protect.delete)
+        with self.assertRaises(IntegrityError):
+            a.protect.delete()
 
     def test_do_nothing(self):
         # Testing DO_NOTHING is a bit harder: It would raise IntegrityError for a normal model,
@@ -224,12 +225,13 @@ class DeletionTests(TestCase):
         s2 = S.objects.create(pk=2, r=r)
         T.objects.create(pk=1, s=s1)
         T.objects.create(pk=2, s=s2)
+        RChild.objects.create(r_ptr=r)
         r.delete()
         self.assertEqual(
-            pre_delete_order, [(T, 2), (T, 1), (S, 2), (S, 1), (R, 1)]
+            pre_delete_order, [(T, 2), (T, 1), (RChild, 1), (S, 2), (S, 1), (R, 1)]
         )
         self.assertEqual(
-            post_delete_order, [(T, 1), (T, 2), (S, 1), (S, 2), (R, 1)]
+            post_delete_order, [(T, 1), (T, 2), (RChild, 1), (S, 1), (S, 2), (R, 1)]
         )
 
         models.signals.post_delete.disconnect(log_post_delete)
@@ -413,6 +415,17 @@ class DeletionTests(TestCase):
         for k, v in existed_objs.items():
             self.assertEqual(deleted_objs[k], v)
 
+    def test_proxied_model_duplicate_queries(self):
+        """
+        #25685 - Deleting instances of a model with existing proxy
+        classes should not issue multiple queries during cascade
+        deletion of referring models.
+        """
+        avatar = Avatar.objects.create()
+        # One query for the Avatar table and a second for the User one.
+        with self.assertNumQueries(2):
+            avatar.delete()
+
 
 class FastDeleteTests(TestCase):
 
@@ -491,3 +504,15 @@ class FastDeleteTests(TestCase):
         # that + fast delete of the related objs.
         self.assertNumQueries(2, a.delete)
         self.assertEqual(User.objects.count(), 0)
+
+    def test_fast_delete_empty_no_update_can_self_select(self):
+        """
+        #25932 - Fast deleting on backends that don't have the
+        `no_update_can_self_select` feature should work even if the specified
+        filter doesn't match any row.
+        """
+        with self.assertNumQueries(1):
+            self.assertEqual(
+                User.objects.filter(avatar__desc='missing').delete(),
+                (0, {'delete.User': 0})
+            )

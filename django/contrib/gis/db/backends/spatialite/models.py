@@ -2,9 +2,7 @@
  The GeometryColumns and SpatialRefSys models for the SpatiaLite backend.
 """
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
-from django.contrib.gis.db.backends.spatialite.base import DatabaseWrapper
-from django.db import connection, models
-from django.db.backends.signals import connection_created
+from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -18,6 +16,7 @@ class SpatialiteGeometryColumns(models.Model):
     coord_dimension = models.IntegerField()
     srid = models.IntegerField(primary_key=True)
     spatial_index_enabled = models.IntegerField()
+    type = models.IntegerField(db_column='geometry_type')
 
     class Meta:
         app_label = 'gis'
@@ -55,30 +54,13 @@ class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
     auth_srid = models.IntegerField()
     ref_sys_name = models.CharField(max_length=256)
     proj4text = models.CharField(max_length=2048)
+    srtext = models.CharField(max_length=2048)
 
     @property
     def wkt(self):
-        if hasattr(self, 'srtext'):
-            return self.srtext
-        from django.contrib.gis.gdal import SpatialReference
-        return SpatialReference(self.proj4text).wkt
+        return self.srtext
 
     class Meta:
         app_label = 'gis'
         db_table = 'spatial_ref_sys'
         managed = False
-
-
-def add_spatial_version_related_fields(sender, **kwargs):
-    """
-    Adds fields after establishing a database connection to prevent database
-    operations at compile time.
-    """
-    if connection_created.disconnect(add_spatial_version_related_fields, sender=DatabaseWrapper):
-        spatial_version = connection.ops.spatial_version[0]
-        if spatial_version >= 4:
-            SpatialiteSpatialRefSys.add_to_class('srtext', models.CharField(max_length=2048))
-            SpatialiteGeometryColumns.add_to_class('type', models.IntegerField(db_column='geometry_type'))
-        else:
-            SpatialiteGeometryColumns.add_to_class('type', models.CharField(max_length=30))
-connection_created.connect(add_spatial_version_related_fields, sender=DatabaseWrapper)

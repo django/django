@@ -11,33 +11,68 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     mysql = True
     name = 'mysql'
-    select = 'AsText(%s)'
-    from_wkb = 'GeomFromWKB'
-    from_text = 'GeomFromText'
 
     Adapter = WKTAdapter
-    Adaptor = Adapter  # Backwards-compatibility alias.
 
-    gis_operators = {
-        'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
-        'bboverlaps': SpatialOperator(func='MBROverlaps'),  # .. ..
-        'contained': SpatialOperator(func='MBRWithin'),    # .. ..
-        'contains': SpatialOperator(func='MBRContains'),
-        'disjoint': SpatialOperator(func='MBRDisjoint'),
-        'equals': SpatialOperator(func='MBREqual'),
-        'exact': SpatialOperator(func='MBREqual'),
-        'intersects': SpatialOperator(func='MBRIntersects'),
-        'overlaps': SpatialOperator(func='MBROverlaps'),
-        'same_as': SpatialOperator(func='MBREqual'),
-        'touches': SpatialOperator(func='MBRTouches'),
-        'within': SpatialOperator(func='MBRWithin'),
-    }
+    @cached_property
+    def is_mysql_5_5(self):
+        return self.connection.mysql_version < (5, 6, 1)
 
-    function_names = {
-        'Distance': 'ST_Distance',
-        'Length': 'GLength',
-        'Union': 'ST_Union',
-    }
+    @cached_property
+    def is_mysql_5_6(self):
+        return self.connection.mysql_version < (5, 7, 6)
+
+    @cached_property
+    def select(self):
+        if self.is_mysql_5_5:
+            return 'AsText(%s)'
+        return 'ST_AsText(%s)'
+
+    @cached_property
+    def from_wkb(self):
+        if self.is_mysql_5_5:
+            return 'GeomFromWKB'
+        return 'ST_GeomFromWKB'
+
+    @cached_property
+    def from_text(self):
+        if self.is_mysql_5_5:
+            return 'GeomFromText'
+        return 'ST_GeomFromText'
+
+    @cached_property
+    def gis_operators(self):
+        MBREquals = 'MBREqual' if self.is_mysql_5_6 else 'MBREquals'
+        return {
+            'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
+            'bboverlaps': SpatialOperator(func='MBROverlaps'),  # ...
+            'contained': SpatialOperator(func='MBRWithin'),  # ...
+            'contains': SpatialOperator(func='MBRContains'),
+            'disjoint': SpatialOperator(func='MBRDisjoint'),
+            'equals': SpatialOperator(func=MBREquals),
+            'exact': SpatialOperator(func=MBREquals),
+            'intersects': SpatialOperator(func='MBRIntersects'),
+            'overlaps': SpatialOperator(func='MBROverlaps'),
+            'same_as': SpatialOperator(func=MBREquals),
+            'touches': SpatialOperator(func='MBRTouches'),
+            'within': SpatialOperator(func='MBRWithin'),
+        }
+
+    @cached_property
+    def function_names(self):
+        return {
+            'Area': 'Area' if self.is_mysql_5_5 else 'ST_Area',
+            'Centroid': 'Centroid' if self.is_mysql_5_5 else 'ST_Centroid',
+            'Difference': 'ST_Difference',
+            'Distance': 'ST_Distance',
+            'Envelope': 'Envelope' if self.is_mysql_5_5 else 'ST_Envelope',
+            'Intersection': 'ST_Intersection',
+            'Length': 'GLength' if self.is_mysql_5_5 else 'ST_Length',
+            'NumGeometries': 'NumGeometries' if self.is_mysql_5_5 else 'ST_NumGeometries',
+            'NumPoints': 'NumPoints' if self.is_mysql_5_5 else 'ST_NumPoints',
+            'SymDifference': 'ST_SymDifference',
+            'Union': 'ST_Union',
+        }
 
     disallowed_aggregates = (
         aggregates.Collect, aggregates.Extent, aggregates.Extent3D,
@@ -48,12 +83,12 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     def unsupported_functions(self):
         unsupported = {
             'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG', 'BoundingCircle',
-            'Difference', 'ForceRHR', 'GeoHash', 'Intersection', 'MemSize',
+            'ForceRHR', 'GeoHash', 'IsValid', 'MakeValid', 'MemSize',
             'Perimeter', 'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid',
-            'SymDifference', 'Transform', 'Translate',
+            'Transform', 'Translate',
         }
-        if self.connection.mysql_version < (5, 6, 1):
-            unsupported.update({'Distance', 'Union'})
+        if self.is_mysql_5_5:
+            unsupported.update({'Difference', 'Distance', 'Intersection', 'SymDifference', 'Union'})
         return unsupported
 
     def geo_db_type(self, f):

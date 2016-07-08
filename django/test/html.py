@@ -148,8 +148,10 @@ class RootElement(Element):
 
 
 class Parser(HTMLParser):
-    SELF_CLOSING_TAGS = ('br', 'hr', 'input', 'img', 'meta', 'spacer',
-        'link', 'frame', 'base', 'col')
+    SELF_CLOSING_TAGS = (
+        'br', 'hr', 'input', 'img', 'meta', 'spacer', 'link', 'frame', 'base',
+        'col',
+    )
 
     def __init__(self):
         HTMLParser.__init__(self)
@@ -223,7 +225,6 @@ def parse_html(html):
     structure that can be easily compared against other HTML on semantic
     equivalence. Syntactical differences like which quotation is used on
     arguments will be ignored.
-
     """
     parser = Parser()
     parser.feed(html)

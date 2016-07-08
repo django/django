@@ -17,9 +17,9 @@ class Foo(models.Model):
 @python_2_unicode_compatible
 class Bar(models.Model):
     name = models.CharField(max_length=50)
-    normal = models.ForeignKey(Foo, related_name='normal_foo')
-    fwd = models.ForeignKey("Whiz")
-    back = models.ForeignKey("Foo")
+    normal = models.ForeignKey(Foo, models.CASCADE, related_name='normal_foo')
+    fwd = models.ForeignKey("Whiz", models.CASCADE)
+    back = models.ForeignKey("Foo", models.CASCADE)
 
     def __str__(self):
         return "Bar %s" % self.place.name
@@ -35,7 +35,7 @@ class Whiz(models.Model):
 
 @python_2_unicode_compatible
 class Child(models.Model):
-    parent = models.OneToOneField('Base')
+    parent = models.OneToOneField('Base', models.CASCADE)
     name = models.CharField(max_length=50)
 
     def __str__(self):

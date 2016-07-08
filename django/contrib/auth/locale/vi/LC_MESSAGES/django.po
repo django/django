@@ -10,11 +10,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:30+0000\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-10-11 08:53+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
-"language/vi/)\n"
+"Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
+"vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -44,6 +44,12 @@ msgstr "Thay đổi mật khẩu: %s"
 msgid "Authentication and Authorization"
 msgstr "Xác thực và ủy quyền"
 
+msgid "password"
+msgstr "Mật khẩu"
+
+msgid "last login"
+msgstr "Lần cuối đăng nhập"
+
 msgid "No password set."
 msgstr "Chưa đặt mật khẩu"
 
@@ -59,17 +65,14 @@ msgstr "Mật khẩu"
 msgid "Password confirmation"
 msgstr "Xác nhận mật khẩu"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Nhập dãy mật mã trên để xác minh lại"
+msgid "Enter the same password as before, for verification."
+msgstr ""
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"Mật khẩu ban đầu sẽ không được lưu giữ, vì không có cách nào để có thể xem "
-"được mật khẩu của người dùng này, nhưng bạn có thể thay đổi mật khẩu bằng "
-"cách truy cập <a href=\"password/\">mẫu đơn này</a>."
 
 #, python-format
 msgid ""
@@ -121,6 +124,9 @@ msgstr "kiểm tra"
 msgid "name"
 msgstr "Tên"
 
+msgid "content type"
+msgstr ""
+
 msgid "codename"
 msgstr "tên mã"
 
@@ -135,12 +141,6 @@ msgstr "Nhóm"
 
 msgid "groups"
 msgstr "Các nhóm"
-
-msgid "password"
-msgstr "Mật khẩu"
-
-msgid "last login"
-msgstr "Lần cuối đăng nhập"
 
 msgid "superuser status"
 msgstr "trạng thái superuser"
@@ -210,6 +210,39 @@ msgstr "Người dùng"
 
 msgid "users"
 msgstr "người sử dụng"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr ""
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+
+msgid "This password is too common."
+msgstr ""
+
+msgid "Your password can't be a commonly used password."
+msgstr ""
+
+msgid "This password is entirely numeric."
+msgstr ""
+
+msgid "Your password can't be entirely numeric."
+msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"

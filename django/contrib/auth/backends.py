@@ -15,12 +15,21 @@ class ModelBackend(object):
             username = kwargs.get(UserModel.USERNAME_FIELD)
         try:
             user = UserModel._default_manager.get_by_natural_key(username)
-            if user.check_password(password):
-                return user
         except UserModel.DoesNotExist:
             # Run the default password hasher once to reduce the timing
             # difference between an existing and a non-existing user (#20760).
             UserModel().set_password(password)
+        else:
+            if user.check_password(password) and self.user_can_authenticate(user):
+                return user
+
+    def user_can_authenticate(self, user):
+        """
+        Reject users with is_active=False. Custom user models that don't have
+        that attribute are allowed.
+        """
+        is_active = getattr(user, 'is_active', None)
+        return is_active or is_active is None
 
     def _get_user_permissions(self, user_obj):
         return user_obj.user_permissions.all()
@@ -36,7 +45,7 @@ class ModelBackend(object):
         be either "group" or "user" to return permissions from
         `_get_group_permissions` or `_get_user_permissions` respectively.
         """
-        if not user_obj.is_active or user_obj.is_anonymous() or obj is not None:
+        if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
 
         perm_cache_name = '_%s_perm_cache' % from_name
@@ -64,7 +73,7 @@ class ModelBackend(object):
         return self._get_permissions(user_obj, obj, 'group')
 
     def get_all_permissions(self, user_obj, obj=None):
-        if not user_obj.is_active or user_obj.is_anonymous() or obj is not None:
+        if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
         if not hasattr(user_obj, '_perm_cache'):
             user_obj._perm_cache = self.get_user_permissions(user_obj)
@@ -90,9 +99,15 @@ class ModelBackend(object):
     def get_user(self, user_id):
         UserModel = get_user_model()
         try:
-            return UserModel._default_manager.get(pk=user_id)
+            user = UserModel._default_manager.get(pk=user_id)
         except UserModel.DoesNotExist:
             return None
+        return user if self.user_can_authenticate(user) else None
+
+
+class AllowAllUsersModelBackend(ModelBackend):
+    def user_can_authenticate(self, user):
+        return True
 
 
 class RemoteUserBackend(ModelBackend):
@@ -140,7 +155,7 @@ class RemoteUserBackend(ModelBackend):
                 user = UserModel._default_manager.get_by_natural_key(username)
             except UserModel.DoesNotExist:
                 pass
-        return user
+        return user if self.user_can_authenticate(user) else None
 
     def clean_username(self, username):
         """
@@ -158,3 +173,8 @@ class RemoteUserBackend(ModelBackend):
         By default, returns the user unmodified.
         """
         return user
+
+
+class AllowAllUsersRemoteUserBackend(RemoteUserBackend):
+    def user_can_authenticate(self, user):
+        return True

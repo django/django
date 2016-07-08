@@ -10,7 +10,7 @@ who wants to contribute code to Django, have a look at
 .. _handling-pull-requests:
 
 Handling pull requests
-----------------------
+======================
 
 Since Django is now hosted at GitHub, most patches are provided in the form of
 pull requests.
@@ -70,7 +70,7 @@ pull request "Merged in XXXXXXX" (replacing with the commit hash) after you
 merge it. Trac checks for this message format to indicate on the ticket page
 whether or not a pull request is merged.
 
-Avoid using GitHub's "Merge pull request" button on the Web site as its creates
+Avoid using GitHub's "Merge pull request" button on the website as it creates
 an ugly "merge commit" and makes navigating history more difficult.
 
 When rewriting the commit history of a pull request, the goal is to make
@@ -101,7 +101,7 @@ community, getting work done, and having a usable commit history.
 .. _committing-guidelines:
 
 Committing guidelines
----------------------
+=====================
 
 In addition, please follow the following guidelines when committing code to
 Django's Git repository:
@@ -176,7 +176,7 @@ Django's Git repository:
     commit message, GitHub will close the pull request, but the Trac plugin
     will also close the same numbered ticket in Trac.
 
-.. _Trac plugin: https://github.com/aaugustin/trac-github
+.. _Trac plugin: https://github.com/trac-hacks/trac-github
 
 * If your commit references a ticket in the Django `ticket tracker`_ but
   does *not* close the ticket, include the phrase "Refs #xxxxx", where "xxxxx"
@@ -200,7 +200,7 @@ Django's Git repository:
   to automate this.
 
 Reverting commits
------------------
+=================
 
 Nobody's perfect; mistakes will be committed.
 
@@ -221,7 +221,7 @@ When a mistaken commit is discovered, please follow these guidelines:
 
 * If the original author can't be reached (within a reasonable amount
   of time -- a day or so) and the problem is severe -- crashing bug,
-  major test failures, etc -- then ask for objections on the
+  major test failures, etc. -- then ask for objections on the
   |django-developers| mailing list then revert if there are none.
 
 * If the problem is small (a feature commit after feature freeze,
@@ -243,4 +243,4 @@ When a mistaken commit is discovered, please follow these guidelines:
   For instance, if you did: ``git push upstream feature_antigravity``,
   just do a reverse push: ``git push upstream :feature_antigravity``.
 
-.. _ticket tracker: https://code.djangoproject.com/newticket
+.. _ticket tracker: https://code.djangoproject.com/

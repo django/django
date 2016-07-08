@@ -5,18 +5,18 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Thanh Le Viet <lethanhx2k@gmail.com>, 2013
 # Tran <hongdiepkien@gmail.com>, 2011
-# Tran Van <vantxm@yahoo.co.uk>, 2011-2013
+# Tran Van <vantxm@yahoo.co.uk>, 2011-2013,2016
 # Vuong Nguyen <autalpha@gmail.com>, 2011
 # xgenvn <xgenvn@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
-"language/vi/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2016-03-16 02:56+0000\n"
+"Last-Translator: Tran Van <vantxm@yahoo.co.uk>\n"
+"Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
+"vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -81,6 +81,12 @@ msgstr "Hoạt động:"
 msgid "action time"
 msgstr "Thời gian tác động"
 
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
 msgid "object id"
 msgstr "Mã đối tượng"
 
@@ -120,6 +126,10 @@ msgstr "Không"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Giữ phím \"Control\", hoặc \"Command\" trên Mac, để chọn nhiều hơn một."
+
+msgid "Added."
+msgstr "Được thêm."
 
 #, python-format
 msgid "Changed %s."
@@ -390,7 +400,7 @@ msgstr ""
 "dữ liệu đi kèm dưới đây cũng sẽ bị mất:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Đối tượng"
 
 msgid "Yes, I'm sure"
 msgstr "Có, tôi chắc chắn."
@@ -474,6 +484,14 @@ msgstr ""
 "liệu được tạo phù hợp và dữ liệu có thể được đọc bởi những người sử dụng phù "
 "hợp."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Bạn đã xác thực bằng tài khoản %(username)s, nhưng không đủ quyền để truy "
+"cập trang này. Bạn có muốn đăng nhập bằng một tài khoản khác?"
+
 msgid "Forgotten your password or username?"
 msgstr "Bạn quên mật khẩu hoặc tài khoản?"
 
@@ -499,17 +517,20 @@ msgstr "Hiện tất cả"
 msgid "Save"
 msgstr "Lưu lại"
 
+msgid "Popup closing..."
+msgstr "Đang đóng cửa sổ popup ..."
+
 #, python-format
 msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "Thêm %(model)s khác"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "Xóa %(model)s đã chọn"
 
 msgid "Search"
 msgstr "Tìm kiếm"
@@ -631,9 +652,6 @@ msgstr "Làm lại mật khẩu"
 
 msgid "All dates"
 msgstr "Tất cả các ngày"
-
-msgid "(None)"
-msgstr "(Không)"
 
 #, python-format
 msgid "Select %s"

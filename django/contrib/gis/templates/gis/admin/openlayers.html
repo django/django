@@ -6,11 +6,11 @@
   #{{ id }}_admin_map { position: relative; vertical-align: top; float: {{ LANGUAGE_BIDI|yesno:"right,left" }}; }
   {% if not display_wkt %}#{{ id }} { display: none; }{% endif %}
   .olControlEditingToolbar .olControlModifyFeatureItemActive {
-     background-image: url("{% static "admin/img/gis/move_vertex_on.png" %}");
+     background-image: url("{% static "admin/img/gis/move_vertex_on.svg" %}");
      background-repeat: no-repeat;
   }
   .olControlEditingToolbar .olControlModifyFeatureItemInactive {
-     background-image: url("{% static "admin/img/gis/move_vertex_off.png" %}");
+     background-image: url("{% static "admin/img/gis/move_vertex_off.svg" %}");
      background-repeat: no-repeat;
   }
 </style>
