@@ -615,7 +615,7 @@ class SchemaTests(TransactionTestCase):
         new_field = PositiveIntegerField(default=42)
         new_field.set_attributes_from_name("height")
         with connection.schema_editor() as editor:
-            editor.alter_field(Author, old_field, new_field)
+            editor.alter_field(Author, old_field, new_field, strict=True)
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertFalse(columns['height'][1][6])
@@ -636,7 +636,7 @@ class SchemaTests(TransactionTestCase):
         new_field = copy(old_field)
         new_field.null = True
         with connection.schema_editor() as editor:
-            editor.alter_field(Author, old_field, new_field)
+            editor.alter_field(Author, old_field, new_field, strict=True)
 
     def test_alter_textfield_to_null(self):
         """
@@ -651,7 +651,7 @@ class SchemaTests(TransactionTestCase):
         new_field = copy(old_field)
         new_field.null = True
         with connection.schema_editor() as editor:
-            editor.alter_field(Note, old_field, new_field)
+            editor.alter_field(Note, old_field, new_field, strict=True)
 
     @skipUnlessDBFeature('supports_combined_alters')
     def test_alter_null_to_not_null_keeping_default(self):
@@ -670,7 +670,7 @@ class SchemaTests(TransactionTestCase):
         new_field = PositiveIntegerField(default=42)
         new_field.set_attributes_from_name("height")
         with connection.schema_editor() as editor:
-            editor.alter_field(AuthorWithDefaultHeight, old_field, new_field)
+            editor.alter_field(AuthorWithDefaultHeight, old_field, new_field, strict=True)
         # Ensure the field is right afterwards
         columns = self.column_classes(AuthorWithDefaultHeight)
         self.assertFalse(columns['height'][1][6])
@@ -1189,7 +1189,7 @@ class SchemaTests(TransactionTestCase):
 
         # "Alter" the field. This should not rename the DB table to itself.
         with connection.schema_editor() as editor:
-            editor.alter_field(LocalAuthorWithM2M, new_field, new_field)
+            editor.alter_field(LocalAuthorWithM2M, new_field, new_field, strict=True)
 
         # Remove the M2M table again
         with connection.schema_editor() as editor:
@@ -1248,7 +1248,7 @@ class SchemaTests(TransactionTestCase):
         new_field = M2MFieldClass("schema.TagM2MTest", related_name="authors", through=LocalAuthorTag)
         new_field.contribute_to_class(LocalAuthorWithM2MThrough, "tags")
         with connection.schema_editor() as editor:
-            editor.alter_field(LocalAuthorWithM2MThrough, old_field, new_field)
+            editor.alter_field(LocalAuthorWithM2MThrough, old_field, new_field, strict=True)
         # Ensure the m2m table is still there
         self.assertEqual(len(self.column_classes(LocalAuthorTag)), 3)
 
@@ -1297,7 +1297,7 @@ class SchemaTests(TransactionTestCase):
         new_field = M2MFieldClass(UniqueTest)
         new_field.contribute_to_class(LocalBookWithM2M, "uniques")
         with connection.schema_editor() as editor:
-            editor.alter_field(LocalBookWithM2M, old_field, new_field)
+            editor.alter_field(LocalBookWithM2M, old_field, new_field, strict=True)
         # Ensure old M2M is gone
         with self.assertRaises(DatabaseError):
             self.column_classes(LocalBookWithM2M._meta.get_field("tags").remote_field.through)
@@ -1884,7 +1884,7 @@ class SchemaTests(TransactionTestCase):
         new_field = IntegerField(blank=True, default=42)
         new_field.set_attributes_from_name('height')
         with connection.schema_editor() as editor:
-            editor.alter_field(Author, old_field, new_field)
+            editor.alter_field(Author, old_field, new_field, strict=True)
         self.assertEqual(Author.objects.get().height, 42)
         # The database default should be removed.
         with connection.cursor() as cursor:
@@ -2117,7 +2117,7 @@ class SchemaTests(TransactionTestCase):
         new_field = AutoField(primary_key=True)
         new_field.set_attributes_from_name('id')
         with connection.schema_editor() as editor:
-            editor.alter_field(Node, old_field, new_field)
+            editor.alter_field(Node, old_field, new_field, strict=True)
 
     @mock.patch('django.db.backends.base.schema.datetime')
     @mock.patch('django.db.backends.base.schema.timezone')
