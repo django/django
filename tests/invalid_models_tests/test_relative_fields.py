@@ -181,7 +181,18 @@ class RelativeFieldTests(SimpleTestCase):
             name = models.CharField(max_length=20)
 
         class ModelM2M(models.Model):
-            m2m = models.ManyToManyField(Model, null=True, validators=[''])
+            m2m = models.ManyToManyField(
+                Model,
+                null=True,
+                validators=[''],
+                limit_choices_to={'name': 'test_name'},
+                through='ThroughModel',
+                through_fields=('modelm2m', 'model'),
+            )
+
+        class ThroughModel(models.Model):
+            model = models.ForeignKey('Model', models.CASCADE)
+            modelm2m = models.ForeignKey('ModelM2M', models.CASCADE)
 
         errors = ModelM2M.check()
         field = ModelM2M._meta.get_field('m2m')
@@ -191,15 +202,19 @@ class RelativeFieldTests(SimpleTestCase):
                 'null has no effect on ManyToManyField.',
                 obj=field,
                 id='fields.W340',
-            )
-        ]
-        expected.append(
+            ),
             DjangoWarning(
                 'ManyToManyField does not support validators.',
                 obj=field,
                 id='fields.W341',
-            )
-        )
+            ),
+            DjangoWarning(
+                'limit_choices_to has no effect on ManyToManyField '
+                'with a through model.',
+                obj=field,
+                id='fields.W343',
+            ),
+        ]
 
         self.assertEqual(errors, expected)
 
