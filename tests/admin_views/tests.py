@@ -588,9 +588,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 values=[p.name for p in Promo.objects.all()],
                 test=lambda obj, value: obj.chap.book.promo_set.filter(name=value).exists()),
         }
-        print '------------'
-        print filters
-        print '------------'
         for filter_path, params in filters.items():
             for value in params['values']:
                 query_string = urlencode({filter_path: value})
