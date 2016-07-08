@@ -588,11 +588,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 values=[p.name for p in Promo.objects.all()],
                 test=lambda obj, value: obj.chap.book.promo_set.filter(name=value).exists()),
         }
+        print '------------'
+        print filters
+        print '------------'
         for filter_path, params in filters.items():
             for value in params['values']:
                 query_string = urlencode({filter_path: value})
                 # ensure filter link exists
-                self.assertContains(response, '<a href="?%s">' % query_string)
+                self.assertContains(response, '<a href="?%s"' % query_string)
                 # ensure link works
                 filtered_response = self.client.get('%s?%s' % (changelist_url, query_string))
                 self.assertEqual(filtered_response.status_code, 200)
@@ -664,8 +667,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "field 'choices' option named group."
         )
         self.assertContains(response, '<div id="changelist-filter">')
-        self.assertContains(response, '<a href="?surface__exact=x">Horizontal</a>', msg_prefix=fail_msg, html=True)
-        self.assertContains(response, '<a href="?surface__exact=y">Vertical</a>', msg_prefix=fail_msg, html=True)
+        self.assertContains(response, '<a href="?surface__exact=x" title="Horizontal">Horizontal</a>', msg_prefix=fail_msg, html=True)
+        self.assertContains(response, '<a href="?surface__exact=y" title="Vertical">Vertical</a>', msg_prefix=fail_msg, html=True)
 
     def test_change_list_null_boolean_display(self):
         Post.objects.create(public=None)
