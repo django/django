@@ -21,7 +21,26 @@ class SchemaIndexesTests(TestCase):
                 column_names=("c1", "c2", "c3"),
                 suffix="123",
             )
-        self.assertEqual(index_name, "indexes_article_c1_7ce4cc86123")
+        self.assertEqual(index_name, "indexes_article_c1_c2_c3_7ce4cc86123")
+
+    def test_index_name_trucation(self):
+        # Test truncation on various databases.
+        long_name = 'l%sng' % ('o' * 86)
+        with connection.schema_editor() as editor:
+            index_name = editor._create_index_name(
+                model=Article,
+                column_names=(long_name, 'c1', 'c2'),
+                suffix='ix',
+            )
+        expected = {
+            'mysql': 'indexes_article_looooooooooooooooooooooooo_2ccf1189ix',
+            'oracle': 'indexes_a_loooooooo_2ccf1189ix',
+            'postgresql': 'indexes_article_loooooooooooooooooooooooo_2ccf1189ix',
+            'sqlite': 'indexes_article_l%sng_c1_c_2ccf1189ix' % ('o' * 86),
+        }
+        if connection.vendor not in expected:
+            self.skipTest("This test is only supported on the built-in database backends.")
+        self.assertEqual(index_name, expected[connection.vendor])
 
     def test_index_together(self):
         editor = connection.schema_editor()
@@ -71,6 +90,6 @@ class SchemaIndexesTests(TestCase):
             self.skip("This test only applies to the InnoDB storage engine")
         index_sql = connection.schema_editor()._model_indexes_sql(ArticleTranslation)
         self.assertEqual(index_sql, [
-            'CREATE INDEX `indexes_articletranslation_99fb53c2` '
+            'CREATE INDEX `indexes_articletranslation_article_no_constraint_id_d6c0806b` '
             'ON `indexes_articletranslation` (`article_no_constraint_id`)'
         ])

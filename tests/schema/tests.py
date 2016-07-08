@@ -1503,6 +1503,8 @@ class SchemaTests(TransactionTestCase):
                 if c['columns'] == ["slug", "title"]
             ),
         )
+        # Check the index name
+        self.assertIn("schema_tag_slug_title_9c7a1732_idx", self.get_constraints("schema_tag"))
         # Alter it back
         new_field2 = SlugField(unique=True)
         new_field2.set_attributes_from_name("slug")
@@ -1917,7 +1919,7 @@ class SchemaTests(TransactionTestCase):
         # Should create two indexes; one for like operator.
         self.assertEqual(
             self.get_constraints_for_column(Author, 'nom_de_plume'),
-            ['schema_author_95aa9e9b', 'schema_author_nom_de_plume_7570a851_like'],
+            ['schema_author_nom_de_plume_7570a851', 'schema_author_nom_de_plume_7570a851_like'],
         )
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
@@ -1947,7 +1949,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, old_field, new_field, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(Author, 'name'),
-            ['schema_author_b068931c', 'schema_author_name_1fbc5617_like']
+            ['schema_author_name_1fbc5617', 'schema_author_name_1fbc5617_like']
         )
         # Remove db_index=True to drop both indexes.
         with connection.schema_editor() as editor:
@@ -1989,7 +1991,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Note, old_field, new_field, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(Note, 'info'),
-            ['schema_note_caf9b6b9', 'schema_note_info_4b0ea695_like']
+            ['schema_note_info_4b0ea695', 'schema_note_info_4b0ea695_like']
         )
         # Remove db_index=True to drop both indexes.
         with connection.schema_editor() as editor:
@@ -2003,7 +2005,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(BookWithoutAuthor)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, 'title'),
-            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like']
+            ['schema_book_title_2dfb2dff', 'schema_book_title_2dfb2dff_like']
         )
         # Alter to add unique=True (should replace the index)
         old_field = BookWithoutAuthor._meta.get_field('title')
@@ -2022,7 +2024,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithoutAuthor, new_field, new_field2, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, 'title'),
-            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like']
+            ['schema_book_title_2dfb2dff', 'schema_book_title_2dfb2dff_like']
         )
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
@@ -2032,7 +2034,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(BookWithoutAuthor)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, 'title'),
-            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like']
+            ['schema_book_title_2dfb2dff', 'schema_book_title_2dfb2dff_like']
         )
         # Alter to add unique=True (should replace the index)
         old_field = BookWithoutAuthor._meta.get_field('title')
@@ -2058,7 +2060,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(BookWithoutAuthor)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, 'title'),
-            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like']
+            ['schema_book_title_2dfb2dff', 'schema_book_title_2dfb2dff_like']
         )
         # Alter to set unique=True and remove db_index=True (should replace the index)
         old_field = BookWithoutAuthor._meta.get_field('title')
@@ -2077,7 +2079,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithoutAuthor, new_field, new_field2, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, 'title'),
-            ['schema_book_d5d3db17', 'schema_book_title_2dfb2dff_like']
+            ['schema_book_title_2dfb2dff', 'schema_book_title_2dfb2dff_like']
         )
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
@@ -2122,7 +2124,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, old_field, new_field, strict=True)
 
-        expected = 'schema_author_7edabf99'
+        expected = 'schema_author_weight_587740f9'
         if connection.features.uppercases_column_names:
             expected = expected.upper()
         self.assertEqual(self.get_constraints_for_column(Author, 'weight'), [expected])
