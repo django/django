@@ -2,7 +2,6 @@ import hashlib
 import logging
 from datetime import datetime
 
-from django.db.backends.utils import truncate_name
 from django.db.transaction import atomic
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes
@@ -831,32 +830,30 @@ class BaseDatabaseSchemaEditor(object):
     def _create_index_name(self, model, column_names, suffix=""):
         """
         Generates a unique name for an index/unique constraint.
+
+        The name is divided into 3 parts: the table name, the column names,
+        and a unique digest and suffix.
         """
-        # If there is just one column in the index, use a default algorithm from Django
-        if len(column_names) == 1 and not suffix:
-            return truncate_name(
-                '%s_%s' % (model._meta.db_table, self._digest(column_names[0])),
-                self.connection.ops.max_name_length()
-            )
-        # Else generate the name for the index using a different algorithm
-        table_name = model._meta.db_table.replace('"', '').replace('.', '_')
-        index_unique_name = '_%s' % self._digest(table_name, *column_names)
+        table_name = model._meta.db_table
+        hash_data = [table_name] + list(column_names)
+        hash_suffix_part = '%s%s' % (self._digest(*hash_data), suffix)
         max_length = self.connection.ops.max_name_length() or 200
-        # If the index name is too long, truncate it
-        index_name = ('%s_%s%s%s' % (
-            table_name, column_names[0], index_unique_name, suffix,
-        )).replace('"', '').replace('.', '_')
-        if len(index_name) > max_length:
-            part = ('_%s%s%s' % (column_names[0], index_unique_name, suffix))
-            index_name = '%s%s' % (table_name[:(max_length - len(part))], part)
-        # It shouldn't start with an underscore (Oracle hates this)
-        if index_name[0] == "_":
-            index_name = index_name[1:]
-        # If it's STILL too long, just hash it down
-        if len(index_name) > max_length:
-            index_name = hashlib.md5(force_bytes(index_name)).hexdigest()[:max_length]
-        # It can't start with a number on Oracle, so prepend D if we need to
-        if index_name[0].isdigit():
+        # If everything fits into max_length, use that name.
+        index_name = '%s_%s_%s' % (table_name, '_'.join(column_names), hash_suffix_part)
+        if len(index_name) <= max_length:
+            return index_name
+        # Shorten a long suffix.
+        if len(hash_suffix_part) > max_length / 3:
+            hash_suffix_part = hash_suffix_part[:max_length // 3]
+        other_length = (max_length - len(hash_suffix_part)) // 2 - 1
+        index_name = '%s_%s_%s' % (
+            table_name[:other_length],
+            '_'.join(column_names)[:other_length],
+            hash_suffix_part,
+        )
+        # Prepend D if needed to prevent the name from starting with an
+        # underscore or a number (not permitted on Oracle).
+        if index_name[0] == "_" or index_name[0].isdigit():
             index_name = "D%s" % index_name[:-1]
         return index_name
 
