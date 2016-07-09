@@ -7,6 +7,7 @@ from ..utils import setup
 
 try:
     import numpy
+    VisibleDeprecationWarning = numpy.VisibleDeprecationWarning
 except ImportError:
     numpy = False
 
@@ -14,12 +15,13 @@ except ImportError:
 @skipIf(numpy is False, "Numpy must be installed to run these tests.")
 class NumpyTests(SimpleTestCase):
     # Ignore numpy deprecation warnings (#23890)
-    warnings.filterwarnings(
-        "ignore",
-        "Using a non-integer number instead of an "
-        "integer will result in an error in the future",
-        DeprecationWarning
-    )
+    if numpy:
+        warnings.filterwarnings(
+            "ignore",
+            "Using a non-integer number instead of an "
+            "integer will result in an error in the future",
+            numpy.VisibleDeprecationWarning
+        )
 
     @setup({'numpy-array-index01': '{{ var.1 }}'})
     def test_numpy_array_index01(self):
