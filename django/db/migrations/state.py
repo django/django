@@ -447,12 +447,19 @@ class ModelState(object):
             bases = (models.Model,)
 
         managers = []
+        manager_names = set()
         default_manager_shim = None
         for manager in model._meta.managers:
-            if manager.use_in_migrations:
+            manager_name = force_text(manager.name)
+            if manager_name in manager_names:
+                # Skip overridden managers.
+                continue
+            elif manager.use_in_migrations:
+                # Copy managers usable in migrations.
                 new_manager = copy.copy(manager)
                 new_manager._set_creation_counter()
             elif manager is model._base_manager or manager is model._default_manager:
+                # Shim custom managers used as default and base managers.
                 new_manager = models.Manager()
                 new_manager.model = manager.model
                 new_manager.name = manager.name
@@ -460,7 +467,8 @@ class ModelState(object):
                     default_manager_shim = new_manager
             else:
                 continue
-            managers.append((force_text(manager.name), new_manager))
+            manager_names.add(manager_name)
+            managers.append((manager_name, new_manager))
 
         # Ignore a shimmed default manager called objects if it's the only one.
         if managers == [('objects', default_manager_shim)]:
