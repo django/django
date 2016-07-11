@@ -536,3 +536,6 @@ Miscellaneous
   :ttag:`{% include %} <include>` template tag is deprecated as the behavior is
   often more confusing than helpful. In Django 2.1, the exception will be
   raised.
+
+* Calls to the ``authenticate()`` method of authentication backends without a
+  ``request`` parameter are deprecated.
