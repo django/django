@@ -391,6 +391,11 @@ it because ``True`` is its default value).
     Support for the ``table`` argument(s) to choose what tables should be
     inspected was added.
 
+.. versionadded:: 1.11
+
+  Indexes associated with the table are added using the
+  :attr:`~django.db.models.Options.indexes` model option.
+
 .. django-admin-option:: --database DATABASE
 
 Specifies the database to introspect. Defaults to ``default``.
