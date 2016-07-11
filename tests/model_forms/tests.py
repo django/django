@@ -963,78 +963,6 @@ class UniqueTest(TestCase):
         self.assertEqual(form.errors['title'], ["Post's Title not unique for Posted date."])
 
 
-class ModelToDictTests(TestCase):
-    """
-    Tests for forms.models.model_to_dict
-    """
-    def test_model_to_dict_many_to_many(self):
-        categories = [
-            Category(name='TestName1', slug='TestName1', url='url1'),
-            Category(name='TestName2', slug='TestName2', url='url2'),
-            Category(name='TestName3', slug='TestName3', url='url3')
-        ]
-        for c in categories:
-            c.save()
-        writer = Writer(name='Test writer')
-        writer.save()
-
-        art = Article(
-            headline='Test article',
-            slug='test-article',
-            pub_date=datetime.date(1988, 1, 4),
-            writer=writer,
-            article='Hello.'
-        )
-        art.save()
-        for c in categories:
-            art.categories.add(c)
-        art.save()
-
-        with self.assertNumQueries(1):
-            d = model_to_dict(art)
-
-        # Ensure all many-to-many categories appear in model_to_dict
-        for c in categories:
-            self.assertIn(c.pk, d['categories'])
-        # Ensure many-to-many relation appears as a list
-        self.assertIsInstance(d['categories'], list)
-
-    def test_reuse_prefetched(self):
-        # model_to_dict should not hit the database if it can reuse
-        # the data populated by prefetch_related.
-        categories = [
-            Category(name='TestName1', slug='TestName1', url='url1'),
-            Category(name='TestName2', slug='TestName2', url='url2'),
-            Category(name='TestName3', slug='TestName3', url='url3')
-        ]
-        for c in categories:
-            c.save()
-        writer = Writer(name='Test writer')
-        writer.save()
-
-        art = Article(
-            headline='Test article',
-            slug='test-article',
-            pub_date=datetime.date(1988, 1, 4),
-            writer=writer,
-            article='Hello.'
-        )
-        art.save()
-        for c in categories:
-            art.categories.add(c)
-
-        art = Article.objects.prefetch_related('categories').get(pk=art.pk)
-
-        with self.assertNumQueries(0):
-            d = model_to_dict(art)
-
-        # Ensure all many-to-many categories appear in model_to_dict
-        for c in categories:
-            self.assertIn(c.pk, d['categories'])
-        # Ensure many-to-many relation appears as a list
-        self.assertIsInstance(d['categories'], list)
-
-
 class ModelFormBasicTests(TestCase):
     def create_basic_data(self):
         self.c1 = Category.objects.create(
@@ -1787,6 +1715,25 @@ class ModelMultipleChoiceFieldTests(TestCase):
         queryset = form.fields['persons'].clean([str(person1.pk)] * 50)
         sql, params = queryset.query.sql_with_params()
         self.assertEqual(len(params), 1)
+
+    def test_to_field_name_with_initial_data(self):
+        class ArticleCategoriesForm(forms.ModelForm):
+            categories = forms.ModelMultipleChoiceField(Category.objects.all(), to_field_name='slug')
+
+            class Meta:
+                model = Article
+                fields = ['categories']
+
+        article = Article.objects.create(
+            headline='Test article',
+            slug='test-article',
+            pub_date=datetime.date(1988, 1, 4),
+            writer=Writer.objects.create(name='Test writer'),
+            article='Hello.',
+        )
+        article.categories.add(self.c2, self.c3)
+        form = ArticleCategoriesForm(instance=article)
+        self.assertEqual(form['categories'].value(), [self.c2.slug, self.c3.slug])
 
 
 class ModelOneToOneFieldTests(TestCase):
