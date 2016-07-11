@@ -1,11 +1,13 @@
 import inspect
 import re
+import warnings
 
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.module_loading import import_string
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
@@ -59,19 +61,29 @@ def _get_user_session_key(request):
     return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
 
 
-def authenticate(**credentials):
+def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
     """
     for backend, backend_path in _get_backends(return_tuples=True):
+        args = (request,)
         try:
-            inspect.getcallargs(backend.authenticate, **credentials)
+            inspect.getcallargs(backend.authenticate, request, **credentials)
         except TypeError:
-            # This backend doesn't accept these credentials as arguments. Try the next one.
-            continue
-
+            try:
+                inspect.getcallargs(backend.authenticate, **credentials)
+            except TypeError:
+                # This backend doesn't accept these credentials as arguments. Try the next one.
+                continue
+            else:
+                args = ()
+                warnings.warn(
+                    "Update authentication backend %s to accept a "
+                    "positional `request` argument." % backend_path,
+                    RemovedInDjango21Warning
+                )
         try:
-            user = backend.authenticate(**credentials)
+            user = backend.authenticate(*args, **credentials)
         except PermissionDenied:
             # This backend says to stop in our tracks - this user should not be allowed in at all.
             break

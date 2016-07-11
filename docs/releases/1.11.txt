@@ -113,6 +113,10 @@ Minor features
   allows using the authentication system :ref:`without any of the built-in
   models <using-auth-without-models>`.
 
+* The ``HttpRequest`` is now passed to :func:`~django.contrib.auth.authenticate`
+  which in turn passes it to the authentication backend if it accepts a
+  ``request`` argument.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -556,3 +560,7 @@ Miscellaneous
 
 * ``DatabaseIntrospection.get_indexes()`` is deprecated in favor of
   ``DatabaseIntrospection.get_constraints()``.
+
+* :func:`~django.contrib.auth.authenticate` now passes a ``request`` argument
+  to the ``authenticate()`` method of authentication backends. Support for
+  methods that don't accept ``request`` will be removed in Django 2.1.

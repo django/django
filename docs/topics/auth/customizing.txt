@@ -89,31 +89,36 @@ Writing an authentication backend
 ---------------------------------
 
 An authentication backend is a class that implements two required methods:
-``get_user(user_id)`` and ``authenticate(**credentials)``, as well as a set of
-optional permission related :ref:`authorization methods <authorization_methods>`.
+``get_user(user_id)`` and ``authenticate(request, **credentials)``, as well as
+a set of optional permission related :ref:`authorization methods
+<authorization_methods>`.
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
 database ID or whatever, but has to be the primary key of your ``User`` object
 -- and returns a ``User`` object.
 
-The ``authenticate`` method takes credentials as keyword arguments. Most of
-the time, it'll just look like this::
+The ``authenticate`` method takes a ``request`` argument and credentials as
+keyword arguments. Most of the time, it'll just look like this::
 
     class MyBackend(object):
-        def authenticate(self, username=None, password=None):
+        def authenticate(self, request, username=None, password=None):
             # Check the username/password and return a User.
             ...
 
 But it could also authenticate a token, like so::
 
     class MyBackend(object):
-        def authenticate(self, token=None):
+        def authenticate(self, request, token=None):
             # Check the token and return a User.
             ...
 
 Either way, ``authenticate`` should check the credentials it gets, and it
 should return a ``User`` object that matches those credentials, if the
 credentials are valid. If they're not valid, it should return ``None``.
+
+``request`` is an :class:`~django.http.HttpRequest` and may be ``None`` if it
+wasn't provided to :func:`~django.contrib.auth.authenticate` (which passes it
+on to the backend).
 
 The Django admin is tightly coupled to the Django :ref:`User object
 <user-objects>`. The best way to deal with this is to create a Django ``User``
@@ -140,7 +145,7 @@ object the first time a user authenticates::
         ADMIN_PASSWORD = 'pbkdf2_sha256$30000$Vo0VlMnkR4Bk$qEvtdyZRWTcOsCnI/oQ7fVOu1XAURIZYoOZ3iq8Dr4M='
         """
 
-        def authenticate(self, username=None, password=None):
+        def authenticate(self, request, username=None, password=None):
             login_valid = (settings.ADMIN_LOGIN == username)
             pwd_valid = check_password(password, settings.ADMIN_PASSWORD)
             if login_valid and pwd_valid:
@@ -162,6 +167,11 @@ object the first time a user authenticates::
                 return User.objects.get(pk=user_id)
             except User.DoesNotExist:
                 return None
+
+.. versionchanged:: 1.11
+
+    The ``request`` parameter was added to ``authenticate()`` and support for
+    backends that don't accept it will be removed in Django 2.1.
 
 .. _authorization_methods:
 

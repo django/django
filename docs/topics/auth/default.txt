@@ -115,7 +115,7 @@ Changing a user's password will log out all their sessions. See
 Authenticating users
 --------------------
 
-.. function:: authenticate(\**credentials)
+.. function:: authenticate(request=None, \**credentials)
 
     Use :func:`~django.contrib.auth.authenticate()` to verify a set of
     credentials. It takes credentials as keyword arguments, ``username`` and
@@ -132,6 +132,13 @@ Authenticating users
             # A backend authenticated the credentials
         else:
             # No backend authenticated the credentials
+
+    ``request`` is an optional :class:`~django.http.HttpRequest` which is
+    passed on the ``authenticate()`` method of the authentication backends.
+
+    .. versionchanged:: 1.11
+
+        The optional ``request`` argument was added.
 
     .. note::
 
@@ -342,7 +349,7 @@ If you have an authenticated user you want to attach to the current session
         def my_view(request):
             username = request.POST['username']
             password = request.POST['password']
-            user = authenticate(username=username, password=password)
+            user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
                 # Redirect to a success page.

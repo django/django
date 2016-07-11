@@ -475,7 +475,7 @@ class PermissionDeniedBackend(object):
     Always raises PermissionDenied in `authenticate`, `has_perm` and `has_module_perms`.
     """
 
-    def authenticate(self, username=None, password=None):
+    def authenticate(self, request, username=None, password=None):
         raise PermissionDenied
 
     def has_perm(self, user_obj, perm, obj=None):
@@ -585,7 +585,7 @@ class TypeErrorBackend(object):
     Always raises TypeError.
     """
 
-    def authenticate(self, username=None, password=None):
+    def authenticate(self, request, username=None, password=None):
         raise TypeError
 
 

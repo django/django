@@ -38,6 +38,9 @@ details on these changes.
 
 * ``DatabaseIntrospection.get_indexes()`` will be removed.
 
+* The ``authenticate()`` method of authentication backends will require a
+  ``request`` argument.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

@@ -518,7 +518,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     implement them other than returning an empty set of permissions if
     ``obj is not None``.
 
-    .. method:: authenticate(username=None, password=None, **kwargs)
+    .. method:: authenticate(request, username=None, password=None, **kwargs)
 
         Tries to authenticate ``username`` with ``password`` by calling
         :meth:`User.check_password
@@ -527,6 +527,14 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         key :attr:`CustomUser.USERNAME_FIELD
         <django.contrib.auth.models.CustomUser.USERNAME_FIELD>`. Returns an
         authenticated user or ``None``.
+
+        ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
+        if it wasn't provided to :func:`~django.contrib.auth.authenticate`
+        (which passes it on to the backend).
+
+        .. versionchanged:: 1.11
+
+            The ``request`` argument was added.
 
     .. method:: get_user_permissions(user_obj, obj=None)
 
@@ -603,7 +611,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     :class:`~django.contrib.auth.models.User` object is created if not already
     in the database.  Defaults to ``True``.
 
-.. method:: RemoteUserBackend.authenticate(remote_user)
+.. method:: RemoteUserBackend.authenticate(request, remote_user)
 
     The username passed as ``remote_user`` is considered trusted. This method
     simply returns the ``User`` object with the given username, creating a new
@@ -613,6 +621,10 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
     ``False`` and a ``User`` object with the given username is not found in the
     database.
+
+    ``request`` is an :class:`~django.http.HttpRequest` and may be ``None`` if
+    it wasn't provided to :func:`~django.contrib.auth.authenticate` (which
+    passes it on to the backend).
 
 .. method:: RemoteUserBackend.clean_username(username)
 
