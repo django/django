@@ -1731,9 +1731,9 @@ After switching to the new signature the router will also be called by the
 Features removed in 1.8
 =======================
 
-These features have reached the end of their deprecation cycle and so have been
-removed in Django 1.8 (please see the :ref:`deprecation timeline
-<deprecation-removed-in-1.8>` for more details):
+These features have reached the end of their deprecation cycle and are removed
+in Django 1.8. See :ref:`deprecated-features-1.6` for details, including how to
+remove usage of these features.
 
 * ``django.contrib.comments`` is removed.
 
