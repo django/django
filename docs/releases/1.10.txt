@@ -1148,9 +1148,9 @@ Miscellaneous
 Features removed in 1.10
 ========================
 
-These features have reached the end of their deprecation cycle and so have been
-removed in Django 1.10 (please see the :ref:`deprecation timeline
-<deprecation-removed-in-1.10>` for more details):
+These features have reached the end of their deprecation cycle and are removed
+in Django 1.10. See :ref:`deprecated-features-1.8` for details, including how
+to remove usage of these features.
 
 * Support for calling a ``SQLCompiler`` directly as an alias for calling its
   ``quote_name_unless_alias`` method is removed.
