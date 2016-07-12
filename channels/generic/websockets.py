@@ -1,6 +1,7 @@
 import json
 
 from ..channel import Group
+from ..auth import channel_session_user_from_http
 from ..sessions import enforce_ordering
 from .base import BaseConsumer
 
@@ -18,6 +19,10 @@ class WebsocketConsumer(BaseConsumer):
         "websocket.disconnect": "raw_disconnect",
     }
 
+    # Turning this on passes the user over from the HTTP session on connect,
+    # implies channel_session_user
+    http_user = False
+
     # Set one to True if you want the class to enforce ordering for you
     slight_ordering = False
     strict_ordering = False
@@ -27,8 +32,16 @@ class WebsocketConsumer(BaseConsumer):
         Pulls out the path onto an instance variable, and optionally
         adds the ordering decorator.
         """
+        # HTTP user implies channel session user
+        if self.http_user:
+            self.channel_session_user = True
+        # Get super-handler
         self.path = message['path']
         handler = super(WebsocketConsumer, self).get_handler(message, **kwargs)
+        # Optionally apply HTTP transfer
+        if self.http_user:
+            handler = channel_session_user_from_http(handler)
+        # Ordering decorators
         if self.strict_ordering:
             return enforce_ordering(handler, slight=False)
         elif self.slight_ordering:

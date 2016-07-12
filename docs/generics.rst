@@ -84,6 +84,10 @@ The basic WebSocket generic consumer is used like this::
 
     class MyConsumer(WebsocketConsumer):
 
+        # Set to True to automatically port users from HTTP cookies
+        # (you don't need channel_session_user, this implies it)
+        http_user = True
+
         # Set to True if you want them, else leave out
         strict_ordering = False
         slight_ordering = False
