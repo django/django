@@ -39,6 +39,7 @@ class AsgiRequest(http.HttpRequest):
         self.reply_channel = self.message.reply_channel
         self._content_length = 0
         self._post_parse_error = False
+        self._read_started = False
         self.resolver_match = None
         # Path info
         self.path = self.message['path']
