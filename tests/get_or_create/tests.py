@@ -418,4 +418,3 @@ class UpdateOrCreateTests(TestCase):
             defaults={'last_name': lambda: 'NotHarrison'},
         )
         self.assertEqual(obj.last_name, 'NotHarrison')
-
