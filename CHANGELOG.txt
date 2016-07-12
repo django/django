@@ -1,3 +1,14 @@
+0.16.1 (2016-07-12)
+-------------------
+
+* WebsocketConsumer now has a http_user option for auto user sessions.
+
+* consumer_started and consumer_finished signals are now available under
+  channels.signals.
+
+* Database connections are closed whenever a consumer finishes.
+
+
 0.16.0 (2016-07-06)
 -------------------
 
