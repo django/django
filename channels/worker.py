@@ -6,6 +6,7 @@ import signal
 import sys
 import time
 
+from .signals import consumer_started, consumer_finished
 from .exceptions import ConsumeLater
 from .message import Message
 from .utils import name_that_thing
@@ -104,6 +105,9 @@ class Worker(object):
                 self.callback(channel, message)
             try:
                 logger.debug("Dispatching message on %s to %s", channel, name_that_thing(consumer))
+                # Send consumer started to manage lifecycle stuff
+                consumer_started.send(sender=self.__class__, environ={})
+                # Run consumer
                 consumer(message, **kwargs)
             except ConsumeLater:
                 # They want to not handle it yet. Re-inject it with a number-of-tries marker.
@@ -127,3 +131,6 @@ class Worker(object):
                         break
             except:
                 logger.exception("Error processing message with consumer %s:", name_that_thing(consumer))
+            else:
+                # Send consumer finished so DB conns close etc.
+                consumer_finished.send(sender=self.__class__)
