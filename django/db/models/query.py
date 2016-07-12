@@ -489,7 +489,7 @@ class QuerySet(object):
             if created:
                 return obj, created
         for k, v in six.iteritems(defaults):
-            setattr(obj, k, v)
+            setattr(obj, k, v() if callable(v) else v)
         obj.save(using=self.db)
         return obj, False
 
