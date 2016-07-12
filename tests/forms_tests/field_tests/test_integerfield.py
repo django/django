@@ -123,6 +123,10 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(9223372036854775808, f.clean('9223372036854775808'))
         self.assertEqual(9223372036854775808, f.clean('9223372036854775808.0'))
 
+    def test_integerfield_unicode_number(self):
+        f = IntegerField()
+        self.assertEqual(50, f.clean('５０'))
+
     def test_integerfield_subclass(self):
         """
         Class-defined widget is not overwritten by __init__() (#22245).

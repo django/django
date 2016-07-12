@@ -276,7 +276,7 @@ class IntegerField(Field):
             value = formats.sanitize_separators(value)
         # Strip trailing decimal and zeros.
         try:
-            value = int(self.re_decimal.sub('', str(value)))
+            value = int(self.re_decimal.sub('', force_text(value)))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
