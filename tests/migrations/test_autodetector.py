@@ -240,6 +240,7 @@ class AutodetectorTests(TestCase):
     }, ("testapp.author", ))
     author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
     author_proxy_third = ModelState("thirdapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
+    author_proxy_third_notproxy = ModelState("thirdapp", "AuthorProxy", [], {}, ("testapp.author", ))
     author_proxy_proxy = ModelState("testapp", "AAuthorProxyProxy", [], {"proxy": True}, ("testapp.authorproxy", ))
     author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
     author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
@@ -335,6 +336,10 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("author", models.ForeignKey("thirdapp.AuthorProxy", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
+    ])
+    book_proxy_proxy_fk = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.AAuthorProxyProxy", models.CASCADE)),
     ])
     book_migrations_fk = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
@@ -1290,6 +1295,73 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([], [self.author_custom_pk, self.author_proxy_third, self.book_proxy_fk])
         # The field name the FK on the book model points to
         self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'pk_field')
+
+    def test_proxy_to_mti_with_fk_to_proxy(self):
+        # First, test the pk table and field name.
+        changes = self.get_changes(
+            [],
+            [self.author_empty, self.author_proxy_third, self.book_proxy_fk],
+        )
+        self.assertEqual(
+            changes['otherapp'][0].operations[0].fields[2][1].remote_field.model._meta.db_table,
+            'testapp_author',
+        )
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'id')
+
+        # Change AuthorProxy to use MTI.
+        changes = self.get_changes(
+            [self.author_empty, self.author_proxy_third, self.book_proxy_fk],
+            [self.author_empty, self.author_proxy_third_notproxy, self.book_proxy_fk],
+        )
+        # Right number/type of migrations for the AuthorProxy model?
+        self.assertNumberMigrations(changes, 'thirdapp', 1)
+        self.assertOperationTypes(changes, 'thirdapp', 0, ['DeleteModel', 'CreateModel'])
+        # Right number/type of migrations for the Book model with a FK to
+        # AuthorProxy?
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ['AlterField'])
+        # otherapp should depend on thirdapp.
+        self.assertMigrationDependencies(changes, 'otherapp', 0, [('thirdapp', 'auto_1')])
+        # Now, test the pk table and field name.
+        self.assertEqual(
+            changes['otherapp'][0].operations[0].field.remote_field.model._meta.db_table,
+            'thirdapp_authorproxy',
+        )
+        self.assertEqual(changes['otherapp'][0].operations[0].field.remote_field.field_name, 'author_ptr')
+
+    def test_proxy_to_mti_with_fk_to_proxy_proxy(self):
+        # First, test the pk table and field name.
+        changes = self.get_changes(
+            [],
+            [self.author_empty, self.author_proxy, self.author_proxy_proxy, self.book_proxy_proxy_fk],
+        )
+        self.assertEqual(
+            changes['otherapp'][0].operations[0].fields[1][1].remote_field.model._meta.db_table,
+            'testapp_author',
+        )
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[1][1].remote_field.field_name, 'id')
+
+        # Change AuthorProxy to use MTI. FK still points to AAuthorProxyProxy,
+        # a proxy of AuthorProxy.
+        changes = self.get_changes(
+            [self.author_empty, self.author_proxy, self.author_proxy_proxy, self.book_proxy_proxy_fk],
+            [self.author_empty, self.author_proxy_notproxy, self.author_proxy_proxy, self.book_proxy_proxy_fk],
+        )
+        # Right number/type of migrations for the AuthorProxy model?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['DeleteModel', 'CreateModel'])
+        # Right number/type of migrations for the Book model with a FK to
+        # AAuthorProxyProxy?
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ['AlterField'])
+        # otherapp should depend on testapp.
+        self.assertMigrationDependencies(changes, 'otherapp', 0, [('testapp', 'auto_1')])
+        # Now, test the pk table and field name.
+        self.assertEqual(
+            changes['otherapp'][0].operations[0].field.remote_field.model._meta.db_table,
+            'testapp_authorproxy',
+        )
+        self.assertEqual(changes['otherapp'][0].operations[0].field.remote_field.field_name, 'author_ptr')
 
     def test_unmanaged_create(self):
         """Tests that the autodetector correctly deals with managed models."""

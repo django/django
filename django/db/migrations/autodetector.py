@@ -612,6 +612,20 @@ class MigrationAutodetector(object):
                     ]
                 )
 
+            # Fix relationships if the model changed from a proxy model to a
+            # concrete model.
+            if (app_label, model_name) in self.old_proxy_keys:
+                for related_object in model_opts.related_objects:
+                    self.add_operation(
+                        related_object.related_model._meta.app_label,
+                        operations.AlterField(
+                            model_name=related_object.related_model._meta.object_name,
+                            name=related_object.field.name,
+                            field=related_object.field,
+                        ),
+                        dependencies=[(app_label, model_name, None, True)],
+                    )
+
     def generate_created_proxies(self):
         """
         Makes CreateModel statements for proxy models.
