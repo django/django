@@ -135,6 +135,8 @@ class MigrationExecutor(object):
                 # Only mutate the state if the migration is actually applied
                 # to make sure the resulting state doesn't include changes
                 # from unrelated migrations.
+                if 'apps' in state.__dict__:
+                    delattr(state, 'apps') # Remove the Render all -- performance critical
                 migration.mutate_state(state, preserve=False)
                 applied_migrations.remove(migration)
 
