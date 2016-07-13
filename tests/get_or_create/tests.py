@@ -404,9 +404,17 @@ class UpdateOrCreateTests(TestCase):
         self.assertFalse(created)
         self.assertEqual(obj.defaults, 'another testing')
 
-    def test_update_callable_default(self):
+    def test_create_callable_default(self):
         obj, created = Person.objects.update_or_create(
             first_name='George', last_name='Harrison',
             defaults={'birthday': lambda: date(1943, 2, 25)},
         )
         self.assertEqual(obj.birthday, date(1943, 2, 25))
+
+    def test_update_callable_default(self):
+        Person.objects.update_or_create(first_name='George', last_name='Harrison', birthday=date(1942, 2, 25))
+        obj, created = Person.objects.update_or_create(
+            first_name='George',
+            defaults={'last_name': lambda: 'NotHarrison'},
+        )
+        self.assertEqual(obj.last_name, 'NotHarrison')
