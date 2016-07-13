@@ -1718,6 +1718,32 @@ class SchemaTests(TransactionTestCase):
             editor.add_field(Author, new_field)
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_add_indexed_charfield(self):
+        field = CharField(max_length=255, db_index=True)
+        field.set_attributes_from_name('nom_de_plume')
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.add_field(Author, field)
+        # Should create two indexes; one for like operator.
+        self.assertEqual(
+            self.get_constraints_for_column(Author, 'nom_de_plume'),
+            ['schema_author_95aa9e9b', 'schema_author_nom_de_plume_7570a851_like'],
+        )
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_add_unique_charfield(self):
+        field = CharField(max_length=255, unique=True)
+        field.set_attributes_from_name('nom_de_plume')
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.add_field(Author, field)
+        # Should create two indexes; one for like operator.
+        self.assertEqual(
+            self.get_constraints_for_column(Author, 'nom_de_plume'),
+            ['schema_author_nom_de_plume_7570a851_like', 'schema_author_nom_de_plume_key']
+        )
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_add_index_to_charfield(self):
         # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
