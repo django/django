@@ -1552,6 +1552,33 @@ class SchemaTests(TransactionTestCase):
             editor.add_field(Author, new_field)
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_add_indexed_charfield(self):
+        field = CharField(max_length=255, db_index=True)
+        field.set_attributes_from_name('nom_de_plume')
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.add_field(Author, field)
+        indexes = self.get_constraints_for_column(Author, 'nom_de_plume')
+        # Should create two indexes; one for like operator.
+        self.assertEqual(len(indexes), 2)
+        # Check that one of the indexes ends with `_like`
+        like_index = [x for x in indexes if x.endswith('_like')]
+        self.assertEqual(1, len(like_index), 'Index with the operator class is missing')
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_add_unique_charfield(self):
+        field = CharField(max_length=255, unique=True)
+        field.set_attributes_from_name('nom_de_plume')
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.add_field(Author, field)
+        indexes = self.get_constraints_for_column(Author, 'nom_de_plume')
+        # Should create two indexes; one for like operator.
+        self.assertEqual(len(indexes), 2)
+        like_index = [x for x in indexes if x.endswith('_like')]
+        self.assertEqual(1, len(like_index), 'Index with the operator class is missing')
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_add_index_to_charfield(self):
         # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
