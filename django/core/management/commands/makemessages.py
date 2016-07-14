@@ -511,7 +511,7 @@ class Command(BaseCommand):
 
         input_files = [bf.work_path for bf in build_files]
         with NamedTemporaryFile(mode='w+') as input_files_list:
-            input_files_list.write('\n'.join(input_files))
+            input_files_list.write(force_str('\n'.join(input_files), encoding=DEFAULT_LOCALE_ENCODING))
             input_files_list.flush()
             args.extend(['--files-from', input_files_list.name])
             args.extend(self.xgettext_options)
