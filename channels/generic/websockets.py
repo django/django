@@ -106,6 +106,12 @@ class WebsocketConsumer(BaseConsumer):
         else:
             raise ValueError("You must pass text or bytes")
 
+    def close(self):
+        """
+        Closes the WebSocket from the server end
+        """
+        self.message.reply_channel.send({"close": True})
+
     def raw_disconnect(self, message, **kwargs):
         """
         Called when a WebSocket connection is closed. Base level so you don't
