@@ -5,6 +5,7 @@ Unit tests for reverse URL lookups.
 from __future__ import unicode_literals
 
 import sys
+import threading
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -428,6 +429,18 @@ class ResolverTests(SimpleTestCase):
         self.assertTrue(resolver._is_callback('urlpatterns_reverse.nested_urls.view2'))
         self.assertTrue(resolver._is_callback('urlpatterns_reverse.nested_urls.View3'))
         self.assertFalse(resolver._is_callback('urlpatterns_reverse.nested_urls.blub'))
+
+    def test_populate_concurrency(self):
+        """
+        RegexURLResolver._populate() can be called concurrently, but not more
+        than once per thread (#26888).
+        """
+        resolver = RegexURLResolver(r'^/', 'urlpatterns_reverse.urls')
+        resolver._local.populating = True
+        thread = threading.Thread(target=resolver._populate)
+        thread.start()
+        thread.join()
+        self.assertNotEqual(resolver._reverse_dict, {})
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.reverse_lazy_urls')
