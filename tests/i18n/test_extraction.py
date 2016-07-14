@@ -243,6 +243,7 @@ class BasicExtractorTests(ExtractorTests):
                       force_text(out.getvalue()))
 
     def test_unicode_file_name(self):
+        os.chdir(self.test_dir)
         open(os.path.join(self.test_dir, 'vidéo.txt'), 'a').close()
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
 
