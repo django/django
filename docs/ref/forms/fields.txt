@@ -585,6 +585,11 @@ For each field, we describe the default widget used if you don't specify
     If provided, these arguments ensure that the string is at most or at least the
     given length.
 
+    .. versionadded:: 1.11
+
+        The `strip` keyword argument is removed. An `EmailField` always
+        strips the given value of leading and trailing whitespace by forcing `strip=True`.
+
 ``FileField``
 -------------
 
@@ -903,6 +908,11 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: min_length
 
     These are the same as ``CharField.max_length`` and ``CharField.min_length``.
+
+    .. versionadded:: 1.11
+
+        The `strip` keyword argument is removed. An `URLField` always
+        strips the given value of leading and trailing whitespace by forcing `strip=True`.
 
 ``UUIDField``
 -------------

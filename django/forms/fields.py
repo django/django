@@ -532,9 +532,8 @@ class EmailField(CharField):
     widget = EmailInput
     default_validators = [validators.validate_email]
 
-    def clean(self, value):
-        value = self.to_python(value).strip()
-        return super(EmailField, self).clean(value)
+    def __init__(self, *args, **kwargs):
+        super(EmailField, self).__init__(*args, strip=True, **kwargs)
 
 
 class FileField(Field):
@@ -665,6 +664,9 @@ class URLField(CharField):
     }
     default_validators = [validators.URLValidator()]
 
+    def __init__(self, *args, **kwargs):
+        super(URLField, self).__init__(*args, strip=True, **kwargs)
+
     def to_python(self, value):
 
         def split_url(url):
@@ -695,10 +697,6 @@ class URLField(CharField):
                 url_fields = split_url(urlunsplit(url_fields))
             value = urlunsplit(url_fields)
         return value
-
-    def clean(self, value):
-        value = self.to_python(value).strip()
-        return super(URLField, self).clean(value)
 
 
 class BooleanField(Field):
