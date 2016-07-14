@@ -12,3 +12,6 @@ Bugfixes
 * Fixed missing ``varchar/text_pattern_ops`` index on ``CharField`` and
   ``TextField`` respectively when using ``AddField`` on PostgreSQL
   (:ticket:`26889`).
+
+* Fixed ``makemessages`` crash on Python 2 with non-ASCII file names
+  (:ticket:`26897`).
