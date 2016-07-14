@@ -258,7 +258,9 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_unicode_file_name(self):
         os.chdir(self.test_dir)
-        open(os.path.join(self.test_dir, 'vidéo.txt'), 'a').close()
+        unicode_path = os.path.join(self.test_dir, 'vidéo.txt')
+        open(unicode_path, 'a').close()
+        self.addCleanup(self.rmfile, unicode_path)
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
 
     def test_extraction_warning(self):
