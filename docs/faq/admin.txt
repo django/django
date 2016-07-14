@@ -6,13 +6,10 @@ I can't log in. When I enter a valid username and password, it just brings up th
 ===========================================================================================================================
 
 The login cookie isn't being set correctly, because the domain of the cookie
-sent out by Django doesn't match the domain in your browser. Try these two
-things:
-
-* Set the :setting:`SESSION_COOKIE_DOMAIN` setting in your admin config
-  file to match your domain. For example, if you're going to
-  "https://www.example.com/admin/" in your browser, in "myproject.settings" you
-  should set :setting:`SESSION_COOKIE_DOMAIN` = 'www.example.com'.
+sent out by Django doesn't match the domain in your browser. Try setting the
+:setting:`SESSION_COOKIE_DOMAIN` setting to match your domain. For example, if
+you're going to "https://www.example.com/admin/" in your browser, set
+``SESSION_COOKIE_DOMAIN = 'www.example.com'``.
 
 I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.
 ===========================================================================================================================================================
