@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 import functools
 import re
+import threading
 from importlib import import_module
 
 from django.conf import settings
@@ -164,7 +165,7 @@ class RegexURLResolver(LocaleRegexProvider):
         # urlpatterns
         self._callback_strs = set()
         self._populated = False
-        self._populating = False
+        self._local = threading.local()
 
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
@@ -178,9 +179,13 @@ class RegexURLResolver(LocaleRegexProvider):
         )
 
     def _populate(self):
-        if self._populating:
+        # Short-circuit if called recursively in this thread to prevent
+        # infinite recursion. Concurrent threads may call this at the same
+        # time and will need to continue, so set 'populating' on a
+        # thread-local variable.
+        if getattr(self._local, 'populating', False):
             return
-        self._populating = True
+        self._local.populating = True
         lookups = MultiValueDict()
         namespaces = {}
         apps = {}
@@ -213,7 +218,7 @@ class RegexURLResolver(LocaleRegexProvider):
                         namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                     for app_name, namespace_list in pattern.app_dict.items():
                         apps.setdefault(app_name, []).extend(namespace_list)
-                if not pattern._populating:
+                if not getattr(pattern._local, 'populating', False):
                     pattern._populate()
                 self._callback_strs.update(pattern._callback_strs)
             else:
@@ -225,7 +230,7 @@ class RegexURLResolver(LocaleRegexProvider):
         self._namespace_dict[language_code] = namespaces
         self._app_dict[language_code] = apps
         self._populated = True
-        self._populating = False
+        self._local.populating = False
 
     @property
     def reverse_dict(self):
