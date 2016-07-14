@@ -217,7 +217,7 @@ Usage example::
     >>> Author.objects.annotate(
     ...     similarity=TrigramSimilarity('name', test),
     ... ).filter(similarity__gt=0.3).order_by('-similarity')
-    [<Author: Katy Stephens>, <Author: Stephen Keats>]
+    [<Author: Katy Stevens>, <Author: Stephen Keats>]
 
 ``TrigramDistance``
 -------------------
@@ -238,4 +238,4 @@ Usage example::
     >>> Author.objects.annotate(
     ...     distance=TrigramDistance('name', test),
     ... ).filter(distance__lte=0.7).order_by('distance')
-    [<Author: Katy Stephens>, <Author: Stephen Keats>]
+    [<Author: Katy Stevens>, <Author: Stephen Keats>]
