@@ -482,15 +482,16 @@ class QuerySet(object):
         defaults = defaults or {}
         lookup, params = self._extract_model_params(defaults, **kwargs)
         self._for_write = True
-        try:
-            obj = self.get(**lookup)
-        except self.model.DoesNotExist:
-            obj, created = self._create_object_from_params(lookup, params)
-            if created:
-                return obj, created
-        for k, v in six.iteritems(defaults):
-            setattr(obj, k, v() if callable(v) else v)
-        obj.save(using=self.db)
+        with transaction.atomic(using=self.db):
+            try:
+                obj = self.select_for_update().get(**lookup)
+            except self.model.DoesNotExist:
+                obj, created = self._create_object_from_params(lookup, params)
+                if created:
+                    return obj, created
+            for k, v in six.iteritems(defaults):
+                setattr(obj, k, v() if callable(v) else v)
+            obj.save(using=self.db)
         return obj, False
 
     def _create_object_from_params(self, lookup, params):
