@@ -168,7 +168,11 @@ class FileDescriptor(object):
 
         # The instance dict contains whatever was originally assigned
         # in __set__.
-        file = instance.__dict__[self.field.name]
+        if self.field.name in instance.__dict__:
+            file = instance.__dict__[self.field.name]
+        else:
+            instance.refresh_from_db(fields=[self.field.name])
+            file = getattr(instance, self.field.name)
 
         # If this value is a string (instance.file = "path/to/file") or None
         # then we simply wrap it with the appropriate attribute class according
@@ -439,9 +443,10 @@ class ImageField(FileField):
         Dimensions can be forced to update with force=True, which is how
         ImageFileDescriptor.__set__ calls this method.
         """
-        # Nothing to update if the field doesn't have dimension fields.
+        # Nothing to update if the field doesn't have dimension fields or if
+        # the field is deferred.
         has_dimension_fields = self.width_field or self.height_field
-        if not has_dimension_fields:
+        if not has_dimension_fields or self.attname not in instance.__dict__:
             return
 
         # getattr will call the ImageFileDescriptor's __get__ method, which
