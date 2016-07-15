@@ -65,6 +65,10 @@ class Binding(object):
         # Optionally resolve model strings
         if isinstance(cls.model, six.string_types):
             cls.model = apps.get_model(cls.model)
+        cls.model_label = "%s.%s" % (
+            cls.model._meta.app_label.lower(),
+            cls.model._meta.object_name.lower(),
+        )
         # Connect signals
         post_save.connect(cls.save_receiver, sender=cls.model)
         post_delete.connect(cls.delete_receiver, sender=cls.model)
@@ -153,13 +157,13 @@ class Binding(object):
         functions by default for update/create, and handles delete itself.
         """
         # Check to see if we're allowed
-        if self.has_permission(self.user, pk):
+        if self.has_permission(self.user, action, pk):
             if action == "create":
                 self.create(data)
             elif action == "update":
-                self.update(self.model.get(pk=pk), data)
+                self.update(self.model.objects.get(pk=pk), data)
             elif action == "delete":
-                self.model.filter(pk=pk).delete()
+                self.model.objects.filter(pk=pk).delete()
             else:
                 raise ValueError("Bad action %r" % action)
 
