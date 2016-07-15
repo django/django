@@ -131,6 +131,7 @@ class Post(models.Model):
 class ModelWithNullFKToSite(models.Model):
     title = models.CharField(max_length=200)
     site = models.ForeignKey(Site, null=True, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title

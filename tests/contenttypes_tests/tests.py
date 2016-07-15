@@ -389,21 +389,27 @@ class UpdateContentTypesTests(TestCase):
     def test_interactive_true_with_dependent_objects(self):
         """
         interactive mode of update_contenttypes() (the default) should delete
-        stale contenttypes and warn of dependent objects
+        stale contenttypes and warn of dependent objects.
         """
-        Post.objects.create(title='post', content_type=self.content_type)
+        post = Post.objects.create(title='post', content_type=self.content_type)
+        # A related object is needed to show that a custom collector with
+        # can_fast_delete=False is needed.
+        ModelWithNullFKToSite.objects.create(post=post)
         contenttypes_management.input = lambda x: force_str("yes")
         with captured_stdout() as stdout:
             contenttypes_management.update_contenttypes(self.app_config)
         self.assertEqual(Post.objects.count(), 0)
-        self.assertIn("1 object of type contenttypes_tests.post:", stdout.getvalue())
-        self.assertIn("Deleting stale content type", stdout.getvalue())
+        output = stdout.getvalue()
+        self.assertIn('- Content type for contenttypes_tests.Fake', output)
+        self.assertIn('- 1 contenttypes_tests.Post object(s)', output)
+        self.assertIn('- 1 contenttypes_tests.ModelWithNullFKToSite', output)
+        self.assertIn('Deleting stale content type', output)
         self.assertEqual(ContentType.objects.count(), self.before_count)
 
     def test_interactive_true_without_dependent_objects(self):
         """
         interactive mode of update_contenttypes() (the default) should delete
-        stale contenttypes and inform there are no dependent objects
+        stale contenttypes even if there aren't any dependent objects.
         """
         contenttypes_management.input = lambda x: force_str("yes")
         with captured_stdout() as stdout:
