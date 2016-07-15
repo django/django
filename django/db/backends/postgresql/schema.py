@@ -17,21 +17,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         return psycopg2.extensions.adapt(value)
 
-    def add_field(self, model, field):
-        super(DatabaseSchemaEditor, self).add_field(model, field)
+    def _field_indexes_sql(self, model, field):
+        output = super(DatabaseSchemaEditor, self)._field_indexes_sql(model, field)
         like_index_statement = self._create_like_index_sql(model, field)
         if like_index_statement is not None:
-            self.deferred_sql.append(like_index_statement)
-
-    def _model_indexes_sql(self, model):
-        output = super(DatabaseSchemaEditor, self)._model_indexes_sql(model)
-        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
-            return output
-
-        for field in model._meta.local_fields:
-            like_index_statement = self._create_like_index_sql(model, field)
-            if like_index_statement is not None:
-                output.append(like_index_statement)
+            output.append(like_index_statement)
         return output
 
     def _create_like_index_sql(self, model, field):

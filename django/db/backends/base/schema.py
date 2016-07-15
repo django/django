@@ -430,8 +430,7 @@ class BaseDatabaseSchemaEditor(object):
             }
             self.execute(sql)
         # Add an index, if required
-        if field.db_index and not field.unique:
-            self.deferred_sql.append(self._create_index_sql(model, [field]))
+        self.deferred_sql.extend(self._field_indexes_sql(model, field))
         # Add any FK constraints later
         if field.remote_field and self.connection.features.supports_foreign_keys and field.db_constraint:
             self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
@@ -897,12 +896,20 @@ class BaseDatabaseSchemaEditor(object):
             return []
         output = []
         for field in model._meta.local_fields:
-            if self._field_should_be_indexed(model, field):
-                output.append(self._create_index_sql(model, [field], suffix=""))
+            output.extend(self._field_indexes_sql(model, field))
 
         for field_names in model._meta.index_together:
             fields = [model._meta.get_field(field) for field in field_names]
             output.append(self._create_index_sql(model, fields, suffix="_idx"))
+        return output
+
+    def _field_indexes_sql(self, model, field):
+        """
+        Return a list of all index SQL statements for the specified field.
+        """
+        output = []
+        if self._field_should_be_indexed(model, field):
+            output.append(self._create_index_sql(model, [field]))
         return output
 
     def _field_should_be_indexed(self, model, field):
