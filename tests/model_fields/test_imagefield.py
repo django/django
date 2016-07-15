@@ -188,6 +188,13 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
         loaded_p = pickle.loads(dump)
         self.assertEqual(p.mugshot, loaded_p.mugshot)
 
+    def test_defer(self):
+        self.PersonModel.objects.create(name='Joe', mugshot=self.file1)
+        with self.assertNumQueries(1):
+            qs = list(self.PersonModel.objects.defer('mugshot'))
+        with self.assertNumQueries(0):
+            self.assertEqual(qs[0].name, 'Joe')
+
 
 @skipIf(Image is None, "Pillow is required to test ImageField")
 class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):

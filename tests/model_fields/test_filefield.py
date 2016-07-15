@@ -50,3 +50,7 @@ class FileFieldTests(TestCase):
         d = Document.objects.create(myfile='something.txt')
         d.refresh_from_db()
         self.assertIs(d.myfile.instance, d)
+
+    def test_defer(self):
+        Document.objects.create(myfile='something.txt')
+        self.assertEqual(Document.objects.defer('myfile')[0].myfile, 'something.txt')
