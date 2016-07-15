@@ -1,1 +1,1 @@
-from .base import Binding
+from .base import Binding  # NOQA isort:skip
