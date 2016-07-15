@@ -38,10 +38,10 @@ Available ``Meta`` options
 
 .. attribute:: Options.base_manager_name
 
-.. versionadded:: 1.10
+    .. versionadded:: 1.10
 
-The name of the manager to use for the model's
-:attr:`~django.db.models.Model._base_manager`.
+    The name of the manager to use for the model's
+    :attr:`~django.db.models.Model._base_manager`.
 
 ``db_table``
 ------------
@@ -108,10 +108,10 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.default_manager_name
 
-.. versionadded:: 1.10
+    .. versionadded:: 1.10
 
-The name of the manager to use for the model's
-:attr:`~django.db.models.Model._default_manager`.
+    The name of the manager to use for the model's
+    :attr:`~django.db.models.Model._default_manager`.
 
 ``default_related_name``
 ------------------------
