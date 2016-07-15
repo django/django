@@ -5,7 +5,9 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
 from django.urls import is_valid_path
-from django.utils.cache import get_conditional_response, set_response_etag
+from django.utils.cache import (
+    cc_delim_re, get_conditional_response, set_response_etag,
+)
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_text
 from django.utils.http import unquote_etag
@@ -113,7 +115,7 @@ class CommonMiddleware(MiddlewareMixin):
             if self.should_redirect_with_slash(request):
                 return self.response_redirect_class(self.get_full_path_with_slash(request))
 
-        if settings.USE_ETAGS:
+        if settings.USE_ETAGS and self.need_etag(response):
             if not response.has_header('ETag'):
                 set_response_etag(response)
 
@@ -129,6 +131,13 @@ class CommonMiddleware(MiddlewareMixin):
             response['Content-Length'] = str(len(response.content))
 
         return response
+
+    def need_etag(self, response):
+        """
+        Returns True if ETag header should be added to response.
+        """
+        cache_control_headers = cc_delim_re.split(response.get('Cache-Control', ''))
+        return 'no-store' not in (header.lower() for header in cache_control_headers)
 
 
 class BrokenLinkEmailsMiddleware(MiddlewareMixin):

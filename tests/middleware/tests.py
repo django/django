@@ -276,6 +276,20 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertFalse(CommonMiddleware().process_response(req, res).has_header('ETag'))
 
     @override_settings(USE_ETAGS=True)
+    def test_no_etag_no_store_cache(self):
+        req = HttpRequest()
+        res = HttpResponse('content')
+        res['Cache-Control'] = 'No-Cache, No-Store, Max-age=0'
+        self.assertFalse(CommonMiddleware().process_response(req, res).has_header('ETag'))
+
+    @override_settings(USE_ETAGS=True)
+    def test_etag_extended_cache_control(self):
+        req = HttpRequest()
+        res = HttpResponse('content')
+        res['Cache-Control'] = 'my-directive="my-no-store"'
+        self.assertTrue(CommonMiddleware().process_response(req, res).has_header('ETag'))
+
+    @override_settings(USE_ETAGS=True)
     def test_if_none_match(self):
         first_req = HttpRequest()
         first_res = CommonMiddleware().process_response(first_req, HttpResponse('content'))
