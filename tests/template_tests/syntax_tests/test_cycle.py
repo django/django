@@ -127,3 +127,24 @@ class CycleTagTests(SimpleTestCase):
     def test_cycle28(self):
         output = self.engine.render_to_string('cycle28', {'a': '<', 'b': '>'})
         self.assertEqual(output, '<&gt;')
+
+    @setup({
+        'cycle29': "{% cycle 'a' 'b' 'c' as cycler silent %}"
+                   "{% for x in values %}"
+                   "{% ifchanged x %}"
+                   "{% cycle cycler %}{{ cycler }}"
+                   "{% else %}"
+                   "{{ cycler }}"
+                   "{% endifchanged %}"
+                   "{% endfor %}"})
+    def test_cycle29(self):
+        """
+        A named { % cycle % } tag should work inside an { % ifchanged % }
+        block and a { % for } loop
+        """
+        output = self.engine.render_to_string(
+            'cycle29', {
+                'irrelevant': 1,
+                'values': [1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 9, 9]
+            })
+        self.assertEqual(output, 'bcabcabcccaa')
