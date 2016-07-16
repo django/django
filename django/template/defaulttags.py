@@ -82,7 +82,7 @@ class CycleNode(Node):
         cycle_iter = context.render_context[self]
         value = next(cycle_iter).resolve(context)
         if self.variable_name:
-            context[self.variable_name] = value
+            context.set_upward(self.variable_name, value)
         if self.silent:
             return ''
         return render_value_in_context(value, context)
