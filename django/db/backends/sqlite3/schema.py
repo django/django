@@ -67,7 +67,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
-    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[]):
+    def _remake_table(self, model, create_field=None, delete_field=None, alter_field=None):
         """
         Shortcut to transform a model from old_model into new_model
 
@@ -95,7 +95,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # If any of the new or altered fields is introducing a new PK,
         # remove the old one
         restore_pk_field = None
-        if any(f.primary_key for f in create_fields) or any(n.primary_key for o, n in alter_fields):
+        if getattr(create_field, 'primary_key', False) or (
+                alter_field and getattr(alter_field[1], 'primary_key', False)):
             for name, field in list(body.items()):
                 if field.primary_key:
                     field.primary_key = False
@@ -104,15 +105,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                         del body[name]
                         del mapping[field.column]
         # Add in any created fields
-        for field in create_fields:
-            body[field.name] = field
+        if create_field:
+            body[create_field.name] = create_field
             # Choose a default and insert it into the copy map
-            if not field.many_to_many and field.concrete:
-                mapping[field.column] = self.quote_value(
-                    self.effective_default(field)
+            if not create_field.many_to_many and create_field.concrete:
+                mapping[create_field.column] = self.quote_value(
+                    self.effective_default(create_field)
                 )
         # Add in any altered fields
-        for (old_field, new_field) in alter_fields:
+        if alter_field:
+            old_field, new_field = alter_field
             body.pop(old_field.name, None)
             mapping.pop(old_field.column, None)
             body[new_field.name] = new_field
@@ -126,12 +128,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 mapping[new_field.column] = self.quote_name(old_field.column)
             rename_mapping[old_field.name] = new_field.name
         # Remove any deleted fields
-        for field in delete_fields:
-            del body[field.name]
-            del mapping[field.column]
+        if delete_field:
+            del body[delete_field.name]
+            del mapping[delete_field.column]
             # Remove any implicit M2M tables
-            if field.many_to_many and field.remote_field.through._meta.auto_created:
-                return self.delete_model(field.remote_field.through)
+            if delete_field.many_to_many and delete_field.remote_field.through._meta.auto_created:
+                return self.delete_model(delete_field.remote_field.through)
         # Work inside a new app registry
         apps = Apps()
 
@@ -225,7 +227,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Special-case implicit M2M tables
         if field.many_to_many and field.remote_field.through._meta.auto_created:
             return self.create_model(field.remote_field.through)
-        self._remake_table(model, create_fields=[field])
+        self._remake_table(model, create_field=field)
 
     def remove_field(self, model, field):
         """
@@ -243,13 +245,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # It might not actually have a column behind it
             if field.db_parameters(connection=self.connection)['type'] is None:
                 return
-            self._remake_table(model, delete_fields=[field])
+            self._remake_table(model, delete_field=field)
 
     def _alter_field(self, model, old_field, new_field, old_type, new_type,
                      old_db_params, new_db_params, strict=False):
         """Actually perform a "physical" (non-ManyToMany) field update."""
         # Alter by remaking table
-        self._remake_table(model, alter_fields=[(old_field, new_field)])
+        self._remake_table(model, alter_field=(old_field, new_field))
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
         """
@@ -259,12 +261,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # The field name didn't change, but some options did; we have to propagate this altering.
             self._remake_table(
                 old_field.remote_field.through,
-                alter_fields=[(
+                alter_field=(
                     # We need the field that points to the target model, so we can tell alter_field to change it -
                     # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
                     old_field.remote_field.through._meta.get_field(old_field.m2m_reverse_field_name()),
                     new_field.remote_field.through._meta.get_field(new_field.m2m_reverse_field_name()),
-                )],
+                ),
             )
             return
 
