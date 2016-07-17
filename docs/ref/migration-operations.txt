@@ -91,20 +91,30 @@ option on the ``Meta`` subclass).
 ``AlterUniqueTogether``
 -----------------------
 
-.. class:: AlterUniqueTogether(name, unique_together)
+.. class:: AlterUniqueTogether(name, unique_together, old_value=[])
 
 Changes the model's set of unique constraints (the
 :attr:`~django.db.models.Options.unique_together` option on the ``Meta``
 subclass).
 
+.. versionadded:: 1.11
+
+The optional ``old_value`` argument was added which stores the earlier value of
+unique_together.
+
 ``AlterIndexTogether``
 ----------------------
 
-.. class:: AlterIndexTogether(name, index_together)
+.. class:: AlterIndexTogether(name, index_together, old_value=[])
 
 Changes the model's set of custom indexes (the
 :attr:`~django.db.models.Options.index_together` option on the ``Meta``
 subclass).
+
+.. versionadded:: 1.11
+
+The optional ``old_value`` argument was added which stores the earlier value of
+index_together.
 
 ``AlterOrderWithRespectTo``
 ---------------------------
