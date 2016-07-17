@@ -10,8 +10,8 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    Case, Col, Exists, ExpressionWrapper, F, Func, OrderBy, OuterRef, Random,
-    RawSQL, Ref, Subquery, Value, When,
+    Case, Col, Exists, ExpressionList, ExpressionWrapper, F, Func, OrderBy,
+    OuterRef, Random, RawSQL, Ref, Subquery, Value, When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -1330,6 +1330,11 @@ class ValueTests(TestCase):
         self.assertNotEqual(value, other_value)
         self.assertNotEqual(value, no_output_field)
 
+    def test_raise_empty_expressionlist(self):
+        msg = 'ExpressionList requires at least one expression'
+        with self.assertRaisesMessage(ValueError, msg):
+            ExpressionList()
+
 
 class ReprTests(TestCase):
 
@@ -1355,6 +1360,14 @@ class ReprTests(TestCase):
         self.assertEqual(repr(RawSQL('table.col', [])), "RawSQL(table.col, [])")
         self.assertEqual(repr(Ref('sum_cost', Sum('cost'))), "Ref(sum_cost, Sum(F(cost)))")
         self.assertEqual(repr(Value(1)), "Value(1)")
+        self.assertEqual(
+            repr(ExpressionList(F('col'), F('anothercol'))),
+            'ExpressionList(F(col), F(anothercol))'
+        )
+        self.assertEqual(
+            repr(ExpressionList(OrderBy(F('col'), descending=False))),
+            'ExpressionList(OrderBy(F(col), descending=False))'
+        )
 
     def test_functions(self):
         self.assertEqual(repr(Coalesce('a', 'b')), "Coalesce(F(a), F(b))")

@@ -1107,6 +1107,8 @@ class SQLInsertCompiler(SQLCompiler):
                 )
             if value.contains_aggregate:
                 raise FieldError("Aggregate functions are not allowed in this query")
+            if value.contains_over_clause:
+                raise FieldError('Window expressions are not allowed in this query.')
         else:
             value = field.get_db_prep_save(value, connection=self.connection)
         return value
@@ -1262,6 +1264,8 @@ class SQLUpdateCompiler(SQLCompiler):
                 val = val.resolve_expression(self.query, allow_joins=False, for_save=True)
                 if val.contains_aggregate:
                     raise FieldError("Aggregate functions are not allowed in this query")
+                if val.contains_over_clause:
+                    raise FieldError('Window expressions are not allowed in this query.')
             elif hasattr(val, 'prepare_database_save'):
                 if field.remote_field:
                     val = field.get_db_prep_save(

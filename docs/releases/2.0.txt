@@ -52,6 +52,14 @@ Mobile-friendly ``contrib.admin``
 The admin is now responsive and supports all major mobile devices.
 Older browser may experience varying levels of graceful degradation.
 
+Window expressions
+------------------
+
+The new :class:`~django.db.models.expressions.Window` expression allows
+adding an ``OVER`` clause to querysets. You can use :ref:`window functions
+<window-functions>` and :ref:`aggregate functions <aggregation-functions>` in
+the expression.
+
 Minor features
 --------------
 
@@ -403,6 +411,11 @@ backends.
   ``DatabaseFeatures.has_select_for_update_of = True``. If the database
   requires that the arguments to ``OF`` be columns rather than tables, set
   ``DatabaseFeatures.select_for_update_of_column = True``.
+
+* To enable support for :class:`~django.db.models.expressions.Window`
+  expressions, set ``DatabaseFeatures.supports_over_clause`` to ``True``. You
+  may need to customize the ``DatabaseOperations.window_start_rows_start_end()``
+  and/or ``window_start_range_start_end()`` methods.
 
 * Third-party database backends should add a
   ``DatabaseOperations.cast_char_field_without_max_length`` attribute with the

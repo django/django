@@ -3,6 +3,7 @@ import datetime
 from decimal import Decimal
 
 from django.core.exceptions import EmptyResultSet, FieldError
+from django.db import connection
 from django.db.models import fields
 from django.db.models.query_utils import Q
 from django.utils.deconstruct import deconstructible
@@ -140,6 +141,10 @@ class BaseExpression:
     # aggregate specific fields
     is_summary = False
     _output_field_resolved_to_none = False
+    # Can the expression be used in a WHERE clause?
+    filterable = True
+    # Can the expression can be used as a source expression in Window?
+    window_compatible = False
 
     def __init__(self, output_field=None):
         if output_field is not None:
@@ -207,6 +212,13 @@ class BaseExpression:
         return False
 
     @cached_property
+    def contains_over_clause(self):
+        for expr in self.get_source_expressions():
+            if expr and expr.contains_over_clause:
+                return True
+        return False
+
+    @cached_property
     def contains_column_references(self):
         for expr in self.get_source_expressions():
             if expr and expr.contains_column_references:
@@ -232,6 +244,7 @@ class BaseExpression:
         c.is_summary = summarize
         c.set_source_expressions([
             expr.resolve_expression(query, allow_joins, reuse, summarize)
+            if expr else None
             for expr in c.get_source_expressions()
         ])
         return c
@@ -482,6 +495,9 @@ class TemporalSubtraction(CombinedExpression):
 @deconstructible
 class F(Combinable):
     """An object capable of resolving references to existing query objects."""
+    # Can the expression be used in a WHERE clause?
+    filterable = True
+
     def __init__(self, name):
         """
         Arguments:
@@ -765,6 +781,23 @@ class Ref(Expression):
 
     def get_group_by_cols(self):
         return [self]
+
+
+class ExpressionList(Func):
+    """
+    An expression containing multiple expressions. Can be used to provide a
+    list of expressions as an argument to another expression, like an
+    ordering clause.
+    """
+    template = '%(expressions)s'
+
+    def __init__(self, *expressions, **extra):
+        if len(expressions) == 0:
+            raise ValueError('%s requires at least one expression.' % self.__class__.__name__)
+        super().__init__(*expressions, **extra)
+
+    def __str__(self):
+        return self.arg_joiner.join(str(arg) for arg in self.source_expressions)
 
 
 class ExpressionWrapper(Expression):
@@ -1118,3 +1151,168 @@ class OrderBy(BaseExpression):
 
     def desc(self):
         self.descending = True
+
+
+class Window(Expression):
+    template = '%(expression)s OVER (%(window)s)'
+    # Although the main expression may either be an aggregate or an
+    # expression with an aggregate function, the GROUP BY that will
+    # be introduced in the query as a result is not desired.
+    contains_aggregate = False
+    contains_over_clause = True
+    filterable = False
+
+    def __init__(self, expression, partition_by=None, order_by=None, frame=None, output_field=None):
+        self.partition_by = partition_by
+        self.order_by = order_by
+        self.frame = frame
+
+        if not getattr(expression, 'window_compatible', False):
+            raise ValueError(
+                "Expression '%s' isn't compatible with OVER clauses." %
+                expression.__class__.__name__
+            )
+
+        if self.partition_by is not None:
+            if not isinstance(self.partition_by, (tuple, list)):
+                self.partition_by = (self.partition_by,)
+            self.partition_by = ExpressionList(*self.partition_by)
+
+        if self.order_by is not None:
+            if isinstance(self.order_by, (list, tuple)):
+                self.order_by = ExpressionList(*self.order_by)
+            elif not isinstance(self.order_by, BaseExpression):
+                raise ValueError(
+                    'order_by must be either an Expression or a sequence of '
+                    'expressions.'
+                )
+        super().__init__(output_field=output_field)
+        self.source_expression = self._parse_expressions(expression)[0]
+
+    def _resolve_output_field(self):
+        return self.source_expression.output_field
+
+    def get_source_expressions(self):
+        return [self.source_expression, self.partition_by, self.order_by, self.frame]
+
+    def set_source_expressions(self, exprs):
+        self.source_expression, self.partition_by, self.order_by, self.frame = exprs
+
+    def as_sql(self, compiler, connection, function=None, template=None):
+        connection.ops.check_expression_support(self)
+        expr_sql, params = compiler.compile(self.source_expression)
+        window_sql, window_params = [], []
+
+        if self.partition_by is not None:
+            sql_expr, sql_params = self.partition_by.as_sql(
+                compiler=compiler, connection=connection,
+                template='PARTITION BY %(expressions)s',
+            )
+            window_sql.extend(sql_expr)
+            window_params.extend(sql_params)
+
+        if self.order_by is not None:
+            window_sql.append(' ORDER BY ')
+            order_sql, order_params = compiler.compile(self.order_by)
+            window_sql.extend(''.join(order_sql))
+            window_params.extend(order_params)
+
+        if self.frame:
+            frame_sql, frame_params = compiler.compile(self.frame)
+            window_sql.extend(' ' + frame_sql)
+            window_params.extend(frame_params)
+
+        params.extend(window_params)
+        template = template or self.template
+
+        return template % {
+            'expression': expr_sql,
+            'window': ''.join(window_sql).strip()
+        }, params
+
+    def __str__(self):
+        return '{} OVER ({}{}{})'.format(
+            str(self.source_expression),
+            'PARTITION BY ' + str(self.partition_by) if self.partition_by else '',
+            'ORDER BY ' + str(self.order_by) if self.order_by else '',
+            str(self.frame or ''),
+        )
+
+    def __repr__(self):
+        return '<%s: %s>' % (self.__class__.__name__, self)
+
+    def get_group_by_cols(self):
+        return []
+
+
+class WindowFrame(Expression):
+    """
+    Model the frame clause in window expressions. There are two types of frame
+    clauses which are subclasses, however, all processing and validation (by no
+    means intended to be complete) is done here. Thus, providing an end for a
+    frame is optional (the default is UNBOUNDED FOLLOWING, which is the last
+    row in the frame).
+    """
+    template = '%(frame_type)s BETWEEN %(start)s AND %(end)s'
+
+    def __init__(self, start=None, end=None):
+        self.start = start
+        self.end = end
+
+    def set_source_expressions(self, exprs):
+        self.start, self.end = exprs
+
+    def get_source_expressions(self):
+        return [Value(self.start), Value(self.end)]
+
+    def as_sql(self, compiler, connection):
+        connection.ops.check_expression_support(self)
+        start, end = self.window_frame_start_end(connection, self.start.value, self.end.value)
+        return self.template % {
+            'frame_type': self.frame_type,
+            'start': start,
+            'end': end,
+        }, []
+
+    def __repr__(self):
+        return '<%s: %s>' % (self.__class__.__name__, self)
+
+    def get_group_by_cols(self):
+        return []
+
+    def __str__(self):
+        if self.start is not None and self.start < 0:
+            start = '%d %s' % (abs(self.start), connection.ops.PRECEDING)
+        elif self.start is not None and self.start == 0:
+            start = connection.ops.CURRENT_ROW
+        else:
+            start = connection.ops.UNBOUNDED_PRECEDING
+
+        if self.end is not None and self.end > 0:
+            end = '%d %s' % (self.end, connection.ops.FOLLOWING)
+        elif self.end is not None and self.end == 0:
+            end = connection.ops.CURRENT_ROW
+        else:
+            end = connection.ops.UNBOUNDED_FOLLOWING
+        return self.template % {
+            'frame_type': self.frame_type,
+            'start': start,
+            'end': end,
+        }
+
+    def window_frame_start_end(self, connection, start, end):
+        raise NotImplementedError('Subclasses must implement window_frame_start_end().')
+
+
+class RowRange(WindowFrame):
+    frame_type = 'ROWS'
+
+    def window_frame_start_end(self, connection, start, end):
+        return connection.ops.window_frame_rows_start_end(start, end)
+
+
+class ValueRange(WindowFrame):
+    frame_type = 'RANGE'
+
+    def window_frame_start_end(self, connection, start, end):
+        return connection.ops.window_frame_range_start_end(start, end)

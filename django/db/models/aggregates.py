@@ -15,6 +15,7 @@ class Aggregate(Func):
     contains_aggregate = True
     name = None
     filter_template = '%s FILTER (WHERE %%(filter)s)'
+    window_compatible = True
 
     def __init__(self, *args, filter=None, **kwargs):
         self.filter = filter

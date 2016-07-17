@@ -55,3 +55,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         END;
     """
     supports_callproc_kwargs = True
+    supports_over_clause = True
