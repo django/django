@@ -653,13 +653,6 @@ class OptimizerTests(SimpleTestCase):
     def test_create_alter_owrt_field(self):
         self._test_create_alter_foo_field(migrations.AlterOrderWithRespectTo("Foo", "b"))
 
-    def test_alter_unique_remove_field(self):
-        # self.assertEqual(1, 2)
-        self.assertDoesNotOptimize([
-            migrations.AlterUniqueTogether("Foo", [["a", "b"]], [["a", "b"], ["b", "c"]]),
-            migrations.RemoveField("Foo", "c"),
-        ])
-
     def test_optimize_through_fields(self):
         """
         Checks that field-level through checking is working.
