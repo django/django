@@ -348,6 +348,11 @@ A channel layer implementing the ``groups`` extension must also provide:
 * ``group_discard(group, channel)``, a callable that removes the ``channel``
   from the ``group`` if it is in it, and does nothing otherwise.
 
+* ``group_channels(group)``, a callable that returns an iterable which yields
+  all of the group's member channel names. The return value should be serializable
+  with regards to local adds and discards, but best-effort with regards to
+  adds and discards on other nodes.
+
 * ``send_group(group, message)``, a callable that takes two positional
   arguments; the group to send to, as a unicode string, and the message
   to send, as a serializable ``dict``. It may raise MessageTooLarge but cannot
