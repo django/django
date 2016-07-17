@@ -1154,6 +1154,13 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'name': "Pony", 'table': "test_almota_pony_2"})
 
+    def test_alter_model_table_none(self):
+        """
+        Tests the AlterModelTable operation if the table name is set to None.
+        """
+        operation = migrations.AlterModelTable("Pony", None)
+        self.assertEqual(operation.describe(), "Rename table for Pony to (default)")
+
     def test_alter_model_table_noop(self):
         """
         Tests the AlterModelTable operation if the table name is not changed.
