@@ -377,6 +377,20 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), ['Please submit 3 or more forms.'])
 
+    def test_formset_validate_min_flags_with_deleted_form(self):
+        data = {
+            'choices-TOTAL_FORMS': '5',  # the number of forms rendered
+            'choices-INITIAL_FORMS': '1',  # the number of forms with initial data
+            'choices-0-choice': 'Zero',
+            'choices-0-votes': '0',
+            'choices-0-DELETE': 'on',
+        }
+
+        ChoiceFormSet = formset_factory(Choice, extra=5, min_num=1, validate_min=True, can_delete=True)
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertFalse(formset.is_valid())
+        self.assertEqual(formset.non_form_errors(), ['Please submit 1 or more forms.'])
+
     def test_second_form_partially_filled_2(self):
         # And once again, if we try to partially complete a form, validation will fail.
 
