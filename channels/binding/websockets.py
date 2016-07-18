@@ -1,5 +1,7 @@
 import json
 
+from django.core import serializers
+
 from .base import Binding
 from ..generic.websockets import JsonWebsocketConsumer
 
@@ -10,10 +12,12 @@ class WebsocketBinding(Binding):
 
     To implement outbound, implement:
      - group_names, which returns a list of group names to send to
-     - serialize_data, which returns JSON-safe data from a model instance
 
     To implement inbound, implement:
      - has_permission, which says if the user can do the action on an instance
+
+    Optionally also implement:
+     - serialize_data, which returns JSON-safe data from a model instance
      - create, which takes incoming data and makes a model instance
      - update, which takes incoming data and a model instance and applies one to the other
     """
@@ -41,7 +45,8 @@ class WebsocketBinding(Binding):
         """
         Serializes model data into JSON-compatible types.
         """
-        raise NotImplementedError()
+        data = serializers.serialize('json', [instance])
+        return json.loads(data)[0]['fields']
 
     # Inbound
 
@@ -51,6 +56,31 @@ class WebsocketBinding(Binding):
         pk = content.get('pk', None)
         data = content.get('data', None)
         return action, pk, data
+
+    def _hydrate(self, pk, data):
+        """
+        Given a raw "data" section of an incoming message, returns a
+        DeserializedObject.
+        """
+        s_data = [
+            {
+                "pk": pk,
+                "model": self.model_label,
+                "fields": data,
+            }
+        ]
+        # TODO: Avoid the JSON roundtrip by using encoder directly?
+        return list(serializers.deserialize("json", json.dumps(s_data)))[0]
+
+    def create(self, data):
+        self._hydrate(None, data).save()
+
+    def update(self, pk, data):
+        instance = self.model.objects.get(pk=pk)
+        hydrated = self._hydrate(pk, data)
+        for name in data.keys():
+            setattr(instance, name, getattr(hydrated.object, name))
+        instance.save()
 
 
 class WebsocketBindingDemultiplexer(JsonWebsocketConsumer):

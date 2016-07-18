@@ -161,9 +161,9 @@ class Binding(object):
             if action == "create":
                 self.create(data)
             elif action == "update":
-                self.update(self.model.objects.get(pk=pk), data)
+                self.update(pk, data)
             elif action == "delete":
-                self.model.objects.filter(pk=pk).delete()
+                self.delete(pk)
             else:
                 raise ValueError("Bad action %r" % action)
 
@@ -173,8 +173,14 @@ class Binding(object):
         """
         raise NotImplementedError()
 
-    def update(self, instance, data):
+    def update(self, pk, data):
         """
         Updates the model with the data.
         """
         raise NotImplementedError()
+
+    def delete(self, pk):
+        """
+        Deletes the model instance.
+        """
+        self.model.objects.filter(pk=pk).delete()
