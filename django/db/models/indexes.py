@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import hashlib
 
 from django.utils.encoding import force_bytes
-from django.utils.functional import cached_property
 
 __all__ = ['Index']
 
@@ -18,31 +17,24 @@ class Index(object):
         if not fields:
             raise ValueError('At least one field is required to define an index.')
         self.fields = fields
-        self._name = name or ''
-        if self._name:
+        self.name = name or ''
+        if self.name:
             errors = self.check_name()
-            if len(self._name) > MAX_NAME_LENGTH:
+            if len(self.name) > MAX_NAME_LENGTH:
                 errors.append('Index names cannot be longer than %s characters.' % MAX_NAME_LENGTH)
             if errors:
                 raise ValueError(errors)
 
-    @cached_property
-    def name(self):
-        if not self._name:
-            self._name = self.get_name()
-            self.check_name()
-        return self._name
-
     def check_name(self):
         errors = []
         # Name can't start with an underscore on Oracle; prepend D if needed.
-        if self._name[0] == '_':
+        if self.name[0] == '_':
             errors.append('Index names cannot start with an underscore (_).')
-            self._name = 'D%s' % self._name[1:]
+            self.name = 'D%s' % self.name[1:]
         # Name can't start with a number on Oracle; prepend D if needed.
-        elif self._name[0].isdigit():
+        elif self.name[0].isdigit():
             errors.append('Index names cannot start with a number (0-9).')
-            self._name = 'D%s' % self._name[1:]
+            self.name = 'D%s' % self.name[1:]
         return errors
 
     def create_sql(self, model, schema_editor):
@@ -81,7 +73,7 @@ class Index(object):
             h.update(force_bytes(arg))
         return h.hexdigest()[:6]
 
-    def get_name(self):
+    def set_name_with_model(self, model):
         """
         Generate a unique name for the index.
 
@@ -89,19 +81,19 @@ class Index(object):
         (8 chars) and unique hash + suffix (10 chars). Each part is made to
         fit its size by truncating the excess length.
         """
-        table_name = self.model._meta.db_table
-        column_names = [self.model._meta.get_field(field).column for field in self.fields]
+        table_name = model._meta.db_table
+        column_names = [model._meta.get_field(field).column for field in self.fields]
         hash_data = [table_name] + column_names + [self.suffix]
-        index_name = '%s_%s_%s' % (
+        self.name = '%s_%s_%s' % (
             table_name[:11],
             column_names[0][:7],
             '%s_%s' % (self._hash_generator(*hash_data), self.suffix),
         )
-        assert len(index_name) <= 30, (
+        assert len(self.name) <= 30, (
             'Index too long for multiple database support. Is self.suffix '
             'longer than 3 characters?'
         )
-        return index_name
+        self.check_name()
 
     def __repr__(self):
         return "<%s: fields='%s'>" % (self.__class__.__name__, ', '.join(self.fields))
