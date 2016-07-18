@@ -41,6 +41,11 @@ class PersonNew(Form):
     birthday = DateField()
 
 
+class MultiValueDictLike(dict):
+    def getlist(self, key):
+        return [self[key]]
+
+
 class FormsTestCase(SimpleTestCase):
     # A Form is a collection of Fields. It knows how to validate a set of data and it
     # knows how to render itself in a couple of default ways (e.g., an HTML table).
@@ -867,6 +872,12 @@ Java</label></li>
         f = SongForm(data)
         self.assertEqual(f.errors, {})
 
+        # SelectMultiple uses ducktyping so that MultiValueDictLike.getlist()
+        # is called.
+        f = SongForm(MultiValueDictLike({'name': 'Yesterday', 'composers': 'J'}))
+        self.assertEqual(f.errors, {})
+        self.assertEqual(f.cleaned_data['composers'], ['J'])
+
     def test_multiple_hidden(self):
         class SongForm(Form):
             name = CharField()
@@ -903,6 +914,12 @@ Java</label></li>
         self.assertEqual(f.errors, {})
         self.assertEqual(f.cleaned_data['composers'], ['J', 'P'])
         self.assertEqual(f.cleaned_data['name'], 'Yesterday')
+
+        # MultipleHiddenInput uses ducktyping so that
+        # MultiValueDictLike.getlist() is called.
+        f = SongForm(MultiValueDictLike({'name': 'Yesterday', 'composers': 'J'}))
+        self.assertEqual(f.errors, {})
+        self.assertEqual(f.cleaned_data['composers'], ['J'])
 
     def test_escaping(self):
         # Validation errors are HTML-escaped when output as HTML.
