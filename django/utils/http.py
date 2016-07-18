@@ -277,10 +277,11 @@ def is_same_domain(host, pattern):
     )
 
 
-def is_safe_url(url, host=None):
+def is_safe_url(url, host=None, secure=False):
     """
     Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
     a different host and uses a safe scheme).
+    If `secure` set to `True` only urls with `https` schemes considered safe.
 
     Always returns ``False`` on an empty url.
     """
@@ -295,10 +296,10 @@ def is_safe_url(url, host=None):
             return False
     # Chrome treats \ completely as / in paths but it could be part of some
     # basic auth credentials so we need to check both URLs.
-    return _is_safe_url(url, host) and _is_safe_url(url.replace('\\', '/'), host)
+    return _is_safe_url(url, host, secure) and _is_safe_url(url.replace('\\', '/'), host, secure)
 
 
-def _is_safe_url(url, host):
+def _is_safe_url(url, host, secure):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith('///'):
@@ -315,8 +316,19 @@ def _is_safe_url(url, host):
     # URL and might consider the URL as scheme relative.
     if unicodedata.category(url[0])[0] == 'C':
         return False
+
+    # If we are using secure mode, we need to allow only https scheme
+    if secure and _is_non_secure_url(url):
+        return False
+
     return ((not url_info.netloc or url_info.netloc == host) and
             (not url_info.scheme or url_info.scheme in ['http', 'https']))
+
+
+def _is_non_secure_url(url):
+    url_info = urlparse(url)
+    # consider all urls starting with // or having non-https scheme as non-secure
+    return url.startswith('//') or (url_info.scheme and url_info.scheme != 'https')
 
 
 def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
