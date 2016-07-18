@@ -140,6 +140,36 @@ class TestUtilsHttp(unittest.TestCase):
         # Basic auth without host is not allowed.
         self.assertFalse(http.is_safe_url(r'http://testserver\@example.com'))
 
+    def test_is_safe_url_secure(self):
+        non_secure_urls = (
+            'http://testserver/',
+            'https:///testserver/',
+            '//testserver/',
+            'ftp://testserver/',
+            'https://example.com/',
+            'javascript:alert("testserver")',
+            '\x08//testserver/'
+        )
+
+        secure_urls = (
+            'https://testserver/',
+            'HTTPS://testserver/',
+            '/view/?param=http://example.com',
+            '/url%20with%20spaces/'
+        )
+
+        for non_secure_url in non_secure_urls:
+            self.assertFalse(
+                http.is_safe_url(non_secure_url, host='testserver', secure=True),
+                "%s should be blocked" % non_secure_url
+            )
+
+        for secure_url in secure_urls:
+            self.assertTrue(
+                http.is_safe_url(secure_url, host='testserver', secure=True),
+                "%s should be allowed" % secure_url
+            )
+
     def test_urlsafe_base64_roundtrip(self):
         bytestring = b'foo'
         encoded = http.urlsafe_base64_encode(bytestring)
