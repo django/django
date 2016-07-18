@@ -336,11 +336,15 @@ class BaseFormSet(object):
         """
         self._errors = []
         self._non_form_errors = self.error_class()
+        empty_forms_count = 0
 
         if not self.is_bound:  # Stop further processing.
             return
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
+            if not form.has_changed():
+                empty_forms_count += 1
+
             self._errors.append(form.errors)
         try:
             if (self.validate_max and
@@ -352,7 +356,7 @@ class BaseFormSet(object):
                     code='too_many_forms',
                 )
             if (self.validate_min and
-                    self.total_form_count() - len(self.deleted_forms) < self.min_num):
+                    self.total_form_count() - len(self.deleted_forms) - empty_forms_count < self.min_num):
                 raise ValidationError(ungettext(
                     "Please submit %d or more forms.",
                     "Please submit %d or more forms.", self.min_num) % self.min_num,
