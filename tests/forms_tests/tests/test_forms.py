@@ -855,6 +855,10 @@ Java</label></li>
                 widget=CheckboxSelectMultiple,
             )
 
+        class MultiValueDictLike(dict):
+            def getlist(self, key):
+                return [self[key]]
+
         data = {'name': 'Yesterday', 'composers': ['J', 'P']}
         f = SongForm(data)
         self.assertEqual(f.errors, {})
@@ -867,7 +871,17 @@ Java</label></li>
         f = SongForm(data)
         self.assertEqual(f.errors, {})
 
+        # checking whether MultiValueDictLike.getlist() is called,
+        # even if composers value is a string
+        data = MultiValueDictLike(dict(name='Yesterday', composers='J'))
+        f = SongForm(data)
+        self.assertEqual(f.errors, {})
+
     def test_multiple_hidden(self):
+        class MultiValueDictLike(dict):
+            def getlist(self, key):
+                return [self[key]]
+
         class SongForm(Form):
             name = CharField()
             composers = MultipleChoiceField(
@@ -902,6 +916,11 @@ Java</label></li>
         f = SongForm({'name': 'Yesterday', 'composers': ['J', 'P']}, auto_id=False)
         self.assertEqual(f.errors, {})
         self.assertEqual(f.cleaned_data['composers'], ['J', 'P'])
+        self.assertEqual(f.cleaned_data['name'], 'Yesterday')
+
+        f = SongForm(MultiValueDictLike(dict(name='Yesterday', composers='J')), auto_id=False)
+        self.assertEqual(f.errors, {})
+        self.assertEqual(f.cleaned_data['composers'], ['J'])
         self.assertEqual(f.cleaned_data['name'], 'Yesterday')
 
     def test_escaping(self):

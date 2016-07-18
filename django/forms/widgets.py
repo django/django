@@ -13,7 +13,6 @@ from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
 from django.templatetags.static import static
 from django.utils import datetime_safe, formats, six
-from django.utils.datastructures import MultiValueDict
 from django.utils.dates import MONTHS
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RenameMethodsBase,
@@ -331,9 +330,11 @@ class MultipleHiddenInput(HiddenInput):
         return mark_safe('\n'.join(inputs))
 
     def value_from_datadict(self, data, files, name):
-        if isinstance(data, MultiValueDict):
-            return data.getlist(name)
-        return data.get(name)
+        try:
+            getter = data.getlist
+        except AttributeError:
+            getter = data.get
+        return getter(name)
 
 
 class FileInput(Input):
@@ -604,9 +605,11 @@ class SelectMultiple(Select):
         return mark_safe('\n'.join(output))
 
     def value_from_datadict(self, data, files, name):
-        if isinstance(data, MultiValueDict):
-            return data.getlist(name)
-        return data.get(name)
+        try:
+            getter = data.getlist
+        except AttributeError:
+            getter = data.get
+        return getter(name)
 
 
 @html_safe
