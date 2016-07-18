@@ -730,3 +730,16 @@ Versions affected
 
 * Django 1.9 `(patch) <https://github.com/django/django/commit/af7d09b0c5c6ab68e629fd9baf736f9dd203b18e>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/f4e6e02f7713a6924d16540be279909ff4091eb6>`__
+
+July 18, 2016 - CVE-2016-6186
+-----------------------------
+
+`CVE-2016-6186 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-6186&cid=2>`_:
+XSS in admin's add/change related popup.
+`Full description <https://www.djangoproject.com/weblog/2016/jul/18/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.9 `(patch) <https://github.com/django/django/commit/d03bf6fe4e9bf5b07de62c1a271c4b41a7d3d158>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/f68e5a99164867ab0e071a936470958ed867479d>`__
