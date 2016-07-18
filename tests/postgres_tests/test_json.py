@@ -156,6 +156,17 @@ class TestQuerying(TestCase):
             [self.objs[0]]
         )
 
+    def test_isnull_key(self):
+        # key__isnull works the same as has_key='key'.
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__a__isnull=True),
+            self.objs[:7] + self.objs[9:]
+        )
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__a__isnull=False),
+            [self.objs[7], self.objs[8]]
+        )
+
     def test_contains(self):
         self.assertSequenceEqual(
             JSONModel.objects.filter(field__contains={'a': 'b'}),
