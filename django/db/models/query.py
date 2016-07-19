@@ -25,7 +25,7 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.functional import partition
+from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
 
 # The maximum number of items to display in a QuerySet.__repr__
@@ -1545,7 +1545,12 @@ def get_prefetcher(instance, through_attr, to_attr):
                 if hasattr(rel_obj, 'get_prefetch_queryset'):
                     prefetcher = rel_obj
                 if through_attr != to_attr:
-                    is_fetched = hasattr(instance, to_attr)
+                    # Special case cached_property instances because hasattr
+                    # triggers attribute computation and assignment.
+                    if isinstance(getattr(instance.__class__, to_attr, None), cached_property):
+                        is_fetched = to_attr in instance.__dict__
+                    else:
+                        is_fetched = hasattr(instance, to_attr)
                 else:
                     is_fetched = through_attr in instance._prefetched_objects_cache
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched
