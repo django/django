@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.http import Http404, HttpResponse
 from django.template import engines
+from django.template.response import TemplateResponse
 
 log = []
 
@@ -40,9 +41,15 @@ class ProcessViewNoneMiddleware(BaseMiddleware):
         return None
 
 
+class ProcessViewTemplateResponseMiddleware(BaseMiddleware):
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        template = engines['django'].from_string('Processed view {{ view }}{% for m in mw %}\n{{ m }}{% endfor %}')
+        return TemplateResponse(request, template, {'mw': [self.__class__.__name__], 'view': view_func.__name__})
+
+
 class TemplateResponseMiddleware(BaseMiddleware):
     def process_template_response(self, request, response):
-        response.template_name = engines['django'].from_string('template-response middleware')
+        response.context_data['mw'].append(self.__class__.__name__)
         return response
 
 

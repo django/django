@@ -22,10 +22,40 @@ class MiddlewareTests(SimpleTestCase):
         response = self.client.get('/middleware_exceptions/view/')
         self.assertEqual(response.content, b'Processed view normal_view')
 
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.ProcessViewTemplateResponseMiddleware',
+        'middleware_exceptions.middleware.LogMiddleware',
+    ])
+    def test_templateresponse_from_process_view_rendered(self):
+        """
+        TemplateResponses returned from process_view() must be rendered before
+        being passed to any middleware that tries to access response.content,
+        such as middleware_exceptions.middleware.LogMiddleware.
+        """
+        response = self.client.get('/middleware_exceptions/view/')
+        self.assertEqual(response.content, b'Processed view normal_view\nProcessViewTemplateResponseMiddleware')
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.ProcessViewTemplateResponseMiddleware',
+        'middleware_exceptions.middleware.TemplateResponseMiddleware',
+    ])
+    def test_templateresponse_from_process_view_passed_to_process_template_response(self):
+        """
+        TemplateResponses returned from process_view() should be passed to any
+        template response middleware.
+        """
+        response = self.client.get('/middleware_exceptions/view/')
+        expected_lines = [
+            b'Processed view normal_view',
+            b'ProcessViewTemplateResponseMiddleware',
+            b'TemplateResponseMiddleware',
+        ]
+        self.assertEqual(response.content, b'\n'.join(expected_lines))
+
     @override_settings(MIDDLEWARE=['middleware_exceptions.middleware.TemplateResponseMiddleware'])
     def test_process_template_response(self):
         response = self.client.get('/middleware_exceptions/template_response/')
-        self.assertEqual(response.content, b'template-response middleware')
+        self.assertEqual(response.content, b'template_response OK\nTemplateResponseMiddleware')
 
     @override_settings(MIDDLEWARE=['middleware_exceptions.middleware.LogMiddleware'])
     def test_view_exception_converted_before_middleware(self):

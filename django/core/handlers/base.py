@@ -177,13 +177,14 @@ class BaseHandler(object):
         for middleware_method in self._view_middleware:
             response = middleware_method(request, callback, callback_args, callback_kwargs)
             if response:
-                return response
+                break
 
-        wrapped_callback = self.make_view_atomic(callback)
-        try:
-            response = wrapped_callback(request, *callback_args, **callback_kwargs)
-        except Exception as e:
-            response = self.process_exception_by_middleware(e, request)
+        if response is None:
+            wrapped_callback = self.make_view_atomic(callback)
+            try:
+                response = wrapped_callback(request, *callback_args, **callback_kwargs)
+            except Exception as e:
+                response = self.process_exception_by_middleware(e, request)
 
         # Complain if the view returned None (a common error).
         if response is None:
