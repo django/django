@@ -87,25 +87,33 @@ class WebsocketConsumer(BaseConsumer):
         """
         pass
 
-    def send(self, text=None, bytes=None):
+    def send(self, text=None, bytes=None, close=False):
         """
         Sends a reply back down the WebSocket
         """
+        message = {}
+        if close:
+            message["close"] = True
         if text is not None:
-            self.message.reply_channel.send({"text": text})
+            message["text"] = text
         elif bytes is not None:
-            self.message.reply_channel.send({"bytes": bytes})
+            message["bytes"] = bytes
         else:
             raise ValueError("You must pass text or bytes")
+        self.message.reply_channel.send(message)
 
     @classmethod
-    def group_send(cls, name, text=None, bytes=None):
+    def group_send(cls, name, text=None, bytes=None, close=False):
+        message = {}
+        if close:
+            message["close"] = True
         if text is not None:
-            Group(name).send({"text": text})
+            message["text"] = text
         elif bytes is not None:
-            Group(name).send({"bytes": bytes})
+            message["bytes"] = bytes
         else:
             raise ValueError("You must pass text or bytes")
+        Group(name).send(message)
 
     def close(self):
         """
@@ -148,15 +156,15 @@ class JsonWebsocketConsumer(WebsocketConsumer):
         """
         pass
 
-    def send(self, content):
+    def send(self, content, close=False):
         """
         Encode the given content as JSON and send it to the client.
         """
-        super(JsonWebsocketConsumer, self).send(text=json.dumps(content))
+        super(JsonWebsocketConsumer, self).send(text=json.dumps(content), close=close)
 
     @classmethod
-    def group_send(cls, name, content):
-        WebsocketConsumer.group_send(name, json.dumps(content))
+    def group_send(cls, name, content, close=False):
+        WebsocketConsumer.group_send(name, json.dumps(content), close=close)
 
 
 class WebsocketDemultiplexer(JsonWebsocketConsumer):
@@ -200,8 +208,11 @@ class WebsocketDemultiplexer(JsonWebsocketConsumer):
         self.message.reply_channel.send(self.encode(stream, payload))
 
     @classmethod
-    def group_send(cls, name, stream, payload):
-        Group(name).send(cls.encode(stream, payload))
+    def group_send(cls, name, stream, payload, close=False):
+        message = cls.encode(stream, payload)
+        if close:
+            message["close"] = True
+        Group(name).send(message)
 
     @classmethod
     def encode(cls, stream, payload):
