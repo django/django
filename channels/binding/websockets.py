@@ -3,7 +3,7 @@ import json
 from django.core import serializers
 
 from .base import Binding
-from ..generic.websockets import JsonWebsocketConsumer, WebsocketDemultiplexer
+from ..generic.websockets import WebsocketDemultiplexer
 
 
 class WebsocketBinding(Binding):
