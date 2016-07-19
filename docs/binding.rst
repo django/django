@@ -3,7 +3,7 @@ Data Binding
 
 .. warning::
 
-    The Data Binding part is new and might change slightly in the
+    Data Binding is new and might change slightly in the
     upcoming weeks, and so don't consider this API totally stable yet.
 
 The Channels data binding framework automates the process of tying Django
@@ -64,6 +64,7 @@ get started and likely close to what you want. Start off like this::
     class IntegerValueBinding(WebsocketBinding):
 
         model = IntegerValue
+        stream = "intval"
 
         def group_names(self, instance, action):
             return ["intval-updates"]
@@ -86,55 +87,56 @@ always provide:
   own permission system to see if the user is allowed that action.
 
 For reference, ``action`` is always one of the unicode strings ``"create"``,
-``"update"`` or ``"delete"``.
+``"update"`` or ``"delete"``. You also supply the :ref:`multiplexing`
+stream name to provide to the client - you must use multiplexing if you
+use WebSocket data binding.
 
 Just adding the binding like this in a place where it will be imported will
 get outbound messages sending, but you still need a Consumer that will both
 accept incoming binding updates and add people to the right Groups when they
-connect. For that, you need the other part of the WebSocket binding module,
-the demultiplexer::
+connect. The WebSocket binding classes use the standard :ref:`multiplexing`,
+so you just need to use that::
 
-    from channels.binding.websockets import WebsocketBindingDemultiplexer
-    from .models import IntegerValueBinding
+    from channels.generic.websockets import WebsocketDemultiplexer
 
-    class BindingConsumer(WebsocketBindingDemultiplexer):
+    class Demultiplexer(WebsocketDemultiplexer):
 
-        bindings = [
-            IntegerValueBinding,
-        ]
+        mapping = {
+            "intval": "binding.intval",
+        }
 
         def connection_groups(self):
             return ["intval-updates"]
 
-This class needs two things set:
+As well as the standard stream-to-channel mapping, you also need to set
+``connection_groups``, a list of groups to put people in when they connect.
+This should match the logic of ``group_names`` on your binding - we've used
+our fixed group name again.
 
-* ``bindings``, a list of Binding subclasses (the ones from before) of the
-  models you want this to receive messages for. The socket will take care of
-  looking for what model the incoming message is and giving it to the correct
-  Binding.
-
-* ``connection_groups``, a list of groups to put people in when they connect.
-  This should match the logic of ``group_names`` on your binding - we've used
-  our fixed group name again.
-
-Tie that into your routing and you're ready to go::
+Tie that into your routing, and tie each demultiplexed channel into the
+``.consumer`` attribute of the Binding, and you're ready to go::
 
     from channels import route_class
     from .consumers import BindingConsumer
+    from .models import IntegerValueBinding
 
     channel_routing = [
         route_class(BindingConsumer, path="^binding/"),
+        route("binding.intval", IntegerValueBinding.consumer),
     ]
 
 
 Frontend Considerations
 -----------------------
 
-Channels is a Python library, and so does not provide any JavaScript to tie
-the binding into your JavaScript (though hopefully some will appear over time).
-It's not very hard to write your own; messages are all in JSON format, and
-have a key of ``action`` to tell you what's happening and ``model`` with the
-Django label of the model they're on.
+You can use the standard Channels WebSocket wrapper **(not yet available)**
+to automatically run demultiplexing, and then tie the events you receive into
+your frontend framework of choice based on ``action``, ``pk`` and ``data``.
+
+.. note::
+
+    Common plugins for data binding against popular JavaScript frameworks are
+    wanted; if you're interested, please get in touch.
 
 
 Custom Serialization/Protocols
