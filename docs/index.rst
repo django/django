@@ -31,6 +31,7 @@ Contents:
    deploying
    generics
    routing
+   binding
    backends
    testing
    cross-compat
