@@ -1,15 +1,17 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function
 
 from datetime import datetime
+import sys
 
 from django.contrib.gis.db.models import Extent
+from django.contrib.gis import geos
 from django.contrib.gis.shortcuts import render_to_kmz
 from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import no_oracle
-from .models import City, PennsylvaniaCity, State, Truth
+from .models import City, PennsylvaniaCity, State, Truth, Feature
 
 
 @skipUnlessDBFeature("gis_enabled")
@@ -87,3 +89,31 @@ class GeoRegressionTests(TestCase):
         # verify values
         self.assertIs(val1, True)
         self.assertIs(val2, False)
+
+    def test_empty_assignment(self):
+        """ Testing that empty geometries are saved correctly to the database. See #26789 """
+        CASES = (
+            # WKBWriter error with GEOS 3.5.0:
+            #('SRID=4326;POINT EMPTY', geos.Point),
+            ('SRID=4326;LINESTRING EMPTY', geos.LineString),
+            # Minimum-points SQL error with PostGIS 2.2.2:
+            #('SRID=4326;POLYGON EMPTY', geos.Polygon),
+            ('SRID=4326;MULTIPOINT EMPTY', geos.MultiPoint),
+            ('SRID=4326;MULTILINESTRING EMPTY', geos.MultiLineString),
+            ('SRID=4326;MULTIPOLYGON EMPTY', geos.MultiPolygon),
+            ('SRID=4326;GEOMETRYCOLLECTION EMPTY', geos.GeometryCollection),
+        )
+
+        for wkt, typ in CASES:
+            o = Feature(name=typ.__class__.__name__, geom=wkt)
+            self.assertIsInstance(o.geom, typ)
+            self.assertTrue(o.geom.empty, wkt)
+            try:
+                o.save()
+            except Exception as e:
+                print("'%s': %s" % (wkt, e))
+                raise
+
+            o.refresh_from_db()
+            self.assertIsInstance(o.geom, typ)
+            self.assertTrue(o.geom.empty, wkt)
