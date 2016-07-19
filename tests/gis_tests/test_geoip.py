@@ -107,8 +107,8 @@ class GeoIPTest(unittest.TestCase):
             lat_lon = g.lat_lon(query)
             lat_lon = (lat_lon[1], lat_lon[0])
             for tup in (geom.tuple, g.coords(query), g.lon_lat(query), lat_lon):
-                self.assertAlmostEqual(lon, tup[0], 4)
-                self.assertAlmostEqual(lat, tup[1], 4)
+                self.assertAlmostEqual(lon, tup[0], 0)
+                self.assertAlmostEqual(lat, tup[1], 0)
 
     def test05_unicode_response(self):
         "Testing that GeoIP strings are properly encoded, see #16553."
