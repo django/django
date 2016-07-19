@@ -175,6 +175,40 @@ that will do this for you if you call it explicitly.
 ``self.close()`` is also provided to easily close the WebSocket from the server
 end once you are done with it.
 
+.. _multiplexing:
+
+WebSocket Multiplexing
+----------------------
+
+Channels provides a standard way to multiplex different data streams over
+a single WebSocket, called a ``Demultiplexer``. You use it like this::
+
+    from channels.generic.websockets import WebsocketDemultiplexer
+
+    class Demultiplexer(WebsocketDemultiplexer):
+
+        mapping = {
+            "intval": "binding.intval",
+            "stats": "internal.stats",
+        }
+
+It expects JSON-formatted WebSocket frames with two keys, ``stream`` and
+``payload``, and will match the ``stream`` against the mapping to find a
+channel name. It will then forward the message onto that channel while
+preserving ``reply_channel``, so you can hook consumers up to them directly
+in the ``routing.py`` file, and use authentication decorators as you wish.
+
+You cannot use class-based consumers this way as the messages are no
+longer in WebSocket format, though. If you need to do operations on
+``connect`` or ``disconnect``, override those methods on the ``Demultiplexer``
+itself (you can also provide a ``connection_groups`` method, as it's just
+based on the JSON WebSocket generic consumer).
+
+The :doc:`data binding <binding>` code will also send out messages to clients
+in the same format, and you can encode things in this format yourself by
+using the ``WebsocketDemultiplexer.encode`` class method.
+
+
 Sessions and Users
 ------------------
 

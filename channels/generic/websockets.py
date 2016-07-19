@@ -1,6 +1,6 @@
 import json
 
-from ..channel import Group
+from ..channel import Group, Channel
 from ..auth import channel_session_user_from_http
 from ..sessions import enforce_ordering
 from .base import BaseConsumer
@@ -98,11 +98,12 @@ class WebsocketConsumer(BaseConsumer):
         else:
             raise ValueError("You must pass text or bytes")
 
-    def group_send(self, name, text=None, bytes=None):
+    @classmethod
+    def group_send(cls, name, text=None, bytes=None):
         if text is not None:
-            Group(name, channel_layer=self.message.channel_layer).send({"text": text})
+            Group(name).send({"text": text})
         elif bytes is not None:
-            Group(name, channel_layer=self.message.channel_layer).send({"bytes": bytes})
+            Group(name).send({"bytes": bytes})
         else:
             raise ValueError("You must pass text or bytes")
 
@@ -153,5 +154,61 @@ class JsonWebsocketConsumer(WebsocketConsumer):
         """
         super(JsonWebsocketConsumer, self).send(text=json.dumps(content))
 
-    def group_send(self, name, content):
-        super(JsonWebsocketConsumer, self).group_send(name, json.dumps(content))
+    @classmethod
+    def group_send(cls, name, content):
+        WebsocketConsumer.group_send(name, json.dumps(content))
+
+
+class WebsocketDemultiplexer(JsonWebsocketConsumer):
+    """
+    JSON-understanding WebSocket consumer subclass that handles demultiplexing
+    streams using a "stream" key in a top-level dict and the actual payload
+    in a sub-dict called "payload". This lets you run multiple streams over
+    a single WebSocket connection in a standardised way.
+
+    Incoming messages on streams are mapped into a custom channel so you can
+    just tie in consumers the normal way. The reply_channels are kept so
+    sessions/auth continue to work. Payloads must be a dict at the top level,
+    so they fulfill the Channels message spec.
+
+    Set a mapping from streams to channels in the "mapping" key. We make you
+    whitelist channels like this to allow different namespaces and for security
+    reasons (imagine if someone could inject straight into websocket.receive).
+    """
+
+    mapping = {}
+
+    def receive(self, content, **kwargs):
+        # Check the frame looks good
+        if isinstance(content, dict) and "stream" in content and "payload" in content:
+            # Match it to a channel
+            stream = content['stream']
+            if stream in self.mapping:
+                # Extract payload and add in reply_channel
+                payload = content['payload']
+                if not isinstance(payload, dict):
+                    raise ValueError("Multiplexed frame payload is not a dict")
+                payload['reply_channel'] = self.message['reply_channel']
+                # Send it onto the new channel
+                Channel(self.mapping[stream]).send(payload)
+            else:
+                raise ValueError("Invalid multiplexed frame received (stream not mapped)")
+        else:
+            raise ValueError("Invalid multiplexed frame received (no channel/payload key)")
+
+    def send(self, stream, payload):
+        self.message.reply_channel.send(self.encode(stream, payload))
+
+    @classmethod
+    def group_send(cls, name, stream, payload):
+        Group(name).send(cls.encode(stream, payload))
+
+    @classmethod
+    def encode(cls, stream, payload):
+        """
+        Encodes stream + payload for outbound sending.
+        """
+        return {"text": json.dumps({
+            "stream": stream,
+            "payload": payload,
+        })}
