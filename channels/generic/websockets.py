@@ -98,11 +98,12 @@ class WebsocketConsumer(BaseConsumer):
         else:
             raise ValueError("You must pass text or bytes")
 
-    def group_send(self, name, text=None, bytes=None):
+    @classmethod
+    def group_send(cls, name, text=None, bytes=None):
         if text is not None:
-            Group(name, channel_layer=self.message.channel_layer).send({"text": text})
+            Group(name).send({"text": text})
         elif bytes is not None:
-            Group(name, channel_layer=self.message.channel_layer).send({"bytes": bytes})
+            Group(name).send({"bytes": bytes})
         else:
             raise ValueError("You must pass text or bytes")
 
@@ -153,8 +154,9 @@ class JsonWebsocketConsumer(WebsocketConsumer):
         """
         super(JsonWebsocketConsumer, self).send(text=json.dumps(content))
 
-    def group_send(self, name, content):
-        super(JsonWebsocketConsumer, self).group_send(name, json.dumps(content))
+    @classmethod
+    def group_send(cls, name, content):
+        WebsocketConsumer.group_send(name, json.dumps(content))
 
 
 class WebsocketDemultiplexer(JsonWebsocketConsumer):
@@ -195,17 +197,18 @@ class WebsocketDemultiplexer(JsonWebsocketConsumer):
             raise ValueError("Invalid multiplexed frame received (no channel/payload key)")
 
     def send(self, stream, payload):
-        super(WebsocketDemultiplexer, self).send(self.encode(stream, payload))
+        self.message.reply_channel.send(self.encode(stream, payload))
 
-    def group_send(self, name, stream, payload):
-        super(WebsocketDemultiplexer, self).group_send(name, self.encode(stream, payload))
+    @classmethod
+    def group_send(cls, name, stream, payload):
+        Group(name).send(cls.encode(stream, payload))
 
     @classmethod
     def encode(cls, stream, payload):
         """
         Encodes stream + payload for outbound sending.
         """
-        return {
+        return {"text": json.dumps({
             "stream": stream,
             "payload": payload,
-        }
+        })}

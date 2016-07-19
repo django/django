@@ -8,7 +8,8 @@ from ..generic.websockets import JsonWebsocketConsumer, WebsocketDemultiplexer
 
 class WebsocketBinding(Binding):
     """
-    Websocket-specific outgoing binding subclass that uses JSON encoding.
+    Websocket-specific outgoing binding subclass that uses JSON encoding
+    and the built-in JSON/WebSocket multiplexer.
 
     To implement outbound, implement:
      - group_names, which returns a list of group names to send to
@@ -26,7 +27,7 @@ class WebsocketBinding(Binding):
 
     model = None
 
-    # Optional stream multiplexing
+    # Stream multiplexing name
 
     stream = None
 
@@ -40,11 +41,7 @@ class WebsocketBinding(Binding):
         }
         # Encode for the stream
         assert self.stream is not None
-        payload = WebsocketDemultiplexer.encode(self.stream, payload)
-        # Return WS format message
-        return {
-            "text": json.dumps(payload),
-        }
+        return WebsocketDemultiplexer.encode(self.stream, payload)
 
     def serialize_data(self, instance):
         """
