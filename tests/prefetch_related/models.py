@@ -6,6 +6,7 @@ from django.contrib.contenttypes.fields import (
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 
 
 # Basic tests
@@ -218,6 +219,10 @@ class Person(models.Model):
     @property
     def all_houses(self):
         return list(self.houses.all())
+
+    @cached_property
+    def cached_all_houses(self):
+        return self.all_houses
 
     class Meta:
         ordering = ['id']
