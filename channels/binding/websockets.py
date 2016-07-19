@@ -3,7 +3,7 @@ import json
 from django.core import serializers
 
 from .base import Binding
-from ..generic.websockets import JsonWebsocketConsumer
+from ..generic.websockets import JsonWebsocketConsumer, WebsocketDemultiplexer
 
 
 class WebsocketBinding(Binding):
@@ -26,19 +26,24 @@ class WebsocketBinding(Binding):
 
     model = None
 
+    # Optional stream multiplexing
+
+    stream = None
+
     # Outbound
 
     def serialize(self, instance, action):
+        payload = {
+            "action": action,
+            "pk": instance.pk,
+            "data": self.serialize_data(instance),
+        }
+        # Encode for the stream
+        assert self.stream is not None
+        payload = WebsocketDemultiplexer.encode(self.stream, payload)
+        # Return WS format message
         return {
-            "text": json.dumps({
-                "model": "%s.%s" % (
-                    instance._meta.app_label.lower(),
-                    instance._meta.object_name.lower(),
-                ),
-                "action": action,
-                "pk": instance.pk,
-                "data": self.serialize_data(instance),
-            }),
+            "text": json.dumps(payload),
         }
 
     def serialize_data(self, instance):
@@ -51,10 +56,13 @@ class WebsocketBinding(Binding):
     # Inbound
 
     def deserialize(self, message):
-        content = json.loads(message['text'])
-        action = content['action']
-        pk = content.get('pk', None)
-        data = content.get('data', None)
+        """
+        You must hook this up behind a Deserializer, so we expect the JSON
+        already dealt with.
+        """
+        action = message['action']
+        pk = message.get('pk', None)
+        data = message.get('data', None)
         return action, pk, data
 
     def _hydrate(self, pk, data):
@@ -81,29 +89,3 @@ class WebsocketBinding(Binding):
         for name in data.keys():
             setattr(instance, name, getattr(hydrated.object, name))
         instance.save()
-
-
-class WebsocketBindingDemultiplexer(JsonWebsocketConsumer):
-    """
-    Allows you to combine multiple Bindings as one websocket consumer.
-    Subclass and provide a custom list of Bindings.
-    """
-
-    http_user = True
-    warn_if_no_match = True
-    bindings = None
-
-    def receive(self, content):
-        # Sanity check
-        if self.bindings is None:
-            raise ValueError("Demultiplexer has no bindings!")
-        # Find the matching binding
-        model_label = content['model']
-        triggered = False
-        for binding in self.bindings:
-            if binding.model_label == model_label:
-                binding.trigger_inbound(self.message)
-                triggered = True
-        # At least one of them should have fired.
-        if not triggered and self.warn_if_no_match:
-            raise ValueError("No binding found for model %s" % model_label)

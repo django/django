@@ -120,11 +120,10 @@ class Binding(object):
     # Inbound binding
 
     @classmethod
-    def trigger_inbound(cls, message):
+    def trigger_inbound(cls, message, **kwargs):
         """
         Triggers the binding to see if it will do something.
-        We separate out message serialization to a consumer, so this gets
-        native arguments.
+        Also acts as a consumer.
         """
         # Late import as it touches models
         from django.contrib.auth.models import AnonymousUser
@@ -135,6 +134,8 @@ class Binding(object):
         self.user = getattr(self.message, "user", AnonymousUser())
         # Run incoming action
         self.run_action(self.action, self.pk, self.data)
+
+    consumer = trigger_inbound
 
     def deserialize(self, message):
         """
