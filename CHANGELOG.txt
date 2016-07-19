@@ -1,3 +1,14 @@
+0.17.0 (2016-07-19)
+-------------------
+
+* Data Binding framework is added, which allows easy tying of model changes
+  to WebSockets (and other protocols) and vice-versa.
+
+* Standardised WebSocket/JSON multiplexing introduced
+
+* WebSocket generic consumers now have a 'close' argument on send/group_send
+
+
 0.16.1 (2016-07-12)
 -------------------
 
