@@ -178,7 +178,7 @@ def logout(request, *args, **kwargs):
 
 
 @deprecate_current_app
-def logout_then_login(request, login_url=None, extra_context=None):
+def logout_then_login(request, login_url=None):
     """
     Logs out the user if they are logged in. Then redirects to the log-in page.
     """
