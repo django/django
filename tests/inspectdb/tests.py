@@ -87,6 +87,11 @@ class InspectDBTestCase(TestCase):
         if (connection.features.can_introspect_max_length and
                 not connection.features.interprets_empty_strings_as_nulls):
             assertFieldType('url_field', "models.CharField(max_length=200)")
+        if connection.features.has_native_uuid_field:
+            assertFieldType('uuid_field', "models.UUIDField()")
+        elif (connection.features.can_introspect_max_length and
+                not connection.features.interprets_empty_strings_as_nulls):
+            assertFieldType('uuid_field', "models.CharField(max_length=32)")
 
     def test_number_field_types(self):
         """Test introspection of various Django field types"""
