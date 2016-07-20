@@ -116,7 +116,7 @@ our fixed group name again.
 Tie that into your routing, and tie each demultiplexed channel into the
 ``.consumer`` attribute of the Binding, and you're ready to go::
 
-    from channels import route_class
+    from channels import route_class, route
     from .consumers import Demultiplexer
     from .models import IntegerValueBinding
 
