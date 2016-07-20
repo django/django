@@ -71,7 +71,8 @@ def update_connections_time_zone(**kwargs):
                 del conn.timezone_name
             except AttributeError:
                 pass
-            conn.ensure_timezone()
+            if conn.connection is not None:
+                conn.ensure_timezone()
 
 
 @receiver(setting_changed)
