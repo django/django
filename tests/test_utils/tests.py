@@ -627,6 +627,19 @@ class HTMLEqualTests(SimpleTestCase):
             self.assertHTMLEqual('<p>', '')
         with self.assertRaises(AssertionError):
             self.assertHTMLEqual('', '<p>')
+        if six.PY2:
+            error_msg = (
+                "First argument is not valid HTML:\n"
+                "Unexpected end tag `div` (Line 1, Column 6), "
+                "at line 1, column 7"
+            )
+        else:
+            error_msg = (
+                "First argument is not valid HTML:\n"
+                "('Unexpected end tag `div` (Line 1, Column 6)', (1, 6))"
+            )
+        with self.assertRaisesMessage(AssertionError, error_msg):
+            self.assertHTMLEqual('< div></ div>', '<div></div>')
         with self.assertRaises(HTMLParseError):
             parse_html('</p>')
 
