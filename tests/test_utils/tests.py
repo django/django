@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import sys
 import unittest
 import warnings
 
@@ -629,6 +630,15 @@ class HTMLEqualTests(SimpleTestCase):
             self.assertHTMLEqual('<p>', '')
         with self.assertRaises(AssertionError):
             self.assertHTMLEqual('', '<p>')
+        error_msg = (
+            "First argument is not valid HTML:\n"
+            "('Unexpected end tag `div` (Line 1, Column 6)', (1, 6))"
+        ) if sys.version_info >= (3, 5) else (
+            "First argument is not valid HTML:\n"
+            "Unexpected end tag `div` (Line 1, Column 6), at line 1, column 7"
+        )
+        with self.assertRaisesMessage(AssertionError, error_msg):
+            self.assertHTMLEqual('< div></ div>', '<div></div>')
         with self.assertRaises(HTMLParseError):
             parse_html('</p>')
 
