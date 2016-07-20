@@ -857,6 +857,16 @@ class ModelAdmin(BaseModelAdmin):
             # Use only the first item in list_display as link
             return list(list_display)[:1]
 
+    def get_field_help_text(self, field_name):
+        """
+        Return the help text property of a custom field defined in the
+        list_display parameter.
+        """
+        if field_name in self.list_display:
+            method = getattr(self, field_name, None)
+            if method:
+                return getattr(method, 'help_text', None)
+
     def get_list_filter(self, request):
         """
         Returns a sequence containing the fields to be displayed as filters in

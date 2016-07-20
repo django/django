@@ -55,6 +55,9 @@ Minor features
 
 * :attr:`.ModelAdmin.date_hierarchy` can now reference fields across relations.
 
+* A ``help_text`` property set to a callable used in :attr:`.ModelAdmin.list_display`
+  is now displayed as a tooltip in the changelist view.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

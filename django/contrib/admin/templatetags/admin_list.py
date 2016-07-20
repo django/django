@@ -122,6 +122,7 @@ def result_headers(cl):
                 # Not sortable
                 yield {
                     "text": text,
+                    "help_text": cl.model_admin.get_field_help_text(field_name),
                     "class_attrib": format_html(' class="column-{}"', field_name),
                     "sortable": False,
                 }
@@ -168,6 +169,7 @@ def result_headers(cl):
 
         yield {
             "text": text,
+            "help_text": cl.model_admin.get_field_help_text(field_name),
             "sortable": True,
             "sorted": sorted,
             "ascending": order_type == "asc",
