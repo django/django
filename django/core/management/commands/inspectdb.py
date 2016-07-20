@@ -153,9 +153,11 @@ class Command(BaseCommand):
                     if extra_params:
                         if not field_desc.endswith('('):
                             field_desc += ', '
-                        field_desc += ', '.join(
+                        field_args = ', '.join(extra_params.get('__args__', []))
+                        field_kwargs = ', '.join(
                             '%s=%s' % (k, strip_prefix(repr(v)))
-                            for k, v in extra_params.items())
+                            for k, v in extra_params.items() if k != '__args__')
+                        field_desc += ', '.join([arg for arg in [field_args, field_kwargs] if arg])
                     field_desc += ')'
                     if comment_notes:
                         field_desc += '  # ' + ' '.join(comment_notes)

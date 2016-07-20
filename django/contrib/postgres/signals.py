@@ -9,6 +9,12 @@ def register_type_handlers(connection, **kwargs):
 
     try:
         register_hstore(connection.connection, globally=True)
+        if ('django.contrib.postgresql.fields.HStoreField' not in
+                connection.introspection.data_types_reverse.values()):
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT oid from pg_type WHERE typname = 'hstore'""")
+                oid = cursor.fetchone()[0]
+                connection.introspection.data_types_reverse[oid] = 'django.contrib.postgresql.fields.HStoreField'
     except ProgrammingError:
         # Hstore is not available on the database.
         #

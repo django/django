@@ -1,3 +1,4 @@
+import re
 import warnings
 
 from django.db.backends.base.introspection import (
@@ -19,15 +20,39 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         700: 'FloatField',
         701: 'FloatField',
         869: 'GenericIPAddressField',
+        1000: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': ['models.BooleanField()']}),
+        1005: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': ['models.SmallIntegerField()']}),
+        1007: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': ['models.IntegerField()']}),
+        1009: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': ['models.TextField()']}),
+        1015: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': ['models.CharField(max_length=%(internal_size)d)']}),
+        1041: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': ['models.GenericIPAddressField()']}),
         1042: 'CharField',  # blank-padded
         1043: 'CharField',
         1082: 'DateField',
         1083: 'TimeField',
         1114: 'DateTimeField',
+        1182: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': ['models.DateField()']}),
+        1183: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': ['models.TimeField()']}),
         1184: 'DateTimeField',
+        1185: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': ['models.DateTimeField()']}),
+        1231: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': [
+                'models.DecimalField(max_digits=%(precision)d, decimal_places=%(scale)d)']}),
         1266: 'TimeField',
         1700: 'DecimalField',
         2950: 'UUIDField',
+        2951: ('django.contrib.postgresql.fields.ArrayField',
+               {'__args__': ['models.UUIDField()']}),
+        # HStoreField oid is registered in register_hstore_handler
     }
 
     ignored_tables = []
@@ -49,6 +74,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return 'AutoField'
             elif field_type == 'BigIntegerField':
                 return 'BigAutoField'
+        if data_type in (1015, 1231):
+            field_type[1]['__args__'][0] %= description._asdict()
         return field_type
 
     def get_table_list(self, cursor):
@@ -71,6 +98,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         # As cursor.description does not return reliably the nullable property,
         # we have to query the information_schema (#7783)
+
+        def patch_array_decimals(col_details):
+            if col_details.type_code == 1231:
+                # Getting nested DecimalField max_digits and decimal_places through pg_attributes
+                cursor.execute("""
+                    SELECT format_type(attr.atttypid, attr.atttypmod)
+                    FROM pg_catalog.pg_class c, pg_attribute attr
+                    WHERE attr.attname = %s AND c.relname = %s AND attr.attrelid = c.oid
+                """, [col_details.name, table_name])
+                m = re.match(r'numeric\(([0-9])+,([0-9])+\)', cursor.fetchone()[0])
+                col_details = col_details._replace(precision=int(m.groups()[0]), scale=int(m.groups()[1]))
+            return col_details[0:6]
+
         cursor.execute("""
             SELECT column_name, is_nullable, column_default
             FROM information_schema.columns
@@ -78,8 +118,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [
-            FieldInfo(*(line[0:6] + (field_map[line.name][0] == 'YES', field_map[line.name][1])))
-            for line in cursor.description
+            FieldInfo(
+                *(patch_array_decimals(line) +
+                (field_map[line.name][0] == 'YES', field_map[line.name][1]))
+            ) for line in cursor.description
         ]
 
     def get_relations(self, cursor, table_name):

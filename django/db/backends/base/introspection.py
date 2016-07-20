@@ -1,3 +1,4 @@
+import copy
 from collections import namedtuple
 
 # Structure returned by DatabaseIntrospection.get_table_list()
@@ -22,7 +23,7 @@ class BaseDatabaseIntrospection:
         For Oracle, the column data_type on its own is insufficient to
         distinguish between a FloatField and IntegerField, for example.
         """
-        return self.data_types_reverse[data_type]
+        return copy.deepcopy(self.data_types_reverse[data_type])
 
     def table_name_converter(self, name):
         """

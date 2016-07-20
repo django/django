@@ -25,6 +25,50 @@ class InspectDBTests(PostgreSQLTestCase):
             ['field = django.contrib.postgresql.fields.JSONField(blank=True, null=True)'],
         )
 
+    def test_hstore_introspection(self):
+        self.assertFieldsInModel(
+            'postgres_tests_hstoremodel',
+            ['field = django.contrib.postgresql.fields.HStoreField(blank=True, null=True)'],
+        )
+
+    def test_array_introspection(self):
+        """
+        Note that nested arrays do not seem to be introspectable.
+        """
+        self.assertFieldsInModel(
+            'postgres_tests_integerarraymodel',
+            ['field = django.contrib.postgresql.fields.ArrayField(models.IntegerField())'],
+        )
+        self.assertFieldsInModel(
+            'postgres_tests_nullableintegerarraymodel',
+            ['field = django.contrib.postgresql.fields.ArrayField(models.IntegerField(), blank=True, null=True)'],
+        )
+        self.assertFieldsInModel(
+            'postgres_tests_chararraymodel',
+            ['field = django.contrib.postgresql.fields.ArrayField(models.CharField(max_length=10))'],
+        )
+        self.assertFieldsInModel(
+            'postgres_tests_datetimearraymodel',
+            [
+                'datetimes = django.contrib.postgresql.fields.ArrayField(models.DateTimeField())',
+                'dates = django.contrib.postgresql.fields.ArrayField(models.DateField())',
+                'times = django.contrib.postgresql.fields.ArrayField(models.TimeField())',
+            ],
+        )
+        self.assertFieldsInModel(
+            'postgres_tests_othertypesarraymodel',
+            [
+                'bools = django.contrib.postgresql.fields.ArrayField(models.BooleanField())',
+                'texts = django.contrib.postgresql.fields.ArrayField(models.TextField())',
+                'ips = django.contrib.postgresql.fields.ArrayField(models.GenericIPAddressField())',
+                'uuids = django.contrib.postgresql.fields.ArrayField(models.UUIDField())',
+                'decimals = django.contrib.postgresql.fields.ArrayField'
+                '(models.DecimalField(max_digits=5, decimal_places=2))',
+                'tags = django.contrib.postgresql.fields.ArrayField'
+                '(models.SmallIntegerField(), blank=True, null=True)',
+            ],
+        )
+
     def test_range_fields(self):
         self.assertFieldsInModel(
             'postgres_tests_rangesmodel',

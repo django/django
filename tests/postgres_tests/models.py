@@ -63,6 +63,8 @@ class NestedIntegerArrayModel(PostgreSQLModel):
 
 
 class OtherTypesArrayModel(PostgreSQLModel):
+    bools = ArrayField(models.BooleanField())
+    texts = ArrayField(models.TextField())
     ips = ArrayField(models.GenericIPAddressField())
     uuids = ArrayField(models.UUIDField())
     decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2))

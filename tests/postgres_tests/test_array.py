@@ -92,6 +92,8 @@ class TestSaveLoad(PostgreSQLTestCase):
 
     def test_other_array_types(self):
         instance = OtherTypesArrayModel(
+            bools=[False, True],
+            texts=['aa', 'bb'],
             ips=['192.168.0.1', '::1'],
             uuids=[uuid.uuid4()],
             decimals=[decimal.Decimal(1.25), 1.75],
@@ -99,6 +101,8 @@ class TestSaveLoad(PostgreSQLTestCase):
         )
         instance.save()
         loaded = OtherTypesArrayModel.objects.get()
+        self.assertEqual(instance.bools, loaded.bools)
+        self.assertEqual(instance.texts, loaded.texts)
         self.assertEqual(instance.ips, loaded.ips)
         self.assertEqual(instance.uuids, loaded.uuids)
         self.assertEqual(instance.decimals, loaded.decimals)
@@ -106,6 +110,8 @@ class TestSaveLoad(PostgreSQLTestCase):
 
     def test_null_from_db_value_handling(self):
         instance = OtherTypesArrayModel.objects.create(
+            bools=[False, True],
+            texts=['aa', 'bb'],
             ips=['192.168.0.1', '::1'],
             uuids=[uuid.uuid4()],
             decimals=[decimal.Decimal(1.25), 1.75],
@@ -363,12 +369,16 @@ class TestDateTimeExactQuerying(PostgreSQLTestCase):
 class TestOtherTypesExactQuerying(PostgreSQLTestCase):
 
     def setUp(self):
+        self.bools = [False, True]
+        self.texts = ['aa', 'bb']
         self.ips = ['192.168.0.1', '::1']
         self.uuids = [uuid.uuid4()]
         self.decimals = [decimal.Decimal(1.25), 1.75]
         self.tags = [Tag(1), Tag(2), Tag(3)]
         self.objs = [
             OtherTypesArrayModel.objects.create(
+                bools=self.bools,
+                texts=self.texts,
                 ips=self.ips,
                 uuids=self.uuids,
                 decimals=self.decimals,

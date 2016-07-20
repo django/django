@@ -56,6 +56,8 @@ class Migration(migrations.Migration):
             name='OtherTypesArrayModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('bools', ArrayField(models.BooleanField(), size=None)),
+                ('texts', ArrayField(models.TextField(), size=None)),
                 ('ips', ArrayField(models.GenericIPAddressField(), size=None)),
                 ('uuids', ArrayField(models.UUIDField(), size=None)),
                 ('decimals', ArrayField(models.DecimalField(max_digits=5, decimal_places=2), size=None)),
