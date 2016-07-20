@@ -117,11 +117,11 @@ Tie that into your routing, and tie each demultiplexed channel into the
 ``.consumer`` attribute of the Binding, and you're ready to go::
 
     from channels import route_class
-    from .consumers import BindingConsumer
+    from .consumers import Demultiplexer
     from .models import IntegerValueBinding
 
     channel_routing = [
-        route_class(BindingConsumer, path="^binding/"),
+        route_class(Demultiplexer, path="^/binding/"),
         route("binding.intval", IntegerValueBinding.consumer),
     ]
 
