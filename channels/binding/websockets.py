@@ -38,6 +38,7 @@ class WebsocketBinding(Binding):
             "action": action,
             "pk": instance.pk,
             "data": self.serialize_data(instance),
+            "model": self.model_label,
         }
         # Encode for the stream
         assert self.stream is not None
