@@ -185,7 +185,7 @@ def logout_then_login(request, login_url=None, extra_context=None):
     if not login_url:
         login_url = settings.LOGIN_URL
     login_url = resolve_url(login_url)
-    return logout(request, login_url, extra_context=extra_context)
+    return LogoutView.as_view(next_page=login_url)(request)
 
 
 def redirect_to_login(next, login_url=None,

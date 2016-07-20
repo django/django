@@ -15,7 +15,9 @@ from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
 )
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, redirect_to_login
+from django.contrib.auth.views import (
+    LoginView, logout_then_login, redirect_to_login,
+)
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
@@ -705,6 +707,32 @@ class RedirectToLoginTests(AuthViewsTestCase):
         login_redirect_response = redirect_to_login(next='/else/where/झ/')
         expected = '/login/?next=/else/where/%E0%A4%9D/'
         self.assertEqual(expected, login_redirect_response.url)
+
+
+class LogoutThenLoginTests(AuthViewsTestCase):
+    """Tests for the logout_then_login view"""
+
+    def confirm_logged_out(self):
+        self.assertNotIn(SESSION_KEY, self.client.session)
+
+    @override_settings(LOGIN_URL='/login/')
+    def test_default_logout_then_login(self):
+        self.login()
+        req = HttpRequest()
+        req.method = 'GET'
+        req.session = self.client.session
+        response = logout_then_login(req)
+        self.confirm_logged_out()
+        self.assertRedirects(response, '/login/', fetch_redirect_response=False)
+
+    def test_logout_then_login_with_custom_login(self):
+        self.login()
+        req = HttpRequest()
+        req.method = 'GET'
+        req.session = self.client.session
+        response = logout_then_login(req, login_url='/custom/')
+        self.confirm_logged_out()
+        self.assertRedirects(response, '/custom/', fetch_redirect_response=False)
 
 
 class LoginRedirectAuthenticatedUser(AuthViewsTestCase):
