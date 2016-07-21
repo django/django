@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest import skipIf
 
 from django.conf import settings
 from django.db import connection
-from django.db.models import DateField, DateTimeField, IntegerField, TimeField
+from django.db.models import DateField, DateTimeField, IntegerField, TimeField, Count
 from django.db.models.functions import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
     ExtractSecond, ExtractWeekDay, ExtractYear, Trunc, TruncDate, TruncDay,
@@ -62,12 +62,34 @@ def truncate_to(value, kind, tzinfo=None):
 class DateFunctionTests(TestCase):
 
     def create_model(self, start_datetime, end_datetime):
+
+        name = "None"
+        start_date = None
+        end_date = None
+        start_time = None
+        end_time = None
+        duration = timedelta(0)
+
+        if start_datetime: 
+            name = start_datetime.isoformat()
+            start_date = start_datetime.date()
+            start_time = start_datetime.time()
+
+        if end_datetime: 
+            end_date = end_datetime.date()
+            end_time = end_datetime.time()
+
+        if start_datetime != end_datetime: 
+            duration = end_datetime - start_datetime
+
         return DTModel.objects.create(
-            name=start_datetime.isoformat(),
+            name=name, 
             start_datetime=start_datetime, end_datetime=end_datetime,
-            start_date=start_datetime.date(), end_date=end_datetime.date(),
-            start_time=start_datetime.time(), end_time=end_datetime.time(),
-            duration=(end_datetime - start_datetime),
+            start_date=start_date, 
+            end_date=end_date, 
+            start_time=start_time, 
+            end_time=end_time, 
+            duration=duration, 
         )
 
     def test_extract_year_exact_lookup(self):
@@ -432,6 +454,7 @@ class DateFunctionTests(TestCase):
             end_datetime = timezone.make_aware(end_datetime, is_dst=False)
         self.create_model(start_datetime, end_datetime)
         self.create_model(end_datetime, start_datetime)
+
         self.assertQuerysetEqual(
             DTModel.objects.annotate(extracted=TruncYear('start_datetime')).order_by('start_datetime'),
             [
@@ -449,6 +472,13 @@ class DateFunctionTests(TestCase):
             lambda m: (m.start_datetime, m.extracted)
         )
         self.assertEqual(DTModel.objects.filter(start_datetime=TruncYear('start_datetime')).count(), 1)
+
+        self.create_model(None, None)
+
+        with_null_fields = DTModel.objects.annotate(extracted=TruncYear('start_date', tzinfo=timezone.UTC())).values('extracted').annotate(c=Count('pk'))
+        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(extracted=TruncYear('start_date', tzinfo=timezone.UTC())).values('extracted').annotate(c=Count('pk'))
+
+        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()), list(without_null_fields.values()))
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncYear('start_time')))
