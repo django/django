@@ -191,15 +191,13 @@ class RelativeFieldTests(SimpleTestCase):
                 'null has no effect on ManyToManyField.',
                 obj=field,
                 id='fields.W340',
-            )
-        ]
-        expected.append(
+            ),
             DjangoWarning(
                 'ManyToManyField does not support validators.',
                 obj=field,
                 id='fields.W341',
             )
-        )
+        ]
 
         self.assertEqual(errors, expected)
 

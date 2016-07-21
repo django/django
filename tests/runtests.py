@@ -312,11 +312,11 @@ def bisect_tests(bisection_label, options, test_labels, parallel):
 
         if failures_a and not failures_b:
             print("***** Problem found in first half. Bisecting again...")
-            iteration = iteration + 1
+            iteration += 1
             test_labels = test_labels_a[:-1]
         elif failures_b and not failures_a:
             print("***** Problem found in second half. Bisecting again...")
-            iteration = iteration + 1
+            iteration += 1
             test_labels = test_labels_b[:-1]
         elif failures_a and failures_b:
             print("***** Multiple sources of failure found")

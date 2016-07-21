@@ -1327,10 +1327,10 @@ class TestIsBoundBehavior(SimpleTestCase):
         unbound_formset = ArticleFormSet()
         bound_formset = ArticleFormSet(data)
 
-        empty_forms = []
-
-        empty_forms.append(unbound_formset.empty_form)
-        empty_forms.append(bound_formset.empty_form)
+        empty_forms = [
+            unbound_formset.empty_form,
+            bound_formset.empty_form
+        ]
 
         # Empty forms should be unbound
         self.assertFalse(empty_forms[0].is_bound)
