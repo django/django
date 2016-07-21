@@ -139,6 +139,10 @@ class TestUtilsHttp(unittest.TestCase):
         self.assertTrue(http.is_safe_url('/confirm/me@example.com'))
         # Basic auth without host is not allowed.
         self.assertFalse(http.is_safe_url(r'http://testserver\@example.com'))
+        # Secure requires same host or https
+        self.assertTrue(http.is_safe_url(r'https://user:pass@testserver/', host='user:pass@testserver', secure=True))
+        self.assertFalse(http.is_safe_url(r'http://user:pass@testserver/', host='user:pass@testserver', secure=True))
+
 
     def test_urlsafe_base64_roundtrip(self):
         bytestring = b'foo'
