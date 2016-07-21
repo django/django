@@ -10,6 +10,8 @@ try:
     VisibleDeprecationWarning = numpy.VisibleDeprecationWarning
 except ImportError:
     numpy = False
+except AttributeError:  # numpy < 1.9.0, e.g. 1.8.2 in Debian 8
+    VisibleDeprecationWarning = DeprecationWarning
 
 
 @skipIf(numpy is False, "Numpy must be installed to run these tests.")
@@ -20,7 +22,7 @@ class NumpyTests(SimpleTestCase):
             "ignore",
             "Using a non-integer number instead of an "
             "integer will result in an error in the future",
-            numpy.VisibleDeprecationWarning
+            VisibleDeprecationWarning
         )
 
     @setup({'numpy-array-index01': '{{ var.1 }}'})
