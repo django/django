@@ -125,8 +125,8 @@ Arguments sent with this signal:
     The database alias being used.
 
 ``update_fields``
-    The set of fields to update explicitly specified in the ``save()`` method.
-    ``None`` if this argument was not used in the ``save()`` call.
+    The set of fields to update as passed to :meth:`.Model.save`, or ``None``
+    if ``update_fields`` wasn't passed to ``save()``.
 
 ``post_save``
 -------------
@@ -158,8 +158,8 @@ Arguments sent with this signal:
     The database alias being used.
 
 ``update_fields``
-    The set of fields to update explicitly specified in the ``save()`` method.
-    ``None`` if this argument was not used in the ``save()`` call.
+    The set of fields to update as passed to :meth:`.Model.save`, or ``None``
+    if ``update_fields`` wasn't passed to ``save()``.
 
 ``pre_delete``
 --------------
