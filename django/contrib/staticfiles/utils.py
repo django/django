@@ -3,6 +3,7 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import get_prefixed_static_url, get_prefixed_media_url
 
 
 def matches_patterns(path, patterns=None):
@@ -41,20 +42,28 @@ def get_files(storage, ignore_patterns=None, location=''):
             yield fn
 
 
-def check_settings(base_url=None):
+def check_settings():
     """
     Checks if the staticfiles settings have sane values.
     """
-    if base_url is None:
-        base_url = settings.STATIC_URL
-    if not base_url:
+    if not settings.STATIC_URL:
         raise ImproperlyConfigured(
             "You're using the staticfiles app "
             "without having set the required STATIC_URL setting.")
-    if settings.MEDIA_URL == base_url:
+    if settings.MEDIA_URL == settings.STATIC_URL:
         raise ImproperlyConfigured("The MEDIA_URL and STATIC_URL "
                                    "settings must have different values")
     if ((settings.MEDIA_ROOT and settings.STATIC_ROOT) and
             (settings.MEDIA_ROOT == settings.STATIC_ROOT)):
         raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
                                    "settings must have different values")
+
+
+def check_base_url(base_url=None):
+    """
+    Checks if the base static URL differs from media URL.
+    """
+    if base_url is None:
+        base_url = get_prefixed_static_url()
+    if get_prefixed_media_url() == base_url:
+        raise ImproperlyConfigured("The media and static URLs must have different values")

@@ -567,7 +567,7 @@ class FileStorageTests(SimpleTestCase):
 
     @override_settings(
         MEDIA_ROOT='media_root',
-        MEDIA_URL='media_url/',
+        MEDIA_URL='/media_url/',
         FILE_UPLOAD_PERMISSIONS=0o777,
         FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o777,
     )
@@ -578,21 +578,21 @@ class FileStorageTests(SimpleTestCase):
         """
         storage = self.storage_class(
             location='explicit_location',
-            base_url='explicit_base_url/',
+            base_url='/explicit_base_url/',
             file_permissions_mode=0o666,
             directory_permissions_mode=0o666,
         )
         defaults_storage = self.storage_class()
         settings = {
             'MEDIA_ROOT': 'overriden_media_root',
-            'MEDIA_URL': 'overriden_media_url/',
+            'MEDIA_URL': '/overriden_media_url/',
             'FILE_UPLOAD_PERMISSIONS': 0o333,
             'FILE_UPLOAD_DIRECTORY_PERMISSIONS': 0o333,
         }
         with self.settings(**settings):
             self.assertEqual(storage.base_location, 'explicit_location')
             self.assertIn('explicit_location', storage.location)
-            self.assertEqual(storage.base_url, 'explicit_base_url/')
+            self.assertEqual(storage.base_url, '/explicit_base_url/')
             self.assertEqual(storage.file_permissions_mode, 0o666)
             self.assertEqual(storage.directory_permissions_mode, 0o666)
             self.assertEqual(defaults_storage.base_location, settings['MEDIA_ROOT'])
