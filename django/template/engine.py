@@ -27,6 +27,9 @@ class Engine(object):
             loaders = ['django.template.loaders.filesystem.Loader']
             if app_dirs:
                 loaders += ['django.template.loaders.app_directories.Loader']
+            if not debug:
+                # If debug is False, wrap default loaders in the cached loader
+                loaders = [('django.template.loaders.cached.Loader', loaders)]
         else:
             if app_dirs:
                 raise ImproperlyConfigured(

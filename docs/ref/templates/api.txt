@@ -97,13 +97,21 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
       item in the tuple should be the ``Loader`` class name, subsequent items
       are passed to the ``Loader`` during initialization.
 
-      It defaults to a list containing:
+      If ``debug`` is ``True`` it defaults to a list containing:
 
       * ``'django.template.loaders.filesystem.Loader'``
       * ``'django.template.loaders.app_directories.Loader'`` if and only if
         ``app_dirs`` is ``True``.
 
+      If ``debug`` is ``False``, it defaults to the same list, but wrapped in
+      ``django.template.loaders.cached.Loader``.
+
       See :ref:`template-loaders` for details.
+
+      .. versionchanged:: 1.11
+
+          Default loaders are now wrapped in
+          ``django.template.loaders.cached.Loader`` if ``debug`` is ``False``.
 
     * ``string_if_invalid`` is the output, as a string, that the template
       system should use for invalid (e.g. misspelled) variables.

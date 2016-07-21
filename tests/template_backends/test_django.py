@@ -130,3 +130,31 @@ class DjangoTemplatesTests(TemplateStringsTests):
             engines['django'].from_string('Hello, {{ name }}').render({'name': 'Bob & Jim'}),
             'Hello, Bob &amp; Jim'
         )
+
+    @override_settings(DEBUG=False)
+    def test_non_debug_default_template_loaders(self):
+        engine = DjangoTemplates({
+            'DIRS': [],
+            'APP_DIRS': True,
+            'NAME': 'django',
+            'OPTIONS': {},
+        })
+        expected_loaders = [('django.template.loaders.cached.Loader', [
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader'
+        ])]
+        self.assertEqual(engine.engine.loaders, expected_loaders)
+
+    @override_settings(DEBUG=True)
+    def test_debug_default_template_loaders(self):
+        engine = DjangoTemplates({
+            'DIRS': [],
+            'APP_DIRS': True,
+            'NAME': 'django',
+            'OPTIONS': {},
+        })
+        expected_loaders = [
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader'
+        ]
+        self.assertEqual(engine.engine.loaders, expected_loaders)
