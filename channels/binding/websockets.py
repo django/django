@@ -32,6 +32,9 @@ class WebsocketBinding(Binding):
     stream = None
 
     # Outbound
+    @classmethod
+    def encode(cls, stream, payload):
+        return WebsocketDemultiplexer.encode(stream, payload)
 
     def serialize(self, instance, action):
         payload = {
@@ -40,9 +43,7 @@ class WebsocketBinding(Binding):
             "data": self.serialize_data(instance),
             "model": self.model_label,
         }
-        # Encode for the stream
-        assert self.stream is not None
-        return WebsocketDemultiplexer.encode(self.stream, payload)
+        return payload
 
     def serialize_data(self, instance):
         """
