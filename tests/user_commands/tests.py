@@ -146,7 +146,7 @@ class CommandTests(SimpleTestCase):
         self.counter = 0
 
         def patched_check(self_, **kwargs):
-            self.counter = self.counter + 1
+            self.counter += 1
 
         saved_check = BaseCommand.check
         BaseCommand.check = patched_check

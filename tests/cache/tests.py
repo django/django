@@ -560,7 +560,7 @@ class BaseCacheTests(object):
         # Count how many keys are left in the cache.
         for i in range(1, initial_count):
             if cull_cache.has_key('cull%d' % i):
-                count = count + 1
+                count += 1
         self.assertEqual(count, final_count)
 
     def test_cull(self):

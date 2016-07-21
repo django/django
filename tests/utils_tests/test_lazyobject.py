@@ -103,8 +103,7 @@ class LazyObjectTestCase(TestCase):
 
     def test_hash(self):
         obj = self.lazy_wrap('foo')
-        d = {}
-        d[obj] = 'bar'
+        d = {obj: 'bar'}
         self.assertIn('foo', d)
         self.assertEqual(d['foo'], 'bar')
 
