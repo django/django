@@ -793,6 +793,8 @@ Keys:
   with ``websocket.send!``. Cannot be used to send at this point; provided
   as a way to identify the connection only.
 
+* ``code``: The WebSocket close code (integer), as per the WebSocket spec.
+
 * ``path``: Path sent during ``connect``, sent to make routing easier for apps.
 
 * ``order``: Order of the disconnection relative to the incoming frames'
