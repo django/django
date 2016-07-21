@@ -708,11 +708,12 @@ Backend     SQL Equivalent
 ==========  ======================================
 PostGIS     ``ST_DWithin(poly, geom, 5)``
 Oracle      ``SDO_WITHIN_DISTANCE(poly, geom, 5)``
+SpatiaLite  ``PtDistWithin(poly, geom, 5)``
 ==========  ======================================
 
-.. note::
+.. versionchanged:: 1.11
 
-    This lookup is not available on SpatiaLite.
+    SpatiaLite support was added.
 
 .. _geoqueryset-methods:
 
