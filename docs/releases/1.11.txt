@@ -467,6 +467,12 @@ Miscellaneous
   :class:`~django.core.serializers.json.DjangoJSONEncoder` (renamed in Django
   1.0) is removed.
 
+* The :class:`cached template loader <django.template.loaders.cached.Loader>`
+  is now enabled if :setting:`DEBUG` is ``False`` and
+  :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified. This could
+  be backwards-incompatible if you have some :ref:`template tags that aren't
+  thread safe <template_tag_thread_safety>`.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
