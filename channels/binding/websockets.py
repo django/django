@@ -30,10 +30,10 @@ class WebsocketBinding(Binding):
     # Stream multiplexing name
 
     stream = None
-    
+
     # only model fields that are listed in fields should be send by default
     # if you want to really send all fields, use fields = ['__all__']
-    
+
     fields = []
 
     # Outbound
