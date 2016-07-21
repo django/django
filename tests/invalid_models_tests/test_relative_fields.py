@@ -176,6 +176,19 @@ class RelativeFieldTests(SimpleTestCase):
         field = Model._meta.get_field('m2m')
         self.assertEqual(field.check(from_model=Model), [])
 
+    def test_many_to_many_with_limit_choices_auto_created_no_warning(self):
+        class Model(models.Model):
+            name = models.CharField(max_length=20)
+
+        class ModelM2M(models.Model):
+            m2m = models.ManyToManyField(
+                Model,
+                limit_choices_to={'name': 'test_name'},
+            )
+
+        errors = ModelM2M.check()
+        self.assertEqual(errors, [])
+
     def test_many_to_many_with_useless_options(self):
         class Model(models.Model):
             name = models.CharField(max_length=20)
