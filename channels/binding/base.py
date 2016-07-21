@@ -88,7 +88,7 @@ class Binding(object):
         Entry point for triggering the binding from save signals.
         """
         cls.trigger_outbound(instance, "delete")
-    
+
     @classmethod
     def encode(cls, stream, payload):
         """
