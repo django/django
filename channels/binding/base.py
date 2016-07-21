@@ -13,18 +13,22 @@ class BindingMetaclass(type):
     Metaclass that tracks instantiations of its type.
     """
 
+    register_immediately = False
     binding_classes = []
 
     def __new__(cls, name, bases, body):
         klass = type.__new__(cls, name, bases, body)
         if bases != (object, ):
             cls.binding_classes.append(klass)
+            if cls.register_immediately:
+                cls.register()
         return klass
 
     @classmethod
     def register_all(cls):
         for binding_class in cls.binding_classes:
             binding_class.register()
+        cls.register_immediately = True
 
 
 @six.add_metaclass(BindingMetaclass)
