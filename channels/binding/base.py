@@ -88,6 +88,13 @@ class Binding(object):
         Entry point for triggering the binding from save signals.
         """
         cls.trigger_outbound(instance, "delete")
+    
+    @classmethod
+    def encode(cls, stream, payload):
+        """
+        Encodes stream + payload for outbound sending.
+        """
+        raise NotImplementedError()
 
     @classmethod
     def trigger_outbound(cls, instance, action):
@@ -100,7 +107,7 @@ class Binding(object):
         payload = self.serialize(instance, action)
         if payload != {}:
             assert self.stream is not None
-            message = WebsocketDemultiplexer.encode(self.stream, payload)
+            message = cls.encode(self.stream, payload)
             for group_name in self.group_names(instance, action):
                 group = Group(group_name)
                 group.send(message)
@@ -115,9 +122,7 @@ class Binding(object):
     def serialize(self, instance, action):
         """
         Should return a serialized version of the instance to send over the
-        wire (return value must be a dict suitable for sending over a channel -
-        e.g., to send JSON as a WebSocket text frame, you must return
-        {"text": json.dumps(instance_serialized_as_dict)}
+        wire (e.g. {"pk": 12, "value": 42, "string": "some string"})
         """
         raise NotImplementedError()
 
