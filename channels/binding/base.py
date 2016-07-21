@@ -12,7 +12,7 @@ class BindingMetaclass(type):
     """
     Metaclass that tracks instantiations of its type.
     """
-    
+
     register_immediately = False
     binding_classes = []
 
