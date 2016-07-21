@@ -447,7 +447,9 @@ should avoid them if possible.
 
     You should be very careful to escape any parameters that the user can
     control by using ``params`` in order to protect against :ref:`SQL injection
-    attacks <sql-injection-protection>`.
+    attacks <sql-injection-protection>`. ``params`` is a required argument to
+    force you to acknowledge that you're not interpolating your SQL with user
+    provided data.
 
 .. currentmodule:: django.db.models
 
