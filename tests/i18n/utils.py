@@ -47,7 +47,8 @@ class RunInTmpDirMixin(object):
     def setUp(self):
         self._cwd = os.getcwd()
         self.work_dir = tempfile.mkdtemp(prefix='i18n_')
-        self.test_dir = os.path.abspath(os.path.join(self.work_dir, self.work_subdir))
+        # Resolve symlinks, if any, in test directory paths.
+        self.test_dir = os.path.realpath(os.path.join(self.work_dir, self.work_subdir))
         copytree(os.path.join(source_code_dir, self.work_subdir), self.test_dir)
         # Step out of the temporary working tree before removing it to avoid
         # deletion problems on Windows. Cleanup actions registered with
