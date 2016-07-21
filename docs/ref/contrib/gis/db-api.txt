@@ -343,7 +343,7 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite 
 :lookup:`distance_gte`             X          X                      X          N
 :lookup:`distance_lt`              X          X                      X          N
 :lookup:`distance_lte`             X          X                      X          N
-:lookup:`dwithin`                  X          X                                 B
+:lookup:`dwithin`                  X          X                      X          B
 :lookup:`equals`                   X          X         X            X          C
 :lookup:`exact`                    X          X         X            X          B
 :lookup:`intersects`               X          X         X            X          B

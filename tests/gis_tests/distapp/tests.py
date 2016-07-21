@@ -10,7 +10,7 @@ from django.db.models import F, Q
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import no_oracle, oracle, postgis
+from ..utils import no_oracle, oracle, postgis, spatialite
 from .models import (
     AustraliaCity, CensusZipcode, Interstate, SouthTexasCity, SouthTexasCityFt,
     SouthTexasInterstate, SouthTexasZipcode,
@@ -82,9 +82,11 @@ class DistanceTest(TestCase):
                 type_error = False
 
             if isinstance(dist, tuple):
-                if oracle:
+                if oracle or spatialite:
+                    # Result in meters
                     dist = dist[1]
                 else:
+                    # Result in units of the field
                     dist = dist[0]
 
             # Creating the query set.

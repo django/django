@@ -58,6 +58,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     gis_operators = {
         'equals': SpatialOperator(func='Equals'),
         'disjoint': SpatialOperator(func='Disjoint'),
+        'dwithin': SpatialOperator(func='PtDistWithin'),
         'touches': SpatialOperator(func='Touches'),
         'crosses': SpatialOperator(func='Crosses'),
         'within': SpatialOperator(func='Within'),

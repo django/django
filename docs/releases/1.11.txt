@@ -95,6 +95,8 @@ Minor features
 * The new :meth:`.GEOSGeometry.from_gml` and :meth:`.OGRGeometry.from_gml`
   methods allow creating geometries from GML.
 
+* Added support for the :lookup:`dwithin` lookup on SpatiaLite.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
