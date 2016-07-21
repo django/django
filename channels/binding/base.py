@@ -97,9 +97,13 @@ class Binding(object):
         self = cls()
         self.instance = instance
         # Check to see if we're covered
-        for group_name in self.group_names(instance, action):
-            group = Group(group_name)
-            group.send(self.serialize(instance, action))
+        assert self.stream is not None
+        payload = self.serialize(instance, action)
+        if payload != {}:
+            message = WebsocketDemultiplexer.encode(self.stream, payload)
+            for group_name in self.group_names(instance, action):
+                group = Group(group_name)
+                group.send(message)
 
     def group_names(self, instance, action):
         """
