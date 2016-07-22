@@ -6,7 +6,9 @@ import re
 from difflib import SequenceMatcher
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import (
+    FieldDoesNotExist, ImproperlyConfigured, ValidationError,
+)
 from django.utils import lru_cache
 from django.utils._os import upath
 from django.utils.encoding import force_text
@@ -144,7 +146,10 @@ class UserAttributeSimilarityValidator(object):
             value_parts = re.split('\W+', value) + [value]
             for value_part in value_parts:
                 if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() > self.max_similarity:
-                    verbose_name = force_text(user._meta.get_field(attribute_name).verbose_name)
+                    try:
+                        verbose_name = force_text(user._meta.get_field(attribute_name).verbose_name)
+                    except FieldDoesNotExist:
+                        verbose_name = attribute_name
                     raise ValidationError(
                         _("The password is too similar to the %(verbose_name)s."),
                         code='password_too_similar',
