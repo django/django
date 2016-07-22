@@ -9,7 +9,8 @@ Widgets
 
 A widget is Django's representation of an HTML input element. The widget
 handles the rendering of the HTML, and the extraction of data from a GET/POST
-dictionary that corresponds to the widget.
+dictionary that corresponds to the widget. All HTML output targets the doctype
+declaration ``<!DOCTYPE html>``.
 
 .. tip::
 
