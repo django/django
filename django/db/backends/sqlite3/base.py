@@ -360,21 +360,18 @@ def _sqlite_date_extract(lookup_type, dt):
 
 
 def _sqlite_date_trunc(lookup_type, dt):
-    try: 
-        try:
-            dt = backend_utils.typecast_timestamp(dt)
-        except (ValueError, TypeError):
-            return None
-        if dt is None: 
-            return None
-        if lookup_type == 'year':
-            return "%i-01-01" % dt.year
-        elif lookup_type == 'month':
-            return "%i-%02i-01" % (dt.year, dt.month)
-        elif lookup_type == 'day':
-            return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
-    except Exception as e: 
-        print e
+    try:
+        dt = backend_utils.typecast_timestamp(dt)
+    except (ValueError, TypeError):
+        return None
+    if dt is None:
+        return None
+    if lookup_type == 'year':
+        return "%i-01-01" % dt.year
+    elif lookup_type == 'month':
+        return "%i-%02i-01" % (dt.year, dt.month)
+    elif lookup_type == 'day':
+        return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
 
 
 def _sqlite_time_trunc(lookup_type, dt):

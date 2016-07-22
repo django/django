@@ -5,7 +5,9 @@ from unittest import skipIf
 
 from django.conf import settings
 from django.db import connection
-from django.db.models import DateField, DateTimeField, IntegerField, TimeField, Count
+from django.db.models import (
+    Count, DateField, DateTimeField, IntegerField, TimeField,
+)
 from django.db.models.functions import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
     ExtractSecond, ExtractWeekDay, ExtractYear, Trunc, TruncDate, TruncDay,
@@ -70,26 +72,26 @@ class DateFunctionTests(TestCase):
         end_time = None
         duration = timedelta(0)
 
-        if start_datetime: 
+        if start_datetime:
             name = start_datetime.isoformat()
             start_date = start_datetime.date()
             start_time = start_datetime.time()
 
-        if end_datetime: 
+        if end_datetime:
             end_date = end_datetime.date()
             end_time = end_datetime.time()
 
-        if start_datetime != end_datetime: 
+        if start_datetime != end_datetime:
             duration = end_datetime - start_datetime
 
         return DTModel.objects.create(
-            name=name, 
+            name=name,
             start_datetime=start_datetime, end_datetime=end_datetime,
-            start_date=start_date, 
-            end_date=end_date, 
-            start_time=start_time, 
-            end_time=end_time, 
-            duration=duration, 
+            start_date=start_date,
+            end_date=end_date,
+            start_time=start_time,
+            end_time=end_time,
+            duration=duration,
         )
 
     def test_extract_year_exact_lookup(self):
@@ -475,10 +477,16 @@ class DateFunctionTests(TestCase):
 
         self.create_model(None, None)
 
-        with_null_fields = DTModel.objects.annotate(extracted=TruncYear('start_date', tzinfo=timezone.UTC())).values('extracted').annotate(c=Count('pk'))
-        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(extracted=TruncYear('start_date', tzinfo=timezone.UTC())).values('extracted').annotate(c=Count('pk'))
+        with_null_fields = DTModel.objects.annotate(
+            extracted=TruncYear('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
 
-        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()), list(without_null_fields.values()))
+        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
+            extracted=TruncYear('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
+                         list(without_null_fields.values()))
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncYear('start_time')))
