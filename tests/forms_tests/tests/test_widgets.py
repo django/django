@@ -130,7 +130,7 @@ beatle J R Ringo False""")
             "\n".join(
                 c.tag() for c in CheckboxSelectMultiple(
                     attrs={'id': 'abc'},
-                    choices=zip(list('abc'), list('ABC'))
+                    choices=zip('abc', 'ABC')
                 ).subwidgets('letters', list('ac'))
             ),
             """<input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" />
@@ -140,7 +140,7 @@ beatle J R Ringo False""")
         # Each subwidget tag does not get an ID if the widget does not have an ID specified
         self.assertHTMLEqual(
             "\n".join(c.tag() for c in CheckboxSelectMultiple(
-                choices=zip(list('abc'), list('ABC')),
+                choices=zip('abc', 'ABC'),
             ).subwidgets('letters', list('ac'))),
             """<input checked="checked" type="checkbox" name="letters" value="a" />
 <input type="checkbox" name="letters" value="b" />
@@ -152,7 +152,7 @@ beatle J R Ringo False""")
                 '<input type="checkbox" name="letters" value="%s" id="%s" />'
                 % (c.choice_value, c.id_for_label) for c in CheckboxSelectMultiple(
                     attrs={'id': 'abc'},
-                    choices=zip(list('abc'), list('ABC')),
+                    choices=zip('abc', 'ABC'),
                 ).subwidgets('letters', [])
             ),
             """<input type="checkbox" name="letters" value="a" id="abc_0" />
