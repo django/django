@@ -481,6 +481,8 @@ class DateFunctionTests(TestCase):
             extracted=TruncYear('start_date', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
+        print "QUERY: {}".format(with_null_fields.query)
+
         without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
             extracted=TruncYear('start_date', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
@@ -520,6 +522,19 @@ class DateFunctionTests(TestCase):
         )
         self.assertEqual(DTModel.objects.filter(start_datetime=TruncMonth('start_datetime')).count(), 1)
 
+        self.create_model(None, None)
+
+        with_null_fields = DTModel.objects.annotate(
+            extracted=TruncMonth('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
+            extracted=TruncMonth('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
+                         list(without_null_fields.values()))
+
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncMonth('start_time')))
 
@@ -543,6 +558,23 @@ class DateFunctionTests(TestCase):
             lambda m: (m.start_datetime, m.extracted)
         )
         self.assertEqual(DTModel.objects.filter(start_datetime__date=TruncDate('start_datetime')).count(), 2)
+
+        # TestFlag
+
+        self.create_model(None, None)
+
+        with_null_fields = DTModel.objects.annotate(
+            extracted=TruncDate('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        print with_null_fields.query
+
+        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
+            extracted=TruncDate('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
+                         list(without_null_fields.values()))
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateField"):
             list(DTModel.objects.annotate(truncated=TruncDate('start_time')))
@@ -568,6 +600,19 @@ class DateFunctionTests(TestCase):
         )
         self.assertEqual(DTModel.objects.filter(start_datetime__time=TruncTime('start_datetime')).count(), 2)
 
+        self.create_model(None, None)
+
+        with_null_fields = DTModel.objects.annotate(
+            extracted=TruncTime('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
+            extracted=TruncTime('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
+                         list(without_null_fields.values()))
+
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to TimeField"):
             list(DTModel.objects.annotate(truncated=TruncTime('start_date')))
 
@@ -591,6 +636,19 @@ class DateFunctionTests(TestCase):
             lambda m: (m.start_datetime, m.extracted)
         )
         self.assertEqual(DTModel.objects.filter(start_datetime=TruncDay('start_datetime')).count(), 1)
+
+        self.create_model(None, None)
+
+        with_null_fields = DTModel.objects.annotate(
+            extracted=TruncDay('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
+            extracted=TruncDay('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
+                         list(without_null_fields.values()))
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncDay('start_time')))
@@ -624,6 +682,19 @@ class DateFunctionTests(TestCase):
         )
         self.assertEqual(DTModel.objects.filter(start_datetime=TruncHour('start_datetime')).count(), 1)
 
+        self.create_model(None, None)
+
+        with_null_fields = DTModel.objects.annotate(
+            extracted=TruncHour('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
+            extracted=TruncHour('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
+                         list(without_null_fields.values()))
+
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncHour('start_date')))
 
@@ -655,6 +726,19 @@ class DateFunctionTests(TestCase):
             lambda m: (m.start_datetime, m.extracted)
         )
         self.assertEqual(DTModel.objects.filter(start_datetime=TruncMinute('start_datetime')).count(), 1)
+
+        self.create_model(None, None)
+
+        with_null_fields = DTModel.objects.annotate(
+            extracted=TruncMinute('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
+            extracted=TruncMinute('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
+                         list(without_null_fields.values()))
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncMinute('start_date')))
@@ -689,6 +773,19 @@ class DateFunctionTests(TestCase):
 
         result = 1 if connection.features.supports_microsecond_precision else 2
         self.assertEqual(DTModel.objects.filter(start_datetime=TruncSecond('start_datetime')).count(), result)
+
+        self.create_model(None, None)
+
+        with_null_fields = DTModel.objects.annotate(
+            extracted=TruncSecond('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
+            extracted=TruncSecond('start_date', tzinfo=timezone.UTC())
+        ).values('extracted').annotate(c=Count('pk'))
+
+        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
+                         list(without_null_fields.values()))
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncSecond('start_date')))
