@@ -156,6 +156,12 @@ class SchemaTests(TransactionTestCase):
                     counts['indexes'] += 1
         return counts
 
+    def assertIndexOrder(self, table, index, order):
+        constraints = self.get_constraints(table)
+        self.assertIn(index, constraints)
+        index_orders = constraints[index]['orders']
+        self.assertTrue(all([(val == expected) for val, expected in zip(index_orders, order)]))
+
     # Tests
     def test_creation_deletion(self):
         """
@@ -1596,6 +1602,24 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.remove_index(Author, index)
         self.assertNotIn('name', self.get_indexes(Author._meta.db_table))
+
+    def test_order_index(self):
+        """
+        Indexes defined with ordering (ASC/DESC) defined on column
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # The table doesn't have an index
+        self.assertNotIn('title', self.get_indexes(Author._meta.db_table))
+        index_name = 'author_name_idx'
+        # Add the index
+        index = Index(fields=['name', '-weight'], name=index_name)
+        with connection.schema_editor() as editor:
+            editor.add_index(Author, index)
+        if connection.features.supports_index_column_ordering:
+            if connection.features.uppercases_column_names:
+                index_name = index_name.upper()
+            self.assertIndexOrder(Author._meta.db_table, index_name, ['ASC', 'DESC'])
 
     def test_indexes(self):
         """

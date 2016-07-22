@@ -46,6 +46,11 @@ class IndexesTests(TestCase):
         index.set_name_with_model(Book)
         self.assertEqual(index.name, 'model_index_author_0f5565_idx')
 
+        # '-' for DESC columns should be accounted for in the index name.
+        index = models.Index(fields=['-author'])
+        index.set_name_with_model(Book)
+        self.assertEqual(index.name, 'model_index_author_708765_idx')
+
         # fields may be truncated in the name. db_column is used for naming.
         long_field_index = models.Index(fields=['pages'])
         long_field_index.set_name_with_model(Book)
