@@ -377,6 +377,8 @@ def _sqlite_date_trunc(lookup_type, dt):
 def _sqlite_time_trunc(lookup_type, dt):
     try:
         dt = backend_utils.typecast_time(dt)
+        if dt is None:
+            return None
     except (ValueError, TypeError):
         return None
     if lookup_type == 'hour':
@@ -401,6 +403,8 @@ def _sqlite_datetime_parse(dt, tzname):
 
 def _sqlite_datetime_cast_date(dt, tzname):
     dt = _sqlite_datetime_parse(dt, tzname)
+    if type(dt) is datetime.date:
+        return dt.isoformat()
     if dt is None:
         return None
     return dt.date().isoformat()
@@ -408,6 +412,8 @@ def _sqlite_datetime_cast_date(dt, tzname):
 
 def _sqlite_datetime_cast_time(dt, tzname):
     dt = _sqlite_datetime_parse(dt, tzname)
+    if isinstance(dt, datetime.time):
+        return dt.isoformat()
     if dt is None:
         return None
     return dt.time().isoformat()

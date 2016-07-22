@@ -481,8 +481,6 @@ class DateFunctionTests(TestCase):
             extracted=TruncYear('start_date', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
-        print "QUERY: {}".format(with_null_fields.query)
-
         without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
             extracted=TruncYear('start_date', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
@@ -559,15 +557,11 @@ class DateFunctionTests(TestCase):
         )
         self.assertEqual(DTModel.objects.filter(start_datetime__date=TruncDate('start_datetime')).count(), 2)
 
-        # TestFlag
-
         self.create_model(None, None)
 
         with_null_fields = DTModel.objects.annotate(
             extracted=TruncDate('start_date', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
-
-        print with_null_fields.query
 
         without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
             extracted=TruncDate('start_date', tzinfo=timezone.UTC())
@@ -603,15 +597,15 @@ class DateFunctionTests(TestCase):
         self.create_model(None, None)
 
         with_null_fields = DTModel.objects.annotate(
-            extracted=TruncTime('start_date', tzinfo=timezone.UTC())
+            extracted=TruncTime('start_time', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
         without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
-            extracted=TruncTime('start_date', tzinfo=timezone.UTC())
+            extracted=TruncTime('start_time', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
-        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
-                         list(without_null_fields.values()))
+        self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values('start_time')),
+                         list(without_null_fields.values('start_time')))
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to TimeField"):
             list(DTModel.objects.annotate(truncated=TruncTime('start_date')))
@@ -685,11 +679,11 @@ class DateFunctionTests(TestCase):
         self.create_model(None, None)
 
         with_null_fields = DTModel.objects.annotate(
-            extracted=TruncHour('start_date', tzinfo=timezone.UTC())
+            extracted=TruncHour('start_time', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
         without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
-            extracted=TruncHour('start_date', tzinfo=timezone.UTC())
+            extracted=TruncHour('start_time', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
         self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
@@ -730,11 +724,11 @@ class DateFunctionTests(TestCase):
         self.create_model(None, None)
 
         with_null_fields = DTModel.objects.annotate(
-            extracted=TruncMinute('start_date', tzinfo=timezone.UTC())
+            extracted=TruncMinute('start_time', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
         without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
-            extracted=TruncMinute('start_date', tzinfo=timezone.UTC())
+            extracted=TruncMinute('start_time', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
         self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
@@ -777,11 +771,11 @@ class DateFunctionTests(TestCase):
         self.create_model(None, None)
 
         with_null_fields = DTModel.objects.annotate(
-            extracted=TruncSecond('start_date', tzinfo=timezone.UTC())
+            extracted=TruncSecond('start_time', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
         without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
-            extracted=TruncSecond('start_date', tzinfo=timezone.UTC())
+            extracted=TruncSecond('start_time', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
         self.assertEqual(list(with_null_fields.filter(extracted__isnull=False).values()),
