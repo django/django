@@ -154,3 +154,19 @@ Are channels Python 2, 3 or 2+3?
 Django-channels and all of its dependencies are compatible with Python 2.7,
 3.3, and higher. This includes the parts of Twisted that some of the Channels
 packages (like daphne) use.
+
+
+Why isn't there support for socket.io/SockJS/long poll fallback?
+----------------------------------------------------------------
+
+Emulating WebSocket over HTTP long polling requires considerably more effort
+than terminating WebSockets; some server-side state of the connection must
+be kept in a place that's accessible from all nodes, so when the new long
+poll comes in, messages can be replayed onto it.
+
+For this reason, we think it's out of scope for Channels itself, though
+Channels and Daphne come with first-class support for long-running HTTP
+connections without taking up a worker thread (you can consume ``http.request``
+and not send a response until later, add the reply channel to groups,
+and even listen out for the ``http.disconnect`` channel that tells you when
+long polls terminate early).

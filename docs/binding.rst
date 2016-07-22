@@ -147,3 +147,15 @@ from the base ``Binding`` class and implement serialization and deserialization
 yourself. Until proper reference documentation for this is written, we
 recommend looking at the source code in ``channels/bindings/base.py``; it's
 reasonably well-commented.
+
+
+Dealing with Disconnection
+--------------------------
+
+Because the data binding Channels ships with has no history of events,
+it means that when a disconnection happens you may miss events that happen
+during your offline time. For this reason, it's recommended you reload
+data directly using an API call once connection has been re-established,
+don't rely on the live updates for critical functionality, or have UI designs
+that cope well with missing data (e.g. ones where it's all updates and no
+creates, so the next update will correct everything).
