@@ -56,6 +56,8 @@ class WebsocketBinding(Binding):
         """
         if self.fields == ['__all__']:
             self.fields = None
+        elif not self.fields:
+            raise ValueError("You must set the fields attribute on Binding %r!" % self.__class__)
         data = serializers.serialize('json', [instance], fields=self.fields)
         return json.loads(data)[0]['fields']
 
