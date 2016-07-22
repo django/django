@@ -201,10 +201,13 @@ code, and so has been made optional in order to enable lightweight
 channel layers for applications that don't need the full feature set defined
 here.
 
-There are three extensions defined here: the ``groups`` extension, which
-is expanded on below, the ``flush`` extension, which allows easier testing
-and development, and the ``statistics`` extension, which allows
-channel layers to provide global and per-channel statistics.
+The extensions defined here are:
+
+* ``groups``: Allows grouping of channels to allow broadcast; see below for more.
+* ``flush``: Allows easier testing and development with channel layers.
+* ``statistics``: Allows channel layers to provide global and per-channel statistics.
+* ``twisted``: Async compatability with the Twisted framework.
+* ``asyncio``: Async compatability with Python 3's asyncio.
 
 There is potential to add further extensions; these may be defined by
 a separate specification, or a new version of this specification.
@@ -383,7 +386,19 @@ A channel layer implementing the ``flush`` extension must also provide:
   implemented). This call must block until the system is cleared and will
   consistently look empty to any client, if the channel layer is distributed.
 
+A channel layer implementing the ``twisted`` extension must also provide:
 
+* ``receive_many_twisted(channels)``, a function that behaves
+  like ``receive_many`` but that returns a Twisted Deferred that eventually
+  returns either ``(channel, message)`` or ``(None, None)``. It is not possible
+  to run it in nonblocking mode; use the normal ``receive_many`` for that.
+
+A channel layer implementing the ``asyncio`` extension must also provide:
+
+* ``receive_many_asyncio(channels)``, a function that behaves
+  like ``receive_many`` but that fulfills the asyncio coroutine contract to
+  block until either a result is available or an internal timeout is reached
+  and ``(None, None)`` is returned.
 
 Channel Semantics
 -----------------
