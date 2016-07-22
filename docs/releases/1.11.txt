@@ -354,6 +354,9 @@ Miscellaneous
   argument. Remove it because it doesn't have an effect in older versions of
   Django as these fields alway strip whitespace.
 
+* The ``checked`` attribute rendered by form widgets now uses HTML5 boolean
+  syntax rather than XHTML's ``checked='checked'``.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

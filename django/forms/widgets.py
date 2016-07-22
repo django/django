@@ -481,9 +481,7 @@ class CheckboxInput(Widget):
         self.check_test = boolean_check if check_test is None else check_test
 
     def render(self, name, value, attrs=None):
-        final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
-        if self.check_test(value):
-            final_attrs['checked'] = 'checked'
+        final_attrs = self.build_attrs(attrs, type='checkbox', name=name, checked=self.check_test(value))
         if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_text(value)
@@ -646,9 +644,13 @@ class ChoiceInput(SubWidget):
 
     def tag(self, attrs=None):
         attrs = attrs or self.attrs
-        final_attrs = dict(attrs, type=self.input_type, name=self.name, value=self.choice_value)
-        if self.is_checked():
-            final_attrs['checked'] = 'checked'
+        final_attrs = dict(
+            attrs,
+            type=self.input_type,
+            name=self.name,
+            value=self.choice_value,
+            checked=self.is_checked(),
+        )
         return format_html('<input{} />', flatatt(final_attrs))
 
     @property
