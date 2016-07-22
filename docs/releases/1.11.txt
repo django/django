@@ -366,6 +366,9 @@ Miscellaneous
   :class:`~django.contrib.auth.views.LoginView` and
   :class:`~django.contrib.auth.views.LogoutView`.
 
+* The unused ``extra_context`` parameter of
+  ``contrib.auth.views.logout_then_login()``  is deprecated.
+
 * ``contrib.auth``’s ``password_change()``, ``password_change_done()``,
   ``password_reset()``, ``password_reset_done()``, ``password_reset_confirm()``,
   and ``password_reset_complete()`` function-based views are deprecated in favor

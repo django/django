@@ -177,11 +177,20 @@ def logout(request, *args, **kwargs):
     return LogoutView.as_view(**kwargs)(request, *args, **kwargs)
 
 
+_sentinel = object()
+
+
 @deprecate_current_app
-def logout_then_login(request, login_url=None, extra_context=None):
+def logout_then_login(request, login_url=None, extra_context=_sentinel):
     """
     Logs out the user if they are logged in. Then redirects to the log-in page.
     """
+    if extra_context is not _sentinel:
+        warnings.warn(
+            "The unused `extra_context` parameter to `logout_then_login` "
+            "is deprecated.", RemovedInDjango21Warning
+        )
+
     if not login_url:
         login_url = settings.LOGIN_URL
     login_url = resolve_url(login_url)
