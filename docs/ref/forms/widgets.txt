@@ -719,8 +719,10 @@ Selector and checkbox widgets
     The outer ``<ul>`` container receives the ``id`` attribute of the widget,
     if defined, or :attr:`BoundField.auto_id` otherwise.
 
-Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
-up the lists. See the documentation of :class:`RadioSelect` for more details.
+Like :class:`RadioSelect`, you can loop over the individual checkboxes for the
+widget's choices. Unlike :class:`RadioSelect`, the checkboxes won't include the
+``required`` HTML attribute if the field is required because browser validation
+would require all checkboxes to be checked instead of at least one.
 
 When looping over the checkboxes, the ``label`` and ``input`` tags include
 ``for`` and ``id`` attributes, respectively. Each checkbox has an
