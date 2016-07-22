@@ -787,6 +787,13 @@ class CheckboxSelectMultiple(RendererMixin, SelectMultiple):
     renderer = CheckboxFieldRenderer
     _empty_value = []
 
+    def build_attrs(self, extra_attrs=None, **kwargs):
+        attrs = super(CheckboxSelectMultiple, self).build_attrs(extra_attrs, **kwargs)
+        # Remove the 'required' attribute because browser validation would
+        # require all checkboxes to be checked instead of at least one.
+        attrs.pop('required', None)
+        return attrs
+
 
 class MultiWidget(Widget):
     """
