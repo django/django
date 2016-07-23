@@ -53,7 +53,14 @@ class Binding(object):
     and tie that in as a consumer.
     """
 
+    # Model to serialize
+
     model = None
+
+    # Only model fields that are listed in fields should be send by default
+    # if you want to really send all fields, use fields = ['__all__']
+
+    fields = None
 
     @classmethod
     def register(cls):
@@ -66,6 +73,9 @@ class Binding(object):
                 return
             else:
                 raise ValueError("You must set the model attribute on Binding %r!" % cls)
+        # If fields is not defined, raise an error
+        if cls.fields is None:
+            raise ValueError("You must set the fields attribute on Binding %r!" % cls)
         # Optionally resolve model strings
         if isinstance(cls.model, six.string_types):
             cls.model = apps.get_model(cls.model)
