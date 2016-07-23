@@ -31,6 +31,11 @@ class WebsocketBinding(Binding):
 
     stream = None
 
+    # only model fields that are listed in fields should be send by default
+    # if you want to really send all fields, use fields = ['__all__']
+
+    fields = []
+
     # Outbound
     @classmethod
     def encode(cls, stream, payload):
@@ -49,7 +54,11 @@ class WebsocketBinding(Binding):
         """
         Serializes model data into JSON-compatible types.
         """
-        data = serializers.serialize('json', [instance])
+        if self.fields == ['__all__']:
+            self.fields = None
+        elif not self.fields:
+            raise ValueError("You must set the fields attribute on Binding %r!" % self.__class__)
+        data = serializers.serialize('json', [instance], fields=self.fields)
         return json.loads(data)[0]['fields']
 
     # Inbound
