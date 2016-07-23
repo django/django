@@ -83,4 +83,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.validation = BaseDatabaseValidation(self)
 
     def is_usable(self):
-        return True
+        return False
