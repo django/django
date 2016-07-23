@@ -1,3 +1,16 @@
+0.17.1 (2016-07-22)
+-------------------
+
+* Bindings now require that `fields` is defined on the class body so all fields
+  are not sent by default. To restore old behaviour, set it to ['__all__']
+
+* Bindings can now be declared after app.ready() has been called and still work.
+
+* Binding payloads now include the model name as `appname.modelname`.
+
+* A worker_ready signal now gets triggered when `runworker` starts consuming
+  messages. It does not fire from within `runserver`.
+
 0.17.0 (2016-07-19)
 -------------------
 
