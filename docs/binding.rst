@@ -65,6 +65,7 @@ get started and likely close to what you want. Start off like this::
 
         model = IntegerValue
         stream = "intval"
+        fields = ["name", "value"]
 
         def group_names(self, instance, action):
             return ["intval-updates"]
@@ -73,8 +74,12 @@ get started and likely close to what you want. Start off like this::
             return True
 
 This defines a WebSocket binding - so it knows to send outgoing messages
-formatted as JSON WebSocket frames - and provides the two methods you must
+formatted as JSON WebSocket frames - and provides the three things you must
 always provide:
+
+* ``fields`` is a whitelist of fields to return in the serialized request.
+  Channels does not default to all fields for security concerns; if you want
+  this, set it to the value ``["__all__"]``.
 
 * ``group_names`` returns a list of groups to send outbound updates to based
   on the model and action. For example, you could dispatch posts on different
