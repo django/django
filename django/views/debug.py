@@ -721,7 +721,6 @@ TECHNICAL_500_TEMPLATE = ("""
                     {% for attempt in entry.tried %}
                         <li><code>{{ attempt.0.loader_name }}</code>: {{ attempt.0.name }} ({{ attempt.1 }})</li>
                     {% endfor %}
-                    </ul>
                 {% else %}
                     <li>This engine did not provide a list of tried templates.</li>
                 {% endif %}
