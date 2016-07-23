@@ -7,6 +7,7 @@ from channels import DEFAULT_CHANNEL_LAYER, channel_layers
 from channels.log import setup_logger
 from channels.staticfiles import StaticFilesConsumer
 from channels.worker import Worker
+from channels.signals import worker_ready
 
 
 class Command(BaseCommand):
@@ -53,12 +54,14 @@ class Command(BaseCommand):
             callback = self.consumer_called
         # Run the worker
         try:
-            Worker(
+            worker = Worker(
                 channel_layer=self.channel_layer,
                 callback=callback,
                 only_channels=options.get("only_channels", None),
                 exclude_channels=options.get("exclude_channels", None),
-            ).run()
+            )
+            worker_ready.send(sender=worker)
+            worker.run()
         except KeyboardInterrupt:
             pass
 
