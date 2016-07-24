@@ -9,7 +9,8 @@ Model index reference
 .. versionadded:: 1.11
 
 Index classes ease creating database indexes. This document explains the API
-references of :class:`Index` which includes the `index options`_.
+references of :class:`Index` which includes the `index options`_ and
+`built-in indexes`_.
 
 .. admonition:: Referencing built-in indexes
 
@@ -22,8 +23,6 @@ references of :class:`Index` which includes the `index options`_.
 =================
 
 .. class:: Index(fields=[], name=None)
-
-    Creates an index (B-Tree) in the database.
 
 ``fields``
 -----------
@@ -46,3 +45,15 @@ than 30 characters and shouldn't start with a number (0-9) or underscore (_).
     Use the :class:`~django.db.migrations.operations.AddIndex` and
     :class:`~django.db.migrations.operations.RemoveIndex` operations to add
     and remove indexes.
+
+Built-in indexes
+================
+
+.. class:: Index(fields=[], name=None)
+
+    Creates the default index (B-Tree) in the database.
+
+.. class:: Hash(Index)
+
+    Creates a hash index in the database. This index is supported only by
+    postgresql.
