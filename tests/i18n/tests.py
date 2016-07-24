@@ -1512,6 +1512,12 @@ class MiscTests(SimpleTestCase):
         with self.settings(LANGUAGES=[('en', 'English')]):
             self.assertNotEqual('pt-br', g(r))
 
+    def test_i18n_patterns_returns_list(self):
+        with override_settings(USE_I18N=False):
+            self.assertIsInstance(i18n_patterns([]), list)
+        with override_settings(USE_I18N=True):
+            self.assertIsInstance(i18n_patterns([]), list)
+
 
 class ResolutionOrderI18NTests(SimpleTestCase):
 
