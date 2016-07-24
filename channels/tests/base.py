@@ -7,6 +7,7 @@ from functools import wraps
 
 from django.test.testcases import TestCase
 from .. import DEFAULT_CHANNEL_LAYER
+from ..channel import Group
 from ..routing import Router, include
 from ..asgi import channel_layers, ChannelLayerWrapper
 from ..message import Message
@@ -132,6 +133,9 @@ class Client(object):
         message = self.get_next_message(self.reply_channel)
         if message:
             return message.content
+
+    def join_group(self, group_name):
+        Group(group_name).add(self.reply_channel)
 
 
 class apply_routes(object):
