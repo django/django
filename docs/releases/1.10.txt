@@ -222,6 +222,9 @@ Minor features
   ``{% load staticfiles %}`` or ``{% load static from staticfiles %}``) and
   not worry about whether or not the ``staticfiles`` app is installed.
 
+* You can :ref:`more easily customize <customize-staticfiles-ignore-patterns>`
+  the ``collectstatic --ignore_patterns`` option with a custom ``AppConfig``.
+
 Cache
 ~~~~~
 

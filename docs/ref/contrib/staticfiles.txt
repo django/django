@@ -124,6 +124,8 @@ For a full list of options, refer to the commands own help by running::
 
    $ python manage.py collectstatic --help
 
+.. _customize-staticfiles-ignore-patterns:
+
 Customizing the ignored pattern list
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -132,8 +134,9 @@ Customizing the ignored pattern list
 The default ignored pattern list, ``['CVS', '.*', '*~']``, can be customized in
 a more persistent way than providing the ``--ignore`` command option at each
 ``collectstatic`` invocation. Provide a custom :class:`~django.apps.AppConfig`
-class, override the ``ignore_patterns`` attribute of this class and specify
-that class path inside your :setting:`INSTALLED_APPS` setting:
+class, override the ``ignore_patterns`` attribute of this class and replace
+``'django.contrib.staticfiles'`` with that class path in your
+:setting:`INSTALLED_APPS` setting:
 
 .. code-block:: python
 
