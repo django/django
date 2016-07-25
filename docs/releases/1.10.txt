@@ -131,6 +131,13 @@ Minor features
   :func:`~django.contrib.auth.views.login` view allows redirecting
   authenticated users visiting the login page.
 
+* The new :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend` and
+  :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` ignore
+  the value of ``User.is_active``, while
+  :class:`~django.contrib.auth.backends.ModelBackend` and
+  :class:`~django.contrib.auth.backends.RemoteUserBackend` now reject inactive
+  users.
+
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
