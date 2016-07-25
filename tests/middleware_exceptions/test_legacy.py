@@ -56,10 +56,23 @@ class ViewMiddleware(TestMiddleware):
         return HttpResponse('View Middleware')
 
 
+class TemplateResponseViewMiddleware(TestMiddleware):
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        super(TemplateResponseViewMiddleware, self).process_view(request, view_func, view_args, view_kwargs)
+        template = engines['django'].from_string('TemplateResponse View Middleware')
+        return TemplateResponse(request, template)
+
+
 class ResponseMiddleware(TestMiddleware):
     def process_response(self, request, response):
         super(ResponseMiddleware, self).process_response(request, response)
         return HttpResponse('Response Middleware')
+
+
+class ContentSensitiveResponseMiddleware(TestMiddleware):
+    def process_response(self, request, response):
+        super(ContentSensitiveResponseMiddleware, self).process_response(request, response)
+        return HttpResponse('Content-sensitive Response Middleware: %d' % len(response.content))
 
 
 class TemplateResponseMiddleware(TestMiddleware):
@@ -511,6 +524,40 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
 
         # Check that the right middleware methods have been invoked
         self.assert_middleware_usage(middleware, True, True, True, True, False)
+
+    def test_templateresponse_from_process_view_rendered(self):
+        """
+        ContentSensitiveResponseMiddleware tries to access response.content in
+        its process_response(). CommonMiddleware does the same thing, but the
+        former is included here to be explicit. See ticket #26915.
+        """
+        view_middleware = TemplateResponseViewMiddleware()
+        post_middleware = ContentSensitiveResponseMiddleware()
+
+        self._add_middleware(view_middleware)
+        self._add_middleware(post_middleware)
+
+        self.assert_exceptions_handled('/middleware_exceptions/view/', [])
+
+        self.assert_middleware_usage(view_middleware, True, True, True, True, False)
+        self.assert_middleware_usage(post_middleware, True, True, True, True, False)
+
+    def test_templateresponse_from_process_view_passed_to_template_response_middleware(self):
+        """
+        TemplateResponses returned from process_view should still be passed to
+        any process_template_response(). See ticket #26915.
+        """
+
+        view_middleware = TemplateResponseViewMiddleware()
+        resp_middleware = TemplateResponseMiddleware()
+
+        self._add_middleware(view_middleware)
+        self._add_middleware(resp_middleware)
+
+        self.assert_exceptions_handled('/middleware_exceptions/view/', [])
+
+        self.assert_middleware_usage(view_middleware, True, True, True, True, False)
+        self.assert_middleware_usage(resp_middleware, True, True, True, True, False)
 
 
 class BadMiddlewareTests(BaseMiddlewareExceptionTest):
