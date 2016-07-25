@@ -1,4 +1,4 @@
-
+import json
 import copy
 
 from django.apps import apps
@@ -56,7 +56,12 @@ class HttpClient(Client):
             self._session = session_for_reply_channel(self.reply_channel)
         return self._session
 
-    def send(self, to, content={}, path='/'):
+    def receive(self):
+        content = super(HttpClient, self).receive()
+        if content:
+            return json.loads(content['text'])
+
+    def send(self, to, text=None, content={}, path='/'):
         """
         Send a message to a channel.
         Adds reply_channel name and channel_session to the message.
@@ -65,6 +70,9 @@ class HttpClient(Client):
         content.setdefault('reply_channel', self.reply_channel)
         content.setdefault('path', path)
         content.setdefault('headers', self.headers)
+        text = text or content.get('text', None)
+        if text:
+            content['text'] = json.dumps(text)
         self.channel_layer.send(to, content)
 
     def login(self, **credentials):

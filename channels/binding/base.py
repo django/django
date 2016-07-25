@@ -21,7 +21,7 @@ class BindingMetaclass(type):
         if bases != (object, ):
             cls.binding_classes.append(klass)
             if cls.register_immediately:
-                cls.register()
+                klass.register()
         return klass
 
     @classmethod
