@@ -258,6 +258,9 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-pub_date', 'author']
 
+    Default ordering also affects :ref:`aggregation queries
+    <aggregation-ordering-interaction>`.
+
 .. warning::
 
     Ordering is not a free operation. Each field you add to the ordering
