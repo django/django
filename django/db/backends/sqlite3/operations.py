@@ -54,10 +54,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         # function django_date_extract that's registered in connect(). Note that
         # single quotes are used because this is a string (and could otherwise
         # cause a collision with a field name).
-        return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
+        return "django_date_extract('{}', {})".format(lookup_type.lower(), field_name)
 
     def date_interval_sql(self, timedelta):
-        return "'%s'" % duration_string(timedelta), []
+        return "'{}'".format(duration_string(timedelta)), []
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing here, we will handle it in the custom function."""
@@ -68,7 +68,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # function django_date_trunc that's registered in connect(). Note that
         # single quotes are used because this is a string (and could otherwise
         # cause a collision with a field name).
-        return "django_date_trunc('%s', %s)" % (lookup_type.lower(), field_name)
+        return "django_date_trunc('{}', {})".format(lookup_type.lower(), field_name)
 
     def _require_pytz(self):
         if settings.USE_TZ and pytz is None:
@@ -76,26 +76,24 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def datetime_cast_date_sql(self, field_name, tzname):
         self._require_pytz()
-        return "django_datetime_cast_date(%s, %%s)" % field_name, [tzname]
+        return "django_datetime_cast_date({}, %{})".format(field_name, [tzname])
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_extract_sql.
         self._require_pytz()
-        return "django_datetime_extract('%s', %s, %%s)" % (
-            lookup_type.lower(), field_name), [tzname]
+        return "django_datetime_extract('{}', {}, %{})".format(lookup_type.lower(), field_name, [tzname])
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_trunc_sql.
         self._require_pytz()
-        return "django_datetime_trunc('%s', %s, %%s)" % (
-            lookup_type.lower(), field_name), [tzname]
+        return "django_datetime_trunc('{}', {}, %{})".format(lookup_type.lower(), field_name, [tzname])
 
     def time_extract_sql(self, lookup_type, field_name):
         # sqlite doesn't support extract, so we fake it with the user-defined
         # function django_time_extract that's registered in connect(). Note that
         # single quotes are used because this is a string (and could otherwise
         # cause a collision with a field name).
-        return "django_time_extract('%s', %s)" % (lookup_type.lower(), field_name)
+        return "django_time_extract('{}', {})".format(lookup_type.lower(), field_name)
 
     def drop_foreignkey_sql(self):
         return ""
@@ -143,7 +141,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 values = tuple(params.values())
                 values = self._quote_params_for_last_executed_query(values)
                 params = dict(zip(keys, values))
-            return sql % params
+            return sql.replace("?", "{}").format(*params)
         # For consistency with SQLiteCursorWrapper.execute(), just return sql
         # when there are no parameters. See #13648 and #17158.
         else:
@@ -152,8 +150,8 @@ class DatabaseOperations(BaseDatabaseOperations):
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
-        return '"%s"' % name
-
+        return '"{}"'.format(name)
+        
     def no_limit_value(self):
         return -1
 
@@ -161,11 +159,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         # NB: The generated SQL below is specific to SQLite
         # Note: The DELETE FROM... SQL generated below works for SQLite databases
         # because constraints don't exist
-        sql = ['%s %s %s;' % (
-            style.SQL_KEYWORD('DELETE'),
-            style.SQL_KEYWORD('FROM'),
-            style.SQL_FIELD(self.quote_name(table))
-        ) for table in tables]
+        sql = ['{} {} {};'.format(style.SQL_KEYWORD('DELETE'),
+                                  style.SQL_KEYWORD('FROM'),
+                                  style.SQL_FIELD(self.quote_name(table))) for table in tables]
         # Note: No requirement for reset of auto-incremented indices (cf. other
         # sql_flush() implementations). Just return SQL at this point
         return sql
@@ -241,7 +237,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def bulk_insert_sql(self, fields, placeholder_rows):
         return " UNION ALL ".join(
-            "SELECT %s" % ", ".join(row)
+            "SELECT {}".format(", ".join(row)
             for row in placeholder_rows
         )
 
@@ -249,16 +245,16 @@ class DatabaseOperations(BaseDatabaseOperations):
         # SQLite doesn't have a power function, so we fake it with a
         # user-defined function django_power that's registered in connect().
         if connector == '^':
-            return 'django_power(%s)' % ','.join(sub_expressions)
+            return 'django_power({})'.format(','.join(sub_expressions))
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ['+', '-']:
-            raise utils.DatabaseError('Invalid connector for timedelta: %s.' % connector)
-        fn_params = ["'%s'" % connector] + sub_expressions
+            raise utils.DatabaseError('Invalid connector for timedelta: {}.'.format(connector))
+        fn_params = ["'{}'".format(connector)] + sub_expressions
         if len(fn_params) > 3:
             raise ValueError('Too many params for timedelta operations.')
-        return "django_format_dtdelta(%s)" % ', '.join(fn_params)
+        return "django_format_dtdelta({})".format(', '.join(fn_params))
 
     def integer_field_range(self, internal_type):
         # SQLite doesn't enforce any integer constraints
