@@ -595,11 +595,11 @@ def cycle(parser, token):
     if len(args) == 2:
         # {% cycle foo %} case.
         name = args[1]
-        if not hasattr(parser, '_namedCycleNodes'):
+        if not hasattr(parser, '_named_cycle_nodes'):
             raise TemplateSyntaxError("No named cycles in template. '%s' is not defined" % name)
-        if name not in parser._namedCycleNodes:
+        if name not in parser._named_cycle_nodes:
             raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
-        return parser._namedCycleNodes[name]
+        return parser._named_cycle_nodes[name]
 
     as_form = False
 
@@ -619,9 +619,9 @@ def cycle(parser, token):
         name = args[-1]
         values = [parser.compile_filter(arg) for arg in args[1:-2]]
         node = CycleNode(values, name, silent=silent)
-        if not hasattr(parser, '_namedCycleNodes'):
-            parser._namedCycleNodes = {}
-        parser._namedCycleNodes[name] = node
+        if not hasattr(parser, '_named_cycle_nodes'):
+            parser._named_cycle_nodes = {}
+        parser._named_cycle_nodes[name] = node
     else:
         values = [parser.compile_filter(arg) for arg in args[1:]]
         node = CycleNode(values)
