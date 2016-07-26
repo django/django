@@ -394,6 +394,7 @@ def _sqlite_datetime_parse(dt, tzname):
         return None
     try:
         dt = backend_utils.typecast_timestamp(dt)
+        # Typecast_timestamp is returning time rather than datetime
     except (ValueError, TypeError):
         return None
     if tzname is not None:

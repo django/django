@@ -600,7 +600,7 @@ class DateFunctionTests(TestCase):
             extracted=TruncTime('start_time', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
-        without_null_fields = DTModel.objects.filter(start_date__isnull=False).annotate(
+        without_null_fields = DTModel.objects.filter(start_time__isnull=False).annotate(
             extracted=TruncTime('start_time', tzinfo=timezone.UTC())
         ).values('extracted').annotate(c=Count('pk'))
 
