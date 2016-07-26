@@ -18,6 +18,8 @@ class JSONField(forms.CharField):
     widget = forms.Textarea
 
     def to_python(self, value):
+        if self.disabled:
+            return value
         if value in self.empty_values:
             return None
         try:
