@@ -108,9 +108,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         # cause a collision with a field name).
         return "django_time_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
-    def drop_foreignkey_sql(self):
-        return ""
-
     def pk_default_value(self):
         return "NULL"
 

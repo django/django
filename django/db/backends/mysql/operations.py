@@ -97,9 +97,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return 'INTERVAL FLOOR(%s / 1000000) SECOND' % sql
 
-    def drop_foreignkey_sql(self):
-        return "DROP FOREIGN KEY"
-
     def force_no_ordering(self):
         """
         "ORDER BY NULL" prevents MySQL from implicitly ordering by grouped
