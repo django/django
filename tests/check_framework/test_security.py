@@ -307,6 +307,50 @@ class CheckStrictTransportSecuritySubdomainsTest(SimpleTestCase):
         self.assertEqual(self.func(None), [])
 
 
+class CheckStrictTransportSecurityPreloadTest(SimpleTestCase):
+    @property
+    def func(self):
+        from django.core.checks.security.base import check_sts_preload
+        return check_sts_preload
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_HSTS_PRELOAD=False,
+        SECURE_HSTS_SECONDS=3600)
+    def test_no_sts_preload(self):
+        """
+        Warn if SECURE_HSTS_PRELOAD isn't True.
+        """
+        self.assertEqual(self.func(None), [base.W021])
+
+    @override_settings(
+        MIDDLEWARE=[],
+        SECURE_HSTS_PRELOAD=False,
+        SECURE_HSTS_SECONDS=3600)
+    def test_no_sts_preload_no_middleware(self):
+        """
+        Don't warn if SecurityMiddleware isn't installed.
+        """
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_SSL_REDIRECT=False,
+        SECURE_HSTS_SECONDS=None)
+    def test_no_sts_preload_no_seconds(self):
+        """
+        Don't warn if SECURE_HSTS_SECONDS isn't set.
+        """
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_HSTS_PRELOAD=True,
+        SECURE_HSTS_SECONDS=3600)
+    def test_with_sts_preload(self):
+        self.assertEqual(self.func(None), [])
+
+
 class CheckXFrameOptionsMiddlewareTest(SimpleTestCase):
     @property
     def func(self):

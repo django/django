@@ -596,6 +596,9 @@ The following checks are run if you use the :option:`check --deploy` option:
   for your site to serve other parts of itself in a frame, you should change
   it to ``'DENY'``.
 * **security.W020**: :setting:`ALLOWED_HOSTS` must not be empty in deployment.
+* **security.W021**: You have not set the
+  :setting:`SECURE_HSTS_PRELOAD` setting to ``True``. Without this, your site
+  cannot be submitted to the browser preload list.
 
 Sites
 -----
