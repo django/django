@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404
@@ -30,6 +29,8 @@ def flatpage(request, url):
         flatpage
             `flatpages.flatpages` object
     """
+    from django.contrib.flatpages.models import FlatPage
+
     if not url.startswith('/'):
         url = '/' + url
     site_id = get_current_site(request).id
