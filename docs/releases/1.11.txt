@@ -101,6 +101,11 @@ Minor features
 * :func:`~django.contrib.auth.update_session_auth_hash` now rotates the session
   key to allow a password change to invalidate stolen session cookies.
 
+* The new ``success_url_allowed_hosts`` attribute for
+  :class:`~django.contrib.auth.views.LoginView` and
+  :class:`~django.contrib.auth.views.LogoutView` allows specifying a set of
+  hosts that are safe for redirecting after login and logout.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

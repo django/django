@@ -999,6 +999,10 @@ implementation details see :ref:`using-the-views`.
       authenticated users accessing the login page will be redirected as if
       they had just successfully logged in. Defaults to ``False``.
 
+    * ``success_url_allowed_hosts``: A :class:`set` of hosts, in addition to
+      :meth:`request.get_host() <django.http.HttpRequest.get_host>`, that are
+      safe for redirecting after login. Defaults to an empty :class:`set`.
+
     Here's what ``LoginView`` does:
 
     * If called via ``GET``, it displays a login form that POSTs to the
@@ -1137,6 +1141,10 @@ implementation details see :ref:`using-the-views`.
 
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
+
+    * ``success_url_allowed_hosts``: A :class:`set` of hosts, in addition to
+      :meth:`request.get_host() <django.http.HttpRequest.get_host>`, that are
+      safe for redirecting after logout. Defaults to an empty :class:`set`.
 
     **Template context:**
 

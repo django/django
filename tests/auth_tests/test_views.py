@@ -822,6 +822,38 @@ class LoginRedirectAuthenticatedUser(AuthViewsTestCase):
                 self.client.get(url)
 
 
+class LoginSuccessURLAllowedHostsTest(AuthViewsTestCase):
+    def test_success_url_allowed_hosts_same_host(self):
+        response = self.client.post('/login/allowed_hosts/', {
+            'username': 'testclient',
+            'password': 'password',
+            'next': 'https://testserver/home',
+        })
+        self.assertIn(SESSION_KEY, self.client.session)
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, 'https://testserver/home')
+
+    def test_success_url_allowed_hosts_safe_host(self):
+        response = self.client.post('/login/allowed_hosts/', {
+            'username': 'testclient',
+            'password': 'password',
+            'next': 'https://otherserver/home',
+        })
+        self.assertIn(SESSION_KEY, self.client.session)
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, 'https://otherserver/home')
+
+    def test_success_url_allowed_hosts_unsafe_host(self):
+        response = self.client.post('/login/allowed_hosts/', {
+            'username': 'testclient',
+            'password': 'password',
+            'next': 'https://evil/home',
+        })
+        self.assertIn(SESSION_KEY, self.client.session)
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, '/accounts/profile/')
+
+
 class LogoutTest(AuthViewsTestCase):
 
     def confirm_logged_out(self):
@@ -891,6 +923,27 @@ class LogoutTest(AuthViewsTestCase):
         response = self.client.get('/logout/next_page/named/')
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/password_reset/')
+        self.confirm_logged_out()
+
+    def test_success_url_allowed_hosts_same_host(self):
+        self.login()
+        response = self.client.get('/logout/allowed_hosts/?next=https://testserver/')
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, 'https://testserver/')
+        self.confirm_logged_out()
+
+    def test_success_url_allowed_hosts_safe_host(self):
+        self.login()
+        response = self.client.get('/logout/allowed_hosts/?next=https://otherserver/')
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, 'https://otherserver/')
+        self.confirm_logged_out()
+
+    def test_success_url_allowed_hosts_unsafe_host(self):
+        self.login()
+        response = self.client.get('/logout/allowed_hosts/?next=https://evil/')
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, '/logout/allowed_hosts/')
         self.confirm_logged_out()
 
     def test_security_check(self):
