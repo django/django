@@ -46,6 +46,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return Database.sqlite_version_info >= (3, 6, 8)
 
     @cached_property
+    def supports_index_column_ordering(self):
+        return Database.sqlite_version_info >= (3, 3, 0)
+
+    @cached_property
     def can_release_savepoints(self):
         return self.uses_savepoints
 

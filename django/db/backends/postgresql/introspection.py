@@ -211,23 +211,36 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Now get indexes
         cursor.execute("""
             SELECT
-                c2.relname,
-                ARRAY(
-                    SELECT (SELECT attname FROM pg_catalog.pg_attribute WHERE attnum = i AND attrelid = c.oid)
-                    FROM unnest(idx.indkey) i
-                ),
-                idx.indisunique,
-                idx.indisprimary
-            FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-                pg_catalog.pg_index idx
-            WHERE c.oid = idx.indrelid
-                AND idx.indexrelid = c2.oid
-                AND c.relname = %s
+                indexname, array_agg(attname), indisunique, indisprimary,
+                array_agg(ordering)
+            FROM (
+                SELECT
+                    c2.relname as indexname, idx.*, attr.attname,
+                    CASE
+                        WHEN am.amcanorder THEN
+                            CASE (option & 1)
+                                WHEN 1 THEN 'DESC' ELSE 'ASC'
+                            END
+                    END as ordering
+                FROM (
+                    SELECT
+                        *, unnest(i.indkey) as key, unnest(i.indoption) as option
+                    FROM pg_index i
+                ) idx, pg_class c, pg_class c2, pg_am am, pg_attribute attr
+                WHERE c.oid=idx.indrelid
+                    AND idx.indexrelid=c2.oid
+                    AND attr.attrelid=c.oid
+                    AND attr.attnum=idx.key
+                    AND c2.relam=am.oid
+                    AND c.relname = %s
+            ) s2
+            GROUP BY indexname, indisunique, indisprimary;
         """, [table_name])
-        for index, columns, unique, primary in cursor.fetchall():
+        for index, columns, unique, primary, orders in cursor.fetchall():
             if index not in constraints:
                 constraints[index] = {
-                    "columns": list(columns),
+                    "columns": columns,
+                    "orders": orders,
                     "primary_key": primary,
                     "unique": unique,
                     "foreign_key": None,
