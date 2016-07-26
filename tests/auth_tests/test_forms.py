@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
-from django.forms.fields import CharField, Field
+from django.forms.fields import CharField, Field, IntegerField
 from django.test import SimpleTestCase, TestCase, mock, override_settings
 from django.utils import six, translation
 from django.utils.encoding import force_text
@@ -23,6 +23,7 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
 from .models.custom_user import CustomUser, ExtensionUser
+from .models.with_integer_username import IntegerUsernameUser
 from .settings import AUTH_TEMPLATES
 
 
@@ -350,6 +351,23 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         form = AuthenticationForm(None, data)
         form.is_valid()  # Not necessary to have valid credentails for the test.
         self.assertEqual(form.cleaned_data['password'], data['password'])
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.IntegerUsernameUser')
+    def test_integer_username(self):
+        class CustomAuthenticationForm(AuthenticationForm):
+            username = IntegerField()
+
+        user = IntegerUsernameUser.objects.create_user(username=0, password='pwd')
+        data = {
+            'username': 0,
+            'password': 'pwd',
+        }
+        form = CustomAuthenticationForm(None, data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['username'], data['username'])
+        self.assertEqual(form.cleaned_data['password'], data['password'])
+        self.assertEqual(form.errors, {})
+        self.assertEqual(form.user_cache, user)
 
 
 class SetPasswordFormTest(TestDataMixin, TestCase):
