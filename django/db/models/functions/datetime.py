@@ -250,7 +250,6 @@ class TruncTime(TruncBase):
         return TimeField()
 
     def as_sql(self, compiler, connection):
-
         # Cast to time rather than truncate to time.
         lhs, lhs_params = compiler.compile(self.lhs)
         if isinstance(self.lhs.output_field, DateTimeField):
