@@ -6,7 +6,7 @@ from unittest import skipIf
 from django.conf import settings
 from django.db import connection
 from django.db.models import (
-    Count, DateField, DateTimeField, IntegerField, TimeField,
+    DateField, DateTimeField, IntegerField, TimeField,
 )
 from django.db.models.functions import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
