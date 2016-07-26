@@ -21,6 +21,8 @@ class JSONField(forms.CharField):
         super(JSONField, self).__init__(**kwargs)
 
     def to_python(self, value):
+        if self.disabled:
+            return value
         if value in self.empty_values:
             return None
         try:
