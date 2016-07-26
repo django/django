@@ -311,6 +311,13 @@ Database backend API
 * To enable ``FOR UPDATE SKIP LOCKED`` support, set
   ``DatabaseFeatures.has_select_for_update_skip_locked = True``.
 
+* The new ``DatabaseFeatures.supports_index_column_ordering`` attribute
+  specifies if a database allows defining ordering for columns in indexes. The
+  default value is ``True`` and the ``DatabaseIntrospection.get_constraints()``
+  method should include an ``'orders'`` key in each of the returned
+  dictionaries with a list of ``'ASC'`` and/or ``'DESC'`` values corresponding
+  to the the ordering of each column in the index.
+
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
 --------------------------------------------------
 

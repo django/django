@@ -259,7 +259,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute("""
             SELECT
                 index_name,
-                LOWER(column_name)
+                LOWER(column_name), descend
             FROM
                 user_ind_columns cols
             WHERE
@@ -271,11 +271,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 )
             ORDER BY cols.column_position
         """, [table_name])
-        for constraint, column in cursor.fetchall():
+        for constraint, column, order in cursor.fetchall():
             # If we're the first column, make the record
             if constraint not in constraints:
                 constraints[constraint] = {
                     "columns": [],
+                    "orders": [],
                     "primary_key": False,
                     "unique": False,
                     "foreign_key": None,
@@ -284,4 +285,5 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 }
             # Record the details
             constraints[constraint]['columns'].append(column)
+            constraints[constraint]['orders'].append(order)
         return constraints

@@ -160,6 +160,9 @@ class BaseDatabaseFeatures(object):
     # Can the backend introspect a TimeField, instead of a DateTimeField?
     can_introspect_time_field = True
 
+    # Can the backend introspect the column order (ASC/DESC) for indexes?
+    supports_index_column_ordering = True
+
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 
