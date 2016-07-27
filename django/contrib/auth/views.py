@@ -415,6 +415,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     template_name = 'registration/password_reset_confirm.html'
     title = _('Enter new password')
     token_generator = default_token_generator
+    post_reset_login = False
 
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)
@@ -438,7 +439,9 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        form.save()
+        user = form.save()
+        if self.post_reset_login:
+            auth_login(self.request, user)
         return super(PasswordResetConfirmView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
