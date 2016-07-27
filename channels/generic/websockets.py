@@ -1,4 +1,4 @@
-import json
+from django.core.serializers.json import json, DjangoJSONEncoder
 
 from ..channel import Group, Channel
 from ..auth import channel_session_user_from_http
@@ -222,4 +222,4 @@ class WebsocketDemultiplexer(JsonWebsocketConsumer):
         return {"text": json.dumps({
             "stream": stream,
             "payload": payload,
-        })}
+        }, cls=DjangoJSONEncoder)}
