@@ -1,7 +1,6 @@
 from functools import update_wrapper
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured
@@ -106,7 +105,7 @@ class AdminSite(object):
 
                 # Instantiate the admin class to save in the registry
                 admin_obj = admin_class(model, self)
-                if admin_class is not ModelAdmin and settings.DEBUG:
+                if admin_class is not ModelAdmin:
                     system_check_errors.extend(admin_obj.check())
 
                 self._registry[model] = admin_obj

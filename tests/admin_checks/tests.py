@@ -43,7 +43,6 @@ class MyAdmin(admin.ModelAdmin):
 )
 class SystemChecksTestCase(SimpleTestCase):
 
-    @override_settings(DEBUG=True)
     def test_checks_are_performed(self):
         admin.site.register(Song, MyAdmin)
         try:
@@ -92,7 +91,6 @@ class SystemChecksTestCase(SimpleTestCase):
         ]
         self.assertEqual(errors, expected)
 
-    @override_settings(DEBUG=True)
     def test_custom_adminsite(self):
         class CustomAdminSite(admin.AdminSite):
             pass
