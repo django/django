@@ -337,6 +337,11 @@ Models
 * You can now use the ``unique=True`` option with
   :class:`~django.db.models.FileField`.
 
+* Added the ``nulls_first`` and ``nulls_last`` parameters to
+  :class:`Expression.asc() <django.db.models.Expression.asc>` and
+  :meth:`~django.db.models.Expression.desc` to control
+  the ordering of null values.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
