@@ -77,7 +77,7 @@ details on how ``staticfiles`` finds your files.
 
 .. _serving-static-files-in-development:
 
-Serving static files during development.
+Serving static files during development
 ========================================
 
 If you use :mod:`django.contrib.staticfiles` as explained above,
@@ -111,7 +111,7 @@ this by adding the following snippet to your urls.py::
 
 .. _serving-uploaded-files-in-development:
 
-Serving files uploaded by a user during development.
+Serving files uploaded by a user during development
 ====================================================
 
 During development, you can serve user-uploaded media files from
