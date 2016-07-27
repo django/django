@@ -45,7 +45,6 @@ class MyAdmin(admin.ModelAdmin):
 )
 class SystemChecksTestCase(SimpleTestCase):
 
-    @override_settings(DEBUG=True)
     def test_checks_are_performed(self):
         admin.site.register(Song, MyAdmin)
         try:
@@ -93,7 +92,6 @@ class SystemChecksTestCase(SimpleTestCase):
         ]
         self.assertEqual(errors, expected)
 
-    @override_settings(DEBUG=True)
     def test_custom_adminsite(self):
         class CustomAdminSite(admin.AdminSite):
             pass
@@ -107,7 +105,6 @@ class SystemChecksTestCase(SimpleTestCase):
         finally:
             custom_site.unregister(Song)
 
-    @override_settings(DEBUG=True)
     def test_allows_checks_relying_on_other_modeladmins(self):
         class MyBookAdmin(admin.ModelAdmin):
             def check(self, **kwargs):

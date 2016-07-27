@@ -2,7 +2,6 @@ from functools import update_wrapper
 from weakref import WeakSet
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured
@@ -71,9 +70,6 @@ class AdminSite(object):
         Run the system checks on all ModelAdmins, except if they aren't
         customized at all.
         """
-        if not settings.DEBUG:
-            return []
-
         if app_configs is None:
             app_configs = apps.get_app_configs()
         app_configs = set(app_configs)  # Speed up lookups below
