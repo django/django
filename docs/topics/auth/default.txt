@@ -1480,6 +1480,10 @@ implementation details see :ref:`using-the-views`.
       will default to ``default_token_generator``, it's an instance of
       ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
+    * ``post_reset_login``: A boolean indicating if the user should be
+      automatically authenticated after a successful password reset. Defaults
+      to ``False``.
+
     * ``form_class``: Form that will be used to set the password. Defaults to
       :class:`~django.contrib.auth.forms.SetPasswordForm`.
 
