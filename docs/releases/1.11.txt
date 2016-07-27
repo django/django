@@ -301,6 +301,9 @@ Models
 
 * Added support for query expressions on lookups that take multiple arguments,
   such as ``range``.
+* Added the ``nulls_last`` and ``nulls_first`` parameters to
+  :class:`django.db.models.F` ``asc`` and ``desc`` methods
+
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
