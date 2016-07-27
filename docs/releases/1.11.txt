@@ -520,3 +520,6 @@ Miscellaneous
 * For the ``PyLibMCCache`` cache backend, passing ``pylibmc`` behavior settings
   as top-level attributes of ``OPTIONS`` is deprecated. Set them under a
   ``behaviors`` key within ``OPTIONS`` instead.
+
+* The ``host`` parameter of ``django.utils.http.is_safe_url()`` is deprecated
+  in favor of the new ``allowed_hosts`` parameter.

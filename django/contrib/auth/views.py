@@ -86,7 +86,7 @@ class LoginView(FormView):
         )
         url_is_safe = is_safe_url(
             url=redirect_to,
-            host=self.request.get_host(),
+            allowed_hosts={self.request.get_host()},
             require_https=self.request.is_secure(),
         )
         if not url_is_safe:
@@ -157,7 +157,7 @@ class LogoutView(TemplateView):
             )
             url_is_safe = is_safe_url(
                 url=next_page,
-                host=self.request.get_host(),
+                allowed_hosts={self.request.get_host()},
                 require_https=self.request.is_secure(),
             )
             # Security check -- don't allow redirection to a different host.

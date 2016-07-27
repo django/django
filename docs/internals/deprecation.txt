@@ -30,6 +30,9 @@ details on these changes.
 * ``django.core.cache.backends.memcached.PyLibMCCache`` will no longer support
   passing ``pylibmc`` behavior settings as top-level attributes of ``OPTIONS``.
 
+* The ``host`` parameter of ``django.utils.http.is_safe_url()`` will be
+  removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

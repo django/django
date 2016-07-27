@@ -6,12 +6,14 @@ import datetime
 import re
 import sys
 import unicodedata
+import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 
 from django.core.exceptions import TooManyFieldsSent
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes, force_str, force_text
 from django.utils.functional import keep_lazy_text
 from django.utils.six.moves.urllib.parse import (
@@ -277,7 +279,7 @@ def is_same_domain(host, pattern):
     )
 
 
-def is_safe_url(url, host=None, require_https=False):
+def is_safe_url(url, host=None, allowed_hosts=None, require_https=False):
     """
     Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
     a different host and uses a safe scheme).
@@ -296,13 +298,23 @@ def is_safe_url(url, host=None, require_https=False):
             url = force_text(url)
         except UnicodeDecodeError:
             return False
+    if allowed_hosts is None:
+        allowed_hosts = set()
+    if host:
+        warnings.warn(
+            "The host argument is deprecated, use allowed_hosts instead.",
+            RemovedInDjango21Warning,
+            stacklevel=2,
+        )
+        # Avoid mutating the passed in allowed_hosts.
+        allowed_hosts = allowed_hosts | {host}
     # Chrome treats \ completely as / in paths but it could be part of some
     # basic auth credentials so we need to check both URLs.
-    return (_is_safe_url(url, host, require_https=require_https) and
-            _is_safe_url(url.replace('\\', '/'), host, require_https=require_https))
+    return (_is_safe_url(url, allowed_hosts, require_https=require_https) and
+            _is_safe_url(url.replace('\\', '/'), allowed_hosts, require_https=require_https))
 
 
-def _is_safe_url(url, host, require_https=False):
+def _is_safe_url(url, allowed_hosts, require_https=False):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith('///'):
@@ -324,7 +336,7 @@ def _is_safe_url(url, host, require_https=False):
     if not url_info.scheme and url_info.netloc:
         scheme = 'http'
     valid_schemes = ['https'] if require_https else ['http', 'https']
-    return ((not url_info.netloc or url_info.netloc == host) and
+    return ((not url_info.netloc or url_info.netloc in allowed_hosts) and
             (not scheme or scheme in valid_schemes))
 
 
