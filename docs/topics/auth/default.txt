@@ -1405,6 +1405,12 @@ implementation details see :ref:`using-the-views`.
         The ``current_app`` parameter is deprecated and will be removed in
         Django 2.0. Callers should set ``request.current_app`` instead.
 
+    .. deprecated:: 1.11
+
+        The ``extra_context`` parameter is deprecated and will be removed in
+        Django 2.1 because ``logout_then_login`` returns ``HttpRedirectResponse``
+        that does not use context.
+
 .. class:: PasswordResetDoneView
 
     .. versionadded:: 1.11
@@ -1475,7 +1481,7 @@ implementation details see :ref:`using-the-views`.
       will default to ``default_token_generator``, it's an instance of
       ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
-    * ``form_class``: Form that will be used to set the password. Defaults to 
+    * ``form_class``: Form that will be used to set the password. Defaults to
       :class:`~django.contrib.auth.forms.SetPasswordForm`.
 
     * ``success_url``: URL to redirect after the password reset done. Defaults
