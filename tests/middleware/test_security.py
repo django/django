@@ -83,7 +83,7 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         With HSTS_SECONDS non-zero and HSTS_INCLUDE_SUBDOMAINS
         True, the middleware adds a "strict-transport-security" header with the
-        "includeSubDomains" tag to the response.
+        "includeSubDomains" directive to the response.
         """
         response = self.process_response(secure=True)
         self.assertEqual(response["strict-transport-security"], "max-age=600; includeSubDomains")
@@ -94,7 +94,7 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         With HSTS_SECONDS non-zero and HSTS_INCLUDE_SUBDOMAINS
         False, the middleware adds a "strict-transport-security" header without
-        the "includeSubDomains" tag to the response.
+        the "includeSubDomains" directive to the response.
         """
         response = self.process_response(secure=True)
         self.assertEqual(response["strict-transport-security"], "max-age=600")
