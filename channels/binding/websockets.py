@@ -121,6 +121,7 @@ class WebsocketBindingWithMembers(WebsocketBinding):
         send_members = ['my_var', 'my_property', 'my_function']
     """
 
+    model = None
     send_members = []
 
     encoder = DjangoJSONEncoder()
