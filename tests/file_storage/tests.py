@@ -24,6 +24,7 @@ from django.test import (
     override_settings,
 )
 from django.test.utils import requires_tz_support
+from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import six, timezone
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -115,6 +116,19 @@ class FileStorageTests(SimpleTestCase):
         storage = self.storage_class(location='')
         self.assertEqual(storage.base_location, '')
         self.assertEqual(storage.location, upath(os.getcwd()))
+
+    def test_lazy_init(self):
+        """
+        Makes sure that init is lazy.
+        """
+        storage = self.storage_class(location=self.temp_dir,
+                                     base_url=reverse_lazy('app:url'))
+        f = ContentFile('custom contents')
+        f.name = 'test.file'
+        storage.save(None, f)
+
+        with self.assertRaises(NoReverseMatch):
+            storage.url(f.name)
 
     def test_file_access_options(self):
         """
