@@ -9,6 +9,7 @@ class SecurityMiddleware(MiddlewareMixin):
     def __init__(self, get_response=None):
         self.sts_seconds = settings.SECURE_HSTS_SECONDS
         self.sts_include_subdomains = settings.SECURE_HSTS_INCLUDE_SUBDOMAINS
+        self.sts_preload = settings.SECURE_HSTS_PRELOAD
         self.content_type_nosniff = settings.SECURE_CONTENT_TYPE_NOSNIFF
         self.xss_filter = settings.SECURE_BROWSER_XSS_FILTER
         self.redirect = settings.SECURE_SSL_REDIRECT
@@ -33,6 +34,9 @@ class SecurityMiddleware(MiddlewareMixin):
 
             if self.sts_include_subdomains:
                 sts_header = sts_header + "; includeSubDomains"
+
+            if self.sts_preload:
+                sts_header = sts_header + "; preload"
 
             response["strict-transport-security"] = sts_header
 

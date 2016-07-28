@@ -99,6 +99,41 @@ class SecurityMiddlewareTest(SimpleTestCase):
         response = self.process_response(secure=True)
         self.assertEqual(response["strict-transport-security"], "max-age=600")
 
+    @override_settings(SECURE_HSTS_SECONDS=10886400, SECURE_HSTS_PRELOAD=True)
+    def test_sts_preload(self):
+        """
+        With HSTS_SECONDS non-zero and SECURE_HSTS_PRELOAD
+        True, the middleware adds a "strict-transport-security" header with the
+        "preload" directive to the response.
+        """
+        response = self.process_response(secure=True)
+        self.assertEqual(response["strict-transport-security"], "max-age=10886400; preload")
+
+    @override_settings(
+        SECURE_HSTS_SECONDS=10886400, SECURE_HSTS_INCLUDE_SUBDOMAINS=True, SECURE_HSTS_PRELOAD=True)
+    def test_sts_subdomains_and_preload(self):
+        """
+        With HSTS_SECONDS non-zero, SECURE_HSTS_INCLUDE_SUBDOMAINS and
+        SECURE_HSTS_PRELOAD True, the middleware adds a "strict-transport-security"
+        header containing both the "includeSubDomains" and "preload" directives
+        to the response.
+        """
+        response = self.process_response(secure=True)
+        self.assertEqual(
+            response["strict-transport-security"],
+            "max-age=10886400; includeSubDomains; preload"
+        )
+
+    @override_settings(SECURE_HSTS_SECONDS=10886400, SECURE_HSTS_PRELOAD=False)
+    def test_sts_no_preload(self):
+        """
+        With HSTS_SECONDS non-zero and SECURE_HSTS_PRELOAD
+        False, the middleware adds a "strict-transport-security" header without
+        the "preload" directive to the response.
+        """
+        response = self.process_response(secure=True)
+        self.assertEqual(response["strict-transport-security"], "max-age=10886400")
+
     @override_settings(SECURE_CONTENT_TYPE_NOSNIFF=True)
     def test_content_type_on(self):
         """
