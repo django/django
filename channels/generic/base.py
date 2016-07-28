@@ -46,7 +46,7 @@ class BaseConsumer(object):
         """
         _cls = cls
         if attrs:
-            assert isinstance(attrs, dict), 'Attri'
+            assert isinstance(attrs, dict), 'attrs must be a dict'
             _cls = type(cls.__name__, (cls,), attrs)
         return route_class(_cls, **kwargs)
 
