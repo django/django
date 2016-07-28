@@ -79,7 +79,7 @@ class GeomValue(Value):
         return super(GeomValue, self).as_sql(compiler, connection)
 
     def as_mysql(self, compiler, connection):
-        return 'GeomFromText(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
+        return 'GeomFromText(%s)', [connection.ops.Adapter(self.value)]
 
     def as_sqlite(self, compiler, connection):
         return 'GeomFromText(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
