@@ -226,6 +226,7 @@ enabled or disabled with a setting.
 * :setting:`SECURE_BROWSER_XSS_FILTER`
 * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
 * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
+* :setting:`SECURE_HSTS_PRELOAD`
 * :setting:`SECURE_HSTS_SECONDS`
 * :setting:`SECURE_REDIRECT_EXEMPT`
 * :setting:`SECURE_SSL_HOST`
@@ -260,6 +261,10 @@ to the ``Strict-Transport-Security`` header. This is recommended (assuming all
 subdomains are served exclusively using HTTPS), otherwise your site may still
 be vulnerable via an insecure connection to a subdomain.
 
+If you wish to submit your site to the `browser preload list`_, set the
+:setting:`SECURE_HSTS_PRELOAD` setting to ``True``. That appends the
+``preload`` directive to the ``Strict-Transport-Security`` header.
+
 .. warning::
     The HSTS policy applies to your entire domain, not just the URL of the
     response that you set the header on. Therefore, you should only use it if
@@ -277,6 +282,7 @@ be vulnerable via an insecure connection to a subdomain.
     you may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
 .. _"Strict-Transport-Security" header: https://en.wikipedia.org/wiki/Strict_Transport_Security
+.. _browser preload list: https://hstspreload.appspot.com/
 
 .. _x-content-type-options:
 

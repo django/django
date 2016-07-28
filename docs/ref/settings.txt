@@ -2062,6 +2062,25 @@ non-zero value.
     :setting:`SECURE_HSTS_SECONDS`) break your site. Read the
     :ref:`http-strict-transport-security` documentation first.
 
+.. setting:: SECURE_HSTS_PRELOAD
+
+``SECURE_HSTS_PRELOAD``
+-----------------------
+
+.. versionadded:: 1.11
+
+Default: ``False``
+
+If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` adds
+the ``preload`` directive to the :ref:`http-strict-transport-security`
+header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
+non-zero value.
+
+.. warning::
+    Setting this incorrectly can irreversibly (for at least several months,
+    depending on browser releases) break your site. Read the
+    :ref:`http-strict-transport-security` documentation first.
+
 .. setting:: SECURE_HSTS_SECONDS
 
 ``SECURE_HSTS_SECONDS``
@@ -3334,6 +3353,7 @@ HTTP
   * :setting:`SECURE_BROWSER_XSS_FILTER`
   * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
   * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
+  * :setting:`SECURE_HSTS_PRELOAD`
   * :setting:`SECURE_HSTS_SECONDS`
   * :setting:`SECURE_PROXY_SSL_HEADER`
   * :setting:`SECURE_REDIRECT_EXEMPT`

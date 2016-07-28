@@ -229,6 +229,9 @@ Requests and Responses
 * :class:`~django.middleware.common.CommonMiddleware` now sets the
   ``Content-Length`` response header for non-streaming responses.
 
+* Added the :setting:`SECURE_HSTS_PRELOAD` setting to allow appending the
+  ``preload`` directive to the ``Strict-Transport-Security`` header.
+
 Serialization
 ~~~~~~~~~~~~~
 

@@ -160,8 +160,9 @@ server, there are some additional steps you may need:
   to a particular site should always use HTTPS. Combined with redirecting
   requests over HTTP to HTTPS, this will ensure that connections always enjoy
   the added security of SSL provided one successful connection has occurred.
-  HSTS may either be configured with :setting:`SECURE_HSTS_SECONDS` and
-  :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` or on the Web server.
+  HSTS may either be configured with :setting:`SECURE_HSTS_SECONDS`,
+  :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`, and :setting:`SECURE_HSTS_PRELOAD`,
+  or on the Web server.
 
 .. _host-headers-virtual-hosting:
 
