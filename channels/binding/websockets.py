@@ -1,6 +1,7 @@
 import json
 
 from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
 
 from .base import Binding
 from ..generic.websockets import WebsocketDemultiplexer
@@ -92,3 +93,44 @@ class WebsocketBinding(Binding):
         for name in data.keys():
             setattr(instance, name, getattr(hydrated.object, name))
         instance.save()
+
+
+class WebsocketBindingWithMembers(WebsocketBinding):
+    """
+    Outgoing binding binding subclass based on WebsocketBinding.
+    Additionally enables sending of member variables, properties and methods.
+    Member methods can only have self as a required argument.
+    Just add the name of the member to the send_members-list.
+    Example:
+
+    class MyModel(models.Model):
+        my_field = models.IntegerField(default=0)
+        my_var = 3
+
+        @property
+        def my_property(self):
+            return self.my_var + self.my_field
+
+        def my_function(self):
+            return self.my_var - self.my_vield
+
+    class MyBinding(BindingWithMembersMixin, WebsocketBinding):
+        model = MyModel
+        stream = 'mystream'
+
+        send_members = ['my_var', 'my_property', 'my_function']
+    """
+
+    send_members = []
+
+    encoder = DjangoJSONEncoder()
+
+    def serialize_data(self, instance):
+        data = super(WebsocketBindingWithMembers, self).serialize_data(instance)
+        for m in self.send_members:
+            member = getattr(instance, m)
+            if callable(member):
+                data[m] = self.encoder.encode(member())
+            else:
+                data[m] = self.encoder.encode(member)
+        return data
