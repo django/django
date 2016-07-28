@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
-from channels.sessions import channel_session
-from channels.auth import channel_session_user
+from ..routing import route_class
+from ..sessions import channel_session
+from ..auth import channel_session_user
 
 
 class BaseConsumer(object):
@@ -36,6 +37,18 @@ class BaseConsumer(object):
         derived from the method_mapping class attribute.
         """
         return set(cls.method_mapping.keys())
+
+    @classmethod
+    def as_route(cls, attrs=None, **kwargs):
+        """
+        Shortcut function to create route with filters (kwargs)
+        to direct to a class-based consumer with given class attributes (attrs)
+        """
+        _cls = cls
+        if attrs:
+            assert isinstance(attrs, dict), 'Attri'
+            _cls = type(cls.__name__, (cls,), attrs)
+        return route_class(_cls, **kwargs)
 
     def get_handler(self, message, **kwargs):
         """

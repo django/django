@@ -83,3 +83,49 @@ class GenericTests(ChannelTestCase):
             client.consume('websocket.connect')
             self.assertEqual(client.consume('websocket.connect').order, 0)
             self.assertEqual(client.consume('websocket.connect').order, 1)
+
+    def test_simple_as_route_method(self):
+
+        class WebsocketConsumer(websockets.WebsocketConsumer):
+
+            def connect(self, message, **kwargs):
+                self.send(text=message.get('order'))
+
+        routes = [
+            WebsocketConsumer.as_route(attrs={'slight_ordering': True}, path='^/path$'),
+            WebsocketConsumer.as_route(path='^/path/2$'),
+        ]
+
+        self.assertIsNot(routes[0].consumer, WebsocketConsumer)
+        self.assertIs(routes[1].consumer, WebsocketConsumer)
+
+        with apply_routes(routes):
+            client = Client()
+
+            client.send('websocket.connect', {'path': '/path', 'order': 1})
+            client.send('websocket.connect', {'path': '/path', 'order': 0})
+            client.consume('websocket.connect')
+            client.consume('websocket.connect')
+            client.consume('websocket.connect')
+            self.assertEqual(client.receive(), {'text': 0})
+            self.assertEqual(client.receive(), {'text': 1})
+
+            client.send_and_consume('websocket.connect', {'path': '/path/2', 'order': 'next'})
+            self.assertEqual(client.receive(), {'text': 'next'})
+
+    def test_as_route_method(self):
+        class WebsocketConsumer(BaseConsumer):
+            trigger = 'new'
+
+            def test(self, message, **kwargs):
+                self.message.reply_channel.send({'trigger': self.trigger})
+
+        method_mapping = {'mychannel': 'test'}
+
+        with apply_routes([WebsocketConsumer.as_route(
+                {'method_mapping': method_mapping, 'trigger': 'from_as_route'},
+                name='filter')]):
+            client = Client()
+
+            client.send_and_consume('mychannel', {'name': 'filter'})
+            self.assertEqual(client.receive(), {'trigger': 'from_as_route'})
