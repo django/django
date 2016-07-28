@@ -1475,7 +1475,7 @@ implementation details see :ref:`using-the-views`.
       will default to ``default_token_generator``, it's an instance of
       ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
-    * ``form_class``: Form that will be used to set the password. Defaults to 
+    * ``form_class``: Form that will be used to set the password. Defaults to
       :class:`~django.contrib.auth.forms.SetPasswordForm`.
 
     * ``success_url``: URL to redirect after the password reset done. Defaults
