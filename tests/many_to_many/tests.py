@@ -400,14 +400,23 @@ class ManyToManyTests(TestCase):
         self.a4.publications.set([], clear=True)
         self.assertQuerysetEqual(self.a4.publications.all(), [])
 
-    def test_assign_deprecation(self):
+    def test_assign_forward_deprecation(self):
         msg = (
-            "Direct assignment to the reverse side of a related set is "
+            "Direct assignment to the reverse side of a many-to-many set is "
             "deprecated due to the implicit save() that happens. Use "
             "article_set.set() instead."
         )
         with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
             self.p2.article_set = [self.a4, self.a3]
+
+    def test_assign_reverse_deprecation(self):
+        msg = (
+            "Direct assignment to the forward side of a many-to-many "
+            "set is deprecated due to the implicit save() that happens. Use "
+            "publications.set() instead."
+        )
+        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
+            self.a1.publications = [self.p1, self.p2]
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_assign_deprecated(self):
