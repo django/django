@@ -110,7 +110,7 @@ class SecurityMiddlewareTest(TestCase):
         """
         self.assertEqual(self.process_response()["x-content-type-options"], "nosniff")
 
-    @override_settings(SECURE_CONTENT_TYPE_NO_SNIFF=True)
+    @override_settings(SECURE_CONTENT_TYPE_NOSNIFF=True)
     def test_content_type_already_present(self):
         """
         The middleware will not override an "x-content-type-options" header
