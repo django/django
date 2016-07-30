@@ -1251,6 +1251,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         return list(self._check_values(value))
 
     def clean(self, value):
+        value = self.prepare_value(value)
         if self.required and not value:
             raise ValidationError(self.error_messages['required'], code='required')
         elif not self.required and not value:
