@@ -232,6 +232,11 @@ like so::
 
    $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
 
+If you encounter an error during the installation, your system might be missing
+a dependency for one or more of the Python packages. Consult the failing
+package's documentation or search the Web with the error message that you
+encounter.
+
 You can also install the database adapter(s) of your choice using
 ``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
 
