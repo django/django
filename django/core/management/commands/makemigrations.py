@@ -95,7 +95,8 @@ class Command(BaseCommand):
 
         # Raise an error if any migrations are applied before their dependencies.
         for db in connections:
-            loader.check_consistent_history(connections[db])
+            if connections[db].is_usable():
+                loader.check_consistent_history(connections[db])
 
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge
