@@ -95,7 +95,9 @@ class Command(BaseCommand):
 
         # Raise an error if any migrations are applied before their dependencies.
         for db in connections:
-            loader.check_consistent_history(connections[db])
+            connection = connections[db]
+            if connection.settings_dict['ENGINE'] != 'django.db.backends.dummy':
+                loader.check_consistent_history(connection)
 
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge

@@ -9,7 +9,9 @@ import sys
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
-from django.db import DatabaseError, connection, connections, models
+from django.db import (
+    ConnectionHandler, DatabaseError, connection, connections, models,
+)
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import ignore_warnings, mock, override_settings
@@ -579,6 +581,19 @@ class MakeMigrationsTests(MigrationTestBase):
                 importlib.invalidate_caches()
             call_command('makemigrations', 'migrations', '--empty', '-n', 'a', '-v', '0')
             self.assertTrue(os.path.exists(os.path.join(migration_dir, '0002_a.py')))
+
+    def test_makemigrations_empty_connections(self):
+        empty_connections = ConnectionHandler({'default': {}})
+        with mock.patch('django.core.management.commands.makemigrations.connections', new=empty_connections):
+            # with no apps
+            out = six.StringIO()
+            call_command('makemigrations', stdout=out)
+            self.assertIn('No changes detected', out.getvalue())
+            # with an app
+            with self.temporary_migration_module() as migration_dir:
+                call_command('makemigrations', 'migrations', verbosity=0)
+                init_file = os.path.join(migration_dir, '__init__.py')
+                self.assertTrue(os.path.exists(init_file))
 
     def test_failing_migration(self):
         # If a migration fails to serialize, it shouldn't generate an empty file. #21280
