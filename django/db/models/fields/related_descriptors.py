@@ -475,6 +475,12 @@ class ReverseManyToOneDescriptor(object):
 
         return self.related_manager_cls(instance)
 
+    def _get_set_deprecation_msg_params(self):
+        return (  # RemovedInDjango20Warning
+            'reverse side of a related set',
+            self.rel.get_accessor_name(),
+        )
+
     def __set__(self, instance, value):
         """
         Set the related objects through the reverse relation.
@@ -486,9 +492,9 @@ class ReverseManyToOneDescriptor(object):
         - ``value`` is the ``children`` sequence on the right of the equal sign
         """
         warnings.warn(
-            'Direct assignment to the reverse side of a related set is '
-            'deprecated due to the implicit save() that happens. Use %s.set() '
-            'instead.' % self.rel.get_accessor_name(), RemovedInDjango20Warning, stacklevel=2,
+            'Direct assignment to the %s is deprecated due to the implicit '
+            'save() that happens. Use %s.set() instead.' % self._get_set_deprecation_msg_params(),
+            RemovedInDjango20Warning, stacklevel=2,
         )
         manager = self.__get__(instance)
         manager.set(value)
@@ -721,6 +727,12 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
             related_model._default_manager.__class__,
             self.rel,
             reverse=self.reverse,
+        )
+
+    def _get_set_deprecation_msg_params(self):
+        return (  # RemovedInDjango20Warning
+            '%s side of a many-to-many set' % ('reverse' if self.reverse else 'forward'),
+            self.rel.get_accessor_name() if self.reverse else self.field.name,
         )
 
 
