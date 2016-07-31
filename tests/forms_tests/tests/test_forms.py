@@ -423,19 +423,19 @@ class FormsTestCase(SimpleTestCase):
         self.assertHTMLEqual(str(f['email']), '<input type="email" name="email" value="test@example.com" required />')
         self.assertHTMLEqual(
             str(f['get_spam']),
-            '<input checked="checked" type="checkbox" name="get_spam" required />',
+            '<input checked type="checkbox" name="get_spam" required />',
         )
 
         # 'True' or 'true' should be rendered without a value attribute
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'True'}, auto_id=False)
         self.assertHTMLEqual(
             str(f['get_spam']),
-            '<input checked="checked" type="checkbox" name="get_spam" required />',
+            '<input checked type="checkbox" name="get_spam" required />',
         )
 
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'true'}, auto_id=False)
         self.assertHTMLEqual(
-            str(f['get_spam']), '<input checked="checked" type="checkbox" name="get_spam" required />')
+            str(f['get_spam']), '<input checked type="checkbox" name="get_spam" required />')
 
         # A value of 'False' or 'false' should be rendered unchecked
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'False'}, auto_id=False)
@@ -808,20 +808,20 @@ Java</label></li>
 </ul>""")
         f = SongForm({'composers': ['J']}, auto_id=False)
         self.assertHTMLEqual(str(f['composers']), """<ul>
-<li><label><input checked="checked" type="checkbox" name="composers" value="J" required /> John Lennon</label></li>
+<li><label><input checked type="checkbox" name="composers" value="J" required /> John Lennon</label></li>
 <li><label><input type="checkbox" name="composers" value="P" required /> Paul McCartney</label></li>
 </ul>""")
         f = SongForm({'composers': ['J', 'P']}, auto_id=False)
         self.assertHTMLEqual(str(f['composers']), """<ul>
-<li><label><input checked="checked" type="checkbox" name="composers" value="J" required /> John Lennon</label></li>
-<li><label><input checked="checked" type="checkbox" name="composers" value="P" required /> Paul McCartney</label></li>
+<li><label><input checked type="checkbox" name="composers" value="J" required /> John Lennon</label></li>
+<li><label><input checked type="checkbox" name="composers" value="P" required /> Paul McCartney</label></li>
 </ul>""")
         # Test iterating on individual checkboxes in a template
         t = Template('{% for checkbox in form.composers %}<div class="mycheckbox">{{ checkbox }}</div>{% endfor %}')
         self.assertHTMLEqual(t.render(Context({'form': f})), """<div class="mycheckbox"><label>
-<input checked="checked" name="composers" type="checkbox" value="J" /> John Lennon</label></div>
+<input checked name="composers" type="checkbox" value="J" /> John Lennon</label></div>
 <div class="mycheckbox"><label>
-<input checked="checked" name="composers" type="checkbox" value="P" /> Paul McCartney</label></div>""")
+<input checked name="composers" type="checkbox" value="P" /> Paul McCartney</label></div>""")
 
     def test_checkbox_auto_id(self):
         # Regarding auto_id, CheckboxSelectMultiple is a special case. Each checkbox

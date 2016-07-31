@@ -176,6 +176,9 @@ Forms
 * The new :attr:`CharField.empty_value <django.forms.CharField.empty_value>`
   attribute allows specifying the Python value to use to represent "empty".
 
+* The ``checked`` attribute rendered by form widgets was changed to use HTML5
+  boolean syntax.
+
 Generic Views
 ~~~~~~~~~~~~~
 
