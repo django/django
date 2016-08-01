@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Rag sagar <ragsagar@gmail.com>, 2016
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-26 08:46+0000\n"
+"Last-Translator: Rag sagar <ragsagar@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
@@ -121,7 +122,7 @@ msgstr ""
 msgid "Arguments"
 msgstr ""
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr ""
 
 msgid "Model documentation"
@@ -141,6 +142,7 @@ msgstr ""
 msgid "Template: \"%(name)s\""
 msgstr ""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr ""
@@ -189,9 +191,9 @@ msgid "Context:"
 msgstr ""
 
 msgid "Templates:"
-msgstr ""
+msgstr "ടെമ്പ്‌ലേറ്റുകള്‍"
 
-msgid "Back to Views Documentation"
+msgid "Back to View documentation"
 msgstr ""
 
 msgid "View documentation"

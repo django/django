@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2013-2015
+# Ramiro Morales, 2013-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-11-30 00:25+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-30 23:54+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -118,6 +118,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr "variedad"
+
+msgid "version"
+msgstr "versión"
+
+msgid "memory cost"
+msgstr "costo en memoria"
+
+msgid "time cost"
+msgstr "costo en tiempo"
+
+msgid "parallelism"
+msgstr "paralelismo"
+
 msgid "work factor"
 msgstr "work factor"
 
@@ -171,16 +186,9 @@ msgstr "Permisos específicos de este usuario"
 msgid "username"
 msgstr "nombre de usuario"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Obligatorio. Longitud máxima de 30 caracteres. Sólo puede estar formado por "
-"letras, números y los caracteres @/./+/-/_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Introduzca un nombre de usuario válido. Este valor solo puede contener "
+"Obligatorio. Longitud máxima de 150 caracteres. Solo puede estar formado por "
 "letras, números y los caracteres @/./+/-/_."
 
 msgid "A user with that username already exists."
@@ -264,6 +272,20 @@ msgstr "Su contraseña no puede estar formada exclusivamente por números."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Reinicio de contraseña en %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Introduzca un nombre de usuario válido. Este valor solo puede contener "
+"letras del alfabeto inglés, números y los caracteres @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Introduzca un nombre de usuario válido. Este valor solo puede contener "
+"letras, números y los caracteres @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Sesión cerrada"

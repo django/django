@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2016-03-06 17:23+0000\n"
-"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -66,6 +66,12 @@ msgstr "Ĉi tiu monato"
 msgid "This year"
 msgstr "Ĉi tiu jaro"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -76,6 +82,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Ago:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Aldoni alian %(verbose_name)sn"
+
+msgid "Remove"
+msgstr "Forigu"
 
 msgid "action time"
 msgstr "aga tempo"
@@ -89,6 +102,8 @@ msgstr "enhava tipo"
 msgid "object id"
 msgstr "objekta identigaĵo"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekta prezento"
 
@@ -119,6 +134,30 @@ msgstr "Forigita \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Protokolera objekto"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr "Aldonita."
+
+msgid "and"
+msgstr "kaj"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Neniu kampo ŝanĝita."
+
 msgid "None"
 msgstr "Neniu"
 
@@ -127,69 +166,35 @@ msgid ""
 msgstr ""
 "Premadu la stirklavon, aŭ Komando-klavon ĉe Mac, por elekti pli ol unu."
 
-msgid "Added."
-msgstr "Aldonita."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Ŝanĝita %s."
-
-msgid "and"
-msgstr "kaj"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Aldonita %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Ŝanĝita %(list)s por %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Forigita %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Neniu kampo ŝanĝita."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"La %(name)s \"%(obj)s\" estis aldonita sukcese. Vi rajtas ĝin redakti denove "
-"sube."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"La %(name)s \"%(obj)s\" estis sukcese aldonita. Vi povas sube aldoni alian "
-"%(name)sn."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "La %(name)s \"%(obj)s\" estis aldonita sukcese."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"La %(name)s \"%(obj)s\" estis sukcese ŝanĝita. Vi povas sube redakti ĝin "
-"denove."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"La %(name)s \"%(obj)s\" estis sukcese ŝanĝita. Vi povas sube aldoni alian "
-"%(name)sn."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "La %(name)s \"%(obj)s\" estis ŝanĝita sukcese."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -346,18 +351,15 @@ msgstr "Dokumentaro"
 msgid "Log out"
 msgstr "Elsaluti"
 
-msgid "Add"
-msgstr "Aldoni"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Aldoni %(name)sn"
 
 msgid "History"
 msgstr "Historio"
 
 msgid "View on site"
 msgstr "Vidi sur retejo"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Aldoni %(name)sn"
 
 msgid "Filter"
 msgstr "Filtri"
@@ -441,13 +443,6 @@ msgstr ""
 msgid "Change"
 msgstr "Ŝanĝi"
 
-msgid "Remove"
-msgstr "Forigu"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Aldoni alian %(verbose_name)sn"
-
 msgid "Delete?"
 msgstr "Forviŝi?"
 
@@ -462,14 +457,17 @@ msgstr "Resumo"
 msgid "Models in the %(name)s application"
 msgstr "Modeloj en la %(name)s aplikaĵo"
 
+msgid "Add"
+msgstr "Aldoni"
+
 msgid "You don't have permission to edit anything."
 msgstr "Vi ne havas permeson por redakti ĉion ajn."
 
-msgid "Recent Actions"
-msgstr "Lastaj agoj"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Miaj agoj"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Neniu disponebla"

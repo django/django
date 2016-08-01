@@ -2,14 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# zejn <zejn@kiberpipa.org>, 2013
+# zejn <zejn@kiberpipa.org>, 2013,2016
 # zejn <zejn@kiberpipa.org>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:51+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
@@ -21,7 +21,7 @@ msgstr ""
 "%100==4 ? 2 : 3);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Dokumentacija o administraciji"
 
 msgid "Home"
 msgstr "Domov"
@@ -40,6 +40,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"Aplete zaznamkov je mogoče namestiti z vleko\n"
+"povezave v orodno vrstico z zaznamki, ali pa z desnim klikom na povezavo.\n"
+"Zaznamek je mogoče izbrati s katerekoli strani tega spletnega mesta."
 
 msgid "Documentation for this page"
 msgstr "Dokumentacija te strani"
@@ -116,7 +119,7 @@ msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Polja"
 
 msgid "Field"
 msgstr "Polje"
@@ -128,15 +131,15 @@ msgid "Description"
 msgstr "Opis"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "Metode z argumenti"
 
 msgid "Method"
-msgstr ""
+msgstr "Metoda"
 
 msgid "Arguments"
-msgstr ""
+msgstr "Argumenti"
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr ""
 
 msgid "Model documentation"
@@ -156,9 +159,10 @@ msgstr "Predloga: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Predloga: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "Poti iskanja za predlogo \"%(name)s\":"
 
 msgid "(does not exist)"
 msgstr "(ne obstaja)"
@@ -210,24 +214,24 @@ msgstr "Kontekst:"
 msgid "Templates:"
 msgstr "Predloge:"
 
-msgid "Back to Views Documentation"
-msgstr "Nazaj na dokumentacijo pogledov"
+msgid "Back to View documentation"
+msgstr ""
 
 msgid "View documentation"
 msgstr "Dokumentacija pogledov"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "Skoči na imenski prostor"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "Prazen imenski prostor"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "Pogledi v imenskem prostoru %(name)s"
 
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "Pogledi brez imenskega prostora"
 
 #, python-format
 msgid ""
@@ -235,6 +239,9 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"    Funkcija pogleda: <code>%(full_name)s</code>. Ime: <code>%(url_name)s</"
+"code>.\n"
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolova vrednost (PRAV ali NAPAK)"
@@ -254,7 +261,7 @@ msgstr "pogled:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "Applikacija %(app_label)r ni najdena"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

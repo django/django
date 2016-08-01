@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Gaynor <alex.gaynor@gmail.com>, 2012
+# Alex Gaynor <inactive+Alex@transifex.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Meir Kriheli <mkriheli@gmail.com>, 2011-2012,2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-28 16:18+0000\n"
-"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 10:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -145,14 +145,69 @@ msgstr "אתמול"
 msgid "Tomorrow"
 msgstr "מחר"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
+msgid "January"
 msgstr ""
-"ינואר פברואר מרץ אפריל מאי יוני יולי אוגוסט ספטמבר אוקטובר נובמבר דצמבר"
 
-msgid "S M T W T F S"
-msgstr "א ב ג ד ה ו ש"
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr ""
 
 msgid "Show"
 msgstr "הצג"

@@ -3,7 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015
+# Matas Dailyda <matas@dailyda.com>, 2015-2016
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
 # sirex <sirexas@gmail.com>, 2011
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 10:34+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-23 12:04+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -68,6 +68,12 @@ msgstr "Šį mėnesį"
 msgid "This year"
 msgstr "Šiais metais"
 
+msgid "No date"
+msgstr "Nėra datos"
+
+msgid "Has date"
+msgstr "Turi datą"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -78,6 +84,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Veiksmas:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Pridėti dar viena %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Pašalinti"
 
 msgid "action time"
 msgstr "veiksmo laikas"
@@ -91,6 +104,8 @@ msgstr "turinio tipas"
 msgid "object id"
 msgstr "objekto id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekto repr"
 
@@ -121,6 +136,30 @@ msgstr "„%(object)s“ ištrinti."
 msgid "LogEntry Object"
 msgstr "LogEntry objektas"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Pridėtas {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Pridėta."
+
+msgid "and"
+msgstr "ir"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Pakeisti {fields} arba {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Pakeisti {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Pašalintas {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Nei vienas laukas nepakeistas"
+
 msgid "None"
 msgstr "None"
 
@@ -130,69 +169,38 @@ msgstr ""
 "Nuspauskite \"Control\", arba \"Command\" Mac kompiuteriuose, kad pasirinkti "
 "daugiau nei vieną."
 
-msgid "Added."
-msgstr "Pridėta."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Pakeistas %s."
-
-msgid "and"
-msgstr "ir"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Įrašyta %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Pakeistas %(list)s šiam %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Pašalinta %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Nei vienas laukas nepakeistas"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" pridėtas sėkmingai. Jūs galite jį taisytį dar kartą "
-"žemiau."
+"{name} \"{obj}\" buvo sėkmingai pridėtas. Galite jį vėl redaguoti žemiau."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" buvo sėkmingai pridėtas. Jūs galite pridėti naują "
-"%(name)s žemiau."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" pridėtas sėkmingai."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" buvo sėkmingai pakeistas.  Jūs galite jį koreguoti "
-"žemiau."
+"{name} \"{obj}\" buvo sėkmingai pridėtas. Galite pridėti kitą {name} žemiau."
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" buvo sėkmingai pridėtas."
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" buvo sėkmingai pakeistas. Jūs galite pridėti naują "
-"%(name)s žemiau."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" buvo sėkmingai pakeistas. Galite jį koreguoti žemiau."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} \"{obj}\" buvo sėkmingai pakeistas. Galite pridėti kitą {name} žemiau."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" buvo sėkmingai pakeistas."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -351,18 +359,15 @@ msgstr "Dokumentacija"
 msgid "Log out"
 msgstr "Atsijungti"
 
-msgid "Add"
-msgstr "Pridėti"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Naujas %(name)s"
 
 msgid "History"
 msgstr "Istorija"
 
 msgid "View on site"
 msgstr "Matyti tinklalapyje"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Naujas %(name)s"
 
 msgid "Filter"
 msgstr "Filtras"
@@ -445,13 +450,6 @@ msgstr ""
 msgid "Change"
 msgstr "Pakeisti"
 
-msgid "Remove"
-msgstr "Pašalinti"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Pridėti dar viena %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Ištrinti?"
 
@@ -466,14 +464,17 @@ msgstr "Santrauka"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s aplikacijos modeliai"
 
+msgid "Add"
+msgstr "Pridėti"
+
 msgid "You don't have permission to edit anything."
 msgstr "Neturite teisių ką nors keistis."
 
-msgid "Recent Actions"
-msgstr "Paskutiniai Veiksmai"
+msgid "Recent actions"
+msgstr "Paskutiniai veiksmai"
 
-msgid "My Actions"
-msgstr "Mano Veiksmai"
+msgid "My actions"
+msgstr "Mano veiksmai"
 
 msgid "None available"
 msgstr "Nėra prieinamų"

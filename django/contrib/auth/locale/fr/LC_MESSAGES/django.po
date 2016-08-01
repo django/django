@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2015
+# Claude Paroz <claude@2xlibre.net>, 2013-2016
 # Claude Paroz <claude@2xlibre.net>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mlorant <maxime.lorant@gmail.com>, 2014
@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 18:03+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 16:34+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -118,6 +118,21 @@ msgstr "salage"
 msgid "hash"
 msgstr "empreinte"
 
+msgid "variety"
+msgstr "variété"
+
+msgid "version"
+msgstr "version"
+
+msgid "memory cost"
+msgstr "coût mémoire"
+
+msgid "time cost"
+msgstr "coût temps"
+
+msgid "parallelism"
+msgstr "parallélisme"
+
 msgid "work factor"
 msgstr "facteur travail"
 
@@ -171,17 +186,10 @@ msgstr "Permissions spécifiques à cet utilisateur."
 msgid "username"
 msgstr "nom d'utilisateur"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Requis. 30 caractères maximum. Uniquement des lettres, nombres et les "
+"Requis. 150 caractères maximum. Uniquement des lettres, nombres et les "
 "caractères « @ », « . », « + », « - » et « _ »."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Saisissez un nom d'utilisateur valide. Il ne peut contenir que des lettres, "
-"des nombres ou les caractères « @ », « . », « + », « - » et « _ »."
 
 msgid "A user with that username already exists."
 msgstr "Un utilisateur avec ce nom existe déjà."
@@ -267,6 +275,21 @@ msgstr "Votre mot de passe ne peut pas être entièrement numérique."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Réinitialisation du mot de passe sur %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Saisissez un nom d'utilisateur valide. Il ne peut contenir que des lettres "
+"non accentuées, des nombres ou les caractères « @ », « . », « + », « - » et "
+"« _ »."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Saisissez un nom d'utilisateur valide. Il ne peut contenir que des lettres, "
+"des nombres ou les caractères « @ », « . », « + », « - » et « _ »."
 
 msgid "Logged out"
 msgstr "Déconnecté"

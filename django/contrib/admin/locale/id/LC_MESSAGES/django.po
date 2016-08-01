@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2016-04-17 19:50+0000\n"
-"Last-Translator: oon arfiandwi <oon.arfiandwi@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -69,6 +69,12 @@ msgstr "Bulan ini"
 msgid "This year"
 msgstr "Tahun ini"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -79,6 +85,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Aksi:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Tambahkan %(verbose_name)s lagi"
+
+msgid "Remove"
+msgstr "Hapus"
 
 msgid "action time"
 msgstr "waktu aksi"
@@ -92,6 +105,8 @@ msgstr "jenis isi"
 msgid "object id"
 msgstr "id objek"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "representasi objek"
 
@@ -122,6 +137,30 @@ msgstr "\"%(object)s\" dihapus."
 msgid "LogEntry Object"
 msgstr "Objek LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr "Ditambahkan."
+
+msgid "and"
+msgstr "dan"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Tidak ada bidang yang berubah."
+
 msgid "None"
 msgstr "None"
 
@@ -130,69 +169,35 @@ msgid ""
 msgstr ""
 "Tekan \"Control\", atau \"Command\" pada Mac, untuk memilih lebih dari satu."
 
-msgid "Added."
-msgstr "Ditambahkan."
-
-#, python-format
-msgid "Changed %s."
-msgstr "%s diubah"
-
-msgid "and"
-msgstr "dan"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" ditambahkan."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "%(list)s untuk %(name)s \"%(object)s\" diubah."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" dihapus."
-
-msgid "No fields changed."
-msgstr "Tidak ada bidang yang berubah."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" berhasil ditambahkan. Anda dapat mengeditnya lagi di "
-"bawah ini."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" berhasil ditambahkan. Anda dapat menambahkan %(name)s "
-"yang lain di bawah ini."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" berhasil ditambahkan."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" berhasil diubah. Anda dapat mengeditnya lagi di bawah "
-"ini."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"%(name)s \"%(obj)s\" berhasil diubah. Anda dapat menambahkan %(name)s yang "
-"lain di bawah ini."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" berhasil diubah."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -346,18 +351,15 @@ msgstr "Dokumentasi"
 msgid "Log out"
 msgstr "Keluar"
 
-msgid "Add"
-msgstr "Tambah"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Tambahkan %(name)s"
 
 msgid "History"
 msgstr "Riwayat"
 
 msgid "View on site"
 msgstr "Lihat di situs"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Tambahkan %(name)s"
 
 msgid "Filter"
 msgstr "Filter"
@@ -442,13 +444,6 @@ msgstr ""
 msgid "Change"
 msgstr "Ubah"
 
-msgid "Remove"
-msgstr "Hapus"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Tambahkan %(verbose_name)s lagi"
-
 msgid "Delete?"
 msgstr "Hapus?"
 
@@ -463,14 +458,17 @@ msgstr "Ringkasan"
 msgid "Models in the %(name)s application"
 msgstr "Model pada aplikasi %(name)s"
 
+msgid "Add"
+msgstr "Tambah"
+
 msgid "You don't have permission to edit anything."
 msgstr "Anda tidak memiliki izin untuk mengubah apapun."
 
-msgid "Recent Actions"
-msgstr "Aktivitas Terbaru"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Aktivitas Saya"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Tidak ada yang tersedia"

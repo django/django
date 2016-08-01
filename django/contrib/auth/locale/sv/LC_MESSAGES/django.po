@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alexander Nordlund <deep.alexander@gmail.com>, 2012
+# Alex Nordlund <deep.alexander@gmail.com>, 2012
 # Cybjit <cybjit@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2016-03-23 11:25+0000\n"
-"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 08:39+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -121,6 +121,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr ""
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
+
 msgid "work factor"
 msgstr "arbetsfaktor"
 
@@ -174,17 +189,8 @@ msgstr "Specifika rättigheter för denna användare."
 msgid "username"
 msgstr "användarnamn"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Obligatoriskt. 30 tecken eller färre. Endast bokstäver, siffror och @/./+/-/"
-"_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Fyll i ett giltigt användarnamn. Detta värde får endast innehålla bokstäver, "
-"siffror och @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "En användare med det användarnamnet finns redan."
@@ -263,6 +269,16 @@ msgstr "Ditt lösenord kan inte bara vara numeriskt."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Lösenord nollställt på %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
 
 msgid "Logged out"
 msgstr "Utloggad"

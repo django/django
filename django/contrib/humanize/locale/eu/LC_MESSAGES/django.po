@@ -2,7 +2,7 @@
 #
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011-2012
-# ander <ander.basaundi@gmail.com>, 2014
+# Ander Martínez <ander.basaundi@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # julen <julenx@gmail.com>, 2014
 msgid ""

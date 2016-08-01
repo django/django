@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2015
+# Claude Paroz <claude@2xlibre.net>, 2013-2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 18:02+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 16:17+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -139,8 +139,8 @@ msgstr "Méthode"
 msgid "Arguments"
 msgstr "Paramètres"
 
-msgid "Back to Model Documentation"
-msgstr "Retour à la documentation du modèle"
+msgid "Back to Model documentation"
+msgstr "Retour à la documentation des modèles"
 
 msgid "Model documentation"
 msgstr "Documentation des modèles"
@@ -159,6 +159,7 @@ msgstr "Gabarit : %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Gabarit : « %(name)s »"
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Chemin de recherche du gabarit « %(name)s » :"
@@ -213,7 +214,7 @@ msgstr "Contexte :"
 msgid "Templates:"
 msgstr "Gabarits :"
 
-msgid "Back to Views Documentation"
+msgid "Back to View documentation"
 msgstr "Retour à la documentation des vues"
 
 msgid "View documentation"

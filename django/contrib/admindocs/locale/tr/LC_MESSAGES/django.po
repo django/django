@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015
+# BouRock, 2015-2016
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Murat Çorlu <muratcorlu@gmail.com>, 2012
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:40+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:58+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -142,8 +142,8 @@ msgstr "Yöntem"
 msgid "Arguments"
 msgstr "Bağımsız değişkenler"
 
-msgid "Back to Model Documentation"
-msgstr "Model Belgelerine Geri Dön"
+msgid "Back to Model documentation"
+msgstr "Model belgelerine geri dön"
 
 msgid "Model documentation"
 msgstr "Model belgeleri"
@@ -162,6 +162,7 @@ msgstr "Şablon: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Şablon: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "\"%(name)s\" şablonu için arama yolu:"
@@ -216,8 +217,8 @@ msgstr "Bağlam:"
 msgid "Templates:"
 msgstr "Şablonlar:"
 
-msgid "Back to Views Documentation"
-msgstr "Görünümler Belgelerine Geri Dön"
+msgid "Back to View documentation"
+msgstr "Görünüm belgelerine geri dön"
 
 msgid "View documentation"
 msgstr "Belgeleri görüntüle"

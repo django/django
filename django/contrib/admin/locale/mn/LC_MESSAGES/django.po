@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2016-03-08 13:17+0000\n"
-"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -67,6 +67,12 @@ msgstr "Энэ сар"
 msgid "This year"
 msgstr "Энэ жил"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -77,6 +83,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Үйлдэл:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Өөр %(verbose_name)s  нэмэх "
+
+msgid "Remove"
+msgstr "Хасах"
 
 msgid "action time"
 msgstr "үйлдлийн хугацаа"
@@ -90,6 +103,8 @@ msgstr "агуулгын төрөл"
 msgid "object id"
 msgstr "обектийн id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "обектийн хамаарал"
 
@@ -120,6 +135,30 @@ msgstr "\"%(object)s\" устгасан."
 msgid "LogEntry Object"
 msgstr "Лог бүртгэлийн обект"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr "Нэмэгдсэн."
+
+msgid "and"
+msgstr "ба"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Өөрчилсөн талбар алга байна."
+
 msgid "None"
 msgstr "Хоосон"
 
@@ -129,69 +168,35 @@ msgstr ""
 "Олон утга сонгохын тулд \"Control\", эсвэл Mac дээр \"Command\" товчыг дарж "
 "байгаад сонгоно."
 
-msgid "Added."
-msgstr "Нэмэгдсэн."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Өөрчлөгдсөн %s."
-
-msgid "and"
-msgstr "ба"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Нэмэгдсэн %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\"-ийн өөрчлөгдсөн %(list)s"
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Устгасан %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Өөрчилсөн талбар алга байна."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" амжилттай нэмэгдлээ. Доорх хэсэгт үүнийг ахин засварлах "
-"боломжтой."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" амжилттай нэмэгдлээ. Доорх хэсгээс %(name)s өөрийн "
-"нэмэх боломжтой."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr " %(name)s \"%(obj)s\" амжилттай нэмэгдлээ."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. Доорх хэсэгт дахин засах "
-"боломжтой."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"%(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. Доорх %(name)s хэсгээс дахин "
-"нэмэх боломжтой."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr " %(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. "
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -347,18 +352,15 @@ msgstr "Баримтжуулалт"
 msgid "Log out"
 msgstr "Гарах"
 
-msgid "Add"
-msgstr "Нэмэх"
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s нэмэх"
 
 msgid "History"
 msgstr "Түүх"
 
 msgid "View on site"
 msgstr "Сайтаас харах"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s нэмэх"
 
 msgid "Filter"
 msgstr "Шүүлтүүр"
@@ -441,13 +443,6 @@ msgstr ""
 msgid "Change"
 msgstr "Өөрчлөх"
 
-msgid "Remove"
-msgstr "Хасах"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Өөр %(verbose_name)s  нэмэх "
-
 msgid "Delete?"
 msgstr "Устгах уу?"
 
@@ -462,14 +457,17 @@ msgstr "Нийт"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s хэрэглүүр дэх моделууд."
 
+msgid "Add"
+msgstr "Нэмэх"
+
 msgid "You don't have permission to edit anything."
 msgstr "Та ямар нэг зүйл засварлах зөвшөөрөлгүй байна."
 
-msgid "Recent Actions"
-msgstr "Сүүлд хийсэн үйлдлүүд"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Миний үйлдлүүд"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Үйлдэл алга"

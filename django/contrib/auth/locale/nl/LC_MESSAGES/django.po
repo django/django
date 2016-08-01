@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2016-03-07 15:56+0000\n"
-"Last-Translator: jaap3 <jaap.roes@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 08:39+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -124,6 +124,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr ""
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
+
 msgid "work factor"
 msgstr "arbeidsfactor"
 
@@ -177,17 +192,8 @@ msgstr "Specifieke permissies voor deze gebruiker."
 msgid "username"
 msgstr "gebruikersnaam"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Vereist. 30 tekens of minder. Alleen letters, cijfers en @/,/+/-/_ tekens "
-"zijn toegestaan."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Geef een geldige gebruikersnaam op. Deze waarde mag alleen letters, cijfers "
-"en de tekens @/./+/-/_ bevatten."
 
 msgid "A user with that username already exists."
 msgstr "Een gebruiker met deze gebruikersnaam bestaat al."
@@ -267,6 +273,16 @@ msgstr "Uw wachtwoord mag niet volledig uit cijfers bestaan."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Wachtwoord reset voor %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
 
 msgid "Logged out"
 msgstr "Afmelden"

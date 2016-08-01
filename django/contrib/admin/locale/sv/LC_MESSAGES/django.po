@@ -1,22 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alexander Nordlund <deep.alexander@gmail.com>, 2012
+# Alex Nordlund <deep.alexander@gmail.com>, 2012
 # Andreas Pelme <andreas@pelme.se>, 2014
 # cvitan <tome@cvitan.com>, 2011
 # Cybjit <cybjit@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
+# Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # sorl <mikko@aino.se>, 2011
 # Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2016-03-23 11:27+0000\n"
-"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-07 19:24+0000\n"
+"Last-Translator: Mattias Hansson <mattias.gothenburg@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -70,6 +71,12 @@ msgstr "Denna månad"
 msgid "This year"
 msgstr "Detta år"
 
+msgid "No date"
+msgstr "Inget datum"
+
+msgid "Has date"
+msgstr "Har datum"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -80,6 +87,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Åtgärd:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Lägg till ytterligare %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Ta bort"
 
 msgid "action time"
 msgstr "händelsetid"
@@ -93,6 +107,8 @@ msgstr "innehållstyp"
 msgid "object id"
 msgstr "objektets id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "objektets beskrivning"
 
@@ -123,6 +139,30 @@ msgstr "Tog bort \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "LogEntry-Objekt"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Lade till {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Lagt till."
+
+msgid "and"
+msgstr "och"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Ändrade {fields} på {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Ändrade {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Tog bort {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Inga fält ändrade."
+
 msgid "None"
 msgstr "Inget"
 
@@ -131,66 +171,35 @@ msgid ""
 msgstr ""
 "Håll ner \"Control\", eller \"Command\" på en Mac, för att välja fler än en."
 
-msgid "Added."
-msgstr "Lagt till."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Ändrade %s."
-
-msgid "and"
-msgstr "och"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Lade till %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Ändrade %(list)s på %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Tog bort %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Inga fält ändrade."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" lades till. Du kan redigera objektet igen nedanför."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" lades till. Du kan lägga till ytterligare %(name)s "
-"nedan."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" lades till."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "%(name)s \"%(obj)s\" ändrades. Du kan ändra det igen nedan."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
 msgstr ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" ändrades."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -347,18 +356,15 @@ msgstr "Dokumentation"
 msgid "Log out"
 msgstr "Logga ut"
 
-msgid "Add"
-msgstr "Lägg till"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Lägg till %(name)s"
 
 msgid "History"
 msgstr "Historik"
 
 msgid "View on site"
 msgstr "Visa på webbplats"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Lägg till %(name)s"
 
 msgid "Filter"
 msgstr "Filtrera"
@@ -443,13 +449,6 @@ msgstr ""
 msgid "Change"
 msgstr "Ändra"
 
-msgid "Remove"
-msgstr "Ta bort"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Lägg till ytterligare %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Radera?"
 
@@ -464,14 +463,17 @@ msgstr "Översikt"
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
 
+msgid "Add"
+msgstr "Lägg till"
+
 msgid "You don't have permission to edit anything."
 msgstr "Du har inte rättigheter att redigera något."
 
-msgid "Recent Actions"
-msgstr "Senaste Händelser"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Mina händelser"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Inga tillgängliga"

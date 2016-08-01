@@ -6,15 +6,16 @@
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # slene <vslene@gmail.com>, 2011
+# spaceoi <zhangzhaoyu@gmail.com>, 2016
 # Ziang Song <songziang@gmail.com>, 2012
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-03-17 12:28+0000\n"
-"Last-Translator: mozillazg <opensource.mozillazg@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-08 01:37+0000\n"
+"Last-Translator: spaceoi <zhangzhaoyu@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -63,7 +64,9 @@ msgstr "选中的 %s"
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr "这是已选%s的列表。你可以"
+msgstr ""
+"这是选中的 %s 的列表。你可以在选择框下面进行选择，然后点击两选框之间的“删"
+"除”箭头进行删除。"
 
 msgid "Remove all"
 msgstr "删除全部"
@@ -144,13 +147,69 @@ msgstr "昨天"
 msgid "Tomorrow"
 msgstr "明天"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月"
+msgid "January"
+msgstr "一月"
 
-msgid "S M T W T F S"
-msgstr "日 一 二 三 四 五 六"
+msgid "February"
+msgstr "二月"
+
+msgid "March"
+msgstr "三月"
+
+msgid "April"
+msgstr "四月"
+
+msgid "May"
+msgstr "五月"
+
+msgid "June"
+msgstr "六月"
+
+msgid "July"
+msgstr "七月"
+
+msgid "August"
+msgstr "八月"
+
+msgid "September"
+msgstr "九月"
+
+msgid "October"
+msgstr "十月"
+
+msgid "November"
+msgstr "十一月"
+
+msgid "December"
+msgstr "十二月"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr ""
 
 msgid "Show"
 msgstr "显示"
