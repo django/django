@@ -1926,7 +1926,7 @@ class AdminViewPermissionsTest(TestCase):
         # the user has no module permissions, because this module doesn't exist
         change_user.user_permissions.remove(permission)
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
 
         # the user now has module permissions
         change_user.user_permissions.add(permission)
