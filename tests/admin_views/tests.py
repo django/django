@@ -1926,10 +1926,9 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(reverse('secure_view'), follow=True)
         self.assertContains(response, 'id="login-form"')
 
-    def test_app_index_fail_early(self):
+    def test_app_list_permissions(self):
         """
-        If a user has no module perms, avoid iterating over all the modeladmins
-        in the registry.
+        If a user has no module perms, the app list returns a 404.
         """
         opts = Article._meta
         change_user = User.objects.get(username='changeuser')
@@ -1937,10 +1936,10 @@ class AdminViewPermissionsTest(TestCase):
 
         self.client.force_login(self.changeuser)
 
-        # the user has no module permissions, because this module doesn't exist
+        # the user has no module permissions
         change_user.user_permissions.remove(permission)
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
 
         # the user now has module permissions
         change_user.user_permissions.add(permission)
@@ -2002,30 +2001,38 @@ class AdminViewPermissionsTest(TestCase):
         In this case, it always returns False, so the module should not be
         displayed on the admin index page for any users.
         """
+        articles = Article._meta.verbose_name_plural.title()
+        sections = Section._meta.verbose_name_plural.title()
         index_url = reverse('admin7:index')
 
         self.client.force_login(self.superuser)
         response = self.client.get(index_url)
-        self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertContains(response, sections)
+        self.assertNotContains(response, articles)
         self.client.logout()
 
         self.client.force_login(self.adduser)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertNotContains(response, articles)
         self.client.logout()
 
         self.client.force_login(self.changeuser)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertNotContains(response, articles)
         self.client.logout()
 
         self.client.force_login(self.deleteuser)
         response = self.client.get(index_url)
-        self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertNotContains(response, articles)
+
+        # The app list displays Sections but not Articles as the latter has
+        # ModelAdmin.has_module_permission() = False.
+        self.client.force_login(self.superuser)
+        response = self.client.get(reverse('admin7:app_list', args=('admin_views',)))
+        self.assertContains(response, sections)
+        self.assertNotContains(response, articles)
 
     def test_post_save_message_no_forbidden_links_visible(self):
         """
