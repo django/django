@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-03-14 12:09+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-18 08:41+0000\n"
 "Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -62,6 +62,9 @@ msgstr "الدنماركيّة"
 
 msgid "German"
 msgstr "الألمانيّة"
+
+msgid "Lower Sorbian"
+msgstr "الصربية السفلى"
 
 msgid "Greek"
 msgstr "اليونانيّة"
@@ -132,6 +135,9 @@ msgstr "الهندية"
 msgid "Croatian"
 msgstr "الكرواتيّة"
 
+msgid "Upper Sorbian"
+msgstr "الصربية العليا"
+
 msgid "Hungarian"
 msgstr "الهنغاريّة"
 
@@ -192,8 +198,8 @@ msgstr "المهاراتية"
 msgid "Burmese"
 msgstr "البورمية"
 
-msgid "Norwegian Bokmal"
-msgstr "البوكمال نرويجيّة"
+msgid "Norwegian Bokmål"
+msgstr "النرويجية"
 
 msgid "Nepali"
 msgstr "النيبالية"
@@ -290,9 +296,6 @@ msgstr "الملفات الثابتة"
 
 msgid "Syndication"
 msgstr "توظيف النشر"
-
-msgid "Web Design"
-msgstr "تصميم الموقع"
 
 msgid "Enter a valid value."
 msgstr "أدخل قيمة صحيحة."
@@ -463,6 +466,9 @@ msgstr "عدد صحيح"
 msgid "'%(value)s' value must be an integer."
 msgstr "قيمة '%(value)s' يجب ان تكون عدد صحيح."
 
+msgid "Big (8 byte) integer"
+msgstr "عدد صحيح كبير (8 بايت)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "قيمة '%(value)s' يجب أن تكون True أو False."
@@ -544,9 +550,6 @@ msgstr "قيمة '%(value)s' يجب ان تكون عدد فاصل عائم."
 msgid "Floating point number"
 msgstr "رقم فاصلة عائمة"
 
-msgid "Big (8 byte) integer"
-msgstr "عدد صحيح كبير (8 بايت)"
-
 msgid "IPv4 address"
 msgstr "عنوان IPv4"
 
@@ -619,6 +622,14 @@ msgstr "الحقل المرتبط (تم تحديد النوع وفقاً للح�
 
 msgid "One-to-one relationship"
 msgstr "علاقة واحد إلى واحد"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s علاقة"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s علاقات"
 
 msgid "Many-to-many relationship"
 msgstr "علاقة متعدد إلى متعدد"

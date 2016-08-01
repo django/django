@@ -6,16 +6,19 @@
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Nikolas Demiridis <nikolas@demiridis.gr>, 2014
-# Panos Laganakos <panos.laganakos@gmail.com>, 2014
-# Stavros Korokithakis <stavros@korokithakis.net>, 2014
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2016
+# Pãnoș <panos.laganakos@gmail.com>, 2014
+# Pãnoș <panos.laganakos@gmail.com>, 2016
+# Serafeim Papastefanos <spapas@gmail.com>, 2016
+# Stavros Korokithakis <stavros@korokithakis.net>, 2014,2016
 # Yorgos Pagles <y.pagles@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-14 16:48+0000\n"
+"Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -65,6 +68,9 @@ msgstr "Δανέζικα"
 msgid "German"
 msgstr "Γερμανικά"
 
+msgid "Lower Sorbian"
+msgstr "Κάτω Σορβικά"
+
 msgid "Greek"
 msgstr "Ελληνικά"
 
@@ -87,7 +93,7 @@ msgid "Argentinian Spanish"
 msgstr "Ισπανικά Αργεντινής"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "Ισπανικά Κολομβίας"
 
 msgid "Mexican Spanish"
 msgstr "Μεξικανική διάλεκτος Ισπανικών"
@@ -120,7 +126,7 @@ msgid "Irish"
 msgstr "Ιρλανδικά"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "Σκωτσέζικα Γαελικά"
 
 msgid "Galician"
 msgstr "Γαελικά"
@@ -134,6 +140,9 @@ msgstr "Ινδικά"
 msgid "Croatian"
 msgstr "Κροατικά"
 
+msgid "Upper Sorbian"
+msgstr "Άνω Σορβικά"
+
 msgid "Hungarian"
 msgstr "Ουγγρικά"
 
@@ -144,7 +153,7 @@ msgid "Indonesian"
 msgstr "Ινδονησιακά"
 
 msgid "Ido"
-msgstr ""
+msgstr "Ίντο"
 
 msgid "Icelandic"
 msgstr "Ισλανδικά"
@@ -194,8 +203,8 @@ msgstr "Μαράθι"
 msgid "Burmese"
 msgstr "Βιρμανικά"
 
-msgid "Norwegian Bokmal"
-msgstr "Νορβηγική διάλεκτος Μποκμάλ - \"γλώσσα των βιβλίων\""
+msgid "Norwegian Bokmål"
+msgstr "Νορβηγικά Μποκμάλ"
 
 msgid "Nepali"
 msgstr "Νεπαλέζικα"
@@ -282,7 +291,7 @@ msgid "Traditional Chinese"
 msgstr "Παραδοσιακά Κινέζικα"
 
 msgid "Messages"
-msgstr ""
+msgstr "Μηνύματα"
 
 msgid "Site Maps"
 msgstr "Χάρτες Ιστότοπου"
@@ -291,10 +300,7 @@ msgid "Static Files"
 msgstr "Στατικά Αρχεία"
 
 msgid "Syndication"
-msgstr ""
-
-msgid "Web Design"
-msgstr "Σχεδιασμός Ιστοσελίδων"
+msgstr "Syndication"
 
 msgid "Enter a valid value."
 msgstr "Εισάγετε μια έγκυρη τιμή."
@@ -311,15 +317,18 @@ msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδ
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Ένα έγκυρο 'slug' αποτελείται από γράμματα, αριθμούς, παύλες ή κάτω παύλες."
+"Εισάγετε ένα έγκυρο 'slug' αποτελούμενο από γράμματα, αριθμούς, παύλες ή "
+"κάτω παύλες."
 
 msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Ένα έγκυρο 'slug' αποτελείται από Unicode γράμματα, αριθμούς, παύλες ή κάτω "
+"παύλες."
 
 msgid "Enter a valid IPv4 address."
-msgstr "Εισάγετε μια έγκυρη διεύθυνση IPv4."
+msgstr "Εισάγετε μια έγκυρη IPv4 διεύθυνση."
 
 msgid "Enter a valid IPv6 address."
 msgstr "Εισάγετε μία έγκυρη IPv6 διεύθυνση"
@@ -392,7 +401,9 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
+"Βεβαιωθείτε ότι δεν υπάρχουν πάνω από %(max)s ψηφία πριν την υποδιαστολή."
 msgstr[1] ""
+"Βεβαιωθείτε ότι δεν υπάρχουν πάνω από %(max)s ψηφία πριν την υποδιαστολή."
 
 msgid "and"
 msgstr "και"
@@ -406,7 +417,7 @@ msgid "Value %(value)r is not a valid choice."
 msgstr "Η τιμή %(value)r δεν είναι έγκυρη επιλογή."
 
 msgid "This field cannot be null."
-msgstr "Αυτό το πεδίο δεν μπορεί να είναι κενό (null)."
+msgstr "Το πεδίο αυτό δεν μπορεί να είναι μηδενικό (null)."
 
 msgid "This field cannot be blank."
 msgstr "Το πεδίο αυτό δεν μπορεί να είναι κενό."
@@ -426,7 +437,7 @@ msgstr ""
 
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr "Είδος πεδίου: %(field_type)s"
+msgstr "Πεδίο τύπου: %(field_type)s"
 
 msgid "Integer"
 msgstr "Ακέραιος"
@@ -434,6 +445,9 @@ msgstr "Ακέραιος"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "Η τιμή '%(value)s' πρέπει να είναι ακέραιος."
+
+msgid "Big (8 byte) integer"
+msgstr "Μεγάλος ακέραιος - big integer (8 bytes)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -481,13 +495,15 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"Η τιμή '%(value)s' έχει τη σωστή μορφή (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"αλλά δεν αντιστοιχεί σε σωστή ημερομηνία και ώρα."
 
 msgid "Date (with time)"
-msgstr "Ημερομηνία (με την ώρα)"
+msgstr "Ημερομηνία (με ώρα)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr "Η '%(value)s' τιμή πρέπει να είναι ακέραιος."
+msgstr "Η τιμή '%(value)s' πρέπει να είναι ακέραιος."
 
 msgid "Decimal number"
 msgstr "Δεκαδικός αριθμός"
@@ -497,6 +513,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"Η τιμή '%(value)s' έχει εσφαλμένη μορφή. Πρέπει να είναι της μορφής [DD] [HH:"
+"[MM:]]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "Διάρκεια"
@@ -514,14 +532,11 @@ msgstr "Η '%(value)s' τιμή πρέπει να είναι δεκαδικός.
 msgid "Floating point number"
 msgstr "Αριθμός κινητής υποδιαστολής"
 
-msgid "Big (8 byte) integer"
-msgstr "Μεγάλος ακέραιος - big integer (8 bytes)"
-
 msgid "IPv4 address"
 msgstr "Διεύθυνση IPv4"
 
 msgid "IP address"
-msgstr "διεύθυνση IP"
+msgstr "IP διεύθυνση"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
@@ -551,12 +566,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"Η τιμή '%(value)s' έχει εσφαλμένη μορφή. Πρέπει να είναι της μορφής HH:MM[:"
+"ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"Η τιμή '%(value)s' έχει τη σωστή μορφή (HH:MM[:ss[.uuuuuu]]) αλλά δεν "
+"αντιστοιχή σε σωστή ώρα."
 
 msgid "Time"
 msgstr "Ώρα"
@@ -565,11 +584,11 @@ msgid "URL"
 msgstr "URL"
 
 msgid "Raw binary data"
-msgstr ""
+msgstr "Δυαδικά δεδομένα"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' δεν είναι ένα έγκυρο UUID."
 
 msgid "File"
 msgstr "Αρχείο"
@@ -580,14 +599,21 @@ msgstr "Εικόνα"
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
 msgstr ""
+"Το μοντέλο %(model)s με την τιμή %(value)r του πεδίου %(field)s δεν υπάρχει."
 
 msgid "Foreign Key (type determined by related field)"
-msgstr ""
-"Εξωτερικό Κλειδί - Foreign Key (ο τύπος καθορίζεται από το πεδίο του "
-"συσχετισμού)"
+msgstr "Foreign Key (ο τύπος καθορίζεται από το πεδίο του συσχετισμού)"
 
 msgid "One-to-one relationship"
 msgstr "Σχέση ένα-προς-ένα"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "σχέση %(from)s-%(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "σχέσεις %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Σχέση πολλά-προς-πολλά"
@@ -617,14 +643,14 @@ msgid "Enter a valid date/time."
 msgstr "Εισάγετε μια έγκυρη ημερομηνία/ώρα."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Εισάγετε μια έγκυρη διάρκεια."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 "Δεν έχει υποβληθεί κάποιο αρχείο. Ελέγξτε τον τύπο κωδικοποίησης στη φόρμα."
 
 msgid "No file was submitted."
-msgstr "Δεν έχει υποβληθεί κάποιο αρχείο."
+msgstr "Δεν υποβλήθηκε κάποιο αρχείο."
 
 msgid "The submitted file is empty."
 msgstr "Το αρχείο που υποβλήθηκε είναι κενό."
@@ -634,7 +660,11 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+"Βεβαιωθείται πως το όνομα του αρχείου έχει το πολύ %(max)d χαρακτήρα (το "
+"παρόν έχει %(length)d)."
 msgstr[1] ""
+"Βεβαιωθείται πως το όνομα του αρχείου έχει το πολύ %(max)d χαρακτήρα (το "
+"παρόν έχει %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
@@ -646,7 +676,7 @@ msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Βεβεαιωθείτε ότι το αρχείο που έχετε επιλέξει για αποστολή είναι αρχείο "
+"Βεβαιωθείτε ότι το αρχείο που έχετε επιλέξει για αποστολή είναι αρχείο "
 "εικόνας. Το τρέχον είτε δεν ήταν εικόνα είτε έχει υποστεί φθορά."
 
 #, python-format
@@ -662,7 +692,7 @@ msgid "Enter a complete value."
 msgstr "Εισάγετε μια πλήρης τιμή"
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Εισάγετε μια έγκυρη UUID."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -670,7 +700,7 @@ msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
+msgstr "(Κρυφό πεδίο %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "Τα δεδομένα του ManagementForm λείπουν ή έχουν αλλοιωθεί"
@@ -716,8 +746,8 @@ msgstr "Έχετε ξαναεισάγει την ίδια τιμη. Βεβαιω
 
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
-"Το ενσωματωμένο εξωτερικό κλειδί δεν αντιστοιχεί με το κλειδί του "
-"αντικειμένου από το οποίο πηγάζει."
+"Το inline foreign key δεν αντιστοιχεί με το primary κλειδί του γονικού "
+"object."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -733,6 +763,8 @@ msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+"Η ημερομηνία %(datetime)s δεν μπόρεσε να μετατραπεί στην ζώνη ώρας "
+"%(current_timezone)s; ίσως να είναι ασαφής ή να μην υπάρχει."
 
 msgid "Currently"
 msgstr "Τώρα"
@@ -741,7 +773,7 @@ msgid "Change"
 msgstr "Επεξεργασία"
 
 msgid "Clear"
-msgstr "Εκκαθάσριση"
+msgstr "Εκκαθάριση"
 
 msgid "Unknown"
 msgstr "Άγνωστο"
@@ -1067,7 +1099,7 @@ msgid "Forbidden"
 msgstr "Απαγορευμένο"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr "Η πιστοποίηση CSRF απέτυχε. Το αίτημα απέτυχε"
+msgstr "Η πιστοποίηση CSRF απέτυχε. Το αίτημα ματαιώθηκε."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1075,45 +1107,63 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Βλέπετε αυτό το μήνυμα επειδή αυτή η HTTPS σελίδα απαιτεί από τον Web "
+"browser σας να σταλεί ένας 'Referer header', όμως τίποτα δεν στάλθηκε. Αυτός "
+"ο header είναι απαραίτητος για λόγους ασφαλείας, για να εξασφαλιστεί ότι ο "
+"browser δεν έχει γίνει hijacked από τρίτους."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Αν οι 'Referer' headers είναι απενεργοποιημένοι στον browser σας από εσάς, "
+"παρακαλούμε να τους ξανά-ενεργοποιήσετε, τουλάχιστον για αυτό το site ή για "
+"τις συνδέσεις HTTPS ή για τα 'same-origin' requests."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Βλέπετε αυτό το μήνυμα επειδή αυτή η σελίδα απαιτεί ένα CSRF cookie, όταν "
+"κατατίθενται φόρμες. Αυτό το cookie είναι απαραίτητο για λόγους ασφαλείας, "
+"για να εξασφαλιστεί ότι ο browser δεν έχει γίνει hijacked από τρίτους."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Αν τα cookies είναι απενεργοποιημένα στον browser σας από εσάς, παρακαλούμε "
+"να τα ξανά-ενεργοποιήσετε, τουλάχιστον για αυτό το site ή για τα 'same-"
+"origin' requests."
 
 msgid "More information is available with DEBUG=True."
-msgstr "Περισσότερες πληροφορίες είναι διαθέσιμες με DEBUG=True"
+msgstr "Περισσότερες πληροφορίες είναι διαθέσιμες με DEBUG=True."
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "Καλωσήρθατε στο Django"
 
 msgid "It worked!"
-msgstr ""
+msgstr "Δούλεψε!"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "Συγχαρητήρια στην πρώτη Django-τροφοδοτούμενη σελίδα σας."
 
 msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"Φυσίκα, δεν έχετε κάνει καμία δουλειά ακόμα. Ξεκινήστε την πρώτη σας "
+"εφαρμογή εκτελώντας <code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"Βλέπετε αυτό το μήνυμα επείδη έχετε <code>DEBUG = True</code> στο αρχείο "
+"settings του Django σας και δεν έχετε ρυθμίσει καμία URL. Στρωθείτε στην "
+"δουλειά!"
 
 msgid "No year specified"
 msgstr "Δεν έχει οριστεί χρονιά"
@@ -1160,7 +1210,7 @@ msgstr "Άκυρη σελίδα (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "Άδεια λίστα ενώ '%(class_name)s.allow_empty' δεν έχει τεθεί."
+msgstr "Άδεια λίστα και το '%(class_name)s.allow_empty' είναι False."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Τα ευρετήρια καταλόγων δεν επιτρέπονται εδώ."

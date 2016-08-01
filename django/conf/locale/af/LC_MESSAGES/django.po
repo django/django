@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
 "af/)\n"
@@ -59,6 +59,9 @@ msgstr "Deens"
 
 msgid "German"
 msgstr "Duits"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "Grieks"
@@ -129,6 +132,9 @@ msgstr "Hindoe"
 msgid "Croatian"
 msgstr "Kroaties"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Hongaars"
 
@@ -189,8 +195,8 @@ msgstr ""
 msgid "Burmese"
 msgstr "Birmaans"
 
-msgid "Norwegian Bokmal"
-msgstr "Noors Bokmal"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepalees"
@@ -287,9 +293,6 @@ msgstr ""
 
 msgid "Syndication"
 msgstr "Sindikasie"
-
-msgid "Web Design"
-msgstr "Webontwerp"
 
 msgid "Enter a valid value."
 msgstr "Sleutel 'n geldige waarde in."
@@ -431,6 +434,9 @@ msgstr "Heelgetal"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' waarde moet 'n heelgetal wees."
 
+msgid "Big (8 byte) integer"
+msgstr "Groot (8 greep) heelgetal"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' waarde moet óf True of False wees."
@@ -512,9 +518,6 @@ msgstr "'%(value)s' waarde meote 'n dryfpunt getal wees."
 msgid "Floating point number"
 msgstr "Dryfpunt getal"
 
-msgid "Big (8 byte) integer"
-msgstr "Groot (8 greep) heelgetal"
-
 msgid "IPv4 address"
 msgstr "IPv4 adres"
 
@@ -588,6 +591,14 @@ msgstr "Vreemde sleutel (tipe bepaal deur verwante veld)"
 
 msgid "One-to-one relationship"
 msgstr "Een-tot-een-verhouding"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Baie-tot-baie-verwantskap"

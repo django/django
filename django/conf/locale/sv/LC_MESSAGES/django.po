@@ -1,12 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alexander Nordlund <deep.alexander@gmail.com>, 2012
+# Alex Nordlund <deep.alexander@gmail.com>, 2012
 # Andreas Pelme <andreas@pelme.se>, 2014
 # Gustaf Hansen <gustaf.hansen@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
+# Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # Mattias Jansson <mattias@colourandcode.se>, 2011
 # Rasmus Précenth <prillan91@gmail.com>, 2014
 # Samuel Linde <samuel@linde.im>, 2011
@@ -15,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-03-23 11:09+0000\n"
-"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-07 19:03+0000\n"
+"Last-Translator: Mattias Hansson <mattias.gothenburg@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -67,6 +68,9 @@ msgstr "Danska"
 
 msgid "German"
 msgstr "Tyska"
+
+msgid "Lower Sorbian"
+msgstr "Lågsorbiska"
 
 msgid "Greek"
 msgstr "Grekiska"
@@ -137,6 +141,9 @@ msgstr "Hindi"
 msgid "Croatian"
 msgstr "Kroatiska"
 
+msgid "Upper Sorbian"
+msgstr "Högsorbiska"
+
 msgid "Hungarian"
 msgstr "Ungerska"
 
@@ -197,8 +204,8 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "Burmesiska"
 
-msgid "Norwegian Bokmal"
-msgstr "Norska (bokmål)"
+msgid "Norwegian Bokmål"
+msgstr "Norskt Bokmål"
 
 msgid "Nepali"
 msgstr "Nepali"
@@ -295,9 +302,6 @@ msgstr "Statiska filer"
 
 msgid "Syndication"
 msgstr "Syndikering"
-
-msgid "Web Design"
-msgstr "Webbdesign"
 
 msgid "Enter a valid value."
 msgstr "Fyll i ett giltigt värde."
@@ -441,6 +445,9 @@ msgstr "Heltal"
 msgid "'%(value)s' value must be an integer."
 msgstr "Värdet '%(value)s' måste vara ett heltal."
 
+msgid "Big (8 byte) integer"
+msgstr "Stort (8 byte) heltal"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Värdet '%(value)s' måste vara antingen True eller False."
@@ -524,9 +531,6 @@ msgstr "Värdet '%(value)s' måste vara ett flyttal."
 msgid "Floating point number"
 msgstr "Flyttal"
 
-msgid "Big (8 byte) integer"
-msgstr "Stort (8 byte) heltal"
-
 msgid "IPv4 address"
 msgstr "IPv4-adress"
 
@@ -600,6 +604,14 @@ msgstr "Främmande nyckel (typ bestäms av relaterat fält)"
 
 msgid "One-to-one relationship"
 msgstr "Ett-till-ett-samband"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s relation"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s relationer"
 
 msgid "Many-to-many relationship"
 msgstr "Många-till-många-samband"

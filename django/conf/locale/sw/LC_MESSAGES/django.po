@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Emil <bmachaku@gmail.com>, 2015
-# Emil <bmachaku@gmail.com>, 2014
+# Machaku <bmachaku@gmail.com>, 2015
+# Machaku <bmachaku@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swahili (http://www.transifex.com/django/django/language/"
 "sw/)\n"
@@ -59,6 +59,9 @@ msgstr "Kideni"
 
 msgid "German"
 msgstr "Kijerumani"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "Kigiriki"
@@ -129,6 +132,9 @@ msgstr "Kihindi"
 msgid "Croatian"
 msgstr "Kikroeshia"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Kihangaria"
 
@@ -189,8 +195,8 @@ msgstr ""
 msgid "Burmese"
 msgstr ""
 
-msgid "Norwegian Bokmal"
-msgstr "kibekmali cha Kinorwei"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Kinepali"
@@ -287,9 +293,6 @@ msgstr ""
 
 msgid "Syndication"
 msgstr ""
-
-msgid "Web Design"
-msgstr "Muonekano wa tovuti"
 
 msgid "Enter a valid value."
 msgstr "Ingiza thamani halali"
@@ -415,6 +418,9 @@ msgstr "Inteja"
 msgid "'%(value)s' value must be an integer."
 msgstr "Thamani ya '%(value)s ni lazima iwe inteja."
 
+msgid "Big (8 byte) integer"
+msgstr "Inteja kubwa (baiti 8)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Thamani ya '%(value)s' ni lazma iwe Kweli au Si kweli"
@@ -488,9 +494,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "Namba ya `floating point`"
 
-msgid "Big (8 byte) integer"
-msgstr "Inteja kubwa (baiti 8)"
-
 msgid "IPv4 address"
 msgstr "anuani ya IPV4"
 
@@ -560,6 +563,14 @@ msgstr "'Foreign Key' (aina inapatikana kwa uga unaohusiana)"
 
 msgid "One-to-one relationship"
 msgstr "Uhusiano wa moja-kwa-moja"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Uhusiano wa vingi-kwa-vingi"

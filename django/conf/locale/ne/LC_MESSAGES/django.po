@@ -3,14 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2014
 # Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012
-# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012
+# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012,2015
 # Sagar Chalise <chalisesagar@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
@@ -60,6 +60,9 @@ msgstr "डेनिस"
 
 msgid "German"
 msgstr "जर्मन"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "ग्रिक"
@@ -130,6 +133,9 @@ msgstr "हिन्दि "
 msgid "Croatian"
 msgstr "क्रोषियन"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "हन्गेरियन"
 
@@ -190,8 +196,8 @@ msgstr "मराठी"
 msgid "Burmese"
 msgstr "बर्मेली"
 
-msgid "Norwegian Bokmal"
-msgstr "नर्वेली बोक्मल"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "नेपाली"
@@ -288,9 +294,6 @@ msgstr "स्टेेटिक फाइलहरु"
 
 msgid "Syndication"
 msgstr "सिन्डिकेसन"
-
-msgid "Web Design"
-msgstr "वेब डिजाइन"
 
 msgid "Enter a valid value."
 msgstr "उपयुक्त मान राख्नुहोस ।"
@@ -425,6 +428,9 @@ msgstr "अंक"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' अंक हुनु पर्छ ।"
 
+msgid "Big (8 byte) integer"
+msgstr "ठूलो (८ बाइटको) अंक"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "%(value)s' को मान True अथवा False हुनुपर्दछ ।."
@@ -498,9 +504,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "दश्मलव हुने संख्या"
 
-msgid "Big (8 byte) integer"
-msgstr "ठूलो (८ बाइटको) अंक"
-
 msgid "IPv4 address"
 msgstr "आइ.पी.भी४ ठेगाना"
 
@@ -570,6 +573,14 @@ msgstr "फोरेन कि (प्रकार नातागत फाँ�
 
 msgid "One-to-one relationship"
 msgstr "एक-देखि-एक नाता"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "अनेक-देखि-अनेक नाता"

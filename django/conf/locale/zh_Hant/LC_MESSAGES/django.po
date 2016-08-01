@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Chun-Chia Chen <ccc.larc@gmail.com>, 2015
+# Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # Eric Ho <eric913@gmail.com>, 2013
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
@@ -66,6 +66,9 @@ msgstr "丹麥語"
 
 msgid "German"
 msgstr "德語"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "希臘語"
@@ -136,6 +139,9 @@ msgstr "印度語"
 msgid "Croatian"
 msgstr "克羅埃西亞語"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "匈牙利語"
 
@@ -196,8 +202,8 @@ msgstr "馬拉地語"
 msgid "Burmese"
 msgstr "緬甸語"
 
-msgid "Norwegian Bokmal"
-msgstr "挪威語（波克默爾）"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "尼泊爾(Nepali)"
@@ -293,9 +299,6 @@ msgid "Static Files"
 msgstr ""
 
 msgid "Syndication"
-msgstr ""
-
-msgid "Web Design"
 msgstr ""
 
 msgid "Enter a valid value."
@@ -417,6 +420,9 @@ msgstr "整數"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' 必須為整數。"
 
+msgid "Big (8 byte) integer"
+msgstr "大整數(8位元組)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' 必須為 True 或 False。"
@@ -492,9 +498,6 @@ msgstr "'%(value)s' 必須為浮點數"
 msgid "Floating point number"
 msgstr "浮點數"
 
-msgid "Big (8 byte) integer"
-msgstr "大整數(8位元組)"
-
 msgid "IPv4 address"
 msgstr "IPv4 地址"
 
@@ -564,6 +567,14 @@ msgstr "外鍵 (型態由關連欄位決定)"
 
 msgid "One-to-one relationship"
 msgstr "一對一關連"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "多對多關連"

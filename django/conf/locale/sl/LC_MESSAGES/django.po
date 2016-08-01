@@ -4,14 +4,14 @@
 # iElectric <domen@dev.si>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jure Cuhalev <gandalf@owca.info>, 2012-2013
-# zejn <zejn@kiberpipa.org>, 2013
+# zejn <zejn@kiberpipa.org>, 2013,2016
 # zejn <zejn@kiberpipa.org>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
@@ -29,7 +29,7 @@ msgid "Arabic"
 msgstr "Arabščina"
 
 msgid "Asturian"
-msgstr ""
+msgstr "Asturijski jezik"
 
 msgid "Azerbaijani"
 msgstr "Azerbajdžanščina"
@@ -64,6 +64,9 @@ msgstr "Danščina"
 msgid "German"
 msgstr "Nemščina"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "Grščina"
 
@@ -71,7 +74,7 @@ msgid "English"
 msgstr "Angleščina"
 
 msgid "Australian English"
-msgstr ""
+msgstr "Avstralska angleščina"
 
 msgid "British English"
 msgstr "Britanska Angleščina"
@@ -86,7 +89,7 @@ msgid "Argentinian Spanish"
 msgstr "Argentinska španščina"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "Kolumbijska španščina"
 
 msgid "Mexican Spanish"
 msgstr "Mehiška španščina"
@@ -119,7 +122,7 @@ msgid "Irish"
 msgstr "Irščina"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "Škotska gelščina"
 
 msgid "Galician"
 msgstr "Galičanski jezik"
@@ -133,6 +136,9 @@ msgstr "Hindujščina"
 msgid "Croatian"
 msgstr "Hrvaščina"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Madžarščina"
 
@@ -143,7 +149,7 @@ msgid "Indonesian"
 msgstr "Indonezijski"
 
 msgid "Ido"
-msgstr ""
+msgstr "Jezik Ido"
 
 msgid "Icelandic"
 msgstr "Islandski jezik"
@@ -188,13 +194,13 @@ msgid "Mongolian"
 msgstr "Mongolščina"
 
 msgid "Marathi"
-msgstr ""
+msgstr "Jezik Marathi"
 
 msgid "Burmese"
 msgstr "Burmanski jezik"
 
-msgid "Norwegian Bokmal"
-msgstr "Norveščina Bokmal"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepalščina"
@@ -281,18 +287,15 @@ msgid "Traditional Chinese"
 msgstr "Tradicionalna kitajščina"
 
 msgid "Messages"
-msgstr ""
+msgstr "Sporočila"
 
 msgid "Site Maps"
-msgstr ""
+msgstr "Zemljevid spletnega mesta"
 
 msgid "Static Files"
-msgstr ""
+msgstr "Statične datoteke"
 
 msgid "Syndication"
-msgstr ""
-
-msgid "Web Design"
 msgstr ""
 
 msgid "Enter a valid value."
@@ -302,7 +305,7 @@ msgid "Enter a valid URL."
 msgstr "Vnesite veljaven URL naslov."
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Vnesite veljavno celo število."
 
 msgid "Enter a valid email address."
 msgstr "Vnesite veljaven e-poštni naslov."
@@ -317,6 +320,8 @@ msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Vnesite veljavno URL okrajšavo, sestavljeno iz Unicode črk, številk, "
+"podčrtajev ali pomišljajev."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Vnesite veljaven IPv4 naslov."
@@ -418,11 +423,11 @@ msgstr "in"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s s tem %(field_labels)s že obstaja."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Vrednost %(value)r ni veljavna izbira."
 
 msgid "This field cannot be null."
 msgstr "To polje ne more biti prazno."
@@ -440,6 +445,7 @@ msgstr "%(model_name)s s tem %(field_label)s že obstaja."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s mora biti enolična za %(date_field_label)s %(lookup_type)s."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -450,11 +456,14 @@ msgstr "Celo število (integer)"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "Vrednost '%(value)s' mora biti celo število. "
+
+msgid "Big (8 byte) integer"
+msgstr "Velika (8 bajtna) cela števila "
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "Vrednost '%(value)s' mora biti Da ali Ne."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolova vrednost (True ali False)"
@@ -471,12 +480,16 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"Vrednost '%(value)s' je v neveljavni obliki zapisa datuma. Biti mora v "
+"obliki LLLL-MM-DD."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"Vrednost '%(value)s' je zapisana v pravilni obliki (LLLL-MM-DD), a ta datum "
+"ne obstaja."
 
 msgid "Date (without time)"
 msgstr "Datum (brez ure)"
@@ -486,19 +499,23 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"Vrednost '%(value)s' je v neveljavni obliki. Biti mora v obliki LLLL-MM-DD "
+"UU:MM[:ss[.uuuuuu]][ČP]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"Vrednost '%(value)s' je v pravi obliki (LLLL-MM-DD UU:MM[:ss[.uuuuuu]][ČP]), "
+"a ta datum oziroma točka v času ne obstaja."
 
 msgid "Date (with time)"
 msgstr "Datum (z uro)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "Vrednost '%(value)s' mora biti decimalno število."
 
 msgid "Decimal number"
 msgstr "Decimalno število"
@@ -508,9 +525,11 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"Vrednost '%(value)s' je v neveljavni obliki. Biti mora v obliki [DD][UU:"
+"[MM]]ss[.uuuuuu]."
 
 msgid "Duration"
-msgstr ""
+msgstr "Trajanje"
 
 msgid "Email address"
 msgstr "E-poštni naslov"
@@ -520,13 +539,10 @@ msgstr "Pot do datoteke"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "Vrednost '%(value)s' mora biti decimalno število v plavajoči vejici."
 
 msgid "Floating point number"
 msgstr "Število s plavajočo vejico"
-
-msgid "Big (8 byte) integer"
-msgstr "Velika (8 bajtna) cela števila "
 
 msgid "IPv4 address"
 msgstr "IPv4 naslov"
@@ -536,7 +552,7 @@ msgstr "IP naslov"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "Vrednost '%(value)s' mora biti bodisi brez vrednosti, Da ali Ne."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolova vrednost (True, False ali None)"
@@ -562,12 +578,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"Vrednost '%(value)s' je v napačnem zapisu. Biti mora v obliki UU:MM[:ss[."
+"uuuuuu]]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"Vrednost '%(value)s' je v pravilnem zapisu (UU:MM[:ss[.uuuuuu]]), a ta čas "
+"ne obstaja."
 
 msgid "Time"
 msgstr "Čas"
@@ -580,7 +600,7 @@ msgstr "Surovi binarni podatki"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "Vrednost '%(value)s' ni veljaven UUID."
 
 msgid "File"
 msgstr "Datoteka"
@@ -591,12 +611,21 @@ msgstr "Slika"
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
 msgstr ""
+"Instanca %(model)s s poljem %(field)s, ki ustreza %(value)r, ne obstaja."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Tuji ključ (tip odvisen od povezanega polja)"
 
 msgid "One-to-one relationship"
 msgstr "Relacija ena-na-ena"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Relacija več-na-več"
@@ -626,7 +655,7 @@ msgid "Enter a valid date/time."
 msgstr "Vnesite veljaven datum/čas."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Vnesite veljavno obdobje trajanja."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Datoteka ni bila poslana. Preverite nabor znakov v formi."
@@ -672,10 +701,10 @@ msgid "Enter a list of values."
 msgstr "Vnesite seznam vrednosti."
 
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Vnesite popolno vrednost."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Vnesite veljaven UUID."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -686,7 +715,7 @@ msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Skrito polje %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "Podatki iz ManagementForm manjkajo ali pa so bili spreminjani."
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -699,10 +728,10 @@ msgstr[3] "Pošljite največ %d obrazcev."
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Prosimo vnesite %d ali več vnosov."
+msgstr[1] "Prosimo vnesite %d ali več vnosov."
+msgstr[2] "Prosimo vnesite %d ali več vnosov."
+msgstr[3] "Prosimo vnesite %d ali več vnosov."
 
 msgid "Order"
 msgstr "Razvrsti"
@@ -1026,7 +1055,7 @@ msgid "December"
 msgstr "December"
 
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "To ni veljaven IPv6 naslov."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1092,10 +1121,10 @@ msgid "0 minutes"
 msgstr "0 minut"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "Prepovedano"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "CSRF preverjanje ni uspelo. Zahtevek preklican."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1103,45 +1132,61 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"To obvestilo vidite, ker ta HTTPS spletna stran zahteva, da vaš brskalnik "
+"pošlje informacijo o napotitelju ('Referer'), a se to ni zgodilo. To je "
+"potrebno zaradi varnosti, da se zagotovi, da ste zahtevek res naredili vi."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Če ste v vašem brskalniku izklopili pošiljanje informacije o napotitelju "
+"('Referer'), to ponovno omogočite, vsaj za to stran ali za HTTPS povezave "
+"ali za povezave iz istega vira ('same-origin')."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"To obvestilo vidite, ker ta spletna stran zahteva CSRF piškotek, ko "
+"pošiljate obrazce. Piškotek je potreben zaradi varnosti, da se zagotovi, da "
+"ste zahtevek res naredili vi."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Če ste v brskalniku onemogočili hrambo piškotkov, jih prosimo ponovno "
+"omogočite, vsaj za to spletno stran ali za povezave iz istega vira ('same-"
+"origin').  "
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Več informacij je na voljo, če nastavite DEBUG=True."
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "Dobrodošli v Django"
 
 msgid "It worked!"
-msgstr ""
+msgstr "Deluje!"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "Dobrodošli na vaši prvi spletni strani, zgrajeni na Django platformi."
 
 msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"Seveda se tu resno delo šele prične. Ustvarite prvo aplikacijo tako, da "
+"poženete <code>python manage.py startapp [ime_aplikacije]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"To sporočilo vidite, ker imate v vaših Django nastavitvah nastavljeno "
+"<code>DEBUG = True</code> in še niste nastavili nobenega URL-ja. Na delo!"
 
 msgid "No year specified"
 msgstr "Leto ni vnešeno"

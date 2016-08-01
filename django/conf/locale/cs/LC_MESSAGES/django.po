@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-09 08:40+0000\n"
-"Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -62,6 +62,9 @@ msgstr "dánsky"
 
 msgid "German"
 msgstr "německy"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "řecky"
@@ -132,6 +135,9 @@ msgstr "hindsky"
 msgid "Croatian"
 msgstr "chorvatsky"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "maďarsky"
 
@@ -192,8 +198,8 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "barmštinou"
 
-msgid "Norwegian Bokmal"
-msgstr "norsky (Bokmål)"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "nepálsky"
@@ -290,9 +296,6 @@ msgstr "Statické soubory"
 
 msgid "Syndication"
 msgstr "Syndikace"
-
-msgid "Web Design"
-msgstr "Design webu"
 
 msgid "Enter a valid value."
 msgstr "Zadejte platnou hodnotu."
@@ -444,6 +447,9 @@ msgstr "Celé číslo"
 msgid "'%(value)s' value must be an integer."
 msgstr "Hodnota '%(value)s' musí být celé číslo."
 
+msgid "Big (8 byte) integer"
+msgstr "Velké číslo (8 bajtů)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Hodnota '%(value)s' musí být buď True nebo False."
@@ -525,9 +531,6 @@ msgstr "Hodnota '%(value)s' musí být reálné číslo."
 msgid "Floating point number"
 msgstr "Číslo s pohyblivou řádovou čárkou"
 
-msgid "Big (8 byte) integer"
-msgstr "Velké číslo (8 bajtů)"
-
 msgid "IPv4 address"
 msgstr "Adresa IPv4"
 
@@ -601,6 +604,14 @@ msgstr "Cizí klíč (typ určen pomocí souvisejícího pole)"
 
 msgid "One-to-one relationship"
 msgstr "Vazba jedna-jedna"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Vazba mnoho-mnoho"
