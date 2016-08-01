@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Irish (http://www.transifex.com/django/django/language/ga/)\n"
 "MIME-Version: 1.0\n"
@@ -63,6 +63,9 @@ msgstr "Danmhairgis "
 
 msgid "German"
 msgstr "Gearmáinis"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "Gréigis"
@@ -133,6 +136,9 @@ msgstr "Hiondúis"
 msgid "Croatian"
 msgstr "Cróitis"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Ungáiris"
 
@@ -193,8 +199,8 @@ msgstr "Maraitis"
 msgid "Burmese"
 msgstr "Burmais"
 
-msgid "Norwegian Bokmal"
-msgstr "Ioruais Bokmål"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Neipeailis"
@@ -291,9 +297,6 @@ msgstr "Comhaid Statach"
 
 msgid "Syndication"
 msgstr "Sindeacáitiú"
-
-msgid "Web Design"
-msgstr "Dearadh Gréasáin"
 
 msgid "Enter a valid value."
 msgstr "Iontráil luach bailí"
@@ -439,6 +442,9 @@ msgstr "Slánuimhir"
 msgid "'%(value)s' value must be an integer."
 msgstr ""
 
+msgid "Big (8 byte) integer"
+msgstr "Mór (8 byte) slánuimhi"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr ""
@@ -512,9 +518,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "Snámhphointe"
 
-msgid "Big (8 byte) integer"
-msgstr "Mór (8 byte) slánuimhi"
-
 msgid "IPv4 address"
 msgstr "Seoladh IPv4"
 
@@ -584,6 +587,14 @@ msgstr "Eochair Eachtracha (cineál a chinnfear de réir réimse a bhaineann)"
 
 msgid "One-to-one relationship"
 msgstr "Duine-le-duine caidreamh"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Go leor le go leor caidreamh"

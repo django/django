@@ -5,15 +5,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
 # Todor Lubenov <tgl.sysdev@gmail.com>, 2013-2015
-# Venelin Stoykov <vkstoykov@gmail.com>, 2015
+# Venelin Stoykov <vkstoykov@gmail.com>, 2015-2016
 # vestimir <vestimir@gmail.com>, 2014
 # Alexander Atanasov <aatanasov@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 16:05+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 17:31+0000\n"
 "Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
@@ -65,6 +65,9 @@ msgstr "датски език"
 msgid "German"
 msgstr "немски език"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "гръцки език"
 
@@ -87,7 +90,7 @@ msgid "Argentinian Spanish"
 msgstr "кастилски"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "Колумбийски Испански"
 
 msgid "Mexican Spanish"
 msgstr "Мексикански испански"
@@ -133,6 +136,9 @@ msgstr "хинди"
 
 msgid "Croatian"
 msgstr "хърватски език"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "унгарски език"
@@ -194,8 +200,8 @@ msgstr "Марати"
 msgid "Burmese"
 msgstr "Бурмесе"
 
-msgid "Norwegian Bokmal"
-msgstr "норвежки букмол"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Непалски"
@@ -292,9 +298,6 @@ msgstr "Статични файлове"
 
 msgid "Syndication"
 msgstr "Syndication"
-
-msgid "Web Design"
-msgstr "Web Design"
 
 msgid "Enter a valid value."
 msgstr "Въведете валидна стойност.  "
@@ -437,6 +440,9 @@ msgstr "Цяло число"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' стойност трябва да е цяло число."
 
+msgid "Big (8 byte) integer"
+msgstr "Голямо (8 байта) цяло число"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Стойността на '%(value)s' трябва да бъде или True или False."
@@ -484,13 +490,15 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"Стойността на  '%(value)s' е с правилен формат ( ГГГГ-ММ-ДД ЧЧ:ММ[:сс[."
+"μμμμμμ]][TZ]), но датата/часът са невалидни"
 
 msgid "Date (with time)"
 msgstr "Дата (и час)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "Стойността на '%(value)s' трябва да е десетично число."
 
 msgid "Decimal number"
 msgstr "Десетична дроб"
@@ -500,6 +508,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"Стойността на '%(value)s'  е с невалиден формат. Тя трябва да бъде в [ДД] "
+"[ЧЧ:[ММ:]]сс[.μμμμμμ]"
 
 msgid "Duration"
 msgstr "Продължителност"
@@ -517,9 +527,6 @@ msgstr "'%(value)s' стойност трябва да е число с плав
 msgid "Floating point number"
 msgstr "Число с плаваща запетая"
 
-msgid "Big (8 byte) integer"
-msgstr "Голямо (8 байта) цяло число"
-
 msgid "IPv4 address"
 msgstr "IPv4 адрес"
 
@@ -528,7 +535,7 @@ msgstr "IP адрес"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "Стойност '%(value)s' трябва да бъде или None, True или False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (Възможните стойности са True, False или None)"
@@ -554,12 +561,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"Стойността '%(value)s'  е с невалиден формат. Тя трябва да бъде в ЧЧ:ММ [:"
+"сс[.μμμμμμ]]"
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"Стойността на '%(value)s' е в правилния формат (ЧЧ:ММ [:сс[.μμμμμμ]]), но "
+"часът е невалиден."
 
 msgid "Time"
 msgstr "Време"
@@ -582,13 +593,21 @@ msgstr "Изображение"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "Инстанция на %(model)s с %(field)s %(value)r не съществува."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Външен ключ (тип, определен от свързаното поле)"
 
 msgid "One-to-one relationship"
 msgstr "словенски език"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Много-към-много връзка"
@@ -1070,12 +1089,19 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Вие виждате това съобщение, защото този HTTPS сайт изисква 'Referer header' "
+"да бъде изпратен от вашият WEB браузър, но такъв не бе изпратен. Този "
+"header  е задължителен от съображения за сигурност, за да се гарантира, че "
+"вашият браузър не е компрометиран от трети страни."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Ако сте конфигурирали вашия браузър, да забраните 'Referer' headers, моля да "
+"ги активирате отново, поне за този сайт, или за HTTPS връзки, или за 'same-"
+"origin' заявки."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
