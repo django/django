@@ -721,6 +721,10 @@ When looping over the checkboxes, the ``label`` and ``input`` tags include
 ``for`` and ``id`` attributes, respectively. Each checkbox has an
 ``id_for_label`` attribute to output the element's ID.
 
+Unlike :class:`RadioSelect`, the checkboxes rendered will not set the
+``required`` HTML attribute for required fields. This avoids incorrect browser
+validation of requiring all checkboxes checked instead of at least one.
+
 .. _file-upload-widgets:
 
 File upload widgets

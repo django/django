@@ -51,6 +51,7 @@ class BoundField(object):
         """
         id_ = self.field.widget.attrs.get('id') or self.auto_id
         attrs = {'id': id_} if id_ else {}
+        attrs = self.build_widget_attrs(attrs)
         for subwidget in self.field.widget.subwidgets(self.html_name, self.value(), attrs):
             yield subwidget
 
@@ -85,10 +86,7 @@ class BoundField(object):
             widget.is_localized = True
 
         attrs = attrs or {}
-        if not widget.is_hidden and self.field.required and self.form.use_required_attribute:
-            attrs['required'] = True
-        if self.field.disabled:
-            attrs['disabled'] = True
+        attrs = self.build_widget_attrs(attrs, widget)
         auto_id = self.auto_id
         if auto_id and 'id' not in attrs and 'id' not in widget.attrs:
             if not only_initial:
@@ -227,3 +225,14 @@ class BoundField(object):
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         return widget.id_for_label(id_)
+
+    def build_widget_attrs(self, attrs, widget=None):
+        if not widget:
+            widget = self.field.widget
+
+        attrs = dict(attrs)
+        if not widget.is_hidden and self.field.required and self.form.use_required_attribute:
+            attrs['required'] = True
+        if self.field.disabled:
+            attrs['disabled'] = True
+        return attrs

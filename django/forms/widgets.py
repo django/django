@@ -787,6 +787,16 @@ class CheckboxSelectMultiple(RendererMixin, SelectMultiple):
     renderer = CheckboxFieldRenderer
     _empty_value = []
 
+    def build_attrs(self, extra_attrs=None, **kwargs):
+        attrs = super(CheckboxSelectMultiple, self).build_attrs(extra_attrs, **kwargs)
+        # The required attribute comes from the bound field if the form field
+        # is required. When required is set on multiple checkboxes with the
+        # same name, the browser will require each checkbox be checked to
+        # submit the form. This is not the desired validation, so remove the
+        # attribute.
+        attrs.pop('required', None)
+        return attrs
+
 
 class MultiWidget(Widget):
     """
