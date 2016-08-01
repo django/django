@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-11-11 11:45+0000\n"
-"Last-Translator: Aarni Koskela\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 08:39+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -117,6 +117,21 @@ msgstr "suola"
 msgid "hash"
 msgstr "tiiviste"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr ""
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
+
 msgid "work factor"
 msgstr "työmäärä"
 
@@ -169,16 +184,8 @@ msgstr "Tämän käyttäjän spesifit oikeudet."
 msgid "username"
 msgstr "käyttäjätunnus"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-" Vaaditaan. Enintään 30 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat "
-"sallittuja."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Syötä kelvollinen käyttäjänimi (vain kirjaimet, numerot ja merkit @/./+/-/_)."
 
 msgid "A user with that username already exists."
 msgstr "Käyttäjätunnus on jo rekisteröity."
@@ -259,6 +266,16 @@ msgstr "Salasanasi ei voi olla kokonaan numeerinen."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Salasanan nollaus sivustolla %(site_name)s "
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
 
 msgid "Logged out"
 msgstr "Kirjautunut ulos"

@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
@@ -69,6 +69,12 @@ msgstr "本月"
 msgid "This year"
 msgstr "今年"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -77,6 +83,13 @@ msgstr "請輸入正確的工作人員%(username)s及密碼。請注意兩者皆
 
 msgid "Action:"
 msgstr "動作:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "新增其它 %(verbose_name)s"
+
+msgid "Remove"
+msgstr "移除"
 
 msgid "action time"
 msgstr "動作時間"
@@ -90,6 +103,8 @@ msgstr ""
 msgid "object id"
 msgstr "物件 id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "物件 repr"
 
@@ -120,6 +135,30 @@ msgstr "\"%(object)s\" 已刪除。"
 msgid "LogEntry Object"
 msgstr "紀錄項目"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "和"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "沒有欄位被變更。"
+
 msgid "None"
 msgstr "None"
 
@@ -127,61 +166,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "按住 \"Control\" 或 \"Command\" (Mac)，可選取多個值"
 
-msgid "Added."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "%s 已變更。"
-
-msgid "and"
-msgstr "和"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" 已新增。"
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" 的 %(list)s 已變更。"
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" 已刪除。"
-
-msgid "No fields changed."
-msgstr "沒有欄位被變更。"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" 新增成功。你可以在下面再次編輯它。"
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr "%(name)s \"%(obj)s\" 新增成功。你可以在下方加入其他 %(name)s 。"
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" 已成功新增。"
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "%(name)s \"%(obj)s\" 變更成功。你可以在下方再次編輯。"
+msgstr ""
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr "%(name)s \"%(obj)s\" 變更成功。你可以在下方加入其他 %(name)s 。"
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" 已成功變更。"
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -332,18 +345,15 @@ msgstr "文件"
 msgid "Log out"
 msgstr "登出"
 
-msgid "Add"
-msgstr "新增"
+#, python-format
+msgid "Add %(name)s"
+msgstr "新增 %(name)s"
 
 msgid "History"
 msgstr "歷史"
 
 msgid "View on site"
 msgstr "在網站上檢視"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "新增 %(name)s"
 
 msgid "Filter"
 msgstr "過濾器"
@@ -422,13 +432,6 @@ msgstr ""
 msgid "Change"
 msgstr "變更"
 
-msgid "Remove"
-msgstr "移除"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "新增其它 %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "刪除？"
 
@@ -443,14 +446,17 @@ msgstr "總結"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s 應用程式中的Model"
 
+msgid "Add"
+msgstr "新增"
+
 msgid "You don't have permission to edit anything."
 msgstr "你沒有編輯任何東西的權限。"
 
-msgid "Recent Actions"
-msgstr "最近的動作"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "我的動作"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "無可用的"

@@ -3,14 +3,15 @@
 # Translators:
 # Dimitris Glezos <glezos@transifex.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Panos Laganakos <panos.laganakos@gmail.com>, 2014
+# Pãnoș <panos.laganakos@gmail.com>, 2014
+# Pãnoș <panos.laganakos@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-07-04 10:41+0000\n"
+"Last-Translator: Pãnoș <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,13 +62,13 @@ msgid "enable comments"
 msgstr "ενεργοποίηση σχολίων"
 
 msgid "template name"
-msgstr "όνομα προτύπου"
+msgstr "όνομα περιγράμματος"
 
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
 msgstr ""
-"Παράδειγμα: 'flatpages/contact_page.html'. Αν δεν εισαχθεί, το σύστημα θα "
+"Παράδειγμα: 'flatpages/contact_page.html'. Αν δεν δηλωθεί, το σύστημα θα "
 "χρησιμοποιήσει το 'flatpages/default.html'."
 
 msgid "registration required"
@@ -78,7 +79,7 @@ msgstr ""
 "Εάν επιλεγεί, μόνο συνδεδεμένοι χρήστες θα μπορούν να βλέπουν τη σελίδα."
 
 msgid "sites"
-msgstr ""
+msgstr "ιστότοποι"
 
 msgid "flat page"
 msgstr "απλή σελίδα"

@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# zejn <zejn@kiberpipa.org>, 2016
 # zejn <zejn@kiberpipa.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 10:11+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
@@ -104,24 +105,24 @@ msgstr ""
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Opomba: glede na čas na strežniku ste %s uro naprej."
+msgstr[1] "Opomba: glede na čas na strežniku ste %s uri naprej."
+msgstr[2] "Opomba: glede na čas na strežniku ste %s ure naprej."
+msgstr[3] "Opomba: glede na čas na strežniku ste %s ur naprej."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Opomba: glede na čas na strežniku ste %s uro zadaj."
+msgstr[1] "Opomba: glede na čas na strežniku ste %s uri zadaj."
+msgstr[2] "Opomba: glede na čas na strežniku ste %s ure zadaj."
+msgstr[3] "Opomba: glede na čas na strežniku ste %s ur zadaj."
 
 msgid "Now"
 msgstr "Takoj"
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "Izberite čas"
 
 msgid "Choose a time"
 msgstr "Izbor časa"
@@ -136,7 +137,7 @@ msgid "Noon"
 msgstr "Opoldne"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "Ob 18h"
 
 msgid "Cancel"
 msgstr "Prekliči"
@@ -145,7 +146,7 @@ msgid "Today"
 msgstr "Danes"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Izberite datum"
 
 msgid "Yesterday"
 msgstr "Včeraj"
@@ -153,15 +154,69 @@ msgstr "Včeraj"
 msgid "Tomorrow"
 msgstr "Jutri"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
+msgid "January"
 msgstr ""
-"Januar Februar Marec April Maj Junij Julij Avgust September Oktober November "
-"December"
 
-msgid "S M T W T F S"
-msgstr "N P T S Č P S"
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr ""
 
 msgid "Show"
 msgstr "Prikaži"

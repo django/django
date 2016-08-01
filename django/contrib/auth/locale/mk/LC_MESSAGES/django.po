@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2016-04-26 14:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-08 09:39+0000\n"
 "Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
@@ -119,6 +119,21 @@ msgstr "случаен клуч"
 msgid "hash"
 msgstr "хеш"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr "верзија"
+
+msgid "memory cost"
+msgstr "просторна (мемориска) комплексност"
+
+msgid "time cost"
+msgstr "временска комплексност"
+
+msgid "parallelism"
+msgstr "паралелизам"
+
 msgid "work factor"
 msgstr "фактор на работа"
 
@@ -172,16 +187,8 @@ msgstr "Специфични дозволи за овој корисник."
 msgid "username"
 msgstr "корисничко име"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Задолжително. 30 или помалку знаци. Единствено букви, бројки и  @/./+/-/_ ."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Внесете валидно корисничко име. Оваа вредност смее да содржи само букви, "
-"бројки и карактерите: @/./+/-/_ ."
 
 msgid "A user with that username already exists."
 msgstr "Веќе постои корисник со тоа корисничко име."
@@ -264,6 +271,20 @@ msgstr "Вашата лозинка не може да содржи само ц�
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Ресетирање на лозинка за  %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Внесете валидно корисничко име. Оваа вредност може да содржи само латински "
+"букви, бројки и @/./+/-/_ знаци."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Внесете валидно корисничко име. Оваа вредност може да содржи само букви, "
+"бројки и @/./+/-/_ знаци."
 
 msgid "Logged out"
 msgstr "Одјавен"

@@ -3,15 +3,16 @@
 # Translators:
 # Dimitris Glezos <glezos@transifex.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Panos Laganakos <panos.laganakos@gmail.com>, 2014
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2016
+# Pãnoș <panos.laganakos@gmail.com>, 2014
 # Yorgos Pagles <y.pagles@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-20 19:52+0000\n"
+"Last-Translator: Pãnoș <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,6 +40,10 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"Για την εγκατάσταση bookmarklets, σύρετε το link στην γραμμή εργαλείων των "
+"bookmarks του browser σας ή δεξί-κλικ πάνω στο link και προσθέστε το στα "
+"bookmarks. Τώρα μπορείτε να επιλέξετε το bookmarklet μέσα από κάθε σελίδα "
+"του site."
 
 msgid "Documentation for this page"
 msgstr "Τεκμηρίωση για αυτήν τη σελίδα"
@@ -118,7 +123,7 @@ msgid "Model: %(name)s"
 msgstr "Μοντέλο: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Πεδία"
 
 msgid "Field"
 msgstr "Πεδίο"
@@ -130,16 +135,16 @@ msgid "Description"
 msgstr "Περιγραφή"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "Μέθοδοι με ορίσματα"
 
 msgid "Method"
-msgstr ""
+msgstr "Μέθοδος"
 
 msgid "Arguments"
-msgstr ""
+msgstr "Ορίσματα"
 
-msgid "Back to Model Documentation"
-msgstr "Πίσω στην Τεκμηρίωση Μοντέλων"
+msgid "Back to Model documentation"
+msgstr "Πίσω στην τεκμηρίωση των Μοντέλων"
 
 msgid "Model documentation"
 msgstr "Τεκμηρίωση Μοντέλων"
@@ -158,6 +163,7 @@ msgstr "Περίγραμμα: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Περίγραμμα: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Αναζήτηση μονοπατιού για περίγραμμα \"%(name)s\":"
@@ -212,8 +218,8 @@ msgstr "Πλαίσιο:"
 msgid "Templates:"
 msgstr "Περιγράμματα:"
 
-msgid "Back to Views Documentation"
-msgstr "Πίσω στην Τεκμηρίωση Οπτικών"
+msgid "Back to View documentation"
+msgstr "Πίσω στην τεκμηρίωση του View"
 
 msgid "View documentation"
 msgstr "Προβολή Τεκμηρίωσης"

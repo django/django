@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2016-04-02 11:55+0000\n"
-"Last-Translator: Bashar Al-Abdulhadi\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 08:39+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -115,6 +115,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr ""
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
+
 msgid "work factor"
 msgstr "عامل العمل"
 
@@ -167,15 +182,8 @@ msgstr "صلاحيات خاصة لهذا المستخدم."
 msgid "username"
 msgstr "اسم المستخدم"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "مطلوب. 30 حرف أو أقل. يتكوّن من حروف، وأرقام، والرموز @/./+/-/_ فقط."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"أدخل اسم مستخدم صحيح. اسم المستخدم يمكن ان يتضمن على الأحرف, الأرقام و رموز "
-"@/./+/-/_"
 
 msgid "A user with that username already exists."
 msgstr "هناك مستخدم موجود مسبقاً بهذا الاسم."
@@ -269,6 +277,16 @@ msgstr "كلمة المرور الخاصة بك لا يمكن أن تكون أر
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "إعادة تعيين كلمة المرور على %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
 
 msgid "Logged out"
 msgstr "تم الخروج"

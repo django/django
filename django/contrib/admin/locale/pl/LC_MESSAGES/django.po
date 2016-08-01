@@ -8,7 +8,8 @@
 # Karol <kfuks2@o2.pl>, 2012
 # konryd <inactive+konryd@transifex.com>, 2011
 # konryd <inactive+konryd@transifex.com>, 2011
-# Maciek Olko <maciej.olko@gmail.com>, 2015
+# m_aciek <maciej.olko@gmail.com>, 2016
+# m_aciek <maciej.olko@gmail.com>, 2015
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Roman Barczyński <rombar@gmail.com>, 2014
@@ -16,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-25 16:53+0000\n"
-"Last-Translator: Janusz Harkot <jh@blueice.pl>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-06 21:56+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -72,6 +73,12 @@ msgstr "Ten miesiąc"
 msgid "This year"
 msgstr "Ten rok"
 
+msgid "No date"
+msgstr "Brak daty"
+
+msgid "Has date"
+msgstr "Posiada datę"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -82,6 +89,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Akcja:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Dodaj kolejne %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Usuń"
 
 msgid "action time"
 msgstr "czas akcji"
@@ -95,6 +109,8 @@ msgstr "typ zawartości"
 msgid "object id"
 msgstr "id obiektu"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "reprezentacja obiektu"
 
@@ -125,6 +141,30 @@ msgstr "Usunięto \" %(object)s \"."
 msgid "LogEntry Object"
 msgstr "Obiekt typu LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Dodano {name} „{object}”."
+
+msgid "Added."
+msgstr "Dodany."
+
+msgid "and"
+msgstr "i"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Zmieniono {fields} w {name} „{object}”."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Zmieniono {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Usunięto {name} „{object}”."
+
+msgid "No fields changed."
+msgstr "Żadne pole nie zmienione."
+
 msgid "None"
 msgstr "brak"
 
@@ -134,68 +174,41 @@ msgstr ""
 "Przytrzymaj wciśnięty klawisz \"Ctrl\" lub \"Command\" na Mac'u aby "
 "zaznaczyć więcej niż jeden wybór."
 
-msgid "Added."
-msgstr "Dodany."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Zmieniono %s"
-
-msgid "and"
-msgstr "i"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Dodano %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Zmieniono %(list)s w %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Usunięto %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Żadne pole nie zmienione."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" dodane pomyślnie. Możesz edytować ponownie wpis poniżej."
+"{name} „{obj}” został dodany pomyślnie. Można edytować go ponownie poniżej."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"Pomyślnie dodano %(name)s \"%(obj)s\". Poniżej możesz dodać dodać kolejny "
-"%(name)s."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"Zmiany w %(name)s \"%(obj)s\" zostały zapisane. Poniżej możesz edytować go "
-"ponownie."
+"{name} „{obj}” został dodany pomyślnie. Można dodać kolejny {name} poniżej."
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} „{obj}” został dodany pomyślnie."
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-"Zmiany w %(name)s \"%(obj)s\" zostały zapisane. Poniżej możesz dodać dodać "
-"kolejny %(name)s."
+"{name} „{obj}” został pomyślnie zmieniony. Można edytować go ponownie "
+"poniżej."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" zostało pomyślnie zmienione."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} „{obj}” został pomyślnie zmieniony. Można dodać kolejny {name} "
+"poniżej."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} „{obj}” został pomyślnie zmieniony."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -354,18 +367,15 @@ msgstr "Dokumentacja"
 msgid "Log out"
 msgstr "Wyloguj się"
 
-msgid "Add"
-msgstr "Dodaj"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Dodaj %(name)s"
 
 msgid "History"
 msgstr "Historia"
 
 msgid "View on site"
 msgstr "Pokaż na stronie"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Dodaj %(name)s"
 
 msgid "Filter"
 msgstr "Filtr"
@@ -450,13 +460,6 @@ msgstr ""
 msgid "Change"
 msgstr "Zmień"
 
-msgid "Remove"
-msgstr "Usuń"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Dodaj kolejne %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Usunąć?"
 
@@ -471,14 +474,17 @@ msgstr "Podsumowanie"
 msgid "Models in the %(name)s application"
 msgstr "Modele w aplikacji %(name)s"
 
+msgid "Add"
+msgstr "Dodaj"
+
 msgid "You don't have permission to edit anything."
 msgstr "Nie masz uprawnień by edytować cokolwiek."
 
-msgid "Recent Actions"
-msgstr "Ostatnie akcje"
+msgid "Recent actions"
+msgstr "Ostatnie działania"
 
-msgid "My Actions"
-msgstr "Moje akcje"
+msgid "My actions"
+msgstr "Moje działania"
 
 msgid "None available"
 msgstr "Brak"

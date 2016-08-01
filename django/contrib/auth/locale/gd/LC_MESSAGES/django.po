@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# GunChleoc, 2015
+# GunChleoc, 2015-2016
 # GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-11-27 09:48+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 10:24+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -120,6 +120,21 @@ msgstr "salann"
 msgid "hash"
 msgstr "hais"
 
+msgid "variety"
+msgstr "eug-samhail"
+
+msgid "version"
+msgstr "tionndadh"
+
+msgid "memory cost"
+msgstr "cosgais cuimhne"
+
+msgid "time cost"
+msgstr "cosgais ùine"
+
+msgid "parallelism"
+msgstr "co-shìneadh"
+
 msgid "work factor"
 msgstr "factar obrachaidh"
 
@@ -173,17 +188,10 @@ msgstr "Ceadan sònraichte airson a’ chleachdaiche seo."
 msgid "username"
 msgstr "ainm-cleachdaiche"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Riatanach. 30 caractar air a char as motha. Litrichean, àireamhan agus @/./"
+"Riatanach. 150 caractar air a char as motha. Litrichean, àireamhan agus @/./"
 "+/-/_ a-mhàin."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Cuir a-steach ainm-cleachdaiche dligheach. Chan fhaod ach litrichean, "
-"àireamhan is caractaran @/./+/-/_ a bhith ’na bhroinn."
 
 msgid "A user with that username already exists."
 msgstr "Tha cleachdaiche air a bheil an t-ainm-cleachdaiche seo ann mar-tha."
@@ -286,6 +294,20 @@ msgstr ""
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Ath-shuidheachadh an fhacail-fhaire air %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Cuir a-steach ainm-cleachdaiche dligheach. Chan fhaod ach litrichean gun "
+"sràcan, àireamhan is caractaran @/./+/-/_ a bhith ’na bhroinn."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Cuir a-steach ainm-cleachdaiche dligheach. Chan fhaod ach litrichean, "
+"àireamhan is caractaran @/./+/-/_ a bhith ’na bhroinn."
 
 msgid "Logged out"
 msgstr "Air a clàradh a-mach"

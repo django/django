@@ -5,14 +5,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janusz Harkot <jh@blueice.pl>, 2014-2015
 # konryd <inactive+konryd@transifex.com>, 2011
+# m_aciek <maciej.olko@gmail.com>, 2016
 # Roman Barczyński <rombar@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-25 17:02+0000\n"
-"Last-Translator: Janusz Harkot <jh@blueice.pl>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-06 22:01+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -159,15 +160,69 @@ msgstr "Wczoraj"
 msgid "Tomorrow"
 msgstr "Jutro"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Styczeń Luty Marzec Kwiecień Maj Czerwiec Lipiec Sierpień Wrzesień "
-"Październik Listopad Grudzień"
+msgid "January"
+msgstr "styczeń"
 
-msgid "S M T W T F S"
-msgstr "N Pn Wt Śr Cz Pt So"
+msgid "February"
+msgstr "luty"
+
+msgid "March"
+msgstr "marzec"
+
+msgid "April"
+msgstr "kwiecień"
+
+msgid "May"
+msgstr "maj"
+
+msgid "June"
+msgstr "czerwiec"
+
+msgid "July"
+msgstr "lipiec"
+
+msgid "August"
+msgstr "sierpień"
+
+msgid "September"
+msgstr "wrzesień"
+
+msgid "October"
+msgstr "październik"
+
+msgid "November"
+msgstr "listopad"
+
+msgid "December"
+msgstr "grudzień"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "n"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "pn"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "w"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "ś"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "c"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "pt"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "s"
 
 msgid "Show"
 msgstr "Pokaż"

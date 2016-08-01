@@ -2,14 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jun-Gu Kang <chr0m3.kr@gmail.com>, 2015
+# Chr0m3 <chr0m3.kr@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
 "PO-Revision-Date: 2015-08-02 17:17+0000\n"
-"Last-Translator: Jun-Gu Kang <chr0m3.kr@gmail.com>\n"
+"Last-Translator: Chr0m3 <chr0m3.kr@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013,2015
+# Erik Wognsen <r4mses@gmail.com>, 2013,2015-2016
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # valberg <valberg@orn.li>, 2014-2015
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-12-01 20:01+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:51+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -66,6 +66,12 @@ msgstr "Denne måned"
 msgid "This year"
 msgstr "Dette år"
 
+msgid "No date"
+msgstr "Ingen dato"
+
+msgid "Has date"
+msgstr "Har dato"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -76,6 +82,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Handling"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Tilføj endnu en %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Fjern"
 
 msgid "action time"
 msgstr "handlingstid"
@@ -89,6 +102,8 @@ msgstr "indholdstype"
 msgid "object id"
 msgstr "objekt-ID"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekt repr"
 
@@ -119,6 +134,30 @@ msgstr "Slettede \"%(object)s\"."
 msgid "LogEntry Object"
 msgstr "LogEntry-objekt"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Tilføjede {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Tilføjet."
+
+msgid "and"
+msgstr "og"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Ændrede {fields} for {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Ændrede {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Slettede {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Ingen felter ændret."
+
 msgid "None"
 msgstr "Ingen"
 
@@ -127,66 +166,36 @@ msgid ""
 msgstr ""
 "Hold \"Ctrl\" (eller \"Æbletasten\" på Mac) nede for at vælge mere end en."
 
-msgid "Added."
-msgstr "Tilføjet."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Ændrede %s."
-
-msgid "and"
-msgstr "og"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Tilføjede %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Ændrede %(list)s for %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Slettede %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Ingen felter ændret."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"%(name)s \"%(obj)s\" blev tilføjet. Du kan redigere den/det igen herunder."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" blev tilføjet. Du kan redigere den/det igen herunder."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" blev tilføjet. Du kan endnu en/et %(name)s herunder."
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"below."
+msgstr "{name} \"{obj}\" blev tilføjet. Du kan endnu en/et {name} herunder."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" blev tilføjet."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" blev tilføjet."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" blev ændret. Du kan redigere den/det igen herunder."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" blev ændret. Du kan redigere den/det igen herunder."
+"{name} \"{obj}\" blev ændret. Du kan tilføje endnu en/et {name} herunder."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" blev ændret. Du kan tilføje endnu en/et %(name)s "
-"herunder."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" blev ændret."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" blev ændret."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -343,18 +352,15 @@ msgstr "Dokumentation"
 msgid "Log out"
 msgstr "Log ud"
 
-msgid "Add"
-msgstr "Tilføj"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Tilføj %(name)s"
 
 msgid "History"
 msgstr "Historik"
 
 msgid "View on site"
 msgstr "Se på website"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Tilføj %(name)s"
 
 msgid "Filter"
 msgstr "Filtrer"
@@ -439,13 +445,6 @@ msgstr ""
 msgid "Change"
 msgstr "Ret"
 
-msgid "Remove"
-msgstr "Fjern"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Tilføj endnu en %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Slet?"
 
@@ -460,13 +459,16 @@ msgstr "Sammendrag"
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
 
+msgid "Add"
+msgstr "Tilføj"
+
 msgid "You don't have permission to edit anything."
 msgstr "Du har ikke rettigheder til at foretage ændringer."
 
-msgid "Recent Actions"
+msgid "Recent actions"
 msgstr "Seneste handlinger"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Mine handlinger"
 
 msgid "None available"

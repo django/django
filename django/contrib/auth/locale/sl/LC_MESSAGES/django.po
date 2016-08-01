@@ -3,14 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jure Cuhalev <gandalf@owca.info>, 2012
-# zejn <zejn@kiberpipa.org>, 2013
+# zejn <zejn@kiberpipa.org>, 2013,2016
 # zejn <zejn@kiberpipa.org>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 08:53+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 08:39+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
@@ -32,7 +32,7 @@ msgstr "Pomembni datumi"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Objekt %(name)s z glavnim ključem %(key)r ne obstaja."
 
 msgid "Password changed successfully."
 msgstr "Geslo je uspešno spremenjeno."
@@ -42,7 +42,7 @@ msgid "Change password: %s"
 msgstr "Spremeni geslo: %s"
 
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Avtentikacija in avtorizacija"
 
 msgid "password"
 msgstr "geslo"
@@ -66,13 +66,16 @@ msgid "Password confirmation"
 msgstr "Potrditev gesla"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Vnesite isto geslo kot prej, za preverjanje"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"../password/"
 "\">this form</a>."
 msgstr ""
+"Gesla se ne shranjujejo v berljivi obliki, zato gesla tega uporabnika ni "
+"mogoče videti, lahko pa geslo spremenite s pomočjo <a href=\"password/"
+"\">tega obrazca</a>."
 
 #, python-format
 msgid ""
@@ -115,6 +118,21 @@ msgstr "naključna vrednost"
 msgid "hash"
 msgstr "razpršilo"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr ""
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
+
 msgid "work factor"
 msgstr "faktor obremenitve"
 
@@ -125,7 +143,7 @@ msgid "name"
 msgstr "ime"
 
 msgid "content type"
-msgstr ""
+msgstr "vrsta vsebine"
 
 msgid "codename"
 msgstr "kodno ime"
@@ -154,24 +172,19 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Skupine, katerih član je ta uporabnik. Uporabnik pridobi vsa dovoljenja, "
+"povezana z vsako izmed skupin."
 
 msgid "user permissions"
 msgstr "uporabniška dovoljenja"
 
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Dovoljenja specifična za tega uporabnika."
 
 msgid "username"
 msgstr "uporabniško ime"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Polje je obvezno. Vpisanih mora biti do 30 znakov, ti pa so lahko črke, "
-"številke in znaki @/./+/-/_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 
 msgid "A user with that username already exists."
@@ -218,62 +231,72 @@ msgid ""
 msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "To geslo je prekratko. Imeti mora vsaj %(min_length)d znak."
+msgstr[1] "To geslo je prekratko. Imeti mora vsaj %(min_length)d znaka."
+msgstr[2] "To geslo je prekratko. Imeti mora vsaj %(min_length)d znake."
+msgstr[3] "To geslo je prekratko. Imeti mora vsaj %(min_length)d znakov."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Vaše geslo mora imeti vsaj %(min_length)d znak."
+msgstr[1] "Vaše geslo mora imeti vsaj %(min_length)d znaka."
+msgstr[2] "Vaše geslo mora imeti vsaj %(min_length)d znake."
+msgstr[3] "Vaše geslo mora imeti vsaj %(min_length)d znakov."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Geslo je preveč podobno %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "Geslo ne sme biti preveč podobno ostalim vašim osebnim podatkom."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Geslo je eno izmed preveč pogosto uporabljanih."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Vaše geslo ne sme biti eno izmed pogosto uporabljanih gesel."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Vaše geslo je sestavljeno samo iz števk."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Vaše geslo ne sme biti sestavljeno samo iz števk."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Geslo na %(site_name)s je ponastavljeno."
 
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+
 msgid "Logged out"
 msgstr "Odjavljen"
 
 msgid "Password reset"
-msgstr ""
+msgstr "Ponastavi geslo"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Navodila za ponastavitev gesla so bila poslana"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Vnesite novo geslo"
 
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Ponastavitev gesla ni uspela"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Ponastavitev gesla zaključena"
 
 msgid "Password change"
-msgstr ""
+msgstr "Sprememba gesla"
 
 msgid "Password change successful"
-msgstr ""
+msgstr "Sprememba gesla je uspela"

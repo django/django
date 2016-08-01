@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-12-07 08:13+0000\n"
-"Last-Translator: Aarni Koskela\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -65,6 +65,12 @@ msgstr "Tässä kuussa"
 msgid "This year"
 msgstr "Tänä vuonna"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -75,6 +81,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Toiminto:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Lisää toinen %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Poista"
 
 msgid "action time"
 msgstr "tapahtumahetki"
@@ -88,6 +101,8 @@ msgstr "sisältötyyppi"
 msgid "object id"
 msgstr "kohteen tunniste"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "kohteen tiedot"
 
@@ -118,6 +133,30 @@ msgstr "Poistettu \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Lokimerkintätietue"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr "Lisätty."
+
+msgid "and"
+msgstr "ja"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Ei muutoksia kenttiin."
+
 msgid "None"
 msgstr "Ei arvoa"
 
@@ -127,61 +166,35 @@ msgstr ""
 " Pidä \"Ctrl\" (tai Macin \"Command\") pohjassa valitaksesi useita "
 "vaihtoehtoja."
 
-msgid "Added."
-msgstr "Lisätty."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Muokattu: %s."
-
-msgid "and"
-msgstr "ja"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Lisätty %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Muutettu %(list)s kohteelle %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Poistettu %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Ei muutoksia kenttiin."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" on lisätty. Voit muokata sitä uudelleen alla."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr "%(name)s \"%(obj)s\" on lisätty. Voit lisätä toisen %(name)s alla."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" on lisätty."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "%(name)s \"%(obj)s\" on muokattu. Voit muokata sitä uudelleen alla."
+msgstr ""
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr "%(name)s \"%(obj)s\" on muokattu. Voit lisätä toisen %(name)s alla."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" on muutettu."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -338,18 +351,15 @@ msgstr "Ohjeita"
 msgid "Log out"
 msgstr "Kirjaudu ulos"
 
-msgid "Add"
-msgstr "Lisää"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Lisää %(name)s"
 
 msgid "History"
 msgstr "Muokkaushistoria"
 
 msgid "View on site"
 msgstr "Näytä lopputulos"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Lisää %(name)s"
 
 msgid "Filter"
 msgstr "Suodatin"
@@ -434,13 +444,6 @@ msgstr ""
 msgid "Change"
 msgstr "Muokkaa"
 
-msgid "Remove"
-msgstr "Poista"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Lisää toinen %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Poista?"
 
@@ -455,14 +458,17 @@ msgstr "Yhteenveto"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s -applikaation mallit"
 
+msgid "Add"
+msgstr "Lisää"
+
 msgid "You don't have permission to edit anything."
 msgstr "Sinulla ei ole oikeutta muokata mitään."
 
-msgid "Recent Actions"
-msgstr "Viimeisimmät tapahtumat"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Omat tapahtumani"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Ei yhtään"

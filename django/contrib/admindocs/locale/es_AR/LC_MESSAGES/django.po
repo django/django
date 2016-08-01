@@ -3,13 +3,13 @@
 # Translators:
 # Federico Bond <federicobond@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2012-2015
+# Ramiro Morales, 2012-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-11-30 00:25+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-30 23:49+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -141,8 +141,8 @@ msgstr "Método"
 msgid "Arguments"
 msgstr "Argumentos"
 
-msgid "Back to Model Documentation"
-msgstr "Volver a la documentación de modelos"
+msgid "Back to Model documentation"
+msgstr "Volver a documentación de modelos"
 
 msgid "Model documentation"
 msgstr "Documentación de modelos"
@@ -161,6 +161,7 @@ msgstr "Plantilla: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Plantilla: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Buscar ruta para la plantilla \"%(name)s\":"
@@ -215,8 +216,8 @@ msgstr "Contexto:"
 msgid "Templates:"
 msgstr "Plantillas:"
 
-msgid "Back to Views Documentation"
-msgstr "Volver a la documentación de vistas"
+msgid "Back to View documentation"
+msgstr "Volver a documentación de vistas"
 
 msgid "View documentation"
 msgstr "Documentación de vistas"

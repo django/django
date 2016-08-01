@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# ander <ander.basaundi@gmail.com>, 2013
+# Ander Martínez <ander.basaundi@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""

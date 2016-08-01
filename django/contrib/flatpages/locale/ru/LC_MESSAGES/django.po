@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Eugene MechanisM <contact@mechanism.name>, 2012
+# Eugene MechanisM <eugene@mechanism.pro>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mike Yumatov <mike@yumatov.org>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015

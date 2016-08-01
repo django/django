@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2012,2014-2015
+# Shinya Okano <tokibito@gmail.com>, 2012,2014-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-31 12:08+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-26 17:05+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
@@ -142,13 +142,69 @@ msgstr "昨日"
 msgid "Tomorrow"
 msgstr "明日"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr "1月 2月 3月 4月 5月 6月 7月 8月 9月 10月 11月 12月"
+msgid "January"
+msgstr "1月"
 
-msgid "S M T W T F S"
-msgstr "日 月 火 水 木 金 土"
+msgid "February"
+msgstr "2月"
+
+msgid "March"
+msgstr "3月"
+
+msgid "April"
+msgstr "4月"
+
+msgid "May"
+msgstr "5月"
+
+msgid "June"
+msgstr "6月"
+
+msgid "July"
+msgstr "7月"
+
+msgid "August"
+msgstr "8月"
+
+msgid "September"
+msgstr "9月"
+
+msgid "October"
+msgstr "10月"
+
+msgid "November"
+msgstr "11月"
+
+msgid "December"
+msgstr "12月"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "日"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "月"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "火"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "水"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "木"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "金"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "土"
 
 msgid "Show"
 msgstr "表示"

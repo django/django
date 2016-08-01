@@ -5,7 +5,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janusz Harkot <jh@blueice.pl>, 2015
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
-# Maciek Olko <maciej.olko@gmail.com>, 2015
+# m_aciek <maciej.olko@gmail.com>, 2015
 # Mattia Procopio <promat85@gmail.com>, 2014
 msgid ""
 msgstr ""

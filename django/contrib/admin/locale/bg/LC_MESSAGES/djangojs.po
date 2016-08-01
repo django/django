@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Venelin Stoykov <vkstoykov@gmail.com>, 2015
+# Venelin Stoykov <vkstoykov@gmail.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 15:42+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 11:57+0000\n"
 "Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
@@ -108,8 +108,8 @@ msgstr[1] "Бележка: Вие сте %s часа напред от врем�
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Внимание: Вие сте %s час назад от времето на сървъра."
+msgstr[1] "Внимание: Вие сте %s часа назад от времето на сървъра."
 
 msgid "Now"
 msgstr "Сега"
@@ -147,15 +147,69 @@ msgstr "Вчера"
 msgid "Tomorrow"
 msgstr "Утре"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Януари Февруари Март Април Май Юни Юли Август Септември Октомври Ноември "
-"Декември"
+msgid "January"
+msgstr "Януари"
 
-msgid "S M T W T F S"
-msgstr "Н П В С Ч П С"
+msgid "February"
+msgstr "Февруари"
+
+msgid "March"
+msgstr "Март"
+
+msgid "April"
+msgstr "Април"
+
+msgid "May"
+msgstr "Май"
+
+msgid "June"
+msgstr "Юни"
+
+msgid "July"
+msgstr "Юли"
+
+msgid "August"
+msgstr "Август"
+
+msgid "September"
+msgstr "Септември"
+
+msgid "October"
+msgstr "Октомври"
+
+msgid "November"
+msgstr "Ноември"
+
+msgid "December"
+msgstr "Декември"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Н"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "П"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "В"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "С"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Ч"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "П"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "С"
 
 msgid "Show"
 msgstr "Покажи"
