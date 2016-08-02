@@ -656,9 +656,8 @@ The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
 ``.bitrightshift()`` and ``.bitleftshift()``, for example::
 
     >>> F('somefield').bitand(16)
-.. warning::
 
-    Oracle does *not* have a binary shift operator.
+Oracle does *not* have a binary shift operator.
 
 
 The ``pk`` lookup shortcut
