@@ -93,7 +93,7 @@ class RelatedLookupMixin(object):
             # ForeignKey to IntegerField given value 'abc'. The ForeignKey itself
             # doesn't have validation for non-integers, so we must run validation
             # using the target field.
-            if hasattr(self.lhs.output_field, 'get_path_info'):
+            if self.prepare_rhs and hasattr(self.lhs.output_field, 'get_path_info'):
                 # Get the target field. We can safely assume there is only one
                 # as we don't get to the direct value branch otherwise.
                 target_field = self.lhs.output_field.get_path_info()[-1].target_fields[-1]

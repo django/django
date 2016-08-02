@@ -2483,6 +2483,19 @@ class ToFieldTests(TestCase):
             [node1]
         )
 
+    def test_isnull_query(self):
+        apple = Food.objects.create(name="apple")
+        Eaten.objects.create(food=apple, meal="lunch")
+        Eaten.objects.create(meal="lunch")
+        self.assertQuerysetEqual(
+            Eaten.objects.filter(food__isnull=False),
+            ['<Eaten: apple at lunch>']
+        )
+        self.assertQuerysetEqual(
+            Eaten.objects.filter(food__isnull=True),
+            ['<Eaten: None at lunch>']
+        )
+
 
 class ConditionalTests(BaseQuerysetTest):
     """Tests whose execution depend on different environment conditions like
