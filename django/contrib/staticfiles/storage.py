@@ -8,7 +8,9 @@ import re
 from collections import OrderedDict
 
 from django.conf import settings
-from django.contrib.staticfiles.utils import check_settings, check_base_url, matches_patterns
+from django.contrib.staticfiles.utils import (
+    check_base_url, check_settings, matches_patterns,
+)
 from django.core.cache import (
     InvalidCacheBackendError, cache as default_cache, caches,
 )

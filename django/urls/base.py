@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils import six
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.functional import lazy
-from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urljoin
+from django.utils.six.moves.urllib.parse import urljoin, urlsplit, urlunsplit
 from django.utils.translation import override
 
 from .exceptions import NoReverseMatch, Resolver404

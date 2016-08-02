@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import get_prefixed_static_url, get_prefixed_media_url
+from django.urls import get_prefixed_media_url, get_prefixed_static_url
 
 
 def matches_patterns(path, patterns=None):

@@ -13,7 +13,7 @@ import itertools
 
 from django.conf import settings
 from django.middleware.csrf import get_token
-from django.urls import get_prefixed_static_url, get_prefixed_media_url
+from django.urls import get_prefixed_media_url, get_prefixed_static_url
 from django.utils.encoding import smart_text
 from django.utils.functional import SimpleLazyObject, lazy
 

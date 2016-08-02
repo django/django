@@ -1,7 +1,8 @@
 from .base import (
-    clear_script_prefix, clear_url_caches, get_script_prefix, get_urlconf,
-    is_valid_path, resolve, reverse, reverse_lazy, set_script_prefix,
-    set_urlconf, translate_url, get_prefixed_static_url, get_prefixed_media_url
+    clear_script_prefix, clear_url_caches, get_prefixed_media_url,
+    get_prefixed_static_url, get_script_prefix, get_urlconf, is_valid_path,
+    resolve, reverse, reverse_lazy, set_script_prefix, set_urlconf,
+    translate_url,
 )
 from .exceptions import NoReverseMatch, Resolver404
 from .resolvers import (
