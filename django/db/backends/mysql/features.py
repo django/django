@@ -75,4 +75,5 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_sql_auto_is_null_enabled(self):
         with self.connection.cursor() as cursor:
             cursor.execute('SELECT @@SQL_AUTO_IS_NULL')
-            return cursor.fetchone()[0] == 1
+            result = cursor.fetchone()
+            return result and result[0] == 1
