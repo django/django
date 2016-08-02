@@ -26,3 +26,6 @@ Bugfixes
 
 * Fixed a crash if ``request.META['CONTENT_LENGTH']`` is an empty string
   (:ticket:`27005`).
+
+* Fixed the ``isnull`` lookup on a ``ForeignKey`` with its ``to_field``
+  pointing to a ``CharField`` (:ticket:`26983`).
