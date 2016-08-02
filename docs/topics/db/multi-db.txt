@@ -45,11 +45,11 @@ If the concept of a ``default`` database doesn't make sense in the context
 of your project, you need to be careful to always specify the database
 that you want to use. Django requires that a ``default`` database entry
 be defined, but the parameters dictionary can be left blank if it will not be
-used. You must setup :setting:`DATABASE_ROUTERS` for all of your apps' models,
-including those in any contrib and third-party apps you are using, so that no
-queries are routed to the default database in order to do this. The following
-is an example ``settings.py`` snippet defining two non-default databases, with
-the ``default`` entry intentionally left empty::
+used. In order to do this, you must set up :setting:`DATABASE_ROUTERS` for all
+of your apps' models, including those in any contrib and third-party apps
+you are using, so that no queries are routed to the default database. The
+following is an example ``settings.py`` snippet defining two non-default
+databases, with the ``default`` entry intentionally left empty::
 
     DATABASES = {
         'default': {},
@@ -78,7 +78,7 @@ The :djadmin:`migrate` management command operates on one database at a
 time. By default, it operates on the ``default`` database, but by
 providing the :option:`--database <migrate --database>` option, you can tell it
 to synchronize a different database. So, to synchronize all models onto
-all databases in our example, you would need to call::
+all databases in the first example above, you would need to call::
 
     $ ./manage.py migrate
     $ ./manage.py migrate --database=users
@@ -87,6 +87,13 @@ If you don't want every application to be synchronized onto a
 particular database, you can define a :ref:`database
 router<topics-db-multi-db-routing>` that implements a policy
 constraining the availability of particular models.
+
+If, as in the second example above, you have left the default database empty,
+you must provide a database name each time you run :djadmin:`migrate`. Omitting
+the database name would raise an error. For the second example, you would call::
+
+    $ ./manage.py migrate --database=users
+    $ ./manage.py migrate --database=customers
 
 Using other management commands
 -------------------------------
@@ -359,8 +366,8 @@ routers are defined)::
     DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.PrimaryReplicaRouter']
 
 The order in which routers are processed is significant. Routers will
-be queried in the order the are listed in the
-:setting:`DATABASE_ROUTERS` setting . In this example, the
+be queried in the order they are listed in the
+:setting:`DATABASE_ROUTERS` setting. In this example, the
 ``AuthRouter`` is processed before the ``PrimaryReplicaRouter``, and as a
 result, decisions concerning the models in ``auth`` are processed
 before any other decision is made. If the :setting:`DATABASE_ROUTERS`
@@ -394,6 +401,15 @@ With this setup installed, lets run some Django code::
     >>> # ... but if we re-retrieve the object, it will come back on a replica
     >>> mh = Book.objects.get(title='Mostly Harmless')
 
+As noted above, this example defined a router to handle interaction with
+models from the ``auth`` app, and other routers to handle interaction with
+all other apps. If you have left your default database empty and do not want
+to define a catch-all database router to handle all apps not otherwise
+specified, then check the :setting:`INSTALLED_APPS` setting to find the names
+of all apps that will need to be included in a database router before
+migrating. See :ref:`behavior of contrib
+apps<contrib_app_multiple_databases>` for information about contrib apps that
+must be together in one database.
 
 Manually selecting a database
 =============================
@@ -586,7 +602,8 @@ where all objects of a given type are stored on a specific database
 usage of multiple databases is more complex, your ``ModelAdmin`` will
 need to reflect that strategy.
 
-Inlines can be handled in a similar fashion. They require three customized methods::
+:class:`~django.contrib.admin.InlineModelAdmin` objects can be handled in a
+similar fashion. They require three customized methods::
 
     class MultiDBTabularInline(admin.TabularInline):
         using = 'other'
