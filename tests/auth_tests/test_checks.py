@@ -195,3 +195,14 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
                 id='auth.E008',
             ),
         ])
+
+    def test_empty_permission_name_max_length(self):
+        """should not fail on empty permissions"""
+
+        class Checked(models.Model):
+            class Meta:
+                permissions = ()
+                default_permissions = ()
+
+        errors = checks.run_checks(self.apps.get_app_configs())
+        self.assertEqual(errors, [])
