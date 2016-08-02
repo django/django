@@ -1061,6 +1061,14 @@ method, e.g.::
 If you override these methods in a custom user model, you must change them to
 properties or attributes.
 
+Django uses a ``CallableBool`` object to allow these attributes to work as both
+a property and a method. Thus, until the deprecation period ends, you cannot
+compare these properties using the ``is`` operator. That is, the following
+won't work::
+
+    if request.user.is_authenticated is True:
+        ...
+
 Custom manager classes available through ``prefetch_related`` must define a ``_apply_rel_filters()`` method
 -----------------------------------------------------------------------------------------------------------
 
