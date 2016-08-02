@@ -17,3 +17,6 @@ Bugfixes
 
 * Removed the broken ``BaseCommand.usage()`` method which was for
   ``optparse`` support (:ticket:`27000`).
+
+* Fixed a checks framework crash with an empty ``Meta.default_permissions``
+  (:ticket:`26997`).
