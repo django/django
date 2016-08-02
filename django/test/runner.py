@@ -257,8 +257,8 @@ def _run_subsuite(args):
     This helper lives at module-level and its arguments are wrapped in a tuple
     because of the multiprocessing module's requirements.
     """
-    subsuite_index, subsuite, failfast = args
-    runner = RemoteTestRunner(failfast=failfast)
+    runner_class, subsuite_index, subsuite, failfast = args
+    runner = runner_class(failfast=failfast)
     result = runner.run(subsuite)
     return subsuite_index, result.events
 
@@ -282,6 +282,7 @@ class ParallelTestSuite(unittest.TestSuite):
     # In case someone wants to modify these in a subclass.
     init_worker = _init_worker
     run_subsuite = _run_subsuite
+    runner_class = RemoteTestRunner
 
     def __init__(self, suite, processes, failfast=False):
         self.subsuites = partition_suite_by_case(suite)
@@ -313,7 +314,7 @@ class ParallelTestSuite(unittest.TestSuite):
             initializer=self.init_worker.__func__,
             initargs=[counter])
         args = [
-            (index, subsuite, self.failfast)
+            (self.runner_class, index, subsuite, self.failfast)
             for index, subsuite in enumerate(self.subsuites)
         ]
         test_results = pool.imap_unordered(self.run_subsuite.__func__, args)
