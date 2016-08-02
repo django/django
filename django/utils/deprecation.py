@@ -107,6 +107,12 @@ class CallableBool:
     def __repr__(self):
         return 'CallableBool(%r)' % self.value
 
+    def __eq__(self, other):
+        return self.value == other
+
+    def __ne__(self, other):
+        return self.value != other
+
 CallableFalse = CallableBool(False)
 CallableTrue = CallableBool(True)
 
