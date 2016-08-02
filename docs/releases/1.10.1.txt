@@ -14,3 +14,5 @@ Bugfixes
 
 * Allowed ``User.is_authenticated`` and ``User.is_anonymous`` properties to be
   compared using ``==`` and ``!=`` (:ticket:`26988`).
+
+* Fixed django crash with empty model permissions (:ticket:`26997`).
