@@ -9,4 +9,5 @@ Django 1.10.1 fixes several bugs in 1.10.
 Bugfixes
 ========
 
-* ...
+* Fixed a crash in MySQL connections where ``SELECT @@SQL_AUTO_IS_NULL``
+  doesn't return a result (:ticket:`26991`).
