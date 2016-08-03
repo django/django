@@ -38,7 +38,7 @@ class JSONField(forms.CharField):
                 params={'value': value},
             )
 
-        if isinstance(converted, str):
+        if isinstance(converted, six.text_type):
             return JsonStr(converted)
         else:
             return converted
