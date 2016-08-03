@@ -311,7 +311,7 @@ class TestFormField(PostgreSQLTestCase):
         self.assertIsInstance(field.widget, widgets.Input)
 
     def test_already_converted_value(self):
-        field = forms.JSONField(blank=True)
+        field = forms.JSONField(required=False)
         vals = [
             ['a', 'b', 'c'],
             {'a': 1, 'b': 2},
