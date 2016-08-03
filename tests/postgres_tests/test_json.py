@@ -312,16 +312,15 @@ class TestFormField(PostgreSQLTestCase):
 
     def test_already_converted_value(self):
         field = forms.JSONField(required=False)
-        vals = [
-            ['a', 'b', 'c'],
-            {'a': 1, 'b': 2},
-            1,
-            True,
-            None,
+        tests = [
+            '["a", "b", "c"]',
+            '{"a": 1, "b": 2}',
+            '1',
+            '1.5',
+            'true',
+            'null',
+            '"foo"',
         ]
-        for val in vals:
+        for json_string in tests:
+            val = field.clean(json_string)
             self.assertEqual(field.clean(val), val)
-
-        # test already converted string
-        val = field.clean('"foo"')
-        self.assertEqual(field.clean(val), val)
