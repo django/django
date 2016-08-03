@@ -20,3 +20,6 @@ Bugfixes
 
 * Fixed a checks framework crash with an empty ``Meta.default_permissions``
   (:ticket:`26997`).
+
+* Fixed a regression in the number of queries when using ``RadioSelect`` with a
+  ``ModelChoiceField`` form field (:ticket:`27001`).

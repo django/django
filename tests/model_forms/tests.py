@@ -1539,6 +1539,14 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(form.errors, {})
         self.assertEqual([x.pk for x in form.cleaned_data['categories']], [category1.pk])
 
+    def test_radioselect_num_queries(self):
+        class CategoriesForm(forms.Form):
+            categories = forms.ModelChoiceField(Category.objects.all(), widget=forms.RadioSelect)
+
+        template = Template('{% for widget in form.categories %}{{ widget }}{% endfor %}')
+        with self.assertNumQueries(2):
+            template.render(Context({'form': CategoriesForm()}))
+
 
 class ModelMultipleChoiceFieldTests(TestCase):
     def setUp(self):
