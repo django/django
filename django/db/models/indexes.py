@@ -4,7 +4,7 @@ import hashlib
 
 from django.utils.encoding import force_bytes
 
-__all__ = ['Index']
+__all__ = ['Index', 'Hash']
 
 # The max length of the names of the indexes (restricted to 30 due to Oracle)
 MAX_NAME_LENGTH = 30
@@ -37,15 +37,15 @@ class Index(object):
             self.name = 'D%s' % self.name[1:]
         return errors
 
-    def create_sql(self, model, schema_editor):
+    def create_sql(self, model, schema_editor, using=''):
         fields = [model._meta.get_field(field) for field in self.fields]
         tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields)
         columns = [field.column for field in fields]
-
         quote_name = schema_editor.quote_name
         return schema_editor.sql_create_index % {
             'table': quote_name(model._meta.db_table),
             'name': quote_name(self.name),
+            'using': using,
             'columns': ', '.join(quote_name(column) for column in columns),
             'extra': tablespace_sql,
         }
@@ -103,3 +103,14 @@ class Index(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+
+class Hash(Index):
+    suffix = 'hsh'
+    supported_backends = ['postgresql']
+
+    def create_sql(self, model, schema_editor):
+        using = ''
+        if schema_editor.connection.vendor in self.supported_backends:
+            using = 'USING hash'
+        return super(Hash, self).create_sql(model, schema_editor, using)

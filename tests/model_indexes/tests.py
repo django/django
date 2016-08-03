@@ -1,4 +1,6 @@
-from django.db import models
+from unittest import skipUnless
+
+from django.db import connection, models
 from django.test import TestCase
 
 from .models import Book
@@ -58,5 +60,32 @@ class IndexesTests(TestCase):
         index = models.Index(fields=['title'])
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, 'django.db.models.Index')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {'fields': ['title']})
+
+
+@skipUnless(connection.vendor in models.Hash.supported_backends, 'Hash index specific backends')
+class HashIndexesTests(TestCase):
+
+    def test_repr(self):
+        index = models.Hash(fields=['title'])
+        self.assertEqual(repr(index), "<Hash: fields='title'>")
+
+    def test_eq(self):
+        index = models.Hash(fields=['title'])
+        same_index = models.Hash(fields=['title'])
+        another_index = models.Index(fields=['title'])
+        self.assertEqual(index, same_index)
+        self.assertNotEqual(index, another_index)
+
+    def test_name_auto_generation(self):
+        index = models.Hash(fields=['author'])
+        index.model = Book
+        self.assertEqual(index.name, 'model_index_author_6c9e90_hsh')
+
+    def test_deconstruction(self):
+        index = models.Hash(fields=['title'])
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, 'django.db.models.Hash')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'fields': ['title']})
