@@ -60,6 +60,27 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     """
     Non-backend specific tests.
     """
+    def get_decoded_attachments(self, django_message):
+        """
+        Encode the specified django.core.mail.message.EmailMessage, then decode
+        it using Python's email.parser module and, for each attachment of the
+        message, return a list of tuples with (filename, content, mimetype).
+        """
+        msg_bytes = django_message.message().as_bytes()
+        email_message = message_from_bytes(msg_bytes)
+
+        def iter_attachments():
+            for i in email_message.walk():
+                # Once support for Python<3.5 has been dropped, we can use
+                # i.get_content_disposition() here instead.
+                content_disposition = i.get('content-disposition', '').split(';')[0].lower()
+                if content_disposition == 'attachment':
+                    filename = i.get_filename()
+                    content = i.get_payload(decode=True)
+                    mimetype = i.get_content_type()
+                    yield filename, content, mimetype
+
+        return list(iter_attachments())
 
     def test_ascii(self):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
@@ -392,11 +413,14 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_attach_text_as_bytes(self):
         msg = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
-        file_path = os.path.join(os.path.dirname(upath(__file__)), 'attachments', 'file.txt')
-        with open(file_path, mode='rb') as fh:
-            msg.attach('file.txt', fh.read())
+        msg.attach('file.txt', b'file content')
+        # Check that the message would be sent at all.
         sent_num = msg.send()
         self.assertEqual(sent_num, 1)
+        filename, content, mimetype = self.get_decoded_attachments(msg)[0]
+        self.assertEqual(filename, 'file.txt')
+        self.assertEqual(content, b'file content')
+        self.assertEqual(mimetype, 'text/plain')
 
     def test_dummy_backend(self):
         """
