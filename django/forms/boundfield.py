@@ -8,6 +8,7 @@ from django.utils import six
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
+from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -42,28 +43,32 @@ class BoundField(object):
             return self.as_widget() + self.as_hidden(only_initial=True)
         return self.as_widget()
 
-    def __iter__(self):
+    @cached_property
+    def subwidgets(self):
         """
-        Yields rendered strings that comprise all widgets in this BoundField.
+        Most widgets yield a single subwidget, but others like RadioSelect and
+        CheckboxSelectMultiple produce one subwidget for each choice.
 
-        This really is only useful for RadioSelect widgets, so that you can
-        iterate over individual radio buttons in a template.
+        This property is cached so that only one database query occurs when
+        rendering ModelChoiceFields.
         """
         id_ = self.field.widget.attrs.get('id') or self.auto_id
         attrs = {'id': id_} if id_ else {}
         attrs = self.build_widget_attrs(attrs)
-        for subwidget in self.field.widget.subwidgets(self.html_name, self.value(), attrs):
-            yield subwidget
+        return list(self.field.widget.subwidgets(self.html_name, self.value(), attrs))
+
+    def __iter__(self):
+        return iter(self.subwidgets)
 
     def __len__(self):
-        return len(list(self.__iter__()))
+        return len(self.subwidgets)
 
     def __getitem__(self, idx):
         # Prevent unnecessary reevaluation when accessing BoundField's attrs
         # from templates.
         if not isinstance(idx, six.integer_types + (slice,)):
             raise TypeError
-        return list(self.__iter__())[idx]
+        return self.subwidgets[idx]
 
     @property
     def errors(self):
