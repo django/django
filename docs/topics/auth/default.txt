@@ -823,6 +823,8 @@ user to the login page or issue an HTTP 403 Forbidden response.
         redirects the user to the ``login_url``, optionally including the
         ``redirect_field_name`` if it is set.
 
+.. currentmodule:: django.contrib.auth
+
 .. _session-invalidation-on-password-change:
 
 Session invalidation on password change
@@ -842,16 +844,20 @@ If your :setting:`AUTH_USER_MODEL` inherits from
 :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
 method, authenticated sessions will include the hash returned by this function.
 In the :class:`~django.contrib.auth.models.AbstractBaseUser` case, this is an
-HMAC of the password field. Django verifies that the hash sent along with each
-request matches the one that's computed server-side. This allows a user to log
-out all of their sessions by changing their password.
+HMAC of the password field. Django verifies that the hash in the session for
+each request matches the one that's computed during the request. This allows a
+user to log out all of their sessions by changing their password.
 
 The default password change views included with Django,
-:func:`django.contrib.auth.views.password_change` and the
+:func:`~django.contrib.auth.views.password_change` and the
 ``user_change_password`` view in the :mod:`django.contrib.auth` admin, update
 the session with the new password hash so that a user changing their own
 password won't log themselves out. If you have a custom password change view
-and wish to have similar behavior, use this function:
+and wish to have similar behavior, use the :func:`update_session_auth_hash`
+function. In this case, however, if a user also wants to invalidate the session
+from which they're changing their password (for example, if they believe the
+session cookie on their machine was stolen), then they also need to log out
+that session.
 
 .. function:: update_session_auth_hash(request, user)
 
