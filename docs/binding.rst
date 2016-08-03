@@ -9,7 +9,7 @@ Data Binding
 The Channels data binding framework automates the process of tying Django
 models into frontend views, such as javascript-powered website UIs. It provides
 a quick and flexible way to generate messages on Groups for model changes
-and to accept messages that chanes models themselves.
+and to accept messages that change models themselves.
 
 The main target for the moment is WebSockets, but the framework is flexible
 enough to be used over any protocol.
@@ -20,9 +20,9 @@ What does data binding allow?
 Data binding in Channels works two ways:
 
 * Outbound, where model changes made through Django are sent out to listening
-  clients. This includes creation, update and deletion of instances.
+  clients. This includes creation, updates and deletion of instances.
 
-* Inbound, where a standardised message format allow creation, update and
+* Inbound, where a standardised message format allows creation, update and
   deletion of instances to be made by clients sending messages.
 
 Combined, these allow a UI to be designed that automatically updates to
@@ -51,7 +51,9 @@ or permission checks, for example).
 
 You can inherit from the base Binding and provide all the methods needed, but
 we'll focus on the WebSocket JSON variant here, as it's the easiest thing to
-get started and likely close to what you want. Start off like this::
+get started and likely close to what you want.
+
+Start off like this::
 
     from django.db import models
     from channels.binding.websockets import WebsocketBinding
