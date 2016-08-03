@@ -23,3 +23,6 @@ Bugfixes
 
 * Fixed a regression in the number of queries when using ``RadioSelect`` with a
   ``ModelChoiceField`` form field (:ticket:`27001`).
+
+* Fixed a crash if ``request.META['CONTENT_LENGTH']`` is an empty string
+  (:ticket:`27005`).
