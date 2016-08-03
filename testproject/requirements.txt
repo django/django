@@ -2,7 +2,7 @@ asgi-redis==0.13.1
 asgiref==0.13.3
 autobahn==0.14.1
 channels==0.14.2
-daphne==0.12.1
+daphne==0.13.1
 Django==1.9.7
 docutils==0.12
 msgpack-python==0.4.7
