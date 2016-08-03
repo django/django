@@ -900,6 +900,9 @@ Miscellaneous
   calls ``super()``. :meth:`.AbstractBaseUser.normalize_username` is called in
   a new :meth:`.AbstractBaseUser.clean` method.
 
+* Private API ``django.forms.models.model_to_dict()`` returns a queryset rather
+  than a list of primary keys for ``ManyToManyField``\s .
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
