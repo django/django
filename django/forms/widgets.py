@@ -693,8 +693,11 @@ class ChoiceFieldRenderer(object):
         self.choices = choices
 
     def __getitem__(self, idx):
-        choice = list(self.choices)[idx]  # Let the IndexError propagate
-        return self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
+        return list(self)[idx]
+
+    def __iter__(self):
+        for idx, choice in enumerate(self.choices):
+            yield self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
 
     def __str__(self):
         return self.render()
