@@ -22,6 +22,9 @@ class JSONField(forms.CharField):
             return value
         if value in self.empty_values:
             return None
+        elif isinstance(value, (list, dict, int, bool)):
+            return value
+
         try:
             return json.loads(value)
         except ValueError:
