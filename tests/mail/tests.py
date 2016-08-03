@@ -422,6 +422,33 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(content, b'file content')
         self.assertEqual(mimetype, 'text/plain')
 
+    def test_attach_utf8_text_as_bytes(self):
+        """
+        Make sure that non-ASCII characters encoded as valid UTF-8 get correctly
+        transported and decoded.
+        """
+        msg = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
+        # UTF-8 encoded a umlaut.
+        msg.attach('file.txt', b'\xc3\xa4')
+        filename, content, mimetype = self.get_decoded_attachments(msg)[0]
+        self.assertEqual(filename, 'file.txt')
+        self.assertEqual(content, b'\xc3\xa4')
+        self.assertEqual(mimetype, 'text/plain')
+
+    def test_attach_non_utf8_text_as_bytes(self):
+        """
+        Make sure that binary data which cannot be decoded as UTF-8 is handled
+        correctly by overriding the MIME type instead of decoding the data.
+        """
+        msg = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
+        # Invalid UTF-8.
+        msg.attach('file.txt', b'\xff')
+        filename, content, mimetype = self.get_decoded_attachments(msg)[0]
+        self.assertEqual(filename, 'file.txt')
+        # Content should be passed through unmodified.
+        self.assertEqual(content, b'\xff')
+        self.assertEqual(mimetype, 'application/octet-stream')
+
     def test_dummy_backend(self):
         """
         Make sure that dummy backends returns correct number of sent messages
