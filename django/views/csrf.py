@@ -81,6 +81,12 @@ CSRF_FAILURE_TEMPLATE = """
     <li>The form has a valid CSRF token. After logging in in another browser
     tab or hitting the back button after a login, you may need to reload the
     page with the form, because the token is rotated after a login.</li>
+
+    <li>This error can be triggered if you have readable cookies without names,
+    possibly from a superdomain or sibling subdomain. Check your cookies for any
+    that have blank names, yet contain values. For example, if your site is
+    <code>mysite.example.com</code>, check cookies from <code>example.com</code>
+    and <code>othersite.example.com</code> for any unnamed cookies as well.</li>
   </ul>
 
   <p>You're seeing the help section of this page because you have <code>DEBUG =
