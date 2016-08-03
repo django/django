@@ -321,3 +321,7 @@ class TestFormField(PostgreSQLTestCase):
         ]
         for val in vals:
             self.assertEqual(field.clean(val), val)
+
+        # test already converted string
+        val = field.clean('foo')
+        self.assertEqual(field.clean(val), val)

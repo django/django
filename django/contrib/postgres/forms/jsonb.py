@@ -11,6 +11,10 @@ class InvalidJSONInput(six.text_type):
     pass
 
 
+class JsonStr(six.text_type):
+    pass
+
+
 class JSONField(forms.CharField):
     default_error_messages = {
         'invalid': _("'%(value)s' value must be valid JSON."),
@@ -22,17 +26,22 @@ class JSONField(forms.CharField):
             return value
         if value in self.empty_values:
             return None
-        elif isinstance(value, (list, dict, int, bool)):
+        elif isinstance(value, (list, dict, int, bool, JsonStr)):
             return value
 
         try:
-            return json.loads(value)
+            converted = json.loads(value)
         except ValueError:
             raise forms.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
                 params={'value': value},
             )
+
+        if isinstance(converted, str):
+            return JsonStr(converted)
+        else:
+            return converted
 
     def bound_data(self, data, initial):
         if self.disabled:
