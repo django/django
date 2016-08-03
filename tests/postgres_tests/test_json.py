@@ -311,7 +311,7 @@ class TestFormField(PostgreSQLTestCase):
         self.assertIsInstance(field.widget, widgets.Input)
 
     def test_already_converted_value(self):
-        field = forms.JSONField()
+        field = forms.JSONField(blank=True)
         vals = [
             ['a', 'b', 'c'],
             {'a': 1, 'b': 2},
@@ -320,7 +320,4 @@ class TestFormField(PostgreSQLTestCase):
             None,
         ]
         for val in vals:
-            try:
-                self.assertEqual(field.clean(val), val)
-            except ValueError:
-                self.fail('forms.JSONField errored when cleaning %s' % str(val))
+            self.assertEqual(field.clean(val), val)
