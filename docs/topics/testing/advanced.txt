@@ -607,15 +607,13 @@ utility methods in the ``django.test.utils`` module.
 
 .. function:: setup_test_environment()
 
-    Performs any global pre-test setup, such as the installing the
-    instrumentation of the template rendering system and setting up
-    the dummy email outbox.
+    Performs global pre-test setup, such as installing instrumentation for the
+    template rendering system and setting up the dummy email outbox.
 
 .. function:: teardown_test_environment()
 
-    Performs any global post-test teardown, such as removing the black
-    magic hooks into the template system and restoring normal email
-    services.
+    Performs global post-test teardown, such as removing instrumentation from
+    the template system and restoring normal email services.
 
 ``django.db.connection.creation``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
