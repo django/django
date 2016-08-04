@@ -503,13 +503,17 @@ class DiscoverRunner(object):
     def get_resultclass(self):
         return DebugSQLTextTestResult if self.debug_sql else None
 
-    def run_suite(self, suite, **kwargs):
-        resultclass = self.get_resultclass()
-        return self.test_runner(
-            verbosity=self.verbosity,
+    def get_test_runner_kwargs(self):
+        return dict(
             failfast=self.failfast,
-            resultclass=resultclass,
-        ).run(suite)
+            resultclass=self.get_resultclass(),
+            verbosity=self.verbosity,
+        )
+
+    def run_suite(self, suite, **kwargs):
+        kwargs = self.get_test_runner_kwargs()
+        runner = self.test_runner(**kwargs)
+        return runner.run(suite)
 
     def teardown_databases(self, old_config, **kwargs):
         """

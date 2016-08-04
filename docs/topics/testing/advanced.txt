@@ -568,6 +568,13 @@ Methods
 
     Returns the result produced by the running the test suite.
 
+.. method:: DiscoverRunner.get_test_runner_kwargs()
+
+    .. versionadded:: 1.11
+
+    Returns the ``**kwargs`` to use to instantiate the
+    ``DiscoverRunner.test_runner``.
+
 .. method:: DiscoverRunner.teardown_databases(old_config, **kwargs)
 
     Destroys the test databases, restoring pre-test conditions.
