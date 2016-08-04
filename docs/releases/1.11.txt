@@ -354,6 +354,21 @@ Miscellaneous
   argument. Remove it because it doesn't have an effect in older versions of
   Django as these fields alway strip whitespace.
 
+* :class:`.template.Engine` now wraps default template loaders in
+  :class:`.template.loaders.cached.Loader` if ``loaders`` is
+  ``None`` and ``debug`` is ``False``. This means that if :setting:`DEBUG` is
+  ``False`` and no loaders are specified in
+  :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>`,
+  the default loaders will be::
+
+      [('django.template.loaders.cached.Loader', [
+          'django.template.loaders.filesystem.Loader',
+          // If APP_DIRS is True:
+          'django.template.loaders.app_directories.Loader',
+      ])]
+
+
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
