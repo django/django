@@ -291,9 +291,8 @@ def phone2numeric(phone):
 # Used with permission.
 def compress_string(s):
     zbuf = BytesIO()
-    zfile = GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
-    zfile.write(s)
-    zfile.close()
+    with GzipFile(mode='wb', compresslevel=6, fileobj=zbuf) as zfile:
+        zfile.write(s)
     return zbuf.getvalue()
 
 
@@ -321,15 +320,14 @@ class StreamingBuffer(object):
 # Like compress_string, but for iterators of strings.
 def compress_sequence(sequence):
     buf = StreamingBuffer()
-    zfile = GzipFile(mode='wb', compresslevel=6, fileobj=buf)
-    # Output headers...
-    yield buf.read()
-    for item in sequence:
-        zfile.write(item)
-        data = buf.read()
-        if data:
-            yield data
-    zfile.close()
+    with GzipFile(mode='wb', compresslevel=6, fileobj=buf) as zfile:
+        # Output headers...
+        yield buf.read()
+        for item in sequence:
+            zfile.write(item)
+            data = buf.read()
+            if data:
+                yield data
     yield buf.read()
 
 
