@@ -1,3 +1,17 @@
+0.17.2 (2016-08-04)
+-------------------
+
+* New CHANNELS_WS_PROTOCOLS setting if you want Daphne to accept certain
+  subprotocols
+
+* WebsocketBindingWithMembers allows serialization of non-fields on instances
+
+* Class-based consumers have an .as_route() method that lets you skip using
+  route_class
+
+* Bindings now work if loaded after app ready state
+
+
 0.17.1 (2016-07-22)
 -------------------
 
@@ -10,6 +24,7 @@
 
 * A worker_ready signal now gets triggered when `runworker` starts consuming
   messages. It does not fire from within `runserver`.
+
 
 0.17.0 (2016-07-19)
 -------------------
