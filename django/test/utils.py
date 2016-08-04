@@ -95,11 +95,9 @@ def instrumented_test_render(self, context):
 
 
 def setup_test_environment():
-    """Perform any global pre-test setup. This involves:
-
-        - Installing the instrumented test renderer
-        - Set the email backend to the locmem email backend.
-        - Setting the active locale to match the LANGUAGE_CODE setting.
+    """
+    Perform global pre-test setup, such as installing the instrumented template
+    renderer and setting the email backend to the locmem email backend.
     """
     Template._original_render = Template._render
     Template._render = instrumented_test_render
@@ -119,10 +117,9 @@ def setup_test_environment():
 
 
 def teardown_test_environment():
-    """Perform any global post-test teardown. This involves:
-
-        - Restoring the original test renderer
-        - Restoring the email sending functions
+    """
+    Perform any global post-test teardown, such as restoring the original
+    template renderer and restoring the email sending functions.
     """
     Template._render = Template._original_render
     del Template._original_render
