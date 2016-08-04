@@ -255,7 +255,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Added :meth:`.DiscoverRunner.get_test_runner_kwargs` to allow customizing the
+  keyword arguments passed to the test runner.
 
 URLs
 ~~~~
