@@ -323,7 +323,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
             hash_len=argon2.DEFAULT_HASH_LENGTH,
             type=argon2.low_level.Type.I,
         )
-        return self.algorithm + data.decode('utf-8')
+        return self.algorithm + data.decode('ascii')
 
     def verify(self, password, encoded):
         argon2 = self._load_library()
