@@ -255,7 +255,9 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Added :meth:`~django.test.runner.DiscoverRunner.get_test_runner_kwargs` to
+  allow customization of the ``**kwargs`` passed to the underlying test
+  runner.
 
 URLs
 ~~~~
