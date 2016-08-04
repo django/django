@@ -8,7 +8,6 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.test import Client
 from django.test.client import CONTENT_TYPE_RE
-from django.test.utils import setup_test_environment
 from django.utils.six.moves.urllib.parse import urlencode
 
 
@@ -63,7 +62,6 @@ def nested_view(request):
     """
     A view that uses test client to call another view.
     """
-    setup_test_environment()
     c = Client()
     c.get("/no_template_view/")
     return render(request, 'base.html', {'nested': 'yes'})
