@@ -381,6 +381,23 @@ class LoaderTests(TestCase):
         with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
             loader.check_consistent_history(connection)
 
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed_extra'},
+        INSTALLED_APPS=['migrations'],
+    )
+    def test_check_consistent_history_squashed(self):
+        """
+        MigrationLoader.check_consistent_history() should ignore unapplied
+        squashed migrations that have all of their `replaces` applied.
+        """
+        loader = MigrationLoader(connection=None)
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0001_initial')
+        recorder.record_applied('migrations', '0002_second')
+        loader.check_consistent_history(connection)
+        recorder.record_applied('migrations', '0003_third')
+        loader.check_consistent_history(connection)
+
     @override_settings(MIGRATION_MODULES={
         "app1": "migrations.test_migrations_squashed_ref_squashed.app1",
         "app2": "migrations.test_migrations_squashed_ref_squashed.app2",
