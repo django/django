@@ -95,11 +95,10 @@ def instrumented_test_render(self, context):
 
 
 def setup_test_environment():
-    """Perform any global pre-test setup. This involves:
+    """Perform any global pre-test setup. This includes, for example:
 
-        - Installing the instrumented test renderer
-        - Set the email backend to the locmem email backend.
-        - Setting the active locale to match the LANGUAGE_CODE setting.
+        - Installing the instrumented test renderer.
+        - Setting the email backend to the locmem email backend.
     """
     Template._original_render = Template._render
     Template._render = instrumented_test_render
