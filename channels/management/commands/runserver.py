@@ -80,6 +80,7 @@ class Command(RunserverCommand):
                 signal_handlers=not options['use_reloader'],
                 action_logger=self.log_action,
                 http_timeout=60,  # Shorter timeout than normal as it's dev
+                ws_protocols=getattr(settings, 'CHANNELS_WS_PROTOCOLS', None),
             ).run()
             self.logger.debug("Daphne exited")
         except KeyboardInterrupt:
