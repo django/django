@@ -29,3 +29,7 @@ Bugfixes
 
 * Fixed the ``isnull`` lookup on a ``ForeignKey`` with its ``to_field``
   pointing to a ``CharField`` (:ticket:`26983`).
+
+* Prevented the ``migrate`` command from raising
+  ``InconsistentMigrationHistory`` in the presence of unapplied squashed
+  migrations (:ticket:`27004`).
