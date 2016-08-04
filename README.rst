@@ -3,9 +3,6 @@ Django Channels
 
 .. image:: https://api.travis-ci.org/andrewgodwin/channels.svg
     :target: https://travis-ci.org/andrewgodwin/channels
-
-.. image:: https://img.shields.io/pypi/dm/channels.svg
-    :target: https://pypi.python.org/pypi/channels
     
 .. image:: https://readthedocs.org/projects/channels/badge/?version=latest
     :target: http://channels.readthedocs.org/en/latest/?badge=latest
