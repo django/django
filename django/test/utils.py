@@ -101,6 +101,10 @@ def setup_test_environment():
         - Set the email backend to the locmem email backend.
         - Setting the active locale to match the LANGUAGE_CODE setting.
     """
+    if hasattr(Template, '_original_render'):
+        # Executing this function twice would overwrite the saved, pre-setup values.
+        raise Exception("setup_test_environment already called")
+
     Template._original_render = Template._render
     Template._render = instrumented_test_render
 
