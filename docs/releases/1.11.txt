@@ -349,6 +349,12 @@ Miscellaneous
   calls ``super()``. :meth:`.BaseUserManager.normalize_email` is called in a
   new :meth:`.AbstractUser.clean` method so that normalization is applied in
   cases like model form validation.
+* :meth:`RelatedManager.add()
+  <django.db.models.fields.related.RelatedManager.add>`,
+  :meth:`~django.db.models.fields.related.RelatedManager.remove`,
+  :meth:`~django.db.models.fields.related.RelatedManager.clear`, and
+  :meth:`~django.db.models.fields.related.RelatedManager.set` now
+  clear the ``prefetch_related()`` cache.
 
 * ``EmailField`` and ``URLField`` no longer accept the ``strip`` keyword
   argument. Remove it because it doesn't have an effect in older versions of
