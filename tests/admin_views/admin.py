@@ -310,7 +310,8 @@ class ParentAdmin(admin.ModelAdmin):
     model = Parent
     inlines = [ChildInline]
     save_as = True
-
+    list_display = ('id', 'name',)
+    list_display_links = ('id',)
     list_editable = ('name',)
 
     def save_related(self, request, form, formsets, change):
@@ -576,14 +577,14 @@ class StoryAdmin(admin.ModelAdmin):
     list_display_links = ('title',)  # 'id' not in list_display_links
     list_editable = ('content', )
     form = StoryForm
-    ordering = ["-pk"]
+    ordering = ['-id']
 
 
 class OtherStoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
     list_display_links = ('title', 'id')  # 'id' in list_display_links
     list_editable = ('content', )
-    ordering = ["-pk"]
+    ordering = ['-id']
 
 
 class ComplexSortedPersonAdmin(admin.ModelAdmin):
@@ -710,7 +711,8 @@ class MainPrepopulatedAdmin(admin.ModelAdmin):
 
 
 class UnorderedObjectAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['id', 'name']
+    list_display_links = ['id']
     list_editable = ['name']
     list_per_page = 2
 

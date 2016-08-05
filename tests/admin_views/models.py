@@ -913,21 +913,22 @@ class ChildOfReferer(ParentWithFK):
 
 
 # Models for #23431
+class InlineReferer(models.Model):
+    pass
+
+
 class ReferencedByInline(models.Model):
     name = models.CharField(max_length=20, unique=True)
 
 
 class InlineReference(models.Model):
+    referer = models.ForeignKey(InlineReferer, models.CASCADE)
     fk = models.ForeignKey(
         ReferencedByInline,
         models.CASCADE,
         to_field='name',
         related_name='hidden+',
     )
-
-
-class InlineReferer(models.Model):
-    refs = models.ManyToManyField(InlineReference)
 
 
 # Models for #23604 and #23915
