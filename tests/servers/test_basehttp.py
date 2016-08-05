@@ -12,6 +12,9 @@ class Stub(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
+    def sendall(self, data):
+        self.makefile('wb').write(data)
+
 
 class WSGIRequestHandlerTestCase(SimpleTestCase):
 
