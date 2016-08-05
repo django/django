@@ -6,6 +6,11 @@ class Country(models.Model):
     iso_two_letter = models.CharField(max_length=2)
 
 
+class Union(models.Model):
+    name = models.CharField(max_length=255)
+    countries = models.ManyToManyField(Country)
+
+
 class ProxyCountry(Country):
     class Meta:
         proxy = True

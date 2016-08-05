@@ -29,3 +29,6 @@ Bugfixes
 
 * Fixed the ``isnull`` lookup on a ``ForeignKey`` with its ``to_field``
   pointing to a ``CharField`` (:ticket:`26983`).
+
+* Fixed updating ``obj._state`` when doing ``bulk_create`` with a backend that
+  supports returning the IDs of the newly created records (:ticket:`27026`).
