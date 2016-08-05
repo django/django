@@ -19,9 +19,13 @@ from django.template.engine import Engine
 
 
 def check_admin_app(**kwargs):
-    from django.contrib.admin.sites import system_check_errors
+    from django.contrib.admin.sites import all_sites
 
-    return system_check_errors
+    errors = []
+    for site in all_sites:
+        errors.extend(site.check())
+
+    return errors
 
 
 def check_dependencies(**kwargs):
