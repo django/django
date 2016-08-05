@@ -110,6 +110,20 @@ class MessageTests(SimpleTestCase):
         expected = "check_framework.SimpleModel.manager: Error"
         self.assertEqual(force_text(e), expected)
 
+    def test_equal_to_self(self):
+        e = Error("Error", obj=SimpleModel)
+        self.assertEqual(e, e)
+
+    def test_equal_to_same_constructed_check(self):
+        e1 = Error("Error", obj=SimpleModel)
+        e2 = Error("Error", obj=SimpleModel)
+        self.assertEqual(e1, e2)
+
+    def test_not_equal_to_different_constructed_check(self):
+        e1 = Error("Error", obj=SimpleModel)
+        e2 = Error("Error2", obj=SimpleModel)
+        self.assertNotEqual(e1, e2)
+
 
 def simple_system_check(**kwargs):
     simple_system_check.kwargs = kwargs
