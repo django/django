@@ -124,6 +124,10 @@ class MessageTests(SimpleTestCase):
         e2 = Error("Error2", obj=SimpleModel)
         self.assertNotEqual(e1, e2)
 
+    def test_not_equal_to_non_check(self):
+        e = Error("Error", obj=DummyObj())
+        self.assertNotEqual(e, 'a string')
+
 
 def simple_system_check(**kwargs):
     simple_system_check.kwargs = kwargs

@@ -23,8 +23,11 @@ class CheckMessage(object):
         self.id = id
 
     def __eq__(self, other):
-        return all(getattr(self, attr) == getattr(other, attr)
-                   for attr in ['level', 'msg', 'hint', 'obj', 'id'])
+        return (
+            isinstance(other, self.__class__) and
+            all(getattr(self, attr) == getattr(other, attr)
+                for attr in ['level', 'msg', 'hint', 'obj', 'id'])
+        )
 
     def __ne__(self, other):
         return not (self == other)
