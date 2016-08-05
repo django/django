@@ -298,6 +298,13 @@ class ModelBase(type):
                 else:
                     new_class.add_to_class(field.name, copy.deepcopy(field))
 
+        # Set the name of _meta.indexes. This can't be done in
+        # Options.contribute_to_class() because fields haven't got added to the
+        # model at that point.
+        for index in new_class._meta.indexes:
+            if not index.name:
+                index.set_name_with_model(new_class)
+
         if abstract:
             # Abstract base models can't be instantiated and don't appear in
             # the list of models for an app. We do the final setup for them a

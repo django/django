@@ -60,7 +60,7 @@ class Index(object):
     def deconstruct(self):
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
         path = path.replace('django.db.models.indexes', 'django.db.models')
-        return (path, (), {'fields': self.fields})
+        return (path, (), {'fields': self.fields, 'name': self.name})
 
     @staticmethod
     def _hash_generator(*args):
