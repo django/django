@@ -37,3 +37,8 @@ Bugfixes
 * Fixed a regression in ``Client.force_login()`` which required specifying a
   ``backend`` rather than automatically using the first one if multiple
   backends are configured (:ticket:`27027`).
+
+* Made ``QuerySet.bulk_create()`` properly initialize model instances on
+  backends, such as PostgreSQL, that support returning the IDs of the created
+  records so that many-to-many relationships can be used on the new objects
+  (:ticket:`27026`).
