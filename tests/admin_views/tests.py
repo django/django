@@ -2957,9 +2957,9 @@ class AdminSearchTest(TestCase):
         cls.per3 = Person.objects.create(name='Guido van Rossum', gender=1, alive=True)
 
         cls.t1 = Recommender.objects.create()
-        cls.t2 = Recommendation.objects.create(recommender=cls.t1)
+        cls.t2 = Recommendation.objects.create(the_recommender=cls.t1)
         cls.t3 = Recommender.objects.create()
-        cls.t4 = Recommendation.objects.create(recommender=cls.t3)
+        cls.t4 = Recommendation.objects.create(the_recommender=cls.t3)
 
         cls.tt1 = TitleTranslation.objects.create(title=cls.t1, text='Bar')
         cls.tt2 = TitleTranslation.objects.create(title=cls.t2, text='Foo')
