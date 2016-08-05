@@ -128,6 +128,11 @@ class RangeLookupsModel(PostgreSQLModel):
     date = models.DateField(blank=True, null=True)
 
 
+class IntegerRangesArrayModel(PostgreSQLModel):
+    int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
+    bigint_ranges = ArrayField(BigIntegerRangeField(), blank=True, null=True)
+
+
 # Only create this model for postgres >= 9.4
 if connection.vendor == 'postgresql' and connection.pg_version >= 90400:
     class JSONModel(models.Model):

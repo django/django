@@ -14,11 +14,12 @@ from django.utils import timezone
 from . import PostgreSQLTestCase
 from .models import (
     ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
-    NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
-    PostgreSQLModel, Tag,
+    IntegerRangesArrayModel, NestedIntegerArrayModel, NullableIntegerArrayModel,
+    OtherTypesArrayModel, PostgreSQLModel, Tag,
 )
 
 try:
+    from psycopg2.extras import NumericRange
     from django.contrib.postgres.fields import ArrayField
     from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 except ImportError:
@@ -116,6 +117,35 @@ class TestSaveLoad(PostgreSQLTestCase):
         field = instance._meta.get_field('field')
         self.assertEqual(field.model, IntegerArrayModel)
         self.assertEqual(field.base_field.model, IntegerArrayModel)
+
+    def test_integer_ranges_passed_as_tuples(self):
+        instance = IntegerRangesArrayModel(
+            int_ranges=[(10, 20), (30, 40)],
+            bigint_ranges=[(7000000000, 10000000000), (50000000000, 70000000000)]
+        )
+        instance.save()
+        loaded = IntegerRangesArrayModel.objects.get()
+
+        instance_int_range_objs = [NumericRange(*t) for t in instance.int_ranges]
+        instance_bigint_range_objs = [NumericRange(*t) for t in instance.bigint_ranges]
+
+        self.assertEqual(instance_int_range_objs, loaded.int_ranges)
+        self.assertEqual(instance_bigint_range_objs, loaded.bigint_ranges)
+
+    def test_integer_ranges_passed_as_numericrange_instances(self):
+        from django.contrib.postgres.fields import ranges
+
+        instance = IntegerRangesArrayModel(
+            int_ranges=[ranges.Int4NumericRange(10, 20), ranges.Int4NumericRange(30, 40)],
+            bigint_ranges=[
+                ranges.Int8NumericRange(7000000000, 10000000000),
+                ranges.Int8NumericRange(50000000000, 70000000000)
+            ]
+        )
+        instance.save()
+        loaded = IntegerRangesArrayModel.objects.get()
+        self.assertEqual(instance.int_ranges, loaded.int_ranges)
+        self.assertEqual(instance.bigint_ranges, loaded.bigint_ranges)
 
 
 class TestQuerying(PostgreSQLTestCase):

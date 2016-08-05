@@ -1,5 +1,8 @@
 import json
 
+import psycopg2.extensions
+
+from psycopg2._range import NumberRangeAdapter
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
 
 from django.contrib.postgres import forms, lookups
@@ -12,6 +15,27 @@ __all__ = [
     'RangeField', 'IntegerRangeField', 'BigIntegerRangeField',
     'FloatRangeField', 'DateTimeRangeField', 'DateRangeField',
 ]
+
+
+class TypedNumericRange(NumericRange):
+    pg_type = None
+
+
+class Int4NumericRange(TypedNumericRange):
+    pg_type = b'int4range'
+
+
+class Int8NumericRange(TypedNumericRange):
+    pg_type = b'int8range'
+
+
+class TypedNumericRangeAdapter(NumberRangeAdapter):
+    def getquoted(self):
+        return super(TypedNumericRangeAdapter, self).getquoted() + b'::' + self.adapted.pg_type
+
+
+psycopg2.extensions.register_adapter(Int4NumericRange, TypedNumericRangeAdapter)
+psycopg2.extensions.register_adapter(Int8NumericRange, TypedNumericRangeAdapter)
 
 
 class RangeField(models.Field):
@@ -84,7 +108,7 @@ class RangeField(models.Field):
 
 class IntegerRangeField(RangeField):
     base_field = models.IntegerField
-    range_type = NumericRange
+    range_type = Int4NumericRange
     form_field = forms.IntegerRangeField
 
     def db_type(self, connection):
@@ -93,7 +117,7 @@ class IntegerRangeField(RangeField):
 
 class BigIntegerRangeField(RangeField):
     base_field = models.BigIntegerField
-    range_type = NumericRange
+    range_type = Int8NumericRange
     form_field = forms.IntegerRangeField
 
     def db_type(self, connection):
