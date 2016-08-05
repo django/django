@@ -1,7 +1,7 @@
 import copy
 import datetime
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.query_utils import Q
@@ -844,12 +844,17 @@ class Case(Expression):
         case_parts = []
         sql_params = []
         for case in self.cases:
-            case_sql, case_params = compiler.compile(case)
+            try:
+                case_sql, case_params = compiler.compile(case)
+            except EmptyResultSet:
+                continue
             case_parts.append(case_sql)
             sql_params.extend(case_params)
+        default_sql, default_params = compiler.compile(self.default)
+        if not case_parts:
+            return default_sql, default_params
         case_joiner = case_joiner or self.case_joiner
         template_params['cases'] = case_joiner.join(case_parts)
-        default_sql, default_params = compiler.compile(self.default)
         template_params['default'] = default_sql
         sql_params.extend(default_params)
         template = template or template_params.get('template', self.template)

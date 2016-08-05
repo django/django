@@ -6,11 +6,10 @@ import unittest
 from collections import OrderedDict
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import EmptyResultSet, FieldError
 from django.db import DEFAULT_DB_ALIAS, connection
 from django.db.models import Count, F, Q
 from django.db.models.sql.constants import LOUTER
-from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.where import NothingNode, WhereNode
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext

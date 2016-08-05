@@ -2,7 +2,7 @@
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
 
-from django.db.models.sql.datastructures import EmptyResultSet
+from django.core.exceptions import EmptyResultSet
 from django.utils import tree
 from django.utils.functional import cached_property
 
