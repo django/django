@@ -12,6 +12,7 @@ from django.test import (
 from .models import (
     Country, NoFields, Pizzeria, ProxyCountry, ProxyMultiCountry,
     ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant, State, TwoFields,
+    Union,
 )
 
 
@@ -217,3 +218,11 @@ class BulkCreateTests(TestCase):
         self.assertEqual(Country.objects.get(pk=countries[1].pk), countries[1])
         self.assertEqual(Country.objects.get(pk=countries[2].pk), countries[2])
         self.assertEqual(Country.objects.get(pk=countries[3].pk), countries[3])
+
+    @skipUnlessDBFeature('can_return_ids_from_bulk_insert')
+    def test_set_pk_and_allow_creating_related(self):
+        union_eu = Union.objects.create(name='EU')
+        country_nl = Country(name='Netherlands', iso_two_letter='NL')
+        with self.assertNumQueries(1):
+            Country.objects.bulk_create([country_nl])
+        union_eu.countries.add(country_nl)

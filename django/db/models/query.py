@@ -454,6 +454,8 @@ class QuerySet(object):
                         assert len(ids) == len(objs_without_pk)
                     for i in range(len(ids)):
                         objs_without_pk[i].pk = ids[i]
+                        objs_without_pk[i]._state.adding = False
+                        objs_without_pk[i]._state.db = self.db
 
         return objs
 
