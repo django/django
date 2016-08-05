@@ -6,6 +6,7 @@ from django.apps import apps
 from django.db.models.signals import post_save, post_delete
 
 from ..channel import Group
+from ..auth import channel_session, channel_session_user
 
 
 class BindingMetaclass(type):
@@ -61,6 +62,10 @@ class Binding(object):
     # if you want to really send all fields, use fields = ['__all__']
 
     fields = None
+
+    # Decorators
+    channel_session_user = True
+    channel_session = False
 
     @classmethod
     def register(cls):
@@ -158,7 +163,23 @@ class Binding(object):
         # Run incoming action
         self.run_action(self.action, self.pk, self.data)
 
-    consumer = trigger_inbound
+    @classmethod
+    def get_handler(cls):
+        """
+        Adds decorators to trigger_inbound.
+        """
+        handler = cls.trigger_inbound
+        if cls.channel_session_user:
+            return channel_session_user(handler)
+        elif cls.channel_session:
+            return channel_session(handler)
+        else:
+            return handler
+
+    @classmethod
+    def consumer(cls, message, **kwargs):
+        handler = cls.get_handler()
+        handler(message, **kwargs)
 
     def deserialize(self, message):
         """

@@ -5,6 +5,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from .base import Binding
 from ..generic.websockets import WebsocketDemultiplexer
+from ..sessions import enforce_ordering
 
 
 class WebsocketBinding(Binding):
@@ -32,6 +33,10 @@ class WebsocketBinding(Binding):
 
     stream = None
 
+    # Decorators
+    strict_ordering = False
+    slight_ordering = False
+
     # Outbound
     @classmethod
     def encode(cls, stream, payload):
@@ -58,6 +63,20 @@ class WebsocketBinding(Binding):
         return json.loads(data)[0]['fields']
 
     # Inbound
+    @classmethod
+    def get_handler(cls):
+        """
+        Adds decorators to trigger_inbound.
+        """
+        # Get super-handler
+        handler = super(WebsocketBinding, cls).get_handler()
+        # Ordering decorators
+        if cls.strict_ordering:
+            return enforce_ordering(handler, slight=False)
+        elif cls.slight_ordering:
+            return enforce_ordering(handler, slight=True)
+        else:
+            return handler
 
     def deserialize(self, message):
         """
