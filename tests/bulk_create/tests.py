@@ -217,3 +217,16 @@ class BulkCreateTests(TestCase):
         self.assertEqual(Country.objects.get(pk=countries[1].pk), countries[1])
         self.assertEqual(Country.objects.get(pk=countries[2].pk), countries[2])
         self.assertEqual(Country.objects.get(pk=countries[3].pk), countries[3])
+
+    @skipUnlessDBFeature('can_return_ids_from_bulk_insert')
+    def test_set_state(self):
+        country_nl = Country(name='Netherlands', iso_two_letter='NL')
+        country_be = Country(name='Belgium', iso_two_letter='BE')
+
+        # Save `country_nl` using `bulk_create`, but `country_be` using `save`.
+        Country.objects.bulk_create([country_nl])
+        country_be.save()
+
+        # Check that both countries have equal state.
+        self.assertEqual(country_nl._state.adding, country_be._state.adding)
+        self.assertEqual(country_nl._state.db, country_be._state.db)

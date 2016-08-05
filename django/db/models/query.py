@@ -452,8 +452,10 @@ class QuerySet(object):
                     ids = self._batched_insert(objs_without_pk, fields, batch_size)
                     if connection.features.can_return_ids_from_bulk_insert:
                         assert len(ids) == len(objs_without_pk)
-                    for i in range(len(ids)):
-                        objs_without_pk[i].pk = ids[i]
+                    for obj_without_pk, pk in zip(objs_without_pk, ids):
+                        obj_without_pk.pk = pk
+                        obj_without_pk._state.adding = False
+                        obj_without_pk._state.db = self.db
 
         return objs
 

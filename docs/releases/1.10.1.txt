@@ -29,3 +29,8 @@ Bugfixes
 
 * Fixed the ``isnull`` lookup on a ``ForeignKey`` with its ``to_field``
   pointing to a ``CharField`` (:ticket:`26983`).
+
+* Made `bulk_create()` properly initialize model instances on backends such as
+  PostgreSQL that support returning the IDs of the newly created records so
+  that many-to-many relationships can be used on the new objects
+  (:ticket:`27026`).
