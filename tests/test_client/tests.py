@@ -532,11 +532,29 @@ class ClientTest(TestCase):
 
         # Log in
         self.client.force_login(self.u1, backend='test_client.auth_backends.TestClientBackend')
+        self.assertEqual(self.u1.backend, 'test_client.auth_backends.TestClientBackend')
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            'django.contrib.auth.backends.ModelBackend',
+            'test_client.auth_backends.TestClientBackend',
+        ],
+    )
+    def test_force_login_without_backend(self):
+        """
+        force_login() without passing a backend and with multiple backends
+        configured should automatically use the first backend.
+        """
+        self.client.force_login(self.u1)
+        response = self.client.get('/login_protected_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+        self.assertEqual(self.u1.backend, 'django.contrib.auth.backends.ModelBackend')
 
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):

@@ -33,3 +33,7 @@ Bugfixes
 * Prevented the ``migrate`` command from raising
   ``InconsistentMigrationHistory`` in the presence of unapplied squashed
   migrations (:ticket:`27004`).
+
+* Fixed a regression in ``Client.force_login()`` which required specifying a
+  ``backend`` rather than automatically using the first one if multiple
+  backends are configured (:ticket:`27027`).
