@@ -21,7 +21,7 @@ def setup_logger(name, verbosity=1):
         logger.setLevel(logging.DEBUG)
 
     # Set up daphne protocol loggers
-    for module in ["daphne.ws_protocol", "daphne.http_protocol"]:
+    for module in ["daphne.ws_protocol", "daphne.http_protocol", "daphne.server"]:
         daphne_logger = logging.getLogger(module)
         daphne_logger.addHandler(handler)
         daphne_logger.setLevel(
