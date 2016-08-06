@@ -46,7 +46,7 @@ class BaseGeometryWidget(Widget):
     def render(self, name, value, attrs=None):
         # If a string reaches here (via a validation error on another
         # field) then just reconstruct the Geometry.
-        if isinstance(value, six.string_types):
+        if value and isinstance(value, six.string_types):
             value = self.deserialize(value)
 
         if value:
