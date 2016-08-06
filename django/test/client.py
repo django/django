@@ -626,6 +626,8 @@ class Client(RequestFactory):
             return False
 
     def force_login(self, user, backend=None):
+        if backend is None:
+            backend = settings.AUTHENTICATION_BACKENDS[0]
         self._login(user, backend)
 
     def _login(self, user, backend=None):
