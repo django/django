@@ -1333,7 +1333,8 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
         self.assertOperationAttributes(
-            changes, "testapp", 0, 0, name="AuthorProxy", options={"proxy": True, "indexes": []}
+            changes, "testapp", 0, 0,
+            name="AuthorProxy", options={"proxy": True, "indexes": [], "unique_together": set()}
         )
         # Now, we test turning a proxy model into a non-proxy model
         # It should delete the proxy then make the real one
