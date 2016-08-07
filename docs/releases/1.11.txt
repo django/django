@@ -364,6 +364,9 @@ Miscellaneous
   :meth:`~django.db.models.fields.related.RelatedManager.set` now
   clear the ``prefetch_related()`` cache.
 
+* The :djadmin:`makemessages` command now requires configured settings, like
+  most other commands.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

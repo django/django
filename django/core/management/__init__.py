@@ -308,8 +308,7 @@ class ManagementUtility(object):
 
         no_settings_commands = [
             'help', 'version', '--help', '--version', '-h',
-            'compilemessages', 'makemessages',
-            'startapp', 'startproject',
+            'startapp', 'startproject', 'compilemessages',
         ]
 
         try:
