@@ -374,6 +374,9 @@ Miscellaneous
   called a second time before calling
   :func:`~django.test.utils.teardown_test_environment`.
 
+* The :djadmin:`makemessages` command now requires configured settings, like
+  most other commands.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
