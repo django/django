@@ -487,6 +487,7 @@ class ModelAdmin(BaseModelAdmin):
     list_per_page = 100
     list_max_show_all = 200
     list_editable = ()
+    changelist_class = None
     search_fields = ()
     date_hierarchy = None
     save_as = False
@@ -651,7 +652,7 @@ class ModelAdmin(BaseModelAdmin):
         Returns the ChangeList class for use on the changelist page.
         """
         from django.contrib.admin.views.main import ChangeList
-        return ChangeList
+        return self.changelist_class or ChangeList
 
     def get_object(self, request, object_id, from_field=None):
         """

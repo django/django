@@ -150,6 +150,10 @@ class RowLevelChangePermissionModelAdmin(admin.ModelAdmin):
         return request.user.is_staff and (obj is not None) and (obj.id % 2 == 0)
 
 
+class CustomChangeList(ChangeList):
+    pass
+
+
 class CustomArticleAdmin(admin.ModelAdmin):
     """
     Tests various hooks for using custom templates and contexts.
@@ -160,6 +164,7 @@ class CustomArticleAdmin(admin.ModelAdmin):
     object_history_template = 'custom_admin/object_history.html'
     delete_confirmation_template = 'custom_admin/delete_confirmation.html'
     delete_selected_confirmation_template = 'custom_admin/delete_selected_confirmation.html'
+    changelist_class = CustomChangeList
 
     def changelist_view(self, request):
         "Test that extra_context works"

@@ -1301,6 +1301,10 @@ templates used by the :class:`ModelAdmin` views:
 
     Path to a custom template, used by :meth:`changelist_view`.
 
+.. attribute:: ModelAdmin.changelist_class
+
+    Classname of changelist class, for override class that render result_list in ModelAdmin.change_list_template.
+
 .. attribute:: ModelAdmin.delete_confirmation_template
 
     Path to a custom template, used by :meth:`delete_view` for displaying a
