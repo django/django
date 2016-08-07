@@ -375,11 +375,11 @@ def _sqlite_date_trunc(lookup_type, dt):
 
 
 def _sqlite_time_trunc(lookup_type, dt):
-    if dt is None:
-        return None
     try:
         dt = backend_utils.typecast_time(dt)
     except (ValueError, TypeError):
+        return None
+    if dt is None:
         return None
     if lookup_type == 'hour':
         return "%02i:00:00" % dt.hour
