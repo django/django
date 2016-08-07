@@ -486,7 +486,6 @@ class DateFunctionTests(TestCase):
             ).values_list('extracted', flat=True).get()
         )
 
-
     def test_trunc_month_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
         end_datetime = truncate_to(microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123)), 'month')
@@ -556,7 +555,6 @@ class DateFunctionTests(TestCase):
                 extracted=TruncDate('start_date')
             ).values_list('extracted', flat=True).get()
         )
-
 
     def test_trunc_time_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
